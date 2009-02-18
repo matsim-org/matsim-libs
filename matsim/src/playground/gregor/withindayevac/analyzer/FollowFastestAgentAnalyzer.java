@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 

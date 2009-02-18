@@ -26,8 +26,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPopulationImpl;
-import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.misc.Counter;
 

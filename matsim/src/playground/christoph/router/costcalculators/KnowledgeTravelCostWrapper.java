@@ -3,7 +3,7 @@ package playground.christoph.router.costcalculators;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.router.util.TravelCost;

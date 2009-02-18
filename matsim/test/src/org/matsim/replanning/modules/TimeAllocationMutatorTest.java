@@ -20,9 +20,9 @@
 
 package org.matsim.replanning.modules;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

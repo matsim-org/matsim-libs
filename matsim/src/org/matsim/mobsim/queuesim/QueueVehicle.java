@@ -20,8 +20,8 @@
 
 package org.matsim.mobsim.queuesim;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.utils.vis.netvis.DrawableAgentI;

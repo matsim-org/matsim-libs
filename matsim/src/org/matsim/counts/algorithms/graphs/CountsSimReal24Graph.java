@@ -42,11 +42,11 @@ import org.jfree.chart.urls.CustomXYURLGenerator;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.basic.v01.Id;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.CountSimComparisonLinkFilter;
 import org.matsim.counts.algorithms.graphs.helper.Comp;
 import org.matsim.counts.algorithms.graphs.helper.MyComparator;
+import org.matsim.interfaces.basic.v01.Id;
 
 public class CountsSimReal24Graph extends CountsGraph{
 

@@ -31,8 +31,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.OpeningTime;
-import org.matsim.interfaces.basic.v01.BasicHousehold;
+import org.matsim.interfaces.basic.v01.BasicAct;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.interfaces.basic.v01.BasicPerson;
+import org.matsim.interfaces.basic.v01.BasicPlan;
+import org.matsim.interfaces.basic.v01.BasicPopulation;
+import org.matsim.basic.v01.BasicPopulationBuilder;
+import org.matsim.interfaces.basic.v01.BasicRoute;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Knowledge;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationReader;
@@ -50,7 +57,7 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 	private static final Logger log = Logger
 			.getLogger(BasicPopulationReaderV5.class);
 	
-	private PopulationBuilder populationBuilder;
+	private BasicPopulationBuilder populationBuilder;
 
 	private BasicPerson currentPerson;
 
@@ -108,12 +115,12 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 	}
 		
   public BasicPopulationReaderV5(BasicPopulation pop, Map<Id, BasicHousehold> households) {
-  	this.populationBuilder = new BasicPopulationBuilder(pop);
+  	this.populationBuilder = new BasicPopulationBuilderImpl(pop);
   	this.householdBuilder = new BasicHouseholdBuilder(households);
   	this.households = households;
   }
 	
-  protected void setPopulationBuilder(PopulationBuilder populationBuilder) {
+  protected void setPopulationBuilder(BasicPopulationBuilder populationBuilder) {
   	this.populationBuilder = populationBuilder;
   }
   

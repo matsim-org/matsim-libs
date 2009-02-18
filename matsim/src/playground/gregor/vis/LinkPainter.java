@@ -23,10 +23,10 @@ package playground.gregor.vis;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicLink;
-import org.matsim.interfaces.basic.v01.BasicNet;
+import org.matsim.interfaces.basic.v01.BasicNetwork;
 import org.matsim.interfaces.basic.v01.BasicNode;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 
 /**
@@ -41,7 +41,7 @@ public class LinkPainter extends DisplayNetStateWriter {
 	private HashMap<Id,NodeAttribute> nodeData = new HashMap<Id,NodeAttribute>();
 
 
-	public LinkPainter(final BasicNet network, final String networkFileName,
+	public LinkPainter(final BasicNetwork network, final String networkFileName,
     		final String filePrefix, final int timeStepLength_s, final int bufferSize) {
         super(network, networkFileName, filePrefix, timeStepLength_s, bufferSize);
     }

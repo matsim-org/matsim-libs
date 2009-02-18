@@ -22,12 +22,12 @@ package org.matsim.integration.population.routes;
 
 import java.util.Collection;
 
-import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.BasicRoute;
 import org.matsim.config.Config;
 import org.matsim.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicRoute;
 import org.matsim.network.NetworkFactory;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;

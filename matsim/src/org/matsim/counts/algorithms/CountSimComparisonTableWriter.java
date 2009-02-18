@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.counts.CountSimComparison;
+import org.matsim.interfaces.basic.v01.Id;
 
 /**
  * This class can write a List of CountSimComparison Objects to a simple table

@@ -23,8 +23,8 @@
  */
 package playground.johannes.mobsim;
 
-import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 
 /**

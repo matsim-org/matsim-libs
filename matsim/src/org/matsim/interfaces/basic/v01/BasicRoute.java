@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicAct.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.basic.v01;
+package org.matsim.interfaces.basic.v01;
 
 import java.util.List;
 
-import org.matsim.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.basic.v01.BasicLocation;
 
 /**
- * @author dgrether
- */
-public interface PopulationBuilder {
+* @author dgrether
+*/
+public interface BasicRoute {
 
-	BasicPerson createPerson(Id id) throws Exception;
+	public double getDist();
 
-	BasicPlan createPlan(BasicPerson currentPerson);
+	public void setDist(final double dist);
 
-	BasicAct createAct(BasicPlan basicPlan, String currentActType, BasicLocation currentlocation);
+	public double getTravelTime();
 
-	BasicLeg createLeg(BasicPlan basicPlan, Mode legMode);
+	public void setTravelTime(final double travelTime);
 
-	/**
-	 * Creates a new Route object
-	 * @param currentRouteLinkIds List of Ids including the start and the end Link Id of the route's links
-	 * @return a BasicRoute Object with the links set accordingly
-	 */
-	BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
+	public List<Id> getLinkIds();
 
-	BasicPlan createPlan(BasicPerson person, boolean selected);
+//	public void setStartLinkId(final Id linkId);
 
-	BasicActivity createActivity(String type, BasicLocation currentlocation);
+	public Id getStartLinkId();
 
-	BasicKnowledge createKnowledge(List<BasicActivity> currentActivities);
+//	public void setEndLinkId(final Id linkId);
+
+	public Id getEndLinkId();
 
 }

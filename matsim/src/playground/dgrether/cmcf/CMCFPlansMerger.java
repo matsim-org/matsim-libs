@@ -19,8 +19,8 @@
 package playground.dgrether.cmcf;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;

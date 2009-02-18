@@ -43,7 +43,7 @@ import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLink;
-import org.matsim.interfaces.basic.v01.BasicNet;
+import org.matsim.interfaces.basic.v01.BasicNetwork;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
@@ -468,7 +468,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 
 	private class NetStateWriter extends DisplayNetStateWriter implements SnapshotWriter {
 
-		public NetStateWriter(final BasicNet network, final String networkFileName,
+		public NetStateWriter(final BasicNetwork network, final String networkFileName,
 				final VisConfig visConfig, final String filePrefix, final int timeStepLength_s, final int bufferSize) {
 			super(network, networkFileName, visConfig, filePrefix, timeStepLength_s, bufferSize);
 		}

@@ -1,8 +1,8 @@
 package org.matsim.config.groups;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.Module;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;

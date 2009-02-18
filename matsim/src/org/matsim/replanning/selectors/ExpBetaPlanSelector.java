@@ -20,9 +20,9 @@
 
 package org.matsim.replanning.selectors;
 
-import org.matsim.basic.v01.BasicPlan;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 

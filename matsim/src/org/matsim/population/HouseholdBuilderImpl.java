@@ -22,13 +22,13 @@ package org.matsim.population;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.basic.v01.BasicHousehold;
 import org.matsim.basic.v01.HouseholdBuilder;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.LocationType;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.interfaces.basic.v01.BasicHousehold;
 import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.interfaces.basic.v01.Id;
 
 /**
  * @author dgrether

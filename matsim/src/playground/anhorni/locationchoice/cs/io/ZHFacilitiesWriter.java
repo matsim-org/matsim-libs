@@ -12,7 +12,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileWriter;

@@ -23,13 +23,13 @@ package org.matsim.integration.timevariantnetworks;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkChangeEvent;

@@ -19,7 +19,6 @@
 
 package org.matsim.basic.v01;
 
-import org.matsim.interfaces.basic.v01.BasicIncome;
 
 /**
  * @author dgrether

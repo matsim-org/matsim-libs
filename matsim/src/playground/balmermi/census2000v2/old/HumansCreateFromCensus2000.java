@@ -25,9 +25,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 
 import playground.balmermi.census2000v2.data.Household;
 import playground.balmermi.census2000v2.data.Households;

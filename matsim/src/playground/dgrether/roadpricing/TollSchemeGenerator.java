@@ -36,12 +36,12 @@ import net.opengis.kml._2.PolygonType;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.MatsimConfigReader;
 import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.KmlNetworkWriter;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;

@@ -22,7 +22,7 @@ package playground.marcel.kti.router;
 
 import java.util.List;
 
-import org.matsim.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.network.NetworkLayer;

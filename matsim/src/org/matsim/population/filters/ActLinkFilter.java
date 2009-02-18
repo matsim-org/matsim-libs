@@ -24,8 +24,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Act;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;

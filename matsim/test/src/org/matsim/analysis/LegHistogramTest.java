@@ -22,10 +22,10 @@ package org.matsim.analysis;
 
 import java.util.Set;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

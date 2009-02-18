@@ -10,7 +10,7 @@ import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 
 import playground.andreas.intersection.QControler;

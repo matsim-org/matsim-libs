@@ -22,10 +22,10 @@ package org.matsim.population.algorithms;
 
 import java.util.ArrayList;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;

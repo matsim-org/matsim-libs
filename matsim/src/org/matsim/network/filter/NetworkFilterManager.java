@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.BasicNet;
+import org.matsim.interfaces.basic.v01.BasicNetwork;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -40,13 +40,13 @@ public class NetworkFilterManager {
 	private static final Logger log = Logger
 			.getLogger(NetworkFilterManager.class);
 	
-	private final BasicNet<Node, Link> network;
+	private final BasicNetwork<Node, Link> network;
 	
 	private List<NetworkLinkFilter> linkFilters;
 	
 	private List<NetworkNodeFilter> nodeFilters;
 	
-	public NetworkFilterManager(final BasicNet<Node, Link> net) {
+	public NetworkFilterManager(final BasicNetwork<Node, Link> net) {
 		this.network = net;
 		this.linkFilters = new ArrayList<NetworkLinkFilter>();
 		this.nodeFilters = new ArrayList<NetworkNodeFilter>();
@@ -64,11 +64,11 @@ public class NetworkFilterManager {
 	 * Call this method to filter the network.
 	 * @return
 	 */
-	public BasicNet<Node, Link> applyFilters() {
+	public BasicNetwork<Node, Link> applyFilters() {
 		log.info("applying filters to network...");
 		int nodeCount = 0;
 		int linkCount = 0;
-		BasicNet<Node, Link> net = new NetworkLayer();
+		BasicNetwork<Node, Link> net = new NetworkLayer();
 		if (!this.nodeFilters.isEmpty()) {
 			for (Node n : this.network.getNodes().values()) {
 				boolean add = true;

@@ -23,7 +23,7 @@ package org.matsim.mobsim.queuesim;
 import java.util.Collection;
 
 import org.matsim.interfaces.basic.v01.BasicLink;
-import org.matsim.interfaces.basic.v01.BasicNet;
+import org.matsim.interfaces.basic.v01.BasicNetwork;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.VisConfig;
 
@@ -44,7 +44,7 @@ public class QueueNetStateWriter extends DisplayNetStateWriter {
         return qlink.getVisData().getDrawableCollection();
     }
 
-    public QueueNetStateWriter(final QueueNetwork queueNetwork, final BasicNet network, final String networkFileName,
+    public QueueNetStateWriter(final QueueNetwork queueNetwork, final BasicNetwork network, final String networkFileName,
     		final VisConfig visConfig, final String filePrefix, final int timeStepLength_s, final int bufferSize) {
         super(network, networkFileName, visConfig, filePrefix, timeStepLength_s, bufferSize);
         this.queueNetwork = queueNetwork;

@@ -2,8 +2,8 @@ package org.matsim.world;
 
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.geometry.Coord;
 
 public interface Location extends BasicLocation {

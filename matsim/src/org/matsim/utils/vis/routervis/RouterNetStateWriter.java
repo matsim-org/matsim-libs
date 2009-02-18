@@ -22,9 +22,9 @@ package org.matsim.utils.vis.routervis;
 
 import java.util.HashMap;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicLink;
-import org.matsim.interfaces.basic.v01.BasicNet;
+import org.matsim.interfaces.basic.v01.BasicNetwork;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.VisConfig;
 
@@ -36,7 +36,7 @@ public class RouterNetStateWriter extends DisplayNetStateWriter {
 	//holds the information of the links explored so far
 	private HashMap<Id,LinkAttribute> linkStates;
 
-	public RouterNetStateWriter(BasicNet network, String networkFileName, VisConfig visConfig, String filePrefix, int timeStepLength_s, int bufferSize) {
+	public RouterNetStateWriter(BasicNetwork network, String networkFileName, VisConfig visConfig, String filePrefix, int timeStepLength_s, int bufferSize) {
 		super(network,networkFileName,visConfig,filePrefix,timeStepLength_s,bufferSize);
 
 		this.linkStates = new HashMap<Id,LinkAttribute>();

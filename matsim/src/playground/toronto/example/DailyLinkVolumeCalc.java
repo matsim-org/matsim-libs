@@ -22,10 +22,10 @@ package playground.toronto.example;
 
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.interfaces.basic.v01.Id;
 
 // a simple example how to implement an eventsHandler
 // More eventsHandler can be found under org.matsim.events.*

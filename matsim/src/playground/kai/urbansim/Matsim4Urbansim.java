@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.util.*;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.controler.ScenarioData;
@@ -16,6 +14,8 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;

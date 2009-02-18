@@ -27,16 +27,16 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.BasicNet;
+import org.matsim.interfaces.basic.v01.BasicNetwork;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Layer;
 
-public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
+public class NetworkLayer extends Layer implements BasicNetwork<Node, Link> {
 
 	// ////////////////////////////////////////////////////////////////////
 	// member variables

@@ -21,7 +21,7 @@
 package org.matsim.population.routes;
 
 import org.matsim.basic.v01.BasicRouteImpl;
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 
 /**

@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.basic.signalsystems.control.SignalSystemControler;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Id;
 
 /**
  * @author dgrether

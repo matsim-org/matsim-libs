@@ -25,10 +25,10 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;

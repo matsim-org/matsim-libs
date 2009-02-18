@@ -23,8 +23,6 @@ package org.matsim.scoring;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicPlan;
-import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentMoneyEvent;
@@ -34,6 +32,8 @@ import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicPlan;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 

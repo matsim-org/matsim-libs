@@ -23,8 +23,8 @@ package org.matsim.roadpricing;
 import junit.framework.TestCase;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.events.Events;
+import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;

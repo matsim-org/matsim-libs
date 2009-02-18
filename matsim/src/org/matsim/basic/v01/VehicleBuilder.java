@@ -1,6 +1,7 @@
 package org.matsim.basic.v01;
 
 import org.matsim.basic.v01.BasicEngineInformation.FuelType;
+import org.matsim.interfaces.basic.v01.Id;
 
 public interface VehicleBuilder {
 

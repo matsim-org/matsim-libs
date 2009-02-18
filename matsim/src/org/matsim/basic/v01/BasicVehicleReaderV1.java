@@ -26,6 +26,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.BasicEngineInformation.FuelType;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

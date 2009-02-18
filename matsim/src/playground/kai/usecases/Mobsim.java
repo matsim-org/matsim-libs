@@ -12,7 +12,7 @@ import org.matsim.utils.geometry.Coord;
 public class Mobsim {
 	private static final Logger log = Logger.getLogger(Mobsim.class);
 	
-	public Mobsim( BasicNet<BasicNode, BasicLink> net , BasicPopulation<BasicPerson> pop , Events eve ) {
+	public Mobsim( BasicNetwork<BasicNode, BasicLink> net , BasicPopulation<BasicPerson> pop , Events eve ) {
 		// TODO All the events stuff is not behind interfaces ...
 		
 		// for network, pop see MentalModule ...

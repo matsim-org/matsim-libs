@@ -22,11 +22,11 @@ package org.matsim.run;
 
 import java.io.File;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;

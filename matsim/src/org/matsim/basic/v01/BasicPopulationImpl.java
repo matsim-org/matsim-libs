@@ -23,6 +23,10 @@ package org.matsim.basic.v01;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.interfaces.basic.v01.BasicPerson;
+import org.matsim.interfaces.basic.v01.BasicPopulation;
+import org.matsim.interfaces.basic.v01.Id;
+
 
 public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulation<T> {
 	
@@ -31,7 +35,7 @@ public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulat
 	private Map<Id, T> persons = new TreeMap<Id, T>();
 
 	/**
-	 * @see org.matsim.basic.v01.BasicPopulation#addPerson(T)
+	 * @see org.matsim.interfaces.basic.v01.BasicPopulation#addPerson(T)
 	 */
 	public void addPerson(T person) {
 		// validation

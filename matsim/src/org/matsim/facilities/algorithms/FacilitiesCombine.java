@@ -25,10 +25,10 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicOpeningTime;
-import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.world.Location;
 
 public class FacilitiesCombine {

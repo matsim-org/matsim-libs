@@ -34,12 +34,12 @@ import net.opengis.kml._2.ScreenOverlayType;
 import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicAct;
-import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicAct;
+import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.KmlNetworkWriter;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;

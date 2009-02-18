@@ -3,7 +3,7 @@ package playground.yu.visum.filter.finalFilters;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Person;
 
 import playground.yu.visum.filter.PersonFilterA;

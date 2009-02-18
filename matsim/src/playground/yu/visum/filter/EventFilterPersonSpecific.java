@@ -6,10 +6,10 @@ package playground.yu.visum.filter;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.PersonEvent;
+import org.matsim.interfaces.basic.v01.Id;
 
 /**
  * A EventFilterPersonSpecific lets the events, whose agentId belong to the

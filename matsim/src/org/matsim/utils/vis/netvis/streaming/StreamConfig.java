@@ -25,7 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import org.matsim.interfaces.basic.v01.BasicNet;
+import org.matsim.interfaces.basic.v01.BasicNetwork;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.config.ConfigModuleI;
 import org.matsim.utils.vis.netvis.config.GeneralConfig;
@@ -50,7 +50,7 @@ public class StreamConfig {
 
     // -------------------- MEMBER VARIABLES --------------------
 
-    private final BasicNet network;
+    private final BasicNetwork network;
 
     private final String filePrefix;
 
@@ -58,7 +58,7 @@ public class StreamConfig {
 
     // -------------------- CONSTRUCTION --------------------
 
-    StreamConfig(BasicNet network, String filePrefix, String fileSuffix,
+    StreamConfig(BasicNetwork network, String filePrefix, String fileSuffix,
             boolean compress) {
         this.network = network;
         this.filePrefix = filePrefix;
@@ -67,7 +67,7 @@ public class StreamConfig {
 
     // -------------------- (PACKAGE) PRIVATE GETTERS --------------------
 
-    BasicNet getNetwork() {
+    BasicNetwork getNetwork() {
         return network;
     }
 

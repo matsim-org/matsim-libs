@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
@@ -35,6 +34,7 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.PopulationWriterV5;

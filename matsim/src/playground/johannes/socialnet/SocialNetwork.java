@@ -29,9 +29,9 @@ import java.util.Set;
 
 import org.matsim.basic.v01.BasicActivity;
 import org.matsim.basic.v01.BasicKnowledge;
-import org.matsim.basic.v01.BasicPerson;
-import org.matsim.basic.v01.BasicPlan;
-import org.matsim.basic.v01.BasicPopulation;
+import org.matsim.interfaces.basic.v01.BasicPerson;
+import org.matsim.interfaces.basic.v01.BasicPlan;
+import org.matsim.interfaces.basic.v01.BasicPopulation;
 
 import playground.johannes.graph.AbstractSparseGraph;
 import playground.johannes.graph.SparseVertex;

@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.events.AgentReplanEvent;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.mobsim.queuesim.PersonAgent;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;

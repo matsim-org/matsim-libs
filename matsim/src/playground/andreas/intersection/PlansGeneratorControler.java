@@ -23,11 +23,11 @@ package playground.andreas.intersection;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Person;

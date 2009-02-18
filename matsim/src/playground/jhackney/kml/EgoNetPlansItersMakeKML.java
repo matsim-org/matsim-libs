@@ -47,10 +47,10 @@ import net.opengis.kml._2.TimeSpanType;
 import net.opengis.kml._2.TimeStampType;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.config.Config;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

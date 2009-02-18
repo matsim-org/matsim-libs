@@ -7,9 +7,10 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
+import org.matsim.interfaces.basic.v01.Id;
+
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.SpanningTree;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;

@@ -28,11 +28,11 @@ import java.util.LinkedList;
 //import java.util.Map;
 
 // matsim imports
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.*;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 //import org.matsim.utils.identifiers.IdI;
-import org.matsim.basic.v01.Id;
 
 // other imports
 import playground.dressler.Intervall.src.Intervalls.*;

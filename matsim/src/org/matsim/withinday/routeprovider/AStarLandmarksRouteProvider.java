@@ -20,7 +20,7 @@
 
 package org.matsim.withinday.routeprovider;
 
-import org.matsim.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.CarRoute;

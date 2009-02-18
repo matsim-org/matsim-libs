@@ -20,12 +20,12 @@
 
 package org.matsim.scoring;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.config.Config;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

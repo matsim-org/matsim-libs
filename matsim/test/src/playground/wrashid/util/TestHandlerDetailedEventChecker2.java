@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
@@ -26,6 +25,7 @@ import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.mobsim.jdeqsim.JDEQSimStarterWithoutController;
 import org.matsim.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.mobsim.jdeqsim.util.DummyPopulationModifier;

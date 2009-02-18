@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.basic.v01.BasicAct;
+import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPlan;
 
 /**
  * @author david

@@ -23,7 +23,7 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.matsim.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;

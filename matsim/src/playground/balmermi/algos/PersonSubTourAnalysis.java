@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;

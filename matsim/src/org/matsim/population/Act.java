@@ -21,9 +21,9 @@
 package org.matsim.population;
 
 import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.BasicLink;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;

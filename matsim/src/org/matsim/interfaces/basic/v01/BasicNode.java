@@ -22,7 +22,6 @@ package org.matsim.interfaces.basic.v01;
 
 import java.util.Map;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.utils.geometry.Coord;
 
 /**

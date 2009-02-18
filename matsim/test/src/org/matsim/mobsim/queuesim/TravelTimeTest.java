@@ -22,7 +22,6 @@ package org.matsim.mobsim.queuesim;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
@@ -31,6 +30,7 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.basic.v01.BasicPerson;
+import org.matsim.interfaces.basic.v01.BasicPlan;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Desires;
 
 // TODO [balmermi]: need discussion about 'extends CustomizableImpl'
@@ -59,7 +62,7 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T, Basi
 	}
 
 	/**
-	 * @see org.matsim.basic.v01.BasicPerson#addPlan(T)
+	 * @see org.matsim.interfaces.basic.v01.BasicPerson#addPlan(T)
 	 */
 	public void addPlan(final T plan) {
 		this.plans.add(plan);

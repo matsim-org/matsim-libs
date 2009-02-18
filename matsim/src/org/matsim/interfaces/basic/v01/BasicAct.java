@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicNetI.java
+ * BasicAct.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,36 +20,42 @@
 
 package org.matsim.interfaces.basic.v01;
 
-import java.util.Map;
-
-import org.matsim.basic.v01.Id;
+import org.matsim.utils.geometry.Coord;
 
 /**
- * A topological network representation.
+ *
+ * @author dgrether
  */
-public interface BasicNet<N extends BasicNode, L extends BasicLink> {
+public interface BasicAct {
 
-    /**
-     * Connects this network in the following sense: After a call to this
-     * function, all contained nodes and links must know about all of their
-     * adjacent network elements.
-     */
-    public void connect();
+	public double getEndTime();
 
-    /**
-     * Returns a set of this network's nodes. This set might be empty, but it
-     * must not be <code>null</code>.
-     *
-     * @return a set of this network's nodes
-     */
-		public Map<Id, N> getNodes();
+	public void setEndTime(final double seconds);
 
-    /**
-     * Returns a set of this network's links. This set might be empty, but it
-     * must not be <code>null</code>.
-     *
-     * @return a set of this network's links
-     */
-    public Map<Id, L> getLinks();
+	/**
+	 * Activity type is, until further notice, defined via the config file.
+	 * 
+	 * @return
+	 */
+	public String getType();
+
+	public void setType(final String type);
+
+	public Coord getCoord();
+
+	public void setCoord(Coord coordinates);
+
+	public double getStartTime();
+
+	public void setStartTime(double seconds);
+
+	public Id getLinkId();
+
+	public Id getFacilityId();
+
+	@Deprecated
+	public double getDuration();
+	@Deprecated
+	public void setDuration(double duration);
 
 }

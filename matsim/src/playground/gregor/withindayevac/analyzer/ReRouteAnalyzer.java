@@ -23,7 +23,7 @@ package playground.gregor.withindayevac.analyzer;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.Dijkstra;

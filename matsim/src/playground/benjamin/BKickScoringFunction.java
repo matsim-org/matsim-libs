@@ -21,10 +21,10 @@ package playground.benjamin;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.population.Act;
 import org.matsim.population.ActUtilityParameters;
 import org.matsim.population.Leg;

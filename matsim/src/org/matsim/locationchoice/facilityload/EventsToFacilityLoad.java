@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.handler.ActEndEventHandler;
@@ -32,6 +31,7 @@ import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
+import org.matsim.interfaces.basic.v01.Id;
 
 /*
  * @author anhorni

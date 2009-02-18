@@ -25,11 +25,11 @@ import java.util.HashSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.evacuation.EvacuationAreaFileReader;
 import org.matsim.evacuation.EvacuationAreaLink;
 import org.matsim.evacuation.EvacuationPlansGeneratorAndNetworkTrimmer;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;

@@ -23,8 +23,8 @@ package playground.david;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.BasicPlanImpl;
+import org.matsim.interfaces.basic.v01.BasicPlan;
 
 public class CopyOfBasicPerson<P extends BasicPlanImpl> {
 	

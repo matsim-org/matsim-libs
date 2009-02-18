@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFDataSimpleAgent;
 import org.matsim.utils.vis.otfvis.data.OTFDataWriter;

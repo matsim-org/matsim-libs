@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * BasicNetI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.basic.v01;
+
+package org.matsim.interfaces.basic.v01;
 
 import java.util.Map;
 
+
 /**
-*
-* @author dgrether
-*
-*/
+ * A topological network representation.
+ */
+public interface BasicNetwork<N extends BasicNode, L extends BasicLink> {
 
-public interface BasicPopulation<T extends BasicPerson> {
-	// TODO [kai] Ich bin, wie diskutiert, für Umbenennung in "BasicPersons".
-	// Andererseits habe ich den Eindruck, dass das vielleicht eher egal ist ("Population" hat den Vorteil, dass man
-	// in den Container tendenziell auch noch andere Dinge einhängen könnte ...)
+    /**
+     * Connects this network in the following sense: After a call to this
+     * function, all contained nodes and links must know about all of their
+     * adjacent network elements.
+     */
+    public void connect();
 
-	public String getName();
-	
-	public void setName(String name);
-	
-	public void addPerson(T person);
+    /**
+     * Returns a set of this network's nodes. This set might be empty, but it
+     * must not be <code>null</code>.
+     *
+     * @return a set of this network's nodes
+     */
+		public Map<Id, N> getNodes();
 
-	public T getPerson(Id personId);
+    /**
+     * Returns a set of this network's links. This set might be empty, but it
+     * must not be <code>null</code>.
+     *
+     * @return a set of this network's links
+     */
+    public Map<Id, L> getLinks();
 
-	public Map<Id, T> getPersons();
-	
-	@Deprecated
-	public T getPerson(String personId);
 }

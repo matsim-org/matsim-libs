@@ -26,6 +26,7 @@ import java.util.Map;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.interfaces.basic.v01.BasicNode;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.geometry.Coord;
 
 public class BasicNodeImpl implements BasicNode {

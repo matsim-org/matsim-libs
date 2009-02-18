@@ -27,11 +27,11 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicPerson;
 import org.matsim.basic.v01.BasicPersonImpl;
-import org.matsim.basic.v01.BasicPlan;
-import org.matsim.basic.v01.Id;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.BasicPerson;
+import org.matsim.interfaces.basic.v01.BasicPlan;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
 /**

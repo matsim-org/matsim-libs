@@ -25,12 +25,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.mobsim.queuesim.SimulationTimer;

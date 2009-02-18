@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicAct.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,18 +20,36 @@
 
 package org.matsim.interfaces.basic.v01;
 
-/**
- * @author dgrether
- */
-public interface BasicIncome {
-	
-	public enum IncomePeriod {year, month, day, hour, second};
-	// TODO [kai] Dann gerne auch noch "week".
 
-	public String getCurrency();
+/**
+* @author dgrether
+*/
+public interface BasicLeg {
+
+	public enum Mode {miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, undefined}
+	// TODO [kai] HŠtte hier gerne noch ein "other" drin (nicht identisch mit "undefined")
+
+	public Mode getMode();
+
+	public void setMode(Mode mode);
+
+	public BasicRoute getRoute();
+
+	public void setRoute(BasicRoute route);
+
+	public double getDepartureTime();
+
+	public void setDepartureTime(final double seconds);
+
+	public double getTravelTime();
+
+	public void setTravelTime(final double seconds);
+
+	public double getArrivalTime();
+
+	public void setArrivalTime(final double seconds);
 	
-	public IncomePeriod getIncomePeriod();
-	
-  public double getIncome();	
+	// TODO [kai] WŠre "makeConsistent" dann eigentlich eine Methode, welche durch das Interface erzwungen werden sollte?
+
 
 }

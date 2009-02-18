@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * IdI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,31 +18,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.basic.v01;
+package org.matsim.interfaces.basic.v01;
 
-import java.util.List;
 
 /**
-* @author dgrether
-*/
-public interface BasicRoute {
+ * Represents a unique identifier.  This is essentially a c++ typedef, except that
+ * typedefs don't exist in Java.
+ */
+public interface Id extends Comparable<Id> {
 
-	public double getDist();
-
-	public void setDist(final double dist);
-
-	public double getTravelTime();
-
-	public void setTravelTime(final double travelTime);
-
-	public List<Id> getLinkIds();
-
-//	public void setStartLinkId(final Id linkId);
-
-	public Id getStartLinkId();
-
-//	public void setEndLinkId(final Id linkId);
-
-	public Id getEndLinkId();
+    /**
+     * This function must return a unique, non-<code>null</code> <code>String</code>
+     * representation of this identifier. For more verbose stuff,
+     * <code>toString()</code> should be used.
+     *
+     * @return a unique, non-<code>null</code> <code>String</code>-representation
+     *         of this identifier
+     */
+    public String toString();
 
 }

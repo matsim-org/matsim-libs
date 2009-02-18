@@ -18,8 +18,8 @@
  * *********************************************************************** */
 package playground.dgrether.utils;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Id;
 
 
 /**

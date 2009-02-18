@@ -28,7 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.mobsim.queuesim.PersonAgent;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueVehicle;

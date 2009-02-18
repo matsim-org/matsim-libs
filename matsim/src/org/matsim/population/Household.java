@@ -21,8 +21,8 @@ package org.matsim.population;
 
 import java.util.Map;
 
-import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicHousehold;
+import org.matsim.basic.v01.BasicHousehold;
+import org.matsim.interfaces.basic.v01.Id;
 
 /**
  * @author dgrether

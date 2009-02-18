@@ -23,21 +23,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicAct;
 import org.matsim.basic.v01.BasicActivity;
 import org.matsim.basic.v01.BasicKnowledge;
-import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.BasicPerson;
-import org.matsim.basic.v01.BasicPlan;
-import org.matsim.basic.v01.BasicRoute;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.LocationType;
-import org.matsim.basic.v01.PopulationBuilder;
-import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
+import org.matsim.interfaces.basic.v01.BasicAct;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.interfaces.basic.v01.BasicPerson;
+import org.matsim.interfaces.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPopulationBuilder;
+import org.matsim.interfaces.basic.v01.BasicRoute;
+import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.CarRoute;
@@ -46,7 +46,7 @@ import org.matsim.population.routes.LinkCarRoute;
 /**
  * @author dgrether
  */
-public class PopulationBuilderImpl implements PopulationBuilder {
+public class PopulationBuilderImpl implements BasicPopulationBuilder {
 
 	private static final Logger log = Logger
 			.getLogger(PopulationBuilderImpl.class);

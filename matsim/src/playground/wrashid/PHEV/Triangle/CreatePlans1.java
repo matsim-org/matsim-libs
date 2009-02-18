@@ -3,13 +3,13 @@ package playground.wrashid.PHEV.Triangle;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Leg;

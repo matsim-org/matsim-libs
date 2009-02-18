@@ -22,9 +22,9 @@ package org.matsim.population.filters;
 
 import java.util.HashMap;
 
-import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

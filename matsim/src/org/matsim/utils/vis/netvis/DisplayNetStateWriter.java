@@ -23,7 +23,7 @@ package org.matsim.utils.vis.netvis;
 import java.util.Collection;
 
 import org.matsim.interfaces.basic.v01.BasicLink;
-import org.matsim.interfaces.basic.v01.BasicNet;
+import org.matsim.interfaces.basic.v01.BasicNetwork;
 import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.utils.vis.netvis.config.IndexationConfig;
 import org.matsim.utils.vis.netvis.drawableNet.DrawableLinkI;
@@ -53,14 +53,14 @@ public class DisplayNetStateWriter extends StreamWriterA {
 
     // -------------------- CONSTRUCTION --------------------
 
-    public DisplayNetStateWriter(BasicNet network,
+    public DisplayNetStateWriter(BasicNetwork network,
             String networkFileName, String filePrefix,
             int timeStepLength_s, int bufferSize) {
         super(network, networkFileName, new IndexationConfig(network),
                 filePrefix, NetVis.FILE_SUFFIX, timeStepLength_s, bufferSize);
     }
 
-    public DisplayNetStateWriter(BasicNet network,
+    public DisplayNetStateWriter(BasicNetwork network,
             String networkFileName, VisConfig visConfig,
             String filePrefix, int timeStepLength_s, int bufferSize) {
         this(network, networkFileName, filePrefix, timeStepLength_s, bufferSize);

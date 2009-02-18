@@ -22,9 +22,9 @@ package org.matsim.demandmodeling;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;

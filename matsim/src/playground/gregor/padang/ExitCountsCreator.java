@@ -29,7 +29,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.counts.Count;
@@ -38,6 +37,7 @@ import org.matsim.counts.CountsWriter;
 import org.matsim.evacuation.EvacuationAreaFileReader;
 import org.matsim.evacuation.EvacuationAreaLink;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;

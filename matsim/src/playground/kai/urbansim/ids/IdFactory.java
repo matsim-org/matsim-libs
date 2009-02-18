@@ -1,6 +1,6 @@
 package playground.kai.urbansim.ids;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 
 /**
  * In the urbansim interface, there are a fair number of lookups of the type personId -> householdId -> buildingId -> parcelId.

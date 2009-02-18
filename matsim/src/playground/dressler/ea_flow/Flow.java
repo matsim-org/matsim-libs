@@ -26,13 +26,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicLegImpl;
-import org.matsim.basic.v01.BasicPopulation;
 import org.matsim.basic.v01.BasicPopulationImpl;
 import org.matsim.basic.v01.BasicRouteImpl;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPopulation;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

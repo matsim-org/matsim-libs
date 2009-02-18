@@ -23,7 +23,7 @@ package org.matsim.planomat.costestimators;
 import java.util.HashMap;
 import java.util.List;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;

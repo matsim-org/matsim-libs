@@ -22,7 +22,7 @@ package org.matsim.counts;
 
 import java.util.HashMap;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.geometry.Coord;
 
 public class Count {

@@ -9,12 +9,12 @@ import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
-import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.mobsim.queuesim.QueueVehicleDepartureTimeComparator;

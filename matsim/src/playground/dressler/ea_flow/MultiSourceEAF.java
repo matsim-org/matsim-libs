@@ -30,12 +30,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.BasicPopulation;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPopulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

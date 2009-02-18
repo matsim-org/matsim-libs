@@ -23,7 +23,6 @@ package org.matsim.events.algorithms;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
@@ -38,6 +37,7 @@ import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

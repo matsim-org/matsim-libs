@@ -6,7 +6,6 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Random;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentMoneyEvent;
@@ -19,6 +18,7 @@ import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 
 //TODO: write tests for this class

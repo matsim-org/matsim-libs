@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 

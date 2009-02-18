@@ -32,7 +32,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.BasicLink;
-import org.matsim.interfaces.basic.v01.BasicNet;
+import org.matsim.interfaces.basic.v01.BasicNetwork;
 import org.matsim.interfaces.basic.v01.BasicNode;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
@@ -82,7 +82,7 @@ public class IndexationConfig extends DefaultHandler {
 
 	// -------------------- MEMBER VARIABLES --------------------
 
-	private BasicNet<BasicNode, BasicLink> network; // only for xml parsing
+	private BasicNetwork<BasicNode, BasicLink> network; // only for xml parsing
 
 	private List<BasicNode> nodes;
 
@@ -105,7 +105,7 @@ public class IndexationConfig extends DefaultHandler {
 	 * @param network
 	 * @param fileName
 	 */
-	public IndexationConfig(BasicNet<BasicNode, BasicLink> network, String fileName) {
+	public IndexationConfig(BasicNetwork<BasicNode, BasicLink> network, String fileName) {
 		this.network = network;
 		read(fileName);
 		this.network = null;
@@ -116,7 +116,7 @@ public class IndexationConfig extends DefaultHandler {
 	 * <code>network</code>.
 	 * @param network
 	 */
-	public IndexationConfig(BasicNet<BasicNode, BasicLink> network) {
+	public IndexationConfig(BasicNetwork<BasicNode, BasicLink> network) {
 		createNodeIndices(new ArrayList<BasicNode>(network.getNodes().values()));
 		createLinkIndices(new ArrayList<BasicLink>(network.getLinks().values()));
 	}

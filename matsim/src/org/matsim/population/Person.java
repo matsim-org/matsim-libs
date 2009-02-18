@@ -19,7 +19,7 @@
 
 package org.matsim.population;
 
-import org.matsim.basic.v01.BasicPerson;
+import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.utils.customize.Customizable;
 
 /**

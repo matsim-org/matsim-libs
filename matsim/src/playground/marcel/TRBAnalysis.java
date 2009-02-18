@@ -22,7 +22,6 @@ package playground.marcel;
 
 import java.util.HashMap;
 
-import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
@@ -33,6 +32,7 @@ import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;

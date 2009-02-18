@@ -23,8 +23,8 @@ package playground.christoph.knowledge;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

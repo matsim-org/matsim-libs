@@ -22,7 +22,7 @@ package playground.gregor.snapshots.writers;
 
 import java.util.Map.Entry;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 

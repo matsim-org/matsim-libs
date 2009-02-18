@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentArrivalEvent;
@@ -39,6 +38,7 @@ import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.interfaces.basic.v01.Id;
 
 /**
  * Sets the correct leg-number in events. For each agent, a counter is increased with every departure event, starting with 0 at the first departure event.

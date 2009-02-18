@@ -26,8 +26,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;

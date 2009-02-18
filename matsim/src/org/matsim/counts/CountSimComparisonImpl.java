@@ -20,7 +20,7 @@
 
 package org.matsim.counts;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 
 /**
  * Implementation of the CountSimComparison Interface.

@@ -27,18 +27,18 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.BasicActivity;
 import org.matsim.basic.v01.BasicKnowledge;
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicLegImpl;
-import org.matsim.basic.v01.BasicPerson;
 import org.matsim.basic.v01.BasicPersonImpl;
-import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.BasicPlanImpl;
-import org.matsim.basic.v01.BasicPopulation;
 import org.matsim.basic.v01.BasicPopulationImpl;
 import org.matsim.basic.v01.BasicPopulationReaderV5;
 import org.matsim.basic.v01.BasicRouteImpl;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPerson;
+import org.matsim.interfaces.basic.v01.BasicPlan;
+import org.matsim.interfaces.basic.v01.BasicPopulation;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.PopulationWriterV5;
 
 

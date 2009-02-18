@@ -28,7 +28,7 @@ ActStartEventHandler
 {
 	private static final Logger log = Logger.getLogger(MentalModule.class);
 	
-	public MentalModule ( BasicPopulation<BasicPerson> pop, BasicNet<BasicNode,BasicLink> net ) {
+	public MentalModule ( BasicPopulation<BasicPerson> pop, BasicNetwork<BasicNode,BasicLink> net ) {
 		// TODO What is the recommended type safety approach?
 		
 		// go through network and copy to my personal network:
@@ -101,7 +101,7 @@ ActStartEventHandler
 		
 		// need to be able to construct a person:
 
-		PopulationBuilder pb = new BasicPopulationBuilder(pop) ; 
+		BasicPopulationBuilder pb = new BasicPopulationBuilderImpl(pop) ; 
 //		PopulationBuilder pb = pop.getPopulationBuilder() ; 
 		// TODO: BasicPopulationBuilder ist eine Implementation, nicht ein Interface. 
 		// Ich fände es konsistenter, wenn man es über ein Interface erhalten könnte.

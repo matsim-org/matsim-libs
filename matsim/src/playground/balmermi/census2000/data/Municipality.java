@@ -20,8 +20,8 @@
 
 package playground.balmermi.census2000.data;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.world.Zone;
 
 

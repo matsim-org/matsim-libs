@@ -23,8 +23,8 @@ package playground.david;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

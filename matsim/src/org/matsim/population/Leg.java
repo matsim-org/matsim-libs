@@ -20,8 +20,8 @@
 
 package org.matsim.population;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicLegImpl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.population.routes.Route;

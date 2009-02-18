@@ -17,73 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.basic.v01;
+package org.matsim.interfaces.basic.v01;
 
-import java.util.List;
-import java.util.TreeSet;
+import java.util.Map;
 
-import org.matsim.population.Desires;
 
 /**
- *
+*
 * @author dgrether
 *
 */
 
-public interface BasicPerson<T extends BasicPlan, K extends BasicKnowledge> {
+public interface BasicPopulation<T extends BasicPerson> {
+	// TODO [kai] Ich bin, wie diskutiert, für Umbenennung in "BasicPersons".
+	// Andererseits habe ich den Eindruck, dass das vielleicht eher egal ist ("Population" hat den Vorteil, dass man
+	// in den Container tendenziell auch noch andere Dinge einhängen könnte ...)
 
-//	TODO [kai]: Would make more sense to be to have something like "getAttributes" and "getPlans".  Current version seems a bit
-//	over-specified to me.  kai, feb09
+	public String getName();
+	
+	public void setName(String name);
+	
+	public void addPerson(T person);
 
-	public void addPlan(final T plan);
+	public T getPerson(Id personId);
 
-	public List<T> getPlans();
-
-	public Id getId();
-
-	public void setId(final Id id);
-
-	public String getSex();
-
-	public int getAge();
-
-	public String getLicense();
-
-	public boolean hasLicense();
-
-	public String getCarAvail();
-
-	/**
-	 * @return "yes" if the person has a job
-	 * @deprecated use {@link #isEmployed()}
-	 */
+	public Map<Id, T> getPersons();
+	
 	@Deprecated
-	public String getEmployed();
-
-	public boolean isEmployed();
-
-	public void setAge(final int age);
-
-	public void setSex(final String sex);
-
-	public void setLicence(final String licence);
-
-	public void setCarAvail(final String carAvail);
-
-	public void setEmployed(final String employed);
-
-//	public Knowledge createKnowledge(final String desc);
-
-	public Desires createDesires(final String desc);
-
-	public void addTravelcard(final String type);
-
-	public TreeSet<String> getTravelcards();
-
-	public K getKnowledge();
-
-	public Desires getDesires();
-
-	public Id getFiscalHouseholdId();
-
+	public T getPerson(String personId);
 }

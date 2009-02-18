@@ -23,8 +23,8 @@ package org.matsim.population.algorithms;
 import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.utils.geometry.CoordImpl;

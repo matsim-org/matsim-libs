@@ -30,10 +30,10 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.Link;
 import org.matsim.network.Node;

@@ -25,12 +25,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.basic.v01.Id;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;

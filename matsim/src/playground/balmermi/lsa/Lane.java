@@ -22,8 +22,8 @@ package playground.balmermi.lsa;
 
 import java.util.HashMap;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 
 public class Lane implements Comparable<Lane> {

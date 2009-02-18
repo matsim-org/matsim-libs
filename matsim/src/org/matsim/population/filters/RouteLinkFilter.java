@@ -23,8 +23,8 @@ package org.matsim.population.filters;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;

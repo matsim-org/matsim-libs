@@ -28,7 +28,7 @@ package playground.christoph.knowledge;
 
 import java.util.ArrayList;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.population.Person;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;

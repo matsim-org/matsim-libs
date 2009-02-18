@@ -24,8 +24,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.matsim.basic.v01.BasicPlan;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.events.ActEndEvent;
@@ -35,6 +33,8 @@ import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicPlan;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;

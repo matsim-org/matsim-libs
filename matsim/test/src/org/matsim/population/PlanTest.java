@@ -22,7 +22,7 @@ package org.matsim.population;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.BasicLeg.Mode;
+import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 

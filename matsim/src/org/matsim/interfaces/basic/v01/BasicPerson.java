@@ -17,45 +17,74 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.interfaces.basic.v01;
 
-package org.matsim.basic.v01;
+import java.util.List;
+import java.util.TreeSet;
 
-import org.matsim.utils.geometry.Coord;
+import org.matsim.basic.v01.BasicKnowledge;
+import org.matsim.population.Desires;
 
 /**
  *
- * @author dgrether
- */
-public interface BasicAct {
+* @author dgrether
+*
+*/
 
-	public double getEndTime();
+public interface BasicPerson<T extends BasicPlan, K extends BasicKnowledge> {
 
-	public void setEndTime(final double seconds);
+//	TODO [kai]: Would make more sense to be to have something like "getAttributes" and "getPlans".  Current version seems a bit
+//	over-specified to me.  kai, feb09
+
+	public void addPlan(final T plan);
+
+	public List<T> getPlans();
+
+	public Id getId();
+
+	public void setId(final Id id);
+
+	public String getSex();
+
+	public int getAge();
+
+	public String getLicense();
+
+	public boolean hasLicense();
+
+	public String getCarAvail();
 
 	/**
-	 * Activity type is, until further notice, defined via the config file.
-	 * 
-	 * @return
+	 * @return "yes" if the person has a job
+	 * @deprecated use {@link #isEmployed()}
 	 */
-	public String getType();
-
-	public void setType(final String type);
-
-	public Coord getCoord();
-
-	public void setCoord(Coord coordinates);
-
-	public double getStartTime();
-
-	public void setStartTime(double seconds);
-
-	public Id getLinkId();
-
-	public Id getFacilityId();
-
 	@Deprecated
-	public double getDuration();
-	@Deprecated
-	public void setDuration(double duration);
+	public String getEmployed();
+
+	public boolean isEmployed();
+
+	public void setAge(final int age);
+
+	public void setSex(final String sex);
+
+	public void setLicence(final String licence);
+
+	public void setCarAvail(final String carAvail);
+
+	public void setEmployed(final String employed);
+
+//	public Knowledge createKnowledge(final String desc);
+
+	public Desires createDesires(final String desc);
+
+	public void addTravelcard(final String type);
+
+	public TreeSet<String> getTravelcards();
+
+	public K getKnowledge();
+
+	public Desires getDesires();
+
+	public Id getFiscalHouseholdId();
 
 }

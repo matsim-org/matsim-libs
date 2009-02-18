@@ -22,6 +22,8 @@ package org.matsim.basic.v01;
 
 import java.io.Serializable;
 
+import org.matsim.interfaces.basic.v01.Id;
+
 
 public class IdImpl implements Id, Serializable {
 

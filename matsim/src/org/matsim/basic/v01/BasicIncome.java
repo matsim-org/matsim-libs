@@ -17,34 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.basic.v01;
-
-import java.util.List;
-
-import org.matsim.basic.v01.Id;
+package org.matsim.basic.v01;
 
 /**
  * @author dgrether
  */
-public interface BasicHousehold {
-
-	public Id getId();
+public interface BasicIncome {
 	
-	public List<Id> getMemberIds();
+	public enum IncomePeriod {year, month, day, hour, second};
+	// TODO [kai] Dann gerne auch noch "week".
+
+	public String getCurrency();
 	
-	public BasicLocation getBasicLocation();
-	// TODO: Nicht "getLocation"??
+	public IncomePeriod getIncomePeriod();
 	
-	public BasicIncome getIncome();
-	
-	public String getLanguage();
-
-	public List<Id> getVehicleIds();
-
-	public void setLanguage(String language);
-
-	public void setIncome(BasicIncome income);
-
-	public void setLocation(BasicLocation location);
+  public double getIncome();	
 
 }

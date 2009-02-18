@@ -25,12 +25,12 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import org.jfree.util.Log;
-import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.config.MatsimConfigReader;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.MatsimPopulationReader;

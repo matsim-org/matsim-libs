@@ -3,10 +3,10 @@ package playground.yu.utils;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;

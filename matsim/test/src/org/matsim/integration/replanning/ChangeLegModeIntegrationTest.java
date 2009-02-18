@@ -20,11 +20,11 @@
 
 package org.matsim.integration.replanning;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.controler.Controler;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

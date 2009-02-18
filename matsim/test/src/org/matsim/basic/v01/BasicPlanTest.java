@@ -21,6 +21,7 @@
 package org.matsim.basic.v01;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;

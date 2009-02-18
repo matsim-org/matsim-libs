@@ -10,8 +10,8 @@ import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationWriter;
 import org.matsim.signalsystems.MatsimLightSignalSystemsWriter;
 

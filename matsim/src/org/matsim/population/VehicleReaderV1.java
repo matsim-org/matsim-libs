@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.matsim.basic.v01.BasicVehicleReaderV1;
 import org.matsim.basic.v01.BasicVehicleType;
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 
 
 /**

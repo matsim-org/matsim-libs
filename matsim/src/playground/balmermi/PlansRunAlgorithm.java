@@ -22,9 +22,9 @@ package playground.balmermi;
 
 import java.util.Date;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;

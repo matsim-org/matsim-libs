@@ -25,9 +25,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Module;
+import org.matsim.interfaces.basic.v01.Id;
 
 /**
  * Configuration group for specifying the plans-replanning to be used.

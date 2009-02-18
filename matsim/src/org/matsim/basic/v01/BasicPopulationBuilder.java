@@ -19,89 +19,36 @@
 
 package org.matsim.basic.v01;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.basic.v01.*;
+import org.matsim.interfaces.basic.v01.*;
+import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 
 /**
  * @author dgrether
  */
-public class BasicPopulationBuilder implements PopulationBuilder {
+public interface BasicPopulationBuilder {
 
-	private BasicPopulation population;
+	BasicPerson createPerson(Id id) throws Exception;
 
-	public BasicPopulationBuilder(BasicPopulation pop) {
-		this.population = pop;
-	}
+	BasicPlan createPlan(BasicPerson currentPerson);
 
-	public BasicAct createAct(BasicPlan basicPlan, String currentActType,
-			BasicLocation currentlocation) {
-		BasicActImpl act = new BasicActImpl(currentActType);
-		basicPlan.addAct(act);
-		if (currentlocation != null) {
-			if (currentlocation.getCenter() != null) {
-				act.setCoord(currentlocation.getCenter());
-			}
-			else if (currentlocation.getId() != null){
-				if (currentlocation.getLocationType() == LocationType.FACILITY) {
-					act.setFacilityId(currentlocation.getId());
-				}
-				else if (currentlocation.getLocationType() == LocationType.LINK) {
-					act.setLinkId(currentlocation.getId());
-				}
-			}
-		}
-		return act;
-	}
+	BasicAct createAct(BasicPlan basicPlan, String currentActType, BasicLocation currentlocation);
 
-	public BasicLeg createLeg(BasicPlan basicPlan, Mode legMode) {
-		BasicLegImpl leg = new BasicLegImpl(legMode); 
-		basicPlan.addLeg(leg);
-		return leg;
-	}
+	BasicLeg createLeg(BasicPlan basicPlan, Mode legMode);
 
-	@SuppressWarnings("unchecked")
-	public BasicPerson createPerson(Id id) throws Exception {
-		BasicPerson p = new BasicPersonImpl(id);
-		this.population.addPerson(p);
-		return p;
-	}
+	/**
+	 * Creates a new Route object
+	 * @param currentRouteLinkIds List of Ids including the start and the end Link Id of the route's links
+	 * @return a BasicRoute Object with the links set accordingly
+	 */
+	BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
 
-	public BasicPlan createPlan(BasicPerson currentPerson) {
-		BasicPlan plan = new BasicPlanImpl();
-		currentPerson.addPlan(plan);
-		return plan;
-	}
-	
-	public BasicPlan createPlan(BasicPerson person, boolean selected) {
-		BasicPlan p = createPlan(person);
-		p.setSelected(true);
-		return p;
-	}
-	
-	public BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds) {
-		BasicRouteImpl route = new BasicRouteImpl(startLinkId, endLinkId);
-		if (!currentRouteLinkIds.isEmpty()) {
-				List<Id> r = new ArrayList<Id>(currentRouteLinkIds);
-				route.setLinkIds(r);
-		}
-		return route;
-	}
+	BasicPlan createPlan(BasicPerson person, boolean selected);
 
-	public BasicActivity createActivity(String type, BasicLocation currentlocation) {
-		BasicActivityImpl ba = new BasicActivityImpl(type);
-		ba.setLocation(currentlocation);
-		return ba;
-	}
+	BasicActivity createActivity(String type, BasicLocation currentlocation);
 
-	public BasicKnowledge createKnowledge(List<BasicActivity> currentActivities) {
-		BasicKnowledgeImpl kn = new BasicKnowledgeImpl();
-		for (BasicActivity ba : currentActivities){
-			kn.addActivity(ba);
-		}
-		return kn;
-	}
+	BasicKnowledge createKnowledge(List<BasicActivity> currentActivities);
 
 }

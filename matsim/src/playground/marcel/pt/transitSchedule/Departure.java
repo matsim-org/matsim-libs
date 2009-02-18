@@ -20,8 +20,8 @@
 
 package playground.marcel.pt.transitSchedule;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facility;
+import org.matsim.interfaces.basic.v01.Id;
 
 public class Departure {
 

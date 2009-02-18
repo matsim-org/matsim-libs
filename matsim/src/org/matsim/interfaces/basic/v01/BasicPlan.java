@@ -18,8 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.basic.v01;
+package org.matsim.interfaces.basic.v01;
 
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;

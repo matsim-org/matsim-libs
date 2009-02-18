@@ -27,11 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.constrained.ManageSubchains;
 import org.matsim.locationchoice.constrained.SubChain;

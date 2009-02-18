@@ -27,9 +27,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 

@@ -21,7 +21,7 @@
 package org.matsim.network;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.population.routes.AbstractRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.population.routes.Route;

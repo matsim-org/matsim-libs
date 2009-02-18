@@ -23,7 +23,7 @@ package org.matsim.world.algorithms;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.world.Layer;
 import org.matsim.world.MappingRule;
 import org.matsim.world.World;

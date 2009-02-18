@@ -23,9 +23,9 @@ package playground.gregor.evacuation.scenarioGenerator;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;

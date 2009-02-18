@@ -20,7 +20,7 @@
 
 package org.matsim.roadpricing;
 
-import org.matsim.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
 import org.matsim.population.Population;

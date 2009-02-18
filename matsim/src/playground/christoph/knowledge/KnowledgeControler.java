@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.AfterMobsimEvent;
@@ -39,6 +38,7 @@ import org.matsim.controler.listener.BeforeMobsimListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.algorithms.EventWriterTXT;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

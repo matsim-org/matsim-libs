@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicPlan;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
@@ -38,6 +36,8 @@ import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicPlan;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;

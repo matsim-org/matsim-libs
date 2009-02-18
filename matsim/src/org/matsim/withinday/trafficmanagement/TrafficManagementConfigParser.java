@@ -22,9 +22,9 @@ package org.matsim.withinday.trafficmanagement;
 import java.util.ArrayList;
 import java.util.Stack;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.groups.SimulationConfigGroup;
 import org.matsim.events.Events;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

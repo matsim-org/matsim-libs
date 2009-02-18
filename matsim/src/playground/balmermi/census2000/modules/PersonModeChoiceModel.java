@@ -23,9 +23,9 @@ package playground.balmermi.census2000.modules;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;

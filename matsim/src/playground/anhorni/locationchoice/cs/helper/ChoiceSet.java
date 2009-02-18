@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 

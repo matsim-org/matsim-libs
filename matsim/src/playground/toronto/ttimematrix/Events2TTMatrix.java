@@ -26,11 +26,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.events.EventsReaderTXTv1;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;

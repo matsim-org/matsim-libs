@@ -3,9 +3,9 @@
  */
 package playground.yu.analysis;
 
-import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPlan;
 
 /**
  * @author yu

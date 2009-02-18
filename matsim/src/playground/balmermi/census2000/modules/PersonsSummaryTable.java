@@ -25,8 +25,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicAct;
 import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.interfaces.basic.v01.BasicAct;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;

@@ -22,13 +22,13 @@ package org.matsim.controler.corelisteners;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.events.Events;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 
 /**
  * Integrates the {@link org.matsim.analysis.LegHistogram} into the

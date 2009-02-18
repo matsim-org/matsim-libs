@@ -20,7 +20,7 @@
 
 package playground.meisterk.org.matsim.basic.v01;
 
-import org.matsim.basic.v01.BasicRoute;
+import org.matsim.interfaces.basic.v01.BasicRoute;
 
 /**
 * @author meisterk

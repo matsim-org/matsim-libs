@@ -23,7 +23,7 @@ package playground.marcel.ectm.planfilter;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;

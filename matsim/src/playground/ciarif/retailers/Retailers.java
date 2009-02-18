@@ -5,10 +5,10 @@ import java.lang.Object;
 import java.math.*;
 
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.*;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Id;
 
 public class Retailers {
 	

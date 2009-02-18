@@ -10,12 +10,12 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Person;

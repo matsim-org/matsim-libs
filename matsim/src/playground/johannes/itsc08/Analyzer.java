@@ -38,7 +38,6 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.math.stat.StatUtils;
-import org.matsim.basic.v01.Id;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.ShutdownEvent;
@@ -53,6 +52,7 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;

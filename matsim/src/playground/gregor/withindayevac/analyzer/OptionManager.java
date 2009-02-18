@@ -22,7 +22,7 @@ package playground.gregor.withindayevac.analyzer;
 
 import java.util.HashMap;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 
 public class OptionManager {

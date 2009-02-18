@@ -23,8 +23,8 @@ package org.matsim.replanning.modules;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.Config;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.testcases.MatsimTestCase;

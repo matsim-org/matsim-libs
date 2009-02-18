@@ -22,7 +22,7 @@ package org.matsim.population.algorithms;
 
 import java.util.HashSet;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 

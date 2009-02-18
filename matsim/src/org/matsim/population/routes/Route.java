@@ -20,7 +20,7 @@
 
 package org.matsim.population.routes;
 
-import org.matsim.basic.v01.BasicRoute;
+import org.matsim.interfaces.basic.v01.BasicRoute;
 import org.matsim.network.Link;
 
 /**

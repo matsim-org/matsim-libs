@@ -20,9 +20,9 @@ package playground.dgrether.events.filters;
 
 import java.util.Set;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.PersonEvent;
+import org.matsim.interfaces.basic.v01.Id;
 
 
 /**
