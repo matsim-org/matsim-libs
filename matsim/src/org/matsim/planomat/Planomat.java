@@ -83,10 +83,6 @@ public class Planomat implements PlanAlgorithm {
 
 	public void run(final Plan plan) {
 
-//		// distinguish for optimization tools
-//		String optiToolboxName = Gbl.getConfig().planomat().getOptimizationToolbox();
-//		if (optiToolboxName.equals(PlanomatConfigGroup.OPTIMIZATION_TOOLBOX_JGAP)) {
-
 		// perform subtour analysis only if mode choice on subtour basis is optimized
 		// (if only times are optimized, subtour analysis is not necessary)
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
@@ -94,6 +90,16 @@ public class Planomat implements PlanAlgorithm {
 			planAnalyzeSubtours = new PlanAnalyzeSubtours();
 			planAnalyzeSubtours.run(plan);
 		}
+
+		Genotype population = this.initJGAP(plan, planAnalyzeSubtours);
+		IChromosome fittest = this.evolveAndReturnFittest(population);
+		this.writeChromosome2Plan(fittest, plan, planAnalyzeSubtours );
+
+	}
+
+	protected synchronized Genotype initJGAP(Plan plan, PlanAnalyzeSubtours planAnalyzeSubtours) {
+	
+		Genotype population = null;
 
 		PlanomatJGAPConfiguration jgapConfiguration = new PlanomatJGAPConfiguration(plan, planAnalyzeSubtours);
 
@@ -108,19 +114,26 @@ public class Planomat implements PlanAlgorithm {
 		} catch (InvalidConfigurationException e1) {
 			e1.printStackTrace();
 		}
+
 		ScoringFunction sf = this.scoringFunctionFactory.getNewScoringFunction(plan);
 		PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper( 
 				sf, 
 				plan, 
 				this.legTravelTimeEstimator, 
 				planAnalyzeSubtours );
-		Genotype population = null;
+
 		try {
 			jgapConfiguration.setFitnessFunction( fitnessFunction );
 			population = Genotype.randomInitialGenotype( jgapConfiguration );
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
 		}
+		
+		return population;
+	}
+	
+	protected IChromosome evolveAndReturnFittest(Genotype population) {
+		
 		IChromosome fittest = null;
 		String logMessage = null;
 		for (int i = 0; i < Gbl.getConfig().planomat().getJgapMaxGenerations(); i++) {
@@ -131,11 +144,10 @@ public class Planomat implements PlanAlgorithm {
 				logger.info(logMessage);
 			}
 		}
-		fittest = population.getFittestChromosome();
-		this.writeChromosome2Plan(fittest, plan, planAnalyzeSubtours );
+		return population.getFittestChromosome();
 
 	}
-
+	
 	protected IChromosome initSampleChromosome(final Plan plan, final PlanAnalyzeSubtours planAnalyzeSubtours, final org.jgap.Configuration jgapConfiguration) {
 
 		ArrayList<Gene> sampleGenes = new ArrayList<Gene>();
