@@ -66,6 +66,7 @@ public abstract class Layer {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated // use of mapping rules is discouraged
 	protected final void setUpRule(final MappingRule up_rule) {
 		if (up_rule == null) {
 			Gbl.errorMsg(this.toString() + "[up_rule=null not allowed.]");
@@ -73,6 +74,7 @@ public abstract class Layer {
 		this.up_rule = up_rule;
 	}
 
+	@Deprecated // use of mapping rules is discouraged
 	protected final void setDownRule(final MappingRule down_rule) {
 		if (down_rule == null) {
 			Gbl.errorMsg(this.toString() + "[down_rule=null not allowed.]");
@@ -88,6 +90,7 @@ public abstract class Layer {
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated // use of mapping rules is discouraged
 	protected final boolean removeUpRule() {
 		if (this.up_rule == null) { return true; }
 		if (this.up_rule.getUpLayer().down_rule == null) { Gbl.errorMsg("This should never happen!"); }
@@ -103,6 +106,7 @@ public abstract class Layer {
 		return true;
 	}
 
+	@Deprecated // use of mapping rules is discouraged
 	protected final boolean removeDownRule() {
 		if (this.down_rule == null) { return true; }
 		if (this.down_rule.getDownLayer().up_rule == null) { Gbl.errorMsg("This should never happen!"); }
@@ -122,6 +126,7 @@ public abstract class Layer {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated // a "type" that returns an "Id" ???
 	public final Id getType() {
 		return this.type;
 	}
@@ -130,10 +135,12 @@ public abstract class Layer {
 		return this.name;
 	}
 
+	@Deprecated // use of mapping rules is discouraged
 	public final MappingRule getUpRule() {
 		return this.up_rule;
 	}
 
+	@Deprecated // use of mapping rules is discouraged
 	public final MappingRule getDownRule() {
 		return this.down_rule;
 	}
@@ -142,6 +149,7 @@ public abstract class Layer {
 		return this.locations.get(location_id);
 	}
 
+	@Deprecated // string-based methods are discouraged
 	public final Location getLocation(final String location_id) {
 		return this.locations.get(new IdImpl(location_id));
 	}
@@ -162,6 +170,9 @@ public abstract class Layer {
 	}
 
 	/**
+	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in 
+	 * most cases.
+     *
 	 * @param coord A coordinate to which the nearest location should be returned.
 	 *
 	 * @return the Location with the smallest distance to the given coordinate. If multiple locations have
@@ -172,12 +183,16 @@ public abstract class Layer {
 	}
 
 	/**
+	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in 
+	 * most cases.
+	 * 
 	 * @param coord A coordinate to which the nearest location should be returned.
 	 * @param excludeLocation A location that should be ignored when finding the nearest location. Useful to
 	 * find the nearest neighbor of the excluded location.
 	 *
 	 * @return the Location with the smallest distance to the given coordinate. If multiple locations have
 	 * the same minimal distance, all of them are returned.
+	 * 
 	 */
 	public final ArrayList<Location> getNearestLocations(final Coord coord, final Location excludeLocation) {
 		ArrayList<Location> locs = new ArrayList<Location>();
