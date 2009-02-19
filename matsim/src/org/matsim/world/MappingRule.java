@@ -56,6 +56,7 @@ public class MappingRule {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated // use of the current "mapping" syntax is discouraged
 	protected MappingRule(final String mapping_rule, final TreeMap<Id,Layer> layers) {
 		if (!mapping_rule.matches("[a-zA-Z]+\\[[\\?\\*1\\+m]\\]-\\[[\\?\\*1\\+m]\\][a-zA-Z]+")) {
 			throw new RuntimeException("mapping_rule="+mapping_rule+" does not match.");
@@ -82,10 +83,12 @@ public class MappingRule {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated // use of the current "mapping" syntax is discouraged
 	public final Layer getDownLayer() {
 		return downLayer;
 	}
 
+	@Deprecated // use of the current "mapping" syntax is discouraged
 	public final Layer getUpLayer() {
 		return upLayer;
 	}
