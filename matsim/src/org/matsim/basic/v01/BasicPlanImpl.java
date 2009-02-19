@@ -78,8 +78,9 @@ public class BasicPlanImpl implements BasicPlan {
 	}
 
 	/** @param score The score to test.
-	 * @return true if <code>score</code> has the meaning of "undefined score". */
-	public static final boolean isUndefinedScore(final double score) {
+	 * @return true if <code>score</code> has the meaning of "undefined score". 
+	 * FIXME kn-refactor This can't remain static since then we can't put it into the interface. */
+	public static final boolean isUndefinedScore(final double score) { 
 		return Double.isNaN(score);
 	}
 
