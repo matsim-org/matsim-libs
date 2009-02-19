@@ -41,8 +41,10 @@ public interface Location extends BasicLocation {
 	public abstract boolean removeAllDownMappings();
 
 	// TODO [balmermi] I do not like that (see above why)
+	@Deprecated // does not really make much sense to set id's outside the creational method
 	public abstract void setId(Id id);
 
+	@Deprecated // use of the current "layer" structure is discouraged
 	public abstract Layer getLayer();
 
 	@Deprecated
