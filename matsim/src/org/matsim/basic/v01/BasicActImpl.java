@@ -94,10 +94,18 @@ public class BasicActImpl implements BasicAct {
 	}
 
 
+	/**
+	 * @see org.matsim.basic.v01.BasicAct#getDuration()
+	 */
+	@Deprecated // nov08, dg
 	public double getDuration() {
 		return this.dur;
 	}
 
+	/**
+	 * @see org.matsim.basic.v01.BasicAct#setDuration(double)
+	 */
+	@Deprecated // nov08, dg
 	public void setDuration(final double dur) {
 		this.dur = dur;
 	}
