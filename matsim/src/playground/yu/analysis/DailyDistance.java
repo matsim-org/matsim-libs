@@ -23,9 +23,9 @@ import playground.yu.utils.SimpleWriter;
 
 /**
  * compute modal split of through distance
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class DailyDistance extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -33,8 +33,11 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 
 	final double totalCounts[], carCounts[], ptCounts[], otherCounts[];
 
-	private double carWorkDist, carEducDist, carShopDist, carLeisDist, carHomeDist, carOtherDist, ptWorkDist, ptEducDist, ptShopDist, ptLeisDist,
-			ptHomeDist, ptOtherDist, throughWorkDist, throughEducDist, throughShopDist, throughLeisDist, throughHomeDist, throughOtherDist;
+	private double carWorkDist, carEducDist, carShopDist, carLeisDist,
+			carHomeDist, carOtherDist, ptWorkDist, ptEducDist, ptShopDist,
+			ptLeisDist, ptHomeDist, ptOtherDist, throughWorkDist,
+			throughEducDist, throughShopDist, throughLeisDist, throughHomeDist,
+			throughOtherDist;
 
 	private int count;
 
@@ -127,7 +130,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 						this.throughOtherDist += dist;
 						break;
 					}
-				} else if (bl.getMode().equals(Mode.car)) {
+				} else if (bl.getMode().equals(Leg.Mode.car)) {
 					this.carDist += dist;
 					carDayDist += dist;
 					switch (ats) {
@@ -191,35 +194,44 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		SimpleWriter sw = new SimpleWriter(outputFilename + ".txt");
 		sw.writeln("\tDaily Distance\t(exkl. through-traffic)");
 		sw.writeln("\tkm\t%");
-		sw.writeln("car\t" + this.carDist / this.count + "\t" + this.carDist / sum
-				* 100.0);
+		sw.writeln("car\t" + this.carDist / this.count + "\t" + this.carDist
+				/ sum * 100.0);
 		sw.writeln("pt\t" + this.ptDist / this.count + "\t" + this.ptDist / sum
 				* 100.0);
-		sw.writeln("through\t" + this.otherDist / this.count + "\t" + this.otherDist
-				/ sum * 100.0);
+		sw.writeln("through\t" + this.otherDist / this.count + "\t"
+				+ this.otherDist / sum * 100.0);
 		sw.writeln("--------------------------------------------");
 		sw.writeln("\tDaily Distance\t(inkl. through-traffic)");
 		sw.writeln("\tkm\t%");
-		sw.writeln("car\t" + (this.carDist + this.otherDist) / this.count + "\t"
-				+ (this.carDist + this.otherDist) / sum * 100.0);
+		sw.writeln("car\t" + (this.carDist + this.otherDist) / this.count
+				+ "\t" + (this.carDist + this.otherDist) / sum * 100.0);
 		sw.writeln("pt\t" + this.ptDist / this.count + "\t" + this.ptDist / sum
 				* 100.0);
 		sw.writeln("--travel destination and modal split--daily distance--");
 		sw.writeln("\twork\teducation\tshopping\tleisure\thome\tother...");
 		sw.writeln("car\t" + this.carWorkDist + "\t" + this.carEducDist + "\t"
-				+ this.carShopDist + "\t" + this.carLeisDist + "\t" + this.carHomeDist + "\t"
-				+ this.carOtherDist);
-		sw.writeln("pt\t" + this.ptWorkDist + "\t" + this.ptEducDist + "\t" + this.ptShopDist
-				+ "\t" + this.ptLeisDist + "\t" + this.ptHomeDist + "\t" + this.ptOtherDist);
-		sw.writeln("through\t" + this.throughWorkDist + "\t" + this.throughEducDist
-				+ "\t" + this.throughShopDist + "\t" + this.throughLeisDist + "\t"
-				+ this.throughHomeDist + "\t" + this.throughOtherDist);
-		sw.writeln("total\t" + (this.carWorkDist + this.ptWorkDist + this.throughWorkDist)
-				+ "\t" + (this.carEducDist + this.ptEducDist + this.throughEducDist) + "\t"
-				+ (this.carShopDist + this.ptShopDist + this.throughShopDist) + "\t"
-				+ (this.carLeisDist + this.ptLeisDist + this.throughLeisDist) + "\t"
-				+ (this.carHomeDist + this.ptHomeDist + this.throughHomeDist) + "\t"
-				+ (this.carOtherDist + this.ptOtherDist + this.throughOtherDist));
+				+ this.carShopDist + "\t" + this.carLeisDist + "\t"
+				+ this.carHomeDist + "\t" + this.carOtherDist);
+		sw.writeln("pt\t" + this.ptWorkDist + "\t" + this.ptEducDist + "\t"
+				+ this.ptShopDist + "\t" + this.ptLeisDist + "\t"
+				+ this.ptHomeDist + "\t" + this.ptOtherDist);
+		sw.writeln("through\t" + this.throughWorkDist + "\t"
+				+ this.throughEducDist + "\t" + this.throughShopDist + "\t"
+				+ this.throughLeisDist + "\t" + this.throughHomeDist + "\t"
+				+ this.throughOtherDist);
+		sw
+				.writeln("total\t"
+						+ (this.carWorkDist + this.ptWorkDist + this.throughWorkDist)
+						+ "\t"
+						+ (this.carEducDist + this.ptEducDist + this.throughEducDist)
+						+ "\t"
+						+ (this.carShopDist + this.ptShopDist + this.throughShopDist)
+						+ "\t"
+						+ (this.carLeisDist + this.ptLeisDist + this.throughLeisDist)
+						+ "\t"
+						+ (this.carHomeDist + this.ptHomeDist + this.throughHomeDist)
+						+ "\t"
+						+ (this.carOtherDist + this.ptOtherDist + this.throughOtherDist));
 		try {
 			sw.close();
 		} catch (IOException e) {

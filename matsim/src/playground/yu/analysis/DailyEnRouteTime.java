@@ -24,16 +24,20 @@ import playground.yu.utils.SimpleWriter;
 
 /**
  * compute modal split of en route time
+ * 
  * @author yu
- *
+ * 
  */
 public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
 	private int count;
 	private double carTime, ptTime, otherTime;
 	final double totalCounts[], carCounts[], ptCounts[], otherCounts[];
-	private double carWorkTime, carEducTime, carShopTime, carLeisTime, carHomeTime, carOtherTime, ptWorkTime, ptEducTime, ptShopTime, ptLeisTime,
-			ptHomeTime, ptOtherTime, throughWorkTime, throughEducTime, throughShopTime, throughLeisTime, throughHomeTime, throughOtherTime;
+	private double carWorkTime, carEducTime, carShopTime, carLeisTime,
+			carHomeTime, carOtherTime, ptWorkTime, ptEducTime, ptShopTime,
+			ptLeisTime, ptHomeTime, ptOtherTime, throughWorkTime,
+			throughEducTime, throughShopTime, throughLeisTime, throughHomeTime,
+			throughOtherTime;
 	private Person person;
 
 	public DailyEnRouteTime() {
@@ -180,36 +184,48 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 
 	public void write(final String outputFilename) {
 		double sum = this.carTime + this.ptTime + this.otherTime;
-		SimpleWriter sw = new SimpleWriter(outputFilename+".txt");
+		SimpleWriter sw = new SimpleWriter(outputFilename + ".txt");
 		sw.writeln("\tDaily En Route Time\t(exkl. through-traffic)");
 		sw.writeln("\tmin\t%");
-		sw.writeln("car\t" + this.carTime / this.count + "\t" + this.carTime / sum
+		sw.writeln("car\t" + this.carTime / this.count + "\t" + this.carTime
+				/ sum * 100.0);
+		sw.writeln("pt\t" + this.ptTime / this.count + "\t" + this.ptTime / sum
 				* 100.0);
-		sw.writeln("pt\t" + this.ptTime / this.count + "\t" + this.ptTime / sum * 100.0);
-		sw.writeln("through\t" + this.otherTime / this.count + "\t" + this.otherTime / sum
-				* 100.0);
+		sw.writeln("through\t" + this.otherTime / this.count + "\t"
+				+ this.otherTime / sum * 100.0);
 		sw.writeln("--------------------------------------------");
 		sw.writeln("\tDaily En Route Time\t(inkl. through-traffic)");
 		sw.writeln("\tmin\t%");
-		sw.writeln("car\t" + (this.carTime + this.otherTime) / this.count + "\t"
-				+ (this.carTime + this.otherTime) / sum * 100.0);
-		sw.writeln("pt\t" + this.ptTime / this.count + "\t" + this.ptTime / sum * 100.0);
-		sw.writeln("--travel destination and modal split--daily on route time--");
+		sw.writeln("car\t" + (this.carTime + this.otherTime) / this.count
+				+ "\t" + (this.carTime + this.otherTime) / sum * 100.0);
+		sw.writeln("pt\t" + this.ptTime / this.count + "\t" + this.ptTime / sum
+				* 100.0);
+		sw
+				.writeln("--travel destination and modal split--daily on route time--");
 		sw.writeln("\twork\teducation\tshopping\tleisure\thome\tother...");
 		sw.writeln("car\t" + this.carWorkTime + "\t" + this.carEducTime + "\t"
-				+ this.carShopTime + "\t" + this.carLeisTime + "\t" + this.carHomeTime + "\t"
-				+ this.carOtherTime);
-		sw.writeln("pt\t" + this.ptWorkTime + "\t" + this.ptEducTime + "\t" + this.ptShopTime
-				+ "\t" + this.ptLeisTime + "\t" + this.ptHomeTime + "\t" + this.ptOtherTime);
-		sw.writeln("through\t" + this.throughWorkTime + "\t" + this.throughEducTime
-				+ "\t" + this.throughShopTime + "\t" + this.throughLeisTime + "\t"
-				+ this.throughHomeTime + "\t" + this.throughOtherTime);
-		sw.writeln("total\t" + (this.carWorkTime + this.ptWorkTime + this.throughWorkTime)
-				+ "\t" + (this.carEducTime + this.ptEducTime + this.throughEducTime) + "\t"
-				+ (this.carShopTime + this.ptShopTime + this.throughShopTime) + "\t"
-				+ (this.carLeisTime + this.ptLeisTime + this.throughLeisTime) + "\t"
-				+ (this.carHomeTime + this.ptHomeTime + this.throughHomeTime) + "\t"
-				+ (this.carOtherTime + this.ptOtherTime + this.throughOtherTime));
+				+ this.carShopTime + "\t" + this.carLeisTime + "\t"
+				+ this.carHomeTime + "\t" + this.carOtherTime);
+		sw.writeln("pt\t" + this.ptWorkTime + "\t" + this.ptEducTime + "\t"
+				+ this.ptShopTime + "\t" + this.ptLeisTime + "\t"
+				+ this.ptHomeTime + "\t" + this.ptOtherTime);
+		sw.writeln("through\t" + this.throughWorkTime + "\t"
+				+ this.throughEducTime + "\t" + this.throughShopTime + "\t"
+				+ this.throughLeisTime + "\t" + this.throughHomeTime + "\t"
+				+ this.throughOtherTime);
+		sw
+				.writeln("total\t"
+						+ (this.carWorkTime + this.ptWorkTime + this.throughWorkTime)
+						+ "\t"
+						+ (this.carEducTime + this.ptEducTime + this.throughEducTime)
+						+ "\t"
+						+ (this.carShopTime + this.ptShopTime + this.throughShopTime)
+						+ "\t"
+						+ (this.carLeisTime + this.ptLeisTime + this.throughLeisTime)
+						+ "\t"
+						+ (this.carHomeTime + this.ptHomeTime + this.throughHomeTime)
+						+ "\t"
+						+ (this.carOtherTime + this.ptOtherTime + this.throughOtherTime));
 		try {
 			sw.close();
 		} catch (IOException e) {
