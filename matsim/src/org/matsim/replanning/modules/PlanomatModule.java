@@ -41,19 +41,12 @@ public class PlanomatModule extends MultithreadedModuleA {
 	public PlanomatModule(Controler controler) {
 		super();
 		this.controler = controler;
+		this.tDepDelayCalc = new DepartureDelayAverageCalculator(
+				this.controler.getNetwork(), 
+				this.controler.getTraveltimeBinSize());
+		this.controler.getEvents().addHandler(tDepDelayCalc);
 	}
 	
-	@Override
-	public void init() {
-		if (this.tDepDelayCalc == null) {
-			this.tDepDelayCalc = new DepartureDelayAverageCalculator(
-					this.controler.getNetwork(), 
-					this.controler.getTraveltimeBinSize());
-		}
-		this.controler.getEvents().addHandler(tDepDelayCalc);
-		super.init();
-	}
-
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 

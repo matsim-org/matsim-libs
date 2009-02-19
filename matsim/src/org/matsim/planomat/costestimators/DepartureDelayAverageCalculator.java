@@ -154,10 +154,7 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	}
 
 	public void resetDepartureDelays() {
-		/* WARNING: this method iterates over the entire network
-		 * and eventually creates the roles. This might become very
-		 * resource intensive and should be avoided!
-		 * it's fine for the equil-net, but not for bigger networks */
+		log.warn("this method iterates over the entire network and eventually creates the roles. This might become very resource intensive and should be avoided! it's fine for the equil-net, but not for bigger networks");
 		for (Link link : this.network.getLinks().values()) {
 			getDepartureDelayRole(link).resetDepartureDelays();
 		}
