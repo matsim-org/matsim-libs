@@ -9,7 +9,6 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
-import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -40,16 +39,13 @@ public class SelectedPlan2QGISDemo implements X2QGIS {
 		final String outputDir = "output/bse";
 
 		Gbl.createConfig(null);
-		Gbl.createWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
-
 		Population population = new Population();
-		new MatsimPopulationReader(population).readFile(populationFilename);
+		new MatsimPopulationReader(population, network)
+				.readFile(populationFilename);
 		/*
 		 * ----------------------------------------------------------------------
 		 */

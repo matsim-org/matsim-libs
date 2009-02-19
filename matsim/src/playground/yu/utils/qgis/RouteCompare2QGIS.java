@@ -171,13 +171,9 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		final String outputDir = args[3];
 
 		Gbl.createConfig(null);
-		Gbl.createWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
-
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 		// ------------------------RouteSummaryA--------------------------------
 		Population populationA = new Population();
 
@@ -185,24 +181,26 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		populationA.addAlgorithm(rsA);
 
 		System.out.println("-->reading plansfile: " + populationFilenameA);
-		new MatsimPopulationReader(populationA).readFile(populationFilenameA);
+		new MatsimPopulationReader(populationA, network)
+				.readFile(populationFilenameA);
 
 		populationA.runAlgorithms();
 		rsA.write();
 		rsA.end();
-		//------------------------RouteSummaryB---------------------------------
+		// ------------------------RouteSummaryB---------------------------------
 		Population populationB = new Population();
 
 		RouteSummary rsB = new RouteSummary(outputDir + "/routeCompareB.txt.gz");
 		populationB.addAlgorithm(rsB);
 
 		System.out.println("-->reading plansfile: " + populationFilenameB);
-		new MatsimPopulationReader(populationB).readFile(populationFilenameB);
+		new MatsimPopulationReader(populationB, network)
+				.readFile(populationFilenameB);
 
 		populationB.runAlgorithms();
 		rsB.write();
 		rsB.end();
-		//----------------------------------------------------------------------
+		// ----------------------------------------------------------------------
 		CoordinateReferenceSystem crs;
 		try {
 			crs = CRS.parseWKT(ch1903);

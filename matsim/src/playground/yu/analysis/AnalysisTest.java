@@ -78,8 +78,6 @@ public class AnalysisTest {
 		Gbl.createConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 
 		OnRouteModalSplit orms = null;
 		TravelTimeModalSplit ttms = null;
@@ -91,11 +89,14 @@ public class AnalysisTest {
 			catl = new CalcAverageTripLength();
 			plans.addAlgorithm(catl);
 
-			PopulationReader plansReader = new MatsimPopulationReader(plans);
+			PopulationReader plansReader = new MatsimPopulationReader(plans,
+					network);
 			plansReader.readFile(plansFilename);
 			plans.runAlgorithms();
 
-			orms = new OnRouteModalSplit(scenario,network, plans);
+			orms = new OnRouteModalSplit(scenario,
+			// network,
+					plans);
 			ttms = new TravelTimeModalSplit(network, plans);
 		}
 

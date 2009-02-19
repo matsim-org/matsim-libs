@@ -26,7 +26,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.world.World;
 
 /**
  * test of NewAgentPtPlan
@@ -41,21 +40,18 @@ public class NewSmallPlansControler {
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String plansFilename = "../schweiz-ivtch-SVN/baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
 
-		World world = Gbl.getWorld();
 		Gbl.createConfig(new String[] {
 		// "./test/yu/ivtch/config_for_10pctZuerich_car_pt_smallPlansl.xml"
-//				"../data/ivtch/make10pctPlans.xml"
-				"input/make10pctPlans.xml"});
+				// "../data/ivtch/make10pctPlans.xml"
+				"input/make10pctPlans.xml" });
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
-
 		Population population = new Population();
 		NewSmallPlan nsp = new NewSmallPlan(population);
 		population.addAlgorithm(nsp);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
 		plansReader.readFile(plansFilename);
 		population.runAlgorithms();
 		nsp.writeEndPlans();

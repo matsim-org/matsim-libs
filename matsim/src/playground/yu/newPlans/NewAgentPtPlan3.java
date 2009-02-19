@@ -56,6 +56,7 @@ public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithm {
 		copyPlans.clear();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run(final Person person) {
 		// if (person.getLicense().equals("yes")) {

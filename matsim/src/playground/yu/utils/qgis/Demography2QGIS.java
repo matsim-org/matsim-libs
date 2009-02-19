@@ -81,14 +81,14 @@ public class Demography2QGIS {
 		this.plans = new Population(false);
 
 		System.out.println("  reading the network...");
-		this.network = (NetworkLayer) Gbl.getWorld().createLayer(
-				NetworkLayer.LAYER_TYPE, null);
+		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(networkPath);
 	}
 
 	private void readFiles(String plansfilePath) {
 		System.out.println("  reading file " + plansfilePath);
-		PopulationReader plansReader0 = new MatsimPopulationReader(this.plans);
+		PopulationReader plansReader0 = new MatsimPopulationReader(this.plans,
+				network);
 		plansReader0.readFile(plansfilePath);
 	}
 
@@ -107,7 +107,7 @@ public class Demography2QGIS {
 				out.write(person.getAge() + ";");
 				out.write(person.getLicense() + ";");
 				out.write(person.getCarAvail() + ";");
-				out.write(person.getEmployed() + ";");
+				out.write(person.isEmployed() + ";");
 
 				Plan sp = person.getSelectedPlan();
 				Act fa = sp.getFirstActivity();
@@ -175,7 +175,7 @@ public class Demography2QGIS {
 		return numberOfLegs;
 	}
 
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 
 	private void run(String networkPath, String plansfilePath, String outfile) {
 		this.init(networkPath);

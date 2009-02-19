@@ -39,13 +39,13 @@ import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.World;
 
 /**
  * @author yu
  * 
  */
-public class ScoreVariance extends AbstractPersonAlgorithm implements PlanAlgorithm {
+public class ScoreVariance extends AbstractPersonAlgorithm implements
+		PlanAlgorithm {
 	private final List<Double> scores = new ArrayList<Double>();
 	private BufferedWriter writer;
 	private final String outputFilename;
@@ -78,12 +78,8 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements PlanAlgori
 		Gbl.startMeasurement();
 		Gbl.createConfig(null);
 
-		World world = Gbl.getWorld();
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 
@@ -91,7 +87,7 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements PlanAlgori
 		population.addAlgorithm(sv);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
 		population.runAlgorithms();
 		sv.writeVariance();

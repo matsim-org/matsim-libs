@@ -163,13 +163,9 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 		final String outputDir = args[2];
 
 		Gbl.createConfig(null);
-		Gbl.createWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
-
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 
 		Population population = new Population();
 
@@ -177,7 +173,8 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 		population.addAlgorithm(rs);
 
 		System.out.println("-->reading plansfile: " + populationFilename);
-		new MatsimPopulationReader(population).readFile(populationFilename);
+		new MatsimPopulationReader(population, network)
+				.readFile(populationFilename);
 
 		population.runAlgorithms();
 		rs.write();

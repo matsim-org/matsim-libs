@@ -28,7 +28,6 @@ import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.world.World;
 
 /**
  * @author ychen
@@ -54,12 +53,8 @@ public class LegDistanceTest {
 		Gbl.startMeasurement();
 		Gbl.createConfig(null);
 
-		World world = Gbl.getWorld();
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		// Plans population = new Plans();
 		// System.out.println("-->reading plansfile: " + plansFilename);

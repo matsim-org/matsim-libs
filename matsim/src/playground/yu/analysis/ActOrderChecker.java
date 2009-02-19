@@ -18,7 +18,6 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.world.World;
 
 import playground.yu.utils.SimpleWriter;
 
@@ -57,7 +56,7 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 
 	/**
 	 * @param args
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
 		Gbl.startMeasurement();
@@ -69,23 +68,21 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 
 		Gbl.createConfig(null);
 
-		World world = Gbl.getWorld();
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population populationA = new Population();
 		ActOrderChecker aocA = new ActOrderChecker();
 		populationA.addAlgorithm(aocA);
-		new MatsimPopulationReader(populationA, network).readFile(plansFilenameA);
+		new MatsimPopulationReader(populationA, network)
+				.readFile(plansFilenameA);
 		populationA.runAlgorithms();
 
 		Population populationB = new Population();
 		ActOrderChecker aocB = new ActOrderChecker();
 		populationB.addAlgorithm(aocB);
-		new MatsimPopulationReader(populationB,network).readFile(plansFilenameB);
+		new MatsimPopulationReader(populationB, network)
+				.readFile(plansFilenameB);
 		populationB.runAlgorithms();
 
 		SimpleWriter writer = new SimpleWriter(outputFilename);

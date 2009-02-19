@@ -11,6 +11,7 @@ public class ActTypeFilter extends PersonFilterA {
 	
 	private static String criterion = "s1";
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean judge(Person person) {
 		for (Plan plan : person.getPlans()) {

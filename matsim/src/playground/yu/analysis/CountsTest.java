@@ -12,7 +12,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.world.World;
 
 /**
  * @author yu
@@ -27,14 +26,12 @@ public class CountsTest {
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String countsFilename = "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.xml";
-		final String outputFilename = "output/counts.txt";
+		// final String outputFilename = "output/counts.txt";
 
 		Gbl.createConfig(null);
-		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
 
 		Counts counts = new Counts();
 		new MatsimCountsReader(counts).readFile(countsFilename);

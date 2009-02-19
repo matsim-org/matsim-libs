@@ -50,13 +50,10 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 	private Map<Double, Double> carLegs = new TreeMap<Double, Double>(),
 			ptLegs = new TreeMap<Double, Double>();
 
-	private String outputFilePath;
-
 	private BufferedWriter out;
 
 	public ModeChoiceByDistance(String outputFilePath) throws Exception {
 		out = IOUtils.getBufferedWriter(outputFilePath + ".txt");
-		this.outputFilePath = outputFilePath;
 	}
 
 	/**
@@ -78,12 +75,10 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 
 		Population ppl = new Population();
 		System.out.println("->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(ppl).readFile(plansFilename);
+		new MatsimPopulationReader(ppl, network).readFile(plansFilename);
 		ModeChoiceByDistance mcbd;
 		try {
 			mcbd = new ModeChoiceByDistance(outputFilePath);

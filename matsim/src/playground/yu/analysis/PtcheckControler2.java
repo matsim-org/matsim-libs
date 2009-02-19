@@ -179,7 +179,9 @@ public class PtcheckControler2 extends Controler {
 			NetworkLayer nl = c.getNetwork();
 			Population ps = c.getPopulation();
 			if (event.getIteration() == c.getLastIteration()) {
-				orms = new OnRouteModalSplit("normal",300, nl, ps);
+				orms = new OnRouteModalSplit("normal", 300,
+				// nl,
+						ps);
 				es.addHandler(orms);
 				ttms = new TravelTimeModalSplit(300, nl, ps);
 				es.addHandler(ttms);
@@ -198,8 +200,8 @@ public class PtcheckControler2 extends Controler {
 
 	// -------------------------MAIN FUNCTION--------------------
 	/**
-	 * @param args -
-	 *            the path of config-file
+	 * @param args
+	 *            - the path of config-file
 	 */
 	public static void main(final String[] args) {
 		final PtcheckControler2 controler;

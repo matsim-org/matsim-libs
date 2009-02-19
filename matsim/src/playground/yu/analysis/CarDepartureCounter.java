@@ -74,12 +74,10 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 		Population ppl = new Population();
 
 		System.out.println("->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(ppl).readFile(plansFilename);
+		new MatsimPopulationReader(ppl,network).readFile(plansFilename);
 
 		Events events = new Events();
 		CarDepartureCounter cdc = new CarDepartureCounter(ppl);

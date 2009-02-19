@@ -45,7 +45,9 @@ public class OSMPatchPaser extends MatsimXmlParser {
 
 	private Set<String> upgradeLinks, degradeLinks, shell;
 	// private status patch_status;
-	private final static String OSM = "OSM", UPGRADE = "upgrade",
+	private final static String
+	// OSM = "OSM",
+			UPGRADE = "upgrade",
 			DEGRADE = "degrade", LINK = "link";
 
 	public OSMPatchPaser() {

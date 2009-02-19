@@ -54,6 +54,7 @@ public class NewAgentPtPlan2 extends NewPlan {
 		this.copyPlansModes.clear();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run(final Person person) {
 		if (person.getLicense().equals("yes")) {

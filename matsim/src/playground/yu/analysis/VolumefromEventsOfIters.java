@@ -35,7 +35,6 @@ import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.charts.XYLineChart;
-import org.matsim.world.World;
 
 public class VolumefromEventsOfIters {
 
@@ -49,7 +48,6 @@ public class VolumefromEventsOfIters {
 	 * @param args
 	 *            [3] - picPath;
 	 */
-	@SuppressWarnings("unchecked")
 	public static void main(final String[] args) {
 		final String netFilename = args[0];
 		final String eventsFilename = args[1];
@@ -59,13 +57,9 @@ public class VolumefromEventsOfIters {
 		// new String[] { "./test/yu/test/configTest.xml" }
 				);
 
-		World world = Gbl.getWorld();
-
 		System.out.println(">>>>>reading the network...");
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		System.out.println(">>>>>reading the counts...");
 		final Counts counts = new Counts();

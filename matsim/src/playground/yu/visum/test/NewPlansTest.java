@@ -11,7 +11,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.world.MatsimWorldReader;
 
 import playground.yu.visum.filter.PersonFilterAlgorithm;
 import playground.yu.visum.filter.PersonRouteFilter;
@@ -27,15 +26,8 @@ public class NewPlansTest extends Population {
 		System.out.println("TEST RUN ---FilterTest---:");
 		// reading all available input
 
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl
-				.getWorld());
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
-		System.out.println("  done.");
-
 		System.out.println("  creating network layer... ");
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
-				NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");
@@ -135,7 +127,8 @@ public class NewPlansTest extends Population {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans,
+				network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		System.out.println("  done.");
 

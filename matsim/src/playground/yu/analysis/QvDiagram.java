@@ -11,7 +11,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.charts.XYScatterChart;
-import org.matsim.world.World;
 
 /**
  * @author yu
@@ -26,12 +25,9 @@ public class QvDiagram {
 
 		Gbl.createConfig(null// new String[] { "./test/yu/test/configTest.xml" }
 				);
-		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Events events = new Events();
 		VolumesAnalyzer va = new VolumesAnalyzer(300, 24 * 3600 - 1, network);

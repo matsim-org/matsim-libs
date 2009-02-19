@@ -30,7 +30,6 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.world.World;
 
 /**
  * checks, how many people have license for driving car and can choose from car
@@ -72,12 +71,9 @@ public class License extends AbstractPersonAlgorithm {
 
 		Gbl.startMeasurement();
 		Gbl.createConfig(null);
-		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 
@@ -85,7 +81,7 @@ public class License extends AbstractPersonAlgorithm {
 		population.addAlgorithm(l);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
 		population.runAlgorithms();
 

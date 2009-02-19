@@ -55,6 +55,7 @@ public class NewAgentPtPlan extends NewPlan implements PersonAlgorithm {
 		super(population, filename);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run(final Person person) {
 		if (Integer.parseInt(person.getId().toString()) < 1000000000) {

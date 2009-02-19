@@ -14,6 +14,7 @@ public class DepTimeFilter extends PersonFilterA {
 
 	private static double criterionMIN = Time.parseTime("06:40");
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean judge(Person person) {
 		for (Plan plan : person.getPlans()) {

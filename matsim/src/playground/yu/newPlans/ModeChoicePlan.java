@@ -33,7 +33,6 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.world.World;
 
 import playground.yu.analysis.PlanModeJudger;
 
@@ -51,6 +50,7 @@ public class ModeChoicePlan extends NewPlan {
 		super(plans);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run(Person person) {
 		Plan sp = person.getSelectedPlan();
@@ -110,19 +110,16 @@ public class ModeChoicePlan extends NewPlan {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		World world = Gbl.getWorld();
 		Config config = Gbl.createConfig(args);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 		ModeChoicePlan mcp = new ModeChoicePlan(population);
 		population.addAlgorithm(mcp);
-		new MatsimPopulationReader(population).readFile(config.plans()
+		new MatsimPopulationReader(population, network).readFile(config.plans()
 				.getInputFile());
 		population.runAlgorithms();
 		mcp.writeEndPlans();

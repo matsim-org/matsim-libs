@@ -29,7 +29,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.world.World;
 
 /**
  * @author ychen
@@ -40,19 +39,17 @@ public class PlanCheckControler {
 		final String netFilename = "./test/yu/schweiz/input/ch.xml";
 		final String plansFilename = "./test/yu/schweiz/input/100ITERs_pt-6t-6output_plans.xml";
 		final String planCheckFilename = "./test/yu/schweiz/output/planCheck.txt";
-		World world = Gbl.getWorld();
 		Gbl
 				.createConfig(new String[] { "./test/yu/schweiz/multipleIterations_.xml" });
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 		PlanChecker pc = new PlanChecker(planCheckFilename);
 		population.addAlgorithm(pc);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
 		plansReader.readFile(plansFilename);
 		population.runAlgorithms();
 		pc.writeResult();

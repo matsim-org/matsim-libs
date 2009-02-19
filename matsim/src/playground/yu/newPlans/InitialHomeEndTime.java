@@ -12,7 +12,6 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.world.World;
 
 /**
  * @author yu
@@ -46,13 +45,10 @@ public class InitialHomeEndTime extends NewPlan implements PlanAlgorithm {
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String plansFilename = "../schweiz-ivtch-SVN/baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
 		final String outputPlansFilename = "output/plans_all_zrh30km_transitincl_10pct_home_end_6h.xml.gz";
-		World world = Gbl.getWorld();
 		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 		InitialHomeEndTime ihet = new InitialHomeEndTime(population,
@@ -60,7 +56,8 @@ public class InitialHomeEndTime extends NewPlan implements PlanAlgorithm {
 
 		population.addAlgorithm(ihet);
 
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
 		plansReader.readFile(plansFilename);
 
 		population.runAlgorithms();

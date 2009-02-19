@@ -30,11 +30,9 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.world.World;
 
 public class VolumefromEventsTest {
 
-	@SuppressWarnings("unchecked")
 	public static void main(final String[] args) {
 		final String netFilename = "./test/yu/test/input/network.xml";
 		// final String plansFilename = "./examples/equil/plans100.xml";
@@ -42,14 +40,8 @@ public class VolumefromEventsTest {
 		Gbl.createConfig(null
 		// new String[] { "./test/yu/test/configTest.xml" }
 				);
-
-		World world = Gbl.getWorld();
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
-
 		Events events = new Events();
 		VolumesAnalyzer volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1,
 				network);

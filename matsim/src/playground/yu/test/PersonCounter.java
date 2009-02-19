@@ -31,7 +31,6 @@ import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.world.World;
 
 /**
  * @author ychen
@@ -68,19 +67,16 @@ public class PersonCounter extends AbstractPersonAlgorithm {
 	public static void main(final String[] args) {
 		final String netFilename = "./test/yu/test/input/network.xml";
 		final String plansFilename = "./test/yu/test/input/10pctZrhCarPtPlans.xml.gz";
-
-		World world = Gbl.getWorld();
 		Gbl.createConfig(new String[] { "./test/yu/test/configTest.xml" });
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 		PersonCounter pc = new PersonCounter();
 		population.addAlgorithm(pc);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
 		plansReader.readFile(plansFilename);
 		population.runAlgorithms();
 		System.out.println(pc.toString());

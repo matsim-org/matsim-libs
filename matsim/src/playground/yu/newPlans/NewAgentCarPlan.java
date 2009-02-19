@@ -32,7 +32,6 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.world.World;
 
 import playground.yu.analysis.PlanModeJudger;
 
@@ -78,19 +77,17 @@ public class NewAgentCarPlan extends NewPlan implements PlanAlgorithm {
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String plansFilename = "../schweiz-ivtch-SVN/baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
 		final String outputPlansFilename = "output/newplans/plans_allMIV_zrh30km_transitincl_10pct.xml.gz";
-		World world = Gbl.getWorld();
 		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 		NewAgentCarPlan nac = new NewAgentCarPlan(population,
 				outputPlansFilename);
 		population.addAlgorithm(nac);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
 		plansReader.readFile(plansFilename);
 		population.runAlgorithms();
 		nac.writeEndPlans();

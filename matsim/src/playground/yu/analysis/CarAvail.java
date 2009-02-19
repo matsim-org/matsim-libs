@@ -36,7 +36,6 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.World;
 
 /**
  * @author ychen
@@ -83,13 +82,8 @@ public class CarAvail extends AbstractPersonAlgorithm {
 	@Override
 	public void run(final Person person) {
 		String carAvail = person.getCarAvail();
-		PlanModeJudger pmj = new PlanModeJudger();
 		if (carAvail != null) {
 			Plan selectedPlan = person.getSelectedPlan();
-			// Plan.Type planType = person.getSelectedPlan().getType();
-			// if (planType != null && planType != Plan.Type.UNDEFINED)
-
-			boolean useCar = new PlanModeJudger().useCar(selectedPlan);
 			if (carAvail.equals("never")) {
 				never_hasCar++;
 				if (
@@ -136,12 +130,8 @@ public class CarAvail extends AbstractPersonAlgorithm {
 
 		Gbl.createConfig(null);
 
-		World world = Gbl.getWorld();
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 
@@ -149,7 +139,7 @@ public class CarAvail extends AbstractPersonAlgorithm {
 		population.addAlgorithm(ca);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
 		population.runAlgorithms();
 

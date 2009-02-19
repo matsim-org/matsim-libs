@@ -32,7 +32,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.World;
 
 public class EventsWait2LinkTest {
 	public static class EventsWait2Link implements AgentWait2LinkEventHandler {
@@ -85,12 +84,9 @@ public class EventsWait2LinkTest {
 		final String outputFilename = "../runs/run266/Wait2Link.events.txt.gz";
 
 		Gbl.createConfig(null);
-		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Events events = new Events();
 

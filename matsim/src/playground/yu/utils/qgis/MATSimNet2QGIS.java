@@ -28,10 +28,11 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.FactoryRegistryException;
+import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.feature.DefaultFeatureCollections;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
@@ -60,13 +61,19 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class MATSimNet2QGIS {
 	/**
 	 * this class is only a copy of
-	 * <class>playground.gregor.shapeFileToMATSim.ShapeFileWriter</class>
-	 * Gregor Laemmel's
+	 * <class>playground.gregor.shapeFileToMATSim.ShapeFileWriter</class> Gregor
+	 * Laemmel's
 	 * 
 	 * @author ychen
 	 * 
 	 */
 	public static class ShapeFileWriter2 {
+
+		// public static class MyFeatureCollections extends
+		// DefaultFeatureCollections{
+		//			
+		// }
+
 		public static void writeGeometries(final Collection<Feature> features,
 				final String filename) throws IOException, FactoryException,
 				SchemaException {
@@ -74,8 +81,13 @@ public class MATSimNet2QGIS {
 					filename)).toURI().toURL());
 			FeatureType ft = features.iterator().next().getFeatureType();
 			datastore.createSchema(ft);
+			DefaultFeatureCollection fc = (DefaultFeatureCollection) DefaultFeatureCollections
+					.newCollection();
+			fc.addAll(features);
 			((FeatureStore) datastore.getFeatureSource(ft.getTypeName()))
-					.addFeatures(DataUtilities.reader(features));
+					.addFeatures(fc
+					// DataUtilities.reader(features)
+					);
 		}
 	}
 
@@ -88,8 +100,6 @@ public class MATSimNet2QGIS {
 		Gbl.createConfig(null);
 		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 	}
 
 	/**
@@ -154,10 +164,11 @@ public class MATSimNet2QGIS {
 		new MatsimEventsReader(events).readFile(eventsFilename);
 	}
 
-	public void readPlans(final String plansFilename, final AbstractPersonAlgorithm pa) {
+	public void readPlans(final String plansFilename,
+			final AbstractPersonAlgorithm pa) {
 		Population population = new Population();
 		population.addAlgorithm(pa);
-		new MatsimPopulationReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
 		population.runAlgorithms();
 	}
 

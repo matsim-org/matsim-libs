@@ -23,8 +23,6 @@
  */
 package playground.yu.utils.qgis;
 
-import org.matsim.network.Link;
-
 /**
  * offers "Well Known Text" (WKT) for CRS objects, e.g. "ch1903"
  * 

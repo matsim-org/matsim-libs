@@ -27,35 +27,31 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.world.World;
 
 /**
  * test of NewAgentPtPlan
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class MakeHwhPlansControler {
 
 	public static void main(final String[] args) {
 		final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String plansFilename = "./test/yu/ivtch/input/allPlansZuerich.xml.gz";
-
-		World world = Gbl.getWorld();
 		Config config = Gbl
 				.createConfig(new String[] { "./test/yu/ivtch/config_for_make_hwhPlans.xml" });
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 
 		HwhPlansMaker hpm = new HwhPlansMaker(network, config, population);
 		population.addAlgorithm(hpm);
 
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
 		plansReader.readFile(plansFilename);
 
 		population.runAlgorithms();

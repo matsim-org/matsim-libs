@@ -179,7 +179,9 @@ public class PtcheckControlerTest extends Controler {
 			NetworkLayer nl = c.getNetwork();
 			Population ps = c.getPopulation();
 			if (event.getIteration() == c.getLastIteration()) {
-				this.orms = new OnRouteModalSplit("Zurich", 300, nl, ps);
+				this.orms = new OnRouteModalSplit("Zurich", 300,
+				// nl,
+						ps);
 				es.addHandler(this.orms);
 				this.ttms = new TravelTimeModalSplit(300, nl, ps);
 				es.addHandler(this.ttms);

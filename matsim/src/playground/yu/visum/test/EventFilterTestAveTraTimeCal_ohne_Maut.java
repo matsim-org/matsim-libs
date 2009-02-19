@@ -31,7 +31,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.world.World;
 
 import playground.yu.visum.filter.EventFilterAlgorithm;
 import playground.yu.visum.filter.finalFilters.AveTraTimeCal;
@@ -45,14 +44,11 @@ import playground.yu.visum.writer.PrintStreamUDANET;
 public class EventFilterTestAveTraTimeCal_ohne_Maut {
 
 	public static void testRunAveTraTimeCal() throws IOException {
-
-		World world = Gbl.getWorld();
 		Config config = Gbl.getConfig();
 
 		// network
 		System.out.println("  creating network object... ");
-		NetworkLayer network = (NetworkLayer) world.createLayer(
-				NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		System.out.println("  done.");
 
 		System.out.println("  reading network file... ");
@@ -70,7 +66,8 @@ public class EventFilterTestAveTraTimeCal_ohne_Maut {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans,
+				network);
 		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 
@@ -117,8 +114,8 @@ public class EventFilterTestAveTraTimeCal_ohne_Maut {
 	}
 
 	/**
-	 * @param args -
-	 *            test/yu/config_hm_ohne_Maut.xml config_v1.dtd
+	 * @param args
+	 *            - test/yu/config_hm_ohne_Maut.xml config_v1.dtd
 	 * @throws Exception
 	 */
 	public static void main(final String[] args) throws Exception {

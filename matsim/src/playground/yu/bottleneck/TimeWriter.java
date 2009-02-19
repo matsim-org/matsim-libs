@@ -37,7 +37,6 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.charts.XYScatterChart;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.World;
 
 /**
  * prepare Departure time- arrival Time- Diagramm
@@ -154,12 +153,9 @@ public class TimeWriter implements AgentDepartureEventHandler,
 		final String chartFilename = "./test/yu/test/output/7-9-6.times.png";
 
 		Gbl.createConfig(null);
-		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Events events = new Events();
 

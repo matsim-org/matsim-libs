@@ -27,7 +27,6 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
-import org.matsim.world.World;
 
 public class OnRouteModalSplitTest {
 
@@ -43,7 +42,6 @@ public class OnRouteModalSplitTest {
 	 * @param args4
 	 *            legFilename
 	 */
-	@SuppressWarnings("unchecked")
 	public static void main(final String[] args) {
 		final String netFilename = args[0];
 		final String plansFilename = args[1];
@@ -54,19 +52,17 @@ public class OnRouteModalSplitTest {
 		Gbl.startMeasurement();
 		Gbl.createConfig(null);
 
-		World world = Gbl.getWorld();
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
-		new MatsimPopulationReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
 		Events events = new Events();
 
-		OnRouteModalSplit mlh = new OnRouteModalSplit("normal",300, network, population);
+		OnRouteModalSplit mlh = new OnRouteModalSplit("normal", 300,
+		// network,
+				population);
 		events.addHandler(mlh);
 
 		new MatsimEventsReader(events).readFile(eventsFilename);

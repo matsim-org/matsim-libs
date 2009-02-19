@@ -27,7 +27,6 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
-import org.matsim.world.World;
 
 import playground.yu.analysis.PtCheck2;
 
@@ -40,19 +39,16 @@ public class PtCheckTest {
 		Gbl
 				.createConfig(new String[] { "./test/yu/test/configPtcheckTest.xml" });
 
-		World world = Gbl.getWorld();
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 		try {
 			PtCheck2 pc = new PtCheck2(ptcheckFilename);
 
 			population.addAlgorithm(pc);
-			new MatsimPopulationReader(population).readFile(plansFilename);
+			new MatsimPopulationReader(population, network)
+					.readFile(plansFilename);
 			population.runAlgorithms();
 
 			pc.write(100);

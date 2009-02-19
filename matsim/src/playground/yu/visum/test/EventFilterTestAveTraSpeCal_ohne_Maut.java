@@ -31,7 +31,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.world.World;
 
 import playground.yu.visum.filter.EventFilterAlgorithm;
 import playground.yu.visum.filter.finalFilters.AveTraSpeCal;
@@ -46,7 +45,7 @@ import playground.yu.visum.writer.PrintStreamUDANET;
  * (EventFilterAlgorithm, EventFilterPersonSpecific, AveTraSpeCal)] [to read
  * events file] [to run events algorithms] [to print additiv netFile of
  * Visum...] [to print attributsFile of link...]
- *
+ * 
  * @author yu chen
  */
 public class EventFilterTestAveTraSpeCal_ohne_Maut {
@@ -69,14 +68,11 @@ public class EventFilterTestAveTraSpeCal_ohne_Maut {
 	 */
 
 	public static void testRunAveTraSpeCal() throws IOException {
-
-		World world = Gbl.getWorld();
 		Config config = Gbl.getConfig();
 
 		// network
 		System.out.println("  creating network object... ");
-		NetworkLayer network = (NetworkLayer) world.createLayer(
-				NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		System.out.println("  done.");
 
 		System.out.println("  reading network file... ");
@@ -95,7 +91,8 @@ public class EventFilterTestAveTraSpeCal_ohne_Maut {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans,
+				network);
 		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 

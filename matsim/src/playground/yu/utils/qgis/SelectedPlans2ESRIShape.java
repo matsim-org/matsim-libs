@@ -174,6 +174,7 @@ public class SelectedPlans2ESRIShape {
 		ShapeFileWriter.writeGeometries(fts, outputFile);
 	}
 
+	@SuppressWarnings("deprecation")
 	private Feature getActFeature(final String id, final Act act) {
 		String type = act.getType();
 		String linkId = act.getLinkId().toString();
@@ -195,6 +196,7 @@ public class SelectedPlans2ESRIShape {
 		return null;
 	}
 
+	@SuppressWarnings("deprecation")
 	protected Feature getLegFeature(final Leg leg, final String id) {
 		Integer num = leg.getNum();
 		BasicLeg.Mode mode = leg.getMode();
@@ -291,14 +293,12 @@ public class SelectedPlans2ESRIShape {
 		final String outputDir = "./plans/";
 
 		Gbl.createConfig(null);
-		Gbl.createWorld();
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 
 		Population population = new Population();
-		new MatsimPopulationReader(population).readFile(populationFilename);
+		new MatsimPopulationReader(population, network)
+				.readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population,

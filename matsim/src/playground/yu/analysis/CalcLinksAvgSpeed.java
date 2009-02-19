@@ -46,7 +46,6 @@ import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
 /**
@@ -282,8 +281,8 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		for (int i = 0; i < xsLength; i++)
 			if (speedsCount[i] > 0)
 				ySpeed[i] = speeds[i] / speedsCount[i];
-		XYLineChart avgSpeedChart = new XYLineChart("avg. speed in cityarea", "time",
-				"avg. speed [km/h]");
+		XYLineChart avgSpeedChart = new XYLineChart("avg. speed in cityarea",
+				"time", "avg. speed [km/h]");
 		avgSpeedChart.addSeries("avg. speed of all agents", xs, ySpeed);
 		avgSpeedChart.saveAsPng(chartFilename, 1024, 768);
 	}
@@ -318,12 +317,9 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		final String outputPath = args[2];
 
 		Gbl.createConfig(null);
-		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Events events = new Events();
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, 900);
@@ -362,12 +358,9 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		final String outputPath = args[3];
 
 		Gbl.createConfig(null);
-		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Events events = new Events();
 

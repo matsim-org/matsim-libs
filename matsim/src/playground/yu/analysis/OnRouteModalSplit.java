@@ -42,7 +42,6 @@ import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
-import org.matsim.network.NetworkLayer;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.charts.XYLineChart;
@@ -65,7 +64,7 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 	private final int[] ptDep, ptArr, ptOnRoute;
 	private int[] otherDep = null, otherArr = null, otherStuck = null,
 			otherOnRoute = null;
-	private final NetworkLayer network;
+	// private final NetworkLayer network;
 	private final Population plans;
 
 	/**
@@ -78,7 +77,9 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 	 *            The number of time bins for this analysis.
 	 */
 	public OnRouteModalSplit(String scenario, final int binSize,
-			final int nofBins, NetworkLayer network, Population plans) {
+			final int nofBins,
+			// NetworkLayer network,
+			Population plans) {
 		super();
 		this.scenario = scenario;
 		this.binSize = binSize;
@@ -101,7 +102,7 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 			this.otherStuck = new int[nofBins + 1];
 		}
 		reset(0);
-		this.network = network;
+		// this.network = network;
 		this.plans = plans;
 	}
 
@@ -113,13 +114,19 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 	 *            The size of a time bin in seconds.
 	 */
 	public OnRouteModalSplit(String scenario, final int binSize,
-			NetworkLayer network, Population plans) {
-		this(scenario, binSize, 30 * 3600 / binSize + 1, network, plans);
+	// NetworkLayer network,
+			Population plans) {
+		this(scenario, binSize, 30 * 3600 / binSize + 1,
+		// network,
+				plans);
 	}
 
-	public OnRouteModalSplit(String scenario, NetworkLayer network,
+	public OnRouteModalSplit(String scenario,
+	// NetworkLayer network,
 			Population plans) {
-		this(scenario, 300, network, plans);
+		this(scenario, 300,
+		// network,
+				plans);
 	}
 
 	/* Implementation of eventhandler-Interfaces */

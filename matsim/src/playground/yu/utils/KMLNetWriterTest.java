@@ -43,19 +43,18 @@ public class KMLNetWriterTest {
 	 */
 	public static void main(String[] args) {
 		final String netFilename = "../schweiz-ivtch/network/ivtch-changed.xml";
-//		final String netFilename = "./test/yu/ivtch/input/network.xml";
-//		final String netFilename = "./test/yu/equil_test/equil_net.xml";
-//		final String kmzFilename = "./test/yu/ivtch/output/testEquil.kmz";
+		// final String netFilename = "./test/yu/ivtch/input/network.xml";
+		// final String netFilename = "./test/yu/equil_test/equil_net.xml";
+		// final String kmzFilename = "./test/yu/ivtch/output/testEquil.kmz";
 		final String kmzFilename = "./test/yu/ivtch/output/testZrh.kmz";
 
 		Gbl.createConfig(null);
 
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
-				NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
-		
+
 		DocumentType d = kmlObjectFactory.createDocumentType();
 		d.setId(kmzFilename);
 		KmlType k = kmlObjectFactory.createKmlType();
@@ -74,15 +73,16 @@ public class KMLNetWriterTest {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		f.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(mkl));
+		f.getAbstractFeatureGroup().add(
+				kmlObjectFactory.createScreenOverlay(mkl));
 
 		KmlNetworkWriter nw = new KmlNetworkWriter(network,
-//				new AtlantisToWGS84()
-				new CH1903LV03toWGS84()
-		, kw, d);
+		// new AtlantisToWGS84()
+				new CH1903LV03toWGS84(), kw, d);
 
 		try {
-			f.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(nw.getNetworkFolder()));
+			f.getAbstractFeatureGroup().add(
+					kmlObjectFactory.createFolder(nw.getNetworkFolder()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

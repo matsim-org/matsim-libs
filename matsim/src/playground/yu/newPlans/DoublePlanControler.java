@@ -27,7 +27,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.world.World;
 
 /**
  * test of DoublePtPlan
@@ -41,20 +40,18 @@ public class DoublePlanControler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		World world = Gbl.getWorld();
 		Config config = Gbl
 				.createConfig(new String[] { "./test/yu/newPlans/newPlans.xml" });
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 		DoublePlan dp = new DoublePlan(population);
 		population.addAlgorithm(dp);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
 		plansReader.readFile(config.plans().getInputFile());
 		population.runAlgorithms();
 		dp.writeEndPlans();

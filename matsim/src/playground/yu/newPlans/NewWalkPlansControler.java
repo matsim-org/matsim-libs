@@ -40,13 +40,11 @@ public class NewWalkPlansControler {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 
 		Population population = new Population();
 		NewAgentWalkPlan nawp = new NewAgentWalkPlan(population);
 		population.addAlgorithm(nawp);
-		new MatsimPopulationReader(population).readFile(config.plans()
+		new MatsimPopulationReader(population, network).readFile(config.plans()
 				.getInputFile());
 		population.runAlgorithms();
 		nawp.writeEndPlans();

@@ -59,13 +59,12 @@ public class NewIdPlan extends NewPlan {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 
 		Population plans = new Population();
 		NewIdPlan nip = new NewIdPlan(plans);
 		plans.addAlgorithm(nip);
-		new MatsimPopulationReader(plans).readFile(config.plans().getInputFile());
+		new MatsimPopulationReader(plans, network).readFile(config.plans()
+				.getInputFile());
 		plans.runAlgorithms();
 		nip.writeEndPlans();
 	}

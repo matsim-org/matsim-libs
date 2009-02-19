@@ -78,6 +78,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 	 *
 	 * @see org.matsim.population.algorithms.AbstractPersonAlgorithm#run(org.matsim.population.Person)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run(final Person person) {
 		int nofPlans = person.getPlans().size();

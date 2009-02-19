@@ -23,8 +23,7 @@ public class PersonFilterTest {
 		System.out.println("TEST RUN ---FilterTest---:");
 		// reading all available input
 		System.out.println("  creating network layer... ");
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
-				NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");
@@ -50,7 +49,8 @@ public class PersonFilterTest {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans,
+				network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		System.out.println("  done.");
 

@@ -17,7 +17,6 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.World;
 
 /**
  * @author yu
@@ -37,15 +36,12 @@ public class LinkTrafficVolumeExtractor {
 		Gbl.startMeasurement();
 		Gbl.createConfig(null);
 
-		World world = Gbl.getWorld();
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
 
 		Population population = new Population();
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
 		Events events = new Events();
 

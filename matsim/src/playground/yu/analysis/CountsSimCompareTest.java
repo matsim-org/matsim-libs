@@ -20,7 +20,6 @@ import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.World;
 
 /**
  * quote from playground.balmermi.Scenario
@@ -41,13 +40,10 @@ public class CountsSimCompareTest {
 		double countsScaleFactor = 10.0;
 
 		Gbl.createConfig(null);
-		World world = Gbl.getWorld();
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		System.out.println("  reading the counts...");
 		final Counts counts = new Counts();

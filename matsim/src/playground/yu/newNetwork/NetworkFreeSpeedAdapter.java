@@ -44,7 +44,7 @@ public class NetworkFreeSpeedAdapter {
 	public static void main(final String[] args) {
 		final String inputNetFilename = "input/Toronto/connector_netclean.xml";
 		final String outputNetFilename = "output/Toronto/connector_netclean_freeSpeed_modified.xml.gz";
-		String logFilename = "output/Toronto/FreeSpeedAdaptor.log";
+		// String logFilename = "output/Toronto/FreeSpeedAdaptor.log";
 		Gbl.createConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputNetFilename);

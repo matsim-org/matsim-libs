@@ -40,7 +40,6 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.World;
 
 /**
  * @author yu
@@ -48,7 +47,7 @@ import org.matsim.world.World;
  */
 public class TripDurationHandler implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
-	private final NetworkLayer network;
+	// private final NetworkLayer network;
 
 	private final Population plans;
 
@@ -64,9 +63,10 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 	 */
 	private final HashMap<String, Double> tmpDptTimes = new HashMap<String, Double>();
 
-	public TripDurationHandler(final NetworkLayer network,
+	public TripDurationHandler(
+	// final NetworkLayer network,
 			final Population plans) {
-		this.network = network;
+		// this.network = network;
 		this.plans = plans;
 	}
 
@@ -153,20 +153,18 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 		Gbl.startMeasurement();
 		Gbl.createConfig(null);
 
-		World world = Gbl.getWorld();
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
 		Events events = new Events();
 
-		TripDurationHandler tdh = new TripDurationHandler(network, population);
+		TripDurationHandler tdh = new TripDurationHandler(
+		// network,
+				population);
 		events.addHandler(tdh);
 
 		System.out.println("-->reading evetsfile: " + eventsFilename);

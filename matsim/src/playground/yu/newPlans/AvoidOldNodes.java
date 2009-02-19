@@ -36,7 +36,6 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.routes.CarRoute;
-import org.matsim.world.World;
 
 /**
  * @author yu
@@ -91,14 +90,11 @@ public class AvoidOldNodes extends NewPlan {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		World world = Gbl.getWorld();
 		Config config = Gbl.createConfig(args);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 		AvoidOldNodes aon = new AvoidOldNodes(network, population);
@@ -109,7 +105,7 @@ public class AvoidOldNodes extends NewPlan {
 			aon.addLink(Integer.toString(i));
 		}
 		population.addAlgorithm(aon);
-		new MatsimPopulationReader(population).readFile(config.plans()
+		new MatsimPopulationReader(population, network).readFile(config.plans()
 				.getInputFile());
 		population.runAlgorithms();
 		aon.writeEndPlans();

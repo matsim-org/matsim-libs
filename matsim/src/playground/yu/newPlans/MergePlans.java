@@ -29,7 +29,6 @@ import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.world.World;
 
 /**
  * @author ychen
@@ -52,7 +51,8 @@ public class MergePlans {
 	private static final class PersonIdCopyPlans extends CopyPlans {
 		private final int lower_limit;
 
-		public PersonIdCopyPlans(final PopulationWriter writer, final int lower_limit) {
+		public PersonIdCopyPlans(final PopulationWriter writer,
+				final int lower_limit) {
 			super(writer);
 			this.lower_limit = lower_limit;
 		}
@@ -84,26 +84,22 @@ public class MergePlans {
 		// "sum_plans_100pt_201-300.xml";
 
 		final int lower_limit = 1000000000;
-
-		World world = Gbl.createWorld();
 		Config config = Gbl.createConfig(null);
 		config.plans().setOutputFile(outputPlansFilename);
 		config.plans().switchOffPlansStreaming(false);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population plansA = new Population();
 		PopulationWriter pw = new PopulationWriter(plansA);
 		plansA.addAlgorithm(new CopyPlans(pw));
-		new MatsimPopulationReader(plansA).readFile(plansFilenameA);
+		new MatsimPopulationReader(plansA, network).readFile(plansFilenameA);
 		plansA.runAlgorithms();
 
 		Population plansB = new Population();
 		plansB.addAlgorithm(new PersonIdCopyPlans(pw, lower_limit));
-		new MatsimPopulationReader(plansB).readFile(plansFilenameB);
+		new MatsimPopulationReader(plansB, network).readFile(plansFilenameB);
 		plansB.runAlgorithms();
 		pw.write();
 	}

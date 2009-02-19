@@ -26,7 +26,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.world.World;
 
 /**
  * test of NewAgentPtPlan
@@ -39,22 +38,19 @@ public class NewPtPlan3Controler {
 	public static void main(final String[] args) {
 		final String netFilename = "../data/ivtch/input/network.xml";
 		final String plansFilename = "../data/ivtch/input/10pctZrhPlans.xml.gz";
-
-		World world = Gbl.getWorld();
 		Gbl
 				.createConfig(new String[] { "../data/ivtch/newAllPlansWithLicense.xml" });
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 		NewAgentPtPlan3 nap3 = new NewAgentPtPlan3(population);
 
 		population.addAlgorithm(nap3);
 
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
 		plansReader.readFile(plansFilename);
 
 		population.runAlgorithms();

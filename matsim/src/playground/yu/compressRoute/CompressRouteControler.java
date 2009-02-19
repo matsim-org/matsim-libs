@@ -29,13 +29,13 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.world.MatsimWorldReader;
-
 
 /**
- * Controler to run MATSim in order to get compression ratio of the sparely new network with sparely linkroute.
+ * Controler to run MATSim in order to get compression ratio of the sparely new
+ * network with sparely linkroute.
+ * 
  * @author ychen
- *
+ * 
  */
 public class CompressRouteControler {
 
@@ -46,19 +46,13 @@ public class CompressRouteControler {
 	public static void main(String[] args) throws IOException {
 		Config config = Gbl.createConfig(args);
 
-		System.out.println("  reading world xml file... ");
-        final MatsimWorldReader world_parser = new MatsimWorldReader(Gbl.getWorld());
-        world_parser.readFile(config.world().getInputFile());
-        System.out.println("  done.");
-
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer) Gbl.getWorld().createLayer(
-				NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(config.network()
+				.getInputFile());
 		System.out.println("  done.");
 
-// 		analyse Netzwerk, make TreeMap<String ssLinkId, String linkId>
+		// analyse Netzwerk, make TreeMap<String ssLinkId, String linkId>
 		System.out.println("-->analysiing network");
 		SubsequentCapacity ss = new SubsequentCapacity(network);
 		ss.compute();
@@ -66,10 +60,11 @@ public class CompressRouteControler {
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.USE_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
-//		compress routes
-		CompressRoute cr=new CompressRoute(ss.getSsLinks(), plans,
-		"./test/yu/output/linkrout_capacity.txt");
+		PopulationReader plansReader = new MatsimPopulationReader(plans,
+				network);
+		// compress routes
+		CompressRoute cr = new CompressRoute(ss.getSsLinks(), plans,
+				"./test/yu/output/linkrout_capacity.txt");
 		plans.addAlgorithm(cr);
 		System.out.println("  done.");
 

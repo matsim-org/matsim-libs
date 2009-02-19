@@ -135,6 +135,7 @@ public class PtPlansFileCreator {
 		createPtPerson("1981", endTime, "7621", getSrcRoute(northNodes));
 	}
 
+	@SuppressWarnings("deprecation")
 	private void createPtPerson(String startLinkId, String endTime,
 			String endLinkId, List<Node> srcRoute) {
 
@@ -142,16 +143,16 @@ public class PtPlansFileCreator {
 		try {
 			Plan pl = new Plan(p);
 			p.addPlan(pl);
-			Link link = this.network.getLink(new IdImpl(startLinkId));
-			Act a = pl.createAct("h", link);
+			Link startLink = this.network.getLink(new IdImpl(startLinkId));
+			Act a = pl.createAct("h", startLink);
 			a.setEndTime(Time.parseTime(endTime));
 			Leg leg = pl.createLeg(Mode.car);
 			leg.setDepartureTime(Time.parseTime(endTime));
 			CarRoute route = new NodeCarRoute();
 			leg.setRoute(route);
-			route.setNodes(srcRoute);
-			link = this.network.getLink(new IdImpl(endLinkId));
-			pl.createAct("w", link);
+			Link endLink = this.network.getLink(new IdImpl(endLinkId));
+			pl.createAct("w", endLink);
+			route.setNodes(startLink, srcRoute, endLink);
 			pop.addPerson(p);
 			personCount++;
 			System.out.println("i have " + pop.getPersons().size()
@@ -175,8 +176,6 @@ public class PtPlansFileCreator {
 		Gbl.createConfig(null);
 		pfc.setNetwork(new NetworkLayer());
 		new MatsimNetworkReader(pfc.getNetwork()).readFile(netFilename);
-		Gbl.getWorld().setNetworkLayer(pfc.getNetwork());
-		Gbl.getWorld().complete();
 
 		pfc.setPop(new Population());
 		PopulationWriter writer = new PopulationWriter(pfc.getPop(),

@@ -46,7 +46,6 @@ import org.matsim.population.Population;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
-import org.matsim.world.World;
 
 /**
  * @author ychen
@@ -54,7 +53,7 @@ import org.matsim.world.World;
  */
 public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler, AgentStuckEventHandler {
-	private final NetworkLayer network;
+	// private final NetworkLayer network;
 
 	private final Population plans;
 
@@ -76,8 +75,9 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 	 * 
 	 */
 	public TravelTimeModalSplit(final int binSize, final int nofBins,
-			final NetworkLayer network, final Population plans) {
-		this.network = network;
+	// final NetworkLayer network,
+			final Population plans) {
+		// this.network = network;
 		this.plans = plans;
 		this.binSize = binSize;
 		travelTimes = new double[nofBins + 1];
@@ -90,7 +90,9 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 
 	public TravelTimeModalSplit(final int binSize, final NetworkLayer network,
 			final Population plans) {
-		this(binSize, 30 * 3600 / binSize + 1, network, plans);
+		this(binSize, 30 * 3600 / binSize + 1,
+		// network,
+				plans);
 	}
 
 	public TravelTimeModalSplit(final NetworkLayer network,
@@ -256,6 +258,7 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 						ptTravelTimes);
 		avgTravelTimeChart.saveAsPng(filename + "Avg.png", 1024, 768);
 	}
+
 	public static void main(final String[] args) {
 		final String netFilename = "../psrc/network/psrc-wo-3212.xml.gz";
 		final String plansFilename = "../runs/run668/it.1500/1500.plans.xml.gz";
@@ -276,15 +279,12 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 		Gbl.startMeasurement();
 		Gbl.createConfig(null);
 
-		World world = Gbl.getWorld();
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
 
 		Population population = new Population();
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
 		Events events = new Events();
 

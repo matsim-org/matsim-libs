@@ -46,7 +46,6 @@ import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.World;
 
 /**
  * @author ychen
@@ -207,13 +206,9 @@ public class RouteSummaryTest {
 		Gbl.startMeasurement();
 		Gbl.createConfig(null);
 
-		World world = Gbl.getWorld();
-
 		NetworkLayer network = new NetworkLayer();
 		System.out.println("-->reading networkfile: " + netFilename);
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
 
@@ -221,7 +216,7 @@ public class RouteSummaryTest {
 		population.addAlgorithm(rs);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
 		population.runAlgorithms();
 		rs.write();

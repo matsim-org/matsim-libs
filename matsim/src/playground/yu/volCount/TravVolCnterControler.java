@@ -32,7 +32,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.world.World;
 
 /**
  * test for TraVolCnter
@@ -45,17 +44,14 @@ public class TravVolCnterControler {
 	public static void main(final String[] args) {
 		final String netFilename = "./equil/equil_net.xml";
 		final String plansFilename = "./equil/equil_plans.xml";
-
-		World world = Gbl.getWorld();
 		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
 		plansReader.readFile(plansFilename);
 
 		Events events = new Events();

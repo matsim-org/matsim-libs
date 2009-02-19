@@ -44,7 +44,6 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.World;
 
 /**
  * @author ychen
@@ -73,15 +72,15 @@ public class Wait2Link_2Acts1LinkTest {
 		private boolean actsAtSameLink;
 		private int actLocCount = 0, personCount = 0;
 		/**
-		 * @param arg0-String
-		 *            agentId;
-		 * @param arg1-String
-		 *            linkId, which indicates a link, where 2 following
+		 * @param arg0
+		 *            -String agentId;
+		 * @param arg1
+		 *            -String linkId, which indicates a link, where 2 following
 		 *            activities happened.
 		 */
 		private final Set<AgentLinkPair> agentLinks = new HashSet<AgentLinkPair>();
 
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings( { "unchecked", "deprecation" })
 		@Override
 		public void run(final Person person) {
 			actsAtSameLink = false;
@@ -141,9 +140,9 @@ public class Wait2Link_2Acts1LinkTest {
 		private int overlapCount;
 
 		/**
-		 * @param linkIds-
-		 *            a map<String agentId,String linkId> of the agentId-linkId
-		 *            pair from SameActLoc
+		 * @param linkIds
+		 *            - a map<String agentId,String linkId> of the
+		 *            agentId-linkId pair from SameActLoc
 		 */
 		public Wait2Link(final Set<AgentLinkPair> agentLinkPairs,
 				final String outputFilename) {
@@ -204,19 +203,16 @@ public class Wait2Link_2Acts1LinkTest {
 		final String outputFilename = "../data/ivtch/Wait2Links_2Acts1Link.txt.gz";
 
 		Gbl.createConfig(null);
-		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 		Population population = new Population();
 
 		SameActLoc sal = new SameActLoc();
 		population.addAlgorithm(sal);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
 		population.runAlgorithms();
 

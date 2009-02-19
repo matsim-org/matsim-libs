@@ -29,7 +29,6 @@ import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.World;
 
 public class CapacityTest {
 
@@ -39,13 +38,10 @@ public class CapacityTest {
 	public static void main(final String[] args) {
 		final String netFilename = "../schweiz-ivtch/network/ivtch-osm-wu.xml";
 		final String outputFilename = "test/yu/test/captest.txt";
-		World world = Gbl.getWorld();
 		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outputFilename);

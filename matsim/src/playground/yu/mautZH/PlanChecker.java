@@ -30,8 +30,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -110,8 +110,8 @@ public class PlanChecker extends AbstractPersonAlgorithm {
 		for (Plan pl : person.getPlans()) {
 			// if (pl.getType().equals("oev")) {
 			StringBuilder text = new StringBuilder("\t");
-			for (Iterator<Leg> it = pl.getIteratorLeg(); it.hasNext();) {
-				Leg l = it.next();
+			for (LegIterator it = pl.getIteratorLeg(); it.hasNext();) {
+				Leg l = (Leg) it.next();
 				CarRoute r = (CarRoute) l.getRoute();
 				text.append(r.getDist() + "\t" + r.getTravelTime() + "\t");
 			}
