@@ -39,6 +39,7 @@ import org.matsim.utils.geometry.CoordImpl;
  * @see AbstractLocation
  * @author Michael Balmer
  */
+@Deprecated // use of current matsim zone object is discouraged; use geotools instead
 public class Zone extends AbstractLocation {
 
 	//////////////////////////////////////////////////////////////////////
@@ -54,6 +55,7 @@ public class Zone extends AbstractLocation {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated // use of current matsim zone object is discouraged; use geotools instead
 	protected Zone(final ZoneLayer layer, final Id id, final Coord center) {
 		super(layer,id,center);
 		this.setMin(center);
@@ -62,6 +64,7 @@ public class Zone extends AbstractLocation {
 		this.setName(null);
 	}
 
+	@Deprecated // use of current matsim zone object is discouraged; use geotools instead
 	protected Zone(final ZoneLayer layer, final Id id, final Coord center,
 			final Coord min, final Coord max) {
 		this(layer, id, center);
@@ -69,6 +72,7 @@ public class Zone extends AbstractLocation {
 		this.setMax(max);
 	}
 
+	@Deprecated // use of current matsim zone object is discouraged; use geotools instead
 	public Zone(final ZoneLayer layer, final Id id, final Coord center,
 	               final Coord min, final Coord max, final double area, final String name) {
 		this(layer, id, center, min, max);
@@ -158,6 +162,7 @@ public class Zone extends AbstractLocation {
 	// query methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated // use of current matsim zone object is discouraged; use geotools instead
 	public final boolean contains(final Coord coord) {
 		double x = coord.getX();
 		double y = coord.getY();
