@@ -64,11 +64,12 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	private final String					LC_MODE;
 	private final PreProcessLandmarks		preProcessRoutingData;
 	private final ScoringFunctionFactory	factory;
-	private final PlanAlgorithm				timer;
+	private final PlanAlgorithm				timer, finalTimer;
 	private final LocationMutatorwChoiceSet locator;
 	private final PlansCalcRouteLandmarks 	router;
 	private final PlanScorer 				scorer;
 	private static final Logger 			log = Logger.getLogger(PlanomatX18.class);
+	private final String					finalOpt;
 	
 	
 	
@@ -95,6 +96,8 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		//this.timer					= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
 		this.timer					= new TimeModeChoicer1(legTravelTimeEstimator, this.scorer);
 		//this.timer		 			= new Planomat (legTravelTimeEstimator, this.factory);
+		//this.finalTimer				= new Planomat (legTravelTimeEstimator, this.factory);
+		this.finalTimer				= this.timer;
 		this.locator				= locator;
 		this.NEIGHBOURHOOD_SIZE 	= 10;				
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
@@ -103,6 +106,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		this.MAX_ITERATIONS 		= 20;
 		this.LC_MODE				= "reducedLC";		/* reducedLC=only modified secondary acts will be located; fullLC=all secondary acts of the plan will be located*/
 		this.LC_SET_SIZE			= 1;
+		this.finalOpt				= "no";
 		
 	}
 	
@@ -122,6 +126,8 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		//this.timer					= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
 		this.timer					= new TimeModeChoicer1(legTravelTimeEstimator, this.scorer);
 		//this.timer		 			= new Planomat (legTravelTimeEstimator, this.factory);
+		//this.finalTimer				= new Planomat (legTravelTimeEstimator, this.factory);
+		this.finalTimer				= this.timer;
 		this.locator 				= locator;
 		this.NEIGHBOURHOOD_SIZE 	= 10;				
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
@@ -130,6 +136,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		this.MAX_ITERATIONS 		= 20;
 		this.LC_MODE				= "reducedLC";		/* reducedLC=only modified secondary acts will be located; fullLC=all secondary acts of the plan will be located*/
 		this.LC_SET_SIZE			= 1;
+		this.finalOpt				= "no";
 		
 	}
 	
@@ -347,7 +354,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 				stream.print(infoOnNeighbourhood[x][1]+"\t");
 				stream.print(infoOnNeighbourhood[x][2]+"\t");
 				stream.println();
-				*/	
+				*/
 			}
 			
 			/* Find best non-tabu plan. Becomes this iteration's solution. Write it into the tabuList*/
@@ -360,9 +367,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	//		ys[currentIteration]=bestIterSolution.getScore();
 	//		stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());	
 			if (bestIterSolution.getScore()>bestScore) bestScore=bestIterSolution.getScore();
-			if (currentIteration%5==0){
-				scoreStat.add(bestScore);
-			}
+			if (currentIteration%5==0) scoreStat.add(bestScore);
 			
 			if (this.MAX_ITERATIONS==currentIteration){
 				log.info("Tabu Search regularly finished for person "+plan.getPerson().getId()+" at iteration "+currentIteration);	
@@ -382,13 +387,28 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		java.util.Collections.sort(tabuList);
 		ArrayList<Object> al = plan.getActsLegs();
 		
+		
 		// TODO must be removed before putting into core!
 		plan.setScore(tabuList.get(tabuList.size()-1).getScore());
+		
 		
 	//	stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
 		
 	//	xs = new double [currentIteration];
 	//	for (int i = 0;i<xs.length;i++)xs[i]=i+1;
+		
+		if (this.finalOpt.equals("yes")){
+			this.finalTimer.run(tabuList.get(tabuList.size()-1));
+			tabuList.get(tabuList.size()-1).setScore(this.scorer.getScore(tabuList.get(tabuList.size()-1)));
+			scoreStat.add(tabuList.get(tabuList.size()-1).getScore());
+	/*		stream.print(tabuList.get(tabuList.size()-1).getScore()+"\t\t\t\t");
+			for (int i= 0;i<tabuList.get(tabuList.size()-1).getActsLegs().size();i=i+2){
+				Act act = (Act)tabuList.get(tabuList.size()-1).getActsLegs().get(i);
+				if (i!=tabuList.get(tabuList.size()-1).getActsLegs().size()-1) stream.print(act.getType()+"\t"+((Leg)(tabuList.get(tabuList.size()-1).getActsLegs()).get(i+1)).getMode()+"\t");
+				else stream.print(act.getType()+"\t");
+			}
+			stream.println(); */
+		}
 		
 		if(al.size()>tabuList.get(tabuList.size()-1).getActsLegs().size()){ 
 			int i;
