@@ -20,7 +20,6 @@
 
 package org.matsim.interfaces.basic.v01;
 
-import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
@@ -36,7 +35,7 @@ public interface BasicPlan {
 	 * instead to test if a plan has an undefined score.
 	 */
 	public static final double UNDEF_SCORE = Double.NaN;
-	// TODO [kai] Eigentlich ist Double.NaN besonders fehleranfŠllig, weil jeder Vergleich falsch ist.  Mšglichkeiten
+	// TODO [kai] Eigentlich ist Double.NaN besonders fehleranfï¿½llig, weil jeder Vergleich falsch ist.  Mï¿½glichkeiten
 	// *  -Double.INFINITY
 	// *  -99999999
 	// *  diese Konstante "private" machen
