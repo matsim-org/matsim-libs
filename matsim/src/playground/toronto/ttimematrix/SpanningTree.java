@@ -117,6 +117,22 @@ public class SpanningTree {
 		return this.nodeData;
 	}
 	
+	public final TravelTime getTravelTimeCalculator() {
+		return this.ttFunction;
+	}
+	
+	public final TravelCost getTravelCostCalulator() {
+		return this.tcFunction;
+	}
+	
+	public final Node getOrigin() {
+		return this.origin;
+	}
+	
+	public final double getDepartureTime() {
+		return this.dTime;
+	}
+	
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////

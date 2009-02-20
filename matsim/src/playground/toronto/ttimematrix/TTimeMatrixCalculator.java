@@ -35,11 +35,10 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.collections.Tuple;
-
-import playground.toronto.ttimematrix.SpanningTree.NodeData;
 
 public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
@@ -49,6 +48,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	
 	private static final Logger log = Logger.getLogger(TTimeMatrixCalculator.class);
 	private final Map<Id,Id> l2zMapping;
+	private final Map<Id,Set<Id>> z2nMapping;
 	private final Set<Integer> hours;
 	private final SpanningTree st;
 	private final NetworkLayer network;
@@ -68,6 +68,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 		this.l2zMapping = l2zMapping;
 		this.st = st;
 		this.network = network;
+		this.z2nMapping = createZoneToNodeMapping();
 		Set<Integer> hrs = new TreeSet<Integer>();
 		for (int i=0; i<hours.length; i++) { hrs.add(hours[i]); }
 		this.hours = hrs;
@@ -79,6 +80,21 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
+	
+	private final Map<Id,Set<Id>> createZoneToNodeMapping() {
+		log.info("  init ZoneToNodeMapping...");
+		Map<Id,Set<Id>> map = new HashMap<Id,Set<Id>>();
+		for (Id linkId : l2zMapping.keySet()) {
+			Id nodeId = network.getLink(linkId).getToNode().getId();
+			Id centroidNodeId = l2zMapping.get(linkId);
+			Set<Id> nodeIds = map.get(centroidNodeId);
+			if (nodeIds == null) { nodeIds = new HashSet<Id>(); map.put(centroidNodeId,nodeIds); }
+			nodeIds.add(nodeId);
+		}
+		log.info("    z2nMapping contains "+map.size()+" zones.");
+		log.info("  done.");
+		return map;
+	}
 	
 	/**
 	 * Produces a Map that has "fromZone,toZone" as key, and leaves the values open
@@ -148,8 +164,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	/**
 	 * For a given "hour" (given externally): 
 	 *    Goes through all fromZones
-	 *    Picks representative startNode for that zone
-	 *    (Well, no, the "zone" is a "node".  I guess these are centroids?!?!)
+	 *    Picks representative startNode (the centroid) for that zone
 	 *    Runs the spanning tree algo.  
 	 *    For every toZone:
 	 *        IF there is nothing in "tuple" then it takes the result from the spanning tree algo
@@ -176,8 +191,14 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 				String key = fzone.toString()+","+tzone.toString();
 				String values = matrix.get(key);
 				if (tuple.getSecond() == 0) {
-					double ttime = st.getTree().get(tzone).getTime()-hour*3600;
-					values = values +  "," + Math.round(ttime);
+					if (fzone.equals(tzone)) {
+						double ttime = calcAverageIntraZonalTravelTime(st);
+						values = values +  "," + Math.round(ttime);
+					}
+					else {
+						double ttime = st.getTree().get(tzone).getTime()-hour*3600;
+						values = values +  "," + Math.round(ttime);
+					}
 				}
 				else {
 					values = values + "," + Math.round(tuple.getFirst()/tuple.getSecond());
@@ -189,6 +210,20 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 		}
 		System.out.print("\n");
 		log.info("  done.");
+	}
+	
+	private final double calcAverageIntraZonalTravelTime(SpanningTree stLocal) {
+		Id originId = stLocal.getOrigin().getId();
+		Set<Id> nodeIds = z2nMapping.get(originId);
+		if (nodeIds == null) {
+			throw new RuntimeException("It is expected that there is at least one node given for each centroid.");
+		}
+		double ttime = 0.0;
+		for (Id nodeId : nodeIds) {
+			ttime += stLocal.getTree().get(nodeId).getTime()-hour*3600;
+		}
+		ttime = ttime / nodeIds.size();
+		return ttime;
 	}
 	
 	//////////////////////////////////////////////////////////////////////

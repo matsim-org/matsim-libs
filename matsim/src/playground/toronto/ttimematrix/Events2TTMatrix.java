@@ -70,18 +70,19 @@ public class Events2TTMatrix {
 	public static void main(String[] args) {
 		// input arguments
 		if (args.length != 5) {
-			System.out.println("Usage: ReadEvents XMLnetwork TXTevents l2z-mapping hours outputfile");
+			System.out.println("Usage: Events2TTMatrix XMLnetwork TXTevents l2z-mapping hours outputfile");
 			System.out.println("       XMLnetwork:  MATSim xml network");
 			System.out.println("       TXTevents:   MATSim text events file");
 			System.out.println("       l2z-mapping: link2zone mapping file (create it via playground.toronto.mapping.LinkZoneMapping)");
-			System.out.println("       hours:       list of hours for the matrix, e.g. '0,7,8,12,19,23'. range[0..23]");
+			System.out.println("       hours:       list of hours for the matrix, e.g. '0,7,8,12,19,23'. range[0..]");
 			System.out.println("       outputfile:  where to store the output ttime matrix file");
 			System.out.println();
-			System.out.println("example: ReadEvents input/network.xml.gz input/events.txt.gz input/l2z-mapping.txt 8,12,17 output/ttimes.txt");
+			System.out.println("example: Events2TTMatrix input/network.xml.gz input/events.txt.gz input/l2z-mapping.txt 8,12,17 output/ttimes.txt");
 			System.out.println();
 			System.out.println("----------------");
 			System.out.println("2008, matsim.org");
 			System.out.println();
+			System.exit(-1);
 		}
 		String networkfile = args[0];
 		String eventsfile = args[1];
