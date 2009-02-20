@@ -27,7 +27,6 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -70,8 +69,7 @@ public class ScoreTest extends AbstractPersonAlgorithm {
 		double sumScores = 0.0;
 		double cntScores = 0;
 		for (Plan plan : person.getPlans()) {
-
-			if (BasicPlanImpl.isUndefinedScore(plan.getScore()))
+			if (plan.hasUndefinedScore())
 				continue;
 			// worst plan
 			if (worstPlan == null)
