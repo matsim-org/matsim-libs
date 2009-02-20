@@ -65,7 +65,12 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	 * @return departure delay estimation
 	 */
 	public double getLinkDepartureDelay(Link link, double departureTime) {
-		return this.getDepartureDelayRole(link).getDepartureDelay(departureTime);
+		DepartureDelayData ddd = this.getDepartureDelayRole(link);
+		if (ddd == null) {
+			return 0.0;
+		} else {
+			return ddd.getDepartureDelay(departureTime);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -75,6 +80,10 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	/*package*/ class DepartureDelayData {
 		private double[] timeSum = null;
 		private int[] timeCnt = null;
+
+		private DepartureDelayData() {
+			this.resetDepartureDelays();
+		}
 
 		private int getTimeSlotIndex(double time) {
 			int slice = (int)(time/DepartureDelayAverageCalculator.this.timeBinSize);
@@ -120,12 +129,7 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	}
 
 	private DepartureDelayData getDepartureDelayRole(Link l) {
-		DepartureDelayData r = this.linkData.get(l);
-		if (null == r) {
-			r = new DepartureDelayData();
-			this.linkData.put(l, r);
-		}
-		return r;
+		return this.linkData.get(l);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -148,16 +152,18 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 			Link link = event.link;
 			if (null == link) link = this.network.getLink(event.linkId);
 			if (null != link) {
-				this.getDepartureDelayRole(link).addDepartureDelay(departureTime, departureDelay);
+				DepartureDelayData ddd = this.getDepartureDelayRole(link);
+				if (ddd == null) {
+					ddd = new DepartureDelayData();
+					this.linkData.put(link, ddd);
+				}
+				ddd.addDepartureDelay(departureTime, departureDelay);
 			}
 		}
 	}
 
 	public void resetDepartureDelays() {
-		log.warn("this method iterates over the entire network and eventually creates the roles. This might become very resource intensive and should be avoided! it's fine for the equil-net, but not for bigger networks");
-		for (Link link : this.network.getLinks().values()) {
-			getDepartureDelayRole(link).resetDepartureDelays();
-		}
+		this.linkData.clear();
 		this.departureEventsTimes.clear();
 	}
 
