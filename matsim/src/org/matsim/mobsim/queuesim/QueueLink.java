@@ -43,7 +43,7 @@ import org.matsim.utils.misc.Time;
  * @author mrieser
  *
  * A QueueLink can consist of one or more QueueLanes, which may have the following layout
- * (Dashes stand for the borders of the QueueLink, equal signs (=) depict one lane, 
+ * (Dashes stand for the borders of the QueueLink, equal signs (===) depict one lane, 
  * plus signs (+) symbolize a decision point where one lane splits into several lanes) :
  * <pre>
  * ----------------
@@ -346,9 +346,15 @@ public class QueueLink {
 				vehicle.getDepartureTime_s(), this);
 	}
 
-	//TODO dg adapt this to multi lane queues
 	protected boolean moveLinkWaitFirst(double time) {
-		return this.originalLane.moveLinkWaitFirst(time);
+		boolean ret = false;	
+		for (QueueLane lane : this.queueLanes){
+			if (lane.moveLaneWaitFirst(time)){
+				ret = true;
+			}
+		}
+		this.active = ret;
+		return ret;
 	}
 
 	protected boolean moveLink(double now) {
@@ -360,7 +366,6 @@ public class QueueLink {
 		}
 		this.active = ret;
 		return ret;
-//		return this.originalLane.moveLink(time);
 	}
 
 	protected boolean bufferIsEmpty() {

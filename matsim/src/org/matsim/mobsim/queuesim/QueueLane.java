@@ -493,7 +493,6 @@ public class QueueLane implements Comparable<QueueLane> {
 		
 		this.bufferCap = this.simulatedFlowCapacity;
 
-		
 		if (this.originalLane) {
 			// move vehicles from parking into waitingQueue if applicable
 			moveParkToWait(now);
@@ -511,6 +510,32 @@ public class QueueLane implements Comparable<QueueLane> {
 		return this.updateActiveStatus();
 	}
 
+	protected boolean moveLaneWaitFirst(final double now) {
+		if (this.meterFromLinkEnd == 0.0) {
+			if (this.originalLane || this.thisTimeStepGreen) 
+				updateBufferCapacity();
+		}
+		else {
+			updateBufferCapacity();
+		}
+		
+		this.bufferCap = this.simulatedFlowCapacity;
+		if (this.originalLane) {
+			// move vehicles from parking into waitingQueue if applicable
+			moveParkToWait(now);
+			// move vehicles from waitingQueue into buffer if possible
+			moveWaitToBuffer(now);
+		}
+		// move vehicles from link to buffer
+		moveLinkToBuffer(now);
+		
+		moveBufferToNextLane(now);
+
+		this.setThisTimeStepGreen(false);
+		return this.updateActiveStatus();
+	}
+
+	
 	private void moveBufferToNextLane(final double now) {
 		boolean moveOn = true;
 		while (moveOn && !this.bufferIsEmpty() && (this.toLanes != null)) {
@@ -533,20 +558,6 @@ public class QueueLane implements Comparable<QueueLane> {
 	}
 	
 
-	/*package*/ boolean moveLinkWaitFirst(final double now) {
-		if (!this.originalLane) {
-			throw new UnsupportedOperationException("Method not yet implemented for multilane simulation!");
-		}
-		updateBufferCapacity();
-		// move vehicles from parking into waitingQueue if applicable
-		moveParkToWait(now);
-		// move vehicles from waitingQueue into buffer if possible
-		moveWaitToBuffer(now);
-		// move vehicles from link to buffer
-		moveLinkToBuffer(now);
-
-		return this.updateActiveStatus();
-	}
 	
 	private void updateBufferCapacity() {
 //		this.bufferCap = this.simulatedFlowCapacity;
