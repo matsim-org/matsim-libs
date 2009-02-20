@@ -40,7 +40,11 @@ public interface BasicPlan {
 	// *  -99999999
 	// *  diese Konstante "private" machen
 	// In der jetzigen Form erscheint es mir auf jeden Fall maximal unrobust.  
-
+	
+	/**
+	 * @deprecated use Leg.Mode instead
+	 */
+	@Deprecated
 	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED}
 	
 	public double getScore();
@@ -67,8 +71,8 @@ public interface BasicPlan {
 	public boolean isSelected();
 	
 	public void setSelected(boolean selected);
-	
+	@Deprecated
 	public void setType(Type type);
-	
+	@Deprecated
 	public Type getType();
 }
