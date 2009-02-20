@@ -64,6 +64,7 @@ public class ActTimeEstimator extends AbstractPersonAlgorithm {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void run(Person person) {
 		for (ActIterator ai = person.getSelectedPlan().getIteratorAct(); ai
