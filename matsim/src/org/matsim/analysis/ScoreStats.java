@@ -114,7 +114,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 			double cntScores = 0;
 			for (Plan plan : person.getPlans()) {
 
-				if (Plan.isUndefinedScore(plan.getScore())) {
+				if (plan.hasUndefinedScore()) {
 					continue;
 				}
 

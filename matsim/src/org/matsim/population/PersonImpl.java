@@ -245,7 +245,7 @@ public class PersonImpl implements Person{
 			double worstScore = Double.POSITIVE_INFINITY;
 			for (Plan plan : this.delegate.getPlans()) {
 				if (typeCounts.get(plan.getType()).intValue() > 1) {
-					if (Plan.isUndefinedScore(plan.getScore())) {
+					if (plan.hasUndefinedScore()) {
 						worst = plan;
 						// make sure no other score could be less than this
 						worstScore = Double.NEGATIVE_INFINITY;
