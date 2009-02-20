@@ -124,9 +124,9 @@ public class CarAvail extends AbstractPersonAlgorithm {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		final String netFilename = "../data/ivtch/input/network.xml";
-		final String plansFilename = "../data/ivtch/run271/ITERS/it.100/100.plans.xml.gz";
-		final String outputFilename = "../data/ivtch/run271/CarAvail.txt";
+		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+		final String plansFilename = "../runs_SVN/run669/it.1000/1000.plans.xml.gz";
+		final String outputFilename = "../runs_SVN/run669/it.1000/CarAvail.txt";
 
 		Gbl.createConfig(null);
 
