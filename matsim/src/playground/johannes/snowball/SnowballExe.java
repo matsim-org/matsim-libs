@@ -142,8 +142,10 @@ public class SnowballExe {
 				statistics.put(key, new DegreeStats(outputDir + key));
 			} else if(CLUSTERING_KEY.equalsIgnoreCase(key)) {
 				statistics.put(key, new ClusteringStats(outputDir + key, responseRate));
-			} else if("clustering-global".equalsIgnoreCase(key)) {
-				statistics.put(key, new ClusteringStatsGlobal(outputDir + key, responseRate));
+			} else if("clustering2".equalsIgnoreCase(key)) {
+				statistics.put(key, new ClusteringStats2(outputDir + key, responseRate));
+			} else if("global-clustering".equalsIgnoreCase(key)) {
+				statistics.put(key, new GlobalClusteringStats(outputDir + key, responseRate));
 			} else if(DEGREE_CORRELATION_KEY.equalsIgnoreCase(key)) {
 				statistics.put(key, new DegreeCorrelationStats(outputDir + key, responseRate));
 			} else if("dcorrelation-weighted".equalsIgnoreCase(key)) {

@@ -161,6 +161,36 @@ public class GraphStatistics {
 		return stats;
 	}
 	
+	public static double getGlobalClusteringCoefficient(Graph g) {
+		int n_tripples = 0;
+		int n_triangles = 0;
+		for(Vertex v : g.getVertices()) {
+			List<? extends Vertex> n1s = v.getNeighbours();
+			for(int i = 0; i < n1s.size(); i++) {
+				List<? extends Vertex> n2s = n1s.get(i).getNeighbours();
+				for(int k = 0; k < n2s.size(); k++) {
+					n_tripples++;
+					if(n2s.get(k).getNeighbours().contains(v))
+						n_triangles++;
+				}
+			}
+		}
+		
+		return 3 * n_triangles / (double)n_tripples;
+	}
+	
+	public static int getNumTwoStars(Graph g) {
+		int n_tripples = 0;
+		for(Vertex v : g.getVertices()) {
+			List<? extends Vertex> n1s = v.getNeighbours();
+			for(int i = 0; i < n1s.size(); i++) {
+				n_tripples += n1s.get(i).getNeighbours().size();
+			}
+		}
+		
+		return n_tripples/2;
+	}
+	
 	/**
 	 * Calculates the mutuality of graph <tt>g</tt>, where mutuality is defined
 	 * as<br>

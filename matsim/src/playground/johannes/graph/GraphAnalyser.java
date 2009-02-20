@@ -58,8 +58,10 @@ public class GraphAnalyser {
 		double meanDegree = GraphStatistics.getDegreeStatistics(g).getMean();
 		logger.info(String.format("Mean degree is %1$s.", meanDegree));
 		
+		long time = System.currentTimeMillis();
 		double clustering = GraphStatistics.getClusteringStatistics(g).getMean();
 		logger.info(String.format("Mean clustering coefficient is %1$s.", clustering));
+		System.out.println(System.currentTimeMillis() - time);
 		
 		double mutuality = GraphStatistics.getMutuality(g);
 		logger.info(String.format("Mutuality is %1$s.", mutuality));
@@ -69,6 +71,10 @@ public class GraphAnalyser {
 		
 		double numComponents = GraphStatistics.getComponents(g).size();
 		logger.info(String.format("Number of disconnected components is %1$s.", numComponents));
+		
+		time = System.currentTimeMillis();
+		System.out.println("Global clustering is " + GraphStatistics.getGlobalClusteringCoefficient(g));
+		System.out.println(System.currentTimeMillis() - time);
 		
 		boolean extended = false;
 		for(String arg : args) {

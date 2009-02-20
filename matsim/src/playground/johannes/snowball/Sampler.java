@@ -24,6 +24,7 @@
 package playground.johannes.snowball;
 
 import gnu.trove.TIntArrayList;
+import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,6 +32,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
+import org.omg.PortableServer.ThreadPolicyOperations;
 
 import playground.johannes.graph.GraphProjection;
 import playground.johannes.graph.SparseVertex;
@@ -236,24 +239,26 @@ public class Sampler {
 			frac1 = getNumSampledVertices(this.iteration - 1)/(double)this.graph.getVertices().size();
 		}
 		
+		TObjectDoubleHashMap<SampledVertex> proba = new TObjectDoubleHashMap<SampledVertex>();
 		for(VertexDecorator<SampledVertex> v : this.projection.getVertices()) {
 			if(v.getDelegate().isSampled()) {
 				vList.add(v.getDelegate());
-				double p = 1;
-				if(this.iteration == 0)
-					p = frac1;
-				else if(iteration == 1) {
-					p = 1 - Math.pow(1 - frac1, v.getEdges().size());
-				} else {
-					for(SparseVertex n : v.getNeighbours()) {
-						if(((VertexDecorator<SampledVertex>)n).getDelegate().isSampled()) {
-							p *= 1 - (1 - Math.pow(1 - frac2, n.getEdges().size()));
-						} else {
-							p *= 1 - frac1;
-						}
-					}
-					p = 1 - p;
-				}
+//				double p = 1;
+//				if(this.iteration == 0)
+//					p = frac1;
+//				else if(iteration == 1) {
+//					p = 1 - Math.pow(1 - frac1, v.getEdges().size());
+//				} else {
+//					for(SparseVertex n : v.getNeighbours()) {
+//						if(((VertexDecorator<SampledVertex>)n).getDelegate().isSampled()) {
+//							p *= 1 - (1 - Math.pow(1 - frac2, n.getEdges().size()));
+//						} else {
+//							p *= 1 - frac1;
+//						}
+//					}
+//					p = 1 - p;
+//				}
+				double p = getSamplingProba(v.getDelegate(), iteration, proba);
 				wsum += 1 / p;
 				v.getDelegate().setSampleProbability(p);
 			}
@@ -263,6 +268,31 @@ public class Sampler {
 		for(SampledVertex v : vList) {
 			v.setNormalizedWeight(1 / v.getSampleProbability() * norm);
 		}
+	}
+	
+	private double getSamplingProba(SampledVertex v, int i,
+			TObjectDoubleHashMap<SampledVertex> proba) {
+		double p = proba.get(v);
+		if (p == 0) {
+			if (v.isSampled()) {
+				if (v.getIterationSampled() > i) {
+					p = getNumSampledVertices(i)
+							/ (double) graph.getVertices().size();
+				} else if (i == 0) {
+					p = egos.size() / (double) graph.getVertices().size();
+				} else {
+					p = 1;
+					for (SampledVertex n : v.getNeighbours())
+						p *= 1 - getSamplingProba(n, i - 1, proba);
+					p = 1 - p;
+				}
+			} else {
+				p = getNumSampledVertices(i)
+						/ (double) graph.getVertices().size();
+			}
+			proba.put(v, p);
+		}
+		return p;
 	}
 	
 //	private TreeMap<Integer, Double> p_k;
