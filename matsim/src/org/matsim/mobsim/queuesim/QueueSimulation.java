@@ -108,7 +108,7 @@ public class QueueSimulation {
 	 * The SignalGroupDefinitions accessible by the Id of the SignalSystem they belong
 	 * to.
 	 */
-	private SortedMap<Id, List<BasicSignalGroupDefinition>> signalGroupDefinitionsBySystemId;
+	private SortedMap<Id, List<BasicSignalGroupDefinition>> signalGroupDefinitions;
 	/**
 	 * Contains the SignalSystemControler instances which can be accessed by the
 	 * Id of the SignalSystemDefinition
@@ -161,18 +161,20 @@ public class QueueSimulation {
 	}
 
 	private void initSignalSystems(BasicSignalSystems signalSystems) {
+		//store the signalSystemDefinitions in a Map
 		this.signalSystemDefinitions = new TreeMap<Id, BasicSignalSystemDefinition>();
 		for (BasicSignalSystemDefinition signalSystem : signalSystems.getSignalSystemDefinitions()) {
 			this.signalSystemDefinitions.put(signalSystem.getId(), signalSystem);
 		}
-		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<BasicSignalGroupDefinition>>();
+		//init the signalGroupDefinitions
+		this.signalGroupDefinitions= new TreeMap<Id, List<BasicSignalGroupDefinition>>();
 		for (BasicSignalGroupDefinition basicLightSignalGroupDefinition : signalSystems.getSignalGroupDefinitions()) {
 			QueueLink queueLink = this.network.getQueueLink(basicLightSignalGroupDefinition.getLinkRefId());
 			//TODO check if quueuLInk null?? or write ScenarioChecker
-			List<BasicSignalGroupDefinition> list = this.signalGroupDefinitionsBySystemId.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId());
+			List<BasicSignalGroupDefinition> list = this.signalGroupDefinitions.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId());
 			if (list == null) {
 				list = new ArrayList<BasicSignalGroupDefinition>();
-				this.signalGroupDefinitionsBySystemId.put(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId(), list);
+				this.signalGroupDefinitions.put(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId(), list);
 			}
 			list.add(basicLightSignalGroupDefinition);
 			queueLink.addSignalGroupDefinition(basicLightSignalGroupDefinition);
@@ -189,7 +191,7 @@ public class QueueSimulation {
 			BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getLightSignalSystemId());
 			controler.setDefaultCirculationTime(systemDef.getDefaultCirculationTime());
 			//TODO set other defaults of xml
-			List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getLightSignalSystemId());
+			List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitions.get(config.getLightSignalSystemId());
 			if ((groups == null) || groups.isEmpty()) {
 				String message = "SignalSystemControler without any SignalGroups defined in SignalSystemConfiguration!";
 				log.warn(message);
