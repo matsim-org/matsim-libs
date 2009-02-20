@@ -78,9 +78,9 @@ public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 		// String netFilename =
 		// "../swiss-advest/ch.cut.640000.200000.740000.310000.xml";
 		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		String eventsFilenameA = "../runs/r153_10/it.1000/1000.events.txt.gz";
-		String eventsFilenameB = "../runs/run628/it.1000/1000.events.txt.gz";
-		String shapeFilepath = "../runs/r153_10/vsRun628/";
+		String eventsFilenameA = "../runs/r145_20/1000.events.txt.gz";
+		String eventsFilenameB = "../runs_SVN/run669/it.1000/1000.events.txt.gz";
+		String shapeFilepath = "../runs/r145_20/vsRun669/";
 		// ////////////////////////////////////////
 		// MATSimNet2QGIS.setFlowCapFactor(0.1);
 		// //////////////////////////////////////

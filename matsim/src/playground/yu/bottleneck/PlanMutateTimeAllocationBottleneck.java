@@ -45,6 +45,7 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithm {
 		mutatePlan(plan);
 	}
 
+	@SuppressWarnings("deprecation")
 	private void mutatePlan(Plan plan) {
 
 		int max = plan.getActsLegs().size();
