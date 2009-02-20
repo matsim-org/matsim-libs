@@ -129,6 +129,12 @@ public class QueueNetwork{
 	 * @param time The current time in the simulation.
 	 */
 	protected void simStep(final double time) {
+		moveNodes(time);
+		reactivateLinks(time);
+		moveLinks(time);
+	}
+	
+	private void moveNodes(final double time) {
 		for (QueueNode node : this.simNodesArray) {
 			if (node.isActive() || simulateAllNodes) {
 				/* It is faster to first test if the node is active, and only then call moveNode(),
@@ -140,9 +146,8 @@ public class QueueNetwork{
 				node.moveNode(time);
 			}
 		}
-		reactivateLinks(time);
-		moveLinks(time);
 	}
+	
 
 	private void moveLinks(final double time) {
 		ListIterator<QueueLink> simLinks = this.simLinksArray.listIterator();
