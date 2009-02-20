@@ -55,6 +55,10 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost {
 	}
 
 	public double getLinkMinimumTravelCost(final Link link) {
-		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME)) * this.travelCostFactor;
+		if (this.marginalUtlOfDistance == 0.0) {
+			return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME)) * this.travelCostFactor;
+		}
+		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME)) * this.travelCostFactor 
+		- this.marginalUtlOfDistance * link.getLength();
 	}
 }
