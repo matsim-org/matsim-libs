@@ -214,11 +214,11 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
 		if (plan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 vor erstem Router.");
-		if (Gbl.getConfig().planomat().getPossibleModes().length>0){
+	//	if (Gbl.getConfig().planomat().getPossibleModes().length>0){
 			for (int z=1;z<plan.getActsLegs().size();z+=2){
 				((Leg)(plan.getActsLegs().get(z))).setMode(BasicLeg.Mode.car);
 			}
-		}
+	//	}
 		this.router.run(plan);
 		if (plan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 vor erstem Timer.");
 		this.timer.run(plan);
@@ -240,11 +240,11 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			}
 			
 			/* Routing*/
-			if (Gbl.getConfig().planomat().getPossibleModes().length>0){
+		//	if (Gbl.getConfig().planomat().getPossibleModes().length>0){
 				for (int z=1;z<plan.getActsLegs().size();z+=2){
 					((Leg)(plan.getActsLegs().get(z))).setMode(BasicLeg.Mode.car);
 				}
-			}
+		//	}
 			this.router.run(plan);
 			this.timer.run(plan);
 			if (plan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach while Schleife mit score = "+plan.getScore());
@@ -307,11 +307,11 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					else throw new IllegalArgumentException(this.LC_MODE);
 					
 					/* Routing*/
-					if (Gbl.getConfig().planomat().getPossibleModes().length>0){
+				//	if (Gbl.getConfig().planomat().getPossibleModes().length>0){
 						for (int z=1;z<neighbourhood[x].getActsLegs().size();z+=2){
 							((Leg)(neighbourhood[x].getActsLegs().get(z))).setMode(BasicLeg.Mode.car);
 						}
-					}
+				//	}
 					this.router.run(neighbourhood[x]);
 										
 					/*Optimizing the start times*/
@@ -341,7 +341,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					else if (solution.getActsLegs().size()==13) solution13.add(solution);
 					else solutionLong.add(solution);
 				}
-				/*
+		/*		
 				stream.print(neighbourhood[x].getScore()+"\t");
 				stream.print(infoOnNeighbourhood[x][0]+"\t");
 				stream.print(tabuInNeighbourhood[x]+"\t");
@@ -354,7 +354,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 				stream.print(infoOnNeighbourhood[x][1]+"\t");
 				stream.print(infoOnNeighbourhood[x][2]+"\t");
 				stream.println();
-				*/
+			*/	
 			}
 			
 			/* Find best non-tabu plan. Becomes this iteration's solution. Write it into the tabuList*/
