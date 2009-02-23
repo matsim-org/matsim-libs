@@ -28,7 +28,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.MatsimNetworkReader;
@@ -40,27 +39,25 @@ import org.xml.sax.SAXException;
 
 public class TransitScheduleReaderTest extends MatsimTestCase {
 
-	public static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "../thesis-data/examples/tryout/transitSchedule2.xml";
-	public static final String INPUT_TEST_FILE_NETWORK = "../thesis-data/examples/tryout/network.xml";
-	public static final String INPUT_TEST_FILE_FACILITIES = "../thesis-data/examples/tryout/facilities.xml";
+	public static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
+	public static final String INPUT_TEST_FILE_NETWORK = "network.xml";
+	public static final String INPUT_TEST_FILE_FACILITIES = "facilities.xml";
 
-	public void testReadLine() throws SAXException, ParserConfigurationException, IOException {
+	public void testReadFile_General() throws SAXException, ParserConfigurationException, IOException {
+		final String inputDir = getPackageInputDirectory();
+
 		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(INPUT_TEST_FILE_NETWORK);
+		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 		Facilities facilities = new Facilities();
-		new MatsimFacilitiesReader(facilities).readFile(INPUT_TEST_FILE_FACILITIES);
+		new MatsimFacilitiesReader(facilities).readFile(inputDir + INPUT_TEST_FILE_FACILITIES);
 
 		World world = new World();
 		world.setFacilityLayer(facilities);
 		world.setNetworkLayer(network);
 		world.complete();
 
-		for (Facility facility : facilities.getFacilities().values()) {
-			System.out.println(facility.getId().toString() + " @ " + facility.getCenter().getX() + "/" + facility.getCenter().getY() + " @ link " + facility.getLink().getId().toString());
-		}
-
 		TransitSchedule schedule = new TransitSchedule();
-		new TransitScheduleReader(schedule, network, facilities).readFile(INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReader(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		assertEquals("wrong number of transit lines.", 1, schedule.getTransitLines().size());
 		assertEquals("wrong line id.", new IdImpl("T1"), schedule.getTransitLines().keySet().iterator().next());
