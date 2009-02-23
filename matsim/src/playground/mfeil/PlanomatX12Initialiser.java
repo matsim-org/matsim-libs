@@ -56,8 +56,7 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 		this.preProcessRoutingData.run(controler.getNetwork());
 		this.network = controler.getNetwork();
 		this.controler = controler;
-		this.init(network);
-		//this.preProcessRoutingData = null;		
+		this.init(network);	
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
 	}
 	
