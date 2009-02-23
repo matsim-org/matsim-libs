@@ -110,14 +110,16 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		else if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
 			this.timer				= new Planomat (legTravelTimeEstimator, this.factory); 
 		}
-		else this.timer				= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
+		else this.timer				= new TimeOptimizer(legTravelTimeEstimator, this.scorer);
+		
 		if (this.finalOpt.equals("TimeModeChoicer")){
 			this.finalTimer			= new TimeModeChoicer1(legTravelTimeEstimator, this.scorer);
 		}
 		else if (this.finalOpt.equals("Planomat")){
-			this.finalTimer			= new Planomat (legTravelTimeEstimator, this.factory); 
+			this.finalTimer			= new Planomat(legTravelTimeEstimator, this.factory); 
 		}
-		else this.finalTimer		= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);		
+		else this.finalTimer		= new TimeOptimizerWIGIC(legTravelTimeEstimator, this.scorer);		
+		
 		this.locator				= locator;		
 	}
 	

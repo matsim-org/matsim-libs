@@ -48,10 +48,10 @@ import org.matsim.basic.v01.*;
 public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int						MAX_ITERATIONS, STOP_CRITERION, NEIGHBOURHOOD_SIZE;
-	private int								OFFSET;
-	private final double					minimumTime;
-	private final PlanScorer 				scorer;
-	private final LegTravelTimeEstimator	estimator;
+	private final int						OFFSET;
+	protected final double					minimumTime;
+	protected final PlanScorer 				scorer;
+	protected final LegTravelTimeEstimator	estimator;
 	private static final Logger 			log = Logger.getLogger(TimeModeChoicer1.class);
 	private final double					maxWalkingDistance;
 	private final String					modeChoice;
@@ -327,7 +327,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	// Neighbourhood definition 
 	//////////////////////////////////////////////////////////////////////
 	
-	public void createInitialNeighbourhood (PlanomatXPlan plan, ArrayList<?> [] neighbourhood, double[]score, int [][] moves,
+	private void createInitialNeighbourhood (PlanomatXPlan plan, ArrayList<?> [] neighbourhood, double[]score, int [][] moves,
 			PlanAnalyzeSubtours planAnalyzeSubtours, int[] subtourDis) {
 		
 		int pos = 0;
@@ -349,7 +349,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	}
 	
 	
-	public void createNeighbourhood (PlanomatXPlan plan, ArrayList<?> [] neighbourhood, double[]score, int[][] moves, int[]position,
+	private void createNeighbourhood (PlanomatXPlan plan, ArrayList<?> [] neighbourhood, double[]score, int[][] moves, int[]position,
 			PlanAnalyzeSubtours planAnalyzeSubtours, int[] subtourDis) {
 		
 		int pos = 0;
@@ -440,7 +440,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	
 	
 	
-	public double increaseTime(PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner,
+	private double increaseTime(PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner,
 			PlanAnalyzeSubtours planAnalyzeSubtours, int[] subtourDis){
 		
 		if ((((Act)(actslegs.get(inner))).getDuration()>=(this.OFFSET+this.minimumTime))	||	
@@ -460,7 +460,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	
 	
 	
-	public double decreaseTime(PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner,
+	private double decreaseTime(PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner,
 			PlanAnalyzeSubtours planAnalyzeSubtours, int[] subtourDis){
 		boolean checkFinalAct = false;
 		double time = OFFSET+this.minimumTime;
@@ -490,7 +490,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	}
 	
 	
-	public double swapDurations (PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner, PlanAnalyzeSubtours planAnalyzeSubtours, int[] subtourDis){
+	private double swapDurations (PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner, PlanAnalyzeSubtours planAnalyzeSubtours, int[] subtourDis){
 		
 		double swaptime= java.lang.Math.max(((Act)(actslegs.get(inner))).getDuration(), this.minimumTime)-((Act)(actslegs.get(outer))).getDuration();
 		if (this.modeChoice=="extended_3"){
@@ -701,7 +701,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	//////////////////////////////////////////////////////////////////////
 	
 	
-	public int findBestSolution (ArrayList<?> [] neighbourhood, double[] score, int [][] moves, int[]position){
+	protected int findBestSolution (ArrayList<?> [] neighbourhood, double[] score, int [][] moves, int[]position){
 				
 		int pointer=-1;
 		double firstScore =-100000;
@@ -734,7 +734,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	}
 	
 	
-	public double cleanSchedule (double now, Plan plan){
+	private double cleanSchedule (double now, Plan plan){
 		
 		((Act)(plan.getActsLegs().get(0))).setEndTime(now);
 		((Act)(plan.getActsLegs().get(0))).setDuration(now);
@@ -784,7 +784,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	}
 		
 
-	public void cleanActs (ArrayList<?> actslegs){
+	protected void cleanActs (ArrayList<?> actslegs){
 		
 		((Act)(actslegs.get(0))).setEndTime(((Leg)(actslegs.get(1))).getDepartureTime());
 		((Act)(actslegs.get(0))).setDuration(((Leg)(actslegs.get(1))).getDepartureTime());
@@ -823,7 +823,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	}
 
 	
-	public ArrayList<Object> copyActsLegs (ArrayList<?> in){
+	protected ArrayList<Object> copyActsLegs (ArrayList<?> in){
 		
 			ArrayList<Object> out = new ArrayList<Object>();
 			
