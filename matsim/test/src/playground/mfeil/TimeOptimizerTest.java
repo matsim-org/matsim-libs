@@ -44,7 +44,7 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import java.util.ArrayList;
 
 public class TimeOptimizerTest extends MatsimTestCase{
-	
+	/*
 	private static final Logger log = Logger.getLogger(TimeOptimizerTest.class);
 	private NetworkLayer network = null;
 	private Facilities facilities = null;
@@ -57,13 +57,13 @@ public class TimeOptimizerTest extends MatsimTestCase{
 	private DepartureDelayAverageCalculator depDelayCalc;
 	private Events events;
 	private LegTravelTimeEstimator ltte;
-	private TimeOptimizer14 testee;
+	private TimeOptimizer testee;
 
 	protected void setUp() throws Exception {
 
 		super.setUp();
 	
-		super.loadConfig("test/scenarios/chessboard/config.xml");
+		super.loadConfig("input/config_chessboard.xml");
 		
 		log.info("Reading facilities xml file...");
 		facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE,null);
@@ -97,7 +97,7 @@ public class TimeOptimizerTest extends MatsimTestCase{
 
 		this.ltte = new CetinCompatibleLegTravelTimeEstimator(this.tTravelEstimator, this.travelCostEstimator, this.depDelayCalc, this.network);
 		
-		this.testee = new TimeOptimizer14 (ltte, new PlanScorer(new JohScoringFunctionFactory()));
+		this.testee = new TimeOptimizer (ltte, new PlanScorer(new JohScoringFunctionFactory()));
 		
 
 	}
@@ -192,7 +192,7 @@ public class TimeOptimizerTest extends MatsimTestCase{
 		
 	}
 	
-	public void testDecreaseTime (){
+	private void testDecreaseTime (){
 		
 		PlanomatXPlan plan = new PlanomatXPlan (population.getPerson(this.TEST_PERSON_ID));
 		plan.copyPlan(population.getPerson(this.TEST_PERSON_ID).getPlans().get(0));
@@ -228,29 +228,41 @@ public class TimeOptimizerTest extends MatsimTestCase{
 		
 		this.router.run(plan);
 		
-		log.info("Reading output plan xml file...");
-		Population popTest = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(popTest);
-		plansReader.readFile("test/input/playground/mfeil/output_person_1.xml");
-		popTest.printPlansCount();
-		log.info("Reading output plan xml file...done.");
-		
-		Plan targetPlan = popTest.getPerson(this.TEST_PERSON_ID).getPlans().get(1);
+		Plan targetPlan = population.getPerson(this.TEST_PERSON_ID).getPlans().get(1);
 		
 		this.testee.run(plan);
 		
-		/* Test whether differences are smaller than 10 sec because leg estimator causes minor time differences*/
+		// Test whether differences are smaller than 10 sec because leg estimator causes minor time differences
 		for (int i=0;i<plan.getActsLegs().size();i++){
 			if (i%2==0){
-				assert(java.lang.Math.abs(((Act)(plan.getActsLegs().get(i))).getDuration()-((Act)(targetPlan.getActsLegs().get(i))).getDuration())<10);
-				assert(java.lang.Math.abs(((Act)(plan.getActsLegs().get(i))).getStartTime()-((Act)(targetPlan.getActsLegs().get(i))).getStartTime())<10);
-				assert(java.lang.Math.abs(((Act)(plan.getActsLegs().get(i))).getEndTime()-((Act)(targetPlan.getActsLegs().get(i))).getEndTime())<10);
+				assert(java.lang.Math.abs(((Act)(plan.getActsLegs().get(i))).getDuration()-((Act)(targetPlan.getActsLegs().get(i))).getDuration())<1);
+				assert(java.lang.Math.abs(((Act)(plan.getActsLegs().get(i))).getStartTime()-((Act)(targetPlan.getActsLegs().get(i))).getStartTime())<1);
+				assert(java.lang.Math.abs(((Act)(plan.getActsLegs().get(i))).getEndTime()-((Act)(targetPlan.getActsLegs().get(i))).getEndTime())<1);
 			}
 			else {
-				assert(java.lang.Math.abs(((Leg)(plan.getActsLegs().get(i))).getTravelTime()-((Leg)(targetPlan.getActsLegs().get(i))).getTravelTime())<10);
-				assert(java.lang.Math.abs(((Leg)(plan.getActsLegs().get(i))).getDepartureTime()-((Leg)(targetPlan.getActsLegs().get(i))).getDepartureTime())<10);
-				assert(java.lang.Math.abs(((Leg)(plan.getActsLegs().get(i))).getArrivalTime()-((Leg)(targetPlan.getActsLegs().get(i))).getArrivalTime())<10);
+				assert(java.lang.Math.abs(((Leg)(plan.getActsLegs().get(i))).getTravelTime()-((Leg)(targetPlan.getActsLegs().get(i))).getTravelTime())<1);
+				assert(java.lang.Math.abs(((Leg)(plan.getActsLegs().get(i))).getDepartureTime()-((Leg)(targetPlan.getActsLegs().get(i))).getDepartureTime())<1);
+				assert(java.lang.Math.abs(((Leg)(plan.getActsLegs().get(i))).getArrivalTime()-((Leg)(targetPlan.getActsLegs().get(i))).getArrivalTime())<1);
 			}
 		}
 	}
+	
+	public void testCheck () {
+		Plan plan = new Plan (population.getPerson(this.TEST_PERSON_ID));
+		plan.copyPlan(population.getPerson(this.TEST_PERSON_ID).getPlans().get(0));
+		for (int i=0;i<plan.getActsLegs().size();i++){
+			if (i%2==1) {
+				System.out.print(((Leg)(plan.getActsLegs().get(i))).getTravelTime()+" "); 
+				System.out.print(((Leg)(plan.getActsLegs().get(i))).getRoute().getTravelTime()+" ");
+				System.out.print(((Leg)(plan.getActsLegs().get(i))).getRoute().getDist()+" ");
+				System.out.print(((Leg)(plan.getActsLegs().get(i))).getMode()+", "); 
+				System.out.print(((Leg)(plan.getActsLegs().get(i))).getRoute().getStartLinkId()+", ");
+				System.out.print(((Leg)(plan.getActsLegs().get(i))).getRoute().getEndLinkId()+", ");
+				for (int j=0;j<((Leg)(plan.getActsLegs().get(i))).getRoute().getLinkIds().size();j++ ){
+					System.out.print(((Leg)(plan.getActsLegs().get(i))).getRoute().getLinkIds().get(j)+" "); 
+				}
+				System.out.println();
+			}
+		}
+	}*/
 }
