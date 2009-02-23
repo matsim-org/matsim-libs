@@ -210,7 +210,10 @@ public class Planomat implements PlanAlgorithm {
 				if (ii < (max - 1)) {
 
 					activity.setStartTime(now);
-					activity.setDuration((((IntegerGene) individual.getGenes()[ii / 2]).intValue() + this.seedGenerator.nextDouble()) * Planomat.TIME_INTERVAL_SIZE);
+					// the new activity duration is
+					// - a random value in the time interval which was the res ult of the optimization
+					// - rounded to a full second with Math.rint() to stay consistent with the time step-based queue simulations
+					activity.setDuration(Math.rint((((IntegerGene) individual.getGenes()[ii / 2]).intValue() + this.seedGenerator.nextDouble()) * Planomat.TIME_INTERVAL_SIZE));
 					now += activity.getDuration();
 					activity.setEndTime(now);
 
@@ -255,6 +258,9 @@ public class Planomat implements PlanAlgorithm {
 						origin,
 						destination,
 						leg);
+				
+				// travel time estimation is rounded to a full second with Math.rint() to stay consistent with the time step-based queue simulations
+				travelTimeEstimation = Math.rint(travelTimeEstimation);
 
 				leg.setTravelTime(travelTimeEstimation);
 
