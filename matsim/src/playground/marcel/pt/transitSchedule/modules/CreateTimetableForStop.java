@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitLine.java
+ * CreateTimetableForStop.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,40 +18,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule;
+package playground.marcel.pt.transitSchedule.modules;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collection;
 
-import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.facilities.Facility;
 
-public class TransitLine {
+import playground.marcel.pt.transitSchedule.Departure;
+import playground.marcel.pt.transitSchedule.TransitLine;
+import playground.marcel.pt.transitSchedule.TransitRoute;
+import playground.marcel.pt.transitSchedule.TransitRouteStop;
 
-	private final Id lineId;
-	private final Map<Id, TransitRoute> transitRoutes = new HashMap<Id, TransitRoute>();
+public class CreateTimetableForStop {
 
-	public TransitLine(final Id id) {
-		this.lineId = id;
+	private final TransitLine line;
+
+	public CreateTimetableForStop(final TransitLine line) {
+		this.line = line;
 	}
 
-	public Id getId() {
-		return this.lineId;
-	}
-
-	public void addRoute(final Id id, final TransitRoute transitRoute) {
-		if (this.transitRoutes.containsKey(id)) {
-			throw new IllegalArgumentException("There is already a transit route with id " + id.toString());
+	public double[] getDeparturesAtStop(final Facility stop) {
+		int numOfDepartures = 0;
+		Collection<TransitRoute> routes = this.line.getRoutes().values();
+		for (TransitRoute route : routes) {
+			numOfDepartures += route.getDepartures().size();
 		}
-		this.transitRoutes.put(id, transitRoute);
-	}
-
-	public TransitRoute getRoute(final Id id) {
-		return this.transitRoutes.get(id);
-	}
-
-	public Map<Id, TransitRoute> getRoutes() {
-		return Collections.unmodifiableMap(this.transitRoutes);
+		double[] departures = new double[numOfDepartures];
+		int index = 0;
+		for (TransitRoute route : routes) {
+			TransitRouteStop trStop = route.getStop(stop);
+			double delay = trStop.getDepartureDelay();
+			for (Departure dep : route.getDepartures().values()) {
+				departures[index] = dep.getDepartureTime() + delay;
+				index++;
+			}
+		}
+		Arrays.sort(departures);
+		return departures;
 	}
 
 }

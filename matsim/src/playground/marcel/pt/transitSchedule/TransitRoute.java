@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.routes.Route;
 
@@ -71,6 +72,15 @@ public class TransitRoute {
 
 	public List<TransitRouteStop> getStops() {
 		return Collections.unmodifiableList(this.stops);
+	}
+
+	public TransitRouteStop getStop(final Facility stop) {
+		for (TransitRouteStop trStop : this.stops) {
+			if (stop == trStop.getStopFacility()) {
+				return trStop;
+			}
+		}
+		return null;
 	}
 
 }

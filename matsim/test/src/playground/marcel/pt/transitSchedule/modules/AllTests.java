@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule;
+package playground.marcel.pt.transitSchedule.modules;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -26,10 +26,9 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.marcel.pt.transitSchedule");
+		TestSuite suite = new TestSuite("Tests for playground.marcel.pt");
 
-		suite.addTestSuite(TransitScheduleReaderTest.class);
-		suite.addTest(playground.marcel.pt.transitSchedule.modules.AllTests.suite());
+		suite.addTestSuite(CreateTimetableForStopTest.class);
 
 		return suite;
 	}

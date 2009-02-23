@@ -34,7 +34,7 @@ public class TransitRouteStop {
 		this.arrivalDelay = arrivalDelay;
 	}
 
-	public Facility getStop() {
+	public Facility getStopFacility() {
 		return this.stop;
 	}
 

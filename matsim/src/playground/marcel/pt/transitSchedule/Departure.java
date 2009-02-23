@@ -20,14 +20,13 @@
 
 package playground.marcel.pt.transitSchedule;
 
-import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.Id;
 
 public class Departure {
 
 	private final Id id;
 	private final double departureTime;
-	
+
 	public Departure(final Id id, final double departureTime) {
 		this.id = id;
 		this.departureTime = departureTime;
@@ -36,13 +35,9 @@ public class Departure {
 	public Id getId() {
 		return this.id;
 	}
-	
+
 	public double getDepartureTime() {
-		return departureTime;
-	}
-	
-	public double getDepartureTimeAtStop(final Facility stop) {
-		return departureTime; // TODO + this.timeProfile.getStop(stop).getDepartureDelay();
+		return this.departureTime;
 	}
 
 }
