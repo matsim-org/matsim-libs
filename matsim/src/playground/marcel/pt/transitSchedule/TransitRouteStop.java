@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitRoute.java
+ * TransitRouteStop.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,57 +20,29 @@
 
 package playground.marcel.pt.transitSchedule;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.matsim.facilities.Facility;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.population.routes.Route;
+public class TransitRouteStop {
 
-public class TransitRoute {
+	private final Facility stop;
+	private final double departureDelay;
+	private final double arrivalDelay;
 
-	private final Id routeId;
-	private final Route route;
-	private final List<TransitRouteStop> stops;
-	private String description = null;
-	private final Map<Id, Departure> departures = new HashMap<Id, Departure>();
-
-	public TransitRoute(final Id id, final Route route, final List<TransitRouteStop> stops) {
-		this.routeId = id;
-		this.route = route;
-		this.stops = stops;
+	public TransitRouteStop(final Facility stop, final double departureDelay, final double arrivalDelay) {
+		this.stop = stop;
+		this.departureDelay = departureDelay;
+		this.arrivalDelay = arrivalDelay;
 	}
 
-	public Id getId() {
-		return this.routeId;
+	public Facility getStop() {
+		return this.stop;
 	}
 
-	public void setDescription(final String description) {
-		this.description = description;
+	public double getDepartureDelay() {
+		return this.departureDelay;
 	}
 
-	public String getDescription() {
-		return this.description;
+	public double getArrivalDelay() {
+		return this.arrivalDelay;
 	}
-
-	public void addDeparture(final Id id, final Departure departure) {
-		if (this.departures.containsKey(id)) {
-			throw new IllegalArgumentException("There is already a departure with id " + id.toString());
-		}
-		this.departures.put(id, departure);
-	}
-
-	public Map<Id, Departure> getDepartures() {
-		return Collections.unmodifiableMap(this.departures);
-	}
-
-	public Route getRoute() {
-		return this.route;
-	}
-
-	public List<TransitRouteStop> getStops() {
-		return Collections.unmodifiableList(this.stops);
-	}
-
 }

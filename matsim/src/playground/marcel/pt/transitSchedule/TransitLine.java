@@ -27,15 +27,15 @@ import org.matsim.interfaces.basic.v01.Id;
 
 public class TransitLine {
 
-	private final Id id;
+	private final Id lineId;
 	private final Map<Id, TransitRoute> transitRoutes = new HashMap<Id, TransitRoute>();
-	
+
 	public TransitLine(final Id id) {
-		this.id = id;
+		this.lineId = id;
 	}
 
 	public Id getId() {
-		return id;
+		return this.lineId;
 	}
 
 	public void addRoute(final Id id, final TransitRoute transitRoute) {
@@ -45,5 +45,8 @@ public class TransitLine {
 		this.transitRoutes.put(id, transitRoute);
 	}
 
-	
+	public TransitRoute getRoute(final Id id) {
+		return this.transitRoutes.get(id);
+	}
+
 }

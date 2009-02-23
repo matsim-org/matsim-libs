@@ -20,6 +20,7 @@
 
 package playground.marcel.pt.transitSchedule;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,16 +29,24 @@ import org.matsim.interfaces.basic.v01.Id;
 public class TransitSchedule {
 
 	private final Map<Id, TransitLine> transitLines = new HashMap<Id, TransitLine>();
-	
+
 	public TransitSchedule() {
 		// TODO [MR] Auto-generated constructor stub
 	}
-	
+
 	public void addTransitLine(final Id id, final TransitLine line) {
 		if (this.transitLines.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a transit line with id " + id.toString());
 		}
 		this.transitLines.put(id, line);
 	}
-	
+
+	public TransitLine getTransitLine(final Id id) {
+		return this.transitLines.get(id);
+	}
+
+	public Map<Id, TransitLine> getTransitLines() {
+		return Collections.unmodifiableMap(this.transitLines);
+	}
+
 }
