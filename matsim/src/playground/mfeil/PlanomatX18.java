@@ -141,21 +141,39 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 				controler.getTravelCostCalculator(), 
 				tDepDelayCalc, 
 				controler.getNetwork());
-		//this.timer					= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
-		this.timer					= new TimeModeChoicer1(legTravelTimeEstimator, this.scorer);
-		//this.timer		 			= new Planomat (legTravelTimeEstimator, this.factory);
-		//this.finalTimer				= new Planomat (legTravelTimeEstimator, this.factory);
-		this.finalTimer				= this.timer;
-		this.locator 				= locator;
-		this.NEIGHBOURHOOD_SIZE 	= 10;				
-		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
-		this.WEIGHT_CHANGE_NUMBER 	= 0.6;
-		this.WEIGHT_INC_NUMBER 		= 0.5; 				/*Weighing whether adding or removing activities in change number method.*/
-		this.MAX_ITERATIONS 		= 20;
-		this.LC_MODE				= "reducedLC";		/* reducedLC=only modified secondary acts will be located; fullLC=all secondary acts of the plan will be located*/
-		this.LC_SET_SIZE			= 1;
-		this.finalOpt				= "no";
+				
+		//this.NEIGHBOURHOOD_SIZE 	= 10;	
+		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(PlanomatXConfigGroup.getNeighbourhoodSize());
+		//this.WEIGHT_CHANGE_ORDER 	= 0.2; 
+		this.WEIGHT_CHANGE_ORDER	= Double.parseDouble(PlanomatXConfigGroup.getWeightChangeOrder());
+		//this.WEIGHT_CHANGE_NUMBER 	= 0.6;
+		this.WEIGHT_CHANGE_NUMBER 	= Double.parseDouble(PlanomatXConfigGroup.getWeightChangeNumber());
+		//this.WEIGHT_INC_NUMBER 		= 0.5; 				/*Weighing whether adding or removing activities in change number method.*/
+		this.WEIGHT_INC_NUMBER		= Double.parseDouble(PlanomatXConfigGroup.getWeightIncNumber());
+		//this.MAX_ITERATIONS 		= 20;
+		this.MAX_ITERATIONS			= Integer.parseInt(PlanomatXConfigGroup.getMaxIterations());
+		//this.LC_MODE				= "reducedLC";		/* reducedLC=only modified secondary acts will be located; fullLC=all secondary acts of the plan will be located*/
+		this.LC_MODE				= PlanomatXConfigGroup.getLCMode();
+		//this.LC_SET_SIZE			= 1;
+		this.LC_SET_SIZE			= Integer.parseInt(PlanomatXConfigGroup.getLCSetSize());
+		//this.finalOpt				= "no";
+		this.finalOpt				= PlanomatXConfigGroup.getFinalTimer();
 		
+		if (PlanomatXConfigGroup.getTimer().equals("TimeModeChoicer")){
+			this.timer				= new TimeModeChoicer1(legTravelTimeEstimator, this.scorer);
+		}
+		else if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
+			this.timer				= new Planomat (legTravelTimeEstimator, this.factory); 
+		}
+		else this.timer				= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
+		if (this.finalOpt.equals("TimeModeChoicer")){
+			this.finalTimer			= new TimeModeChoicer1(legTravelTimeEstimator, this.scorer);
+		}
+		else if (this.finalOpt.equals("Planomat")){
+			this.finalTimer			= new Planomat (legTravelTimeEstimator, this.factory); 
+		}
+		else this.finalTimer		= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);		
+		this.locator				= locator;		
 	}
 	
 		
@@ -339,7 +357,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					timerRunTime += (System.currentTimeMillis()-planomatStartTime);
 					
 					/* Scoring*/
-					//neighbourhood[x].setScore(scorer.getScore(neighbourhood[x]));
+					if (PlanomatXConfigGroup.getTimer().equals("Planomat")) neighbourhood[x].setScore(scorer.getScore(neighbourhood[x]));
 					nonTabuNeighbourhood.add(neighbourhood[x]);
 					
 					/* Do iterating location choice if requested*/

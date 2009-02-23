@@ -20,11 +20,18 @@
 package playground.mfeil;
 
 import org.matsim.controler.Controler;
+import java.util.ArrayList;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.network.NetworkLayer;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.*;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
+import org.matsim.facilities.Activity;
+import org.matsim.facilities.Facilities;
+import org.matsim.gbl.Gbl;
 
 
 
@@ -45,12 +52,13 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 	
 	public PlanomatX12Initialiser (final ControlerMFeil controler) {
 		
+		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
+		this.preProcessRoutingData.run(controler.getNetwork());
 		this.network = controler.getNetwork();
 		this.controler = controler;
 		this.init(network);
-		this.preProcessRoutingData = null;		
+		//this.preProcessRoutingData = null;		
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
-	
 	}
 	
 	public PlanomatX12Initialiser (final ControlerMFeil controler, 
@@ -72,14 +80,13 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		PlanAlgorithm planomatXAlgorithm;
-		if (this.preProcessRoutingData!=null){
-			planomatXAlgorithm = new PlanomatX18 (this.controler, this.preProcessRoutingData, 
-					this.locator);
-		}		
-		else {
-			planomatXAlgorithm =  new PlanomatX18 (this.controler, this.locator);
-		}
-
+		planomatXAlgorithm = new PlanomatX18 (this.controler, this.preProcessRoutingData, this.locator);
 		return planomatXAlgorithm;
 	}
+	
+	// TODO The list of valid act types across all agents must be implemented here.
+	/*private ArrayList<Activity> findActTypes (){
+		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE,null);
+		return new ArrayList<Activity>();
+	}*/
 }
