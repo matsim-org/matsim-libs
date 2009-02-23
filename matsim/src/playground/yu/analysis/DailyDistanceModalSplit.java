@@ -82,7 +82,8 @@ public class DailyDistanceModalSplit extends AbstractPersonAlgorithm implements
 		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
 			Leg leg = (Leg) li.next();
 			double legDist = leg.getRoute().getDist() / 1000.0;
-			if (Integer.parseInt(person.getId().toString()) < 1000000000)
+			if (Integer.parseInt(person.getId().toString()) < 1000000000
+					&& leg.getDepartureTime() < 86400)
 				if (leg.getMode().equals(Mode.car)) {
 					if (person.getSex().equals("m"))
 						maleCarDist += legDist;

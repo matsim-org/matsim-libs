@@ -18,6 +18,7 @@ import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.charts.XYLineChart;
+import org.matsim.utils.charts.XYScatterChart;
 
 import playground.yu.utils.SimpleWriter;
 
@@ -31,7 +32,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
 	private double carDist, ptDist, otherDist;
 
-	final double totalCounts[], carCounts[], ptCounts[], otherCounts[];
+	private double totalCounts[], carCounts[], ptCounts[], otherCounts[],
+			carCounts5[], ptCounts5[];
 
 	private double carWorkDist, carEducDist, carShopDist, carLeisDist,
 			carHomeDist, carOtherDist, ptWorkDist, ptEducDist, ptShopDist,
@@ -56,6 +58,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		this.carCounts = new double[101];
 		this.ptCounts = new double[101];
 		this.otherCounts = new double[101];
+		carCounts5 = new double[21];
+		ptCounts5 = new double[21];
 		this.carWorkDist = 0.0;
 		this.carEducDist = 0.0;
 		this.carShopDist = 0.0;
@@ -153,6 +157,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 						this.carOtherDist += dist;
 						break;
 					}
+					carCounts5[Math.min(20, (int) dist / 5)]++;
 				} else if (bl.getMode().equals(Mode.pt)) {
 					this.ptDist += dist;
 					ptDayDist += dist;
@@ -176,6 +181,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 						this.ptOtherDist += dist;
 						break;
 					}
+					ptCounts5[Math.min(20, (int) dist / 5)]++;
 				}
 			}
 		}
@@ -191,7 +197,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 
 	public void write(final String outputFilename) {
 		double sum = this.carDist + this.ptDist + this.otherDist;
-		SimpleWriter sw = new SimpleWriter(outputFilename + ".txt");
+		SimpleWriter sw = new SimpleWriter(outputFilename + "dailyDistance.txt");
 		sw.writeln("\tDaily Distance\t(exkl. through-traffic)");
 		sw.writeln("\tkm\t%");
 		sw.writeln("car\t" + this.carDist / this.count + "\t" + this.carDist
@@ -258,7 +264,22 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		chart.addSeries("pt", x, yPt);
 		chart.addSeries("other", x, yOther);
 		chart.addSeries("total", x, yTotal);
-		chart.saveAsPng(outputFilename + ".png", 800, 600);
+		chart.saveAsPng(outputFilename + "dailyDistance.png", 800, 600);
+
+		XYScatterChart xYchart = new XYScatterChart(
+				"Modal split -- leg distance", "pt fraction [%]",
+				"car fraction [%]");
+		for (int i = 0; i < 20; i++)
+			xYchart.addSeries(i * 5 + "-" + (i + 1) * 5 + " km",
+					new double[] { ptCounts5[i]
+							/ (ptCounts5[i] + carCounts5[i]) * 100.0 },
+					new double[] { carCounts5[i]
+							/ (ptCounts5[i] + carCounts5[i]) * 100.0 });
+		xYchart.addSeries("100+ km", new double[] { ptCounts5[20]
+				/ (ptCounts5[20] + carCounts5[20]) * 100.0 },
+				new double[] { carCounts5[20]
+						/ (ptCounts5[20] + carCounts5[20]) * 100.0 });
+		xYchart.saveAsPng(outputFilename + "legDistanceModalSplit.png", 1200, 900);
 	}
 
 	/**
@@ -269,7 +290,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String plansFilename = "../runs_SVN/run669/it.1000/1000.plans.xml.gz";
-		final String outputFilename = "output/669dailyDistance";
+		final String outputFilename = "../runs_SVN/run669/it.1000/";
 
 		Gbl.createConfig(null);
 

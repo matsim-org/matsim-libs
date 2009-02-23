@@ -82,7 +82,8 @@ public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
 			Leg leg = (Leg) li.next();
 			double legTime = leg.getRoute().getTravelTime() / 60.0;
-			if (Integer.parseInt(person.getId().toString()) < 1000000000)
+			if (Integer.parseInt(person.getId().toString()) < 1000000000
+					&& leg.getDepartureTime() < 86400)
 				if (leg.getMode().equals(Mode.car)) {
 					if (person.getSex().equals("m"))
 						maleCarTime += legTime;
