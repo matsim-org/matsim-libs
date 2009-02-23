@@ -90,7 +90,7 @@ public class RecyclingModule implements StrategyModule {
 				tDepDelayCalc, 
 				controler.getNetwork());
 		this.nonassignedAgents 		= new LinkedList<String>();
-		this.timer					= new TimeOptimizer14 (this.estimator, new PlanScorer(controler.getScoringFunctionFactory()));
+		this.timer					= new TimeOptimizer (this.estimator, new PlanScorer(controler.getScoringFunctionFactory()));
 		this.schedulingModule 		= new PlanomatX12Initialiser(controler, this.preProcessRoutingData, this.locator);
 		this.assignmentModule		= new AgentsAssignmentInitialiser (this.controler, this.preProcessRoutingData, this.locator,
 			this.scorer, this.cleaner, this, this.minimumTime, this.nonassignedAgents);
