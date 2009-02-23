@@ -16,12 +16,13 @@ import playground.anhorni.locationchoice.cs.GenerateChoiceSets;
 public class ChoiceSet {
 
 	private Id id = null;
-	double travelTimeBudget = -1.0;
-	Trip trip;
-	ArrayList<ZHFacility> facilities = new ArrayList<ZHFacility>();
-	ArrayList<Double> travelTimes2Facilities = new ArrayList<Double>();
-	ArrayList<Double> travelDistances2Facilities = new ArrayList<Double>();
-	ZHFacility chosenZHFacility;
+	private double travelTimeBudget = -1.0;
+	private Trip trip;
+	private ArrayList<ZHFacility> facilities = new ArrayList<ZHFacility>();
+	private ArrayList<Double> travelTimes2Facilities = new ArrayList<Double>();
+	private ArrayList<Double> travelDistances2Facilities = new ArrayList<Double>();
+	private ZHFacility chosenZHFacility;
+	private PersonAttributes personAttributes;
 		
 	public ChoiceSet(Id id, Trip trip) {
 		this.id = id;
@@ -179,7 +180,7 @@ public class ChoiceSet {
 		ZHFacility mostDistantFacility = null;
 		while (it.hasNext()) {
 			ZHFacility facility = it.next();		
-			if (facility.getMappedposition().calcDistance(coord) > tempMaxDist) {
+			if (facility.getMappedPosition().calcDistance(coord) > tempMaxDist) {
 				mostDistantFacility = facility;
 			}
 		}	
@@ -197,7 +198,7 @@ public class ChoiceSet {
 			ZHFacility facility = this.facilities.get(i);
 
 			if (totalDist > GenerateChoiceSets.epsilon) {
-				val += facility.getMappedposition().calcDistance(other)/totalDist;
+				val += facility.getMappedPosition().calcDistance(other)/totalDist;
 				accProbabilities[i] = val;
 			}
 			else {
@@ -246,7 +247,7 @@ public class ChoiceSet {
 		double totalDist = 0.0;
 		while (it.hasNext()) {
 			ZHFacility facility = it.next();
-			totalDist += facility.getMappedposition().calcDistance(coord);
+			totalDist += facility.getMappedPosition().calcDistance(coord);
 			//log.info("distance " + facility.getCenter().calcDistance(coord));
 		}
 		//log.info("totalDistance " + totalDist);
@@ -294,4 +295,27 @@ public class ChoiceSet {
 		int index = this.facilities.indexOf(this.chosenZHFacility);
 		return this.travelTimes2Facilities.get(index);	
 	}
+	public boolean zhFacilityIsInChoiceSet(ZHFacility facility) {
+		if (this.facilities.contains(facility)) return true;
+		else return false;
+	}
+
+	public PersonAttributes getPersonAttributes() {
+		return personAttributes;
+	}
+
+	public void setPersonAttributes(PersonAttributes personAttributes) {
+		this.personAttributes = personAttributes;
+	}
+	
+	public double calculateCrowFlyDistanceMapped(Coord mappedCoords) {
+		return this.trip.getBeforeShoppingAct().getCoord().calcDistance(mappedCoords) +
+			this.trip.getAfterShoppingAct().getCoord().calcDistance(mappedCoords);
+	}
+	
+	public double calculateCrowFlyDistanceExact(Coord exactCoords) {
+		return this.trip.getBeforeShoppingAct().getCoord().
+			calcDistance(exactCoords) +
+			this.trip.getAfterShoppingAct().getCoord().calcDistance(exactCoords);
+	}	
 }

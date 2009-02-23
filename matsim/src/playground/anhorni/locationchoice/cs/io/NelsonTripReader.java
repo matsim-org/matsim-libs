@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -14,12 +13,10 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Act;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
+import playground.anhorni.locationchoice.cs.helper.Line;
 import playground.anhorni.locationchoice.cs.helper.MZTrip;
-import playground.anhorni.locationchoice.cs.helper.Trip;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 
 /*	  0			1		2			3			4			5		6		7			8				9
@@ -63,94 +60,36 @@ public class NelsonTripReader {
 			while ((curr_line = bufferedReader.readLine()) != null) {	
 				String[] entries = curr_line.split("\t", -1);
 				
-				String wmittel = entries[70].trim();
-				
+				Line line = new Line();
+				if (!line.catchLine(entries)) break;
+								
 				/*
 				String ausmittel = entries[74].trim();
 				boolean walk = wmittel.equals("15") && ausmittel.equals("10") && mode.equals("walk") ;
 				boolean car = wmittel.equals("9") && ausmittel.equals("6") && mode.equals("car");
 				*/
 				
-				boolean walk = wmittel.equals("15") && mode.equals("walk") ;
-				boolean car = wmittel.equals("9")  && mode.equals("car");
+				boolean walk = line.getWmittel().equals("15") && mode.equals("walk") ;
+				boolean car = line.getWmittel().equals("9")  && mode.equals("car");
 				
 				if (!(walk || car )) continue;
-				
-				String recordID = entries[0].trim();
-				// TODO:
-				// Passed last line. Why not captured in null test?
-				if (recordID.length()==0) break;
-				
-				String trip3ID = entries[0].trim();	
-				String HHNR = entries[3].trim();
-				String ZIELPNR = entries[6].trim();
-				if (ZIELPNR.length() == 1) ZIELPNR = "0" + ZIELPNR; 
-				int tripNr = Integer.parseInt(entries[8].trim());
-				
+								
 				// get the after shopping trip:	
-				String key = HHNR + ZIELPNR + Integer.toString(tripNr+1);
-				MZTrip mzTrip = this.mzTrips.get(new IdImpl(key));
+				MZTrip mzTrip = this.mzTrips.get(new IdImpl(line.getNextTrip()));
 				
-				// mode change: e.g. auto -> velo 43179022
+				// mode change: e.g. auto -> bike 43179022
 				if (mzTrip == null) {
 					continue;
 				}
 				
-				//----------------------------------------------------------------------------------------
-				
-				Coord beforeShoppingCoord = new CoordImpl(
-						Double.parseDouble(entries[38].trim()), Double.parseDouble(entries[39].trim()));
-				Act beforeShoppingAct = new Act("start", beforeShoppingCoord);
-				// in seconds after midnight
-				double endTimeBeforeShoppingAct = 60.0 * Double.parseDouble(entries[12].trim());
-				beforeShoppingAct.setEndTime(endTimeBeforeShoppingAct);
-				beforeShoppingAct.setLink(network.getNearestLink(beforeShoppingCoord));
-				
-				
-				Link link = null;
-				ZHFacility chosenZHFacility = null;
-				Iterator<ArrayList<ZHFacility>> fac0_it = this.zhFacilitiesByLink.values().iterator();
-				while (fac0_it.hasNext()) {		
-					ArrayList<ZHFacility> fac_list = fac0_it.next();
-					
-					Iterator<ZHFacility> fac1_it = fac_list.iterator();
-					while (fac1_it.hasNext()) {		
-						ZHFacility facility = fac1_it.next();
-					
-						if (facility.getId().compareTo(new IdImpl(entries[2].trim())) == 0) {
-							link = network.getLink(facility.getLinkId());
-							chosenZHFacility = facility;
-						}
-					}
-				}
-				Act shoppingAct = new Act("shop", link);
-				shoppingAct.setCoord(link.getCenter());
-				
-				double startTimeShoppingAct = 60.0 * Double.parseDouble(entries[15].trim());
-				shoppingAct.setStartTime(startTimeShoppingAct);
-				double endTimeShoppingAct = mzTrip.getStartTime();
-				shoppingAct.setEndTime(endTimeShoppingAct);
-						
-				Coord afterShoppingCoord = mzTrip.getCoord();
-				Act afterShoppingAct = new Act("end", afterShoppingCoord);
-				afterShoppingAct.setLink(network.getNearestLink(afterShoppingCoord));
-				
-				if (!(mzTrip.getEndTime() > 0.0)) {
-					log.error("No end time found for MZ trip : " + mzTrip.getId());
-				}
-				double startTimeAfterShoppingAct = mzTrip.getEndTime(); 			
-				afterShoppingAct.setStartTime(startTimeAfterShoppingAct);
-								
-				Trip trip = new Trip(tripNr, beforeShoppingAct, shoppingAct, afterShoppingAct);
-				
-				ChoiceSet choiceSet = new ChoiceSet(new IdImpl(trip3ID), trip);
-				choiceSet.setChosenZHFacility(chosenZHFacility);
-				
-				double travelTimeBudget = (startTimeAfterShoppingAct- endTimeBeforeShoppingAct) - (endTimeShoppingAct - startTimeShoppingAct);
-				choiceSet.setTravelTimeBudget(travelTimeBudget);
+				line.constructTrip(entries, network, zhFacilitiesByLink, mzTrip);
+				ChoiceSet choiceSet = new ChoiceSet(new IdImpl(line.getTripId()), line.getTrip());
+				choiceSet.setPersonAttributes(line.getPersonAttributes());
+				choiceSet.setChosenZHFacility(line.getChosenZHFacility());
+				choiceSet.setTravelTimeBudget(line.getTravelTimeBudget());
 				
 				// filter trips 55534012 and 56751011 (fehlende Geodaten)
-				if (!(trip3ID.equals("55534012") || trip3ID.equals("56751011"))) {
+				if (!(line.getTripId().equals("55534012") || line.getTripId().equals("56751011"))) {
 					this.choiceSets.add(choiceSet);		
 				}
 			}

@@ -37,7 +37,7 @@ public class ZHFacilitiesWriter {
 			Iterator<ZHFacility> facilitiesList_it = facilitiesList.iterator();			
 			while (facilitiesList_it.hasNext()) {
 				ZHFacility facility = facilitiesList_it.next();	
-				Coord coord = facility.getMappedposition();
+				Coord coord = facility.getMappedPosition();
 				features.add(this.createFeature(coord, facility.getId()));
 				featuresExact.add(this.createFeature(facility.getExactPosition(), facility.getId()));
 			}

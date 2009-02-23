@@ -54,19 +54,39 @@ public class ZHFacilitiesReader {
 				String[] entries = curr_line.split("\t", -1);
 				
 				String shopID = entries[0].trim();
-				double xCH = Double.parseDouble(entries[1].trim());
-				double yCH = Double.parseDouble(entries[2].trim());
+				String retailerID =  entries[1].trim();
+				int size_descr = Integer.parseInt(entries[2].trim());
+				double dHalt = Double.parseDouble(entries[3].trim());
+				double xCH = Double.parseDouble(entries[4].trim());
+				double yCH = Double.parseDouble(entries[5].trim());
+				double hrs_week = Double.parseDouble(entries[6].trim());
 				
 				Coord exactPosition = new CoordImpl(xCH, yCH);
 				Link closestLink = network.getNearestLink(exactPosition);
 								
 				if (zhFacilitiesByLink.containsKey(closestLink.getId())) {
 					zhFacilitiesByLink.get(closestLink.getId()).add(
-							new ZHFacility(new IdImpl(shopID), closestLink.getCenter(), exactPosition, closestLink.getId()));
+							new ZHFacility(
+									new IdImpl(shopID),
+									closestLink.getCenter(),
+									exactPosition, 
+									closestLink.getId(),
+									new IdImpl(retailerID),
+									size_descr,
+									dHalt,
+									hrs_week));
 				}
 				else {
 					ArrayList<ZHFacility> list = new ArrayList<ZHFacility>();
-					list.add(new ZHFacility(new IdImpl(shopID), closestLink.getCenter(), exactPosition, closestLink.getId()));
+					list.add(new ZHFacility(
+							new IdImpl(shopID),
+							closestLink.getCenter(),
+							exactPosition, 
+							closestLink.getId(),
+							new IdImpl(retailerID),
+							size_descr,
+							dHalt,
+							hrs_week));
 					zhFacilitiesByLink.put(
 							closestLink.getId(),list);
 				}	
