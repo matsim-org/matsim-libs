@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE facilities SYSTEM "http://www.matsim.org/files/dtd/facilities_v1.dtd">
+
+<facilities>
+
+<!-- ====================================================================== -->
+
+	<facility id="home" x="400.0" y="399.0">
+		<activity type="home">
+		</activity>
+
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="stop1" x="100.0" y="900.0">
+		<activity type="transitInteraction">
+		</activity>
+
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="stop2" x="1000.0" y="500.0">
+		<activity type="transitInteraction">
+		</activity>
+
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="stop3" x="2800.0" y="500.0">
+		<activity type="transitInteraction">
+		</activity>
+
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="stop4" x="3300.0" y="500.0">
+		<activity type="transitInteraction">
+		</activity>
+
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="stop5" x="4100.0" y="499.0">
+		<activity type="transitInteraction">
+		</activity>
+
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="stop6" x="4800.0" y="200.0">
+		<activity type="transitInteraction">
+		</activity>
+
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="work" x="4700.0" y="700.0">
+		<activity type="work">
+		</activity>
+
+	</facility>
+
+<!-- ====================================================================== -->
+
+</facilities>

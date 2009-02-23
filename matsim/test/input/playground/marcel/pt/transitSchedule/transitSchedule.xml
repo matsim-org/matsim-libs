@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- <!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.xsd">-->
+
+<transitSchedule>
+
+	<transitLine id="T1">
+		<transitRoutes>
+			<transitRoute id="1">
+				<description></description>
+				<routeProfile>
+					 <!-- arrival is optional, departure required for all but last, time infos are just offsets -->
+					<stop ref="stop1" departure="00:00:00" /><!-- implicitly specify link1 -->
+					<stop ref="stop2" arrival="00:01:20" departure="00:01:40" />
+					<link ref="4" />
+					<stop ref="stop3" departure="00:03:00" />
+					<stop ref="stop4" departure="00:03:50" />
+					<stop ref="stop5" departure="00:04:50" />
+					<stop ref="stop6" arrival="00:05:30" />
+				</routeProfile>
+
+				<departures>
+					<departure id="T1.1" departureTime="07:00:00" />
+					<departure id="T1.2" departureTime="07:10:00" />
+					<departure id="T1.3" departureTime="07:20:00" />
+				</departures>
+			</transitRoute>
+			
+		</transitRoutes><!-- braucht es den Container transitRoutes ueberhaupt? -->
+		
+		
+	</transitLine>
+
+</transitSchedule>
+
+<!-- 
+Dieses Format wuerde fuer Simulation genuegen und haette alle benoetigten Daten.
+Aber fuer Router koennte es ineffizienter sein, weil er nicht eine Route mit mehreren
+Fahrzeitprofilen als 1 Route/1 Link darstellen kann (zumindest nicht ohne komplexe
+Analyse). Das fuehrt dann zu mehr Links im Router, was auf die Performance schlaegt.
+
+Wenn man aber davon ausgeht, dass die Fahrzeitprofile i.A. zeitlich "blockweise"
+verwendet werden (also ein Fahrzeitprofil fuer Nacht, eines fuer Tag, eines fuer 
+Stosszeiten), dann ist es im Router auch nicht so tragisch: Zwar kann er mal einen
+Link eines anderen Fahrzeitprofils erwischen, wenn dort aber erst in 2 Stunden der
+naechste Kurs verkehrt, wird hoffentlich dieser Link von Dijkstra nie weiterverfolgt
+werden, weil er vorher am Ziel ankommt. Als Optimierung koennte man noch sicherstellen,
+dass Dijkstra nie versucht, von einem Fahrzeitprofil auf das naechste innerhalb einer
+Linie umzusteigen (hmm, sinnvoll? Was, wenn Hin- und Rueckrichtung einer Linie unterschiedlich
+fahren, z.B. 32er in Morgenthal/Wollishofen, und man genau zu einer Haltestelle im Einbahnbereich
+will? Muesste also richtungsabhaengig sein...) 
+ -->
