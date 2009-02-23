@@ -61,15 +61,23 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRouteLandmarks pcrl = null;
 	private final String facilityIdFile;
+	private final String locationStrategy;
+	private int alternatives;
 
-	public RetailersLocationListener(final String facilityIdFile, final String retailerSummaryFileName) {
+	public RetailersLocationListener(final String facilityIdFile, final String retailerSummaryFileName,final String locationStrategy, int alternatives) {
 		this.facilityIdFile = facilityIdFile;
-		rs = new RetailersSummaryWriter(retailerSummaryFileName, this.retailers);
-		pst = new PlansSummaryTable ("output/triangle/output_Persons.txt");
+		this.rs = new RetailersSummaryWriter(retailerSummaryFileName, this.retailers);
+		this.pst = new PlansSummaryTable ("output/triangle/output_Persons.txt"); //should come from the config file
+		this.locationStrategy = locationStrategy;
+		this.alternatives = alternatives;
 	}
 
 	public RetailersLocationListener(final String retailerSummaryFileName) {
-		this(null,retailerSummaryFileName);
+		this(null,retailerSummaryFileName, 0);
+	}
+	
+	public RetailersLocationListener(final String retailerSummaryFileName, final String locationStrategy, int alternatives) {
+		this(null,retailerSummaryFileName,locationStrategy, alternatives);
 	}
 
 	public void notifyStartup(StartupEvent event) {
@@ -77,7 +85,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 
 		preprocess.run(controler.getNetwork());
 		pcrl = new PlansCalcRouteLandmarks(controler.getNetwork(),preprocess,timeCostCalc, timeCostCalc);
-		
+						
 		// define all given retailers
 		ArrayList<Facility> facilities = new ArrayList<Facility>();
 		if (this.facilityIdFile == null) {
@@ -85,6 +93,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 			for (Facility f:controler.getFacilities().getFacilities("shop").values()) {
 			System.out.println("next = " + f);
 			facilities.add(f);
+			
 			}
 		}
 		else {
@@ -105,15 +114,30 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 				Gbl.errorMsg(e);
 			}
 		}
-		this.retailers = this.createRetailers(facilities);
+		
+		if (this.locationStrategy.compareTo("RandomRetailerStrategy")==0) {
+			RandomRetailerStrategy rst = new RandomRetailerStrategy(controler.getNetwork());
+			this.retailers = this.createRetailers(facilities,rst);
+		}
+		if (this.locationStrategy.compareTo("MaxLinkRetailerStrategy")==0) {
+			MaxLinkRetailerStrategy rst = new MaxLinkRetailerStrategy (controler);
+			this.retailers = this.createRetailers(facilities,rst);
+		}
+		
+		if (this.locationStrategy.compareTo("LogitMaxLinkRetailerStrategy")==0) {
+			LogitMaxLinkRetailerStrategy rst = new LogitMaxLinkRetailerStrategy (controler,this.alternatives);
+			this.retailers = this.createRetailers(facilities,rst);
+		}
+		
 	}
 	
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
 		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
+		controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
+		
 		for (Retailer r : retailers.getRetailers().values()) {
-			// TODO balmermi: replace that with r.runStrategy();
-			Map<Id,Facility> facs =  r.moveFacilitiesMaxLink(controler);
+			Map<Id,Facility> facs =  r.runStrategy();
 			movedFacilities.putAll(facs);
 		}
 		
@@ -149,10 +173,10 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		return fs;
 	}
 	
-	private final Retailers createRetailers(ArrayList<Facility> retailerFacilities) {
+	private final Retailers createRetailers(ArrayList<Facility> retailerFacilities, RetailerStrategy rst) {
 		Retailers retailers = new Retailers();
 		for (Facility f : retailerFacilities) {
-			Retailer r = new Retailer(f.getId());
+			Retailer r = new Retailer(f.getId(),rst);
 			if (!r.addFacility(f)) { throw new RuntimeException("Could not add facility id="+f.getId()+" to retailer."); } 
 			if (!retailers.addRetailer(r)) { throw new RuntimeException("Could not add retailer id="+r.getId()+" to retailers."); } 
 		}

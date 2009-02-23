@@ -15,7 +15,8 @@ public class RandomRetailerStrategy implements RetailerStrategy {
 	public RandomRetailerStrategy (NetworkLayer network) {
 		this.network = network;
 	}
-	// strategy: Random Mutation
+	
+	// strategy: Random Mutation: A new link is randomly chosen and given to the retailer as new location
 	final public void moveFacilities(Map<Id, Facility> facilities) {
 		for (Facility f : facilities.values()) {
 			Object[] links = network.getLinks().values().toArray();
