@@ -59,8 +59,8 @@ public class ExtractWalkChoiceSetsEllipse extends ChoiceSetExtractor {
 	
 	private boolean inEllipse(ZHFacility facility, ChoiceSet choiceSet) {
 		
-			double dist0 = choiceSet.getTrip().getBeforeShoppingAct().getCoord().calcDistance(facility.getMappedposition());
-			double dist1 = choiceSet.getTrip().getAfterShoppingAct().getCoord().calcDistance(facility.getMappedposition());
+			double dist0 = choiceSet.getTrip().getBeforeShoppingAct().getCoord().calcDistance(facility.getMappedPosition());
+			double dist1 = choiceSet.getTrip().getAfterShoppingAct().getCoord().calcDistance(facility.getMappedPosition());
 			
 			if (dist0 + dist1 <= choiceSet.getTravelTimeBudget() * this.walkingSpeed) return true;
 			else return false;
