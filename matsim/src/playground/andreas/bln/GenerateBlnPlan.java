@@ -26,7 +26,7 @@ import org.matsim.utils.misc.Time;
 public class GenerateBlnPlan {
 
 	private static final Logger log = Logger.getLogger(TabReader.class);
-	private static final String plansOutFile = "z:/plans_out.xml";
+	private static final String plansOutFile = "z:/raw_plans_out.xml";
 	
 	HashMap<Id, PersonImpl> personList = new HashMap<Id, PersonImpl>();
 	
@@ -40,34 +40,68 @@ public class GenerateBlnPlan {
 		GenerateBlnPlan myGenerator = new GenerateBlnPlan();
 		myGenerator.generatePersons();
 		myGenerator.generatePlans();
-		myGenerator.filterPopulation();
-		myGenerator.writePopulation();
+		
+		ArrayList<PersonImpl> persons = myGenerator.getPersonList();
+		
+		persons = myGenerator.filterPersonsWithZeroPlans(persons);
+		persons = myGenerator.filterPersonsWithOneAct(persons);
+		myGenerator.writePopulation(persons);
 
 	}
 	
-	private void filterPopulation(){
+	private ArrayList<PersonImpl> filterPersonsWithOneAct(ArrayList<PersonImpl> inPersons) {
 		
 		int numberOfRemovedPersons = 0;
-		ArrayList<PersonImpl> filteresPersons  = new ArrayList<PersonImpl>();
+		ArrayList<PersonImpl> outPersons  = new ArrayList<PersonImpl>();
 		
-		for (PersonImpl person : this.personList.values()) {
+		for (PersonImpl person : inPersons) {
+			if (person.getSelectedPlan().getActsLegs().size() == 1){
+				numberOfRemovedPersons++;
+//				log.info("Removed person due to no selected plan");
+			} else {
+				outPersons.add(person);
+			}
+		}
+		
+		log.info("Removed " + numberOfRemovedPersons + " persons with one Activity");
+		
+		return outPersons;		
+	}
+
+	private ArrayList<PersonImpl> filterPersonsWithZeroPlans(ArrayList<PersonImpl> inPersons){
+		
+		int numberOfRemovedPersons = 0;
+		ArrayList<PersonImpl> outPersons  = new ArrayList<PersonImpl>();
+		
+		for (PersonImpl person : inPersons) {
 			if (person.getSelectedPlan() == null){
 				numberOfRemovedPersons++;
+//				log.info("Removed person due to no selected plan");
 			} else {
-				filteresPersons.add(person);
+				outPersons.add(person);
 			}
 		}
 		
 		log.info("Removed " + numberOfRemovedPersons + " persons with zero Plans");
 		
+		return outPersons;		
+	}
+	
+	private ArrayList<PersonImpl> getPersonList(){
+		ArrayList<PersonImpl> persons  = new ArrayList<PersonImpl>();
+		for (PersonImpl person : this.personList.values()) {
+			persons.add(person);
+		}
+		this.personList = null;
+		return persons;
 	}
 	
 	
-	private void writePopulation(){
+	private void writePopulation(ArrayList<PersonImpl> filteredPersons){
 		
 		log.info("Generating population");
 		Population pop = new Population();
-		for (PersonImpl person : this.personList.values()) {
+		for (PersonImpl person : filteredPersons) {
 			pop.addPerson(person);
 		}
 		log.info("Writing Population to " + GenerateBlnPlan.plansOutFile);
@@ -96,79 +130,191 @@ public class GenerateBlnPlan {
 			Act lastAct = null;
 			Id lastPersonId = null;
 			
+			int workCounter = 0;
+			int homeCounter = 0;
+			int educationCounter = 0;
+			int shoppingcounter = 0;
+			int leisureCounter = 0;
+			int otherCounter = 0;
+			
 			for (String[] data : tripData) {
-				
-				if (Double.parseDouble(data[11]) != 0.0 || Double.parseDouble(data[12]) != 0.0){
-				
-				PersonImpl actPerson= this.personList.get(new IdImpl(data[1]));
 
-				Plan actPlan;
-				
-				if (actPerson.getSelectedPlan() == null){
-					actPlan = actPerson.createPlan(true);
-					numberOfPlansAdded++;
-				} else {
-					actPlan = actPerson.getSelectedPlan();
-				}
-				
-				Act newAct = null;
-				
-				
-					
-					// set every non home activity to work
-					if (data[10].equalsIgnoreCase("WAHR")){
-						newAct = new Act("home", new CoordImpl(Double.parseDouble(data[11]), Double.parseDouble(data[12])));
-					} else {
-						newAct = new Act("work", new CoordImpl(Double.parseDouble(data[11]), Double.parseDouble(data[12])));
-					}
-					
-					numberOfTripsUsed++;
-									
-					Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMM);
-					newAct.setStartTime(Time.parseTime(data[5]));
-					
-				
-				
-				
-				
-				if(lastPersonId == null){
-					
-					lastPersonId = actPerson.getId();
-					lastAct = newAct;
-					
-				} else {
-					
-					if(lastPersonId.equals(actPerson.getId())){
-				
-						if(lastAct == null){
-							log.error("This should not happen");
+				// Ignore all trips with coord -1.0
+				if (Double.parseDouble(data[11]) != -1.0 && Double.parseDouble(data[12]) != -1.0){
+
+					// Ignore all trips with coord 0.0
+					if (Double.parseDouble(data[11]) != 0.0 && Double.parseDouble(data[12]) != 0.0){
+
+						PersonImpl actPerson= this.personList.get(new IdImpl(data[1]));
+
+						Plan actPlan;
+
+						if (actPerson.getSelectedPlan() == null){
+							actPlan = actPerson.createPlan(true);
+							numberOfPlansAdded++;
 						} else {
-							lastAct.setEndTime(Time.parseTime(data[0]));
-							lastAct = newAct;
-							actPlan.addLeg(new Leg(BasicLeg.Mode.car));
+							actPlan = actPerson.getSelectedPlan();
 						}
-					} else {
-						if (lastAct != null){
-							lastAct.setEndTime(86400.0);
-							lastPersonId = actPerson.getId();
-							lastAct = newAct;
-						} else {
-							log.error("This should not happen");
+
+						Act newAct = null;
+
+						// set every non home activity to work
+//						if (data[10].equalsIgnoreCase("WAHR")){
+//							newAct = new Act("home", new CoordImpl(Double.parseDouble(data[11]), Double.parseDouble(data[12])));
+//						} else {
+//							newAct = new Act("work", new CoordImpl(Double.parseDouble(data[11]), Double.parseDouble(data[12])));
+//						}
+						
+						// Read Activity from survey
+						String actType;
+						int actNr = Integer.parseInt(data[38]);
+						
+						switch (actNr) {
+						case 0:
+							if (data[10].equalsIgnoreCase("WAHR")){
+								actType = "home";
+								homeCounter++;
+							} else {
+								// "keine Angabe"
+								actType = "not specified";
+								otherCounter++;
+							}
+							break;
+						case 1:
+							// "Arbeitsplatz"
+							actType = "work";
+							workCounter++;
+							break;
+						case 2:
+							// "Schule / Ausbildung"
+							actType = "education";
+							educationCounter++;
+							break;
+						case 3:
+							// "dienstl./geschaeftl."
+							actType = "business";
+							workCounter++;
+							break;
+						case 4:
+							// "Einkauf taegl.Bedarf"
+							actType = "shopping";
+							shoppingcounter++;
+							break;
+						case 5:
+							// "Einkauf sonstiges"
+							actType = "shopping";
+							shoppingcounter++;
+							break;
+						case 6:
+							// "Freizeit (Kino,Rest.,usw.)"
+							actType = "leisure";
+							leisureCounter++;
+							break;
+						case 7:
+							// "Freizeit (sonstiges incl.Sport)"
+							actType = "leisure";
+							leisureCounter++;
+							break;
+						case 8:
+							// "nach Hause"
+							actType = "home";
+							homeCounter++;
+							break;
+						case 9:
+							// "zum Arzt"
+							actType = "see a doctor";
+							otherCounter++;
+							break;
+						case 10:
+							// "Urlaub / Reise"
+							actType = "holiday / journey";
+							leisureCounter++;
+							break;
+						case 11:
+							// "Anderes"
+							actType = "other";
+							otherCounter++;
+							break;
+						case 12:
+							// "Mehrfachnennung"
+							actType = "multiple";
+							otherCounter++;
+							break;
+						default:
+							log.error("ActType not defined");
+							actType = "not defined";
 						}
 						
+						newAct = new Act(actType, new CoordImpl(Double.parseDouble(data[11]), Double.parseDouble(data[12])));
+				
+						numberOfTripsUsed++;
+
+						Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMM);
+						
+						// Since data is from survey, it is more likely to get x:00, x:15, x:30, x:45 as answer,
+						// and therefore arbitrary peaks in departure and arrival time histogram -> spread it
+						double startTime = Time.parseTime(data[5]);
+						if (startTime % (15*60) == 0){
+							startTime = (startTime - 900) + Math.random() * 1800;
+							startTime = Math.max(0.0, startTime);
+							newAct.setStartTime(startTime);
+						} else {
+							newAct.setStartTime(startTime);
+						}
+
+						if(lastPersonId == null){
+
+							lastPersonId = actPerson.getId();
+							lastAct = newAct;
+
+						} else {
+
+							if(lastPersonId.equals(actPerson.getId())){
+
+								if(lastAct == null){
+									log.error("This should not happen");
+								} else {
+									// Since data is from survey, it is more likely to get x:00, x:15, x:30, x:45 as answer,
+									// and therefore arbitrary peaks in departure and arrival time histogram -> spread it
+									double endTime = Time.parseTime(data[0]);
+									if (endTime % (15*60) == 0){
+										endTime = (endTime - 900) + Math.random() * 1800;
+										endTime = Math.max(0.0, endTime);
+										lastAct.setEndTime(endTime);
+									} else {
+										lastAct.setEndTime(endTime);
+									}
+									
+//									lastAct.setEndTime(Time.parseTime(data[0]));
+									lastAct = newAct;
+									actPlan.addLeg(new Leg(BasicLeg.Mode.car));
+								}
+							} else {
+								if (lastAct != null){
+									lastAct.setEndTime(86400.0);
+									lastPersonId = actPerson.getId();
+									lastAct = newAct;
+								} else {
+									log.error("This should not happen");
+								}
+
+							}
+
+						}
+
+						actPlan.addAct(newAct);				
+						//				log.info("hold");
+
 					}
-				
-				}
-				
-				actPlan.addAct(newAct);				
-//				log.info("hold");
-				
 				}
 
 
 			}
 			log.info("...finished generating " + numberOfPlansAdded + " Plans.");
-			log.info("...used " + numberOfTripsUsed + " trips.");			
+			log.info("...used " + numberOfTripsUsed + " trips.");
+			log.info("...whereas " + homeCounter + " home, " + workCounter + " work, " + educationCounter + 
+					" education, " + leisureCounter + " leisure, " + shoppingcounter + " shopping and " + 
+					otherCounter + " other acts were counted.");
 
 		} catch (IOException e) {
 			e.printStackTrace();
