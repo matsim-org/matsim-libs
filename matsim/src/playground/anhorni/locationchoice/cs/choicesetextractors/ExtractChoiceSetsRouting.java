@@ -73,7 +73,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			
 		NetworkLayer network = controler.getNetwork();
 		
-		Iterator<Id> link_it = this.facilities.getZhFacilities().keySet().iterator();
+		Iterator<Id> link_it = this.facilities.getZhFacilitiesByLink().keySet().iterator();
 		while (link_it.hasNext()) {		
 			Id linkId = link_it.next();
 			
