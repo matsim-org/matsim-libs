@@ -77,13 +77,14 @@ public class ZHFacilities {
 	}
 	
 	public void calculateAccesibilities() {
-		double accessibility02 = 0.0;
-		double accessibility10 = 0.0;
-		double accessibility20 = 0.0;
+		
 		
 		Iterator<ZHFacility> referenceFacility_it = this.zhFacilities.values().iterator();
 		while (referenceFacility_it.hasNext()) {
 			ZHFacility referenceFacility = referenceFacility_it.next();
+			double accessibility02 = 0.0;
+			double accessibility10 = 0.0;
+			double accessibility20 = 0.0;
 		
 			Iterator<ZHFacility> facilities_it = this.zhFacilities.values().iterator();
 			while (facilities_it.hasNext()) {
