@@ -968,10 +968,6 @@ public class Controler {
 		return volumes;
 	}
 
-	public final TravelTime getLinkTravelTimes() {
-		return this.travelTimeCalculator;
-	}
-
 	/**
 	 * @return Returns the RoadPricing-ControlerListener, or null if no road
 	 *         pricing is simulated.

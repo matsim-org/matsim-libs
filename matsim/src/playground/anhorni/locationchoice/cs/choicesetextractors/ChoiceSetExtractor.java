@@ -3,9 +3,11 @@ package playground.anhorni.locationchoice.cs.choicesetextractors;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
+
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.SpanningTree;
 import playground.anhorni.locationchoice.cs.helper.ZHFacilities;
@@ -26,7 +28,7 @@ public abstract class ChoiceSetExtractor {
 	
 	protected void computeChoiceSets() {
 
-		SpanningTree spanningTree = new SpanningTree(this.controler.getLinkTravelTimes(), this.controler.getTravelCostCalculator());
+		SpanningTree spanningTree = new SpanningTree(this.controler.getTravelTimeCalculator(), this.controler.getTravelCostCalculator());
 		String type ="s";
 		
 		int index = 0;
