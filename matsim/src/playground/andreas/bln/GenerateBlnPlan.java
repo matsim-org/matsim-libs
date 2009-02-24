@@ -27,6 +27,7 @@ public class GenerateBlnPlan {
 
 	private static final Logger log = Logger.getLogger(TabReader.class);
 	private static final String plansOutFile = "z:/raw_plans_out.xml";
+	private static final int spreadingTime = 900; // 15min
 	
 	HashMap<Id, PersonImpl> personList = new HashMap<Id, PersonImpl>();
 	
@@ -136,6 +137,7 @@ public class GenerateBlnPlan {
 			int shoppingcounter = 0;
 			int leisureCounter = 0;
 			int otherCounter = 0;
+			int[] modalSplit = new int[8];
 			
 			for (String[] data : tripData) {
 
@@ -164,6 +166,11 @@ public class GenerateBlnPlan {
 //						} else {
 //							newAct = new Act("work", new CoordImpl(Double.parseDouble(data[11]), Double.parseDouble(data[12])));
 //						}
+						
+						// Register ModalSplit
+						if (!data[49].equalsIgnoreCase("")){
+							modalSplit[Integer.parseInt(data[48])]++;
+						}
 						
 						// Read Activity from survey
 						String actType;
@@ -255,7 +262,7 @@ public class GenerateBlnPlan {
 						// and therefore arbitrary peaks in departure and arrival time histogram -> spread it
 						double startTime = Time.parseTime(data[5]);
 						if (startTime % (15*60) == 0){
-							startTime = (startTime - 900) + Math.random() * 1800;
+							startTime = (startTime - (spreadingTime / 2)) + Math.random() * spreadingTime;
 							startTime = Math.max(0.0, startTime);
 							newAct.setStartTime(startTime);
 						} else {
@@ -278,7 +285,7 @@ public class GenerateBlnPlan {
 									// and therefore arbitrary peaks in departure and arrival time histogram -> spread it
 									double endTime = Time.parseTime(data[0]);
 									if (endTime % (15*60) == 0){
-										endTime = (endTime - 900) + Math.random() * 1800;
+										endTime = (endTime - (spreadingTime / 2)) + Math.random() * spreadingTime;
 										endTime = Math.max(0.0, endTime);
 										lastAct.setEndTime(endTime);
 									} else {
@@ -315,6 +322,9 @@ public class GenerateBlnPlan {
 			log.info("...whereas " + homeCounter + " home, " + workCounter + " work, " + educationCounter + 
 					" education, " + leisureCounter + " leisure, " + shoppingcounter + " shopping and " + 
 					otherCounter + " other acts were counted.");
+			log.info("...ModalSplit: " + modalSplit[0] + " keine Angabe, " + modalSplit[1] + " Fuss, " +
+					modalSplit[2] +	" Rad, " + modalSplit[3] + " MIV, " + modalSplit[4] + " OEV, " +
+					modalSplit[5] + " Rad/OEV, " + modalSplit[6] + " MIV/OEV, " + modalSplit[7] + " Sonst.");
 
 		} catch (IOException e) {
 			e.printStackTrace();
