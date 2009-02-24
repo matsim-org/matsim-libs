@@ -238,11 +238,6 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 						+ (this.carHomeDist + this.ptHomeDist + this.throughHomeDist)
 						+ "\t"
 						+ (this.carOtherDist + this.ptOtherDist + this.throughOtherDist));
-		try {
-			sw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
 		double x[] = new double[101];
 		for (int i = 0; i < 101; i++)
@@ -257,6 +252,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 			yPt[i] = this.ptCounts[i] / this.count * 100.0;
 			yOther[i] = this.otherCounts[i] / this.count * 100.0;
 		}
+
 		XYLineChart chart = new XYLineChart("Daily Distance distribution",
 				"Daily Distance in km",
 				"fraction of persons with daily distance bigger than x... in %");
@@ -266,25 +262,62 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		chart.addSeries("total", x, yTotal);
 		chart.saveAsPng(outputFilename + "dailyDistance.png", 800, 600);
 
+		sw.writeln("");
+		sw.writeln("--Modal split -- leg distance--");
+		sw
+				.writeln("leg Distance [km]\tcar legs no.\tpt legs no.\tcar fraction [%]\tpt fraction [%]");
+
+		double xs[] = new double[21];
+		double yCarFracs[] = new double[21];
+		double yPtFracs[] = new double[21];
+
 		BubbleChart bubbleChart = new BubbleChart(
 				"Modal split -- leg distance", "pt fraction [%]",
 				"car fraction [%]");
-		for (int i = 0; i < 20; i++)
+		for (int i = 0; i < 20; i++) {
+			double ptFraction = ptCounts5[i] / (ptCounts5[i] + carCounts5[i])
+					* 100.0;
+			double carFraction = carCounts5[i] / (ptCounts5[i] + carCounts5[i])
+					* 100.0;
 			bubbleChart.addSeries(i * 5 + "-" + (i + 1) * 5 + " km",
-					new double[][] {
-							new double[] { ptCounts5[i]
-									/ (ptCounts5[i] + carCounts5[i]) * 100.0 },
-							new double[] { carCounts5[i]
-									/ (ptCounts5[i] + carCounts5[i]) * 100.0 },
+					new double[][] { new double[] { ptFraction },
+							new double[] { carFraction },
 							new double[] { (i + 0.5) / 5.0 } });
+			sw.writeln((i * 5) + "+\t" + carCounts5[i] + "\t" + ptCounts5[i]
+					+ "\t" + carFraction + "\t" + ptFraction);
+
+			xs[i] = i * 5;
+			yCarFracs[i] = carFraction;
+			yPtFracs[i] = ptFraction;
+
+		}
+		double ptFraction = ptCounts5[20] / (ptCounts5[20] + carCounts5[20])
+				* 100.0;
+		double carFraction = carCounts5[20] / (ptCounts5[20] + carCounts5[20])
+				* 100.0;
 		bubbleChart.addSeries("100+ km", new double[][] {
-				new double[] { ptCounts5[20] / (ptCounts5[20] + carCounts5[20])
-						* 100.0 },
-				new double[] { carCounts5[20]
-						/ (ptCounts5[20] + carCounts5[20]) * 100.0 },
+				new double[] { ptFraction }, new double[] { carFraction },
 				new double[] { 4.1 } });
+		sw.writeln(100 + "+\t" + carCounts5[20] + "\t" + ptCounts5[20] + "\t"
+				+ carFraction + "\t" + ptFraction);
 		bubbleChart.saveAsPng(outputFilename + "legDistanceModalSplit.png",
-				1200, 900);
+				900, 900);
+
+		xs[20] = 100;
+		yCarFracs[20] = carFraction;
+		yPtFracs[20] = ptFraction;
+		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
+				"leg Distance [km]", "mode fraction [%]");
+		chart2.addSeries("car", xs, yCarFracs);
+		chart2.addSeries("pt", xs, yPtFracs);
+		chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png", 800,
+				600);
+		
+		try {
+			sw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

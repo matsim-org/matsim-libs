@@ -233,11 +233,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 						+ (this.carHomeTime + this.ptHomeTime + this.throughHomeTime)
 						+ "\t"
 						+ (this.carOtherTime + this.ptOtherTime + this.throughOtherTime));
-		try {
-			sw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
 		double x[] = new double[101];
 		for (int i = 0; i < 101; i++)
 			x[i] = i;
@@ -260,27 +256,64 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		chart.addSeries("total", x, yTotal);
 		chart.saveAsPng(outputFilename + "dailyEnRouteTime.png", 800, 600);
 
-		BubbleChart bubbleChart = new BubbleChart("Modal split -- leg Time",
-				"pt fraction [%]", "car fraction [%]");
-		for (int i = 0; i < 20; i++)
-			bubbleChart
-					.addSeries(i * 10 + "-" + (i + 1) * 10 + " min",
-							new double[][] {
-									new double[] { ptCounts10[i]
-											/ (ptCounts10[i] + carCounts10[i])
-											* 100.0 },
-									new double[] { carCounts10[i]
-											/ (ptCounts10[i] + carCounts10[i])
-											* 100.0 },
-									new double[] { (i + 0.5) / 2.5 } });
+		sw.writeln("");
+		sw.writeln("--Modal split -- leg duration--");
+		sw
+				.writeln("leg Duration [min]\tcar legs no.\tpt legs no.\tcar fraction [%]\tpt fraction [%]");
+
+		double xs[] = new double[21];
+		double yCarFracs[] = new double[21];
+		double yPtFracs[] = new double[21];
+
+		BubbleChart bubbleChart = new BubbleChart(
+				"Modal split -- leg Duration", "pt fraction [%]",
+				"car fraction [%]");
+		for (int i = 0; i < 20; i++) {
+			double ptFraction = ptCounts10[i]
+					/ (ptCounts10[i] + carCounts10[i]) * 100.0;
+			double carFraction = carCounts10[i]
+					/ (ptCounts10[i] + carCounts10[i]) * 100.0;
+			bubbleChart.addSeries(i * 10 + "-" + (i + 1) * 10 + " min",
+					new double[][] { new double[] { ptFraction },
+							new double[] { carFraction },
+							new double[] { (i + 0.5) / 2.5 } });
+			sw.writeln((i * 10) + "+\t" + carCounts10[i] + "\t" + ptCounts10[i]
+					+ "\t" + carFraction + "\t" + ptFraction);
+
+			xs[i] = i * 10;
+			yCarFracs[i] = carFraction;
+			yPtFracs[i] = ptFraction;
+
+		}
+		double ptFraction = ptCounts10[20] / (ptCounts10[20] + carCounts10[20])
+				* 100.0;
+		double carFraction = carCounts10[20]
+				/ (ptCounts10[20] + carCounts10[20]) * 100.0;
 		bubbleChart.addSeries("200+ min", new double[][] {
 				new double[] { ptCounts10[20]
 						/ (ptCounts10[20] + carCounts10[20]) * 100.0 },
 				new double[] { carCounts10[20]
 						/ (ptCounts10[20] + carCounts10[20]) * 100.0 },
 				new double[] { 8.2 } });
+		sw.writeln(200 + "+\t" + carCounts10[20] + "\t" + ptCounts10[20] + "\t"
+				+ carFraction + "\t" + ptFraction);
 		bubbleChart.saveAsPng(outputFilename + "legTimeModalSplit.png", 1200,
 				900);
+
+		xs[20] = 100;
+		yCarFracs[20] = carFraction;
+		yPtFracs[20] = ptFraction;
+		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Duration",
+				"leg Duration [min]", "mode fraction [%]");
+		chart2.addSeries("car", xs, yCarFracs);
+		chart2.addSeries("pt", xs, yPtFracs);
+		chart2.saveAsPng(outputFilename + "legTimeModalSplit2.png", 800, 600);
+
+		try {
+			sw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
