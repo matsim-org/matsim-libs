@@ -45,9 +45,9 @@ public class ChoiceSetWriterSimple extends CSWriter {
 					"SH" + i + "RetailerID\t" +
 					"SH" + i + "Size\t" +
 					"SH" + i + "dHalt\t" +
-					"SH" + i + "aAlt02\t" +
-					"SH" + i + "aAlt10\t" +
-					"SH" + i + "aAlt20\t" +
+					"SH" + i + "acc02\t" +
+					"SH" + i + "acc10\t" +
+					"SH" + i + "acc20\t" +
 					"SH" + i + "HRS_WEEK\t";
 		}
 	
@@ -59,29 +59,28 @@ public class ChoiceSetWriterSimple extends CSWriter {
 			Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
 			while (choiceSet_it.hasNext()) {
 				ChoiceSet choiceSet = choiceSet_it.next();
-
-				String outLine = choiceSet.getId() +"\t" + choiceSet.getPersonAttributes().getWP() +"\t";
-				
-				// chosen facility is always 1st alternative in choice set
-				String choice = "1\t";
-				outLine += choice;
+				String id_WP = choiceSet.getId() +"\t" + choiceSet.getPersonAttributes().getWP() +"\t";
+				int choice = -99;
 				
 				PersonAttributes attributes = choiceSet.getPersonAttributes();
-				outLine += attributes.getAge() +"\t"+ attributes.getGender() +"\t" + attributes.getIncomeHH() +"\t"+ 
+				String outLine = attributes.getAge() +"\t"+ attributes.getGender() +"\t" + attributes.getIncomeHH() +"\t"+ 
 				attributes.getNumberOfPersonsHH() +"\t" + attributes.getCivilStatus() +"\t" + attributes.getEducation() +"\t";
 				
 				outLine += choiceSet.getTrip().getShoppingAct().getStartTime() +"\t" + attributes.getStart_is_home() +"\t";
 				outLine += choiceSet.getTravelTimeBudget() +"\t";
-				
-				// chosen facility: ------------------------------------------------------------
-				outLine += this.printFacility(choiceSet.getChosenFacility().getFacility(), choiceSet);
 								
+				int index = 0;
 				Iterator<ZHFacility> facilities_it = this.facilities.getZhFacilities().values().iterator();
 				while (facilities_it.hasNext()) {
 					ZHFacility facility = facilities_it.next();	
-					outLine += this.printFacility(facility, choiceSet);
+					outLine += this.printFacility(facility, choiceSet);				
+					if (facility.getId().compareTo(choiceSet.getChosenFacilityId()) == 0 ) {
+						choice = index;
+					}
+					index++;
 				}
-				out.write(outLine);
+				
+				out.write(id_WP + choice + outLine);
 				out.newLine();
 				out.flush();
 			}
