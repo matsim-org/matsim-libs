@@ -1,29 +1,26 @@
 package playground.ciarif.retailers;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
 public class RandomRetailerStrategy implements RetailerStrategy {
-	private NetworkLayer network;
+	private final ArrayList<Link> links;
 	
 	public RandomRetailerStrategy (NetworkLayer network) {
-		this.network = network;
+		links = new ArrayList<Link>(network.getLinks().values());
 	}
 	
-	// strategy: Random Mutation: A new link is randomly chosen and given to the retailer as new location
 	final public void moveFacilities(Map<Id, Facility> facilities) {
 		for (Facility f : facilities.values()) {
-			Object[] links = network.getLinks().values().toArray();
-			int rd = MatsimRandom.random.nextInt(links.length);
-			Link link = (Link)links[rd];
-			Coord coord = link.getCenter();
-			f.moveTo(coord);
+			int rd = MatsimRandom.random.nextInt(links.size());
+			Link link = (Link)links.get(rd);
+			Utils.moveFacility(f,link);
 		}
 	}
 }

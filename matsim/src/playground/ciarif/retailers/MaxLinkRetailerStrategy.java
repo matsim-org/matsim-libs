@@ -5,12 +5,12 @@ import java.util.Map;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 
 public class MaxLinkRetailerStrategy implements RetailerStrategy {
 	private Controler controler;
+	// TODO balmermi: do the same speed optimization here
 
 	public MaxLinkRetailerStrategy(Controler controler) {
 		this.controler = controler;
@@ -39,8 +39,7 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 			System.out.println ("currentlink_volume = " + currentlink_volume);
 			System.out.println ("newlink_volume = " + newlink_volume);
 			if (newlink_volume >= currentlink_volume) {
-				Coord coord = link.getCenter();
-				f.moveTo(coord);
+				Utils.moveFacility(f,link);
 			}
 		}
 	}

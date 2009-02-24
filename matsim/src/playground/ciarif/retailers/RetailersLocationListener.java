@@ -54,7 +54,11 @@ import org.matsim.router.util.PreProcessLandmarks;
 
 
 public class RetailersLocationListener implements StartupListener, BeforeMobsimListener {
+	
+	public final static String CONFIG_GROUP = "Retailers";
+	public final static String CONFIG_POP_SUM_TABLE = "populationSummaryTable";
 
+//	private Retailers retailers = new Retailers();
 	private Retailers retailers;
 	private final RetailersSummaryWriter rs;
 	private final PlansSummaryTable pst;
@@ -68,7 +72,9 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	public RetailersLocationListener(final String facilityIdFile, final String retailerSummaryFileName,final String locationStrategy, int alternatives) {
 		this.facilityIdFile = facilityIdFile;
 		this.rs = new RetailersSummaryWriter(retailerSummaryFileName, this.retailers);
-		this.pst = new PlansSummaryTable ("output/triangle/output_Persons.txt"); //should come from the config file
+		String popOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
+		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
+		this.pst = new PlansSummaryTable (popOutFile); //should come from the config file
 		this.locationStrategy = locationStrategy;
 		this.alternatives = alternatives;
 	}
@@ -86,8 +92,13 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 
 		preprocess.run(controler.getNetwork());
 		pcrl = new PlansCalcRoute(controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess));
+		
+		// createRetailersFromFile();
 						
 		// define all given retailers
+		// DONE balmermi: not necessary when you get the facilities from the input table file
+		// instead read in the file defined by the config and create the retailers according to the file
+		// information (only reomve the if statement)
 		ArrayList<Facility> facilities = new ArrayList<Facility>();
 		if (this.facilityIdFile == null) {
 			Iterator<Facility> fac_it = controler.getFacilities().getFacilities("shop").values().iterator();
@@ -106,6 +117,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 				String curr_line = br.readLine();
 				while ((curr_line = br.readLine()) != null) {
 					String[] entries = curr_line.split("\t", -1);
+					// TODO balmermi: extend the file with a second column containing the strategies
 					// header: f_id
 					// index:     0
 					Id fid = new IdImpl(entries[0]);
@@ -115,7 +127,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 				Gbl.errorMsg(e);
 			}
 		}
-		
+
 		if (this.locationStrategy.compareTo("RandomRetailerStrategy")==0) {
 			RandomRetailerStrategy rst = new RandomRetailerStrategy(controler.getNetwork());
 			this.retailers = this.createRetailers(facilities,rst);
@@ -128,6 +140,8 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		if (this.locationStrategy.compareTo("LogitMaxLinkRetailerStrategy")==0) {
 			LogitMaxLinkRetailerStrategy rst = new LogitMaxLinkRetailerStrategy (controler,this.alternatives);
 			this.retailers = this.createRetailers(facilities,rst);
+//			Retailer retailer = this.createRetailer(facilities,rst);
+//			this.retailers.addRetailer(retailer);
 		}
 		
 	}

@@ -3,13 +3,8 @@ package playground.ciarif.retailers;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.matsim.controler.Controler;
 import org.matsim.facilities.Facility;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.network.Link;
-import org.matsim.network.NetworkLayer;
 
 public class Retailer {
 	private final Id id;
@@ -17,11 +12,8 @@ public class Retailer {
 	private final RetailerStrategy strategy;
 		
 	protected Retailer(final Id id, RetailerStrategy rs) { 
-		//Try to avoid to pass the network here
 		this.id = id;
-		// TODO balmermi: implement different strategies and instantiate them here
-		this.strategy = rs;//new RetailerStrategy (); // implementation of the strategy
-		//Try to avoid a hard coded strategy type here but let it come from the config file 
+		this.strategy = rs;
 	}
 
 	public final Id getId() {
