@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BusPassenger.java
+ * AllTests.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,28 +20,18 @@
 
 package playground.marcel.pt.tryout;
 
-import org.matsim.facilities.Facility;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.population.PersonImpl;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-import playground.marcel.pt.interfaces.PassengerAgent;
+public class AllTests {
 
-public class BusPassenger extends PersonImpl implements PassengerAgent {
+	public static Test suite() {
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
-	private final Facility exitStop;
+		suite.addTestSuite(BusDriverTest.class);
 
-	public BusPassenger(final Id id, final Facility exitStop) {
-		super(id);
-		this.exitStop = exitStop;
+		return suite;
 	}
 
-	public boolean arriveAtStop(final Facility stop) {
-		return this.exitStop == stop;
-	}
-
-	public boolean ptLineAvailable() {
-		// TODO [MR] Auto-generated method stub
-		return true;
-	}
 
 }
