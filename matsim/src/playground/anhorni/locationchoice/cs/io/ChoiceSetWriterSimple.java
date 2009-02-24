@@ -122,7 +122,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 				crowFlyDistanceMapped +"\t";
 		}
 		else {
-			outLine += "-99\t-99\t-99\t-99\t";
+			outLine += "-1\t-1\t-1\t-1\t";
 		}
 		
 		outLine += facility.getRetailerID() + "\t" +
