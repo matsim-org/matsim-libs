@@ -300,7 +300,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		bubbleChart.saveAsPng(outputFilename + "legTimeModalSplit.png", 1200,
 				900);
 
-		xs[20] = 100;
+		xs[20] = 200;
 		yCarFracs[20] = carFraction;
 		yPtFracs[20] = ptFraction;
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Duration",
