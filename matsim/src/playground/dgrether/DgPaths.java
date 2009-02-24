@@ -25,7 +25,7 @@ package playground.dgrether;
  */
 public interface DgPaths {
 
-	final String VSPSVNBASE = "/Volumes/data/work/vspSvn/";
+	final String VSPSVNBASE = "/Volumes/data/work/scmWorkspace/";
 	
 	final String WSBASE = "/Volumes/data/work/svnWorkspace/";
 	
@@ -36,4 +36,6 @@ public interface DgPaths {
 	final String IVTCHROADPRICING = VSPSVNBASE + "studies/schweiz-ivtch/baseCase/roadpricing/zurichCityArea/zurichCityAreaWithoutHighwaysPricingScheme.xml";
 	
 	final String IVTCHCOUNTS = VSPSVNBASE + "studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml";
+
+  final String SHAREDSVN = VSPSVNBASE + "shared-svn/";
 }
