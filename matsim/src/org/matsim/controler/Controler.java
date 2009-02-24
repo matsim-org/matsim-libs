@@ -28,8 +28,6 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.TreeMap;
 
-import javax.swing.event.EventListenerList;
-
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
@@ -53,19 +51,13 @@ import org.matsim.controler.corelisteners.PlansScoring;
 import org.matsim.controler.corelisteners.RoadPricing;
 import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.BeforeMobsimEvent;
-import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
-import org.matsim.controler.events.ReplanningEvent;
-import org.matsim.controler.events.ScoringEvent;
 import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.AfterMobsimListener;
 import org.matsim.controler.listener.BeforeMobsimListener;
 import org.matsim.controler.listener.ControlerListener;
-import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
-import org.matsim.controler.listener.ReplanningListener;
-import org.matsim.controler.listener.ScoringListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.counts.CountControlerListener;
@@ -139,15 +131,6 @@ public class Controler {
 	private boolean overwriteFiles = false;
 	private static int iteration = -1;
 
-	/** The swing event listener list to manage ControlerListeners efficiently. First list manages core listeners
-	 * which are called first when a ControlerEvent is thrown. I.e. this list contains the listeners that are
-	 * always running in a predefined order to ensure correctness.
-	 * The second list manages the other listeners, which can be added by calling addControlerListener(...).
-	 * A normal ControlerListener is not allowed to depend on the execution of other ControlerListeners.
-	 */
-	private final EventListenerList coreListenerList = new EventListenerList();
-	private final EventListenerList listenerList = new EventListenerList();
-
 	/** The Config instance the Controler uses. */
 	protected final Config config;
 	private final String configFileName;
@@ -199,6 +182,10 @@ public class Controler {
 	 * Attribute for the routing factory
 	 */
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+	/**
+	 * This instance encapsulates all behavior concerning the ControlerEvents/Listeners
+	 */
+	private ControlerListenerManager controlerListenerManager = new ControlerListenerManager(this);
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
@@ -323,7 +310,7 @@ public class Controler {
 		setup();
 		loadCoreListeners();
 		loadControlerListeners();
-		fireControlerStartupEvent();
+		this.controlerListenerManager.fireControlerStartupEvent();
 	}
 
 	/**
@@ -365,20 +352,20 @@ public class Controler {
 			makeIterationPath(iteration);
 			resetRandomNumbers();
 
-			fireControlerIterationStartsEvent(iteration);
+			this.controlerListenerManager.fireControlerIterationStartsEvent(iteration);
 			if (iteration > firstIteration) {
 				this.stopwatch.beginOperation("replanning");
-				fireControlerReplanningEvent(iteration);
+				this.controlerListenerManager.fireControlerReplanningEvent(iteration);
 				this.stopwatch.endOperation("replanning");
 			}
-			fireControlerBeforeMobsimEvent(iteration);
+			this.controlerListenerManager.fireControlerBeforeMobsimEvent(iteration);
 			this.stopwatch.beginOperation("mobsim");
 			resetRandomNumbers();
 			runMobSim();
 			this.stopwatch.endOperation("mobsim");
-			fireControlerAfterMobsimEvent(iteration);
-			fireControlerScoringEvent(iteration);
-			fireControlerIterationEndsEvent(iteration);
+			this.controlerListenerManager.fireControlerAfterMobsimEvent(iteration);
+			this.controlerListenerManager.fireControlerScoringEvent(iteration);
+			this.controlerListenerManager.fireControlerIterationEndsEvent(iteration);
 			this.stopwatch.endOperation("iteration");
 			this.stopwatch.write(getOutputFilename("stopwatch.txt"));
 			log.info(marker + "ITERATION " + iteration + " ENDS") ;
@@ -396,7 +383,7 @@ public class Controler {
 			} else {
 				log.info("S H U T D O W N   ---   start regular shutdown.");
 			}
-			fireControlerShutdownEvent(unexpected);
+			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
 
 			// dump plans
 			new PopulationWriter(this.population, getOutputFilename("output_plans.xml.gz"),
@@ -728,12 +715,7 @@ public class Controler {
 	 */
 	@SuppressWarnings("unchecked")
 	protected final void addCoreControlerListener(final ControlerListener l) {
-		Class[] interfaces = l.getClass().getInterfaces();
-		for (int i = 0; i < interfaces.length; i++) {
-			if (ControlerListener.class.isAssignableFrom(interfaces[i])) {
-				this.coreListenerList.add(interfaces[i], l);
-			}
-		}
+		this.controlerListenerManager.addCoreControlerListener(l);
 	}
 
 	/* ===================================================================
@@ -747,12 +729,7 @@ public class Controler {
 	 */
 	@SuppressWarnings("unchecked")
 	public final void addControlerListener(final ControlerListener l) {
-		Class[] interfaces = l.getClass().getInterfaces();
-		for (int i = 0; i < interfaces.length; i++) {
-			if (ControlerListener.class.isAssignableFrom(interfaces[i])) {
-				this.listenerList.add(interfaces[i], l);
-			}
-		}
+		this.controlerListenerManager.addControlerListener(l);
 	}
 
 	/**
@@ -762,145 +739,9 @@ public class Controler {
 	 */
 	@SuppressWarnings("unchecked")
 	public final void removeControlerListener(final ControlerListener l) {
-		Class[] interfaces = l.getClass().getInterfaces();
-		for (int i = 0; i < interfaces.length; i++) {
-			if (ControlerListener.class.isAssignableFrom(interfaces[i])) {
-				this.listenerList.remove(interfaces[i], l);
-			}
-		}
+		this.controlerListenerManager.removeControlerListener(l);
 	}
 
-	/**
-	 * Notifies all ControlerListeners
-	 */
-	private void fireControlerStartupEvent() {
-		StartupEvent event = new StartupEvent(this);
-		StartupListener[] listener = this.coreListenerList.getListeners(StartupListener.class);
-    for (int i = 0; i < listener.length; i++) {
-    	listener[i].notifyStartup(event);
-    }
-    listener = this.listenerList.getListeners(StartupListener.class);
-    for (int i = 0; i < listener.length; i++) {
-    	listener[i].notifyStartup(event);
-    }
-	}
-
-	/**
-	 * Notifies all ControlerListeners
-	 * @param unexpected Whether the shutdown is unexpected or not.
-	 */
-	private void fireControlerShutdownEvent(final boolean unexpected) {
-		ShutdownEvent event = new ShutdownEvent(this, unexpected);
-    ShutdownListener[] listener = this.coreListenerList.getListeners(ShutdownListener.class);
-    for (int i = 0; i < listener.length; i++) {
-    	listener[i].notifyShutdown(event);
-    }
-    listener = this.listenerList.getListeners(ShutdownListener.class);
-    for (int i = 0; i < listener.length; i++) {
-    	listener[i].notifyShutdown(event);
-    }
-	}
-
-	/**
-	 * Notifies all ControlerSetupIterationStartsListeners
-	 * @param iteration
-	 */
-	private void fireControlerIterationStartsEvent(final int iteration) {
-		IterationStartsEvent event = new IterationStartsEvent(this, iteration);
-		IterationStartsListener[] listener = this.coreListenerList.getListeners(IterationStartsListener.class);
-		for (int i = 0; i < listener.length; i++) {
-    	listener[i].notifyIterationStarts(event);
-    }
-		listener = this.listenerList.getListeners(IterationStartsListener.class);
-		for (int i = 0; i < listener.length; i++) {
-    	listener[i].notifyIterationStarts(event);
-    }
-	}
-
-	/**
-	 * Notifies all ControlerIterationEndsListeners
-	 *
-	 * @param iteration
-	 */
-	private void fireControlerIterationEndsEvent(final int iteration) {
-		IterationEndsEvent event = new IterationEndsEvent(this, iteration);
-		IterationEndsListener[] listener = this.coreListenerList.getListeners(IterationEndsListener.class);
-		for (int i = 0; i < listener.length; i++) {
-			listener[i].notifyIterationEnds(event);
-		}
-		listener = this.listenerList.getListeners(IterationEndsListener.class);
-		for (int i = 0; i < listener.length; i++) {
-			listener[i].notifyIterationEnds(event);
-		}
-	}
-
-	/**
-	 * Notifies all ControlerScoringListeners
-	 *
-	 * @param iteration
-	 */
-	private void fireControlerScoringEvent(final int iteration) {
-		ScoringEvent event = new ScoringEvent(this, iteration);
-		ScoringListener[] listener = this.coreListenerList.getListeners(ScoringListener.class);
-		for (int i = 0; i < listener.length; i++) {
-			listener[i].notifyScoring(event);
-		}
-		listener = this.listenerList.getListeners(ScoringListener.class);
-		for (int i = 0; i < listener.length; i++) {
-			listener[i].notifyScoring(event);
-		}
-	}
-
-	/**
-	 * Notifies all ControlerReplanningListeners
-	 *
-	 * @param iteration
-	 */
-	private void fireControlerReplanningEvent(final int iteration) {
-		ReplanningEvent event = new ReplanningEvent(this, iteration);
-		ReplanningListener[] listener = this.coreListenerList.getListeners(ReplanningListener.class);
-		for (int i = 0; i < listener.length; i++) {
-			listener[i].notifyReplanning(event);
-		}
-		listener = this.listenerList.getListeners(ReplanningListener.class);
-		for (int i = 0; i < listener.length; i++) {
-			listener[i].notifyReplanning(event);
-		}
-	}
-
-	/**
-	 * Notifies all ControlerBeforeMobsimListeners
-	 *
-	 * @param iteration
-	 */
-	private void fireControlerBeforeMobsimEvent(final int iteration) {
-		BeforeMobsimEvent event = new BeforeMobsimEvent(this, iteration);
-		BeforeMobsimListener[] listener = this.coreListenerList.getListeners(BeforeMobsimListener.class);
-		for (int i = 0; i < listener.length; i++) {
-			listener[i].notifyBeforeMobsim(event);
-		}
-		listener = this.listenerList.getListeners(BeforeMobsimListener.class);
-		for (int i = 0; i < listener.length; i++) {
-			listener[i].notifyBeforeMobsim(event);
-		}
-	}
-
-	/**
-	 * Notifies all ControlerAfterMobsimListeners
-	 *
-	 * @param iteration
-	 */
-	private void fireControlerAfterMobsimEvent(final int iteration) {
-		AfterMobsimEvent event = new AfterMobsimEvent(this, iteration);
-		AfterMobsimListener[] listener = this.coreListenerList.getListeners(AfterMobsimListener.class);
-		for (int i = 0; i < listener.length; i++) {
-			listener[i].notifyAfterMobsim(event);
-		}
-		listener = this.listenerList.getListeners(AfterMobsimListener.class);
-		for (int i = 0; i < listener.length; i++) {
-			listener[i].notifyAfterMobsim(event);
-		}
-	}
 
 	/* ===================================================================
 	 * Options
