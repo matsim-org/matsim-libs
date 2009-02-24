@@ -3,7 +3,6 @@ package playground.anhorni.locationchoice.cs.io;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -18,7 +17,6 @@ import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.Line;
 import playground.anhorni.locationchoice.cs.helper.MZTrip;
 import playground.anhorni.locationchoice.cs.helper.ZHFacilities;
-import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 
 /*	  0			1		2			3			4			5		6		7			8				9
  * ---------------------------------------------------------------------------------------------------------		
