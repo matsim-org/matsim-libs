@@ -18,8 +18,8 @@ import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.charts.XYLineChart;
-import org.matsim.utils.charts.XYScatterChart;
 
+import playground.yu.utils.BubbleChart;
 import playground.yu.utils.SimpleWriter;
 
 /**
@@ -266,20 +266,25 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		chart.addSeries("total", x, yTotal);
 		chart.saveAsPng(outputFilename + "dailyDistance.png", 800, 600);
 
-		XYScatterChart xYchart = new XYScatterChart(
+		BubbleChart bubbleChart = new BubbleChart(
 				"Modal split -- leg distance", "pt fraction [%]",
 				"car fraction [%]");
 		for (int i = 0; i < 20; i++)
-			xYchart.addSeries(i * 5 + "-" + (i + 1) * 5 + " km",
-					new double[] { ptCounts5[i]
-							/ (ptCounts5[i] + carCounts5[i]) * 100.0 },
-					new double[] { carCounts5[i]
-							/ (ptCounts5[i] + carCounts5[i]) * 100.0 });
-		xYchart.addSeries("100+ km", new double[] { ptCounts5[20]
-				/ (ptCounts5[20] + carCounts5[20]) * 100.0 },
+			bubbleChart.addSeries(i * 5 + "-" + (i + 1) * 5 + " km",
+					new double[][] {
+							new double[] { ptCounts5[i]
+									/ (ptCounts5[i] + carCounts5[i]) * 100.0 },
+							new double[] { carCounts5[i]
+									/ (ptCounts5[i] + carCounts5[i]) * 100.0 },
+							new double[] { (i + 0.5) / 5.0 } });
+		bubbleChart.addSeries("100+ km", new double[][] {
+				new double[] { ptCounts5[20] / (ptCounts5[20] + carCounts5[20])
+						* 100.0 },
 				new double[] { carCounts5[20]
-						/ (ptCounts5[20] + carCounts5[20]) * 100.0 });
-		xYchart.saveAsPng(outputFilename + "legDistanceModalSplit.png", 1200, 900);
+						/ (ptCounts5[20] + carCounts5[20]) * 100.0 },
+				new double[] { 4.1 } });
+		bubbleChart.saveAsPng(outputFilename + "legDistanceModalSplit.png",
+				1200, 900);
 	}
 
 	/**
