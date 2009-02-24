@@ -23,6 +23,8 @@ package playground.mfeil;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.config.Module;
+import org.matsim.config.groups.PlanomatConfigGroup.PlanomatConfigParameter;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 
 public class TimeModeChoicerConfigGroup extends Module {
 	
@@ -31,6 +33,7 @@ public class TimeModeChoicerConfigGroup extends Module {
 	public static final String GROUP_NAME = "planomatX";
 	
 	/* Name of parameters */
+	private static final String POSSIBLE_MODES = "possible_modes";
 	private static final String NEIGHBOURHOOD_SIZE = "neighbourhood_size";
 	private static final String MAX_ITERATIONS = "max_iterations";
 	private static final String STOP_CRITERION = "stop_criterion";
@@ -42,6 +45,7 @@ public class TimeModeChoicerConfigGroup extends Module {
 	
 	//default values
 	// TODO all "static" to be removed later, only bypassing solution
+	private static String possible_modes = "car,pt,walk";
 	private static String neighbourhood_size = "10";
 	private static String max_iterations = "30";
 	private static String stop_criterion = "5";
@@ -60,6 +64,9 @@ public class TimeModeChoicerConfigGroup extends Module {
 
 	@Override
 	public String getValue(final String key) {
+		if (POSSIBLE_MODES.equals(key)) {
+			return possible_modes;
+		}
 		if (NEIGHBOURHOOD_SIZE.equals(key)) {
 			return getNeighbourhoodSize();
 		}
@@ -86,6 +93,11 @@ public class TimeModeChoicerConfigGroup extends Module {
 	
 	@Override
 	public void addParam(final String key, final String value) {
+		
+		if (POSSIBLE_MODES.equals(key)) {
+			setPossibleModes(value); // no quality check yet
+		}
+		
 		if (NEIGHBOURHOOD_SIZE.equals(key)) {
 			if (Integer.parseInt(value)<1) {
 				log.warn("Parameter NEIGHBOURHOOD_SIZE has been set to "+value+" but must be equal to or greater than 1. The default value of 10 will be used instead.");
@@ -160,6 +172,21 @@ public class TimeModeChoicerConfigGroup extends Module {
 	}
 	
 	// TODO all "static" to be removed later, only bypassing solution
+	private static BasicLeg.Mode[] cachedPossibleModes = null;
+	
+	public static BasicLeg.Mode[] getPossibleModes() {
+		if (cachedPossibleModes == null) {
+			String[] possibleModesStringArray = possible_modes.split(",");
+			cachedPossibleModes = new BasicLeg.Mode[possibleModesStringArray.length];
+			for (int i=0; i < possibleModesStringArray.length; i++) {
+				cachedPossibleModes[i] = BasicLeg.Mode.valueOf(possibleModesStringArray[i]);
+			}			
+		}
+		return cachedPossibleModes;
+	}	
+	public void setPossibleModes(final String modes){
+		this.possible_modes = modes;
+	}	
 	public static String getNeighbourhoodSize() {
 		return neighbourhood_size;
 	}

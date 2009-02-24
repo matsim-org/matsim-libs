@@ -72,7 +72,8 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.minimumTime			= Double.parseDouble(TimeModeChoicerConfigGroup.getMinimumTime());
 		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(TimeModeChoicerConfigGroup.getNeighbourhoodSize());
 		this.maxWalkingDistance		= Double.parseDouble(TimeModeChoicerConfigGroup.getMaximumWalkingDistance());
-		this.possibleModes			= Gbl.getConfig().planomat().getPossibleModes(); //faster call at runtime
+		//this.possibleModes			= Gbl.getConfig().planomat().getPossibleModes(); //faster call at runtime
+		this.possibleModes			= TimeModeChoicerConfigGroup.getPossibleModes();
 		this.modeChoice				= TimeModeChoicerConfigGroup.getModeChoice();
 		this.routes					= null;
 		
