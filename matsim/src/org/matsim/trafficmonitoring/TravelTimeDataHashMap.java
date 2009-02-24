@@ -25,12 +25,12 @@ import java.util.HashMap;
 import org.matsim.network.Link;
 import org.matsim.utils.misc.IntegerCache;
 
-public class TravelTimeRoleHashMap implements TravelTimeRole {
+public class TravelTimeDataHashMap implements TravelTimeData {
 	private final HashMap<Integer,TimeStruct> travelTimes;
 	
 	private final Link link;
 
-	public TravelTimeRoleHashMap(final Link link, final int unused) {
+	public TravelTimeDataHashMap(final Link link, final int unused) {
 		// unused, must be there because of Prototype-Constructor
 		this.travelTimes =  new HashMap<Integer,TimeStruct>();
 		this.link = link;

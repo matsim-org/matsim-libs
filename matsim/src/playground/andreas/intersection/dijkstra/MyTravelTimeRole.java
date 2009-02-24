@@ -3,11 +3,11 @@ package playground.andreas.intersection.dijkstra;
 import java.util.HashMap;
 
 import org.matsim.network.Link;
-import org.matsim.trafficmonitoring.TravelTimeRole;
+import org.matsim.trafficmonitoring.TravelTimeData;
 import org.matsim.utils.misc.IntegerCache;
 
 // No use for that one, ask Gregor
-public class MyTravelTimeRole implements TravelTimeRole {
+public class MyTravelTimeRole implements TravelTimeData {
 	
 	private final HashMap<Integer, TimeStruct> travelTimes;
 	private final Link link;

@@ -40,10 +40,10 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 	private final HashMap<String, EnterEvent> enterEvents = new HashMap<String, EnterEvent>();
 	private NetworkLayer network = null;
-	private final HashMap<Link, TravelTimeRole> linkData;
+	private final HashMap<Link, TravelTimeData> linkData;
 	private final int timeslice;
 	private final int numSlots;
-	private final TravelTimeCalculatorFactory factory;
+	private final TravelTimeAggregatorFactory factory;
 	private final AbstractTravelTimeAggregator aggregator;
 
 	
@@ -57,15 +57,15 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	}
 
 	public TravelTimeCalculator(NetworkLayer network, int timeslice,	int maxTime) {
-		this(network, timeslice, maxTime, new TravelTimeCalculatorFactory());
+		this(network, timeslice, maxTime, new TravelTimeAggregatorFactory());
 	}
 	
-	public TravelTimeCalculator(final NetworkLayer network, final int timeslice, final int maxTime, TravelTimeCalculatorFactory factory) {
+	public TravelTimeCalculator(final NetworkLayer network, final int timeslice, final int maxTime, TravelTimeAggregatorFactory factory) {
 		this.factory = factory;
 		this.network = network;
 		this.timeslice = timeslice;
 		this.numSlots = (maxTime / this.timeslice) + 1;
-		this.linkData = new HashMap<Link, TravelTimeRole>((int) (this.network.getLinks().size() * 1.4));
+		this.linkData = new HashMap<Link, TravelTimeData>((int) (this.network.getLinks().size() * 1.4));
 		this.aggregator = this.factory.createTravelTimeAggregator(this.numSlots, this.timeslice);
 		
 		resetTravelTimes();
@@ -77,7 +77,7 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 
 	public void resetTravelTimes() {
 		for (Link link : this.network.getLinks().values()) {
-			TravelTimeRole r = getTravelTimeRole(link);
+			TravelTimeData r = getTravelTimeRole(link);
 			r.resetTravelTimes();
 		}
 		this.enterEvents.clear();
@@ -129,8 +129,8 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 		}
 	}
 	
-	private TravelTimeRole getTravelTimeRole(final Link link) {
-		TravelTimeRole r = this.linkData.get(link);
+	private TravelTimeData getTravelTimeRole(final Link link) {
+		TravelTimeData r = this.linkData.get(link);
 		if (null == r) {
 			r = this.factory.createTravelTimeRole(link, this.numSlots);
 			this.linkData.put(link, r);

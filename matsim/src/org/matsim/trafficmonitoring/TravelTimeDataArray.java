@@ -22,13 +22,13 @@ package org.matsim.trafficmonitoring;
 
 import org.matsim.network.Link;
 
-public class TravelTimeRoleArray implements TravelTimeRole {
+public class TravelTimeDataArray implements TravelTimeData {
 	private final double[] timeSum;
 	private final int[] timeCnt;
 	private final double[] travelTimes;
 	private final Link link;
 
-	public TravelTimeRoleArray(final Link link, final int numSlots) {
+	public TravelTimeDataArray(final Link link, final int numSlots) {
 		this.timeSum = new double[numSlots];
 		this.timeCnt = new int[numSlots];
 		this.travelTimes = new double[numSlots];

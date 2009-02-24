@@ -39,7 +39,7 @@ import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorFactory;
+import org.matsim.trafficmonitoring.TravelTimeAggregatorFactory;
 import org.matsim.utils.misc.Time;
 
 
@@ -71,10 +71,10 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 	}
 
 	public TravelTimeAndSocialCostCalculator(final NetworkLayer network, final int timeslice,	final int maxTime) {
-		this(network, timeslice, maxTime, new TravelTimeCalculatorFactory());
+		this(network, timeslice, maxTime, new TravelTimeAggregatorFactory());
 	}
 	
-	public TravelTimeAndSocialCostCalculator(final NetworkLayer network, final int timeslice, final int maxTime, final TravelTimeCalculatorFactory factory) {
+	public TravelTimeAndSocialCostCalculator(final NetworkLayer network, final int timeslice, final int maxTime, final TravelTimeAggregatorFactory factory) {
 		super(network,timeslice,maxTime,factory);
 		this.travelTimeBinSize = timeslice;
 		this.numSlots = (maxTime / this.travelTimeBinSize) + 1;

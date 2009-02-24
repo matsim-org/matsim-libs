@@ -23,8 +23,8 @@ package playground.gregor.systemopt;
 import org.matsim.controler.Controler;
 import org.matsim.evacuation.EvacuationQSimControler;
 import org.matsim.trafficmonitoring.PessimisticTravelTimeAggregator;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorFactory;
-import org.matsim.trafficmonitoring.TravelTimeRoleHashMap;
+import org.matsim.trafficmonitoring.TravelTimeAggregatorFactory;
+import org.matsim.trafficmonitoring.TravelTimeDataHashMap;
 
 
 public class SystemOptEvacControler extends EvacuationQSimControler{
@@ -40,8 +40,8 @@ public class SystemOptEvacControler extends EvacuationQSimControler{
 		super.setup();
 		
 		
-		TravelTimeCalculatorFactory factory = new TravelTimeCalculatorFactory();
-		factory.setTravelTimeRolePrototype(TravelTimeRoleHashMap.class);
+		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
+		factory.setTravelTimeRolePrototype(TravelTimeDataHashMap.class);
 		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 //		SocialCostCalculator sc = new SocialCostCalculator(this.network,this.config.controler().getTraveltimeBinSize());

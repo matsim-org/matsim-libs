@@ -28,7 +28,7 @@ public class OptimisticTravelTimeAggregator extends AbstractTravelTimeAggregator
 
 
 	@Override
-	protected void addTravelTime(TravelTimeRole travelTimeRole,
+	protected void addTravelTime(TravelTimeData travelTimeRole,
 			double enterTime, double leaveTime) {
 
 		final int timeSlot = getTimeSlotIndex(enterTime);

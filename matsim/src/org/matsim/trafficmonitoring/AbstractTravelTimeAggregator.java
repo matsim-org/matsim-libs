@@ -39,17 +39,17 @@ public abstract class AbstractTravelTimeAggregator {
 	}
 
 
-	protected abstract void addTravelTime(TravelTimeRole travelTimeRole, double enterTime,
+	protected abstract void addTravelTime(TravelTimeData travelTimeRole, double enterTime,
 			double leaveTime);
 
 
-	public void addStuckEventTravelTime(TravelTimeRole travelTimeRole,
+	public void addStuckEventTravelTime(TravelTimeData travelTimeRole,
 			double enterTime, double stuckEventTime) {
 		//here is the right place to handle StuckEvents (just overwrite this method) 
 	}
 	
 
-	protected double getTravelTime(TravelTimeRole travelTimeRole, double time) {
+	protected double getTravelTime(TravelTimeData travelTimeRole, double time) {
 		final int timeSlot = getTimeSlotIndex(time);
 		return travelTimeRole.getTravelTime(timeSlot, time);
 	}

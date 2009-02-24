@@ -27,7 +27,7 @@ public class PessimisticTravelTimeAggregator extends AbstractTravelTimeAggregato
 	}
 
 	@Override
-	protected void addTravelTime(TravelTimeRole travelTimeRole,
+	protected void addTravelTime(TravelTimeData travelTimeRole,
 			double enterTime, double leaveTime) {
 
 		double ttime = leaveTime - enterTime;
@@ -38,7 +38,7 @@ public class PessimisticTravelTimeAggregator extends AbstractTravelTimeAggregato
 	}
 
 	@Override
-	public void addStuckEventTravelTime(TravelTimeRole travelTimeRole,
+	public void addStuckEventTravelTime(TravelTimeData travelTimeRole,
 			double enterTime, double stuckEventTime) {
 		double ttime = Double.POSITIVE_INFINITY;
 		for (int slot = getTimeSlotIndex(enterTime); slot <= getTimeSlotIndex(stuckEventTime); slot++ ){

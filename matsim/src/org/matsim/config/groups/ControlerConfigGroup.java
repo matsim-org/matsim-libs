@@ -28,8 +28,8 @@ import org.matsim.config.Module;
 import org.matsim.network.NetworkLayer;
 import org.matsim.trafficmonitoring.PessimisticTravelTimeAggregator;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorFactory;
-import org.matsim.trafficmonitoring.TravelTimeRoleHashMap;
+import org.matsim.trafficmonitoring.TravelTimeAggregatorFactory;
+import org.matsim.trafficmonitoring.TravelTimeDataHashMap;
 
 public class ControlerConfigGroup extends Module {
 	
@@ -176,10 +176,10 @@ public class ControlerConfigGroup extends Module {
 	}
 	
 	public TravelTimeCalculator getTravelTimeCalculator(NetworkLayer network, int endTime) {
-		TravelTimeCalculatorFactory factory = new TravelTimeCalculatorFactory();
+		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 		
 		if ("TravelTimeCalculatorHashMap".equals(this.travelTimeCalculator)) {
-			factory.setTravelTimeRolePrototype(TravelTimeRoleHashMap.class);
+			factory.setTravelTimeRolePrototype(TravelTimeDataHashMap.class);
 		} else if (!"TravelTimeCalculatorArray".equals(this.travelTimeCalculator)) {
 			throw new RuntimeException(this.travelTimeCalculator + " is unknown!");
 		}

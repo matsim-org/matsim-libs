@@ -25,17 +25,17 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.matsim.network.Link;
 
-public class TravelTimeCalculatorFactory {
+public class TravelTimeAggregatorFactory {
 	
-	private Constructor<? extends TravelTimeRole> prototypeContructorTravelTimeRole;
+	private Constructor<? extends TravelTimeData> prototypeContructorTravelTimeRole;
 	private static final Class[] PROTOTYPECONSTRUCTOR_TRAVELTIMEROLE = {Link.class, int.class};
 
 	private Constructor<? extends AbstractTravelTimeAggregator> prototypeContructorTravelTimeAggregator;
 	private static final Class[] PROTOTYPECONSTRUCTOR_TRAVELTIMEAGGREGATOR = {int.class, int.class};
 	
-	public TravelTimeCalculatorFactory() {
+	public TravelTimeAggregatorFactory() {
 		try {
-			this.prototypeContructorTravelTimeRole = TravelTimeRoleArray.class
+			this.prototypeContructorTravelTimeRole = TravelTimeDataArray.class
 			.getConstructor(PROTOTYPECONSTRUCTOR_TRAVELTIMEROLE);
 		} catch (SecurityException e) {
 			throw new RuntimeException(e);
@@ -54,8 +54,8 @@ public class TravelTimeCalculatorFactory {
 	}
 	
 	
-	public void setTravelTimeRolePrototype(Class < ? extends TravelTimeRole> protoype) {
-		Constructor<? extends TravelTimeRole> c;
+	public void setTravelTimeRolePrototype(Class < ? extends TravelTimeData> protoype) {
+		Constructor<? extends TravelTimeData> c;
 		try {
 			c = protoype.getConstructor(PROTOTYPECONSTRUCTOR_TRAVELTIMEROLE);
 			if (c != null ) {
@@ -105,8 +105,8 @@ public class TravelTimeCalculatorFactory {
 		}
 	}
 	
-	public TravelTimeRole createTravelTimeRole(Link link, int numSlots) {
-		TravelTimeRole ret;
+	public TravelTimeData createTravelTimeRole(Link link, int numSlots) {
+		TravelTimeData ret;
 		try {
 			ret = this.prototypeContructorTravelTimeRole.newInstance(new Object[] {link, numSlots});
 			return ret;

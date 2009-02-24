@@ -34,8 +34,8 @@ import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.trafficmonitoring.OptimisticTravelTimeAggregator;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorFactory;
-import org.matsim.trafficmonitoring.TravelTimeRoleArray;
+import org.matsim.trafficmonitoring.TravelTimeAggregatorFactory;
+import org.matsim.trafficmonitoring.TravelTimeDataArray;
 import org.matsim.utils.io.IOUtils;
 
 public class TravelTimeCalculatorTiming {
@@ -72,9 +72,9 @@ public class TravelTimeCalculatorTiming {
 		MatsimEventsReader eventsReader = new MatsimEventsReader(events);
 
 		// setup traveltime calculator
-		TravelTimeCalculatorFactory factory = new TravelTimeCalculatorFactory();
+		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 		factory.setTravelTimeAggregatorPrototype(OptimisticTravelTimeAggregator.class);
-		factory.setTravelTimeRolePrototype(TravelTimeRoleArray.class);
+		factory.setTravelTimeRolePrototype(TravelTimeDataArray.class);
 		
 		this.ttcalc = new TravelTimeCalculator(this.network, binSize * 60, 30*3600, factory);
 		events.addHandler(this.ttcalc);

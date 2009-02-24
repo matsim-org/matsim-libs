@@ -20,7 +20,7 @@
 
 package org.matsim.trafficmonitoring;
 
-public interface TravelTimeRole {
+public interface TravelTimeData {
 
 	public abstract void resetTravelTimes();
 

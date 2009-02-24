@@ -32,8 +32,8 @@ import org.matsim.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.router.util.TravelTime;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorFactory;
-import org.matsim.trafficmonitoring.TravelTimeRoleHashMap;
+import org.matsim.trafficmonitoring.TravelTimeAggregatorFactory;
+import org.matsim.trafficmonitoring.TravelTimeDataHashMap;
 import org.matsim.utils.geometry.CoordImpl;
 
 public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
@@ -97,8 +97,8 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		network.addNetworkChangeEvent(change);
 
 		// create a travel time calculator object
-		TravelTimeCalculatorFactory factory = new TravelTimeCalculatorFactory();
-		factory.setTravelTimeRolePrototype(TravelTimeRoleHashMap.class);
+		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
+		factory.setTravelTimeRolePrototype(TravelTimeDataHashMap.class);
 		
 		TravelTime ttcalc = new TravelTimeCalculator(network, 15*60, 30*3600, factory);
 
