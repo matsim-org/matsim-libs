@@ -3,6 +3,8 @@ package playground.anhorni.locationchoice.cs.helper;
 //import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+
+import java.util.Iterator;
 import java.util.TreeMap;
 
 public class ChoiceSet {
@@ -101,7 +103,7 @@ public class ChoiceSet {
 	
 	public ChoiceSetFacility getChosenFacility() {
 		return this.choiceSetFacilities.get(this.chosenFacilityId);
-	}
+	}	
 }
 
 

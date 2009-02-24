@@ -22,7 +22,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 	}
 	
 	public void write(String outdir, String name, List<ChoiceSet> choiceSets)  {
-		
+		this.facilities.calculateAccesibilities();
 		this.writeNumberOfAlternatives(outdir, name, choiceSets);
 	
 		String outfile = outdir + name + "_ChoiceSets.txt";	
@@ -130,7 +130,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 			facility.getSize_descr() +"\t" +
 			facility.getDHalt() + "\t";	
 			
-		outLine += "aAlt02\taAlt10\taAlt20\t";
+		outLine += facility.getAccessibility02()+ "\t" + facility.getAccessibility10()+ "\t" + facility.getAccessibility20()+"\t";
 		outLine += facility.getHrs_week() +"\t";
 		return outLine;
 	}

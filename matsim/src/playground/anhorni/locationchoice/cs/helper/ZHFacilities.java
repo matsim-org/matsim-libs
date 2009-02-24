@@ -75,4 +75,28 @@ public class ZHFacilities {
 	public int getNumberOfFacilities() {
 		return numberOfFacilities;
 	}
+	
+	public void calculateAccesibilities() {
+		double accessibility02 = 0.0;
+		double accessibility10 = 0.0;
+		double accessibility20 = 0.0;
+		
+		Iterator<ZHFacility> referenceFacility_it = this.zhFacilities.values().iterator();
+		while (referenceFacility_it.hasNext()) {
+			ZHFacility referenceFacility = referenceFacility_it.next();
+		
+			Iterator<ZHFacility> facilities_it = this.zhFacilities.values().iterator();
+			while (facilities_it.hasNext()) {
+				ZHFacility facility = facilities_it.next();
+				
+				double distance = facility.getExactPosition().calcDistance(referenceFacility.getExactPosition());
+				accessibility02 += Math.exp(0.2 * distance * (-1.0));
+				accessibility10 += Math.exp(1.0 * distance * (-1.0));
+				accessibility20 += Math.exp(2.0 * distance * (-1.0));	
+			}
+			referenceFacility.setAccessibility02(accessibility02);
+			referenceFacility.setAccessibility10(accessibility10);
+			referenceFacility.setAccessibility20(accessibility20);
+		}
+	}	
 }

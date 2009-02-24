@@ -15,6 +15,10 @@ public class ZHFacility  {
 	private double dHalt;
 	private double hrs_week;
 	
+	private double accessibility02;
+	private double accessibility10;
+	private double accessibility20;
+	
 	
 	
 	public ZHFacility(Id id, Coord mappedPosition, Coord exactPosition,
@@ -101,5 +105,29 @@ public class ZHFacility  {
 
 	public void setHrs_week(double hrs_week) {
 		this.hrs_week = hrs_week;
+	}
+
+	public double getAccessibility02() {
+		return accessibility02;
+	}
+
+	public void setAccessibility02(double accessibility02) {
+		this.accessibility02 = accessibility02;
+	}
+
+	public double getAccessibility10() {
+		return accessibility10;
+	}
+
+	public void setAccessibility10(double accessibility10) {
+		this.accessibility10 = accessibility10;
+	}
+
+	public double getAccessibility20() {
+		return accessibility20;
+	}
+
+	public void setAccessibility20(double accessibility20) {
+		this.accessibility20 = accessibility20;
 	}
 }
