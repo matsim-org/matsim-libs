@@ -1,10 +1,13 @@
 package playground.anhorni.locationchoice.cs.helper;
 
+import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
 
 public class Line {
+	
+	private final static Logger log = Logger.getLogger(Line.class);
 	
 	private String tripId;
 	private String wmittel;
@@ -53,7 +56,15 @@ public class Line {
 		this.age = Integer.parseInt(entries[108].trim());
 		this.gender = Integer.parseInt(entries[109].trim());
 		this.incomeHH = Integer.parseInt(entries[122].trim());
-		this.numberOfPersonsHH = Integer.parseInt(entries[76].trim());
+		
+		int numberOfPersons = -99;
+		if (!entries[76].trim().equals("")) {
+			numberOfPersons = Integer.parseInt(entries[76].trim());
+		}
+		else {
+			log.info("Input data problem with trip: " + this.tripId + ". No household size defined!");
+		}
+		this.numberOfPersonsHH = numberOfPersons;
 		this.civilStatus = Integer.parseInt(entries[78].trim());
 		this.education = Integer.parseInt(entries[79].trim());
 		this.start_is_home = Integer.parseInt(entries[79].trim());
