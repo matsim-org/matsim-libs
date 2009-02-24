@@ -100,6 +100,7 @@ import org.matsim.router.util.TravelTime;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorBuilder;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.logging.CollectLogMessagesAppender;
 import org.matsim.utils.misc.Time;
@@ -144,6 +145,7 @@ public class Controler {
 
 	protected TravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCost travelCostCalculator = null;
+	private FreespeedTravelTimeCost freespeedTravelTimeCost = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
 
@@ -417,10 +419,13 @@ public class Controler {
 	protected void setup() {
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = this.config.controler().getTravelTimeCalculator(this.network, (int)endTime);
+			this.travelTimeCalculator = new TravelTimeCalculatorBuilder(this.config.controler()).createTravelTimeCalculator(this.network, (int)endTime);
 		}
 		if (this.travelCostCalculator == null) {
 			this.travelCostCalculator = new TravelTimeDistanceCostCalculator(this.travelTimeCalculator);
+		}
+		if (this.getFreespeedTravelTimeCost() == null){
+			this.freespeedTravelTimeCost = new FreespeedTravelTimeCost();
 		}
 		this.events.addHandler(this.travelTimeCalculator);
 
@@ -833,6 +838,10 @@ public class Controler {
 
 	public final TravelTime getTravelTimeCalculator() {
 		return this.travelTimeCalculator;
+	}
+	
+	public final FreespeedTravelTimeCost getFreespeedTravelTimeCost(){
+		return this.freespeedTravelTimeCost;
 	}
 
 	/**

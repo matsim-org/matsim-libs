@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-// Enthält hardcodierte LinkIDs - diese beziehen sich auf das Equil Szenario
+// Enthï¿½lt hardcodierte LinkIDs - diese beziehen sich auf das Equil Szenario
 // aus den Tutorials - also bitte damit laufen lassen :)
 
 package playground.christoph.knowledge;
@@ -27,34 +27,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
-import org.matsim.controler.events.AfterMobsimEvent;
-import org.matsim.controler.events.BeforeMobsimEvent;
-import org.matsim.controler.events.IterationStartsEvent;
-import org.matsim.controler.events.StartupEvent;
-import org.matsim.controler.listener.AfterMobsimListener;
-import org.matsim.controler.listener.BeforeMobsimListener;
-import org.matsim.controler.listener.IterationStartsListener;
-import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.network.Link;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.population.Person;
-import org.matsim.population.Population;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
-import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.replanning.StrategyManager;
-import org.matsim.router.Dijkstra;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.PreProcessDijkstra;
-import org.matsim.utils.misc.Time;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorBuilder;
 
-import playground.christoph.knowledge.nodeselection.DijkstraForSelectNodes;
 import playground.christoph.knowledge.replanning.KnowledgeStrategyManagerConfigLoader;
 
 public class KnowledgeControler extends Controler {
@@ -85,6 +64,7 @@ public class KnowledgeControler extends Controler {
 	/**
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
+	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new StrategyManager();
 		KnowledgeStrategyManagerConfigLoader.load(this, this.config, manager);
@@ -93,11 +73,12 @@ public class KnowledgeControler extends Controler {
 	
 		
 	// Workaround!
-	// Wo wird der TravelCostCalculator festgelegt? Gibt's dafür ein Feld in der Konfigurationsdatei?
+	// Wo wird der TravelCostCalculator festgelegt? Gibt's dafï¿½r ein Feld in der Konfigurationsdatei?
+	@Override
 	protected void setup() {
 		
-		// Diese beiden Befehle müssen sind unabhängig vom initialisieren der CostCalculators.
-		// Auch wenn diese via Configfile geladen werden, werden die Zeilen benötigt!
+		// Diese beiden Befehle mï¿½ssen sind unabhï¿½ngig vom initialisieren der CostCalculators.
+		// Auch wenn diese via Configfile geladen werden, werden die Zeilen benï¿½tigt!
 		initKnowledge();	// neu...
 		setKnowledge();		// neu...
 		
@@ -126,12 +107,12 @@ public class KnowledgeControler extends Controler {
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 
 		// TravelTimeCalculator initialisieren
-		this.travelTimeCalculator = this.config.controler().getTravelTimeCalculator(this.network, (int)endTime);
+		this.travelTimeCalculator = new TravelTimeCalculatorBuilder(this.config.controler()).createTravelTimeCalculator(this.network, (int)endTime);;
 			
 		// Eigenen TravenCostCalculator verwenden...
 		this.travelCostCalculator = new OldKnowledgeTravelCost(this.travelTimeCalculator);
 		
-		// ... dieser wird von nun folgenden Setup nicht mehr überschrieben.
+		// ... dieser wird von nun folgenden Setup nicht mehr ï¿½berschrieben.
 		super.setup();
 	}
 	
@@ -147,7 +128,7 @@ public class KnowledgeControler extends Controler {
 				p.createKnowledge("Knowledgemodels");
 			}
 			
-			// Kosten für Links fixieren bzw. je Person beeinflussen
+			// Kosten fï¿½r Links fixieren bzw. je Person beeinflussen
 			ArrayList<Id> linkIds = new ArrayList<Id>();
 			ArrayList<Double> costs = new ArrayList<Double>();
 			
@@ -163,8 +144,8 @@ public class KnowledgeControler extends Controler {
 
 	}
 	
-	// Hier werden die neuen Knowledge-Attribute befüllt.
-	// Aktuell händisch erstellt, später aus Configfiles geladen.
+	// Hier werden die neuen Knowledge-Attribute befï¿½llt.
+	// Aktuell hï¿½ndisch erstellt, spï¿½ter aus Configfiles geladen.
 	protected void setKnowledge()
 	{
 		Iterator<Person> PersonIterator = this.getPopulation().iterator();
