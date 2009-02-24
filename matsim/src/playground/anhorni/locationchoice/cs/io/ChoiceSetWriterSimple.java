@@ -39,8 +39,8 @@ public class ChoiceSetWriterSimple extends CSWriter {
 					"SH" + i + "_AV\t" +
 					"SH" + i + "_Mapped_x\t" + "SH" + i + "_Mapped_y\t" +
 					"SH" + i + "_Exact_x\t" + "SH" + i + "_Exact_y\t" +
-					"SH" + i + "_Travel_time_in_Net\t" + 
-					"SH" + i + "_Travel_distance_in_net\t" +
+					"SH" + i + "_TTnet\t" + 
+					"SH" + i + "_TDnet\t" +
 					"SH" + i + "_CFD_exact\t" + "SH" + i + "_CFD_mapped\t" +
 					"SH" + i + "RetailerID\t" +
 					"SH" + i + "Size\t" +
