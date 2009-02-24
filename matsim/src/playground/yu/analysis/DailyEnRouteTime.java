@@ -297,7 +297,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 				new double[] { 8.2 } });
 		sw.writeln(200 + "+\t" + carCounts10[20] + "\t" + ptCounts10[20] + "\t"
 				+ carFraction + "\t" + ptFraction);
-		bubbleChart.saveAsPng(outputFilename + "legTimeModalSplit.png", 1200,
+		bubbleChart.saveAsPng(outputFilename + "legTimeModalSplit.png", 900,
 				900);
 
 		xs[20] = 200;
