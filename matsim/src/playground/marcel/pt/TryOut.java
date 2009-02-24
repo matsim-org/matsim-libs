@@ -128,7 +128,7 @@ public class TryOut {
 		Act act = (Act) plan.getActsLegs().get(0);
 		fv.handleEvent(new ActStartEvent(0.0, person1, link2, act));
 
-		busDriver.enterLink(link1);
+		busDriver.enterNextLink();//link1
 
 		// - person departs at home
 		act = (Act) plan.getActsLegs().get(0);
@@ -142,10 +142,10 @@ public class TryOut {
 		fv.handleEvent(new ActStartEvent(7.20*3600, person1, link3, act));
 
 		// - bus crosses node 3
-		busDriver.leaveLink(link1);
+		busDriver.leaveCurrentLink();//link1
 		new LinkLeaveEvent(7.27*3600, null/*bus*/, link1, null/*leg*/);
 		new LinkEnterEvent(7.27*3600, null/*bus*/, link3, null/*leg*/);
-		busDriver.enterLink(link3);
+		busDriver.enterNextLink();//link3
 
 		// - bus arrives at stop2
 		new ArrivalAtFacilityEvent(7.30*3600, bus, stop2);
@@ -234,33 +234,33 @@ public class TryOut {
 //		new NetworkWriter(network, filename).write();
 
 		new MatsimNetworkReader(network).readFile(filename);
-		
+
 		return network;
 	}
 
 	private Facilities createFacilities() {
 		final String filename = "../thesis-data/examples/tryout/facilities.xml";
 		final Facilities facilities = new Facilities();
-		
-//		final Facility home = facilities.createFacility(new IdImpl("home"), new CoordImpl(0, 900));
+
+//		final Facility home = facilities.createFacility(new IdImpl("home"), new CoordImpl(400, 399));
 //		home.createActivity("home");
-//		final Facility work = facilities.createFacility(new IdImpl("work"), new CoordImpl(0, 900));
+//		final Facility work = facilities.createFacility(new IdImpl("work"), new CoordImpl(4700, 700));
 //		work.createActivity("work");
-//		final Facility stop1 = facilities.createFacility(new IdImpl("stop1"), new CoordImpl(0, 900));
+//		final Facility stop1 = facilities.createFacility(new IdImpl("stop1"), new CoordImpl(100, 900));
 //		stop1.createActivity("transitInteraction");
-//		final Facility stop2 = facilities.createFacility(new IdImpl("stop2"), new CoordImpl(0, 900));
+//		final Facility stop2 = facilities.createFacility(new IdImpl("stop2"), new CoordImpl(1000, 500));
 //		stop2.createActivity("transitInteraction");
-//		final Facility stop3 = facilities.createFacility(new IdImpl("stop3"), new CoordImpl(0, 900));
+//		final Facility stop3 = facilities.createFacility(new IdImpl("stop3"), new CoordImpl(2800, 500));
 //		stop3.createActivity("transitInteraction");
-//		final Facility stop4 = facilities.createFacility(new IdImpl("stop4"), new CoordImpl(0, 900));
+//		final Facility stop4 = facilities.createFacility(new IdImpl("stop4"), new CoordImpl(3300, 500));
 //		stop4.createActivity("transitInteraction");
-//		final Facility stop5 = facilities.createFacility(new IdImpl("stop5"), new CoordImpl(0, 900));
+//		final Facility stop5 = facilities.createFacility(new IdImpl("stop5"), new CoordImpl(4100, 499));
 //		stop5.createActivity("transitInteraction");
-//		final Facility stop6 = facilities.createFacility(new IdImpl("stop6"), new CoordImpl(0, 900));
+//		final Facility stop6 = facilities.createFacility(new IdImpl("stop6"), new CoordImpl(4800, 200));
 //		stop6.createActivity("transitInteraction");
-//		
+//
 //		new FacilitiesWriter(facilities, filename).write();
-		
+
 		new MatsimFacilitiesReader(facilities).readFile(filename);
 
 		return facilities;
@@ -284,7 +284,7 @@ public class TryOut {
 		final Leg walk2 = plan.createLeg(BasicLeg.Mode.walk);
 		final Act workAct = plan.createAct("work", facilities.getFacility(new IdImpl("work")));
 		workAct.setDuration(8.0*3600);
-		
+
 		Gbl.createConfig(null); // required for plans.outputSample
 		new PopulationWriter(population, filename, "v4").write();
 
