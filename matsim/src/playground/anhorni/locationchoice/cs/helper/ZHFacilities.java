@@ -89,7 +89,8 @@ public class ZHFacilities {
 			while (facilities_it.hasNext()) {
 				ZHFacility facility = facilities_it.next();
 				
-				double distance = facility.getExactPosition().calcDistance(referenceFacility.getExactPosition());
+				// distance in km
+				double distance = 0.001 * facility.getExactPosition().calcDistance(referenceFacility.getExactPosition());
 				accessibility02 += Math.exp(0.2 * distance * (-1.0));
 				accessibility10 += Math.exp(1.0 * distance * (-1.0));
 				accessibility20 += Math.exp(2.0 * distance * (-1.0));	
