@@ -35,7 +35,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 		"WP\tChoice\tAge\tGender\tIncome\tNbrPersHH\tCivil_Status\tEducation\tTpurchase\tstart_is_home\tTTB\t" ;
 
 		for (int i = 0; i < this.facilities.getZhFacilities().size(); i++) {
-			header += "SH" + i + "_Shop_id\t " +
+			header += "SH" + i + "_Shop_id\t" +
 					"SH" + i + "_AV\t" +
 					"SH" + i + "_Mapped_x\t" + "SH" + i + "_Mapped_y\t" +
 					"SH" + i + "_Exact_x\t" + "SH" + i + "_Exact_y\t" +
