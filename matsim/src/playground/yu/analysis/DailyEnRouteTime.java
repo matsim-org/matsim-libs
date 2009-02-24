@@ -20,6 +20,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.charts.XYLineChart;
 
 import playground.yu.analysis.DailyDistance.ActTypeStart;
+import playground.yu.utils.BubbleChart;
 import playground.yu.utils.SimpleWriter;
 
 /**
@@ -32,7 +33,8 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
 	private int count;
 	private double carTime, ptTime, otherTime;
-	final double totalCounts[], carCounts[], ptCounts[], otherCounts[];
+	final double totalCounts[], carCounts[], ptCounts[], otherCounts[],
+			carCounts10[], ptCounts10[];
 	private double carWorkTime, carEducTime, carShopTime, carLeisTime,
 			carHomeTime, carOtherTime, ptWorkTime, ptEducTime, ptShopTime,
 			ptLeisTime, ptHomeTime, ptOtherTime, throughWorkTime,
@@ -49,6 +51,8 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		this.carCounts = new double[101];
 		this.ptCounts = new double[101];
 		this.otherCounts = new double[101];
+		carCounts10 = new double[21];
+		ptCounts10 = new double[21];
 		this.carWorkTime = 0.0;
 		this.carEducTime = 0.0;
 		this.carShopTime = 0.0;
@@ -146,6 +150,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 						this.carOtherTime += time;
 						break;
 					}
+					carCounts10[Math.min(20, (int) time / 10)]++;
 				} else if (bl.getMode().equals(Mode.pt)) {
 					this.ptTime += time;
 					ptDayTime += time;
@@ -169,6 +174,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 						this.ptOtherTime += time;
 						break;
 					}
+					ptCounts10[Math.min(20, (int) time / 10)]++;
 				}
 			}
 		}
@@ -184,7 +190,8 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 
 	public void write(final String outputFilename) {
 		double sum = this.carTime + this.ptTime + this.otherTime;
-		SimpleWriter sw = new SimpleWriter(outputFilename + ".txt");
+		SimpleWriter sw = new SimpleWriter(outputFilename
+				+ "dailyEnRouteTime.txt");
 		sw.writeln("\tDaily En Route Time\t(exkl. through-traffic)");
 		sw.writeln("\tmin\t%");
 		sw.writeln("car\t" + this.carTime / this.count + "\t" + this.carTime
@@ -251,7 +258,29 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		chart.addSeries("pt", x, yPt);
 		chart.addSeries("other", x, yOther);
 		chart.addSeries("total", x, yTotal);
-		chart.saveAsPng(outputFilename + ".png", 800, 600);
+		chart.saveAsPng(outputFilename + "dailyEnRouteTime.png", 800, 600);
+
+		BubbleChart bubbleChart = new BubbleChart("Modal split -- leg Time",
+				"pt fraction [%]", "car fraction [%]");
+		for (int i = 0; i < 20; i++)
+			bubbleChart
+					.addSeries(i * 10 + "-" + (i + 1) * 10 + " min",
+							new double[][] {
+									new double[] { ptCounts10[i]
+											/ (ptCounts10[i] + carCounts10[i])
+											* 100.0 },
+									new double[] { carCounts10[i]
+											/ (ptCounts10[i] + carCounts10[i])
+											* 100.0 },
+									new double[] { (i + 0.5) / 2.5 } });
+		bubbleChart.addSeries("200+ min", new double[][] {
+				new double[] { ptCounts10[20]
+						/ (ptCounts10[20] + carCounts10[20]) * 100.0 },
+				new double[] { carCounts10[20]
+						/ (ptCounts10[20] + carCounts10[20]) * 100.0 },
+				new double[] { 8.2 } });
+		bubbleChart.saveAsPng(outputFilename + "legTimeModalSplit.png", 1200,
+				900);
 	}
 
 	/**
@@ -262,7 +291,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String plansFilename = "../runs_SVN/run669/it.1000/1000.plans.xml.gz";
-		final String outputFilename = "output/669dailyEnRouteTime";
+		final String outputFilename = "../runs_SVN/run669/it.1000/";
 
 		Gbl.createConfig(null);
 

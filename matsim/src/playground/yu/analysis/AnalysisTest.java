@@ -23,20 +23,21 @@
  */
 package playground.yu.analysis;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
+
+import playground.yu.utils.SimpleWriter;
 
 /**
  * @author ychen
@@ -63,8 +64,6 @@ public class AnalysisTest {
 		System.out.println("----------------");
 	}
 
-	private static BufferedWriter writer;
-
 	private static void runIntern(String[] args, String scenario) {
 		final String netFilename = args[0];
 		final String eventsFilename = args[1];
@@ -82,12 +81,20 @@ public class AnalysisTest {
 		OnRouteModalSplit orms = null;
 		TravelTimeModalSplit ttms = null;
 		CalcAverageTripLength catl = null;
+		DailyDistance dd = null;
+		DailyEnRouteTime dert = null;
 
 		if (plansFilename != null) {
 			Population plans = new Population();
 
 			catl = new CalcAverageTripLength();
 			plans.addAlgorithm(catl);
+
+			dd = new DailyDistance();
+			plans.addAlgorithm(dd);
+
+			dert = new DailyEnRouteTime();
+			plans.addAlgorithm(dert);
 
 			PopulationReader plansReader = new MatsimPopulationReader(plans,
 					network);
@@ -98,6 +105,7 @@ public class AnalysisTest {
 			// network,
 					plans);
 			ttms = new TravelTimeModalSplit(network, plans);
+
 		}
 
 		Events events = new Events();
@@ -137,23 +145,28 @@ public class AnalysisTest {
 		ld.write(outputpath + "legDistances.txt.gz");
 		ld.writeCharts(outputpath + "legDistances");
 
+		SimpleWriter sw = new SimpleWriter(outputpath + "output.txt");
+		sw.write("netfile:\t" + netFilename + "\neventsFile:\t"
+				+ eventsFilename + "\noutputpath:\t" + outputpath + "\n");
+		if (catl != null)
+			sw.write("avg. Trip length:\t" + catl.getAverageTripLength()
+					+ " [m]\n");
+		sw.write("traffic performance:\t" + ctpf.getTrafficPerformance()
+				+ " [Pkm]\n");
+		sw.write("avg. speed of the total network:\t" + cas.getNetAvgSpeed()
+				+ " [km/h]\n");
 		try {
-			writer = IOUtils.getBufferedWriter(outputpath + "output.txt");
-			writer.write("netfile:\t" + netFilename + "\neventsFile:\t"
-					+ eventsFilename + "\noutputpath:\t" + outputpath + "\n");
-			if (catl != null)
-				writer.write("avg. Trip length:\t"
-						+ catl.getAverageTripLength() + " [m]\n");
-			writer.write("traffic performance:\t"
-					+ ctpf.getTrafficPerformance() + " [Pkm]\n");
-			writer.write("avg. speed of the total network:\t"
-					+ cas.getNetAvgSpeed() + " [km/h]\n");
-			writer.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			sw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		dd.write(outputpath);
+		dert.write(outputpath);
+
+		new OTFEvent2MVI(new QueueNetwork(network), eventsFilename, outputpath,
+				Integer.parseInt(args[args.length - 1])).convert();
+
 		System.out.println("done.");
 	}
 
