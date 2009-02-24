@@ -108,7 +108,7 @@ public class QueueSimulation {
 	 * The SignalGroupDefinitions accessible by the Id of the SignalSystem they belong
 	 * to.
 	 */
-	private SortedMap<Id, List<BasicSignalGroupDefinition>> signalGroupDefinitions;
+	private SortedMap<Id, List<BasicSignalGroupDefinition>> signalGroupDefinitionsBySystemId;
 	/**
 	 * Contains the SignalSystemControler instances which can be accessed by the
 	 * Id of the SignalSystemDefinition
@@ -167,14 +167,14 @@ public class QueueSimulation {
 			this.signalSystemDefinitions.put(signalSystem.getId(), signalSystem);
 		}
 		//init the signalGroupDefinitions
-		this.signalGroupDefinitions= new TreeMap<Id, List<BasicSignalGroupDefinition>>();
+		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<BasicSignalGroupDefinition>>();
 		for (BasicSignalGroupDefinition basicLightSignalGroupDefinition : signalSystems.getSignalGroupDefinitions()) {
 			QueueLink queueLink = this.network.getQueueLink(basicLightSignalGroupDefinition.getLinkRefId());
 			//TODO check if quueuLInk null?? or write ScenarioChecker
-			List<BasicSignalGroupDefinition> list = this.signalGroupDefinitions.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId());
+			List<BasicSignalGroupDefinition> list = this.signalGroupDefinitionsBySystemId.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId());
 			if (list == null) {
 				list = new ArrayList<BasicSignalGroupDefinition>();
-				this.signalGroupDefinitions.put(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId(), list);
+				this.signalGroupDefinitionsBySystemId.put(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId(), list);
 			}
 			list.add(basicLightSignalGroupDefinition);
 			queueLink.addSignalGroupDefinition(basicLightSignalGroupDefinition);
@@ -186,14 +186,17 @@ public class QueueSimulation {
 		this.signalSystemControlerBySystemId = new TreeMap<Id, SignalSystemControler>();
 		for (BasicSignalSystemConfiguration config : signalSystemsConfig) {
 			//TODO consider adaptive controlers
+			//create the controler
 			PlanBasedSignalSystemControler controler = new PlanBasedSignalSystemControler(config);
 			this.signalSystemControlerBySystemId.put(config.getLightSignalSystemId(), controler);
+			
 			BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getLightSignalSystemId());
-			controler.setDefaultCirculationTime(systemDef.getDefaultCirculationTime());
 			//TODO set other defaults of xml
-			List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitions.get(config.getLightSignalSystemId());
+			controler.setDefaultCirculationTime(systemDef.getDefaultCirculationTime());
+
+			List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getLightSignalSystemId());
 			if ((groups == null) || groups.isEmpty()) {
-				String message = "SignalSystemControler without any SignalGroups defined in SignalSystemConfiguration!";
+				String message = "SignalSystemControler for SignalSystem Id: " + config.getLightSignalSystemId() + "without any SignalGroups defined in SignalSystemConfiguration!";
 				log.warn(message);
 			}
 			else {
