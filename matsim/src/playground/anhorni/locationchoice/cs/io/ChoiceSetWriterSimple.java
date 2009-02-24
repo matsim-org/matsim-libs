@@ -97,7 +97,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 	
 	private String printFacility(ZHFacility facility, ChoiceSet choiceSet) {
 		
-		String outLine = facility.getId().toString();
+		String outLine = facility.getId().toString()+"\t";
 		
 		//AV
 		if (choiceSet.zhFacilityIsInChoiceSet(facility.getId())) {
@@ -129,8 +129,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 		outLine += facility.getRetailerID() + "\t" +
 			facility.getSize_descr() +"\t" +
 			facility.getDHalt() + "\t";	
-		
-		
+			
 		outLine += "aAlt02\taAlt10\taAlt20\t";
 		return outLine;
 	}
