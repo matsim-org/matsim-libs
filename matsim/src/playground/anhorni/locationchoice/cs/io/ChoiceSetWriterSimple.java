@@ -59,12 +59,12 @@ public class ChoiceSetWriterSimple extends CSWriter {
 			Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
 			while (choiceSet_it.hasNext()) {
 				ChoiceSet choiceSet = choiceSet_it.next();
-				String id_WP = choiceSet.getId() +"\t" + choiceSet.getPersonAttributes().getWP() +"\t";
-				int choice = -99;
+				String id_WP = choiceSet.getId() +"\t" + choiceSet.getPersonAttributes().getWP() + "\t";
+				String choice = null;
 				
 				PersonAttributes attributes = choiceSet.getPersonAttributes();
-				String outLine = attributes.getAge() +"\t"+ attributes.getGender() +"\t" + attributes.getIncomeHH() +"\t"+ 
-				attributes.getNumberOfPersonsHH() +"\t" + attributes.getCivilStatus() +"\t" + attributes.getEducation() +"\t";
+				String outLine = attributes.getAge() + "\t" + attributes.getGender() + "\t" + attributes.getIncomeHH() + "\t"+ 
+				attributes.getNumberOfPersonsHH() + "\t" + attributes.getCivilStatus() +"\t" + attributes.getEducation() +"\t";
 				
 				outLine += choiceSet.getTrip().getShoppingAct().getStartTime() +"\t" + attributes.getStart_is_home() +"\t";
 				outLine += choiceSet.getTravelTimeBudget() +"\t";
@@ -75,7 +75,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 					ZHFacility facility = facilities_it.next();	
 					outLine += this.printFacility(facility, choiceSet);				
 					if (facility.getId().compareTo(choiceSet.getChosenFacilityId()) == 0 ) {
-						choice = index;
+						choice = Integer.toString(index) + "\t";
 					}
 					index++;
 				}
