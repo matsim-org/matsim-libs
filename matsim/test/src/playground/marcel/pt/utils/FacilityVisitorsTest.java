@@ -46,10 +46,10 @@ public class FacilityVisitorsTest extends MatsimTestCase {
 		final Act workAct = plan.createAct("work", facility);
 
 		final FacilityVisitors facVis = new FacilityVisitors();
-		assertEquals("there should be no visitors yet.", 0, facVis.getVisitors(facility).size());
+		assertEquals("there should be no visitors yet.", 0, facVis.getVisitors(facility, "work").size());
 		facVis.handleEvent(new ActStartEvent(7.0*3600, person, link, workAct));
-		assertEquals("there should be one visitor.", 1, facVis.getVisitors(facility).size());
-		assertEquals(person, facVis.getVisitors(facility).get(0));
+		assertEquals("there should be one visitor.", 1, facVis.getVisitors(facility, "work").size());
+		assertEquals(person, facVis.getVisitors(facility, "work").get(0));
 	}
 
 	public void testPersonEndAct() {
@@ -63,11 +63,11 @@ public class FacilityVisitorsTest extends MatsimTestCase {
 
 		final FacilityVisitors facVis = new FacilityVisitors();
 		facVis.handleEvent(new ActStartEvent(7.0*3600, person, link, workAct));
-		assertEquals("there should be one visitor.", 1, facVis.getVisitors(facility).size());
-		assertEquals(person, facVis.getVisitors(facility).get(0));
+		assertEquals("there should be one visitor.", 1, facVis.getVisitors(facility, "work").size());
+		assertEquals(person, facVis.getVisitors(facility, "work").get(0));
 
 		facVis.handleEvent(new ActEndEvent(8.0*3600, person, link, workAct));
-		assertEquals("there should be noone anymore.", 0, facVis.getVisitors(facility).size());
+		assertEquals("there should be noone anymore.", 0, facVis.getVisitors(facility, "work").size());
 	}
 
 	public void testReset() {
@@ -80,13 +80,13 @@ public class FacilityVisitorsTest extends MatsimTestCase {
 		final Act workAct = plan.createAct("work", facility);
 
 		final FacilityVisitors facVis = new FacilityVisitors();
-		assertEquals("there should be no visitors yet.", 0, facVis.getVisitors(facility).size());
+		assertEquals("there should be no visitors yet.", 0, facVis.getVisitors(facility, "work").size());
 		facVis.handleEvent(new ActStartEvent(7.0*3600, person, link, workAct));
-		assertEquals("there should be one visitor.", 1, facVis.getVisitors(facility).size());
-		assertEquals(person, facVis.getVisitors(facility).get(0));
+		assertEquals("there should be one visitor.", 1, facVis.getVisitors(facility, "work").size());
+		assertEquals(person, facVis.getVisitors(facility, "work").get(0));
 
 		facVis.reset(1);
-		assertEquals("there should be no visitors after reset().", 0, facVis.getVisitors(facility).size());
+		assertEquals("there should be no visitors after reset().", 0, facVis.getVisitors(facility, "work").size());
 	}
 
 }

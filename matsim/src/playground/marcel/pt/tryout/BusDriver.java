@@ -20,14 +20,21 @@
 
 package playground.marcel.pt.tryout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.facilities.Facility;
 import org.matsim.network.Link;
+import org.matsim.population.Person;
+import org.matsim.population.routes.CarRoute;
 
 import playground.marcel.pt.interfaces.DriverAgent;
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.interfaces.Vehicle;
+import playground.marcel.pt.transitSchedule.Departure;
+import playground.marcel.pt.transitSchedule.TransitRoute;
+import playground.marcel.pt.transitSchedule.TransitRouteStop;
+import playground.marcel.pt.utils.FacilityVisitors;
 
 public class BusDriver implements DriverAgent {
 
@@ -38,11 +45,31 @@ public class BusDriver implements DriverAgent {
 		private Vehicle vehicle = null;
 
 		private int nextLinkIndex = 0;
+		private Link currentLink = null;
+		private FacilityVisitors facilityVisitors = null;
 
 		public BusDriver(final List<Facility> stops, final List<Link> linkRoute, final double departureTime) {
 			this.stops = stops;
 			this.linkRoute = linkRoute;
 			this.departureTime = departureTime;
+		}
+
+		public BusDriver(final TransitRoute route, final Departure departure) {
+			this.stops = new ArrayList<Facility>(route.getStops().size());
+			for (TransitRouteStop stop : route.getStops()) {
+				this.stops.add(stop.getStopFacility());
+			}
+			CarRoute carRoute = (CarRoute) route.getRoute();
+			List<Link> links = carRoute.getLinks();
+			this.linkRoute = new ArrayList<Link>(2 + links.size());
+			this.linkRoute.add(carRoute.getStartLink());
+			this.linkRoute.addAll(links);
+			this.linkRoute.add(carRoute.getEndLink());
+			this.departureTime = departure.getDepartureTime();
+		}
+
+		public void setFacilityVisitorObserver(final FacilityVisitors fv) {
+			this.facilityVisitors  = fv;
 		}
 
 		public void setVehicle(final Vehicle vehicle) {
@@ -56,18 +83,16 @@ public class BusDriver implements DriverAgent {
 			return null;
 		}
 
+		public void leaveCurrentLink() {
+			this.currentLink = null;
+		}
+
 		public void enterNextLink() {
+			this.currentLink = this.linkRoute.get(this.nextLinkIndex);
 			this.nextLinkIndex++;
-		}
-
-		public void leaveLink(final Link link) {
-
-		}
-
-		public void enterLink(final Link link) {
 			// let's see if we have a stop at that link
 			for (Facility stop : this.stops) {
-				if (stop.getLink() == link) {
+				if (stop.getLink() == this.currentLink) {
 					handleStop(stop);
 				}
 			}
@@ -75,15 +100,26 @@ public class BusDriver implements DriverAgent {
 
 		private void handleStop(final Facility stop) {
 			// let passengers get out if they want
+			ArrayList<PassengerAgent> passengersLeaving = new ArrayList<PassengerAgent>();
 			for (PassengerAgent passenger : this.vehicle.getPassengers()) {
 				if (passenger.arriveAtStop(stop)) {
-					this.vehicle.removePassenger(passenger);
+					passengersLeaving.add(passenger);
 				}
 			}
+			for (PassengerAgent passenger : passengersLeaving) {
+				this.vehicle.removePassenger(passenger);
+				// TODO [MR] add person to facility
+			}
 
-			// let passengers get in if they want
-			// TODO [MR]
-			// how to get to the list of people waiting there...?
+			if (this.facilityVisitors != null) {
+				List<Person> people = this.facilityVisitors.getVisitors(stop, "pt_interaction");
+				for (Person person : people) {
+					if (((PassengerAgent) person).ptLineAvailable()) {
+						this.vehicle.addPassenger((PassengerAgent) person);
+						// TODO [MR] remove person from facility
+					}
+				}
+			}
 		}
 
 }

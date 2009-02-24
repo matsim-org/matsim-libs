@@ -42,40 +42,51 @@ public class FacilityVisitors implements ActEndEventHandler, ActStartEventHandle
 
 	private static final List<Person> EMPTY_LIST= Collections.unmodifiableList(new LinkedList<Person>());
 
-	private final Map<Facility, List<Person>> facilities = new HashMap<Facility, List<Person>>();
+	/** for each facility and for each activity type being performed at a facility the list of persons performing that activity type. */
+	private final Map<Facility, Map<String, List<Person>>> facilities = new HashMap<Facility, Map<String, List<Person>>>();
+
+	public void handleEvent(final ActStartEvent event) {
+		Facility facility = event.act.getFacility();
+		if (facility != null) {
+			Map<String, List<Person>> actTypes = this.facilities.get(facility);
+			if (actTypes == null) {
+				actTypes = new HashMap<String, List<Person>>();
+				this.facilities.put(facility, actTypes);
+			}
+			List<Person> persons = actTypes.get(event.act.getType());
+			if (persons == null) {
+				persons = new LinkedList<Person>();
+				actTypes.put(event.act.getType(), persons);
+			}
+			persons.add(event.agent);
+		}
+	}
 
 	public void handleEvent(final ActEndEvent event) {
 		Facility facility = event.act.getFacility();
 		if (facility != null) {
-			List<Person> persons = this.facilities.get(facility);
+			List<Person> persons = this.facilities.get(facility).get(event.act.getType());
 			if (persons != null) {
 				persons.remove(event.agent);
 			}
 		}
 	}
 
-	public void handleEvent(final ActStartEvent event) {
-		Facility facility = event.act.getFacility();
-		if (facility != null) {
-			List<Person> persons = this.facilities.get(facility);
-			if (persons == null) {
-				persons = new LinkedList<Person>();
-				this.facilities.put(facility, persons);
-			}
-			persons.add(event.agent);
-		}
-	}
-
 	/**
 	 * @param facility
-	 * @return the list of persons currently executing an activity at the given facility, ordered by their activity start time
+	 * @param actType
+	 * @return the list of persons currently executing an activity of the specified type at the given facility, ordered by their activity start time
 	 */
-	public List<Person> getVisitors(final Facility facility) {
-		List<Person> persons = this.facilities.get(facility);
-		if (persons != null) {
-			return Collections.unmodifiableList(persons);
+	public List<Person> getVisitors(final Facility facility, final String actType) {
+		Map<String, List<Person>> actTypes = this.facilities.get(facility);
+		if (actTypes == null) {
+			return EMPTY_LIST;
 		}
-		return EMPTY_LIST;
+		List<Person> persons = actTypes.get(actType);
+		if (persons == null) {
+			return EMPTY_LIST;
+		}
+		return Collections.unmodifiableList(persons);
 	}
 
 	public void reset(final int iteration) {

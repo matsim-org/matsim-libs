@@ -74,6 +74,8 @@ public class TransitRoute {
 		return Collections.unmodifiableList(this.stops);
 	}
 
+
+
 	public TransitRouteStop getStop(final Facility stop) {
 		for (TransitRouteStop trStop : this.stops) {
 			if (stop == trStop.getStopFacility()) {

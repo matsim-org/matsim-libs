@@ -30,9 +30,10 @@ public class MockDriverAgent implements DriverAgent {
 		return null;
 	}
 
-	public void leaveLink(Link link) {
+	public void enterNextLink() {
 	}
-	public void enterLink(Link link) {
+
+	public void leaveCurrentLink() {
 	}
 
 }

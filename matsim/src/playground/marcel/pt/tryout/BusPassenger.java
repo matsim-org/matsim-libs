@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitSchedule.java
+ * BusPassenger.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,34 +18,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule;
+package playground.marcel.pt.tryout;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
+import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.population.PersonImpl;
 
-public class TransitSchedule {
+import playground.marcel.pt.interfaces.PassengerAgent;
 
-	private final Map<Id, TransitLine> transitLines = new HashMap<Id, TransitLine>();
+public class BusPassenger extends PersonImpl implements PassengerAgent {
 
-	public TransitSchedule() {
+	private final Facility exitStop;
+
+	public BusPassenger(final Id id, final Facility exitStop) {
+		super(id);
+		this.exitStop = exitStop;
 	}
 
-	public void addTransitLine(final Id id, final TransitLine line) {
-		if (this.transitLines.containsKey(id)) {
-			throw new IllegalArgumentException("There is already a transit line with id " + id.toString());
-		}
-		this.transitLines.put(id, line);
+	public boolean arriveAtStop(final Facility stop) {
+		return this.exitStop == stop;
 	}
 
-	public TransitLine getTransitLine(final Id id) {
-		return this.transitLines.get(id);
-	}
-
-	public Map<Id, TransitLine> getTransitLines() {
-		return Collections.unmodifiableMap(this.transitLines);
+	public boolean ptLineAvailable() {
+		// TODO [MR] Auto-generated method stub
+		return false;
 	}
 
 }

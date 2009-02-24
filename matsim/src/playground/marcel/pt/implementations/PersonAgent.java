@@ -33,11 +33,11 @@ public class PersonAgent implements DriverAgent, PassengerAgent {
 		return null;
 	}
 
-	public void leaveLink(final Link link) {
+	public void enterNextLink() {
 		// TODO [MR] Auto-generated method stub
 	}
 
-	public void enterLink(final Link link) {
+	public void leaveCurrentLink() {
 		// TODO [MR] Auto-generated method stub
 	}
 
