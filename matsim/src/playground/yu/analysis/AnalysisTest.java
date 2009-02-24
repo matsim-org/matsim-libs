@@ -164,8 +164,9 @@ public class AnalysisTest {
 		dd.write(outputpath);
 		dert.write(outputpath);
 
-		new OTFEvent2MVI(new QueueNetwork(network), eventsFilename, outputpath,
-				Integer.parseInt(args[args.length - 1])).convert();
+		new OTFEvent2MVI(new QueueNetwork(network), eventsFilename,
+				eventsFilename.split("txt.gz")[0] + "mvi", Integer
+						.parseInt(args[args.length - 1])).convert();
 
 		System.out.println("done.");
 	}
