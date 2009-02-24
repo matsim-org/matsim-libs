@@ -24,11 +24,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Module;
-import org.matsim.config.groups.LocationChoiceConfigGroup;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.scoring.ScoringFunctionFactory;
 
 public class PlanomatXConfigGroup extends Module {
 	

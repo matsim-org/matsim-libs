@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TimeOptimizer.java
+ * TimeOptimizerWIGIC.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,23 +19,13 @@
  * *********************************************************************** */
 package playground.mfeil;
 
-import java.util.ArrayList;
-import java.util.List;
+
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.apache.log4j.Logger;
-import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.population.routes.LinkCarRoute;
 import org.matsim.scoring.PlanScorer;
-import org.matsim.controler.Controler;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.io.File;
-import java.io.FileNotFoundException;
+
+
 
 
 /**
@@ -43,7 +33,7 @@ import java.io.FileNotFoundException;
  * TimeOptimizerWIGIC: "What I Get Is Correct"
  * This is an extension of the standard TimeOptimizer that saves runtime by
  * assuming that the plans to be optimized are "correct" (i.e. times of the legs
- * and acts are meaningful and correct, no overlapping or similar). It basically saves
+ * and acts are meaningful and correct, no overlaps or similar). It basically saves
  * the initial clean-up loop compared to the standard TimeOptimizer.
  * The TimeOptimizerWIGIC is particularly designed to serve as FinalTimer in the 
  * PlanomatX.

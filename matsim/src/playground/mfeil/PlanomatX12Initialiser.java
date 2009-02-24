@@ -20,18 +20,12 @@
 package playground.mfeil;
 
 import org.matsim.controler.Controler;
-import java.util.ArrayList;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.network.NetworkLayer;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.*;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.facilities.Activity;
-import org.matsim.facilities.Facilities;
-import org.matsim.gbl.Gbl;
 
 
 

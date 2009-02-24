@@ -23,7 +23,6 @@ package playground.mfeil.config;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.config.Module;
-import org.matsim.config.groups.PlanomatConfigGroup.PlanomatConfigParameter;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 
 public class TimeModeChoicerConfigGroup extends Module {
@@ -45,7 +44,7 @@ public class TimeModeChoicerConfigGroup extends Module {
 	
 	//default values
 	// TODO all "static" to be removed later, only bypassing solution
-	private static String possible_modes = "walk";
+	private static String possible_modes = null;
 	private static String neighbourhood_size = "10";
 	private static String max_iterations = "30";
 	private static String stop_criterion = "5";
@@ -176,11 +175,14 @@ public class TimeModeChoicerConfigGroup extends Module {
 	
 	public static BasicLeg.Mode[] getPossibleModes() {
 		if (cachedPossibleModes == null) {
-			String[] possibleModesStringArray = possible_modes.split(",");
-			cachedPossibleModes = new BasicLeg.Mode[possibleModesStringArray.length];
-			for (int i=0; i < possibleModesStringArray.length; i++) {
-				cachedPossibleModes[i] = BasicLeg.Mode.valueOf(possibleModesStringArray[i]);
-			}			
+			if (possible_modes == null) cachedPossibleModes = new BasicLeg.Mode [0];
+			else {
+				String[] possibleModesStringArray = possible_modes.split(",");
+				cachedPossibleModes = new BasicLeg.Mode[possibleModesStringArray.length];
+				for (int i=0; i < possibleModesStringArray.length; i++) {
+					cachedPossibleModes[i] = BasicLeg.Mode.valueOf(possibleModesStringArray[i]);
+				}	
+			}
 		}
 		return cachedPossibleModes;
 	}	

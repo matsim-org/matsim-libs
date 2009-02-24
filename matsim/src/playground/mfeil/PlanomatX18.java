@@ -198,16 +198,13 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		//////////////////////////////////////////////////////////////////////
 		
 		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
-		if (plan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 vor erstem Router.");
 	//	if (Gbl.getConfig().planomat().getPossibleModes().length>0){
 			for (int z=1;z<plan.getActsLegs().size();z+=2){
 				((Leg)(plan.getActsLegs().get(z))).setMode(BasicLeg.Mode.car);
 			}
 	//	}
 		this.router.run(plan);
-		if (plan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 vor erstem Timer.");
 		this.timer.run(plan);
-		if (plan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach erstem Timer mit score = "+plan.getScore());
 		while (plan.getScore()==-100000){
 			
 			/* Remove last secondary activity to make plan shorter*/
@@ -232,7 +229,6 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		//	}
 			this.router.run(plan);
 			this.timer.run(plan);
-			if (plan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach while Schleife mit score = "+plan.getScore());
 		}
 						
 		/* Copy the plan into all fields of the array neighbourhood*/

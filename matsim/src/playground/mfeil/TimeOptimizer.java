@@ -36,7 +36,8 @@ import java.io.FileNotFoundException;
 
 /**
  * @author Matthias Feil
- * Like TimeOptimizer14 but first draft how to include also mode choice.
+ * This is a lean extension of the TimeModeChoicer excluding mode choice -> time optimization only.
+ * However includes initial clean-up of the schedule.
  */
 
 public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm { 
@@ -408,7 +409,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 			
 			if (i!=plan.getActsLegs().size()-2){
 				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
-				travelTime = java.lang.Math.max(((Act)(plan.getActsLegs().get(i+1))).getDuration()-travelTime, this.minimumTime);
+				travelTime = java.lang.Math.max(((Act)(plan.getActsLegs().get(i+1))).getDuration()/*-travelTime*/, this.minimumTime);
 				((Act)(plan.getActsLegs().get(i+1))).setDuration(travelTime);	
 				((Act)(plan.getActsLegs().get(i+1))).setEndTime(now+travelTime);	
 				now+=travelTime;

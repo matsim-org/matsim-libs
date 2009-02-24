@@ -28,7 +28,6 @@ import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.replanning.modules.StrategyModule;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import org.matsim.controler.Controler;
 
 
@@ -352,13 +351,13 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 	
 	private ArrayList<String> detectSoftCoefficients (){
 		ArrayList<String> softCoef = new ArrayList<String>();
-		if (this.primActsDistance=="yes") {
+		if (this.primActsDistance.equals("yes")) {
 			softCoef.add("primActsDistance");
 		}
-		if (this.homeLocationDistance=="yes") {
+		if (this.homeLocationDistance.equals("yes")) {
 			softCoef.add("homeLocationDistance");
 		}
-		if (this.age=="yes") {
+		if (this.age.equals("yes")) {
 			softCoef.add("age");
 		}
 		return softCoef;
@@ -366,25 +365,25 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 	
 	private ArrayList<String> detectAllCoefficients (){
 		ArrayList<String> allCoef = new ArrayList<String>();
-		if (this.primActsDistance=="yes") {
+		if (this.primActsDistance.equals("yes")) {
 			allCoef.add("primActsDistance");
 		}
-		if (this.homeLocationDistance=="yes") {
+		if (this.homeLocationDistance.equals("yes")) {
 			allCoef.add("homeLocationDistance");
 		}
-		if (this.sex=="yes") {
+		if (this.sex.equals("yes")) {
 			allCoef.add("sex");
 		}
-		if (this.age=="yes") {
+		if (this.age.equals("yes")) {
 			allCoef.add("age");
 		}
-		if (this.license=="yes") {
+		if (this.license.equals("yes")) {
 			allCoef.add("license");
 		}
-		if (this.car_avail=="yes") {
+		if (this.car_avail.equals("yes")) {
 			allCoef.add("car_avail");
 		}
-		if (this.employed=="yes") {
+		if (this.employed.equals("yes")) {
 			allCoef.add("employed");
 		}
 		return allCoef;
