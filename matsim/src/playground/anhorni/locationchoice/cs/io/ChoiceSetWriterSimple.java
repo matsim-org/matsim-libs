@@ -32,7 +32,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 		}
 		
 		String header="Id\t" +
-		"WP\tChoice\tAge\tGender\tIncome\tNumber_of_personsHH\tCivil_Status\tEducation\tTime_of_purchase\tstart_is_home\tTTB\t" ;
+		"WP\tChoice\tAge\tGender\tIncome\tNbrPersHH\tCivil_Status\tEducation\tTpurchase\tstart_is_home\tTTB\t" ;
 
 		for (int i = 0; i < this.facilities.getZhFacilities().size(); i++) {
 			header += "SH" + i + "_Shop_id\t " +
@@ -41,7 +41,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 					"SH" + i + "_Exact_x\t" + "SH" + i + "_Exact_y\t" +
 					"SH" + i + "_Travel_time_in_Net\t" + 
 					"SH" + i + "_Travel_distance_in_net\t" +
-					"SH" + i + "_Crow_fly_distance_exact\t" + "SH" + i + "_Crow_fly_distance_mapped\t" +
+					"SH" + i + "_CFD_exact\t" + "SH" + i + "_CFD_mapped\t" +
 					"SH" + i + "RetailerID\t" +
 					"SH" + i + "Size\t" +
 					"SH" + i + "dHalt\t" +
