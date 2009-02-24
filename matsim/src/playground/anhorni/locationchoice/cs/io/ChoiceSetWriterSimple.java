@@ -131,6 +131,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 			facility.getDHalt() + "\t";	
 			
 		outLine += "aAlt02\taAlt10\taAlt20\t";
+		outLine += facility.getHrs_week() +"\t";
 		return outLine;
 	}
 	
