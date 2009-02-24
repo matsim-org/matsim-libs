@@ -6,8 +6,7 @@ package playground.yu.utils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.xy.MatrixSeries;
-import org.jfree.data.xy.MatrixSeriesCollection;
+import org.jfree.data.xy.DefaultXYZDataset;
 import org.jfree.data.xy.XYZDataset;
 import org.matsim.utils.charts.ChartUtil;
 
@@ -16,7 +15,7 @@ import org.matsim.utils.charts.ChartUtil;
  * 
  */
 public class BubbleChart extends ChartUtil {
-	private MatrixSeriesCollection dataset;
+	private DefaultXYZDataset dataset;
 
 	/**
 	 * @param title
@@ -25,7 +24,7 @@ public class BubbleChart extends ChartUtil {
 	 */
 	public BubbleChart(String title, String xAxisLabel, String yAxisLabel) {
 		super(title, xAxisLabel, yAxisLabel);
-		dataset = new MatrixSeriesCollection();
+		dataset = new DefaultXYZDataset();
 		this.chart = createChart(title, xAxisLabel, yAxisLabel, this.dataset);
 		addDefaultFormatting();
 	}
@@ -44,18 +43,25 @@ public class BubbleChart extends ChartUtil {
 				);
 	}
 
-	public void addSeries(final String title, final double[] xs,
-			final double[] ys, final double[] zs) {
-		MatrixSeries ms=new MatrixSeries(title, xs.length, ys.length);
-//		TODO
-		this.dataset.addSeries(ms);
+	/**
+	 * @param title
+	 * @param data
+	 *            the data (must be an array with length 3, containing three
+	 *            arrays of equal length, the first containing the x-values, the
+	 *            second containing the y-values and the third containing the
+	 *            z-values).
+	 */
+	public void addSeries(final String title, final double[][] data) {
+		this.dataset.addSeries(title, data);
 	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
+		BubbleChart chart = new BubbleChart("TITLE", "x-axis", "y-axis");
+		chart.addSeries("serie 1", new double[][] { { 1, 3, 5 }, { 2, 4, 6 },
+				{ 0.1, 0.2, 0.3 } });
+		chart.saveAsPng("output/bubbleTest.png", 800, 600);
 	}
-
 }
