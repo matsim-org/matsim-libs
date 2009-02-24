@@ -136,7 +136,6 @@ public class Controler {
 
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout("%d{ISO8601} %5p %C{1}:%L %m%n");
 
-	private int traveltimeBinSize = 15*60; // use default of 15mins
 	private boolean overwriteFiles = false;
 	private static int iteration = -1;
 
@@ -197,7 +196,7 @@ public class Controler {
 
 	private TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
 	/**
-	 * Attribute for the routing factory, default is currently AStarLandmarks Routing
+	 * Attribute for the routing factory
 	 */
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
@@ -931,24 +930,15 @@ public class Controler {
 		return this.overwriteFiles;
 	}
 
-	/**
-	 * Sets the size of the time-window over which the travel times are accumulated and averaged.
-	 * Changes to this parameter have no effect after {@link #run()} is called. <br>
-	 * Note that smaller values for the binSize increase memory consumption to store the travel times.
-	 *
-	 * @param binSize The size of the time-window in seconds.
-	 */
-	public final void setTraveltimeBinSize(final int binSize) {
-		this.traveltimeBinSize = binSize;
-	}
 
 	/**
 	 * Returns the size of the time-window used to accumulate and average travel times.
-	 *
+	 * @deprecated Read the value set in the ControlerConfigGroup directly
 	 * @return The size of the time-window in seconds.
 	 */
+	@Deprecated
 	public final int getTraveltimeBinSize() {
-		return this.traveltimeBinSize;
+		return this.config.controler().getTraveltimeBinSize();
 	}
 
 	/**
