@@ -47,8 +47,9 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.router.PlansCalcRouteLandmarks;
+import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.AStarLandmarksFactory;
 import org.matsim.router.util.PreProcessLandmarks;
 
 
@@ -59,7 +60,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	private final PlansSummaryTable pst;
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
-	private PlansCalcRouteLandmarks pcrl = null;
+	private PlansCalcRoute pcrl = null;
 	private final String facilityIdFile;
 	private final String locationStrategy;
 	private int alternatives;
@@ -84,7 +85,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		Controler controler = event.getControler();
 
 		preprocess.run(controler.getNetwork());
-		pcrl = new PlansCalcRouteLandmarks(controler.getNetwork(),preprocess,timeCostCalc, timeCostCalc);
+		pcrl = new PlansCalcRoute(controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess));
 						
 		// define all given retailers
 		ArrayList<Facility> facilities = new ArrayList<Facility>();

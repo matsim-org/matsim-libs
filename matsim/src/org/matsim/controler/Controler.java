@@ -97,9 +97,11 @@ import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.StrategyManagerConfigLoader;
 import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.router.PlansCalcRouteLandmarks;
+import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.router.util.AStarLandmarksFactory;
+import org.matsim.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -194,6 +196,10 @@ public class Controler {
 	private CollectLogMessagesAppender collectLogMessagesAppender = null;
 
 	private TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
+	/**
+	 * Attribute for the routing factory, default is currently AStarLandmarks Routing
+	 */
+	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
@@ -692,6 +698,11 @@ public class Controler {
 	 * =================================================================== */
 
 	protected void runMobSim() {
+		//FIXME dg feb 09: this null checks are not really safe
+		//consider the case that a user copies a config with some
+		//externalMobsim or JDEQSim information in it and isn't aware
+		//that those configs will be used instead of the "normal" queuesimulation
+		//configuration
 		if (this.externalMobsim == null) {
 			final String JDEQ_SIM="JDEQSim";
 			if (Gbl.getConfig().getModule(JDEQ_SIM)!=null){
@@ -1017,6 +1028,15 @@ public class Controler {
 	public final StrategyManager getStrategyManager() {
 		return this.strategyManager;
 	}
+	
+	public LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory(){
+		return this.leastCostPathCalculatorFactory;
+	}
+	
+	public void setLeastCostPathCalculatorFactory(LeastCostPathCalculatorFactory factory){
+		this.leastCostPathCalculatorFactory = factory;
+	}
+	
 
 	/* ===================================================================
 	 * Factory methods
@@ -1048,7 +1068,7 @@ public class Controler {
 		if ((this.roadPricing != null) && (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.roadPricing.getRoadPricingScheme().getType()))) {
 			return new PlansCalcAreaTollRoute(this.network, this.commonRoutingData, travelCosts, travelTimes, this.roadPricing.getRoadPricingScheme());
 		}
-		return new PlansCalcRouteLandmarks(this.network, this.commonRoutingData, travelCosts, travelTimes);
+		return new PlansCalcRoute(this.network, travelCosts, travelTimes, new AStarLandmarksFactory(this.commonRoutingData));
 	}
 
 	/* ===================================================================

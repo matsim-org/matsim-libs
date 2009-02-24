@@ -22,7 +22,8 @@ package org.matsim.replanning.modules;
 
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.router.PlansCalcRouteLandmarks;
+import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.util.AStarLandmarksFactory;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -39,9 +40,8 @@ public class ReRouteLandmarks extends ReRouteDijkstra {
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new PlansCalcRouteLandmarks(
-				this.network, this.commonRouterData,
-				this.costCalculator, this.timeCalculator);
+		return new PlansCalcRoute(
+				this.network, this.costCalculator, this.timeCalculator, new AStarLandmarksFactory(this.commonRouterData));
 	}
 
 }

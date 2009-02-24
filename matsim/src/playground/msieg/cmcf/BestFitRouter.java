@@ -58,25 +58,30 @@ public class BestFitRouter extends CMCFRouter {
 			List<Link> path = null;
 			Commodity<Node> com = this.pathFlow.getCommodity(from, to);
 			if(com == null){
-				System.out.println("Warning, no commodity in CMCF solution found from "+from+" to "+to+"!  Skipping person"+p);
+				System.out.println("Warning, no commodity in CMCF solution found from "+from+" to "+to+"!  Skipping person with id "+p.getId());
 				continue;
 			}
 			assert(com != null);
 			double max = 0;
 			for(List<Link> pp: this.pathFlow.getFlowPaths(com)){
 				double flow = flowValues.get(pp);
-				if( flow > max && flow > 0){
+				if( (flow > max) && (flow > 0)){
 					path = pp;
 					max = flow; 
 				}
 			}
 			//path is found, therefore reroute:
 			assert(path != null);
-			NodeCarRoute route = new NodeCarRoute(leg.getRoute().getStartLink(), leg.getRoute().getEndLink());
-			route.setLinks(	leg.getRoute().getStartLink(), path, leg.getRoute().getEndLink());
-			leg.setRoute(route);
-			flowValues.put(path, flowValues.get(path) < 1 ? 0 : flowValues.get(path)-1);
-			routedPersons++;
+			if (path != null) {
+				NodeCarRoute route = new NodeCarRoute(leg.getRoute().getStartLink(), leg.getRoute().getEndLink());
+				route.setLinks(	leg.getRoute().getStartLink(), path, leg.getRoute().getEndLink());
+				leg.setRoute(route);
+				flowValues.put(path, flowValues.get(path) < 1 ? 0 : flowValues.get(path)-1);
+				routedPersons++;
+			}
+			else {
+				System.out.println("Path is null for com " + com + "! Skipping person with id " + p.getId());
+			}
 		}
 		System.out.println(" Agents routed: "+routedPersons+"/"+pop.getPersons().size());
 	}

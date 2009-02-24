@@ -56,14 +56,14 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	{
 		this.person = person;
 		
-		if(routeAlgo instanceof PersonLeastCostPathCalculator)
+		if(this.getLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
 		{
-			((PersonLeastCostPathCalculator)routeAlgo).setPerson(person);
+			((PersonLeastCostPathCalculator)this.getLeastCostPathCalculator()).setPerson(person);
 		}
 		
-		if(routeAlgoFreeflow instanceof PersonLeastCostPathCalculator)
+		if(this.getFreeflowLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
 		{
-			((PersonLeastCostPathCalculator)routeAlgoFreeflow).setPerson(person);
+			((PersonLeastCostPathCalculator)this.getFreeflowLeastCostPathCalculator()).setPerson(person);
 		}
 	}
 	
@@ -79,14 +79,14 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	{
 		this.queueNetwork = queueNetwork;
 		
-		if(routeAlgo instanceof PersonLeastCostPathCalculator)
+		if(this.getLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
 		{
-			((PersonLeastCostPathCalculator)routeAlgo).setQueueNetwork(queueNetwork);
+			((PersonLeastCostPathCalculator)this.getLeastCostPathCalculator()).setQueueNetwork(queueNetwork);
 		}
 		
-		if(routeAlgoFreeflow instanceof PersonLeastCostPathCalculator)
+		if(this.getFreeflowLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
 		{
-			((PersonLeastCostPathCalculator)routeAlgoFreeflow).setQueueNetwork(queueNetwork);
+			((PersonLeastCostPathCalculator)this.getFreeflowLeastCostPathCalculator()).setQueueNetwork(queueNetwork);
 		}
 	}
 	
@@ -102,14 +102,14 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	{
 		this.time = time;
 		
-		if(routeAlgo instanceof PersonLeastCostPathCalculator)
+		if(this.getLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
 		{
-			((PersonLeastCostPathCalculator)routeAlgo).setTime(time);
+			((PersonLeastCostPathCalculator)this.getLeastCostPathCalculator()).setTime(time);
 		}
 		
-		if(routeAlgoFreeflow instanceof PersonLeastCostPathCalculator)
+		if(this.getFreeflowLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
 		{
-			((PersonLeastCostPathCalculator)routeAlgoFreeflow).setTime(time);
+			((PersonLeastCostPathCalculator)this.getFreeflowLeastCostPathCalculator()).setTime(time);
 		}
 	}
 	
@@ -118,29 +118,30 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		return this.time;
 	}
 	
+	@Override
 	public KnowledgePlansCalcRoute clone()
 	{
 		LeastCostPathCalculator routeAlgoClone;
 		LeastCostPathCalculator routeAlgoFreeflowClone;
 		
-		if(this.routeAlgo instanceof PersonLeastCostPathCalculator)
+		if(this.getLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
 		{
-			routeAlgoClone = ((PersonLeastCostPathCalculator)routeAlgo).clone();
+			routeAlgoClone = ((PersonLeastCostPathCalculator)this.getLeastCostPathCalculator()).clone();
 		}
 		else
 		{
 			log.error("Could not clone the Route Algorithm - use reference to the existing Algorithm and hope the best...");
-			routeAlgoClone = routeAlgo;
+			routeAlgoClone = this.getLeastCostPathCalculator();
 		}
 		
-		if(this.routeAlgoFreeflow instanceof PersonLeastCostPathCalculator)
+		if(this.getFreeflowLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
 		{
-			routeAlgoFreeflowClone = ((PersonLeastCostPathCalculator)routeAlgoFreeflow).clone();
+			routeAlgoFreeflowClone = ((PersonLeastCostPathCalculator)this.getFreeflowLeastCostPathCalculator()).clone();
 		}
 		else
 		{
 			log.error("Could not clone the Freeflow Route Algorithm - use reference to the existing Algorithm and hope the best...");
-			routeAlgoFreeflowClone = routeAlgoFreeflow;
+			routeAlgoFreeflowClone = this.getFreeflowLeastCostPathCalculator();
 		}
 		
 		/* 
@@ -148,7 +149,7 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		 * In this case -> use only one clone.
 		 */
 		KnowledgePlansCalcRoute clone;
-		if(routeAlgo == routeAlgoFreeflow)
+		if(this.getLeastCostPathCalculator() == this.getFreeflowLeastCostPathCalculator())
 		{
 			clone = new KnowledgePlansCalcRoute(routeAlgoClone, routeAlgoClone);
 		}

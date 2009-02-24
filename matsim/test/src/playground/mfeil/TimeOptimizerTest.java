@@ -20,28 +20,7 @@
 
 package playground.mfeil;
 
-import org.apache.log4j.Logger;
-import org.matsim.events.Events;
-import org.matsim.facilities.Facilities;
-import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.population.*;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.router.PlansCalcRouteLandmarks;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCost;
-import org.matsim.scoring.PlanScorer;
-import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import java.util.ArrayList;
 
 public class TimeOptimizerTest extends MatsimTestCase{
 	/*

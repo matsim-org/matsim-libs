@@ -35,7 +35,9 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.DijkstraFactory;
 import org.matsim.router.util.LeastCostPathCalculator;
+import org.matsim.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
@@ -50,31 +52,55 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	/**
 	 * The routing algorithm to be used for finding routes on the network with actual travel times.
 	 */
-	protected final LeastCostPathCalculator routeAlgo;
+	private LeastCostPathCalculator routeAlgo;
 	/**
 	 * The routing algorithm to be used for finding routes in the empty network, with freeflow travel times.
 	 */
-	protected final LeastCostPathCalculator routeAlgoFreeflow;
+	private LeastCostPathCalculator routeAlgoFreeflow;
+	
+	private LeastCostPathCalculatorFactory factory;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
-
-	public PlansCalcRoute(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+	/**
+	 * Creates a rerouting strategy module using the rerouting of the factory
+	 */
+	public PlansCalcRoute(final NetworkLayer network, final TravelCost costCalculator,
+			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		super();
-		this.routeAlgo = new Dijkstra(network, costCalculator, timeCalculator);
+		this.factory = factory;
+		this.routeAlgo = this.factory.createPathCalculator(network, costCalculator, timeCalculator);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		this.routeAlgoFreeflow = new Dijkstra(network, timeCostCalc, timeCostCalc);
+		this.routeAlgoFreeflow = this.factory.createPathCalculator(network, timeCostCalc, timeCostCalc);
+		
+	}
+	
+	/**
+	 * Creates a rerouting strategy module using dijkstra rerouting
+	 */
+	public PlansCalcRoute(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+		this(network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
 
 	/**
 	 * @param router The routing algorithm to be used for finding routes on the network with actual travel times.
 	 * @param routerFreeflow The routing algorithm to be used for finding routes in the empty network, with freeflow travel times.
+	 * @deprecated use one of the other constructors of this class
 	 */
+	@Deprecated
 	public PlansCalcRoute(final LeastCostPathCalculator router, final LeastCostPathCalculator routerFreeflow) {
 		super();
 		this.routeAlgo = router;
 		this.routeAlgoFreeflow = routerFreeflow;
+	}
+	
+	public final LeastCostPathCalculator getLeastCostPathCalculator(){
+		return this.routeAlgo;
+	}
+	
+	public final LeastCostPathCalculator getFreeflowLeastCostPathCalculator(){
+		return this.routeAlgoFreeflow;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -115,7 +141,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			if (endTime != Time.UNDEFINED_TIME) {
 				// use fromAct.endTime as time for routing
 				now = endTime;
-			} else if (startTime != Time.UNDEFINED_TIME && dur != Time.UNDEFINED_TIME) {
+			} else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
 				// use fromAct.startTime + fromAct.duration as time for routing
 				now = startTime + dur;
 			} else if (dur != Time.UNDEFINED_TIME) {

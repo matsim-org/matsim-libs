@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlansCalcRouteLandmarks.java
+ * AStarLandmarksFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.router;
+package org.matsim.router.util;
 
 import org.matsim.network.NetworkLayer;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+import org.matsim.router.AStarLandmarks;
+
 
 /**
- * A AbstractPersonAlgorithm that calculates and sets the routes of a person's activities using {@link Dijkstra}.
+ * @author dgrether
  *
- * @author mrieser
  */
-public class PlansCalcRouteDijkstra extends PlansCalcRoute {
+public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 
-	public PlansCalcRouteDijkstra(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
-		this(network, costCalculator, timeCalculator, new FreespeedTravelTimeCost());
+	private PreProcessLandmarks preProcessData;
+	
+	public AStarLandmarksFactory(final PreProcessLandmarks preProcessData){
+		this.preProcessData = preProcessData;
+	}
+	
+	/**
+	 * @see org.matsim.router.util.LeastCostPathCalculatorFactory#createPathCalculator(org.matsim.network.NetworkLayer, org.matsim.router.util.TravelCost, org.matsim.router.util.TravelTime)
+	 */
+	public LeastCostPathCalculator createPathCalculator(NetworkLayer network,
+			TravelCost travelCosts, TravelTime travelTimes) {
+		return new AStarLandmarks(network, this.preProcessData, travelCosts, travelTimes);
 	}
 
-	private PlansCalcRouteDijkstra(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator,
-			final FreespeedTravelTimeCost freespeedTimeCost) {
-		super(new Dijkstra(network, costCalculator, timeCalculator),
-				new Dijkstra(network, freespeedTimeCost, freespeedTimeCost));
-	}
 }

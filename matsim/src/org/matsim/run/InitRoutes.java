@@ -30,8 +30,9 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
-import org.matsim.router.PlansCalcRouteLandmarks;
+import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.AStarLandmarksFactory;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.utils.misc.ArgumentParser;
 
@@ -126,7 +127,7 @@ public class InitRoutes {
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 		preprocess.run(network);
-		plans.addAlgorithm(new PlansCalcRouteLandmarks(network, preprocess, timeCostCalc, timeCostCalc));
+		plans.addAlgorithm(new PlansCalcRoute(network, timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess)));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();

@@ -60,7 +60,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 		Path path = null;
 		if (toLink != fromLink) {
 			// do not drive/walk around, if we stay on the same link
-			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
+			path = this.getLeastCostPathCalculator().calcLeastCostPath(startNode, endNode, depTime);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			
 			NetworkLayer realNetwork = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);

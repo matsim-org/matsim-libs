@@ -31,7 +31,8 @@ import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.router.AStarLandmarks;
-import org.matsim.router.PlansCalcRouteLandmarks;
+import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.util.AStarLandmarksFactory;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
@@ -45,7 +46,7 @@ import org.matsim.utils.misc.Time;
  *
  * @author mrieser
  */
-public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
+public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 
 	private final RoadPricingScheme scheme;
 	private final TravelTime timeCalculator;
@@ -61,7 +62,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 	 * @param scheme
 	 */
 	public PlansCalcAreaTollRoute(final NetworkLayer network, final PreProcessLandmarks preProcessData, final TravelCost costCalculator, final TravelTime timeCalculator, final RoadPricingScheme scheme) {
-		super(network, preProcessData, costCalculator, timeCalculator);
+		super(network, costCalculator, timeCalculator, new AStarLandmarksFactory(preProcessData));
 		this.scheme = scheme;
 		this.timeCalculator = timeCalculator;
 		this.tollRouter = new AStarLandmarks(network, preProcessData, new TollTravelCostCalculator(costCalculator, scheme), timeCalculator);
@@ -119,7 +120,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 				// # start searching a route where agent may pay the toll
 				boolean tollRouteInsideTollArea = false;
 				if (toLink != fromLink) {
-					Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
+					Path path = this.getLeastCostPathCalculator().calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
 					if (path == null) {
 						throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 					}

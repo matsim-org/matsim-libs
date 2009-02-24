@@ -40,7 +40,8 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.router.PlansCalcRouteDijkstra;
+import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.util.DijkstraFactory;
 import org.matsim.router.util.TravelCost;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 
@@ -57,14 +58,14 @@ public class EvacDestinationAssigner implements ScoringListener {
 
 
 
-	private final PlansCalcRouteDijkstra plansCalcRoute;
+	private final PlansCalcRoute plansCalcRoute;
 	
 	
 	public EvacDestinationAssigner(final TravelCost travelCostCalculator,
 			final TravelTimeCalculator travelTimeCalculator, final NetworkLayer network) {
 
 		this.network = network;
-		this.plansCalcRoute = new PlansCalcRouteDijkstra(network,travelCostCalculator,travelTimeCalculator); 
+		this.plansCalcRoute = new PlansCalcRoute(network,travelCostCalculator,travelTimeCalculator, new DijkstraFactory()); 
 
 	}
 

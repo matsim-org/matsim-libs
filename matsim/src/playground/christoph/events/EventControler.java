@@ -21,31 +21,27 @@
 package playground.christoph.events;
 
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.controler.Controler;
 import org.matsim.population.Person;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.Dijkstra;
-import org.matsim.router.PlansCalcRouteLandmarks;
+import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.router.util.AStarLandmarksFactory;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.utils.geometry.transformations.AtlantisToWGS84;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
-import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
 
 import playground.christoph.events.algorithms.ParallelInitialReplanner;
 import playground.christoph.events.algorithms.ParallelReplanner;
-import playground.christoph.knowledge.nodeselection.FileNameCreator;
 import playground.christoph.knowledge.KMLPersonWriter;
-import playground.christoph.knowledge.nodeselection.CreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
@@ -60,7 +56,6 @@ import playground.christoph.router.KnowledgePlansCalcRoute;
 import playground.christoph.router.RandomCompassRoute;
 import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
-import playground.christoph.router.costcalculators.KnowledgeTravelCostCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 
@@ -139,7 +134,7 @@ public class EventControler extends Controler{
 		//AStarLandmarks
 		PreProcessLandmarks landmarks = new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		landmarks.run(network);
-		replanners.add(new PlansCalcRouteLandmarks(network, landmarks, travelCostCalculator, travelTimeCalculator));
+		replanners.add(new PlansCalcRoute(network, travelCostCalculator, travelTimeCalculator, new AStarLandmarksFactory(landmarks)));
 		
 		// BasicReplanners (Random, Tabu, Compass, ...)
 		// each replanner can handle an arbitrary number of persons

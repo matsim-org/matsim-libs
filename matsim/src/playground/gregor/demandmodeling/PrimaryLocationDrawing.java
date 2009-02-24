@@ -45,8 +45,9 @@ import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
-import org.matsim.router.PlansCalcRouteDijkstra;
+import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.DijkstraFactory;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordImpl;
@@ -104,7 +105,7 @@ public class PrimaryLocationDrawing {
 		HashMap<String,Feature> ftDist = getFeatures(this.districts);
 		ArrayList<Zone> zones = getZones();
 		Population pop = getPopulation(ftDist,zones);
-		PlansCalcRouteDijkstra router = new PlansCalcRouteDijkstra(this.network,new FreespeedTravelTimeCost(),new FreespeedTravelTimeCost());
+		PlansCalcRoute router = new PlansCalcRoute(this.network,new FreespeedTravelTimeCost(),new FreespeedTravelTimeCost(), new DijkstraFactory());
 		router.run(pop);
 		new PopulationWriter(pop,this.demandFilename, "v4").write();
 	}

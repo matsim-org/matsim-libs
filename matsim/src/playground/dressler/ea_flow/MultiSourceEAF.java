@@ -31,37 +31,23 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.config.Config;
-import org.matsim.events.Events;
-import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicPopulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriterV5;
 import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.PlansCalcRouteDijkstra;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.scoring.EventsToScore;
-import org.matsim.world.World;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.world.World;
 
-import playground.dressler.ea_flow.FakeTravelTimeCost;
-import playground.dressler.ea_flow.Flow;
-import playground.dressler.ea_flow.MBFdynamic_withFlowClass;
-
-import playground.dressler.Intervall.src.Intervalls.EdgeIntervall;
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
-import playground.dressler.Intervall.src.Intervalls.VertexIntervall;
 import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
 
 /**
@@ -225,7 +211,7 @@ public class MultiSourceEAF {
 			System.out.println("reading input done");
 		}
 		
-		if(!demands.isEmpty() && sink != null) {
+		if(!demands.isEmpty() && (sink != null)) {
 			TimeExpandedPath result = null;
 			FakeTravelTimeCost travelcost = new FakeTravelTimeCost();
 			Flow fluss = new Flow( network, travelcost, demands, sink, timeHorizon );
@@ -274,8 +260,8 @@ public class MultiSourceEAF {
 			else{
 				FakeTravelTimeCost length = new FakeTravelTimeCost();
 				fluss = new Flow(network, length, demands, sink, timeHorizon);
-				TravelCost travelCost = (TravelCost) length;
-				TravelTime travelTime = (TravelTime) length;
+				TravelCost travelCost = length;
+				TravelTime travelTime = length;
 				MBFdynamic_withFlowClass routingAlgo = new MBFdynamic_withFlowClass(travelCost, travelTime, fluss);
 				fluss = routingAlgo.calcLeastCostFlow(0.0, fluss);
 			}

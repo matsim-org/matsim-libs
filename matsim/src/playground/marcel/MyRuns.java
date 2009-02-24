@@ -126,9 +126,9 @@ import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.router.util.AStarLandmarksFactory;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
@@ -800,7 +800,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  processing plans..." + (new Date()));
-		new PlansCalcRouteLandmarks(network, preprocess, timeCostCalc, timeCostCalc).run(population);
+		new PlansCalcRoute(network, timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess)).run(population);
 		System.out.println("  done. " + (new Date()));
 
 		System.out.println("  writing plans...");

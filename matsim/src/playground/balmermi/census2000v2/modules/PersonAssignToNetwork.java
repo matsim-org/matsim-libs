@@ -29,8 +29,9 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.router.PlansCalcRouteLandmarks;
+import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.AStarLandmarksFactory;
 import org.matsim.router.util.PreProcessLandmarks;
 
 public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements PlanAlgorithm {
@@ -41,7 +42,7 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 
 	private final static Logger log = Logger.getLogger(PersonAssignToNetwork.class);
 
-	private final PlansCalcRouteLandmarks router;
+	private final PlansCalcRoute router;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -52,7 +53,7 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 		preprocess.run(network);
-		this.router = new PlansCalcRouteLandmarks(network,preprocess,timeCostCalc,timeCostCalc);
+		this.router = new PlansCalcRoute(network, timeCostCalc,timeCostCalc, new AStarLandmarksFactory(preprocess));
 		log.info("    done.");
 	}
 

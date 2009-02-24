@@ -26,18 +26,19 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.scoring.PlanScorer;
-import org.matsim.population.Act;
-import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.router.PlansCalcRouteLandmarks;
-import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.population.Act;
+import org.matsim.population.Plan;
+import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.util.AStarLandmarksFactory;
+import org.matsim.router.util.PreProcessLandmarks;
+import org.matsim.scoring.PlanScorer;
 
 
 /**
@@ -51,7 +52,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected final PlanAlgorithm				timer;
 	protected final LocationMutatorwChoiceSet 	locator;
 	protected final PlanScorer					scorer;
-	protected final PlansCalcRouteLandmarks 	router;
+	protected final PlansCalcRoute router;
 	protected final RecyclingModule				module;
 	protected final ScheduleCleaner				cleaner;
 	protected final double						minimumTime;
@@ -69,7 +70,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			LocationMutatorwChoiceSet locator, PlanScorer scorer, ScheduleCleaner cleaner, RecyclingModule recyclingModule,
 			double minimumTime, LinkedList<String> nonassignedAgents){
 		this.controler				= controler;
-		this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
+		this.router 				= new PlansCalcRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), new AStarLandmarksFactory(preProcessRoutingData));
 		this.scorer					= scorer;
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
 				controler.getNetwork(), 
