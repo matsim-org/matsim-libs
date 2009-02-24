@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mfeil;
+package playground.mfeil.config;
 
 import java.util.TreeMap;
 

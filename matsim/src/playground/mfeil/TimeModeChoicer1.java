@@ -39,6 +39,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import org.matsim.basic.v01.*;
 
+import playground.mfeil.config.TimeModeChoicerConfigGroup;
+
 
 /**
  * @author Matthias Feil

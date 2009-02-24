@@ -48,6 +48,8 @@ import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.scoring.PlanScorer;
 import org.matsim.scoring.ScoringFunctionFactory;
 
+import playground.mfeil.config.PlanomatXConfigGroup;
+
 
 
 
@@ -276,7 +278,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					
 					/* Conduct location choice*/	
 					if (this.LC_MODE.equals("reducedLC")	||	this.LC_MODE.equals("iteratingLC")){
-						if (infoOnNeighbourhood[x][1]!=-1	||	infoOnNeighbourhood[x][2]!=-1){		
+						if ((infoOnNeighbourhood[x][1]!=-1)	||	(infoOnNeighbourhood[x][2]!=-1)){		
 							long lcStartTime=System.currentTimeMillis();
 							this.locator.handleSubChains(neighbourhood[x], this.getSubChains(neighbourhood[x], infoOnNeighbourhood[x][1], infoOnNeighbourhood[x][2]));
 							lcRunTime+=System.currentTimeMillis()-lcStartTime;							
