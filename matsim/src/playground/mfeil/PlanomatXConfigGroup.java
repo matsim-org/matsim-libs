@@ -55,7 +55,7 @@ public class PlanomatXConfigGroup extends Module {
 	private static String weight_change_number = "0.6";
 	private static String weight_inc_number = "0.5";
 	private static String timer = "TimeModeChoicer";
-	private static String final_timer = "TimeOptimizerWIGIC";
+	private static String final_timer = "none";
 	private static String lc_mode = "reducedLC";
 	private static String lc_set_size = "1";
 	
@@ -113,14 +113,18 @@ public class PlanomatXConfigGroup extends Module {
 			if (Integer.parseInt(value) < 1) {
 				log.warn("Parameter MAX_ITERATIONS has been set to "+value+" but must be equal to or greater than 1. The default value of 20 will be used instead.");
 			}
-			setMaxIterations(value);
+			else {
+				setMaxIterations(value);
+			}
 			
 			
 		} else if (WEIGHT_CHANGE_ORDER.equals(key)) {
 			if ((Double.parseDouble(value)) < 0 || (Double.parseDouble(value)) > 1) {
 				log.warn("Parameter WEIGHT_CHANGE_ORDER has been set to "+value+" but must be between 0 and 1. The default value of 0.2 will be used instead.");
 			}
-			setWeightChangeOrder(value);
+			else {
+				setWeightChangeOrder(value);
+			}
 			
 		} else if (WEIGHT_CHANGE_NUMBER.equals(key)) {
 			if ((Double.parseDouble(value)) < 0 || (Double.parseDouble(value)) > 1) {
@@ -145,6 +149,7 @@ public class PlanomatXConfigGroup extends Module {
 			else {
 				setWeightIncNumber(value);
 			}
+			
 		} else if (TIMER.equals(key)) {
 			if (value.equals("Planomat") || value.equals("TimeModeChoicer") || value.equals("TimeOptimizer")) {
 				setTimer(value);
@@ -160,6 +165,7 @@ public class PlanomatXConfigGroup extends Module {
 			else {
 				log.warn(value+" is no valid FINAL_TIMER. Final timeing will be skipped.");
 			}
+			
 		} else if (LC_MODE.equals(key)) {
 			if (value.equals("fullLC") || value.equals("reducedLC")) {
 				setLCMode(value);
@@ -167,6 +173,7 @@ public class PlanomatXConfigGroup extends Module {
 			else {
 				log.warn(value+" is no valid LC_MODE. Default reducedLC will be used instead.");
 			}
+			
 		} else if (LC_SET_SIZE.equals(key)) {
 			if (Integer.parseInt(value)<1) {
 				log.warn("Parameter LC_SET_SIZE has been set to "+value+" but must be equal to or greater than 1. The default value of 1 will be used instead.");
@@ -174,6 +181,7 @@ public class PlanomatXConfigGroup extends Module {
 			else {
 				setLCSetSize(value);
 			}
+			
 		} else throw new IllegalArgumentException(key);
 	}
 	

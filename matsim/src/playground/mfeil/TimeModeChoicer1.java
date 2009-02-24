@@ -48,7 +48,7 @@ import org.matsim.basic.v01.*;
 public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int						MAX_ITERATIONS, STOP_CRITERION, NEIGHBOURHOOD_SIZE;
-	private final int						OFFSET;
+	private final double					OFFSET;
 	protected final double					minimumTime;
 	protected final PlanScorer 				scorer;
 	protected final LegTravelTimeEstimator	estimator;
@@ -66,14 +66,14 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		
 		this.scorer 				= scorer;
 		this.estimator				= estimator;
-		this.OFFSET					= 1800;
-		this.MAX_ITERATIONS 		= 5;
-		this.STOP_CRITERION			= 5;
-		this.minimumTime			= 3600;
-		this.NEIGHBOURHOOD_SIZE		= 10;
-		this.maxWalkingDistance		= 2000;
+		this.OFFSET					= Double.parseDouble(TimeModeChoicerConfigGroup.getOffset());
+		this.MAX_ITERATIONS 		= Integer.parseInt(TimeModeChoicerConfigGroup.getMaxIterations());
+		this.STOP_CRITERION			= Integer.parseInt(TimeModeChoicerConfigGroup.getStopCriterion());
+		this.minimumTime			= Double.parseDouble(TimeModeChoicerConfigGroup.getMinimumTime());
+		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(TimeModeChoicerConfigGroup.getNeighbourhoodSize());
+		this.maxWalkingDistance		= Double.parseDouble(TimeModeChoicerConfigGroup.getMaximumWalkingDistance());
 		this.possibleModes			= Gbl.getConfig().planomat().getPossibleModes(); //faster call at runtime
-		this.modeChoice				= "standard";
+		this.modeChoice				= TimeModeChoicerConfigGroup.getModeChoice();
 		this.routes					= null;
 		
 		//TODO @MF: constants to be configured externally
