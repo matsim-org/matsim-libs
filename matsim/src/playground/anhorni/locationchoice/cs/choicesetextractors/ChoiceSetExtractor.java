@@ -1,24 +1,19 @@
 package playground.anhorni.locationchoice.cs.choicesetextractors;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
-import org.matsim.interfaces.basic.v01.Id;
-
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.SpanningTree;
-import playground.anhorni.locationchoice.cs.helper.ZHFacility;
+import playground.anhorni.locationchoice.cs.helper.ZHFacilities;
 
 public abstract class ChoiceSetExtractor {
 		
-	protected TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink = null;
-	protected Controler controler = null;
+	protected ZHFacilities facilities;
+	protected Controler controler;
 	private List<ChoiceSet> choiceSets;
 	
 	private final static Logger log = Logger.getLogger(ChoiceSetExtractor.class);

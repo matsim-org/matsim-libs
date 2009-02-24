@@ -2,16 +2,13 @@ package playground.anhorni.locationchoice.cs.io;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.io.IOUtils;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
+import playground.anhorni.locationchoice.cs.helper.ZHFacilities;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 
 public class ChoiceSetWriterSimple extends CSWriter {
@@ -19,12 +16,12 @@ public class ChoiceSetWriterSimple extends CSWriter {
 	private final static Logger log = Logger.getLogger(ChoiceSetWriterSimple.class);
 	private String mode;
 	private String crowFly;
-	private TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink = new TreeMap<Id, ArrayList<ZHFacility>>();
+	private ZHFacilities facilities;
 	
-	public ChoiceSetWriterSimple(String mode, String crowFly, TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink) {
+	public ChoiceSetWriterSimple(String mode, String crowFly, ZHFacilities facilities) {
 		this.mode = mode;
 		this.crowFly = crowFly;
-		this.zhFacilitiesByLink = zhFacilitiesByLink;
+		this.facilities = facilities;
 	}
 	
 	public void write(String outdir, String name, List<ChoiceSet> choiceSets)  {
@@ -40,7 +37,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 		String header="Id\t" +
 		"WP\tChoice\tAge\tGender\tIncome\tNumber_of_personsHH\tCivil_Status\tEducation\tTime_of_purchase\tstart_is_home\tTTB" ;
 
-		for (int i = 0; i < this.zhFacilitiesByLink.size(); i++) {
+		for (int i = 0; i < this.facilities.getZhFacilities().size(); i++) {
 			header += "SH" + i + "_Shop_id\t +" +
 					"SH" + i + "_AV" +
 					"SH" + i + "_Mapped_x\t" + "SH" + i + "_Mapped_y\t" +
@@ -78,44 +75,39 @@ public class ChoiceSetWriterSimple extends CSWriter {
 				// chosen facility:
 				outLine += choiceSet.getChosenZHFacility().getId() +"\t" + "1\t";
 								
-				Iterator<ArrayList<ZHFacility>> facilities_it = zhFacilitiesByLink.values().iterator();
+				Iterator<ZHFacility> facilities_it = this.facilities.getZhFacilities().values().iterator();
 				while (facilities_it.hasNext()) {
-					ArrayList<ZHFacility> facilitiesList = facilities_it.next();
-					
-					Iterator<ZHFacility> facilitiesList_it = facilitiesList.iterator();			
-					while (facilitiesList_it.hasNext()) {
-						ZHFacility facility = facilitiesList_it.next();	
+					ZHFacility facility = facilities_it.next();	
 
-						//AV
-						if (!(facility.getId().compareTo(choiceSet.getChosenZHFacility().getId()) == 0)) {
-							outLine += facility.getId() +"\t";
-							
-							if (choiceSet.zhFacilityIsInChoiceSet(facility)) {
-								outLine += "1\t";
-							}
-							else {
-								outLine += "0\t";
-							}
+					//AV
+					if (!(facility.getId().compareTo(choiceSet.getChosenZHFacility().getId()) == 0)) {
+						outLine += facility.getId() +"\t";
+						
+						if (choiceSet.zhFacilityIsInChoiceSet(facility)) {
+							outLine += "1\t";
 						}
-						
-						outLine += 
-							facility.getMappedPosition().getX() + "\t" + 
-							facility.getMappedPosition().getY()	+ "\t" + 
-							facility.getExactPosition().getX() 	+ "\t" +
-							facility.getExactPosition().getY();
-						
-						double crowFlyDistanceMapped = choiceSet.calculateCrowFlyDistanceMapped(facility.getMappedPosition());
-						double crowFlyDistanceExact = choiceSet.calculateCrowFlyDistanceExact(facility.getExactPosition());
-						
-						outLine += choiceSet.getTravelTime(facility) + "\t" +
-							choiceSet.getTravelDistance(facility) +"\t" +
-							crowFlyDistanceExact +"\t" +
-							crowFlyDistanceMapped +"\t";
-						
-						outLine += facility.getRetailerID() + "\t" +
-							facility.getSize_descr() +"\t" +
-							facility.getDHalt() + "\t";							
+						else {
+							outLine += "0\t";
+						}
 					}
+					
+					outLine += 
+						facility.getMappedPosition().getX() + "\t" + 
+						facility.getMappedPosition().getY()	+ "\t" + 
+						facility.getExactPosition().getX() 	+ "\t" +
+						facility.getExactPosition().getY();
+					
+					double crowFlyDistanceMapped = choiceSet.calculateCrowFlyDistanceMapped(facility.getMappedPosition());
+					double crowFlyDistanceExact = choiceSet.calculateCrowFlyDistanceExact(facility.getExactPosition());
+					
+					outLine += choiceSet.getTravelTime(facility) + "\t" +
+						choiceSet.getTravelDistance(facility) +"\t" +
+						crowFlyDistanceExact +"\t" +
+						crowFlyDistanceMapped +"\t";
+					
+					outLine += facility.getRetailerID() + "\t" +
+						facility.getSize_descr() +"\t" +
+						facility.getDHalt() + "\t";							
 				}
 				out.write(outLine);
 				out.newLine();

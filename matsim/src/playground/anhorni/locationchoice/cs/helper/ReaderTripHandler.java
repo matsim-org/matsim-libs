@@ -1,13 +1,10 @@
 package playground.anhorni.locationchoice.cs.helper;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.TreeMap;
 
+import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
@@ -22,7 +19,7 @@ public class ReaderTripHandler {
 	private double travelTimeBudget;
 	
 
-	public void constructTrip(String [] entries, NetworkLayer network, TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink, 
+	public void constructTrip(String [] entries, NetworkLayer network, ZHFacilities facilities, 
 			MZTrip mzTrip, int tripNr) {
 		
 		Coord beforeShoppingCoord = new CoordImpl(
@@ -35,18 +32,12 @@ public class ReaderTripHandler {
 		
 		
 		Link link = null;
-		Iterator<ArrayList<ZHFacility>> fac0_it = zhFacilitiesByLink.values().iterator();
-		while (fac0_it.hasNext()) {		
-			ArrayList<ZHFacility> fac_list = fac0_it.next();
-			
-			Iterator<ZHFacility> fac1_it = fac_list.iterator();
-			while (fac1_it.hasNext()) {		
-				ZHFacility facility = fac1_it.next();
-			
-				if (facility.getId().compareTo(new IdImpl(entries[2].trim())) == 0) {
-					link = network.getLink(facility.getLinkId());
-					this.chosenZHFacility = facility;
-				}
+		Iterator<ZHFacility> facilities_it = facilities.getZhFacilities().values().iterator();
+		while (facilities_it.hasNext()) {		
+			ZHFacility facility = facilities_it.next();	
+			if (facility.getId().compareTo(new IdImpl(entries[2].trim())) == 0) {
+				link = network.getLink(facility.getLinkId());
+				this.chosenZHFacility = facility;
 			}
 		}
 		Act shoppingAct = new Act("shop", link);

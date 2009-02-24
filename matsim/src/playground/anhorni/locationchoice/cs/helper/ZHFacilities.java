@@ -1,14 +1,78 @@
 package playground.anhorni.locationchoice.cs.helper;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.TreeMap;
-
 import org.matsim.interfaces.basic.v01.Id;
 
 public class ZHFacilities {
 	
 	private TreeMap<Id, ZHFacility> zhFacilities = new TreeMap<Id, ZHFacility>();	
 	private TreeMap<Id, ArrayList<Id>> zhFacilitiesByLink = new TreeMap<Id, ArrayList<Id>>();
+	private int numberOfFacilities;
+	
+	
+	public ZHFacilities() {
+		this.zhFacilities = new TreeMap<Id, ZHFacility>();
+		this.zhFacilitiesByLink = new TreeMap<Id, ArrayList<Id>>();
+	}
+	
+	public void addFacilityByLink(Id linkId, ZHFacility facility) {
+	
+		if (this.zhFacilitiesByLink.containsKey(linkId)) {
+			this.zhFacilitiesByLink.get(linkId).add(facility.getId());
+		}
+		else {
+			ArrayList<Id> list = new ArrayList<Id>();
+			list.add(facility.getId());
+			this.zhFacilitiesByLink.put(linkId,list);
+		}
 		
+		if (!this.zhFacilities.containsKey(facility.getId())) {
+			this.zhFacilities.put(facility.getId(), facility);
+			this.numberOfFacilities += 1;
+		}			
+	}
+	
+	public ArrayList<ZHFacility> getFacilitiesByLinkId(Id linkId) {
+		ArrayList<Id> idList = this.zhFacilitiesByLink.get(linkId);
+		
+		ArrayList<ZHFacility> facilitiesList = new ArrayList<ZHFacility>();
+		
+		Iterator<Id> idList_it = idList.iterator();
+		while (idList_it.hasNext()) {
+			Id id = idList_it.next();
+			facilitiesList.add(this.zhFacilities.get(id));					
+		}
+		return facilitiesList;
+	}
+	
+	
+	public void addFacilitiesByLink(Id linkId, ArrayList<ZHFacility> facilitiesList) {		
+		Iterator<ZHFacility> facility_it = facilitiesList.iterator();
+		while (facility_it.hasNext()) {
+			ZHFacility facility = facility_it.next();
+			this.addFacilityByLink(facility.getId(), facility);					
+		}
+	}
 
+	public TreeMap<Id, ZHFacility> getZhFacilities() {
+		return zhFacilities;
+	}
+
+	public void setZhFacilities(TreeMap<Id, ZHFacility> zhFacilities) {
+		this.zhFacilities = zhFacilities;
+	}
+
+	public TreeMap<Id, ArrayList<Id>> getZhFacilitiesByLink() {
+		return zhFacilitiesByLink;
+	}
+
+	public void setZhFacilitiesByLink(TreeMap<Id, ArrayList<Id>> zhFacilitiesByLink) {
+		this.zhFacilitiesByLink = zhFacilitiesByLink;
+	}
+
+	public int getNumberOfFacilities() {
+		return numberOfFacilities;
+	}
 }

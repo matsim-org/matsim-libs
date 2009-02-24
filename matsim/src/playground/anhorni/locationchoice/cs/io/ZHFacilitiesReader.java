@@ -3,17 +3,15 @@ package playground.anhorni.locationchoice.cs.io;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.network.Link;
 
+import playground.anhorni.locationchoice.cs.helper.ZHFacilities;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 
 
@@ -39,7 +37,7 @@ public class ZHFacilitiesReader {
 		this.network = network;
 	}
 	
-	public void readFile(final String file, TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink)  {
+	public void readFile(final String file, ZHFacilities facilities)  {
 		
 		if (file == null) {
 			log.error("file is null");
@@ -63,10 +61,8 @@ public class ZHFacilitiesReader {
 				
 				Coord exactPosition = new CoordImpl(xCH, yCH);
 				Link closestLink = network.getNearestLink(exactPosition);
-								
-				if (zhFacilitiesByLink.containsKey(closestLink.getId())) {
-					zhFacilitiesByLink.get(closestLink.getId()).add(
-							new ZHFacility(
+				
+				facilities.addFacilityByLink(closestLink.getId(), new ZHFacility(
 									new IdImpl(shopID),
 									closestLink.getCenter(),
 									exactPosition, 
@@ -74,22 +70,7 @@ public class ZHFacilitiesReader {
 									new IdImpl(retailerID),
 									size_descr,
 									dHalt,
-									hrs_week));
-				}
-				else {
-					ArrayList<ZHFacility> list = new ArrayList<ZHFacility>();
-					list.add(new ZHFacility(
-							new IdImpl(shopID),
-							closestLink.getCenter(),
-							exactPosition, 
-							closestLink.getId(),
-							new IdImpl(retailerID),
-							size_descr,
-							dHalt,
-							hrs_week));
-					zhFacilitiesByLink.put(
-							closestLink.getId(),list);
-				}	
+									hrs_week));	
 			}
 			bufferedReader.close();
 			fileReader.close();

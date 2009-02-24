@@ -20,10 +20,8 @@
 
 package playground.anhorni.locationchoice.cs.choicesetextractors;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.AfterMobsimEvent;
@@ -40,7 +38,7 @@ import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.PlansCalcRoute;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.SpanningTree;
-import playground.anhorni.locationchoice.cs.helper.ZHFacility;
+import playground.anhorni.locationchoice.cs.helper.ZHFacilities;
 
 /**
  * @author anhorni
@@ -51,11 +49,11 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	private String mode;
 	private String crowFly;
 
-	public ExtractChoiceSetsRouting(Controler controler, TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink, 
+	public ExtractChoiceSetsRouting(Controler controler, ZHFacilities facilities, 
 			List<ChoiceSet> choiceSets, String mode, String crowFly) {
 		
 		super(controler, choiceSets);
-		super.zhFacilitiesByLink = zhFacilitiesByLink;
+		super.facilities = facilities;
 		this.mode = mode;	
 		this.crowFly = crowFly;
 	}
@@ -65,13 +63,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		if (event.getIteration() < Gbl.getConfig().controler().getLastIteration()) {
 			return;
 		}
-				
-		int numberOfFacilities = 0;
-		Iterator<ArrayList<ZHFacility>> it = super.zhFacilitiesByLink.values().iterator();
-		while (it.hasNext()) {
-			numberOfFacilities += it.next().size();
-		}
-		log.info("Number of ZH facilities " + numberOfFacilities);
+		log.info("Number of ZH facilities " + this.facilities.getNumberOfFacilities());
 		log.info("computing " + this.mode + " choice sets...:");
 		super.computeChoiceSets();
 	}
@@ -81,7 +73,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			
 		NetworkLayer network = controler.getNetwork();
 		
-		Iterator<Id> link_it = this.zhFacilitiesByLink.keySet().iterator();
+		Iterator<Id> link_it = this.facilities.getZhFacilities().keySet().iterator();
 		while (link_it.hasNext()) {		
 			Id linkId = link_it.next();
 			
@@ -147,9 +139,9 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 				}
 			}					
 			if (totalTravelTime <= choiceSet.getTravelTimeBudget()) {			
-				choiceSet.addFacilities(this.zhFacilitiesByLink.get(linkId), totalTravelTime, travelDist);
+				choiceSet.addFacilities(this.facilities.getFacilitiesByLinkId(linkId), totalTravelTime, travelDist);
 			}
-			else if (this.zhFacilitiesByLink.get(linkId).contains(choiceSet.getChosenZHFacility())) {
+			else if (this.facilities.getFacilitiesByLinkId(linkId).contains(choiceSet.getChosenZHFacility())) {
 				choiceSet.addFacility(choiceSet.getChosenZHFacility(), totalTravelTime, travelDist);
 			}
 		}	

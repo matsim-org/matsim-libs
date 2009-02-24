@@ -5,16 +5,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.mobsim.cppdeqsim.DEQSimControler;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -28,7 +25,7 @@ import playground.anhorni.locationchoice.cs.filters.SampleDrawer;
 import playground.anhorni.locationchoice.cs.filters.SampleDrawerFixedSizeRandom;
 import playground.anhorni.locationchoice.cs.filters.SampleDrawerFixedSizeTravelCosts;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
-import playground.anhorni.locationchoice.cs.helper.ZHFacility;
+import playground.anhorni.locationchoice.cs.helper.ZHFacilities;
 import playground.anhorni.locationchoice.cs.io.CSWriter;
 import playground.anhorni.locationchoice.cs.io.ChoiceSetWriterSimple;
 import playground.anhorni.locationchoice.cs.io.CSShapeFileWriter;
@@ -47,7 +44,9 @@ public class GenerateChoiceSets {
 	private Population choiceSetPopulation = new Population(false);
 	
 	private NetworkLayer network = new NetworkLayer();
-	private TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink = new TreeMap<Id, ArrayList<ZHFacility>>();
+	//private TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink = new TreeMap<Id, ArrayList<ZHFacility>>();
+	
+	private ZHFacilities zhFacilities;
 	
 	private List<ChoiceSet> carChoiceSets = null;
 	private List<ChoiceSet> walkChoiceSets = null;
@@ -150,7 +149,7 @@ public class GenerateChoiceSets {
 		new File(this.outdir +"shapefiles/singletrips").mkdir();
 		new File(this.outdir +"shapefiles/singlechoicesets").mkdir();
 		
-		ChoiceSetWriterSimple writer = new ChoiceSetWriterSimple(this.mode, this.walkCrowFly, this.zhFacilitiesByLink);
+		ChoiceSetWriterSimple writer = new ChoiceSetWriterSimple(this.mode, this.walkCrowFly, this.zhFacilities);
 		this.writers.add(writer);	
 		CSShapeFileWriter shpWriter = new CSShapeFileWriter();
 		this.writers.add(shpWriter);
@@ -158,7 +157,7 @@ public class GenerateChoiceSets {
 		TripStats tripStats = new TripStats(this.mode, this.walkCrowFly);
 		this.writers.add(tripStats);
 		
-		
+		this.zhFacilities = new ZHFacilities();
 		
 		// sampler
 		SampleDrawer sampleDrawer;
@@ -179,8 +178,8 @@ public class GenerateChoiceSets {
 		this.createChoiceSetFacilities();
 				
 		if (this.readNelson.equals("true")) {
-			this.carChoiceSets = new NelsonTripReader(this.network, this.zhFacilitiesByLink).readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "car");
-			this.walkChoiceSets = new NelsonTripReader(this.network, this.zhFacilitiesByLink).readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "walk");				
+			this.carChoiceSets = new NelsonTripReader(this.network, this.zhFacilities).readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "car");
+			this.walkChoiceSets = new NelsonTripReader(this.network, this.zhFacilities).readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "walk");				
 		}
 		else {
 			this.choiceSetPopulation = this.createChoiceSetPopulationFromMZ();
@@ -199,7 +198,7 @@ public class GenerateChoiceSets {
 			this.controler = new Controler(this.matsimRunConfigFile);
 		}		
 		
-		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
+		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilities, 
 				this.carChoiceSets, "car", "false");
 		
 		/*
@@ -214,7 +213,7 @@ public class GenerateChoiceSets {
 		}
 		*/
 				
-		ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
+		ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilities, 
 					this.walkChoiceSets, "walk", this.walkCrowFly);
 		
 		if (this.mode.equals("car")) {
@@ -263,9 +262,9 @@ public class GenerateChoiceSets {
 		networkReader.readFile(Gbl.getConfig().network().getInputFile());
 				
 		ZHFacilitiesReader zhFacilitiesReader = new ZHFacilitiesReader(this.network);
-		zhFacilitiesReader.readFile(this.zhFacilitiesFile, zhFacilitiesByLink);
+		zhFacilitiesReader.readFile(this.zhFacilitiesFile, this.zhFacilities);
 		
-		new ZHFacilitiesWriter().write(this.outdir, this.zhFacilitiesByLink);
+		new ZHFacilitiesWriter().write(this.outdir, this.zhFacilities);
 	}
 						
 	private void output() {			

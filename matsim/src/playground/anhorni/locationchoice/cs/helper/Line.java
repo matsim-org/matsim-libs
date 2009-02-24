@@ -1,13 +1,8 @@
 package playground.anhorni.locationchoice.cs.helper;
 
-import java.util.ArrayList;
-import java.util.TreeMap;
-
 import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
-
 
 public class Line {
 	
@@ -74,10 +69,9 @@ public class Line {
 		return true;		
 	}
 	
-	public void constructTrip(String [] entries, NetworkLayer network, TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink, 
-			MZTrip mzTrip) {
+	public void constructTrip(String [] entries, NetworkLayer network, ZHFacilities facilities, MZTrip mzTrip) {
 		this.tripHandler = new ReaderTripHandler();
-		this.tripHandler.constructTrip(entries, network, zhFacilitiesByLink, mzTrip, this.tripNr);
+		this.tripHandler.constructTrip(entries, network, facilities, mzTrip, this.tripNr);
 	}
 	
 	public Trip getTrip() {

@@ -17,6 +17,7 @@ import org.matsim.network.NetworkLayer;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.Line;
 import playground.anhorni.locationchoice.cs.helper.MZTrip;
+import playground.anhorni.locationchoice.cs.helper.ZHFacilities;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 
 /*	  0			1		2			3			4			5		6		7			8				9
@@ -32,11 +33,11 @@ public class NelsonTripReader {
 	private final static Logger log = Logger.getLogger(NelsonTripReader.class);
 	private TreeMap<Id, MZTrip> mzTrips = null; 
 	private NetworkLayer network = null;
-	private TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink = new TreeMap<Id, ArrayList<ZHFacility>>();
+	private ZHFacilities facilities;
 		
-	public NelsonTripReader(NetworkLayer network, TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink) {
+	public NelsonTripReader(NetworkLayer network, ZHFacilities facilities) {
 		this.network = network;
-		this.zhFacilitiesByLink = zhFacilitiesByLink;
+		this.facilities = facilities;
 	}
 	
 	public List<ChoiceSet> readFiles(final String file0, final String file1, String mode)  {
@@ -82,7 +83,7 @@ public class NelsonTripReader {
 					continue;
 				}
 				
-				line.constructTrip(entries, network, zhFacilitiesByLink, mzTrip);
+				line.constructTrip(entries, network, this.facilities, mzTrip);
 				ChoiceSet choiceSet = new ChoiceSet(new IdImpl(line.getTripId()), line.getTrip());
 				choiceSet.setPersonAttributes(line.getPersonAttributes());
 				choiceSet.setChosenZHFacility(line.getChosenZHFacility());
