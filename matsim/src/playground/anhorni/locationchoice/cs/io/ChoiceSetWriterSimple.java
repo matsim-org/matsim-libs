@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
+import playground.anhorni.locationchoice.cs.helper.PersonAttributes;
 import playground.anhorni.locationchoice.cs.helper.ZHFacilities;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 
@@ -35,19 +36,19 @@ public class ChoiceSetWriterSimple extends CSWriter {
 
 		for (int i = 0; i < this.facilities.getZhFacilities().size(); i++) {
 			header += "SH" + i + "_Shop_id\t " +
-					"SH" + i + "_AV" +
+					"SH" + i + "_AV\t" +
 					"SH" + i + "_Mapped_x\t" + "SH" + i + "_Mapped_y\t" +
 					"SH" + i + "_Exact_x\t" + "SH" + i + "_Exact_y\t" +
 					"SH" + i + "_Travel_time_in_Net\t" + 
 					"SH" + i + "_Travel_distance_in_net\t" +
 					"SH" + i + "_Crow_fly_distance_exact\t" + "SH" + i + "_Crow_fly_distance_mapped\t" +
-					"SH" + i + "RetailerID" +
-					"SH" + i + "Size" +
-					"SH" + i + "dHalt" +
-					"SH" + i + "aAlt02" +
-					"SH" + i + "aAlt10" +
-					"SH" + i + "aAlt20" +
-					"SH" + i + "HRS_WEEK";
+					"SH" + i + "RetailerID\t" +
+					"SH" + i + "Size\t" +
+					"SH" + i + "dHalt\t" +
+					"SH" + i + "aAlt02\t" +
+					"SH" + i + "aAlt10\t" +
+					"SH" + i + "aAlt20\t" +
+					"SH" + i + "HRS_WEEK\t";
 		}
 	
 		try {								
@@ -59,56 +60,26 @@ public class ChoiceSetWriterSimple extends CSWriter {
 			while (choiceSet_it.hasNext()) {
 				ChoiceSet choiceSet = choiceSet_it.next();
 
-				String outLine = "" + choiceSet.getPersonAttributes().getWP() +"\t";
+				String outLine = choiceSet.getId() +"\t" + choiceSet.getPersonAttributes().getWP() +"\t";
 				
 				// chosen facility is always 1st alternative in choice set
 				String choice = "1\t";
 				outLine += choice;
 				
-				outLine += choiceSet.getPersonAttributes().getAge() +"\t"+ choiceSet.getPersonAttributes().getGender() +"\t"+ 
-				choiceSet.getPersonAttributes().getIncomeHH() +"\t"+ choiceSet.getPersonAttributes().getNumberOfPersonsHH() +"\t";
+				PersonAttributes attributes = choiceSet.getPersonAttributes();
+				outLine += attributes.getAge() +"\t"+ attributes.getGender() +"\t" + attributes.getIncomeHH() +"\t"+ 
+				attributes.getNumberOfPersonsHH() +"\t" + attributes.getCivilStatus() +"\t" + attributes.getEducation() +"\t";
 				
-				// chosen facility:
-				outLine += choiceSet.getTrip().getShoppingAct().getFacilityId() +"\t" + "1\t";
+				outLine += choiceSet.getTrip().getShoppingAct().getStartTime() +"\t" + attributes.getStart_is_home() +"\t";
+				outLine += choiceSet.getTravelTimeBudget() +"\t";
+				
+				// chosen facility: ------------------------------------------------------------
+				outLine += this.printFacility(choiceSet.getChosenFacility().getFacility(), choiceSet);
 								
 				Iterator<ZHFacility> facilities_it = this.facilities.getZhFacilities().values().iterator();
 				while (facilities_it.hasNext()) {
 					ZHFacility facility = facilities_it.next();	
-
-					//AV
-					if (!(facility.getId().compareTo(choiceSet.getChosenFacilityId()) == 0)) {
-						outLine += facility.getId() +"\t";
-						
-						if (choiceSet.zhFacilityIsInChoiceSet(facility.getId())) {
-							outLine += "1\t";
-						}
-						else {
-							outLine += "0\t";
-						}
-					}
-					
-					outLine += 
-						facility.getMappedPosition().getX() + "\t" + 
-						facility.getMappedPosition().getY()	+ "\t" + 
-						facility.getExactPosition().getX() 	+ "\t" +
-						facility.getExactPosition().getY()	+ "t";
-					
-					double crowFlyDistanceMapped = choiceSet.calculateCrowFlyDistanceMapped(facility.getMappedPosition());
-					double crowFlyDistanceExact = choiceSet.calculateCrowFlyDistanceExact(facility.getExactPosition());
-					
-					if (choiceSet.zhFacilityIsInChoiceSet(facility.getId())) {
-						outLine += choiceSet.getTravelTimeStartShopEnd(facility.getId()) + "\t" +
-							choiceSet.getTravelDistanceStartShopEnd(facility.getId()) +"\t" +
-							crowFlyDistanceExact +"\t" +
-							crowFlyDistanceMapped +"\t";
-					}
-					else {
-						outLine += "-99\t-99\t-99\t-99\t";
-					}
-					
-					outLine += facility.getRetailerID() + "\t" +
-						facility.getSize_descr() +"\t" +
-						facility.getDHalt() + "\t";							
+					outLine += this.printFacility(facility, choiceSet);
 				}
 				out.write(outLine);
 				out.newLine();
@@ -121,6 +92,47 @@ public class ChoiceSetWriterSimple extends CSWriter {
 		} catch (final IOException e) {
 				Gbl.errorMsg(e);
 		}	
+	}
+	
+	
+	private String printFacility(ZHFacility facility, ChoiceSet choiceSet) {
+		
+		String outLine = facility.getId().toString();
+		
+		//AV
+		if (choiceSet.zhFacilityIsInChoiceSet(facility.getId())) {
+			outLine += "1\t";
+		}
+		else {
+			outLine += "0\t";
+		}
+
+		outLine += 
+			facility.getMappedPosition().getX() + "\t" + 
+			facility.getMappedPosition().getY()	+ "\t" + 
+			facility.getExactPosition().getX() 	+ "\t" +
+			facility.getExactPosition().getY()	+ "\t";
+		
+		double crowFlyDistanceMapped = choiceSet.calculateCrowFlyDistanceMapped(facility.getMappedPosition());
+		double crowFlyDistanceExact = choiceSet.calculateCrowFlyDistanceExact(facility.getExactPosition());
+		
+		if (choiceSet.zhFacilityIsInChoiceSet(facility.getId())) {
+			outLine += choiceSet.getTravelTimeStartShopEnd(facility.getId()) + "\t" +
+				choiceSet.getTravelDistanceStartShopEnd(facility.getId()) +"\t" +
+				crowFlyDistanceExact +"\t" +
+				crowFlyDistanceMapped +"\t";
+		}
+		else {
+			outLine += "-99\t-99\t-99\t-99\t";
+		}
+		
+		outLine += facility.getRetailerID() + "\t" +
+			facility.getSize_descr() +"\t" +
+			facility.getDHalt() + "\t";	
+		
+		
+		outLine += "aAlt02\taAlt10\taAlt20\t";
+		return outLine;
 	}
 	
 	

@@ -33,8 +33,6 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
-import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.PlansCalcRoute;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.SpanningTree;
@@ -48,15 +46,13 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	
 	private final static Logger log = Logger.getLogger(ExtractChoiceSetsRouting.class);
 	private String mode;
-	private String crowFly;
 
 	public ExtractChoiceSetsRouting(Controler controler, ZHFacilities facilities, 
-			List<ChoiceSet> choiceSets, String mode, String crowFly) {
+			List<ChoiceSet> choiceSets, String mode) {
 		
 		super(controler, choiceSets);
 		super.facilities = facilities;
 		this.mode = mode;	
-		this.crowFly = crowFly;
 	}
 	
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
@@ -122,23 +118,16 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			 */
 			double travelDist = 0.0;
 			
-			
-			if (this.crowFly.equals("true") && this.mode.equals("walk")) {
-				travelDist = fromAct0.getCoord().calcDistance(toAct0.getCoord()) +
-					fromAct1.getCoord().calcDistance(toAct1.getCoord());
+			Iterator<Id> routeLinkBefore_it = legBefore.getRoute().getLinkIds().iterator();
+			while (routeLinkBefore_it.hasNext()) {		
+				Id lId = routeLinkBefore_it.next();
+				travelDist += network.getLink(lId).getLength();
 			}
-			else {
-				Iterator<Id> routeLinkBefore_it = legBefore.getRoute().getLinkIds().iterator();
-				while (routeLinkBefore_it.hasNext()) {		
-					Id lId = routeLinkBefore_it.next();
-					travelDist += network.getLink(lId).getLength();
-				}
-				
-				Iterator<Id> routeLinkAfter_it = legAfter.getRoute().getLinkIds().iterator();
-				while (routeLinkAfter_it.hasNext()) {		
-					Id lId = routeLinkAfter_it.next();
-					travelDist += network.getLink(lId).getLength();
-				}
+			
+			Iterator<Id> routeLinkAfter_it = legAfter.getRoute().getLinkIds().iterator();
+			while (routeLinkAfter_it.hasNext()) {		
+				Id lId = routeLinkAfter_it.next();
+				travelDist += network.getLink(lId).getLength();
 			}
 			if (totalTravelTime <= choiceSet.getTravelTimeBudget() || facility.getId().compareTo(choiceSet.getChosenFacilityId()) == 0) {			
 				choiceSet.addFacility(facility, totalTravelTime, travelDist);
@@ -147,35 +136,11 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	}
 		
 	private Leg computeLeg(Act fromAct, Act toAct, Controler controler) {	
-		Leg leg = null;
-		
-		if (this.crowFly.equals("true")) {
-				leg = new Leg(BasicLeg.Mode.walk);
-				this.handleWalkLeg(leg, fromAct, toAct, fromAct.getEndTime());
-			}
-			else {
-				leg = new Leg(BasicLeg.Mode.car);
-				PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
-				router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
-		}
+		Leg leg = new Leg(BasicLeg.Mode.car);
+		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
+		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
 		
 		return leg;
-	}
-	
-	
-	private double handleWalkLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
-		// make simple assumption about distance and walking speed
-		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
-		double speed = 5.0 / 3.6; // 4.0 km/h --> m/s
-		// create an empty route, but with realistic travel time
-		CarRoute route = new NodeCarRoute(fromAct.getLink(), toAct.getLink());
-		int travTime = (int)(dist / speed);
-		route.setTravelTime(travTime);
-		leg.setRoute(route);
-		leg.setDepartureTime(depTime);
-		leg.setTravelTime(travTime);
-		leg.setArrivalTime(depTime + travTime);
-		return travTime;
 	}
 }
 
@@ -222,6 +187,24 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			}
 			index++;
 		}		
+	}
+	
+	
+	
+	
+		private double handleWalkLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+		// make simple assumption about distance and walking speed
+		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
+		double speed = 5.0 / 3.6; // 4.0 km/h --> m/s
+		// create an empty route, but with realistic travel time
+		CarRoute route = new NodeCarRoute(fromAct.getLink(), toAct.getLink());
+		int travTime = (int)(dist / speed);
+		route.setTravelTime(travTime);
+		leg.setRoute(route);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		leg.setArrivalTime(depTime + travTime);
+		return travTime;
 	}
 	
 	

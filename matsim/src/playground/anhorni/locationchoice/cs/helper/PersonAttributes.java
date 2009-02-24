@@ -14,8 +14,7 @@ public class PersonAttributes {
 	
 	
 	public PersonAttributes(double wp, int age, int gender, int incomeHH,
-			int numberOfPersonsHH, int civilStatus, int education,
-			int start_is_home) {
+			int numberOfPersonsHH, int civilStatus, int education) {
 		super();
 		WP = wp;
 		this.age = age;
@@ -24,7 +23,6 @@ public class PersonAttributes {
 		this.numberOfPersonsHH = numberOfPersonsHH;
 		this.civilStatus = civilStatus;
 		this.education = education;
-		this.start_is_home = start_is_home;
 	}
 	
 	

@@ -11,16 +11,9 @@ import org.matsim.utils.io.IOUtils;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 
 public class TripStats extends CSWriter{
-	
-	private String mode;
-	private String crowFly;
-	
-	
-	
-	public TripStats(String mode, String crowFly) {
+		
+	public TripStats(String mode) {
 		super();
-		this.mode = mode;
-		this.crowFly = crowFly;
 	}
 
 	public void write(String outdir, String mode, List<ChoiceSet> choiceSets)  {
@@ -52,12 +45,7 @@ public class TripStats extends CSWriter{
 				
 				String location = choiceSet.getId().toString();
 				
-				if (this.mode.equals("walk") && this.crowFly.equals("true")) {
-					location += "\t" + "-" + "\t" + crowFlyDistance + "\t" + "-" + "\t" + "-";
-				}
-				else {
-					location += "\t" + travelDistance + "\t" + crowFlyDistance + "\t" + travelTime + "\t" + travelSpeed;
-				}
+				location += "\t" + travelDistance + "\t" + crowFlyDistance + "\t" + travelTime + "\t" + travelSpeed;
 				location += "\t" + choiceSet.getTravelTimeBudget() + "\t" + usedBudgetPercent;
 				
 				out.write(location);

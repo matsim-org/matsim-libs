@@ -68,7 +68,6 @@ public class Line {
 		this.numberOfPersonsHH = numberOfPersons;
 		this.civilStatus = Integer.parseInt(entries[78].trim());
 		this.education = Integer.parseInt(entries[79].trim());
-		this.start_is_home = Integer.parseInt(entries[79].trim());
 		
 		this.homeCoordinates = new CoordImpl(
 				Double.parseDouble(entries[21].trim()), 
@@ -76,7 +75,7 @@ public class Line {
 				);
 		
 		this.personAttributes = new PersonAttributes(this.personWeight, this.age, this.gender, this.incomeHH, this.numberOfPersonsHH,
-				this.civilStatus, this.education, this.start_is_home);
+				this.civilStatus, this.education);
 		
 		return true;		
 	}
@@ -84,6 +83,14 @@ public class Line {
 	public void constructTrip(String [] entries, NetworkLayer network, ZHFacilities facilities, MZTrip mzTrip) {
 		this.tripHandler = new ReaderTripHandler();
 		this.tripHandler.constructTrip(entries, network, facilities, mzTrip, this.tripNr);
+		
+		if (this.getTrip().getBeforeShoppingAct().getCoord().calcDistance(this.homeCoordinates) < 0.01) {
+			this.start_is_home = 1;
+		}
+		else {
+			this.start_is_home = 0;
+		}
+		this.personAttributes.setStart_is_home(start_is_home);
 	}
 	
 	public Trip getTrip() {

@@ -66,7 +66,6 @@ public class GenerateChoiceSets {
 	private String outdir = null;
 	private String sampling;
 	private String readNelson;
-	private String walkCrowFly;
 	private String DEQSim;
 	private String mode;
 	
@@ -110,7 +109,6 @@ public class GenerateChoiceSets {
 			this.choiceSetSize = Integer.parseInt(bufferedReader.readLine().trim());
 			this.sampling = bufferedReader.readLine();
 			this.readNelson = bufferedReader.readLine();
-			this.walkCrowFly = bufferedReader.readLine();
 			this.DEQSim = bufferedReader.readLine();
 			this.mode = bufferedReader.readLine();
 			
@@ -123,7 +121,6 @@ public class GenerateChoiceSets {
 			log.info("choice set size: " + this.choiceSetSize);
 			log.info("Sampling :" + this.sampling);
 			log.info("readNelson: " + this.readNelson);
-			log.info("walk crow fly: " + this.walkCrowFly);
 			log.info("DEQSim : " + this.DEQSim);
 			log.info("mode : " + this.mode);
 
@@ -157,7 +154,7 @@ public class GenerateChoiceSets {
 		CSShapeFileWriter shpWriter = new CSShapeFileWriter();
 		this.writers.add(shpWriter);
 		
-		TripStats tripStats = new TripStats(this.mode, this.walkCrowFly);
+		TripStats tripStats = new TripStats(this.mode);
 		this.writers.add(tripStats);
 		
 		
@@ -202,7 +199,7 @@ public class GenerateChoiceSets {
 		}		
 		
 		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilities, 
-				this.carChoiceSets, "car", "false");
+				this.carChoiceSets, "car");
 		
 		/*
 		 * This does NOT work at the moment:
@@ -217,7 +214,7 @@ public class GenerateChoiceSets {
 		*/
 				
 		ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilities, 
-					this.walkChoiceSets, "walk", this.walkCrowFly);
+					this.walkChoiceSets, "walk");
 		
 		if (this.mode.equals("car")) {
 			controler.addControlerListener(listenerCar);
