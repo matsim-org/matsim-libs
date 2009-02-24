@@ -90,7 +90,16 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		
 		if (basePlan.getActsLegs().size()==1) return;
 		
-		/* Memorize the initial car routes */
+		boolean carIsIn = false;
+		for (int i=0;i<this.possibleModes.length;i++){
+			if (this.possibleModes[i]==BasicLeg.Mode.car){
+				carIsIn = true;
+				break;
+			}
+		}
+		
+		/* Memorize the initial car routes.
+		 * Do this in any case as the car routes are required in the setTimes() method. */
 		ArrayList <LinkCarRoute> routes = new ArrayList<LinkCarRoute>();
 		for (int i=1;i<basePlan.getActsLegs().size();i=i+2){
 			LinkCarRoute r = new LinkCarRoute(((Leg)(basePlan.getActsLegs().get(i))).getRoute().getStartLink(), ((Leg)(basePlan.getActsLegs().get(i))).getRoute().getEndLink());
@@ -104,6 +113,13 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		}
 		this.routes = routes;
 		
+		if (!carIsIn && this.possibleModes.length>0) {
+			/* Set all legs to an - at least - valid mode.
+			 * If the mode is score-wise crap the initial cleaning of the schedule will relieve this. */
+			for (int i=1;i<basePlan.getActsLegs().size();i=i+2){
+				((Leg)(basePlan.getActsLegs().get(i))).setMode(this.possibleModes[0]);
+			}
+		}
 		
 		/* Analysis of subtours */
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
@@ -145,15 +161,17 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 					// TODO: whole plan copying needs to removed when there is no PlanomatXPlan any longer!
 					PlanomatXPlan planAux = new PlanomatXPlan(basePlan.getPerson());
 					planAux.copyPlan(basePlan);
-					double tmpScore = this.chooseModeAllChains(planAux, basePlan.getActsLegs(), planAnalyzeSubtours, subtourDis);
+					double tmpScore = -100000;
+					if (this.possibleModes.length>0){						
+						tmpScore = this.chooseModeAllChains(planAux, basePlan.getActsLegs(), planAnalyzeSubtours, subtourDis);
+					}
 					if (tmpScore!=-100000) {
-						log.warn("Valid initial solution found by first mode choice run.");
+						log.warn("Valid initial solution found by full mode choice run.");
 						// TODO: whole plan copying needs to removed when there is no PlanomatXPlan any longer!
 						basePlan.copyPlan(planAux);
 						break;
 					}
-					else {
-					
+					else {					
 						// TODO Check whether allowed?
 						basePlan.setScore(-100000);	// Like this, PlanomatX will see that the solution is no proper solution
 						log.warn("No valid initial solution found for person "+basePlan.getPerson().getId()+"!");
@@ -646,6 +664,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		int index = subtourDistances.size()-1;
 		int searchSpace = (int) java.lang.Math.pow(this.possibleModes.length, index+1);
 		for (int i=0; i<searchSpace;i++){
+			System.out.println("in iteration "+i);
 			boolean tour=false;
 			for (int k=0;k<subtourDistances.size();k++){
 				if (this.possibleModes[subtourDistances.get(k)[1]].toString().equals("walk")){
@@ -677,15 +696,18 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 					actslegsResult = this.copyActsLegs(actslegs);
 				}
 			}
-			while (subtourDistances.get(index)[1]==this.possibleModes.length-1){
-				subtourDistances.get(index)[1]=0;
-				if (index!=0) {
-					index--;
+			if (this.possibleModes.length>1){
+				while (subtourDistances.get(index)[1]==this.possibleModes.length-1){
+					System.out.println("in while schleife");
+					subtourDistances.get(index)[1]=0;
+					if (index!=0) {
+						index--;
+					}
 				}
-			}
-			subtourDistances.get(index)[1]++;
-			if (index!=subtourDistances.size()-1){
-				index=subtourDistances.size()-1;
+				subtourDistances.get(index)[1]++;
+				if (index!=subtourDistances.size()-1){
+					index=subtourDistances.size()-1;
+				}
 			}
 		}
 	

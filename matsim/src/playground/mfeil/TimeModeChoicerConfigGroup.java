@@ -45,13 +45,13 @@ public class TimeModeChoicerConfigGroup extends Module {
 	
 	//default values
 	// TODO all "static" to be removed later, only bypassing solution
-	private static String possible_modes = "car,pt,walk";
+	private static String possible_modes = "walk";
 	private static String neighbourhood_size = "10";
 	private static String max_iterations = "30";
 	private static String stop_criterion = "5";
 	private static String offset = "1800";
 	private static String minimum_time = "3600";
-	private static String maximum_walking_distance = "2000";
+	private static String maximum_walking_distance = "50000";
 	private static String mode_choice = "standard";
 
 	
