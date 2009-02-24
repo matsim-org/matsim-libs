@@ -75,10 +75,9 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		/* Initial clean-up of plan for the case actslegs is not sound*/
 		double move = this.cleanSchedule (((Act)(basePlan.getActsLegs().get(0))).getEndTime(), basePlan);
 		int loops=1;
-		boolean cannotMove = false;
 		while (move!=0.0){
-			if (cannotMove || loops>3) {
-				for (int i=2;i<basePlan.getActsLegs().size()-4;i+=2){
+			if (loops>3) {
+				for (int i=0;i<basePlan.getActsLegs().size()-2;i+=2){
 					((Act)basePlan.getActsLegs().get(i)).setDuration(this.minimumTime);
 				}
 				move = this.cleanSchedule(this.minimumTime, basePlan);
@@ -88,10 +87,13 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 					log.warn("No valid initial solution found for person "+basePlan.getPerson().getId()+"!");
 					return;
 				}
+				else break;
 			}
 			loops++;
-			if (((Act)(basePlan.getActsLegs().get(0))).getEndTime()-move<this.minimumTime) cannotMove = true;
-			move = this.cleanSchedule(java.lang.Math.max(((Act)(basePlan.getActsLegs().get(0))).getEndTime()-move,this.minimumTime), basePlan);
+			for (int i=0;i<basePlan.getActsLegs().size()-2;i=i+2){
+				((Act)basePlan.getActsLegs().get(i)).setDuration(java.lang.Math.max(((Act)basePlan.getActsLegs().get(i)).getDuration()*0.9, this.minimumTime));
+			}
+			move = this.cleanSchedule(((Act)(basePlan.getActsLegs().get(0))).getDuration(), basePlan);
 		}
 		
 		this.processPlan(basePlan);
