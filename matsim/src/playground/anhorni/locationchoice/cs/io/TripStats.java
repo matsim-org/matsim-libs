@@ -39,16 +39,16 @@ public class TripStats extends CSWriter{
 			while (choiceSet_it.hasNext()) {
 				ChoiceSet choiceSet = choiceSet_it.next();
 				
-				double travelDistance = choiceSet.getTravelDistance(choiceSet.getChosenZHFacility());
-				double travelTime = choiceSet.getTravelTime(choiceSet.getChosenZHFacility());
+				double travelDistance = choiceSet.getTravelDistanceStartShopEnd(choiceSet.getChosenFacilityId());
+				double travelTime = choiceSet.getTravelTimeStartShopEnd(choiceSet.getChosenFacilityId());
 				
 				double travelSpeed = 3.6 * travelDistance / travelTime;
 				double usedBudgetPercent = 100.0 * travelTime / choiceSet.getTravelTimeBudget();
 				
 				double crowFlyDistance = choiceSet.getTrip().getBeforeShoppingAct().getCoord().
-					calcDistance(choiceSet.getChosenZHFacility().getExactPosition()) +
+					calcDistance(choiceSet.getChosenFacility().getFacility().getExactPosition()) +
 					choiceSet.getTrip().getAfterShoppingAct().getCoord().
-					calcDistance(choiceSet.getChosenZHFacility().getExactPosition());
+					calcDistance(choiceSet.getChosenFacility().getFacility().getExactPosition());
 				
 				String location = choiceSet.getId().toString();
 				

@@ -39,6 +39,7 @@ import org.matsim.router.PlansCalcRoute;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.SpanningTree;
 import playground.anhorni.locationchoice.cs.helper.ZHFacilities;
+import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 
 /**
  * @author anhorni
@@ -72,11 +73,12 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			Controler controler) {
 			
 		NetworkLayer network = controler.getNetwork();
-		
-		Iterator<Id> link_it = this.facilities.getZhFacilitiesByLink().keySet().iterator();
-		while (link_it.hasNext()) {		
-			Id linkId = link_it.next();
+				
+		Iterator<ZHFacility> facilities_it = this.facilities.getZhFacilities().values().iterator();
+		while (facilities_it.hasNext()) {
+			ZHFacility facility = facilities_it.next();
 			
+			Id linkId = facility.getLinkId();
 			
 			//--------------------------------------------------
 			/*
@@ -137,12 +139,9 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 					Id lId = routeLinkAfter_it.next();
 					travelDist += network.getLink(lId).getLength();
 				}
-			}					
-			if (totalTravelTime <= choiceSet.getTravelTimeBudget()) {			
-				choiceSet.addFacilities(this.facilities.getFacilitiesByLinkId(linkId), totalTravelTime, travelDist);
 			}
-			else if (this.facilities.getFacilitiesByLinkId(linkId).contains(choiceSet.getChosenZHFacility())) {
-				choiceSet.addFacility(choiceSet.getChosenZHFacility(), totalTravelTime, travelDist);
+			if (totalTravelTime <= choiceSet.getTravelTimeBudget() || facility.getId().compareTo(choiceSet.getChosenFacilityId()) == 0) {			
+				choiceSet.addFacility(facility, totalTravelTime, travelDist);
 			}
 		}	
 	}

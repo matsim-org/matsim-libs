@@ -38,7 +38,8 @@ public class ExtractWalkChoiceSetsEllipse extends ChoiceSetExtractor {
 	
 	protected void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type,
 			Controler controler) {
-		
+
+/*
 		Coord referencePoint = choiceSet.getReferencePoint();			
 		double radius = choiceSet.getTravelTimeBudget()/2.0 * this.walkingSpeed;	
 		
@@ -55,6 +56,7 @@ public class ExtractWalkChoiceSetsEllipse extends ChoiceSetExtractor {
 		if (facilities != null) {
 			choiceSet.addFacilities(facilities, null, null);
 		}
+*/
 	}
 	
 	private boolean inEllipse(ZHFacility facility, ChoiceSet choiceSet) {

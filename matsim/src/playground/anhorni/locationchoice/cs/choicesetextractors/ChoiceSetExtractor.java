@@ -39,7 +39,7 @@ public abstract class ChoiceSetExtractor {
 			log.info(index + ": Choice set " + choiceSet.getId().toString() + ": " + choiceSet.getFacilities().size() + " alternatives");
 			index++;
 			
-			if (choiceSet.getTravelTime2ChosenFacility() > 8 * choiceSet.getTravelTimeBudget()) {	
+			if (choiceSet.getTravelTimeStartShopEnd(choiceSet.getChosenFacilityId()) > 8 * choiceSet.getTravelTimeBudget()) {	
 				choiceSets2Remove.add(choiceSet);			
 			}
 			

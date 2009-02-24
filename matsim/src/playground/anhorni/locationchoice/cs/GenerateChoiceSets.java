@@ -19,11 +19,11 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 
 import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractChoiceSetsRouting;
-import playground.anhorni.locationchoice.cs.filters.ActTypeAndAreaTripFilter;
-import playground.anhorni.locationchoice.cs.filters.TripFilter;
-import playground.anhorni.locationchoice.cs.filters.SampleDrawer;
-import playground.anhorni.locationchoice.cs.filters.SampleDrawerFixedSizeRandom;
-import playground.anhorni.locationchoice.cs.filters.SampleDrawerFixedSizeTravelCosts;
+import playground.anhorni.locationchoice.cs.depr.filters.ActTypeAndAreaTripFilter;
+import playground.anhorni.locationchoice.cs.depr.filters.SampleDrawer;
+import playground.anhorni.locationchoice.cs.depr.filters.SampleDrawerFixedSizeRandom;
+import playground.anhorni.locationchoice.cs.depr.filters.SampleDrawerFixedSizeTravelCosts;
+import playground.anhorni.locationchoice.cs.depr.filters.TripFilter;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.ZHFacilities;
 import playground.anhorni.locationchoice.cs.io.CSWriter;
@@ -140,6 +140,9 @@ public class GenerateChoiceSets {
 	 */
 	
 	public void setup() {
+		
+		this.zhFacilities = new ZHFacilities();
+		
 		//filters
 		ActTypeAndAreaTripFilter filterAreaAndType = new ActTypeAndAreaTripFilter(this.shapeFile, "s");
 		this.filter = filterAreaAndType;
@@ -149,7 +152,7 @@ public class GenerateChoiceSets {
 		new File(this.outdir +"shapefiles/singletrips").mkdir();
 		new File(this.outdir +"shapefiles/singlechoicesets").mkdir();
 		
-		ChoiceSetWriterSimple writer = new ChoiceSetWriterSimple(this.mode, this.walkCrowFly, this.zhFacilities);
+		ChoiceSetWriterSimple writer = new ChoiceSetWriterSimple(this.zhFacilities);
 		this.writers.add(writer);	
 		CSShapeFileWriter shpWriter = new CSShapeFileWriter();
 		this.writers.add(shpWriter);
@@ -157,7 +160,7 @@ public class GenerateChoiceSets {
 		TripStats tripStats = new TripStats(this.mode, this.walkCrowFly);
 		this.writers.add(tripStats);
 		
-		this.zhFacilities = new ZHFacilities();
+		
 		
 		// sampler
 		SampleDrawer sampleDrawer;

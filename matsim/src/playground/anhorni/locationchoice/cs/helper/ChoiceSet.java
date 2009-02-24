@@ -1,35 +1,26 @@
 package playground.anhorni.locationchoice.cs.helper;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import org.apache.log4j.Logger;
-import org.matsim.gbl.MatsimRandom;
+//import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.utils.geometry.CoordImpl;
-
-import playground.anhorni.locationchoice.cs.GenerateChoiceSets;
-
+import java.util.TreeMap;
 
 public class ChoiceSet {
 
 	private Id id = null;
 	private double travelTimeBudget = -1.0;
-	private Trip trip;
-	private ArrayList<ZHFacility> facilities = new ArrayList<ZHFacility>();
-	private ArrayList<Double> travelTimes2Facilities = new ArrayList<Double>();
-	private ArrayList<Double> travelDistances2Facilities = new ArrayList<Double>();
-	private ZHFacility chosenZHFacility;
+	private Trip trip;	
+	private TreeMap<Id, ChoiceSetFacility> choiceSetFacilities = new TreeMap<Id, ChoiceSetFacility>();
 	private PersonAttributes personAttributes;
+	private Id chosenFacilityId;
 		
-	public ChoiceSet(Id id, Trip trip) {
+	public ChoiceSet(Id id, Trip trip, Id chosenFacilityId) {
 		this.id = id;
-		this.trip = trip;		
+		this.trip = trip;	
+		this.chosenFacilityId = chosenFacilityId;
 	}
 	
-	private final static Logger log = Logger.getLogger(ChoiceSet.class);
+	//private final static Logger log = Logger.getLogger(ChoiceSet.class);
 	
 	public double getTravelTimeBudget() {
 		if (this.travelTimeBudget == -1.0) {
@@ -42,7 +33,82 @@ public class ChoiceSet {
 		}
 	}
 	
-	public Coord getReferencePoint() {
+	public TreeMap<Id, ChoiceSetFacility> getFacilities() {
+		return this.choiceSetFacilities;
+	}
+	
+	public void addFacility(ZHFacility facility, double traveltime, double traveldistance) {
+		if (!this.choiceSetFacilities.containsKey(facility.getId())) {
+			this.choiceSetFacilities.put(facility.getId(), new ChoiceSetFacility(facility, traveltime, traveldistance));
+		}		
+	}
+	
+	public int choiceSetSize() {
+		return this.choiceSetFacilities.size();
+	}
+	
+		
+	// -------------------------------------------------------------------------------------
+	public Id getId() {
+		return id;
+	}
+	public void setId(Id id) {
+		this.id = id;
+	}
+	public Trip getTrip() {
+		return trip;
+	}
+	public void setTrip(Trip trip) {
+		this.trip = trip;
+	}
+	public void setTravelTimeBudget(double travelTimeBudget) {
+		this.travelTimeBudget = travelTimeBudget;
+	}
+	public double getTravelTimeStartShopEnd(Id facilityId) {
+		return this.choiceSetFacilities.get(facilityId).getTravelTimeStartShopEnd();
+	}
+	public double getTravelDistanceStartShopEnd(Id facilityId) {
+		return this.choiceSetFacilities.get(facilityId).getTravelDistanceStartShopEnd();
+	}
+
+	public boolean zhFacilityIsInChoiceSet(Id facilityId) {
+		if (this.choiceSetFacilities.containsKey(facilityId)) return true;
+		else return false;
+	}
+
+	public PersonAttributes getPersonAttributes() {
+		return personAttributes;
+	}
+
+	public void setPersonAttributes(PersonAttributes personAttributes) {
+		this.personAttributes = personAttributes;
+	}
+	
+	public double calculateCrowFlyDistanceMapped(Coord mappedCoords) {
+		return this.trip.getBeforeShoppingAct().getCoord().calcDistance(mappedCoords) +
+			this.trip.getAfterShoppingAct().getCoord().calcDistance(mappedCoords);
+	}
+	
+	public double calculateCrowFlyDistanceExact(Coord exactCoords) {
+		return this.trip.getBeforeShoppingAct().getCoord().
+			calcDistance(exactCoords) +
+			this.trip.getAfterShoppingAct().getCoord().calcDistance(exactCoords);
+	}
+
+	public Id getChosenFacilityId() {
+		return this.chosenFacilityId;
+	}
+	
+	public ChoiceSetFacility getChosenFacility() {
+		return this.choiceSetFacilities.get(this.chosenFacilityId);
+	}
+}
+
+
+/*
+ * unused:
+ * 
+ * public Coord getReferencePoint() {
 		Coord referencePoint = null;
 		Coord coordStart = this.trip.getBeforeShoppingAct().getCoord();
 		Coord coordEnd = this.trip.getAfterShoppingAct().getCoord();
@@ -58,137 +124,10 @@ public class ChoiceSet {
 		}
 		return referencePoint;
 	}
-	
-	public ArrayList<ZHFacility> getFacilities() {
-		return facilities;
-	}
-
-
-	public void addFacility(ZHFacility facility, double traveltime, double traveldistance) {
-		if (!this.facilities.contains(facility)) {
-			this.facilities.add(facility);
-			this.travelTimes2Facilities.add(traveltime);
-			this.travelDistances2Facilities.add(traveldistance);
-		}		
-	}
-	public void addFacilities(ArrayList<ZHFacility> facilities, ArrayList<Double> traveltimes, ArrayList<Double> traveldistances) {
-		
-		int index = 0;
-		Iterator<ZHFacility> it = facilities.iterator();
-		while (it.hasNext()) {	
-			ZHFacility facility = it.next();
-			this.facilities.add(facility);
-			if (traveltimes != null) {
-				this.travelTimes2Facilities.add(traveltimes.get(index));
-			}
-			else {
-				this.travelTimes2Facilities.add(0.0);
-			}
-			if (traveldistances != null) {
-				this.travelDistances2Facilities.add(traveldistances.get(index));
-			}
-			else {
-				this.travelDistances2Facilities.add(0.0);
-			}
-			index++;
-		}
-	}
-	public void addFacilities(ArrayList<ZHFacility> facilities, double traveltime, double traveldistance) {		
-		ArrayList<Double> traveltimes = new ArrayList<Double>();
-		ArrayList<Double> traveldistances = new ArrayList<Double>();
-		for (int i = 0; i < facilities.size(); i++) {
-			traveltimes.add(traveltime);	
-			traveldistances.add(traveldistance);
-		}
-		this.addFacilities(facilities, traveltimes, traveldistances);
-	}
-	
-	public void removeFacility(int index) {
-		this.travelTimes2Facilities.trimToSize();
-		if (index >= 0 && index < this.facilities.size()) {
-			this.facilities.remove(index);
-			if (!travelTimes2Facilities.isEmpty()) {
-				this.travelTimes2Facilities.remove(index);
-			}
-			if (!travelDistances2Facilities.isEmpty()) {
-				this.travelDistances2Facilities.remove(index);
-			}
-		}
-		else {
-			log.info("Index out of range: " + index);
-		}
-	}
-	
-	public boolean removeFacility(Id id) {
-		Iterator<ZHFacility> it = this.facilities.iterator();
-		int counter = 0;
-		while (it.hasNext()) {		
-			if (it.next().getId().compareTo(id) == 0) {
-				removeFacility(counter);
-				return true;
-			}
-			counter++;
-		}	
-		return false;
-	}
-	public boolean removeFacilityRandomly() {		
-		this.facilities.trimToSize();
-		if (this.facilities.size() > 1) {
-			int index = MatsimRandom.random.nextInt(this.facilities.size());
-			this.removeFacility(index);
-			return true;
-		}
-		return false;
-	}
-	
-	public int choiceSetSize() {
-		return this.facilities.size();
-	}
-	
-	public int getFacilityIndexProbDependendOnTravelCost(Coord other, boolean crowFly) {
-		this.facilities.trimToSize();
-		
-		// TODO: sort by traveltime (crowfly);
-		this.sortByCrowFlyDistance(other);		
-		double [] accProbabilities;
-		
-		// traveltimes is empty for walk
-		if (crowFly || this.travelTimes2Facilities.isEmpty()) {
-			accProbabilities = assignAccProbabilitiesDependendOnCrowFlyDistance(other);
-		}
-		else {
-			accProbabilities = assignAccProbabilitiesDependendOnTravelTimes();
-		}
-		double val = MatsimRandom.random.nextDouble();
-		double last = 0.0;
-				
-		for (int i = 0; i < accProbabilities.length; i++) {
-			// >= and <= if first field has width = 0.0
-			if (val >= last && val <= accProbabilities[i]) {
-				return i;
-			}
-			last = accProbabilities[i];
-			//log.info("acc :" + accProbabilities[i]);
-		}	
-		// if accProbabalities not exactly summing up to 1 -> return last index;
-		return (this.facilities.size()-1);
-	}
-		
-	public ZHFacility getMostDistantFacility(Coord coord) {
-		Iterator<ZHFacility> it = this.facilities.iterator();
-		double tempMaxDist = 0.0;
-		ZHFacility mostDistantFacility = null;
-		while (it.hasNext()) {
-			ZHFacility facility = it.next();		
-			if (facility.getMappedPosition().calcDistance(coord) > tempMaxDist) {
-				mostDistantFacility = facility;
-			}
-		}	
-		return mostDistantFacility;
-	}
-	
-		
-	private double [] assignAccProbabilitiesDependendOnCrowFlyDistance(Coord other) {
+ * 
+ * 
+ * 
+ * private double [] assignAccProbabilitiesDependendOnCrowFlyDistance(Coord other) {
 		double totalDist = this.computeTotalCrowFlyDistance(other);
 		double [] accProbabilities = new double[this.facilities.size()];
 		boolean allAtTheSamePlace = false;
@@ -233,8 +172,81 @@ public class ChoiceSet {
 		}
 		return accProbabilities;
 	}
+ * 
+ * 
+ * 
+ * public void removeFacility(int index) {
+		this.travelTimes2Facilities.trimToSize();
+		if (index >= 0 && index < this.facilities.size()) {
+			this.facilities.remove(index);
+			if (!travelTimes2Facilities.isEmpty()) {
+				this.travelTimes2Facilities.remove(index);
+			}
+			if (!travelDistances2Facilities.isEmpty()) {
+				this.travelDistances2Facilities.remove(index);
+			}
+		}
+		else {
+			log.info("Index out of range: " + index);
+		}
+	}
 	
-	private double computeTotalTravelTime() {	
+	public boolean removeFacility(Id id) {
+		Iterator<ZHFacility> it = this.facilities.iterator();
+		int counter = 0;
+		while (it.hasNext()) {		
+			if (it.next().getId().compareTo(id) == 0) {
+				removeFacility(counter);
+				return true;
+			}
+			counter++;
+		}	
+		return false;
+	}
+	public boolean removeFacilityRandomly() {		
+		this.facilities.trimToSize();
+		if (this.facilities.size() > 1) {
+			int index = MatsimRandom.random.nextInt(this.facilities.size());
+			this.removeFacility(index);
+			return true;
+		}
+		return false;
+	}
+	
+	
+	
+	public int getFacilityIndexProbDependendOnTravelCost(Coord other, boolean crowFly) {
+		this.facilities.trimToSize();
+		
+		// TODO: sort by traveltime (crowfly);
+		this.sortByCrowFlyDistance(other);		
+		double [] accProbabilities;
+		
+		// traveltimes is empty for walk
+		if (crowFly || this.travelTimes2Facilities.isEmpty()) {
+			accProbabilities = assignAccProbabilitiesDependendOnCrowFlyDistance(other);
+		}
+		else {
+			accProbabilities = assignAccProbabilitiesDependendOnTravelTimes();
+		}
+		double val = MatsimRandom.random.nextDouble();
+		double last = 0.0;
+				
+		for (int i = 0; i < accProbabilities.length; i++) {
+			// >= and <= if first field has width = 0.0
+			if (val >= last && val <= accProbabilities[i]) {
+				return i;
+			}
+			last = accProbabilities[i];
+			//log.info("acc :" + accProbabilities[i]);
+		}	
+		// if accProbabalities not exactly summing up to 1 -> return last index;
+		return (this.facilities.size()-1);
+	}
+	
+	
+	
+		private double computeTotalTravelTime() {	
 		double totalTravelTime = 0.0;
 		for (int i = 0; i < this.travelTimes2Facilities.size(); i++) {
 			totalTravelTime += travelTimes2Facilities.get(i);
@@ -259,63 +271,18 @@ public class ChoiceSet {
 		Collections.sort(this.facilities, distanceComparator);
 	}
 	
-	// -------------------------------------------------------------------------------------
-	public Id getId() {
-		return id;
-	}
-	public void setId(Id id) {
-		this.id = id;
-	}
-	public Trip getTrip() {
-		return trip;
-	}
-	public void setTrip(Trip trip) {
-		this.trip = trip;
-	}
-	public void setTravelTimeBudget(double travelTimeBudget) {
-		this.travelTimeBudget = travelTimeBudget;
-	}
-	public double getTravelTime(ZHFacility facility) {
-		int facilityIndex = this.facilities.indexOf(facility);
-		return this.travelTimes2Facilities.get(facilityIndex);
-	}
-	public double getTravelDistance(ZHFacility facility) {
-		int facilityIndex = this.facilities.indexOf(facility);
-		return this.travelDistances2Facilities.get(facilityIndex);
-	}
-
-	public ZHFacility getChosenZHFacility() {
-		return chosenZHFacility;
-	}
-
-	public void setChosenZHFacility(ZHFacility chosenZHFacility) {
-		this.chosenZHFacility = chosenZHFacility;
-	}
-	public double getTravelTime2ChosenFacility() {
-		int index = this.facilities.indexOf(this.chosenZHFacility);
-		return this.travelTimes2Facilities.get(index);	
-	}
-	public boolean zhFacilityIsInChoiceSet(ZHFacility facility) {
-		if (this.facilities.contains(facility)) return true;
-		else return false;
-	}
-
-	public PersonAttributes getPersonAttributes() {
-		return personAttributes;
-	}
-
-	public void setPersonAttributes(PersonAttributes personAttributes) {
-		this.personAttributes = personAttributes;
+	
+		public ZHFacility getMostDistantFacility(Coord coord) {
+		Iterator<ZHFacility> it = this.facilities.iterator();
+		double tempMaxDist = 0.0;
+		ZHFacility mostDistantFacility = null;
+		while (it.hasNext()) {
+			ZHFacility facility = it.next();		
+			if (facility.getMappedPosition().calcDistance(coord) > tempMaxDist) {
+				mostDistantFacility = facility;
+			}
+		}	
+		return mostDistantFacility;
 	}
 	
-	public double calculateCrowFlyDistanceMapped(Coord mappedCoords) {
-		return this.trip.getBeforeShoppingAct().getCoord().calcDistance(mappedCoords) +
-			this.trip.getAfterShoppingAct().getCoord().calcDistance(mappedCoords);
-	}
-	
-	public double calculateCrowFlyDistanceExact(Coord exactCoords) {
-		return this.trip.getBeforeShoppingAct().getCoord().
-			calcDistance(exactCoords) +
-			this.trip.getAfterShoppingAct().getCoord().calcDistance(exactCoords);
-	}	
-}
+ */

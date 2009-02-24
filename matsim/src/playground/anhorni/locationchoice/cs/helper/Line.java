@@ -2,6 +2,7 @@ package playground.anhorni.locationchoice.cs.helper;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -88,11 +89,7 @@ public class Line {
 	public Trip getTrip() {
 		return this.tripHandler.getTrip();
 	}
-	
-	public ZHFacility getChosenZHFacility() {
-		return this.tripHandler.getChosenZHFacility();
-	}
-	
+		
 	public double getTravelTimeBudget() {
 		return this.tripHandler.getTravelTimeBudget();
 	}
@@ -191,4 +188,7 @@ public class Line {
 	public void setPersonAttributes(PersonAttributes personAttributes) {
 		this.personAttributes = personAttributes;
 	}	
+	public Id getChosenFacilityId() {
+		return this.tripHandler.getChosenFacilityId();
+	}
 }

@@ -84,9 +84,8 @@ public class NelsonTripReader {
 				}
 				
 				line.constructTrip(entries, network, this.facilities, mzTrip);
-				ChoiceSet choiceSet = new ChoiceSet(new IdImpl(line.getTripId()), line.getTrip());
+				ChoiceSet choiceSet = new ChoiceSet(new IdImpl(line.getTripId()), line.getTrip(), line.getChosenFacilityId());
 				choiceSet.setPersonAttributes(line.getPersonAttributes());
-				choiceSet.setChosenZHFacility(line.getChosenZHFacility());
 				choiceSet.setTravelTimeBudget(line.getTravelTimeBudget());
 				
 				// filter trips 55534012 and 56751011 (fehlende Geodaten)

@@ -1,22 +1,20 @@
 package playground.anhorni.locationchoice.cs.helper;
 
-
-import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.utils.geometry.CoordImpl;
 
-
 public class ReaderTripHandler {
 	
 	private final static Logger log = Logger.getLogger(ReaderTripHandler.class);
-	private ZHFacility chosenZHFacility;
 	private Trip trip;
 	private double travelTimeBudget;
+	private Id chosenFacilityId;
 	
 
 	public void constructTrip(String [] entries, NetworkLayer network, ZHFacilities facilities, 
@@ -30,16 +28,11 @@ public class ReaderTripHandler {
 		beforeShoppingAct.setEndTime(endTimeBeforeShoppingAct);
 		beforeShoppingAct.setLink(network.getNearestLink(beforeShoppingCoord));
 		
-		
-		Link link = null;
-		Iterator<ZHFacility> facilities_it = facilities.getZhFacilities().values().iterator();
-		while (facilities_it.hasNext()) {		
-			ZHFacility facility = facilities_it.next();	
-			if (facility.getId().compareTo(new IdImpl(entries[2].trim())) == 0) {
-				link = network.getLink(facility.getLinkId());
-				this.chosenZHFacility = facility;
-			}
-		}
+		Id chosenFacilityId = new IdImpl(entries[2].trim());
+	
+		ZHFacility chosenFacility = facilities.getZhFacilities().get(chosenFacilityId);
+		Link link = network.getLink(chosenFacility.getLinkId());
+
 		Act shoppingAct = new Act("shop", link);
 		shoppingAct.setCoord(link.getCenter());
 		
@@ -47,7 +40,9 @@ public class ReaderTripHandler {
 		shoppingAct.setStartTime(startTimeShoppingAct);
 		double endTimeShoppingAct = mzTrip.getStartTime();
 		shoppingAct.setEndTime(endTimeShoppingAct);
-				
+		
+		this.chosenFacilityId = chosenFacilityId;
+			
 		Coord afterShoppingCoord = mzTrip.getCoord();
 		Act afterShoppingAct = new Act("end", afterShoppingCoord);
 		afterShoppingAct.setLink(network.getNearestLink(afterShoppingCoord));
@@ -63,28 +58,21 @@ public class ReaderTripHandler {
 		Trip trip = new Trip(tripNr, beforeShoppingAct, shoppingAct, afterShoppingAct);
 		this.trip = trip;
 	}
-
-
-	public ZHFacility getChosenZHFacility() {
-		return chosenZHFacility;
-	}
-	public void setChosenZHFacility(ZHFacility chosenZHFacility) {
-		this.chosenZHFacility = chosenZHFacility;
-	}
+	
 	public Trip getTrip() {
 		return trip;
 	}
 	public void setTrip(Trip trip) {
 		this.trip = trip;
 	}
-
-
 	public double getTravelTimeBudget() {
 		return travelTimeBudget;
 	}
-
-
 	public void setTravelTimeBudget(double travelTimeBudget) {
 		this.travelTimeBudget = travelTimeBudget;
+	}
+
+	public Id getChosenFacilityId() {
+		return chosenFacilityId;
 	}	
 }

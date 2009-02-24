@@ -20,7 +20,8 @@ import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileWriter;
 import com.vividsolutions.jts.geom.Point;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
-import playground.anhorni.locationchoice.cs.helper.ZHFacility;
+import playground.anhorni.locationchoice.cs.helper.ChoiceSetFacility;
+
 
 public class CSShapeFileWriter extends CSWriter {
 
@@ -49,11 +50,13 @@ public class CSShapeFileWriter extends CSWriter {
 		Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
 		while (choiceSet_it.hasNext()) {
 			ChoiceSet choiceSet = choiceSet_it.next();
-			ArrayList<ZHFacility> facilities = choiceSet.getFacilities();
 			
 			ArrayList<Feature> singleFeatures = new ArrayList<Feature>();
-			for (int i = 0; i < facilities.size(); i++) {
-				Coord coord = new CoordImpl(facilities.get(i).getMappedPosition().getX(), facilities.get(i).getMappedPosition().getY());
+			Iterator<ChoiceSetFacility> choiceSetFacilities_it = choiceSet.getFacilities().values().iterator();
+			while (choiceSetFacilities_it.hasNext()) {
+				ChoiceSetFacility choiceSetFacility = choiceSetFacilities_it.next();
+				Coord coord = new CoordImpl(choiceSetFacility.getFacility().getMappedPosition().getX(), 
+						choiceSetFacility.getFacility().getMappedPosition().getY());
 				
 				Feature feature = this.createFeature(coord, choiceSet.getId());
 				features.add(feature);
