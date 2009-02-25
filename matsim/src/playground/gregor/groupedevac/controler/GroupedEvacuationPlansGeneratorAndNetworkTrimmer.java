@@ -102,14 +102,14 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 			leg.setArrivalTime(0.0);
 			plan.addLeg(leg);
 
-			Act actB = new Act("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
+			Act actB = new org.matsim.population.ActImpl("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
 			plan.addAct(actB);
 
 			router.run(plan);
 			
 			Link el = getEvacLink(leg);
 			Leg eLeg = getELeg(leg);
-			Act actEvac = new Act("h",el);
+			Act actEvac = new org.matsim.population.ActImpl("h",el);
 			
 			plan.removeAct(2);
 			plan.addLeg(eLeg);

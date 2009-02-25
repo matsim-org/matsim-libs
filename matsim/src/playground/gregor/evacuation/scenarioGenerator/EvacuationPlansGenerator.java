@@ -111,7 +111,7 @@ public class EvacuationPlansGenerator {
 			leg.setArrivalTime(0.0);
 			plan.addLeg(leg);
 
-			Act actB = new Act("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
+			Act actB = new org.matsim.population.ActImpl("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
 			plan.addAct(actB);
 
 			router.run(plan);

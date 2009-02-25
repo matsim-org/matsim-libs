@@ -17,7 +17,7 @@ public class MyObject implements BasicLink,BasicAct {
 	
 	LinkImpl basicLink = new LinkImpl(null, null, null, null, 0, 0, 0, 0) ;
 	
-	Act basicAct = new Act("h", basicLink);
+	Act basicAct = new org.matsim.population.ActImpl("h", basicLink);
 
 	public final void addDownMapping(Location other) {
 		basicLink.addDownMapping(other);

@@ -39,6 +39,7 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.Planomat;
 import org.matsim.population.Act;
+import org.matsim.population.ActImpl;
 import org.matsim.population.Leg;
 import org.matsim.population.LegImpl;
 import org.matsim.population.Plan;
@@ -503,7 +504,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					Act act1 = (Act)(actslegs.get(planRunningPos));
 					if (act0.getType()!=act1.getType()){
 							
-						Act actHelp = new Act ((Act)(actslegs.get(planBasePos)));
+						Act actHelp = new ActImpl ((Act)(actslegs.get(planBasePos)));
 						
 						actslegs.set(planBasePos, actslegs.get(planRunningPos));
 						actslegs.set(planRunningPos, actHelp);
@@ -617,7 +618,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			((Act)actslegs.get(0)).setDuration(12*3600);
 			((Act)actslegs.get(0)).setEndTime(12*3600);
 			
-			Act actHelp = new Act ((Act)(actslegs.get((0))));
+			Act actHelp = new ActImpl ((Act)(actslegs.get((0))));
 			actHelp.setDuration(12*3600);
 			actHelp.setEndTime(24*3600);
 			actHelp.setStartTime(12*3600);
@@ -876,7 +877,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		ArrayList<Object> actslegs = basePlan.getActsLegs();
 		//Act actHelp = new Act ((Act)(actslegs.get((position*2)-2))); //changed the actHelp position to the act "behind" the gap because of conflict with location choice (would otherwise see it as primary activity)
-		Act actHelp = new Act ((Act)(actslegs.get((position*2))));
+		Act actHelp = new ActImpl ((Act)(actslegs.get((position*2))));
 		actHelp.setDuration(0);
 		actHelp.setEndTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
 		actHelp.setStartTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());

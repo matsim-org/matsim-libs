@@ -625,12 +625,12 @@ public class Flow {
 					//Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 					leg.setRoute(route);
 					BasicActImpl home = new BasicActImpl("h");
-					//Act home = new Act("h", path.getPathEdges().getFirst().getEdge());
+					//Act home = new org.matsim.population.ActImpl("h", path.getPathEdges().getFirst().getEdge());
 					home.setEndTime(0);
 					home.setCoord(path.getPathEdges().getFirst().getEdge().getFromNode().getCoord());
 					home.setEndTime(path.getPathEdges().getFirst().getTime());
 					BasicActImpl work = new BasicActImpl("w");
-					//Act work = new Act("w", path.getPathEdges().getLast().getEdge());
+					//Act work = new org.matsim.population.ActImpl("w", path.getPathEdges().getLast().getEdge());
 					work.setEndTime(0);
 					work.setCoord(path.getPathEdges().getLast().getEdge().getToNode().getCoord());
 					Link fromlink =path.getPathEdges().getFirst().getEdge();
@@ -658,19 +658,19 @@ public class Flow {
 					Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 					leg.setRoute(route);
 					//BasicActImpl home = new BasicActImpl("h");
-					Act home = new Act("h", path.getPathEdges().getFirst().getEdge());
+					Act home = new org.matsim.population.ActImpl("h", path.getPathEdges().getFirst().getEdge());
 					home.setEndTime(0);
 					home.setCoord(path.getPathEdges().getFirst().getEdge().getFromNode().getCoord());
 					home.setEndTime(path.getPathEdges().getFirst().getTime());
 					//BasicActImpl work = new BasicActImpl("w");
-					Act work = new Act("w", path.getPathEdges().getLast().getEdge());
+					Act work = new org.matsim.population.ActImpl("w", path.getPathEdges().getLast().getEdge());
 					work.setEndTime(0);
 					work.setCoord(path.getPathEdges().getLast().getEdge().getToNode().getCoord());
 					Link fromlink =path.getPathEdges().getFirst().getEdge();
 					Link tolink =path.getPathEdges().getLast().getEdge();
 					
-					home.setLinkId(fromlink.getId());
-					work.setLinkId(tolink.getId());
+					home.setLink(fromlink);
+					work.setLink(tolink);
 					for (int i =1 ; i<= nofpersons;i++){
 						Id matsimid  = new IdImpl(id);
 						Person p = new PersonImpl(matsimid);

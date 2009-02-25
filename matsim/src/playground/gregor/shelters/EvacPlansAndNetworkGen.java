@@ -93,7 +93,7 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);
 			plan.addLeg(leg);
-			Act act = new Act("evacuated",fac);
+			Act act = new org.matsim.population.ActImpl("evacuated",fac);
 			person.getKnowledge().addActivity(fac.getActivity("evacuated"),false);
 						
 			

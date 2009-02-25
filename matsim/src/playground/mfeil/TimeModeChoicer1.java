@@ -27,6 +27,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Act;
+import org.matsim.population.ActImpl;
 import org.matsim.population.Leg;
 import org.matsim.population.LegImpl;
 import org.matsim.population.Plan;
@@ -856,7 +857,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				try {
 					if (i % 2 == 0) {
 						// Activity
-						Act a = new Act ((Act)in.get(i));
+						Act a = new ActImpl ((Act)in.get(i));
 						out.add(a);
 					} else {
 						// Leg

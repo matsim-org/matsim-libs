@@ -165,7 +165,7 @@ public class PTRouter2 {
 	}
 	
 	private Act newPTAct(Coord coord, Link link, double startTime, double dur, double endTime){
-		Act ptAct= new Act("Wait PT Vehicle", coord);
+		Act ptAct= new org.matsim.population.ActImpl("Wait PT Vehicle", coord);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
 		//ptAct.setDuration(dur);   deprecated

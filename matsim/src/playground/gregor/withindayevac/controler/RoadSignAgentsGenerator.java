@@ -58,14 +58,14 @@ public class RoadSignAgentsGenerator {
 			
 			for (Link dest : node.getOutLinks().values()){
 				Plan plan  = new org.matsim.population.PlanImpl(p);
-				Act actA = new Act("h", link.getCenter(), link);
+				Act actA = new org.matsim.population.ActImpl("h", link.getCenter(), link);
 				actA.setEndTime(3600 * 3 - 2);
 				Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 				leg.setNum(0);
 				leg.setDepartureTime(0.0);
 				leg.setTravelTime(0.0);
 				leg.setArrivalTime(0.0);
-				Act actB = new Act("h",dest.getCenter(), dest);
+				Act actB = new org.matsim.population.ActImpl("h",dest.getCenter(), dest);
 				plan.addAct(actA);
 				plan.addLeg(leg);
 				plan.addAct(actB);

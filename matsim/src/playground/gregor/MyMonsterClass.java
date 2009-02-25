@@ -318,7 +318,7 @@ public class MyMonsterClass {
 			}
 
 
-			Act nact = new Act("w", act.getLink().getCenter(), act.getLink());
+			Act nact = new org.matsim.population.ActImpl("w", act.getLink().getCenter(), act.getLink());
 			nact.setStartTime(0);
 			nact.setEndTime(39600);
 			nact.setDuration(39600);

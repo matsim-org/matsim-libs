@@ -57,14 +57,14 @@ public class GuideAgentsGenerator {
 			Id id = new IdImpl("guide" + count++);
 			Person p = new PersonImpl(id);
 			Plan plan  = new org.matsim.population.PlanImpl(p);
-			Act actA = new Act("h", new CoordImpl(12000.0, -12000.0), l);
+			Act actA = new org.matsim.population.ActImpl("h", new CoordImpl(12000.0, -12000.0), l);
 			actA.setEndTime(3600 * 3);
 			Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 			leg.setNum(0);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);
-			Act actB = new Act("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
+			Act actB = new org.matsim.population.ActImpl("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
 			plan.addAct(actA);
 			plan.addLeg(leg);
 			plan.addAct(actB);

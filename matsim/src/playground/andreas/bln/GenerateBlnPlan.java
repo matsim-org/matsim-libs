@@ -162,9 +162,9 @@ public class GenerateBlnPlan {
 
 						// set every non home activity to work
 //						if (data[10].equalsIgnoreCase("WAHR")){
-//							newAct = new Act("home", new CoordImpl(Double.parseDouble(data[11]), Double.parseDouble(data[12])));
+//							newAct = new org.matsim.population.ActImpl("home", new CoordImpl(Double.parseDouble(data[11]), Double.parseDouble(data[12])));
 //						} else {
-//							newAct = new Act("work", new CoordImpl(Double.parseDouble(data[11]), Double.parseDouble(data[12])));
+//							newAct = new org.matsim.population.ActImpl("work", new CoordImpl(Double.parseDouble(data[11]), Double.parseDouble(data[12])));
 //						}
 						
 						// Register ModalSplit
@@ -252,7 +252,7 @@ public class GenerateBlnPlan {
 							actType = "not defined";
 						}
 						
-						newAct = new Act(actType, new CoordImpl(Double.parseDouble(data[11]), Double.parseDouble(data[12])));
+						newAct = new org.matsim.population.ActImpl(actType, new CoordImpl(Double.parseDouble(data[11]), Double.parseDouble(data[12])));
 				
 						numberOfTripsUsed++;
 

@@ -326,7 +326,7 @@ public class PTActWriter {
 	}//insert
 	
 	private Act newPTAct(String type, Coord coord, Link link, double startTime, double dur, double endTime){
-		Act ptAct= new Act(type, coord);
+		Act ptAct= new org.matsim.population.ActImpl(type, coord);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
 		//ptAct.setDuration(dur); Deprecated?

@@ -122,7 +122,7 @@ System.out.println(count);
 //		pers.removeWorstPlans(this.maxPlans-1);
 		Plan plan = new org.matsim.population.PlanImpl(pers);
 		Act oldA = pers.getSelectedPlan().getFirstActivity();
-		Act a = new Act(oldA);
+		Act a = new org.matsim.population.ActImpl(oldA);
 		a.setType("h");
 		Leg oldLeg = pers.getSelectedPlan().getNextLeg(oldA);
 		Leg l = new org.matsim.population.LegImpl(oldLeg.getMode());
@@ -132,7 +132,7 @@ System.out.println(count);
 		l.setArrivalTime(oldLeg.getArrivalTime());
 		
 		Act oldB = pers.getSelectedPlan().getNextActivity(oldLeg);
-		Act b = new Act(oldB);
+		Act b = new org.matsim.population.ActImpl(oldB);
 		plan.addAct(a);
 		CarRoute route = new NodeCarRoute();
 		route.setNodes(nodes);

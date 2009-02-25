@@ -158,7 +158,6 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 					Act lastAct = (Act) newPlan.getActsLegs().get(newPlan.getActsLegs().size()-1);
 //					Act lastAct = (Act) plan.getActsLegs().get(plan.getActsLegs().size()-1);
 					lastAct.setLink(f.getLink());
-					lastAct.setLinkId(f.getLink().getId());
 					lastAct.setCoord(f.getCenter());
 					lastAct.setFacility(f);
 				}
@@ -166,14 +165,12 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 				if(newAct.getType() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getType() && newAct.getLink() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getLink()){
 					Act firstAct = (Act) newPlan.getFirstActivity();
 					firstAct.setLink(f.getLink());
-					firstAct.setLinkId(f.getLink().getId());
 					firstAct.setCoord(f.getCenter());
 					firstAct.setFacility(f);
 				}
 				// Change the activity
 //				System.out.println("  ##### Act "+newAct.getRefId()+" of type "+newAct.getType()+" ID "+newAct.getLink().getId()+" was changed for person "+plan.getPerson().getId()+" to "+fFromKnowledge.getLink().getId());
 				newAct.setLink(f.getLink());
-				newAct.setLinkId(f.getLink().getId());
 				newAct.setCoord(f.getCenter());
 				newAct.setFacility(f);
 				changed = true;

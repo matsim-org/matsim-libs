@@ -63,14 +63,14 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 
 	public final Act createAct(final String type, final Coord coord) throws IllegalStateException {
 		verifyCreateAct(Time.UNDEFINED_TIME);
-		Act a = new Act(type, coord);
+		Act a = new ActImpl(type, coord);
 		this.actsLegs.add(a);
 		return a;
 	}
 
 	public final Act createAct(final String type, final Facility fac) throws IllegalStateException {
 		verifyCreateAct(Time.UNDEFINED_TIME);
-		Act a = new Act(type, fac);
+		Act a = new ActImpl(type, fac);
 		this.actsLegs.add(a);
 		return a;
 	}
@@ -78,7 +78,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 
 	public final Act createAct(final String type, final Link link) throws IllegalStateException {
 		verifyCreateAct(Time.UNDEFINED_TIME);
-		Act a = new Act(type, link);
+		Act a = new ActImpl(type, link);
 		this.actsLegs.add(a);
 		return a;
 	}
@@ -247,7 +247,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 				if (i % 2 == 0) {
 					// activity
 					Act a = (Act)actl.get(i);
-					this.actsLegs.add(new Act(a));
+					this.actsLegs.add(new ActImpl(a));
 				} else {
 					// Leg
 					Leg l = (Leg) actl.get(i);
