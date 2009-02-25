@@ -49,8 +49,10 @@ public interface BasicAct {
 	public void setStartTime(double seconds);
 
 	public Id getLinkId();
+	// TODO: Does this really make sense without a setter?
 
 	public Id getFacilityId();
+	// TODO: Does this really make sense without a setter?
 
 	@Deprecated
 	public double getDuration();

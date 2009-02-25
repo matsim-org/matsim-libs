@@ -5,16 +5,13 @@ import java.util.*;
 import org.apache.log4j.Logger;
 
 // ok:
-import org.matsim.basic.v01.*;
-import org.matsim.controler.ScenarioData;
-import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.*;
-import org.matsim.network.Link;
 
 // not ok:
+//import org.matsim.basic.v01.*;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.events.*;
 import org.matsim.events.handler.*;
-import org.matsim.utils.geometry.CoordImpl;
 
 @SuppressWarnings("unused")
 public class MentalModule implements 

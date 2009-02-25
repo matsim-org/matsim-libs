@@ -62,6 +62,7 @@ public interface BasicPerson<T extends BasicPlan, K extends BasicKnowledge> {
 	public String getEmployed();
 
 	public boolean isEmployed();
+	// TODO [kn]: need setter
 
 	public void setAge(final int age);
 
@@ -82,8 +83,10 @@ public interface BasicPerson<T extends BasicPlan, K extends BasicKnowledge> {
 
 	public TreeSet<String> getTravelcards();
 
+	@Deprecated // not yet well enough understood
 	public K getKnowledge();
 
+	@Deprecated // not yet well enough understood
 	public Desires getDesires();
 
 	public Id getFiscalHouseholdId();

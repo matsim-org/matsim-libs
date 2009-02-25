@@ -41,7 +41,7 @@ public interface BasicNetwork<N extends BasicNode, L extends BasicLink> {
      *
      * @return a set of this network's nodes
      */
-		public Map<Id, N> getNodes();
+    public Map<Id, N> getNodes();
 
     /**
      * Returns a set of this network's links. This set might be empty, but it

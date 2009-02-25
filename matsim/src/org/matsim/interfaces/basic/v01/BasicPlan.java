@@ -46,6 +46,7 @@ public interface BasicPlan {
 	 */
 	@Deprecated
 	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED}
+	// TODO [kai] would like to add "UNKNOWN" (not same as "UNDEFINED")
 	
 	public double getScore();
 

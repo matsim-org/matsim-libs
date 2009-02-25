@@ -29,9 +29,8 @@ import java.util.Map;
 */
 
 public interface BasicPopulation<T extends BasicPerson> {
-	// TODO [kai] Ich bin, wie diskutiert, für Umbenennung in "BasicPersons".
-	// Andererseits habe ich den Eindruck, dass das vielleicht eher egal ist ("Population" hat den Vorteil, dass man
-	// in den Container tendenziell auch noch andere Dinge einhängen könnte ...)
+	// Bin inzwischen der Meinung, dass wir es bei "population" lassen sollten, und dafür "households" 
+	// noch einhängen sollten.  kai, feb09
 
 	public String getName();
 	
@@ -47,4 +46,10 @@ public interface BasicPopulation<T extends BasicPerson> {
 	public T getPerson(String personId);
 
 	public BasicPopulationBuilder getPopulationBuilder();
+	
+	// TODO:
+
+//	public Map<Id,?> getHouseholds() ;
+//  public void addHousehold( ?? ) ;
+	
 }
