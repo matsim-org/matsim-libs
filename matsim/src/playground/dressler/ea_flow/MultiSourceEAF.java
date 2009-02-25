@@ -132,7 +132,7 @@ public class MultiSourceEAF {
 			
 			//set debuging modes
 			MultiSourceEAF.debug(true);
-			BellmanFordVertexIntervalls.debug(false);
+			BellmanFordVertexIntervalls.debug(0);
 			VertexIntervalls.debug(false);
 			//VertexIntervall.debug(false);
 			EdgeIntervalls.debug(false);

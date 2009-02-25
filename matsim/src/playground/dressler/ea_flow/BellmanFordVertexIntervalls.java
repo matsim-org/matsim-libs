@@ -79,27 +79,11 @@ public class BellmanFordVertexIntervalls {
 	private final Node _sink;
 
 	/**
-	 * debug flag
+	 * debug variable, the higher the value the more it tells
 	 */
-	private static boolean _debug=false;
+	private static int _debug=0;
 
 	//--------------------CONSTRUCTORS-------------------------------------//
-	
-	/**
-	 * Constructor
-	 * @param network network used for calculations
-	 * @param flow data structure to hold the flow on the network, must be initialized
-	 * @param timeHorizon maximal time allowed to be used
-	 * @param sink node to which demands are routed
-	 *//*
-	public BellmanFordVertexIntervalls(final NetworkLayer network,
-			HashMap<Link, EdgeIntervalls> flow, int timeHorizon,Node sink) {
-		this.network = network;
-		this._flowlabels = flow;
-		this._timehorizon = timeHorizon;
-		this._sink = sink;
-		this._labels = new HashMap<Node, VertexIntervalls>();
-	}*/
 	
 	/**
 	 * Constructor using all the data initialized in the Flow object use recommended
@@ -117,10 +101,10 @@ public class BellmanFordVertexIntervalls {
 	
 	
 	/**
-	 * Setter for debug mode
-	 * @param debug true is debug mode is on
+	 * Setter for debug mode the higher the value the more it tells
+	 * @param debug > 0 is debug mode is on
 	 */
-	public static void debug(boolean debug){
+	public static void debug(int debug){
 		BellmanFordVertexIntervalls._debug = debug;
 	}
 	
@@ -147,7 +131,7 @@ public class BellmanFordVertexIntervalls {
 	 * @return true if there is still demand on the node
 	 */
 	private boolean isActiveSource(Node node) {
-		if(_debug){
+		if(_debug>3){
 			System.out.println(node.getId() + " active:" + this._flow.isActiveSource(node));
 		}
 		return this._flow.isActiveSource(node);
@@ -226,7 +210,7 @@ public class BellmanFordVertexIntervalls {
 			i = labelfrom.getIntervallAt(t);
 			t=i.getHighBound();
 			if(i.getDist()){
-				if(_debug){
+				if(_debug>0){
 					System.out.println("wir kommen los:"+ from.getId());
 				}	//TODO cast to int capacity handling!!!
 				if((int)over.getCapacity(1.)==0){
@@ -234,7 +218,7 @@ public class BellmanFordVertexIntervalls {
 				}
 				ArrayList<Intervall> arrive = flowover.propagate(i, (int)over.getCapacity(1.),forward);
 				if(!arrive.isEmpty()){
-					if(_debug){
+					if(_debug>0){
 						System.out.println("wir kommen weiter: "+ to.getId());
 						for(Intervall inter: arrive){
 							System.out.println(forward);
@@ -246,7 +230,7 @@ public class BellmanFordVertexIntervalls {
 						changed = true;
 					}
 				}else{
-					if(_debug){
+					if(_debug>0){
 						System.out.println("edge: " + over.getId() +" forward:"+forward+ " blocked " + flowover.toString());
 					}	
 				}
@@ -299,11 +283,11 @@ public class BellmanFordVertexIntervalls {
 					queue.add(w);
 				}
 			}
-			if(_debug){
+			if(_debug>0){
 				printStatus();
 			}
 		}
-		if (_debug) {
+		if (_debug>0) {
 		  System.out.println("Removed " + gain + " intervals.");
 		}
 		//System.out.println("finale labels: \n");
