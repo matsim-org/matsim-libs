@@ -79,6 +79,13 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 		for (Link link : this.network.getLinks().values()) {
 			TravelTimeData r = getTravelTimeRole(link);
 			r.resetTravelTimes();
+			/*
+			 * 	lazy initialization of travel time data would be:
+			 *	if (r != null) {
+			 *		r.resetTravelTimes();
+			 *	}
+			 *	(konrad/25feb2009)
+			 */
 		}
 		this.enterEvents.clear();
 	}
@@ -107,6 +114,16 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 			if (event.link == null) event.link = this.network.getLink(event.linkId);
 			if (event.link != null) {
 				this.aggregator.addTravelTime(getTravelTimeRole(event.link),e.time,event.time);
+				/*
+				* 	lazy initialization of travel time data would be:
+				* 	TravelTimeRole r = getTravelTimeRole(event.link);
+				* 	if (r == null) {
+				*		r = this.factory.createTravelTimeRole(event.link, this.numSlots);
+				*		this.linkData.put(event.link, r);
+				*	}
+				*	this.aggregator.addTravelTime(r,e.time,event.time);
+				*	(konrad/25feb2009)
+				*/
 
 			}
 		}
@@ -125,6 +142,16 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 			if (event.link == null) event.link = this.network.getLink(event.linkId);
 			if (event.link != null) {
 				this.aggregator.addStuckEventTravelTime(getTravelTimeRole(event.link),e.time,event.time);
+				/*
+				* 	lazy initialization of travel time data would be:
+				* 	TravelTimeRole r = getTravelTimeRole(event.link);
+				* 	if (r == null) {
+				*		r = this.factory.createTravelTimeRole(event.link, this.numSlots);
+				*		this.linkData.put(event.link, r);
+				*	}
+				*	this.aggregator.addStuckEventTravelTime(r,e.time,event.time);
+				*	(konrad/25feb2009)
+				*/
 			}
 		}
 	}
@@ -136,10 +163,26 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 			this.linkData.put(link, r);
 		}
 		return r;
+		/*
+		 * lazy initialization of travel time data would be:
+		 * return this.linkData.get(link);
+		 *	(konrad/25feb2009)
+		 */
+		
 	}
 
 	public double getLinkTravelTime(final Link link, final double time) {
 		return this.aggregator.getTravelTime(getTravelTimeRole(link), time); 
+		/*
+		 * lazy initialization of travel time data would be:
+		 * 		TravelTimeRole r = getTravelTimeRole(link);
+		 * 		if (r == null) {
+		 *		r = this.factory.createTravelTimeRole(link, this.numSlots);
+		 *			this.linkData.put(link, r);
+		 *		}
+		 *		return this.aggregator.getTravelTime(r, time); 
+		 *	(konrad/25feb2009)
+ 		 */
 	}
 
 	private static class EnterEvent {
