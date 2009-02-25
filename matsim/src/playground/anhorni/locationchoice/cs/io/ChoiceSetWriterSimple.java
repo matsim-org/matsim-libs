@@ -25,9 +25,13 @@ public class ChoiceSetWriterSimple extends CSWriter {
 		
 		this.writeNumberOfAlternatives(outdir, name, choiceSets);
 		
-		this.writeRoundTripIndetermediateStop(outdir, name, choiceSets, 0);
-		this.writeRoundTripIndetermediateStop(outdir, name +"_RoundTrip", choiceSets, 1);
-		this.writeRoundTripIndetermediateStop(outdir, name +"_IntermediateStop", choiceSets, 2);
+		this.writeRoundTripIndetermediateStop(outdir, name, choiceSets, 0, false);
+		this.writeRoundTripIndetermediateStop(outdir, name +"_RoundTrip", choiceSets, 1, false);
+		this.writeRoundTripIndetermediateStop(outdir, name +"_IntermediateStop", choiceSets, 2, false);
+		
+		this.writeRoundTripIndetermediateStop(outdir, name, choiceSets, 0, true);
+		this.writeRoundTripIndetermediateStop(outdir, name +"_RoundTrip", choiceSets, 1, true);
+		this.writeRoundTripIndetermediateStop(outdir, name +"_IntermediateStop", choiceSets, 2, true);
 	}
 	
 	/*
@@ -35,9 +39,16 @@ public class ChoiceSetWriterSimple extends CSWriter {
 	 * 				1: round trip
 	 * 				2: intermediate stop
 	 */
-	private void writeRoundTripIndetermediateStop(String outdir, String name, List<ChoiceSet> choiceSets, int tripKind) {
+	private void writeRoundTripIndetermediateStop(String outdir, String name, List<ChoiceSet> choiceSets, 
+			int tripKind, boolean imputed) {
 				
-		String outfile = outdir + name + "_ChoiceSets.txt";	
+		String outfile;
+		if (imputed) {
+			outfile = outdir + name + "_Imputed_ChoiceSets.txt";	
+		}
+		else {
+			outfile = outdir + name + "_ChoiceSets.txt";
+		}
 		
 		if (!super.checkBeforeWriting(choiceSets)) {
 			log.warn("Choice sets not written");
@@ -64,8 +75,37 @@ public class ChoiceSetWriterSimple extends CSWriter {
 				String choice = null;
 				
 				PersonAttributes attributes = choiceSet.getPersonAttributes();
-				String outLine = attributes.getAge() + "\t" + attributes.getGender() + "\t" + attributes.getIncomeHH() + "\t"+ 
-				attributes.getNumberOfPersonsHH() + "\t" + attributes.getCivilStatus() +"\t" + attributes.getEducation() +"\t";
+				String outLine = attributes.getAge() + "\t" + attributes.getGender() + "\t";
+				
+				if (attributes.getIncomeHH() < 0.0 && imputed) {
+					outLine += "3.78\t";
+				}
+				else {
+					outLine += attributes.getIncomeHH() + "\t";
+				}
+				
+				if (attributes.getNumberOfPersonsHH() < 0 && imputed) {
+					
+					int age = attributes.getAge();					
+					if (age >= 0 && age <=18) {
+						outLine += "4.14\t";
+					}
+					else if (age >= 19 && age <= 30) {
+ 						outLine += "2.74\t";
+					}
+					else if (age >= 31 && age <= 49){
+						outLine += "2.89\t";
+					}
+					else if (age >= 50) {
+						outLine += "1.96\t";
+					}
+					else {
+						outLine += "2.64\t";
+					}
+				}
+				else {
+					outLine += attributes.getNumberOfPersonsHH() + "\t";
+				}
 				
 				outLine += choiceSet.getTrip().getShoppingAct().getStartTime() +"\t" + attributes.getStart_is_home() +"\t";
 				outLine += choiceSet.getTravelTimeBudget() +"\t";
@@ -160,7 +200,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 	
 	private String getHeader() {
 		String header="Id\t" +
-		"WP\tChoice\tAge\tGender\tIncome\tNbrPersHH\tCivil_Status\tEducation\tTpurchase\tstart_is_home\tTTB\t" ;
+		"WP\tChoice\tAge\tGender\tIncome\tNbrPersHH\tTpurchase\tstart_is_home\tTTB\t" ;
 
 		for (int i = 0; i < this.facilities.getZhFacilities().size(); i++) {
 			header += "SH" + i + "_Shop_id\t" +
