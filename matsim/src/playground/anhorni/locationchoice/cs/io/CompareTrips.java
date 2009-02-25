@@ -56,14 +56,15 @@ public class CompareTrips {
 		try {
 			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			String curr_line = bufferedReader.readLine(); // Skip header
+			bufferedReader.readLine(); // Skip header
 					
 			try {		
 				final String header="Id\tAction\tWmittel\tAusmittel\t" +
 						"Following trip wmittel\tFollowing trip ausmittel\tIs in old "+ this.mode+ " choice set file [1]";						
 				final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 				out.write(header);
-				out.newLine();								
+				out.newLine();	
+				String curr_line;
 				while ((curr_line = bufferedReader.readLine()) != null) {								
 					String[] entries = curr_line.split("\t", -1);					
 					String tripId = entries[0].trim();
@@ -134,8 +135,9 @@ public class CompareTrips {
 		try {
 			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			String curr_line = bufferedReader.readLine(); // Skip header
-						
+			bufferedReader.readLine(); // Skip header
+			
+			String curr_line;
 			while ((curr_line = bufferedReader.readLine()) != null) {
 								
 				String[] entries = curr_line.split("\t", -1);
@@ -178,7 +180,9 @@ public class CompareTrips {
 		try {
 			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			String curr_line = bufferedReader.readLine(); // Skip header						
+			bufferedReader.readLine(); // Skip header
+			
+			String curr_line;
 			while ((curr_line = bufferedReader.readLine()) != null) {					
 				String[] entries = curr_line.split("\t", -1);
 				String id = entries[0].trim();
