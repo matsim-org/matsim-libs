@@ -24,6 +24,8 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class SelectGautengVehicles {
+	final static String gautengShapefileSource = "/Users/johanwjoubert/MATSim/workspace/MATSimData/ShapeFiles/Gauteng/Gauteng_UTM35S.shp";
+
 
 	public static void main(String[] args) {
 		long startTime = System.currentTimeMillis();
@@ -110,12 +112,11 @@ public class SelectGautengVehicles {
 	
 	public static Polygon readGautengPolygon() {
 		
-		String fileName = "/Users/johanwjoubert/MATSim/workspace/MATSimData/ShapeFiles/Gauteng/Gauteng.shp";
 		FeatureSource fs = null;
 		MultiPolygon mp = null;
 		Polygon p = null;
 		try {	
-			fs = ShapeFileReader.readDataFile(fileName);
+			fs = ShapeFileReader.readDataFile( gautengShapefileSource );
 			for(Object o: fs.getFeatures() ){
 				Geometry geo = ((Feature)o).getDefaultGeometry();
 				if(geo instanceof MultiPolygon){

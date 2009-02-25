@@ -2,43 +2,58 @@ package playground.jjoubert.CommercialTraffic;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
+/**
+ * A class to represent Geospatial Analysis Platform (GAP) mesozones,
+ * but specifically for the Gauteng area. 
+ * 
+ * ... Could consider changing the code to rather use the more generic
+ *     SAZone. 
+ * 
+ * @author johanwjoubert
+ *
+ */
 public class GapZone {
 
 	private final int gapID;
-	private int minorCount;
-	private int majorCount;
+	private int minorActivityCount;
+	private int majorActivityCount;
 	private final MultiPolygon gapPolygon;
 	private Integer[] activityCount;
 	private Integer[] activityDuration;
 	
+	/**
+	 * Constructs a new Geospatial Analysis Platform (GAP) mesozone.
+	 *
+	 * @param ID of type {@code int}, the GAP_ID as established by the CSIR
+	 * @param poly of type {@code MultiPolygon},	the polygon of the mesozone
+	 */
 	public GapZone(int ID, MultiPolygon poly){
 		this.gapID = ID;
 		this.gapPolygon = poly;
-		this.minorCount = 0;
-		this.majorCount = 0;
+		this.minorActivityCount = 0;
+		this.majorActivityCount = 0;
 		this.activityCount = new Integer[24];
 		this.activityDuration = new Integer[24];
 		for(int i = 0; i < this.activityCount.length; i++ ){
 			this.activityCount[i] = 0;
 			this.activityDuration[i] = 0;
-		}
-		
+		}	
 	}
 
-	public int getMinorCount() {
-		return minorCount;
+	public int getMinorActivityCount() {
+		return minorActivityCount;
 	}
 
-	public void setMinorCount(int minorCount) {
-		this.minorCount = minorCount;
+	public void setMinorActivityCount(int minorCount) {
+		this.minorActivityCount = minorCount;
 	}
 
-	public int getMajorCount() {
-		return majorCount;
+	public int getMajorActivityCount() {
+		return majorActivityCount;
 	}
 
-	public void setMajorCount(int majorCount) {
-		this.majorCount = majorCount;
+	public void setMajorActivityCount(int majorCount) {
+		this.majorActivityCount = majorCount;
 	}
 
 	public int getGapID() {
@@ -65,7 +80,13 @@ public class GapZone {
 		return this.activityDuration[hour];
 	}
 
-	public void update(){
+	/**
+	 * The {@code activityDuration} field previously merely
+	 * contained the sum of the activity durations. This method
+	 * thus divides the 'total' duration by the number of
+	 * activities.  
+	 */
+	public void calculateAverageDuration(){
 		for (int i = 0; i < this.activityDuration.length; i++ ) {
 			if(this.activityCount[i] > 0){
 				double x = ((double) this.activityDuration[i] ) / 

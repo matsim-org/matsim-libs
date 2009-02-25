@@ -12,6 +12,7 @@ import java.util.Scanner;
 public class ExpandHourOfDay {
 
 	final static String DELIMETER = ",";
+	private static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles";
 	
 	public static void main ( String args[] ){
 		System.out.print("Starting the analysis... ");
@@ -23,8 +24,10 @@ public class ExpandHourOfDay {
 		
 		
 		try{
-			Scanner inFile = new Scanner( new BufferedReader( new FileReader( new File("/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Activities/20090214-2230/hourOfDayInGautengStats.txt"))));
-			String[] header = inFile.nextLine().split(DELIMETER);
+			Scanner inFile = new Scanner( new BufferedReader( new FileReader( 
+					new File(ROOT + "/Activities/20090214-2230/hourOfDayInGautengStats.txt" ) ) ) );
+			@SuppressWarnings("unused")
+			String header = inFile.nextLine();
 			
 
 //			BufferedWriter outFile = new BufferedWriter( new FileWriter( new File("/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Activities/20090214-2230/hourOfDayInGautengStatsForGIS-D.txt")));

@@ -27,16 +27,16 @@ public class AnalyseGAPDensity {
 		System.out.println("Starting GAP mesozone analysis.");
 		
 		System.out.println("Reading GAP mesozone shapefile...");
-		String gapShapefile = "/Users/johanwjoubert/MATSim/workspace/MATSimData/ShapeFiles/Gauteng/GautengGAP.shp";
+		String gapShapefile = "/Users/johanwjoubert/MATSim/workspace/MATSimData/ShapeFiles/Gauteng/GautengGAP_UTM35S.shp";
 		ArrayList<GapZone> zoneList = readGapShapefile(gapShapefile);
 		System.out.println("Done.");
 		
 		GeometryFactory gf = new GeometryFactory();
 		
 		System.out.print("Processing activity list... " );
-		String activityFolder = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Activities";
-		String activityFile = "/20090214-2230/hourOfDayInGautengStats.txt";
-		String outputFile = "/20090214-2230/GapStats.txt";
+		String activityFolder = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Activities/";
+		String activityFile = "hourOfDayInGautengStats.txt";
+		String outputFile = "GapStats.txt";
 		
 		File inFile = new File( activityFolder + activityFile );
 		File outFile = new File( activityFolder + outputFile );
@@ -71,8 +71,9 @@ public class AnalyseGAPDensity {
 			}
 			// Update the average duration for each hour
 			for (GapZone gapZone : zoneList) {
-				gapZone.update();
+				gapZone.calculateAverageDuration();
 			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -136,9 +137,9 @@ public class AnalyseGAPDensity {
 		try {	
 			fs = ShapeFileReader.readDataFile( gapShapefile );
 			
-			ArrayList<Object> gapArray = (ArrayList<Object>) fs.getFeatures().getAttribute(0);
-			for (int i = 0; i < gapArray.size(); i++) {
-				Object thisGAP = gapArray.get(i);
+			ArrayList<Object> objectArray = (ArrayList<Object>) fs.getFeatures().getAttribute(0);
+			for (int i = 0; i < objectArray.size(); i++) {
+				Object thisGAP = objectArray.get(i);
 				int j = 0;
 				j++;
 				Integer gapID = (Integer) ((Feature) thisGAP).getAttribute(1);
