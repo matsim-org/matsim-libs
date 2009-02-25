@@ -20,45 +20,46 @@ public class ChoiceSetWriterSimple extends CSWriter {
 	public ChoiceSetWriterSimple(ZHFacilities facilities) {
 		this.facilities = facilities;
 	}
-	
-	public void write(String outdir, String name, List<ChoiceSet> choiceSets)  {
-		this.facilities.calculateAccesibilities();
+		
+	public void write(String outdir, String name, List<ChoiceSet> choiceSets)  {	
+		
 		this.writeNumberOfAlternatives(outdir, name, choiceSets);
+		
+		this.writeRoundTripIndetermediateStop(outdir, name, choiceSets, 0);
+		this.writeRoundTripIndetermediateStop(outdir, name +"_RoundTrip", choiceSets, 1);
+		this.writeRoundTripIndetermediateStop(outdir, name +"_IntermediateStop", choiceSets, 2);
+	}
 	
+	/*
+	 * tripKind: 	0: round trip or intermediate stop
+	 * 				1: round trip
+	 * 				2: intermediate stop
+	 */
+	private void writeRoundTripIndetermediateStop(String outdir, String name, List<ChoiceSet> choiceSets, int tripKind) {
+				
 		String outfile = outdir + name + "_ChoiceSets.txt";	
+		
 		if (!super.checkBeforeWriting(choiceSets)) {
-			log.warn(outfile +" not created");
+			log.warn("Choice sets not written");
 			return;
 		}
 		
-		String header="Id\t" +
-		"WP\tChoice\tAge\tGender\tIncome\tNbrPersHH\tCivil_Status\tEducation\tTpurchase\tstart_is_home\tTTB\t" ;
-
-		for (int i = 0; i < this.facilities.getZhFacilities().size(); i++) {
-			header += "SH" + i + "_Shop_id\t" +
-					"SH" + i + "_AV\t" +
-					"SH" + i + "_Mapped_x\t" + "SH" + i + "_Mapped_y\t" +
-					"SH" + i + "_Exact_x\t" + "SH" + i + "_Exact_y\t" +
-					"SH" + i + "_TTnet\t" + 
-					"SH" + i + "_TDnet\t" +
-					"SH" + i + "_CFD_exact\t" + "SH" + i + "_CFD_mapped\t" +
-					"SH" + i + "RetailerID\t" +
-					"SH" + i + "Size\t" +
-					"SH" + i + "dHalt\t" +
-					"SH" + i + "acc02\t" +
-					"SH" + i + "acc10\t" +
-					"SH" + i + "acc20\t" +
-					"SH" + i + "HRS_WEEK\t";
-		}
+		String header = this.getHeader();
 	
 		try {								
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			out.write(header);
-			out.newLine();		
-			
+			out.newLine();	
+						
 			Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
 			while (choiceSet_it.hasNext()) {
 				ChoiceSet choiceSet = choiceSet_it.next();
+				
+				if (!(tripKind == 0)) {
+					if (tripKind == 1 && !choiceSet.isRoundTrip()) continue;
+					if (tripKind == 2 &&  choiceSet.isRoundTrip()) continue;
+				}
+				
 				String id_WP = choiceSet.getId() +"\t" + choiceSet.getPersonAttributes().getWP() + "\t";
 				String choice = null;
 				
@@ -90,7 +91,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 						
 		} catch (final IOException e) {
 				Gbl.errorMsg(e);
-		}	
+		}
 	}
 	
 	
@@ -134,7 +135,6 @@ public class ChoiceSetWriterSimple extends CSWriter {
 		return outLine;
 	}
 	
-	
 	private void writeNumberOfAlternatives(String outdir, String name,List<ChoiceSet> choiceSets)  {
 		
 		String outfile_alternatives = outdir + name + "_NumberOfAlternativesInclusive.txt";
@@ -156,5 +156,28 @@ public class ChoiceSetWriterSimple extends CSWriter {
 		} catch (final IOException e) {
 				Gbl.errorMsg(e);
 		}	
-	}	
+	}
+	
+	private String getHeader() {
+		String header="Id\t" +
+		"WP\tChoice\tAge\tGender\tIncome\tNbrPersHH\tCivil_Status\tEducation\tTpurchase\tstart_is_home\tTTB\t" ;
+
+		for (int i = 0; i < this.facilities.getZhFacilities().size(); i++) {
+			header += "SH" + i + "_Shop_id\t" +
+					"SH" + i + "_AV\t" +
+					"SH" + i + "_Mapped_x\t" + "SH" + i + "_Mapped_y\t" +
+					"SH" + i + "_Exact_x\t" + "SH" + i + "_Exact_y\t" +
+					"SH" + i + "_TTnet\t" + 
+					"SH" + i + "_TDnet\t" +
+					"SH" + i + "_CFD_exact\t" + "SH" + i + "_CFD_mapped\t" +
+					"SH" + i + "RetailerID\t" +
+					"SH" + i + "Size\t" +
+					"SH" + i + "dHalt\t" +
+					"SH" + i + "acc02\t" +
+					"SH" + i + "acc10\t" +
+					"SH" + i + "acc20\t" +
+					"SH" + i + "HRS_WEEK\t";
+		}	
+		return header;
+	}
 }

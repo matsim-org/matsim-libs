@@ -24,7 +24,7 @@ import playground.anhorni.locationchoice.cs.depr.filters.SampleDrawer;
 import playground.anhorni.locationchoice.cs.depr.filters.SampleDrawerFixedSizeRandom;
 import playground.anhorni.locationchoice.cs.depr.filters.SampleDrawerFixedSizeTravelCosts;
 import playground.anhorni.locationchoice.cs.depr.filters.TripFilter;
-import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
+import playground.anhorni.locationchoice.cs.helper.ChoiceSets;
 import playground.anhorni.locationchoice.cs.helper.ZHFacilities;
 import playground.anhorni.locationchoice.cs.io.CSWriter;
 import playground.anhorni.locationchoice.cs.io.ChoiceSetWriterSimple;
@@ -48,8 +48,14 @@ public class GenerateChoiceSets {
 	
 	private ZHFacilities zhFacilities;
 	
+	/*
 	private List<ChoiceSet> carChoiceSets = null;
 	private List<ChoiceSet> walkChoiceSets = null;
+	*/
+	
+	private ChoiceSets choiceSets = new ChoiceSets();
+	
+	
 	private List<CSWriter> writers = new Vector<CSWriter>();
 	private TripFilter filter;
 	private SampleDrawer sampleDrawer = null;
@@ -178,16 +184,18 @@ public class GenerateChoiceSets {
 		this.createChoiceSetFacilities();
 				
 		if (this.readNelson.equals("true")) {
-			this.carChoiceSets = new NelsonTripReader(this.network, this.zhFacilities).readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "car");
-			this.walkChoiceSets = new NelsonTripReader(this.network, this.zhFacilities).readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "walk");				
+			this.choiceSets.setCarChoiceSets(new NelsonTripReader(this.network, this.zhFacilities)
+					.readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "car"));
+			this.choiceSets.setWalkChoiceSets(new NelsonTripReader(this.network, this.zhFacilities)
+					.readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "walk"));				
 		}
 		else {
 			this.choiceSetPopulation = this.createChoiceSetPopulationFromMZ();
 			new PopulationWriter(choiceSetPopulation, this.outdir+"/MZPopulation.txt", "v4").write();
 			
 			// TODO: maybe also optimize area?
-			this.carChoiceSets = this.filter.apply(this.choiceSetPopulation, "car");
-			this.walkChoiceSets = this.filter.apply(this.choiceSetPopulation, "walk");	
+			this.choiceSets.setCarChoiceSets(this.filter.apply(this.choiceSetPopulation, "car"));
+			this.choiceSets.setWalkChoiceSets(this.filter.apply(this.choiceSetPopulation, "walk"));	
 		}
 		
 		if (this.DEQSim.equals("true")) {
@@ -199,7 +207,7 @@ public class GenerateChoiceSets {
 		}		
 		
 		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilities, 
-				this.carChoiceSets, "car");
+				this.choiceSets.getCarChoiceSets(), "car");
 		
 		/*
 		 * This does NOT work at the moment:
@@ -214,7 +222,7 @@ public class GenerateChoiceSets {
 		*/
 				
 		ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilities, 
-					this.walkChoiceSets, "walk");
+					this.choiceSets.getWalkChoiceSets(), "walk");
 		
 		if (this.mode.equals("car")) {
 			controler.addControlerListener(listenerCar);
@@ -224,22 +232,19 @@ public class GenerateChoiceSets {
 		}
 		else {
 			log.error("No mode chosen");
-		}
-		
-		
+		}	
 		log.info("Running controler: ...");
 		controler.run();
-		
+			
+		// sample the choice sets: not used at the moment:
 		/*
 		CSShapeFileWriter shpWriter = new CSShapeFileWriter(this.outdir);
 		shpWriter.writeChoiceSets(this.outdir, "carBeforeSampling", this.carChoiceSets);
 		shpWriter.writeChoiceSets(this.outdir, "walkBeforeSampling", this.walkChoiceSets);
-		*/
-		
-		// sample the choice sets
-		
+			
 		log.info("Sampling: ...");
 		this.drawSample();
+		*/
 		
 		log.info("Output: ...");
 		this.output();	
@@ -267,37 +272,43 @@ public class GenerateChoiceSets {
 		new ZHFacilitiesWriter().write(this.outdir, this.zhFacilities);
 	}
 						
-	private void output() {			
+	private void output() {	
+		
+		this.choiceSets.finish();
+		this.zhFacilities.finish();
+		
 		Iterator<CSWriter> writer_it = this.writers.iterator();
 		while (writer_it.hasNext()) {
 			CSWriter writer = writer_it.next();
 			if (this.mode.equals("car")) {
-				writer.write(this.outdir, "car", this.carChoiceSets);
+				writer.write(this.outdir, "car", this.choiceSets.getCarChoiceSets());
 			}
 			else if (this.mode.equals("walk")) {
-				writer.write(this.outdir, "walk", this.walkChoiceSets);
+				writer.write(this.outdir, "walk", this.choiceSets.getWalkChoiceSets());
 			}	
 		}
 		
 		NelsonTripWriter nelsonWriter = new NelsonTripWriter();
-		nelsonWriter.write(this.outdir, "car", this.carChoiceSets);
-		nelsonWriter.write(this.outdir, "walk", this.walkChoiceSets);
+		nelsonWriter.write(this.outdir, "car",  this.choiceSets.getCarChoiceSets());
+		nelsonWriter.write(this.outdir, "walk", this.choiceSets.getWalkChoiceSets());
 		
 		
 		CompareTrips compareTripsCar = new CompareTrips(this.outdir, "car");
-		compareTripsCar.compare("input/ttbcar.dat", this.carChoiceSets);
+		compareTripsCar.compare("input/ttbcar.dat", this.choiceSets.getCarChoiceSets());
 		
 		CompareTrips compareTripsWalk = new CompareTrips(this.outdir, "walk");
-		compareTripsWalk.compare("input/ttbwalk.dat", this.walkChoiceSets);
+		compareTripsWalk.compare("input/ttbwalk.dat", this.choiceSets.getWalkChoiceSets());
 		
 	}
 	
+	/* not used at the moment
 	private void drawSample() {
 		if (this.sampleDrawer != null) {
-			sampleDrawer.drawSample(this.carChoiceSets);
-			sampleDrawer.drawSample(this.walkChoiceSets);
+			sampleDrawer.drawSample(this.choiceSets.getCarChoiceSets());
+			sampleDrawer.drawSample(this.choiceSets.getWalkChoiceSets());
 		}
 	}
+	*/
 	
 	
 	
@@ -319,12 +330,6 @@ public class GenerateChoiceSets {
 	}
 	public void setConfigFile(String configfile) {
 		this.matsimRunConfigFile = configfile;
-	}
-	public List<ChoiceSet>  getChoiceSets() {
-		return carChoiceSets;
-	}
-	public void setChoiceSets(List<ChoiceSet>  choiceSets) {
-		this.carChoiceSets = choiceSets;
 	}
 	public String getZhFacilitiesFile() {
 		return zhFacilitiesFile;

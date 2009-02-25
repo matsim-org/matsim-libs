@@ -76,9 +76,7 @@ public class ZHFacilities {
 		return numberOfFacilities;
 	}
 	
-	public void calculateAccesibilities() {
-		
-		
+	private void calculateAccesibilities() {		
 		Iterator<ZHFacility> referenceFacility_it = this.zhFacilities.values().iterator();
 		while (referenceFacility_it.hasNext()) {
 			ZHFacility referenceFacility = referenceFacility_it.next();
@@ -101,4 +99,8 @@ public class ZHFacilities {
 			referenceFacility.setAccessibility20(accessibility20);
 		}
 	}	
+	
+	public void finish() {
+		this.calculateAccesibilities();
+	}
 }

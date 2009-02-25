@@ -15,6 +15,7 @@ public class ChoiceSet {
 	private TreeMap<Id, ChoiceSetFacility> choiceSetFacilities = new TreeMap<Id, ChoiceSetFacility>();
 	private PersonAttributes personAttributes;
 	private Id chosenFacilityId;
+	//private final static Logger log = Logger.getLogger(ChoiceSet.class);
 		
 	public ChoiceSet(Id id, Trip trip, Id chosenFacilityId) {
 		this.id = id;
@@ -22,8 +23,56 @@ public class ChoiceSet {
 		this.chosenFacilityId = chosenFacilityId;
 	}
 	
-	//private final static Logger log = Logger.getLogger(ChoiceSet.class);
+	public boolean isRoundTrip() {
+		if (this.trip.getBeforeShoppingAct().getCoord().calcDistance(this.trip.getAfterShoppingAct().getCoord()) < 0.01) {
+			return true;
+		}
+		else return false;
+	}
 	
+	private void calculateAdditionalTravelTime() {		
+		// find cheapest:
+		double minTravelTime = 999999999999999999.0;
+		Iterator<ChoiceSetFacility> choiceSet_it = this.choiceSetFacilities.values().iterator();
+		while (choiceSet_it.hasNext()) {
+			ChoiceSetFacility choiceSetFacility = choiceSet_it.next();
+			double actualTravelTime = choiceSetFacility.getTravelTimeStartShopEnd();
+			if (actualTravelTime >= 0.0 && actualTravelTime < minTravelTime) {
+				minTravelTime = actualTravelTime;			
+			}
+		}		
+		// calculate difference to cheapest for all facilities in the choice set:
+		choiceSet_it = this.choiceSetFacilities.values().iterator();
+		while (choiceSet_it.hasNext()) {
+			ChoiceSetFacility choiceSetFacility = choiceSet_it.next();
+			choiceSetFacility.setAdditionalTime(choiceSetFacility.getTravelTimeStartShopEnd() - minTravelTime);
+		}	
+	}
+	
+	private void calculateAdditionalTravelDistance() {		
+		// find cheapest:
+		double minTravelDistance = 999999999999999999.0;
+		Iterator<ChoiceSetFacility> choiceSet_it = this.choiceSetFacilities.values().iterator();
+		while (choiceSet_it.hasNext()) {
+			ChoiceSetFacility choiceSetFacility = choiceSet_it.next();
+			double actualTravelDistance = choiceSetFacility.getTravelTimeStartShopEnd();
+			if (actualTravelDistance >= 0.0 && actualTravelDistance < minTravelDistance) {
+				minTravelDistance = actualTravelDistance;			
+			}
+		}		
+		// calculate difference to cheapest for all facilities in the choice set:
+		choiceSet_it = this.choiceSetFacilities.values().iterator();
+		while (choiceSet_it.hasNext()) {
+			ChoiceSetFacility choiceSetFacility = choiceSet_it.next();
+			choiceSetFacility.setAdditionalTime(choiceSetFacility.getTravelDistanceStartShopEnd() - minTravelDistance);
+		}	
+	}
+	
+	public void calculateAdditonalTravelEffort() {
+		this.calculateAdditionalTravelTime();
+		this.calculateAdditionalTravelDistance();
+	}
+		
 	public double getTravelTimeBudget() {
 		if (this.travelTimeBudget == -1.0) {
 			double beforeShopping = trip.getShoppingAct().getStartTime() - trip.getBeforeShoppingAct().getEndTime();
@@ -48,9 +97,7 @@ public class ChoiceSet {
 	public int choiceSetSize() {
 		return this.choiceSetFacilities.size();
 	}
-	
-		
-	// -------------------------------------------------------------------------------------
+
 	public Id getId() {
 		return id;
 	}

@@ -6,7 +6,9 @@ public class ChoiceSetFacility {
 	private double	travelTimeStartShopEnd;
 	private double travelDistanceStartShopEnd;
 	
-
+	private double additionalTime;
+	private double additionalDistance;
+	
 	public ChoiceSetFacility(ZHFacility facility,
 			double travelTimeStartShopEnd, double travelDistanceStartShopEnd) {
 		super();
@@ -32,5 +34,21 @@ public class ChoiceSetFacility {
 	}
 	public void setTravelDistanceStartShopEnd(double travelDistanceStartShopEnd) {
 		this.travelDistanceStartShopEnd = travelDistanceStartShopEnd;
+	}
+
+	public double getAdditionalTime() {
+		return additionalTime;
+	}
+
+	public void setAdditionalTime(double additionalTime) {
+		this.additionalTime = additionalTime;
+	}
+
+	public double getAdditionalDistance() {
+		return additionalDistance;
+	}
+
+	public void setAdditionalDistance(double additionalDistance) {
+		this.additionalDistance = additionalDistance;
 	}
 }

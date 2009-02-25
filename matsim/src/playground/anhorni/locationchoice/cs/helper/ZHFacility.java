@@ -19,8 +19,7 @@ public class ZHFacility  {
 	private double accessibility10;
 	private double accessibility20;
 	
-	
-	
+
 	public ZHFacility(Id id, Coord mappedPosition, Coord exactPosition,
 			Id linkId, Id retID, int size_descr, double halt, double hrs_week) {
 		super();
