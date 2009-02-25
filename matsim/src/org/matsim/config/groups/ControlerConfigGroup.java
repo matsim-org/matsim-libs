@@ -27,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Module;
 
 public class ControlerConfigGroup extends Module {
+
+	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks};
 	
 	private static final long serialVersionUID = 1L;
 
@@ -40,6 +42,7 @@ public class ControlerConfigGroup extends Module {
 	private static final String TRAVEL_TIME_CALCULATOR = "travelTimeCalculator";
 	private static final String TRAVEL_TIME_BIN_SIZE = "travelTimeBinSize";
 	private static final String TRAVEL_TIME_AGGREGATOR = "travelTimeAggregator";
+	private static final String ROUTINGALGORITHMTYPE = "routingAlgorithmType";
 	
 	private String outputDirectory = "./output";
 	private int firstIteration = 0;
@@ -47,6 +50,7 @@ public class ControlerConfigGroup extends Module {
 	private String travelTimeCalculator = "TravelTimeCalculatorArray";
 	private String travelTimeAggregator = "optimistic";
 	private int traveltimeBinSize = 15 * 60; // use a default of 15min time-bins for analyzing the travel times
+	private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.AStarLandmarks;
 	
 	public ControlerConfigGroup() {
 		super(GROUP_NAME);
@@ -66,6 +70,8 @@ public class ControlerConfigGroup extends Module {
 			return getTravelTimeAggregatorType();
 		} else if (TRAVEL_TIME_BIN_SIZE.equals(key)) {
 			return Integer.toString(getTraveltimeBinSize());
+		} else if (ROUTINGALGORITHMTYPE.equals(key)){
+			return this.getRoutingAlgorithmType().toString();
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -85,7 +91,18 @@ public class ControlerConfigGroup extends Module {
 			setTravelTimeAggregatorType(value);
 		} else if (TRAVEL_TIME_BIN_SIZE.equals(key)) {
 			setTraveltimeBinSize(Integer.parseInt(value));
-		}  else {
+		} else if (ROUTINGALGORITHMTYPE.equals(key)){
+			if (RoutingAlgorithmType.Dijkstra.toString().equalsIgnoreCase(value)){
+				setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
+			}
+			else if (RoutingAlgorithmType.AStarLandmarks.toString().equalsIgnoreCase(value)){
+				setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
+			}
+			else {
+				throw new IllegalArgumentException(value + " is not a valid parameter value for key: "+ key + " of config group " + this.GROUP_NAME);
+			}
+		}
+		else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -99,6 +116,7 @@ public class ControlerConfigGroup extends Module {
 		map.put(TRAVEL_TIME_CALCULATOR, getValue(TRAVEL_TIME_CALCULATOR));
 		map.put(TRAVEL_TIME_AGGREGATOR, getValue(TRAVEL_TIME_AGGREGATOR));
 		map.put(TRAVEL_TIME_BIN_SIZE, getValue(TRAVEL_TIME_BIN_SIZE));		
+		map.put(ROUTINGALGORITHMTYPE, getValue(ROUTINGALGORITHMTYPE));
 		return map;
 	}
 	
@@ -106,6 +124,7 @@ public class ControlerConfigGroup extends Module {
 	protected final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(TRAVEL_TIME_BIN_SIZE, "The size of the time bin (in sec) into which the link travel times are aggregated for the router") ;
+		map.put(ROUTINGALGORITHMTYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + " or " + RoutingAlgorithmType.AStarLandmarks);
 		return map;
 	}
 
@@ -168,6 +187,14 @@ public class ControlerConfigGroup extends Module {
 	 */
 	public final int getTraveltimeBinSize() {
 		return this.traveltimeBinSize;
+	}
+	
+	public RoutingAlgorithmType getRoutingAlgorithmType(){
+		return this.routingAlgorithmType;
+	}
+	
+	public void setRoutingAlgorithmType(RoutingAlgorithmType type){
+		this.routingAlgorithmType = type;
 	}
 	
 }

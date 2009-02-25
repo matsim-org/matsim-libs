@@ -44,6 +44,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.config.MatsimConfigReader;
+import org.matsim.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.controler.corelisteners.LegHistogramListener;
 import org.matsim.controler.corelisteners.PlansDumping;
 import org.matsim.controler.corelisteners.PlansReplanning;
@@ -93,6 +94,7 @@ import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.AStarLandmarksFactory;
+import org.matsim.router.util.DijkstraFactory;
 import org.matsim.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
@@ -429,6 +431,16 @@ public class Controler {
 		}
 		this.events.addHandler(this.travelTimeCalculator);
 
+		if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.Dijkstra)){
+			this.leastCostPathCalculatorFactory = new DijkstraFactory();
+		}
+		else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.AStarLandmarks)){
+			this.leastCostPathCalculatorFactory = new AStarLandmarksFactory(this.network, this.getFreespeedTravelTimeCost());
+		}
+		else {
+			throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
+		}
+		
 		/* TODO [MR] linkStats uses ttcalc and volumes, but ttcalc has 15min-steps,
 		 * while volumes uses 60min-steps! It works a.t.m., but the traveltimes
 		 * in linkStats are the avg. traveltimes between xx.00 and xx.15, and not
@@ -902,12 +914,10 @@ public class Controler {
 	 * travelCosts and travelTimes. Only to be used by a single thread, use multiple instances for multiple threads!
 	 */
 	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
-		AStarLandmarksFactory fac = new AStarLandmarksFactory(this.network, this.getFreespeedTravelTimeCost());
-		
 		if ((this.roadPricing != null) && (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.roadPricing.getRoadPricingScheme().getType()))) {
-			return new PlansCalcAreaTollRoute(this.network, travelCosts, travelTimes, fac, this.roadPricing.getRoadPricingScheme());
+			return new PlansCalcAreaTollRoute(this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), this.roadPricing.getRoadPricingScheme());
 		}
-		return new PlansCalcRoute(this.network, travelCosts, travelTimes, fac);
+		return new PlansCalcRoute(this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
 	}
 
 	/* ===================================================================
