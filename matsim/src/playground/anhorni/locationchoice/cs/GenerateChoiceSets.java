@@ -154,6 +154,7 @@ public class GenerateChoiceSets {
 		new File(this.outdir +"shapefiles").mkdir();
 		new File(this.outdir +"shapefiles/singletrips").mkdir();
 		new File(this.outdir +"shapefiles/singlechoicesets").mkdir();
+		new File(this.outdir +"choicesets").mkdir();
 		
 		ChoiceSetWriterSimple writer = new ChoiceSetWriterSimple(this.zhFacilities);
 		this.writers.add(writer);	
