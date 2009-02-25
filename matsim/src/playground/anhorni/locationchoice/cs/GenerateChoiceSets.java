@@ -40,7 +40,7 @@ import playground.balmermi.mz.PlansCreateFromMZ;
 public class GenerateChoiceSets {
 
 	//private static int idOffset = 20000000;
-	public static double epsilon = 0.01;	
+	//private final static double epsilon = 0.01;	
 	private Population choiceSetPopulation = new Population(false);
 	
 	private NetworkLayer network = new NetworkLayer();
@@ -151,10 +151,14 @@ public class GenerateChoiceSets {
 		this.filter = filterAreaAndType;
 		
 		//writers
-		new File(this.outdir +"shapefiles").mkdir();
-		new File(this.outdir +"shapefiles/singletrips").mkdir();
-		new File(this.outdir +"shapefiles/singlechoicesets").mkdir();
-		new File(this.outdir +"choicesets").mkdir();
+		boolean folderGenerated = new File(this.outdir +"shapefiles").mkdir();
+		folderGenerated = folderGenerated && new File(this.outdir +"shapefiles/singletrips").mkdir();
+		folderGenerated = folderGenerated && new File(this.outdir +"shapefiles/singlechoicesets").mkdir();
+		folderGenerated = folderGenerated && new File(this.outdir +"choicesets").mkdir();
+		
+		if (!folderGenerated) {
+			log.info("Problem while generating output folders");
+		}
 		
 		ChoiceSetWriterSimple writer = new ChoiceSetWriterSimple(this.zhFacilities);
 		this.writers.add(writer);	
