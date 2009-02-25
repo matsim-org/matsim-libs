@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunCompare.java
+ * NetworkClearanceAnalysis.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,8 +22,8 @@ package playground.gregor.gis.analysis;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.geotools.factory.FactoryRegistryException;
@@ -35,19 +35,16 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.Events;
 import org.matsim.events.EventsReaderTXTv1;
-import org.matsim.events.handler.AgentArrivalEventHandler;
-import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.events.LinkEnterEvent;
+import org.matsim.events.LinkLeaveEvent;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.gis.ShapeFileWriter;
@@ -58,48 +55,43 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class EventFilesCompare {
+public class NetworkClearanceAnalysis {
 	
-	private final static Logger log = Logger.getLogger(EventFilesCompare.class);
+	private static final Logger log = Logger.getLogger(NetworkClearanceAnalysis.class);
 	
 	private static final String INPUT_BASE="../../arbeit/svn/shared-svn/runs/";
-	
+	private final String ev2;
+	private final String ev1;
+	private final NetworkLayer network;
 	private final CoordinateReferenceSystem crs;
-	final NetworkLayer network;
-	private ArrayList<Polygon> polygons;
+	private final String outfile;
+	
+//	private ArrayList<Polygon> polygons;
 	private final GeometryFactory geofac;
-	private final String eventsFile1;
-	private final String eventsFile2;
-
-	private TravelTimesFromEvents t1;
-
-	private TravelTimesFromEvents t2;
-
+	
 	private ArrayList<Feature> features;
 
 	private FeatureType ftRunCompare;
-
-	private final String outfile;
+	
 	final static Envelope ENVELOPE = new Envelope(648815,655804,9888424,9902468);
-	final static double LENGTH = 250;
+	final static double LENGTH = 350;
+	private final QuadTree<PolygonInfo> polygons1 = new QuadTree<PolygonInfo>(ENVELOPE.getMinX(),ENVELOPE.getMinY(),ENVELOPE.getMaxX(),ENVELOPE.getMaxY());
+	private final QuadTree<PolygonInfo> polygons2 = new QuadTree<PolygonInfo>(ENVELOPE.getMinX(),ENVELOPE.getMinY(),ENVELOPE.getMaxX(),ENVELOPE.getMaxY());
+	private final Map<String,PolygonInfo> linkMapping1 = new HashMap<String,PolygonInfo>();
+	private final Map<String,PolygonInfo> linkMapping2 = new HashMap<String,PolygonInfo>();
 	
-	
-	public EventFilesCompare(final String eventsFile1, final String eventsFile2,
-			final CoordinateReferenceSystem crs, final NetworkLayer network, final String outfile) {
-		
-		this.eventsFile1 = eventsFile1;
-		this.eventsFile2 = eventsFile2;
-		this.crs = crs;
+	public NetworkClearanceAnalysis(final String eventsFile1, final String eventsFile2,
+			final NetworkLayer network, final String outfile, final CoordinateReferenceSystem crs) {
+		this.ev1 = eventsFile1;
+		this.ev2 = eventsFile2;
 		this.network = network;
 		this.outfile = outfile;
+		this.crs = crs;
 		
 		this.geofac = new GeometryFactory();
 		initFeatures();
-		
-		
 	}
 
-	
 	private void initFeatures() {
 		this.features = new ArrayList<Feature>();
 
@@ -117,16 +109,18 @@ public class EventFilesCompare {
 
 		
 	}
-
-
-	public void run() {
+	
+	private void run() {
 		createPolygons();
+		classifyLinks();
 		readEvents();
 		iteratePolygons();
 		writeFeatures();
-
+			
 	}
 	
+
+
 	private void writeFeatures() {
 		try {
 			ShapeFileWriter.writeGeometries(this.features, this.outfile);
@@ -136,64 +130,55 @@ public class EventFilesCompare {
 		
 	}
 
-
 	private void iteratePolygons() {
-		for (Polygon p : this.polygons) {
-			double avgT1 = getAvgTT(p,this.t1);
-			double avgT2 = getAvgTT(p,this.t2);
-			
+		for (PolygonInfo p1 : this.polygons1.values()) {
+			PolygonInfo p2 = this.polygons2.get(p1.p.getCentroid().getX(), p1.p.getCentroid().getY());
+			double t1t2 = p1.clearanceTime - p2.clearanceTime;
 			try {
-				this.features.add(this.ftRunCompare.create(new Object[]{p,avgT1,avgT2,avgT1-avgT2}));
+				this.features.add(this.ftRunCompare.create(new Object[]{p1.p,p1.clearanceTime,p2.clearanceTime,t1t2}));
 			} catch (IllegalAttributeException e) {
 				e.printStackTrace();
 			}
+			
 		}
 		
 	}
-
-
-	private double getAvgTT(final Polygon p, final TravelTimesFromEvents t) {
-		
-		Collection<AgentInfo> ais = t.getAgents(p);
-		if (ais.size() == 0) {
-			return 0;
-		}
-		
-		double ttSum = 0;
-		for (AgentInfo ai : ais) {
-			ttSum += ai.time;
-		}
-		
-		return ttSum / ais.size();
-	}
-
 
 	private void readEvents() {
 		Events events1 = new Events();
 		Events events2 = new Events();
-		this.t1 = new TravelTimesFromEvents();
-		this.t2 = new TravelTimesFromEvents();
-		events1.addHandler(this.t1);
-		events2.addHandler(this.t2);
-		log.info("reading events file 1 from: " + this.eventsFile1);
-		new EventsReaderTXTv1(events1).readFile(this.eventsFile1);
-		this.t1.printAvgTT();
+		EventsHandler e1 = new EventsHandler(this.linkMapping1);
+		EventsHandler e2 = new EventsHandler(this.linkMapping2);
+		events1.addHandler(e1);
+		events2.addHandler(e2);
+		
+		log.info("reading events file 1 from: " + this.ev1);
+		new EventsReaderTXTv1(events1).readFile(this.ev1);
 		log.info("done.");
-		log.info("reading events file 2 from: " + this.eventsFile2);
-		new EventsReaderTXTv1(events2).readFile(this.eventsFile2);
-		this.t2.printAvgTT();
+		log.info("reading events file 2 from: " + this.ev2);
+		new EventsReaderTXTv1(events2).readFile(this.ev2);
 		log.info("done.");
+		
 	}
 
+	private void classifyLinks() {
+		for (Link link : this.network.getLinks().values()) {
+			PolygonInfo pi1 = this.polygons1.get(link.getCenter().getX(),link.getCenter().getY());
+
+			this.linkMapping1.put(link.getId().toString(),pi1);
+			PolygonInfo pi2 = this.polygons2.get(link.getCenter().getX(),link.getCenter().getY());
+			this.linkMapping2.put(link.getId().toString(),pi2);
+		}
+	}
 
 	private void createPolygons() {
-		this.polygons = new ArrayList<Polygon>();
 		GTH gth = new GTH(this.geofac);
 	
 		for (double x = ENVELOPE.getMinX(); x < ENVELOPE.getMaxX(); x += LENGTH) {
 			for (double y = ENVELOPE.getMinY(); y < ENVELOPE.getMaxY(); y+= LENGTH) {
 				Polygon p = gth.getSquare(new Coordinate(x,y), LENGTH);
-				this.polygons.add(p);
+				this.polygons1.put(p.getCentroid().getX(), p.getCentroid().getY(), new PolygonInfo(p));
+				this.polygons2.put(p.getCentroid().getX(), p.getCentroid().getY(), new PolygonInfo(p));
 			}
 
 		}
@@ -201,52 +186,31 @@ public class EventFilesCompare {
 
 	}
 	
-	public static void main(final String [] args) {
-//		String eventsFile1 = "../outputs/output_nash_wave/ITERS/it.150/150.events.txt.gz";
-		String eventsFile1 = INPUT_BASE + "run316/output/ITERS/it.201/201.events.txt.gz";
-		String eventsFile2 = INPUT_BASE + "run317/output/ITERS/it.200/200.events.txt.gz";
-		String network = "../inputs/networks/padang_net_evac_v20080618.xml";
-		String outfile = INPUT_BASE + "run316/analysis/runComp316vs317.shp";
-		NetworkLayer net = new NetworkLayer();
-		new MatsimNetworkReader(net).readFile(network);
-		
-		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
-		new EventFilesCompare(eventsFile1, eventsFile2, crs, net, outfile).run();
+	private static class PolygonInfo {
+		Polygon p;
+		int agents = 0;
+		double clearanceTime = 0;
+		public PolygonInfo(final Polygon p) {
+			this.p = p;
+		}
 	}
-
 	
-	private class TravelTimesFromEvents implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
+	private static class EventsHandler implements LinkEnterEventHandler, LinkLeaveEventHandler{
 
-		private final HashMap<String,AgentInfo> ttimes;
-		private final QuadTree<AgentInfo> ttimesTree = new QuadTree<AgentInfo>(EventFilesCompare.ENVELOPE.getMinX(),EventFilesCompare.ENVELOPE.getMinY(),EventFilesCompare.ENVELOPE.getMaxX(),EventFilesCompare.ENVELOPE.getMaxY());
+		private final Map<String, PolygonInfo> linkMapping;
 
-		public TravelTimesFromEvents() {
-			this.ttimes = new HashMap<String,AgentInfo>();
+		public EventsHandler(final Map<String,PolygonInfo> linkMapping) {
+			this.linkMapping = linkMapping;
 		}
 		
-		public Collection<AgentInfo> getAgents(final Polygon p) {
-			Collection<AgentInfo> ret = new ArrayList<AgentInfo>();
-			Envelope e = p.getEnvelopeInternal();
-			Rect bounds = new Rect(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
-			this.ttimesTree.get(bounds, ret);
-			return ret;
-		}
-		
-		public void printAvgTT() {
-			double ttSum = 0;
-			for (AgentInfo ai : this.ttimes.values()) {
-				ttSum += ai.time;
+		public void handleEvent(final LinkEnterEvent event) {
+			if (event.linkId.contains("el")) {
+				return;
 			}
-			System.out.println("avg tt:" + ttSum/this.ttimes.size());
 			
-		}
-
-		public void handleEvent(final AgentDepartureEvent event) {
-			AgentInfo ai = new AgentInfo();
-			ai.time = event.time;
-			Link link = EventFilesCompare.this.network.getLink(event.linkId);
-			ai.c = new Coordinate(link.getCenter().getX(),link.getCenter().getY());
-			this.ttimes.put(event.agentId, ai);
+			PolygonInfo pi = this.linkMapping.get(event.linkId);
+			pi.agents++;
+			pi.clearanceTime = 0;
 			
 		}
 
@@ -255,22 +219,35 @@ public class EventFilesCompare {
 			
 		}
 
-		public void handleEvent(final AgentArrivalEvent event) {
-			AgentInfo ai = this.ttimes.get(event.agentId);
-			ai.time = event.time - ai.time;
-			this.ttimesTree.put(ai.c.x, ai.c.y, ai);
-			
-		}
+		public void handleEvent(final LinkLeaveEvent event) {
+			if (event.linkId.contains("el")) {
+				return;
+			}
+			PolygonInfo pi = this.linkMapping.get(event.linkId);
+			pi.agents--;
+			if (pi.agents <= 0) {
+				pi.clearanceTime = event.time;
+			}
 
-		public void handleEvent(final AgentStuckEvent event) {
-			this.ttimes.remove(event.agentId);
-			
 		}
+		
+		
 		
 	}
 	
-	private static class AgentInfo {
-		double time;
-		Coordinate c;
+	public static void main (final String [] args) {
+		String eventsFile1 = INPUT_BASE + "run316/output/ITERS/it.201/201.events.txt.gz";
+		String eventsFile2 = INPUT_BASE + "run317/output/ITERS/it.200/200.events.txt.gz";
+		String network = "../inputs/networks/padang_net_evac_v20080618.xml";
+		String outfile = INPUT_BASE + "run316/analysis/runComp316vs317.shp";
+		NetworkLayer net = new NetworkLayer();
+		new MatsimNetworkReader(net).readFile(network);
+		
+		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
+		new NetworkClearanceAnalysis(eventsFile1, eventsFile2, net, outfile, crs).run();
 	}
+
+
+
+
 }

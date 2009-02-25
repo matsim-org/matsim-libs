@@ -189,7 +189,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 		final String vehFileName = "../outputs/output/colorizedT.veh.txt.gz";
 //		
 //		String vehFileName = "../runs/run301/output/100.T.veh.gz";
-		final String outFileName = "../outputs/output/ITERS/it.200/200.movie.mvi";
+		final String outFileName = "../outputs/output/ITERS/it.0/0.movie.mvi";
 		final int intervall_s = 60;
 
 		Gbl.createConfig(null);

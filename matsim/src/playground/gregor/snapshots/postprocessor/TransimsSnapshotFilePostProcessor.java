@@ -92,7 +92,7 @@ public class TransimsSnapshotFilePostProcessor {
 		while (line != null){
 
 			double time = Double.parseDouble(line[1]);
-			if (time > 18000) {
+			if (time > 5*3600) {
 				break;
 			}
 			

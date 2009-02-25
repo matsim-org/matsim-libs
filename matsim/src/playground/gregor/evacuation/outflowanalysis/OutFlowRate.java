@@ -67,7 +67,7 @@ public class OutFlowRate implements AgentArrivalEventHandler {
 		}
 		
 		
-		if ((event.time -this.offset)> this.time && ((int)(event.time-this.offset) % 60 == 0)){
+		if ((event.time -this.offset)> this.time && ((int)(event.time-this.offset) % 180 == 0)){
 			this.time = (int) event.time - this.offset;
 			writeLine(new String[] {this.time/60+"",this.evacuated+""});
 		}
