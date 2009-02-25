@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * java.util.Collections.sort (nameOfList<>).
  * See e.g., PlanomatX class.
  */
-public class PlanomatXPlan extends Plan implements Comparable<PlanomatXPlan>{
+public class PlanomatXPlan extends PlanImpl implements Comparable<PlanomatXPlan>{
 
 	public PlanomatXPlan (Person person){
 		super(person);

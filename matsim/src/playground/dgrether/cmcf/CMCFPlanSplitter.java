@@ -62,7 +62,7 @@ public class CMCFPlanSplitter {
 				idStringBuffer.append(Integer.toString(i));
 				
 				Person pNew = new PersonImpl(new IdImpl(idStringBuffer.toString()));
-				Plan planNew = new Plan(pNew);
+				Plan planNew = new org.matsim.population.PlanImpl(pNew);
 				Leg leg = (Leg) legIter.next();
 				
 				planNew.addAct(pl.getPreviousActivity(leg));

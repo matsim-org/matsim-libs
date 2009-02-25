@@ -88,7 +88,7 @@ public class PersonImpl implements Person{
 	}
 
 	public Plan createPlan(final boolean selected) {
-		Plan p = new Plan(this);
+		Plan p = new PlanImpl(this);
 		this.delegate.getPlans().add(p);
 		if (selected) {
 			setSelectedPlan(p);
@@ -157,7 +157,7 @@ public class PersonImpl implements Person{
 		if (oldPlan == null) {
 			return null;
 		}
-		Plan newPlan = new Plan(oldPlan.getPerson());
+		Plan newPlan = new PlanImpl(oldPlan.getPerson());
 		try {
 			newPlan.copyPlan(oldPlan);
 			this.delegate.getPlans().add(newPlan);

@@ -68,13 +68,13 @@ public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithm {
 
 			if (!legMode.equals(BasicLeg.Mode.car)) {
 				if (person.getLicense().equals("yes")) {
-					Plan copyPlan = new Plan(person);
+					Plan copyPlan = new org.matsim.population.PlanImpl(person);
 					//copyPlan.setType(Plan.Type.CAR);//????????????????????????
 					// ??
 					copyPlans.add(copyPlan);
 				}
 			} else if (!legMode.equals(BasicLeg.Mode.pt)) {
-				Plan copyPlan = new Plan(person);
+				Plan copyPlan = new org.matsim.population.PlanImpl(person);
 				// copyPlan.setType(Plan.Type.PT);//?????????????????????
 				copyPlans.add(copyPlan);
 			}

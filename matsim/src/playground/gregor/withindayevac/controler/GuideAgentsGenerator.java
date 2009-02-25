@@ -56,7 +56,7 @@ public class GuideAgentsGenerator {
 			}
 			Id id = new IdImpl("guide" + count++);
 			Person p = new PersonImpl(id);
-			Plan plan  = new Plan(p);
+			Plan plan  = new org.matsim.population.PlanImpl(p);
 			Act actA = new Act("h", new CoordImpl(12000.0, -12000.0), l);
 			actA.setEndTime(3600 * 3);
 			Leg leg = new Leg(BasicLeg.Mode.car);

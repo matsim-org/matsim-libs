@@ -641,7 +641,7 @@ public class Flow {
 					for (int i =1 ; i<= nofpersons;i++){
 						Id matsimid  = new IdImpl(id);
 						Person p = new PersonImpl(matsimid);
-						Plan plan = new Plan(p);
+						Plan plan = new org.matsim.population.PlanImpl(p);
 						plan.addAct(home);
 						plan.addLeg(leg);					
 						plan.addAct(work);
@@ -674,7 +674,7 @@ public class Flow {
 					for (int i =1 ; i<= nofpersons;i++){
 						Id matsimid  = new IdImpl(id);
 						Person p = new PersonImpl(matsimid);
-						Plan plan = new Plan(p);
+						Plan plan = new org.matsim.population.PlanImpl(p);
 						plan.addAct(home);
 						plan.addLeg(leg);					
 						plan.addAct(work);

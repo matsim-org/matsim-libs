@@ -137,7 +137,7 @@ public class CMCFtoEvacConverter {
 			 for (int i = 1 ; i<= dem ;i++) {
 				 Id matsimid  = new IdImpl(id+"."+i);
 				 Person p = new PersonImpl(matsimid);
-				 Plan plan = new Plan(p);
+				 Plan plan = new org.matsim.population.PlanImpl(p);
 				 BasicActImpl home = new BasicActImpl("home");
 				 home.setEndTime(0.);
 				 BasicActImpl work = new BasicActImpl("work");

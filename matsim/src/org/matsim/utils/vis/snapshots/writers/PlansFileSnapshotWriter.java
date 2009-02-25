@@ -25,6 +25,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
+import org.matsim.population.PlanImpl;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.utils.geometry.CoordImpl;
@@ -79,7 +80,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 	public void addAgent(PositionInfo position) {
 		Person pers = new PersonImpl(position.getAgentId());
 
-		Plan plan = new Plan(pers);
+		Plan plan = new PlanImpl(pers);
 		Act actA = new Act("h", new CoordImpl(position.getEasting(), position.getNorthing()),
 				position.getLink());
 		actA.setEndTime(this.currenttime);

@@ -38,14 +38,14 @@ public class PersonTest extends MatsimTestCase {
 	public void testRemoveWorstPlans_nullType() {
 		Person person = new PersonImpl(new IdImpl("1"));
 
-		Plan plan1 = new Plan(person);
+		Plan plan1 = new org.matsim.population.PlanImpl(person);
 		plan1.setScore(15.0);
-		Plan plan2 = new Plan(person);
+		Plan plan2 = new org.matsim.population.PlanImpl(person);
 		plan2.setScore(22.0);
-		Plan plan3 = new Plan(person);
-		Plan plan4 = new Plan(person);
+		Plan plan3 = new org.matsim.population.PlanImpl(person);
+		Plan plan4 = new org.matsim.population.PlanImpl(person);
 		plan4.setScore(1.0);
-		Plan plan5 = new Plan(person);
+		Plan plan5 = new org.matsim.population.PlanImpl(person);
 		plan5.setScore(18.0);
 		person.addPlan(plan1);
 		person.addPlan(plan2);
@@ -91,16 +91,16 @@ public class PersonTest extends MatsimTestCase {
 		 */
 		Person person = new PersonImpl(new IdImpl("1"));
 
-		Plan plan1 = new Plan(person);
+		Plan plan1 = new org.matsim.population.PlanImpl(person);
 		plan1.setScore(15.0);
-		Plan plan2 = new Plan(person);
+		Plan plan2 = new org.matsim.population.PlanImpl(person);
 		plan2.setScore(22.0);
-		Plan plan3 = new Plan(person);
-		Plan plan4 = new Plan(person);
+		Plan plan3 = new org.matsim.population.PlanImpl(person);
+		Plan plan4 = new org.matsim.population.PlanImpl(person);
 		plan4.setScore(1.0);
-		Plan plan5 = new Plan(person);
+		Plan plan5 = new org.matsim.population.PlanImpl(person);
 		plan5.setScore(18.0);
-		Plan plan6 = new Plan(person);
+		Plan plan6 = new org.matsim.population.PlanImpl(person);
 		plan6.setScore(21.0);
 
 		plan1.setType(Plan.Type.CAR);
@@ -145,16 +145,16 @@ public class PersonTest extends MatsimTestCase {
 	public void testRemoveWorstPlans_selectedPlan() {
 		Person person = new PersonImpl(new IdImpl("1"));
 
-		Plan plan1 = new Plan(person);
+		Plan plan1 = new org.matsim.population.PlanImpl(person);
 		plan1.setScore(15.0);
-		Plan plan2 = new Plan(person);
+		Plan plan2 = new org.matsim.population.PlanImpl(person);
 		plan2.setScore(22.0);
-		Plan plan3 = new Plan(person);
-		Plan plan4 = new Plan(person);
+		Plan plan3 = new org.matsim.population.PlanImpl(person);
+		Plan plan4 = new org.matsim.population.PlanImpl(person);
 		plan4.setScore(1.0);
-		Plan plan5 = new Plan(person);
+		Plan plan5 = new org.matsim.population.PlanImpl(person);
 		plan5.setScore(18.0);
-		Plan plan6 = new Plan(person);
+		Plan plan6 = new org.matsim.population.PlanImpl(person);
 		plan6.setScore(21.0);
 		person.addPlan(plan1);
 		person.addPlan(plan2);

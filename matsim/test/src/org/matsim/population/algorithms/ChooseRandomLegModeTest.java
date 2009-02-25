@@ -34,7 +34,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 
 	public void testRandomChoice() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk}, MatsimRandom.random);
-		Plan plan = new Plan(null);
+		Plan plan = new org.matsim.population.PlanImpl(null);
 		plan.createAct("home", new CoordImpl(0, 0));
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
 		plan.createAct("work", new CoordImpl(0, 0));
@@ -63,14 +63,14 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 
 	public void testHandleEmptyPlan() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk}, MatsimRandom.random);
-		Plan plan = new Plan(null);
+		Plan plan = new org.matsim.population.PlanImpl(null);
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
 
 	public void testHandlePlanWithoutLeg() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk}, MatsimRandom.random);
-		Plan plan = new Plan(null);
+		Plan plan = new org.matsim.population.PlanImpl(null);
 		plan.createAct("home", new CoordImpl(0, 0));
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
@@ -81,7 +81,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	 */
 	public void testMultipleLegs() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt}, MatsimRandom.random);
-		Plan plan = new Plan(null);
+		Plan plan = new org.matsim.population.PlanImpl(null);
 		plan.createAct("home", new CoordImpl(0, 0));
 		plan.createLeg(BasicLeg.Mode.car);
 		plan.createAct("work", new CoordImpl(0, 0));

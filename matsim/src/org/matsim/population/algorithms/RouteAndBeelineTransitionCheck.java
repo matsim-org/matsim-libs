@@ -31,6 +31,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
+import org.matsim.population.PlanImpl;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -85,7 +86,7 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 	}
 
 	private Plan getBeeline(final Plan plan) {
-		Plan beeline = new Plan(plan.getPerson());
+		Plan beeline = new PlanImpl(plan.getPerson());
 		ActIterator it = plan.getIteratorAct();
 		beeline.addAct(it.next());
 		while (it.hasNext()) {

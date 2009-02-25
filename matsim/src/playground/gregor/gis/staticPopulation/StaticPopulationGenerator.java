@@ -102,7 +102,7 @@ public class StaticPopulationGenerator {
 				all += li;
 				for (int i = 0; i < li ; i++) {
 					final Person pers = new PersonImpl(new IdImpl(id++));
-					final Plan plan = new Plan(pers);
+					final Plan plan = new org.matsim.population.PlanImpl(pers);
 					final Act act = new Act("h",link.getCenter(),link);
 					act.setStartTime(3 * 3600.0); 
 					// (I still think it would make more sense to leave the starting time of the first activity undefined. kai)

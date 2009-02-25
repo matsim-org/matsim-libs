@@ -64,9 +64,9 @@ public class NewAgentPtPlan extends NewPlan implements PersonAlgorithm {
 			for (Plan pl : person.getPlans()) {
 				// set plan type for car, pt, walk
 				pl.setType(Type.CAR);
-				Plan ptPlan = new Plan(person);
+				Plan ptPlan = new org.matsim.population.PlanImpl(person);
 				ptPlan.setType(Type.PT);
-				Plan walkPlan = new Plan(person);
+				Plan walkPlan = new org.matsim.population.PlanImpl(person);
 				walkPlan.setType(Type.WALK);
 
 				List actsLegs = pl.getActsLegs();

@@ -151,7 +151,7 @@ public class Converter {
 					Act lastAct = tmpPl.createAct(this.tmpTabs[10], tmpCoord2);
 					
 					// make a copy of the just finished plan and set it to use public transit mode
-					Plan nonCarPlan = new Plan(p);
+					Plan nonCarPlan = new org.matsim.population.PlanImpl(p);
 					nonCarPlan.copyPlan(tmpPl);
 					for (LegIterator li = nonCarPlan.getIteratorLeg(); li.hasNext();) {
 						li.next().setMode(Mode.pt);
@@ -160,7 +160,7 @@ public class Converter {
 				}
 
 				Person p = new PersonImpl(new IdImpl(personId));
-				Plan pl = new Plan(p);
+				Plan pl = new org.matsim.population.PlanImpl(p);
 				// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 				endTime = convertTime(tabs[3]);
 

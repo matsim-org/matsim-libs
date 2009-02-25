@@ -139,7 +139,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 
 	private WithindayAgent createAgent(final Link homeLink, final Link workLink) {
 		Person p = new PersonImpl(new IdImpl("1"));
-		this.plan = new Plan(p);
+		this.plan = new org.matsim.population.PlanImpl(p);
 		p.addPlan(this.plan);
 		this.leg = null;
 		try {

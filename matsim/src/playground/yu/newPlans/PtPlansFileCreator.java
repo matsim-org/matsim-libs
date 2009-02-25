@@ -141,7 +141,7 @@ public class PtPlansFileCreator {
 
 		Person p = new PersonImpl(new IdImpl("245-" + personCount));
 		try {
-			Plan pl = new Plan(p);
+			Plan pl = new org.matsim.population.PlanImpl(p);
 			p.addPlan(pl);
 			Link startLink = this.network.getLink(new IdImpl(startLinkId));
 			Act a = pl.createAct("h", startLink);

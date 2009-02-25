@@ -167,7 +167,7 @@ public class PrimaryLocationDrawing {
 			all += li;
 			for (int i = 0; i < li ; i++) {
 				final Person pers = new PersonImpl(new IdImpl(this.id++));
-				final Plan plan = new Plan(pers);
+				final Plan plan = new org.matsim.population.PlanImpl(pers);
 				final Act act = new Act("h",link.getCenter(),link);
 				act.setEndTime(6*3600);
 				plan.addAct(act);

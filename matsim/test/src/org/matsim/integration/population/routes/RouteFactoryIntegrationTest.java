@@ -22,6 +22,7 @@ package org.matsim.integration.population.routes;
 
 import java.util.Collection;
 
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.config.Config;
 import org.matsim.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.controler.Controler;
@@ -68,7 +69,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		Population population = controler.getPopulation();
 		for (Person person : population) {
 			for (Plan plan : person.getPlans()) {
-				for (Plan.LegIterator iter = plan.getIteratorLeg(); iter.hasNext(); ) {
+				for (LegIterator iter = plan.getIteratorLeg(); iter.hasNext(); ) {
 					BasicLeg leg = iter.next();
 					BasicRoute route = leg.getRoute();
 					assertTrue(route instanceof NodeCarRoute); // that must be different from the class used below
@@ -89,7 +90,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 			int planCounter = 0;
 			for (Plan plan : person.getPlans()) {
 				planCounter++;
-				for (Plan.LegIterator iter = plan.getIteratorLeg(); iter.hasNext(); ) {
+				for (LegIterator iter = plan.getIteratorLeg(); iter.hasNext(); ) {
 					BasicLeg leg = iter.next();
 					BasicRoute route = leg.getRoute();
 					assertTrue("person: " + person.getId() + "; plan: " + planCounter, route instanceof CompressedCarRoute);

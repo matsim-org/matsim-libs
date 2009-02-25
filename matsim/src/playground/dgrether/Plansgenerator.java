@@ -76,7 +76,7 @@ public class Plansgenerator {
 		final Coord workCoord = new CoordImpl(10000, 0);
 		for (int i = 1; i <= 100; i++) {
 			Person p = new PersonImpl(new IdImpl(i));
-			Plan plan = new Plan(p);
+			Plan plan = new org.matsim.population.PlanImpl(p);
 			p.addPlan(plan);
 			//home
 			homeEndtime += 0.5 * 60;

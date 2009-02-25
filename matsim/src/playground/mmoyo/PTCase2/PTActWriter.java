@@ -76,7 +76,7 @@ public class PTActWriter {
 			Act thisAct= null;
 			int legNum=0;
 
-			Plan newPlan = new Plan(person);
+			Plan newPlan = new org.matsim.population.PlanImpl(person);
 			for (Iterator<BasicActImpl> iter= plan.getIteratorAct(); iter.hasNext();){
 				thisAct= (Act)iter.next();
 			

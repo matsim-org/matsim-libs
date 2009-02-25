@@ -65,7 +65,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
-import org.matsim.population.Plan;
+import org.matsim.population.Plan;	
+import org.matsim.population.PlanImpl;	
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.world.Layer;
@@ -296,9 +297,12 @@ public class PrimlocModule  implements PersonAlgorithm {
 	}
 	
 	boolean agentHasPrimaryActivityInPlan( Person guy ){
-		for( Plan plan : guy.getPlans() )
-			if( plan.containsActivity(primaryActivityName))
+		for( Plan plan : guy.getPlans() ) {
+			PlanImpl planImpl = (PlanImpl) plan ;
+			if( planImpl.containsActivity(primaryActivityName)) {
 				return true;
+			}
+		}
 		return false;
 	}
 	

@@ -48,7 +48,7 @@ public class ReroutingStrategy implements IntradayStrategy {
 			/*
 			 * TODO: Introduce standard clone() methods!
 			 */
-			Plan copy = new Plan(agent.getPerson());
+			Plan copy = new org.matsim.population.PlanImpl(agent.getPerson());
 			copy.copyPlan(agent.getPerson().getSelectedPlan());
 
 			CarRoute newRoute = getRoute(agent.getLink(), agent

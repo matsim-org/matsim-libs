@@ -120,7 +120,7 @@ public class MyControler1 extends Controler {
 			Person p = new PersonImpl(new IdImpl(i+1));
 
 			try {
-				Plan plan1 = new Plan(p);
+				Plan plan1 = new org.matsim.population.PlanImpl(p);
 				Act act1a = plan1.createAct("h", new CoordImpl(100., 100.));
 				act1a.setLink(link9);
 				act1a.setEndTime(0*60*60.);
@@ -133,7 +133,7 @@ public class MyControler1 extends Controler {
 				act1b.setStartTime(8*60*60);
 				p.addPlan(plan1);
 
-				Plan plan2 = new Plan(p);
+				Plan plan2 = new org.matsim.population.PlanImpl(p);
 				Act act2a = plan1.createAct("h", new CoordImpl(100., 100.));
 				act2a.setLink(link9);
 				act2a.setEndTime(0*60*60.);
@@ -324,7 +324,7 @@ public class MyControler1 extends Controler {
 
 	private void generatePerson(final int ii, final LinkImpl sourceLink, final LinkImpl destLink, final Population population){
 		Person p = new PersonImpl(new IdImpl(ii));
-		Plan plan = new Plan(p);
+		Plan plan = new org.matsim.population.PlanImpl(p);
 		try {
 			Act act1 = plan.createAct("h", new CoordImpl(100., 100.));
 			act1.setLink(sourceLink);

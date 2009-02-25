@@ -65,12 +65,12 @@ public class NewAgentPtPlan2 extends NewPlan {
 				// pl.setType(getPlanType(legMode));//????????????
 
 				if (!legMode.equals(BasicLeg.Mode.car)) {
-					Plan copyPlan = new Plan(person);
+					Plan copyPlan = new org.matsim.population.PlanImpl(person);
 					// copyPlan.setType(Plan.Type.CAR);//????????????
 					this.copyPlans.add(copyPlan);
 					this.copyPlansModes.add(BasicLeg.Mode.car);
 				} else if (!legMode.equals(BasicLeg.Mode.pt)) {
-					Plan copyPlan = new Plan(person);
+					Plan copyPlan = new org.matsim.population.PlanImpl(person);
 					// copyPlan.setType(Plan.Type.PT);//??????????????
 					this.copyPlans.add(copyPlan);
 					this.copyPlansModes.add(BasicLeg.Mode.pt);

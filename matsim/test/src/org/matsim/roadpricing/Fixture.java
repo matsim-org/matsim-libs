@@ -171,7 +171,7 @@ public class Fixture {
 
 	private static Person createPerson1(final int personId, final String startTime, final Link homeLink, final String routeNodes, final Link workLink) {
 		Person person = new PersonImpl(new IdImpl(personId));
-		Plan plan = new Plan(person);
+		Plan plan = new org.matsim.population.PlanImpl(person);
 		person.addPlan(plan);
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
 		Leg leg = plan.createLeg(Mode.car);//"car", startTime, "00:01", null);
@@ -184,7 +184,7 @@ public class Fixture {
 
 	private static Person createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
 		Person person = new PersonImpl(new IdImpl(personId));
-		Plan plan = new Plan(person);
+		Plan plan = new org.matsim.population.PlanImpl(person);
 		person.addPlan(plan);
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));//, "00:00", startTime, startTime, "no");
 		plan.createLeg(Mode.car);//"car", startTime, "00:01", null);

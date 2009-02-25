@@ -36,6 +36,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
+import org.matsim.population.PlanImpl;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.Route;
 import org.matsim.scoring.PlanScorer;
@@ -164,7 +165,7 @@ public class WithindayAgent extends PersonAgent {
 			passedNodesList.addAll(oldRouteNodes.subList(0, lastPassedNodeIndex+1));
 		}
 		//create new plan
-		Plan newPlan = new Plan(this.getPerson());
+		Plan newPlan = new PlanImpl(this.getPerson());
 		newPlan.copyPlan(oldPlan);
 		//put new route into the new plan
 		//first determine index of current leg in the plan

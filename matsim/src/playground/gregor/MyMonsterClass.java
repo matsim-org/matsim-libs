@@ -322,7 +322,7 @@ public class MyMonsterClass {
 			nact.setStartTime(0);
 			nact.setEndTime(39600);
 			nact.setDuration(39600);
-			Plan plan = new Plan(nperson);
+			Plan plan = new org.matsim.population.PlanImpl(nperson);
 			plan.addAct(nact);
 			nperson.addPlan(plan);
 			writer.writePerson(nperson);

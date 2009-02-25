@@ -149,7 +149,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 			String facString  = entry.getKey();
 			log.info("Testing location sequence: " + facString);
 
-			Plan plan = new Plan(person);
+			Plan plan = new org.matsim.population.PlanImpl(person);
 
 			String[] facIdSequence = facString.split(" ");
 			for (int aa=0; aa < facIdSequence.length; aa++) {

@@ -362,7 +362,7 @@ public class PlansCreateFromMZ {
 		for (Person p : plans.getPersons().values()) {
 			boolean has_changed = false;
 			Plan plan = p.getSelectedPlan();
-			Plan plan2 = new Plan(p);
+			Plan plan2 = new org.matsim.population.PlanImpl(p);
 			plan2.setSelected(true);
 			plan2.setScore(plan.getScore());
 			plan2.addAct((Act)plan.getActsLegs().get(0));

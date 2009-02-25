@@ -134,7 +134,7 @@ public class RandomPlansGenerator {
 		
 		for(int i=1; i <= numberOfAgents; i++){
 			Person person = ((Person) new PersonImpl(new IdImpl(i)));
-			Plan plan = new Plan(person);
+			Plan plan = new org.matsim.population.PlanImpl(person);
 			person.addPlan(plan);
 			
 			//create random home and work link

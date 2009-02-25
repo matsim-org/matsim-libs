@@ -65,10 +65,10 @@ public class PlanStatsManager  {
 	}
 
 	public void run(final Plan plan, final int iteration) {
-		if (plan.firstPlanStatsAlgorithm == null){
+		if (plan.getFirstPlanStatsAlgorithm() == null){
 			initPlan(plan);
 		}
-		plan.firstPlanStatsAlgorithm.run(plan.getScore(),  iteration);
+		plan.getFirstPlanStatsAlgorithm().run(plan.getScore(),  iteration);
 
 	}
 
@@ -101,7 +101,7 @@ public class PlanStatsManager  {
 	}
 
 	public void initPlan(final Plan plan){
-		plan.firstPlanStatsAlgorithm = new BasicPlanStats(new PlanScoreTrajectory(this.iters, this.minIteration));
+		plan.setFirstPlanStatsAlgorithm(new BasicPlanStats(new PlanScoreTrajectory(this.iters, this.minIteration)));
 		Id persId = plan.getPerson().getId();
 
 		ArrayList<PlanStats> plans  = this.stats.get(persId);
@@ -109,7 +109,7 @@ public class PlanStatsManager  {
 			plans = new ArrayList<PlanStats>();
 			this.stats.put(persId,plans);
 		}
-		plans.add(plan.firstPlanStatsAlgorithm);
+		plans.add(plan.getFirstPlanStatsAlgorithm());
 	}
 
 	//a simple writer to dump the stats to file

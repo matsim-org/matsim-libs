@@ -188,7 +188,7 @@ public class LeaveLinkReplanner {
 		Plan currentPlan = person.getSelectedPlan();
 		
 		// create new plan and select it
-		Plan newPlan = new Plan(person);
+		Plan newPlan = new org.matsim.population.PlanImpl(person);
 		person.setSelectedPlan(newPlan);
 			
 		// here we are at the moment

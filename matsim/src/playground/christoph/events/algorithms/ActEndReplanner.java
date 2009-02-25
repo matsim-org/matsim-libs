@@ -159,7 +159,7 @@ public class ActEndReplanner implements ActEndEventHandler {
 		// Create new Plan and select it.
 		// This Plan contains only the just ended and the next Activity.
 		// -> That's the only Part of the Route that we want to replan.
-		Plan newPlan = new Plan(person);
+		Plan newPlan = new org.matsim.population.PlanImpl(person);
 		person.addPlan(newPlan);
 		person.setSelectedPlan(newPlan);
 		

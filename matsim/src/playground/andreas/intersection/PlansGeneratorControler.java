@@ -161,7 +161,7 @@ public class PlansGeneratorControler extends Controler {
 	/** Generates one Person a time */
 	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Population population) {
 		Person p = new PersonImpl(new IdImpl(String.valueOf(ii)));
-		Plan plan = new Plan(p);
+		Plan plan = new org.matsim.population.PlanImpl(p);
 		try {
 			Act act1 = plan.createAct("h", new CoordImpl(100., 100.));
 			act1.setLink(fromLink);

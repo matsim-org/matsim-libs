@@ -120,7 +120,7 @@ System.out.println(count);
 //		nodes.add(this.network.getLink(strLinks.get(strLinks.size()-1)).getToNode());
 		
 //		pers.removeWorstPlans(this.maxPlans-1);
-		Plan plan = new Plan(pers);
+		Plan plan = new org.matsim.population.PlanImpl(pers);
 		Act oldA = pers.getSelectedPlan().getFirstActivity();
 		Act a = new Act(oldA);
 		a.setType("h");

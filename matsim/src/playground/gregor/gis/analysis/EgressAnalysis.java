@@ -179,7 +179,7 @@ public class EgressAnalysis {
 				List<Node> route = ((CarRoute) leg.getRoute()).getNodes();
 				Node node = route.get(route.size()-2);
 				this.egressNodes.get(node.getId()).num_current++;
-				Plan plan = new Plan(person);
+				Plan plan = new org.matsim.population.PlanImpl(person);
 				plan.addAct(person.getSelectedPlan().getFirstActivity());
 				Leg l = new Leg(BasicLeg.Mode.car);
 				l.setNum(1);

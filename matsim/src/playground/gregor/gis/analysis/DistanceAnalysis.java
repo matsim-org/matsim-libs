@@ -234,7 +234,7 @@ public class DistanceAnalysis {
 
 			dist[0] +=  l1;
 			dist[2] += person.getSelectedPlan().getScore();
-			Plan plan = new Plan(person);
+			Plan plan = new org.matsim.population.PlanImpl(person);
 			plan.addAct(person.getSelectedPlan().getFirstActivity());
 			Leg ll = new Leg(BasicLeg.Mode.car);
 			ll.setNum(1);
