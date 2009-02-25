@@ -23,6 +23,7 @@ package org.matsim.planomat.costestimators;
 import java.util.HashMap;
 import java.util.List;
 
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -49,7 +50,8 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	private PlansCalcRoute plansCalcRoute;
 
 	private HashMap<Route, List<Link>> linkRoutesCache = new HashMap<Route, List<Link>>();
-	
+	private HashMap<Leg, HashMap<BasicLeg.Mode, Double>> travelTimeCache = new HashMap<Leg, HashMap<BasicLeg.Mode, Double>>();
+
 	public FixedRouteLegTravelTimeEstimator(
 			TravelTime linkTravelTimeEstimator,
 			TravelCost linkTravelCostEstimator,
@@ -64,8 +66,23 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			Act actOrigin, Act actDestination, Leg legIntermediate) {
-		
-			return this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime);
+
+		HashMap<BasicLeg.Mode, Double> legInformation = null; 
+		if (this.travelTimeCache.containsKey(legIntermediate)) {
+			legInformation = this.travelTimeCache.get(legIntermediate);
+		} else {
+			legInformation = new HashMap<BasicLeg.Mode, Double>();
+			this.travelTimeCache.put(legIntermediate, legInformation);
+		}
+		double cachedTravelTimeInformation = Double.MIN_VALUE;
+		if (legInformation.containsKey(legIntermediate.getMode())) {
+			cachedTravelTimeInformation = legInformation.get(legIntermediate.getMode()).doubleValue();
+		} else {
+			cachedTravelTimeInformation = this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime);
+			legInformation.put(legIntermediate.getMode(), cachedTravelTimeInformation);
+		}
+
+		return cachedTravelTimeInformation;
 		
 	}
 
@@ -79,7 +96,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	protected double processRouteTravelTime(final CarRoute route, final double start) {
 
 		double now = start;
-		
+
 		List<Link> links = null;
 		if (this.linkRoutesCache.containsKey(route)) {
 			links = this.linkRoutesCache.get(route);
@@ -87,7 +104,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 			links = route.getLinks();
 			this.linkRoutesCache.put(route, links);
 		}
-		
+
 		for (Link link : links) {
 			now = this.processLink(link, now);
 		}
@@ -109,6 +126,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 
 	public void reset() {
 		this.linkRoutesCache.clear();
+		this.travelTimeCache.clear();
 	}
-	
+
 }

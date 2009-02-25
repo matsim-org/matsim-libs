@@ -83,17 +83,40 @@ public class Planomat implements PlanAlgorithm {
 
 	public void run(final Plan plan) {
 
+		if (Gbl.getConfig().planomat().isDoLogging()) {
+			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...");
+		}
 		// perform subtour analysis only if mode choice on subtour basis is optimized
 		// (if only times are optimized, subtour analysis is not necessary)
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
 		if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
+			if (Gbl.getConfig().planomat().isDoLogging()) {
+				logger.info("Running subtour analysis...");
+			}
 			planAnalyzeSubtours = new PlanAnalyzeSubtours();
 			planAnalyzeSubtours.run(plan);
 		}
-
+		if (Gbl.getConfig().planomat().isDoLogging()) {
+			logger.info("Running subtour analysis...done.");
+			logger.info("Initialization of JGAP configuration...");
+		}
 		Genotype population = this.initJGAP(plan, planAnalyzeSubtours);
+		if (Gbl.getConfig().planomat().isDoLogging()) {
+			logger.info("Initialization of JGAP configuration...done.");
+			logger.info("Running evolution...");
+		}
 		IChromosome fittest = this.evolveAndReturnFittest(population);
+		if (Gbl.getConfig().planomat().isDoLogging()) {
+			logger.info("Running evolution...done.");
+			logger.info("Writing solution back to Plan object...");
+		}
 		this.writeChromosome2Plan(fittest, plan, planAnalyzeSubtours );
+		if (Gbl.getConfig().planomat().isDoLogging()) {
+			logger.info("Writing solution back to Plan object...done.");
+			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...done.");
+		}
+		// reset leg travel time estimator
+		this.legTravelTimeEstimator.reset();
 
 	}
 
@@ -134,15 +157,15 @@ public class Planomat implements PlanAlgorithm {
 	
 	protected IChromosome evolveAndReturnFittest(Genotype population) {
 		
-		IChromosome fittest = null;
-		String logMessage = null;
+//		IChromosome fittest = null;
+//		String logMessage = null;
 		for (int i = 0; i < Gbl.getConfig().planomat().getJgapMaxGenerations(); i++) {
 			population.evolve();
-			if (Gbl.getConfig().planomat().isDoLogging()) {
-				fittest = population.getFittestChromosome();
-				logMessage = "Generation #" + Integer.toString(i) + " : Max: " + fittest.getFitnessValue();
-				logger.info(logMessage);
-			}
+//			if (Gbl.getConfig().planomat().isDoLogging()) {
+//				fittest = population.getFittestChromosome();
+//				logMessage = "Generation #" + Integer.toString(i) + " : Max: " + fittest.getFitnessValue();
+//				logger.info(logMessage);
+//			}
 		}
 		return population.getFittestChromosome();
 
@@ -279,9 +302,6 @@ public class Planomat implements PlanAlgorithm {
 
 		// invalidate score information
 		plan.setScore(Double.NaN);
-
-		// reset leg travel time estimator
-		this.legTravelTimeEstimator.reset();
 
 	}
 
