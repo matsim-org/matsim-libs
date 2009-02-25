@@ -34,7 +34,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 	private double carDist, ptDist, otherDist;
 
 	private double totalCounts[], carCounts[], ptCounts[], otherCounts[],
-			carCounts5[], ptCounts5[];
+			carCounts5[], ptCounts5[], carCounts1[], ptCounts1[];
 
 	private double carWorkDist, carEducDist, carShopDist, carLeisDist,
 			carHomeDist, carOtherDist, ptWorkDist, ptEducDist, ptShopDist,
@@ -61,6 +61,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		this.otherCounts = new double[101];
 		carCounts5 = new double[21];
 		ptCounts5 = new double[21];
+		carCounts1 = new double[101];
+		ptCounts1 = new double[101];
 		this.carWorkDist = 0.0;
 		this.carEducDist = 0.0;
 		this.carShopDist = 0.0;
@@ -159,6 +161,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 						break;
 					}
 					carCounts5[Math.min(20, (int) dist / 5)]++;
+					carCounts1[Math.min(100, (int) dist)]++;
 				} else if (bl.getMode().equals(Mode.pt)) {
 					this.ptDist += dist;
 					ptDayDist += dist;
@@ -183,6 +186,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 						break;
 					}
 					ptCounts5[Math.min(20, (int) dist / 5)]++;
+					ptCounts1[Math.min(100, (int) dist)]++;
 				}
 			}
 		}
@@ -243,7 +247,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		BarChart barChart = new BarChart(
 				"travel destination and modal split--daily distance",
 				"travel destination", "daily distance [km]", new String[] {
-						"work", "educ", "shop", "leis", "home", "other" });
+						"work", "education", "shopping", "leisure", "home", "others" });
 		barChart.addSeries("car", new double[] { carWorkDist, carEducDist,
 				carShopDist, carLeisDist, carHomeDist, carOtherDist });
 		barChart.addSeries("pt", new double[] { ptWorkDist, ptEducDist,
@@ -283,9 +287,9 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		sw
 				.writeln("leg Distance [km]\tcar legs no.\tpt legs no.\tcar fraction [%]\tpt fraction [%]");
 
-		double xs[] = new double[21];
-		double yCarFracs[] = new double[21];
-		double yPtFracs[] = new double[21];
+		double xs[] = new double[101];
+		double yCarFracs[] = new double[101];
+		double yPtFracs[] = new double[101];
 
 		BubbleChart bubbleChart = new BubbleChart(
 				"Modal split -- leg distance", "pt fraction [%]",
@@ -301,11 +305,6 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 							new double[] { (i + 0.5) / 5.0 } });
 			sw.writeln((i * 5) + "+\t" + carCounts5[i] + "\t" + ptCounts5[i]
 					+ "\t" + carFraction + "\t" + ptFraction);
-
-			xs[i] = i * 5;
-			yCarFracs[i] = carFraction;
-			yPtFracs[i] = ptFraction;
-
 		}
 		double ptFraction = ptCounts5[20] / (ptCounts5[20] + carCounts5[20])
 				* 100.0;
@@ -319,9 +318,12 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		bubbleChart.saveAsPng(outputFilename + "legDistanceModalSplit.png",
 				900, 900);
 
-		xs[20] = 100;
-		yCarFracs[20] = carFraction;
-		yPtFracs[20] = ptFraction;
+		for (int i = 0; i < 101; i++) {
+			xs[i] = (double) i;
+			yCarFracs[i] = carCounts1[i] / (ptCounts1[i] + carCounts1[i])
+					* 100.0;
+			yPtFracs[i] = ptCounts1[i] / (ptCounts1[i] + carCounts1[i]) * 100.0;
+		}
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
 				"leg Distance [km]", "mode fraction [%]");
 		chart2.addSeries("car", xs, yCarFracs);

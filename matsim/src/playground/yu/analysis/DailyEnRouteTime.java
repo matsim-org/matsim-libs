@@ -35,7 +35,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 	private int count;
 	private double carTime, ptTime, otherTime;
 	final double totalCounts[], carCounts[], ptCounts[], otherCounts[],
-			carCounts10[], ptCounts10[];
+			carCounts10[], ptCounts10[], carCounts2[], ptCounts2[];
 	private double carWorkTime, carEducTime, carShopTime, carLeisTime,
 			carHomeTime, carOtherTime, ptWorkTime, ptEducTime, ptShopTime,
 			ptLeisTime, ptHomeTime, ptOtherTime, throughWorkTime,
@@ -54,6 +54,8 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		this.otherCounts = new double[101];
 		carCounts10 = new double[21];
 		ptCounts10 = new double[21];
+		carCounts2 = new double[101];
+		ptCounts2 = new double[101];
 		this.carWorkTime = 0.0;
 		this.carEducTime = 0.0;
 		this.carShopTime = 0.0;
@@ -152,6 +154,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 						break;
 					}
 					carCounts10[Math.min(20, (int) time / 10)]++;
+					carCounts2[Math.min(100, (int) time / 2)]++;
 				} else if (bl.getMode().equals(Mode.pt)) {
 					this.ptTime += time;
 					ptDayTime += time;
@@ -176,6 +179,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 						break;
 					}
 					ptCounts10[Math.min(20, (int) time / 10)]++;
+					ptCounts2[Math.min(100, (int) time / 2)]++;
 				}
 			}
 		}
@@ -236,9 +240,10 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 						+ (this.carOtherTime + this.ptOtherTime + this.throughOtherTime));
 
 		BarChart barChart = new BarChart(
-				"travel destination and modal split--daily distance",
-				"travel destination", "daily distance [km]", new String[] {
-						"work", "educ", "shop", "leis", "home", "other" });
+				"travel destination and modal split--daily En Route Time",
+				"travel destination", "daily En Route Time [min]",
+				new String[] { "work", "education", "shopping", "leisure",
+						"home", "others" });
 		barChart.addSeries("car", new double[] { carWorkTime, carEducTime,
 				carShopTime, carLeisTime, carHomeTime, carOtherTime });
 		barChart.addSeries("pt", new double[] { ptWorkTime, ptEducTime,
@@ -247,8 +252,8 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 				throughEducTime, throughShopTime, throughLeisTime,
 				throughHomeTime, throughOtherTime });
 		barChart.addMatsimLogo();
-		barChart.saveAsPng(outputFilename + "dailyTimeTravelDistination.png",
-				1200, 900);
+		barChart.saveAsPng(outputFilename
+				+ "dailyEnRouteTimeTravelDistination.png", 1200, 900);
 
 		double x[] = new double[101];
 		for (int i = 0; i < 101; i++)
@@ -277,10 +282,6 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		sw
 				.writeln("leg Duration [min]\tcar legs no.\tpt legs no.\tcar fraction [%]\tpt fraction [%]");
 
-		double xs[] = new double[21];
-		double yCarFracs[] = new double[21];
-		double yPtFracs[] = new double[21];
-
 		BubbleChart bubbleChart = new BubbleChart(
 				"Modal split -- leg Duration", "pt fraction [%]",
 				"car fraction [%]");
@@ -295,11 +296,6 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 							new double[] { (i + 0.5) / 2.5 } });
 			sw.writeln((i * 10) + "+\t" + carCounts10[i] + "\t" + ptCounts10[i]
 					+ "\t" + carFraction + "\t" + ptFraction);
-
-			xs[i] = i * 10;
-			yCarFracs[i] = carFraction;
-			yPtFracs[i] = ptFraction;
-
 		}
 		double ptFraction = ptCounts10[20] / (ptCounts10[20] + carCounts10[20])
 				* 100.0;
@@ -316,9 +312,16 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		bubbleChart.saveAsPng(outputFilename + "legTimeModalSplit.png", 900,
 				900);
 
-		xs[20] = 200;
-		yCarFracs[20] = carFraction;
-		yPtFracs[20] = ptFraction;
+		double xs[] = new double[101];
+		double yCarFracs[] = new double[101];
+		double yPtFracs[] = new double[101];
+		for (int i = 0; i < 101; i++) {
+			xs[i] = i * 2;
+			yCarFracs[i] = carCounts2[i] / (ptCounts2[i] + carCounts2[i])
+					* 100.0;
+			yPtFracs[i] = ptCounts2[i] / (ptCounts2[i] + carCounts2[i]) * 100.0;
+		}
+
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Duration",
 				"leg Duration [min]", "mode fraction [%]");
 		chart2.addSeries("car", xs, yCarFracs);
