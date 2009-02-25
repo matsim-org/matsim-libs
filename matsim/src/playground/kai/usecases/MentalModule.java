@@ -9,6 +9,7 @@ import org.matsim.interfaces.basic.v01.*;
 
 // not ok:
 //import org.matsim.basic.v01.*;
+//import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.events.*;
 import org.matsim.events.handler.*;
@@ -102,41 +103,50 @@ ActStartEventHandler
 		}
 		
 		// need to be able to construct a person:
-
-//		BasicPopulationBuilder pb = new BasicPopulationBuilderImpl(pop) ; 
 		BasicPopulationBuilder pb = pop.getPopulationBuilder() ; 
-		// TODO: BasicPopulationBuilder ist eine Implementation, nicht ein Interface. 
-		// Ich fände es konsistenter, wenn man es über ein Interface erhalten könnte.
-		// Dafür z.B.: pop.getPopulationBuilder() .  M.E. doch kein Problem, oder??
 		
-//		try {
-//			Id id = sc.createId("1") ; // TODO: auch dies braucht eine Implementation
-//			BasicPerson person = pb.createPerson(id) ;
-//			
-//			BasicPlan plan = pb.createPlan(person) ;
-//			person.addPlan(plan) ;
-//			
-//			Coord coord = sc.createCoord(1.,1.) ;
+		try {
+			Id id = sc.createId("1") ; 
+			BasicPerson person = pb.createPerson(id) ;
+			
+			BasicPlan plan = pb.createPlan(person) ;
+			person.addPlan(plan) ;
+			
+			Coord coord = sc.createCoord(1.,1.) ;
+			Id linkId = sc.createId("2" ) ;
+			Id facId = sc.createId("3") ;
+			
 //			BasicLocation loc = pb.createFacility( coord ) ;
+			
+			BasicLink link ;
+//			BasicAct hAct = pb.createAct( "home", link ) ;
 //			
-//			BasicAct hAct = pb.createAct(plan, "home", loc ) ;
+//			BasicFacility fac ;
+//			BasicAct h2Act = pb.createAct( "home", fac ) ;
+//			
+//			BasicAct h3Act = pb.createAct( "home", coord ) ;
+			
+//			BasicAct hAct = pb.createAct( "home" ) ;
+//			hAct.setCoord( coord ) ;
+//			hAct.setLink ( link ) ;
+//			hAct.setFacility( fac ) ;
 //			plan.addAct( hAct ) ;
-//			
-//			BasicLeg leg = pb.createLeg(plan, BasicLeg.Mode.bike) ;
-//			plan.addLeg( leg ) ;
-//			
-//			List<Id> routeIdList = new ArrayList<Id>() ;
-//			routeIdList.add(id) ; routeIdList.add(id) ;
-//			BasicRoute route = pb.createRoute(id, id, routeIdList ) ;
-//			leg.setRoute(route) ;
-//			
+			
+			BasicLeg leg = pb.createLeg(plan, BasicLeg.Mode.bike) ;
+			plan.addLeg( leg ) ;
+			
+			List<Id> routeIdList = new ArrayList<Id>() ;
+			routeIdList.add(id) ; routeIdList.add(id) ;
+			BasicRoute route = pb.createRoute(id, id, routeIdList ) ;
+			leg.setRoute(route) ;
+			
 //			BasicLink link ;
-//			BasicAct wAct = pb.createAct(plan, "work", link ) ;
+//			BasicAct wAct = pb.createAct("work") ;
 //			plan.addAct( wAct ) ;
-//			
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 
 	}
