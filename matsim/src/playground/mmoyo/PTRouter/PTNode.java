@@ -1,6 +1,6 @@
 package playground.mmoyo.PTRouter;
 
-import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.network.Node;
 
@@ -12,34 +12,34 @@ import org.matsim.network.Node;
  * @param idPTLine the PT line that exclusively travels through the node
  */
 public class PTNode extends Node {
-	private IdImpl idFather;
-	private IdImpl idPTLine;
+	private Id idFather;
+	private Id idPTLine;
 	private String stationName;
-	private IdImpl IdFareStage;
+	private Id IdFareStage;
 	
-	public PTNode(IdImpl idImpl, Coord coord, final String type, IdImpl idFather, IdImpl idPTLine) {
-		super(idImpl, coord, type);
+	public PTNode(Id id, Coord coord, final String type, Id idFather, Id idPTLine) {
+		super(id, coord, type);
 		this.idFather = idFather;
 		this.idPTLine = idPTLine;
 	}
 
-	public PTNode(IdImpl idImpl, Coord coord, final String type){
-		super(idImpl, coord, type);
+	public PTNode(Id id, Coord coord, final String type){
+		super(id, coord, type);
 	}
 
-	public IdImpl getIdFather() {
+	public Id getIdFather() {
 		return idFather;
 	}
 
-	public void setIdFather(IdImpl idFather) {
+	public void setIdFather(Id idFather) {
 		this.idFather = idFather;
 	}
 
-	public IdImpl getIdPTLine() {
+	public Id getIdPTLine() {
 		return idPTLine;
 	}
 
-	public void setIdPTLine(IdImpl idPTLine) {
+	public void setIdPTLine(Id idPTLine) {
 		this.idPTLine = idPTLine;
 	}
 
@@ -51,11 +51,11 @@ public class PTNode extends Node {
 		this.stationName = stationName;
 	}
 
-	public IdImpl getIdFarestage() {
+	public Id getIdFarestage() {
 		return IdFareStage;
 	}
 
-	public void setIdFarestage(IdImpl idFareStage) {
+	public void setIdFarestage(Id idFareStage) {
 		IdFareStage = idFareStage;
 	}	
 }

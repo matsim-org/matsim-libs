@@ -1,6 +1,7 @@
 package playground.mmoyo.PTRouter;
 
-import org.matsim.basic.v01.IdImpl;
+//import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 
 /** 
@@ -24,9 +25,9 @@ public class PTTimeTableInfo {
 	//timetables of father nodes
 	//The expected parameter is a Link from PTNetwork so it is assumed to get PTNodes
 	public int travelTime (Link l, int time){
-		IdImpl idPtLine = ((PTNode)l.getFromNode()).getIdPTLine(); 
-		IdImpl idFromFather = ((PTNode)l.getFromNode()).getIdFather();
-        IdImpl idToFather= ((PTNode)l.getToNode()).getIdFather();
+		Id idPtLine = ((PTNode)l.getFromNode()).getIdPTLine(); 
+		Id idFromFather = ((PTNode)l.getFromNode()).getIdFather();
+        Id idToFather= ((PTNode)l.getToNode()).getIdFather();
    		int departure = ptTimeTable.nextDepartureXLine(idFromFather, idPtLine, time); 
 		int arrival =ptTimeTable.nextDepartureXLine(idToFather, idPtLine, departure+1); 
 		

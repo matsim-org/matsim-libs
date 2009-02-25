@@ -21,7 +21,7 @@ import playground.mmoyo.PTRouter.*;
  */
 
 public class PTNetworkLayer extends NetworkLayer {
-	// TODO: Get these values out from the city network
+	//--> Get these values out from the city network
 	// These are temporary values for the 5x5 scenario
 	int maxNodekey = 24;
 	int maxLinkKey = 79;
@@ -196,7 +196,6 @@ public class PTNetworkLayer extends NetworkLayer {
 	}
 	
 	// Creates only irrelevant values to create a PTLink. Actually the cost is calculated on other parameters
-	//TODO: Check later if this affect the simulation
 	private void createLink(int id, String from, String to, String ptType ){
 		String length = "1";
 		String freespeed= "1";

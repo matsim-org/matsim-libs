@@ -11,8 +11,6 @@ import org.matsim.population.Population;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 
-
-
 public class PTTester {
 	private PTOb pt;
 

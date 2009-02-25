@@ -136,7 +136,7 @@ public class PTTimeTable2{
 		}
 		
 		if (index== -1) {
-			//TODO Define what todo here!!
+			//TODO Define what to do here!!
 		}
 		return arrDep[index];
 		//System.out.println("Next departuere: "+ nextDep);

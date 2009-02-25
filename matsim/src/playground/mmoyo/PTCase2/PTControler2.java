@@ -1,20 +1,11 @@
 package playground.mmoyo.PTCase2;
 
+import java.util.Collection;
 import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Node;
-import org.matsim.network.Link;
+
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.CoordImpl;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import org.matsim.basic.v01.IdImpl;
-
-import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.Validators.*;
 
 public class PTControler2 {
@@ -32,14 +23,12 @@ public class PTControler2 {
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, INPTNETFILE, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
 		
-		int option =-1;
+		int option =3;
 		
 		if (option>0){pt.readPTNet(ZURICHPTN);}
 		switch (option){
-	    	
 			case -2:
 				pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
-	    		//pt.getPtNetworkFactory().writeNet(pt.getPtNetworkLayer(), ZURICHPTN);
 	    		pt.readPTNet(ZURICHPTN);
 	    		NetValidator netValidator = new NetValidator(pt.getPtNetworkLayer(), pt.getPtTimeTable());
 	    		netValidator.printNegativeTransferCosts(28800);
@@ -48,18 +37,17 @@ public class PTControler2 {
 				pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
 				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300);
 	    		pt.getPtNetworkFactory().writeNet(pt.getPtNetworkLayer(), ZURICHPTN);
-	    		
 	    		pt.readPTNet(ZURICHPTN);
-	    		
-	    		PTActWriter ptActWriter = new PTActWriter(pt);
-	    		ptActWriter.writePTActsLegs();
+   		
+	    		PTActWriter ptActWriter1 = new PTActWriter(pt);
+	    		ptActWriter1.writePTActsLegs();
 	    		
 				break;
 			case 0: 
 	    		pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
 	    		
-	    		Map<String, List<IdImpl>> intersecionMap = pt.getPtNetworkFactory().createIntersecionMap(pt.getPtTimeTable());
-	    		new StationValidator().validateStations(pt.getPtNetworkLayer(),intersecionMap);
+	    		//Map<String, List<IdImpl>> intersecionMap = pt.getPtNetworkFactory().createIntersecionMap(pt.getPtTimeTable());
+	    		//new StationValidator().validateStations(pt.getPtNetworkLayer(),intersecionMap);
 	    		    		
 	    		break;
 	    	case 1:
@@ -74,26 +62,36 @@ public class PTControler2 {
 	    		Node ptNode2 = pt.getPtNetworkLayer().getNode("101456");
 	    		pt.getPtRouter2().PrintRoute(pt.getPtRouter2().findRoute(ptNode, ptNode2, 391));
 	    		break;
+	    	
 	    	case 3:
 	    		long startTime = System.currentTimeMillis();
+	    		PTActWriter ptActWriter = new PTActWriter(pt);
+	    		ptActWriter.writePTActsLegs();
+	    		System.out.println("Duration: " + (System.currentTimeMillis()-startTime));	
 	    		
-	    		//PTActWriter ptActWriter = new PTActWriter(pt);
-	    		//ptActWriter.writePTActsLegs();
-	    		
-	        	System.out.println("Duration: " + (System.currentTimeMillis()-startTime));	
-	    		
+	    		ptActWriter.ptTravelTime.costValidator.printNegativeVaues();
+	    		//System.out.println(ptActWriter.ptTravelTime.costValidator==null);
 	    		break;
+	 
 	    	case 4:
 	    		PTTester pttester= new PTTester(pt);
 	    		pttester.countRoutes();
 	    		break;
 	    	case 5:
-	    		playground.mmoyo.PTRouter.PTNProximity ptnProximity = new playground.mmoyo.PTRouter.PTNProximity(pt.getPtNetworkLayer());  
+	    		//24 feb
+	    		//playground.mmoyo.PTRouter.PTNProximity ptnProximity = new playground.mmoyo.PTRouter.PTNProximity(pt.getPtNetworkLayer());  
+
 	    		Coord coord6= new CoordImpl(708146,243607);
-	    		ptnProximity.printNearestBusStops(coord6, 3500);
+	    		double distance= 4500;
+	    		Collection <Node> nearNodes = pt.getPtNetworkLayer().getNearestNodes(coord6, distance);
+	    		
+	    		System.out.println ("Nodes near " + coord6.toString());
+	    		for (Node nearNode : nearNodes){
+	    			System.out.println (nearNode.getId());
+	    		}
 	    		break;
 	    	case 6:
-	      		//TODO: implement better createTransferLinks2
+	      		//--> implement better createTransferLinks2
 	    		//pt.getPtNetworkFactory().createTransferLinks2(pt.getPtNetworkLayer(),IntersecionMap );
 	    		pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 200);
 	    		pt.getPtNetworkFactory().writeNet(pt.getPtNetworkLayer(), ZURICHPTN);
@@ -105,10 +103,6 @@ public class PTControler2 {
 	    		System.out.println(nodeB==null);
 	    		boolean unidos= pt.getPtNetworkFactory().areConected(nodeA, nodeB);
 	    		System.out.println(unidos);
-	    		break;
-	    	case 8:
-	    		Link l= pt.getPtNetworkLayer().getLink("DT1557");
-	    		System.out.println(l.toString());
 	    		break;
 	    		
 		}//switch

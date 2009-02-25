@@ -8,7 +8,7 @@ import org.matsim.network.NetworkLayer;
 
 public class PTOb {
 	private NetworkLayer ptNetworkLayer; 
-	private PTRouter2 ptRouter2;
+	public  PTRouter2 ptRouter2;  //TODO: make private
 	private PTTimeTable2 ptTimeTable;
 	private String outPutPlanFile; 
 	private String config;

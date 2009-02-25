@@ -27,14 +27,6 @@ public class PTControler {
 	    		createPTView(); 
 	            break;
 	            
-	    	case 2:     //Search near bus/train stops
-	    		readCityNetwork();
-	    		createPTNetwork();
-	    		PTNProximity ptnProximity= new PTNProximity (cityNetworkLayer, ptNetworkLayer);
-	    		ptnProximity.printNearestBusStops(cityNetworkLayer.getNode("16"), 3000);
-	    		//ptnProximity.dumpNet();
-	    		break;
-
 	    	case 3: // new version of router
 	    		readCityNetwork();
 	    		createPTNetwork();

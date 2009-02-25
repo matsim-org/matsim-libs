@@ -103,13 +103,6 @@ public class PTLinesReader2 extends MatsimXmlParser {
 	
 	private void endLine() {	
 		this.ptLineList.add(new PTLine(idPTLine, type, direction, route, minutes, departureList));
-		
-		//PTLine ptl= ptLineList.get(ptLineList.size()-1);
-		//System.out.println(ptl.getId());
-		//System.out.println(ptl.getDirection());
-		//System.out.println(ptl.getRoute());
-		//System.out.println(ptl.getMinutes().toString());
-		//System.out.println(ptl.getDepartures());
 	}
 
 	private void endLines(){

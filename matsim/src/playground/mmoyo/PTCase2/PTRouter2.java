@@ -1,10 +1,12 @@
 package playground.mmoyo.PTCase2;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -16,7 +18,7 @@ import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 
-import playground.mmoyo.PTRouter.PTNProximity;
+//import playground.mmoyo.PTRouter.PTNProximity;   //24 feb
 import playground.mmoyo.PTRouter.PTNode;
 /** 
  * Second version of Router using Matsims Class Dijkstra  
@@ -31,30 +33,35 @@ import playground.mmoyo.PTRouter.PTNode;
  */
 public class PTRouter2 {
 	private NetworkLayer ptNetworkLayer; 
-	private PTNProximity ptnProximity;
+	///private PTNProximity ptnProximity;  //24 feb
 	private Dijkstra dijkstra;
 	private PTNetworkFactory2 ptNetworkFactory = new PTNetworkFactory2();
 	private PTTravelCost ptTravelCost;
-	private PTTravelTime ptTravelTime;
+	public PTTravelTime ptTravelTime; //TODO: make private
 	
 	/**
 	 * @param network
 	 */
 	public PTRouter2(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimetable) {
 		this.ptNetworkLayer = ptNetworkLayer;
-		this.ptnProximity = new PTNProximity (ptNetworkLayer);
+		///this.ptnProximity = new PTNProximity (ptNetworkLayer);  //24 feb
 		this.ptTravelCost = new PTTravelCost(ptTimetable);
 		this.ptTravelTime =new PTTravelTime(ptTimetable);
 		this.dijkstra = new Dijkstra(ptNetworkLayer, ptTravelCost, ptTravelTime);	
 	}
 		
 	public Path findRoute(Coord coord1, Coord coord2, double time, int distToWalk){
-		PTNode[] NearStops1= ptnProximity.getNearestBusStops(coord1, distToWalk, false);
-		PTNode[] NearStops2= ptnProximity.getNearestBusStops(coord2, distToWalk, false);
+		//original code //24 feb
+		//PTNode[] NearStops1= ptnProximity.getNearestBusStops(coord1, distToWalk, false);
+		//PTNode[] NearStops2= ptnProximity.getNearestBusStops(coord2, distToWalk, false);
+		
+		Collection <Node> NearStops1 = ptNetworkLayer.getNearestNodes(coord1, distToWalk);
+		Collection <Node> NearStops2 = ptNetworkLayer.getNearestNodes(coord2, distToWalk);
+		
 		PTNode ptNode1=ptNetworkFactory.CreateWalkingNode(ptNetworkLayer, new IdImpl("W1"), coord1);
 		PTNode ptNode2=ptNetworkFactory.CreateWalkingNode(ptNetworkLayer, new IdImpl("W2"), coord2);
-		List <IdImpl> walkingLinkList1 = ptNetworkFactory.CreateWalkingLinks(ptNetworkLayer, ptNode1, NearStops1, true);
-		List <IdImpl> walkingLinkList2 = ptNetworkFactory.CreateWalkingLinks(ptNetworkLayer, ptNode2, NearStops2, false);
+		List <Id> walkingLinkList1 = ptNetworkFactory.CreateWalkingLinks(ptNetworkLayer, ptNode1, NearStops1, true);
+		List <Id> walkingLinkList2 = ptNetworkFactory.CreateWalkingLinks(ptNetworkLayer, ptNode2, NearStops2, false);
 
 		Path path = dijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 		
@@ -73,8 +80,12 @@ public class PTRouter2 {
 	}
 
 	public Path findRoute(Coord coord1, Coord coord2, double time){
-		PTNode node1= ptnProximity.getNearestNode(coord1.getX(), coord1.getY());
-		PTNode node2= ptnProximity.getNearestNode(coord2.getX(), coord2.getY());
+		//24 feb
+		//PTNode node1= ptnProximity.getNearestNode(coord1.getX(), coord1.getY());
+		//PTNode node2= ptnProximity.getNearestNode(coord2.getX(), coord2.getY());
+		
+		Node node1= ptNetworkLayer.getNearestNode(coord1);
+		Node node2= ptNetworkLayer.getNearestNode(coord2);
 		return findRoute(node1, node2,time);
 	}
 	
@@ -126,7 +137,7 @@ public class PTRouter2 {
 					leg.setDepartureTime(accumulatedTime);
 					leg.setTravelTime(routeTravelTime);
 					leg.setArrivalTime((accumulatedTime + (routeTravelTime))); 
-					leg.setNum(num); 		
+					//leg.setNum(num);   deprecated 		
 					leg.setRoute(legRoute);
 					actLegList.add(leg);		
 					
@@ -147,7 +158,6 @@ public class PTRouter2 {
 				//legArrTime =  accumulatedTime;
 				routeTravelTime=0;
 					
-				
 			}// for x=0
 		}//if route!null
 		return actLegList;
@@ -158,7 +168,7 @@ public class PTRouter2 {
 		Act ptAct= new Act("Wait PT Vehicle", coord);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
-		ptAct.setDuration(dur);
+		//ptAct.setDuration(dur);   deprecated
 		ptAct.calculateDuration();
 		ptAct.setLink(link);
 		//act.setDur(linkTravelTime*60);
@@ -174,7 +184,7 @@ public class PTRouter2 {
 				//System.out.println("link: "l.getId() + " cost: " + link.);
 			//}
 		
-			IdImpl idPTLine = new IdImpl("");
+			Id idPTLine = new IdImpl("");
 			for (Iterator<Node> iter = path.nodes.iterator(); iter.hasNext();){
 				PTNode ptNode= (PTNode)iter.next();
 				if(ptNode.getIdPTLine()==idPTLine){
@@ -193,125 +203,3 @@ public class PTRouter2 {
 	}//printroute
 
 }//class
-
-/*
-public Path forceRoute(Coord coord1, Coord coord2, double time, int distToWalk){
-	Path path=null;
-	while (path==null && distToWalk<1300){
-		path= findRoute(coord1, coord2, time, distToWalk);
-		distToWalk= distToWalk+50;
-	}
-	return path;
-}
-*/
-
-/*
-private Leg createLeg(int num, CarRoute legRoute, double depTime, double travTime, double arrTime){
-	Leg leg = new Leg(Leg.Mode.pt);
-	leg.setNum(num);
-	leg.setRoute(legRoute);
-	leg.setArrivalTime(arrTime);
-	leg.setTravelTime(travTime);
-	leg.setDepartureTime(depTime);
-	return leg;
-}
-
-private Link findLink(Node node1, Node node2){
-	Link link= null;
-	for (Link l: (node1.getInLinks().values())) {
-		if (l.getFromNode().equals(node2)){
-			return l;
-		}
-	}
-	return  link;
-}
-*/
-
-
-
-/*
-for (Iterator<Node> iter = route.getRoute().iterator(); iter.hasNext();){
-	PTNode ptNode= (PTNode)iter.next();
-	if(ptNode.getIdPTLine()==idPTLine && iter.hasNext()){
-		//legList.get(x);
-		//System.out.print(ptNode.getId().toString() + " ");
-		legRoute.getRoute().add(ptNode);
-		if (check){
-			Link link= findLink(fromNode, ptNode);
-			if (link== null){
-				System.out.println (fromNode.getId() + " "+  ptNode.getId());	
-			}
-			travTime = travTime+ ptTravelTime.getLinkTravelTime(link, travTime); //TODO: corregir este travTime
-			//System.out.println("link:" + link.getId() + " traveltime:" + this.ptTravelTime.getLinkTravelTime(link, 8000));
-			//System.out.println(ptNode.getId() + " " + ptNode.getIdPTLine() + " " + legRoute.getRoute().size());
-		}
-	}else{
-		//System.out.println("\n" + ptNode.getIdPTLine().toString());
-		//System.out.println(subRoute.getRoute().toString());
-		//System.out.println(legRoute.toString());
-		//System.out.println("\nCambio" );
-		
-		Leg leg = new Leg(Leg.Mode.pt);
-		leg.setNum(num);
-		leg.setRoute(legRoute);
-		leg.setDepTime(depTime);
-		leg.setTravTime(travTime);
-		leg.setArrTime(depTime+travTime);
-		legList.add(leg);
-		
-		//clean variables
-		depTime= leg.getArrTime();
-		legRoute = new Route();
-		fromNode= ptNode;
-		travTime=0;
-		check=true;
-		num++;
-		//x++;
-	}
-	idPTLine= ptNode.getIdPTLine();	
-}
- */
-//System.out.println(legList.toString());
-
-
-/*codigo original
-if (x>0){
-	legRoute.getRoute().add(route.getLinkRoute()[x-1].getToNode()); //if Transfer or end of route we add the toNode of last Link to complete the route;
-}
-	//Add the standard leg 
-	arrTime=depTime+travTime;
-	Leg leg = createLeg(num, legRoute, depTime, travTime, arrTime);
-	legList.add(leg);
-	
-	depTime= leg.getArrTime();
-	num++;
-
-	//Add the transfer leg
-	if (link.getType().equals("Transfer")){
-		legRoute = new Route();
-		legRoute.getRoute().add(link.getFromNode());
-		legRoute.getRoute().add(link.getToNode());
-	
-		///////////////////////////////////////////////////////
-		//System.out.println(subRoute.getRoute().toString());
-		//System.out.println(legRoute.toString());
-		//System.out.println("\nCambio" );
-		//leg.setNum(num);
-		//System.out.println(leg.setRoute(legRoute);
-		//leg.setDepTime(depTime);
-		//leg.setTravTime(travTime);
-		//leg.setArrTime(depTime+travTime);
-		//legList.add(leg);
-		///////////////////////////////////////////////////////
-		
-		arrTime= depTime;
-		travTime= ptTravelTime.getLinkTravelTime(link, travTime);
-		depTime= depTime +  travTime;
-		
-		num++;
-	}
-	//clean variables
-	legRoute = new Route();
-	leg=null;
-	travTime=0;
-*/

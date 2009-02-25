@@ -57,8 +57,20 @@ public class PathValidator {
 			}//if pathlinks
 		}else{
 			valid=false;
-		}//path1=null
+		}//path!=null
 		return valid;
 	}//is valid
+	
+	
+	public void printPath(Path path){
+		System.out.print(path.toString());
+		/*
+		for (Link link : path.links){
+			System.out.print(b);
+			//link.getId()
+		}
+		*/	
+	}
+	
 	
 }//class

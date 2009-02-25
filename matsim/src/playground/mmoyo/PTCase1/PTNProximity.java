@@ -1,19 +1,19 @@
-package playground.mmoyo.PTRouter;
+package playground.mmoyo.PTCase1;
 
 import java.util.Iterator;
 import java.util.ArrayList;
-import java.util.Collection;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import playground.mmoyo.PTRouter.PTNode;
 
 /**
  *  Searches in the Public Transport Network for the closest bus/train stops
  *  Replaces the search within an euclidian distance
  *	@param ptNetworkLayer 
  */
-public class PTNProximity {
+public class PTNProximity
+{
 	private QuadTree<Node> ptQuadTree;
 	
 	public PTNProximity (NetworkLayer cityNetworkLayer, NetworkLayer ptNetworkLayer){
@@ -21,7 +21,7 @@ public class PTNProximity {
 
 	}
 	
-	public PTNProximity (NetworkLayer ptNetworkLayer){
+	public PTNProximity(NetworkLayer ptNetworkLayer){
 		createPTQuadTree (ptNetworkLayer);
 	}
 	
@@ -118,6 +118,7 @@ public class PTNProximity {
 	}//CreateQuadTree
 	
 	
+	
 	/**
 	 * Returns a list of bus/train stops after the query 
 	 * If bus/train stops are found in the distance required, return the closes stop.
@@ -127,6 +128,7 @@ public class PTNProximity {
 	 * @return list of nearest nodes
 	 */
 	
+	/*
 	public PTNode[] getNearestBusStops(Coord coord, int distance, boolean force){
 		double x = coord.getX();
 		double y= coord.getY();
@@ -143,7 +145,7 @@ public class PTNProximity {
 		}
 		return stopList.toArray(new PTNode[stopList.size()]);
 	}
-	
+	*/
 	
 	
 	
@@ -151,10 +153,12 @@ public class PTNProximity {
 		return (PTNode)ptQuadTree.get(x, y);
 	}
 	
+	/*
 	public void printNearestBusStops(Node node, int distance){
 		System.out.println ("Bus stops near " + node.getId().toString());
 		printNearestBusStops(node.getCoord(), distance);
 	}
+	
 	
 	public void printNearestBusStops(Coord coord, int distance){
 		System.out.println ("Bus stops near " + coord.getX() + ", " + coord.getY());
@@ -163,6 +167,7 @@ public class PTNProximity {
 			System.out.println (stops[x].getId().toString());
 		}
 	}
+	*/
 	
 	public void dumpNet(){
 		System.out.println("Size of the Quedtreemap:" + this.ptQuadTree.size());

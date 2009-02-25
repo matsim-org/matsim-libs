@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.misc.Time;
 
 /** 
@@ -14,7 +15,7 @@ import org.matsim.utils.misc.Time;
  * @param departures integer representing milliseconds after the midnight
  */
 public class PTTimeTable {
-	private Map <IdImpl, Map<IdImpl,int[]>> timeTableMap = new TreeMap <IdImpl, Map<IdImpl,int[]>>();
+	private Map <Id, Map<Id,int[]>> timeTableMap = new TreeMap <Id, Map<Id,int[]>>();
 	private static Time time;
 	
 	public PTTimeTable() {
@@ -22,11 +23,11 @@ public class PTTimeTable {
 	}
 	
 	public void addDepartures(String strIdNode, String strIdPTLine, String departure){  
-		IdImpl idNode = new IdImpl(strIdNode);	
-		IdImpl idPTLine = new IdImpl(strIdPTLine);
+		Id idNode = new IdImpl(strIdNode);	
+		Id idPTLine = new IdImpl(strIdPTLine);
 		
 		if (!timeTableMap.containsKey(idNode)){
-			Map<IdImpl,int[]> map2 = new TreeMap <IdImpl,int[]>();
+			Map<Id,int[]> map2 = new TreeMap <Id,int[]>();
 			map2.put(idPTLine, departuresToArray(departure));
 			timeTableMap.put(idNode,  map2);
 		}else{
@@ -48,11 +49,12 @@ public class PTTimeTable {
 	//Reports the next departure in human understandable format
 	public void nextDeparture(String IdNode, String time){      
 		System.out.println(TimeToString(nextDeparture(new IdImpl(IdNode),TimeToIntegers(time))) );
+	
 	}
 
 	//Reports the next departure in integers after the midnight
-	public int nextDeparture(IdImpl idNode, int time){//Core 
-		Map<IdImpl,int[]> map = timeTableMap.get(idNode); 
+	public int nextDeparture(Id idNode, int time){//Core 
+		Map<Id,int[]> map = timeTableMap.get(idNode); 
 		int x2 = Integer.MAX_VALUE;
 		
 		for (int[] tt : map.values()) {
@@ -92,8 +94,8 @@ public class PTTimeTable {
 		return arrDep[x];
 	}
 
-	public int nextDepartureXLine(IdImpl idNode, IdImpl idPTLine, int time){
-		Map<IdImpl,int[]> mp =timeTableMap.get(idNode);
+	public int nextDepartureXLine(Id idNode, Id idPTLine, int time){
+		Map<Id,int[]> mp =timeTableMap.get(idNode);
 		if (!mp.containsKey(idPTLine)){
 			throw new NullPointerException("idNode " + idNode + " The Line " + idPTLine.toString()  +  " does not exist");
 		}
@@ -115,7 +117,7 @@ public class PTTimeTable {
 		Iterator iter = timeTableMap.entrySet().iterator();
 		while (iter.hasNext()) {
 			Map.Entry entry = (Map.Entry) iter.next();
-			Map<IdImpl,int[]> map2 = (Map<IdImpl,int[]>)entry.getValue();
+			Map<Id,int[]> map2 = (Map<Id,int[]>)entry.getValue();
 			Iterator iter2 = map2.entrySet().iterator();
 			while (iter2.hasNext()) {
 				Map.Entry entry2 = (Map.Entry) iter2.next();

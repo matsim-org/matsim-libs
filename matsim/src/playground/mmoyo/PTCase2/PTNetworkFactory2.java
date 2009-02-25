@@ -3,6 +3,7 @@ package playground.mmoyo.PTCase2;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -112,14 +113,14 @@ public class PTNetworkFactory2 {
 		return ptTimeTable;
 	}
 	
-	public Map<String, List<IdImpl>>  createIntersecionMap(PTTimeTable2 ptTimeTable){
-		//TODO: IntersectionMap should be a class property, maybe in a class "station"
-		Map<String, List<IdImpl>> IntersectionMap = new TreeMap<String, List<IdImpl>>();   
+	public Map<String, List<Id>>  createIntersecionMap(PTTimeTable2 ptTimeTable){
+		//-> IntersectionMap should be a class property, maybe in a class "station"
+		Map<String, List<Id>> IntersectionMap = new TreeMap<String, List<Id>>();   
 		for (PTLine ptLine : ptTimeTable.getPtLineList()) {
 			for (String strIdNode: ptLine.getRoute()) {
 				String strNodeBaseId =  getNodeBaseId(strIdNode);
 				if (!IntersectionMap.containsKey(strNodeBaseId)){
-	    			List<IdImpl> ch = new ArrayList<IdImpl>();
+	    			List<Id> ch = new ArrayList<Id>();
 	    			IntersectionMap.put(strNodeBaseId, ch);
 	    			//IntersectionMap.get(strBaseIdNode).add(strBaseIdNode); ///por que????????? checar urgentemente
 	    			//IntersectionMap.get(strBaseIdNode).add(strBaseIdNode);
@@ -208,28 +209,29 @@ public class PTNetworkFactory2 {
 		}// ArrayList <String>chList
 	}//createTransferLinks
 	
-	public PTNode CreateWalkingNode(NetworkLayer ptNetworkLayer,IdImpl idNode, Coord coord) {
+	public PTNode CreateWalkingNode(NetworkLayer ptNetworkLayer,Id idNode, Coord coord) {
 		PTNode ptNode = new PTNode(idNode, coord, "Walking");
 		ptNode.setIdPTLine(new IdImpl("Walk"));
 		ptNetworkLayer.getNodes().put(idNode, ptNode);
 		return (PTNode)ptNetworkLayer.getNode(idNode);
 	}
 	
-	public List <IdImpl> CreateWalkingLinks(NetworkLayer ptNetworkLayer, PTNode ptNode, PTNode[]nearNodes, boolean to){
-		List<IdImpl> NewWalkLinks = new ArrayList<IdImpl>();
+	public List <Id> CreateWalkingLinks(NetworkLayer ptNetworkLayer, PTNode walkNode,	Collection <Node> nearNodes, boolean to){
+		List<Id> NewWalkLinks = new ArrayList<Id>();
 		String idLink;
 		PTNode fromPTNode;
 		PTNode toPTNode;
 		
-		for (int x= 0; x<nearNodes.length;x++){
+		int x=0;
+		for (Node node : nearNodes){
 			if (to){
-				fromPTNode= ptNode;
-				toPTNode= nearNodes[x];
-				idLink= "W" + x;
+				fromPTNode= walkNode;
+				toPTNode= (PTNode)node;
+				idLink= "WLO" + x++;
 			}else{
-				fromPTNode=nearNodes[x];
-				toPTNode=  ptNode;
-				idLink= "WW" + x;
+				fromPTNode=(PTNode)node;
+				toPTNode=  walkNode;
+				idLink= "WLD" + x++;
 			}
 			createPTLink(ptNetworkLayer, idLink, fromPTNode, toPTNode, "Walking");
 			NewWalkLinks.add(new IdImpl(idLink));
@@ -237,9 +239,9 @@ public class PTNetworkFactory2 {
 		return NewWalkLinks;
 	}
 	
-	public void removeWalkingLinks(NetworkLayer ptNetworkLayer,List<IdImpl> WalkingLinkList){
+	public void removeWalkingLinks(NetworkLayer ptNetworkLayer,List<Id> WalkingLinkList){
 		//Removes temporal links at the end of the ruting process
-		for (IdImpl linkId : WalkingLinkList){
+		for (Id linkId : WalkingLinkList){
 			Link link = ptNetworkLayer.getLink(linkId);
 			ptNetworkLayer.removeLink(link);
 		}
@@ -257,11 +259,13 @@ public class PTNetworkFactory2 {
 		createPTLink(ptNetworkLayer, idLink, fromNode, toNode, type);
 	}
 	
+	/*
 	private void createPTLink(NetworkLayer ptNetworkLayer, String idLink, IdImpl from, IdImpl to, String type){
 		PTNode fromNode= (PTNode)ptNetworkLayer.getNode(from);
 		PTNode toNode= (PTNode)ptNetworkLayer.getNode(to);
 		createPTLink(ptNetworkLayer, idLink, fromNode, toNode, type);
 	}
+	*/
 	
 	public void createPTLink(NetworkLayer net, String strIdLink, PTNode fromNode, PTNode toNode, String Type){
 		if (fromNode==null)
