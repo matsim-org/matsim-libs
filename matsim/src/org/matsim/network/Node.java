@@ -53,11 +53,12 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 	//////////////////////////////////////////////////////////////////////
 
 	private String type = null;
-	protected String origid = null;
+	private String origid = null;
 
 	/* TODO [balmermi] The topo_type member should not be here, instead using a role or
 	 * inheritance would make more sense. topo_type is calculated by
 	 * org.matsim.network.algorithms.NetworkCalcTopoType */
+	@Deprecated
 	private int topoType = Integer.MIN_VALUE;
 
 	private final static Logger log = Logger.getLogger(Node.class);
@@ -126,6 +127,7 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 		this.origid = id;
 	}
 
+	@Deprecated
 	public final void setTopoType(final int topotype) {
 		this.topoType = topotype;
 	}
@@ -193,6 +195,7 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 		return nodes;
 	}
 
+	@Deprecated
 	public int getTopoType() {
 		return this.topoType;
 	}

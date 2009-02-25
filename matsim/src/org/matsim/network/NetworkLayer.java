@@ -44,7 +44,7 @@ public class NetworkLayer extends Layer implements BasicNetwork<Node, Link> {
 
 	public static final Id LAYER_TYPE = new IdImpl("link");
 
-	protected int capperiod = Integer.MIN_VALUE ;
+	private int capperiod = Integer.MIN_VALUE ;
 
 	protected Map<Id, Node> nodes = new TreeMap<Id, Node>();
 
