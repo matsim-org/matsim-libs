@@ -17,6 +17,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.utils.charts.BarChart;
 import org.matsim.utils.charts.XYLineChart;
 
 import playground.yu.utils.BubbleChart;
@@ -239,6 +240,21 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 						+ "\t"
 						+ (this.carOtherDist + this.ptOtherDist + this.throughOtherDist));
 
+		BarChart barChart = new BarChart(
+				"travel destination and modal split--daily distance",
+				"travel destination", "daily distance [km]", new String[] {
+						"work", "educ", "shop", "leis", "home", "other" });
+		barChart.addSeries("car", new double[] { carWorkDist, carEducDist,
+				carShopDist, carLeisDist, carHomeDist, carOtherDist });
+		barChart.addSeries("pt", new double[] { ptWorkDist, ptEducDist,
+				ptShopDist, ptLeisDist, ptHomeDist, ptOtherDist });
+		barChart.addSeries("through", new double[] { throughWorkDist,
+				throughEducDist, throughShopDist, throughLeisDist,
+				throughHomeDist, throughOtherDist });
+		barChart.addMatsimLogo();
+		barChart.saveAsPng(outputFilename
+				+ "dailyDistancetravelDistination.png", 1200, 900);
+
 		double x[] = new double[101];
 		for (int i = 0; i < 101; i++)
 			x[i] = i;
@@ -312,7 +328,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		chart2.addSeries("pt", xs, yPtFracs);
 		chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png", 800,
 				600);
-		
+
 		try {
 			sw.close();
 		} catch (IOException e) {

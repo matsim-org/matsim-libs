@@ -17,6 +17,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.utils.charts.BarChart;
 import org.matsim.utils.charts.XYLineChart;
 
 import playground.yu.analysis.DailyDistance.ActTypeStart;
@@ -233,6 +234,21 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 						+ (this.carHomeTime + this.ptHomeTime + this.throughHomeTime)
 						+ "\t"
 						+ (this.carOtherTime + this.ptOtherTime + this.throughOtherTime));
+
+		BarChart barChart = new BarChart(
+				"travel destination and modal split--daily distance",
+				"travel destination", "daily distance [km]", new String[] {
+						"work", "educ", "shop", "leis", "home", "other" });
+		barChart.addSeries("car", new double[] { carWorkTime, carEducTime,
+				carShopTime, carLeisTime, carHomeTime, carOtherTime });
+		barChart.addSeries("pt", new double[] { ptWorkTime, ptEducTime,
+				ptShopTime, ptLeisTime, ptHomeTime, ptOtherTime });
+		barChart.addSeries("through", new double[] { throughWorkTime,
+				throughEducTime, throughShopTime, throughLeisTime,
+				throughHomeTime, throughOtherTime });
+		barChart.addMatsimLogo();
+		barChart.saveAsPng(outputFilename + "dailyTimeTravelDistination.png",
+				1200, 900);
 
 		double x[] = new double[101];
 		for (int i = 0; i < 101; i++)
