@@ -21,6 +21,7 @@ package org.matsim.router.util;
 
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.AStarLandmarks;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
 
 /**
@@ -31,6 +32,17 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 
 	private PreProcessLandmarks preProcessData;
 	
+	public AStarLandmarksFactory(NetworkLayer network, final FreespeedTravelTimeCost fsttc){
+		synchronized (this) {
+				this.preProcessData = new PreProcessLandmarks(fsttc);
+				this.preProcessData.run(network);
+		}
+	}
+	/**
+	 * @deprecated Use other constructor of this class
+	 * @param preProcessData
+	 */
+	@Deprecated
 	public AStarLandmarksFactory(final PreProcessLandmarks preProcessData){
 		this.preProcessData = preProcessData;
 	}

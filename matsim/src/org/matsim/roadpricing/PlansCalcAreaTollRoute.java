@@ -34,6 +34,7 @@ import org.matsim.router.AStarLandmarks;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.AStarLandmarksFactory;
 import org.matsim.router.util.LeastCostPathCalculator;
+import org.matsim.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -52,6 +53,24 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	private final TravelTime timeCalculator;
 	private final LeastCostPathCalculator tollRouter;
 
+	/**
+	 * Constructs a new Area-Toll Router.
+	 * @param network
+	 * @param costCalculator This must be a normal implementation of TravelCost that does not take care of the area toll!
+	 * @param timeCalculator
+	 * @param factory
+	 * @param scheme
+	 */
+	public PlansCalcAreaTollRoute(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator,
+			LeastCostPathCalculatorFactory factory, final RoadPricingScheme scheme) {
+		super(network, costCalculator, timeCalculator, factory);
+		this.scheme = scheme;
+		this.timeCalculator = timeCalculator;
+		this.tollRouter =	factory.createPathCalculator(network, new TollTravelCostCalculator(costCalculator, scheme), timeCalculator);
+	}
+	
+	
+	
 	/**
 	 * Constructs a new Area-Toll Router.
 	 *

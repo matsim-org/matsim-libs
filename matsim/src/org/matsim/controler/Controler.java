@@ -843,6 +843,10 @@ public class Controler {
 	public final FreespeedTravelTimeCost getFreespeedTravelTimeCost(){
 		return this.freespeedTravelTimeCost;
 	}
+	
+	public void setFreespeedTravelTimeCost(FreespeedTravelTimeCost fttc){
+		this.freespeedTravelTimeCost = fttc;
+	}
 
 	/**
 	 * Sets a new {@link org.matsim.scoring.ScoringFunctionFactory} to use. <strong>Note:</strong> This will
@@ -898,17 +902,12 @@ public class Controler {
 	 * travelCosts and travelTimes. Only to be used by a single thread, use multiple instances for multiple threads!
 	 */
 	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
-		synchronized (this) {
-			if (this.commonRoutingData == null) {
-				this.commonRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
-				this.commonRoutingData.run(this.network);
-			}
-		}
-
+		AStarLandmarksFactory fac = new AStarLandmarksFactory(this.network, this.getFreespeedTravelTimeCost());
+		
 		if ((this.roadPricing != null) && (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.roadPricing.getRoadPricingScheme().getType()))) {
-			return new PlansCalcAreaTollRoute(this.network, this.commonRoutingData, travelCosts, travelTimes, this.roadPricing.getRoadPricingScheme());
+			return new PlansCalcAreaTollRoute(this.network, travelCosts, travelTimes, fac, this.roadPricing.getRoadPricingScheme());
 		}
-		return new PlansCalcRoute(this.network, travelCosts, travelTimes, new AStarLandmarksFactory(this.commonRoutingData));
+		return new PlansCalcRoute(this.network, travelCosts, travelTimes, fac);
 	}
 
 	/* ===================================================================
