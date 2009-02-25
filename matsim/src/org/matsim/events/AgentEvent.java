@@ -35,6 +35,8 @@ public abstract class AgentEvent extends PersonEvent {
 	public Leg leg;
 
 	public String linkId;
+	
+	@Deprecated
 	public int legId;
 
 	AgentEvent(final double time, final Person agent, final Link link, final Leg leg) {
