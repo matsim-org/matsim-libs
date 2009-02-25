@@ -163,9 +163,12 @@ public class ChoiceSetWriterSimple extends CSWriter {
 				choiceSet.getTravelDistanceStartShopEnd(facility.getId()) +"\t" +
 				crowFlyDistanceExact +"\t" +
 				crowFlyDistanceMapped +"\t";
+			
+			outLine += choiceSet.getFacilities().get(facility.getId()).getAdditionalTime() +"\t";
+			outLine += choiceSet.getFacilities().get(facility.getId()).getAdditionalDistance() +"\t";			
 		}
 		else {
-			outLine += "-1\t-1\t-1\t-1\t";
+			outLine += "-1\t-1\t-1\t-1\t-1\t-1\t";
 		}
 		
 		outLine += facility.getRetailerID() + "\t" +
@@ -212,6 +215,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 					"SH" + i + "_TTnet\t" + 
 					"SH" + i + "_TDnet\t" +
 					"SH" + i + "_CFD_exact\t" + "SH" + i + "_CFD_mapped\t" +
+					"SH" + i + "_addTime2ClosestStore\t" +"SH" + i + "_addDistance2ClosestStore\t" +
 					"SH" + i + "RetailerID\t" +
 					"SH" + i + "Size\t" +
 					"SH" + i + "dHalt\t" +
