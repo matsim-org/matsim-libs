@@ -25,7 +25,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 		
 		this.writeNumberOfAlternatives(outdir, name, choiceSets);
 		
-		outdir = "choicesets/" + outdir;
+		outdir += "/choicesets/";
  		
 		this.writeRoundTripIndetermediateStop(outdir, name, choiceSets, 0, false);
 		this.writeRoundTripIndetermediateStop(outdir, name +"_RoundTrip", choiceSets, 1, false);
