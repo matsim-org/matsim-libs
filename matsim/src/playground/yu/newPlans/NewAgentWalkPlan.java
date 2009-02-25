@@ -88,10 +88,10 @@ public class NewAgentWalkPlan extends NewPlan implements PersonAlgorithm {
 							walkLeg.setArrivalTime(leg.getArrivalTime());
 							walkLeg.setRoute(null);
 							walkPlan.addLeg(walkLeg);
-							if (!leg.getMode().equals(Mode.car)) {
-								leg.setRoute(null);
-								leg.setMode(Mode.car);
-							}
+							// if (!leg.getMode().equals(Mode.car)) {
+							// leg.setRoute(null);
+							// leg.setMode(Mode.car);
+							// }
 						}
 					}
 					copyPlans.add(walkPlan);
