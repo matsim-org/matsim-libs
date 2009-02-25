@@ -20,7 +20,7 @@
 
 package org.matsim.scoring;
 
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Plan;
 
 /**
  * Generates {@link CharyparNagelScoringOpenTimesFunction}s.

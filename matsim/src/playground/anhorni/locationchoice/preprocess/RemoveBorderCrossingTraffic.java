@@ -7,8 +7,8 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Facilities;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Person;
 import org.matsim.population.Population;
 
 public class RemoveBorderCrossingTraffic extends Modifier {

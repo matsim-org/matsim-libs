@@ -22,9 +22,9 @@ package org.matsim.events;
 
 import java.util.Map;
 
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.network.Link;
-import org.matsim.population.Leg;
-import org.matsim.population.Person;
 
 public abstract class LinkEvent extends PersonEvent {
 

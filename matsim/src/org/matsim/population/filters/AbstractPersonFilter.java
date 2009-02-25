@@ -20,7 +20,7 @@
 
 package org.matsim.population.filters;
 
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonAlgorithm;
 

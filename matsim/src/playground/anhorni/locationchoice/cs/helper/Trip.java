@@ -1,6 +1,6 @@
 package playground.anhorni.locationchoice.cs.helper;
 
-import org.matsim.population.Act;
+import org.matsim.interfaces.core.v01.Act;
 
 public class Trip {
 	

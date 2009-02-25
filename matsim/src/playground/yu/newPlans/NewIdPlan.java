@@ -25,10 +25,10 @@ package playground.yu.newPlans;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Person;
 import org.matsim.population.Population;
 
 /**

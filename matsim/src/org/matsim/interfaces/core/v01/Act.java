@@ -1,4 +1,4 @@
-package org.matsim.population;
+package org.matsim.interfaces.core.v01;
 
 import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.BasicAct;

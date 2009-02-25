@@ -20,8 +20,8 @@
 
 package org.matsim.withinday.routeprovider;
 
+import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.network.Link;
-import org.matsim.population.routes.CarRoute;
 
 
 /**

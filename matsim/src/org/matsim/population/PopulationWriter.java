@@ -27,8 +27,12 @@ import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.writer.Writer;
 

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 
 /*
  * The purpose of the EgoNet class is to avoid extending the Person class.

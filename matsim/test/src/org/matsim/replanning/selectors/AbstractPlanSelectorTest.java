@@ -21,9 +21,9 @@
 package org.matsim.replanning.selectors;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -83,7 +83,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	/**
 	 * Test how a plan selector reacts when a person has no plans at all. The correct behavior would be
 	 * to just return null, as stated in
-	 * {@link PlanSelector#selectPlan(org.matsim.population.Person) PlanSelector.selectPlan(Person)}
+	 * {@link PlanSelector#selectPlan(org.matsim.interfaces.core.v01.Person) PlanSelector.selectPlan(Person)}
 	 *
 	 * @author mrieser
 	 */

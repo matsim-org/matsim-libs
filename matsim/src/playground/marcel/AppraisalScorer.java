@@ -24,13 +24,13 @@ import java.util.TreeMap;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Route;
 import org.matsim.network.Link;
-import org.matsim.population.Act;
 import org.matsim.population.ActUtilityParameters;
-import org.matsim.population.Leg;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
-import org.matsim.population.routes.Route;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.scoring.ScoringFunction;

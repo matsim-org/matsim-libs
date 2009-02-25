@@ -41,7 +41,7 @@ import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.io.IOUtils;
 

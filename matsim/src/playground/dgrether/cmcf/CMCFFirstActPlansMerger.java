@@ -19,10 +19,10 @@
 package playground.dgrether.cmcf;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Leg;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.population.Population;
 
 import playground.dgrether.DgPaths;

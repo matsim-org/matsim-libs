@@ -23,13 +23,13 @@ package org.matsim.roadpricing;
 import java.util.ArrayList;
 
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
-import org.matsim.population.Plan;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.router.AStarLandmarks;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.AStarLandmarksFactory;

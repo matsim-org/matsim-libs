@@ -20,9 +20,9 @@
 package playground.mfeil;
 
 
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.population.Plan;
 import org.matsim.scoring.PlanScorer;
 
 

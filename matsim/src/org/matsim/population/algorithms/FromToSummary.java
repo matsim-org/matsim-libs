@@ -28,10 +28,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.Node;
-import org.matsim.population.Act;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 
 /**
  * @author lnicolas
@@ -123,7 +123,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 	}
 
 	/**
-	 * @see org.matsim.population.algorithms.PlanAlgorithm#run(org.matsim.population.Plan)
+	 * @see org.matsim.population.algorithms.PlanAlgorithm#run(org.matsim.interfaces.core.v01.Plan)
 	 */
 	public void run(Plan plan) {
 		ArrayList actslegs = plan.getActsLegs();

@@ -26,9 +26,9 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.ScoringFunction;
 
 /**

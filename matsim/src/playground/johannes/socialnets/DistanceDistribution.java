@@ -34,7 +34,7 @@ import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.Population;
 
 import playground.johannes.statistics.WeightedStatistics;

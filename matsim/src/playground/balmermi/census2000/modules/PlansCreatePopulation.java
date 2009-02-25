@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Population;
 

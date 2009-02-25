@@ -30,8 +30,8 @@ import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Leg;
 
 public class MyRecentEventsBasedEstimator
 implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {

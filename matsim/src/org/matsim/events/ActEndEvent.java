@@ -20,9 +20,9 @@
 
 package org.matsim.events;
 
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.network.Link;
-import org.matsim.population.Act;
-import org.matsim.population.Person;
 
 public class ActEndEvent extends ActEvent {
 

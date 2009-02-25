@@ -32,11 +32,14 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Household;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
 /**
  * For comments see interface
- * @see org.matsim.population.Person
+ * @see org.matsim.interfaces.core.v01.Person
  * @author dgrether
  *
  */
@@ -65,7 +68,7 @@ public class PersonImpl implements Person{
 	}
 
 	/**
-	 * @see org.matsim.population.Person#getSelectedPlan()
+	 * @see org.matsim.interfaces.core.v01.Person#getSelectedPlan()
 	 */
 	public Plan getSelectedPlan() {
 		return this.selectedPlan;

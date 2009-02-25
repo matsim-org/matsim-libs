@@ -22,8 +22,8 @@ package playground.mfeil;
 
 
 import org.apache.log4j.Logger;
-import org.matsim.population.Act;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.Act;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.replanning.modules.StrategyModule;
 import java.util.ArrayList;

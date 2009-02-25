@@ -25,7 +25,11 @@ import java.io.IOException;
 
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.OpeningTime;
-import org.matsim.population.routes.CarRoute;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.writer.WriterHandler;
 
 public interface PopulationWriterHandler extends WriterHandler {

@@ -21,9 +21,9 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.network.Node;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
 
 /**
  * Example implementation of a leg travel time estimation (the estimation of

@@ -5,9 +5,9 @@ import java.util.Iterator;
 
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.Knowledge;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.socialnetworks.io.ActivityActReader;
 

@@ -20,7 +20,7 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Plan;
 
 public interface PlanAlgorithm {
 	public abstract void run(Plan plan);

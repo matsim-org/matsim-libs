@@ -21,7 +21,7 @@
 package playground.yu.newPlans;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.Population;
 
 /**
@@ -47,7 +47,7 @@ public class DoublePlan extends NewPlan {
 	/**
 	 * writes an old Person and also new Persons in new plansfile.
 	 * 
-	 * @see org.matsim.population.algorithms.AbstractPersonAlgorithm#run(org.matsim.population.Person)
+	 * @see org.matsim.population.algorithms.AbstractPersonAlgorithm#run(org.matsim.interfaces.core.v01.Person)
 	 */
 	@Override
 	public void run(Person person) {

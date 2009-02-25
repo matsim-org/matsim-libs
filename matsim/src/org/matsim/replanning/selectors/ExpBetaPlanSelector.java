@@ -23,8 +23,8 @@ package org.matsim.replanning.selectors;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicPlan;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 
 /**
  * Selects one of the existing plans of the person based on the

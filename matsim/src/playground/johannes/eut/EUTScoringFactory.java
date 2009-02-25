@@ -23,7 +23,7 @@
  */
 package playground.johannes.eut;
 
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 

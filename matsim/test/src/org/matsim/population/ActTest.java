@@ -19,6 +19,7 @@
 
 package org.matsim.population;
 
+import org.matsim.interfaces.core.v01.Act;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;

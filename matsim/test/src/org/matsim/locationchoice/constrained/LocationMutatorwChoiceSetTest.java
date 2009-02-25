@@ -3,8 +3,8 @@ package org.matsim.locationchoice.constrained;
 
 import java.util.List;
 
-import org.matsim.population.Plan;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.locationchoice.Initializer;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.testcases.MatsimTestCase;

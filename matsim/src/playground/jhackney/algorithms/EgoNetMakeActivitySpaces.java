@@ -22,8 +22,8 @@ package playground.jhackney.algorithms;
 
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
 import org.matsim.population.algorithms.PersonDrawActivtiySpaces;

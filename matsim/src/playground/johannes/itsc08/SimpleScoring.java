@@ -23,8 +23,8 @@
  */
 package playground.johannes.itsc08;
 
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.scoring.ScoringFunction;
 
 /**

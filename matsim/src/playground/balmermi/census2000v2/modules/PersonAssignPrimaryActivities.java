@@ -25,10 +25,10 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.Act;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.Knowledge;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 

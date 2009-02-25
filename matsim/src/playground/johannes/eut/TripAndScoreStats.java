@@ -43,7 +43,7 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.utils.io.IOUtils;
 
 /**

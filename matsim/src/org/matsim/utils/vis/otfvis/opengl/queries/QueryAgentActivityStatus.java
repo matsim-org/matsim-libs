@@ -23,12 +23,12 @@ package org.matsim.utils.vis.otfvis.opengl.queries;
 import java.util.Collection;
 
 import org.matsim.events.Events;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueVehicle;
-import org.matsim.population.Act;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;

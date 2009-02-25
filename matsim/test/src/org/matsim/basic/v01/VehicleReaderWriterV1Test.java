@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.population.Vehicle;
+import org.matsim.interfaces.core.v01.Vehicle;
 import org.matsim.population.VehicleReaderV1;
 import org.matsim.testcases.MatsimTestCase;
 

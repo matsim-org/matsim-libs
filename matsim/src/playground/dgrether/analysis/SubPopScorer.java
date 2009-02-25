@@ -28,7 +28,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
 import org.matsim.population.filters.RouteLinkFilter;

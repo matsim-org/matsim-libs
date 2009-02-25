@@ -38,9 +38,9 @@ import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.Population;
 import org.matsim.scoring.ScoringFunction;
 

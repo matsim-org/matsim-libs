@@ -42,7 +42,7 @@ import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;

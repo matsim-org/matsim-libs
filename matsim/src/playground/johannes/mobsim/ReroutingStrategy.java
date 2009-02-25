@@ -23,10 +23,10 @@
  */
 package playground.johannes.mobsim;
 
+import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.Link;
-import org.matsim.population.Leg;
-import org.matsim.population.Plan;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.withinday.routeprovider.RouteProvider;
 
 /**

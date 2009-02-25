@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.christoph.mobsim;
 
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.mobsim.queuesim.AgentFactory;
 import org.matsim.mobsim.queuesim.PersonAgent;
-import org.matsim.population.Person;
 
 public class MyAgentFactory extends AgentFactory {
 	

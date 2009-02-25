@@ -26,11 +26,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Route;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.population.routes.Route;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 
 import playground.christoph.router.util.KnowledgeTools;

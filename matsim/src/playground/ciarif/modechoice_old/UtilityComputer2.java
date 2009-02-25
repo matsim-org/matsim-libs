@@ -20,7 +20,7 @@
 
 package playground.ciarif.modechoice_old;
 
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 
 public interface UtilityComputer2 {
 

@@ -7,9 +7,9 @@ import java.io.PrintStream;
 
 import org.matsim.controler.Controler;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.population.Act;
-import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;

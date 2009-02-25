@@ -25,13 +25,13 @@ import java.util.Set;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Leg;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;

@@ -30,7 +30,7 @@ import java.util.Map;
 import org.matsim.controler.Controler;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorBuilder;
 

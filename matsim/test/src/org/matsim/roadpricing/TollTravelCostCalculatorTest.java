@@ -22,12 +22,12 @@ package org.matsim.roadpricing;
 
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Leg;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;

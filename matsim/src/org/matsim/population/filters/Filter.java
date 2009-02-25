@@ -27,13 +27,13 @@ package org.matsim.population.filters;
  */
 public interface Filter {
 	/**
-	 * Counts, how many objects (e.g. {@link org.matsim.population.Person}s, 
+	 * Counts, how many objects (e.g. {@link org.matsim.interfaces.core.v01.Person}s, 
 	 * {@link org.matsim.events.BasicEvent Events}) were selected by the filter.
 	 */
 	void count();
 
 	/**
-	 * @return the number of objects (e.g. {@link org.matsim.population.Person}s, 
+	 * @return the number of objects (e.g. {@link org.matsim.interfaces.core.v01.Person}s, 
 	 * {@link org.matsim.events.BasicEvent Events}) were selected by the filter.
 	 */
 	int getCount();

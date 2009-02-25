@@ -29,8 +29,8 @@ import org.matsim.events.ActStartEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.facilities.Facility;
-import org.matsim.population.Act;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 
 

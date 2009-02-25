@@ -27,10 +27,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;

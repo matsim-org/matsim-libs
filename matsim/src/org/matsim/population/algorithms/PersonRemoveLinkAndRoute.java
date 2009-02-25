@@ -22,9 +22,9 @@ package org.matsim.population.algorithms;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-import org.matsim.population.Act;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 
 public class PersonRemoveLinkAndRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
 

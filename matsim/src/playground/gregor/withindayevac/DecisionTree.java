@@ -23,9 +23,9 @@ package playground.gregor.withindayevac;
 import java.util.ArrayList;
 
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Plan;
 
 import playground.gregor.withindayevac.analyzer.Analyzer;
 import playground.gregor.withindayevac.analyzer.ChooseRandomLinkAnalyzer;

@@ -22,7 +22,7 @@ package playground.marcel;
 
 import java.util.LinkedList;
 
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.scoring.ScoringFunction;

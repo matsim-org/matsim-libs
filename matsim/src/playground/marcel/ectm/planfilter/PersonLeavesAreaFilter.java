@@ -24,14 +24,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.Link;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.filters.AbstractPersonFilter;
-import org.matsim.population.routes.CarRoute;
 
 /**
  * @author mrieser

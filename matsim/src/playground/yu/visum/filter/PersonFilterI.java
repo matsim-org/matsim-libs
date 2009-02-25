@@ -3,7 +3,7 @@
  */
 package playground.yu.visum.filter;
 
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 
 /**
  * This interface extends interface: org.matsim.playground.filters.filter.FilterI,

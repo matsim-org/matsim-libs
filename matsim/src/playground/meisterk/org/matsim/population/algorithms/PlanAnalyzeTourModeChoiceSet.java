@@ -26,8 +26,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-import org.matsim.population.Leg;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.world.Location;
 

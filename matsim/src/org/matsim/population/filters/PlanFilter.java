@@ -20,7 +20,7 @@
 
 package org.matsim.population.filters;
 
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public interface PlanFilter extends PlanAlgorithm, Filter {

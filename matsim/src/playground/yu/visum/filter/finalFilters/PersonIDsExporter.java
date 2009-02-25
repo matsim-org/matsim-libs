@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 
 import playground.yu.visum.filter.PersonFilterA;
 

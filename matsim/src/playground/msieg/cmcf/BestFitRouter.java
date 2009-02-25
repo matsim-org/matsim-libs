@@ -24,10 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.population.Leg;
-import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.routes.NodeCarRoute;
 

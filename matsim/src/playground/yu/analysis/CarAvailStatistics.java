@@ -6,10 +6,10 @@ package playground.yu.analysis;
 import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.charts.BarChart;

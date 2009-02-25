@@ -22,7 +22,7 @@ package org.matsim.population.algorithms;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Plan;
 
 /**
  * @author dgrether
@@ -37,7 +37,7 @@ public class PlanCollectFromAlgorithm implements PlanAlgorithm {
 
 	/**
 	 * Just collects all plans in a set.
-	 * @see org.matsim.population.algorithms.PlanAlgorithm#run(org.matsim.population.Plan)
+	 * @see org.matsim.population.algorithms.PlanAlgorithm#run(org.matsim.interfaces.core.v01.Plan)
 	 */
 	public void run(Plan plan) {
 		this.plans.add(plan);

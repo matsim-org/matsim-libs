@@ -1,6 +1,6 @@
 package playground.yu.visum.filter;
 
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 
 /**
  * This class is an example to select a person with a special person-id

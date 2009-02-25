@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.PlansCalcRoute;

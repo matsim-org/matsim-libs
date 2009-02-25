@@ -24,13 +24,13 @@ package playground.marcel;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.misc.Time;
 
 /**

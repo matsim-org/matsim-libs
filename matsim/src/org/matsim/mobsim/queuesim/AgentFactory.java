@@ -19,7 +19,7 @@
 
 package org.matsim.mobsim.queuesim;
 
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 
 /**
  * @author dgrether

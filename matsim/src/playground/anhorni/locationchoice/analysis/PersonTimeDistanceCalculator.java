@@ -1,8 +1,8 @@
 package playground.anhorni.locationchoice.analysis;
 
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-import org.matsim.population.Leg;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
 
 /*
  * This is a helper class for TravelTimeandDistanceStats

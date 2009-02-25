@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.facilities.Facility;
+import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.network.Link;
-import org.matsim.population.Person;
-import org.matsim.population.routes.CarRoute;
 
 import playground.marcel.pt.interfaces.DriverAgent;
 import playground.marcel.pt.interfaces.PassengerAgent;

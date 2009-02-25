@@ -27,12 +27,12 @@ import java.util.Map;
 import org.matsim.config.Config;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Act;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.roadpricing.RoadPricingScheme;
 

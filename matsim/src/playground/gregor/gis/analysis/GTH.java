@@ -22,8 +22,8 @@ package playground.gregor.gis.analysis;
 
 import java.util.List;
 
+import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.network.Link;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;

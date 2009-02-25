@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

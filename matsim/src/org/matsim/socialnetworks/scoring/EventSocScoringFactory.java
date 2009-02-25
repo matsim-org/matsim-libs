@@ -3,8 +3,8 @@ package org.matsim.socialnetworks.scoring;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-import org.matsim.population.Act;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 

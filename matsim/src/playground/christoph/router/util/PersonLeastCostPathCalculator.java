@@ -20,9 +20,9 @@
 
 package playground.christoph.router.util;
 
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.Node;
-import org.matsim.population.Person;
 import org.matsim.router.util.LeastCostPathCalculator;
 
 public abstract class PersonLeastCostPathCalculator implements LeastCostPathCalculator, Cloneable{

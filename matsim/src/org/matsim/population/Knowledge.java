@@ -31,6 +31,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.socialnetworks.mentalmap.MentalMap;
 import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.utils.customize.CustomizableImpl;

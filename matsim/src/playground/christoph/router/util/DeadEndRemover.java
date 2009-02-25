@@ -26,10 +26,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.Node;
-import org.matsim.population.Act;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 
 /*
  * Removes Dead Ends from the Activity Maps in the Knowledge of a Person.

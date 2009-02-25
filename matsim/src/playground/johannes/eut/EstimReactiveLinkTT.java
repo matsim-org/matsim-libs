@@ -37,10 +37,10 @@ import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.interfaces.basic.v01.BasicLink;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
-import org.matsim.population.Person;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 

@@ -23,11 +23,12 @@ import java.util.ArrayList;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.apache.log4j.Logger;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
-import org.matsim.population.Plan;
 import org.matsim.scoring.PlanScorer;
 import org.matsim.controler.Controler;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Plan;
+
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.File;

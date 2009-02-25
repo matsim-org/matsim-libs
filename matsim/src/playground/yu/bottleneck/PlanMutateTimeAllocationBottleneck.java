@@ -21,9 +21,9 @@
 package playground.yu.bottleneck;
 
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.misc.Time;
 

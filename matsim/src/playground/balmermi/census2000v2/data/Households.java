@@ -33,7 +33,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.Population;
 import org.matsim.world.Layer;
 

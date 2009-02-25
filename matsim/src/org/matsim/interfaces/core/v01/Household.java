@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Route.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,25 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.routes;
+package org.matsim.interfaces.core.v01;
 
-import org.matsim.interfaces.basic.v01.BasicRoute;
-import org.matsim.network.Link;
+import java.util.Map;
+
+import org.matsim.basic.v01.BasicHousehold;
+import org.matsim.interfaces.basic.v01.Id;
 
 /**
- * Defines the minimum amount of information a route in MATSim must provide.
- *
- * @author mrieser
+ * @author dgrether
  */
-public interface Route extends BasicRoute {
-
-	public double getTravelTime();
-	public void setTravelTime(final double travelTime);
-
-	public Link getStartLink();
-	public void setStartLink(final Link link);
-
-	public Link getEndLink();
-	public void setEndLink(final Link link);
-
+public interface Household extends BasicHousehold {
+	
+	public void addMember(Person member);
+	
+	public Map<Id, Person> getMembers();
+	
+	public Map<Id, Vehicle> getVehicles();
+	
+	public void addVehicle(Vehicle v);
+	
 }

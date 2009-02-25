@@ -17,9 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population;
+package org.matsim.interfaces.core.v01;
 
 import org.matsim.interfaces.basic.v01.BasicPerson;
+import org.matsim.population.Knowledge;
 import org.matsim.utils.customize.Customizable;
 
 /**
@@ -82,7 +83,7 @@ public interface Person extends BasicPerson<Plan, Knowledge>, Customizable{
 	 * first. If there are several plans with the same bad score, it can not be predicted which
 	 * one of them will be removed.<br>
 	 * This method insures that if there are different types of plans (see
-	 * {@link org.matsim.population.Plan#getType()}),
+	 * {@link org.matsim.interfaces.core.v01.Plan#getType()}),
 	 * at least one plan of each type remains. This could lead to the worst plan being kept if
 	 * it is the only one of it's type. Plans with type <code>null</code> are handled like any
 	 * other type, and are differentiated from plans with the type set to an empty String.<br>

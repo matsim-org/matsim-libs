@@ -25,9 +25,12 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Route;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.routes.Route;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 

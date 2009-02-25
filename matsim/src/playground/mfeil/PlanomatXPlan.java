@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.mfeil;
 
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.*;
 import java.util.ArrayList;
 

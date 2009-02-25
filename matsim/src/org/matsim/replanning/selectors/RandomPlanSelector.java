@@ -20,8 +20,8 @@
 
 package org.matsim.replanning.selectors;
 
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 
 /**
  * Select randomly one of the existing plans of the person.

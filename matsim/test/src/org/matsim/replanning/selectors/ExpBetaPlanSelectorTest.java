@@ -23,9 +23,9 @@ package org.matsim.replanning.selectors;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Plan;
 
 /**
  * Tests for {@link ExpBetaPlanSelector}.

@@ -25,8 +25,8 @@ package playground.johannes.eut;
 
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 
 /**
  * @author illenberger

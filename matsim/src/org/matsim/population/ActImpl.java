@@ -25,6 +25,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Act;
 import org.matsim.network.Link;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;

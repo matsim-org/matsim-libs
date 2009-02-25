@@ -26,6 +26,9 @@ import java.util.Map;
 
 import org.matsim.basic.v01.BasicHouseholdImpl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Household;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Vehicle;
 
 /**
  * @author dgrether

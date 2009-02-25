@@ -20,7 +20,7 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 
 public interface PersonAlgorithm {
 	public void run(Person person);

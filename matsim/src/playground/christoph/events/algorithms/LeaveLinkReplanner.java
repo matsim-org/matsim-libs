@@ -24,17 +24,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.mobsim.queuesim.PersonAgent;
 import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;

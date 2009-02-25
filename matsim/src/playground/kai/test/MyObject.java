@@ -8,8 +8,8 @@ import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Act;
 import org.matsim.network.LinkImpl;
-import org.matsim.population.Act;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 

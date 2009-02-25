@@ -36,7 +36,7 @@ import org.matsim.controler.listener.ScoringListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.Act;
+import org.matsim.interfaces.core.v01.Act;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;

@@ -33,7 +33,7 @@ import org.jgap.impl.WeightedRouletteSelector;
 import org.jgap.util.ICloneable;
 import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 public class PlanomatJGAPConfiguration extends Configuration implements ICloneable {

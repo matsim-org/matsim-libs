@@ -18,10 +18,10 @@
  * *********************************************************************** */
 package playground.gregor.withindayevac.mobsim;
 
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.mobsim.queuesim.AgentFactory;
 import org.matsim.mobsim.queuesim.PersonAgent;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Person;
 
 import playground.gregor.withindayevac.BDIAgent;
 import playground.gregor.withindayevac.communication.InformationExchanger;

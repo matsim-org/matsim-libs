@@ -23,9 +23,9 @@ package playground.gregor.withindayevac.analyzer;
 import java.util.HashSet;
 import java.util.List;
 
+import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.Link;
-import org.matsim.population.Plan;
-import org.matsim.population.routes.CarRoute;
 
 import playground.gregor.withindayevac.Beliefs;
 import playground.gregor.withindayevac.communication.InformationExchanger;

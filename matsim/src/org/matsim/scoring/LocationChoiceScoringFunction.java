@@ -29,11 +29,11 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
-import org.matsim.population.Act;
 import org.matsim.population.ActUtilityParameters;
-import org.matsim.population.Plan;
 
 /* 
  * Scoring function factoring in capacity restraints

@@ -19,7 +19,7 @@
 package playground.benjamin;
 
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 
@@ -38,7 +38,7 @@ public class BKickScoringFunctionFactory implements ScoringFunctionFactory {
 	}
 
 	/**
-	 * @see org.matsim.scoring.ScoringFunctionFactory#getNewScoringFunction(org.matsim.population.Plan)
+	 * @see org.matsim.scoring.ScoringFunctionFactory#getNewScoringFunction(org.matsim.interfaces.core.v01.Plan)
 	 */
 	public ScoringFunction getNewScoringFunction(Plan plan) {
 		return new BKickScoringFunction(plan, this.configGroup);

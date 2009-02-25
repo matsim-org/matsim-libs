@@ -1,6 +1,6 @@
 package playground.jhackney.algorithms;
 
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.socialnetworks.algorithms.PersonCalculateActivitySpaces;
 

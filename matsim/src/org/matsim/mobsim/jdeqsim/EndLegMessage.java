@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.utils.misc.Time;
 
 public class EndLegMessage extends EventMessage {

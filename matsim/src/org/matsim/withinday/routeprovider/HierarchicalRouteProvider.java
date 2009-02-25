@@ -27,10 +27,10 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
 
 
 /**
@@ -103,7 +103,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 
 	/**
 	 * As this implementation is backed by a AStarRouter the class provides Routes from everywhere to everywhere
-	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.network.LinkImpl, org.matsim.population.routes.CarRoute)
+	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.network.LinkImpl, org.matsim.interfaces.core.v01.CarRoute)
 	 */
 	public boolean providesRoute(final Link currentLink, final CarRoute subRoute) {
 		return true;

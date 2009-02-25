@@ -22,12 +22,12 @@ package playground.mfeil;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.controler.Controler;
-import org.matsim.population.Act;
-import org.matsim.population.Plan;
 import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;

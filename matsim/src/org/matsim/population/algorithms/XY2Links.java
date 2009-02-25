@@ -22,11 +22,11 @@ package org.matsim.population.algorithms;
 
 import java.util.ArrayList;
 
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Act;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 
 /**
  * Assigns each activity in a plan a link where the activity takes place

@@ -22,7 +22,7 @@ package org.matsim.events;
 
 import java.util.Map;
 
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 
 /**
  * @author mrieser

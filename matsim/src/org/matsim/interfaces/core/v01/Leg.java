@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Vehicle
+ * Leg.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,18 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.population;
 
-import org.matsim.basic.v01.BasicVehicle;
-import org.matsim.basic.v01.BasicVehicleType;
+package org.matsim.interfaces.core.v01;
 
+import org.matsim.interfaces.basic.v01.BasicLeg;
 
-/**
- * @author dgrether
- *
- */
-public interface Vehicle extends BasicVehicle {
+public interface Leg extends BasicLeg {
 
-	public BasicVehicleType getType();
-	
+	public Route getRoute();
+
+	public String toString();
+
 }

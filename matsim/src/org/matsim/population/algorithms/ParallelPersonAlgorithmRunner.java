@@ -24,7 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.Population;
 import org.matsim.utils.misc.Counter;
 

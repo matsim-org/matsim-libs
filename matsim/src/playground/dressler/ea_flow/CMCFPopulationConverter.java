@@ -40,13 +40,13 @@ import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkReaderMatsimV1;
 import org.matsim.network.Node;
-import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Plan;
 import org.matsim.population.PopulationWriterV5;
 import org.xml.sax.SAXException;
 /**

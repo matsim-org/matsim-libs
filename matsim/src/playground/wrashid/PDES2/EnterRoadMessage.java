@@ -3,8 +3,8 @@ package playground.wrashid.PDES2;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEvent;
+import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.network.Link;
-import org.matsim.population.Leg;
 
 public class EnterRoadMessage extends EventMessage {
 

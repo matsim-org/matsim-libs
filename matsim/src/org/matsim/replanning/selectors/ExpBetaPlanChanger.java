@@ -23,8 +23,8 @@ package org.matsim.replanning.selectors;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 
 /**
  * Changes to another plan if that plan is better.  Probability to change depends on score difference.

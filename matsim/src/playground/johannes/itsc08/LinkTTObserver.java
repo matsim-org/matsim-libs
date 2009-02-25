@@ -34,9 +34,9 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Person;
 import org.matsim.utils.io.IOUtils;
 
 import playground.johannes.eut.EstimReactiveLinkTT;

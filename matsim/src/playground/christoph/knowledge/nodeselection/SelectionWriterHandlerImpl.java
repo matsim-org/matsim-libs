@@ -28,6 +28,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.ActivitySpace;
@@ -36,7 +37,6 @@ import org.matsim.population.ActivitySpaceCassini;
 import org.matsim.population.ActivitySpaceEllipse;
 import org.matsim.population.ActivitySpaceSuperEllipse;
 import org.matsim.population.Knowledge;
-import org.matsim.population.Person;
 import org.matsim.utils.misc.Time;
 
 public class SelectionWriterHandlerImpl implements SelectionWriterHandler {

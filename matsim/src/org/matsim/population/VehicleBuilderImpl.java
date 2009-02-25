@@ -25,6 +25,7 @@ import org.matsim.basic.v01.BasicVehicle;
 import org.matsim.basic.v01.BasicVehicleBuilder;
 import org.matsim.basic.v01.BasicVehicleType;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Vehicle;
 
 
 

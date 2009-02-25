@@ -1,5 +1,6 @@
 package playground.wrashid.PDES3;
 
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.mobsim.jdeqsim.DeadlockPreventionMessage;
 import org.matsim.mobsim.jdeqsim.Message;
 import org.matsim.mobsim.jdeqsim.MessageFactory;
@@ -7,7 +8,6 @@ import org.matsim.mobsim.jdeqsim.Road;
 import org.matsim.mobsim.jdeqsim.Scheduler;
 import org.matsim.mobsim.jdeqsim.SimUnit;
 import org.matsim.mobsim.jdeqsim.Vehicle;
-import org.matsim.population.Person;
 
 
 public class PVehicle extends Vehicle {

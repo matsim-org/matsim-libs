@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.routes;
+package org.matsim.interfaces.core.v01;
 
 import java.util.List;
 

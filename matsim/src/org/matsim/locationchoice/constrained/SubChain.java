@@ -25,7 +25,7 @@ import java.util.Vector;
 
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.population.Act;
+import org.matsim.interfaces.core.v01.Act;
 
 public class SubChain {
 	

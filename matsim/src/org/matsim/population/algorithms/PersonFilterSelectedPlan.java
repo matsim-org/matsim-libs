@@ -20,8 +20,8 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 
 /**
  * Removes all non-selected plans from a person. If a person has no

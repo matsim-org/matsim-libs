@@ -6,10 +6,10 @@ import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.listener.AfterMobsimListener;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.utils.geometry.CoordImpl;
 

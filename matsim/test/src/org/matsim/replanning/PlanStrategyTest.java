@@ -20,7 +20,7 @@
 
 package org.matsim.replanning;
 
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;

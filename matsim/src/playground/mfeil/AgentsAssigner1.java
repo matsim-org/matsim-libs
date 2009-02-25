@@ -24,13 +24,13 @@ package playground.mfeil;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
-import org.matsim.population.Leg;
-import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.scoring.PlanScorer;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.population.Act;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

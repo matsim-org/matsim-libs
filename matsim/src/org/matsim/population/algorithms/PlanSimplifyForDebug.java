@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 

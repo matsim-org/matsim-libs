@@ -22,7 +22,7 @@ package org.matsim.population.filters;
 
 import java.util.regex.Pattern;
 
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 /**

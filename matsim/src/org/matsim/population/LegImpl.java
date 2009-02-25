@@ -22,9 +22,10 @@ package org.matsim.population;
 
 import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.population.routes.CarRoute;
+import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Route;
 import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.population.routes.Route;
 import org.matsim.utils.misc.Time;
 
 public class LegImpl extends BasicLegImpl implements Leg {

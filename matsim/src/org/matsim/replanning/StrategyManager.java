@@ -27,7 +27,7 @@ import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.Population;
 
 /**

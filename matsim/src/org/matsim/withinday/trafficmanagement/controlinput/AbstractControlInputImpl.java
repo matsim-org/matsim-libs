@@ -37,10 +37,10 @@ import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.misc.Time;
 import org.matsim.withinday.trafficmanagement.ControlInput;
 

@@ -20,7 +20,7 @@
 
 package org.matsim.scoring;
 
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Plan;
 
 /**
  * A factory to create {@link CharyparNagelScoringFunction}s.

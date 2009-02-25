@@ -26,10 +26,10 @@ import java.util.List;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.AStarLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;

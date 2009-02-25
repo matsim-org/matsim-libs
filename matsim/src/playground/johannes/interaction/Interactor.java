@@ -23,7 +23,7 @@
  */
 package playground.johannes.interaction;
 
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 
 /**
  * @author illenberger

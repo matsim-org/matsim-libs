@@ -2,9 +2,9 @@ package playground.yu.visum.filter;
 
 import java.util.List;
 
-import org.matsim.population.Leg;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
+import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.utils.misc.Time;
 
 public class DepTimeFilter extends PersonFilterA {

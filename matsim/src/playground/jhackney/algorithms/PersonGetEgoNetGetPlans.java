@@ -3,7 +3,7 @@ package playground.jhackney.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.Population;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 

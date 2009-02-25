@@ -26,7 +26,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.Population;
 
 import playground.balmermi.census2000v2.data.CAtts;

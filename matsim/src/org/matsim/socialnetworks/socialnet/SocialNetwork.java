@@ -30,8 +30,8 @@ import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.population.Act;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.Population;
 import org.matsim.socialnetworks.io.MakeSocialNetworkFromFile;
 /**

@@ -29,10 +29,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.mobsim.queuesim.PersonAgent;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueVehicle;
-import org.matsim.population.Leg;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFDataSimpleAgent;
 import org.matsim.utils.vis.otfvis.data.OTFDataWriter;

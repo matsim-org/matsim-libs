@@ -30,7 +30,7 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.handler.EventHandler;
-import org.matsim.population.Person;
+import org.matsim.interfaces.core.v01.Person;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.selectors.ExpBetaPlanChanger;
