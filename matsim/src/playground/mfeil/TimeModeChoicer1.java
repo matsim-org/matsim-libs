@@ -28,6 +28,7 @@ import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
+import org.matsim.population.LegImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.population.routes.LinkCarRoute;
@@ -860,7 +861,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 					} else {
 						// Leg
 						Leg inl = ((Leg) in.get(i));
-						Leg l = new Leg (inl.getMode());
+						Leg l = new LegImpl (inl.getMode());
 						l.setArrivalTime(inl.getArrivalTime());
 						l.setDepartureTime(inl.getDepartureTime());
 						l.setTravelTime(inl.getTravelTime());

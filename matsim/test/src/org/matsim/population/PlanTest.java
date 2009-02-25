@@ -86,7 +86,7 @@ public class PlanTest extends MatsimTestCase {
 
 		// modification
 		Act a = new Act("l", new CoordImpl(200, 100));
-		Leg l = new Leg(Mode.car);
+		Leg l = new org.matsim.population.LegImpl(Mode.car);
 		plan.insertLegAct(1, l, a);
 
 		// test
@@ -112,7 +112,7 @@ public class PlanTest extends MatsimTestCase {
 
 		// modification
 		Act a = new Act("l", new CoordImpl(200, 100));
-		Leg l = new Leg(Mode.car);
+		Leg l = new org.matsim.population.LegImpl(Mode.car);
 		plan.insertLegAct(3, l, a);
 
 		// test
@@ -138,7 +138,7 @@ public class PlanTest extends MatsimTestCase {
 
 		// modification
 		Act a = new Act("l", new CoordImpl(200, 100));
-		Leg l = new Leg(Mode.car);
+		Leg l = new org.matsim.population.LegImpl(Mode.car);
 		try {
 			plan.insertLegAct(2, l, a);
 			fail("expected Exception because of wrong act/leg-index.");
@@ -161,7 +161,7 @@ public class PlanTest extends MatsimTestCase {
 
 		// modification
 		Act a = new Act("l", new CoordImpl(200, 100));
-		Leg l = new Leg(Mode.car);
+		Leg l = new org.matsim.population.LegImpl(Mode.car);
 		try {
 			plan.insertLegAct(0, l, a);
 			fail("expected Exception because of wrong act/leg-index.");
@@ -185,7 +185,7 @@ public class PlanTest extends MatsimTestCase {
 
 		// modification
 		Act a = new Act("l", new CoordImpl(200, 100));
-		Leg l = new Leg(Mode.car);
+		Leg l = new org.matsim.population.LegImpl(Mode.car);
 		try {
 			plan.insertLegAct(4, l, a);
 			fail("expected Exception because of wrong act/leg-index.");

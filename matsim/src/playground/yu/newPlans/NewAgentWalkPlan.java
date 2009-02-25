@@ -81,7 +81,7 @@ public class NewAgentWalkPlan extends NewPlan implements PersonAlgorithm {
 							// calculated
 							// automaticly!!
 							// -----------------------------------------------
-							Leg walkLeg = new Leg(Mode.walk);
+							Leg walkLeg = new org.matsim.population.LegImpl(Mode.walk);
 							walkLeg.setNum(leg.getNum());
 							walkLeg.setDepartureTime(leg.getDepartureTime());
 							walkLeg.setTravelTime(leg.getTravelTime());

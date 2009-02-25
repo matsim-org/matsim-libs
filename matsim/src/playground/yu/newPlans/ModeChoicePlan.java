@@ -71,7 +71,7 @@ public class ModeChoicePlan extends NewPlan {
 				if (i % 2 == 0) {
 					cp.addAct((Act) o);
 				} else {
-					Leg cl = new Leg((Leg) o);
+					Leg cl = new org.matsim.population.LegImpl((Leg) o);
 					cl.setMode(
 					// "pt"
 							BasicLeg.Mode.pt);
@@ -89,7 +89,7 @@ public class ModeChoicePlan extends NewPlan {
 				if (i % 2 == 0) {
 					cp.addAct((Act) o);
 				} else {
-					Leg cl = new Leg((Leg) o);
+					Leg cl = new org.matsim.population.LegImpl((Leg) o);
 					cl.setMode(
 					// "car"
 							BasicLeg.Mode.car);

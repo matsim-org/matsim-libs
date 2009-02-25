@@ -294,7 +294,7 @@ public class GenerateBlnPlan {
 									
 //									lastAct.setEndTime(Time.parseTime(data[0]));
 									lastAct = newAct;
-									actPlan.addLeg(new Leg(BasicLeg.Mode.car));
+									actPlan.addLeg(new org.matsim.population.LegImpl(BasicLeg.Mode.car));
 								}
 							} else {
 								if (lastAct != null){

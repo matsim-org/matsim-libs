@@ -88,7 +88,7 @@ public class NewAgentPtPlan2 extends NewPlan {
 							copyPlan.addAct((Act) o);
 						} else {
 							Leg leg = (Leg) o;
-							Leg copyLeg = new Leg(leg);
+							Leg copyLeg = new org.matsim.population.LegImpl(leg);
 							copyLeg.setRoute(null);
 							copyLeg.setMode(this.copyPlansModes.get(j));
 							// -----------------------------------------------

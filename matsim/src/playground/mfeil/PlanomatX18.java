@@ -40,6 +40,7 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.Planomat;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
+import org.matsim.population.LegImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRoute;
@@ -622,7 +623,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			actHelp.setStartTime(12*3600);
 			
 			Leg legHelp;
-			legHelp = new Leg (BasicLeg.Mode.walk); // First and second acts must be "home" acts at same location so walk is appropriate
+			legHelp = new LegImpl (BasicLeg.Mode.walk); // First and second acts must be "home" acts at same location so walk is appropriate
 			
 			actslegs.add(legHelp);
 			actslegs.add(actHelp);	
@@ -897,7 +898,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		Leg legHelp;
 
-		legHelp = new Leg ((Leg)(actslegs.get((position*2)-1)));
+		legHelp = new LegImpl ((Leg)(actslegs.get((position*2)-1)));
 					
 		actslegs.add(position*2, legHelp);
 		actslegs.add(position*2, actHelp);

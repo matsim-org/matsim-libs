@@ -173,7 +173,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	}
 	
 	protected double computeTravelTime(Act fromAct, Act toAct) {	
-		Leg leg = new Leg(BasicLeg.Mode.car);
+		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		leg.setNum(0);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);

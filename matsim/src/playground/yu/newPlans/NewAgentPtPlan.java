@@ -77,7 +77,7 @@ public class NewAgentPtPlan extends NewPlan implements PersonAlgorithm {
 						walkPlan.addAct((Act) o);
 					} else {
 						Leg leg = (Leg) o;
-						Leg ptLeg = new Leg(leg);
+						Leg ptLeg = new org.matsim.population.LegImpl(leg);
 						ptLeg.setMode(Mode.pt);
 						ptLeg.setRoute(null);
 						// -----------------------------------------------
@@ -86,7 +86,7 @@ public class NewAgentPtPlan extends NewPlan implements PersonAlgorithm {
 						// automaticly!!
 						// -----------------------------------------------
 						ptPlan.addLeg(ptLeg);
-						Leg walkLeg = new Leg(leg);
+						Leg walkLeg = new org.matsim.population.LegImpl(leg);
 						walkLeg.setMode(Mode.walk);
 						walkLeg.setRoute(null);
 						walkPlan.addLeg(walkLeg);

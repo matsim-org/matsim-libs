@@ -136,7 +136,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	}
 		
 	private Leg computeLeg(Act fromAct, Act toAct, Controler controler) {	
-		Leg leg = new Leg(BasicLeg.Mode.car);
+		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
 		

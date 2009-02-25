@@ -343,7 +343,7 @@ public class PTActWriter {
 		legRoute.setTravelTime(travTime);
 		legRoute.setDist(distance);  
 	
-		Leg leg = new Leg(mode);
+		Leg leg = new org.matsim.population.LegImpl(mode);
 		//leg.setNum(num); deprecated
 		leg.setRoute(legRoute);
 		leg.setDepartureTime(depTime);

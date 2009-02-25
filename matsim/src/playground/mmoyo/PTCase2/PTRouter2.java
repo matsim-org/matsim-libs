@@ -132,7 +132,7 @@ public class PTRouter2 {
 					if (linkList.size()>0) {legRoute.setLinks(null, linkList, null);}
 					
 					//insert leg 
-					Leg leg = new Leg(Leg.Mode.pt);
+					Leg leg = new org.matsim.population.LegImpl(Leg.Mode.pt);
 					//routeTravelTime =routeTravelTime; // routeTravelTime =routeTravelTime*3600;  //Seconds
 					leg.setDepartureTime(accumulatedTime);
 					leg.setTravelTime(routeTravelTime);

@@ -88,7 +88,7 @@ public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithm {
 						copyPlan.addAct((Act) o);
 					else {
 						Leg leg = (Leg) o;
-						Leg copyLeg = new Leg(leg);
+						Leg copyLeg = new org.matsim.population.LegImpl(leg);
 						copyLeg.setRoute(null);
 						copyLeg.setMode(
 						// copyPlan.getType().toString()

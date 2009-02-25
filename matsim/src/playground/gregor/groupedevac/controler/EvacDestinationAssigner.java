@@ -144,7 +144,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 	private void modifyPlans(final Link dest, final ArrayList<Node> evacRoute, final Link origin, final ArrayList<Plan> plans) {
 		
 		for (Plan plan : plans) {
-			Leg leg = new Leg(Mode.car);
+			Leg leg = new org.matsim.population.LegImpl(Mode.car);
 			CarRoute route = new NodeCarRoute();
 			route.setNodes(evacRoute);
 			leg.setRoute(route);

@@ -125,7 +125,7 @@ System.out.println(count);
 		Act a = new Act(oldA);
 		a.setType("h");
 		Leg oldLeg = pers.getSelectedPlan().getNextLeg(oldA);
-		Leg l = new Leg(oldLeg.getMode());
+		Leg l = new org.matsim.population.LegImpl(oldLeg.getMode());
 		l.setNum(oldLeg.getNum());
 		l.setDepartureTime(oldLeg.getDepartureTime());
 		l.setTravelTime(oldLeg.getTravelTime());

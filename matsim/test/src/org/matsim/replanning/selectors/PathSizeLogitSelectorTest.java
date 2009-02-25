@@ -78,7 +78,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Plan p1 = new org.matsim.population.PlanImpl(person);
 		Act a = new Act("h", l6);
 		Act b = new Act("w", l7);
-		Leg leg = new Leg(BasicLeg.Mode.car);
+		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -100,7 +100,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		// ... test with multiple plans that all have negative score
 		a = new Act("h", l6);
 		b = new Act("w", l7);
-		leg = new Leg(BasicLeg.Mode.car);
+		leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -120,7 +120,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 		a = new Act("h", l6);
 		b = new Act("w", l7);
-		leg = new Leg(BasicLeg.Mode.car);
+		leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -149,7 +149,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p1 = new org.matsim.population.PlanImpl(person);
 		a = new Act("h", l6);
 		b = new Act("w", l7);
-		leg = new Leg(BasicLeg.Mode.car);
+		leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -182,7 +182,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Plan p1 = new org.matsim.population.PlanImpl(person);
 		Act a = new Act("h", l6);
 		Act b = new Act("w", l7);
-		Leg leg = new Leg(BasicLeg.Mode.car);
+		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -217,7 +217,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Plan p1 = new org.matsim.population.PlanImpl(person);
 		Act a = new Act("h", l6);
 		Act b = new Act("w", l7);
-		Leg leg = new Leg(BasicLeg.Mode.car);
+		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -235,7 +235,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	
 		a = new Act("h", l6);
 		b = new Act("w", l7);
-		leg = new Leg(BasicLeg.Mode.car);
+		leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -255,7 +255,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		
 		a = new Act("h", l6);
 		b = new Act("w", l7);
-		leg = new Leg(BasicLeg.Mode.car);
+		leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);

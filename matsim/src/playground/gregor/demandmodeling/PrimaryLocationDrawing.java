@@ -234,8 +234,8 @@ public class PrimaryLocationDrawing {
 				}
 				
 				Link link = getRandomLinkWithin(ftW);
-//				Leg leg = new Leg(0,"car",Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME);
-				Leg leg = new Leg(Mode.car);
+//				Leg leg = new org.matsim.population.LegImpl(0,"car",Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME);
+				Leg leg = new org.matsim.population.LegImpl(Mode.car);
 				leg.setNum(0);
 				leg.setArrivalTime(Time.UNDEFINED_TIME);
 				leg.setDepartureTime(Time.UNDEFINED_TIME);

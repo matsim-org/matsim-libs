@@ -90,8 +90,7 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 		ActIterator it = plan.getIteratorAct();
 		beeline.addAct(it.next());
 		while (it.hasNext()) {
-			Leg leg = new Leg(BasicLeg.Mode.car);
-			leg.setNum(1);
+			Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);

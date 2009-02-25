@@ -104,7 +104,7 @@ public class EvacuationPlansGenerator {
 				Gbl.errorMsg("For each initial evacuation plan only one Act is allowed - and no Leg at all");
 			}
 
-			Leg leg = new Leg(BasicLeg.Mode.car);
+			Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 			leg.setNum(1);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);

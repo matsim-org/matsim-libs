@@ -20,53 +20,13 @@
 
 package org.matsim.population;
 
-import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.population.routes.Route;
-import org.matsim.utils.misc.Time;
 
-public class Leg extends BasicLegImpl {
+public interface Leg extends BasicLeg {
 
-	public Leg(final BasicLeg.Mode mode) {
-		super(mode);
-	}
+	public Route getRoute();
 
-	/**
-	 * Makes a deep copy of this leg, however only when the Leg has a route which is
-	 * instance of Route or BasicRoute. Other route instances are not considered.
-	 * @param leg
-	 */
-	public Leg(final Leg leg) {
-		super(leg.getMode());
-		this.num = leg.num;
-		this.setDepartureTime(leg.getDepartureTime());
-		this.setTravelTime(leg.getTravelTime());
-		this.setArrivalTime(leg.getArrivalTime());
-		//FIXME the copy of a leg should contain the same subtype
-		// of CarRoute as the original
-		if (leg.route instanceof NodeCarRoute) {
-			this.route = new NodeCarRoute((NodeCarRoute) leg.route);
-		} else {
-			this.route = new NodeCarRoute(leg.getRoute().getStartLink(), leg.getRoute().getEndLink());
-			((CarRoute)this.route).setNodes(leg.getRoute().getStartLink(), ((CarRoute) (leg.getRoute())).getNodes(), leg.getRoute().getEndLink());
-		}
-	}
-
-	@Override
-	public Route getRoute() {
-		return (Route) this.route;
-	}
-
-	@Override
-	public final String toString() {
-		return "[num=" + this.num + "]" +
-				"[mode=" + this.getMode().toString()  + "]" +
-				"[depTime=" + Time.writeTime(this.getDepartureTime()) + "]" +
-				"[travTime=" + Time.writeTime(this.getTravelTime()) + "]" +
-				"[arrTime=" + Time.writeTime(this.getArrivalTime()) + "]" +
-				"[route=" + this.route + "]";
-	}
+	public String toString();
 
 }

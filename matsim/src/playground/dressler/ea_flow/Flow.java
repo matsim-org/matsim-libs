@@ -622,7 +622,7 @@ public class Flow {
 					}
 					
 					BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.car);
-					//Leg leg = new Leg(BasicLeg.Mode.car);
+					//Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 					leg.setRoute(route);
 					BasicActImpl home = new BasicActImpl("h");
 					//Act home = new Act("h", path.getPathEdges().getFirst().getEdge());
@@ -655,7 +655,7 @@ public class Flow {
 					route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
 					
 					//BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.car);
-					Leg leg = new Leg(BasicLeg.Mode.car);
+					Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 					leg.setRoute(route);
 					//BasicActImpl home = new BasicActImpl("h");
 					Act home = new Act("h", path.getPathEdges().getFirst().getEdge());

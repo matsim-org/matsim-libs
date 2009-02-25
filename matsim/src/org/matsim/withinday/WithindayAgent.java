@@ -178,7 +178,7 @@ public class WithindayAgent extends PersonAgent {
 		}
 		//remove the old leg in the plan and replace it with the new one
     Leg oldLeg = (Leg) newPlan.getActsLegs().remove(currentLegIndex);
-    Leg newLeg = new Leg(oldLeg);
+    Leg newLeg = new org.matsim.population.LegImpl(oldLeg);
     //concat the Route of already passed nodes with the new route
     ArrayList<Node> newRouteConcatedList = new ArrayList<Node>(passedNodesList.size() + alternativeRoute.getNodes().size());
     newRouteConcatedList.addAll(passedNodesList);

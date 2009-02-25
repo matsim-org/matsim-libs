@@ -95,7 +95,7 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 				Gbl.errorMsg("For each initial evacuation plan only one Act is allowed - and no Leg at all");
 			}
 
-			Leg leg = new Leg(BasicLeg.Mode.car);
+			Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 			leg.setNum(0);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
@@ -120,7 +120,7 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 	private Leg getELeg(final Leg leg) {
 		List<Node> nodeRoute = ((CarRoute) leg.getRoute()).getNodes();
 		nodeRoute.remove(nodeRoute.size()-1);
-		Leg l = new Leg(BasicLeg.Mode.car);
+		Leg l = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		CarRoute route = new NodeCarRoute();
 		route.setNodes(nodeRoute);
 		l.setRoute(route);

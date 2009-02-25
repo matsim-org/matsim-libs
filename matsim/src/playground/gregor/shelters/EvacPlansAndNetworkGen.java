@@ -88,7 +88,7 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 			fact.setFacility(f);
 			Activity a = f.getActivity("h");
 			person.getKnowledge().addActivity(a, true);
-			Leg leg = new Leg(BasicLeg.Mode.car);
+			Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);

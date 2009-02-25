@@ -178,7 +178,7 @@ public class LeaveLinkReplanner {
 		subRoute.setNodes(nodesRoute);
 
 		// put the new route in a new leg
-		Leg newLeg = new Leg(leg.getMode());
+		Leg newLeg = new org.matsim.population.LegImpl(leg.getMode());
 		newLeg.setDepartureTime(leg.getDepartureTime());
 		newLeg.setTravelTime(leg.getTravelTime());
 		newLeg.setArrivalTime(leg.getArrivalTime());

@@ -50,6 +50,14 @@ public interface BasicLeg {
 	public void setArrivalTime(final double seconds);
 	
 	// TODO [kai] WŠre "makeConsistent" dann eigentlich eine Methode, welche durch das Interface erzwungen werden sollte?
+	
+	@Deprecated
+	public int getNum() ;
+	
+	@Deprecated
+	public void setNum(int num) ;
+
+
 
 
 }
