@@ -215,7 +215,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 					"SH" + i + "_TTnet\t" + 
 					"SH" + i + "_TDnet\t" +
 					"SH" + i + "_CFD_exact\t" + "SH" + i + "_CFD_mapped\t" +
-					"SH" + i + "_addTime2ClosestStore\t" +"SH" + i + "_addDistance2ClosestStore\t" +
+					"SH" + i + "_addTime\t" +"SH" + i + "_addDistance\t" +
 					"SH" + i + "RetailerID\t" +
 					"SH" + i + "Size\t" +
 					"SH" + i + "dHalt\t" +
