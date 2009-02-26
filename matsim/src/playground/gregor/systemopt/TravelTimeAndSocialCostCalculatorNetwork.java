@@ -37,11 +37,11 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.NetworkLayer;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.trafficmonitoring.TravelTimeAggregatorFactory;
+import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.misc.Time;
 
-public class TravelTimeAndSocialCostCalculatorHeadMultiLink extends TravelTimeCalculator implements IterationStartsListener, AgentDepartureEventHandler{
+public class TravelTimeAndSocialCostCalculatorNetwork extends TravelTimeCalculator implements IterationStartsListener, AgentDepartureEventHandler{
 
 	private final int travelTimeBinSize;
 	private final int numSlots;
@@ -53,28 +53,30 @@ public class TravelTimeAndSocialCostCalculatorHeadMultiLink extends TravelTimeCa
 	private final HashMap<String,SocialCostRole> socCosts = new HashMap<String, SocialCostRole>();
 	
 	private final static int MSA_OFFSET = 20;
+	private final static double CONGESTION_RATION_THRESHOLD = 0.9;
 	
 	static double oldCoef = 0;
 	static double newCoef = 1;
 	static int iteration = 0;
 	
-	public TravelTimeAndSocialCostCalculatorHeadMultiLink(final NetworkLayer network) {
+	public TravelTimeAndSocialCostCalculatorNetwork(final NetworkLayer network) {
 		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
 	}
 
-	public TravelTimeAndSocialCostCalculatorHeadMultiLink(final NetworkLayer network, final int timeslice) {
+	public TravelTimeAndSocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice) {
 		this(network, timeslice, 30*3600); // default: 30 hours at most
 	}
 
-	public TravelTimeAndSocialCostCalculatorHeadMultiLink(final NetworkLayer network, final int timeslice,	final int maxTime) {
+	public TravelTimeAndSocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice,	final int maxTime) {
 		this(network, timeslice, maxTime, new TravelTimeAggregatorFactory());
 	}
 	
-	public TravelTimeAndSocialCostCalculatorHeadMultiLink(final NetworkLayer network, final int timeslice, final int maxTime, final TravelTimeAggregatorFactory factory) {
+	public TravelTimeAndSocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice, final int maxTime, final TravelTimeAggregatorFactory factory) {
 		super(network,timeslice,maxTime,factory);
 		this.travelTimeBinSize = timeslice;
 		this.numSlots = (maxTime / this.travelTimeBinSize) + 1;
 		this.network = network;
+		throw new RuntimeException("not implemented yet!!!");
 
 	}
 	public double getSocialCost(final Link link, final double time) {
@@ -260,6 +262,10 @@ public class TravelTimeAndSocialCostCalculatorHeadMultiLink extends TravelTimeCa
 		double t_free;
 //		double cTime = Time.UNDEFINED_TIME;
 		int lastFSSlice = 0;
+		
+		public boolean isCongested() {
+			return this.agentsOnLink.size() / this.storageCap > CONGESTION_RATION_THRESHOLD;
+		}
 	}
 	
 	private static class AgentInfo {
