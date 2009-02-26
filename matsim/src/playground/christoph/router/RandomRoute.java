@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.network.Link;
-import org.matsim.network.Node;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.population.routes.NodeCarRoute;
 
 import playground.christoph.router.util.KnowledgeTools;

@@ -24,7 +24,7 @@
 package playground.johannes.eut;
 
 import org.apache.log4j.Logger;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;

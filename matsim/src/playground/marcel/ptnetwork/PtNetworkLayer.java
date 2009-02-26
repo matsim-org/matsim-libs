@@ -35,9 +35,9 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.utils.collections.QuadTree;
@@ -69,7 +69,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 	protected Node newNode(final String id, final String x, final String y, final String type) {
 		return new PtNode(id,x,y,type);
 	}
-//	@Override _TODO change to NetworkFactory when used again. 
+//	@Override _TODO change to NetworkFactory when used again.
 	protected Link newLink(final NetworkLayer network, final String id, final Node from, final Node to,
 			 final String length, final String freespeed, final String capacity, final String permlanes,
 			 final String origid, final String type) {
@@ -86,7 +86,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		// much faster than it is at the moment. remove?
 		ArrayList<PtNode> nearestNodes = new ArrayList<PtNode>();
 		double shortestDistance = Double.MAX_VALUE;
-		for (Iterator<Node> it = this.nodes.values().iterator(); it.hasNext(); ) {
+		for (Iterator<Node> it = this.getNodes().values().iterator(); it.hasNext(); ) {
 			PtNode node = (PtNode)it.next();
 			if (PEDESTRIAN_TYPE.equals(node.getType())) {
 				double distance = node.getCoord().calcDistance(coord);
@@ -144,7 +144,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 
 	public ArrayList<PtNode> getDeadEnds(){
 		ArrayList<PtNode> deads= new ArrayList<PtNode>();
-		for (Iterator<Node> it = this.nodes.values().iterator();it.hasNext();){
+		for (Iterator<Node> it = this.getNodes().values().iterator();it.hasNext();){
 			PtNode node = (PtNode) it.next();
 			if(PEDESTRIAN_TYPE.equals(node.getType())) {
 				int totalin=0;
@@ -274,7 +274,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 			/* okay, now we have to re-initialize all nodes, as our counter will
 			 * "wrap around" and we could no longer be sure the counter-values are
 			 * unique.         */
-			for (Iterator<Node> it2 = this.nodes.values().iterator(); it2.hasNext();) {
+			for (Iterator<Node> it2 = this.getNodes().values().iterator(); it2.hasNext();) {
 				PtNode node = (PtNode) it2.next();
 				node.dijkstraCounter = Long.MIN_VALUE;
 			}
@@ -398,7 +398,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 
 			SortedSet<PtNode> pending = new TreeSet<PtNode>(new PtNodeCostComparator());
 
-			for (Iterator<Node> it2 = this.nodes.values().iterator();it2.hasNext();){
+			for (Iterator<Node> it2 = this.getNodes().values().iterator();it2.hasNext();){
 				PtNode node =(PtNode)it2.next();
 				node.actCost=Integer.MAX_VALUE;
 				node.actTime=Integer.MAX_VALUE;
@@ -532,7 +532,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (Node n : this.nodes.values()) {
+		for (Node n : this.getNodes().values()) {
 			if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
 			if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
 			if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
@@ -544,7 +544,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		maxy += 1.0;
 		System.out.println("building quad tree: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.pedNodeQuadTree = new QuadTree<PtNode>(minx, miny, maxx, maxy);
-		Iterator<Node> n_it = this.nodes.values().iterator();
+		Iterator<Node> n_it = this.getNodes().values().iterator();
 		while (n_it.hasNext()) {
 			PtNode n = (PtNode)n_it.next();
 			if (PEDESTRIAN_TYPE.equals(n.getType())) {

@@ -25,8 +25,8 @@ import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
 import org.matsim.events.LinkLeaveEvent;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 

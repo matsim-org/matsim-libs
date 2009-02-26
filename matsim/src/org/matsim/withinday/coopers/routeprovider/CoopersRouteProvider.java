@@ -24,8 +24,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.network.Link;
-import org.matsim.network.Node;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.withinday.routeprovider.AStarLandmarksRouteProvider;
 import org.matsim.withinday.routeprovider.AbstractRouteProvider;
 import org.matsim.withinday.routeprovider.HierarchicalRouteProvider;
@@ -55,7 +55,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 
 	/**
 	 *
-	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.network.Link,
+	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.interfaces.core.v01.Link,
 	 *      org.matsim.interfaces.core.v01.CarRoute)
 	 */
 	public boolean providesRoute(final Link currentLink, final CarRoute subRoute) {

@@ -22,8 +22,6 @@ package org.matsim.interfaces.core.v01;
 
 import java.util.List;
 
-import org.matsim.network.Link;
-import org.matsim.network.Node;
 
 public interface CarRoute extends Route {
 

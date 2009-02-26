@@ -31,9 +31,9 @@ import playground.dressler.Intervall.src.Intervalls.*;
 import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
 
 // matsim imports
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -194,8 +194,8 @@ import org.matsim.router.util.TravelTime;
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.network.Node,
-	 *      org.matsim.network.Node, double)
+	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.interfaces.core.v01.Node,
+	 *      org.matsim.interfaces.core.v01.Node, double)
 	 */
 	 public Path calcLeastCostPath(LinkedList<Node> sources, Node sink, final double startTime) {
 		boolean found = false;
@@ -253,8 +253,8 @@ import org.matsim.router.util.TravelTime;
 	 *            ignored
 	 * @param flow
 	 *            Determines the flow on links.
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.network.Node,
-	 *      org.matsim.network.Node, double)
+	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.interfaces.core.v01.Node,
+	 *      org.matsim.interfaces.core.v01.Node, double)
 	 */
 	public Path calcLeastCostPath(LinkedList<Node> sources, Node sink, final double startTime, Flow flow) {
 
@@ -273,8 +273,8 @@ import org.matsim.router.util.TravelTime;
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.network.Node,
-	 *      org.matsim.network.Node, double)
+	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.interfaces.core.v01.Node,
+	 *      org.matsim.interfaces.core.v01.Node, double)
 	 */
 	 public ArrayList<Link> calcLeastCostLinkRoute(LinkedList<Node> sources, Node sink, final double startTime) {
 		boolean found = false;
@@ -321,8 +321,8 @@ import org.matsim.router.util.TravelTime;
 	 *            ignored
 	 * @param flow
 	 *            Determines the flow on links.
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.network.Node,
-	 *      org.matsim.network.Node, double)
+	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.interfaces.core.v01.Node,
+	 *      org.matsim.interfaces.core.v01.Node, double)
 	 */
 	public ArrayList<Link> calcLeastCostLinkRoute(LinkedList<Node> sources, Node sink, final double startTime, Flow flow) {
 		this.flow = flow;
@@ -340,8 +340,8 @@ import org.matsim.router.util.TravelTime;
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.network.Node,
-	 *      org.matsim.network.Node, double)
+	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.interfaces.core.v01.Node,
+	 *      org.matsim.interfaces.core.v01.Node, double)
 	 */
 	public Flow calcLeastCostFlow(LinkedList<Node> sources, final Node sink, final double startTime) {
 		boolean addNewPath = false;
@@ -387,8 +387,8 @@ import org.matsim.router.util.TravelTime;
 	 *            ignored
 	 * @param flow
 	 *            Determines the flow on links.
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.network.Node,
-	 *      org.matsim.network.Node, double)
+	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.interfaces.core.v01.Node,
+	 *      org.matsim.interfaces.core.v01.Node, double)
 	 */
 	public Flow calcLeastCostFlow(final double startTime, Flow flow) {
 		this.flow = flow;
@@ -542,7 +542,7 @@ import org.matsim.router.util.TravelTime;
 			for (Link link : v.getOutLinks().values()) {
 				// w is the other node of the link
 				w = link.getToNode();
-				//TODO tausche for-schleife + ifs für bessere Laufzeit nach oben?
+				//TODO tausche for-schleife + ifs fï¿½r bessere Laufzeit nach oben?
 				for(Node source : sources){
 					if(flow.isActiveSource(source)){
 						// compute new distance to neighbor
@@ -922,4 +922,4 @@ import org.matsim.router.util.TravelTime;
 }
  // TODO kontrolliere alle methodenbeschreibungen!!!!!!!!!!!!!
  // TODO set wait und arrival und gebe path mit print aus
- // TODO benutze flow.getLength(link); für Länge
+ // TODO benutze flow.getLength(link); fï¿½r Lï¿½nge

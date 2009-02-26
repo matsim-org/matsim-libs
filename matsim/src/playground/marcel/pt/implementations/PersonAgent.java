@@ -21,7 +21,7 @@
 package playground.marcel.pt.implementations;
 
 import org.matsim.facilities.Facility;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 
 import playground.marcel.pt.interfaces.DriverAgent;
 import playground.marcel.pt.interfaces.PassengerAgent;

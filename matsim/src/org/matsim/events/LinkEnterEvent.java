@@ -21,8 +21,8 @@
 package org.matsim.events;
 
 import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.network.Link;
 
 public class LinkEnterEvent extends LinkEvent {
 

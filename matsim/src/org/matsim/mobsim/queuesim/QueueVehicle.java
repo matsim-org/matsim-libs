@@ -23,7 +23,7 @@ package org.matsim.mobsim.queuesim;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 
 public class QueueVehicle implements DrawableAgentI {

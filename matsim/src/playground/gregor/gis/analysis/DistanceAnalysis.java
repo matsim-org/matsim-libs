@@ -44,9 +44,9 @@ import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
@@ -77,12 +77,12 @@ import com.vividsolutions.jts.geom.Polygon;
  * - dann werden alle Personen mit den Koordinaten der home location in einen 
  *   QuadTree gepackt. (DistanceAnalysis.handlePlans())
  *   
- * - nun kann man Ÿber die Polygons des Rasters iterieren 
+ * - nun kann man ï¿½ber die Polygons des Rasters iterieren 
  *   (DistanceAnalysis.iteratePolygons()). Die Personen werden in zwei Schritten 
- *   gefiltert (dieses Vorgehen ist wesentlich effizienter als immer Ÿber alle 
+ *   gefiltert (dieses Vorgehen ist wesentlich effizienter als immer ï¿½ber alle 
  *   Personen zu iterieren):
  *   
- * - Aus dem QuadTree holt man sich zunŠchst alle Personen im Umkreis von  min 
+ * - Aus dem QuadTree holt man sich zunï¿½chst alle Personen im Umkreis von  min 
  *   d/2 des Mittelpunkts eines Polygons.  (DistanceAnalysis.iteratePolygons - 
  *   Zeile 158)
  *   

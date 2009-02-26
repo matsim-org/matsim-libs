@@ -1,6 +1,6 @@
 package playground.ciarif.retailers;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 
 public interface UtilityComputer {
 

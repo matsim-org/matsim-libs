@@ -8,9 +8,9 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 
 import playground.mmoyo.PTRouter.*;
 
@@ -212,7 +212,7 @@ public class PTNetworkFactory {
 	
 	public void printLinks() {
 		//Displays a quick visualization of links with from- and to- nodes
-		for (org.matsim.network.Link l : this.ptNetworkLayer.getLinks().values()) {
+		for (org.matsim.interfaces.core.v01.Link l : this.ptNetworkLayer.getLinks().values()) {
 			System.out.print("\n(" ); 
 			System.out.print(l.getFromNode().getId().toString()); 
 			System.out.print( ")----" ); 

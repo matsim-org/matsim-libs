@@ -23,7 +23,7 @@ package org.matsim.network.algorithms;
 import java.util.Iterator;
 
 import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 
 public class NetworkAdaptLength {

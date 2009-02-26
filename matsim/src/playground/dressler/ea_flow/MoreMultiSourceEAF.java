@@ -29,6 +29,8 @@ import java.util.LinkedList;
 
 // matsim imports
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.*;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;

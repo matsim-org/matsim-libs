@@ -20,10 +20,10 @@
 
 package playground.marcel.ptnetwork;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.network.Node;
+import org.matsim.network.NodeImpl;
 import org.matsim.utils.geometry.CoordImpl;
 
-public class PtNode extends Node{
+public class PtNode extends NodeImpl {
 
 	protected PtNode(final String id, final String x, final String y, final String type) {
 		super(new IdImpl(id), new CoordImpl(x, y), type);

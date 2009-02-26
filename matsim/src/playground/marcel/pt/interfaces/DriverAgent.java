@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.interfaces;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 
 public interface DriverAgent {
 

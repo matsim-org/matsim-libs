@@ -29,8 +29,10 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 
-public class Node extends BasicNodeImpl implements Comparable<Node> {
+public class NodeImpl extends BasicNodeImpl implements Node {
 
 	//////////////////////////////////////////////////////////////////////
 	// constants
@@ -67,7 +69,7 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	protected Node(final Id id, final Coord coord, final String type) {
+	protected NodeImpl(final Id id, final Coord coord, final String type) {
 		super(id, coord);
 		this.type = type == null ? null : type.intern();
 	}
@@ -77,13 +79,13 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 	//////////////////////////////////////////////////////////////////////
 
 	public int compareTo(final Node o) {
-		return this.id.toString().compareTo(o.id.toString());
+		return this.id.toString().compareTo(o.getId().toString());
 	}
 
 	@Override
 	public boolean equals(final Object other) {
-		if (other instanceof Node) {
-			return this.id.equals(((Node)other).id);
+		if (other instanceof NodeImpl) {
+			return this.id.equals(((NodeImpl)other).id);
 		}
 		return false;
 	}
@@ -131,7 +133,7 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 	public final void setTopoType(final int topotype) {
 		this.topoType = topotype;
 	}
-	
+
 	public final void setType(final String type) {
 		this.type = type == null ? null : type.intern();
 	}

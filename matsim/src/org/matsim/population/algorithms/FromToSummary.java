@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.network.Node;
 
 /**
  * @author lnicolas

@@ -21,9 +21,9 @@
 package org.matsim.utils.vis.snapshots;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;

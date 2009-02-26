@@ -6,8 +6,8 @@ import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.network.Link;
 
 public class StartingLegMessage extends EventMessage {
 

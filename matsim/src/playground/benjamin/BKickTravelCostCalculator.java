@@ -20,7 +20,7 @@
 package playground.benjamin;
 
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.router.util.TravelMinCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
@@ -47,14 +47,14 @@ public class BKickTravelCostCalculator implements TravelMinCost {
 	}
 
 	/**
-	 * @see org.matsim.router.util.TravelMinCost#getLinkMinimumTravelCost(org.matsim.network.Link)
+	 * @see org.matsim.router.util.TravelMinCost#getLinkMinimumTravelCost(org.matsim.interfaces.core.v01.Link)
 	 */
 	public double getLinkMinimumTravelCost(Link link) {
 		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME)) * marginalUtilityOfTraveling + marginalUtilityOfFuel * 0.12d/1000.0d * link.getLength();
 	}
 
 	/**
-	 * @see org.matsim.router.util.TravelCost#getLinkTravelCost(org.matsim.network.Link, double)
+	 * @see org.matsim.router.util.TravelCost#getLinkTravelCost(org.matsim.interfaces.core.v01.Link, double)
 	 */
 	public double getLinkTravelCost(Link link, double time) {
 		return travelTimeCalculator.getLinkTravelTime(link, time) * marginalUtilityOfTraveling + marginalUtilityOfFuel * 0.12d/1000.0d * link.getLength();

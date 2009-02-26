@@ -6,8 +6,8 @@ import org.matsim.events.BasicEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.network.Link;
 
 public class EndRoadMessage extends EventMessage {
 // TODO: This is not a normal Event message, perhaps I should redesign it and put it somewhere else

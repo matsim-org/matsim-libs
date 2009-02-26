@@ -21,8 +21,8 @@
 package playground.dressler.ea_flow;
 
 //matsim imports
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 
 //other imports
 import java.util.Hashtable;

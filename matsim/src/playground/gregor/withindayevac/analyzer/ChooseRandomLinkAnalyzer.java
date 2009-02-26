@@ -21,7 +21,7 @@
 package playground.gregor.withindayevac.analyzer;
 
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 
 import playground.gregor.withindayevac.Beliefs;
 

@@ -2,7 +2,7 @@ package playground.andreas.intersection.dijkstra;
 
 import java.util.HashMap;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.trafficmonitoring.TravelTimeData;
 import org.matsim.utils.misc.IntegerCache;
 

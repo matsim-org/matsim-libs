@@ -6,6 +6,8 @@ import java.util.Comparator;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
@@ -13,8 +15,6 @@ import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.Simulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.mobsim.queuesim.QueueVehicle;
-import org.matsim.network.Link;
-import org.matsim.network.Node;
 
 public class QNode extends QueueNode{
 

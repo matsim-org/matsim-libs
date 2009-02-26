@@ -20,7 +20,7 @@
 
 package playground.gregor.withindayevac.communication;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 
 public class FollowGuideMessage implements Message{
 

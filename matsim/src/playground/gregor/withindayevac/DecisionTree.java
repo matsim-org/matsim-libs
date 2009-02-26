@@ -23,8 +23,8 @@ package playground.gregor.withindayevac;
 import java.util.ArrayList;
 
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
 import playground.gregor.withindayevac.analyzer.Analyzer;

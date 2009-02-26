@@ -43,9 +43,9 @@ import org.matsim.controler.listener.StartupListener;
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.network.Link;
 import org.matsim.population.Population;
 import org.matsim.utils.io.IOUtils;
 

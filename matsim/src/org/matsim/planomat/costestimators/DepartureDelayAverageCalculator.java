@@ -28,7 +28,7 @@ import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 
 /**

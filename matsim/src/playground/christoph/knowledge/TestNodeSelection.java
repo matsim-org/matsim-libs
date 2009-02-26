@@ -25,9 +25,9 @@ import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;

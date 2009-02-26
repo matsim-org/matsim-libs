@@ -26,6 +26,7 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.utils.geometry.CoordImpl;

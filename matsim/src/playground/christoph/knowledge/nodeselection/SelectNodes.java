@@ -21,11 +21,11 @@
 /**
  * @author Christoph Dobler
  * 
- * Ziel: Knoten eines Netzwerks anhand vorgegebener Regeln auswählen und 
- * zu einer übergebenen ArrayList hinzufügen.
+ * Ziel: Knoten eines Netzwerks anhand vorgegebener Regeln auswï¿½hlen und 
+ * zu einer ï¿½bergebenen ArrayList hinzufï¿½gen.
  * 
  * Beispiel: Alle Knoten die innerhalb eines vorgegebenen Abstandes zu einem
- * Zielknoten liegen sollen gefunden und zurück gegeben werden.
+ * Zielknoten liegen sollen gefunden und zurï¿½ck gegeben werden.
  */
 
 package playground.christoph.knowledge.nodeselection;
@@ -33,7 +33,7 @@ package playground.christoph.knowledge.nodeselection;
 import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.network.Node;
+import org.matsim.interfaces.core.v01.Node;
 
 public interface SelectNodes extends Cloneable {
 

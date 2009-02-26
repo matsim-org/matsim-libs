@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 
 /**
  * Pre-processes a given network, gathering information which can be used by

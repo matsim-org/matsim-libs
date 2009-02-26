@@ -26,7 +26,7 @@ package playground.johannes.eut;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.router.util.TravelTime;
 
 /**

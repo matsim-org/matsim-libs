@@ -22,7 +22,7 @@ package playground.gregor.evacuation.changeeventsmanipulation;
 
 import java.util.List;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkChangeEventsParser;

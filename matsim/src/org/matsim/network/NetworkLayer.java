@@ -31,8 +31,9 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.BasicNetwork;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Layer;
 
@@ -46,12 +47,12 @@ public class NetworkLayer extends Layer implements BasicNetwork<Node, Link> {
 
 	private int capperiod = Integer.MIN_VALUE ;
 
-	protected Map<Id, Node> nodes = new TreeMap<Id, Node>();
+	private final Map<Id, Node> nodes = new TreeMap<Id, Node>();
 
 	private QuadTree<Node> nodeQuadTree = null;
 
 	private static final double DEFAULT_EFFECTIVE_CELL_SIZE = 7.5;
-	
+
 	private double effectiveCellSize = DEFAULT_EFFECTIVE_CELL_SIZE;
 
 	private double effectiveLaneWidth = Double.NaN;
@@ -73,7 +74,7 @@ public class NetworkLayer extends Layer implements BasicNetwork<Node, Link> {
 		this.factory = new NetworkFactory();
 	}
 
-	public NetworkLayer(NetworkFactory factory) {
+	public NetworkLayer(final NetworkFactory factory) {
 		super(LAYER_TYPE, null);
 		this.factory = factory;
 	}
@@ -81,14 +82,6 @@ public class NetworkLayer extends Layer implements BasicNetwork<Node, Link> {
 	// ////////////////////////////////////////////////////////////////////
 	// create methods
 	// ////////////////////////////////////////////////////////////////////
-
-
-	/** Usage of this method is discouraged, as the method will soon be deprecated. */
-	@Deprecated
-	public final Node createNode(final String id, final String x, final String y, final String type) {
-		// TODO [MR] delete this method. no more usages as of 26dec2008
-		return createNode(new IdImpl(id), new CoordImpl(x, y), type);
-	}
 
 	public final Node createNode(final Id id, final Coord coord) {
 		return createNode(id, coord, null);
@@ -112,7 +105,7 @@ public class NetworkLayer extends Layer implements BasicNetwork<Node, Link> {
 	@Deprecated
 	public final Link createLink(final String id, final String fromTo, final String toNode, final String length,
 	                             final String freespeed, final String capacity, final String permlanes,
-	                             final String origid, String type) {
+	                             final String origid, final String type) {
 		return createLink(new IdImpl(id), this.nodes.get(new IdImpl(fromTo)), this.nodes.get(new IdImpl(toNode)), Double.parseDouble(length),
 				Double.parseDouble(freespeed), Double.parseDouble(capacity), Double.parseDouble(permlanes),
 				origid, type);
@@ -256,7 +249,7 @@ public class NetworkLayer extends Layer implements BasicNetwork<Node, Link> {
 		return this.nodes.get(new IdImpl(id));
 	}
 
-	public final Node getNode(Id id) {
+	public final Node getNode(final Id id) {
 		return this.nodes.get(id);
 	}
 
@@ -278,7 +271,7 @@ public class NetworkLayer extends Layer implements BasicNetwork<Node, Link> {
 			log.warn("[nearestNode not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" + this ) ;
 			return null ;
 		}
-		
+
 		if ( nearestNode.getIncidentLinks().isEmpty() ) {
 			log.warn(this + "[found nearest node that has no incident links.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" ) ;
 		}
@@ -440,7 +433,7 @@ public class NetworkLayer extends Layer implements BasicNetwork<Node, Link> {
 	public NetworkFactory getFactory() {
 		return this.factory;
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////
 	// remove methods
 	// ////////////////////////////////////////////////////////////////////
@@ -521,7 +514,7 @@ public class NetworkLayer extends Layer implements BasicNetwork<Node, Link> {
 		this.nodeQuadTree = null;
 		buildQuadTree();
 	}
-	
+
 	public void connect() {
 		buildQuadTree();
 	}

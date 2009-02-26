@@ -30,10 +30,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
-import org.matsim.network.Node;
 import org.matsim.utils.io.IOUtils;
 
 /**

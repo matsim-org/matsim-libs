@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 
 public class InformationExchanger {
 	

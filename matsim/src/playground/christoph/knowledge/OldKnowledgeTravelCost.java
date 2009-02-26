@@ -20,7 +20,7 @@
 
 /*
  * Anpassung der TravelCosts basierend auf des Wissensstandes einer Person.
- * -> Überlagerung mit dem globalen Wissen oder gänzliches Überschreiben.
+ * -> ï¿½berlagerung mit dem globalen Wissen oder gï¿½nzliches ï¿½berschreiben.
  * 
  */
 
@@ -29,8 +29,8 @@ package playground.christoph.knowledge;
 import java.util.ArrayList;
 
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.network.Link;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.TravelTime;
 
@@ -81,12 +81,12 @@ public class OldKnowledgeTravelCost extends TravelTimeDistanceCostCalculator {
 		for(int i = 0; i < linkIds.size(); i++)
 		{
 			System.out.println("Comparing... " + ID.toString() + " with " + linkIds.get(i).toString());
-			// falls eine Übereinstimmung gefunden wurde
+			// falls eine ï¿½bereinstimmung gefunden wurde
 			if(linkIds.get(i).compareTo(ID) == 0)
 			//if(linkIds.get(i).equals(ID))
 			//if(linkIds.get(i).toString().equals(ID.toString()))
 			{
-				// Derzeit Wert einfach übernehmen - später je nach Strategie
+				// Derzeit Wert einfach ï¿½bernehmen - spï¿½ter je nach Strategie
 				// addieren, multiplizieren oder whatever!
 				cost = costs.get(i);
 				//System.out.println("Adapting Travelcosts!!!");
@@ -127,7 +127,7 @@ public class OldKnowledgeTravelCost extends TravelTimeDistanceCostCalculator {
 		}
 		*/
 		
-		// ... überarbeitete Kosten retour geben
+		// ... ï¿½berarbeitete Kosten retour geben
 		return cost;
 	}
 		

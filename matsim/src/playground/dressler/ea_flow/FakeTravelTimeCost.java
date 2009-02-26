@@ -20,7 +20,7 @@
 
 package playground.dressler.ea_flow;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.router.util.TravelMinCost;
 import org.matsim.router.util.TravelTime;
 

@@ -23,7 +23,7 @@ package playground.dgrether;
 import java.util.ArrayList;
 
 import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.network.Node;
+import org.matsim.interfaces.core.v01.Node;
 
 
 /**

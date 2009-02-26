@@ -5,7 +5,7 @@ import java.util.HashMap;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 

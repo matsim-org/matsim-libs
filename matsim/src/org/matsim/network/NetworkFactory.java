@@ -29,6 +29,8 @@ import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Route;
 import org.matsim.population.routes.NodeCarRouteFactory;
 import org.matsim.population.routes.RouteFactory;
@@ -44,8 +46,8 @@ public class NetworkFactory {
 			BasicNode.class, BasicNode.class, NetworkLayer.class, double.class,
 			double.class, double.class, double.class};
 
-	private Map<BasicLeg.Mode, RouteFactory> routeFactories = new HashMap<BasicLeg.Mode, RouteFactory>();
-	
+	private final Map<BasicLeg.Mode, RouteFactory> routeFactories = new HashMap<BasicLeg.Mode, RouteFactory>();
+
 	public NetworkFactory() {
 		try {
 			this.prototypeContructor = LinkImpl.class
@@ -55,17 +57,17 @@ public class NetworkFactory {
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 		}
-		
-		routeFactories.put(BasicLeg.Mode.car, new NodeCarRouteFactory());
+
+		this.routeFactories.put(BasicLeg.Mode.car, new NodeCarRouteFactory());
 	}
 
 	protected Node createNode(final Id id, final Coord coord, final String type) {
-		return new Node(id, coord, type);
+		return new NodeImpl(id, coord, type);
 	}
 
-	protected Link createLink(final Id id, Node from, Node to,
-			NetworkLayer network, double length, double freespeedTT, double capacity,
-			double lanes) {
+	protected Link createLink(final Id id, final Node from, final Node to,
+			final NetworkLayer network, final double length, final double freespeedTT, final double capacity,
+			final double lanes) {
 		Link ret;
 		Exception ex;
 		try {
@@ -89,14 +91,14 @@ public class NetworkFactory {
 				"Cannot instantiate link from prototype, this should never happen, but never say never!",
 				ex);
 	}
-	
+
 	/**
 	 * @param mode the transport mode the route should be for
 	 * @param startLink the link where the route starts
 	 * @param endLink the link where the route ends
 	 * @return a new Route for the specified mode
 	 * @throws IllegalArgumentException if no {@link RouteFactory} is registered that creates routes for the specified mode.
-	 * 
+	 *
 	 * @see #setRouteFactory(org.matsim.interfaces.basic.v01.BasicLeg.Mode, RouteFactory)
 	 */
 	public Route createRoute(final BasicLeg.Mode mode, final Link startLink, final Link endLink) {
@@ -106,7 +108,7 @@ public class NetworkFactory {
 		}
 		return factory.createRoute(startLink, endLink);
 	}
-	
+
 	@Deprecated
 	public Route createRoute(final BasicLeg.Mode mode) {
 		final RouteFactory factory = this.routeFactories.get(mode);
@@ -119,7 +121,7 @@ public class NetworkFactory {
 	/**
 	 * Registers a {@link RouteFactory} for the specified mode. If <code>factory</code> is <code>null</code>,
 	 * the existing entry for this <code>mode</code> will be deleted.
-	 * 
+	 *
 	 * @param mode
 	 * @param factory
 	 */
@@ -130,8 +132,8 @@ public class NetworkFactory {
 			this.routeFactories.put(mode, factory);
 		}
 	}
-	
-	public void setLinkPrototype(Class<? extends Link> prototype) {
+
+	public void setLinkPrototype(final Class<? extends Link> prototype) {
 		try {
 			Constructor<? extends Link> c = prototype.getConstructor(PROTOTYPECONSTRUCTOR);
 			if (null != c) {

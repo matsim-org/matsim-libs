@@ -23,6 +23,8 @@ package playground.dressler.ea_flow;
 
 //import java.util.Map;
 
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.*;
 //import org.matsim.utils.identifiers.IdI;
 

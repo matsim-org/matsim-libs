@@ -27,9 +27,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.utils.geometry.CoordImpl;
 
 /**

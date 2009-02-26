@@ -21,6 +21,8 @@
 package org.matsim.network;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 

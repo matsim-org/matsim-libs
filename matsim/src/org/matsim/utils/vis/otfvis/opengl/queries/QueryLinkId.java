@@ -27,9 +27,9 @@ import java.util.Map;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.network.Link;
 import org.matsim.population.Population;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.collections.QuadTree.Executor;

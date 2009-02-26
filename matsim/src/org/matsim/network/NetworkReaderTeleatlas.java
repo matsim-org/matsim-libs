@@ -28,6 +28,7 @@ import org.geotools.feature.Feature;
 import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.gis.ShapeFileReader;
 

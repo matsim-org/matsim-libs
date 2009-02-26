@@ -1,6 +1,7 @@
 package playground.mmoyo.PTCase1;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
+
 import playground.mmoyo.PTRouter.PTTimeTableInfo;;
 
 /**

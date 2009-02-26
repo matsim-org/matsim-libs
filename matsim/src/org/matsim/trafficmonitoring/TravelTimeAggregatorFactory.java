@@ -23,7 +23,7 @@ package org.matsim.trafficmonitoring;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 
 public class TravelTimeAggregatorFactory {
 	

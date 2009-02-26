@@ -24,8 +24,8 @@
 package playground.johannes.mobsim;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.network.Link;
 
 /**
  * A DeliberateAgent is an agent that can modify its plan conforming to a

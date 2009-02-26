@@ -24,10 +24,10 @@ import java.util.Collection;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.mobsim.queuesim.PersonAgent;
 import org.matsim.mobsim.queuesim.SimulationTimer;
-import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
 import playground.gregor.withindayevac.analyzer.NextLinkWithEstimatedTravelTimeOption;

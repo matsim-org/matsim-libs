@@ -22,10 +22,10 @@
  * @author Christoph Dobler
  * 
  * Liefert eine ArrayList von Links.
- * Übergabeparameter muss ein Netzwerk und eine ArrayList von Nodes sein.
- * Zurückgegeben wird eine ArrayList von Links, welche dem Netzwerk angehören
- * und deren Start- und Endknoten in der übergebenen ArrayList enthalten sind. 
- * Wird zusätzlich noch eine ArrayList Links mit übergeben, so wird diese
+ * ï¿½bergabeparameter muss ein Netzwerk und eine ArrayList von Nodes sein.
+ * Zurï¿½ckgegeben wird eine ArrayList von Links, welche dem Netzwerk angehï¿½ren
+ * und deren Start- und Endknoten in der ï¿½bergebenen ArrayList enthalten sind. 
+ * Wird zusï¿½tzlich noch eine ArrayList Links mit ï¿½bergeben, so wird diese
  * mit den neu gefundenen Links erweitert. Andernfalls wird eine neue erstellt.
  *
  */
@@ -38,9 +38,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 
 public class GetAllIncludedLinks {
 

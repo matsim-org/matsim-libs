@@ -19,8 +19,8 @@
 
 package org.matsim.network.filter;
 
-import org.matsim.network.Link;
-import org.matsim.network.Node;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 
 /**
  * @author dgrether

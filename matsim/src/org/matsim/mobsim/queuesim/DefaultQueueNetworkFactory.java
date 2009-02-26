@@ -19,8 +19,8 @@
 
 package org.matsim.mobsim.queuesim;
 
-import org.matsim.network.Link;
-import org.matsim.network.Node;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 
 /**
  * @author dgrether
@@ -32,7 +32,7 @@ public final class DefaultQueueNetworkFactory implements QueueNetworkFactory<Que
 	}
 
 	/**
-	 * @see org.matsim.mobsim.queuesim.QueueNetworkFactory#newQueueNode(org.matsim.network.Node, org.matsim.mobsim.queuesim.QueueNetwork)
+	 * @see org.matsim.mobsim.queuesim.QueueNetworkFactory#newQueueNode(org.matsim.interfaces.core.v01.Node, org.matsim.mobsim.queuesim.QueueNetwork)
 	 */
 	public QueueNode newQueueNode(Node node, QueueNetwork queueNetwork) {
 		return new QueueNode(node, queueNetwork);

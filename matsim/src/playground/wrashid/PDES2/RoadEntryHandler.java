@@ -6,8 +6,8 @@ import java.util.PriorityQueue;
 import java.util.LinkedList;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.mobsim.jdeqsim.util.Timer;
-import org.matsim.network.Link;
 
 
 public class RoadEntryHandler {

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-// Zusätzlich Punkte innerhalb des aufgespannten Polygons finden?
+// Zusï¿½tzlich Punkte innerhalb des aufgespannten Polygons finden?
 // -> http://www.coding-board.de/board/showthread.php?t=23953 : 
 // Herausfinden, ob ein beliebiger Punkt innerhalb eines Polygons liegt
 
@@ -33,9 +33,9 @@ import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.TravelCost;
 import org.matsim.utils.misc.Time;
@@ -450,7 +450,7 @@ class DijkstraNode
 		{
 			Node node = (Node)nodeIterator.next();
 
-			// zugehörigen DijsktraNode aus der Map holen
+			// zugehï¿½rigen DijsktraNode aus der Map holen
 			DijkstraNode dijkstraNode = dijkstraNodeMap.get(node);
 			ingoingNodes.add(dijkstraNode);
 		}
@@ -468,7 +468,7 @@ class DijkstraNode
 		{
 			Node node = (Node)nodeIterator.next();
 
-			// zugehörigen DijsktraNode aus der Map holen
+			// zugehï¿½rigen DijsktraNode aus der Map holen
 			DijkstraNode dijkstraNode = dijkstraNodeMap.get(node);
 			outgoingNodes.add(dijkstraNode);
 		}

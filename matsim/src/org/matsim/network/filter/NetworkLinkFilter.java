@@ -19,7 +19,7 @@
 
 package org.matsim.network.filter;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 
 /**
  * Implement this interface to filter the links of a network

@@ -23,8 +23,8 @@ package playground.christoph.router.util;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.network.Link;
-import org.matsim.network.Node;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 
 
 

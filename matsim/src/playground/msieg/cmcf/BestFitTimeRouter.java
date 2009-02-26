@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.network.Link;
-import org.matsim.network.Node;
 import org.matsim.population.routes.NodeCarRoute;
 
 import playground.msieg.structure.Commodity;

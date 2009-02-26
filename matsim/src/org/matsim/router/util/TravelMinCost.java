@@ -20,7 +20,7 @@
 
 package org.matsim.router.util;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 
 /**
  * @author lnicolas

@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
 

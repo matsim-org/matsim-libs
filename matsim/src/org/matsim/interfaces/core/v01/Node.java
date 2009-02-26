@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkIdComparator.java
+ * Node.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,25 +18,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.network;
+package org.matsim.interfaces.core.v01;
 
-import java.io.Serializable;
-import java.util.Comparator;
+import java.util.Map;
 
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.basic.v01.BasicNode;
+import org.matsim.interfaces.basic.v01.Id;
 
-/**
- * Compares two links by their Id. A simple helper class so one is
- * able to put Links in a TreeMap or other sorted data structure.
- *
- * @author mrieser
- */
-public class LinkIdComparator implements Comparator<Link>, Serializable {
+public interface Node extends BasicNode, Comparable<Node> {
 
-	private static final long serialVersionUID = 1L;
+	public void setOrigId(final String id);
 
-	public int compare(final Link o1, final Link o2) {
-		return o1.getId().compareTo(o2.getId());
-	}
+	@Deprecated
+	public void setTopoType(final int topotype);
+
+	public void setType(final String type);
+
+	public void removeInLink(final Link inlink);
+
+	public void removeOutLink(final Link outlink);
+
+	public String getOrigId();
+
+	public String getType();
+
+	public Map<Id, ? extends Link> getIncidentLinks();
+
+	public Map<Id, ? extends Node> getInNodes();
+
+	public Map<Id, ? extends Node> getOutNodes();
+
+	public Map<Id, ? extends Node> getIncidentNodes();
+
+	@Deprecated
+	public int getTopoType();
+
+	public Map<Id, ? extends Link> getInLinks();
+
+	public Map<Id, ? extends Link> getOutLinks();
 
 }

@@ -22,11 +22,11 @@ package playground.christoph.mobsim;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.mobsim.queuesim.QueueLane;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.mobsim.queuesim.QueueVehicle;
-import org.matsim.network.Node;
 
 public class MyQueueNode extends QueueNode{
 	

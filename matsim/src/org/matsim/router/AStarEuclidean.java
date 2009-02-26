@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.router.util.PreProcessEuclidean;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -305,7 +305,7 @@ public class AStarEuclidean extends Dijkstra {
 		}
 
 		/**
-		 * @see org.matsim.router.Dijkstra.ComparatorDijkstraCost#getCost(org.matsim.network.Node)
+		 * @see org.matsim.router.Dijkstra.ComparatorDijkstraCost#getCost(org.matsim.interfaces.core.v01.Node)
 		 */
 		@Override
 		protected double getCost(final Node node) {

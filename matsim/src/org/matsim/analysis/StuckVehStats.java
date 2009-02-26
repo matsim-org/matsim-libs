@@ -29,7 +29,7 @@ import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
 

@@ -4,7 +4,7 @@ import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 
 public class EnterRoadMessage extends EventMessage {
 

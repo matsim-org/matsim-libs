@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.utils.io.IOUtils;
 
 public class NetworkWriterHandlerImplTNodes {

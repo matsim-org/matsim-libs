@@ -1,4 +1,4 @@
-package org.matsim.network;
+package org.matsim.interfaces.core.v01;
 
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.interfaces.basic.v01.Coord;

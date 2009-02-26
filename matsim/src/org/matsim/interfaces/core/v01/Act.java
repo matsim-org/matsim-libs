@@ -4,7 +4,6 @@ import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.BasicAct;
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.network.Link;
 
 public interface Act extends BasicAct {
 

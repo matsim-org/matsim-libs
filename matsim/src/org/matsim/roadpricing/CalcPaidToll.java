@@ -31,7 +31,7 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.PersonEvent;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 

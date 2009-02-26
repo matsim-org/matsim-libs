@@ -29,7 +29,7 @@ import java.util.Iterator;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkAlgorithm;

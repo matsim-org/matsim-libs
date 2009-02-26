@@ -30,8 +30,8 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.geometry.CoordImpl;

@@ -22,8 +22,8 @@ package org.matsim.withinday.beliefs;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.mobsim.queuesim.SimulationTimer;
-import org.matsim.network.Link;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 import org.matsim.withinday.WithindayAgent;

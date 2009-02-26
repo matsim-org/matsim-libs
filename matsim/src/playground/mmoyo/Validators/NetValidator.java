@@ -1,7 +1,7 @@
 package playground.mmoyo.Validators;
 
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Link;
 
 import playground.mmoyo.PTCase2.PTTimeTable2;
 

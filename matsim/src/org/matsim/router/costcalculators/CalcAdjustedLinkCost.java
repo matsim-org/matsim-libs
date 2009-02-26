@@ -21,7 +21,7 @@
 package org.matsim.router.costcalculators;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.router.util.TravelCost;
 
 /**

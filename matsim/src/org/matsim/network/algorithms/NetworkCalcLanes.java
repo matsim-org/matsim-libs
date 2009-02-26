@@ -20,7 +20,7 @@
 
 package org.matsim.network.algorithms;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 
 /**

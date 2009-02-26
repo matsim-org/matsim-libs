@@ -33,7 +33,7 @@ import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkChangeEvent.ChangeType;

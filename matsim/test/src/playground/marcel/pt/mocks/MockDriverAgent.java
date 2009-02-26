@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.mocks;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 
 import playground.marcel.pt.interfaces.DriverAgent;
 

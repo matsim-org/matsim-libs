@@ -20,7 +20,7 @@
 
 package org.matsim.roadpricing;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 import org.matsim.router.util.TravelCost;
 

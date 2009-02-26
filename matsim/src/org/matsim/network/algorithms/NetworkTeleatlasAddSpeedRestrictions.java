@@ -26,7 +26,7 @@ import java.nio.channels.FileChannel;
 import org.apache.log4j.Logger;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkReaderTeleatlas;

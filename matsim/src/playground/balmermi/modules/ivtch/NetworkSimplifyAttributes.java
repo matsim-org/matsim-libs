@@ -23,7 +23,7 @@ package playground.balmermi.modules.ivtch;
 import java.util.ArrayList;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.misc.Time;

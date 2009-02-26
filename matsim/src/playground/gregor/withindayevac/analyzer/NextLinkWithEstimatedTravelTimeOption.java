@@ -20,7 +20,7 @@
 
 package playground.gregor.withindayevac.analyzer;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 
 public class NextLinkWithEstimatedTravelTimeOption extends Option {
 

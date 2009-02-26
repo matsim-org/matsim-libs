@@ -26,11 +26,11 @@ import java.util.List;
 
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.population.Population;
 
 public class Wardrop {

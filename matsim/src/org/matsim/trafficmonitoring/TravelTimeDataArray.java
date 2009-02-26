@@ -20,7 +20,7 @@
 
 package org.matsim.trafficmonitoring;
 
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 
 public class TravelTimeDataArray implements TravelTimeData {
 	private final double[] timeSum;

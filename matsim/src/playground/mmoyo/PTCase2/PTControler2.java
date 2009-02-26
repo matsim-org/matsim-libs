@@ -2,7 +2,7 @@ package playground.mmoyo.PTCase2;
 
 import java.util.Collection;
 import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.network.Node;
+import org.matsim.interfaces.core.v01.Node;
 
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.CoordImpl;

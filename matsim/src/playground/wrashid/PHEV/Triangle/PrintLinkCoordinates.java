@@ -2,7 +2,7 @@ package playground.wrashid.PHEV.Triangle;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 

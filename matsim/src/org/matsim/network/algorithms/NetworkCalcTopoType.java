@@ -21,8 +21,9 @@
 package org.matsim.network.algorithms;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
+import org.matsim.network.NodeImpl;
 
 /* See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
  * for a description of node types. It's the graph matching paper. */
@@ -33,23 +34,23 @@ public class NetworkCalcTopoType {
 		super();
 	}
 
-	public void run(NetworkLayer network) {
+	public void run(final NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		for (Node n : network.getNodes().values()) {
-			if (n.getIncidentLinks().size() == 0) { n.setTopoType(Node.EMPTY); }
-			else if (n.getInLinks().size() == 0) { n.setTopoType(Node.SOURCE); }
-			else if (n.getOutLinks().size() == 0) {n.setTopoType(Node.SINK); }
-			else if (n.getIncidentNodes().size() == 1) { n.setTopoType(Node.DEADEND); }
+			if (n.getIncidentLinks().size() == 0) { n.setTopoType(NodeImpl.EMPTY); }
+			else if (n.getInLinks().size() == 0) { n.setTopoType(NodeImpl.SOURCE); }
+			else if (n.getOutLinks().size() == 0) {n.setTopoType(NodeImpl.SINK); }
+			else if (n.getIncidentNodes().size() == 1) { n.setTopoType(NodeImpl.DEADEND); }
 			else if (n.getIncidentNodes().size() == 2) {
-				if ((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 1)) { n.setTopoType(Node.PASS1WAY); }
-				else if ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 2)) { n.setTopoType(Node.PASS2WAY); }
-				else if ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 1)) { n.setTopoType(Node.START1WAY); }
-				else if ((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 2)) { n.setTopoType(Node.END1WAY); }
+				if ((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 1)) { n.setTopoType(NodeImpl.PASS1WAY); }
+				else if ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 2)) { n.setTopoType(NodeImpl.PASS2WAY); }
+				else if ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 1)) { n.setTopoType(NodeImpl.START1WAY); }
+				else if ((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 2)) { n.setTopoType(NodeImpl.END1WAY); }
 				else { Gbl.errorMsg("Node=" + n.toString() + " cannot be assigned to a topo type!"); }
 			}
 			else { // more than two neighbour nodes and no sink or source
-				n.setTopoType(Node.INTERSECTION);
+				n.setTopoType(NodeImpl.INTERSECTION);
 			}
 		}
 
@@ -59,15 +60,15 @@ public class NetworkCalcTopoType {
 		}
 
 		System.out.println("      #nodes        = " + network.getNodes().size());
-		System.out.println("      #EMTPY        = " + cnt[Node.EMPTY]);
-		System.out.println("      #SOURCE       = " + cnt[Node.SOURCE]);
-		System.out.println("      #SINK         = " + cnt[Node.SINK]);
-		System.out.println("      #DEADEND      = " + cnt[Node.DEADEND]);
-		System.out.println("      #PASS1WAY     = " + cnt[Node.PASS1WAY]);
-		System.out.println("      #PASS2WAY     = " + cnt[Node.PASS2WAY]);
-		System.out.println("      #START1WAY    = " + cnt[Node.START1WAY]);
-		System.out.println("      #END1WAY      = " + cnt[Node.END1WAY]);
-		System.out.println("      #INTERSECTION = " + cnt[Node.INTERSECTION]);
+		System.out.println("      #EMTPY        = " + cnt[NodeImpl.EMPTY]);
+		System.out.println("      #SOURCE       = " + cnt[NodeImpl.SOURCE]);
+		System.out.println("      #SINK         = " + cnt[NodeImpl.SINK]);
+		System.out.println("      #DEADEND      = " + cnt[NodeImpl.DEADEND]);
+		System.out.println("      #PASS1WAY     = " + cnt[NodeImpl.PASS1WAY]);
+		System.out.println("      #PASS2WAY     = " + cnt[NodeImpl.PASS2WAY]);
+		System.out.println("      #START1WAY    = " + cnt[NodeImpl.START1WAY]);
+		System.out.println("      #END1WAY      = " + cnt[NodeImpl.END1WAY]);
+		System.out.println("      #INTERSECTION = " + cnt[NodeImpl.INTERSECTION]);
 
 		System.out.println("    done.");
 	}

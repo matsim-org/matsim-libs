@@ -20,9 +20,9 @@
 
 package playground.christoph.router.util;
 
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.network.Link;
 import org.matsim.router.util.TravelCost;
 
 public abstract class KnowledgeTravelCost implements TravelCost, Cloneable {

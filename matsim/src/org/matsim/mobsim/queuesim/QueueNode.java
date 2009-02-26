@@ -27,8 +27,8 @@ import org.apache.log4j.Logger;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.Link;
-import org.matsim.network.Node;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 
 /**
  * Represents a node in the QueueSimulation.

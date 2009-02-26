@@ -30,6 +30,8 @@ import net.opengis.kml._2.PlacemarkType;
 import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.vis.kml.KMZWriter;
 import org.matsim.utils.vis.kml.MatsimKmlStyleFactory;

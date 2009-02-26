@@ -1,7 +1,7 @@
 package playground.mmoyo.PTCase2;
 
 import org.matsim.router.util.TravelCost;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 
 public class PTTravelCost implements TravelCost {
 	PTTimeTable2 ptTimeTable;

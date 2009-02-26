@@ -28,9 +28,9 @@ import org.matsim.events.ActStartEvent;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.network.Link;
-import org.matsim.network.Node;
 import org.matsim.utils.misc.Time;
 
 /**

@@ -20,8 +20,8 @@
 
 package org.matsim.network.algorithms;
 
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 
 /**
  * Calculates the bounding box (=maximal extent) of a network.

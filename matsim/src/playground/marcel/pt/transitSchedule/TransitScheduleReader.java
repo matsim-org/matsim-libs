@@ -35,7 +35,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;

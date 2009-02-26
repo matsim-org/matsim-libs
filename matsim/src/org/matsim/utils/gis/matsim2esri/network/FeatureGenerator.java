@@ -21,7 +21,7 @@
 package org.matsim.utils.gis.matsim2esri.network;
 
 import org.geotools.feature.Feature;
-import org.matsim.network.Link;
+import org.matsim.interfaces.core.v01.Link;
 
 public interface FeatureGenerator {
 

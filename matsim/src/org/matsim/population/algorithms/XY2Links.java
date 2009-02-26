@@ -23,9 +23,9 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
 /**
