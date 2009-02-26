@@ -17,12 +17,14 @@ public abstract class ChoiceSetExtractor {
 	protected ZHFacilities facilities;
 	protected Controler controler;
 	private List<ChoiceSet> choiceSets;
+	private int tt;
 	
 	private final static Logger log = Logger.getLogger(ChoiceSetExtractor.class);
 	
-	public ChoiceSetExtractor(Controler controler, List<ChoiceSet> choiceSets) {
+	public ChoiceSetExtractor(Controler controler, List<ChoiceSet> choiceSets, int tt) {
 		this.controler = controler;
 		this.choiceSets = choiceSets;
+		this.tt = tt;
 	} 
 	
 	
@@ -37,7 +39,7 @@ public abstract class ChoiceSetExtractor {
 		Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
 		while (choiceSet_it.hasNext()) {
 			ChoiceSet choiceSet = choiceSet_it.next();										
-			this.computeChoiceSet(choiceSet, spanningTree, type, this.controler);
+			this.computeChoiceSet(choiceSet, spanningTree, type, this.controler, this.tt);
 			log.info(index + ": Choice set " + choiceSet.getId().toString() + ": " + choiceSet.getFacilities().size() + " alternatives");
 			index++;
 			
@@ -85,7 +87,7 @@ public abstract class ChoiceSetExtractor {
 	}
 		
 	protected abstract void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type,
-			Controler controler);
+			Controler controler, int tt);
 		
 	public List<ChoiceSet> getChoiceSets() {
 		return choiceSets;

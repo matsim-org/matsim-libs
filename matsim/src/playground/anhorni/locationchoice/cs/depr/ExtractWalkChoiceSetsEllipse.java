@@ -24,9 +24,9 @@ public class ExtractWalkChoiceSetsEllipse extends ChoiceSetExtractor {
 	private double walkingSpeed = 1.39;
 	
 	public ExtractWalkChoiceSetsEllipse(Controler controler, List<ZHFacility> zhFacilities, double walkingSpeed, 
-			List<ChoiceSet> choiceSets) {
+			List<ChoiceSet> choiceSets, int tt) {
 		
-		super(controler, choiceSets);
+		super(controler, choiceSets, tt);
 		this.initShoppingTree(zhFacilities);
 		this.walkingSpeed = walkingSpeed;
 	}
@@ -37,7 +37,7 @@ public class ExtractWalkChoiceSetsEllipse extends ChoiceSetExtractor {
 	
 	
 	protected void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type,
-			Controler controler) {
+			Controler controler, int tt) {
 
 /*
 		Coord referencePoint = choiceSet.getReferencePoint();			

@@ -75,6 +75,7 @@ public class GenerateChoiceSets {
 	private String readNelson;
 	private String DEQSim;
 	private String mode;
+	private String reported;
 
 	private final static Logger log = Logger.getLogger(GenerateChoiceSets.class);
 
@@ -118,6 +119,7 @@ public class GenerateChoiceSets {
 			this.readNelson = bufferedReader.readLine();
 			this.DEQSim = bufferedReader.readLine();
 			this.mode = bufferedReader.readLine();
+			this.reported = bufferedReader.readLine();
 
 			log.info("MATSim config file: " + this.matsimRunConfigFile);
 			log.info("choice set population file: " + this.choiceSetPopulationFile);
@@ -130,6 +132,7 @@ public class GenerateChoiceSets {
 			log.info("readNelson: " + this.readNelson);
 			log.info("DEQSim : " + this.DEQSim);
 			log.info("mode : " + this.mode);
+			log.info("reported : " + this.reported);
 
 			bufferedReader.close();
 			fileReader.close();
@@ -211,9 +214,17 @@ public class GenerateChoiceSets {
 		else {
 			this.controler = new Controler(this.matsimRunConfigFile);
 		}
+		
+		int tt;
+		if (this.reported.equals("reported")) {
+			tt = 1;
+		}
+		else {
+			tt = 2;
+		}
 
 		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilities,
-				this.choiceSets.getCarChoiceSets(), "car");
+				this.choiceSets.getCarChoiceSets(), "car", tt);
 
 		/*
 		 * This does NOT work at the moment:
@@ -228,7 +239,7 @@ public class GenerateChoiceSets {
 		*/
 
 		ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilities,
-					this.choiceSets.getWalkChoiceSets(), "walk");
+					this.choiceSets.getWalkChoiceSets(), "walk", tt);
 
 		if (this.mode.equals("car")) {
 			this.controler.addControlerListener(listenerCar);

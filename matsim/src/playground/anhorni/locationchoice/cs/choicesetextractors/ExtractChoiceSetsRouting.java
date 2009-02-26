@@ -48,9 +48,9 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	private String mode;
 
 	public ExtractChoiceSetsRouting(Controler controler, ZHFacilities facilities, 
-			List<ChoiceSet> choiceSets, String mode) {
+			List<ChoiceSet> choiceSets, String mode, int tt) {
 		
-		super(controler, choiceSets);
+		super(controler, choiceSets, tt);
 		super.facilities = facilities;
 		this.mode = mode;	
 	}
@@ -66,75 +66,101 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	}
 				
 	protected void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type, 
-			Controler controler) {
-			
-		NetworkLayer network = controler.getNetwork();
+			Controler controler, int tt) {
+					
+		// first add chosen facility and compute tt etc.
+		ZHFacility chosenFacility = super.facilities.getZhFacilities().get(choiceSet.getChosenFacilityId());
+		this.handleFacility(chosenFacility, choiceSet, controler, 0);
 				
 		Iterator<ZHFacility> facilities_it = this.facilities.getZhFacilities().values().iterator();
 		while (facilities_it.hasNext()) {
-			ZHFacility facility = facilities_it.next();
-			
-			Id linkId = facility.getLinkId();
-			
-			//--------------------------------------------------
-			/*
-			 * this is NOT working: 
-			 * Link linkBefore = choiceSet.getTrip().getBeforeShoppingAct().getLink(); ...
-			 */
-			//Link linkBefore = network.getNearestLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getCenter());
-			Link linkBefore = network.getLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getId());
-			Act fromAct0 = new org.matsim.population.ActImpl("beforeShop", linkBefore);
-			fromAct0.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
-			fromAct0.setCoord(linkBefore.getCenter());
-						
-			Link link = network.getLink(linkId);
-			Act toAct0 = new org.matsim.population.ActImpl("shop", link);
-			toAct0.setCoord(link.getCenter());
-						
-			Leg legBefore = computeLeg(fromAct0, toAct0, controler);				
-			double travelTimeBeforeShopping = legBefore.getTravelTime();
-			
-			//--------------------------------------------------			
-			Act fromAct1 = new org.matsim.population.ActImpl(toAct0.getType(), toAct0.getLink());
-			double endTime = choiceSet.getTrip().getBeforeShoppingAct().getEndTime() + 
-			travelTimeBeforeShopping +
-			choiceSet.getTrip().getShoppingAct().calculateDuration();			
-			fromAct1.setEndTime(endTime);
-			fromAct1.setCoord(toAct0.getCoord());
-						
-			//Link linkAfter = network.getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getCenter());
-			Link linkAfter = network.getLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getId());
-			Act toAct1 = new org.matsim.population.ActImpl("afterShop", linkAfter);
-			toAct1.setCoord(linkAfter.getCenter());
-						
-			Leg legAfter = computeLeg(fromAct1, toAct1, controler);	
-			double travelTimeAfterShopping = legAfter.getTravelTime();
-			//--------------------------------------------------
-			
-			double totalTravelTime = travelTimeBeforeShopping + travelTimeAfterShopping;	
-			
-			/*
-			 * This is NOT working: legBefore.getRoute().getDist() + legAfter.getRoute().getDist()
-			 */
-			double travelDist = 0.0;
-			
-			Iterator<Id> routeLinkBefore_it = legBefore.getRoute().getLinkIds().iterator();
-			while (routeLinkBefore_it.hasNext()) {		
-				Id lId = routeLinkBefore_it.next();
-				travelDist += network.getLink(lId).getLength();
+			ZHFacility facility = facilities_it.next();	
+			this.handleFacility(facility, choiceSet, controler, tt);	
+		}	
+	}
+	
+	/*
+	 * int tt:	0: add it in any case
+	 * 			1: check reported travel time budget
+	 * 			2: use computed travel time budget to chosen facility
+	 */
+	
+	private void handleFacility(ZHFacility facility, ChoiceSet choiceSet, Controler controler, int tt) {
+		NetworkLayer network = controler.getNetwork();
+		
+		Id linkId = facility.getLinkId();
+		
+		//--------------------------------------------------
+		/*
+		 * this is NOT working: 
+		 * Link linkBefore = choiceSet.getTrip().getBeforeShoppingAct().getLink(); ...
+		 */
+		//Link linkBefore = network.getNearestLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getCenter());
+		Link linkBefore = network.getLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getId());
+		Act fromAct0 = new org.matsim.population.ActImpl("beforeShop", linkBefore);
+		fromAct0.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
+		fromAct0.setCoord(linkBefore.getCenter());
+					
+		Link link = network.getLink(linkId);
+		Act toAct0 = new org.matsim.population.ActImpl("shop", link);
+		toAct0.setCoord(link.getCenter());
+					
+		Leg legBefore = computeLeg(fromAct0, toAct0, controler);				
+		double travelTimeBeforeShopping = legBefore.getTravelTime();
+		
+		//--------------------------------------------------			
+		Act fromAct1 = new org.matsim.population.ActImpl(toAct0.getType(), toAct0.getLink());
+		double endTime = choiceSet.getTrip().getBeforeShoppingAct().getEndTime() + 
+		travelTimeBeforeShopping +
+		choiceSet.getTrip().getShoppingAct().calculateDuration();			
+		fromAct1.setEndTime(endTime);
+		fromAct1.setCoord(toAct0.getCoord());
+					
+		//Link linkAfter = network.getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getCenter());
+		Link linkAfter = network.getLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getId());
+		Act toAct1 = new org.matsim.population.ActImpl("afterShop", linkAfter);
+		toAct1.setCoord(linkAfter.getCenter());
+					
+		Leg legAfter = computeLeg(fromAct1, toAct1, controler);	
+		double travelTimeAfterShopping = legAfter.getTravelTime();
+		//--------------------------------------------------
+		
+		double totalTravelTime = travelTimeBeforeShopping + travelTimeAfterShopping;	
+		
+		/*
+		 * This is NOT working: legBefore.getRoute().getDist() + legAfter.getRoute().getDist()
+		 */
+		double totalTravelDist = 0.0;
+		
+		Iterator<Id> routeLinkBefore_it = legBefore.getRoute().getLinkIds().iterator();
+		while (routeLinkBefore_it.hasNext()) {		
+			Id lId = routeLinkBefore_it.next();
+			totalTravelDist += network.getLink(lId).getLength();
+		}
+		
+		Iterator<Id> routeLinkAfter_it = legAfter.getRoute().getLinkIds().iterator();
+		while (routeLinkAfter_it.hasNext()) {		
+			Id lId = routeLinkAfter_it.next();
+			totalTravelDist += network.getLink(lId).getLength();
+		}
+		
+		// chosen facility
+		if (tt == 0) {
+			choiceSet.addFacility(facility, totalTravelTime, totalTravelDist);
+		}
+		else if (tt == 1) {
+			if (totalTravelTime <= choiceSet.getTravelTimeBudget()) {			
+				choiceSet.addFacility(facility, totalTravelTime, totalTravelDist);
 			}
-			
-			Iterator<Id> routeLinkAfter_it = legAfter.getRoute().getLinkIds().iterator();
-			while (routeLinkAfter_it.hasNext()) {		
-				Id lId = routeLinkAfter_it.next();
-				travelDist += network.getLink(lId).getLength();
-			}
-			if (totalTravelTime <= choiceSet.getTravelTimeBudget() || facility.getId().compareTo(choiceSet.getChosenFacilityId()) == 0) {			
-				choiceSet.addFacility(facility, totalTravelTime, travelDist);
+		}
+		else if (tt == 2) {
+			if (totalTravelTime <= choiceSet.getTravelTimeStartShopEnd(choiceSet.getChosenFacilityId())) {			
+				choiceSet.addFacility(facility, totalTravelTime, totalTravelDist);
 			}
 		}	
 	}
-		
+	
+	
 	private Leg computeLeg(Act fromAct, Act toAct, Controler controler) {	
 		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
