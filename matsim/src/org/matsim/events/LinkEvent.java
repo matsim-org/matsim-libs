@@ -34,7 +34,9 @@ public abstract class LinkEvent extends PersonEvent {
 	public String linkId;
 	public transient Link link;
 	public Leg leg = null;
-	/** The number of the leg in the plans file, starting from 0. */
+	/** @deprecated
+	 * The number of the leg in the plans file, starting from 0. */
+	@Deprecated
 	public int legId;
 
 	LinkEvent(final double time, final Person agent, final Link link, final Leg leg) {
