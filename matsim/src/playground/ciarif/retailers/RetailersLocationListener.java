@@ -57,34 +57,19 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	
 	public final static String CONFIG_GROUP = "Retailers";
 	public final static String CONFIG_POP_SUM_TABLE = "populationSummaryTable";
-
+	public final static String CONFIG_RETAILERS = "retailers";
 //	private Retailers retailers = new Retailers();
 	private Retailers retailers;
-	private final RetailersSummaryWriter rs;
-	private final PlansSummaryTable pst;
+	private final RetailersSummaryWriter rs = null;
+	private PlansSummaryTable pst = null;
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
-	private final String facilityIdFile;
-	private final String locationStrategy;
+	private String facilityIdFile = null;
+	//private final String locationStrategy=null;
 	private int alternatives;
-
-	public RetailersLocationListener(final String facilityIdFile, final String retailerSummaryFileName,final String locationStrategy, int alternatives) {
-		this.facilityIdFile = facilityIdFile;
-		this.rs = new RetailersSummaryWriter(retailerSummaryFileName, this.retailers);
-		String popOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
-		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
-		this.pst = new PlansSummaryTable (popOutFile); //should come from the config file
-		this.locationStrategy = locationStrategy;
-		this.alternatives = alternatives;
-	}
-
-	public RetailersLocationListener(final String retailerSummaryFileName) {
-		this(null,retailerSummaryFileName, 0);
-	}
 	
-	public RetailersLocationListener(final String retailerSummaryFileName, final String locationStrategy, int alternatives) {
-		this(null,retailerSummaryFileName,locationStrategy, alternatives);
+	public RetailersLocationListener() {
 	}
 
 	public void notifyStartup(StartupEvent event) {
@@ -92,24 +77,27 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 
 		preprocess.run(controler.getNetwork());
 		pcrl = new PlansCalcRoute(controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess));
+		// TODO see how to avoid the use of the deprecated constructor.
+		String popOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
+		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
+		this.pst = new PlansSummaryTable (popOutFile);
 		
 		// createRetailersFromFile();
 						
 		// define all given retailers
 		// DONE balmermi: not necessary when you get the facilities from the input table file
 		// instead read in the file defined by the config and create the retailers according to the file
-		// information (only reomve the if statement)
+		// information (only remove the if statement)
+		
+		this.facilityIdFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
 		ArrayList<Facility> facilities = new ArrayList<Facility>();
-		if (this.facilityIdFile == null) {
-			Iterator<Facility> fac_it = controler.getFacilities().getFacilities("shop").values().iterator();
-			for (Facility f:controler.getFacilities().getFacilities("shop").values()) {
-			System.out.println("next = " + f);
-			facilities.add(f);
-			
-			}
+		if (this.facilityIdFile == null) { //decide if throw an exception or permit a way to create retailers without
+			// 
+
 		}
 		else {
 			try {
+				retailers = new Retailers();
 				facilities =  new ArrayList<Facility>();
 				FileReader fr = new FileReader(this.facilityIdFile);
 				BufferedReader br = new BufferedReader(fr);
@@ -120,30 +108,19 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 					// TODO balmermi: extend the file with a second column containing the strategies
 					// header: f_id
 					// index:     0
-					Id fid = new IdImpl(entries[0]);
+					Id rid = new IdImpl(entries[0]);
+					RetailerStrategy rts = null;
+					//Retailer r = new Retailer();
+					Id fid = new IdImpl(entries[1]);
+					System.out.println("read file test1 = " + entries[0]);
+					System.out.println("read file test2 = " + entries[1]);
+					System.out.println("read file test3 = " + entries[2]);
 					facilities.add(controler.getFacilities().getFacility(fid));
 				}
 			} catch (IOException e) {
 				Gbl.errorMsg(e);
 			}
-		}
-
-		if (this.locationStrategy.compareTo("RandomRetailerStrategy")==0) {
-			RandomRetailerStrategy rst = new RandomRetailerStrategy(controler.getNetwork());
-			this.retailers = this.createRetailers(facilities,rst);
-		}
-		if (this.locationStrategy.compareTo("MaxLinkRetailerStrategy")==0) {
-			MaxLinkRetailerStrategy rst = new MaxLinkRetailerStrategy (controler);
-			this.retailers = this.createRetailers(facilities,rst);
-		}
-		
-		if (this.locationStrategy.compareTo("LogitMaxLinkRetailerStrategy")==0) {
-			LogitMaxLinkRetailerStrategy rst = new LogitMaxLinkRetailerStrategy (controler,this.alternatives);
-			this.retailers = this.createRetailers(facilities,rst);
-//			Retailer retailer = this.createRetailer(facilities,rst);
-//			this.retailers.addRetailer(retailer);
-		}
-		
+		} 
 	}
 	
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
@@ -188,13 +165,13 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		return fs;
 	}
 	
-	private final Retailers createRetailers(ArrayList<Facility> retailerFacilities, RetailerStrategy rst) {
-		Retailers retailers = new Retailers();
-		for (Facility f : retailerFacilities) {
-			Retailer r = new Retailer(f.getId(),rst);
-			if (!r.addFacility(f)) { throw new RuntimeException("Could not add facility id="+f.getId()+" to retailer."); } 
-			if (!retailers.addRetailer(r)) { throw new RuntimeException("Could not add retailer id="+r.getId()+" to retailers."); } 
-		}
+	private final Retailers createRetailers(ArrayList<Facility> retailerFacilities) {
+//		Retailers retailers = new Retailers();
+//		for (Facility f : retailerFacilities) {
+//			Retailer r = new Retailer(f.getId());//Probably is wrong the facility ID is passed as retailer ID
+//			if (!r.addFacility(f)) { throw new RuntimeException("Could not add facility id="+f.getId()+" to retailer."); } 
+//			if (!retailers.addRetailer(r)) { throw new RuntimeException("Could not add retailer id="+r.getId()+" to retailers."); } 
+//		}
 		return retailers;
 	}
 }

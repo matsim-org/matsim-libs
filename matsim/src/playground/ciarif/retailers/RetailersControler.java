@@ -26,8 +26,8 @@ public class RetailersControler {
     public static void main (final String[] args) { 
     	Controler controler = new Controler(args);
     	//controler.addControlerListener(new RetailersLocationListener("../../output/output_retailers.txt"));
-    	controler.addControlerListener(new RetailersLocationListener("output/triangle/output_retailers.txt", "MaxLinkRetailerStrategy", 2)); //try to put it in the config
-//    	controler.addControlerListener(new RetailersLocationListener()); //try to put it in the config
+    	//controler.addControlerListener(new RetailersLocationListener("output/triangle/output_retailers.txt", "MaxLinkRetailerStrategy", 2)); //try to put it in the config
+    	controler.addControlerListener(new RetailersLocationListener()); //try to put it in the config
     	controler.run();
     }
 }

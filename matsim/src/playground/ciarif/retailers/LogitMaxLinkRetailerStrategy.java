@@ -18,18 +18,19 @@ import playground.ciarif.retailers.RetailerStrategy;
 
 public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	
-		private Controler controler;
-		private int alternatives;
-		// TODO balmermi: remove all params for the alt-size and replace it here by a config parameter
-		
-		public LogitMaxLinkRetailerStrategy (Controler controler, int alternatives) {
-			this.controler = controler;
-			this.alternatives = alternatives;
-		}
+	public final static String CONFIG_GROUP = "alternatives";
+	private Controler controler;
+	private int alternatives;
+	// TODO balmermi: remove all params for the alt-size and replace it here by a config parameter
+	
+	public LogitMaxLinkRetailerStrategy (Controler controler, int alternatives) {
+		this.controler = controler;
+		this.alternatives = alternatives;
+	}
 
-		public void moveFacilities(Map<Id, Facility> facilities) {
+	public void moveFacilities(Map<Id, Facility> facilities) {
 
-			for (Facility f : facilities.values()) {
+		for (Facility f : facilities.values()) {
 //				
 //				boolean changeLocation = false;
 //				changelocation = 
@@ -37,10 +38,10 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 //					Coord coord = newLink.getCenter();
 //					f.moveTo(coord);
 //				}
-			}
-		}	
+		}
+	}	
 		
-		public void logitUtilityAlgo() {
+	public void logitUtilityAlgo() {
 			
 //			Object[] links = controler.getNetwork().getLinks().values().toArray();
 //			int rd = MatsimRandom.random.nextInt(links.length);
@@ -101,14 +102,14 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 //				return 0;
 //			}
 			
+	}
+	private double getLogitProbability(double referenceUtility,double[] utilities) {
+		double expSumOfAlternatives = 0.0;
+		for (double utility : utilities) {
+			expSumOfAlternatives += Math.exp(utility);
 		}
-		private double getLogitProbability(double referenceUtility,double[] utilities) {
-			double expSumOfAlternatives = 0.0;
-			for (double utility : utilities) {
-				expSumOfAlternatives += Math.exp(utility);
-			}
-			return Math.exp(referenceUtility) / expSumOfAlternatives;
-		}
+		return Math.exp(referenceUtility) / expSumOfAlternatives;
+	}
 
 
 }
