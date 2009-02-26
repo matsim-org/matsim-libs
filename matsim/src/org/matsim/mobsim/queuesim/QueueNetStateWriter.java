@@ -32,11 +32,11 @@ import org.matsim.utils.vis.netvis.VisConfig;
  *
  * @author david
  */
-public class QueueNetStateWriter extends DisplayNetStateWriter {
+/*package*/ class QueueNetStateWriter extends DisplayNetStateWriter {
 
 	private static final boolean writeSpaceCap = true;
 
-	private QueueNetwork queueNetwork;
+	private final QueueNetwork queueNetwork;
 
     @Override
     protected Collection<org.matsim.mobsim.queuesim.QueueLane.AgentOnLink> getAgentsOnLink(final BasicLink link) {

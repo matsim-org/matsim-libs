@@ -25,16 +25,16 @@ import org.matsim.interfaces.core.v01.Node;
 /**
  * @author dgrether
  */
-public final class DefaultQueueNetworkFactory implements QueueNetworkFactory<QueueNode, QueueLink> {
+/*package*/ final class DefaultQueueNetworkFactory implements QueueNetworkFactory<QueueNode, QueueLink> {
 
-	public QueueLink newQueueLink(Link link, QueueNetwork queueNetwork, QueueNode toQueueNode) {
+	public QueueLink newQueueLink(final Link link, final QueueNetwork queueNetwork, final QueueNode toQueueNode) {
 		return new QueueLink(link, queueNetwork, toQueueNode);
 	}
 
 	/**
 	 * @see org.matsim.mobsim.queuesim.QueueNetworkFactory#newQueueNode(org.matsim.interfaces.core.v01.Node, org.matsim.mobsim.queuesim.QueueNetwork)
 	 */
-	public QueueNode newQueueNode(Node node, QueueNetwork queueNetwork) {
+	public QueueNode newQueueNode(final Node node, final QueueNetwork queueNetwork) {
 		return new QueueNode(node, queueNetwork);
 	}
 
