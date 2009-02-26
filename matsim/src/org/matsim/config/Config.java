@@ -380,7 +380,7 @@ public class Config {
 		return this.locationchoice;
 	}
 
-	public PlanomatConfigGroup planomat() {
+	public final PlanomatConfigGroup planomat() {
 		return planomat;
 	}
 

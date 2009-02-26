@@ -26,28 +26,31 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.world.Location;
 
-import playground.meisterk.org.matsim.basic.v01.ExtendedBasicLeg;
+import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 
 public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
-	private EnumSet<ExtendedBasicLeg.Mode> modeSet = null;
-
-	private ArrayList<ExtendedBasicLeg.Mode[]> result = null;
+	private MeisterkConfigGroup meisterk = new MeisterkConfigGroup();
 	
-	public ArrayList<ExtendedBasicLeg.Mode[]> getResult() {
+	private EnumSet<BasicLeg.Mode> modeSet = null;
+
+	private ArrayList<BasicLeg.Mode[]> result = null;
+	
+	public ArrayList<BasicLeg.Mode[]> getResult() {
 		return result;
 	}
 
-	public EnumSet<ExtendedBasicLeg.Mode> getModeSet() {
+	public EnumSet<BasicLeg.Mode> getModeSet() {
 		return modeSet;
 	}
 
-	public void setModeSet(EnumSet<ExtendedBasicLeg.Mode> modeSet) {
+	public void setModeSet(EnumSet<BasicLeg.Mode> modeSet) {
 		this.modeSet = modeSet;
 	}
 
@@ -61,14 +64,15 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 //
 //		System.out.println();
 		
-		this.result = new ArrayList<ExtendedBasicLeg.Mode[]>();
+		this.result = new ArrayList<BasicLeg.Mode[]>();
 
 		for (int numCombination = 0; numCombination < numCombinations; numCombination++) {
 
 			// setup the trackers for all chain-based modes, set all chain-based modes starting at the first location (usually home)
-			HashMap<ExtendedBasicLeg.Mode, Location> modeTracker = new HashMap<ExtendedBasicLeg.Mode, Location>();
-			for (ExtendedBasicLeg.Mode mode : this.modeSet) {
-				if (mode.isChainBased()) {
+			HashMap<BasicLeg.Mode, Location> modeTracker = new HashMap<BasicLeg.Mode, Location>();
+			for (BasicLeg.Mode mode : this.modeSet) {
+				if (meisterk.getChainBasedModes().contains(mode)) {
+//				if (mode.isChainBased()) {
 					modeTracker.put(mode, plan.getFirstActivity().getFacility());
 //					System.out.println(mode + " " + modeTracker.get(mode).getId());
 				}
@@ -76,7 +80,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
 //			System.out.println();
 
-			ExtendedBasicLeg.Mode[] candidate = new ExtendedBasicLeg.Mode[numLegs]; 
+			BasicLeg.Mode[] candidate = new BasicLeg.Mode[numLegs]; 
 
 			String modeIndices = Integer.toString(numCombination, this.modeSet.size());
 			while (modeIndices.length() < numLegs) {
@@ -90,9 +94,10 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
 				Leg currentLeg = (Leg) legIterator.next();
 
-				ExtendedBasicLeg.Mode legMode = (ExtendedBasicLeg.Mode) this.modeSet.toArray()[Integer.parseInt(modeIndices.substring(legNum, legNum + 1))];
+				BasicLeg.Mode legMode = (BasicLeg.Mode) this.modeSet.toArray()[Integer.parseInt(modeIndices.substring(legNum, legNum + 1))];
 //				System.out.println("Mode test for leg num " + Integer.toString(legNum) + ": " + legMode);
-				if (legMode.isChainBased()) {
+				if (meisterk.getChainBasedModes().contains(legMode)) {
+//				if (legMode.isChainBased()) {
 					Location currentLocation = modeTracker.get(legMode);
 					Location requiredLocation = plan.getPreviousActivity(currentLeg).getFacility();
 					if (currentLocation.equals(requiredLocation)) {
@@ -112,9 +117,9 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 				legNum++;
 			}
 			// chain-based modes must finish at the location of the last activity of the plan
-			Iterator<ExtendedBasicLeg.Mode> modeTrackerCheck = modeTracker.keySet().iterator();
+			Iterator<BasicLeg.Mode> modeTrackerCheck = modeTracker.keySet().iterator();
 			while(modeChainIsFeasible && modeTrackerCheck.hasNext()) {
-				ExtendedBasicLeg.Mode mode = modeTrackerCheck.next();
+				BasicLeg.Mode mode = modeTrackerCheck.next();
 				Location currentLocation = modeTracker.get(mode);
 				if (!currentLocation.equals(plan.getFirstActivity().getFacility()) && !currentLocation.equals(plan.getLastActivity().getFacility())) {
 //					System.out.println("Mode " + mode + " is not at the location of either the first or the last activity.");
