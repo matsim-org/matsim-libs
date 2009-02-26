@@ -29,11 +29,11 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Plan;
 
 /**
- * Analyses plans for subtours. 
- * 
- * A subtour is a sequence of activities whose first 
+ * Analyses plans for subtours.
+ *
+ * A subtour is a sequence of activities whose first
  * and the last activity are at the same location.
- * The current implementation uses the {@link Facility} as location information, 
+ * The current implementation uses the {@link Facility} as location information,
  * thus activities at the same facility constitute a subtour.
  * <br><br>
  * Usage:
@@ -47,9 +47,9 @@ import org.matsim.interfaces.core.v01.Plan;
  * int numSubtours = past.getNumSubtours();<br>
  * int[] subtourIndexation = past.getSubtourIndexation();<br>
  * </code>
- * 
+ *
  * @see PlanAnalyzeSubtoursTest
- * 
+ *
  * @author meisterk
  *
  */
@@ -67,23 +67,23 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 		super();
 	}
 
-	public void run(Plan plan) {
+	public void run(final Plan plan) {
 
-		locationIds = new ArrayList<Id>();
+		this.locationIds = new ArrayList<Id>();
 
 		ArrayList<Object> actsLegs = plan.getActsLegs();
 		for (int ii=0; ii < actsLegs.size(); ii++) {
-			if (actsLegs.get(ii).getClass().equals(Act.class)) {
+			if (actsLegs.get(ii) instanceof Act) {
 				// TODO subtour analysis should be possible on link-level, too
 				// not only on facility level
 				// in this case one could run a scenario also without facility information
-				locationIds.add(((Act) actsLegs.get(ii)).getFacility().getId());
+				this.locationIds.add(((Act) actsLegs.get(ii)).getFacility().getId());
 			}
 		}
 
 		this.numSubtours = 0;
 
-		this.subtourIndexation = new int[locationIds.size() - 1];
+		this.subtourIndexation = new int[this.locationIds.size() - 1];
 		for (int ii = 0; ii < this.subtourIndexation.length; ii++) {
 			this.subtourIndexation[ii] = PlanAnalyzeSubtours.UNDEFINED;
 		}
@@ -91,16 +91,16 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 		ArrayList<Id> locationEnumerator = new ArrayList<Id>();
 
 		int ii = 0;
-		while(ii <= locationIds.size() - 1) {
-			Id currentLinkId = locationIds.get(ii);
+		while(ii <= this.locationIds.size() - 1) {
+			Id currentLinkId = this.locationIds.get(ii);
 			if (locationEnumerator.contains(currentLinkId)) {
 				int lastLinkIndex = locationEnumerator.lastIndexOf(currentLinkId);
 				for (int jj = lastLinkIndex; jj < ii; jj++) {
 					if (this.subtourIndexation[jj] == PlanAnalyzeSubtours.UNDEFINED) {
-						this.subtourIndexation[jj] = numSubtours;
+						this.subtourIndexation[jj] = this.numSubtours;
 					}
 				}
-				numSubtours++;
+				this.numSubtours++;
 				for (int removeMe = lastLinkIndex; removeMe < ii; removeMe++) {
 					locationEnumerator.set(removeMe, INVALID_ID);
 				}
@@ -132,15 +132,15 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	 * <br>
 	 * 0 0 2 1 1 2<br>
 	 * <br>
-	 * The subtour analysis algorithm first identifies subtours lying within the plan. 
+	 * The subtour analysis algorithm first identifies subtours lying within the plan.
 	 * This is why the "outer" subtour in the second part of the plan has the higher index than its "inner" part.<br>
 	 * <br>
-	 * For more illustrative examples, see the code of the test class {@link PlanAnalyzeSubtoursTest}.<br>  
+	 * For more illustrative examples, see the code of the test class {@link PlanAnalyzeSubtoursTest}.<br>
 	 * <br>
 	 * @return an array with subtour indices [int] of each leg of the {@link Plan} that was analyzed most recently
 	 */
 	public int[] getSubtourIndexation() {
-		return subtourIndexation;
+		return this.subtourIndexation;
 	}
 
 	/**
@@ -164,12 +164,12 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	 * <br>
 	 * 3<br>
 	 * <br>
-	 * For more illustrative examples, see the code of the test class {@link PlanAnalyzeSubtoursTest}.<br>  
+	 * For more illustrative examples, see the code of the test class {@link PlanAnalyzeSubtoursTest}.<br>
 	 * <br>
 	 * @return the number of subtours in the {@link Plan} that was analyzed most recently
 	 */
 	public int getNumSubtours() {
-		return numSubtours;
+		return this.numSubtours;
 	}
 
 }

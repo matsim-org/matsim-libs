@@ -61,7 +61,7 @@ import org.matsim.utils.misc.Time;
 public class Planomat implements PlanAlgorithm {
 
 	/**
-	 * Maximum possible activity duration. Serves as upper limit for double encoding of activity durations in GA plan chromosome. 
+	 * Maximum possible activity duration. Serves as upper limit for double encoding of activity durations in GA plan chromosome.
 	 */
 	protected static final double MAX_ACTIVITY_DURATION = 24.0 * 3600;
 	protected static final int NUM_TIME_INTERVALS = (int) Math.pow(2, Gbl.getConfig().planomat().getLevelOfTimeResolution());
@@ -120,8 +120,8 @@ public class Planomat implements PlanAlgorithm {
 
 	}
 
-	protected synchronized Genotype initJGAP(Plan plan, PlanAnalyzeSubtours planAnalyzeSubtours) {
-	
+	protected synchronized Genotype initJGAP(final Plan plan, final PlanAnalyzeSubtours planAnalyzeSubtours) {
+
 		Genotype population = null;
 
 		PlanomatJGAPConfiguration jgapConfiguration = new PlanomatJGAPConfiguration(plan, planAnalyzeSubtours);
@@ -139,10 +139,10 @@ public class Planomat implements PlanAlgorithm {
 		}
 
 		ScoringFunction sf = this.scoringFunctionFactory.getNewScoringFunction(plan);
-		PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper( 
-				sf, 
-				plan, 
-				this.legTravelTimeEstimator, 
+		PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper(
+				sf,
+				plan,
+				this.legTravelTimeEstimator,
 				planAnalyzeSubtours );
 
 		try {
@@ -151,12 +151,12 @@ public class Planomat implements PlanAlgorithm {
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
 		}
-		
+
 		return population;
 	}
-	
-	protected IChromosome evolveAndReturnFittest(Genotype population) {
-		
+
+	protected IChromosome evolveAndReturnFittest(final Genotype population) {
+
 //		IChromosome fittest = null;
 //		String logMessage = null;
 		for (int i = 0; i < Gbl.getConfig().planomat().getJgapMaxGenerations(); i++) {
@@ -170,7 +170,7 @@ public class Planomat implements PlanAlgorithm {
 		return population.getFittestChromosome();
 
 	}
-	
+
 	protected IChromosome initSampleChromosome(final Plan plan, final PlanAnalyzeSubtours planAnalyzeSubtours, final org.jgap.Configuration jgapConfiguration) {
 
 		ArrayList<Gene> sampleGenes = new ArrayList<Gene>();
@@ -184,7 +184,7 @@ public class Planomat implements PlanAlgorithm {
 			if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
 				for (int ii=0; ii < planAnalyzeSubtours.getNumSubtours(); ii++) {
 					sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Gbl.getConfig().planomat().getPossibleModes().length - 1));
-				} 
+				}
 			}
 
 		} catch (InvalidConfigurationException e) {
@@ -209,8 +209,8 @@ public class Planomat implements PlanAlgorithm {
 	 * @param plan the plan that will be altered
 	 */
 	protected void writeChromosome2Plan(
-			final IChromosome individual, 
-			final Plan plan, 
+			final IChromosome individual,
+			final Plan plan,
 			final PlanAnalyzeSubtours planAnalyzeSubtours ) {
 
 		Act activity = null;
@@ -225,7 +225,7 @@ public class Planomat implements PlanAlgorithm {
 
 			Object o = plan.getActsLegs().get(ii);
 
-			if (o.getClass().equals(Act.class)) {
+			if (o instanceof Act) {
 
 				activity = ((Act) o);
 
@@ -251,7 +251,7 @@ public class Planomat implements PlanAlgorithm {
 
 				}
 
-			} else if (o.getClass().equals(Leg.class)) {
+			} else if (o instanceof Leg) {
 
 				leg = ((Leg) o);
 
@@ -281,7 +281,7 @@ public class Planomat implements PlanAlgorithm {
 						origin,
 						destination,
 						leg);
-				
+
 				// travel time estimation is rounded to a full second with Math.rint() to stay consistent with the time step-based queue simulations
 				travelTimeEstimation = Math.rint(travelTimeEstimation);
 
@@ -305,12 +305,12 @@ public class Planomat implements PlanAlgorithm {
 
 	}
 
-	public void setSeedGenerator(Random seedGenerator) {
+	public void setSeedGenerator(final Random seedGenerator) {
 		this.seedGenerator = seedGenerator;
 	}
 
 	public Random getSeedGenerator() {
-		return seedGenerator;
+		return this.seedGenerator;
 	}
 
 }
