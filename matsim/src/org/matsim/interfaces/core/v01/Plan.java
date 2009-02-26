@@ -6,10 +6,9 @@ import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.stats.algorithms.PlanStats;
 
 public interface Plan extends BasicPlan {
-	
+
 	public Act createAct(final String type, final Coord coord) throws IllegalStateException;
 
 	public Act createAct(final String type, final Facility fac) throws IllegalStateException;
@@ -103,9 +102,5 @@ public interface Plan extends BasicPlan {
 	public Act getFirstActivity();
 
 	public Act getLastActivity();
-
-	public void setFirstPlanStatsAlgorithm(PlanStats firstPlanStatsAlgorithm);
-
-	public PlanStats getFirstPlanStatsAlgorithm();
 
 }

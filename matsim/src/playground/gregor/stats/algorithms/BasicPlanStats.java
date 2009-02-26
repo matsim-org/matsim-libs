@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanScoreTrajectory.java
+ * BasicPlanStats.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,60 +18,56 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.stats.algorithms;
+package playground.gregor.stats.algorithms;
 
 
 /**
  * @author laemmel
  *
  */
-public class PlanScoreTrajectory extends AbstractPlanStatsAlgorithm {
-
-	private double[] TRAJECTORY;
-	private int minIteration;
-	private int iterations;
+public class BasicPlanStats extends AbstractPlanStatsAlgorithm  {
 	
-	public PlanScoreTrajectory(int iters, int minIter){
-		minIteration = minIter;
-		iterations = iters;
+	private double xSum;
+	private double xxSum;
+	private int calls;
+	
+	public BasicPlanStats(){
 		init();
 	}
 	
-	public PlanScoreTrajectory(PlanStats nextAlgo,int iters, int minIter){
-		minIteration = minIter;
-		iterations = iters;		
+	public BasicPlanStats(PlanStats nextAlgo){
 		this.nextAlgorithm = nextAlgo;
 		init();
 	}
+	
 
-	private void init(){
-		TRAJECTORY = new double[iterations];
-		for (int i = 0 ; i < iterations; i++) TRAJECTORY[i] = 0;
-		
+	private double getAvg(){
+		return xSum /  calls;
+	}
+	private double getVar(){
+		return xxSum / calls - (getAvg() * getAvg());
+	}
+	
+	@Override
+	public void printStats(){
+		System.out.print( " " + calls + " " + getAvg() + " " + getVar());
 	}
 
-
-	@Override
-	public void printStats() {
-		for (int i = 0; i < iterations;  i++)
-			System.out.print(" " + TRAJECTORY[i] );
-
-		
+	public void init(){
+		xSum = 0;
+		xxSum = 0;
+		calls = 0;
 	}
 
 	@Override
 	public void update(double score, int iteration) {
-		TRAJECTORY[iteration - minIteration] = score;
+		xSum += score;
+		xxSum += score * score;
+		calls++;
 	}
 
 	@Override
 	public String printStrStats() {
-		StringBuilder str = new StringBuilder();
-		for (int i = 0; i < iterations; i++) {
-			str.append(' ');
-			str.append(TRAJECTORY[i]);
-		}
-		return str.toString();
+		return " " + calls + " " + getAvg() + " " + getVar();
 	}
-
 }

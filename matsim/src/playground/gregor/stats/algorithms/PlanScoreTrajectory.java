@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractPlanStatsAlgorithm.java
+ * PlanScoreTrajectory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,48 +18,60 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.stats.algorithms;
-
+package playground.gregor.stats.algorithms;
 
 
 /**
  * @author laemmel
  *
  */
-public abstract class AbstractPlanStatsAlgorithm implements PlanStats {
+public class PlanScoreTrajectory extends AbstractPlanStatsAlgorithm {
 
-	protected PlanStats nextAlgorithm = null;
+	private double[] TRAJECTORY;
+	private int minIteration;
+	private int iterations;
 	
-	abstract public void update(double score, int iteration);
+	public PlanScoreTrajectory(int iters, int minIter){
+		minIteration = minIter;
+		iterations = iters;
+		init();
+	}
 	
-	abstract public void printStats();
-	
-	abstract public String printStrStats();
-	
-	public void run(double score, int iteration) {
+	public PlanScoreTrajectory(PlanStats nextAlgo,int iters, int minIter){
+		minIteration = minIter;
+		iterations = iters;		
+		this.nextAlgorithm = nextAlgo;
+		init();
+	}
+
+	private void init(){
+		TRAJECTORY = new double[iterations];
+		for (int i = 0 ; i < iterations; i++) TRAJECTORY[i] = 0;
 		
-		update(score, iteration);
-		if (this.nextAlgorithm != null)
-			this.nextAlgorithm.run(score, iteration);
 	}
-	
-	public String printStr(){
-		String tmp = printStrStats();
-		if (this.nextAlgorithm != null){
-			return tmp + this.nextAlgorithm.printStr();
+
+
+	@Override
+	public void printStats() {
+		for (int i = 0; i < iterations;  i++)
+			System.out.print(" " + TRAJECTORY[i] );
+
+		
+	}
+
+	@Override
+	public void update(double score, int iteration) {
+		TRAJECTORY[iteration - minIteration] = score;
+	}
+
+	@Override
+	public String printStrStats() {
+		StringBuilder str = new StringBuilder();
+		for (int i = 0; i < iterations; i++) {
+			str.append(' ');
+			str.append(TRAJECTORY[i]);
 		}
-		return tmp;
-	}
-	
-	
-	public void print(){
-		printStats();
-		if (this.nextAlgorithm != null)
-			this.nextAlgorithm.print();
-	}
-	
-	public void setAlgorithm(PlanStats nextAlgo){
-		nextAlgorithm = nextAlgo;
+		return str.toString();
 	}
 
 }

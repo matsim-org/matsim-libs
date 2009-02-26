@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.stats;
+package playground.gregor.stats;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,10 +29,9 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
-import org.matsim.stats.algorithms.BasicPlanStats;
-import org.matsim.stats.algorithms.PlanScoreTrajectory;
-import org.matsim.stats.algorithms.PlanStats;
 import org.matsim.writer.MatsimWriter;
+
+import playground.gregor.stats.algorithms.PlanStats;
 
 /**
  * @author laemmel
@@ -65,10 +64,11 @@ public class PlanStatsManager  {
 	}
 
 	public void run(final Plan plan, final int iteration) {
-		if (plan.getFirstPlanStatsAlgorithm() == null){
-			initPlan(plan);
-		}
-		plan.getFirstPlanStatsAlgorithm().run(plan.getScore(),  iteration);
+		System.err.println("commented non-compiling code out.");
+//		if (plan.getFirstPlanStatsAlgorithm() == null){
+//			initPlan(plan);
+//		}
+//		plan.getFirstPlanStatsAlgorithm().run(plan.getScore(),  iteration);
 
 	}
 
@@ -101,15 +101,16 @@ public class PlanStatsManager  {
 	}
 
 	public void initPlan(final Plan plan){
-		plan.setFirstPlanStatsAlgorithm(new BasicPlanStats(new PlanScoreTrajectory(this.iters, this.minIteration)));
-		Id persId = plan.getPerson().getId();
-
-		ArrayList<PlanStats> plans  = this.stats.get(persId);
-		if (this.stats.get(persId) == null){
-			plans = new ArrayList<PlanStats>();
-			this.stats.put(persId,plans);
-		}
-		plans.add(plan.getFirstPlanStatsAlgorithm());
+		System.err.println("Commented non-compiling code out.");
+//		plan.setFirstPlanStatsAlgorithm(new BasicPlanStats(new PlanScoreTrajectory(this.iters, this.minIteration)));
+//		Id persId = plan.getPerson().getId();
+//
+//		ArrayList<PlanStats> plans  = this.stats.get(persId);
+//		if (this.stats.get(persId) == null){
+//			plans = new ArrayList<PlanStats>();
+//			this.stats.put(persId,plans);
+//		}
+//		plans.add(plan.getFirstPlanStatsAlgorithm());
 	}
 
 	//a simple writer to dump the stats to file

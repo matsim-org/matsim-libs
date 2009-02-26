@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicPlanStats.java
+ * AbstractPlanStatsAlgorithm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,56 +18,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.stats.algorithms;
+package playground.gregor.stats.algorithms;
+
 
 
 /**
  * @author laemmel
  *
  */
-public class BasicPlanStats extends AbstractPlanStatsAlgorithm  {
-	
-	private double xSum;
-	private double xxSum;
-	private int calls;
-	
-	public BasicPlanStats(){
-		init();
-	}
-	
-	public BasicPlanStats(PlanStats nextAlgo){
-		this.nextAlgorithm = nextAlgo;
-		init();
-	}
-	
+public abstract class AbstractPlanStatsAlgorithm implements PlanStats {
 
-	private double getAvg(){
-		return xSum /  calls;
-	}
-	private double getVar(){
-		return xxSum / calls - (getAvg() * getAvg());
+	protected PlanStats nextAlgorithm = null;
+	
+	abstract public void update(double score, int iteration);
+	
+	abstract public void printStats();
+	
+	abstract public String printStrStats();
+	
+	public void run(double score, int iteration) {
+		
+		update(score, iteration);
+		if (this.nextAlgorithm != null)
+			this.nextAlgorithm.run(score, iteration);
 	}
 	
-	@Override
-	public void printStats(){
-		System.out.print( " " + calls + " " + getAvg() + " " + getVar());
+	public String printStr(){
+		String tmp = printStrStats();
+		if (this.nextAlgorithm != null){
+			return tmp + this.nextAlgorithm.printStr();
+		}
+		return tmp;
 	}
-
-	public void init(){
-		xSum = 0;
-		xxSum = 0;
-		calls = 0;
+	
+	
+	public void print(){
+		printStats();
+		if (this.nextAlgorithm != null)
+			this.nextAlgorithm.print();
 	}
-
-	@Override
-	public void update(double score, int iteration) {
-		xSum += score;
-		xxSum += score * score;
-		calls++;
+	
+	public void setAlgorithm(PlanStats nextAlgo){
+		nextAlgorithm = nextAlgo;
 	}
 
-	@Override
-	public String printStrStats() {
-		return " " + calls + " " + getAvg() + " " + getVar();
-	}
 }

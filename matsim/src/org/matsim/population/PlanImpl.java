@@ -36,13 +36,12 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.stats.algorithms.PlanStats;
 import org.matsim.utils.misc.Time;
 
 public class PlanImpl extends BasicPlanImpl implements Plan {
 
 	private final static Logger log = Logger.getLogger(PlanImpl.class);
-	
+
 	private final static String ACT_ERROR = "The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.";
 
 	//////////////////////////////////////////////////////////////////////
@@ -51,8 +50,6 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 
 	private Person person = null;
 
-	private PlanStats firstPlanStatsAlgorithm = null;
-
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -60,8 +57,8 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	public PlanImpl(final Person person) {
 		this.person = person;
 	}
-	
-	public static Plan createPlan( Person p) {
+
+	public static Plan createPlan( final Person p) {
 		return new PlanImpl(p) ;
 	}
 
@@ -242,7 +239,6 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	 **/
 	public void copyPlan(final Plan in) {
 		setScore(in.getScore());
-		this.setFirstPlanStatsAlgorithm(null);
 		this.setType(in.getType());
 		this.person = in.getPerson();
 		List<?> actl = in.getActsLegs();
@@ -370,12 +366,4 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 		return (Act) this.actsLegs.get(this.actsLegs.size() - 1);
 	}
 
-	public void setFirstPlanStatsAlgorithm(PlanStats firstPlanStatsAlgorithm) {
-		this.firstPlanStatsAlgorithm = firstPlanStatsAlgorithm;
-	}
-
-	public PlanStats getFirstPlanStatsAlgorithm() {
-		return firstPlanStatsAlgorithm;
-	}
-	
 }

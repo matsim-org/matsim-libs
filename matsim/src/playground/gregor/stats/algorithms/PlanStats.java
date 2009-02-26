@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.stats.algorithms;
+package playground.gregor.stats.algorithms;
 
 
 /**
