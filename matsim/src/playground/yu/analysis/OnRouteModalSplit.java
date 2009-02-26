@@ -28,11 +28,18 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentStuckEvent;
+import org.matsim.events.Events;
+import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.PopulationImpl;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
@@ -160,13 +167,16 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 
 			}
 		else {
-			if (PlanModeJudger.useCar(selectedPlan)) {
+			if (PlanModeJudger.useCar(selectedPlan))
 				carCount[binIdx]++;
-			} else if (PlanModeJudger.usePt(selectedPlan)) {
+			else if (PlanModeJudger.usePt(selectedPlan)) {
 				if (ptCount != null)
 					ptCount[binIdx]++;
-			}
+			} else if (PlanModeJudger.useWalk(selectedPlan))
+				if (wlkCount != null)
+					wlkCount[binIdx]++;
 		}
+
 	}
 
 	/* output methods */
@@ -227,7 +237,12 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 		calcOnRoute();
 		try {
 			bw
-					.write("time\ttimeBin\tdepartures\tarrivals\tstuck\ton_route\tcarDepartures\tcarArrivals\tcarStuck\tcarOnRoute\tptDepartures\tptArrivals\tptStuck\tptOnRoute\twalkDepartures\twalkArrivals\twalkStuck\twalkOnRoute\totherDepartures\totherArrivals\totherStuck\totherOnRoute\n");
+					.write("time\ttimeBin\t"
+							+ "departures\tarrivals\tstuck\ton_route\t"
+							+ "carDepartures\tcarArrivals\tcarStuck\tcarOnRoute\t"
+							+ "ptDepartures\tptArrivals\tptStuck\tptOnRoute\t"
+							+ "walkDepartures\twalkArrivals\twalkStuck\twalkOnRoute\t"
+							+ "otherDepartures\totherArrivals\totherStuck\totherOnRoute\n");
 			for (int i = 0; i < this.dep.length; i++) {
 				bw.write(Time.writeTime(i * this.binSize)
 						+ "\t"
@@ -305,11 +320,13 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 		double[] onRoute = new double[length];
 		double[] carOnRoute = new double[length];
 		double[] ptOnRoute = new double[length];
+		double[] wlkOnRoute = new double[length];
 		double[] otherOnRoute = new double[length];
 		for (int i = 0; i < length; i++) {
 			onRoute[i] = this.onRoute[i];
 			carOnRoute[i] = this.carOnRoute[i];
 			ptOnRoute[i] = this.ptOnRoute[i];
+			wlkOnRoute[i] = this.wlkOnRoute[i];
 			otherOnRoute[i] = (this.otherOnRoute != null) ? this.otherOnRoute[i]
 					: 0;
 		}
@@ -317,7 +334,35 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 		onRouteChart.addSeries("drivers on route", category, carOnRoute);
 		onRouteChart.addSeries("public transit users on route", category,
 				ptOnRoute);
+		onRouteChart.addSeries("walkers on route", category, wlkOnRoute);
 		onRouteChart.addSeries("others on route", category, otherOnRoute);
 		onRouteChart.saveAsPng(filename, 1024, 768);
+	}
+
+	public static void main(final String[] args) {
+		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+		final String eventsFilename = "D:/tmp/it.100/100.events.txt.gz";
+		String plansFilename = "D:/tmp/it.100/100.plans.xml.gz";
+		String outputFilename = "D:/tmp/it.100/onRoute.txt";
+		String chartFilename = "D:/tmp/it.100/onRoute.png";
+
+		Gbl.createConfig(null);
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFilename);
+
+		Population population = new PopulationImpl();
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
+
+		Events events = new Events();
+		OnRouteModalSplit orms = new OnRouteModalSplit("Zurich", population);
+		events.addHandler(orms);
+		new MatsimEventsReader(events).readFile(eventsFilename);
+
+		orms.write(outputFilename);
+		orms.writeCharts(chartFilename);
+
+		System.out.println("-> Done!");
+		System.exit(0);
 	}
 }
