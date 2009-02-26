@@ -154,7 +154,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			}
 		}
 		else if (tt == 2) {
-			if (totalTravelTime <= choiceSet.getTravelTimeStartShopEnd(choiceSet.getChosenFacilityId())) {			
+			if (totalTravelTime <= 1.5 * choiceSet.getTravelTimeStartShopEnd(choiceSet.getChosenFacilityId())) {			
 				choiceSet.addFacility(facility, totalTravelTime, totalTravelDist);
 			}
 		}	
