@@ -216,13 +216,13 @@ public class ChoiceSetWriterSimple extends CSWriter {
 					"SH" + i + "_TDnet\t" +
 					"SH" + i + "_CFD_exact\t" + "SH" + i + "_CFD_mapped\t" +
 					"SH" + i + "_addTime\t" +"SH" + i + "_addDistance\t" +
-					"SH" + i + "RetailerID\t" +
-					"SH" + i + "Size\t" +
-					"SH" + i + "dHalt\t" +
-					"SH" + i + "acc02\t" +
-					"SH" + i + "acc10\t" +
-					"SH" + i + "acc20\t" +
-					"SH" + i + "HRS_WEEK\t";
+					"SH" + i + "_RetailerID\t" +
+					"SH" + i + "_Size\t" +
+					"SH" + i + "_dHalt\t" +
+					"SH" + i + "_acc02\t" +
+					"SH" + i + "_acc10\t" +
+					"SH" + i + "_acc20\t" +
+					"SH" + i + "_HRS_WEEK\t";
 		}	
 		return header;
 	}
