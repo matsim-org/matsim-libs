@@ -44,7 +44,7 @@ public class TravelTimeCalculatorBuilder {
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 		
 		if ("TravelTimeCalculatorHashMap".equals(controlerConfigGroup.getTravelTimeCalculatorType())) {
-			factory.setTravelTimeRolePrototype(TravelTimeDataHashMap.class);
+			factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 		} else if (!"TravelTimeCalculatorArray".equals(controlerConfigGroup.getTravelTimeCalculatorType())) {
 			throw new RuntimeException(controlerConfigGroup.getTravelTimeCalculatorType() + " is unknown!");
 		}

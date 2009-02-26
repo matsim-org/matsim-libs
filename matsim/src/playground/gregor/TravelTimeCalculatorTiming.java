@@ -74,7 +74,7 @@ public class TravelTimeCalculatorTiming {
 		// setup traveltime calculator
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 		factory.setTravelTimeAggregatorPrototype(OptimisticTravelTimeAggregator.class);
-		factory.setTravelTimeRolePrototype(TravelTimeDataArray.class);
+		factory.setTravelTimeDataPrototype(TravelTimeDataArray.class);
 		
 		this.ttcalc = new TravelTimeCalculator(this.network, binSize * 60, 30*3600, factory);
 		events.addHandler(this.ttcalc);

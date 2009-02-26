@@ -37,7 +37,7 @@ public class TravelTimeDataArray implements TravelTimeData {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.matsim.trafficmonitoring.TravelTimeRole#resetTravelTimes()
+	 * @see org.matsim.trafficmonitoring.TravelTimeData#resetTravelTimes()
 	 */
 	public void resetTravelTimes() {
 		for (int i = 0; i < this.timeSum.length; i++) {
@@ -48,7 +48,7 @@ public class TravelTimeDataArray implements TravelTimeData {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.matsim.trafficmonitoring.TravelTimeRole#addTravelTime(double, double)
+	 * @see org.matsim.trafficmonitoring.TravelTimeData#addTravelTime(double, double)
 	 */
 	public void addTravelTime(final int timeSlot, final double traveltime) {
 		double sum = this.timeSum[timeSlot];
@@ -61,7 +61,7 @@ public class TravelTimeDataArray implements TravelTimeData {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.matsim.trafficmonitoring.TravelTimeRole#getTravelTime(double)
+	 * @see org.matsim.trafficmonitoring.TravelTimeData#getTravelTime(double)
 	 */
 	public double getTravelTime(final int timeSlot, final double now) {
 		double ttime = this.travelTimes[timeSlot];

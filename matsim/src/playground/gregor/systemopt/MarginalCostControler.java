@@ -40,7 +40,7 @@ public class MarginalCostControler extends EvacuationQSimControler{
 		
 		
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-		factory.setTravelTimeRolePrototype(TravelTimeDataHashMap.class);
+		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 		SocialCostCalculator sc = new SocialCostCalculator(this.network,this.config.controler().getTraveltimeBinSize());

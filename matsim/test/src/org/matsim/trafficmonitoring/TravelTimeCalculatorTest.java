@@ -151,7 +151,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		// setup traveltime calculator
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-		factory.setTravelTimeRolePrototype(TravelTimeDataHashMap.class);
+		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 30*3600, factory);
 		events.addHandler(ttcalc);
 
@@ -234,7 +234,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		// setup traveltime calculator
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-		factory.setTravelTimeRolePrototype(TravelTimeDataHashMap.class);
+		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 30*3600, factory);
 		events.addHandler(ttcalc);

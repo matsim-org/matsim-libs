@@ -27,16 +27,16 @@ import org.matsim.interfaces.core.v01.Link;
 
 public class TravelTimeAggregatorFactory {
 	
-	private Constructor<? extends TravelTimeData> prototypeContructorTravelTimeRole;
-	private static final Class[] PROTOTYPECONSTRUCTOR_TRAVELTIMEROLE = {Link.class, int.class};
+	private Constructor<? extends TravelTimeData> prototypeContructorTravelTimeData;
+	private static final Class[] PROTOTYPECONSTRUCTOR_TRAVELTIMEDATA = {Link.class, int.class};
 
 	private Constructor<? extends AbstractTravelTimeAggregator> prototypeContructorTravelTimeAggregator;
 	private static final Class[] PROTOTYPECONSTRUCTOR_TRAVELTIMEAGGREGATOR = {int.class, int.class};
 	
 	public TravelTimeAggregatorFactory() {
 		try {
-			this.prototypeContructorTravelTimeRole = TravelTimeDataArray.class
-			.getConstructor(PROTOTYPECONSTRUCTOR_TRAVELTIMEROLE);
+			this.prototypeContructorTravelTimeData = TravelTimeDataArray.class
+			.getConstructor(PROTOTYPECONSTRUCTOR_TRAVELTIMEDATA);
 		} catch (SecurityException e) {
 			throw new RuntimeException(e);
 		} catch (NoSuchMethodException e) {
@@ -54,12 +54,12 @@ public class TravelTimeAggregatorFactory {
 	}
 	
 	
-	public void setTravelTimeRolePrototype(Class < ? extends TravelTimeData> protoype) {
+	public void setTravelTimeDataPrototype(Class < ? extends TravelTimeData> protoype) {
 		Constructor<? extends TravelTimeData> c;
 		try {
-			c = protoype.getConstructor(PROTOTYPECONSTRUCTOR_TRAVELTIMEROLE);
+			c = protoype.getConstructor(PROTOTYPECONSTRUCTOR_TRAVELTIMEDATA);
 			if (c != null ) {
-				this.prototypeContructorTravelTimeRole = c;
+				this.prototypeContructorTravelTimeData = c;
 			} else {
 				throw new IllegalArgumentException(
 						"Wrong prototype constructor!");
@@ -108,7 +108,7 @@ public class TravelTimeAggregatorFactory {
 	public TravelTimeData createTravelTimeData(Link link, int numSlots) {
 		TravelTimeData ret;
 		try {
-			ret = this.prototypeContructorTravelTimeRole.newInstance(new Object[] {link, numSlots});
+			ret = this.prototypeContructorTravelTimeData.newInstance(new Object[] {link, numSlots});
 			return ret;
 		} catch (InstantiationException e) {
 			throw new RuntimeException(e);

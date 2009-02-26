@@ -98,7 +98,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 
 		// create a travel time calculator object
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-		factory.setTravelTimeRolePrototype(TravelTimeDataHashMap.class);
+		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 		
 		TravelTime ttcalc = new TravelTimeCalculator(network, 15*60, 30*3600, factory);
 
