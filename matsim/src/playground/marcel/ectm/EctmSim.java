@@ -32,7 +32,7 @@ import org.matsim.controler.Controler;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Population;
-import org.matsim.mobsim.queuesim.ExternalMobsim;
+import org.matsim.mobsim.external.ExternalMobsim;
 import org.matsim.utils.misc.ExeRunner;
 
 public class EctmSim extends ExternalMobsim {

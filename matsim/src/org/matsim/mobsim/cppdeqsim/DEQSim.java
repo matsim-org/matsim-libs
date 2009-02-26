@@ -43,7 +43,7 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
-import org.matsim.mobsim.queuesim.ExternalMobsim;
+import org.matsim.mobsim.external.ExternalMobsim;
 import org.matsim.utils.misc.Time;
 
 /**
