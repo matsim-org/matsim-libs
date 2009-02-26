@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.utils;
+package playground.yu.utils.io;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

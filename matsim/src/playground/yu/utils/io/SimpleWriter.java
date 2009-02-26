@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.yu.utils;
+package playground.yu.utils.io;
 
 import java.io.BufferedWriter;
 import java.io.Closeable;

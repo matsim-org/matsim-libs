@@ -15,7 +15,7 @@ import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.charts.BarChart;
 
-import playground.yu.utils.SimpleWriter;
+import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu

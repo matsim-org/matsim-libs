@@ -38,11 +38,11 @@ import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
 
-import playground.yu.utils.SimpleWriter;
+import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class AnalysisTest {
 	private static void printUsage() {
@@ -102,9 +102,7 @@ public class AnalysisTest {
 			plansReader.readFile(plansFilename);
 			plans.runAlgorithms();
 
-			orms = new OnRouteModalSplit(scenario,
-			// network,
-					plans);
+			orms = new OnRouteModalSplit(scenario, plans);
 			ttms = new TravelTimeModalSplit(network, plans);
 
 		}

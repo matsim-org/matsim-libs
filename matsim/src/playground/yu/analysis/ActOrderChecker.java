@@ -20,7 +20,7 @@ import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.yu.utils.SimpleWriter;
+import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu

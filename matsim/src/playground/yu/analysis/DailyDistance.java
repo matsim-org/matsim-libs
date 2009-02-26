@@ -22,7 +22,7 @@ import org.matsim.utils.charts.BarChart;
 import org.matsim.utils.charts.XYLineChart;
 
 import playground.yu.utils.BubbleChart;
-import playground.yu.utils.SimpleWriter;
+import playground.yu.utils.io.SimpleWriter;
 
 /**
  * compute modal split of through distance

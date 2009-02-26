@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.utils;
+package playground.yu.utils.io;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,12 +36,12 @@ import org.matsim.utils.io.IOUtils;
 
 /**
  * @author yu
- * 
+ *
  */
-public class FifthFilter extends TableSplitter {
+public class FourthFilter extends TableSplitter {
 	private final BufferedWriter writer;
 
-	public FifthFilter(final String regex, final String attTableFilename,
+	public FourthFilter(final String regex, final String attTableFilename,
 			final String outputFilename) throws IOException {
 		super(regex, attTableFilename);
 		writer = IOUtils.getBufferedWriter(outputFilename);
@@ -175,13 +174,6 @@ public class FifthFilter extends TableSplitter {
 		 *            SecoLine an object of SecoLine
 		 */
 		private final Map<Integer, SecoLine> secoLines = new HashMap<Integer, SecoLine>();
-		/**
-		 * @param initSecoLines
-		 *            List<arg0>
-		 * @param arg0
-		 *            the secondary line in inputfile
-		 */
-		private final List<String> initSecoLines = new LinkedList<String>();
 
 		public PrimLine(final String origZoneNo, final String destZoneNo,
 				final String travelTime, final String transfers)
@@ -239,13 +231,10 @@ public class FifthFilter extends TableSplitter {
 		}
 
 		public void addSecoLine(final String line) {
-			initSecoLines.add(line);
 			String[] secoLineArray = line.split(";");
-			if (Integer.parseInt(secoLineArray[3]) % 2 == 0) {
-				String busId = secoLineArray[7].split(" ")[0];
-				secoLines.put(new Integer(secoLineArray[3]), new SecoLine(
-						secoLineArray[5], secoLineArray[6], busId));
-			}
+			String busId = secoLineArray[7].split(" ")[0];
+			secoLines.put(new Integer(secoLineArray[3]), new SecoLine(
+					secoLineArray[5], secoLineArray[6], busId));
 		}
 	}
 
@@ -310,7 +299,7 @@ public class FifthFilter extends TableSplitter {
 
 				outputFilename = tir.getOutputFilename(i);
 
-				FifthFilter ff = new FifthFilter(";", attTableFilename,
+				FourthFilter ff = new FourthFilter(";", attTableFilename,
 						outputFilename);
 				String line;
 				// to search headline of the table
@@ -347,11 +336,6 @@ public class FifthFilter extends TableSplitter {
 										pls.add(currentPl);
 										ff.writeNewLine(currentLine);
 										compareSecoLines = false;
-										for (int n = 0; n < currentPl.initSecoLines
-												.size(); n++)
-											ff
-													.writeNewLine(currentPl.initSecoLines
-															.get(n));
 									}
 									referencePls.clear();
 									currentLine = null;
@@ -404,13 +388,16 @@ public class FifthFilter extends TableSplitter {
 											compareSecoLines = false;
 										}
 									}
-								} else
-									compareSecoLines = true;
+								}
 							}
 						} else if (currentPl != null) {
-							if (!compareSecoLines)
-								ff.writeNewLine(line);
-							currentPl.addSecoLine(line);
+							// if (currentPl.transfers > 0) {
+							String[] secoLines = ff.split(line);
+							int pathLegIndex = Integer.parseInt(secoLines[3]);
+							// if (pathLegIndex > 0)
+							if (pathLegIndex % 2 == 0)
+								currentPl.addSecoLine(line);
+							// }
 						}
 				} while (line != null);
 				ff.closeReader();

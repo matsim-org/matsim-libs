@@ -29,7 +29,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 
 import playground.yu.analysis.NetworkLinkIdsInCircle;
-import playground.yu.utils.OSMPatchPaser;
+import playground.yu.utils.io.OSMPatchPaser;
 
 public class OSMNetCreator {
 	private final double capperiod;
