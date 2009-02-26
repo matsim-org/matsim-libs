@@ -197,6 +197,20 @@ public class PTNetworkLayer extends NetworkLayer {
 	}
 
 	// Creates only irrelevant values to create a PTLink. Actually the cost is calculated on other parameters
+	private void createLink(final int intId, final String from, final String to, final String ptType ){
+
+		Id id = new IdImpl(String.valueOf(intId)); 
+		Node fromNode = this.getNode(from);
+		Node toNode = this.getNode(to);
+		double length = fromNode.getCoord().calcDistance(toNode.getCoord());
+		double freespeed=   1;
+		double capacity =  1;
+		double numLanes=  1;
+		String origId =  "0";
+		this.createLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, origId, ptType);
+	}
+
+		/*
 	private void createLink(final int id, final String from, final String to, final String ptType ){
 		String length = "1";
 		String freespeed= "1";
@@ -204,7 +218,10 @@ public class PTNetworkLayer extends NetworkLayer {
 		String permlanes = "1";
 		String origid = "0";
 		this.createLink(String.valueOf(id), from, to, length, freespeed, capacity, permlanes, origid, ptType);
+>>>>>>> .r5540
 	}
+*/
+
 
 	public void printLinks() {
 		//Displays a quick visualization of links with from- and to- nodes
@@ -226,16 +243,3 @@ public class PTNetworkLayer extends NetworkLayer {
 		}
 	}
 }
-
-/*
- * Old CODE
- *  public void setMaxNodekey(int maxNodekey) {
- *  	this.maxNodekey = maxNodekey;
- *  }
- *
- * public void setMaxLinkKey(int maxLinkKey) {
- *		this.maxLinkKey = maxLinkKey;
- * }
- *
-*/
-

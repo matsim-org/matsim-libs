@@ -45,12 +45,12 @@ public class PTNetwork2View extends NetworkLayer {
 	}
 
 	private void addLink(Link l) {
-		if (this.getLink(l.getId().toString()) == null) {
-			this.createLink(l.getId().toString(), l.getFromNode().getId().toString(), l.getToNode().getId().toString(), String.valueOf(l.getLength()), String.valueOf(l.getFreespeed(0)), String.valueOf(l.getCapacity(0)), String.valueOf(l.getLanesAsInt(0)), l.getOrigId(), l.getType());
+		if (this.getLink(l.getId()) == null) {
+			this.createLink(l.getId(), l.getFromNode(), l.getToNode(), l.getLength(), 1.0, 1.0, 1.0, l.getOrigId(), l.getType());
 		}
 	}
 
-	public void writePTNetwork() {
+	public void writePTNetwork(){
 		NetworkWriter networkWriter = new NetworkWriter(this,NETWORKFILENAME);
 		networkWriter.write();
 	}

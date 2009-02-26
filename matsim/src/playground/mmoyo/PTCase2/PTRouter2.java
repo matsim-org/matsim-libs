@@ -14,9 +14,19 @@ import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.routes.NodeCarRoute;
+/*
+<<<<<<< .mine
+import org.matsim.network.Node;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.routes.LinkCarRoute;
+=======
+*/
+import org.matsim.population.routes.LinkCarRoute;
+//>>>>>>> .r5540
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
+
 
 //import playground.mmoyo.PTRouter.PTNProximity;   //24 feb
 import playground.mmoyo.PTRouter.PTNode;
@@ -50,7 +60,7 @@ public class PTRouter2 {
 		this.dijkstra = new Dijkstra(ptNetworkLayer, ptTravelCost, ptTravelTime);	
 	}
 		
-	public Path findRoute(Coord coord1, Coord coord2, double time, int distToWalk){
+	public Path findRoute(Coord coord1, Coord coord2, double time, double distToWalk){
 		//original code //24 feb
 		//PTNode[] NearStops1= ptnProximity.getNearestBusStops(coord1, distToWalk, false);
 		//PTNode[] NearStops2= ptnProximity.getNearestBusStops(coord2, distToWalk, false);
@@ -127,7 +137,9 @@ public class PTRouter2 {
 					legTravTime = legTravTime+ linkTravelTime; 
 					linkList.add(link);
 				}else{
-					CarRoute legRoute = new NodeCarRoute();
+					//CarRoute legRoute = new NodeCarRoute();    25 feb
+					LinkCarRoute legRoute = new LinkCarRoute(null, null); 
+					
 					legRoute.setTravelTime(routeTravelTime); //legRoute.setTravTime(routeTravelTime*3600);
 					if (linkList.size()>0) {legRoute.setLinks(null, linkList, null);}
 					

@@ -23,7 +23,7 @@ public class PTControler2 {
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, INPTNETFILE, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
 		
-		int option =3;
+		int option =-1;
 		
 		if (option>0){pt.readPTNet(ZURICHPTN);}
 		switch (option){

@@ -2,7 +2,7 @@ package playground.mmoyo.Validators;
 
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
-
+import org.matsim.interfaces.basic.v01.Coord;
 import playground.mmoyo.PTCase2.PTTimeTable2;
 
 public class NetValidator {
@@ -45,7 +45,17 @@ public class NetValidator {
 		System.out.println("negative costs found: " + x);
 	}
 	
-	
+	public boolean validLinkLengths(){
+		for (Link l : net.getLinks().values()){
+			Coord from = l.getFromNode().getCoord();
+			Coord to = l.getToNode().getCoord();
+			double distance= from.calcDistance(to);
+			if (l.getLength()!= distance ){
+				return false;
+			}
+		}
+		return true;
+	}
 	
 	
 }

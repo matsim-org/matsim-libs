@@ -25,7 +25,7 @@ public class PTTester {
 		int routes=0;
 		int intPersonNum=0;
 		Population population = new PopulationImpl(false);
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(population);
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, pt.getPtNetworkLayer());
 		plansReader.readFile(this.pt.getPlansFile());
 
 		for (Person person: population.getPersons().values()) {

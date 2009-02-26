@@ -19,13 +19,13 @@ import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.population.LegImpl;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
-import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.population.routes.LinkCarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
-import org.matsim.utils.geometry.CoordImpl;
 
 import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.Validators.PathValidator;
@@ -65,8 +65,8 @@ public class PTActWriter {
 		int valid=0;
 		int invalid=0;
 
-		//for (Person person: this.population.getPersons().values()) {
-			Person person = this.population.getPerson("3937204");
+		for (Person person: this.population.getPersons().values()) {
+			//Person person = population.getPerson("3937204");
 			System.out.println(x + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
 
@@ -81,12 +81,11 @@ public class PTActWriter {
 				thisAct= (Act)iter.next();
 
 				if (!first) {
-					//System.out.println("====new plan");
 					Coord lastActCoord = lastAct.getCoord();
 		    		Coord actCoord = thisAct.getCoord();
 
-		    		int distanceToDestination = (int)lastActCoord.calcDistance(actCoord);
-		    		int distToWalk= distToWalk(person.getAge());
+		    		double distanceToDestination = lastActCoord.calcDistance(actCoord);
+		    		double distToWalk= distToWalk(person.getAge());
 		    		if (distanceToDestination<= distToWalk){
 		    			newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
 			    	}else{
@@ -124,8 +123,8 @@ public class PTActWriter {
 			    		}//path=null
 					}//distanceToDestination<= distToWalk
 				}//if !First
-
-		    	//TODO: this must be read from the city network not from pt network!!!
+				
+		    	//Attention: this should be read from the city network not from pt network!!! 
 		    	thisAct.setLink(this.pt.getPtNetworkLayer().getNearestLink(thisAct.getCoord()));
 
 		    	newPlan.addAct(thisAct);
@@ -139,9 +138,8 @@ public class PTActWriter {
 				newPopulation.addPerson(person);
 			}
 			x++;
-		//}//for person
+		}//for person
 
-		//Write outplan XML
 		System.out.println("writing output plan file...");
 		Gbl.getConfig().plans().setOutputFile(this.pt.getOutPutFile());
 		Gbl.getConfig().plans().setOutputVersion("v4");
@@ -177,7 +175,7 @@ public class PTActWriter {
 	}
 
 	public Path findRoute(final Coord coord1, final Coord coord2, final double time, final int distToWalk){
-		//origincal code
+		//23 feb
 		//PTNode[] NearStops1=  ptnProximity.getNearestBusStops(coord1, distToWalk, false);
 		//PTNode[] NearStops2= ptnProximity.getNearestBusStops(coord2, distToWalk, false);
 
@@ -201,22 +199,14 @@ public class PTActWriter {
 		return path;
 	}
 
-	private Leg walkLeg(final int legNum, final Act act1, final Act act2){
-		double walkDistance = coordDistance(act1.getCoord(), act2.getCoord());
-		double walkTravelTime = walkTravelTime(walkDistance);
-		double depTime = act1.getEndTime();
-		double arrTime = depTime + walkTravelTime;
-		double distance= coordDistance(act1.getCoord(), act2.getCoord());
-		return newPTLeg(legNum, Leg.Mode.walk, new ArrayList<Link>(), distance, depTime, walkTravelTime, arrTime);
-	}
+
 
 	private double linkDistance(final Link link){
 		return coordDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
 	}
 
 	private double coordDistance(final Coord coord1, final Coord coord2){
-		CoordImpl coordImpl = new CoordImpl(coord1);
-		return coordImpl.calcDistance(coord2); //the swiss coordinate system with 6 digit means meters
+		return coord1.calcDistance(coord2);
 	}
 
 	private double walkTravelTime(final double distance){
@@ -258,9 +248,11 @@ public class PTActWriter {
 				if(linkCounter == (routeLinks.size()-1)){//Last PTAct: getting off
 					arrTime= depTime+ legTravelTime;
 					legDistance=legDistance + linkDistance;
-					//TODO: The legMode car is temporal only for visualization purposes
+
+					//Attention: The legMode car is temporal only for visualization purposes
 					newPlan.addLeg(newPTLeg(legNum++, Leg.Mode.car, legRouteLinks, legDistance, arrTime-legTravelTime, legTravelTime, arrTime));
-					//test
+										
+					//test: Check what method describes the location more exactly
 					//newPlan.addAct(newPTAct("exit pt veh", link.getFromNode().getCoord(), link, arrTime, 0, arrTime));
 					newPlan.addAct(newPTAct("exit pt veh", link.getToNode().getCoord(), link, arrTime, 0, arrTime));
 				}
@@ -336,14 +328,16 @@ public class PTActWriter {
 	}
 
 	private Leg newPTLeg(final int num, final Leg.Mode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
-		CarRoute legRoute = new NodeCarRoute();
+		CarRoute legRoute = new LinkCarRoute(null, null); 
+		//CarRoute legRoute = new NodeCarRoute();  25 feb
+		
 		if (mode!=Leg.Mode.walk){
 			legRoute.setLinks(null, routeLinks, null);
 		}
+		
 		legRoute.setTravelTime(travTime);
 		legRoute.setDist(distance);
-
-		Leg leg = new org.matsim.population.LegImpl(mode);
+		Leg leg = new LegImpl(mode);
 		//leg.setNum(num); deprecated
 		leg.setRoute(legRoute);
 		leg.setDepartureTime(depTime);
@@ -351,6 +345,16 @@ public class PTActWriter {
 		leg.setArrivalTime(arrTime);
 		return leg;
 	}
+
+	private Leg walkLeg(final int legNum, final Act act1, final Act act2){
+		double distance= coordDistance(act1.getCoord(), act2.getCoord());
+		double walkTravelTime = walkTravelTime(distance); 
+		double depTime = act1.getEndTime();
+		double arrTime = depTime + walkTravelTime;
+		return newPTLeg(legNum, Leg.Mode.walk, new ArrayList<Link>(), distance, depTime, walkTravelTime, arrTime);
+	}
+
+
 }
 
 /*
