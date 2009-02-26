@@ -105,7 +105,7 @@ public class TravelTimeAggregatorFactory {
 		}
 	}
 	
-	public TravelTimeData createTravelTimeRole(Link link, int numSlots) {
+	public TravelTimeData createTravelTimeData(Link link, int numSlots) {
 		TravelTimeData ret;
 		try {
 			ret = this.prototypeContructorTravelTimeRole.newInstance(new Object[] {link, numSlots});
