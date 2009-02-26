@@ -62,9 +62,6 @@ public class Line {
 		if (!entries[76].trim().equals("")) {
 			numberOfPersons = Integer.parseInt(entries[76].trim());
 		}
-		else {
-			log.info("Input data problem with trip: " + this.tripId + ". No household size defined!");
-		}
 		this.numberOfPersonsHH = numberOfPersons;
 		this.civilStatus = Integer.parseInt(entries[78].trim());
 		this.education = Integer.parseInt(entries[79].trim());
