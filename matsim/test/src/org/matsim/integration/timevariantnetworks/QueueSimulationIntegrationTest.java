@@ -37,6 +37,7 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkFactory;
@@ -45,7 +46,7 @@ import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.network.NetworkChangeEvent.ChangeType;
 import org.matsim.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.geometry.CoordImpl;
@@ -73,7 +74,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		network.addNetworkChangeEvent(change);
 
 		// create a population
-		Population plans = new Population(Population.NO_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		Person person1 = createPersons(7*3600, link1, link3, network, 1).get(0);
 		Person person2 = createPersons(9*3600, link1, link3, network, 1).get(0);
 		plans.addPerson(person1);
@@ -124,7 +125,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
-		Population plans = new Population(Population.NO_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		List<Person> persons1 = createPersons(0, link1, link3, network, personsPerWave);
 		for(Person p : persons1)
 			plans.addPerson(p);

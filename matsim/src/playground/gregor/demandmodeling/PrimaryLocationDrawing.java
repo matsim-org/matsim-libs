@@ -40,10 +40,11 @@ import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -82,7 +83,7 @@ public class PrimaryLocationDrawing {
 	private int id = 0;
 
 	private static final Logger log = Logger.getLogger(PrimaryLocationDrawing.class);
-	
+
 	public PrimaryLocationDrawing(final String zonesFile, final String demandFilename, final String districts) {
 		this.network = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		this.zonesFilename = zonesFile;
@@ -112,9 +113,9 @@ public class PrimaryLocationDrawing {
 
 
 	private ArrayList<Person> getPersons(final Feature zone) {
-		
+
 		ArrayList<Person> ret = new ArrayList<Person>();
-		
+
 		final Polygon p = (Polygon) zone.getDefaultGeometry().getGeometryN(0);
 		final Envelope e = zone.getBounds();
 		final long inhabitants = (Long)zone.getAttribute(6);
@@ -124,7 +125,7 @@ public class PrimaryLocationDrawing {
 		if (links.size() == 0) {
 			log.warn("no link found!");
 		}
-		
+
 		final ArrayList<Link> tmp = new ArrayList<Link>();
 		for (final Link link : links) {
 			final Point point = this.geofac.createPoint(new Coordinate(link.getCenter().getX(),link.getCenter().getY()));
@@ -132,32 +133,32 @@ public class PrimaryLocationDrawing {
 				tmp.add(link);
 			}
 		}
-		
+
 		if (tmp.size() == 0) {
 			for (final Link link : links) {
 				LineString ls = this.geofac.createLineString(new Coordinate[] {new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY()),
 						new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY())});
-				
+
 				if (ls.touches(p)) {
 					tmp.add(link);
-				} 					
-				
-			}			
+				}
+
+			}
 		}
-		
+
 		if (tmp.size() == 0) {
 			for (final Link link : links) {
 				tmp.add(link);
 			}
 		}
-		
+
 //		if (tmp.size() == 0) {
 //			log.warn("could not find any link for zone: " + zone.getAttribute(1) + "just taking the nearest link to centroid!");
 //		}
-//		
+//
 		Coord c = MGC.point2Coord(p.getCentroid());
 		tmp.add(this.network.getNearestLink(c));
-		
+
 		links = tmp;
 		final double overalllength = getOALength(links);
 		int all = 0;
@@ -177,7 +178,7 @@ public class PrimaryLocationDrawing {
 				} catch (final Exception e1) {
 					e1.printStackTrace();
 				}
-				
+
 			}
 		}
 		return ret;
@@ -190,21 +191,21 @@ public class PrimaryLocationDrawing {
 		}
 		return l;
 	}
-	
+
 	private Population getPopulation(final HashMap<String, Feature> ftDist,
 			final ArrayList<Zone> zones) {
-		
-	
-		
-		Population population = new Population();
+
+
+
+		Population population = new PopulationImpl();
 		int count = 0;
 		for (Entry<String, Feature> e : ftDist.entrySet()) {
 			Feature ft = e.getValue();
 			Long inhabitants = (Long) ft.getAttribute(6);
 			ArrayList<Person> persons = getPersons(ft);
-			
+
 			for (Person pers : persons) {
-				
+
 				Zone primActZone = null;
 				while(true) {
 					// draw random zone based on numOpportunities
@@ -218,21 +219,21 @@ public class PrimaryLocationDrawing {
 							break;
 						}
 					}
-					
+
 					double distance = tmpZone.coord.calcDistance(pers.getRandomPlan().getFirstActivity().getCoord());
 					double p = Math.exp(-BETA * distance);
 					if (p >= MatsimRandom.random.nextDouble()) {
 						primActZone = tmpZone;
 						break;
-					}					
-					
+					}
+
 				}
 				Feature ftW = ftDist.get(primActZone.zoneId);
 				if (ftW == null) {
 //					System.out.println(primActZone.zoneId);
 					continue;
 				}
-				
+
 				Link link = getRandomLinkWithin(ftW);
 //				Leg leg = new org.matsim.population.LegImpl(0,"car",Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME);
 				Leg leg = new org.matsim.population.LegImpl(Mode.car);
@@ -276,7 +277,7 @@ public class PrimaryLocationDrawing {
 
 			}
 			count++;
-			
+
 		}
 //		log.warn("somthing went wrong with the geotools - just taking the link next to the centroid");
 		Coord rnd = new CoordImpl(centroid.x + MatsimRandom.random.nextDouble() * maxShift, centroid.y + MatsimRandom.random.nextDouble() * maxShift);
@@ -348,7 +349,7 @@ public class PrimaryLocationDrawing {
 		Gbl.createWorld();
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
-		Gbl.getWorld().setNetworkLayer(network);		
+		Gbl.getWorld().setNetworkLayer(network);
 		Gbl.getWorld().complete();
 
 
@@ -356,7 +357,7 @@ public class PrimaryLocationDrawing {
 		new PrimaryLocationDrawing(zonesFilename,demandFilename,districts).run();
 
 
-		
+
 	}
 
 

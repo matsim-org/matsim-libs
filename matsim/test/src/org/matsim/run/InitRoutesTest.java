@@ -32,16 +32,17 @@ import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
- * Simple test case to ensure that {@link org.matsim.run.InitRoutes} functions properly, e.g. really 
+ * Simple test case to ensure that {@link org.matsim.run.InitRoutes} functions properly, e.g. really
  * writes out modified plans. It does <em>not</em> test that the routing algorithms actually produce
  * correct shortest paths or similar.
  *
@@ -59,9 +60,9 @@ public class InitRoutesTest extends MatsimTestCase {
 		// prepare data like world and network
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).parse(NETWORK_FILE);
-		
+
 		// create one person with missing link in act
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		Person person = new PersonImpl(new IdImpl("1"));
 		population.addPerson(person);
 		Plan plan = person.createPlan(true);
@@ -69,7 +70,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		a1.setEndTime(3600);
 		plan.createLeg(BasicLeg.Mode.car);
 		plan.createAct("w", network.getLink(new IdImpl("20")));
-		
+
 		// write person to file
 		new PopulationWriter(population, PLANS_FILE_TESTINPUT, "v4").write();
 
@@ -79,16 +80,16 @@ public class InitRoutesTest extends MatsimTestCase {
 		config.plans().setOutputFile(PLANS_FILE_TESTOUTPUT);
 		new ConfigWriter(config, CONFIG_FILE).write();
 		Gbl.reset(); // needed to delete the global config etc for the test
-		
+
 		// some pre-tests
 		assertFalse("Output-File should not yet exist.", new File(PLANS_FILE_TESTOUTPUT).exists());
-		
+
 		// now run the tested class
 		InitRoutes.main(new String[] {CONFIG_FILE});
-		
+
 		// now perform some tests
 		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
-		Population population2 = new Population(Population.NO_STREAMING);
+		Population population2 = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		new MatsimPopulationReader(population2, network).parse(PLANS_FILE_TESTOUTPUT);
 		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
 		Person person2 = population2.getPerson(new IdImpl("1"));

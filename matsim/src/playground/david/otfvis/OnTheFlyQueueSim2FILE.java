@@ -25,14 +25,14 @@ import java.io.IOException;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.utils.vis.otfvis.server.OnTheFlyServer;
 import org.matsim.world.MatsimWorldReader;
@@ -70,7 +70,7 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 	}
 
 	@Override
-	protected void afterSimStep(double time) {
+	protected void afterSimStep(final double time) {
 		super.afterSimStep(time);
 
 		try {
@@ -83,13 +83,13 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 
 	}
 
-	public OnTheFlyQueueSim2FILE(NetworkLayer net, Population plans, Events events) {
+	public OnTheFlyQueueSim2FILE(final NetworkLayer net, final Population plans, final Events events) {
 		super(net, plans, events);
 		// TODO Auto-generated constructor stub
 	}
 
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 		String studiesRoot = "../";
 		String localDtdBase = "../matsimJ/dtd/";
@@ -123,7 +123,7 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 		world.setNetworkLayer(net);
 		world.complete();
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		// Read plans file with special Reader Implementation
 		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(popFileName);
@@ -147,7 +147,7 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 		Gbl.printElapsedTime();
 	}
 
-	public void setOtfwriter(OTFQuadFileHandler.Writer  otfwriter) {
+	public void setOtfwriter(final OTFQuadFileHandler.Writer  otfwriter) {
 		this.otfwriter = otfwriter;
 	}
 

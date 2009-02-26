@@ -36,10 +36,11 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.World;
@@ -47,14 +48,14 @@ import org.matsim.world.World;
 class EventHH implements LinkEnterEventHandler {
 
 	static Set<String> linkList = new HashSet<String>();
-	
-	public void handleEvent(LinkEnterEvent event) {
+
+	public void handleEvent(final LinkEnterEvent event) {
 		linkList.add(event.linkId);
 	}
 
-	public void reset(int iteration) {
+	public void reset(final int iteration) {
 	}
-	
+
 }
 
 class FilterPersons2 extends AbstractPersonAlgorithm{
@@ -67,14 +68,14 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 	PopulationWriter plansWriter;
 	public Set<Link> usedlinkList = new HashSet<Link>();
 
-	
-	public FilterPersons2(int modulo, PopulationWriter plansWriter) {
+
+	public FilterPersons2(final int modulo, final PopulationWriter plansWriter) {
 		super();
 		this.modulo = modulo;
 		this.plansWriter = plansWriter;
 	}
 
-	public void addLinks(Plan p) {
+	public void addLinks(final Plan p) {
 		List<?> actl = p.getActsLegs();
 		for (int i= 0; i< actl.size() ; i++) {
 				if (i % 2 == 0) {
@@ -86,14 +87,14 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 					Leg l = (Leg) actl.get(i);
 					List<Link> ll = new LinkedList<Link>();
 					for(Link link : ((CarRoute) l.getRoute()).getLinks()) {
-						usedlinkList.add(link);
+						this.usedlinkList.add(link);
 					}
 				}
 		}
-		
+
 	}
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		// check for selected plans routes, if any of the relevant nodes shows up
 		person.removeUnselectedPlans();
 		Plan plan = person.getSelectedPlan();
@@ -102,17 +103,17 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 			System.out.print("X");
 			return;
 		}
-		if ((count++ % modulo) == 0) {
+		if ((this.count++ % this.modulo) == 0) {
 			try {
-				plansWriter.writePerson(person);
+				this.plansWriter.writePerson(person);
 				//addLinks(plan);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		if(count % 10000 == 0) {
+		if(this.count % 10000 == 0) {
 			System.out.println("");
-			System.out.println("Count == " + count);
+			System.out.println("Count == " + this.count);
 		}
 	}
 }
@@ -125,10 +126,10 @@ public class ReducePopulationExe {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		final int b;
 		b=324;
-		
+
 		//String popFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\DSkutter010car_bln.router_wip.plans.v4.xml";
 		//String netFileName = "../../tmp/studies/ivtch/ivtch-osm.xml";
 		String netFileName = "../../tmp/studies/ivtch/ivtch_red100.xml";
@@ -145,10 +146,10 @@ public class ReducePopulationExe {
 		world.setNetworkLayer(network);
 		world.complete();
 
-		relevantPopulation = new Population(Population.USE_STREAMING);
+		relevantPopulation = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		PopulationWriter plansWriter = new PopulationWriter(relevantPopulation, outpopFileName, "v4");
 
-		Population population = new Population(Population.USE_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population);
 		FilterPersons2 filter = new FilterPersons2(10, plansWriter);
 		population.addAlgorithm(filter);
@@ -157,16 +158,16 @@ public class ReducePopulationExe {
 		System.out.println("write # persons: " );
 		relevantPopulation.printPlansCount();
 		population.runAlgorithms();
-		
+
 		plansWriter.writeEndPlans();
-		
+
 //		List<Link> nolinkList = new LinkedList<Link>();
 //		for(Link link : network.getLinks().values()) if(!filter.usedlinkList.contains(link)) nolinkList.add(link);
-//		
+//
 //		for(Link link : nolinkList)network.removeLink(link);
-//		
+//
 //		new NetworkWriter(network, outnetFileName).write();
-		
+
 	}
 
 }

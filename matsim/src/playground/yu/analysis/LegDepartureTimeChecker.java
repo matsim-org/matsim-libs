@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -10,10 +10,11 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.misc.Time;
@@ -22,9 +23,9 @@ import playground.yu.utils.SimpleWriter;
 
 /**
  * check, whether the departure time of leg is later than 24:00
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -32,28 +33,28 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 	private Id personId = null;
 
 	/**
-	 * 
+	 *
 	 */
-	public LegDepartureTimeChecker(String outputFilename) {
-		sw = new SimpleWriter(outputFilename);
-		sw.writeln("personId\ttime[s]\ttime[hh:mm:ss]\tlegNo.");
+	public LegDepartureTimeChecker(final String outputFilename) {
+		this.sw = new SimpleWriter(outputFilename);
+		this.sw.writeln("personId\ttime[s]\ttime[hh:mm:ss]\tlegNo.");
 	}
 
 	@Override
-	public void run(Person person) {
-		personId = person.getId();
+	public void run(final Person person) {
+		this.personId = person.getId();
 		run(person.getSelectedPlan());
 	}
 
-	public void run(Plan plan) {
+	public void run(final Plan plan) {
 		int c = 0;
 		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
 			double legDepTime = li.next().getDepartureTime();
 			if (legDepTime >= 86400.0) {
-				sw.writeln(personId + "\t" + legDepTime + "\t"
+				this.sw.writeln(this.personId + "\t" + legDepTime + "\t"
 						+ Time.writeTime(legDepTime) + "\t" + c);
 				try {
-					sw.flush();
+					this.sw.flush();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -64,7 +65,7 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 
 	public void close() {
 		try {
-			sw.close();
+			this.sw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -73,7 +74,7 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
@@ -87,7 +88,7 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		LegDepartureTimeChecker fldtc = new LegDepartureTimeChecker(
 				outputFilename);
 		population.addAlgorithm(fldtc);

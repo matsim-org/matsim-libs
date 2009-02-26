@@ -24,9 +24,10 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PlanImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
@@ -39,8 +40,8 @@ import org.matsim.utils.misc.Time;
  */
 public class PlansFileSnapshotWriter implements SnapshotWriter {
 
-	private String filePrefix;
-	private String fileSuffix;
+	private final String filePrefix;
+	private final String fileSuffix;
 
 	private String version = null;
 	private String filename = null;
@@ -49,15 +50,15 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 
 	private Population plans = null;
 
-	public PlansFileSnapshotWriter(String snapshotFilePrefix, String snapshotFileSuffix){
+	public PlansFileSnapshotWriter(final String snapshotFilePrefix, final String snapshotFileSuffix){
 		this.filePrefix = snapshotFilePrefix;
 		this.fileSuffix = snapshotFileSuffix;
 
 		this.version = Gbl.getConfig().plans().getOutputVersion();
 	}
 
-	public void beginSnapshot(double time) {
-		this.plans = new Population(Population.NO_STREAMING);
+	public void beginSnapshot(final double time) {
+		this.plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		this.filename = this.filePrefix + Time.writeTime(time, "-") + "." + this.fileSuffix;
 		this.currenttime = time;
 	}
@@ -77,7 +78,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 		pw.write();
 	}
 
-	public void addAgent(PositionInfo position) {
+	public void addAgent(final PositionInfo position) {
 		Person pers = new PersonImpl(position.getAgentId());
 
 		Plan plan = new PlanImpl(pers);

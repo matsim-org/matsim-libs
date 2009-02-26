@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.newPlans;
 
@@ -16,42 +16,43 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.utils.misc.Time;
 
 /**
  * @author yu
- * 
+ *
  */
 public class PtPlansFileCreator {
 	private int personCount = 0;
 	private Population pop;
 
-	public void setPop(Population pop) {
+	public void setPop(final Population pop) {
 		this.pop = pop;
 	}
 
-	public void setNetwork(NetworkLayer network) {
+	public void setNetwork(final NetworkLayer network) {
 		this.network = network;
 	}
 
 	public Population getPop() {
-		return pop;
+		return this.pop;
 	}
 
 	private NetworkLayer network;
 
 	public NetworkLayer getNetwork() {
-		return network;
+		return this.network;
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public PtPlansFileCreator() {
 	}
@@ -110,14 +111,14 @@ public class PtPlansFileCreator {
 		createSouthBus245Person("00:18");
 	}
 
-	public List<Node> getSrcRoute(int[] nodes) {
+	public List<Node> getSrcRoute(final int[] nodes) {
 		List<Node> srcRoute = new ArrayList<Node>();
 		for (int i = 0; i < nodes.length; i++)
-			srcRoute.add(network.getNode(new IdImpl(nodes[i])));
+			srcRoute.add(this.network.getNode(new IdImpl(nodes[i])));
 		return srcRoute;
 	}
 
-	protected void createSouthBus245Person(String endTime) {
+	protected void createSouthBus245Person(final String endTime) {
 		int[] southNodes = { 2857, 2856, 2855, 1000142, 2850, 1000134, 2848,
 				6575, 2787, 2805, 1000544, 6362, 1000540, 2768, 1000580, 2765,
 				2763, 2727, 2728, 1915, 1918, 1917, 1867, 1872, 1869, 1865,
@@ -126,7 +127,7 @@ public class PtPlansFileCreator {
 		createPtPerson("7622", endTime, "1982", getSrcRoute(southNodes));
 	}
 
-	protected void createNorthBus245Person(String endTime) {
+	protected void createNorthBus245Person(final String endTime) {
 		int[] northNodes = { 1906, 1000453, 1892, 1849, 1861, 1859, 1000448,
 				1863, 1856, 1854, 1866, 1000447, 1865, 1869, 1872, 1867, 1917,
 				1918, 1915, 2728, 2727, 2763, 2765, 1000580, 2768, 1000540,
@@ -136,10 +137,10 @@ public class PtPlansFileCreator {
 	}
 
 	@SuppressWarnings("deprecation")
-	private void createPtPerson(String startLinkId, String endTime,
-			String endLinkId, List<Node> srcRoute) {
+	private void createPtPerson(final String startLinkId, final String endTime,
+			final String endLinkId, final List<Node> srcRoute) {
 
-		Person p = new PersonImpl(new IdImpl("245-" + personCount));
+		Person p = new PersonImpl(new IdImpl("245-" + this.personCount));
 		try {
 			Plan pl = new org.matsim.population.PlanImpl(p);
 			p.addPlan(pl);
@@ -153,9 +154,9 @@ public class PtPlansFileCreator {
 			Link endLink = this.network.getLink(new IdImpl(endLinkId));
 			pl.createAct("w", endLink);
 			route.setNodes(startLink, srcRoute, endLink);
-			pop.addPerson(p);
-			personCount++;
-			System.out.println("i have " + pop.getPersons().size()
+			this.pop.addPerson(p);
+			this.personCount++;
+			System.out.println("i have " + this.pop.getPersons().size()
 					+ " persons\t" + startLinkId + "\t" + endTime + "\t"
 					+ endLinkId);
 		} catch (Exception e) {
@@ -167,7 +168,7 @@ public class PtPlansFileCreator {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		String newPlansFilename = "output/bvg/245.xml.gz";
 		String netFilename = "test/scenarios/berlin/network.xml.gz";
 
@@ -177,7 +178,7 @@ public class PtPlansFileCreator {
 		pfc.setNetwork(new NetworkLayer());
 		new MatsimNetworkReader(pfc.getNetwork()).readFile(netFilename);
 
-		pfc.setPop(new Population());
+		pfc.setPop(new PopulationImpl());
 		PopulationWriter writer = new PopulationWriter(pfc.getPop(),
 				newPlansFilename, "v4", 1.0);
 		writer.writeStartPlans();

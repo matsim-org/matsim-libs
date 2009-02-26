@@ -23,8 +23,9 @@ package org.matsim.replanning;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.replanning.selectors.PlanSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
@@ -40,7 +41,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testChangeRequests() {
 
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		for (int i = 0; i < 1000; i++) {
 			population.addPerson(new PersonImpl(new IdImpl(i)));
 		}
@@ -110,7 +111,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		assertEquals(0, strategy3.getCounter());
 		assertEquals(498, strategy4.getCounter());
 	}
-	
+
 	/**
 	 * Tests the removal of strategies. Ensures that after removal, no plan is given to the removed strategy.
 	 * Also checks that the removal of strategies not known to the StrategyManager doesn't have any side-effects.
@@ -119,7 +120,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testRemoveStrategy() {
 
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		for (int i = 0; i < 100; i++) {
 			population.addPerson(new PersonImpl(new IdImpl(i)));
 		}
@@ -141,7 +142,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 
 		strategy1.resetCounter();
 		strategy2.resetCounter();
-		
+
 		// remove 2nd strategy
 		manager.removeStrategy(strategy2);
 
@@ -175,7 +176,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testOptimisticBehavior() {
 
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		Person person = null;
 		Plan[] plans = new Plan[10];
 		// create a person with 4 unscored plans

@@ -20,25 +20,20 @@
 
 package playground.wrashid.deqsim;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
-import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.jdeqsim.Road;
 import org.matsim.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.mobsim.jdeqsim.util.Timer;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 
 import playground.wrashid.PDES3.PScheduler;
@@ -49,7 +44,7 @@ public class JavaPDEQSim3 {
 
 	Population population;
 	NetworkLayer network;
-	
+
 	public JavaPDEQSim3(final NetworkLayer network, final Population population, final Events events) {
 		// constructor
 
@@ -75,8 +70,8 @@ public class JavaPDEQSim3 {
 
 		if (SimulationParameters.getTestPlanPath() != null) {
 			// read population
-			Population pop = new Population(Population.NO_STREAMING);
-			PopulationReader plansReader = new MatsimPopulationReader(pop);
+			Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
+			PopulationReader plansReader = new MatsimPopulationReader(pop, network);
 			plansReader.readFile(SimulationParameters.getTestPlanPath());
 
 			this.population = pop;
@@ -87,7 +82,7 @@ public class JavaPDEQSim3 {
 			this.population = SimulationParameters.getTestPopulationModifier().modifyPopulation(this.population);
 		}
 	}
-	
+
 	public void run() {
 		//System.out.println("JavaDEQSim.run");
 		double zoneBorderLines[] = new double[SimParametersParallel.numberOfZones - 1];
@@ -97,66 +92,66 @@ public class JavaPDEQSim3 {
 		int bucketCount[]=new int[SimParametersParallel.numberOfZoneBuckets];
 		double minXCoodrinate = Double.MAX_VALUE;
 		double maxXCoodrinate = Double.MIN_VALUE;
-		
-		
+
+
 		PScheduler scheduler=new PScheduler();
-		
-		
-		
+
+
+
 		// initialize network (roads)
 		SimulationParameters.setAllRoads(new HashMap<String,Road>());
 
-		
-		
-		
-		for (Link link: network.getLinks().values()){
+
+
+
+		for (Link link: this.network.getLinks().values()){
 
 			double xCoordinate= link.getFromNode().getCoord().getX();
-			
+
 			if (xCoordinate<minXCoodrinate){
 				minXCoodrinate=xCoordinate;
 			} else if (xCoordinate>maxXCoodrinate){
 				maxXCoodrinate=xCoordinate;
 			}
-			
+
 			xCoordinate= link.getToNode().getCoord().getX();
-			
+
 			if (xCoordinate<minXCoodrinate){
 				minXCoodrinate=xCoordinate;
 			} else if (xCoordinate>maxXCoodrinate){
 				maxXCoodrinate=xCoordinate;
 			}
-			
+
 		}
-		
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
+
 		// only create equi-distant buckets in the area of the map, where really roads are
 		double bucketDistance=(maxXCoodrinate-minXCoodrinate)/SimParametersParallel.numberOfZoneBuckets;
 		for (int i=0;i<SimParametersParallel.numberOfZoneBuckets-1;i++){
 			bucketBoundries[i]=minXCoodrinate+(i+1)*bucketDistance;
 		}
-		
-		
+
+
 		// initialize vehicles
 		// the vehicle has registered itself to the scheduler
 		PVehicle vehicle=null;
 		for (Person person : this.population.getPersons().values()) {
 			vehicle =new PVehicle(scheduler,person);
 		}
-		
-		// TODO: I must set zoneId properly for PVehicle (road.fromnode.getzone, etc.)
-		// 
 
-		
-		
-		
-		
-		
+		// TODO: I must set zoneId properly for PVehicle (road.fromnode.getzone, etc.)
+		//
+
+
+
+
+
+
 		 // Equi-Distant zones
 		// TODO: replace by more sophisticated split as in PDES2
 		double xZoneDistance=(maxXCoodrinate-minXCoodrinate)/SimParametersParallel.numberOfZones;
@@ -164,47 +159,47 @@ public class JavaPDEQSim3 {
 			zoneBorderLines[i]=(i+1)*xZoneDistance;
 			System.out.println(i+"-th boundry:" + zoneBorderLines[i]);
 		}
-		
-		
-		
+
+
+
 		// assign a zone to each road
 		Road road=null;
-		for (Link link: network.getLinks().values()){
-			
-			
+		for (Link link: this.network.getLinks().values()){
+
+
 			SimulationParameters.getAllRoads().put(link.getId().toString(), road);
 		}
-		
-				
+
+
 		// TODO: continue here...
-		
-		
-		
-		
-		
-		
-		
-		
 
-		
+
+
+
+
+
+
+
+
+
 		scheduler.startSimulation();
-		
-		
 
-		
-		
+
+
+
+
 		t.endTimer();
 		t.printMeasuredTime("Time needed for one iteration (only PDES part): ");
-		
-		
+
+
 		// print output
 		//for(int i=0;i<SimulationParameters.eventOutputLog.size();i++) {
 		//	SimulationParameters.eventOutputLog.get(i).print();
 		//}
-		
+
 	}
-	
-	public int getZone(double xCoordinate, double bucketBoundries[]) {
+
+	public int getZone(final double xCoordinate, final double bucketBoundries[]) {
 		int zoneId=0;
 		for (int i=0;i<SimParametersParallel.numberOfZoneBuckets-1;i++){
 			zoneId=i;
@@ -217,10 +212,10 @@ public class JavaPDEQSim3 {
 		//System.out.println(zoneId);
 		return zoneId;
 	}
-	
-	
-	public int getFinalZoneId(Node node, double zoneBorderLines[]) {
+
+
+	public int getFinalZoneId(final Node node, final double zoneBorderLines[]) {
 		return getZone(node.getCoord().getX(),zoneBorderLines);
 	}
-	
+
 }

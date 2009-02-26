@@ -26,11 +26,12 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.MatsimWorldReader;
@@ -40,43 +41,44 @@ import org.matsim.world.WorldWriter;
 public class PrimlocModuleTest extends MatsimTestCase{
 
 	// FIXME this test-case has no Assert-statement, so it will always succeed!
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
 	Config config;
-	
+
 	private static final String inputfolder = "test/scenarios/triangle/" ;
-	
+
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.config = super.loadConfig( "test/input/org/matsim/demandmodeling/primloc/config_primloc_triangle.xml");
 		String outputDirectory = super.getOutputDirectory();
-		
-		config.config().setOutputFile(outputDirectory + "output_config.xml");
-		
-		config.world().setInputFile(inputfolder + "world.xml");
-		config.world().setOutputFile(outputDirectory + "output_world.xml");
-		
-		config.network().setInputFile(inputfolder + "network.xml");
-		config.network().setOutputFile(outputDirectory + "output_network.xml");
-		
-		config.facilities().setInputFile(inputfolder + "facilities.xml");
-		config.facilities().setOutputFile(outputDirectory + "output_facilities.xml");
-				
-		config.plans().setInputFile(inputfolder + "init_plans.xml.gz" );
-		config.plans().setOutputFile(outputDirectory + "output_plans.xml.gz");
-		config.plans().setOutputVersion("v4");
-		config.plans().setOutputSample(1.0);
+
+		this.config.config().setOutputFile(outputDirectory + "output_config.xml");
+
+		this.config.world().setInputFile(inputfolder + "world.xml");
+		this.config.world().setOutputFile(outputDirectory + "output_world.xml");
+
+		this.config.network().setInputFile(inputfolder + "network.xml");
+		this.config.network().setOutputFile(outputDirectory + "output_network.xml");
+
+		this.config.facilities().setInputFile(inputfolder + "facilities.xml");
+		this.config.facilities().setOutputFile(outputDirectory + "output_facilities.xml");
+
+		this.config.plans().setInputFile(inputfolder + "init_plans.xml.gz" );
+		this.config.plans().setOutputFile(outputDirectory + "output_plans.xml.gz");
+		this.config.plans().setOutputVersion("v4");
+		this.config.plans().setOutputSample(1.0);
 	}
-	
+
 	public void testModule() {
-		
+
 		System.out.println("TEST MODULE PRIMLOC:");
 
 		Config config = Gbl.getConfig();
-		
+
 		// reading all available input
 
 		System.out.println("  reading world xml file... ");
@@ -98,7 +100,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
@@ -108,7 +110,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 
 		// REAL STUFF HERE
 		// ***************
-		
+
 		System.out.println("  adding plan algorithms");
 		System.out.println("  ** adding primary location choice module (PLCM)");
 		PrimlocModule plcm = new PrimlocModule();
@@ -119,10 +121,10 @@ public class PrimlocModuleTest extends MatsimTestCase{
 
 		System.out.println("  running plan algorithms");
 		population.runAlgorithms();
-		
+
 		// ************
-		
-		
+
+
 		// writing all available input
 
 		System.out.println("  writing plans xml file... ");

@@ -142,6 +142,7 @@ public class NetworkLayer extends Layer implements BasicNetwork<Node, Link> {
 	// set methods
 	// ////////////////////////////////////////////////////////////////////
 
+	@Deprecated
 	public final void setCapacityPeriod(final String capperiod) {
 		if (this.capperiod != Integer.MIN_VALUE) {
 			log.warn(this + "[capperiod=" + capperiod + " already set. capperiod will be overwritten]");

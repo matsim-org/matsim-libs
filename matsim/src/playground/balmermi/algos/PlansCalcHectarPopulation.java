@@ -31,8 +31,8 @@ import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.PersonAlgorithm;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class PlansCalcHectarPopulation extends AbstractPersonAlgorithm implements PersonAlgorithm {
 

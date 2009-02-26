@@ -32,10 +32,11 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.World;
@@ -63,7 +64,7 @@ class FilterPersons extends AbstractPersonAlgorithm{
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		// check for selected plans routes, if any of the relevant nodes shows up
 		Plan plan = person.getSelectedPlan();
 		for (int jj = 0; jj < plan.getActsLegs().size(); jj++) {
@@ -100,7 +101,7 @@ public class FilterBerlinKutter {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		//String popFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\DSkutter010car_bln.router_wip.plans.v4.xml";
 		String netFileName = "..\\..\\tmp\\studies\\berlin-wip\\network\\wip_net.xml";
 
@@ -117,7 +118,7 @@ public class FilterBerlinKutter {
 		world.setNetworkLayer(network);
 		world.complete();
 
-		relevantPopulation = new Population(false);
+		relevantPopulation = new PopulationImpl(false);
 		Population population = new MyPopulation();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population);
 		population.addAlgorithm(new FilterPersons());

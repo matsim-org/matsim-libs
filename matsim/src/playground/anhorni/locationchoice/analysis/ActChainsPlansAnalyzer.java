@@ -30,10 +30,11 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Counter;
@@ -54,7 +55,7 @@ public class ActChainsPlansAnalyzer {
 	 * @param
 	 *  - path of the plans file
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 		if (args.length < 1 || args.length > 1 ) {
 			System.out.println("Too few or too many arguments. Exit");
@@ -62,7 +63,7 @@ public class ActChainsPlansAnalyzer {
 		}
 		String plansfilePath = args[0];
 		log.info(plansfilePath);
-		
+
 		String networkfilePath="./input/network.xml";
 
 		ActChainsPlansAnalyzer analyzer = new ActChainsPlansAnalyzer();
@@ -76,22 +77,22 @@ public class ActChainsPlansAnalyzer {
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 		log.info("network reading done");
 
-		this.plans=new Population(false);
+		this.plans=new PopulationImpl(false);
 		final PopulationReader plansReader = new MatsimPopulationReader(this.plans);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");
 	}
 
-	
+
 	private void analyze() {
-		
+
 		try {
 			final String header="Person_id\tnumberOfSL";
 			final BufferedWriter out = IOUtils.getBufferedWriter("./output/actchainsplananalysis.txt");
 			out.write(header);
 			out.newLine();
-		
-		
+
+
 			Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
 			Counter counter = new Counter(" person # ");
 			while (person_iter.hasNext()) {
@@ -99,27 +100,27 @@ public class ActChainsPlansAnalyzer {
 				counter.incCounter();
 				Plan selectedPlan = person.getSelectedPlan();
 				final ArrayList<?> actslegs = selectedPlan.getActsLegs();
-				
+
 				int countSL = 0;
 				for (int j = 0; j < actslegs.size(); j=j+2) {
-					final Act act = (Act)actslegs.get(j);	
+					final Act act = (Act)actslegs.get(j);
 					if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
 						countSL++;
 					}
-					else if (act.getType().startsWith("h") || act.getType().startsWith("w")|| 
+					else if (act.getType().startsWith("h") || act.getType().startsWith("w")||
 							act.getType().startsWith("e")) {
 						if (countSL > 0) {
 							out.write(person.getId().toString()+"\t"+String.valueOf(countSL)+"\n");
 							countSL = 0;
 						}
 					}
-				}	
+				}
 			}
 			out.close();
 		}
 		catch (final IOException e) {
 			Gbl.errorMsg(e);
-		}	
+		}
 	}
 }
 

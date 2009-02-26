@@ -33,17 +33,18 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldCheck;
+import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class DilutedZurichFilter {
@@ -91,14 +92,14 @@ public class DilutedZurichFilter {
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		log.info("  running world modules... ");
 		new WorldCheck().run(Gbl.getWorld());
 		new WorldConnectLocations().run(Gbl.getWorld());
 		new WorldMappingInfo().run(Gbl.getWorld());
 		new WorldCheck().run(Gbl.getWorld());
 		log.info("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  calculate area of interest... ");
@@ -120,15 +121,15 @@ public class DilutedZurichFilter {
 		log.info("  done. " + (new Date()));
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		System.out.println("  setting up population objects...");
-		Population pop = new Population(Population.USE_STREAMING);
+		Population pop = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		PopulationWriter pop_writer = new PopulationWriter(pop);
 		PopulationReader pop_reader = new MatsimPopulationReader(pop);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		System.out.println("  adding person modules... ");
 		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(pop_writer,areaOfInterest);
 		filter.setAlternativeAOI(center,radius);

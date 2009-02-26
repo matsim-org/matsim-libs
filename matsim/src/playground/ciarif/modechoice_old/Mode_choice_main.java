@@ -23,12 +23,13 @@ package playground.ciarif.modechoice_old;
 import org.matsim.config.ConfigWriter;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.algorithms.NetworkCalcTopoType;
 import org.matsim.network.algorithms.NetworkSummary;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonCreatePlanFromKnowledge;
 import org.matsim.population.algorithms.PlansCreateFromNetwork;
@@ -46,7 +47,7 @@ public class Mode_choice_main {
 	//////////////////////////////////////////////////////////////////////
 
 	public static void testRun01() {
-		
+
 		System.out.println("TEST RUN 01:");
 		final World world = Gbl.getWorld();
 		final Facilities facilities = new Facilities();
@@ -87,7 +88,7 @@ public class Mode_choice_main {
 		System.out.println();
 
 		System.out.println("  creating plans object... ");
-		Population plans = new Population();
+		Population plans = new PopulationImpl();
 		System.out.println("  done.");
 
 		System.out.println("  running plans algorithms... ");
@@ -135,7 +136,7 @@ public class Mode_choice_main {
 		plans.addAlgorithm(new PersonCreatePlanFromKnowledge());
 		//plans.addAlgorithm(new FrancescoAlgo());
 		plans.addAlgorithm (new TicketAlgo ());
-			
+
 		plans.addAlgorithm (new ModeChoiceAlgorithm ());
 		//plans.addAlgorithm (new ModeAlgo ());
 		plans.runAlgorithms();
@@ -177,7 +178,7 @@ public class Mode_choice_main {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 		Gbl.createConfig(args);
 		Gbl.createWorld();

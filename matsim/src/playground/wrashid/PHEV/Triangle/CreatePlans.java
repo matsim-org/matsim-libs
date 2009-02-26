@@ -14,9 +14,10 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.Knowledge;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.world.World;
 
@@ -28,7 +29,7 @@ public class CreatePlans {
 	 */
 	public static void main(String[] args) throws Exception {
 		// TODO: am schluss alle meiste pfade in config.xml reintun...
-		Population plans = new Population(false);
+		Population plans = new PopulationImpl(false);
 		Gbl.reset();
 		args=new String[1];
 		args[0]="C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/config.xml";

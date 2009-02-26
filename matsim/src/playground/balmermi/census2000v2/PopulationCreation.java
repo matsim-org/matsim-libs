@@ -25,7 +25,8 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
@@ -77,7 +78,7 @@ public class PopulationCreation {
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		System.out.println("  parsing additional municipality information... ");
 		Municipalities municipalities = new Municipalities(indir+"/gg25_2001_infos.txt");
 		municipalities.parse();
@@ -88,7 +89,7 @@ public class PopulationCreation {
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object...");
-		Population plans = new Population(Population.NO_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -97,7 +98,7 @@ public class PopulationCreation {
 		new WorldCheck().run(Gbl.getWorld());
 		new WorldMappingInfo().run(Gbl.getWorld());
 		System.out.println("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running household modules... ");
@@ -112,7 +113,7 @@ public class PopulationCreation {
 		new WorldMappingInfo().run(Gbl.getWorld());
 		new WorldWriteFacilityZoneMapping(outdir+"/output_f2z_mapping.txt").run(Gbl.getWorld());
 		System.out.println("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running plans modules... ");
@@ -121,7 +122,7 @@ public class PopulationCreation {
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		System.out.println("  writing plans xml file... ");
 		PopulationWriter plans_writer = new PopulationWriter(plans);
 		plans_writer.write();

@@ -26,15 +26,16 @@ package playground.yu.analysis;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class CarIllegal extends AbstractPersonAlgorithm {
 	private int count = 0;
@@ -54,7 +55,7 @@ public class CarIllegal extends AbstractPersonAlgorithm {
 			// planType != null && planType != Plan.Type.CAR
 			PlanModeJudger.useCar(selectedPlan))
 				if (person.getAge() < 18 || person.getLicense().equals("no"))
-					count++;
+					this.count++;
 		}
 	}
 
@@ -62,7 +63,7 @@ public class CarIllegal extends AbstractPersonAlgorithm {
 	 * @return the count
 	 */
 	public int getCount() {
-		return count;
+		return this.count;
 	}
 
 	/**
@@ -87,7 +88,7 @@ public class CarIllegal extends AbstractPersonAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		CarIllegal cl = new CarIllegal();
 		population.addAlgorithm(cl);

@@ -39,7 +39,8 @@ import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.PopulationWriterHandler;
 import org.matsim.utils.misc.ExeRunner;
@@ -125,7 +126,7 @@ public class ExternalMobsim {
 	protected void writePlans(final String iterationPlansFile) throws FileNotFoundException, IOException {
 		log.info("writing plans for external mobsim");
 		String version = "v4";
-		PopulationWriter plansWriter = new PopulationWriter(new Population(Population.USE_STREAMING), iterationPlansFile, version);
+		PopulationWriter plansWriter = new PopulationWriter(new PopulationImpl(PopulationImpl.USE_STREAMING), iterationPlansFile, version);
 		PopulationWriterHandler handler = plansWriter.getHandler();
 		plansWriter.writeStartPlans();
 		BufferedWriter writer = plansWriter.getWriter();

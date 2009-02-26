@@ -27,12 +27,13 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.facilities.algorithms.FacilitiesDefineCapAndOpentime;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.algorithms.NetworkCalcTopoType;
 import org.matsim.network.algorithms.NetworkSummary;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonCreatePlanFromKnowledge;
 import org.matsim.population.algorithms.PlansCreateFromNetwork;
@@ -147,7 +148,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("\n");
 
 		log.info("  creating plans object... ");
-		Population plans = new Population(false);
+		Population plans = new PopulationImpl(false);
 		log.info("  done.");
 
 		log.info("  running plans modules... ");

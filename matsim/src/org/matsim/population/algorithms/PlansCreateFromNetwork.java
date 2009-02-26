@@ -24,10 +24,10 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkSummary;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
 
 public class PlansCreateFromNetwork {
 

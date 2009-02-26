@@ -31,16 +31,17 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class Wait2LinkCheckTest {
 	public static class Wait2LinkCheck extends AbstractPersonAlgorithm {
@@ -48,9 +49,9 @@ public class Wait2LinkCheckTest {
 
 		public Wait2LinkCheck(final String filename) {
 			try {
-				writer = IOUtils.getBufferedWriter(filename);
-				writer.write("personId\tlinkId\tactIdx\n");
-				writer.flush();
+				this.writer = IOUtils.getBufferedWriter(filename);
+				this.writer.write("personId\tlinkId\tactIdx\n");
+				this.writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -60,7 +61,7 @@ public class Wait2LinkCheckTest {
 
 		public void end() {
 			try {
-				writer.close();
+				this.writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -78,9 +79,9 @@ public class Wait2LinkCheckTest {
 						if (tmpLinkId != null && nextTmpLinkId != null)
 							if (!tmpLinkId.equals(nextTmpLinkId))
 								try {
-									writer.write(person.getId().toString()
+									this.writer.write(person.getId().toString()
 											+ "\t" + tmpLinkId + "\n");
-									writer.flush();
+									this.writer.flush();
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
@@ -110,7 +111,7 @@ public class Wait2LinkCheckTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		Wait2LinkCheck alt = new Wait2LinkCheck(outFilename);
 		population.addAlgorithm(alt);

@@ -29,13 +29,14 @@ import org.matsim.basic.v01.BasicPopulationImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.interfaces.core.v01.PersonAlgorithm;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.utils.misc.Counter;
 
 /**
  * Root class of the population description (previously also called "plans file")
  */
-public class Population extends BasicPopulationImpl<Person> implements Iterable<Person> {
+public class PopulationImpl extends BasicPopulationImpl<Person> implements Population {
 
 	public static final boolean USE_STREAMING = true;
 	public static final boolean NO_STREAMING = false;
@@ -46,22 +47,22 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 
 	private long counter = 0;
 	private long nextMsg = 1;
-	private boolean isStreaming;
+	private final boolean isStreaming;
 
 	// algorithms over plans
 	private final ArrayList<PersonAlgorithm> personAlgos = new ArrayList<PersonAlgorithm>();
 
-	private static final Logger log = Logger.getLogger(Population.class);
+	private static final Logger log = Logger.getLogger(PopulationImpl.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public Population() {
+	public PopulationImpl() {
 		this(!Gbl.getConfig().plans().switchOffPlansStreaming());
 	}
 
-	public Population(final boolean isStreaming) {
+	public PopulationImpl(final boolean isStreaming) {
 		this.isStreaming = isStreaming;
 	}
 
@@ -167,7 +168,7 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 	public final boolean isStreaming() {
 		return this.isStreaming;
 	}
-	
+
 	/**
 	 * @return the size of the population, i.e. the number of persons in this population.
 	 */

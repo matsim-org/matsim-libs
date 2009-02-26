@@ -27,8 +27,8 @@ import org.matsim.config.MatsimConfigReader;
 import org.matsim.controler.ScenarioData;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Population;
 
 public class DEQSimStarter {
 

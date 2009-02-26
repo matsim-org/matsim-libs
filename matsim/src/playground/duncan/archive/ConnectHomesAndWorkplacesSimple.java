@@ -22,43 +22,27 @@ package playground.duncan.archive;
  * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
  */
 
-import java.io.PrintWriter;
-
-import org.matsim.config.Config;
-import org.matsim.config.ConfigWriter;
-import org.matsim.controler.Controler;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.gbl.Gbl;
-import org.matsim.locationchoice.LocationChoice;
-import org.matsim.locationchoice.LocationMutator;
-import org.matsim.locationchoice.RandomLocationMutator;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
-import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.utils.vis.netvis.NetVis;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 
 public class ConnectHomesAndWorkplacesSimple {
-	
+
 	public void run(final String[] args) {
 
 		Facilities facilities = new Facilities() ;
 		MatsimFacilitiesReader fr = new MatsimFacilitiesReader( facilities ) ;
 		fr.readFile( "lsfd" ) ;
-		
-		Population population = new Population() ;
-		MatsimPopulationReader pr = new MatsimPopulationReader ( population ) ;
+
+		Population population = new PopulationImpl() ;
+		MatsimPopulationReader pr = new MatsimPopulationReader ( population, null ) ;
 		pr.readFile( "lsdkjf" ) ;
 
 		// program locachoice here
-		
+
 		PopulationWriter popWriter = new PopulationWriter(population,"newfilename","v4",1 ) ;
 		popWriter.write();
 

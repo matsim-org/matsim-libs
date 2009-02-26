@@ -32,36 +32,37 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 
 /**
  * @author yu
- * 
+ *
  */
 public class AvoidOldNodes extends NewPlan {
 	private boolean nullRoute = false;
-	private Set<String> nodeIds;
+	private final Set<String> nodeIds;
 
-	public AvoidOldNodes(NetworkLayer network, Population plans) {
+	public AvoidOldNodes(final NetworkLayer network, final Population plans) {
 		super(network, plans);
-		nodeIds = new HashSet<String>();
+		this.nodeIds = new HashSet<String>();
 	}
 
-	public void addNode(String nodeId) {
-		nodeIds.add(nodeId);
+	public void addNode(final String nodeId) {
+		this.nodeIds.add(nodeId);
 	}
 
-	public void addLink(String linkId) {
-		Link l = net.getLink(linkId);
-		nodeIds.add(l.getFromNode().getId().toString());
-		nodeIds.add(l.getToNode().getId().toString());
+	public void addLink(final String linkId) {
+		Link l = this.net.getLink(linkId);
+		this.nodeIds.add(l.getFromNode().getId().toString());
+		this.nodeIds.add(l.getToNode().getId().toString());
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		for (Plan p : person.getPlans()) {
 			for (LegIterator i = p.getIteratorLeg(); i.hasNext();) {
 				BasicLeg bl = i.next();
@@ -69,16 +70,16 @@ public class AvoidOldNodes extends NewPlan {
 				if (br != null) {
 					tag: for (final Node n : br.getNodes()) {
 						final String nId = n.getId().toString();
-						for (String nodeId : nodeIds) {
+						for (String nodeId : this.nodeIds) {
 							if (nId.equals(nodeId)) {
-								nullRoute = true;
+								this.nullRoute = true;
 								break tag;
 							}
 						}
 					}
-					if (nullRoute) {
+					if (this.nullRoute) {
 						bl.setRoute(null);
-						nullRoute = false;
+						this.nullRoute = false;
 					}
 				}
 			}
@@ -89,14 +90,14 @@ public class AvoidOldNodes extends NewPlan {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Config config = Gbl.createConfig(args);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		AvoidOldNodes aon = new AvoidOldNodes(network, population);
 		aon.addNode("100000");
 		aon.addLink("3000000");

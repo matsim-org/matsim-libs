@@ -36,7 +36,7 @@ import org.matsim.controler.listener.StartupListener;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 

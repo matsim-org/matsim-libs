@@ -23,17 +23,18 @@ package playground.david;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterXML;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 
 public class ExternalMobsimTest {
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		String[] defaultArgs = {"test/simple/default_config.xml"};
 		Gbl.createConfig(defaultArgs);
 
@@ -46,7 +47,7 @@ public class ExternalMobsimTest {
 		System.out.println("[External MOBSIM called"  + "]");
 
 		Events events_ = new Events();
-		Population population_ = new Population(Population.NO_STREAMING);
+		Population population_ = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		//load pop from popfile
 		System.out.println("[External MOBSIM"  + "] loading plansfile: " + args[0]);

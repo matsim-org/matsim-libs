@@ -28,9 +28,10 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
@@ -42,7 +43,7 @@ public class PersonFilter {
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
-	public static void dilZhFilter(String[] args) {
+	public static void dilZhFilter(final String[] args) {
 
 		System.out.println("running dilZhFilter... " + (new Date()));
 
@@ -77,7 +78,7 @@ public class PersonFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, filtering and writing population... " + (new Date()));
-		Population plans = new Population(Population.USE_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter,areaOfInterest);

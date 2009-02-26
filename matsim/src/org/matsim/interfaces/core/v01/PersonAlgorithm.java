@@ -18,9 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package org.matsim.interfaces.core.v01;
 
-import org.matsim.interfaces.core.v01.Person;
 
 public interface PersonAlgorithm {
 	public void run(Person person);

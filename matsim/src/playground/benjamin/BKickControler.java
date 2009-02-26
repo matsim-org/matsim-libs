@@ -19,7 +19,7 @@
 package playground.benjamin;
 
 import org.matsim.controler.Controler;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.algorithms.PlanCalcType;
 import org.matsim.run.OTFVis;
 import org.matsim.scoring.ScoringFunctionFactory;

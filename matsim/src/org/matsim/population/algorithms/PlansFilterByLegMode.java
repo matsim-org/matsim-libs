@@ -28,7 +28,7 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 
 /**
  * This algorithm filters out all persons having plans with legs with a certain leg mode.

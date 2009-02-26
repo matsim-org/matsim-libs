@@ -9,7 +9,7 @@ import org.matsim.events.ActStartEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 
 public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEventHandler {
 

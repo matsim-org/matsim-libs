@@ -29,15 +29,16 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
-import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldCheck;
+import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldMappingInfo;
 
 import playground.balmermi.census2000v2.modules.PersonAssignToNetwork;
@@ -87,7 +88,7 @@ public class IIDMAssign2Network {
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		log.info("  running world modules... ");
 		// the link types where no facility can be placed on
 		// Here: for the ivtch network (nationales Netzmodell)
@@ -109,17 +110,17 @@ public class IIDMAssign2Network {
 		new WorldMappingInfo().run(Gbl.getWorld());
 		new WorldCheck().run(Gbl.getWorld());
 		log.info("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up population objects...");
-		Population pop = new Population(Population.USE_STREAMING);
+		Population pop = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		PopulationWriter pop_writer = new PopulationWriter(pop);
 		PopulationReader pop_reader = new MatsimPopulationReader(pop);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		System.out.println("  adding person modules... ");
 		pop.addAlgorithm(new PersonAssignToNetwork(network));
 		log.info("  done.");

@@ -21,7 +21,7 @@
 package org.matsim.population.filters;
 
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.interfaces.core.v01.PersonAlgorithm;
 
 /**
  * Interface for filtering persons.

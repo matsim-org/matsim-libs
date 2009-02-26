@@ -27,10 +27,11 @@ import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.config.MatsimConfigReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.xml.sax.SAXException;
@@ -42,10 +43,10 @@ import org.xml.sax.SAXException;
  */
 public class MatsimIo {
 
-	
+
 	private static final Logger log = Logger.getLogger(MatsimIo.class);
-	
-	public static Config loadConfig(Config conf, String filename) {
+
+	public static Config loadConfig(final Config conf, final String filename) {
 		MatsimConfigReader reader = new MatsimConfigReader(conf);
 		try {
 			reader.parse(filename);
@@ -55,26 +56,26 @@ public class MatsimIo {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		}
 		return conf;
 	}
-	
-	public static void writerConfig(Config config, String filename) {
+
+	public static void writerConfig(final Config config, final String filename) {
 		ConfigWriter configWriter = new ConfigWriter(config, filename);
 		configWriter.write();
 	}
-	
-	public static NetworkLayer loadNetwork(String filename) {
+
+	public static NetworkLayer loadNetwork(final String filename) {
 		NetworkLayer network = new NetworkLayer();
 		Gbl.getWorld().setNetworkLayer(network);
 		new MatsimNetworkReader(network).readFile(filename);
 		Gbl.getWorld().complete();
 		return network;
 	}
-	
-	
-	public static Population loadPlans(String filename) {
-		Population plans = new Population(Population.NO_STREAMING);
+
+
+	public static Population loadPlans(final String filename) {
+		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		log.info("  reading plans xml file... ");
 		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		plansReader.readFile(filename);
@@ -82,15 +83,15 @@ public class MatsimIo {
 		log.info("  done");
 		return plans;
 	}
-	
 
-	public static void writePlans(Population plans, String filename) {
+
+	public static void writePlans(final Population plans, final String filename) {
 		if (Gbl.getConfig() == null) {
 			Gbl.createConfig(null);
 		}
 		PopulationWriter pwriter = new PopulationWriter(plans, filename, "v4");
 //		pwriter.setWriterHandler(new PlansWriterHandlerImplV4());
-		pwriter.write();	
+		pwriter.write();
 	}
-	
+
 }

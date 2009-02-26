@@ -33,9 +33,10 @@ import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.utils.NetworkUtils;
 
@@ -45,7 +46,7 @@ import playground.dgrether.utils.MatsimIo;
 
 /**
  * @author dgrether
- * 
+ *
  */
 public class CMCFScenarioGeneratorNoReroute {
 
@@ -99,54 +100,54 @@ public class CMCFScenarioGeneratorNoReroute {
 	public CMCFScenarioGeneratorNoReroute() throws Exception {
 		init();
 		createPlans();
-		MatsimIo.writePlans(plans, plansOut);
+		MatsimIo.writePlans(this.plans, plansOut);
 		// set scenario
-		config.network().setInputFile(networkFile);
-		config.plans().setInputFile(plansOut);
+		this.config.network().setInputFile(networkFile);
+		this.config.plans().setInputFile(plansOut);
 		// configure scoring for plans
-		config.charyparNagelScoring().setLateArrival(0.0);
-		config.charyparNagelScoring().setPerforming(6.0);
+		this.config.charyparNagelScoring().setLateArrival(0.0);
+		this.config.charyparNagelScoring().setPerforming(6.0);
 		// this is unfortunately not working at all....
 		ActivityParams homeParams = new ActivityParams("h");
 		// homeParams.setOpeningTime(0);
-		config.charyparNagelScoring().addActivityParams(homeParams);
+		this.config.charyparNagelScoring().addActivityParams(homeParams);
 		// set it with f. strings
-		config.charyparNagelScoring().addParam("activityType_0", "h");
-		config.charyparNagelScoring().addParam("activityTypicalDuration_0",
+		this.config.charyparNagelScoring().addParam("activityType_0", "h");
+		this.config.charyparNagelScoring().addParam("activityTypicalDuration_0",
 				"24:00:00");
 
 		// configure controler
-		config.controler().setTraveltimeBinSize(1);
-		
+		this.config.controler().setTraveltimeBinSize(1);
+
 //		config.controler().setTravelTimeCalculatorType("TravelTimeCalculatorHashMap".intern());
-		config.controler().setLastIteration(iterations + iterations2);
+		this.config.controler().setLastIteration(iterations + iterations2);
 		if (isAlternativeRouteEnabled)
-			config.controler().setOutputDirectory(
+			this.config.controler().setOutputDirectory(
 					DgPaths.WSBASE + "testData/output/cmcfNewAltRouteNoReroute");
 		else
-			config.controler().setOutputDirectory(
+			this.config.controler().setOutputDirectory(
 					DgPaths.WSBASE + "testData/output/cmcfNewNoReroute");
 
 		// configure simulation and snapshot writing
-		config.simulation().setSnapshotFormat("otfvis");
-		config.simulation().setSnapshotFile("cmcf.mvi");
-		config.simulation().setSnapshotPeriod(60.0);
+		this.config.simulation().setSnapshotFormat("otfvis");
+		this.config.simulation().setSnapshotFile("cmcf.mvi");
+		this.config.simulation().setSnapshotPeriod(60.0);
 		// configure strategies for replanning
-		config.strategy().setMaxAgentPlanMemorySize(4);
+		this.config.strategy().setMaxAgentPlanMemorySize(4);
 		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(
 				IdFactory.get(1));
 		selectExp.setProbability(0.9);
 		selectExp.setModuleName("SelectExpBeta");
-		config.strategy().addStrategySettings(selectExp);
+		this.config.strategy().addStrategySettings(selectExp);
 
 		StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings(
 				IdFactory.get(2));
 		reRoute.setProbability(0.10);
 		reRoute.setModuleName("ReRoute");
 		reRoute.setDisableAfter(iterations);
-		config.strategy().addStrategySettings(reRoute);
+		this.config.strategy().addStrategySettings(reRoute);
 
-		MatsimIo.writerConfig(config, configOut);
+		MatsimIo.writerConfig(this.config, configOut);
 
 		log.info("scenario written!");
 	}
@@ -160,22 +161,22 @@ public class CMCFScenarioGeneratorNoReroute {
 			plansOut = plans1Out;
 			configOut = config1Out;
 		}
-		config = new Config();
-		Gbl.setConfig(config);
-		config.addCoreModules();
+		this.config = new Config();
+		Gbl.setConfig(this.config);
+		this.config.addCoreModules();
 
-		config.plans().setOutputVersion("v4");
-		config.plans().setOutputFile(plansOut);
+		this.config.plans().setOutputVersion("v4");
+		this.config.plans().setOutputFile(plansOut);
 
 		this.network = MatsimIo.loadNetwork(networkFile);
 	}
 
 	private void createPlans() throws Exception {
-		this.plans = new Population(false);
+		this.plans = new PopulationImpl(false);
 		int firstHomeEndTime = 0;// 6 * 3600;
 		int homeEndTime = firstHomeEndTime;
-		Link l1 = network.getLink(IdFactory.get(1));
-		Link l6 = network.getLink(IdFactory.get(6));
+		Link l1 = this.network.getLink(IdFactory.get(1));
+		Link l6 = this.network.getLink(IdFactory.get(6));
 
 		for (int i = 1; i <= 7200; i++) {
 			Person p = new PersonImpl(new IdImpl(i));

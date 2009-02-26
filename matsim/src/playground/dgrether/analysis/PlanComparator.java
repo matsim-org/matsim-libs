@@ -28,10 +28,11 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.world.MatsimWorldReader;
 
@@ -53,7 +54,7 @@ public class PlanComparator {
 	/**
    * the data needed to compare the plans is stored here
    */
-	private PlanComparison _result;
+	private final PlanComparison _result;
 
 	/**
    * Creates the object and computes the resulting comparison
@@ -64,8 +65,8 @@ public class PlanComparator {
    * @param outpath
    *          if null the output is written to the console
    */
-	public PlanComparator(String configPath, String firstPlanPath,
-			String secondPlanPath, String outpath) {
+	public PlanComparator(final String configPath, final String firstPlanPath,
+			final String secondPlanPath, final String outpath) {
 		// create config
 		initConfig(configPath);
 		loadWorld();
@@ -144,8 +145,8 @@ public class PlanComparator {
    *          the path to the filename
    * @return the Plans object containing the population
    */
-	protected Population loadPlansFile(String filename) {
-		Population plans = new Population(Population.NO_STREAMING);
+	protected Population loadPlansFile(final String filename) {
+		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		printNote("", "  reading plans xml file... ");
 		PopulationReader plansReader = new MatsimPopulationReader(plans);
@@ -161,7 +162,7 @@ public class PlanComparator {
    *
    * @param configPath
    */
-	private void initConfig(String configPath) {
+	private void initConfig(final String configPath) {
 		if (Gbl.getConfig() == null) {
 			Gbl.createConfig(new String[] { configPath, "config_v1.dtd" });
 		}
@@ -188,7 +189,7 @@ public class PlanComparator {
    * @param action
    *          the status message, will be printed together with a timestamp
    */
-	private final void printNote(String header, String action) {
+	private final void printNote(final String header, final String action) {
 		if (header != "") {
 			System.out.println();
 			System.out
@@ -225,7 +226,7 @@ public class PlanComparator {
    *
    * @param args
    */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		if (args.length == 3) {
 			new PlanComparator(args[0], args[1], args[2], null);
 		}

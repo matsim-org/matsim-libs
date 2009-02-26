@@ -26,11 +26,12 @@ import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.EventWriterXML;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.NetVis;
@@ -55,9 +56,9 @@ public class IteratePopSimTest {
 		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
 		world.complete();
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		// Read plans file with special Reader Implementation
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(popFileName);
 
 		Gbl.startMeasurement();

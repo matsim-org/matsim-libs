@@ -37,13 +37,14 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicScenario;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkChangeEventsParser;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationReader;
 import org.matsim.signalsystems.MatsimLightSignalSystemsReader;
 import org.matsim.utils.geometry.CoordImpl;
@@ -70,14 +71,14 @@ public class ScenarioData implements BasicScenario {
 	private boolean networkLoaded = false;
 	private boolean facilitiesLoaded = false;
 	private boolean populationLoaded = false;
-	
+
 	private World world = null;
 	private NetworkLayer network = null;
 	private Facilities facilities = null;
 	private Population population = null;
 	private BasicSignalSystems signalSystems = null;
 	private List<BasicSignalSystemConfiguration> signalSystemConfigurations = null;
-	
+
 	private final NetworkFactory networkFactory;
 	private Config config;
 
@@ -194,7 +195,7 @@ public class ScenarioData implements BasicScenario {
 
 	public Population getPopulation() throws RuntimeException {
 		if (!this.populationLoaded) {
-			this.population = new Population(Population.NO_STREAMING);
+			this.population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 			// make sure that world, facilities and network are loaded as well
 			getWorld();
 			getNetwork();
@@ -212,7 +213,7 @@ public class ScenarioData implements BasicScenario {
 		}
 		return this.population;
 	}
-	
+
 	public BasicSignalSystems getSignalSystems() {
 		if ((this.config == null) || (this.config.signalSystems() == null)){
 			throw new IllegalStateException("SignalSystems can only be loaded if set in config");
@@ -225,7 +226,7 @@ public class ScenarioData implements BasicScenario {
 		}
 		return this.signalSystems;
 	}
-	
+
 	public List<BasicSignalSystemConfiguration> getSignalSystemsConfiguration() {
 		if ((this.config == null) || (this.config.signalSystems() == null)){
 			throw new IllegalStateException("SignalSystems can only be loaded if set in config");
@@ -243,12 +244,12 @@ public class ScenarioData implements BasicScenario {
 		return this.config;
 	}
 
-	public Coord createCoord(double d, double e) {
+	public Coord createCoord(final double d, final double e) {
 		return new CoordImpl( d, e ) ;
 	}
 
-	public Id createId(String string) {
+	public Id createId(final String string) {
 		return new IdImpl( string) ;
 	}
-	
+
 }

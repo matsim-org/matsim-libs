@@ -24,10 +24,10 @@ import java.util.Date;
 
 import org.matsim.controler.Controler;
 import org.matsim.events.Events;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Population;
 
 
 public class ReplanningQueueSimulation extends QueueSimulation{
@@ -38,7 +38,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	{
 		super(network, plans, events);
 		
-		// eigenes Queuenetwork hinterlegen, welches MyQueueNodes enthält -> nötig für das Replanning!
+		// eigenes Queuenetwork hinterlegen, welches MyQueueNodes enthï¿½lt -> nï¿½tig fï¿½r das Replanning!
 		this.network = new MyQueueNetwork(network, new MyQueueNetworkFactory());
 		this.networkLayer = network;	
 		setAgentFactory(new MyAgentFactory());

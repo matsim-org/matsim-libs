@@ -34,10 +34,11 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.gis.ShapeFileReader;
@@ -55,7 +56,7 @@ public class StaticPopulationGenerator {
 	private final Collection<Feature> zones;
 	private final QuadTree<Link> linksTree;
 	private final GeometryFactory geofac;
-	
+
 	public StaticPopulationGenerator(final NetworkLayer network,
 			final Collection<Feature> zones) {
 		this.network = network;
@@ -69,7 +70,7 @@ public class StaticPopulationGenerator {
 
 	public void createPopulation() {
 		int id = 0;
-		final Population population = new Population();
+		final Population population = new PopulationImpl();
 		int inhabitants_all = 0;
 		int lost = 0;
 		for (final Feature zone : this.zones) {
@@ -104,7 +105,7 @@ public class StaticPopulationGenerator {
 					final Person pers = new PersonImpl(new IdImpl(id++));
 					final Plan plan = new org.matsim.population.PlanImpl(pers);
 					final Act act = new org.matsim.population.ActImpl("h",link.getCenter(),link);
-					act.setStartTime(3 * 3600.0); 
+					act.setStartTime(3 * 3600.0);
 					// (I still think it would make more sense to leave the starting time of the first activity undefined. kai)
 					act.setEndTime(3 *3600.0);
 					act.setDuration(0);
@@ -115,17 +116,17 @@ public class StaticPopulationGenerator {
 					} catch (final Exception e1) {
 						e1.printStackTrace();
 					}
-					
+
 				}
 			}
 			System.out.println("Diff: " +  (inhabitants - all));
-			
+
 		}
 		System.err.println("inh:" + inhabitants_all + " agents:" + id + " lost:" + lost);
 		new PopulationWriter(population,"padang_plans_v200800820.xml.gz", "v4").write();
-		
+
 	}
-	
+
 	private double getOALength(final Collection<Link> links) {
 		double l = 0;
 		for (final Link link : links) {
@@ -137,7 +138,7 @@ public class StaticPopulationGenerator {
 	public static void main(final String [] args) {
 		final String netFile = "./networks/padang_net_v20080618.xml";
 		final String zonesFile = "./padang/podes.shp";
-		
+
 		Gbl.createWorld();
 		Gbl.createConfig(null);
 		Collection<Feature> zones = null;
@@ -146,13 +147,13 @@ public class StaticPopulationGenerator {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFile);
-		
+
 		new StaticPopulationGenerator(network,zones).createPopulation();
 	}
-	
+
 	private static Collection<Feature> getPolygons(final FeatureSource n) {
 		final Collection<Feature> polygons = new ArrayList<Feature>();
 		FeatureIterator it = null;
@@ -173,8 +174,8 @@ public class StaticPopulationGenerator {
 			final Polygon polygon = (Polygon) multiPolygon.getGeometryN(0);
 			polygons.add(feature);
 	}
-	
+
 		return polygons;
 	}
-	
+
 }

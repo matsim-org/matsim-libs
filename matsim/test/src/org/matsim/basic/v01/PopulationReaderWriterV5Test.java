@@ -47,10 +47,11 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.interfaces.core.v01.Vehicle;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReaderMatsimV5;
 import org.matsim.population.PopulationWriterV5;
 import org.matsim.population.VehicleReaderV1;
@@ -64,9 +65,9 @@ import org.matsim.utils.geometry.CoordImpl;
 public class PopulationReaderWriterV5Test extends MatsimTestCase {
 
   private static final String TESTXML  = "testPopulation.xml";
-  
+
   private static final String TESTVEHICLESXML = "testVehicles.xml";
-	
+
   private final Id id23 = new IdImpl("23");
   private final Id id24 = new IdImpl("24");
   private final Id id42 = new IdImpl("42");
@@ -75,8 +76,8 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
   private final Id id45 = new IdImpl("45");
   private final Id id666 = new IdImpl("666");
   private final Coord coord = new CoordImpl(0.0, 0.0);
-  
-  
+
+
 	public void testBasicParser() {
 		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge>> population = new BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge>>();
 		Map<Id, BasicHousehold> households = new HashMap<Id, BasicHousehold>();
@@ -86,7 +87,7 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		BasicHouseholdsReaderV1Test hhTest = new BasicHouseholdsReaderV1Test();
 		hhTest.checkContent(households);
 	}
-	
+
 	public void testParser() {
 		//read vehicles
 		Map<String, BasicVehicleType> vehicleTypes = new HashMap<String, BasicVehicleType>();
@@ -94,18 +95,18 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		VehicleReaderV1 reader = new VehicleReaderV1(vehicleTypes, vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTVEHICLESXML);
 		//create pop and add missing persons refered from testHouseholds.xml
-		Population pop = new Population(Population.NO_STREAMING);
-		pop.addPerson(new PersonImpl(id42));
-		pop.addPerson(new PersonImpl(id43));
-		pop.addPerson(new PersonImpl(id44));
-		pop.addPerson(new PersonImpl(id45));
+		Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		pop.addPerson(new PersonImpl(this.id42));
+		pop.addPerson(new PersonImpl(this.id43));
+		pop.addPerson(new PersonImpl(this.id44));
+		pop.addPerson(new PersonImpl(this.id45));
 		//create the network layer containing the referenced links
 		NetworkLayer net = new NetworkLayer();
 		createNetwork(net);
 		//create the household and facility data structures
 		Map<Id, Household> households = new HashMap<Id, Household>();
 		Facilities facilities = new Facilities();
-		facilities.createFacility(id666, coord);
+		facilities.createFacility(this.id666, this.coord);
 		//do it, do it, do it now
 		PopulationReaderMatsimV5 parser = new PopulationReaderMatsimV5(net, pop, households, facilities, vehicles);
 		parser.readFile(this.getPackageInputDirectory() + TESTXML);
@@ -114,16 +115,16 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		hhTest.checkContent((Map)households);
 		checkReferences(pop, facilities, net, vehicles);
 	}
-	
-	private void checkReferences(Population pop, Facilities fac, NetworkLayer net, Map<Id, Vehicle> vehicles) {
-		Person person = pop.getPerson(id23);
+
+	private void checkReferences(final Population pop, final Facilities fac, final NetworkLayer net, final Map<Id, Vehicle> vehicles) {
+		Person person = pop.getPerson(this.id23);
 		assertNotNull(person);
 		assertNotNull(person.getKnowledge());
 		assertNotNull(person.getKnowledge().getActivities());
 		for (Activity a : person.getKnowledge().getActivities()) {
 			assertNotNull(a);
 			assertNotNull(a.getFacility());
-			assertEquals(fac.getFacilities().get(id666), a.getFacility());
+			assertEquals(fac.getFacilities().get(this.id666), a.getFacility());
 		}
 		Plan p = person.getPlans().get(0);
 		Act a = p.getFirstActivity();
@@ -143,7 +144,7 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		}
 		for (Link ll : route.getLinks()){
 			assertNotNull(ll);
-			assertTrue((ll.equals(net.getLink(id23))) || ll.equals(net.getLink(id24)));
+			assertTrue((ll.equals(net.getLink(this.id23))) || ll.equals(net.getLink(this.id24)));
 		}
 		a = p.getNextActivity(l);
 		assertNotNull(a);
@@ -152,30 +153,30 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		assertNull(a.getLinkId());
 		assertNotNull(a.getFacility());
 		assertNotNull(a.getFacilityId());
-		assertEquals(fac.getFacilities().get(id666), a.getFacility());
-		assertEquals(id666, a.getFacilityId());
+		assertEquals(fac.getFacilities().get(this.id666), a.getFacility());
+		assertEquals(this.id666, a.getFacilityId());
 		//...one could test the complete plan however this gets boring so step to the households
 		Household h = person.getHousehold();
 		assertNotNull(h);
-		assertEquals(id23, h.getId());
+		assertEquals(this.id23, h.getId());
 		assertNotNull(h.getMembers());
 		assertNotNull(h.getMemberIds());
 		List<Id> memberIds = h.getMemberIds();
 		Collections.sort(memberIds);
-		assertEquals(id23, memberIds.get(0));
-		assertEquals(id42, memberIds.get(1));
-		assertEquals(id43, memberIds.get(2));
+		assertEquals(this.id23, memberIds.get(0));
+		assertEquals(this.id42, memberIds.get(1));
+		assertEquals(this.id43, memberIds.get(2));
 		for (Person per : h.getMembers().values()){
 			assertNotNull(per);
-			assertTrue(per.equals(pop.getPerson(id23)) || per.equals(pop.getPerson(id42)) || per.equals(pop.getPerson(id43)));
+			assertTrue(per.equals(pop.getPerson(this.id23)) || per.equals(pop.getPerson(this.id42)) || per.equals(pop.getPerson(this.id43)));
 		}
 		assertNotNull(h.getBasicLocation());
-		assertEquals(fac.getFacilities().get(id666), h.getBasicLocation());
+		assertEquals(fac.getFacilities().get(this.id666), h.getBasicLocation());
 		assertNotNull(h.getVehicles());
 		assertEquals(2, h.getVehicles().size());
 		for (Vehicle v : h.getVehicles().values()) {
 			assertNotNull(v);
-			assertTrue(v.equals(vehicles.get(id23)) || v.equals(vehicles.get(id42)));
+			assertTrue(v.equals(vehicles.get(this.id23)) || v.equals(vehicles.get(this.id42)));
 		}
 	}
 
@@ -199,28 +200,28 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		BasicHouseholdsReaderV1Test hhTest = new BasicHouseholdsReaderV1Test();
 		hhTest.checkContent(households);
 	}
-	
-	
-	private void createNetwork(NetworkLayer n) {
-		Node n23 = n.createNode(id23, this.coord);
-		Node n24 = n.createNode(id24, coord);
-		Node n666  = n.createNode(id666, coord);
-		n.createLink(id23, n23, n24, 0.0, 0.0, 1, 1);
-		n.createLink(id24, n24, n666, 0.0, 0.0, 1, 1);
+
+
+	private void createNetwork(final NetworkLayer n) {
+		Node n23 = n.createNode(this.id23, this.coord);
+		Node n24 = n.createNode(this.id24, this.coord);
+		Node n666  = n.createNode(this.id666, this.coord);
+		n.createLink(this.id23, n23, n24, 0.0, 0.0, 1, 1);
+		n.createLink(this.id24, n24, n666, 0.0, 0.0, 1, 1);
 	}
 
-	private void checkContent(BasicPopulation population) {
+	private void checkContent(final BasicPopulation population) {
 		assertNotNull(population);
-		BasicPerson pp = population.getPerson(id23);
+		BasicPerson pp = population.getPerson(this.id23);
 		assertNotNull(pp);
-		assertEquals(id23, pp.getId());
+		assertEquals(this.id23, pp.getId());
 		assertEquals("m", pp.getSex());
 		assertEquals(23, pp.getAge());
 		assertTrue(pp.hasLicense());
 		assertEquals("sometimes", pp.getCarAvail());
 		assertTrue(pp.isEmployed());
 		assertEquals("ch-HT-2y", pp.getTravelcards().first());
-		assertEquals(id23, pp.getFiscalHouseholdId());
+		assertEquals(this.id23, pp.getFiscalHouseholdId());
 		//check knowledge
 		BasicKnowledge<BasicActivity> knowledge = pp.getKnowledge();
 		assertNotNull(knowledge);
@@ -231,7 +232,7 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		assertNotNull(activity);
 		assertEquals(Integer.valueOf(4), activity.getFrequency());
 		assertNotNull(activity.getLocation());
-		assertEquals(id666, activity.getLocation().getId());
+		assertEquals(this.id666, activity.getLocation().getId());
 		assertEquals(LocationType.FACILITY, activity.getLocation().getLocationType());
 		assertEquals(Integer.valueOf(40), activity.getCapacity());
 		assertNotNull(activity.getOpeningTime(DayType.wk));
@@ -243,7 +244,7 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		assertNull(activity.getFrequency());
 		assertNotNull(activity.getLocation());
 		assertNotNull(activity.getLocation().getId());
-		assertEquals(id666, activity.getLocation().getId());
+		assertEquals(this.id666, activity.getLocation().getId());
 		//here we have to branch the test, as the basic classes don't need a coordinate for a location
 		//the derived classes however do -> there is still an artificial null value of 0.0, 0.0
 		if (activity.getLocation().getCenter() == null) {
@@ -255,7 +256,7 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		assertNull(activity.getCapacity());
 		assertNull(activity.getOpeningTime(DayType.wk));
 
-		
+
 		//now check the contents of plans
 		assertEquals(1, pp.getPlans().size());
 		BasicPlan p = (BasicPlan) pp.getPlans().get(0);
@@ -288,7 +289,7 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 				assertNull(act.getLinkId());
 				assertNull(act.getCoord());
 				assertNotNull(act.getFacilityId());
-				assertEquals(id666, act.getFacilityId());
+				assertEquals(this.id666, act.getFacilityId());
 			}
 			else if(i == 3) {
 				assertEquals("h", act.getType());
@@ -301,7 +302,7 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 			i++;
 		}
 		assertEquals(4, i);
-		
+
 		i = 0;
 		for (LegIterator it = p.getIteratorLeg(); it.hasNext();) {
 			BasicLeg leg = it.next();
@@ -317,15 +318,15 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 				assertEquals(45.5d, route.getDist(), EPSILON);
 				assertEquals(23.0d * 60.0d + 23.0d, route.getTravelTime(), EPSILON);
 				assertEquals(2, route.getLinkIds().size());
-				assertEquals(id23, route.getLinkIds().get(0));
-				assertEquals(id24, route.getLinkIds().get(1));
+				assertEquals(this.id23, route.getLinkIds().get(0));
+				assertEquals(this.id24, route.getLinkIds().get(1));
 			}
 			else if (i == 1) {
 				assertEquals(BasicLeg.Mode.car, leg.getMode());
 				assertNotNull(leg.getRoute());
 				route = leg.getRoute();
 				assertEquals(1, route.getLinkIds().size());
-				assertEquals(id23, route.getLinkIds().get(0));
+				assertEquals(this.id23, route.getLinkIds().get(0));
 			}
 			else if (i == 2) {
 				assertEquals(BasicLeg.Mode.pt, leg.getMode());
@@ -335,5 +336,5 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		}
 		assertEquals(3, i);
 	}
-	
+
 }

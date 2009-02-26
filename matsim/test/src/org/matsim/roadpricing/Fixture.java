@@ -31,10 +31,11 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
@@ -136,7 +137,7 @@ public class Fixture {
 	 * @return a population for network1
 	 **/
 	public static Population createPopulation1(final NetworkLayer network) {
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		Link link0 = network.getLink(new IdImpl(0));
 		Link link1 = network.getLink(new IdImpl(1));
@@ -158,11 +159,11 @@ public class Fixture {
 	}
 
 	/**
-	 * @param network the network returned by {@link #createNetwork2()} 
+	 * @param network the network returned by {@link #createNetwork2()}
 	 * @return a population for network2
 	 **/
 	public static Population createPopulation2(final NetworkLayer network) {
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		population.addPerson(Fixture.createPerson2(1, "07:00", network.getLink("1"), network.getLink("7"), network.getLink("13")));
 

@@ -25,11 +25,12 @@ import java.rmi.RemoteException;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.utils.vis.otfvis.opengl.gui.PreferencesDialog2;
@@ -70,13 +71,13 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 	}
 
 	@Override
-	protected void afterSimStep(double time) {
+	protected void afterSimStep(final double time) {
 		super.afterSimStep(time);
 		this.myOTFServer.updateStatus(time);
 
 	}
 
-	public OnTheFlyQueueSimQuad(NetworkLayer net, Population plans, Events events) {
+	public OnTheFlyQueueSimQuad(final NetworkLayer net, final Population plans, final Events events) {
 		super(net, plans, events);
 
 		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
@@ -85,7 +86,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 		String studiesRoot = "../";
 		String localDtdBase = "../matsimJ/dtd/";
@@ -117,7 +118,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, net);
 		plansReader.readFile(popFileName);
 		population.printPlansCount();

@@ -23,13 +23,13 @@ package playground.david;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
-import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
 public class StandaloneSimTest {
@@ -48,7 +48,7 @@ public class StandaloneSimTest {
 
 		String localDtdBase = "./dtd/";
 		Gbl.getConfig().global().setLocalDtdBase(localDtdBase);
-		
+
 		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
@@ -56,8 +56,8 @@ public class StandaloneSimTest {
 		world.setNetworkLayer(network);
 		world.complete();
 
-		Population population = new Population();
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		Population population = new PopulationImpl();
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(popFileName);
 
 		Events events = new Events() ;

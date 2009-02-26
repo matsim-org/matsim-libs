@@ -30,12 +30,13 @@ import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.cppdeqsim.EventsReaderDEQv1;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
@@ -79,7 +80,7 @@ public class KtiSpeedTest {
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
-		final Population population = new Population(Population.NO_STREAMING);
+		final Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");

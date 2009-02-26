@@ -25,8 +25,9 @@ import java.util.ArrayList;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -38,12 +39,12 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 
 	/**
 	 * Tests that the specified number of threads is allocated.
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	public void testNumberOfThreads() {
 		loadConfig(null);
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		PersonAlgorithmTester algo = new PersonAlgorithmTester();
 		PersonAlgoProviderTester tester = new PersonAlgoProviderTester(algo);
 		ParallelPersonAlgorithmRunner.run(population, 2, tester);
@@ -53,24 +54,24 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 		ParallelPersonAlgorithmRunner.run(population, 4, tester2);
 		assertEquals(4, tester2.counter);
 	}
-	
+
 	/**
 	 * Tests that all persons in the population are handled when using the threads.
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	public void testNofPersons() {
 		loadConfig(null);
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		for (int i = 0; i < 100; i++) {
 			Person person = new PersonImpl(new IdImpl(i));
 			population.addPerson(person);
 		}
 		final PersonAlgorithmTester tester = new PersonAlgorithmTester();
 		ParallelPersonAlgorithmRunner.run(population, 2, tester);
-		
+
 		assertEquals(100, tester.personIds.size());
-		
+
 		// test that all 100 different persons got handled, and not 1 person 100 times
 		int sum = 0;
 		int sumRef = 0;
@@ -81,7 +82,7 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 		}
 		assertEquals(sumRef, sum);
 	}
-	
+
 	/**
 	 * A helper class for {@link #testNumberOfThreads}.
 	 *
@@ -89,34 +90,34 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 	 */
 	private static class PersonAlgoProviderTester implements ParallelPersonAlgorithmRunner.PersonAlgorithmProvider {
 		public int counter = 0;
-		private AbstractPersonAlgorithm algo;
+		private final AbstractPersonAlgorithm algo;
 
 		public PersonAlgoProviderTester(final AbstractPersonAlgorithm algo) {
 			this.algo = algo;
 		}
 		public AbstractPersonAlgorithm getPersonAlgorithm() {
-			counter++;
-			return algo;
-		}		
+			this.counter++;
+			return this.algo;
+		}
 	}
-	
-	/** 
-	 * A helper class for {@link #testNofPersons}. 
+
+	/**
+	 * A helper class for {@link #testNofPersons}.
 	 *
 	 * @author mrieser
 	 */
 	private static class PersonAlgorithmTester extends AbstractPersonAlgorithm {
 		public final ArrayList<Id> personIds = new ArrayList<Id>(100);
-		
+
 		public PersonAlgorithmTester() {
 			// make constructor public
 		}
 		@Override
-		public void run(Person person) {
+		public void run(final Person person) {
 			handlePerson(person);
 		}
-		private synchronized void handlePerson(Person person) {
-			personIds.add(person.getId());			
+		private synchronized void handlePerson(final Person person) {
+			this.personIds.add(person.getId());
 		}
 	}
 }

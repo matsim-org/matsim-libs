@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -34,26 +34,27 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
-	private Map<Double, Double> carLegs = new TreeMap<Double, Double>(),
+	private final Map<Double, Double> carLegs = new TreeMap<Double, Double>(),
 			ptLegs = new TreeMap<Double, Double>();
 
-	private BufferedWriter out;
+	private final BufferedWriter out;
 
-	public ModeChoiceByDistance(String outputFilePath) throws Exception {
-		out = IOUtils.getBufferedWriter(outputFilePath + ".txt");
+	public ModeChoiceByDistance(final String outputFilePath) throws Exception {
+		this.out = IOUtils.getBufferedWriter(outputFilePath + ".txt");
 	}
 
 	/**
@@ -64,7 +65,7 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 	 * @param args
 	 *            [2] - outputFilepath
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
 		final String netFilename = args[0];
@@ -76,7 +77,7 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population ppl = new Population();
+		Population ppl = new PopulationImpl();
 		System.out.println("->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(ppl, network).readFile(plansFilename);
 		ModeChoiceByDistance mcbd;
@@ -129,36 +130,36 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		for (LegIterator li = person.getSelectedPlan().getIteratorLeg(); li
 				.hasNext();) {
 			Leg l = (Leg) li.next();
-			double dist = (double) (((int) l.getRoute().getDist()) / 1000 * 1000);
+			double dist = (((int) l.getRoute().getDist()) / 1000 * 1000);
 			if (dist < 320000) {
 				if (l.getMode().equals(Mode.car)) {
-					Double carLegsCounter = carLegs.get(dist);
+					Double carLegsCounter = this.carLegs.get(dist);
 					if (carLegsCounter == null) {
 						carLegsCounter = new Double(0.0);
 					}
 					carLegsCounter = new Double(
 							carLegsCounter.doubleValue() + 1.0);
-					carLegs.put(dist, carLegsCounter);
+					this.carLegs.put(dist, carLegsCounter);
 				} else if (l.getMode().equals(Mode.pt)) {
-					Double ptLegsCounter = ptLegs.get(dist);
+					Double ptLegsCounter = this.ptLegs.get(dist);
 					if (ptLegsCounter == null) {
 						ptLegsCounter = new Double(0.0);
 					}
 					ptLegsCounter = new Double(
 							ptLegsCounter.doubleValue() + 1.0);
-					ptLegs.put(dist, ptLegsCounter);
+					this.ptLegs.put(dist, ptLegsCounter);
 				}
 			}
 		}
 	}
 
-	public void write(String args) {
+	public void write(final String args) {
 		try {
-			out.write(args);
+			this.out.write(args);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -166,16 +167,16 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 
 	public void close() {
 		try {
-			out.close();
+			this.out.close();
 		} catch (IOException e) {
 		}
 	}
 
 	public Map<Double, Double> getCarLegs() {
-		return carLegs;
+		return this.carLegs;
 	}
 
 	public Map<Double, Double> getPtLegs() {
-		return ptLegs;
+		return this.ptLegs;
 	}
 }

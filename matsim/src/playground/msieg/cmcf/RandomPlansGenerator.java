@@ -36,10 +36,11 @@ import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.PopulationWriterHandlerImplV4;
 import org.matsim.population.routes.NodeCarRoute;
@@ -52,28 +53,28 @@ import org.xml.sax.SAXException;
 /**
  * This class is designed to create random plan files for
  * a given network.
- * 
+ *
  * @author msieg
  *
  */
 public class RandomPlansGenerator {
 
 	protected NetworkLayer network;
-	
+
 	private Random rand;
-	
+
 	private String networkFile;
-	
+
 	private LeastCostPathCalculator routingAlgo;
-	
-	private int workDuration = 4 * 3600; //4 hours of work
-	
+
+	private final int workDuration = 4 * 3600; //4 hours of work
+
 	public RandomPlansGenerator(){
 		this.setSeed(this.hashCode());
 	}
-	
-	
-	public RandomPlansGenerator(String s){
+
+
+	public RandomPlansGenerator(final String s){
 		this();
 		this.setNetworkFile(s);
 		try {
@@ -83,18 +84,18 @@ public class RandomPlansGenerator {
 		}
 	}
 
-	public void setSeed(long seed){
-		if(rand == null)
-			rand = new Random(seed);
+	public void setSeed(final long seed){
+		if(this.rand == null)
+			this.rand = new Random(seed);
 		else
-			rand.setSeed(seed);
+			this.rand.setSeed(seed);
 	}
 
 	public String getNetworkFile() {
-		return networkFile;
+		return this.networkFile;
 	}
 
-	public void setNetworkFile(String networkFile) {
+	public void setNetworkFile(final String networkFile) {
 		this.networkFile = networkFile;
 	}
 
@@ -112,7 +113,7 @@ public class RandomPlansGenerator {
 			throw e;
 		}
 	}
-	
+
 	private void initDijkstra(){
 		PreProcessDijkstra preProcessData = new PreProcessDijkstra();
 		preProcessData.run(this.network);
@@ -123,20 +124,20 @@ public class RandomPlansGenerator {
 		final FreespeedTravelTimeCost costFunction = new FreespeedTravelTimeCost();
 		this.routingAlgo = new Dijkstra(this.network, costFunction, costFunction, preProcessData);
 	}
-	
-	public Population createPlans(int numberOfAgents){
+
+	public Population createPlans(final int numberOfAgents){
 		return this.createPlans(numberOfAgents, 6*3600, 7*3600);
 	}
-	
-	public Population createPlans(int numberOfAgents, int startTime, int endTime){
-		Population pop = new Population(Population.NO_STREAMING);
+
+	public Population createPlans(final int numberOfAgents, final int startTime, final int endTime){
+		Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		this.initDijkstra();
-		
+
 		for(int i=1; i <= numberOfAgents; i++){
-			Person person = ((Person) new PersonImpl(new IdImpl(i)));
+			Person person = (new PersonImpl(new IdImpl(i)));
 			Plan plan = new org.matsim.population.PlanImpl(person);
 			person.addPlan(plan);
-			
+
 			//create random home and work link
 			Link lHome, lWork;
 			LeastCostPathCalculator.Path lPath = null;
@@ -146,58 +147,58 @@ public class RandomPlansGenerator {
 				lWork = lHome;
 				while(lHome == lWork)
 					lWork = this.getRandomLink();
-				randTime = startTime+rand.nextInt(endTime-startTime);
-				lPath = this.routingAlgo.calcLeastCostPath(lHome.getToNode(), lWork.getFromNode(), randTime); 
+				randTime = startTime+this.rand.nextInt(endTime-startTime);
+				lPath = this.routingAlgo.calcLeastCostPath(lHome.getToNode(), lWork.getFromNode(), randTime);
 			}while(lPath == null);
 			Coord homeCoord = lHome.getCenter(), workCoord = lWork.getCenter();
-			
+
 			//create home act
 			Act a = plan.createAct("h", homeCoord);
 			a.setLink(lHome);
 			a.setStartTime(startTime);
 			a.setEndTime(endTime);
-			
+
 			//create leg to work
 			Leg leg = plan.createLeg(Mode.car);
 			leg.setDepartureTime(randTime);
 			CarRoute route = new NodeCarRoute(lHome, lWork);
 			route.setNodes(lHome, lPath.nodes, lWork);
 			leg.setRoute(route);
-			
+
 			//create work act
 			a = plan.createAct("h", workCoord);
 			a.setLink(lWork);
 			a.setDuration(this.workDuration);
-		
+
 			//finally add person to population instance
 			pop.addPerson(person);
 		}
-		
+
 		return pop;
 	}
-	
+
 	private Link getRandomLink(){
 		int i = this.rand.nextInt(this.network.getLinks().size());
 		Link randomLink = null;
 		for (Iterator<Link> iterator = this.network.getLinks().values().iterator(); i >= 0; i--) {
-			randomLink = (Link) iterator.next();
+			randomLink = iterator.next();
 		}
 		return randomLink;
 	}
-	
-	public void writePlans(Population plans){
+
+	public void writePlans(final Population plans){
 		PopulationWriter pwriter = new PopulationWriter(plans);
 		pwriter.setWriterHandler(new PopulationWriterHandlerImplV4());
 		pwriter.write();
 	}
-	
-	public void writePlans(Population plans, String file){
+
+	public void writePlans(final Population plans, final String file){
 		PopulationWriter pwriter = new PopulationWriter(plans, file, "v4", 1.0);
 		pwriter.setWriterHandler(new PopulationWriterHandlerImplV4());
 		pwriter.write();
 	}
-	
-	public static void main(String[] args) {
+
+	public static void main(final String[] args) {
 		String inFile = "examples/siouxfalls/network.xml";
 		if(args.length == 0){
 			System.out.println("usage: java "+RandomPlansGenerator.class.getSimpleName() +
@@ -213,16 +214,16 @@ public class RandomPlansGenerator {
 			start = Integer.parseInt(args[2]);
 		if(args.length > 3)
 			end = Integer.parseInt(args[3]);
-		
+
 		RandomPlansGenerator rpg = new RandomPlansGenerator(inFile);
-		
+
 		Population pop = rpg.createPlans(number, start, end);
-		
+
 		String outFile = "";
 		if(inFile.lastIndexOf('/') != -1)
 			outFile = inFile.substring(0, inFile.lastIndexOf('/')+1);
 		outFile += "randPlans"+number+"_"+System.currentTimeMillis()+".xml";
-		
+
 		System.out.println(pop);
 		rpg.writePlans(pop, outFile);
 		System.out.println("\tNew Plans-File written to: "+outFile);

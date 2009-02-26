@@ -31,9 +31,10 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.StrategyManagerConfigLoader;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -62,7 +63,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		Link link = network.createLink(new IdImpl(1), node1, node2, 1000, 10, 3600, 1);
 
 		// setup population with one person
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		Person person = new PersonImpl(new IdImpl(1));
 		population.addPerson(person);
 		Plan plan = person.createPlan(true);

@@ -11,7 +11,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 
 /**
  * Writes the correspondence table between the facilities and the acts in the plans

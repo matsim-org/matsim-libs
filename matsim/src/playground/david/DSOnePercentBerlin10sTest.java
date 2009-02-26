@@ -28,13 +28,14 @@ import org.matsim.events.algorithms.GenerateRealPlans;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAverageScore;
 import org.matsim.world.World;
@@ -86,7 +87,7 @@ public class DSOnePercentBerlin10sTest {
 		}
 		System.out.println("Overall network length = " + sum);
 
-		Population population = new Population() ;
+		Population population = new PopulationImpl() ;
 		// Read plans file with special dtd version
 		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(popFileName);

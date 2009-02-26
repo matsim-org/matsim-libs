@@ -38,16 +38,17 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class Wait2Link_2Acts1LinkTest {
 	public static class AgentLinkPair {
@@ -64,7 +65,7 @@ public class Wait2Link_2Acts1LinkTest {
 
 		@Override
 		public String toString() {
-			return legNr + "\t" + agentId + "\t" + linkId + "\n";
+			return this.legNr + "\t" + this.agentId + "\t" + this.linkId + "\n";
 		}
 	}
 
@@ -83,7 +84,7 @@ public class Wait2Link_2Acts1LinkTest {
 		@SuppressWarnings( { "unchecked", "deprecation" })
 		@Override
 		public void run(final Person person) {
-			actsAtSameLink = false;
+			this.actsAtSameLink = false;
 			String tmpLinkId = null;
 			String nextTmpLinkId = null;
 			if (person != null) {
@@ -97,17 +98,17 @@ public class Wait2Link_2Acts1LinkTest {
 							nextTmpLinkId = a.getLink().getId().toString();
 							if (tmpLinkId != null && nextTmpLinkId != null)
 								if (tmpLinkId.equals(nextTmpLinkId)) {
-									actLocCount++;
-									actsAtSameLink = true;
-									agentLinks.add(new AgentLinkPair(person
+									this.actLocCount++;
+									this.actsAtSameLink = true;
+									this.agentLinks.add(new AgentLinkPair(person
 											.getId().toString(), tmpLinkId,
 											((Leg) actsLegs.get(i - 1))
 													.getNum()));
 								}
 							tmpLinkId = nextTmpLinkId;
 						}
-					if (actsAtSameLink)
-						personCount++;
+					if (this.actsAtSameLink)
+						this.personCount++;
 				}
 			}
 		}
@@ -116,21 +117,21 @@ public class Wait2Link_2Acts1LinkTest {
 		 * @return the agentLinks
 		 */
 		public Set<AgentLinkPair> getAgentLinks() {
-			return agentLinks;
+			return this.agentLinks;
 		}
 
 		/**
 		 * @return the actLocCount
 		 */
 		public int getActLocCount() {
-			return actLocCount;
+			return this.actLocCount;
 		}
 
 		/**
 		 * @return the personCount
 		 */
 		public int getPersonCount() {
-			return personCount;
+			return this.personCount;
 		}
 	}
 
@@ -146,38 +147,38 @@ public class Wait2Link_2Acts1LinkTest {
 		 */
 		public Wait2Link(final Set<AgentLinkPair> agentLinkPairs,
 				final String outputFilename) {
-			agentLinksPairs = agentLinkPairs;
+			this.agentLinksPairs = agentLinkPairs;
 			try {
-				writer = IOUtils.getBufferedWriter(outputFilename);
-				writer.write("time\tagentId\tLinkId\n");
+				this.writer = IOUtils.getBufferedWriter(outputFilename);
+				this.writer.write("time\tagentId\tLinkId\n");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			overlapCount = 0;
+			this.overlapCount = 0;
 		}
 
 		public void handleEvent(final AgentWait2LinkEvent event) {
-			for (AgentLinkPair alp : agentLinksPairs)
+			for (AgentLinkPair alp : this.agentLinksPairs)
 				if (alp.agentId.equals(event.agentId)
 						&& alp.linkId.equals(event.linkId)
 						&& alp.legNr == event.legId) {
 					try {
-						writer.write(alp.toString());
+						this.writer.write(alp.toString());
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					overlapCount++;
+					this.overlapCount++;
 				}
 		}
 
 		public void reset(final int iteration) {
-			agentLinksPairs.clear();
+			this.agentLinksPairs.clear();
 		}
 
 		public void end() {
 			try {
-				writer.write("-->overlapCount = " + overlapCount);
-				writer.close();
+				this.writer.write("-->overlapCount = " + this.overlapCount);
+				this.writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -185,7 +186,7 @@ public class Wait2Link_2Acts1LinkTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public Wait2Link_2Acts1LinkTest() {
 
@@ -206,7 +207,7 @@ public class Wait2Link_2Acts1LinkTest {
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		SameActLoc sal = new SameActLoc();
 		population.addAlgorithm(sal);

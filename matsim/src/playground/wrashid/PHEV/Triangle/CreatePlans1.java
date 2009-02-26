@@ -14,9 +14,10 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.Knowledge;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.world.World;
 
@@ -27,7 +28,7 @@ public class CreatePlans1 {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		Population plans = new Population(false);
+		Population plans = new PopulationImpl(false);
 		Gbl.reset();
 		args=new String[1];
 		args[0]="C:/data/SandboxCVS/ivt/studies/triangle/config/config.xml";
@@ -87,12 +88,12 @@ public class CreatePlans1 {
 			double mitterNacht=3600*24;
 			double duration=3600*8;
 
-			
+
 			// home: 0:00-8:00
 			// work: 8-16
 			// shop: 16-17.30
 			// home: 17.30-0:00
-			
+
 			Act a = plan.createAct("home",home_facility.getCenter());
 			a.setLink(home_facility.getLink());
 			a.setEndTime(depTimeHome);

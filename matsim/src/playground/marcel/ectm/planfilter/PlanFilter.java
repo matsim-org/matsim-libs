@@ -29,11 +29,12 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonIdRecorder;
@@ -64,7 +65,7 @@ public class PlanFilter {
 		System.out.println("  done.");
 
 		System.out.println("  reading population... " + (new Date()));
-		final Population population = new Population(Population.NO_STREAMING);
+		final Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
@@ -131,7 +132,7 @@ public class PlanFilter {
 		System.out.println("  done.");
 
 		System.out.println("  reading population... " + (new Date()));
-		final Population population = new Population(Population.NO_STREAMING);
+		final Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();

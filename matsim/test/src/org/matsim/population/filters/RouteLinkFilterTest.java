@@ -33,10 +33,11 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.StringUtils;
@@ -64,8 +65,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 		Link link1 = network.getLink(new IdImpl(1));
 		Link link20 = network.getLink(new IdImpl(20));
-		
-		Population population = new Population(Population.NO_STREAMING);
+
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		Person person;
 		Plan plan;
@@ -116,7 +117,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		}
 
 	}
-	
+
 	private List<Node> getNodesFromString(final NetworkLayer network, final String nodes) {
 		List<Node> nodesList = new ArrayList<Node>();
 		for (String node : StringUtils.explode(nodes, ' ')) {

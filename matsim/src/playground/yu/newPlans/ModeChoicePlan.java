@@ -29,16 +29,17 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 
 import playground.yu.analysis.PlanModeJudger;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ModeChoicePlan extends NewPlan {
 	private boolean addNewPlan = false;
@@ -46,13 +47,13 @@ public class ModeChoicePlan extends NewPlan {
 	/**
 	 * @param plans
 	 */
-	public ModeChoicePlan(Population plans) {
+	public ModeChoicePlan(final Population plans) {
 		super(plans);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		Plan sp = person.getSelectedPlan();
 		person.getPlans().clear();
 		person.addPlan(sp);
@@ -64,7 +65,7 @@ public class ModeChoicePlan extends NewPlan {
 		if (
 		// t.equals(Plan.Type.CAR)
 		PlanModeJudger.useCar(sp)) {
-			addNewPlan = true;
+			this.addNewPlan = true;
 			// cp.setType(Plan.Type.PT);//?????????????????????????????????????
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);
@@ -82,7 +83,7 @@ public class ModeChoicePlan extends NewPlan {
 		} else if (
 		// t.equals(Plan.Type.PT)
 		PlanModeJudger.usePt(sp)) {
-			addNewPlan = true;
+			this.addNewPlan = true;
 			// cp.setType(Plan.Type.CAR);
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);
@@ -98,25 +99,25 @@ public class ModeChoicePlan extends NewPlan {
 				}
 			}
 		}
-		if (addNewPlan) {
+		if (this.addNewPlan) {
 			person.addPlan(cp);
-			addNewPlan = false;
+			this.addNewPlan = false;
 		}
 
-		pw.writePerson(person);
+		this.pw.writePerson(person);
 	}
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Config config = Gbl.createConfig(args);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		ModeChoicePlan mcp = new ModeChoicePlan(population);
 		population.addAlgorithm(mcp);
 		new MatsimPopulationReader(population, network).readFile(config.plans()

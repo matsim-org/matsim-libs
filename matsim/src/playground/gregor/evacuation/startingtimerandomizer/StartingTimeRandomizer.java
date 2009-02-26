@@ -26,15 +26,16 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.world.World;
 
 public class StartingTimeRandomizer {
-	
+
 	private final Population pop;
 	private final double MEAN = 5;
 	private final double SIGMA = 5;
@@ -42,7 +43,7 @@ public class StartingTimeRandomizer {
 	public StartingTimeRandomizer(final Population pop) {
 		this.pop = pop;
 	}
-	
+
 	public void run(){
 		for (Person pers : this.pop) {
 			Plan plan = pers.getSelectedPlan();
@@ -60,16 +61,16 @@ public class StartingTimeRandomizer {
 		String planIn = "../inputs/networks/padang_plans_v20080618_reduced_10p.xml.gz";
 		String planOut = "../inputs/networks/padang_plans_v20080618_reduced_10p_rndStartTime.xml.gz";
 		String network = "../inputs/networks/padang_net_v20080618.xml";
-		
+
 		World world = Gbl.createWorld();
 		Gbl.createConfig(null);
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(network);
 		world.setNetworkLayer(net);
 		world.complete();
-		Population pop = new Population();
-		new MatsimPopulationReader(pop).readFile(planIn);
-		
+		Population pop = new PopulationImpl();
+		new MatsimPopulationReader(pop, net).readFile(planIn);
+
 		new StartingTimeRandomizer(pop).run();
 		new PopulationWriter(pop,planOut,"v4").write();
 	}

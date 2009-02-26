@@ -47,18 +47,19 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.PersonAlgorithm;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.ActLocationFalsifier;
-import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.population.algorithms.PlansFilterActInArea;
 import org.matsim.population.algorithms.XY2Links;
@@ -289,7 +290,7 @@ public class MyMonsterClass {
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		System.out.println("reading plans xml file... ");
 		PopulationReader plansReader = new MatsimPopulationReader(population);
@@ -503,7 +504,6 @@ int three=0;
 		try {
 			enfw.writeFile("./output/evacuationarea_padang_cutout.xml.gz");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -551,20 +551,16 @@ int three=0;
 		HashMap<Id,Link> areaOfInteresst = new HashMap<Id,Link>();
 
 		Config config = Gbl.createConfig(new String[] {configFile});
-		World world = Gbl.getWorld();
-
 
 		System.out.println("reading network xml file... ");
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFile);
-		world.setNetworkLayer(network);
-		world.complete();
 		System.out.println("done. ");
 
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		System.out.println("reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(plansFile);
 		population.printPlansCount();
 
@@ -608,14 +604,11 @@ int three=0;
 		String netfile = "./networks/navteq_network.xml.gz";
 		String configFile = "./configs/evacuationConf.xml";
 
-		World world = Gbl.getWorld();
 		Config config = Gbl.createConfig(new String[] {configFile});
 
 		System.out.println("reading network xml file... ");
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
-		world.setNetworkLayer(network);
-		world.complete();
 		System.out.println("done. ");
 
 		System.out.println("reading subnetwork xml file... ");
@@ -625,12 +618,12 @@ int three=0;
 		System.out.println("done. ");
 
 
-		Population population = new Population(Population.USE_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		PersonAlgorithm algo = new PlansFilterActInArea(subNetwork,"w");
 		population.addAlgorithm(algo);
 
 		System.out.println("reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(plans);
 		System.out.println("done. ");
 
@@ -653,21 +646,17 @@ int three=0;
 
 		String configFile = "./configs/evacuationConf.xml";
 		String net = "./networks/padang_net_evac.xml";
-		World world = Gbl.getWorld();
 		Config config = Gbl.createConfig(new String[] {configFile});
 
 		System.out.println("reading old network xml file... ");
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(net);
-		world.setNetworkLayer(network);
-		world.complete();
 		System.out.println("done. ");
 
-
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		System.out.println("reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(plans);
 		population.printPlansCount();
 
@@ -677,14 +666,9 @@ int three=0;
 		try {
 			wr = new FileWriter(new File("scores.txt"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		BufferedWriter out = new BufferedWriter(wr);
-
-
-
-
 
 
 		for (Person pers : population.getPersons().values()){
@@ -698,7 +682,6 @@ int three=0;
 			try {
 				out.write(min + " " + max + "\n");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -707,7 +690,6 @@ int three=0;
 		try {
 			out.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -723,22 +705,17 @@ int three=0;
 		String old_netfile = "./networks/zurich_net.xml";
 		String configFile = "./configs/evacuationConf.xml";
 
-		World world = Gbl.getWorld();
 		Config config = Gbl.createConfig(new String[] {configFile});
-
 
 		System.out.println("reading old network xml file... ");
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(old_netfile);
-		world.setNetworkLayer(network);
-		world.complete();
 		System.out.println("done. ");
 
-
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		System.out.println("reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(in_plans);
 		population.printPlansCount();
 
@@ -753,7 +730,6 @@ int three=0;
 		network = null;
 		NetworkLayer new_network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
-		world.setNetworkLayer(new_network);
 		System.out.println("done. ");
 
 		new XY2Links(new_network).run(population);
@@ -773,15 +749,11 @@ int three=0;
 		String netfile = "./networks/navteq_network.xml.gz";
 		String configFile = "./configs/routerTest.xml";
 
-
-		World world = Gbl.getWorld();
 		Config config = Gbl.createConfig(new String[] {configFile});
 
 		System.out.println("reading network xml file... ");
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
-		world.setNetworkLayer(network);
-		world.complete();
 		System.out.println("done. ");
 
 //		network.beforeSim();
@@ -829,7 +801,7 @@ int three=0;
 				}
 			}
 		}
-		new_network.setCapacityPeriod(Integer.toString(network.getCapacityPeriod()));
+		new_network.setCapacityPeriod(network.getCapacityPeriod());
 		network = null;
 		System.out.println("done");
 
@@ -853,15 +825,11 @@ int three=0;
 		String netfile = "./networks/navteq_network.xml.gz";
 		String configFile = "./configs/evacuationConf.xml";
 
-
-		World world = Gbl.getWorld();
 		Config config = Gbl.createConfig(new String[] {configFile});
 
 		System.out.println("reading network xml file... ");
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
-		world.setNetworkLayer(network);
-		world.complete();
 		System.out.println("done. ");
 
 		List<Node> shell = new ArrayList<Node>();
@@ -900,15 +868,14 @@ int three=0;
 //		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		System.out.println("reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 
@@ -1000,7 +967,6 @@ int three=0;
 			try {
 				super.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1011,7 +977,6 @@ int three=0;
 			try {
 				super.openFile(filename);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1020,7 +985,6 @@ int three=0;
 			try {
 				this.writer.write(str);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

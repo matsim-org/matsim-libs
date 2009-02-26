@@ -22,8 +22,9 @@ package playground.balmermi;
 
 import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonActChainGrouping;
@@ -39,7 +40,7 @@ public class ActivityChainGrouping {
 		System.out.println("calculateActivitySpaces():");
 
 		System.out.println("  creating plans object... ");
-		Population plans = new Population(Population.USE_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		System.out.println("  done.");
 
 		System.out.println("  adding person algorithms... ");
@@ -75,14 +76,14 @@ public class ActivityChainGrouping {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
 		if (!args[0].endsWith("test/balmermi/ActivityChainGrouping_config.xml")) {
 			Gbl.errorMsg("This run must be based on 'test/balmermi/" +
 			 "ActivitySpaces_config.xml' input config file.");
 		}
-		
+
 		Gbl.createConfig(args);
 
 		calculateActivityChainGroups();

@@ -12,10 +12,11 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.cppdeqsim.DEQSimControler;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 
 import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractChoiceSetsRouting;
@@ -26,9 +27,9 @@ import playground.anhorni.locationchoice.cs.depr.filters.SampleDrawerFixedSizeTr
 import playground.anhorni.locationchoice.cs.depr.filters.TripFilter;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSets;
 import playground.anhorni.locationchoice.cs.helper.ZHFacilities;
+import playground.anhorni.locationchoice.cs.io.CSShapeFileWriter;
 import playground.anhorni.locationchoice.cs.io.CSWriter;
 import playground.anhorni.locationchoice.cs.io.ChoiceSetWriterSimple;
-import playground.anhorni.locationchoice.cs.io.CSShapeFileWriter;
 import playground.anhorni.locationchoice.cs.io.CompareTrips;
 import playground.anhorni.locationchoice.cs.io.NelsonTripReader;
 import playground.anhorni.locationchoice.cs.io.NelsonTripWriter;
@@ -40,31 +41,31 @@ import playground.balmermi.mz.PlansCreateFromMZ;
 public class GenerateChoiceSets {
 
 	//private static int idOffset = 20000000;
-	//private final static double epsilon = 0.01;	
-	private Population choiceSetPopulation = new Population(false);
-	
-	private NetworkLayer network = new NetworkLayer();
+	//private final static double epsilon = 0.01;
+	private Population choiceSetPopulation = new PopulationImpl(false);
+
+	private final NetworkLayer network = new NetworkLayer();
 	//private TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink = new TreeMap<Id, ArrayList<ZHFacility>>();
-	
+
 	private ZHFacilities zhFacilities;
-	
+
 	/*
 	private List<ChoiceSet> carChoiceSets = null;
 	private List<ChoiceSet> walkChoiceSets = null;
 	*/
-	
-	private ChoiceSets choiceSets = new ChoiceSets();
-	
-	
-	private List<CSWriter> writers = new Vector<CSWriter>();
+
+	private final ChoiceSets choiceSets = new ChoiceSets();
+
+
+	private final List<CSWriter> writers = new Vector<CSWriter>();
 	private TripFilter filter;
 	private SampleDrawer sampleDrawer = null;
 	private boolean isSetup = false;
 	Controler controler = null;
 	private int choiceSetSize = 20;
-	
+
 	// args
-	private String choiceSetPopulationFile = null;	
+	private String choiceSetPopulationFile = null;
 	private String matsimRunConfigFile = null;
 	private String zhFacilitiesFile = null;
 	private String shapeFile = null;
@@ -74,11 +75,11 @@ public class GenerateChoiceSets {
 	private String readNelson;
 	private String DEQSim;
 	private String mode;
-	
+
 	private final static Logger log = Logger.getLogger(GenerateChoiceSets.class);
-	
-	public static void main(String[] args) {
-		
+
+	public static void main(final String[] args) {
+
 		// for the moment hard-coding
 		String inputFile = "./input/input.txt";
 		/*
@@ -88,7 +89,7 @@ public class GenerateChoiceSets {
 			System.exit(1);
 		}
 		*/
-		
+
 		Gbl.startMeasurement();
 
 		GenerateChoiceSets generator = new GenerateChoiceSets();
@@ -97,11 +98,11 @@ public class GenerateChoiceSets {
 			generator.setup();
 		}
 		generator.run();
-		
+
 		Gbl.printElapsedTime();
 	}
-	
-	private void readInputFile(String inputFile) {
+
+	private void readInputFile(final String inputFile) {
 		try {
 			FileReader fileReader = new FileReader(inputFile);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -111,13 +112,13 @@ public class GenerateChoiceSets {
 			this.outdir = bufferedReader.readLine();
 			this.zhFacilitiesFile = bufferedReader.readLine();
 			this.shapeFile = bufferedReader.readLine();
-			this.walkingSpeed = Double.parseDouble(bufferedReader.readLine().trim())/3.6; 
+			this.walkingSpeed = Double.parseDouble(bufferedReader.readLine().trim())/3.6;
 			this.choiceSetSize = Integer.parseInt(bufferedReader.readLine().trim());
 			this.sampling = bufferedReader.readLine();
 			this.readNelson = bufferedReader.readLine();
 			this.DEQSim = bufferedReader.readLine();
 			this.mode = bufferedReader.readLine();
-			
+
 			log.info("MATSim config file: " + this.matsimRunConfigFile);
 			log.info("choice set population file: " + this.choiceSetPopulationFile);
 			log.info("out dir: " + this.outdir);
@@ -132,47 +133,47 @@ public class GenerateChoiceSets {
 
 			bufferedReader.close();
 			fileReader.close();
-		
+
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
-		}			
+		}
 	}
-	
-	/* Setting of trip filter, writers and the sampler 
+
+	/* Setting of trip filter, writers and the sampler
 	 * Overwrite this method or use getters and setters and set this.setup to true
 	 */
-	
+
 	public void setup() {
-		
+
 		this.zhFacilities = new ZHFacilities();
-		
+
 		//filters
 		ActTypeAndAreaTripFilter filterAreaAndType = new ActTypeAndAreaTripFilter(this.shapeFile, "s");
 		this.filter = filterAreaAndType;
-		
+
 		//writers
 		boolean folderGenerated = new File(this.outdir +"shapefiles").mkdir();
 		folderGenerated = folderGenerated && new File(this.outdir +"shapefiles/singletrips").mkdir();
 		folderGenerated = folderGenerated && new File(this.outdir +"shapefiles/singlechoicesets").mkdir();
 		folderGenerated = folderGenerated && new File(this.outdir +"choicesets").mkdir();
-		
+
 		if (!folderGenerated) {
 			log.info("Problem while generating output folders");
 		}
-		
+
 		ChoiceSetWriterSimple writer = new ChoiceSetWriterSimple(this.zhFacilities);
-		this.writers.add(writer);	
+		this.writers.add(writer);
 		CSShapeFileWriter shpWriter = new CSShapeFileWriter();
 		this.writers.add(shpWriter);
-		
+
 		TripStats tripStats = new TripStats(this.mode);
 		this.writers.add(tripStats);
-		
-		
-		
+
+
+
 		// sampler
 		SampleDrawer sampleDrawer;
-		if (sampling.equals("random")) {
+		if (this.sampling.equals("random")) {
 			sampleDrawer = new SampleDrawerFixedSizeRandom(this.choiceSetSize);
 		}
 		else {
@@ -180,85 +181,85 @@ public class GenerateChoiceSets {
 		}
 		this.setSampleDrawer(sampleDrawer);
 	}
-	
+
 	public void run() {
-			
-		String configArgs [] = {this.matsimRunConfigFile};	
+
+		String configArgs [] = {this.matsimRunConfigFile};
 		Gbl.createConfig(configArgs);
-								
+
 		this.createChoiceSetFacilities();
-				
+
 		if (this.readNelson.equals("true")) {
 			this.choiceSets.setCarChoiceSets(new NelsonTripReader(this.network, this.zhFacilities)
 					.readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "car"));
 			this.choiceSets.setWalkChoiceSets(new NelsonTripReader(this.network, this.zhFacilities)
-					.readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "walk"));				
+					.readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "walk"));
 		}
 		else {
 			this.choiceSetPopulation = this.createChoiceSetPopulationFromMZ();
-			new PopulationWriter(choiceSetPopulation, this.outdir+"/MZPopulation.txt", "v4").write();
-			
+			new PopulationWriter(this.choiceSetPopulation, this.outdir+"/MZPopulation.txt", "v4").write();
+
 			// TODO: maybe also optimize area?
 			this.choiceSets.setCarChoiceSets(this.filter.apply(this.choiceSetPopulation, "car"));
-			this.choiceSets.setWalkChoiceSets(this.filter.apply(this.choiceSetPopulation, "walk"));	
+			this.choiceSets.setWalkChoiceSets(this.filter.apply(this.choiceSetPopulation, "walk"));
 		}
-		
+
 		if (this.DEQSim.equals("true")) {
 			String [] args = {this.matsimRunConfigFile};
 			this.controler = new DEQSimControler(args);
 		}
 		else {
 			this.controler = new Controler(this.matsimRunConfigFile);
-		}		
-		
-		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilities, 
+		}
+
+		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilities,
 				this.choiceSets.getCarChoiceSets(), "car");
-		
+
 		/*
 		 * This does NOT work at the moment:
 		 *
 		// set free speed to walking speed
-		if (this.walkingSpeed > 0.0) {	
+		if (this.walkingSpeed > 0.0) {
 			Iterator<Link> link_it = this.network.getLinks().values().iterator();
-			while (link_it.hasNext()) {		
+			while (link_it.hasNext()) {
 				link_it.next().setFreespeed(this.walkingSpeed);
 			}
 		}
 		*/
-				
-		ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilities, 
+
+		ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilities,
 					this.choiceSets.getWalkChoiceSets(), "walk");
-		
+
 		if (this.mode.equals("car")) {
-			controler.addControlerListener(listenerCar);
+			this.controler.addControlerListener(listenerCar);
 		}
 		else if (this.mode.equals("walk")) {
-			controler.addControlerListener(listenerWalk);
+			this.controler.addControlerListener(listenerWalk);
 		}
 		else {
 			log.error("No mode chosen");
-		}	
+		}
 		log.info("Running controler: ...");
-		controler.run();
-			
+		this.controler.run();
+
 		// sample the choice sets: not used at the moment:
 		/*
 		CSShapeFileWriter shpWriter = new CSShapeFileWriter(this.outdir);
 		shpWriter.writeChoiceSets(this.outdir, "carBeforeSampling", this.carChoiceSets);
 		shpWriter.writeChoiceSets(this.outdir, "walkBeforeSampling", this.walkChoiceSets);
-			
+
 		log.info("Sampling: ...");
 		this.drawSample();
 		*/
-		
+
 		log.info("Output: ...");
-		this.output();	
+		this.output();
 	}
-		
-	private Population createChoiceSetPopulationFromMZ() {	
-		
-		Population temporaryPopulation = new Population(false);
-		
+
+	private Population createChoiceSetPopulationFromMZ() {
+
+		Population temporaryPopulation = new PopulationImpl(false);
+
 		try {
 			new PlansCreateFromMZ(this.choiceSetPopulationFile,this.outdir+"/output_wegeketten.dat",1,7).run(temporaryPopulation);
 		} catch (Exception e) {
@@ -266,22 +267,22 @@ public class GenerateChoiceSets {
 		}
 		return temporaryPopulation;
 	}
-			
-	private void createChoiceSetFacilities() {		
+
+	private void createChoiceSetFacilities() {
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(this.network);
 		networkReader.readFile(Gbl.getConfig().network().getInputFile());
-				
+
 		ZHFacilitiesReader zhFacilitiesReader = new ZHFacilitiesReader(this.network);
 		zhFacilitiesReader.readFile(this.zhFacilitiesFile, this.zhFacilities);
-		
+
 		new ZHFacilitiesWriter().write(this.outdir, this.zhFacilities);
 	}
-						
-	private void output() {	
-		
+
+	private void output() {
+
 		this.choiceSets.finish();
 		this.zhFacilities.finish();
-		
+
 		Iterator<CSWriter> writer_it = this.writers.iterator();
 		while (writer_it.hasNext()) {
 			CSWriter writer = writer_it.next();
@@ -290,22 +291,22 @@ public class GenerateChoiceSets {
 			}
 			else if (this.mode.equals("walk")) {
 				writer.write(this.outdir, "walk", this.choiceSets.getWalkChoiceSets());
-			}	
+			}
 		}
-		
+
 		NelsonTripWriter nelsonWriter = new NelsonTripWriter();
 		nelsonWriter.write(this.outdir, "car",  this.choiceSets.getCarChoiceSets());
 		nelsonWriter.write(this.outdir, "walk", this.choiceSets.getWalkChoiceSets());
-		
-		
+
+
 		CompareTrips compareTripsCar = new CompareTrips(this.outdir, "car");
 		compareTripsCar.compare("input/ttbcar.dat", this.choiceSets.getCarChoiceSets());
-		
+
 		CompareTrips compareTripsWalk = new CompareTrips(this.outdir, "walk");
 		compareTripsWalk.compare("input/ttbwalk.dat", this.choiceSets.getWalkChoiceSets());
-		
+
 	}
-	
+
 	/* not used at the moment
 	private void drawSample() {
 		if (this.sampleDrawer != null) {
@@ -314,76 +315,76 @@ public class GenerateChoiceSets {
 		}
 	}
 	*/
-	
-	
-	
+
+
+
 	// getters and setters: --------------------------------------------------------------------------------
 	public String getSpssfile() {
-		return choiceSetPopulationFile;
+		return this.choiceSetPopulationFile;
 	}
-	public void setSpssfile(String spssfile) {
+	public void setSpssfile(final String spssfile) {
 		this.choiceSetPopulationFile = spssfile;
 	}
 	public String getOutdir() {
-		return outdir;
+		return this.outdir;
 	}
-	public void setOutdir(String outdir) {
+	public void setOutdir(final String outdir) {
 		this.outdir = outdir;
 	}
 	public String getConfigFile() {
-		return matsimRunConfigFile;
+		return this.matsimRunConfigFile;
 	}
-	public void setConfigFile(String configfile) {
+	public void setConfigFile(final String configfile) {
 		this.matsimRunConfigFile = configfile;
 	}
 	public String getZhFacilitiesFile() {
-		return zhFacilitiesFile;
+		return this.zhFacilitiesFile;
 	}
-	public void setZhFacilitiesFile(String zhFacilitiesFile) {
+	public void setZhFacilitiesFile(final String zhFacilitiesFile) {
 		this.zhFacilitiesFile = zhFacilitiesFile;
 	}
 	public TripFilter getFilter() {
 		return this.filter;
 	}
-	public void setFilter(TripFilter filter) {
+	public void setFilter(final TripFilter filter) {
 		this.filter = filter;
 	}
 	public String getShapeFile() {
-		return shapeFile;
+		return this.shapeFile;
 	}
-	public void setShapeFile(String shapeFile) {
+	public void setShapeFile(final String shapeFile) {
 		this.shapeFile = shapeFile;
 	}
 	public SampleDrawer getSampleDrawer() {
-		return sampleDrawer;
+		return this.sampleDrawer;
 	}
-	public void setSampleDrawer(SampleDrawer sampleDrawer) {
+	public void setSampleDrawer(final SampleDrawer sampleDrawer) {
 		this.sampleDrawer = sampleDrawer;
 	}
 	public boolean isSetup() {
-		return isSetup;
+		return this.isSetup;
 	}
-	public void setSetup(boolean isSetup) {
+	public void setSetup(final boolean isSetup) {
 		this.isSetup = isSetup;
 	}
 }
 
 
 /* unused:
- * 
- * private void extractWalkChoiceSetsEllipse(List<ChoiceSet> choiceSets) {	
+ *
+ * private void extractWalkChoiceSetsEllipse(List<ChoiceSet> choiceSets) {
 		// create a list of all zhFacilities to give to ExtractWalkChoiceSets()
-		List<ZHFacility> zhFacilities = new Vector<ZHFacility>();		
+		List<ZHFacility> zhFacilities = new Vector<ZHFacility>();
 		Iterator<ArrayList<ZHFacility>> zhFacilitiesList_it = this.zhFacilitiesByLink.values().iterator();
 		while (zhFacilitiesList_it.hasNext()) {
 			List<ZHFacility> list = zhFacilitiesList_it.next();
 			zhFacilities.addAll(list);
-		}		
+		}
 		ExtractWalkChoiceSetsEllipse extractor = new ExtractWalkChoiceSetsEllipse(
 				this.controler, zhFacilities, this.walkingSpeed, choiceSets);
 		extractor.run();
 	}
- * 
+ *
  */
 
 

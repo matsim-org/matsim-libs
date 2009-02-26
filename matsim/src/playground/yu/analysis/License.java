@@ -25,41 +25,42 @@ package playground.yu.analysis;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * checks, how many people have license for driving car and can choose from car
  * or pt
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class License extends AbstractPersonAlgorithm {
 	private int hasLicenseCount;
 
 	/**
-	 * 
+	 *
 	 */
 	public License() {
-		hasLicenseCount = 0;
+		this.hasLicenseCount = 0;
 	}
 
 	@Override
 	public void run(final Person person) {
 		if (person != null)
 			if (person.getLicense().equals("yes"))
-				hasLicenseCount++;
+				this.hasLicenseCount++;
 	}
 
 	/**
 	 * @return the hasLicenseCount
 	 */
 	public int getHasLicenseCount() {
-		return hasLicenseCount;
+		return this.hasLicenseCount;
 	}
 
 	/**
@@ -75,7 +76,7 @@ public class License extends AbstractPersonAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		License l = new License();
 		population.addAlgorithm(l);

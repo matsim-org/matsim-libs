@@ -31,6 +31,7 @@ import org.matsim.interfaces.basic.v01.BasicLocation;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Household;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.interfaces.core.v01.Vehicle;
 
 /**

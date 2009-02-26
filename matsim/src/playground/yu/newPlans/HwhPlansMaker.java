@@ -27,8 +27,8 @@ import java.util.Set;
 
 import org.matsim.config.Config;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PlanSimplifyForDebug;
 

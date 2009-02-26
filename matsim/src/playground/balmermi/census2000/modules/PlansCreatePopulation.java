@@ -25,8 +25,8 @@ import java.util.Iterator;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
 
 import playground.balmermi.census2000.data.Persons;
 

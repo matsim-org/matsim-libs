@@ -28,25 +28,22 @@ import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.locationchoice.LocationChoice;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.RandomLocationMutator;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 
 public class ConnectHomesAndWorkplaces {
-	
+
 	Config config ;
 
 	public void run(final String[] args) {
@@ -65,7 +62,7 @@ public class ConnectHomesAndWorkplaces {
 //		controler.loadData() ;
 		// (I think that the control(l)er is only needed to make the locationchoice module happy;
 		// there is no logical reason why it is necessary. Kai)
-		
+
 		// create/read the network:
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
@@ -86,12 +83,12 @@ public class ConnectHomesAndWorkplaces {
 		// create the locachoice object:
 		LocationMutator locachoice = new RandomLocationMutator( controler.getNetwork(),controler) ;
 
-		final Population plans = new Population(Population.USE_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans);
+		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(locachoice);
 		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added
-		
+
 		// I don't know why this works:
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();

@@ -22,24 +22,25 @@ package playground.yu.newPlans;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 
 /**
  * test of DoublePtPlan
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class DoublePlanControler {
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Config config = Gbl
 				.createConfig(new String[] { "./test/yu/newPlans/newPlans.xml" });
 
@@ -47,7 +48,7 @@ public class DoublePlanControler {
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		DoublePlan dp = new DoublePlan(population);
 		population.addAlgorithm(dp);
 		PopulationReader plansReader = new MatsimPopulationReader(population,

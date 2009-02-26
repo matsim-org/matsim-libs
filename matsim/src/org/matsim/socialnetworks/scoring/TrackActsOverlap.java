@@ -31,7 +31,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.socialnetworks.algorithms.CompareActs;
 import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;

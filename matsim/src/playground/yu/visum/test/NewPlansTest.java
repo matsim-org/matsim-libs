@@ -6,10 +6,11 @@ import java.util.List;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 
 import playground.yu.visum.filter.PersonFilterAlgorithm;
@@ -19,7 +20,7 @@ import playground.yu.visum.filter.finalFilters.NewPlansWriter;
 /**
  * @author ychen
  */
-public class NewPlansTest extends Population {
+public class NewPlansTest extends PopulationImpl {
 
 	public static void testRun() {
 
@@ -36,7 +37,7 @@ public class NewPlansTest extends Population {
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
-		Population plans = new Population(Population.USE_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		System.out.println("  done.");
 
 		System.out.println("  setting plans algorithms... ");

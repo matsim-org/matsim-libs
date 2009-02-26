@@ -30,12 +30,13 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.router.PlansCalcRoute;
@@ -44,25 +45,25 @@ import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.World;
 
 public class EvacuationPlansGenerator {
-	
+
 	private static Logger log = Logger.getLogger(EvacuationPlansGenerator.class);
 	private final Population plans;
 	private final NetworkLayer network;
 	private final static String saveLinkId = "el1";
-	
-	public EvacuationPlansGenerator(Population population, NetworkLayer network) {
+
+	public EvacuationPlansGenerator(final Population population, final NetworkLayer network) {
 		this.plans = population;
 		this.network = network;
-				
+
 	}
 
 	private void run() {
-		
+
 		createEvacuationPlans();
-		
+
 	}
-	
-	
+
+
 	/**
 	 * Generates an evacuation plan for all agents inside the evacuation area.
 	 * Agents outside the evacuation are will be removed from the plans.
@@ -72,25 +73,25 @@ public class EvacuationPlansGenerator {
 	 */
 	private void createEvacuationPlans() {
 
-		PlansCalcRoute router = new PlansCalcRoute(network, new FreespeedTravelTimeCost(), new FreespeedTravelTimeCost());
+		PlansCalcRoute router = new PlansCalcRoute(this.network, new FreespeedTravelTimeCost(), new FreespeedTravelTimeCost());
 
 		/* all persons that want to start on an already deleted link will be excluded from the
 		 *simulation.     */
 		log.info("  - removing all persons outside the evacuation area");
-		Iterator<Person> it = plans.getPersons().values().iterator();
+		Iterator<Person> it = this.plans.getPersons().values().iterator();
 		while (it.hasNext()) {
 			Person pers = it.next();
 
 			Id id = ((Act)pers.getPlans().get(0).getActsLegs().get(0)).getLink().getId();
 
-			if (network.getLink(id) == null) {
+			if (this.network.getLink(id) == null) {
 				it.remove();
 			}
 		}
 
 		// the remaining persons plans will be routed
 		log.info("  - generating evacuation plans for the remaining persons");
-		it = plans.getPersons().values().iterator();
+		it = this.plans.getPersons().values().iterator();
 		while (it.hasNext()) {
 			Person pers = it.next();
 
@@ -111,22 +112,22 @@ public class EvacuationPlansGenerator {
 			leg.setArrivalTime(0.0);
 			plan.addLeg(leg);
 
-			Act actB = new org.matsim.population.ActImpl("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
+			Act actB = new org.matsim.population.ActImpl("h", new CoordImpl(12000.0, -12000.0), this.network.getLink(saveLinkId));
 			plan.addAct(actB);
 
 			router.run(plan);
 		}
 
 	}
-	public static void main(String [] args) {
+	public static void main(final String [] args) {
 		String plans = "./networks/padang_plans_v20080618_reduced.xml";
 		String netfile = "./networks/padang_net_evac_v20080618.xml";
 		String change = "./networks/padang_change_evac_v20080618.xml";
 		String plansout = "./networks/padang_plans_v20080618_reduced_it0.xml";
-		
+
 		World world = Gbl.createWorld();
 		Gbl.createConfig(null);
-		
+
 		log.info("loading network from " + netfile);
 		NetworkFactory nf = new NetworkFactory();
 		nf.setLinkPrototype(TimeVariantLinkImpl.class);
@@ -136,18 +137,18 @@ public class EvacuationPlansGenerator {
 		world.setNetworkLayer(network);
 		world.complete();
 		log.info("done.");
-		
+
 
 		log.info("loading population from " + plans);
-		Population population = new Population(false);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		Population population = new PopulationImpl(false);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(plans);
 		log.info("done.");
-		
+
 		new EvacuationPlansGenerator(population,network).run();
-		
+
 		new PopulationWriter(population,plansout, "v4").write();
-		
+
 	}
 
 

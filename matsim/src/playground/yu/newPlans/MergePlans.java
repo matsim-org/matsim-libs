@@ -23,16 +23,17 @@ package playground.yu.newPlans;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class MergePlans {
 	public static class CopyPlans extends AbstractPersonAlgorithm {
@@ -44,7 +45,7 @@ public class MergePlans {
 
 		@Override
 		public void run(final Person person) {
-			writer.writePerson(person);
+			this.writer.writePerson(person);
 		}
 	}
 
@@ -59,7 +60,7 @@ public class MergePlans {
 
 		@Override
 		public void run(final Person person) {
-			if (Integer.parseInt(person.getId().toString()) >= lower_limit)
+			if (Integer.parseInt(person.getId().toString()) >= this.lower_limit)
 				super.run(person);
 		}
 	}
@@ -91,13 +92,13 @@ public class MergePlans {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population plansA = new Population();
+		Population plansA = new PopulationImpl();
 		PopulationWriter pw = new PopulationWriter(plansA);
 		plansA.addAlgorithm(new CopyPlans(pw));
 		new MatsimPopulationReader(plansA, network).readFile(plansFilenameA);
 		plansA.runAlgorithms();
 
-		Population plansB = new Population();
+		Population plansB = new PopulationImpl();
 		plansB.addAlgorithm(new PersonIdCopyPlans(pw, lower_limit));
 		new MatsimPopulationReader(plansB, network).readFile(plansFilenameB);
 		plansB.runAlgorithms();

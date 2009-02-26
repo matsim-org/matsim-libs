@@ -40,10 +40,11 @@ import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 
@@ -57,16 +58,16 @@ public class RouteSummaryTest {
 		 * @param odRoutes
 		 *            Map<String odPair, Set<List<Id linkId>>>
 		 */
-		private Map<String, Set<List<Id>>> odRoutes = new HashMap<String, Set<List<Id>>>();
+		private final Map<String, Set<List<Id>>> odRoutes = new HashMap<String, Set<List<Id>>>();
 		/**
 		 * @param routeCounters
 		 *            Map<List<Id routelinkId>,Integer routeFlows (car, total
 		 *            day)>
 		 */
-		private Map<List<Id>, Integer> routeCounters = new HashMap<List<Id>, Integer>();
+		private final Map<List<Id>, Integer> routeCounters = new HashMap<List<Id>, Integer>();
 
 		public Map<List<Id>, Integer> getRouteCounters() {
-			return routeCounters;
+			return this.routeCounters;
 		}
 
 		/**
@@ -74,13 +75,13 @@ public class RouteSummaryTest {
 		 *            Map<Integer routeFlows (car, total day), Integer number of
 		 *            occurrences of "key">
 		 */
-		private Map<Integer, Integer> numRoutesDistribution = new HashMap<Integer, Integer>();
+		private final Map<Integer, Integer> numRoutesDistribution = new HashMap<Integer, Integer>();
 
 		public RouteSummary(final String filename) {
 			try {
-				writer = IOUtils.getBufferedWriter(filename);
-				writer.write("odPair\trouteLinkIds\tnumber of routes\n");
-				writer.flush();
+				this.writer = IOUtils.getBufferedWriter(filename);
+				this.writer.write("odPair\trouteLinkIds\tnumber of routes\n");
+				this.writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -90,15 +91,15 @@ public class RouteSummaryTest {
 
 		public void write() {
 			try {
-				for (String odPair : odRoutes.keySet()) {
-					Set<List<Id>> routes = odRoutes.get(odPair);
+				for (String odPair : this.odRoutes.keySet()) {
+					Set<List<Id>> routes = this.odRoutes.get(odPair);
 					if (routes.size() > 0) {
-						writer.write("odPair :\t" + odPair + "\n");
+						this.writer.write("odPair :\t" + odPair + "\n");
 						for (List<Id> linkIds : routes) {
-							Integer routeFlows = routeCounters.get(linkIds);
-							Integer num_of_num_of_routes = numRoutesDistribution
+							Integer routeFlows = this.routeCounters.get(linkIds);
+							Integer num_of_num_of_routes = this.numRoutesDistribution
 									.get(routeFlows);
-							numRoutesDistribution
+							this.numRoutesDistribution
 									.put(
 											routeFlows,
 											(num_of_num_of_routes == null) ? new Integer(
@@ -106,19 +107,19 @@ public class RouteSummaryTest {
 													: new Integer(
 															num_of_num_of_routes
 																	.intValue() + 1));
-							writer
+							this.writer
 									.write(linkIds.toString()
 											+ "\tnum_of_routes :\t"
 											+ routeFlows + "\n");
 						}
-						writer.write("-----------------------\n");
-						writer.flush();
+						this.writer.write("-----------------------\n");
+						this.writer.flush();
 					}
 				}
-				writer.write("number_of_routes\tnumber_of_number_of_routes\n");
-				for (Integer n_o_routes : numRoutesDistribution.keySet()) {
-					writer.write(n_o_routes + "\t"
-							+ numRoutesDistribution.get(n_o_routes) + "\n");
+				this.writer.write("number_of_routes\tnumber_of_number_of_routes\n");
+				for (Integer n_o_routes : this.numRoutesDistribution.keySet()) {
+					this.writer.write(n_o_routes + "\t"
+							+ this.numRoutesDistribution.get(n_o_routes) + "\n");
 				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -129,7 +130,7 @@ public class RouteSummaryTest {
 
 		public void end() {
 			try {
-				writer.close();
+				this.writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -150,7 +151,7 @@ public class RouteSummaryTest {
 						String odPair = previousActLinkId.toString() + "->"
 								+ nextActLinkId.toString();
 
-						Set<List<Id>> aOdRouteSet = odRoutes.get(odPair);
+						Set<List<Id>> aOdRouteSet = this.odRoutes.get(odPair);
 						if (aOdRouteSet == null)
 							aOdRouteSet = new HashSet<List<Id>>();
 
@@ -176,12 +177,12 @@ public class RouteSummaryTest {
 						if (!aOdRouteSet.contains(routeLinkIds))
 							aOdRouteSet.add(routeLinkIds);
 						// if (!illegalRoute) {
-						Integer itg = routeCounters.get(routeLinkIds);
-						routeCounters.put(routeLinkIds,
+						Integer itg = this.routeCounters.get(routeLinkIds);
+						this.routeCounters.put(routeLinkIds,
 								(itg == null) ? new Integer(1) : new Integer(
 										itg.intValue() + 1));
 						// }
-						odRoutes.put(odPair, aOdRouteSet);
+						this.odRoutes.put(odPair, aOdRouteSet);
 					}
 		}
 	}
@@ -210,7 +211,7 @@ public class RouteSummaryTest {
 		System.out.println("-->reading networkfile: " + netFilename);
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		RouteSummary rs = new RouteSummary(outFilename);
 		population.addAlgorithm(rs);

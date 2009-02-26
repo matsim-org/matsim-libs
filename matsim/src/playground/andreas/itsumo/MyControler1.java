@@ -34,11 +34,12 @@ import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.NetworkUtils;
@@ -109,7 +110,7 @@ public class MyControler1 extends Controler {
 	protected Population loadPopulation() {
 
 
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		log.info("  generating plans... ");
 

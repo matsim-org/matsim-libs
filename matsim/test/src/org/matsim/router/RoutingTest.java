@@ -23,10 +23,11 @@ package org.matsim.router;
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
@@ -110,7 +111,7 @@ public class RoutingTest extends MatsimTestCase {
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
 		String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		new MatsimPopulationReader(population, network).readFile(inPlansName);
 		population.printPlansCount();
 		long referenceChecksum = CRCChecksum.getCRCFromGZFile(inPlansName);

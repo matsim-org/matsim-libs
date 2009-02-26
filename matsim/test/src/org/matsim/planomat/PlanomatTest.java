@@ -34,6 +34,7 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
@@ -42,7 +43,7 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
@@ -72,20 +73,20 @@ public class PlanomatTest extends MatsimTestCase {
 		super.loadConfig(this.getClassInputDirectory() + "config.xml");
 
 		log.info("Reading facilities xml file...");
-		facilities = (Facilities)Gbl.createWorld().createLayer(Facilities.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		this.facilities = (Facilities)Gbl.createWorld().createLayer(Facilities.LAYER_TYPE,null);
+		new MatsimFacilitiesReader(this.facilities).readFile(Gbl.getConfig().facilities().getInputFile());
 		log.info("Reading facilities xml file...done.");
 
 		log.info("Reading network xml file...");
-		network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		this.network = new NetworkLayer();
+		new MatsimNetworkReader(this.network).readFile(Gbl.getConfig().network().getInputFile());
 		log.info("Reading network xml file...done.");
 
 		log.info("Reading plans xml file...");
-		population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		this.population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		PopulationReader plansReader = new MatsimPopulationReader(this.population, this.network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		population.printPlansCount();
+		this.population.printPlansCount();
 		log.info("Reading plans xml file...done.");
 
 	}
@@ -111,10 +112,10 @@ public class PlanomatTest extends MatsimTestCase {
 		Gbl.getConfig().plans().setInputFile(this.getInputDirectory() + "input_plans.xml.gz");
 
 		log.info("Reading plans xml file...");
-		population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		this.population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		PopulationReader plansReader = new MatsimPopulationReader(this.population, this.network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		population.printPlansCount();
+		this.population.printPlansCount();
 		log.info("Reading plans xml file...done.");
 
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR);
@@ -122,15 +123,15 @@ public class PlanomatTest extends MatsimTestCase {
 
 	private void runATestRun(final PlanomatTestRun testRun) {
 
-		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, 900);
+		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.network, 900);
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator);
-		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
+		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.network, 900);
 
 		Events events = new Events();
 		events.addHandler(tTravelEstimator);
 		events.addHandler(depDelayCalc);
 
-		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, network);
+		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, this.network);
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
 
 		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
@@ -160,7 +161,7 @@ public class PlanomatTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = population.getPerson(TEST_PERSON_ID);
+		Person testPerson = this.population.getPerson(TEST_PERSON_ID);
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
@@ -168,7 +169,7 @@ public class PlanomatTest extends MatsimTestCase {
 		testee.run(testPlan);
 
 		// write out the test person and the modified plan into a file
-		Population outputPopulation = new Population();
+		Population outputPopulation = new PopulationImpl();
 		outputPopulation.addPerson(testPerson);
 
 		System.out.println("Writing plans file...");
@@ -193,7 +194,7 @@ public class PlanomatTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = population.getPerson(TEST_PERSON_ID);
+		Person testPerson = this.population.getPerson(TEST_PERSON_ID);
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
@@ -225,7 +226,7 @@ public class PlanomatTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = population.getPerson(TEST_PERSON_ID);
+		Person testPerson = this.population.getPerson(TEST_PERSON_ID);
 		// only plan of that person
 		testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
@@ -264,10 +265,10 @@ public class PlanomatTest extends MatsimTestCase {
 		}
 
 		// init LegTravelTimeEstimator
-		TravelTime tTravelEstimator = new LinearInterpolatingTTCalculator(network, 900);
+		TravelTime tTravelEstimator = new LinearInterpolatingTTCalculator(this.network, 900);
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator);
-		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
-		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, network);
+		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.network, 900);
+		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, this.network);
 
 		// run the method
 		Planomat testee = new Planomat(ltte, null);
@@ -275,7 +276,7 @@ public class PlanomatTest extends MatsimTestCase {
 		testee.writeChromosome2Plan(testChromosome, testPlan, planAnalyzeSubtours);
 
 		// write out the test person and the modified plan into a file
-		Population outputPopulation = new Population();
+		Population outputPopulation = new PopulationImpl();
 		outputPopulation.addPerson(testPerson);
 
 		System.out.println("Writing plans file...");
@@ -304,11 +305,11 @@ public class PlanomatTest extends MatsimTestCase {
 		Gbl.getConfig().planomat().setJgapMaxGenerations(0);
 		Gbl.getConfig().planomat().setPossibleModes("car,pt");
 
-		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, 900);
+		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.network, 900);
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator);
-		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
+		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.network, 900);
 
-		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, network);
+		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, this.network);
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
 
 		Planomat testee = new Planomat(ltte, scoringFunctionFactory);

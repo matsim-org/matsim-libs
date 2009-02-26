@@ -6,7 +6,7 @@ import java.util.Iterator;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 
 public class PersonsRandomizeId {
 

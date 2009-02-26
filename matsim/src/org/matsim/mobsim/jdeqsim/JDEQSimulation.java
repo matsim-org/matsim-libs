@@ -28,10 +28,11 @@ import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.jdeqsim.util.Timer;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.misc.Time;
 
@@ -49,8 +50,8 @@ public class JDEQSimulation {
 
 		// initialize the events handler to which the micro simulatation gives the events
 		SimulationParameters.setProcessEventThread(events);
-		
-		
+
+
 		// READING SIMULATION PARAMETERS FROM CONFIG FILE
 		final String JDEQ_SIM = "JDEQSim";
 		final String SQUEEZE_TIME = "squeezeTime";
@@ -75,42 +76,42 @@ public class JDEQSimulation {
 			log.info("parameter 'squeezeTime' not defined. Using default value [s]: "
 					+ SimulationParameters.getSqueezeTime());
 		}
-		
+
 		if (flowCapacityFactor != null) {
 			SimulationParameters.setFlowCapacityFactor((Double.parseDouble(flowCapacityFactor)));
 		} else {
 			log.info("parameter 'flowCapacityFactor' not defined. Using default value: "
 					+ SimulationParameters.getFlowCapacityFactor());
 		}
-		
+
 		if (storageCapacityFactor != null) {
 			SimulationParameters.setStorageCapacityFactor((Double.parseDouble(storageCapacityFactor)));
 		} else {
 			log.info("parameter 'storageCapacityFactor' not defined. Using default value: "
 					+ SimulationParameters.getStorageCapacityFactor());
 		}
-		
+
 		if (minimumInFlowCapacity != null) {
 			SimulationParameters.setMinimumInFlowCapacity((Double.parseDouble(minimumInFlowCapacity)));
 		} else {
 			log.info("parameter 'minimumInFlowCapacity' not defined. Using default value [vehicles per hour]: "
 					+ SimulationParameters.getMinimumInFlowCapacity());
 		}
-		
+
 		if (carSize != null) {
 			SimulationParameters.setCarSize((Double.parseDouble(carSize)));
 		} else {
 			log.info("parameter 'carSize' not defined. Using default value [m]: "
 					+ SimulationParameters.getCarSize());
 		}
-		
+
 		if (gapTravelSpeed != null) {
 			SimulationParameters.setGapTravelSpeed(Double.parseDouble(gapTravelSpeed));
 		} else {
 			log.info("parameter 'gapTravelSpeed' not defined. Using default value [m/s]: "
 					+ SimulationParameters.getGapTravelSpeed());
 		}
-		
+
 		if (endTime != null) {
 			if (Time.parseTime(endTime)!=0.0){
 				SimulationParameters.setSimulationEndTime(Time.parseTime(endTime));
@@ -119,8 +120,8 @@ public class JDEQSimulation {
 			log.info("parameter 'endTime' not defined. Using default value [s]: "
 					+ SimulationParameters.getSimulationEndTime());
 		}
-		
-		
+
+
 
 		// enable testing to hook in here as a handler
 		if (SimulationParameters.getTestEventHandler() != null) {
@@ -130,7 +131,7 @@ public class JDEQSimulation {
 
 		if (SimulationParameters.getTestPlanPath() != null) {
 			// read population
-			Population pop = new Population(Population.NO_STREAMING);
+			Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
 			PopulationReader plansReader = new MatsimPopulationReader(pop, this.network);
 			plansReader.readFile(SimulationParameters.getTestPlanPath());
 
@@ -154,7 +155,7 @@ public class JDEQSimulation {
 
 		// initialize network
 		Road road = null;
-		for (Link link : network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			road = new Road(scheduler, link);
 			SimulationParameters.getAllRoads().put(link.getId().toString(), road);
 		}

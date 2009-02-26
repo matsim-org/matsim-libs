@@ -44,10 +44,11 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -96,7 +97,7 @@ public class PlanScoreAnalysis {
 
 	private FeatureType ftHome;
 
-	private GeometryFactory geofac = new GeometryFactory();
+	private final GeometryFactory geofac = new GeometryFactory();
 
 	private long counter = 0;
 	private long nextMsg = 1;
@@ -125,7 +126,7 @@ public class PlanScoreAnalysis {
 		}
 	}
 
-	private Feature createHomeFeature(double score, Coord loc, Id id) {
+	private Feature createHomeFeature(final double score, final Coord loc, final Id id) {
 		Coordinate coord = new Coordinate(loc.getX(), loc.getY());
 		CoordinateSequence coords = new CoordinateArraySequence(
 				new Coordinate[] { coord });
@@ -145,12 +146,12 @@ public class PlanScoreAnalysis {
 		Gbl.getWorld().setNetworkLayer(net);
 		Gbl.getWorld().complete();
 
-		Population plans = new Population(false);
+		Population plans = new PopulationImpl(false);
 		MatsimPopulationReader reader = new MatsimPopulationReader(plans);
 		reader.readFile(PLANS);
 
 
-		Population plans2 = new Population(false);
+		Population plans2 = new PopulationImpl(false);
 		reader = new MatsimPopulationReader(plans2);
 		reader.readFile(PLANS2);
 
@@ -199,7 +200,7 @@ public class PlanScoreAnalysis {
 				"completed analysis of plans");
 	}
 
-	private void writeShapeFile(Collection<Feature> features, String filename)
+	private void writeShapeFile(final Collection<Feature> features, final String filename)
 			throws IOException, FactoryException, SchemaException {
 		URL fileURL = (new File(filename)).toURL();
 		ShapefileDataStore datastore = new ShapefileDataStore(fileURL);
@@ -214,7 +215,7 @@ public class PlanScoreAnalysis {
 
 	}
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		PlanScoreAnalysis ana = new PlanScoreAnalysis();
 		ana.doAnalysis();
 	}

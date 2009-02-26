@@ -36,8 +36,9 @@ import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.PopulationWriterHandler;
@@ -65,7 +66,7 @@ public class ExternalModule implements StrategyModule {
 	private static final String SCENARIO_WORKING_PLANS_FILENAME = "workingPlansFilename";
 	private static final String SCENARIO_WORKING_EVENTS_TXT_FILENAME = "workingEventsTxtFilename";
 	private static final String SCENARIO_NETWORK_FILENAME = "networkFilename";
-	
+
 	protected static final String ExternalInFileName = "plans.in.xml";
 	protected static final String ExternalOutFileName = "plans.out.xml";
 	protected static final String ExternalConfigFileName = "config.xml";
@@ -97,7 +98,7 @@ public class ExternalModule implements StrategyModule {
 	protected PopulationWriter getPlansWriterHandler() {
 		String filename = this.outFileRoot + this.moduleId + ExternalInFileName;
 		String version = "v4";
-		return new PopulationWriter(new Population(Population.USE_STREAMING), filename, version);
+		return new PopulationWriter(new PopulationImpl(PopulationImpl.USE_STREAMING), filename, version);
 	}
 
 	public void handlePlan(final Plan plan) {
@@ -162,7 +163,7 @@ public class ExternalModule implements StrategyModule {
 			MatsimConfigReader reader = new MatsimConfigReader(this.extConfig);
 			reader.readFile(configFileName);
 		}
-		
+
 		// Change scenario config according to given output- and input-filenames: events, plans, network
 		this.extConfig.setParam(SCENARIO, SCENARIO_INPUT_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalInFileName);
 		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalOutFileName);
@@ -202,7 +203,7 @@ public class ExternalModule implements StrategyModule {
 	}
 
 	private void reReadPlans() {
-		Population plans = new Population(Population.NO_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		PopulationReader plansReader = getPlansReader(plans);
 		plans.addAlgorithm(new PersonCalcTimes());
 		plans.addAlgorithm(new UpdatePlansAlgo(this.persons));

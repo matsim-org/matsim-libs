@@ -32,31 +32,31 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkReader;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.PopulationWriterHandlerImplV4;
 import org.xml.sax.SAXException;
 
-import playground.dgrether.cmcf.CMCFScenarioGenerator;
 import playground.msieg.structure.HashPathFlow;
 import playground.msieg.structure.PathFlow;
 
 public abstract class CMCFRouter implements NetworkReader{
 
 	private static final Logger log = Logger.getLogger(CMCFRouter.class);
-	
+
 	private final String networkFile, plansFile, cmcfFile;
-	
+
 	protected NetworkLayer network;
 	protected Population population;
 	protected PathFlow<Node, Link> pathFlow;
-	
-	
-	public CMCFRouter(String networkFile, String plansFile, String cmcfFile) {
+
+
+	public CMCFRouter(final String networkFile, final String plansFile, final String cmcfFile) {
 		super();
 		this.networkFile = networkFile;
 		this.plansFile = plansFile;
@@ -68,7 +68,7 @@ public abstract class CMCFRouter implements NetworkReader{
 		this.loadPopulation();
 		this.loadCMCFSolution();
 	}
-	
+
 	public void loadEverything(){
 		this.loadNetwork();
 		this.loadPopulation();
@@ -80,7 +80,7 @@ public abstract class CMCFRouter implements NetworkReader{
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected void loadNetwork(){
 		//this.network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		//new MatsimNetworkReader(network).readFile(networkFile);
@@ -99,12 +99,12 @@ public abstract class CMCFRouter implements NetworkReader{
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected void loadPopulation(){
-		this.population = new Population(Population.NO_STREAMING);
-		new MatsimPopulationReader(this.population, this.network).readFile(plansFile);
+		this.population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		new MatsimPopulationReader(this.population, this.network).readFile(this.plansFile);
 	}
-	
+
 	protected void loadCMCFSolution() throws NumberFormatException, IOException{
 		this.pathFlow = new HashPathFlow<Node, Link>();
 		BufferedReader in = new BufferedReader(new FileReader(this.cmcfFile));
@@ -129,18 +129,18 @@ public abstract class CMCFRouter implements NetworkReader{
 				while(st.hasMoreTokens()){
 					path.add(this.network.getLink(st.nextToken()));
 				}
-				pathFlow.add(this.network.getNode(fromID), this.network.getNode(toID), path, flow);
+				this.pathFlow.add(this.network.getNode(fromID), this.network.getNode(toID), path, flow);
 			}
 		}
 	}
-	
-	public void writePlans(String outPlansFile){
+
+	public void writePlans(final String outPlansFile){
 		//MatsimIo.writePlans(this.population, outPlansFile);
 		PopulationWriter pwriter = new PopulationWriter(this.population, outPlansFile, "v4", 1.0);
 		pwriter.setWriterHandler(new PopulationWriterHandlerImplV4());
 		pwriter.write();
 	}
-	
+
 	abstract public void route();
 }
 

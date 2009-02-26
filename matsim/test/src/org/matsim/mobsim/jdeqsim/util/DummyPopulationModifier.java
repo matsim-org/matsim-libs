@@ -1,7 +1,7 @@
 package org.matsim.mobsim.jdeqsim.util;
 
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.jdeqsim.util.testable.PopulationModifier;
-import org.matsim.population.Population;
 
 
 public class DummyPopulationModifier implements PopulationModifier {

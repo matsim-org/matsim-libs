@@ -42,10 +42,11 @@ import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -53,18 +54,18 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * This class founds on many codes of Gregor Laemmel. man should for this "run"
  * install com.sun.media.jai and javax.media.jai from http://jai.dev.java.net
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class MATSimNet2QGIS {
 	/**
 	 * this class is only a copy of
 	 * <class>playground.gregor.shapeFileToMATSim.ShapeFileWriter</class> Gregor
 	 * Laemmel's
-	 * 
+	 *
 	 * @author ychen
-	 * 
+	 *
 	 */
 	public static class ShapeFileWriter2 {
 
@@ -88,8 +89,8 @@ public class MATSimNet2QGIS {
 
 	public void readNetwork(final String netFilename) {
 		Gbl.createConfig(null);
-		network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		this.network = new NetworkLayer();
+		new MatsimNetworkReader(this.network).readFile(netFilename);
 	}
 
 	/**
@@ -98,11 +99,11 @@ public class MATSimNet2QGIS {
 	 */
 	public void setCrs(final String wkt) {
 		try {
-			crs = CRS.parseWKT(wkt);
+			this.crs = CRS.parseWKT(wkt);
 		} catch (FactoryException e) {
 			e.printStackTrace();
 		}
-		n2g = new Network2PolygonGraph(network, crs);
+		this.n2g = new Network2PolygonGraph(this.network, this.crs);
 	}// TODO override
 
 	/**
@@ -119,7 +120,7 @@ public class MATSimNet2QGIS {
 	 */
 	public void writeShapeFile(final String ShapeFilename) {
 		try {
-			ShapeFileWriter2.writeGeometries(n2g.getFeatures(), ShapeFilename);
+			ShapeFileWriter2.writeGeometries(this.n2g.getFeatures(), ShapeFilename);
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
 		} catch (SchemaException e) {
@@ -136,7 +137,7 @@ public class MATSimNet2QGIS {
 	// /////////////////////////////
 	public void addParameter(final String paraName, final Class<?> clazz,
 			final Map<Id, ?> parameters) {
-		n2g.addParameter(paraName, clazz, parameters);
+		this.n2g.addParameter(paraName, clazz, parameters);
 	}
 
 	// /////////////////////////////
@@ -144,7 +145,7 @@ public class MATSimNet2QGIS {
 	 * @return the network
 	 */
 	public NetworkLayer getNetwork() {
-		return network;
+		return this.network;
 	}
 
 	public void readEvents(final String eventsFilename,
@@ -156,14 +157,14 @@ public class MATSimNet2QGIS {
 
 	public void readPlans(final String plansFilename,
 			final AbstractPersonAlgorithm pa) {
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		population.addAlgorithm(pa);
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		new MatsimPopulationReader(population, this.network).readFile(plansFilename);
 		population.runAlgorithms();
 	}
 
 	public CoordinateReferenceSystem getCrs() {
-		return crs;
+		return this.crs;
 	}
 
 	/**

@@ -46,10 +46,11 @@ import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileWriter;
@@ -66,9 +67,9 @@ import com.vividsolutions.jts.geom.Point;
  * Parameters as defined in the population xml file will be added as attributes
  * to the shape files. There are also some parameters to configure this
  * converter, please consider the corresponding setters in this class."
- * 
+ *
  * @author laemmel
- * 
+ *
  *         this a copy of
  *         org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape.java
  *         of Mr. Laemmel with some changes.
@@ -89,10 +90,10 @@ public class SelectedPlans2ESRIShape {
 	protected GeometryFactory geofac;
 
 	public SelectedPlans2ESRIShape() {
-		crs = null;
-		population = null;
-		outputDir = null;
-		geofac = null;
+		this.crs = null;
+		this.population = null;
+		this.outputDir = null;
+		this.geofac = null;
 	}
 
 	public SelectedPlans2ESRIShape(final Population population,
@@ -296,7 +297,7 @@ public class SelectedPlans2ESRIShape {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		new MatsimPopulationReader(population, network)
 				.readFile(populationFilename);
 
@@ -317,39 +318,39 @@ public class SelectedPlans2ESRIShape {
 	}
 
 	public GeometryFactory getGeofac() {
-		return geofac;
+		return this.geofac;
 	}
 
-	public void setFeatureTypeLeg(FeatureType featureTypeLeg) {
+	public void setFeatureTypeLeg(final FeatureType featureTypeLeg) {
 		this.featureTypeLeg = featureTypeLeg;
 	}
 
 	public FeatureType getFeatureTypeLeg() {
-		return featureTypeLeg;
+		return this.featureTypeLeg;
 	}
 
 	public CoordinateReferenceSystem getCrs() {
-		return crs;
+		return this.crs;
 	}
 
-	public void setFeatureTypeAct(FeatureType featureTypeAct) {
+	public void setFeatureTypeAct(final FeatureType featureTypeAct) {
 		this.featureTypeAct = featureTypeAct;
 	}
 
 	public FeatureType getFeatureTypeAct() {
-		return featureTypeAct;
+		return this.featureTypeAct;
 	}
 
 	public String getOutputDir() {
-		return outputDir;
+		return this.outputDir;
 	}
 
-	public void setOutputSamplePlans(ArrayList<Plan> outputSamplePlans) {
+	public void setOutputSamplePlans(final ArrayList<Plan> outputSamplePlans) {
 		this.outputSamplePlans = outputSamplePlans;
 	}
 
 	public ArrayList<Plan> getOutputSamplePlans() {
-		return outputSamplePlans;
+		return this.outputSamplePlans;
 	}
 
 }

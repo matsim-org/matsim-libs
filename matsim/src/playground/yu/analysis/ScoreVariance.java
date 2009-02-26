@@ -32,17 +32,18 @@ import java.util.List;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ScoreVariance extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -53,7 +54,7 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements
 	public ScoreVariance(final String outputFilename) {
 		this.outputFilename = outputFilename;
 		try {
-			writer = IOUtils.getBufferedWriter(outputFilename);
+			this.writer = IOUtils.getBufferedWriter(outputFilename);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -81,7 +82,7 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		ScoreVariance sv = new ScoreVariance(outputFilename);
 		population.addAlgorithm(sv);
@@ -98,17 +99,17 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements
 	}
 
 	public void run(final Plan plan) {
-		scores.add(plan.getScore());
+		this.scores.add(plan.getScore());
 	}
 
 	public void writeVariance() {
-		int size = scores.size();
+		int size = this.scores.size();
 		if (size == 0) {
 			try {
-				writer
-						.write(outputFilename
+				this.writer
+						.write(this.outputFilename
 								+ "\nERROR: there is not data for calculating Variance!");
-				writer.close();
+				this.writer.close();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -117,14 +118,14 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements
 		}
 		double[] scoreArray = new double[size];
 		for (int i = 0; i < size; i++)
-			scoreArray[i] = scores.get(i);
+			scoreArray[i] = this.scores.get(i);
 		double var = getVariance(scoreArray);
 		try {
-			writer.write(outputFilename + "\ncount = " + scoreArray.length
+			this.writer.write(this.outputFilename + "\ncount = " + scoreArray.length
 					+ "\navg. = " + getAverage(scoreArray)
 					+ "\nScoreVariance = " + var + "\nStandard deviation = "
 					+ getStandardDeviation(var));
-			writer.close();
+			this.writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

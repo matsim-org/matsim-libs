@@ -36,9 +36,10 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
@@ -77,7 +78,7 @@ public class ControlerTest extends MatsimTestCase {
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
 		 * same time at 7am.  */
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		Person person1 = null;
 
 		person1 = new PersonImpl(new IdImpl(1));
@@ -158,7 +159,7 @@ public class ControlerTest extends MatsimTestCase {
 		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(100, 0));
 		network.createLink(new IdImpl(1), node1, node2, 100, 1, 3600, 1);
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		final Controler controler = new Controler(config, network, population);
 		controler.setCreateGraphs(false);
@@ -201,7 +202,7 @@ public class ControlerTest extends MatsimTestCase {
 		Link link3 = network.createLink(new IdImpl(3), node3, node4,  100, 10, 7200, 1);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		Person person1 = null;
 		Leg leg1 = null;
 		Leg leg2 = null;
@@ -276,7 +277,7 @@ public class ControlerTest extends MatsimTestCase {
 		Link link3 = network.createLink(new IdImpl(3), node3, node4,  100, 10, 7200, 1);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		Person person1 = null;
 		Act act1a = null;
 		Act act1b = null;

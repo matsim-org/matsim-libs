@@ -31,10 +31,11 @@ import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.PopulationWriterHandlerImplV4;
 import org.matsim.population.routes.NodeCarRoute;
@@ -67,7 +68,7 @@ public class Plansgenerator {
 
 	private void createPlans() throws Exception {
 		init();
-		this.plans = new Population(false);
+		this.plans = new PopulationImpl(false);
 		int homeEndtime = 6 * 3600;
 		NetworkLayer networkLayer = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		final Link link1 = networkLayer.getLink(new IdImpl("1"));
@@ -116,7 +117,7 @@ public class Plansgenerator {
 
 	}
 
-	protected NetworkLayer loadNetwork(String filename) {
+	protected NetworkLayer loadNetwork(final String filename) {
 		// - read network: which buildertype??
 		NetworkLayer network = new NetworkLayer();
 		Gbl.getWorld().setNetworkLayer(network);

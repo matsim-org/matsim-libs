@@ -24,18 +24,19 @@ import java.io.IOException;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 
 /**
  * Controler to run MATSim in order to get compression ratio of the sparely new
  * network with sparely linkroute.
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class CompressRouteControler {
 
@@ -43,7 +44,7 @@ public class CompressRouteControler {
 	 * @param args
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(final String[] args) throws IOException {
 		Config config = Gbl.createConfig(args);
 
 		System.out.println("  reading the network...");
@@ -59,7 +60,7 @@ public class CompressRouteControler {
 		System.out.println("-->done.");
 
 		System.out.println("  setting up plans objects...");
-		final Population plans = new Population(Population.USE_STREAMING);
+		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		PopulationReader plansReader = new MatsimPopulationReader(plans,
 				network);
 		// compress routes

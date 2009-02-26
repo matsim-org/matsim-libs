@@ -22,30 +22,31 @@ package org.matsim.utils.io;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriterV5;
 
 /**
  * This class provides helper methods to convert the
- * different MATSim XML versions to other versions. 
+ * different MATSim XML versions to other versions.
  *
  * @author dgrether
  *
  */
 public class MatsimXMLFormatConverter {
-	
-	public static void convertPopulationV4ToV5(String popv4, String popv5, String network) throws FileNotFoundException, IOException{
+
+	public static void convertPopulationV4ToV5(final String popv4, final String popv5, final String network) throws FileNotFoundException, IOException{
 		NetworkLayer net = new NetworkLayer();
 		MatsimNetworkReader reader = new MatsimNetworkReader(net);
 		reader.readFile(network);
-		
-		Population pop = new Population(Population.NO_STREAMING);
+
+		Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		MatsimPopulationReader popreader = new MatsimPopulationReader(pop, net);
 		popreader.readFile(popv4);
-		
+
 		PopulationWriterV5 writer = new PopulationWriterV5(pop);
 		writer.writeFile(popv5);
 	}

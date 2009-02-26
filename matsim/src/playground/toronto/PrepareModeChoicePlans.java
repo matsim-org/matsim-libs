@@ -21,10 +21,11 @@
 package playground.toronto;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 
 import playground.yu.newPlans.NewAgentPtPlan;
 
@@ -43,12 +44,10 @@ public class PrepareModeChoicePlans {
 		Gbl.createConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputNetworkFile);
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
-		Population population = new Population(Population.USE_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		NewAgentPtPlan planGenerator = new NewAgentPtPlan(population, outputPlansFile);
 		population.addAlgorithm(planGenerator);
-		new MatsimPopulationReader(population).readFile(inputPlansFile);
+		new MatsimPopulationReader(population, network).readFile(inputPlansFile);
 		population.printPlansCount();
 		planGenerator.writeEndPlans();
 		System.out.println("done.");

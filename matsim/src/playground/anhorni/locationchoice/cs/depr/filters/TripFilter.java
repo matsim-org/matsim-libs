@@ -8,7 +8,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 

@@ -20,27 +20,21 @@
 
 package playground.balmermi;
 
-import org.matsim.facilities.Facilities;
-import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
-import org.matsim.world.algorithms.WorldConnectLocations;
-import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldMappingInfo;
-
-import playground.balmermi.algos.PersonXY2Facility;
 
 public class PersonStreaming {
 
 	public static void run() {
 
 		System.out.println("person streaming...");
-		
+
 //		System.out.println("  reading facilities xml file... ");
 //		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 //		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
@@ -61,7 +55,7 @@ public class PersonStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		Population plans = new Population(Population.USE_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
@@ -77,7 +71,7 @@ public class PersonStreaming {
 //		plans.addAlgorithm(new PersonCalcTripDistances());
 //		PersonTripSummaryTable ptst = new PersonTripSummaryTable("output/output_trip-summary-table.txt");
 //		plans.addAlgorithm(ptst);
-		
+
 //		DoAndUndo dau = new DoAndUndo();
 //		plans.addAlgorithm(dau);
 
@@ -86,13 +80,13 @@ public class PersonStreaming {
 //		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 //		preprocess.run(network);
 //		plans.addAlgorithm(new PlansCalcRouteLandmarks(network, preprocess, timeCostCalc, timeCostCalc));
-		
+
 //		plans.addAlgorithm(dau);
 
 //		PersonLinkRoutesTable plrt = new PersonLinkRoutesTable("output/linkroutes");
 //		plans.addAlgorithm(plrt);
 		System.out.println("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
@@ -124,7 +118,7 @@ public class PersonStreaming {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
 		Gbl.createConfig(args);

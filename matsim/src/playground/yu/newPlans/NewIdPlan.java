@@ -19,21 +19,22 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.newPlans;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 
 /**
  * @author yu
- * 
+ *
  */
 public class NewIdPlan extends NewPlan {
 
@@ -47,7 +48,7 @@ public class NewIdPlan extends NewPlan {
 	@Override
 	public void run(final Person person) {
 		if (Integer.parseInt(person.getId().toString()) <= 100)
-			pw.writePerson(person);
+			this.pw.writePerson(person);
 	}
 
 	/**
@@ -60,7 +61,7 @@ public class NewIdPlan extends NewPlan {
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 
-		Population plans = new Population();
+		Population plans = new PopulationImpl();
 		NewIdPlan nip = new NewIdPlan(plans);
 		plans.addAlgorithm(nip);
 		new MatsimPopulationReader(plans, network).readFile(config.plans()

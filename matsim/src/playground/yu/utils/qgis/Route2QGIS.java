@@ -20,10 +20,11 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -39,9 +40,9 @@ import com.vividsolutions.jts.geom.Polygon;
  * This class is a copy of main() from
  * org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape of Mr.
  * Laemmeland can convert a MATSim-population to a QGIS .shp-file (acts or legs)
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 	protected Map<List<Id>, Integer> routeCounters;
@@ -49,8 +50,8 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 	private FeatureType featureTypeRoute;
 	private boolean writeRoutes = true;
 
-	public Route2QGIS(CoordinateReferenceSystem crs, String outputDir,
-			NetworkLayer network, Map<List<Id>, Integer> routeCounters) {
+	public Route2QGIS(final CoordinateReferenceSystem crs, final String outputDir,
+			final NetworkLayer network, final Map<List<Id>, Integer> routeCounters) {
 		this.crs = crs;
 		this.outputDir = outputDir;
 		this.geofac = new GeometryFactory();
@@ -77,18 +78,18 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 		}
 	}
 
-	public void setFeatureTypeRoute(FeatureType featureTypeRoute) {
+	public void setFeatureTypeRoute(final FeatureType featureTypeRoute) {
 		this.featureTypeRoute = featureTypeRoute;
 	}
 
-	protected Feature getRouteFeature(List<Id> routeLinkIds) {
-		Integer routeFlows = routeCounters.get(routeLinkIds);
+	protected Feature getRouteFeature(final List<Id> routeLinkIds) {
+		Integer routeFlows = this.routeCounters.get(routeLinkIds);
 		if (routeFlows != null)
 			if (routeFlows.intValue() > 1) {
 				Coordinate[] coordinates = new Coordinate[(routeLinkIds.size() + 1) * 2 + 1];
 				double width = 5.0 * Math.min(250.0, routeFlows.doubleValue());
 				for (int i = 0; i < routeLinkIds.size(); i++) {
-					Link l = network.getLink(routeLinkIds.get(i));
+					Link l = this.network.getLink(routeLinkIds.get(i));
 					Coord c = l.getFromNode().getCoord();
 					Coordinate cdn = new Coordinate(c.getX(), c.getY());
 					coordinates[i] = cdn;
@@ -104,7 +105,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 									* xdiff / denominator);
 				}
 
-				Coord c = network.getLink(
+				Coord c = this.network.getLink(
 						routeLinkIds.get(routeLinkIds.size() - 1)).getToNode()
 						.getCoord();
 				Coordinate cdn = new Coordinate(c.getX(), c.getY());
@@ -137,12 +138,12 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 	}
 
 	protected FeatureType getFeatureTypeRoute() {
-		return featureTypeRoute;
+		return this.featureTypeRoute;
 	}
 
 	protected void writeRoutes() throws IOException {
 		ArrayList<Feature> fts = new ArrayList<Feature>();
-		for (List<Id> routeLinkIds : routeCounters.keySet()) {
+		for (List<Id> routeLinkIds : this.routeCounters.keySet()) {
 			Feature ft = getRouteFeature(routeLinkIds);
 			if (ft != null)
 				fts.add(ft);
@@ -167,7 +168,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		RouteSummary rs = new RouteSummary(outputDir + "/routeCompare.txt.gz");
 		population.addAlgorithm(rs);
@@ -197,7 +198,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 		}
 	}
 
-	protected void setWriteRoutes(boolean writeRoutes) {
+	protected void setWriteRoutes(final boolean writeRoutes) {
 		this.writeRoutes = writeRoutes;
 	}
 }

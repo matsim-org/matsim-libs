@@ -28,6 +28,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.interfaces.core.v01.Route;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -46,7 +47,7 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 	public void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
 		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).parse("test/scenarios/equil/network.xml");
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(population, network);
 		reader.parse(getInputDirectory() + "plans2.xml");
 

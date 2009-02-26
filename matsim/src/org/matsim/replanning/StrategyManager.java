@@ -28,7 +28,7 @@ import java.util.TreeMap;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 
 /**
  * Manages and applies strategies to agents for re-planning.

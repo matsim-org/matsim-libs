@@ -25,7 +25,7 @@ import java.util.TreeSet;
 
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 
 /**
  * This algorithm filters out all persons without plans, leaving only persons in the

@@ -27,10 +27,11 @@ import org.matsim.config.MatsimConfigReader;
 import org.matsim.controler.ScenarioData;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
 import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientFileQuad;
 import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientQuad;
@@ -92,11 +93,11 @@ public class OTFVis {
 		}
 	}
 
-	public static final void playMVI(String[] args) {
+	public static final void playMVI(final String[] args) {
 		new OnTheFlyClientFileQuad(args[0]).run();
 	}
 
-	public static final void playVEH(String[] args) {
+	public static final void playVEH(final String[] args) {
 		// we should have the network as second argument
 		String vehFileName = args[0];
 		if (args.length < 2) {
@@ -110,7 +111,7 @@ public class OTFVis {
 		}
 	}
 
-	public static final void playConfig(String[] args) {
+	public static final void playConfig(final String[] args) {
 		Config config = Gbl.createConfig(null);
 		if ((args.length > 1) && args[1].toLowerCase().endsWith(".dtd")) {
 			try {
@@ -124,21 +125,21 @@ public class OTFVis {
 		}
 		ScenarioData data = new ScenarioData(config);
 		Events events = new Events();
-		
+
 		Population pop;
 		try {
 			pop = data.getPopulation();
 		} catch (RuntimeException e) {
 			// if this population can not be found start showing network with empty population
 			System.out.println("OTFVis: Population not found: Starting empty network");
-			pop = new Population();
+			pop = new PopulationImpl();
 		}
-		
+
 		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(data.getNetwork(), pop, events);
 		client.run();
 	}
 
-	public static final void convert(String[] args) {
+	public static final void convert(final String[] args) {
 		if ((args.length < 4) || (args.length > 5)) {
 			printUsage();
 			return;

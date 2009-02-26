@@ -4,14 +4,15 @@ import org.apache.log4j.Logger;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
-import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldCheck;
+import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class PlanModifications {
@@ -62,7 +63,7 @@ public class PlanModifications {
 
 	}
 
-	private void setModifier(Modifier modifier) {
+	private void setModifier(final Modifier modifier) {
 		this.modifier=modifier;
 	}
 
@@ -106,7 +107,7 @@ public class PlanModifications {
 		log.info("world checking done.");
 
 
-		this.plans=new Population(false);
+		this.plans=new PopulationImpl(false);
 		final PopulationReader plansReader = new MatsimPopulationReader(this.plans);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");

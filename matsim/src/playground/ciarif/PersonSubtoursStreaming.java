@@ -21,8 +21,9 @@
 package playground.ciarif;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
@@ -63,7 +64,7 @@ public class PersonSubtoursStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		Population plans = new Population(Population.USE_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
@@ -78,7 +79,7 @@ public class PersonSubtoursStreaming {
 //		Persons persons = new Persons(hhs,null);
 //		persons.households = hhs;
 //		persons.persons.put(person.p_id,person);
-		
+
 		System.out.println("  adding mode choice module...");
 		PersonModeChoiceModel pmcm= new PersonModeChoiceModel(persons, municipalities);
 		plans.addAlgorithm(pmcm);
@@ -107,10 +108,10 @@ public class PersonSubtoursStreaming {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 		Gbl.printElapsedTime();
-		
+
 		Gbl.createConfig(args);
 		run();
 

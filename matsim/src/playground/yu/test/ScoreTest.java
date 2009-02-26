@@ -30,16 +30,17 @@ import java.io.IOException;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class ScoreTest extends AbstractPersonAlgorithm {
 	private double sumScoreWorst = 0.0, sumScoreBest = 0.0, sumAvgScores = 0.0,
@@ -49,12 +50,12 @@ public class ScoreTest extends AbstractPersonAlgorithm {
 	private BufferedWriter writer = null;
 
 	/**
-	 * 
+	 *
 	 */
 	public ScoreTest(final String outputFilename) {
 		try {
-			writer = IOUtils.getBufferedWriter(outputFilename);
-			writer.write("of each agent\tavg. score\tsum\tn\n");
+			this.writer = IOUtils.getBufferedWriter(outputFilename);
+			this.writer.write("of each agent\tavg. score\tsum\tn\n");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -86,35 +87,35 @@ public class ScoreTest extends AbstractPersonAlgorithm {
 			cntScores++;
 			// executed plan?
 			if (plan.isSelected()) {
-				sumExecutedScores += plan.getScore();
-				nofExecutedScores++;
+				this.sumExecutedScores += plan.getScore();
+				this.nofExecutedScores++;
 			}
 		}
 		if (worstPlan != null) {
-			nofScoreWorst++;
-			sumScoreWorst += worstPlan.getScore();
+			this.nofScoreWorst++;
+			this.sumScoreWorst += worstPlan.getScore();
 		}
 		if (bestPlan != null) {
-			nofScoreBest++;
-			sumScoreBest += bestPlan.getScore();
+			this.nofScoreBest++;
+			this.sumScoreBest += bestPlan.getScore();
 		}
 		if (cntScores > 0) {
-			sumAvgScores += sumScores / cntScores;
-			nofAvgScores++;
+			this.sumAvgScores += sumScores / cntScores;
+			this.nofAvgScores++;
 		}
 	}
 
 	public void end() {
 		try {
-			writer.write("executed: " + "\t"
-					+ sumExecutedScores / nofExecutedScores + "\t"
-					+ sumExecutedScores + "\t" + nofExecutedScores
-					+ "\nworst: \t" + sumScoreWorst / nofScoreWorst + "\t"
-					+ sumScoreWorst + "\t" + nofScoreWorst + "\navg.: \t"
-					+ sumAvgScores / nofAvgScores + "\t" + sumAvgScores + "\t"
-					+ nofAvgScores + "\nbest: \t" + sumScoreBest / nofScoreBest
-					+ "\t" + sumScoreBest + "\t" + nofScoreBest + "\n");
-			writer.close();
+			this.writer.write("executed: " + "\t"
+					+ this.sumExecutedScores / this.nofExecutedScores + "\t"
+					+ this.sumExecutedScores + "\t" + this.nofExecutedScores
+					+ "\nworst: \t" + this.sumScoreWorst / this.nofScoreWorst + "\t"
+					+ this.sumScoreWorst + "\t" + this.nofScoreWorst + "\navg.: \t"
+					+ this.sumAvgScores / this.nofAvgScores + "\t" + this.sumAvgScores + "\t"
+					+ this.nofAvgScores + "\nbest: \t" + this.sumScoreBest / this.nofScoreBest
+					+ "\t" + this.sumScoreBest + "\t" + this.nofScoreBest + "\n");
+			this.writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -144,7 +145,7 @@ public class ScoreTest extends AbstractPersonAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		ScoreTest st = new ScoreTest(outputFilename);
 		population.addAlgorithm(st);

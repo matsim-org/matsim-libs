@@ -7,15 +7,17 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.utils.misc.Counter;
-import org.matsim.world.algorithms.WorldConnectLocations;
+import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldCheck;
+import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class PlanRemoveUnselected {
@@ -39,7 +41,7 @@ public class PlanRemoveUnselected {
 			System.exit(1);
 		}
 		String plansfilePath=args[0];
-		
+
 		String networkfilePath="./input/network.xml";
 		String facilitiesfilePath="./input/facilities.xml.gz";
 		String worldfilePath="./input/world.xml";
@@ -50,12 +52,12 @@ public class PlanRemoveUnselected {
 	}
 
 	private void runModifications() {
-		
+
 		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
 		while (person_iter.hasNext()) {
 			Person person = person_iter.next();
-				counter.incCounter();				
+				counter.incCounter();
 				person.removeUnselectedPlans();
 		}
 		log.info("runModifications done.");
@@ -71,31 +73,31 @@ public class PlanRemoveUnselected {
 
 
 		System.out.println("  create world ... ");
-		Gbl.createWorld();
+		World world = Gbl.createWorld();
 		//final MatsimWorldReader worldReader = new MatsimWorldReader(this.world);
 		//worldReader.readFile(worldfilePath);
 		System.out.println("  done.");
 
 
-		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		this.network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 		log.info("network reading done");
 
 		//this.facilities=new Facilities();
-		this.facilities=(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		this.facilities=(Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 		log.info("facilities reading done");
 
-		Gbl.getWorld().complete();
-		new WorldCheck().run(Gbl.getWorld());
-		new WorldConnectLocations().run(Gbl.getWorld());
-		new WorldMappingInfo().run(Gbl.getWorld());
-		new WorldCheck().run(Gbl.getWorld());
+		world.complete();
+		new WorldCheck().run(world);
+		new WorldConnectLocations().run(world);
+		new WorldMappingInfo().run(world);
+		new WorldCheck().run(world);
 		log.info("world checking done.");
 
 
-		this.plans=new Population(false);
-		final PopulationReader plansReader = new MatsimPopulationReader(this.plans);
+		this.plans=new PopulationImpl(false);
+		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, this.network);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");
 		log.info(this.plans.getPersons().size() + " persons");

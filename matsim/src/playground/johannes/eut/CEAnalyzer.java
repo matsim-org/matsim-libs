@@ -37,7 +37,7 @@ import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.utils.io.IOUtils;
 
 /**

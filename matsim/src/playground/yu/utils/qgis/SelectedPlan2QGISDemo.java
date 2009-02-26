@@ -5,10 +5,11 @@ import java.io.IOException;
 import org.geotools.referencing.CRS;
 import org.jfree.util.Log;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -17,9 +18,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * This class is a copy of main() from
  * org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape and can
  * convert a MATSim-population to a QGIS .shp-file (acts or legs)
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class SelectedPlan2QGISDemo implements X2QGIS {
 	public static void main(final String[] args) throws FactoryException {
@@ -43,7 +44,7 @@ public class SelectedPlan2QGISDemo implements X2QGIS {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		new MatsimPopulationReader(population, network)
 				.readFile(populationFilename);
 		/*

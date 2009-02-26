@@ -26,8 +26,9 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
@@ -91,7 +92,7 @@ public class IIDMGeneration {
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		log.info("  parsing additional municipality information... ");
 		Municipalities municipalities = new Municipalities(indir+"/gg25_2001_infos.txt");
 		municipalities.parse();
@@ -103,7 +104,7 @@ public class IIDMGeneration {
 		new WorldCheck().run(Gbl.getWorld());
 		new WorldMappingInfo().run(Gbl.getWorld());
 		log.info("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  parsing f2z_mapping... ");
@@ -116,16 +117,16 @@ public class IIDMGeneration {
 		new WorldCheck().run(Gbl.getWorld());
 		new WorldMappingInfo().run(Gbl.getWorld());
 		log.info("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reding plans xml file... ");
-		Population pop = new Population(Population.NO_STREAMING);
+		Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		new MatsimPopulationReader(pop).readFile(Gbl.getConfig().plans().getInputFile());
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		// TODO: write some consistency tests
 
 		//////////////////////////////////////////////////////////////////////
@@ -136,7 +137,7 @@ public class IIDMGeneration {
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 //		// Test Demand for Timo Smiezek
 //		// ch.cut.640000.200000.740000.310000.xml
 //		Coord min = new CoordImpl(640000.0,200000.0);
@@ -146,32 +147,32 @@ public class IIDMGeneration {
 //		new PersonCreateFakePlanFromKnowledge().run(plans);
 //		new PlansScenarioCut(min,max).run(plans);
 //		log.info("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
-		
+
 		log.info("  removing persons... ");
 		new PlansFilterPersons().run(pop);
 		log.info("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
-		
+
 		log.info("  adding custom attributes for persons... ");
 		new PopulationAddCustomAttributes(indir+"/ETHZ_Pers.tab").run(pop);
 		log.info("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reding mz plans xml file... ");
-		Population mz_pop = new Population(Population.NO_STREAMING);
+		Population mz_pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		new MatsimPopulationReader(mz_pop).readFile(indir+"/mz.plans.xml.gz");
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		log.info("  creating mz data stucture... ");
 		MicroCensus mz = new MicroCensus(mz_pop);
 		log.info("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  runnning person models... ");
@@ -181,7 +182,7 @@ public class IIDMGeneration {
 		new PlansAnalyse().run(pop);
 		new PlansAnalyse().run(mz_pop);
 		log.info("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  writing custom attributes of the persons... ");

@@ -1,10 +1,11 @@
 package playground.yu.visum.test;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 
 import playground.yu.visum.filter.ActTypeFilter;
@@ -32,7 +33,7 @@ public class PersonFilterTest {
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
-		Population plans = new Population(Population.USE_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		System.out.println("  done.");
 
 		System.out.println("  setting plans algorithms... ");

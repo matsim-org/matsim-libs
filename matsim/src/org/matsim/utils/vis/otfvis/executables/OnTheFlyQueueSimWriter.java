@@ -26,11 +26,12 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
@@ -47,6 +48,7 @@ import org.matsim.world.World;
  *
  * @deprecated please use org.matsim.run.OTFVis to start the visualizer
  */
+@Deprecated
 public class OnTheFlyQueueSimWriter extends QueueSimulation{
 	protected LegHistogram hist = null;
 
@@ -75,13 +77,13 @@ public class OnTheFlyQueueSimWriter extends QueueSimulation{
 	}
 
 
-	public OnTheFlyQueueSimWriter(NetworkLayer net, Population plans, Events events) {
+	public OnTheFlyQueueSimWriter(final NetworkLayer net, final Population plans, final Events events) {
 		super(net, plans, events);
 		// TODO Auto-generated constructor stub
 	}
 
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 		String studiesRoot = "../";
 		String localDtdBase = "../matsimJ/dtd/";
@@ -117,7 +119,7 @@ public class OnTheFlyQueueSimWriter extends QueueSimulation{
 		world.setNetworkLayer(net);
 		world.complete();
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		// Read plans file with special Reader Implementation
 		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(popFileName);
@@ -143,7 +145,7 @@ public class OnTheFlyQueueSimWriter extends QueueSimulation{
 
 	}
 
-	public void setOtfwriter(OTFQuadFileHandler.Writer  otfwriter) {
+	public void setOtfwriter(final OTFQuadFileHandler.Writer  otfwriter) {
 		this.netStateWriter = otfwriter;
 	}
 

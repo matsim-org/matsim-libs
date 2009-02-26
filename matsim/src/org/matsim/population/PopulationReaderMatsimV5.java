@@ -28,6 +28,7 @@ import org.matsim.basic.v01.PopulationSchemaV5Names;
 import org.matsim.facilities.Facilities;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Household;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.interfaces.core.v01.Vehicle;
 import org.matsim.network.NetworkLayer;
 import org.xml.sax.Attributes;

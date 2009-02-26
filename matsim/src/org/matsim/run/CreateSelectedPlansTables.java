@@ -28,10 +28,11 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.io.IOUtils;
 
@@ -97,8 +98,8 @@ public class CreateSelectedPlansTables {
 	}
 
 	private void init(final String networkPath) {
-		this.plans0=new Population(false);
-		this.plans1=new Population(false);
+		this.plans0=new PopulationImpl(false);
+		this.plans1=new PopulationImpl(false);
 
 		System.out.println("  reading the network...");
 		this.network = new NetworkLayer();

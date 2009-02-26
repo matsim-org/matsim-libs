@@ -21,17 +21,18 @@
 package playground.yu.newPlans;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 
 /**
  * test of NewAgentPtPlan
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class SelectedPlansControler {
 
@@ -43,7 +44,7 @@ public class SelectedPlansControler {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		SelectedPlans sp = new SelectedPlans(population);
 		population.addAlgorithm(sp);
 		PopulationReader plansReader = new MatsimPopulationReader(population,

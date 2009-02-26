@@ -23,34 +23,29 @@ package playground.duncan;
  */
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.controler.ScenarioData;
-import org.matsim.facilities.Facilities;
-import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.gis.ShapeFileReader;
-import org.matsim.utils.vis.netvis.NetVis;
-
-import playground.kai.urbansim.Utils;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
@@ -62,8 +57,8 @@ public class MyControler2 {
 
 	private static Population createPlansFromShp(final FeatureSource n) {
 		List<Coord> workPlaces = new ArrayList<Coord>() ;
-		
-		Population population = new Population(Population.NO_STREAMING) ;
+
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING) ;
 		int popCnt = 0 ;
 
 		FeatureIterator it = null; try {
@@ -73,9 +68,9 @@ public class MyControler2 {
 		}
 		while (it.hasNext()) {
 			final Feature feature = it.next();
-			
+
 			double area = (Double) feature.getAttribute("AREA") ;
-			
+
 			final MultiPolygon multiPolygon = (MultiPolygon) feature.getDefaultGeometry();
 			if (multiPolygon.getNumGeometries() > 1) {
 				log.warn("MultiPolygons with more then 1 Geometry ignored!");
@@ -85,7 +80,7 @@ public class MyControler2 {
 			Point center = polygon.getCentroid();
 //			Coord coord = new CoordImpl ( center.getY()/100000.-180.+2.15 , center.getX()/10000. ) ;
 			Coord coord = new CoordImpl ( center.getY() , center.getX() ) ;
-			// (FIXME: should check if this really produces useful coordinates) 
+			// (FIXME: should check if this really produces useful coordinates)
 
 			int nPersons = 0 ;
 			int nJobs = 0 ;
@@ -105,7 +100,7 @@ public class MyControler2 {
 				plan.setSelected(true) ;
 				playground.kai.urbansim.Utils.makeHomePlan(plan, coord) ;
 			}
-			
+
 			// store workplace coordinates in temporary data structure
 			for ( int ii=0 ; ii<nJobs ; ii++ ) {
 				workPlaces.add( coord ) ;
@@ -118,16 +113,16 @@ public class MyControler2 {
 			Coord workCoord = workPlaces.get( idx ) ;
 //			workPlaces.remove( idx ) ;
 			// (with replacement.  W/o replacement, make sure that there are enough workplaces!)
-			playground.kai.urbansim.Utils.completePlanToHwh(plan, workCoord) ; 
+			playground.kai.urbansim.Utils.completePlanToHwh(plan, workCoord) ;
 		}
-		
+
 		return population ;
 	}
 
 	public static void main(final String[] args) {
-		
+
 		final String shpFile = "/Users/nagel/shared-svn/studies/north-america/ca/vancouver/facilities/shp/landuse.shp";
-		
+
 		Population plans=null ;
 		try {
 			plans = createPlansFromShp( ShapeFileReader.readDataFile(shpFile) );
@@ -138,9 +133,9 @@ public class MyControler2 {
 		// write the population for debugging purposes
 		PopulationWriter popWriter = new PopulationWriter(plans,"pop.xml.gz","v4",1) ;
 		popWriter.write();
-		
+
 		log.info("### DONE with demand generation from urbansim ###") ;
-		
+
 		// parse the config arguments so we have a config.  generate scenario data from this
 		if ( args.length==0 ) {
 			Gbl.createConfig(new String[] {"./src/playground/duncan/myconfig1.xml"});
@@ -148,9 +143,9 @@ public class MyControler2 {
 			Gbl.createConfig(args) ;
 		}
 		ScenarioData scenarioData = new ScenarioData( Gbl.getConfig() ) ;
-		
+
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
-		// order to implement policy measures. 
+		// order to implement policy measures.
 		NetworkLayer network = scenarioData.getNetwork() ;
 		log.info("") ; 	log.info("cleaning network ...");
 		NetworkCleaner nwCleaner = new NetworkCleaner() ;

@@ -24,10 +24,11 @@ import java.util.Iterator;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.utils.misc.ArgumentParser;
@@ -106,7 +107,7 @@ public class XY2Links {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 
-		final Population plans = new Population(Population.USE_STREAMING);
+		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));

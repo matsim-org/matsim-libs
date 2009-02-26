@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -11,10 +11,11 @@ import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.charts.XYScatterChart;
@@ -23,7 +24,7 @@ import playground.yu.utils.SimpleWriter;
 
 /**
  * @author yu
- * 
+ *
  */
 public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 		implements PlanAlgorithm {
@@ -39,131 +40,131 @@ public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 	private Person person;
 
 	/**
-	 * 
+	 *
 	 */
 	public DailyEnRouteTimeModalSplit() {
-		maleCarTime = 0.0;
-		malePtTime = 0.0;
-		femaleCarTime = 0.0;
-		femalePtTime = 0.0;
-		ageACarTime = 0.0;
-		ageBCarTime = 0.0;
-		ageCCarTime = 0.0;
-		ageDCarTime = 0.0;
-		ageAPtTime = 0.0;
-		ageBPtTime = 0.0;
-		ageCPtTime = 0.0;
-		ageDPtTime = 0.0;
-		withLicenseCarTime = 0.0;
-		withoutLicenseCarTime = 0.0;
-		withLicensePtTime = 0.0;
-		withoutLicensePtTime = 0.0;
-		isEmployedCarTime = 0.0;
-		isEmployedPtTime = 0.0;
-		notEmployedCarTime = 0.0;
-		notEmployedPtTime = 0.0;
-		alwaysCarTime = 0.0;
-		alwaysPtTime = 0.0;
-		sometimesCarTime = 0.0;
-		sometimesPtTime = 0.0;
-		neverCarTime = 0.0;
-		neverPtTime = 0.0;
+		this.maleCarTime = 0.0;
+		this.malePtTime = 0.0;
+		this.femaleCarTime = 0.0;
+		this.femalePtTime = 0.0;
+		this.ageACarTime = 0.0;
+		this.ageBCarTime = 0.0;
+		this.ageCCarTime = 0.0;
+		this.ageDCarTime = 0.0;
+		this.ageAPtTime = 0.0;
+		this.ageBPtTime = 0.0;
+		this.ageCPtTime = 0.0;
+		this.ageDPtTime = 0.0;
+		this.withLicenseCarTime = 0.0;
+		this.withoutLicenseCarTime = 0.0;
+		this.withLicensePtTime = 0.0;
+		this.withoutLicensePtTime = 0.0;
+		this.isEmployedCarTime = 0.0;
+		this.isEmployedPtTime = 0.0;
+		this.notEmployedCarTime = 0.0;
+		this.notEmployedPtTime = 0.0;
+		this.alwaysCarTime = 0.0;
+		this.alwaysPtTime = 0.0;
+		this.sometimesCarTime = 0.0;
+		this.sometimesPtTime = 0.0;
+		this.neverCarTime = 0.0;
+		this.neverPtTime = 0.0;
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		this.person = person;
 		run(person.getSelectedPlan());
 	}
 
-	public void run(Plan plan) {
-		int age = person.getAge();
-		String carAvail = person.getCarAvail();
+	public void run(final Plan plan) {
+		int age = this.person.getAge();
+		String carAvail = this.person.getCarAvail();
 		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
 			Leg leg = (Leg) li.next();
 			double legTime = leg.getRoute().getTravelTime() / 60.0;
-			if (Integer.parseInt(person.getId().toString()) < 1000000000
+			if (Integer.parseInt(this.person.getId().toString()) < 1000000000
 					&& leg.getDepartureTime() < 86400)
 				if (leg.getMode().equals(Mode.car)) {
-					if (person.getSex().equals("m"))
-						maleCarTime += legTime;
+					if (this.person.getSex().equals("m"))
+						this.maleCarTime += legTime;
 					else
-						femaleCarTime += legTime;
+						this.femaleCarTime += legTime;
 					if (age < 30)
-						ageACarTime += legTime;
+						this.ageACarTime += legTime;
 					else if (age >= 30 && age < 50)
-						ageBCarTime += legTime;
+						this.ageBCarTime += legTime;
 					else if (age >= 50 && age < 70)
-						ageCCarTime += legTime;
+						this.ageCCarTime += legTime;
 					else
-						ageDCarTime += legTime;
-					if (person.getLicense().equals("yes"))
-						withLicenseCarTime += legTime;
+						this.ageDCarTime += legTime;
+					if (this.person.getLicense().equals("yes"))
+						this.withLicenseCarTime += legTime;
 					else
-						withoutLicenseCarTime += legTime;
+						this.withoutLicenseCarTime += legTime;
 					if (carAvail.equals("always"))
-						alwaysCarTime += legTime;
+						this.alwaysCarTime += legTime;
 					else if (carAvail.equals("sometimes"))
-						sometimesCarTime += legTime;
+						this.sometimesCarTime += legTime;
 					else
-						neverCarTime += legTime;
-					if (person.isEmployed())
-						isEmployedCarTime += legTime;
+						this.neverCarTime += legTime;
+					if (this.person.isEmployed())
+						this.isEmployedCarTime += legTime;
 					else
-						notEmployedCarTime += legTime;
+						this.notEmployedCarTime += legTime;
 				} else if (leg.getMode().equals(Mode.pt)) {
-					if (person.getSex().equals("m"))
-						malePtTime += legTime;
+					if (this.person.getSex().equals("m"))
+						this.malePtTime += legTime;
 					else
-						femalePtTime += legTime;
+						this.femalePtTime += legTime;
 					if (age < 30)
-						ageAPtTime += legTime;
+						this.ageAPtTime += legTime;
 					else if (age >= 30 && age < 50)
-						ageBPtTime += legTime;
+						this.ageBPtTime += legTime;
 					else if (age >= 50 && age < 70)
-						ageCPtTime += legTime;
+						this.ageCPtTime += legTime;
 					else
-						ageDPtTime += legTime;
-					if (person.getLicense().equals("yes"))
-						withLicensePtTime += legTime;
+						this.ageDPtTime += legTime;
+					if (this.person.getLicense().equals("yes"))
+						this.withLicensePtTime += legTime;
 					else
-						withoutLicensePtTime += legTime;
+						this.withoutLicensePtTime += legTime;
 					if (carAvail.equals("always"))
-						alwaysPtTime += legTime;
+						this.alwaysPtTime += legTime;
 					else if (carAvail.equals("sometimes"))
-						sometimesPtTime += legTime;
+						this.sometimesPtTime += legTime;
 					else
-						neverPtTime += legTime;
-					if (person.isEmployed())
-						isEmployedPtTime += legTime;
+						this.neverPtTime += legTime;
+					if (this.person.isEmployed())
+						this.isEmployedPtTime += legTime;
 					else
-						notEmployedPtTime += legTime;
+						this.notEmployedPtTime += legTime;
 				}
 
 		}
 	}
 
-	public void write(String outputFilename) {
+	public void write(final String outputFilename) {
 		SimpleWriter sw = new SimpleWriter(outputFilename + ".txt");
 		sw.writeln("Modal Split -- DailyTime");
 		sw.writeln("category\tcar Time [km]\tpt Time [km]");
-		sw.writeln("male\t" + maleCarTime + "\t" + malePtTime);
-		sw.writeln("female\t" + femaleCarTime + "\t" + femalePtTime);
-		sw.writeln("age<30\t" + ageACarTime + "\t" + ageAPtTime);
-		sw.writeln("30<=age<50\t" + ageBCarTime + "\t" + ageBPtTime);
-		sw.writeln("50<=age<70\t" + ageCCarTime + "\t" + ageCPtTime);
-		sw.writeln("age>70\t" + ageDCarTime + "\t" + ageDPtTime);
-		sw.writeln("with license\t" + withLicenseCarTime + "\t"
-				+ withLicensePtTime);
-		sw.writeln("without license\t" + withoutLicenseCarTime + "\t"
-				+ withoutLicensePtTime);
-		sw.writeln("always has a car\t" + alwaysCarTime + "\t" + alwaysPtTime);
-		sw.writeln("sometimes has a car\t" + sometimesCarTime + "\t"
-				+ sometimesPtTime);
-		sw.writeln("never has a car\t" + neverCarTime + "\t" + neverPtTime);
-		sw.writeln("employed\t" + sometimesCarTime + "\t" + sometimesPtTime);
-		sw.writeln("not employed\t" + notEmployedCarTime + "\t"
-				+ notEmployedPtTime);
+		sw.writeln("male\t" + this.maleCarTime + "\t" + this.malePtTime);
+		sw.writeln("female\t" + this.femaleCarTime + "\t" + this.femalePtTime);
+		sw.writeln("age<30\t" + this.ageACarTime + "\t" + this.ageAPtTime);
+		sw.writeln("30<=age<50\t" + this.ageBCarTime + "\t" + this.ageBPtTime);
+		sw.writeln("50<=age<70\t" + this.ageCCarTime + "\t" + this.ageCPtTime);
+		sw.writeln("age>70\t" + this.ageDCarTime + "\t" + this.ageDPtTime);
+		sw.writeln("with license\t" + this.withLicenseCarTime + "\t"
+				+ this.withLicensePtTime);
+		sw.writeln("without license\t" + this.withoutLicenseCarTime + "\t"
+				+ this.withoutLicensePtTime);
+		sw.writeln("always has a car\t" + this.alwaysCarTime + "\t" + this.alwaysPtTime);
+		sw.writeln("sometimes has a car\t" + this.sometimesCarTime + "\t"
+				+ this.sometimesPtTime);
+		sw.writeln("never has a car\t" + this.neverCarTime + "\t" + this.neverPtTime);
+		sw.writeln("employed\t" + this.sometimesCarTime + "\t" + this.sometimesPtTime);
+		sw.writeln("not employed\t" + this.notEmployedCarTime + "\t"
+				+ this.notEmployedPtTime);
 		sw.writeln("-----------------------------");
 		try {
 			sw.close();
@@ -172,59 +173,59 @@ public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 		}
 		XYScatterChart chart = new XYScatterChart("Modal split -- daily Time",
 				"pt fraction", "car fraction");
-		chart.addSeries("male", new double[] { malePtTime * 100.0
-				/ (maleCarTime + malePtTime) }, new double[] { maleCarTime
-				* 100.0 / (maleCarTime + malePtTime) });
-		chart.addSeries("female", new double[] { femalePtTime * 100.0
-				/ (femaleCarTime + femalePtTime) },
-				new double[] { femaleCarTime * 100.0
-						/ (femaleCarTime + femalePtTime) });
-		chart.addSeries("age<30", new double[] { ageAPtTime * 100.0
-				/ (ageACarTime + ageAPtTime) }, new double[] { ageACarTime
-				* 100.0 / (ageACarTime + ageAPtTime) });
-		chart.addSeries("30<=age<50", new double[] { ageBPtTime * 100.0
-				/ (ageBCarTime + ageBPtTime) }, new double[] { ageBCarTime
-				* 100.0 / (ageBCarTime + ageBPtTime) });
-		chart.addSeries("50<=age<70", new double[] { ageCPtTime * 100.0
-				/ (ageCCarTime + ageCPtTime) }, new double[] { ageCCarTime
-				* 100.0 / (ageCCarTime + ageCPtTime) });
-		chart.addSeries("age>70", new double[] { ageDPtTime * 100.0
-				/ (ageDCarTime + ageDPtTime) }, new double[] { ageDCarTime
-				* 100.0 / (ageDCarTime + ageDPtTime) });
-		chart.addSeries("with license", new double[] { withLicensePtTime
-				* 100.0 / (withLicenseCarTime + withLicensePtTime) },
-				new double[] { withLicenseCarTime * 100.0
-						/ (withLicenseCarTime + withLicensePtTime) });
-		chart.addSeries("without license", new double[] { withoutLicensePtTime
-				* 100.0 / (withoutLicenseCarTime + withoutLicensePtTime) },
-				new double[] { withoutLicenseCarTime * 100.0
-						/ (withoutLicenseCarTime + withoutLicensePtTime) });
-		chart.addSeries("always has a car", new double[] { alwaysPtTime * 100.0
-				/ (alwaysCarTime + alwaysPtTime) },
-				new double[] { alwaysCarTime * 100.0
-						/ (alwaysCarTime + alwaysPtTime) });
-		chart.addSeries("sometimes has a car", new double[] { sometimesPtTime
-				* 100.0 / (sometimesCarTime + sometimesPtTime) },
-				new double[] { sometimesCarTime * 100.0
-						/ (sometimesCarTime + sometimesPtTime) });
-		chart.addSeries("never has a car", new double[] { neverPtTime * 100.0
-				/ (neverCarTime + neverPtTime) }, new double[] { neverCarTime
-				* 100.0 / (neverCarTime + neverPtTime) });
-		chart.addSeries("employed", new double[] { isEmployedPtTime * 100.0
-				/ (isEmployedCarTime + isEmployedPtTime) },
-				new double[] { isEmployedCarTime * 100.0
-						/ (isEmployedCarTime + isEmployedPtTime) });
-		chart.addSeries("not employed", new double[] { notEmployedPtTime
-				* 100.0 / (notEmployedCarTime + notEmployedPtTime) },
-				new double[] { notEmployedCarTime * 100.0
-						/ (notEmployedCarTime + notEmployedPtTime) });
+		chart.addSeries("male", new double[] { this.malePtTime * 100.0
+				/ (this.maleCarTime + this.malePtTime) }, new double[] { this.maleCarTime
+				* 100.0 / (this.maleCarTime + this.malePtTime) });
+		chart.addSeries("female", new double[] { this.femalePtTime * 100.0
+				/ (this.femaleCarTime + this.femalePtTime) },
+				new double[] { this.femaleCarTime * 100.0
+						/ (this.femaleCarTime + this.femalePtTime) });
+		chart.addSeries("age<30", new double[] { this.ageAPtTime * 100.0
+				/ (this.ageACarTime + this.ageAPtTime) }, new double[] { this.ageACarTime
+				* 100.0 / (this.ageACarTime + this.ageAPtTime) });
+		chart.addSeries("30<=age<50", new double[] { this.ageBPtTime * 100.0
+				/ (this.ageBCarTime + this.ageBPtTime) }, new double[] { this.ageBCarTime
+				* 100.0 / (this.ageBCarTime + this.ageBPtTime) });
+		chart.addSeries("50<=age<70", new double[] { this.ageCPtTime * 100.0
+				/ (this.ageCCarTime + this.ageCPtTime) }, new double[] { this.ageCCarTime
+				* 100.0 / (this.ageCCarTime + this.ageCPtTime) });
+		chart.addSeries("age>70", new double[] { this.ageDPtTime * 100.0
+				/ (this.ageDCarTime + this.ageDPtTime) }, new double[] { this.ageDCarTime
+				* 100.0 / (this.ageDCarTime + this.ageDPtTime) });
+		chart.addSeries("with license", new double[] { this.withLicensePtTime
+				* 100.0 / (this.withLicenseCarTime + this.withLicensePtTime) },
+				new double[] { this.withLicenseCarTime * 100.0
+						/ (this.withLicenseCarTime + this.withLicensePtTime) });
+		chart.addSeries("without license", new double[] { this.withoutLicensePtTime
+				* 100.0 / (this.withoutLicenseCarTime + this.withoutLicensePtTime) },
+				new double[] { this.withoutLicenseCarTime * 100.0
+						/ (this.withoutLicenseCarTime + this.withoutLicensePtTime) });
+		chart.addSeries("always has a car", new double[] { this.alwaysPtTime * 100.0
+				/ (this.alwaysCarTime + this.alwaysPtTime) },
+				new double[] { this.alwaysCarTime * 100.0
+						/ (this.alwaysCarTime + this.alwaysPtTime) });
+		chart.addSeries("sometimes has a car", new double[] { this.sometimesPtTime
+				* 100.0 / (this.sometimesCarTime + this.sometimesPtTime) },
+				new double[] { this.sometimesCarTime * 100.0
+						/ (this.sometimesCarTime + this.sometimesPtTime) });
+		chart.addSeries("never has a car", new double[] { this.neverPtTime * 100.0
+				/ (this.neverCarTime + this.neverPtTime) }, new double[] { this.neverCarTime
+				* 100.0 / (this.neverCarTime + this.neverPtTime) });
+		chart.addSeries("employed", new double[] { this.isEmployedPtTime * 100.0
+				/ (this.isEmployedCarTime + this.isEmployedPtTime) },
+				new double[] { this.isEmployedCarTime * 100.0
+						/ (this.isEmployedCarTime + this.isEmployedPtTime) });
+		chart.addSeries("not employed", new double[] { this.notEmployedPtTime
+				* 100.0 / (this.notEmployedCarTime + this.notEmployedPtTime) },
+				new double[] { this.notEmployedCarTime * 100.0
+						/ (this.notEmployedCarTime + this.notEmployedPtTime) });
 		chart.saveAsPng(outputFilename + ".png", 1200, 900);
 	}
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
@@ -236,7 +237,7 @@ public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		DailyEnRouteTimeModalSplit ddms = new DailyEnRouteTimeModalSplit();
 		population.addAlgorithm(ddms);

@@ -26,10 +26,11 @@ import java.util.List;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -39,38 +40,38 @@ import playground.yu.analysis.PlanModeJudger;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NewAgentCarPlan extends NewPlan implements PlanAlgorithm {
 	private Person person = null;
-	private List<Plan> plans = new ArrayList<Plan>();
+	private final List<Plan> plans = new ArrayList<Plan>();
 
 	/**
 	 * Constructor, writes file-head
-	 * 
+	 *
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentCarPlan(Population plans, String filename) {
+	public NewAgentCarPlan(final Population plans, final String filename) {
 		super(plans, filename);
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		this.person = person;
-		plans.clear();
-		plans.addAll(person.getPlans());
-		for (Plan p : plans) {
+		this.plans.clear();
+		this.plans.addAll(person.getPlans());
+		for (Plan p : this.plans) {
 			run(p);
 		}
-		pw.writePerson(person);
+		this.pw.writePerson(person);
 	}
 
-	public void run(Plan plan) {
+	public void run(final Plan plan) {
 		if (!PlanModeJudger.useCar(plan))
-			person.removePlan(plan);
+			this.person.removePlan(plan);
 	}
 
 	public static void main(final String[] args) {
@@ -82,7 +83,7 @@ public class NewAgentCarPlan extends NewPlan implements PlanAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		NewAgentCarPlan nac = new NewAgentCarPlan(population,
 				outputPlansFilename);
 		population.addAlgorithm(nac);

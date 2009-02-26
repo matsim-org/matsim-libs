@@ -22,7 +22,7 @@ package playground.yu.newPlans;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 
 /**
  * increases the amount of Agents in a new MATSim plansfile, by copying the old

@@ -23,15 +23,15 @@ package playground.david.otfvis;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.misc.Time;
-import org.matsim.world.World;
 
 
 
@@ -53,24 +53,20 @@ public class OnTheFlyQueueSimSWISS2_3Mill {
 //		String popFileName = "../../tmp/studies/ivtch/all_plans.xml.gz";
 
 		Gbl.printSystemInfo();
-			
+
 		args = new String [] {"../../tmp/studies/ivtch/config.xml"};
 		Gbl.createConfig(args);
 		Gbl.startMeasurement();
 		Config config = Gbl.getConfig();
 		config.setParam("global", "localDTDBase", "dtd/");
 
-		World world = Gbl.getWorld();
-
 		net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
-		world.setNetworkLayer(net);
-		world.complete();
 
 		Gbl.printElapsedTime();
 
-		population = new Population();
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		population = new PopulationImpl();
+		PopulationReader plansReader = new MatsimPopulationReader(population, net);
 		plansReader.readFile(popFileName);
 
 		events = new Events();

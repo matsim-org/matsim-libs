@@ -47,10 +47,11 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -69,26 +70,26 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class EgressAnalysis {
 	private static final Logger log = Logger.getLogger(DistanceAnalysis.class);
-	private FeatureSource featureSourcePolygon;
+	private final FeatureSource featureSourcePolygon;
 	private ArrayList<Polygon> polygons;
 
-	private Population population;
-	private Envelope envelope = null;
+	private final Population population;
+	private final Envelope envelope = null;
 	private QuadTree<Person> personTree;
-	private NetworkLayer network;
-	private PlansCalcRoute router;
+	private final NetworkLayer network;
+	private final PlansCalcRoute router;
 	private FeatureType ftDistrictShape;
 	private ArrayList<Feature> features;
-	private GeometryFactory geofac;
-	private HashMap<Polygon,Double> catchRadi = new HashMap<Polygon,Double>();
+	private final GeometryFactory geofac;
+	private final HashMap<Polygon,Double> catchRadi = new HashMap<Polygon,Double>();
 	private static double CATCH_RADIUS;
 	playground.gregor.collections.gnuclasspath.TreeMap<Double, Feature> ft_tree;
-	private GTH gth;
-	private Map<Id, EgressNode> egressNodes;
+	private final GTH gth;
+	private final Map<Id, EgressNode> egressNodes;
 
 
-	public EgressAnalysis(FeatureSource features, Population population,
-			NetworkLayer network) throws Exception {
+	public EgressAnalysis(final FeatureSource features, final Population population,
+			final NetworkLayer network) throws Exception {
 		this.featureSourcePolygon = features;
 		this.population = population;
 		this.network = network;
@@ -161,8 +162,8 @@ public class EgressAnalysis {
 		this.ftDistrictShape = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id,   current, shortest, deviance}, "egressShape");
 	}
 
-	private Feature getPolyFeature(Coordinate coord2Coordinate,
-			int num_current, int num_shortest, double length) throws IllegalAttributeException {
+	private Feature getPolyFeature(final Coordinate coord2Coordinate,
+			final int num_current, final int num_shortest, final double length) throws IllegalAttributeException {
 		Polygon p = this.gth.getSquare(coord2Coordinate, length);
 		int diff = num_current - num_shortest;
 		Feature ft = this.ftDistrictShape.create(new Object [] {new MultiPolygon(new Polygon []{p},this.geofac),0,num_current, num_shortest, diff},"egress");
@@ -188,7 +189,7 @@ public class EgressAnalysis {
 				l.setArrivalTime(0.0);
 				plan.addLeg(l);
 				plan.addAct(person.getSelectedPlan().getNextActivity(leg));
-				router.run(plan);
+				this.router.run(plan);
 				Leg leg2 = plan.getNextLeg(plan.getFirstActivity());
 				List<Node> route2 = ((CarRoute) leg2.getRoute()).getNodes();
 				Node node2 = route2.get(route2.size()-2);
@@ -223,7 +224,7 @@ public class EgressAnalysis {
 
 
 
-	public static void main(String [] args) {
+	public static void main(final String [] args) {
 
 
 		String district_shape_file;
@@ -258,8 +259,8 @@ public class EgressAnalysis {
 
 
 		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
-		Population population = new Population();
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		Population population = new PopulationImpl();
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		log.info("done.");
 

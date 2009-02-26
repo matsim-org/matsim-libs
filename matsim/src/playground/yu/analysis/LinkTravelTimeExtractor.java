@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -10,23 +10,24 @@ import java.io.IOException;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * @author yu
- * 
+ *
  */
 public class LinkTravelTimeExtractor {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		int timeBin = 60;
 		final String netFilename = "../psrc/network/psrc-wo-3212.xml.gz";
 		final String plansFilename = "../runs/run668/it.2000/2000.plans.xml.gz";
@@ -39,7 +40,7 @@ public class LinkTravelTimeExtractor {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
@@ -60,13 +61,13 @@ public class LinkTravelTimeExtractor {
 			writer
 					.write("TimeBin\tLinkTravelTime\t[s]\tLinkTravelTime\t[m]\tLinkTravelTime\t[h]\n");
 			for (int anI = 0; anI < 24 * 3600; anI = anI + timeBin) {
-				index = ((int) anI) / timeBin;
+				index = (anI) / timeBin;
 				ys[index] = ttc.getLinkTravelTime(network.getLink("6760"),
-						(double) anI);
+						anI);
 				writer.write(anI + "\t" + ys[index] + "\t[s]\t" + ys[index]
 						/ 60.0 + "\t[m]\t" + ys[index] / 3600.0 + "\t[h]\n");
 				ys[index] /= 60.0;
-				xs[index] = ((double) anI) / 3600.0;
+				xs[index] = (anI) / 3600.0;
 				writer.flush();
 			}
 			writer.close();

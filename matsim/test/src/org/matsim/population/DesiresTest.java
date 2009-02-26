@@ -57,7 +57,7 @@ public class DesiresTest extends MatsimTestCase {
 		log.info("running testReadWriteDesires()... ");
 
 		log.info("  creating single person with desires... ");
-		Population pop = new Population(false);
+		PopulationImpl pop = new PopulationImpl(false);
 		Person p = new PersonImpl(new IdImpl(0));
 		pop.addPerson(p);
 		Desires d = p.createDesires("created by 'DesiresTest.testReadWriteDesires'");

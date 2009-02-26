@@ -29,11 +29,12 @@ import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
 
@@ -41,7 +42,7 @@ import playground.yu.utils.SimpleWriter;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class AnalysisTest {
 	private static void printUsage() {
@@ -64,7 +65,7 @@ public class AnalysisTest {
 		System.out.println("----------------");
 	}
 
-	private static void runIntern(String[] args, String scenario) {
+	private static void runIntern(final String[] args, final String scenario) {
 		final String netFilename = args[0];
 		final String eventsFilename = args[1];
 		final String outputpath = args[2];
@@ -85,7 +86,7 @@ public class AnalysisTest {
 		DailyEnRouteTime dert = null;
 
 		if (plansFilename != null) {
-			Population plans = new Population();
+			Population plans = new PopulationImpl();
 
 			catl = new CalcAverageTripLength();
 			plans.addAlgorithm(catl);
@@ -170,11 +171,11 @@ public class AnalysisTest {
 		System.out.println("done.");
 	}
 
-	public static void run(String[] args) {
+	public static void run(final String[] args) {
 		runIntern(args, "normal");
 	}
 
-	public static void runZurich(String[] args) {
+	public static void runZurich(final String[] args) {
 		runIntern(args, "Zurich");
 	}
 

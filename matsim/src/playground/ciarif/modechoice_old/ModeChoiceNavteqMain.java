@@ -20,10 +20,11 @@
 
 package playground.ciarif.modechoice_old;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 
@@ -75,14 +76,14 @@ public class ModeChoiceNavteqMain {
 //		System.out.println("3. CREATING A POPULATION BASED ON THE NETWORK");
 //		System.out.println();
 //		System.out.println("  creating plans object... ");
-		Population plans = new Population(Population.USE_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
 //		System.out.println("  done.");
 //		System.out.println("  running plans algorithms... ");
 //		PlansCreateFromNetwork pcfn_algo = new PlansCreateFromNetwork(network,ns_algo);
 //		plans.addAlgorithm(pcfn_algo);
 //		plans.runAlgorithms();
 //		System.out.println("  done.");
-		
+
 //		PlansParser plansParser = new MatsimPopulationReader(plans);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		PopulationReader plansReader = new MatsimPopulationReader(plans);
@@ -190,7 +191,7 @@ public class ModeChoiceNavteqMain {
 
 
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 		Gbl.startMeasurement();
 

@@ -21,10 +21,11 @@ package playground.dgrether.analysis;
 import java.util.Date;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
@@ -39,19 +40,19 @@ public class ScenarioLoader {
 
 //	private static final Logger log = Logger.getLogger(ScenarioLoader.class);
 
-	private NetworkLayer networkLayer;
+	private final NetworkLayer networkLayer;
 
 	private Population plans;
 
 
-	public ScenarioLoader(String config) {
+	public ScenarioLoader(final String config) {
 		Gbl.createConfig(new String[] {config});
 		this.networkLayer = loadNetwork(Gbl.getConfig().network().getInputFile());
 		this.loadWorld();
 		this.plans = this.loadPopulation();
 	}
 
-	public void setPlans(Population p) {
+	public void setPlans(final Population p) {
 		this.plans = p;
 	}
 
@@ -68,7 +69,7 @@ public class ScenarioLoader {
 	}
 
 	private Population loadPopulation() {
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		printNote("", "  reading plans xml file... ");
 		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());

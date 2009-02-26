@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -35,15 +35,16 @@ import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * @author yu
- * 
+ *
  */
 public class TripDurationHandler implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
@@ -71,18 +72,18 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		tmpDptTimes.put(event.agentId, event.time);
+		this.tmpDptTimes.put(event.agentId, event.time);
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
 		double time = event.time;
 		String agentId = event.agentId;
-		Double dptTime = tmpDptTimes.get(agentId);
+		Double dptTime = this.tmpDptTimes.get(agentId);
 		if (dptTime != null) {
 			double travelTime = time - dptTime;
-			travelTimes += travelTime;
-			arrCount++;
-			tmpDptTimes.remove(agentId);
+			this.travelTimes += travelTime;
+			this.arrCount++;
+			this.tmpDptTimes.remove(agentId);
 
 			if (event.agent == null) {
 				// rebuild event
@@ -97,17 +98,17 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 				if (
 				// planType.equals(Plan.Type.CAR)
 				PlanModeJudger.useCar(selectedPlan)) {
-					carTravelTimes += travelTime;
-					carArrCount++;
+					this.carTravelTimes += travelTime;
+					this.carArrCount++;
 				} else if (
 				// planType.equals(Plan.Type.PT)
 				PlanModeJudger.usePt(selectedPlan)) {
-					ptTravelTimes += travelTime;
-					ptArrCount++;
+					this.ptTravelTimes += travelTime;
+					this.ptArrCount++;
 				}
 			} else {
-				otherTravelTimes += travelTime;
-				otherArrCount++;
+				this.otherTravelTimes += travelTime;
+				this.otherArrCount++;
 			}
 		}
 	}
@@ -125,14 +126,14 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 
 	@Override
 	public String toString() {
-		return "\ttrips\tcar trips\tpt trips\tother trips\nnumber\t" + arrCount
-				+ "\t" + carArrCount + "\t" + ptArrCount + "\t" + otherArrCount
-				+ "\nTripDuration (sum, s)\t" + travelTimes + "\t"
-				+ carTravelTimes + "\t" + ptTravelTimes + "\t"
-				+ otherTravelTimes + "\nTripDuration (avg., s)\t"
-				+ travelTimes / arrCount + "\t" + carTravelTimes / carArrCount
-				+ "\t" + ptTravelTimes / ptArrCount + "\t" + otherTravelTimes
-				/ otherArrCount;
+		return "\ttrips\tcar trips\tpt trips\tother trips\nnumber\t" + this.arrCount
+				+ "\t" + this.carArrCount + "\t" + this.ptArrCount + "\t" + this.otherArrCount
+				+ "\nTripDuration (sum, s)\t" + this.travelTimes + "\t"
+				+ this.carTravelTimes + "\t" + this.ptTravelTimes + "\t"
+				+ this.otherTravelTimes + "\nTripDuration (avg., s)\t"
+				+ this.travelTimes / this.arrCount + "\t" + this.carTravelTimes / this.carArrCount
+				+ "\t" + this.ptTravelTimes / this.ptArrCount + "\t" + this.otherTravelTimes
+				/ this.otherArrCount;
 	}
 
 	/**
@@ -156,7 +157,7 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 

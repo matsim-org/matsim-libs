@@ -30,16 +30,17 @@ import java.io.IOException;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class LegCountTest2 {
 	public static class LegCount extends AbstractPersonAlgorithm {
@@ -53,9 +54,9 @@ public class LegCountTest2 {
 
 		public LegCount(final String filename) {
 			try {
-				writer = IOUtils.getBufferedWriter(filename);
-				writer.write("personId\tLegNumber\n");
-				writer.flush();
+				this.writer = IOUtils.getBufferedWriter(filename);
+				this.writer.write("personId\tLegNumber\n");
+				this.writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -65,43 +66,43 @@ public class LegCountTest2 {
 
 		public void end() {
 			try {
-				writer.write("------------------------------------\ncarUser:\t"
-						+ carUserCount
+				this.writer.write("------------------------------------\ncarUser:\t"
+						+ this.carUserCount
 						+ ";\tcarLegs:\t"
-						+ carLegCount
+						+ this.carLegCount
 						+ ";\t"
-						+ (double) carLegCount / (double) carUserCount
+						+ (double) this.carLegCount / (double) this.carUserCount
 						+ "\tLegs pro carUser;\tlicensedCarUser:\t"
-						+ licensedCarUserCount
+						+ this.licensedCarUserCount
 						+ ";\tlicensedCarLegs:\t"
-						+ licensedCarLegCount
+						+ this.licensedCarLegCount
 						+ ";\t"
-						+ (double) licensedCarLegCount
-								/ (double) licensedCarUserCount
+						+ (double) this.licensedCarLegCount
+								/ (double) this.licensedCarUserCount
 						+ "\tLegs pro licensedCarUser;\n" + "\nptUser:\t"
-						+ ptUserCount + ";\tptLegs:\t" + ptLegCount + ";\t"
-						+ (double) ptLegCount / (double) ptUserCount
+						+ this.ptUserCount + ";\tptLegs:\t" + this.ptLegCount + ";\t"
+						+ (double) this.ptLegCount / (double) this.ptUserCount
 						+ "\tLegs pro ptUser;\tlicensedPtUser:\t"
-						+ licensedPtUserCount + ";\tlicensedPtLegs:\t"
-						+ licensedPtLegCount + ";\t"
-						+ (double) licensedPtLegCount
-						/ (double) licensedPtUserCount
+						+ this.licensedPtUserCount + ";\tlicensedPtLegs:\t"
+						+ this.licensedPtLegCount + ";\t"
+						+ (double) this.licensedPtLegCount
+						/ (double) this.licensedPtUserCount
 						+ "\tLegs pro licensedPtUser.");
-				writer.flush();
-				writer.close();
+				this.writer.flush();
+				this.writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
 		private void carAppend(final int legsNumber) {
-			carUserCount++;
-			carLegCount += legsNumber;
+			this.carUserCount++;
+			this.carLegCount += legsNumber;
 		}
 
 		private void carLicensedAppend(final int legsNumber) {
-			licensedCarUserCount++;
-			licensedCarLegCount += legsNumber;
+			this.licensedCarUserCount++;
+			this.licensedCarLegCount += legsNumber;
 		}
 
 		@Override
@@ -110,8 +111,8 @@ public class LegCountTest2 {
 			if (p != null) {
 				int nLegs = (p.getActsLegs().size() + 1) / 2;
 				try {
-					writer.write(person.getId() + "\t" + nLegs + "\n");
-					writer.flush();
+					this.writer.write(person.getId() + "\t" + nLegs + "\n");
+					this.writer.flush();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -126,11 +127,11 @@ public class LegCountTest2 {
 					} else if (
 					// planType.equals(Plan.Type.PT)
 					PlanModeJudger.usePt(p)) {
-						ptUserCount++;
-						ptLegCount += nLegs;
+						this.ptUserCount++;
+						this.ptLegCount += nLegs;
 						if (person.getLicense().equals("yes")) {
-							licensedPtUserCount++;
-							licensedPtLegCount += nLegs;
+							this.licensedPtUserCount++;
+							this.licensedPtLegCount += nLegs;
 						}
 					}
 			}
@@ -157,7 +158,7 @@ public class LegCountTest2 {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		LegCount lc = new LegCount(outFilename);
 		population.addAlgorithm(lc);

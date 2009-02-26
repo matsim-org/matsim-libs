@@ -22,26 +22,18 @@ package playground.jhackney;
 
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.facilities.algorithms.FacilitiesMakeSample;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.PopulationImpl;
+import org.matsim.population.PopulationReader;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
-import org.matsim.population.PopulationReader;
-import org.matsim.population.algorithms.PersonRemoveReferences;
-import org.matsim.population.algorithms.PlansScenarioCut;
-import org.matsim.population.algorithms.XY2Links;
-import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.algorithms.WorldConnectLocations;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
-import org.matsim.world.WorldWriter;
 
-import playground.jhackney.algorithms.*;
+import playground.jhackney.algorithms.PersonSetActToLinkWithNonNullFacility;
 
 public class MakeScenario {
 
@@ -52,7 +44,7 @@ public class MakeScenario {
 	public static void run() {
 
 		System.out.println("Make Scenario SAMPLE OF FACILITIES:");
-		
+
 		System.out.println("Uses output of a CUT. Samples 100x\"pct\"% of the facilities and moves Acts to take place at these");
 
 //		System.out.println("  reading world xml file... ");
@@ -78,8 +70,8 @@ public class MakeScenario {
 //		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		Population plans = new Population();
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		Population plans = new PopulationImpl();
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		System.out.println("  done.");
 

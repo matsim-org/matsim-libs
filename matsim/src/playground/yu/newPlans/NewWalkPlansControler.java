@@ -22,16 +22,17 @@ package playground.yu.newPlans;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 
 /**
  * test of NewAgentPtPlan
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NewWalkPlansControler {
 	public static void main(final String[] args) {
@@ -41,7 +42,7 @@ public class NewWalkPlansControler {
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		NewAgentWalkPlan nawp = new NewAgentWalkPlan(population);
 		population.addAlgorithm(nawp);
 		new MatsimPopulationReader(population, network).readFile(config.plans()

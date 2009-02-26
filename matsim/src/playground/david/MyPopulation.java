@@ -20,8 +20,8 @@
 
 package playground.david;
 
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 
-public class MyPopulation extends Population {
+public class MyPopulation extends PopulationImpl {
 
 }

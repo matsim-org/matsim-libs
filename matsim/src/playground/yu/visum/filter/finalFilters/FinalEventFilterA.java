@@ -10,8 +10,8 @@ import java.util.Map;
 
 import org.matsim.events.BasicEvent;
 import org.matsim.events.LinkEnterEvent;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Population;
 
 import playground.yu.visum.filter.EventFilterA;
 import playground.yu.visum.writer.UserDefAtt;

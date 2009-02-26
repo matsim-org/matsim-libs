@@ -47,12 +47,13 @@ import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -71,30 +72,30 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * - man braucht eine shape file mit einem Raster  
+ * - man braucht eine shape file mit einem Raster
  *   DistanceAnalysis.createPolygons() kreiert eins
- *   
- * - dann werden alle Personen mit den Koordinaten der home location in einen 
+ *
+ * - dann werden alle Personen mit den Koordinaten der home location in einen
  *   QuadTree gepackt. (DistanceAnalysis.handlePlans())
- *   
- * - nun kann man �ber die Polygons des Rasters iterieren 
- *   (DistanceAnalysis.iteratePolygons()). Die Personen werden in zwei Schritten 
- *   gefiltert (dieses Vorgehen ist wesentlich effizienter als immer �ber alle 
+ *
+ * - nun kann man �ber die Polygons des Rasters iterieren
+ *   (DistanceAnalysis.iteratePolygons()). Die Personen werden in zwei Schritten
+ *   gefiltert (dieses Vorgehen ist wesentlich effizienter als immer �ber alle
  *   Personen zu iterieren):
- *   
- * - Aus dem QuadTree holt man sich zun�chst alle Personen im Umkreis von  min 
- *   d/2 des Mittelpunkts eines Polygons.  (DistanceAnalysis.iteratePolygons - 
+ *
+ * - Aus dem QuadTree holt man sich zun�chst alle Personen im Umkreis von  min
+ *   d/2 des Mittelpunkts eines Polygons.  (DistanceAnalysis.iteratePolygons -
  *   Zeile 158)
- *   
- * - Dannach werden alle die Personen, deren home location sich ausserhalb des 
- *   Polygons befindet mit der Methode DistanceAnalysis.rmAliens(...,...) 
+ *
+ * - Dannach werden alle die Personen, deren home location sich ausserhalb des
+ *   Polygons befindet mit der Methode DistanceAnalysis.rmAliens(...,...)
  *   entfernt.
- *   
- * - zum Schluss wird basierend auf der Analyse dieser Personen noch ein neues 
- *   Feature mit den entsprechenden Attributen angelegt 
+ *
+ * - zum Schluss wird basierend auf der Analyse dieser Personen noch ein neues
+ *   Feature mit den entsprechenden Attributen angelegt
  *   (DistanceAnalysis.iteratePolygons - Zeile 174)
- *   
- * - am Ende werden noch alle Features in einen neuen Shapefile geschrieben 
+ *
+ * - am Ende werden noch alle Features in einen neuen Shapefile geschrieben
  *   (DistanceAnalysis.writePolygons())
  *
  * @author laemmel
@@ -390,8 +391,8 @@ public class DistanceAnalysis {
 
 
 		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
-		Population population = new Population();
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		Population population = new PopulationImpl();
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 //		plansReader.readFile("./badPersons.xml");
 		log.info("done.");

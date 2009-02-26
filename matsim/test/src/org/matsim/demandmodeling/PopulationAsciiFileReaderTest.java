@@ -25,7 +25,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;

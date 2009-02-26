@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractPersonAlgorithm.java
+ * Plans.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,29 +18,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package org.matsim.interfaces.core.v01;
 
-import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.PersonAlgorithm;
-import org.matsim.interfaces.core.v01.Population;
-import org.matsim.utils.misc.Counter;
+import java.util.Iterator;
+import java.util.Map;
 
-public abstract class AbstractPersonAlgorithm implements PersonAlgorithm {
+import org.matsim.interfaces.basic.v01.BasicPopulation;
+import org.matsim.interfaces.basic.v01.Id;
 
-	private final static Logger log = Logger.getLogger(AbstractPersonAlgorithm.class);
+/**
+ * Root class of the population description (previously also called "plans file")
+ */
+public interface Population extends BasicPopulation<Person>, Iterable<Person> {
 
-	public final void run(final Population plans) {
-		log.info("running " + this.getClass().getName() + " algorithm...");
-		Counter counter = new Counter(" person # ");
+	public void addPerson(final Person p);
 
-		for (Person p : plans.getPersons().values()) {
-			counter.incCounter();
-			this.run(p);
-		}
-		counter.printCounter();
-		log.info("done running algorithm.");
-	}
+	public void runAlgorithms();
 
-	public abstract void run(Person person);
+	public void clearAlgorithms();
+
+	public boolean removeAlgorithm(final PersonAlgorithm algo);
+
+	public void addAlgorithm(final PersonAlgorithm algo);
+
+	public Map<Id, Person> getPersons();
+
+	public boolean isStreaming();
+
+	/**
+	 * @return the size of the population, i.e. the number of persons in this population.
+	 */
+	public int size();
+
+	public void printPlansCount();
+
+	public Iterator<Person> iterator();
+
 }

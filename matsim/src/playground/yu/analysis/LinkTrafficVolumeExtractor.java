@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -11,22 +11,23 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * @author yu
- * 
+ *
  */
 public class LinkTrafficVolumeExtractor {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		int timeBin = 60;
 		final String netFilename = "../psrc/network/psrc-wo-3212.xml.gz";
 		final String plansFilename = "../runs/run668/it.1500/1500.plans.xml.gz";
@@ -39,7 +40,7 @@ public class LinkTrafficVolumeExtractor {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
@@ -60,12 +61,12 @@ public class LinkTrafficVolumeExtractor {
 			writer.write("TimeBin\tLinkVolume[veh/" + timeBin
 					+ " s]\tLinkVolume[veh/h]\n");
 			for (int anI = 0; anI < 24 * 3600; anI = anI + timeBin) {
-				index = ((int) anI) / timeBin;
-				ys[index] = (double) va.getVolumesForLink("6760")[index];
+				index = (anI) / timeBin;
+				ys[index] = va.getVolumesForLink("6760")[index];
 				writer.write(anI + "\t" + ys[index] + "\t" + ys[index] * 3600.0
-						/ (double) timeBin + "\n");
-				ys[index] = ys[index] * 3600.0 / (double) timeBin;
-				xs[index] = ((double) anI) / 3600.0;
+						/ timeBin + "\n");
+				ys[index] = ys[index] * 3600.0 / timeBin;
+				xs[index] = (anI) / 3600.0;
 				writer.flush();
 			}
 			writer.close();

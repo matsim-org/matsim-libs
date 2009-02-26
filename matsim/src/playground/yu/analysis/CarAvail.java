@@ -30,16 +30,17 @@ import java.io.IOException;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class CarAvail extends AbstractPersonAlgorithm {
 	private int never_hasCar, always_hasCar, sometimes_hasCar,
@@ -47,29 +48,29 @@ public class CarAvail extends AbstractPersonAlgorithm {
 			always_but_pt_plan, sometimes_but_car_plan, sometimes_but_pt_plan;
 
 	/**
-	 * 
+	 *
 	 */
 	public CarAvail() {
-		never_but_car_plan = 0;
-		never_but_pt_plan = 0;
-		never_hasCar = 0;
-		always_but_car_plan = 0;
-		always_but_pt_plan = 0;
-		always_hasCar = 0;
-		sometimes_but_car_plan = 0;
-		sometimes_but_pt_plan = 0;
-		sometimes_hasCar = 0;
+		this.never_but_car_plan = 0;
+		this.never_but_pt_plan = 0;
+		this.never_hasCar = 0;
+		this.always_but_car_plan = 0;
+		this.always_but_pt_plan = 0;
+		this.always_hasCar = 0;
+		this.sometimes_but_car_plan = 0;
+		this.sometimes_but_pt_plan = 0;
+		this.sometimes_hasCar = 0;
 	}
 
 	public void write(final String outputFilename) {
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(outputFilename);
 			writer.write("\tpersons\tcar-plans\tpt-plans\nnever\t"
-					+ never_hasCar + "\t" + never_but_car_plan + "\t"
-					+ never_but_pt_plan + "\nalways\t" + always_hasCar + "\t"
-					+ always_but_car_plan + "\t" + always_but_pt_plan
-					+ "\nsometimes\t" + sometimes_hasCar + "\t"
-					+ sometimes_but_car_plan + "\t" + sometimes_but_pt_plan
+					+ this.never_hasCar + "\t" + this.never_but_car_plan + "\t"
+					+ this.never_but_pt_plan + "\nalways\t" + this.always_hasCar + "\t"
+					+ this.always_but_car_plan + "\t" + this.always_but_pt_plan
+					+ "\nsometimes\t" + this.sometimes_hasCar + "\t"
+					+ this.sometimes_but_car_plan + "\t" + this.sometimes_but_pt_plan
 					+ "\n");
 			writer.close();
 		} catch (FileNotFoundException e) {
@@ -85,35 +86,35 @@ public class CarAvail extends AbstractPersonAlgorithm {
 		if (carAvail != null) {
 			Plan selectedPlan = person.getSelectedPlan();
 			if (carAvail.equals("never")) {
-				never_hasCar++;
+				this.never_hasCar++;
 				if (
 				// planTyp == Plan.Type.CAR
 				PlanModeJudger.useCar(selectedPlan))
-					never_but_car_plan++;
+					this.never_but_car_plan++;
 				else if (
 				// planType.equals(Plan.Type.PT)
 				PlanModeJudger.usePt(selectedPlan))
-					never_but_pt_plan++;
+					this.never_but_pt_plan++;
 			} else if (carAvail.equals("always")) {
-				always_hasCar++;
+				this.always_hasCar++;
 				if (
 				// planType.equals(Plan.Type.PT)
 				PlanModeJudger.usePt(selectedPlan))
-					always_but_pt_plan++;
+					this.always_but_pt_plan++;
 				else if (
 				// planType.equals(Plan.Type.CAR)
 				PlanModeJudger.useCar(selectedPlan))
-					always_but_car_plan++;
+					this.always_but_car_plan++;
 			} else if (carAvail.equals("sometimes")) {
-				sometimes_hasCar++;
+				this.sometimes_hasCar++;
 				if (
 				// planType.equals(Plan.Type.PT)
 				PlanModeJudger.usePt(selectedPlan))
-					sometimes_but_pt_plan++;
+					this.sometimes_but_pt_plan++;
 				else if (
 				// planType.equals(Plan.Type.CAR)
 				PlanModeJudger.useCar(selectedPlan))
-					sometimes_but_car_plan++;
+					this.sometimes_but_car_plan++;
 			}
 		}
 	}
@@ -133,7 +134,7 @@ public class CarAvail extends AbstractPersonAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		CarAvail ca = new CarAvail();
 		population.addAlgorithm(ca);

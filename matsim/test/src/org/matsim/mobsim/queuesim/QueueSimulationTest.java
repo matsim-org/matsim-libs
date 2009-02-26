@@ -41,9 +41,10 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.geometry.CoordImpl;
@@ -73,7 +74,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 100, 10, 60000, 9);
 
 		/* build plans */
-		Population plans = new Population(Population.NO_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		ArrayList<Node> nodes23 = new ArrayList<Node>();
 		nodes23.add(node2);
@@ -160,7 +161,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 100, 10, 60000, 9);
 
 		/* build plans */
-		Population plans = new Population(Population.NO_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		ArrayList<Node> nodes3 = new ArrayList<Node>();
 		nodes3.add(node3);
@@ -239,8 +240,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 100, 10, 60000, 9);
 
 		/* build plans */
-		Population plans = new Population(Population.NO_STREAMING);
-		
+		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
+
 		ArrayList<Node> nodes3 = new ArrayList<Node>();
 		nodes3.add(node3);
 
@@ -393,7 +394,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Link link6 = network.createLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
 
 		/* build plans */
-		Population plans = new Population(Population.NO_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		// create a person with a car-leg from link1 to link5, but an incomplete route
 		Person person = new PersonImpl(new IdImpl(0));

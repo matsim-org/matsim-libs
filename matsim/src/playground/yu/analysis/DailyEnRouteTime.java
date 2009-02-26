@@ -11,10 +11,11 @@ import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.charts.BarChart;
@@ -26,9 +27,9 @@ import playground.yu.utils.SimpleWriter;
 
 /**
  * compute modal split of en route time
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -52,10 +53,10 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		this.carCounts = new double[101];
 		this.ptCounts = new double[101];
 		this.otherCounts = new double[101];
-		carCounts10 = new double[21];
-		ptCounts10 = new double[21];
-		carCounts2 = new double[101];
-		ptCounts2 = new double[101];
+		this.carCounts10 = new double[21];
+		this.ptCounts10 = new double[21];
+		this.carCounts2 = new double[101];
+		this.ptCounts2 = new double[101];
 		this.carWorkTime = 0.0;
 		this.carEducTime = 0.0;
 		this.carShopTime = 0.0;
@@ -153,8 +154,8 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 						this.carOtherTime += time;
 						break;
 					}
-					carCounts10[Math.min(20, (int) time / 10)]++;
-					carCounts2[Math.min(100, (int) time / 2)]++;
+					this.carCounts10[Math.min(20, (int) time / 10)]++;
+					this.carCounts2[Math.min(100, (int) time / 2)]++;
 				} else if (bl.getMode().equals(Mode.pt)) {
 					this.ptTime += time;
 					ptDayTime += time;
@@ -178,8 +179,8 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 						this.ptOtherTime += time;
 						break;
 					}
-					ptCounts10[Math.min(20, (int) time / 10)]++;
-					ptCounts2[Math.min(100, (int) time / 2)]++;
+					this.ptCounts10[Math.min(20, (int) time / 10)]++;
+					this.ptCounts2[Math.min(100, (int) time / 2)]++;
 				}
 			}
 		}
@@ -244,13 +245,13 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 				"travel destination", "daily En Route Time [min]",
 				new String[] { "work", "education", "shopping", "leisure",
 						"home", "others" });
-		barChart.addSeries("car", new double[] { carWorkTime, carEducTime,
-				carShopTime, carLeisTime, carHomeTime, carOtherTime });
-		barChart.addSeries("pt", new double[] { ptWorkTime, ptEducTime,
-				ptShopTime, ptLeisTime, ptHomeTime, ptOtherTime });
-		barChart.addSeries("through", new double[] { throughWorkTime,
-				throughEducTime, throughShopTime, throughLeisTime,
-				throughHomeTime, throughOtherTime });
+		barChart.addSeries("car", new double[] { this.carWorkTime, this.carEducTime,
+				this.carShopTime, this.carLeisTime, this.carHomeTime, this.carOtherTime });
+		barChart.addSeries("pt", new double[] { this.ptWorkTime, this.ptEducTime,
+				this.ptShopTime, this.ptLeisTime, this.ptHomeTime, this.ptOtherTime });
+		barChart.addSeries("through", new double[] { this.throughWorkTime,
+				this.throughEducTime, this.throughShopTime, this.throughLeisTime,
+				this.throughHomeTime, this.throughOtherTime });
 		barChart.addMatsimLogo();
 		barChart.saveAsPng(outputFilename
 				+ "dailyEnRouteTimeTravelDistination.png", 1200, 900);
@@ -286,28 +287,28 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 				"Modal split -- leg Duration", "pt fraction [%]",
 				"car fraction [%]");
 		for (int i = 0; i < 20; i++) {
-			double ptFraction = ptCounts10[i]
-					/ (ptCounts10[i] + carCounts10[i]) * 100.0;
-			double carFraction = carCounts10[i]
-					/ (ptCounts10[i] + carCounts10[i]) * 100.0;
+			double ptFraction = this.ptCounts10[i]
+					/ (this.ptCounts10[i] + this.carCounts10[i]) * 100.0;
+			double carFraction = this.carCounts10[i]
+					/ (this.ptCounts10[i] + this.carCounts10[i]) * 100.0;
 			bubbleChart.addSeries(i * 10 + "-" + (i + 1) * 10 + " min",
 					new double[][] { new double[] { ptFraction },
 							new double[] { carFraction },
 							new double[] { (i + 0.5) / 2.5 } });
-			sw.writeln((i * 10) + "+\t" + carCounts10[i] + "\t" + ptCounts10[i]
+			sw.writeln((i * 10) + "+\t" + this.carCounts10[i] + "\t" + this.ptCounts10[i]
 					+ "\t" + carFraction + "\t" + ptFraction);
 		}
-		double ptFraction = ptCounts10[20] / (ptCounts10[20] + carCounts10[20])
+		double ptFraction = this.ptCounts10[20] / (this.ptCounts10[20] + this.carCounts10[20])
 				* 100.0;
-		double carFraction = carCounts10[20]
-				/ (ptCounts10[20] + carCounts10[20]) * 100.0;
+		double carFraction = this.carCounts10[20]
+				/ (this.ptCounts10[20] + this.carCounts10[20]) * 100.0;
 		bubbleChart.addSeries("200+ min", new double[][] {
-				new double[] { ptCounts10[20]
-						/ (ptCounts10[20] + carCounts10[20]) * 100.0 },
-				new double[] { carCounts10[20]
-						/ (ptCounts10[20] + carCounts10[20]) * 100.0 },
+				new double[] { this.ptCounts10[20]
+						/ (this.ptCounts10[20] + this.carCounts10[20]) * 100.0 },
+				new double[] { this.carCounts10[20]
+						/ (this.ptCounts10[20] + this.carCounts10[20]) * 100.0 },
 				new double[] { 8.2 } });
-		sw.writeln(200 + "+\t" + carCounts10[20] + "\t" + ptCounts10[20] + "\t"
+		sw.writeln(200 + "+\t" + this.carCounts10[20] + "\t" + this.ptCounts10[20] + "\t"
 				+ carFraction + "\t" + ptFraction);
 		bubbleChart.saveAsPng(outputFilename + "legTimeModalSplit.png", 900,
 				900);
@@ -317,9 +318,9 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		double yPtFracs[] = new double[101];
 		for (int i = 0; i < 101; i++) {
 			xs[i] = i * 2;
-			yCarFracs[i] = carCounts2[i] / (ptCounts2[i] + carCounts2[i])
+			yCarFracs[i] = this.carCounts2[i] / (this.ptCounts2[i] + this.carCounts2[i])
 					* 100.0;
-			yPtFracs[i] = ptCounts2[i] / (ptCounts2[i] + carCounts2[i]) * 100.0;
+			yPtFracs[i] = this.ptCounts2[i] / (this.ptCounts2[i] + this.carCounts2[i]) * 100.0;
 		}
 
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Duration",
@@ -350,7 +351,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		DailyEnRouteTime ert = new DailyEnRouteTime();
 		population.addAlgorithm(ert);

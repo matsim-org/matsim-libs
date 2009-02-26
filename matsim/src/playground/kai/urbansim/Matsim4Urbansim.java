@@ -1,72 +1,53 @@
 package playground.kai.urbansim;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.*;
-
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.controler.ScenarioData;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.Act;
-import org.matsim.interfaces.core.v01.Node;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkCleaner;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.misc.ExeRunner;
-import org.matsim.world.Layer;
-import org.matsim.world.Location;
 
 /**
  * Class that is meant to interface with urbansim.  As of nov08, only working for the urbansim "parcel"
  * models: Those models output persons with jobId, so the h2w-connection can be taken from urbansim.
  * This class then just produces hwh acts and starts iterating them.
- * 
+ *
  * Not all "parcel" models work, however.  For example, seattle_parcel in oct08 seemed to be "cut out" from
  * psrc_parcel, and care was not taken to make sure that the JobIds in the persons still point to something.
  * Or maybe I made a mistake on my side.
- * 
- * Pathnames: One could use OPUS_HOME.  However, the matsim config system does not know anything about that. 
+ *
+ * Pathnames: One could use OPUS_HOME.  However, the matsim config system does not know anything about that.
  * Instead, I assume that matsim is called from OPUS_HOME/opus_matsim
- * 
+ *
  *   cd ${OPUS_HOME}/opus_matsim ; java -cp jar/matsim.jar ...
- *   
- * If you want to debug inside eclipse, it makes sense to have OPUS_HOME/opus_matsim also at the root of the eclipse workspace 
+ *
+ * If you want to debug inside eclipse, it makes sense to have OPUS_HOME/opus_matsim also at the root of the eclipse workspace
  * (e.g. via a symbolic link),
  * so that, from the normal matsim root directory, ../opus_matsim points to OPUS_HOME.  (This is better than having
  * OPUS_HOME itself at the root, since OPUS_HOME may have different names for different people.)
- * 
+ *
  * @author nagel
  *
  */
 public class Matsim4Urbansim {
 	private static final Logger log = Logger.getLogger(Matsim4Urbansim.class);
-	
+
 	/**
-	 * Note that OPUS_HOME needs to be set; in eclipse as part of the run dialog.  
+	 * Note that OPUS_HOME needs to be set; in eclipse as part of the run dialog.
 	 * When called from urbansim, this is hopefully always set.
 	 */
 	public static final String PATH_TO_OPUS_MATSIM = System.getenv("OPUS_HOME")+'/' +"opus_matsim/" ;
-	
-	public static void main ( String[] args ) {
+
+	public static void main ( final String[] args ) {
 		log.info("Starting the matsim run from the urbansim interface.  This looks a little rough initially since 'normal' matsim" ) ;
 		log.info("is not entered until later (after 'DONE with demand generation from urbansim')." ) ;
-		
+
 		int year = 0 ;
 		double samplingRate = 0.01 ;
 		for ( int ii=1 ; ii<args.length ; ii++ ) { //args[0] is the config file
@@ -82,11 +63,11 @@ public class Matsim4Urbansim {
 		for ( int ii=args.length-1 ; ii>=1 ; ii-- ) {
 			args[ii] = "" ;
 		}
-		
+
 		// parse the config arguments so we have a config.  generate scenario data from this
 		Config config = Gbl.createConfig(args);
 		ScenarioData scenarioData = new ScenarioData(config) ;
-		
+
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
 		NetworkLayer network = scenarioData.getNetwork() ;
@@ -99,7 +80,7 @@ public class Matsim4Urbansim {
 		log.info("") ;
 
 		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year ) ;
-		
+
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		Facilities facilities = new Facilities("urbansim locations (gridcells _or_ parcels _or_ ...)", Facilities.FACILITIES_NO_STREAMING) ;
 		Facilities zones      = new Facilities("urbansim zones", Facilities.FACILITIES_NO_STREAMING) ;
@@ -107,7 +88,7 @@ public class Matsim4Urbansim {
 
 		FacilitiesWriter facWriter = new FacilitiesWriter(facilities,PATH_TO_OPUS_MATSIM+"tmp/locations.xml.gz") ;
 		facWriter.write();
-		
+
 		Population oldPop ;
 		if ( config.plans().getInputFile() != null ) {
 			log.info("Population specified in matsim config file; assuming WARM start with pre-existing pop file.");
@@ -120,18 +101,18 @@ public class Matsim4Urbansim {
 			log.info("(I.e. generate new pop from urbansim files.)" );
 			oldPop=null ;
 		}
-		
-		Population newPop = new Population(Population.NO_STREAMING);
+
+		Population newPop = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		// read urbansim persons.  Generates hwh acts as side effect
 		readFromUrbansim.readPersons( oldPop, newPop, facilities, network, samplingRate ) ;
 		oldPop=null ;
 		System.gc() ;
-				
+
 		PopulationWriter popWriter = new PopulationWriter(newPop,PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz","v4",1) ;
 		popWriter.write();
-		
+
 		log.info("### DONE with demand generation from urbansim ###") ;
-		
+
 		Controler controler = new Controler(config,network,newPop) ;
 		controler.setOverwriteFiles(true) ;
 

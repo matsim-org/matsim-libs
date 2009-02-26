@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -12,10 +12,11 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -23,13 +24,13 @@ import playground.yu.utils.SimpleWriter;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ActOrderChecker extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
 	// ------------------------------------------------------------------------
 	public static class ActOder {
-		public static String getActOder(Plan plan) {
+		public static String getActOder(final Plan plan) {
 			StringBuffer acts = new StringBuffer("");
 			for (ActIterator ai = plan.getIteratorAct(); ai.hasNext();)
 				acts.append(ai.next().getType());
@@ -39,26 +40,27 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 
 	// --------------------------------------------------------------------------
 	private Id personId;
-	private Map<Id, String> actsMap = new HashMap<Id, String>();
+	private final Map<Id, String> actsMap = new HashMap<Id, String>();
 
 	public Map<Id, String> getActsMap() {
-		return actsMap;
+		return this.actsMap;
 	}
 
-	public void run(Person person) {
-		personId = person.getId();
+	@Override
+	public void run(final Person person) {
+		this.personId = person.getId();
 		run(person.getSelectedPlan());
 	}
 
-	public void run(Plan plan) {
-		actsMap.put(personId, ActOder.getActOder(plan));
+	public void run(final Plan plan) {
+		this.actsMap.put(this.personId, ActOder.getActOder(plan));
 	}
 
 	/**
 	 * @param args
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(final String[] args) throws IOException {
 		Gbl.startMeasurement();
 
 		final String netFilename = args[0];
@@ -71,14 +73,14 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population populationA = new Population();
+		Population populationA = new PopulationImpl();
 		ActOrderChecker aocA = new ActOrderChecker();
 		populationA.addAlgorithm(aocA);
 		new MatsimPopulationReader(populationA, network)
 				.readFile(plansFilenameA);
 		populationA.runAlgorithms();
 
-		Population populationB = new Population();
+		Population populationB = new PopulationImpl();
 		ActOrderChecker aocB = new ActOrderChecker();
 		populationB.addAlgorithm(aocB);
 		new MatsimPopulationReader(populationB, network)

@@ -21,10 +21,11 @@
 package playground.balmermi;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.XY2Links;
@@ -36,7 +37,7 @@ public class NavtechRouting {
 	// xy2links
 	//////////////////////////////////////////////////////////////////////
 
-	public static void xy2links(String[] args) {
+	public static void xy2links(final String[] args) {
 
 		System.out.println("RUN: xy2links");
 
@@ -54,7 +55,7 @@ public class NavtechRouting {
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
-		Population plans = new Population(Population.USE_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
@@ -81,7 +82,7 @@ public class NavtechRouting {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 		Gbl.printElapsedTime();
 

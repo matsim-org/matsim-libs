@@ -26,8 +26,9 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
@@ -88,7 +89,7 @@ public class IIDMGenerationPart2 {
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		log.info("  parsing additional municipality information... ");
 		Municipalities municipalities = new Municipalities(indir+"/gg25_2001_infos.txt");
 		municipalities.parse();
@@ -100,7 +101,7 @@ public class IIDMGenerationPart2 {
 		new WorldCheck().run(Gbl.getWorld());
 		new WorldMappingInfo().run(Gbl.getWorld());
 		log.info("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  parsing f2z_mapping... ");
@@ -113,17 +114,17 @@ public class IIDMGenerationPart2 {
 		new WorldCheck().run(Gbl.getWorld());
 		new WorldMappingInfo().run(Gbl.getWorld());
 		log.info("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up population objects...");
-		Population pop = new Population(Population.USE_STREAMING);
+		Population pop = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		PopulationWriter pop_writer = new PopulationWriter(pop);
 		PopulationReader pop_reader = new MatsimPopulationReader(pop);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		System.out.println("  adding person modules... ");
 		pop.addAlgorithm(new PersonSetLocationsFromKnowledge());
 		pop.addAlgorithm(new PersonAssignShopLeisureLocations(facilities));

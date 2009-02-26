@@ -30,13 +30,14 @@ import java.util.TreeMap;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.PersonAlgorithm;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.ActUtilityParameters;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
-import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activities;
 import org.matsim.utils.misc.Time;
@@ -83,7 +84,7 @@ public class MyRuns {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(String[] args) throws Exception {
+	public static void main(final String[] args) throws Exception {
 
 		Gbl.createConfig(args);
 //		Gbl.createWorld();
@@ -92,10 +93,10 @@ public class MyRuns {
 //		run();
 
 		String emptyString = "car";
-		
+
 		String[] bla = emptyString.split(",");
 		System.out.println(bla.length);
-		
+
 	}
 
 	public static NetworkLayer initWorldNetwork() {
@@ -114,12 +115,12 @@ public class MyRuns {
 	}
 
 	// Gbl.getConfig().plans().getInputFile()
-	public static Population initMatsimAgentPopulation(String inputFilename, boolean isStreaming, ArrayList<PersonAlgorithm> algos) {
+	public static Population initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos) {
 
 		Population population = null;
 
 		System.out.println("  reading plans xml file... ");
-		population = new Population(isStreaming);
+		population = new PopulationImpl(isStreaming);
 
 		if (isStreaming) {
 			// add plans algos for streaming
@@ -137,7 +138,7 @@ public class MyRuns {
 		return population;
 	}
 
-	public static void readEvents(Events events, NetworkLayer network) {
+	public static void readEvents(final Events events, final NetworkLayer network) {
 
 		// load test events
 		long startTime, endTime;
@@ -167,7 +168,7 @@ public class MyRuns {
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
 		plansAlgos.add(pa);
 
-		Population matsimAgentPopulation = new Population(Population.USE_STREAMING);
+		Population matsimAgentPopulation = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		PopulationReader plansReader = new MatsimPopulationReader(matsimAgentPopulation);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		matsimAgentPopulation.printPlansCount();
@@ -180,7 +181,7 @@ public class MyRuns {
 
 	}
 
-	private static void writeAnArray(int[][] anArray, String filename) {
+	private static void writeAnArray(final int[][] anArray, final String filename) {
 
 		File outFile = null;
 		BufferedWriter out = null;

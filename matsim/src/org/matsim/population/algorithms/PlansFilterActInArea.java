@@ -23,8 +23,9 @@ package org.matsim.population.algorithms;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 
 /**
  * @author laemmel
@@ -39,7 +40,7 @@ public class PlansFilterActInArea extends AbstractPersonAlgorithm {
 	public PlansFilterActInArea(final NetworkLayer net, final String a){
 		this.network = net;
 		this.actType = a;
-		this.plans =  new Population();
+		this.plans =  new PopulationImpl();
 	}
 
 	public void setArea(final String a){

@@ -26,10 +26,11 @@ import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 
 import playground.yu.visum.filter.EventFilterAlgorithm;
@@ -57,7 +58,7 @@ public class EventFilterTestAveTraTimeCal_ohne_Maut {
 		System.out.println("  done.");
 		// plans
 		System.out.println("  creating plans object... ");
-		Population plans = new Population(Population.USE_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		System.out.println("  done.");
 
 		// events

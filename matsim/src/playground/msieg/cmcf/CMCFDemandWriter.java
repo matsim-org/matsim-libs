@@ -32,10 +32,11 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.xml.sax.SAXException;
 
@@ -50,30 +51,30 @@ public class CMCFDemandWriter{
 	//The input tag has to be specified before converting starts,
 	//it must equal the network name, otherwise CMCF won't run.
 	private String inputNetwork = "notspecified";
-	private String networkPath, plansPath;
-	
+	private final String networkPath, plansPath;
+
 //	public CMCFDemandWriter(){
 //		this.plans = new Population(Population.NO_STREAMING);
 //		this.popReader = new MatsimPopulationReader(this.plans);
 //	}
-	
-	public CMCFDemandWriter(String configPath){
+
+	public CMCFDemandWriter(final String configPath){
 		this( 	Gbl.createConfig(new String[] { configPath, "config_v1.dtd" }).network().getInputFile(),
 				Gbl.getConfig().plans().getInputFile()
 			);
 	}
-	
-	public CMCFDemandWriter(String networkPath, String plansPath){
+
+	public CMCFDemandWriter(final String networkPath, final String plansPath){
 		this.networkPath = networkPath == null ? Gbl.getConfig().network().getInputFile(): networkPath;
 		this.plansPath = plansPath == null ? Gbl.getConfig().plans().getInputFile(): plansPath;
-		
+
 		this.network = new NetworkLayer();
-		this.plans = new Population(Population.NO_STREAMING);
+		this.plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		this.popReader = new MatsimPopulationReader(this.plans, this.network);
-		
+
 		this.init();
 	}
-	
+
 	private void init(){
 		try {
 			new MatsimNetworkReader(this.network).parse(this.networkPath);
@@ -87,18 +88,18 @@ public class CMCFDemandWriter{
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Deprecated
 	public void readFile()
 	{
 		this.init();
 	}
-	
-	
-	public void setInputNetwork(String inputNetwork) {
+
+
+	public void setInputNetwork(final String inputNetwork) {
 		this.inputNetwork = inputNetwork;
 	}
-	
+
 
 	/**
 	 * Converts plan file and prints out to console, equivalent to call convert(null)
@@ -106,8 +107,8 @@ public class CMCFDemandWriter{
 	public void convert(){
 		this.convert(null);
 	}
-	
-	public void convert(int numberOfTimeSteps){
+
+	public void convert(final int numberOfTimeSteps){
 		this.convert(null, numberOfTimeSteps);
 	}
 
@@ -117,16 +118,16 @@ public class CMCFDemandWriter{
 	 * Make sure you have called read() before calling this function.
 	 * @param out the Writer where to write the output, or null
 	 */
-	public void convert(Writer out){
+	public void convert(final Writer out){
 		this.convert(out, 1);
 	}
-	public void convert(Writer out, int numberOfTimeSteps){
+	public void convert(final Writer out, final int numberOfTimeSteps){
 		log("<demandgraph>\n", out);
 		this.convertHeader(out, (byte) 1);
 		this.convertDemands(out, (byte) 1, numberOfTimeSteps);
 		log("</demandgraph>", out);
 	}
-	
+
 	/**
 	 * Make something like:
 	 *       <header>
@@ -136,13 +137,13 @@ public class CMCFDemandWriter{
  	 *               <creator>CMCFDemandWriter</creator>
  	 *               <input>sourcenetwork</input>
  	 *       </header>
- 	 *       
+ 	 *
  	 * Very important is the input tag, CMCF only accepts the demand file,
  	 * if the input tag equals the name of the network!
 	 * @param out
 	 * @param tabs
 	 */
-	protected void convertHeader(Writer out, byte tabs){
+	protected void convertHeader(final Writer out, byte tabs){
 		String tab="";
 		while(tabs-- > 0)
 			tab += '\t';
@@ -153,8 +154,8 @@ public class CMCFDemandWriter{
 		log(tab+"\t<input>"+this.inputNetwork+"</input>\n", out);
 		log(tab+"</header>\n", out);
 	}
-	
-	
+
+
 	/**
 	 * Make something like:
 	 *          <demands>
@@ -167,17 +168,17 @@ public class CMCFDemandWriter{
 	 * @param out
 	 * @param tabs
 	 */
-	protected void convertDemands(Writer out, byte tabs){
+	protected void convertDemands(final Writer out, final byte tabs){
 		this.convertDemands(out, tabs, 1);
 	}
 	/**
 	 * To create time dependent solutions for MATSIM, the parameter divisor is introduced
-	 * For each commodity the demand value is divided by divisor. 
+	 * For each commodity the demand value is divided by divisor.
 	 * @param out
 	 * @param tabs
 	 * @param divisor
 	 */
-	protected void convertDemands(Writer out, byte tabs, int divisor){
+	protected void convertDemands(final Writer out, byte tabs, final int divisor){
 		String tab="";
 		while(tabs-- > 0)
 			tab += '\t';
@@ -189,12 +190,12 @@ public class CMCFDemandWriter{
 		Leg leg;
 		for (Id id : this.plans.getPersons().keySet()) {
 			plan = this.plans.getPerson(id).getSelectedPlan();
-			act1 = (Act) plan.getFirstActivity();
+			act1 = plan.getFirstActivity();
 			leg = plan.getNextLeg(act1);
 			act2 = plan.getNextActivity(leg);
 			com.add( act1.getLink().getToNode(), act2.getLink().getFromNode(), 1);
 		}
-		
+
 		//now write the output
 		log(tab+"<demands>\n", out);
 		int counter = 1;
@@ -213,8 +214,8 @@ public class CMCFDemandWriter{
 		}
 		log(tab+"</demands>\n", out);
 	}
-	
-	private void log(String s, Writer out){
+
+	private void log(final String s, final Writer out){
 		if(out == null){
 			System.out.print(s);
 		}
@@ -227,8 +228,8 @@ public class CMCFDemandWriter{
 			}
 		}
 	}
-	
-	public static void main(String[] args) {
+
+	public static void main(final String[] args) {
 		if(args.length==0){
 			System.out.println("Usage: java CMCFDemandWriter config.xml \n\tOR: java CMCFDemandWriter network.xml plans.xml [outputFile] [input] \n" +
 					"\t second argument is the plansFile to convert, if not given, then the plans file in the config is used." +
@@ -240,7 +241,7 @@ public class CMCFDemandWriter{
 		CMCFDemandWriter cdw = null;
 		if(args.length==1)
 			cdw = new CMCFDemandWriter(args[0]);
-		else 
+		else
 			cdw = new CMCFDemandWriter(args[0], args[1]);
 		Writer out=null;
 		if(args.length>2){

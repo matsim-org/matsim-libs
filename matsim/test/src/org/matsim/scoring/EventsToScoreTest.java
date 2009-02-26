@@ -27,8 +27,9 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -40,7 +41,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 	 * Tests that an AgentUtilityEvent is handled by calling the method addUtility() of a scoring function.
 	 */
 	public void testAddMoney() {
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		Person person = new PersonImpl(new IdImpl(1));
 		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
@@ -71,9 +72,9 @@ public class EventsToScoreTest extends MatsimTestCase {
 			// empty public constructor for private inner class
 		}
 
-		public ScoringFunction getNewScoringFunction(Plan plan) {
-			counter++;
-			return sf;
+		public ScoringFunction getNewScoringFunction(final Plan plan) {
+			this.counter++;
+			return this.sf;
 		}
 
 	}
@@ -94,19 +95,19 @@ public class EventsToScoreTest extends MatsimTestCase {
 			// empty public constructor for private inner class
 		}
 
-		public void addMoney(double amount) {
+		public void addMoney(final double amount) {
 			this.cntMoney++;
 		}
 
-		public void agentStuck(double time) {
+		public void agentStuck(final double time) {
 			this.cntStuck++;
 		}
 
-		public void endActivity(double time) {
+		public void endActivity(final double time) {
 			this.cntEndAct++;
 		}
 
-		public void endLeg(double time) {
+		public void endLeg(final double time) {
 			this.cntEndLeg++;
 		}
 
@@ -123,11 +124,11 @@ public class EventsToScoreTest extends MatsimTestCase {
 			this.cntReset++;
 		}
 
-		public void startActivity(double time, Act act) {
+		public void startActivity(final double time, final Act act) {
 			this.cntStartAct++;
 		}
 
-		public void startLeg(double time, Leg leg) {
+		public void startLeg(final double time, final Leg leg) {
 			this.cntStartLeg++;
 		}
 

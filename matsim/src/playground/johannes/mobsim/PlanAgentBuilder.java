@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 
 /**
  * A builder class that builds {@link PlanAgent} instances out of {@link Person}

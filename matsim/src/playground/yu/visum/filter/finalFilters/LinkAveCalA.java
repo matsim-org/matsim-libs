@@ -10,8 +10,8 @@ import java.util.TreeMap;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Population;
 import org.matsim.utils.misc.Time;
 
 import playground.yu.visum.writer.UserDefAtt;

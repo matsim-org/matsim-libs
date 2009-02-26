@@ -31,16 +31,17 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class SameActLocTest {
 	public static class SameActLoc extends AbstractPersonAlgorithm {
@@ -51,9 +52,9 @@ public class SameActLocTest {
 
 		public SameActLoc(final String filename) {
 			try {
-				writer = IOUtils.getBufferedWriter(filename);
-				writer.write("personId\tlinkId\tactIdx\n");
-				writer.flush();
+				this.writer = IOUtils.getBufferedWriter(filename);
+				this.writer.write("personId\tlinkId\tactIdx\n");
+				this.writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -63,17 +64,17 @@ public class SameActLocTest {
 
 		public void end() {
 			try {
-				writer
+				this.writer
 						.write("------------------------------------\nacts at same link: "
-								+ actLocCount
+								+ this.actLocCount
 								+ "\namong them "
-								+ carActLocCount
+								+ this.carActLocCount
 								+ " car-legs and "
-								+ ptActLocCount
+								+ this.ptActLocCount
 								+ " pt-legs;"
 								+ "\npersons, who has such acts: "
-								+ personCount);
-				writer.close();
+								+ this.personCount);
+				this.writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -81,7 +82,7 @@ public class SameActLocTest {
 
 		@Override
 		public void run(final Person person) {
-			actsAtSameLink = false;
+			this.actsAtSameLink = false;
 			String tmpLinkId = null;
 			String nextTmpLinkId = null;
 			int i = 0;
@@ -93,7 +94,7 @@ public class SameActLocTest {
 						nextTmpLinkId = ai.next().getLinkId().toString();
 						if (tmpLinkId != null && nextTmpLinkId != null)
 							if (tmpLinkId.equals(nextTmpLinkId)) {
-								actLocCount++;
+								this.actLocCount++;
 								if (
 								// planType != null
 								// && Plan.Type.UNDEFINED != planType
@@ -101,17 +102,17 @@ public class SameActLocTest {
 									if (
 									// planType.equals(Plan.Type.CAR)
 									PlanModeJudger.useCar(p))
-										carActLocCount++;
+										this.carActLocCount++;
 									else if (
 									// planType.equals(Plan.Type.PT)
 									PlanModeJudger.usePt(p))
-										ptActLocCount++;
-								actsAtSameLink = true;
+										this.ptActLocCount++;
+								this.actsAtSameLink = true;
 								try {
-									writer.write(person.getId().toString()
+									this.writer.write(person.getId().toString()
 											+ "\t" + tmpLinkId + "\t" + i
 											+ "\n");
-									writer.flush();
+									this.writer.flush();
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
@@ -119,8 +120,8 @@ public class SameActLocTest {
 						tmpLinkId = nextTmpLinkId;
 						i++;
 					}
-					if (actsAtSameLink)
-						personCount++;
+					if (this.actsAtSameLink)
+						this.personCount++;
 				}
 			}
 		}
@@ -146,7 +147,7 @@ public class SameActLocTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		SameActLoc alt = new SameActLoc(outFilename);
 		population.addAlgorithm(alt);

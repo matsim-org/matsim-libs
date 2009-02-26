@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 
 import org.matsim.facilities.Facility;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.world.Location;

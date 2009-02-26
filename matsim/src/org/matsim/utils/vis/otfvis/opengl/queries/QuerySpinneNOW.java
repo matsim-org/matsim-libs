@@ -5,10 +5,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueVehicle;
-import org.matsim.population.Population;
 
 public class QuerySpinneNOW extends QuerySpinne {
 

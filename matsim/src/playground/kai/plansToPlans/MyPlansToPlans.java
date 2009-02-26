@@ -24,14 +24,13 @@ import java.io.PrintWriter;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 
 /**
  * @author kn after mrieser
@@ -39,28 +38,26 @@ import org.matsim.world.World;
 public class MyPlansToPlans {
 
 	private Config config;
-	private String configfile = null;
-	private String dtdfile = null;
+	private final String configfile = null;
+	private final String dtdfile = null;
 
 	public void run(final String[] args) {
 		this.config = Gbl.createConfig(new String[]{"../padang/dlr-network/pconfig.xml"});
 		ConfigWriter configwriter = new ConfigWriter(this.config, new PrintWriter(System.out));
 		configwriter.write();
 
-		final World world = Gbl.getWorld();
-
-		if (this.config.world().getInputFile() != null) {
-			final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-			worldReader.readFile(this.config.world().getInputFile());
-		}
+//		final World world = Gbl.getWorld();
+//
+//		if (this.config.world().getInputFile() != null) {
+//			final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+//			worldReader.readFile(this.config.world().getInputFile());
+//		}
 
 		NetworkLayer network = new NetworkLayer();
-		world.setNetworkLayer(network);
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
-		world.complete();
 
-		final Population plans = new Population(Population.USE_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans);
+		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 //		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
 		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added

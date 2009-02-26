@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Population;
 import org.matsim.utils.misc.Time;
 
 import playground.yu.visum.writer.UserDefAtt;

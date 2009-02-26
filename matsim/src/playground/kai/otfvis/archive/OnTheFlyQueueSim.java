@@ -24,19 +24,17 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.otfvis.executables.OnTheFlyClientQuadSwing;
 import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientQuad;
 import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.utils.vis.otfvis.server.OnTheFlyServer;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 
 
 /**
@@ -78,19 +76,19 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 	}
 
 	@Override
-	protected void afterSimStep(double time) {
+	protected void afterSimStep(final double time) {
 		super.afterSimStep(time);
 
 		this.myOTFServer.updateStatus(time);
 
 	}
 
-	public OnTheFlyQueueSim(NetworkLayer net, Population plans, Events events) {
+	public OnTheFlyQueueSim(final NetworkLayer net, final Population plans, final Events events) {
 		super(net, plans, events);
 	}
 
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 		String studiesRoot = "/home/nagel/vsp-cvs/studies/";
 		String localDtdBase = "../matsim-trunk/dtd/";
@@ -114,21 +112,12 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 			worldFileName = config.world().getInputFile();
 		}
 
-		World world = Gbl.createWorld();
-
-		if (worldFileName != null) {
-			MatsimWorldReader world_parser = new MatsimWorldReader(Gbl.getWorld());
-			world_parser.readFile(worldFileName);
-		}
-
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
-		world.setNetworkLayer(net);
-		world.complete();
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		// Read plans file with special Reader Implementation
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, net);
 		plansReader.readFile(popFileName);
 
 		Events events = new Events();
@@ -152,7 +141,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 
 	}
 
-	public void setOtfwriter(OTFQuadFileHandler.Writer  otfwriter) {
+	public void setOtfwriter(final OTFQuadFileHandler.Writer  otfwriter) {
 		//this.otfwriter = otfwriter;
 	}
 

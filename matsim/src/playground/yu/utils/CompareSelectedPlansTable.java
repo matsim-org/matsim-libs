@@ -10,10 +10,11 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.charts.XYScatterChart;
 import org.matsim.utils.io.IOUtils;
@@ -23,13 +24,13 @@ import playground.yu.analysis.PlanModeJudger;
 /**
  * it is a copy of <class>org.matsim.run.CompareSelectedPlansTable</class>, only
  * some small changes were taken.
- * 
+ *
  */
 public class CompareSelectedPlansTable {
 
 	private Population plans0;
 	private Population plans1;
-	private String header = "personid;sex;age;license;caravail;employed;homex;homey;homelink;"
+	private final String header = "personid;sex;age;license;caravail;employed;homex;homey;homelink;"
 			+ "score0;score1;s1-s0;relativScoreDiff;"
 			+ "plantraveltime0;plantraveltime1;t1-t0;"
 			+ "plantraveldistance0;plantraveldistance1;d1-d0;"
@@ -43,7 +44,7 @@ public class CompareSelectedPlansTable {
 	 *            array with 4 entries: {path to plans file 0, path to plans
 	 *            file 1, name of output file, path to network file}
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		if (args.length < 4) {
 			System.out.println("Too few arguments.");
 			printUsage();
@@ -57,28 +58,28 @@ public class CompareSelectedPlansTable {
 		Gbl.printElapsedTime();
 	}
 
-	private void init(String networkPath) {
-		this.plans0 = new Population(false);
-		this.plans1 = new Population(false);
+	private void init(final String networkPath) {
+		this.plans0 = new PopulationImpl(false);
+		this.plans1 = new PopulationImpl(false);
 
 		System.out.println("  reading the network...");
 		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(networkPath);
 	}
 
-	private void readFiles(String plansfilePath0, String plansfilePath1) {
+	private void readFiles(final String plansfilePath0, final String plansfilePath1) {
 		System.out.println("  reading file " + plansfilePath0);
 		PopulationReader plansReader0 = new MatsimPopulationReader(this.plans0,
-				network);
+				this.network);
 		plansReader0.readFile(plansfilePath0);
 
 		System.out.println("  reading file " + plansfilePath1);
 		PopulationReader plansReader1 = new MatsimPopulationReader(this.plans1,
-				network);
+				this.network);
 		plansReader1.readFile(plansfilePath1);
 	}
 
-	private void writeSummaryFile(String outfile) {
+	private void writeSummaryFile(final String outfile) {
 		XYScatterChart chart = new XYScatterChart("Score differences",
 				"score0", "score1");
 		try {
@@ -196,7 +197,7 @@ public class CompareSelectedPlansTable {
 	 * to have everything in one single class
 	 */
 
-	private double getTravelTime(Person person) {
+	private double getTravelTime(final Person person) {
 
 		double travelTime = 0.0;
 		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
@@ -207,7 +208,7 @@ public class CompareSelectedPlansTable {
 		return travelTime;
 	}
 
-	private double getTravelDist(Person person) {
+	private double getTravelDist(final Person person) {
 
 		double travelDist = 0.0;
 		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
@@ -219,7 +220,7 @@ public class CompareSelectedPlansTable {
 		return travelDist;
 	}
 
-	private int getNumberOfTrips(Person person) {
+	private int getNumberOfTrips(final Person person) {
 
 		int numberOfLegs = 0;
 		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
@@ -232,8 +233,8 @@ public class CompareSelectedPlansTable {
 
 	// --------------------------------------------------------------------------
 
-	private void run(String plansfilePath0, String plansfilePath1,
-			String outfile, String networkPath) {
+	private void run(final String plansfilePath0, final String plansfilePath1,
+			final String outfile, final String networkPath) {
 		this.init(networkPath);
 		readFiles(plansfilePath0, plansfilePath1);
 		writeSummaryFile(outfile);

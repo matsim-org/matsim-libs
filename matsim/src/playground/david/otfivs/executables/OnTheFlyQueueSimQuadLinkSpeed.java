@@ -7,12 +7,13 @@ import java.util.List;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
 import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
@@ -72,7 +73,7 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 	}
 
 	@Override
-	protected void afterSimStep(double time) {
+	protected void afterSimStep(final double time) {
 		super.afterSimStep(time);
 		int status = 0;
 
@@ -82,11 +83,11 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 
 	}
 
-	public OnTheFlyQueueSimQuadLinkSpeed(NetworkLayer net, Population plans, Events events) {
+	public OnTheFlyQueueSimQuadLinkSpeed(final NetworkLayer net, final Population plans, final Events events) {
 		super(net, plans, events);
 	}
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 //		String studiesRoot = "../";
 		String localDtdBase = "../matsimGIS/dtd/";
@@ -139,7 +140,7 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 		world.setNetworkLayer(net);
 		world.complete();
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(popFileName);
 		population.printPlansCount();

@@ -17,8 +17,9 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.utils.WorldUtils;
 import org.matsim.utils.io.IOUtils;
@@ -149,7 +150,7 @@ public class Converter {
 						tmpCoord2 = this.tmpHome;
 					}
 					Act lastAct = tmpPl.createAct(this.tmpTabs[10], tmpCoord2);
-					
+
 					// make a copy of the just finished plan and set it to use public transit mode
 					Plan nonCarPlan = new org.matsim.population.PlanImpl(p);
 					nonCarPlan.copyPlan(tmpPl);
@@ -165,7 +166,7 @@ public class Converter {
 				endTime = convertTime(tabs[3]);
 
 				this.tmpHome = getRandomCoordInZone(tabs[9]);
-				Act homeAct = pl.createAct(tabs[7], tmpHome);
+				Act homeAct = pl.createAct(tabs[7], this.tmpHome);
 				homeAct.setEndTime(convertTime(tabs[3]));
 				p.addPlan(pl);
 				this.pop.addPerson(p);
@@ -243,7 +244,7 @@ public class Converter {
 		c.createZones();
 
 		//
-		c.setPop(new Population());
+		c.setPop(new PopulationImpl());
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
 			PopulationWriter writer = new PopulationWriter(c.pop,

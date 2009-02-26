@@ -34,6 +34,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.MatsimMatricesReader;
@@ -41,7 +42,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
@@ -58,21 +59,21 @@ public abstract class ScenarioConfig {
 	// For KMZ drawings of final iteration: needs ActivityActMap500.txt, edge and agent.txt (for iter 500)
 //	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB5/postprocessing/";
 //	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB5/";
-	
+
 	//For TRB run analyses of 500 iterations
 	private static final String output_directory = "D:/SocialNetsFolder/FixedEd/TRB1/timecorr/";
 	private static final String input_directory = "D:/SocialNetsFolder/FixedEd/TRB1/";
-	private static String configFileName; 
+	private static String configFileName;
 	private static String dtdFileName;
 //	private static final String output_directory="output/Analyses/TRB6/";//AnalyzeScores
 //	private static final String input_directory="output/TRB6/";//AnalyzeScores
 //	private static final String output_directory="../../results/matsim/Analyses/EventsInt6_10/";//AnalyzeTimeCorrelation
-//	private static final String input_directory="output/EventsInt6_10_restart420/";//AnalyzeTimeCorrelation	
+//	private static final String input_directory="output/EventsInt6_10_restart420/";//AnalyzeTimeCorrelation
 
 //	private static final String output_directory="D:/eclipse_workspace/matsim/output/EventsInt5_10/timecorr/";
 //	private static final String input_directory="D:/eclipse_workspace/matsim/output/EventsInt5_10/";
 //	private static final String output_directory="D:/SocialNetsFolder/Battery/22_HC/timecorr/";//AnalyzeTimeCorrelation
-//	private static final String input_directory="D:/SocialNetsFolder/Battery/22_HC/";//AnalyzeTimeCorrelation	
+//	private static final String input_directory="D:/SocialNetsFolder/Battery/22_HC/";//AnalyzeTimeCorrelation
 	private static final String out2 = "1.out";
 	private static final String out1 = "AgentsAtActivities1.out";
 	private static String eventsFileName=null;
@@ -81,7 +82,7 @@ public abstract class ScenarioConfig {
 	private static String facsFileName=null;
 	private static String matsFileName=null;
 	private static String popFileName=null;
-	
+
 	private static final Config config= Gbl.createConfig(null);
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -128,12 +129,12 @@ public abstract class ScenarioConfig {
 		config.plans().setOutputFile(output_directory + "output_plans.xml.gz");
 		config.plans().setOutputVersion("v4");
 		config.plans().setOutputSample(1.0);
-		
+
 		config.counts().setCountsFileName(input_directory + "counts.xml");
 		config.counts().setOutputFile(output_directory + "output_counts.xml.gz");
-		
+
 		config.events().setInputFile("events.txt");
-		
+
 		config.socnetmodule().setInDirName(input_directory);
 		config.socnetmodule().setOutDir(output_directory);
 //		config.socnetmodule().setSocNetGraphAlgo("none");
@@ -149,7 +150,7 @@ public abstract class ScenarioConfig {
 		config.socnetmodule().setBeta2("0");
 		config.socnetmodule().setBeta3("0");
 		config.socnetmodule().setBeta4("0");
-		
+
 		config.createModule("kml21");
 		config.getModule("kml21").addParam("outputDirectory", output_directory);
 		config.getModule("kml21").addParam("outputEgoNetPlansKMLMainFile","egoNetKML" );
@@ -188,7 +189,7 @@ public abstract class ScenarioConfig {
 		System.out.println("  done.");
 		return facilities;
 	}
-	
+
 	public static final NetworkLayer readNetwork() {
 		System.out.println("  reading the network xml file...");
 		System.out.println(Gbl.getConfig().network().getInputFile());
@@ -198,26 +199,26 @@ public abstract class ScenarioConfig {
 		System.out.println("  done.");
 		return network;
 	}
-	
+
 	public static final Counts readCounts() {
 		System.out.println("  reading the counts...");
 		final Counts counts = new Counts();
 		new MatsimCountsReader(counts).readFile(Gbl.getConfig().counts().getCountsFileName());
-		
+
 		System.out.println("  done.");
 		return counts;
 	}
-	
+
 	public static final Matrices readMatrices() {
 		System.out.println("  reading matrices xml file... ");
 		new MatsimMatricesReader(Matrices.getSingleton(), Gbl.getWorld()).readFile(Gbl.getConfig().matrices().getInputFile());
 		System.out.println("  done.");
 		return Matrices.getSingleton();
 	}
-	
+
 	public static final Population readPlans() {
 		System.out.println("  reading plans xml file... ");
-		Population plans = new Population();
+		Population plans = new PopulationImpl();
 //		System.out.println(Gbl.getConfig().plans().getInputFile());
 //		new MatsimPopulationReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
 		System.out.println(popFileName);
@@ -226,21 +227,21 @@ public abstract class ScenarioConfig {
 		System.out.println("  done.");
 		return plans;
 	}
-	public static final Population readPlans(int i) {
+	public static final Population readPlans(final int i) {
 		System.out.println("  reading plans xml file... ");
-		Population plans = new Population();
+		Population plans = new PopulationImpl();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
 //		String filename=input_directory +Gbl.getConfig().plans().getInputFile();
 		String filename=input_directory +popFileName;
 //		System.out.println(filename);
 		System.out.println(filename);
 		new MatsimPopulationReader(plans).readFile(filename);
-		
+
 		System.out.println("  done.");
 		return plans;
 	}
-	
-	public static final Events readEvents(int i, EventsMapStartEndTimes epp) {
+
+	public static final Events readEvents(final int i, final EventsMapStartEndTimes epp) {
 		System.out.println("  reading plans xml file... ");
 		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
@@ -252,8 +253,8 @@ public abstract class ScenarioConfig {
 		System.out.println("  done.");
 		return events;
 	}
-	
-	public static final Events readEvents(int i, EventsMapStartEndTimes epp, EventsToScore scoring) {
+
+	public static final Events readEvents(final int i, final EventsMapStartEndTimes epp, final EventsToScore scoring) {
 		System.out.println("  reading plans xml file... ");
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
 		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
@@ -266,8 +267,8 @@ public abstract class ScenarioConfig {
 		System.out.println("  done.");
 		return events;
 	}
-	
-	public static final Events readEvents(int i, EventsMapStartEndTimes epp, playground.jhackney.scoring.EventsToScoreAndReport scoring) {
+
+	public static final Events readEvents(final int i, final EventsMapStartEndTimes epp, final playground.jhackney.scoring.EventsToScoreAndReport scoring) {
 		System.out.println("  reading plans xml file... ");
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
 		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
@@ -284,37 +285,37 @@ public abstract class ScenarioConfig {
 	// write output
 	//////////////////////////////////////////////////////////////////////
 
-	public static final void writePlans(Population plans) {
+	public static final void writePlans(final Population plans) {
 		System.out.println("  writing plans xml file... ");
 		new PopulationWriter(plans).write();
 		System.out.println("  done.");
 	}
 
-	public static final void writeMatrices(Matrices matrices) {
+	public static final void writeMatrices(final Matrices matrices) {
 		System.out.println("  writing matrices xml file... ");
 		new MatricesWriter(matrices).write();
 		System.out.println("  done.");
 	}
 
-	public static final void writeCounts(Counts counts) {
+	public static final void writeCounts(final Counts counts) {
 		System.out.println("  writing counts xml file... ");
 		new CountsWriter(counts).write();
 		System.out.println("  done.");
 	}
 
-	public static final void writeNetwork(NetworkLayer network) {
+	public static final void writeNetwork(final NetworkLayer network) {
 		System.out.println("  writing network xml file... ");
 		new NetworkWriter(network).write();
 		System.out.println("  done.");
 	}
-	
-	public static final void writeFacilities(Facilities facilities) {
+
+	public static final void writeFacilities(final Facilities facilities) {
 		System.out.println("  writing facilities xml file... ");
 		new FacilitiesWriter(facilities).write();
 		System.out.println("  done.");
 	}
 
-	public static final void writeWorld(World world) {
+	public static final void writeWorld(final World world) {
 		System.out.println("  writing world xml file... ");
 		new WorldWriter(world).write();
 		System.out.println("  done.");

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -24,10 +24,11 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -40,14 +41,14 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author yu
- * 
+ *
  */
 public class RouteCompare2QGIS extends Route2QGIS {
-	private Map<List<Id>, Integer> routeCountersB;
+	private final Map<List<Id>, Integer> routeCountersB;
 
-	public RouteCompare2QGIS(CoordinateReferenceSystem crs, String outputDir,
-			NetworkLayer network, Map<List<Id>, Integer> routeCountersA,
-			Map<List<Id>, Integer> routeCountersB) {
+	public RouteCompare2QGIS(final CoordinateReferenceSystem crs, final String outputDir,
+			final NetworkLayer network, final Map<List<Id>, Integer> routeCountersA,
+			final Map<List<Id>, Integer> routeCountersB) {
 		super(crs, outputDir, network, routeCountersA);
 		this.routeCountersB = routeCountersB;
 	}
@@ -77,9 +78,9 @@ public class RouteCompare2QGIS extends Route2QGIS {
 	}
 
 	@Override
-	protected Feature getRouteFeature(List<Id> routeLinkIds) {
-		Integer routeFlowsA = routeCounters.get(routeLinkIds);
-		Integer routeFlowsB = routeCountersB.get(routeLinkIds);
+	protected Feature getRouteFeature(final List<Id> routeLinkIds) {
+		Integer routeFlowsA = this.routeCounters.get(routeLinkIds);
+		Integer routeFlowsB = this.routeCountersB.get(routeLinkIds);
 		if (routeFlowsA != null || routeFlowsB != null) {
 			if (routeFlowsA == null)
 				routeFlowsA = new Integer(0);
@@ -94,7 +95,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 				double width = 10.0 * Math.min(250.0, absDiff);
 
 				for (int i = 0; i < routeLinkIds.size(); i++) {
-					Link l = network.getLink(routeLinkIds.get(i));
+					Link l = this.network.getLink(routeLinkIds.get(i));
 					Coord c = l.getFromNode().getCoord();
 					Coordinate cdn = new Coordinate(c.getX(), c.getY());
 					coordinates[i] = cdn;
@@ -110,7 +111,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 									* xdiff / denominator);
 				}
 
-				Coord c = network.getLink(
+				Coord c = this.network.getLink(
 						routeLinkIds.get(routeLinkIds.size() - 1)).getToNode()
 						.getCoord();
 				Coordinate cdn = new Coordinate(c.getX(), c.getY());
@@ -151,8 +152,8 @@ public class RouteCompare2QGIS extends Route2QGIS {
 	protected void writeRoutes() throws IOException {
 		ArrayList<Feature> fts = new ArrayList<Feature>();
 		Set<List<Id>> totalKeys = new HashSet<List<Id>>();
-		totalKeys.addAll(routeCounters.keySet());
-		totalKeys.addAll(routeCountersB.keySet());
+		totalKeys.addAll(this.routeCounters.keySet());
+		totalKeys.addAll(this.routeCountersB.keySet());
 		for (List<Id> routeLinkIds : totalKeys) {
 			Feature ft = getRouteFeature(routeLinkIds);
 			if (ft != null)
@@ -164,7 +165,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		final String networkFilename = args[0];
 		final String populationFilenameA = args[1];
 		final String populationFilenameB = args[2];
@@ -175,7 +176,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 		// ------------------------RouteSummaryA--------------------------------
-		Population populationA = new Population();
+		Population populationA = new PopulationImpl();
 
 		RouteSummary rsA = new RouteSummary(outputDir + "/routeCompareA.txt.gz");
 		populationA.addAlgorithm(rsA);
@@ -188,7 +189,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		rsA.write();
 		rsA.end();
 		// ------------------------RouteSummaryB---------------------------------
-		Population populationB = new Population();
+		Population populationB = new PopulationImpl();
 
 		RouteSummary rsB = new RouteSummary(outputDir + "/routeCompareB.txt.gz");
 		populationB.addAlgorithm(rsB);

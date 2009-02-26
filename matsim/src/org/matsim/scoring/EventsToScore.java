@@ -35,7 +35,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.population.Population;
+import org.matsim.interfaces.core.v01.Population;
 
 /**
  * Calculates continuously the score of the selected plans of a given population

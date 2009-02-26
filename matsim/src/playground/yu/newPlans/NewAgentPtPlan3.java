@@ -27,9 +27,9 @@ import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.PersonAlgorithm;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.population.Population;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.interfaces.core.v01.Population;
 
 import playground.yu.analysis.PlanModeJudger;
 

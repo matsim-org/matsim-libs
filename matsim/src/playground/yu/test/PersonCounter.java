@@ -25,39 +25,40 @@ package playground.yu.test;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class PersonCounter extends AbstractPersonAlgorithm {
 	private int cnt, nullCnt;
 
 	/**
-	 * 
+	 *
 	 */
 	public PersonCounter() {
-		cnt = 0;
-		nullCnt = 0;
+		this.cnt = 0;
+		this.nullCnt = 0;
 	}
 
 	@Override
 	public void run(final Person person) {
 		if (person != null)
-			cnt++;
+			this.cnt++;
 		else
-			nullCnt++;
+			this.nullCnt++;
 	}
 
 	@Override
 	public String toString() {
-		return "There are " + cnt + " persons and " + nullCnt
+		return "There are " + this.cnt + " persons and " + this.nullCnt
 				+ " (null)persons";
 	}
 
@@ -72,7 +73,7 @@ public class PersonCounter extends AbstractPersonAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		PersonCounter pc = new PersonCounter();
 		population.addAlgorithm(pc);
 		PopulationReader plansReader = new MatsimPopulationReader(population,

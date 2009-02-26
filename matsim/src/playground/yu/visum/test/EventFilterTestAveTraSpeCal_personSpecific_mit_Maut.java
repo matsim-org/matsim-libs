@@ -26,10 +26,11 @@ import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 
 import playground.yu.visum.filter.EventFilterAlgorithm;
@@ -45,7 +46,7 @@ import playground.yu.visum.writer.PrintStreamUDANET;
  * (EventFilterAlgorithm, EventFilterPersonSpecific, AveTraSpeCal)] [to read
  * events file] [to run events algorithms] [to print additive netFile of
  * Visum...] [to print attributsFile of link...]
- * 
+ *
  * @author yu chen
  */
 public class EventFilterTestAveTraSpeCal_personSpecific_mit_Maut {
@@ -83,7 +84,7 @@ public class EventFilterTestAveTraSpeCal_personSpecific_mit_Maut {
 
 		// plans
 		System.out.println("  creating plans object... ");
-		Population plans = new Population(Population.USE_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		System.out.println("  done.");
 
 		// events

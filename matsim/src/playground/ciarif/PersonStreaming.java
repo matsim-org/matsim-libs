@@ -20,21 +20,18 @@
 
 package playground.ciarif;
 
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 
 import playground.balmermi.census2000.data.Household;
 import playground.balmermi.census2000.data.Households;
-import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Person;
 import playground.balmermi.census2000.data.Persons;
-import playground.ciarif.models.subtours.PersonInitDemandSummaryTable;
-import playground.ciarif.models.subtours.PersonModeChoiceModel;
 
 public class PersonStreaming {
 
@@ -43,14 +40,14 @@ public class PersonStreaming {
 		//Config config = Gbl.createConfig(args);
 		Scenario.setUpScenarioConfig();
 		Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		
+
 		//////////////////////////////////////////////////////////////////////
-		
-		
+
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		Population plans = new Population(Population.USE_STREAMING);
+		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		//SubtoursWriteTable subtoursWriteTable = new SubtoursWriteTable ("output/output_persons_subtours.txt");
 		PopulationReader plansReader = new MatsimPopulationReader(plans);
@@ -71,10 +68,10 @@ public class PersonStreaming {
 		Persons persons = new Persons(hhs,null);
 //		persons.households = hhs;
 		persons.persons.put(person.p_id,person);
-		
+
 		//PersonModeChoiceModel pmcm = new PersonModeChoiceModel(persons);
 		//plans.addAlgorithm(pmcm);
-		
+
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -100,7 +97,7 @@ public class PersonStreaming {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 		Gbl.printElapsedTime();
 		run();

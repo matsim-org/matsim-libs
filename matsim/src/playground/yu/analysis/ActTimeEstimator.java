@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -13,16 +13,17 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ActTimeEstimator extends AbstractPersonAlgorithm {
 	private static class ActTimeCounter {
@@ -30,25 +31,25 @@ public class ActTimeEstimator extends AbstractPersonAlgorithm {
 		private double sum = 0.0, min = 86400.0, max = 0.0;
 
 		public double getMin() {
-			return min;
+			return this.min;
 		}
 
 		public double getMax() {
-			return max;
+			return this.max;
 		}
 
-		public void add(double time) {
-			sum += time;
-			count++;
-			if (time > max) {
-				max = time;
-			} else if (time < min) {
-				min = time;
+		public void add(final double time) {
+			this.sum += time;
+			this.count++;
+			if (time > this.max) {
+				this.max = time;
+			} else if (time < this.min) {
+				this.min = time;
 			}
 		}
 
 		public double getAvg() {
-			return sum / (double) count;
+			return this.sum / this.count;
 		}
 	}
 
@@ -66,45 +67,45 @@ public class ActTimeEstimator extends AbstractPersonAlgorithm {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		for (ActIterator ai = person.getSelectedPlan().getIteratorAct(); ai
 				.hasNext();) {
 			Act a = (Act) ai.next();
 			String actType = a.getType();
-			ActDurCounter adc = actDurs.get(actType);
+			ActDurCounter adc = this.actDurs.get(actType);
 			if (adc == null) {
 				adc = new ActDurCounter();
-				actDurs.put(actType, adc);
+				this.actDurs.put(actType, adc);
 			}
 			adc.add(a.getDuration());
-			ActStartTimeCounter astc = actStarts.get(actType);
+			ActStartTimeCounter astc = this.actStarts.get(actType);
 			if (astc == null) {
 				astc = new ActStartTimeCounter();
-				actStarts.put(actType, astc);
+				this.actStarts.put(actType, astc);
 			}
 			astc.add(a.getStartTime());
-			ActEndTimeCounter aetc = actEnds.get(actType);
+			ActEndTimeCounter aetc = this.actEnds.get(actType);
 			if (aetc == null) {
 				aetc = new ActEndTimeCounter();
-				actEnds.put(actType, aetc);
+				this.actEnds.put(actType, aetc);
 			}
 			aetc.add(a.getEndTime());
 		}
 	}
 
-	private Map<String, ActDurCounter> actDurs = new HashMap<String, ActDurCounter>();
-	private Map<String, ActStartTimeCounter> actStarts = new HashMap<String, ActStartTimeCounter>();
-	private Map<String, ActEndTimeCounter> actEnds = new HashMap<String, ActEndTimeCounter>();
+	private final Map<String, ActDurCounter> actDurs = new HashMap<String, ActDurCounter>();
+	private final Map<String, ActStartTimeCounter> actStarts = new HashMap<String, ActStartTimeCounter>();
+	private final Map<String, ActEndTimeCounter> actEnds = new HashMap<String, ActEndTimeCounter>();
 
 	public void write(final String outputFilename) {
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(outputFilename);
 			writer
 					.write("actType\tactDur\tavg.\tmin\tmax\tactStart\tavg.\tmin\tmax\tactEnd\tavg.\tmin\tmax\n");
-			for (String actType : actDurs.keySet()) {
-				ActDurCounter adc = actDurs.get(actType);
-				ActStartTimeCounter astc = actStarts.get(actType);
-				ActEndTimeCounter aetc = actEnds.get(actType);
+			for (String actType : this.actDurs.keySet()) {
+				ActDurCounter adc = this.actDurs.get(actType);
+				ActStartTimeCounter astc = this.actStarts.get(actType);
+				ActEndTimeCounter aetc = this.actEnds.get(actType);
 				writer.write(actType + "\tactDur\t" + adc.getAvg() + "\t"
 						+ adc.getMin() + "\t" + adc.getMax() + "\tactStart\t"
 						+ astc.getAvg() + "\t" + astc.getMin() + "\t"
@@ -122,7 +123,7 @@ public class ActTimeEstimator extends AbstractPersonAlgorithm {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
 		final String netFilename = "input/Toronto/toronto.xml";
@@ -134,7 +135,7 @@ public class ActTimeEstimator extends AbstractPersonAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		ActTimeEstimator ade = new ActTimeEstimator();
 		population.addAlgorithm(ade);

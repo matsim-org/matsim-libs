@@ -24,15 +24,16 @@
 package playground.yu.mautZH;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class PlanCheckControler {
 	public static void main(final String[] args) {
@@ -45,7 +46,7 @@ public class PlanCheckControler {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		PlanChecker pc = new PlanChecker(planCheckFilename);
 		population.addAlgorithm(pc);
 		PopulationReader plansReader = new MatsimPopulationReader(population,

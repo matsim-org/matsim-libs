@@ -11,10 +11,11 @@ import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.charts.BarChart;
@@ -25,15 +26,15 @@ import playground.yu.utils.SimpleWriter;
 
 /**
  * compute modal split of through distance
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DailyDistance extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
 	private double carDist, ptDist, otherDist;
 
-	private double totalCounts[], carCounts[], ptCounts[], otherCounts[],
+	private final double totalCounts[], carCounts[], ptCounts[], otherCounts[],
 			carCounts5[], ptCounts5[], carCounts1[], ptCounts1[];
 
 	private double carWorkDist, carEducDist, carShopDist, carLeisDist,
@@ -59,10 +60,10 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		this.carCounts = new double[101];
 		this.ptCounts = new double[101];
 		this.otherCounts = new double[101];
-		carCounts5 = new double[21];
-		ptCounts5 = new double[21];
-		carCounts1 = new double[101];
-		ptCounts1 = new double[101];
+		this.carCounts5 = new double[21];
+		this.ptCounts5 = new double[21];
+		this.carCounts1 = new double[101];
+		this.ptCounts1 = new double[101];
 		this.carWorkDist = 0.0;
 		this.carEducDist = 0.0;
 		this.carShopDist = 0.0;
@@ -160,8 +161,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 						this.carOtherDist += dist;
 						break;
 					}
-					carCounts5[Math.min(20, (int) dist / 5)]++;
-					carCounts1[Math.min(100, (int) dist)]++;
+					this.carCounts5[Math.min(20, (int) dist / 5)]++;
+					this.carCounts1[Math.min(100, (int) dist)]++;
 				} else if (bl.getMode().equals(Mode.pt)) {
 					this.ptDist += dist;
 					ptDayDist += dist;
@@ -185,8 +186,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 						this.ptOtherDist += dist;
 						break;
 					}
-					ptCounts5[Math.min(20, (int) dist / 5)]++;
-					ptCounts1[Math.min(100, (int) dist)]++;
+					this.ptCounts5[Math.min(20, (int) dist / 5)]++;
+					this.ptCounts1[Math.min(100, (int) dist)]++;
 				}
 			}
 		}
@@ -248,13 +249,13 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				"travel destination and modal split--daily distance",
 				"travel destination", "daily distance [km]", new String[] {
 						"work", "education", "shopping", "leisure", "home", "others" });
-		barChart.addSeries("car", new double[] { carWorkDist, carEducDist,
-				carShopDist, carLeisDist, carHomeDist, carOtherDist });
-		barChart.addSeries("pt", new double[] { ptWorkDist, ptEducDist,
-				ptShopDist, ptLeisDist, ptHomeDist, ptOtherDist });
-		barChart.addSeries("through", new double[] { throughWorkDist,
-				throughEducDist, throughShopDist, throughLeisDist,
-				throughHomeDist, throughOtherDist });
+		barChart.addSeries("car", new double[] { this.carWorkDist, this.carEducDist,
+				this.carShopDist, this.carLeisDist, this.carHomeDist, this.carOtherDist });
+		barChart.addSeries("pt", new double[] { this.ptWorkDist, this.ptEducDist,
+				this.ptShopDist, this.ptLeisDist, this.ptHomeDist, this.ptOtherDist });
+		barChart.addSeries("through", new double[] { this.throughWorkDist,
+				this.throughEducDist, this.throughShopDist, this.throughLeisDist,
+				this.throughHomeDist, this.throughOtherDist });
 		barChart.addMatsimLogo();
 		barChart.saveAsPng(outputFilename
 				+ "dailyDistancetravelDistination.png", 1200, 900);
@@ -295,34 +296,34 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				"Modal split -- leg distance", "pt fraction [%]",
 				"car fraction [%]");
 		for (int i = 0; i < 20; i++) {
-			double ptFraction = ptCounts5[i] / (ptCounts5[i] + carCounts5[i])
+			double ptFraction = this.ptCounts5[i] / (this.ptCounts5[i] + this.carCounts5[i])
 					* 100.0;
-			double carFraction = carCounts5[i] / (ptCounts5[i] + carCounts5[i])
+			double carFraction = this.carCounts5[i] / (this.ptCounts5[i] + this.carCounts5[i])
 					* 100.0;
 			bubbleChart.addSeries(i * 5 + "-" + (i + 1) * 5 + " km",
 					new double[][] { new double[] { ptFraction },
 							new double[] { carFraction },
 							new double[] { (i + 0.5) / 5.0 } });
-			sw.writeln((i * 5) + "+\t" + carCounts5[i] + "\t" + ptCounts5[i]
+			sw.writeln((i * 5) + "+\t" + this.carCounts5[i] + "\t" + this.ptCounts5[i]
 					+ "\t" + carFraction + "\t" + ptFraction);
 		}
-		double ptFraction = ptCounts5[20] / (ptCounts5[20] + carCounts5[20])
+		double ptFraction = this.ptCounts5[20] / (this.ptCounts5[20] + this.carCounts5[20])
 				* 100.0;
-		double carFraction = carCounts5[20] / (ptCounts5[20] + carCounts5[20])
+		double carFraction = this.carCounts5[20] / (this.ptCounts5[20] + this.carCounts5[20])
 				* 100.0;
 		bubbleChart.addSeries("100+ km", new double[][] {
 				new double[] { ptFraction }, new double[] { carFraction },
 				new double[] { 4.1 } });
-		sw.writeln(100 + "+\t" + carCounts5[20] + "\t" + ptCounts5[20] + "\t"
+		sw.writeln(100 + "+\t" + this.carCounts5[20] + "\t" + this.ptCounts5[20] + "\t"
 				+ carFraction + "\t" + ptFraction);
 		bubbleChart.saveAsPng(outputFilename + "legDistanceModalSplit.png",
 				900, 900);
 
 		for (int i = 0; i < 101; i++) {
-			xs[i] = (double) i;
-			yCarFracs[i] = carCounts1[i] / (ptCounts1[i] + carCounts1[i])
+			xs[i] = i;
+			yCarFracs[i] = this.carCounts1[i] / (this.ptCounts1[i] + this.carCounts1[i])
 					* 100.0;
-			yPtFracs[i] = ptCounts1[i] / (ptCounts1[i] + carCounts1[i]) * 100.0;
+			yPtFracs[i] = this.ptCounts1[i] / (this.ptCounts1[i] + this.carCounts1[i]) * 100.0;
 		}
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
 				"leg Distance [km]", "mode fraction [%]");
@@ -353,7 +354,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 
 		DailyDistance dd = new DailyDistance();
 		population.addAlgorithm(dd);

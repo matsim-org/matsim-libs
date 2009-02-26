@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -35,34 +35,35 @@ import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * @author yu
- * 
+ *
  */
 public class CarDepartureCounter implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
-	private Population ppl;
+	private final Population ppl;
 
 	private int cdc = 0, cac = 0;
 
 	public int getCac() {
-		return cac;
+		return this.cac;
 	}
 
-	public CarDepartureCounter(Population ppl) {
+	public CarDepartureCounter(final Population ppl) {
 		this.ppl = ppl;
 	}
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
@@ -74,7 +75,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		Population ppl = new Population();
+		Population ppl = new PopulationImpl();
 
 		System.out.println("->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(ppl,network).readFile(plansFilename);
@@ -103,25 +104,25 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		System.exit(0);
 	}
 
-	public void handleEvent(AgentDepartureEvent event) {
-		Person p = ppl.getPerson(event.agentId);
+	public void handleEvent(final AgentDepartureEvent event) {
+		Person p = this.ppl.getPerson(event.agentId);
 		if (PlanModeJudger.useCar(p.getSelectedPlan()))
-			cdc++;
+			this.cdc++;
 	}
 
-	public void reset(int iteration) {
-		cdc = 0;
-		cac = 0;
+	public void reset(final int iteration) {
+		this.cdc = 0;
+		this.cac = 0;
 	}
 
 	public int getCdc() {
-		return cdc;
+		return this.cdc;
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
-		Person p = ppl.getPerson(event.agentId);
+	public void handleEvent(final AgentArrivalEvent event) {
+		Person p = this.ppl.getPerson(event.agentId);
 		if (PlanModeJudger.useCar(p.getSelectedPlan()))
-			cac++;
+			this.cac++;
 
 	}
 

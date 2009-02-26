@@ -31,10 +31,11 @@ import org.geotools.feature.FeatureIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
@@ -50,15 +51,15 @@ public class PlanExcluder {
 	private final Population plans;
 	private final Collection<Polygon> ps;
 
-	
-	
-	
-	
-	
-	
-	
-	public PlanExcluder(NetworkLayer network, Population population,
-			Collection<Polygon> ps) {
+
+
+
+
+
+
+
+	public PlanExcluder(final NetworkLayer network, final Population population,
+			final Collection<Polygon> ps) {
 		this.network = network;
 		this.plans = population;
 		this.ps = ps;
@@ -67,14 +68,14 @@ public class PlanExcluder {
 
 
 	public Population run() {
-		
-		Population plans = new Population();
-		
+
+		Population plans = new PopulationImpl();
+
 		for (Person person : this.plans.getPersons().values()) {
-			
+
 			Coord c = person.getSelectedPlan().getFirstActivity().getCoord();
 			Point p  = MGC.coord2Point(c);
-			
+
 			boolean include = true;
 			for (Polygon po : this.ps) {
 				if (po.contains(p)) {
@@ -91,18 +92,18 @@ public class PlanExcluder {
 				}
 			}
 		}
-		
-		return plans;
-		
-	}
-	
 
-	public static void main(String [] args) {
-		
+		return plans;
+
+	}
+
+
+	public static void main(final String [] args) {
+
 
 		final String links = "./output/analysis/excludes.shp";
 		final String config = "./configs/timeVariantEvac.xml";
-		
+
 		FeatureSource l = null;
 		try {
 			l = ShapeFileReader.readDataFile(links);
@@ -110,29 +111,29 @@ public class PlanExcluder {
 			e.printStackTrace();
 		}
 		final Collection<Polygon> ls = getPolygons(l);
-		
+
 		Gbl.createConfig(new String [] {config});
 		Gbl.createWorld();
-		
-		
+
+
 		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		Gbl.getWorld().setNetworkLayer(network);
 		Gbl.getWorld().complete();
-		
-		
-		final Population population = new Population();
-		new MatsimPopulationReader(population).readFile(Gbl.getConfig().plans().getInputFile());
-		
+
+
+		final Population population = new PopulationImpl();
+		new MatsimPopulationReader(population, network).readFile(Gbl.getConfig().plans().getInputFile());
+
 
 		Population toSave = new PlanExcluder(network,population,ls).run();
 		new PopulationWriter(toSave,"./output/analysis/padang_plans_v20080618_reduced.xml.gz", "v4").write();
 
 	}
-	
-	
-	
-	
+
+
+
+
 	private static Collection<Polygon> getPolygons(final FeatureSource n) {
 		final Collection<Polygon> polygons = new ArrayList<Polygon>();
 		FeatureIterator it = null;
@@ -153,7 +154,7 @@ public class PlanExcluder {
 			Polygon polygon = (Polygon) multiPolygon.getGeometryN(0);
 			polygons.add(polygon);
 	}
-	
+
 		return polygons;
 	}
 }

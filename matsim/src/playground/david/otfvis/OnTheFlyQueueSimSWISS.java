@@ -23,11 +23,12 @@ package playground.david.otfvis;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
@@ -38,7 +39,7 @@ import org.matsim.world.World;
  */
 public class OnTheFlyQueueSimSWISS {
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		QueueSimulation sim;
 		NetworkLayer net;
 		Population population;
@@ -60,7 +61,7 @@ public class OnTheFlyQueueSimSWISS {
 
 		Gbl.printElapsedTime();
 
-		population = new Population();
+		population = new PopulationImpl();
 
 		events = new Events();
 

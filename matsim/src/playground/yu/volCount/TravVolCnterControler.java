@@ -26,18 +26,19 @@ package playground.yu.volCount;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 
 /**
  * test for TraVolCnter
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class TravVolCnterControler {
 
@@ -49,7 +50,7 @@ public class TravVolCnterControler {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
 		plansReader.readFile(plansFilename);

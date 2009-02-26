@@ -32,10 +32,11 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.testcases.MatsimTestCase;
@@ -44,6 +45,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(PlanomatJGAPConfigurationTest.class);
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		super.loadConfig(this.getInputDirectory() + "config.xml");
@@ -62,7 +64,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		log.info("Reading network xml file...done.");
 
 		log.info("Reading plans xml file...");
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
@@ -82,16 +84,16 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 
 		// run testee
 		PlanomatJGAPConfiguration jgapConfig = new PlanomatJGAPConfiguration(testPlan, planAnalyzeSubtours);
-		
+
 		// test correct setting of natural selector
 		assertEquals(0, jgapConfig.getNaturalSelectorsSize(false));
 		assertEquals(1, jgapConfig.getNaturalSelectorsSize(true));
 		assertEquals(WeightedRouletteSelector.class, jgapConfig.getNaturalSelector(true, 0).getClass());
-		
+
 		// test correct setting of population size
 		int expectedPopSize = 14;
 		assertEquals(expectedPopSize, jgapConfig.getPopulationSize());
-		
+
 		// test correct settings for genetic operators
 		assertEquals(2, jgapConfig.getGeneticOperators().size());
 		Iterator geneticOperatorsIterator = jgapConfig.getGeneticOperators().iterator();
@@ -106,7 +108,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 	}
 
 	public void testPlanomatJGAPConfigurationCarPt() {
-		
+
 		log.info("Reading facilities xml file...");
 		Facilities facilities = (Facilities)Gbl.createWorld().createLayer(Facilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
@@ -118,7 +120,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		log.info("Reading network xml file...done.");
 
 		log.info("Reading plans xml file...");
-		Population population = new Population(Population.NO_STREAMING);
+		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
@@ -138,16 +140,16 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 
 		// run testee
 		PlanomatJGAPConfiguration jgapConfig = new PlanomatJGAPConfiguration(testPlan, planAnalyzeSubtours);
-		
+
 		// test correct setting of natural selector
 		assertEquals(0, jgapConfig.getNaturalSelectorsSize(false));
 		assertEquals(1, jgapConfig.getNaturalSelectorsSize(true));
 		assertEquals(WeightedRouletteSelector.class, jgapConfig.getNaturalSelector(true, 0).getClass());
-		
+
 		// test correct setting of population size
 		int expectedPopSize = 16;
 		assertEquals(expectedPopSize, jgapConfig.getPopulationSize());
-		
+
 		// test correct settings for genetic operators
 		assertEquals(2, jgapConfig.getGeneticOperators().size());
 		Iterator geneticOperatorsIterator = jgapConfig.getGeneticOperators().iterator();
@@ -161,5 +163,5 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		}
 
 	}
-	
+
 }

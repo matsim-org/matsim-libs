@@ -24,17 +24,18 @@ package playground.yu.newPlans;
  * $Id: NewPlansControler.java,v 1.7 2007/11/23 13:04:04 ychen Exp $
  */
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 
 /**
  * test of NewAgentPtPlan
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NewPlansControler {
 
@@ -47,7 +48,7 @@ public class NewPlansControler {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		NewAgentPtPlan nap = new NewAgentPtPlan(population);
 		population.addAlgorithm(nap);
 		PopulationReader plansReader = new MatsimPopulationReader(population,

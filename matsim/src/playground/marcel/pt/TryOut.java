@@ -39,10 +39,11 @@ import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.world.World;
 
@@ -268,7 +269,7 @@ public class TryOut {
 
 	private Population createPopulation(final NetworkLayer network, final Facilities facilities) {
 		final String filename = "../thesis-data/examples/tryout/population.xml";
-		final Population population = new Population(Population.NO_STREAMING);
+		final Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		final Person person = new PersonImpl(new IdImpl("1"));
 		population.addPerson(person);

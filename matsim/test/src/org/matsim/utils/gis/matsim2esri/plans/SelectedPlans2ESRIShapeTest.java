@@ -23,10 +23,11 @@ package org.matsim.utils.gis.matsim2esri.plans;
 import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.utils.geometry.geotools.MGC;
@@ -51,7 +52,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
@@ -90,7 +91,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		Population population = new Population();
+		Population population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");

@@ -32,8 +32,9 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.utils.geometry.CoordImpl;
 
 public class PlansGeneratorControler extends Controler {
@@ -60,7 +61,7 @@ public class PlansGeneratorControler extends Controler {
 	private Population generate4wPersons(){
 
 		int numberOfPlans = 1;
-		Population pop = new Population(Population.NO_STREAMING);
+		Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		log.info("  generating plans... ");
 
 		for (int i = 0; i < 314; i++) {
@@ -124,7 +125,7 @@ public class PlansGeneratorControler extends Controler {
 		final int agentsPerDest = 1;
 		int numberOfPlans = 1;
 
-		Population pop = new Population(Population.NO_STREAMING);
+		Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		log.info("  generating plans... ");
 
 		LinkedList <Link> fromLinks = new LinkedList<Link>();

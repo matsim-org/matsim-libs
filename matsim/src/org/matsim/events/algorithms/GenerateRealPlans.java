@@ -45,9 +45,10 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.utils.misc.Time;
 
 // "GeneratePlansFromEvents" would be more appropriate as class name...
@@ -63,7 +64,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 		AgentStuckEventHandler,
 		LinkEnterEventHandler {
 
-	private final Population realplans = new Population(Population.NO_STREAMING);
+	private final Population realplans = new PopulationImpl(PopulationImpl.NO_STREAMING);
 	private Population oldplans = null;
 	private NetworkLayer network = null;
 

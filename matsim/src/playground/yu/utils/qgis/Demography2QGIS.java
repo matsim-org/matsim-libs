@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -33,10 +33,11 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
+import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.io.IOUtils;
 
@@ -46,13 +47,13 @@ import playground.yu.analysis.PlanModeJudger;
  * this class quote codes from
  * <class>org.matsim.run.CompareSelectedPlansTable</class> offered a simplified
  * function
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class Demography2QGIS {
 	private Population plans;
-	private String header = "personId;sex;age;license;caravail;employed;homex;homey;homelink;"
+	private final String header = "personId;sex;age;license;caravail;employed;homex;homey;homelink;"
 			+ "planType;planScore;departureTime;"
 			+ "planTravelTime;planTravelDistance;numberOfTrips";
 	private NetworkLayer network;
@@ -62,7 +63,7 @@ public class Demography2QGIS {
 	 *            array with 3 entries: {path to network file, path to plans
 	 *            file, name of output file}
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 		if (args.length < 3) {
 			System.out.println("Too few arguments.");
@@ -77,22 +78,22 @@ public class Demography2QGIS {
 		Gbl.printElapsedTime();
 	}
 
-	private void init(String networkPath) {
-		this.plans = new Population(false);
+	private void init(final String networkPath) {
+		this.plans = new PopulationImpl(false);
 
 		System.out.println("  reading the network...");
 		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(networkPath);
 	}
 
-	private void readFiles(String plansfilePath) {
+	private void readFiles(final String plansfilePath) {
 		System.out.println("  reading file " + plansfilePath);
 		PopulationReader plansReader0 = new MatsimPopulationReader(this.plans,
-				network);
+				this.network);
 		plansReader0.readFile(plansfilePath);
 	}
 
-	private void writeSummaryFile(String outfile) {
+	private void writeSummaryFile(final String outfile) {
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			out.write(this.header);
@@ -141,7 +142,7 @@ public class Demography2QGIS {
 	 * to have everything in one single class
 	 */
 
-	private double getTravelTime(Person person) {
+	private double getTravelTime(final Person person) {
 
 		double travelTime = 0.0;
 		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
@@ -152,7 +153,7 @@ public class Demography2QGIS {
 		return travelTime;
 	}
 
-	private double getTravelDist(Person person) {
+	private double getTravelDist(final Person person) {
 
 		double travelDist = 0.0;
 		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
@@ -164,7 +165,7 @@ public class Demography2QGIS {
 		return travelDist;
 	}
 
-	private int getNumberOfTrips(Person person) {
+	private int getNumberOfTrips(final Person person) {
 
 		int numberOfLegs = 0;
 		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
@@ -177,7 +178,7 @@ public class Demography2QGIS {
 
 	// --------------------------------------------------------------------------
 
-	private void run(String networkPath, String plansfilePath, String outfile) {
+	private void run(final String networkPath, final String plansfilePath, final String outfile) {
 		this.init(networkPath);
 		readFiles(plansfilePath);
 		writeSummaryFile(outfile);
