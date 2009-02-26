@@ -34,6 +34,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.scoring.PlanScorer;
+import org.matsim.planomat.Planomat;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -90,11 +91,12 @@ public class RecyclingModule implements StrategyModule {
 				tDepDelayCalc, 
 				controler.getNetwork());
 		this.nonassignedAgents 		= new LinkedList<String>();
-		this.timer					= new TimeOptimizer (this.estimator, new PlanScorer(controler.getScoringFunctionFactory()));
+		//this.timer					= new TimeModeChoicer1 (this.estimator, new PlanScorer(controler.getScoringFunctionFactory()));
+		this.timer					= new Planomat (this.estimator, controler.getScoringFunctionFactory());
 		this.schedulingModule 		= new PlanomatX12Initialiser(controler, this.preProcessRoutingData, this.locator);
 		this.assignmentModule		= new AgentsAssignmentInitialiser (this.controler, this.preProcessRoutingData, this.locator,
 			this.scorer, this.cleaner, this, this.minimumTime, this.nonassignedAgents);
-		this.minimumTime			= 1800;
+		this.minimumTime			= 3600;
 		this.cleaner				= new ScheduleCleaner (this.estimator, this.minimumTime);		
 		this.testAgentsNumber		= 5;
 		this.criteria				= new String [2];
