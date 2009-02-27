@@ -33,13 +33,13 @@ public class IntegerCache {
 	private static boolean initialized = false;
 	private static Integer [] cache;
 
-	public static Integer getInteger(int i) {
+	public static Integer getInteger(final int i) {
 		
 		if (!initialized) {
 			init();
 		}
 
-		if ( i <= MAX_VALUE && i >= MIN_VALUE) {
+		if ( i < MAX_VALUE && i >= MIN_VALUE) {
 			return cache[i + MIN_VALUE];
 		}
 		
