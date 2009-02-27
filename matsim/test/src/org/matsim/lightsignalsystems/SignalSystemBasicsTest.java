@@ -24,10 +24,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
+import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
@@ -53,9 +53,9 @@ public class SignalSystemBasicsTest extends MatsimTestCase implements
 	
 	private Id id1 = new IdImpl(1);
 	private Id id2 = new IdImpl(2);
-	private Id id3 = new IdImpl(3);
-	private Id id4 = new IdImpl(4);
-	private Id id5 = new IdImpl(5);
+//	private Id id3 = new IdImpl(3);
+//	private Id id4 = new IdImpl(4);
+//	private Id id5 = new IdImpl(5);
 	
 	
 	@Override
@@ -70,7 +70,7 @@ public class SignalSystemBasicsTest extends MatsimTestCase implements
 		String plansFile = this.getClassInputDirectory() + "plans1Agent.xml";
 		String lsaDefinition = this.getClassInputDirectory() + "lsa.xml";
 		String lsaConfig = this.getClassInputDirectory() + "lsa_config.xml";
-		String tempFile = this.getOutputDirectory() + "__tempFile__.xml";
+//		String tempFile = this.getOutputDirectory() + "__tempFile__.xml";
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 		conf.plans().setInputFile(plansFile);
