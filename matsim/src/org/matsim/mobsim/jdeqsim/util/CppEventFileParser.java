@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.concurrent.ExecutionException;
 
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
@@ -19,23 +18,20 @@ public class CppEventFileParser {
 
 	private static ArrayList<EventLog> eventLog = null;
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		String eventFileName = args[0];
 		CppEventFileParser eventFileParser = new CppEventFileParser();
 		eventFileParser.parse(eventFileName);
 	}
 
-	public void parse(String eventFileName) {
+	public void parse(final String eventFileName) {
 		setEventLog (CppEventFileParser.parseFile(eventFileName));
-		for (int i = 0; i < eventLog.size(); i++) {
-			// eventLog.get(i).print();
-		}
+//		for (int i = 0; i < eventLog.size(); i++) {
+//			 eventLog.get(i).print();
+//		}
 	}
 
-	public static ArrayList<EventLog> parseFile(String filePath) {
+	public static ArrayList<EventLog> parseFile(final String filePath) {
 		int counter = 0;
 		ArrayList<EventLog> rows = new ArrayList<EventLog>();
 		try {
@@ -105,7 +101,7 @@ public class CppEventFileParser {
 	/*
 	 * Compares events produced by java and by C++ simulation
 	 */
-	public static boolean equals(PersonEvent personEvent, EventLog deqSimEvent) {
+	public static boolean equals(final PersonEvent personEvent, final EventLog deqSimEvent) {
 		if (Integer.parseInt(personEvent.agentId) != deqSimEvent.getVehicleId()) {
 			CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 			return false;
@@ -166,7 +162,7 @@ public class CppEventFileParser {
 		return true;
 	}
 
-	private static void printNotEqualEvents(PersonEvent personEvent, EventLog deqSimEvent) {
+	private static void printNotEqualEvents(final PersonEvent personEvent, final EventLog deqSimEvent) {
 		System.out.println("POSSIBLE PROBLEM: EVENTS NOT EQUAL");
 		System.out.println(personEvent.toString());
 		deqSimEvent.print();
@@ -176,7 +172,7 @@ public class CppEventFileParser {
 		return eventLog;
 	}
 
-	public static void setEventLog(ArrayList<EventLog> eventLog) {
+	public static void setEventLog(final ArrayList<EventLog> eventLog) {
 		CppEventFileParser.eventLog = eventLog;
 	}
 
