@@ -138,8 +138,7 @@ public class CountsComparisonAlgorithm {
 		return this.countSimComp;
 	}
 
-	public void run(final Counts counts) {
-		this.counts = counts;
+	public void run() {
 		this.compare();
 	}
 

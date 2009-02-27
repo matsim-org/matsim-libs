@@ -32,7 +32,7 @@ public class CountsComparisonAlgorithmTest extends MatsimTestCase {
 		fixture.setUp();
 
 		CountsComparisonAlgorithm cca = fixture.getCCA();
-		cca.run(fixture.counts);
+		cca.run();
 
 		List<CountSimComparison> csc_list = cca.getComparison();
 
@@ -50,7 +50,7 @@ public class CountsComparisonAlgorithmTest extends MatsimTestCase {
 
 		CountsComparisonAlgorithm cca = fixture.getCCA();
 		cca.setDistanceFilter(Double.valueOf(0.5), "1");
-		cca.run(fixture.counts);
+		cca.run();
 
 		List<CountSimComparison> csc_list = cca.getComparison();
 		assertEquals("Distance filter not working", 0, csc_list.size());

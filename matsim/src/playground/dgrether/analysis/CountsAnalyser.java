@@ -182,7 +182,7 @@ public class CountsAnalyser {
 		if ((this.distanceFilter != null) && (this.distanceFilterCenterNode != null))
 			cca.setDistanceFilter(this.distanceFilter, this.distanceFilterCenterNode);
 		cca.setCountsScaleFactor(Gbl.getConfig().counts().getCountsScaleFactor());
-		cca.run(counts);
+		cca.run();
 		return cca.getComparison();
 	}
 

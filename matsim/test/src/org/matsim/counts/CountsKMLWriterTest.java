@@ -38,7 +38,7 @@ public class CountsKMLWriterTest extends MatsimTestCase {
 		fixture.setUp();
 
 		CountsComparisonAlgorithm cca=fixture.getCCA();
-		cca.run(fixture.counts);
+		cca.run();
 
 		String filename = this.getOutputDirectory() + "countscompare.kmz";
 		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(

@@ -39,7 +39,7 @@ public class CountsGraphWriterTest extends MatsimTestCase {
 		fixture.setUp();
 
 		CountsComparisonAlgorithm cca = fixture.getCCA();
-		cca.run(fixture.counts);
+		cca.run();
 
 		CountsGraphWriter cgw = new CountsGraphWriter(this.getOutputDirectory(), cca.getComparison(),1, true, true);
 		cgw.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim vs. real volumes per hour"));

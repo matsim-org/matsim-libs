@@ -66,7 +66,7 @@ public class CountControlerListener implements StartupListener,
 				cca.setDistanceFilter(this.config.counts().getDistanceFilter(), this.config.counts().getDistanceFilterCenterNode());
 			}
 			cca.setCountsScaleFactor(this.config.counts().getCountsScaleFactor());
-			cca.run(this.counts);
+			cca.run();
 
 			if (this.config.counts().getOutputFormat().contains("html") ||
 					this.config.counts().getOutputFormat().contains("all")) {

@@ -177,7 +177,7 @@ public class LinkStatsAnalyser {
 				counts, this.network);
 
 		cca.setCountsScaleFactor(this.scaleFactor);
-		cca.run(counts);
+		cca.run();
 		return cca.getComparison();
 	}
 

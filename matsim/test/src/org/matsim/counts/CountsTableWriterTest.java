@@ -35,7 +35,7 @@ public class CountsTableWriterTest extends MatsimTestCase {
 		fixture.setUp();
 
 		CountsComparisonAlgorithm cca = fixture.getCCA();
-		cca.run(fixture.counts);
+		cca.run();
 
 		CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
 		ctw.writeFile(this.getOutputDirectory() + "/countTable.txt");

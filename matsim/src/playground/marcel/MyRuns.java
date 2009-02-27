@@ -2181,7 +2181,7 @@ public class MyRuns {
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(linkStats, counts, network);
 		cca.setDistanceFilter(30000.0, "2531");
 		cca.setCountsScaleFactor(10);
-		cca.run(counts);
+		cca.run();
 		new CountSimComparisonTableWriter(cca.getComparison(), null).writeFile("counts.txt");
 
 //		new CountsWriter(counts).writeFile("test_counts.xml");
