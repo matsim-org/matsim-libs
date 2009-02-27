@@ -106,6 +106,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 			else
 				ats = ActTypeStart.o;
 			double time = bl.getTravelTime() / 60.0;
+			if(time<0)time=0;
 			if (bl.getDepartureTime() < 86400) {
 				dayTime += time;
 				if (Long.parseLong(this.person.getId().toString()) > 1000000000) {

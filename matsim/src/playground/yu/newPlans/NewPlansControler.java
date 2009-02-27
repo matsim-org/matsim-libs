@@ -49,7 +49,7 @@ public class NewPlansControler {
 		new MatsimNetworkReader(network).readFile(netFilename);
 
 		Population population = new PopulationImpl();
-		NewAgentPtPlan nap = new NewAgentPtPlan(population);
+		NewPtWalkPlan nap = new NewPtWalkPlan(population);
 		population.addAlgorithm(nap);
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);

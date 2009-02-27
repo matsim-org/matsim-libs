@@ -345,11 +345,6 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		sw
 				.writeln("leg Distance [km]\tcar legs no.\tpt legs no.\twalk legs no.\tcar fraction [%]\tpt fraction [%]\twalk fraction [%]");
 
-		double xs[] = new double[101];
-		double yCarFracs[] = new double[101];
-		double yPtFracs[] = new double[101];
-		double yWlkFracs[] = new double[101];
-
 		BubbleChart bubbleChart = new BubbleChart(
 				"Modal split -- leg distance", "pt fraction [%]",
 				"car fraction [%]");
@@ -389,18 +384,27 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		bubbleChart.saveAsPng(outputFilename + "legDistanceModalSplit.png",
 				900, 900);
 
+		double xs[] = new double[101];
+		double yCarFracs[] = new double[101];
+		double yPtFracs[] = new double[101];
+		double yWlkFracs[] = new double[101];
 		for (int i = 0; i < 101; i++) {
 			xs[i] = i;
 			yCarFracs[i] = this.carCounts1[i]
-					/ (this.ptCounts1[i] + this.carCounts1[i]+wlkCounts1[i]) * 100.0;
+					/ (this.ptCounts1[i] + this.carCounts1[i] + wlkCounts1[i])
+					* 100.0;
 			yPtFracs[i] = this.ptCounts1[i]
-					/ (this.ptCounts1[i] + this.carCounts1[i]+wlkCounts1[i]) * 100.0;
-//			TODO
+					/ (this.ptCounts1[i] + this.carCounts1[i] + wlkCounts1[i])
+					* 100.0;
+			yWlkFracs[i] = this.wlkCounts1[i]
+					/ (this.ptCounts1[i] + this.carCounts1[i] + wlkCounts1[i])
+					* 100.0;
 		}
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
 				"leg Distance [km]", "mode fraction [%]");
 		chart2.addSeries("car", xs, yCarFracs);
 		chart2.addSeries("pt", xs, yPtFracs);
+		chart2.addSeries("walk", xs, yWlkFracs);
 		chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png", 800,
 				600);
 

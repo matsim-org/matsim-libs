@@ -53,10 +53,18 @@ public class CharyparNagelScoringFunctionWithWalk extends
 
 		if (BasicLeg.Mode.car.equals(leg.getMode())) {
 			tmpScore += travelTime * marginalUtilityOfTraveling;
+			System.out.println("car\ttmpScore=" + travelTime + "*"
+					+ marginalUtilityOfTraveling + "=" + travelTime
+					* marginalUtilityOfTraveling);
 		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
 			tmpScore += travelTime * (-3.0) / 3600.0;
+			System.out.println("pt\ttmpScore=" + travelTime + "*" + (-3.0)
+					/ 3600.0 + "=" + travelTime * (-3.0) / 3600.0);
 		} else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
 			tmpScore += offsetWlk + travelTime * (-18.0) / 3600.0;
+			System.out.println("walk\ttmpScore=" + offsetWlk + "+" + travelTime
+					+ "*" + (-18.0) / 3600.0 + "=" + offsetWlk + travelTime
+					* (-18.0) / 3600.0);
 		} else {
 			// use the same values as for "car"
 			tmpScore += travelTime * marginalUtilityOfTraveling;
