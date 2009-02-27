@@ -33,6 +33,7 @@ import org.matsim.population.PersonImpl;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.misc.Time;
 
 /**
  * Tests the functionality of {@link TimeAllocationMutator}, mainly that the
@@ -101,7 +102,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 	private void runMutationRangeTest(final TimeAllocationMutator mutator, final int expectedMutationRange) {
 		// setup network
 		NetworkLayer network = new NetworkLayer();
-		network.setCapacityPeriod("01:00:00");
+		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
 		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(200, 0));

@@ -31,6 +31,7 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -80,6 +81,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	 * @param filename The name of the file to parse.
 	 * @deprecated please use {@link #parse(String)}
 	 */
+	@Deprecated
 	public void readFile(final String filename) {
 		try {
 			parse(filename);
@@ -100,7 +102,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		if (atts.getValue("capDivider") != null) {
 			log.warn("capDivider defined. it will be used but should be gone somewhen");
 			String capperiod = atts.getValue("capDivider") + ":00:00";
-			this.network.setCapacityPeriod(capperiod);
+			this.network.setCapacityPeriod(Time.parseTime(capperiod));
 		}
 	}
 
@@ -111,7 +113,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 			capperiod = "12:00:00";
 			log.info("capperiod was not defined. Using default value of 12:00:00.");
 		}
-		this.network.setCapacityPeriod(capperiod);
+		this.network.setCapacityPeriod(Time.parseTime(capperiod));
 
 		String effectivecellsize = atts.getValue("effectivecellsize");
 		if (effectivecellsize == null){
@@ -141,7 +143,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startLink(final Attributes atts) {
-		Link l = this.network.createLink(new IdImpl(atts.getValue("id")), network.getNode(atts.getValue("from")), network.getNode(atts.getValue("to")),
+		Link l = this.network.createLink(new IdImpl(atts.getValue("id")), this.network.getNode(atts.getValue("from")), this.network.getNode(atts.getValue("to")),
 				Double.parseDouble(atts.getValue("length")), Double.parseDouble(atts.getValue("freespeed")), Double.parseDouble(atts.getValue("capacity")),
 				Double.parseDouble(atts.getValue("permlanes")));
 		l.setOrigId(atts.getValue("origid"));

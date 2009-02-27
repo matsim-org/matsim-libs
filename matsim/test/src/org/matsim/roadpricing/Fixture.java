@@ -20,6 +20,8 @@
 
 package org.matsim.roadpricing;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.matsim.basic.v01.IdImpl;
@@ -64,7 +66,7 @@ public class Fixture {
 		/* The vehicles can travel with 18km/h = 5m/s, so it should take them 20 seconds
 		 * to travel along one link.		 */
 		NetworkLayer network = new NetworkLayer();
-		network.setCapacityPeriod("01:00:00");
+		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(100, 0));
 		Node node3 = network.createNode(new IdImpl(3), new CoordImpl(200, 0));
@@ -103,7 +105,7 @@ public class Fixture {
 		 * each link is 100m long and can be traveled along with 18km/h = 5m/s = 20s for 100m
 		 */
 		NetworkLayer network = new NetworkLayer();
-		network.setCapacityPeriod("01:00:00");
+		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node0 = network.createNode(new IdImpl( "0"), new CoordImpl(  0,   10));
 		Node node1 = network.createNode(new IdImpl( "1"), new CoordImpl(  0,  100));
 		Node node2 = network.createNode(new IdImpl( "2"), new CoordImpl(100,  100));
@@ -144,16 +146,16 @@ public class Fixture {
 		Link link2 = network.getLink(new IdImpl(2));
 		Link link3 = network.getLink(new IdImpl(3));
 		Link link4 = network.getLink(new IdImpl(4));
-		population.addPerson(Fixture.createPerson1( 1, "07:00"   , link0, "2 3 4 5", link4)); // toll in 1st time slot
-		population.addPerson(Fixture.createPerson1( 2, "11:00"   , link0, "2 3 4 5", link4)); // toll in 2nd time slot
-		population.addPerson(Fixture.createPerson1( 3, "16:00"   , link0, "2 3 4 5", link4)); // toll in 3rd time slot
-		population.addPerson(Fixture.createPerson1( 4, "09:59:50", link0, "2 3 4 5", link4)); // toll in 1st and 2nd time slot
-		population.addPerson(Fixture.createPerson1( 5, "08:00:00", link1, "3 4 5", link4)); // starts on the 2nd link
-		population.addPerson(Fixture.createPerson1( 6, "09:00:00", link0, "2 3 4", link3)); // ends not on the last link
-		population.addPerson(Fixture.createPerson1( 7, "08:30:00", link1, "3 4", link3)); // starts and ends not on the first/last link
-		population.addPerson(Fixture.createPerson1( 8, "08:35:00", link1, "3", link2)); // starts and ends not on the first/last link
-		population.addPerson(Fixture.createPerson1( 9, "08:40:00", link1, "", link1)); // two acts on the same link
-		population.addPerson(Fixture.createPerson1(10, "08:45:00", link2, "4", link3));
+		population.addPerson(Fixture.createPerson1( 1, "07:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4)); // toll in 1st time slot
+		population.addPerson(Fixture.createPerson1( 2, "11:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4)); // toll in 2nd time slot
+		population.addPerson(Fixture.createPerson1( 3, "16:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4)); // toll in 3rd time slot
+		population.addPerson(Fixture.createPerson1( 4, "09:59:50", link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4)); // toll in 1st and 2nd time slot
+		population.addPerson(Fixture.createPerson1( 5, "08:00:00", link1, NetworkUtils.getNodes(network, "3 4 5"), link4)); // starts on the 2nd link
+		population.addPerson(Fixture.createPerson1( 6, "09:00:00", link0, NetworkUtils.getNodes(network, "2 3 4"), link3)); // ends not on the last link
+		population.addPerson(Fixture.createPerson1( 7, "08:30:00", link1, NetworkUtils.getNodes(network, "3 4"), link3)); // starts and ends not on the first/last link
+		population.addPerson(Fixture.createPerson1( 8, "08:35:00", link1, NetworkUtils.getNodes(network, "3"), link2)); // starts and ends not on the first/last link
+		population.addPerson(Fixture.createPerson1( 9, "08:40:00", link1, NetworkUtils.getNodes(network, ""), link1)); // two acts on the same link
+		population.addPerson(Fixture.createPerson1(10, "08:45:00", link2, NetworkUtils.getNodes(network, "4"), link3));
 
 		return population;
 	}
@@ -170,14 +172,14 @@ public class Fixture {
 		return population;
 	}
 
-	private static Person createPerson1(final int personId, final String startTime, final Link homeLink, final String routeNodes, final Link workLink) {
+	private static Person createPerson1(final int personId, final String startTime, final Link homeLink, final List<Node> routeNodes, final Link workLink) {
 		Person person = new PersonImpl(new IdImpl(personId));
 		Plan plan = new org.matsim.population.PlanImpl(person);
 		person.addPlan(plan);
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
 		Leg leg = plan.createLeg(Mode.car);//"car", startTime, "00:01", null);
 		CarRoute route = new NodeCarRoute(homeLink, workLink);
-		route.setNodes(homeLink, NetworkUtils.getNodes((NetworkLayer) homeLink.getLayer(), routeNodes), workLink);
+		route.setNodes(homeLink, routeNodes, workLink);
 		leg.setRoute(route);
 		plan.createAct("w", workLink);//, null, "24:00", null, "yes");
 		return person;
@@ -187,11 +189,11 @@ public class Fixture {
 		Person person = new PersonImpl(new IdImpl(personId));
 		Plan plan = new org.matsim.population.PlanImpl(person);
 		person.addPlan(plan);
-		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));//, "00:00", startTime, startTime, "no");
-		plan.createLeg(Mode.car);//"car", startTime, "00:01", null);
-		plan.createAct("w", workLink).setDuration(8.0 * 3600);//, null, "16:00", "08:00", "no");
-		plan.createLeg(Mode.car);//"car", "16:00", null, null);
-		plan.createAct("h", finishLink);//, null, "24:00", "00:00", "no");
+		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
+		plan.createLeg(Mode.car);
+		plan.createAct("w", workLink).setEndTime(16.0 * 3600);
+		plan.createLeg(Mode.car);
+		plan.createAct("h", finishLink);
 		return person;
 	}
 

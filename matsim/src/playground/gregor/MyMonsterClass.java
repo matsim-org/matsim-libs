@@ -67,7 +67,6 @@ import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
-import org.matsim.world.World;
 import org.matsim.writer.MatsimWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -106,8 +105,8 @@ public class MyMonsterClass {
 
 		System.out.println("  create new empty network...");
 		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-		network.setCapacityPeriod("01:00:00");
+		network = new NetworkLayer();
+		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		try {
 			BufferedReader file = IOUtils.getBufferedReader(asciiNode);
 			String line = file.readLine();
@@ -233,12 +232,12 @@ public class MyMonsterClass {
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 		for (Link link : network.getLinks().values()) {
 			link.setFreespeed(1.666);
-			link.setCapacity(link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * 8.19 );
+			link.setCapacity(link.getCapacity(Time.UNDEFINED_TIME) * 8.19 );
 		}
 		NetworkWriter nw = new NetworkWriter(network,"./networks/evacuationnet_zurich_navteq.xml");
 		nw.write();
@@ -261,7 +260,7 @@ public class MyMonsterClass {
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 		NetworkWriter nw = new NetworkWriter(network,"./networks/padang_net_evac_2.xml");
@@ -286,14 +285,14 @@ public class MyMonsterClass {
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 
 		System.out.println("reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 
@@ -397,7 +396,6 @@ public class MyMonsterClass {
 	//////////////////////////////////////////////////////////////////////
 	public static void networkClipping(final String[] args){
 		//for now hardcoded
-		World world = Gbl.createWorld();
 		Config config = Gbl.createConfig(new String[] {"./configs/evacuationConf.xml"});
 		String networkFile = config.network().getInputFile();
 
@@ -405,10 +403,7 @@ public class MyMonsterClass {
 		System.out.println("reading network xml file... ");
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFile);
-		world.setNetworkLayer(network);
-		world.complete();
 		System.out.println("done. ");
-
 
 
 		ArrayList<Coordinate> coords = new ArrayList<Coordinate>();
@@ -439,10 +434,10 @@ public class MyMonsterClass {
 		ConcurrentLinkedQueue<Link> l = new ConcurrentLinkedQueue<Link>();
 		ConcurrentLinkedQueue<Link> oneWay = new ConcurrentLinkedQueue<Link>();
 		HashMap<Id,EvacuationAreaLink> links = new HashMap<Id,EvacuationAreaLink>();
-		Iterator it = network.getLinks().values().iterator();
+		Iterator<Link> it = network.getLinks().values().iterator();
 
 		while (it.hasNext()) {
-			Link link = (Link)it.next();
+			Link link = it.next();
 			Node a = link.getFromNode();
 			Node b = link.getToNode();
 			CoordinateSequence seqA = new CoordinateArraySequence(new Coordinate[]{MGC.coord2Coordinate(a.getCoord())});

@@ -29,6 +29,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.misc.Time;
 
 public class NetworkParseETNet extends NetworkAlgorithm {
 
@@ -38,12 +39,12 @@ public class NetworkParseETNet extends NetworkAlgorithm {
 
 	private final String nodefile;
 	private final String linkfile;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public NetworkParseETNet(String nodefile, String linkfile) {
+	public NetworkParseETNet(final String nodefile, final String linkfile) {
 		super();
 		this.nodefile = nodefile;
 		this.linkfile = linkfile;
@@ -53,9 +54,9 @@ public class NetworkParseETNet extends NetworkAlgorithm {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void parseNodes(NetworkLayer network) {
+	private final void parseNodes(final NetworkLayer network) {
 		try {
-			FileReader file_reader = new FileReader(nodefile);
+			FileReader file_reader = new FileReader(this.nodefile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
 
 			// read header
@@ -73,9 +74,9 @@ public class NetworkParseETNet extends NetworkAlgorithm {
 		}
 	}
 
-	private final void parseLinksET(NetworkLayer network) {
+	private final void parseLinksET(final NetworkLayer network) {
 		try {
-			FileReader file_reader = new FileReader(linkfile);
+			FileReader file_reader = new FileReader(this.linkfile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
 
 			// read header
@@ -85,10 +86,12 @@ public class NetworkParseETNet extends NetworkAlgorithm {
 				// ET_FID  ID  FROMID  TOID  LENGTH  SPEED  CAP  LANES  ORIGID  TYPE  X1  Y1  X2  Y2
 				// 0       1   2       3     4       5      6    7      8       9     10  11  12  13
 				if (entries.length == 14) {
+					double length = Double.parseDouble(entries[4]);
 					double freespeed = Double.parseDouble(entries[5])/3.6;
-					network.createLink(entries[1],entries[2],entries[3],
-					                   entries[4],String.valueOf(freespeed),
-					                   entries[6],entries[7],entries[8],entries[9]);
+					double capacity = Double.parseDouble(entries[6]);
+					double nofLanes = Double.parseDouble(entries[7]);
+					network.createLink(new IdImpl(entries[1]), network.getNode(new IdImpl(entries[2])), network.getNode(new IdImpl(entries[3])),
+					                   length, freespeed, capacity, nofLanes, entries[8], entries[9]);
 				}
 			}
 			buffered_reader.close();
@@ -103,15 +106,15 @@ public class NetworkParseETNet extends NetworkAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(NetworkLayer network) {
+	public void run(final NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-		
+
 		if (!network.getNodes().isEmpty()) { Gbl.errorMsg("links already exist."); }
 		if (!network.getLinks().isEmpty()) { Gbl.errorMsg("links already exist."); }
-		
+
 		network.setName("created by '"+this.getClass().getName()+"'");
-		network.setCapacityPeriod("01:00:00");
-		
+		network.setCapacityPeriod(Time.parseTime("01:00:00"));
+
 		this.parseNodes(network);
 		this.parseLinksET(network);
 

@@ -45,6 +45,7 @@ import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.misc.Time;
 
 public class ControlerTest extends MatsimTestCase {
 
@@ -67,7 +68,7 @@ public class ControlerTest extends MatsimTestCase {
 		 * (one having 100secs, the other having 200secs to cross the link).
 		 */
 		NetworkLayer network = new NetworkLayer();
-		network.setCapacityPeriod("01:00:00");
+		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
 		Node node3 = network.createNode(new IdImpl(3), new CoordImpl(1000.0, 0.0));
@@ -192,7 +193,7 @@ public class ControlerTest extends MatsimTestCase {
 		 * (one having 100secs, the other having 200secs to cross the link).
 		 */
 		NetworkLayer network = new NetworkLayer();
-		network.setCapacityPeriod("01:00:00");
+		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
 		Node node3 = network.createNode(new IdImpl(3), new CoordImpl(1000.0, 0.0));
@@ -267,7 +268,7 @@ public class ControlerTest extends MatsimTestCase {
 		 * (one having 100secs, the other having 200secs to cross the link).
 		 */
 		NetworkLayer network = new NetworkLayer();
-		network.setCapacityPeriod("01:00:00");
+		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
 		Node node3 = network.createNode(new IdImpl(3), new CoordImpl(+1000.0, 0.0));

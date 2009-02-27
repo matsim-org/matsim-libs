@@ -29,6 +29,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -36,18 +37,18 @@ import org.xml.sax.XMLReader;
 
 public class ITSUMONetworkReader {
 
-	private NetworkLayer network;
+	private final NetworkLayer network;
 
-	public ITSUMONetworkReader(NetworkLayer network) {
+	public ITSUMONetworkReader(final NetworkLayer network) {
 		this.network = network;
-		network.setCapacityPeriod("01:00:00");
+		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		System.out.println("\n##################################################################################################\n" +
 				"#   REMINDER - Cell size has to be changed in ITSUMONetworkReader.BrazilParser.endElement\n" +
 				"#              according to the itsumo scenario description file." +
 				"\n##################################################################################################\n");
 	}
 
-	public void read(String filename) {
+	public void read(final String filename) {
 		try {
 
 			SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -71,7 +72,7 @@ public class ITSUMONetworkReader {
 	}
 
 
-	private class BrazilParser extends org.xml.sax.helpers.DefaultHandler {
+	/*package*/ class BrazilParser extends org.xml.sax.helpers.DefaultHandler {
 
 		private String nodeId = null;
 		private String xCoord = null;
@@ -83,10 +84,10 @@ public class ITSUMONetworkReader {
 		private int lanesCount = 0;
 		private double laneSpeed = 0.0;
 
-		private Stack<StringBuffer> textbuffer = new Stack<StringBuffer>();
+		private final Stack<StringBuffer> textbuffer = new Stack<StringBuffer>();
 
 		@Override
-		public void startElement(String ns, String lname, String qname, Attributes atts) throws SAXException {
+		public void startElement(final String ns, String lname, final String qname, final Attributes atts) throws SAXException {
 			this.textbuffer.push(new StringBuffer());
 			if (ns.length() == 0) lname = qname;
 
@@ -124,7 +125,7 @@ public class ITSUMONetworkReader {
 		}
 
 		@Override
-		public void endElement(String ns, String lname, String qname) throws SAXException {
+		public void endElement(final String ns, String lname, final String qname) throws SAXException {
 			if (ns.length() == 0) lname = qname;
 
 			String content = new String(this.textbuffer.peek());
@@ -148,7 +149,7 @@ public class ITSUMONetworkReader {
 			} else if (lname.equals("laneset")) {
 				double length = ITSUMONetworkReader.this.network.getNode(this.lanesetFrom).getCoord().calcDistance(ITSUMONetworkReader.this.network.getNode(this.lanesetTo).getCoord());
 				double capacity = 3600.0; // TODO calculate capacity from speed
-				network.createLink(new IdImpl(this.lanesetId), network.getNode(this.lanesetFrom), network.getNode(this.lanesetTo),
+				ITSUMONetworkReader.this.network.createLink(new IdImpl(this.lanesetId), ITSUMONetworkReader.this.network.getNode(this.lanesetFrom), ITSUMONetworkReader.this.network.getNode(this.lanesetTo),
 						length, this.laneSpeed / this.lanesCount, capacity, this.lanesCount);
 			} else if (lname.equals("laneset_id")) {
 				this.lanesetId = content.trim();
@@ -168,7 +169,7 @@ public class ITSUMONetworkReader {
 		}
 
 		@Override
-		public void characters(char buf[], int offset, int len) {
+		public void characters(final char buf[], final int offset, final int len) {
 			StringBuffer str = this.textbuffer.peek();
 			str.append(buf, offset, len);
 		}
