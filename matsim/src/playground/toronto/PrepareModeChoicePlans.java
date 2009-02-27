@@ -27,7 +27,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 
-import playground.yu.newPlans.NewAgentPtPlan;
 
 /**
  * Prepares a plans file with only a single plan per person to be used with
