@@ -56,7 +56,7 @@ public class BKickControler3 extends Controler {
 		BKickTravelCostCalculator tcc = new BKickTravelCostCalculator(this.config.charyparNagelScoring());
 		super.setTravelCostCalculator(tcc);
 		BKickFreespeedTravelTimeCost fttc = new BKickFreespeedTravelTimeCost(this.config.charyparNagelScoring());
-		super.setFreespeedTravelTimeCost(fttc);
+//		super.setFreespeedTravelTimeCost(fttc);
 		super.setup();
 		tcc.setTravelTimeCalculator(super.getTravelTimeCalculator());
 	}

@@ -71,8 +71,8 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		super();
 		this.factory = factory;
 		this.routeAlgo = this.factory.createPathCalculator(network, costCalculator, timeCalculator);
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		this.routeAlgoFreeflow = this.factory.createPathCalculator(network, timeCostCalc, timeCostCalc);
+		FreespeedTravelTimeCost ptTimeCostCalc = new FreespeedTravelTimeCost(-1.0, 0.0, 0.0);
+		this.routeAlgoFreeflow = this.factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
 		
 	}
 	
@@ -99,7 +99,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		return this.routeAlgo;
 	}
 	
-	public final LeastCostPathCalculator getFreeflowLeastCostPathCalculator(){
+	public final LeastCostPathCalculator getPtFreeflowLeastCostPathCalculator(){
 		return this.routeAlgoFreeflow;
 	}
 

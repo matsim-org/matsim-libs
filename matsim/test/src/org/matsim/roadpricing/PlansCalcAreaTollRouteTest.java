@@ -54,7 +54,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.setType("area");
 		toll.addLink("5");
 		toll.addLink("11");
-		Cost morningCost = toll.addCost(6*3600, 10*3600, 0.06);
+		Cost morningCost = toll.addCost(6*3600, 10*3600, 0.12);
 		/* Start with a rather low toll. The toll is also so low, because we only
 		 * have small network with short links: the cost to travel across one link
 		 * is: 20s * (-6 EUR / h) = 20 * (-6) / 3600 = 0.03333

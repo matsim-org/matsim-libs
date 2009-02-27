@@ -73,7 +73,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		new PlansCalcRoute(network, costCalc, timeCostCalc, new AStarLandmarksFactory(commonRouterData)).run(population);
 		Fixture.compareRoutes("1 2 4 5", (CarRoute) leg.getRoute());
 
-		Cost morningCost = toll.addCost(6*3600, 10*3600, 0.0003); // 0.0003 * link_length(100m) = 0.03, which is slightly below the threshold of 0.0333
+		Cost morningCost = toll.addCost(6*3600, 10*3600, 0.0006); // 0.0006 * link_length(100m) = 0.06, which is slightly below the threshold of 0.0666
 		// 2nd case: with a low toll, agent still chooses shortest path
 		clearRoutes(population);
 		new PlansCalcRoute(network, costCalc, timeCostCalc).run(population);
@@ -85,7 +85,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 
 		// 3rd case: with a higher toll, agent decides to drive around tolled link
 		toll.removeCost(morningCost);
-		toll.addCost(6*3600, 10*3600, 0.00035); // new morning toll, this should be slightly over the threshold
+		toll.addCost(6*3600, 10*3600, 0.0007); // new morning toll, this should be slightly over the threshold
 		clearRoutes(population);
 		new PlansCalcRoute(network, costCalc, timeCostCalc).run(population);
 		Fixture.compareRoutes("1 2 3 4 5", (CarRoute) leg.getRoute());
@@ -122,7 +122,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		Fixture.compareRoutes("1 2 4 5", (CarRoute) leg.getRoute());
 
 		// 2nd case: with a low toll, agent still chooses shortest path and pay the toll
-		Cost morningCost = toll.addCost(6*3600, 10*3600, 0.03);
+		Cost morningCost = toll.addCost(6*3600, 10*3600, 0.06);
 		clearRoutes(population);
 		new PlansCalcRoute(network, costCalc, timeCostCalc).run(population);
 		Fixture.compareRoutes("1 2 4 5", (CarRoute) leg.getRoute());
@@ -133,7 +133,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		Fixture.compareRoutes("1 2 4 5", (CarRoute) leg.getRoute());
 
 		// 3rd case: with a higher toll, agent decides to drive around tolled link
-		toll.addCost(6*3600, 10*3600, 0.035);
+		toll.addCost(6*3600, 10*3600, 0.067);
 		clearRoutes(population);
 		new PlansCalcRoute(network, costCalc, timeCostCalc).run(population);
 		Fixture.compareRoutes("1 2 3 4 5", (CarRoute) leg.getRoute());

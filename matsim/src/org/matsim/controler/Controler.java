@@ -96,7 +96,6 @@ import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.AStarLandmarksFactory;
 import org.matsim.router.util.DijkstraFactory;
 import org.matsim.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
@@ -147,12 +146,8 @@ public class Controler {
 
 	protected TravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCost travelCostCalculator = null;
-	private FreespeedTravelTimeCost freespeedTravelTimeCost = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
-
-	/** Stores data commonly used by all router instances. */
-	private PreProcessLandmarks commonRoutingData = null;
 
 	/**
 	 * Defines in which iterations the events should be written. <tt>1</tt> is in every iteration,
@@ -424,10 +419,7 @@ public class Controler {
 			this.travelTimeCalculator = new TravelTimeCalculatorBuilder(this.config.controler()).createTravelTimeCalculator(this.network, (int)endTime);
 		}
 		if (this.travelCostCalculator == null) {
-			this.travelCostCalculator = new TravelTimeDistanceCostCalculator(this.travelTimeCalculator);
-		}
-		if (this.getFreespeedTravelTimeCost() == null){
-			this.freespeedTravelTimeCost = new FreespeedTravelTimeCost();
+			this.travelCostCalculator = new TravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
 		}
 		this.events.addHandler(this.travelTimeCalculator);
 
@@ -435,7 +427,7 @@ public class Controler {
 			this.leastCostPathCalculatorFactory = new DijkstraFactory();
 		}
 		else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.AStarLandmarks)){
-			this.leastCostPathCalculatorFactory = new AStarLandmarksFactory(this.network, this.getFreespeedTravelTimeCost());
+			this.leastCostPathCalculatorFactory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring()));
 		}
 		else {
 			throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
@@ -852,14 +844,6 @@ public class Controler {
 		return this.travelTimeCalculator;
 	}
 	
-	public final FreespeedTravelTimeCost getFreespeedTravelTimeCost(){
-		return this.freespeedTravelTimeCost;
-	}
-	
-	public void setFreespeedTravelTimeCost(FreespeedTravelTimeCost fttc){
-		this.freespeedTravelTimeCost = fttc;
-	}
-
 	/**
 	 * Sets a new {@link org.matsim.scoring.ScoringFunctionFactory} to use. <strong>Note:</strong> This will
 	 * reset all scores calculated so far! Only call this before any events are generated in an iteration.

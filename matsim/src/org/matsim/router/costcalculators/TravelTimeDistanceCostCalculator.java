@@ -20,6 +20,7 @@
 
 package org.matsim.router.costcalculators;
 
+import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.router.util.TravelMinCost;
@@ -36,14 +37,22 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost {
 	protected final TravelTime timeCalculator;
 	private final double travelCostFactor;
 	private final double marginalUtlOfDistance;
-
-	public TravelTimeDistanceCostCalculator(final TravelTime timeCalculator) {
+	
+	public TravelTimeDistanceCostCalculator(final TravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
 		this.timeCalculator = timeCalculator;
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
 		 */
-		this.travelCostFactor = -Gbl.getConfig().charyparNagelScoring().getTraveling() / 3600.0;
+		this.travelCostFactor = (- cnScoringGroup.getTraveling() / 3600.0) + (cnScoringGroup.getPerforming() / 3600.0);
 		this.marginalUtlOfDistance = Gbl.getConfig().charyparNagelScoring().getMarginalUtlOfDistance();
+	}
+	
+	/**
+	 * @deprecated use constructor with explicit parameters for scoring config group
+	 */
+	@Deprecated
+	public TravelTimeDistanceCostCalculator(final TravelTime timeCalculator) {
+		this(timeCalculator, Gbl.getConfig().charyparNagelScoring());
 	}
 
 	public double getLinkTravelCost(final Link link, final double time) {

@@ -94,8 +94,8 @@ public class RouterVisTest extends MatsimTestCase {
 		// run test
 		final Node fromNode = network.getNode("13");
 		final Node toNode = network.getNode("7");
-
-		final TravelTime costCalc = new FreespeedTravelTimeCost();
+		//run the test without any opportunity costs to produce same results as the version checked in initially
+		final TravelTime costCalc = new FreespeedTravelTimeCost(-6.0/3600, 0.0, 0.0);
 		final RouterVis routerVis = new RouterVis(network, (TravelCost) costCalc, costCalc, CLogitRouter.class);
 
 		routerVis.runRouter(fromNode, toNode, 0.0);
@@ -130,8 +130,8 @@ public class RouterVisTest extends MatsimTestCase {
 		// run test
 		final Node fromNode = network.getNode("13");
 		final Node toNode = network.getNode("7");
-
-		final TravelTime costCalc = new FreespeedTravelTimeCost();
+		//run the test without any opportunity costs to produce same results as the version checked in initially
+		final TravelTime costCalc = new FreespeedTravelTimeCost(-6.0/3600, 0.0, 0.0);
 		final RouterVis routerVis = new RouterVis(network, (TravelCost) costCalc, costCalc, PSLogitRouter.class);
 
 		routerVis.runRouter(fromNode, toNode, 0.0);
