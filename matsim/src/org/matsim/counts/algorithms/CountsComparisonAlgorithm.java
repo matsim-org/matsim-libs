@@ -20,8 +20,8 @@
 
 package org.matsim.counts.algorithms;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
@@ -70,7 +70,7 @@ public class CountsComparisonAlgorithm {
 	public CountsComparisonAlgorithm(final CalcLinkStats linkStats, final Counts counts, final NetworkLayer network) {
 		this.linkStats = linkStats;
 		this.counts = counts;
-		this.countSimComp = new Vector<CountSimComparison>();
+		this.countSimComp = new ArrayList<CountSimComparison>();
 		this.network = network;
 		if (Gbl.getConfig()!=null) {
 			this.countsScaleFactor = Gbl.getConfig().counts().getCountsScaleFactor();
@@ -79,10 +79,10 @@ public class CountsComparisonAlgorithm {
 			this.countsScaleFactor=1.0;
 		}
 	}
+
 	/**
 	 * Creates the List with the counts vs sim values stored in the
 	 * countAttribute Attribute of this class.
-	 *
 	 */
 	private void compare() {
 		double countValue;
@@ -101,12 +101,12 @@ public class CountsComparisonAlgorithm {
 				Volume volume = count.getVolume(hour);
 				if (volume != null) {
 					countValue = volume.getValue();
+					double simValue=volumes[hour-1];
+					simValue *= this.countsScaleFactor;
+					this.countSimComp.add(new CountSimComparisonImpl(count.getLocId(), hour, countValue, simValue));
 				} else {
 					countValue = 0.0;
 				}
-				double simValue=volumes[hour-1];
-				simValue *= this.countsScaleFactor;
-				this.countSimComp.add(new CountSimComparisonImpl(count.getLocId(), hour, countValue, simValue));
 			}
 		}
 	}
@@ -142,6 +142,7 @@ public class CountsComparisonAlgorithm {
 		this.counts = counts;
 		this.compare();
 	}
+
 	/**
 	 * Set a distance filter, dropping everything out which is not in the
 	 * distance given in meters around the given Node Id.
