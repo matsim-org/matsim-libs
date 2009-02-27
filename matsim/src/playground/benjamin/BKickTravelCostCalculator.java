@@ -43,7 +43,7 @@ public class BKickTravelCostCalculator implements TravelMinCost {
 			CharyparNagelScoringConfigGroup charyparNagelScoring) {
 		this.scoringConfig = charyparNagelScoring;
 		this.marginalUtilityOfFuel = -scoringConfig.getMarginalUtlOfDistance();
-		this.marginalUtilityOfTraveling = -scoringConfig.getTraveling();
+		this.marginalUtilityOfTraveling = -scoringConfig.getTraveling() / 3600.0;
 	}
 
 	/**

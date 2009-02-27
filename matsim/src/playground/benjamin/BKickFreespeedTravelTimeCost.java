@@ -40,7 +40,7 @@ public class BKickFreespeedTravelTimeCost extends FreespeedTravelTimeCost {
 			CharyparNagelScoringConfigGroup charyparNagelScoring) {
 		this.scoringConfig = charyparNagelScoring;
 		this.marginalUtilityOfFuel = -scoringConfig.getMarginalUtlOfDistance();
-		this.marginalUtilityOfTraveling = -scoringConfig.getTraveling();
+		this.marginalUtilityOfTraveling = -scoringConfig.getTraveling()/3600.0;
 	}
 	
 	/**
