@@ -53,7 +53,7 @@ public class LinkSetRendererLanes extends RendererA {
     // -------------------- RENDERING --------------------
 
     @Override
-		protected synchronized void myRendering(Graphics2D display, AffineTransform boxTransform) {
+		protected void myRendering(Graphics2D display, AffineTransform boxTransform) {
     	this.linkWidth = DisplayLink.LANE_WIDTH* getVisConfig().getLinkWidthFactor();
 
     	NetJComponent comp = getNetJComponent();

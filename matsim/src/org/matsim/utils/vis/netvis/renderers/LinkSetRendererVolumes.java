@@ -58,7 +58,7 @@ public class LinkSetRendererVolumes extends RendererA {
     // -------------------- RENDERING --------------------
 
     @Override
-		protected synchronized void myRendering(Graphics2D display, AffineTransform boxTransform) {
+		protected void myRendering(Graphics2D display, AffineTransform boxTransform) {
     	String test = getVisConfig().get("ShowAgents");
     	boolean drawAgents = test == null || test.equals("true");
         this.linkWidth = DisplayLink.LANE_WIDTH* getVisConfig().getLinkWidthFactor();

@@ -48,7 +48,7 @@ public class NodeSetRenderer extends RendererA {
     // -------------------- RENDERING --------------------
 
     @Override
-		protected synchronized void myRendering(Graphics2D display,
+		protected void myRendering(Graphics2D display,
             AffineTransform boxTransform) {
 
         if (!RENDER_NODES)

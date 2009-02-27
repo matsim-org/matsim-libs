@@ -55,7 +55,7 @@ public class LinkSetRenderer extends RendererA {
     // -------------------- RENDERING --------------------
 
     @Override
-		protected synchronized void myRendering(Graphics2D display,
+		protected void myRendering(Graphics2D display,
             AffineTransform boxTransform) {
         String test = getVisConfig().get("ShowAgents");
         boolean drawAgents = test == null || test.equals("true");
