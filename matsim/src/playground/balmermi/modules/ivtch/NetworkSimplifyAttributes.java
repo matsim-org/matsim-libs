@@ -24,11 +24,10 @@ import java.util.ArrayList;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkAlgorithm;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.utils.misc.Time;
 
-public class NetworkSimplifyAttributes extends NetworkAlgorithm {
+public class NetworkSimplifyAttributes {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -52,8 +51,7 @@ public class NetworkSimplifyAttributes extends NetworkAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void run(NetworkLayer network) {
+	public void run(Network network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		ArrayList<Link> link90 = new ArrayList<Link>();

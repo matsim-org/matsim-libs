@@ -30,8 +30,8 @@ import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.NetworkLayer;
 
 /**
  * Pre-processes a given network, gathering information which can be used by
@@ -90,7 +90,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	}
 
 	@Override
-	public void run(final NetworkLayer network) {
+	public void run(final Network network) {
 		super.run(network);
 
 		log.info("Putting landmarks on network...");

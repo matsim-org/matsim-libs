@@ -30,13 +30,12 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.geometry.CoordImpl;
 
-class LandmarkerPieSlices extends NetworkAlgorithm {
+class LandmarkerPieSlices {
 
 	private Node[] landmarks;
 
@@ -53,8 +52,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		this.travelZone = travelZone;
 	}
 
-	@Override
-	public void run(final NetworkLayer network) {
+	public void run(final Network network) {
 		Collection<? extends Node> nodes;
 		if (this.travelZone.getHeight() == 0 || this.travelZone.getWidth() == 0) {
 			nodes = network.getNodes().values();
@@ -64,7 +62,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		run(nodes);
 	}
 
-	private Set<Node> getNodesInTravelZone(final NetworkLayer network) {
+	private Set<Node> getNodesInTravelZone(final Network network) {
 		double minX = travelZone.getX();
 		double maxX = travelZone.getWidth() + minX;
 		double minY = travelZone.getY();

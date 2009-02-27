@@ -34,11 +34,10 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkAlgorithm;
 
-public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
+public class NetworkAnalyseRouteSet {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -60,7 +59,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 	private final TreeMap<Id,Double> node_heights = new TreeMap<Id, Double>();
 	// Link atts: Laenge  VWeg  VWegEm  ParkW  Ampel  Bruecke  Tunnel  NatBel  DTVKat
 	// idx:       0       1     2       3      4      5        6       7       8
-	private final TreeMap<Id,Double[]> link_atts = new TreeMap<Id, Double[]>();
+	private final TreeMap<Id,double[]> link_atts = new TreeMap<Id, double[]>();
 	private final TreeMap<Id,ArrayList<Node>> routes = new TreeMap<Id, ArrayList<Node>>();
 
 	//////////////////////////////////////////////////////////////////////
@@ -75,7 +74,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void readNodeHeight(String inputfile, NetworkLayer network) {
+	private final void readNodeHeight(String inputfile, Network network) {
 		try {
 			FileReader file_reader = new FileReader(inputfile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
@@ -103,7 +102,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void readLinkAtts(String inputfile, NetworkLayer network) {
+	private final void readLinkAtts(String inputfile, Network network) {
 		try {
 			FileReader file_reader = new FileReader(inputfile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
@@ -117,8 +116,8 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 
 				Id linkid = new IdImpl(entries[0].trim());
 				if (!network.getLinks().containsKey(linkid)) { Gbl.errorMsg("Link id=" + linkid + " does not exist in the network!"); }
-				this.link_atts.put(linkid,new Double[9]);
-				Double[] atts = this.link_atts.get(linkid);
+				this.link_atts.put(linkid,new double[9]);
+				double[] atts = this.link_atts.get(linkid);
 				for (int i=0; i<atts.length; i++) {
 					Double att = new Double(entries[i+3].trim());
 					atts[i] = att;
@@ -135,7 +134,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void readRoutes(String inputfile, NetworkLayer network) {
+	private final void readRoutes(String inputfile, Network network) {
 		try {
 			FileReader file_reader = new FileReader(inputfile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
@@ -148,17 +147,17 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 				// index:   0       1          2        3     4  ...
 
 				ArrayList<Node> node_routes = new ArrayList<Node>();
-				Node node = network.getNode(entries[1].trim());
+				Node node = network.getNode(new IdImpl(entries[1].trim()));
 				if (node == null) { Gbl.errorMsg("Node id=" + entries[1].trim() + " does not exist!"); }
 				node_routes.add(node);
 
 				int idx = 3;
 				while (!entries[idx].trim().equals("-1")) {
-					node = network.getLink(entries[idx].trim()).getToNode();
+					node = network.getLink(new IdImpl(entries[idx].trim())).getToNode();
 					node_routes.add(node);
 					idx++;
 				}
-				Node last = network.getNode(entries[2].trim());
+				Node last = network.getNode(new IdImpl(entries[2].trim()));
 				if (last == null) { Gbl.errorMsg("Node id=" + entries[1].trim() + " does not exist!"); }
 				if (!last.getId().equals(node_routes.get(node_routes.size()-1).getId())) {
 					Gbl.errorMsg("Last node does not fit!");
@@ -207,7 +206,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 			Link link = null;
 			for (Link l : from.getOutLinks().values()) { if (l.getToNode().getId().equals(to.getId())) { link = l; } }
 			if (link == null) { Gbl.errorMsg("Something is wrong!"); }
-			Double[] atts = this.link_atts.get(link.getId());
+			double[] atts = this.link_atts.get(link.getId());
 
 			length += atts[LAENGE];
 
@@ -298,7 +297,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 		System.out.print(formatter.format(ampel_nofl) + "\n");
 	}
 
-	private final void analysis(NetworkLayer network) {
+	private final void analysis(Network network) {
 		double length = 0.0;
 		double rise_av = 0.0;
 		double rise_min = 0.0;
@@ -328,7 +327,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 		for (Link link : network.getLinks().values()) {
 			Node from = link.getFromNode();
 			Node to = link.getToNode();
-			Double[] atts = this.link_atts.get(link.getId());
+			double[] atts = this.link_atts.get(link.getId());
 			length += atts[LAENGE];
 			double gradient = this.node_heights.get(to.getId())-this.node_heights.get(from.getId());
 			if (gradient > 0.0) {
@@ -437,8 +436,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void run(NetworkLayer network) {
+	public void run(Network network) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
 		System.out.println("      reading in heights of the nodes...");

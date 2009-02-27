@@ -22,7 +22,7 @@ package org.matsim.router.util;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 
 /**
  * Pre-processes a given network, gathering information which can be used by a
@@ -51,7 +51,7 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 	}
 
 	@Override
-	public void run(final NetworkLayer network) {
+	public void run(final Network network) {
 		super.run(network);
 
 		if (checkLinkLengths(network) == false) {
@@ -61,7 +61,7 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 		updateMinTravelCostPerLength(network);
 	}
 
-	void updateMinTravelCostPerLength(final NetworkLayer network) {
+	void updateMinTravelCostPerLength(final Network network) {
 		for (Link link : network.getLinks().values()) {
 			double minCost = this.costFunction.getLinkMinimumTravelCost(link) / link.getLength();
 			if (getMinTravelCostPerLength() > minCost) {
@@ -70,7 +70,7 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 		}
 	}
 
-	private boolean checkLinkLengths(final NetworkLayer network) {
+	private boolean checkLinkLengths(final Network network) {
 		for (Link link : network.getLinks().values()) {
 			double linkLength = link.getLength();
 			double eucDist = link.getFromNode().getCoord().calcDistance(link.getToNode().getCoord());

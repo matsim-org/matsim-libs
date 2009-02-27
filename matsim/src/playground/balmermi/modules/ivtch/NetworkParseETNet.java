@@ -27,11 +27,10 @@ import java.io.IOException;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
-public class NetworkParseETNet extends NetworkAlgorithm {
+public class NetworkParseETNet {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -105,7 +104,6 @@ public class NetworkParseETNet extends NetworkAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(final NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 

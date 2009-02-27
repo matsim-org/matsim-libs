@@ -27,10 +27,9 @@ import java.util.Random;
 
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkAlgorithm;
+import org.matsim.interfaces.core.v01.Network;
 
-public class NetworkWriteVolumesAsTable extends NetworkAlgorithm {
+public class NetworkWriteVolumesAsTable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -79,8 +78,7 @@ public class NetworkWriteVolumesAsTable extends NetworkAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void run(NetworkLayer network) {
+	public void run(Network network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		int capperiod = network.getCapacityPeriod();

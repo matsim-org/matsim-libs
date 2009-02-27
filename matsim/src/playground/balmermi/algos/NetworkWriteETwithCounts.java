@@ -29,12 +29,11 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.misc.Time;
 
-public class NetworkWriteETwithCounts extends NetworkAlgorithm {
+public class NetworkWriteETwithCounts {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -122,8 +121,7 @@ public class NetworkWriteETwithCounts extends NetworkAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void run(NetworkLayer network) {
+	public void run(Network network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		int capperiod = network.getCapacityPeriod();
@@ -141,12 +139,12 @@ public class NetworkWriteETwithCounts extends NetworkAlgorithm {
 				Node t = l.getToNode();
 				this.out_l.write(l.getId() + "\t" + f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");
 				this.out_l.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\t" + l.getLength() + "\t");
-				this.out_l.write(l.getFreespeed(Time.UNDEFINED_TIME) + "\t" + (l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)/capperiod) + "\t" + l.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\t1\n");
+				this.out_l.write(l.getFreespeed(Time.UNDEFINED_TIME) + "\t" + (l.getCapacity(Time.UNDEFINED_TIME)/capperiod) + "\t" + l.getLanesAsInt(Time.UNDEFINED_TIME) + "\t1\n");
 				this.out_l.flush();
 
 				this.out_et.write(l.getId() + "\t" + l.getFromNode().getId() + "\t" + l.getToNode().getId() + "\t");
 				this.out_et.write(Math.round(l.getLength()) + "\t" + Math.round(l.getFreespeed(Time.UNDEFINED_TIME)*3.6) + "\t");
-				this.out_et.write(Math.round(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)/capperiod) + "\t" + l.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\t");
+				this.out_et.write(Math.round(l.getCapacity(Time.UNDEFINED_TIME)/capperiod) + "\t" + l.getLanesAsInt(Time.UNDEFINED_TIME) + "\t");
 				this.out_et.write(l.getOrigId() + "\t" + l.getType() + "\t" + maxvol + "\t");
 				this.out_et.write(f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");
 				this.out_et.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\n");

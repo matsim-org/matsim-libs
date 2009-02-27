@@ -23,20 +23,16 @@ package playground.balmermi.modules.ivtch;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.network.LinkImpl;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkAlgorithm;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.utils.misc.Time;
 
-public class NetworkCalibrationWithCounts extends NetworkAlgorithm {
+public class NetworkCalibrationWithCounts {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -59,9 +55,9 @@ public class NetworkCalibrationWithCounts extends NetworkAlgorithm {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void writeGTFfile(final NetworkLayer network) {
+	private final void writeGTFfile(final Network network) {
 		try {
-			double capperiod = network.getCapacityPeriod();
+//			double capperiod = network.getCapacityPeriod();
 			FileWriter fw = new FileWriter(this.gtf_outfile);
 			BufferedWriter out = new BufferedWriter(fw);
 			out.write("<greentimefractions desc=\"calibration gtfs file\">\n");
@@ -104,8 +100,7 @@ public class NetworkCalibrationWithCounts extends NetworkAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void run(NetworkLayer network) {
+	public void run(Network network) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 //		for (Link l : network.getLinks().values()) { l.setCapacity(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)*1.5); }
 		for (Link l : network.getLinks().values()) { l.setCapacity(10000.0); l.setLanes(5.0); l.setFreespeed(36.0/3.6); }
