@@ -34,7 +34,6 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.misc.Time;
 import org.matsim.world.Layer;
 
 public class NetworkLayer extends Layer implements Network {
@@ -61,9 +60,7 @@ public class NetworkLayer extends Layer implements Network {
 
 	private final NetworkFactory factory;
 
-
 	private Collection<NetworkChangeEvent> networkChangeEvents = null;
-
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructor
@@ -101,16 +98,6 @@ public class NetworkLayer extends Layer implements Network {
 		return n;
 	}
 
-	/** Usage of this method is discouraged, as the method will soon be deprecated. */
-	@Deprecated
-	public final Link createLink(final String id, final String fromTo, final String toNode, final String length,
-	                             final String freespeed, final String capacity, final String permlanes,
-	                             final String origid, final String type) {
-		return createLink(new IdImpl(id), this.nodes.get(new IdImpl(fromTo)), this.nodes.get(new IdImpl(toNode)), Double.parseDouble(length),
-				Double.parseDouble(freespeed), Double.parseDouble(capacity), Double.parseDouble(permlanes),
-				origid, type);
-	}
-
 	public final Link createLink(final Id id, final Node fromNode, final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
 		return createLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
 	}
@@ -141,14 +128,6 @@ public class NetworkLayer extends Layer implements Network {
 	// ////////////////////////////////////////////////////////////////////
 	// set methods
 	// ////////////////////////////////////////////////////////////////////
-
-	@Deprecated
-	public final void setCapacityPeriod(final String capperiod) {
-		if (this.capperiod != Integer.MIN_VALUE) {
-			log.warn(this + "[capperiod=" + capperiod + " already set. capperiod will be overwritten]");
-		}
-		this.capperiod = (int)Time.parseTime(capperiod);
-	}
 	
 	/**
 	 * @param capPeriod the capacity-period in seconds
