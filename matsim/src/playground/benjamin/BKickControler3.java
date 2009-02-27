@@ -69,7 +69,9 @@ public class BKickControler3 extends Controler {
 		return pop;
 	}
 	
-	public static void main(final String[] args) {
+	public static void main(String[] args) {
+		String []args2 = {"../bkick/routerTest/configRouterTest.xml"};
+		args = args2;
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");

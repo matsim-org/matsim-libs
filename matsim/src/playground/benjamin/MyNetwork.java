@@ -8,7 +8,7 @@ public class MyNetwork {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		NetVis.displayNetwork("../bkick/oneRouteNoModeTest/network.xml");
+		NetVis.displayNetwork("../bkick/routerTest/network.xml");
 	}
 
 }

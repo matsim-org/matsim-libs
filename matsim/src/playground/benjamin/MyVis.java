@@ -32,7 +32,8 @@ public class MyVis {
 	public static void main(String[] args) {
 //		String otffile = "../bkick/output/oneRouteTwoModeTest_1000/ITERS/it.1000/1000.otfvis.mvi";
 //		String otffile = "../bkick/output/oneRouteTwoModeTest_2000/ITERS/it.2000/2000.otfvis.mvi";
-		String otffile = "C:/4_Meins/Studium/WiIng/Hauptstudium/Diplomarbeit/Eclipse_WS/run704/it.500/500.events.mvi";
+//		String otffile = "C:/4_Meins/Studium/WiIng/Hauptstudium/Diplomarbeit/Eclipse_WS/run704/it.500/500.events.mvi";
+		String otffile = "../bkick/output/routerTest/ITERS/it.2/2.otfvis.mvi";
 		OTFVis.main(new String[] {otffile});
 	}
 
