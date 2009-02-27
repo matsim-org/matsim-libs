@@ -43,7 +43,7 @@ public class QueueNode {
 
 	private boolean active = false;
 
-	private Node node;
+	private final Node node;
 
 	public QueueNetwork queueNetwork;
 	/**
@@ -51,7 +51,7 @@ public class QueueNode {
 	 */
 	private boolean signalized = false;
 
-	public QueueNode(Node n, QueueNetwork queueNetwork) {
+	public QueueNode(final Node n, final QueueNetwork queueNetwork) {
 		this.node = n;
 		this.queueNetwork = queueNetwork;
 
@@ -93,21 +93,19 @@ public class QueueNode {
 		Link nextLink = veh.getDriver().chooseNextLink();
 		Link currentLink = veh.getCurrentLink();
 		// veh has to move over node
-		QueueLink currentQueueLink = this.queueNetwork.getQueueLink(currentLink.getId());
 		if (nextLink != null) {
 
 			QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLink.getId());
 			// _FIXME: Ich haette gerne die alte Konstruktion wieder, dass explizit ueber den Knoten nach den outgoing links
 			// gesucht wird.  Ansonsten kann man hier naemlich teleportieren.  kai, nov08
-			/* This is done in PersonAgent.chooseNextLink() (see few lines above). 
+			/* This is done in PersonAgent.chooseNextLink() (see few lines above).
 			 * The line here only does the lookup from Link to QueueLink. If one
-			 * still wants to have the check, I propose to use 
+			 * still wants to have the check, I propose to use
 			 * currentQueueLink.getToNode() == nextQueueLink.getFromNode(), which should be
 			 * more efficient then looping through all outgoing links.  marcel/04dec2008
 			 */
 
 			if (nextQueueLink.hasSpace()) {
-//				currentQueueLink.popFirstFromBuffer();
 				currentLane.popFirstFromBuffer();
 				veh.getDriver().incCurrentNode();
 				nextQueueLink.add(veh);
@@ -122,15 +120,12 @@ public class QueueNode {
 				 * die here, we have a config setting for that!
 				 */
 				if (removeStuckVehicle()) {
-//					currentQueueLink.popFirstFromBuffer();
 					currentLane.popFirstFromBuffer();
 					Simulation.decLiving();
 					Simulation.incLost();
 					QueueSimulation.getEvents().processEvent(
 							new AgentStuckEvent(now, veh.getDriver().getPerson(), currentLink, veh.getCurrentLeg()));
-				}
-				else {
-//					currentQueueLink.popFirstFromBuffer();
+				} else {
 					currentLane.popFirstFromBuffer();
 					veh.getDriver().incCurrentNode();
 					nextQueueLink.add(veh);
@@ -178,7 +173,7 @@ public class QueueNode {
 	public void moveNode(final double now) {
 		/* called by the framework, do all necessary action for node movement here */
 		if (this.signalized) {
-			for (QueueLink link : inLinksArrayCache){
+			for (QueueLink link : this.inLinksArrayCache){
 				for (QueueLane lane : link.getToNodeQueueLanes()) {
 					while (lane.canMoveFirstVehicle()) {
 						QueueVehicle veh = lane.getFirstFromBuffer();
@@ -200,12 +195,12 @@ public class QueueNode {
 					inLinksCapSum += link.getLink().getCapacity(now);
 				}
 			}
-			
+
 			if (inLinksCounter == 0) {
 				this.active = false;
 				return; // Nothing to do
 			}
-			
+
 			int auxCounter = 0;
 			// randomize based on capacity
 			while (auxCounter < inLinksCounter) {
@@ -235,10 +230,10 @@ public class QueueNode {
 				}
 			}
 		}
-		
+
 	}
 
-	public void setSignalized(boolean b) {
+	public void setSignalized(final boolean b) {
 		this.signalized = b;
 	}
 
