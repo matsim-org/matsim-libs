@@ -46,8 +46,8 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	private final TravelTimeAggregatorFactory factory;
 	private final AbstractTravelTimeAggregator aggregator;
 
-	
-	
+
+
 	public TravelTimeCalculator(final NetworkLayer network) {
 		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
 	}
@@ -59,7 +59,7 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	public TravelTimeCalculator(NetworkLayer network, int timeslice,	int maxTime) {
 		this(network, timeslice, maxTime, new TravelTimeAggregatorFactory());
 	}
-	
+
 	public TravelTimeCalculator(final NetworkLayer network, final int timeslice, final int maxTime, TravelTimeAggregatorFactory factory) {
 		this.factory = factory;
 		this.network = network;
@@ -67,25 +67,20 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 		this.numSlots = (maxTime / this.timeslice) + 1;
 		this.linkData = new HashMap<Link, TravelTimeData>((int) (this.network.getLinks().size() * 1.4));
 		this.aggregator = this.factory.createTravelTimeAggregator(this.numSlots, this.timeslice);
-		
+
 		resetTravelTimes();
 	}
 
-	
-	
+
+
 
 
 	public void resetTravelTimes() {
 		for (Link link : this.network.getLinks().values()) {
-			TravelTimeData r = getTravelTimeData(link);
-			r.resetTravelTimes();
-			/*
-			 * 	lazy initialization of travel time data would be:
-			 *	if (r != null) {
-			 *		r.resetTravelTimes();
-			 *	}
-			 *	(konrad/25feb2009)
-			 */
+			TravelTimeData r = getTravelTimeData(link, false);
+			if (r != null) {
+				r.resetTravelTimes();
+			}
 		}
 		this.enterEvents.clear();
 	}
@@ -113,18 +108,7 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 		if ((e != null) && e.linkId.equals(event.linkId)) {
 			if (event.link == null) event.link = this.network.getLink(event.linkId);
 			if (event.link != null) {
-				this.aggregator.addTravelTime(getTravelTimeData(event.link),e.time,event.time);
-				/*
-				* 	lazy initialization of travel time data would be:
-				* 	TravelTimeRole r = getTravelTimeRole(event.link);
-				* 	if (r == null) {
-				*		r = this.factory.createTravelTimeRole(event.link, this.numSlots);
-				*		this.linkData.put(event.link, r);
-				*	}
-				*	this.aggregator.addTravelTime(r,e.time,event.time);
-				*	(konrad/25feb2009)
-				*/
-
+				this.aggregator.addTravelTime(getTravelTimeData(event.link, true),e.time,event.time);
 			}
 		}
 	}
@@ -141,48 +125,22 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 		if ((e != null) && e.linkId.equals(event.linkId)) {
 			if (event.link == null) event.link = this.network.getLink(event.linkId);
 			if (event.link != null) {
-				this.aggregator.addStuckEventTravelTime(getTravelTimeData(event.link),e.time,event.time);
-				/*
-				* 	lazy initialization of travel time data would be:
-				* 	TravelTimeRole r = getTravelTimeRole(event.link);
-				* 	if (r == null) {
-				*		r = this.factory.createTravelTimeRole(event.link, this.numSlots);
-				*		this.linkData.put(event.link, r);
-				*	}
-				*	this.aggregator.addStuckEventTravelTime(r,e.time,event.time);
-				*	(konrad/25feb2009)
-				*/
+				this.aggregator.addStuckEventTravelTime(getTravelTimeData(event.link, true),e.time,event.time);
 			}
 		}
 	}
-	
-	private TravelTimeData getTravelTimeData(final Link link) {
+
+	private TravelTimeData getTravelTimeData(final Link link, final boolean createIfMissing) {
 		TravelTimeData r = this.linkData.get(link);
-		if (null == r) {
+		if ((null == r) && createIfMissing) {
 			r = this.factory.createTravelTimeData(link, this.numSlots);
 			this.linkData.put(link, r);
 		}
 		return r;
-		/*
-		 * lazy initialization of travel time data would be:
-		 * return this.linkData.get(link);
-		 *	(konrad/25feb2009)
-		 */
-		
 	}
 
 	public double getLinkTravelTime(final Link link, final double time) {
-		return this.aggregator.getTravelTime(getTravelTimeData(link), time); 
-		/*
-		 * lazy initialization of travel time data would be:
-		 * 		TravelTimeRole r = getTravelTimeRole(link);
-		 * 		if (r == null) {
-		 *		r = this.factory.createTravelTimeRole(link, this.numSlots);
-		 *			this.linkData.put(link, r);
-		 *		}
-		 *		return this.aggregator.getTravelTime(r, time); 
-		 *	(konrad/25feb2009)
- 		 */
+		return this.aggregator.getTravelTime(getTravelTimeData(link, true), time); 
 	}
 
 	private static class EnterEvent {
