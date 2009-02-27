@@ -64,7 +64,7 @@ public class ChoiceSet {
 		choiceSet_it = this.choiceSetFacilities.values().iterator();
 		while (choiceSet_it.hasNext()) {
 			ChoiceSetFacility choiceSetFacility = choiceSet_it.next();
-			choiceSetFacility.setAdditionalTime(choiceSetFacility.getTravelDistanceStartShopEnd() - minTravelDistance);
+			choiceSetFacility.setAdditionalDistance(choiceSetFacility.getTravelDistanceStartShopEnd() - minTravelDistance);
 		}	
 	}
 	
