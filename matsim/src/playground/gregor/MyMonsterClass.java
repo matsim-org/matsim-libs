@@ -487,7 +487,7 @@ int three=0;
 		while (oneWayLink != null){
 			Node toNode = oneWayLink.getFromNode();
 			Node fromNode = oneWayLink.getToNode();
-			Link testlink = network.createLink(oneWayLink.getId().toString() + "666", fromNode.getId().toString(), toNode.getId().toString(),((Double) oneWayLink.getLength()).toString(), ((Double)oneWayLink.getFreespeed(Time.UNDEFINED_TIME)).toString(),((Double)oneWayLink.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)).toString(), ((Integer)oneWayLink.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME)).toString(), oneWayLink.getOrigId() + "666",oneWayLink.getType());
+			Link testlink = network.createLink(new IdImpl(oneWayLink.getId().toString() + "666"), fromNode, toNode, oneWayLink.getLength(), oneWayLink.getFreespeed(Time.UNDEFINED_TIME), oneWayLink.getCapacity(Time.UNDEFINED_TIME), oneWayLink.getLanesAsInt(Time.UNDEFINED_TIME), oneWayLink.getOrigId() + "666", oneWayLink.getType());
 
 			EvacuationAreaLink el = new EvacuationAreaLink((IdImpl) testlink.getId(),3600.0 * 11 + 85*60);
 			links.put(el.getId(),el);
@@ -950,7 +950,7 @@ int three=0;
 		double length = fromNode.getCoord().calcDistance(toNode.getCoord());
 //		double freeFlowTime = (Double.parseDouble(result[5])/100)*3600; // free flow time is given in 0.01 hours ...
 //		double freeSpeed = length / freeFlowTime;
-		network.createLink(result[0], result[1], result[2],Double.toString(length),"13.88","2000" ,"1", id, null);
+		network.createLink(new IdImpl(result[0]), fromNode, toNode, length, 13.88, 2000 , 1, id, null);
 	}
 
 
