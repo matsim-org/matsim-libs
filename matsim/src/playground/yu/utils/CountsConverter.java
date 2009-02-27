@@ -59,6 +59,7 @@ public class CountsConverter {
 		Counts counts = new Counts();
 		counts.setYear(2000);
 		counts.setName("berlin counts");
+		counts.setLayer("0");
 		counts
 				.setDescription("extracted from vsp-cvs/studies/berlin-wip/external-data/counts/senstadt-hand/link_counts_PKW_hrs0-24.att");
 		for (Link link : network.getLinks().values()) {
@@ -74,12 +75,21 @@ public class CountsConverter {
 					System.out.println("C:\tlinkToNodeId:\t"
 							+ link.getToNode().getId().toString()
 							+ "\tTONODENO:\t" + NO_TONODENOs.get(origLinkId));
-					Count count = counts.createCount(link.getId(), null);
 					List<Double> cvs = NO_CVs.get(origLinkId);
-					for (int i = 0; i < cvs.size(); i++) {
-						double volume = cvs.get(i).doubleValue();
-						if (volume >= 0)
-							count.createVolume(i + 1, volume);
+					boolean hasValidVolume = false;
+					for (Double value : cvs)
+						if (value.doubleValue() >= 0) {
+							hasValidVolume = true;
+							break;
+						}
+
+					if (hasValidVolume) {
+						Count count = counts.createCount(link.getId(), null);
+						for (int i = 0; i < cvs.size(); i++) {
+							double volume = cvs.get(i).doubleValue();
+							if (volume >= 0)
+								count.createVolume(i + 1, volume);
+						}
 					}
 				}
 				System.out.println("-------------------------");

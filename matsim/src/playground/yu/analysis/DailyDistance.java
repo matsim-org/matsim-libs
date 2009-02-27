@@ -26,22 +26,24 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * compute modal split of through distance
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class DailyDistance extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
-	private double carDist, ptDist, otherDist;
+	private double carDist, ptDist, wlkDist, otherDist;
 
-	private final double totalCounts[], carCounts[], ptCounts[], otherCounts[],
-			carCounts5[], ptCounts5[], carCounts1[], ptCounts1[];
+	private final double totalCounts[], carCounts[], ptCounts[], wlkCounts[],
+			otherCounts[], carCounts5[], ptCounts5[], wlkCounts5[],
+			carCounts1[], ptCounts1[], wlkCounts1[];
 
 	private double carWorkDist, carEducDist, carShopDist, carLeisDist,
 			carHomeDist, carOtherDist, ptWorkDist, ptEducDist, ptShopDist,
-			ptLeisDist, ptHomeDist, ptOtherDist, throughWorkDist,
-			throughEducDist, throughShopDist, throughLeisDist, throughHomeDist,
-			throughOtherDist;
+			ptLeisDist, ptHomeDist, ptOtherDist, wlkWorkDist, wlkEducDist,
+			wlkShopDist, wlkLeisDist, wlkHomeDist, wlkOtherDist,
+			throughWorkDist, throughEducDist, throughShopDist, throughLeisDist,
+			throughHomeDist, throughOtherDist;
 
 	private int count;
 
@@ -54,16 +56,20 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 	public DailyDistance() {
 		this.carDist = 0.0;
 		this.ptDist = 0.0;
+		wlkDist = 0.0;
 		this.otherDist = 0.0;
 		this.count = 0;
 		this.totalCounts = new double[101];
 		this.carCounts = new double[101];
 		this.ptCounts = new double[101];
+		wlkCounts = new double[101];
 		this.otherCounts = new double[101];
 		this.carCounts5 = new double[21];
 		this.ptCounts5 = new double[21];
+		wlkCounts5 = new double[21];
 		this.carCounts1 = new double[101];
 		this.ptCounts1 = new double[101];
+		wlkCounts1 = new double[101];
 		this.carWorkDist = 0.0;
 		this.carEducDist = 0.0;
 		this.carShopDist = 0.0;
@@ -76,6 +82,12 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		this.ptLeisDist = 0.0;
 		this.ptHomeDist = 0.0;
 		this.ptOtherDist = 0.0;
+		this.wlkWorkDist = 0.0;
+		this.wlkEducDist = 0.0;
+		this.wlkShopDist = 0.0;
+		this.wlkLeisDist = 0.0;
+		this.wlkHomeDist = 0.0;
+		this.wlkOtherDist = 0.0;
 		this.throughWorkDist = 0.0;
 		this.throughEducDist = 0.0;
 		this.throughShopDist = 0.0;
@@ -95,6 +107,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		double dayDist = 0.0;
 		double carDayDist = 0.0;
 		double ptDayDist = 0.0;
+		double wlkDayDist = 0.0;
 		double otherDayDist = 0.0;
 		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
 			Leg bl = (Leg) li.next();
@@ -188,6 +201,31 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 					}
 					this.ptCounts5[Math.min(20, (int) dist / 5)]++;
 					this.ptCounts1[Math.min(100, (int) dist)]++;
+				} else if (bl.getMode().equals(Mode.walk)) {
+					this.wlkDist += dist;
+					wlkDayDist += dist;
+					switch (ats) {
+					case h:
+						this.wlkHomeDist += dist;
+						break;
+					case w:
+						this.wlkWorkDist += dist;
+						break;
+					case e:
+						this.wlkEducDist += dist;
+						break;
+					case s:
+						this.wlkShopDist += dist;
+						break;
+					case l:
+						this.wlkLeisDist += dist;
+						break;
+					default:
+						this.wlkOtherDist += dist;
+						break;
+					}
+					this.wlkCounts5[Math.min(20, (int) dist / 5)]++;
+					this.wlkCounts1[Math.min(100, (int) dist)]++;
 				}
 			}
 		}
@@ -199,10 +237,12 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 			this.carCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) ptDayDist); i++)
 			this.ptCounts[i]++;
+		for (int i = 0; i <= Math.min(100, (int) wlkDayDist); i++)
+			this.wlkCounts[i]++;
 	}
 
 	public void write(final String outputFilename) {
-		double sum = this.carDist + this.ptDist + this.otherDist;
+		double sum = this.carDist + this.ptDist + wlkDist + this.otherDist;
 		SimpleWriter sw = new SimpleWriter(outputFilename + "dailyDistance.txt");
 		sw.writeln("\tDaily Distance\t(exkl. through-traffic)");
 		sw.writeln("\tkm\t%");
@@ -210,6 +250,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				/ sum * 100.0);
 		sw.writeln("pt\t" + this.ptDist / this.count + "\t" + this.ptDist / sum
 				* 100.0);
+		sw.writeln("walk\t" + this.wlkDist / this.count + "\t" + this.wlkDist
+				/ sum * 100.0);
 		sw.writeln("through\t" + this.otherDist / this.count + "\t"
 				+ this.otherDist / sum * 100.0);
 		sw.writeln("--------------------------------------------");
@@ -219,6 +261,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				+ "\t" + (this.carDist + this.otherDist) / sum * 100.0);
 		sw.writeln("pt\t" + this.ptDist / this.count + "\t" + this.ptDist / sum
 				* 100.0);
+		sw.writeln("walk\t" + this.wlkDist / this.count + "\t" + this.wlkDist
+				/ sum * 100.0);
 		sw.writeln("--travel destination and modal split--daily distance--");
 		sw.writeln("\twork\teducation\tshopping\tleisure\thome\tother...");
 		sw.writeln("car\t" + this.carWorkDist + "\t" + this.carEducDist + "\t"
@@ -227,38 +271,48 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		sw.writeln("pt\t" + this.ptWorkDist + "\t" + this.ptEducDist + "\t"
 				+ this.ptShopDist + "\t" + this.ptLeisDist + "\t"
 				+ this.ptHomeDist + "\t" + this.ptOtherDist);
+		sw.writeln("walk\t" + this.wlkWorkDist + "\t" + this.wlkEducDist + "\t"
+				+ this.wlkShopDist + "\t" + this.wlkLeisDist + "\t"
+				+ this.wlkHomeDist + "\t" + this.wlkOtherDist);
 		sw.writeln("through\t" + this.throughWorkDist + "\t"
 				+ this.throughEducDist + "\t" + this.throughShopDist + "\t"
 				+ this.throughLeisDist + "\t" + this.throughHomeDist + "\t"
 				+ this.throughOtherDist);
 		sw
 				.writeln("total\t"
-						+ (this.carWorkDist + this.ptWorkDist + this.throughWorkDist)
+						+ (this.carWorkDist + this.ptWorkDist + wlkWorkDist + this.throughWorkDist)
 						+ "\t"
-						+ (this.carEducDist + this.ptEducDist + this.throughEducDist)
+						+ (this.carEducDist + this.ptEducDist + wlkEducDist + this.throughEducDist)
 						+ "\t"
-						+ (this.carShopDist + this.ptShopDist + this.throughShopDist)
+						+ (this.carShopDist + this.ptShopDist + wlkShopDist + this.throughShopDist)
 						+ "\t"
-						+ (this.carLeisDist + this.ptLeisDist + this.throughLeisDist)
+						+ (this.carLeisDist + this.ptLeisDist + wlkLeisDist + this.throughLeisDist)
 						+ "\t"
-						+ (this.carHomeDist + this.ptHomeDist + this.throughHomeDist)
+						+ (this.carHomeDist + this.ptHomeDist + wlkHomeDist + this.throughHomeDist)
 						+ "\t"
-						+ (this.carOtherDist + this.ptOtherDist + this.throughOtherDist));
+						+ (this.carOtherDist + this.ptOtherDist + wlkOtherDist + this.throughOtherDist));
 
 		BarChart barChart = new BarChart(
 				"travel destination and modal split--daily distance",
 				"travel destination", "daily distance [km]", new String[] {
-						"work", "education", "shopping", "leisure", "home", "others" });
-		barChart.addSeries("car", new double[] { this.carWorkDist, this.carEducDist,
-				this.carShopDist, this.carLeisDist, this.carHomeDist, this.carOtherDist });
-		barChart.addSeries("pt", new double[] { this.ptWorkDist, this.ptEducDist,
-				this.ptShopDist, this.ptLeisDist, this.ptHomeDist, this.ptOtherDist });
+						"work", "education", "shopping", "leisure", "home",
+						"others" });
+		barChart.addSeries("car", new double[] { this.carWorkDist,
+				this.carEducDist, this.carShopDist, this.carLeisDist,
+				this.carHomeDist, this.carOtherDist });
+		barChart.addSeries("pt", new double[] { this.ptWorkDist,
+				this.ptEducDist, this.ptShopDist, this.ptLeisDist,
+				this.ptHomeDist, this.ptOtherDist });
+		barChart.addSeries("walk", new double[] { this.wlkWorkDist,
+				this.wlkEducDist, this.wlkShopDist, this.wlkLeisDist,
+				this.wlkHomeDist, this.wlkOtherDist });
 		barChart.addSeries("through", new double[] { this.throughWorkDist,
-				this.throughEducDist, this.throughShopDist, this.throughLeisDist,
-				this.throughHomeDist, this.throughOtherDist });
+				this.throughEducDist, this.throughShopDist,
+				this.throughLeisDist, this.throughHomeDist,
+				this.throughOtherDist });
 		barChart.addMatsimLogo();
 		barChart.saveAsPng(outputFilename
-				+ "dailyDistancetravelDistination.png", 1200, 900);
+				+ "dailyDistanceTravelDistination.png", 1200, 900);
 
 		double x[] = new double[101];
 		for (int i = 0; i < 101; i++)
@@ -266,19 +320,22 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		double yTotal[] = new double[101];
 		double yCar[] = new double[101];
 		double yPt[] = new double[101];
+		double yWlk[] = new double[101];
 		double yOther[] = new double[101];
 		for (int i = 0; i < 101; i++) {
 			yTotal[i] = this.totalCounts[i] / this.count * 100.0;
 			yCar[i] = this.carCounts[i] / this.count * 100.0;
 			yPt[i] = this.ptCounts[i] / this.count * 100.0;
+			yWlk[i] = this.wlkCounts[i] / this.count * 100.0;
 			yOther[i] = this.otherCounts[i] / this.count * 100.0;
 		}
 
-		XYLineChart chart = new XYLineChart("Daily Distance distribution",
+		XYLineChart chart = new XYLineChart("Daily Distance Distribution",
 				"Daily Distance in km",
 				"fraction of persons with daily distance bigger than x... in %");
 		chart.addSeries("car", x, yCar);
 		chart.addSeries("pt", x, yPt);
+		chart.addSeries("walk", x, yWlk);
 		chart.addSeries("other", x, yOther);
 		chart.addSeries("total", x, yTotal);
 		chart.saveAsPng(outputFilename + "dailyDistance.png", 800, 600);
@@ -286,44 +343,59 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		sw.writeln("");
 		sw.writeln("--Modal split -- leg distance--");
 		sw
-				.writeln("leg Distance [km]\tcar legs no.\tpt legs no.\tcar fraction [%]\tpt fraction [%]");
+				.writeln("leg Distance [km]\tcar legs no.\tpt legs no.\twalk legs no.\tcar fraction [%]\tpt fraction [%]\twalk fraction [%]");
 
 		double xs[] = new double[101];
 		double yCarFracs[] = new double[101];
 		double yPtFracs[] = new double[101];
+		double yWlkFracs[] = new double[101];
 
 		BubbleChart bubbleChart = new BubbleChart(
 				"Modal split -- leg distance", "pt fraction [%]",
 				"car fraction [%]");
 		for (int i = 0; i < 20; i++) {
-			double ptFraction = this.ptCounts5[i] / (this.ptCounts5[i] + this.carCounts5[i])
+			double ptFraction = this.ptCounts5[i]
+					/ (this.ptCounts5[i] + this.carCounts5[i] + wlkCounts5[i])
 					* 100.0;
-			double carFraction = this.carCounts5[i] / (this.ptCounts5[i] + this.carCounts5[i])
+			double wlkFraction = this.wlkCounts5[i]
+					/ (this.ptCounts5[i] + this.carCounts5[i] + wlkCounts5[i])
+					* 100.0;
+			double carFraction = this.carCounts5[i]
+					/ (this.ptCounts5[i] + this.carCounts5[i] + wlkCounts5[i])
 					* 100.0;
 			bubbleChart.addSeries(i * 5 + "-" + (i + 1) * 5 + " km",
 					new double[][] { new double[] { ptFraction },
 							new double[] { carFraction },
 							new double[] { (i + 0.5) / 5.0 } });
-			sw.writeln((i * 5) + "+\t" + this.carCounts5[i] + "\t" + this.ptCounts5[i]
-					+ "\t" + carFraction + "\t" + ptFraction);
+			sw.writeln((i * 5) + "+\t" + this.carCounts5[i] + "\t"
+					+ this.ptCounts5[i] + "\t" + this.wlkCounts5[i] + "\t"
+					+ carFraction + "\t" + ptFraction + "\t" + wlkFraction);
 		}
-		double ptFraction = this.ptCounts5[20] / (this.ptCounts5[20] + this.carCounts5[20])
+		double ptFraction = this.ptCounts5[20]
+				/ (this.ptCounts5[20] + this.carCounts5[20] + wlkCounts5[20])
 				* 100.0;
-		double carFraction = this.carCounts5[20] / (this.ptCounts5[20] + this.carCounts5[20])
+		double wlkFraction = this.wlkCounts5[20]
+				/ (this.ptCounts5[20] + this.carCounts5[20] + wlkCounts5[20])
+				* 100.0;
+		double carFraction = this.carCounts5[20]
+				/ (this.ptCounts5[20] + this.carCounts5[20] + wlkCounts5[20])
 				* 100.0;
 		bubbleChart.addSeries("100+ km", new double[][] {
 				new double[] { ptFraction }, new double[] { carFraction },
 				new double[] { 4.1 } });
-		sw.writeln(100 + "+\t" + this.carCounts5[20] + "\t" + this.ptCounts5[20] + "\t"
-				+ carFraction + "\t" + ptFraction);
+		sw.writeln(100 + "+\t" + this.carCounts5[20] + "\t"
+				+ this.ptCounts5[20] + "\t" + this.wlkCounts5[20] + "\t"
+				+ carFraction + "\t" + ptFraction + "\t" + wlkFraction);
 		bubbleChart.saveAsPng(outputFilename + "legDistanceModalSplit.png",
 				900, 900);
 
 		for (int i = 0; i < 101; i++) {
 			xs[i] = i;
-			yCarFracs[i] = this.carCounts1[i] / (this.ptCounts1[i] + this.carCounts1[i])
-					* 100.0;
-			yPtFracs[i] = this.ptCounts1[i] / (this.ptCounts1[i] + this.carCounts1[i]) * 100.0;
+			yCarFracs[i] = this.carCounts1[i]
+					/ (this.ptCounts1[i] + this.carCounts1[i]+wlkCounts1[i]) * 100.0;
+			yPtFracs[i] = this.ptCounts1[i]
+					/ (this.ptCounts1[i] + this.carCounts1[i]+wlkCounts1[i]) * 100.0;
+//			TODO
 		}
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
 				"leg Distance [km]", "mode fraction [%]");
