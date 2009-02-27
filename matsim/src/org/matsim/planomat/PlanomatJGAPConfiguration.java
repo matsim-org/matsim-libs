@@ -30,13 +30,12 @@ import org.jgap.impl.GABreeder;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
 import org.jgap.impl.WeightedRouletteSelector;
-import org.jgap.util.ICloneable;
 import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
-public class PlanomatJGAPConfiguration extends Configuration implements ICloneable {
+public class PlanomatJGAPConfiguration extends Configuration {
 
 	/**
 	 * default serial version ID

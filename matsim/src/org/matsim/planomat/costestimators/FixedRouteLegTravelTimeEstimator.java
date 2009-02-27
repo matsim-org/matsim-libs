@@ -74,7 +74,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 			legInformation = new HashMap<BasicLeg.Mode, Double>();
 			this.travelTimeCache.put(legIntermediate, legInformation);
 		}
-		double cachedTravelTimeInformation = Double.MIN_VALUE;
+		double cachedTravelTimeInformation;
 		if (legInformation.containsKey(legIntermediate.getMode())) {
 			cachedTravelTimeInformation = legInformation.get(legIntermediate.getMode()).doubleValue();
 		} else {
