@@ -245,7 +245,7 @@ public class QueueLink {
 			int laneNumber = 1;
 			for (Link link : result.values()) {
 				if (lane.getDestinationLinks().contains(link)){
-					lane.setVisualizerLane(laneNumber);;
+					lane.setVisualizerLane(laneNumber);
 					break;
 				}
 				laneNumber++;
@@ -318,7 +318,7 @@ public class QueueLink {
 
 	/**
 	 * Adds a vehicle to the link, called by
-	 * {@link QueueNode#moveVehicleOverNode(QueueVehicle, double)}.
+	 * {@link QueueNode#moveVehicleOverNode(QueueVehicle, QueueLane, double)}.
 	 *
 	 * @param veh
 	 *          the vehicle
@@ -386,10 +386,6 @@ public class QueueLink {
 		return true;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public boolean hasSpace() {
 		return this.originalLane.hasSpace();
 	}
@@ -407,7 +403,6 @@ public class QueueLink {
 	public Collection<QueueVehicle> getAllVehicles() {
 		return this.originalLane.getAllVehicles();
 	}
-	
 
 	public double getSpaceCap() {
 		return this.originalLane.getSpaceCap();
@@ -443,7 +438,6 @@ public class QueueLink {
 		return this.toQueueNode;
 	}
 
-
 	/**
 	 * This method returns the normalized capacity of the link, i.e. the capacity
 	 * of vehicles per second. It is considering the capacity reduction factors
@@ -459,8 +453,5 @@ public class QueueLink {
 	public VisData getVisData() {
 		return this.originalLane.visdata;
 	}
-
-	
-
 	
 }
