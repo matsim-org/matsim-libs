@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.writer.WriterHandler;
 
@@ -33,7 +34,7 @@ public interface NetworkWriterHandler extends WriterHandler {
 	// <network ... > ... </network>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startNetwork(final NetworkLayer network, final BufferedWriter out) throws IOException;
+	public void startNetwork(final Network network, final BufferedWriter out) throws IOException;
 
 	public void endNetwork(final BufferedWriter out) throws IOException;
 
@@ -41,7 +42,7 @@ public interface NetworkWriterHandler extends WriterHandler {
 	// <nodes ... > ... </nodes>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startNodes(final NetworkLayer network, final BufferedWriter out) throws IOException;
+	public void startNodes(final Network network, final BufferedWriter out) throws IOException;
 
 	public void endNodes(final BufferedWriter out) throws IOException;
 
@@ -49,7 +50,7 @@ public interface NetworkWriterHandler extends WriterHandler {
 	// <links ... > ... </links>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startLinks(final NetworkLayer network, final BufferedWriter out) throws IOException;
+	public void startLinks(final Network network, final BufferedWriter out) throws IOException;
 
 	public void endLinks(final BufferedWriter out) throws IOException;
 

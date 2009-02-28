@@ -31,6 +31,7 @@ import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.vis.kml.KMZWriter;
@@ -44,7 +45,7 @@ public class KmlNetworkWriter {
 
 	private static final Logger log = Logger.getLogger(KmlNetworkWriter.class);
 
-	private NetworkLayer network;
+	private Network network;
 
 	private MatsimKmlStyleFactory styleFactory;
 
@@ -56,7 +57,7 @@ public class KmlNetworkWriter {
 
 	private StyleType networkNodeStyle;
 
-	public KmlNetworkWriter(final NetworkLayer network, final CoordinateTransformation coordTransform, KMZWriter writer, DocumentType doc) {
+	public KmlNetworkWriter(final Network network, final CoordinateTransformation coordTransform, KMZWriter writer, DocumentType doc) {
 		this.network = network;
 		this.styleFactory = new MatsimKmlStyleFactory(writer, doc);
 		this.networkFeatureFactory = new NetworkFeatureFactory(coordTransform);

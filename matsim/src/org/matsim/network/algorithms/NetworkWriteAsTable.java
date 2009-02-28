@@ -25,8 +25,8 @@ import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.NetworkLayer;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
 
@@ -97,7 +97,7 @@ public class NetworkWriteAsTable {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(NetworkLayer network) {
+	public void run(Network network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		int capperiod = network.getCapacityPeriod();

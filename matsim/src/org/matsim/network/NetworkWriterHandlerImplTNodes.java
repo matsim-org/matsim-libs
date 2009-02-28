@@ -24,15 +24,16 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.utils.io.IOUtils;
 
 public class NetworkWriterHandlerImplTNodes {
 
-	private final NetworkLayer network;
+	private final Network network;
 	private BufferedWriter out;
 
-	public NetworkWriterHandlerImplTNodes(final NetworkLayer network) {
+	public NetworkWriterHandlerImplTNodes(final Network network) {
 		this.network = network;
 	}
 

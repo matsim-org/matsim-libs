@@ -30,9 +30,9 @@ import java.util.TreeMap;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.LinkIdComparator;
-import org.matsim.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -49,14 +49,14 @@ import org.matsim.utils.misc.Time;
  */
 public class SubsequentLinksAnalyzer {
 
-	private final NetworkLayer network;
+	private final Network network;
 
 	private final static LinkIdComparator linkComparator = new LinkIdComparator();
 
 	/** Stores the logical subsequent link (value) for a given link (key). */
 	private final TreeMap<Link, Link> subsequentLinks = new TreeMap<Link, Link>(linkComparator);
 
-	public SubsequentLinksAnalyzer(final NetworkLayer network) {
+	public SubsequentLinksAnalyzer(final Network network) {
 		this.network = network;
 		compute();
 	}

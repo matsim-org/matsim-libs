@@ -25,8 +25,8 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.NetworkLayer;
 
 public class NetworkScenarioCut {
 
@@ -45,7 +45,7 @@ public class NetworkScenarioCut {
 		this.maxY = max.getY();
 	}
 
-	public void run(final NetworkLayer network) {
+	public void run(final Network network) {
 		log.info("running module...");
 
 		TreeSet<Node> n_set = new TreeSet<Node>();

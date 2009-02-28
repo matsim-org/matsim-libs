@@ -29,6 +29,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
 
@@ -55,7 +56,7 @@ public class NetworkCleaner {
 	 * @param network the network the startNode is part of
 	 * @return cluster of nodes <pre>startNode</pre> is part of
 	 */
-	private Map<Id, Node> findCluster(final Node startNode, final NetworkLayer network) {
+	private Map<Id, Node> findCluster(final Node startNode, final Network network) {
 
 		final Map<Node, DoubleFlagRole> nodeRoles = new HashMap<Node, DoubleFlagRole>(network.getNodes().size());
 

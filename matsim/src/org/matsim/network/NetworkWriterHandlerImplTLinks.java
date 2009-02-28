@@ -25,15 +25,16 @@ import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
 
 public class NetworkWriterHandlerImplTLinks {
 
-	private final NetworkLayer network;
+	private final Network network;
 	private BufferedWriter out;
 
-	public NetworkWriterHandlerImplTLinks(final NetworkLayer network) {
+	public NetworkWriterHandlerImplTLinks(final Network network) {
 		this.network = network;
 	}
 

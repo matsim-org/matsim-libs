@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.writer.Writer;
@@ -31,13 +32,13 @@ import org.matsim.writer.Writer;
 public class NetworkWriter extends Writer {
 
 	private NetworkWriterHandler handler = null;
-	private final NetworkLayer network;
+	private final Network network;
 
-	public NetworkWriter(final NetworkLayer network) {
+	public NetworkWriter(final Network network) {
 		this(network, Gbl.getConfig().network().getOutputFile());
 	}
 
-	public NetworkWriter(final NetworkLayer network, final String filename) {
+	public NetworkWriter(final Network network, final String filename) {
 
 		super();
 		this.network = network;

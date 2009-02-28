@@ -24,8 +24,8 @@ import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
 
 public class NetworkMergeDoubleLinks {
@@ -51,7 +51,7 @@ public class NetworkMergeDoubleLinks {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void mergeLink2IntoLink1(Link link1, Link link2, NetworkLayer network) {
+	private final void mergeLink2IntoLink1(Link link1, Link link2, Network network) {
 		if (mergetype == 0) {
 			System.out.println("        Link id=" + link2.getId() + " removed because of Link id=" + link1.getId());
 			network.removeLink(link2);
@@ -91,7 +91,7 @@ public class NetworkMergeDoubleLinks {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(NetworkLayer network) {
+	public void run(Network network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		for (Node n : network.getNodes().values()) {

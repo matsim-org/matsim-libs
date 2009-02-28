@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.utils.misc.Time;
 
@@ -39,7 +40,7 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 	// <network ... > ... </network>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startNetwork(final NetworkLayer network, final BufferedWriter out) throws IOException {
+	public void startNetwork(final Network network, final BufferedWriter out) throws IOException {
 		out.write("<network");
 		if (network.getName() != null) {
 			out.write(" name=\"" + network.getName() + "\"");
@@ -55,7 +56,7 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 	// <nodes ... > ... </nodes>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startNodes(final NetworkLayer network, final BufferedWriter out) throws IOException {
+	public void startNodes(final Network network, final BufferedWriter out) throws IOException {
 		out.write("\t<nodes");
 		out.write(">\n");
 	}
@@ -68,7 +69,7 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 	// <links ... > ... </links>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startLinks(final NetworkLayer network, final BufferedWriter out) throws IOException {
+	public void startLinks(final Network network, final BufferedWriter out) throws IOException {
 		out.write("\t<links");
 		if (network.getCapacityPeriod() != Integer.MIN_VALUE) {
 			out.write(" capperiod=\"" + Time.writeTime(network.getCapacityPeriod()) + "\"");

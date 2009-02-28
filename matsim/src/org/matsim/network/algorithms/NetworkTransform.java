@@ -23,8 +23,8 @@ package org.matsim.network.algorithms;
 import java.util.Iterator;
 
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordinateTransformation;
 
 public class NetworkTransform {
@@ -36,7 +36,7 @@ public class NetworkTransform {
 		this.transformer = transformer;
 	}
 
-	public void run(final NetworkLayer network) {
+	public void run(final Network network) {
 		Iterator<? extends Node> n_it = network.getNodes().values().iterator();
 		while (n_it.hasNext()) {
 			Node n = n_it.next();

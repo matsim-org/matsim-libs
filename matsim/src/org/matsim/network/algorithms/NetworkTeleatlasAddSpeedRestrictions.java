@@ -27,13 +27,13 @@ import org.apache.log4j.Logger;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.network.LinkImpl;
-import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkReaderTeleatlas;
 import org.matsim.utils.misc.Time;
 
 /**
- * Adds additional speed restrictions to a MATSim {@link NetworkLayer network} created
+ * Adds additional speed restrictions to a MATSim {@link Network network} created
  * by {@link NetworkReaderTeleatlas}. The input speed restriction DBF file is based on
  * <strong>Tele Atlas MultiNet Shapefile 4.3.2.1 Format Specifications
  * document version Final v1.0, June 2007</strong>.
@@ -63,7 +63,7 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * To add speed restrictions to a Tele Atlas MultiNet {@link NetworkLayer network}.
+	 * To add speed restrictions to a Tele Atlas MultiNet {@link Network network}.
 	 * 
 	 * @param srDbfFileName Tele Atlas MultiNet speed restriction DBF file
 	 */
@@ -78,7 +78,7 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Reading and assigning speed restrictions to the {@link Link links} of a {@link NetworkLayer network}.
+	 * Reading and assigning speed restrictions to the {@link Link links} of a {@link Network network}.
 	 * 
 	 * <p>It uses the following attributes from the Tele Atlas MultiNet speed restriction DBF file:
 	 * <ul>
@@ -112,7 +112,7 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 	 * @param network
 	 * @throws Exception
 	 */
-	public void run(final NetworkLayer network) throws Exception {
+	public void run(final Network network) throws Exception {
 		log.info("running " + this.getClass().getName() + " module...");
 		FileChannel in = new FileInputStream(this.srDbfFileName).getChannel();
 		DbaseFileReader r = new DbaseFileReader(in,true);

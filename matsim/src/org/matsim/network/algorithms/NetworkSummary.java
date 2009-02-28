@@ -22,8 +22,8 @@ package org.matsim.network.algorithms;
 
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
@@ -39,7 +39,7 @@ public class NetworkSummary {
 		super();
 	}
 
-	public void run(final NetworkLayer network) {
+	public void run(final Network network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		int min_node_id = Integer.MAX_VALUE;
@@ -72,7 +72,6 @@ public class NetworkSummary {
 
 		System.out.println("      network summary:");
 		System.out.println("        name             = " + network.getName());
-		System.out.println("        type             = " + network.getType());
 		System.out.println("        capperiod        = " + Time.writeTime(network.getCapacityPeriod()));
 		System.out.println("        network_capacity = " + this.network_capacity + " cells");
 		System.out.println("      nodes summary:");
