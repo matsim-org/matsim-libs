@@ -57,7 +57,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements T
 	public void checkAssertions() {
 
 		// at least one event
-		assertEquals(true, events.size() > 0);
+		assertTrue(events.size() > 0);
 
 		// all events of one agent must have ascending time stamps
 		double lastTimeStamp;
@@ -70,14 +70,10 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements T
 					}
 					System.out.println(lastTimeStamp);
 					System.out.println(list.get(i).time);
-
-					assertEquals(true, false); // in this case, something is
-					// wrong (messages are not
-					// arriving in a consistent
-					// manner)
+					fail("Messages are not arriving in a consistent manner.");
 				}
 
-				assertEquals(true, lastTimeStamp <= list.get(i).time);
+				assertTrue(lastTimeStamp <= list.get(i).time);
 				lastTimeStamp = list.get(i).time;
 			}
 		}
@@ -99,39 +95,39 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements T
 				Leg leg = (Leg) legIter.next();
 
 				// act end event
-				assertEquals(true, list.get(index) instanceof ActEndEvent);
-				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
+				assertTrue(list.get(index) instanceof ActEndEvent);
+				assertTrue(act.getLinkId().toString().equalsIgnoreCase(
 						((ActEndEvent) list.get(index)).linkId));
 				index++;
 
 				// each leg starts with departure on act link
-				assertEquals(true, list.get(index) instanceof AgentDepartureEvent);
-				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
+				assertTrue(list.get(index) instanceof AgentDepartureEvent);
+				assertTrue(act.getLinkId().toString().equalsIgnoreCase(
 						((AgentDepartureEvent) list.get(index)).linkId));
 				index++;
 
 				// each CAR leg must enter/leave act link
 				if (leg.getMode().equals(BasicLeg.Mode.car)) {
 					// the first LinkEnterEvent is a AgentWait2LinkEvent
-					assertEquals(true, list.get(index) instanceof AgentWait2LinkEvent);
-					assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
+					assertTrue(list.get(index) instanceof AgentWait2LinkEvent);
+					assertTrue(act.getLinkId().toString().equalsIgnoreCase(
 							((AgentWait2LinkEvent) list.get(index)).linkId));
 					index++;
 
-					assertEquals(true, list.get(index) instanceof LinkLeaveEvent);
-					assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
+					assertTrue(list.get(index) instanceof LinkLeaveEvent);
+					assertTrue(act.getLinkId().toString().equalsIgnoreCase(
 							((LinkLeaveEvent) list.get(index)).linkId));
 					index++;
 
 					for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
 						// enter link and leave each link on route
-						assertEquals(true, list.get(index) instanceof LinkEnterEvent);
-						assertEquals(true, link.getId().toString().equalsIgnoreCase(
+						assertTrue(list.get(index) instanceof LinkEnterEvent);
+						assertTrue(link.getId().toString().equalsIgnoreCase(
 								((LinkEnterEvent) list.get(index)).linkId));
 						index++;
 
-						assertEquals(true, list.get(index) instanceof LinkLeaveEvent);
-						assertEquals(true, link.getId().toString().equalsIgnoreCase(
+						assertTrue(list.get(index) instanceof LinkLeaveEvent);
+						assertTrue(link.getId().toString().equalsIgnoreCase(
 								((LinkLeaveEvent) list.get(index)).linkId));
 						index++;
 					}
@@ -141,14 +137,14 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements T
 				act = (Act) actIter.next();
 
 				// each leg ends with arrival on act link
-				assertEquals(true, list.get(index) instanceof AgentArrivalEvent);
-				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
+				assertTrue(list.get(index) instanceof AgentArrivalEvent);
+				assertTrue(act.getLinkId().toString().equalsIgnoreCase(
 						((AgentArrivalEvent) list.get(index)).linkId));
 				index++;
 
 				// each leg ends with arrival on act link
-				assertEquals(true, list.get(index) instanceof ActStartEvent);
-				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
+				assertTrue(list.get(index) instanceof ActStartEvent);
+				assertTrue(act.getLinkId().toString().equalsIgnoreCase(
 						((ActStartEvent) list.get(index)).linkId));
 				index++;
 			}
@@ -303,7 +299,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements T
 		}
 	}
 
-	private static class ExpectedNumberOfEvents {
+	/*package*/ static class ExpectedNumberOfEvents {
 		public int expectedLinkEnterEvents;
 		public int expectedLinkLeaveEvents;
 		public int expectedDepartureEvents;
