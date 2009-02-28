@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.interfaces.core.v01.Population;
@@ -61,7 +62,7 @@ public abstract class FinalEventFilterA extends EventFilterA {
 	public LinkEnterEvent rebuildEventLinkEnter(LinkEnterEvent enter) {
 		// very important to rebuild LinkEventData Object: event, aim to get
 		// the id and the length of the right link
-		enter.agent = this.plans.getPerson(enter.agentId);
+		enter.agent = this.plans.getPerson(new IdImpl(enter.agentId));
 		enter.link = network.getLink(enter.linkId);
 		return enter;
 	}

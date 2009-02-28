@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.ShutdownEvent;
@@ -96,7 +97,7 @@ public class CEAnalyzer implements IterationEndsListener, ShutdownListener {
 			BufferedReader reader = IOUtils.getBufferedReader(file);
 			String personId;
 			while ((personId = reader.readLine()) != null) {
-				Person p = plans.getPerson(personId);
+				Person p = plans.getPerson(new IdImpl(personId));
 				if (p != null)
 					persons.add(p);
 			}

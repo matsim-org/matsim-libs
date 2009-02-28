@@ -20,7 +20,7 @@ import playground.yu.visum.filter.finalFilters.NewPlansWriter;
 /**
  * @author ychen
  */
-public class NewPlansTest extends PopulationImpl {
+public class NewPlansTest {
 
 	public static void testRun() {
 

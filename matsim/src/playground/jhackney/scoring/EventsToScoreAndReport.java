@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
@@ -112,7 +113,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 			sf.finish();
 
 			double score = sf.getScore();
-			Plan plan = this.population.getPerson(agentId).getSelectedPlan();
+			Plan plan = this.population.getPerson(new IdImpl(agentId)).getSelectedPlan();
 			double oldScore = plan.getScore();
 			if (Double.isNaN(oldScore)) {
 				plan.setScore(score);
@@ -145,7 +146,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 			for (Map.Entry<String, playground.jhackney.scoring.EventSocScoringFunction> entry : this.agentScorers.entrySet()) {
 				String agentId = entry.getKey();
 				playground.jhackney.scoring.EventSocScoringFunction sf = entry.getValue();
-				Plan plan = this.population.getPerson(agentId).getSelectedPlan();
+				Plan plan = this.population.getPerson(new IdImpl(agentId)).getSelectedPlan();
 				ActLegIterator actLegIter = plan.getIterator();
 				Act act = (Act) actLegIter.nextAct();
 
@@ -224,7 +225,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 	private playground.jhackney.scoring.EventSocScoringFunction getScoringFunctionForAgent(final String agentId) {
 		playground.jhackney.scoring.EventSocScoringFunction sf = this.agentScorers.get(agentId);
 		if (sf == null) {
-			sf = this.sfFactory.getNewScoringFunction(this.population.getPerson(agentId).getSelectedPlan());
+			sf = this.sfFactory.getNewScoringFunction(this.population.getPerson(new IdImpl(agentId)).getSelectedPlan());
 			this.agentScorers.put(agentId, sf);
 		}
 		return sf;

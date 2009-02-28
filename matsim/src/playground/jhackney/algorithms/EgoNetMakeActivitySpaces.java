@@ -20,19 +20,19 @@
 
 package playground.jhackney.algorithms;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
-import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
 import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
+import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
-import playground.jhackney.kml.EgoNetPlansItersMakeKML;
 
 public class EgoNetMakeActivitySpaces {
 
@@ -46,7 +46,7 @@ public class EgoNetMakeActivitySpaces {
 
 		Scenario.setUpScenarioConfig();
 
-		Scenario.readWorld();
+		World world = Scenario.readWorld();
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
 		Population plans = Scenario.readPlans();
@@ -58,7 +58,7 @@ public class EgoNetMakeActivitySpaces {
 		
 		//read in facilities knowledge
 		new InitializeKnowledge(plans, facilities);
-		new WorldConnectLocations().run(Gbl.getWorld());
+		new WorldConnectLocations().run(world);
 		//////////////////////////////////////////////////////////////////////
 
 //		// ch.cut.640000.200000.740000.310000.xml
@@ -109,7 +109,7 @@ public class EgoNetMakeActivitySpaces {
 //		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 //		new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
 //		new PersonsRandomizeId(plans);
-		Person ego=plans.getPerson("21924270");
+		Person ego=plans.getPerson(new IdImpl("21924270"));
 
 		Population socialPlans = new PersonGetEgoNetGetPlans().extract(ego, plans);
 //		// make the set of plans to use as EgoNet

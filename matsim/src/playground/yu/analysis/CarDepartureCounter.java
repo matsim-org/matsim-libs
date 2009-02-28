@@ -27,6 +27,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.Events;
@@ -105,7 +106,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		Person p = this.ppl.getPerson(event.agentId);
+		Person p = this.ppl.getPerson(new IdImpl(event.agentId));
 		if (PlanModeJudger.useCar(p.getSelectedPlan()))
 			this.cdc++;
 	}
@@ -120,7 +121,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		Person p = this.ppl.getPerson(event.agentId);
+		Person p = this.ppl.getPerson(new IdImpl(event.agentId));
 		if (PlanModeJudger.useCar(p.getSelectedPlan()))
 			this.cac++;
 

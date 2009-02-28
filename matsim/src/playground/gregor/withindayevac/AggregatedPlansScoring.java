@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.ScoringEvent;
@@ -117,7 +118,7 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 			final GroupScore g = this.gs.get(mapping);
 			final GroupScore nullG = this.gs.get("stuckAndAbord"); 
 			final double score = (g.scoreSum + nullG.scoreSum ) / (g.nagents + nullG.nagents);
-			final Plan plan = this.population.getPerson(agentId).getSelectedPlan();
+			final Plan plan = this.population.getPerson(new IdImpl(agentId)).getSelectedPlan();
 			final double oldScore = plan.getScore();
 			if (Double.isNaN(oldScore)) {
 				plan.setScore(score);
@@ -269,13 +270,13 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 	protected ScoringFunction getScoringFunctionForAgent(final String agentId) {
 		ScoringFunction sf = this.agentScorers.get(agentId);
 		if (sf == null) {
-			sf = this.sfFactory.getNewScoringFunction(this.population.getPerson(agentId).getSelectedPlan());
+			sf = this.sfFactory.getNewScoringFunction(this.population.getPerson(new IdImpl(agentId)).getSelectedPlan());
 			this.agentScorers.put(agentId, sf);
 		}
 		return sf;
 	}
 	
-	private static class GroupScore {
+	/*package*/ static class GroupScore {
 		int nagents = 0;
 		double scoreSum = 0;
 	}

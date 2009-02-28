@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
@@ -257,7 +258,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 //				Write out the KML for the EgoNet of a chosen agent
 				this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
-				Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
+				Person testP=this.controler.getPopulation().getPerson(new IdImpl("21924270"));//1pct
 //				Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
 				EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
 				this.log.info(" ... done");

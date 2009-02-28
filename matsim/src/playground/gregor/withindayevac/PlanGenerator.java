@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.BeforeMobsimEvent;
 import org.matsim.controler.events.StartupEvent;
@@ -79,7 +80,7 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 		
 		int count = 0;
 		for (Entry<String,ArrayList<String>> e : this.traces.entrySet()) {
-			Person pers = this.population.getPerson(e.getKey());
+			Person pers = this.population.getPerson(new IdImpl(e.getKey()));
 			Plan plan = pers.getSelectedPlan();
 		
 			List<Link> links = ((CarRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinks();

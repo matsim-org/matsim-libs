@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentEvent;
@@ -130,7 +131,7 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 
 			if (ae.agent == null) {
 				// rebuild event
-				ae.agent = this.plans.getPerson(ae.agentId);
+				ae.agent = this.plans.getPerson(new IdImpl(ae.agentId));
 			}
 
 			// Plan.Type planType = ae.agent.getSelectedPlan().getType();

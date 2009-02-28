@@ -116,7 +116,7 @@ public class Converter {
 				// "extend" the plan of that person with a Leg and an Act
 
 				// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
-				Plan pl = this.pop.getPerson(personId).getSelectedPlan();
+				Plan pl = this.pop.getPerson(new IdImpl(personId)).getSelectedPlan();
 				endTime = convertTime(tabs[3]);
 				double dur = endTime - this.tmpEndTime;
 
@@ -138,7 +138,7 @@ public class Converter {
 				// then start the new person
 
 				if (!this.pop.getPersons().isEmpty()) {
-					Person p = this.pop.getPerson(this.tmpPersonId);
+					Person p = this.pop.getPerson(new IdImpl(this.tmpPersonId));
 					Plan tmpPl = p.getSelectedPlan();
 
 					Leg leg = tmpPl.createLeg(Mode.car);

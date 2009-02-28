@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentEvent;
@@ -148,7 +149,7 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 		allCount[binIdx]++;
 
 		if (ae.agent == null) {
-			ae.agent = this.plans.getPerson(ae.agentId);
+			ae.agent = this.plans.getPerson(new IdImpl(ae.agentId));
 		}
 		Plan selectedPlan = ae.agent.getSelectedPlan();
 

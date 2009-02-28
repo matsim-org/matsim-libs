@@ -25,6 +25,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
@@ -68,13 +69,13 @@ public class PopulationAddCustomAttributes {
 			while ((curr_line = br.readLine()) != null) {
 				String[] entries = curr_line.split("\t", -1);
 
-				Integer nat = Integer.parseInt(entries[CAtts.I_HMAT]);
-				Integer aperz = Integer.parseInt(entries[CAtts.I_APERZ]);
-				Integer aperw = Integer.parseInt(entries[CAtts.I_APERW]);
-				Integer wkata = Integer.parseInt(entries[CAtts.I_WKATA]);
+				Integer nat = Integer.valueOf(entries[CAtts.I_HMAT]);
+				Integer aperz = Integer.valueOf(entries[CAtts.I_APERZ]);
+				Integer aperw = Integer.valueOf(entries[CAtts.I_APERW]);
+				Integer wkata = Integer.valueOf(entries[CAtts.I_WKATA]);
 
-				Person p = pop.getPerson(entries[CAtts.I_PERSON_ID]);
-				if (p == null) { p = pop.getPerson(entries[CAtts.I_PARTNR]); }
+				Person p = pop.getPerson(new IdImpl(entries[CAtts.I_PERSON_ID]));
+				if (p == null) { p = pop.getPerson(new IdImpl(entries[CAtts.I_PARTNR])); }
 				if (p != null) {
 					p.getCustomAttributes().put(CAtts.P_HMAT,nat);
 					p.getCustomAttributes().put(CAtts.P_APERZ,aperz);

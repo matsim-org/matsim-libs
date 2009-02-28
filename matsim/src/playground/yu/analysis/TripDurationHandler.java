@@ -27,6 +27,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.Events;
@@ -87,7 +88,7 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 
 			if (event.agent == null) {
 				// rebuild event
-				event.agent = this.plans.getPerson(event.agentId);
+				event.agent = this.plans.getPerson(new IdImpl(event.agentId));
 			}
 
 			// Type planType = event.agent.getSelectedPlan().getType();d
