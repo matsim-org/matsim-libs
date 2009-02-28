@@ -171,7 +171,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 					float x = vertex.get();
 					float y = vertex.get();
 					// DS We do not need z value here but need to fetch it from buffer!
-					float z =  vertex.get();
+					/*float z = */vertex.get();
 					
 					// Manhattan dist reicht uns hier
 					dist = Math.abs(x-point.x) + Math.abs(y-point.y);

@@ -27,7 +27,6 @@ import java.net.URL;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.Schema;
 
 import org.apache.xerces.jaxp.validation.XMLSchemaFactory;
@@ -51,37 +50,34 @@ import org.xml.sax.SAXException;
  * @author dgrether
  */
 public class MatsimLightSignalSystemsReader {
-	
-	private BasicSignalSystems lightSignalSystems;
-   
-  private BasicSignalSystemsFactory factory = new BasicSignalSystemsFactory();
 
-	
+	private BasicSignalSystems lightSignalSystems;
+
+	private BasicSignalSystemsFactory factory = new BasicSignalSystemsFactory();
+
 	public MatsimLightSignalSystemsReader(BasicSignalSystems lightSignalSystems) {
 		this.lightSignalSystems = lightSignalSystems;
 	}
-	
-	
+
 	public void readFile(final String filename) {
-  	JAXBContext jc;
-    XMLLightSignalSystems xmlLssDefinition;
+		JAXBContext jc;
+		XMLLightSignalSystems xmlLssDefinition;
 		try {
-			
+
 			jc = JAXBContext.newInstance(org.matsim.basic.xml.lightsignalsystems.ObjectFactory.class);
 			ObjectFactory fac = new ObjectFactory();
 			Unmarshaller u = jc.createUnmarshaller();
-			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+//			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 //			SAXParser saxParser = parserFactory.newSAXParser();
 //			XMLReader xmlReader = saxParser.getXMLReader();
 //			MatsimXmlEntityResolver resolver = new MatsimXmlEntityResolver();
 //			EntityResolver resolver = new MatsimXmlParser();
 //			xmlReader.setEntityResolver(resolver);
 //			xmlReader.setContentHandler(resolver);
-			
+
 //			SAXSource saxSource = new SAXSource(xmlReader, new InputSource(new FileInputStream(filename)));
-			
+
 			XMLSchemaFactory schemaFac = new XMLSchemaFactory();
-//			schemaFac.
 			Schema schema = schemaFac.newSchema(new URL("http://www.matsim.org/files/dtd/lightSignalSystems_v1.0.xsd"));
 			u.setSchema(schema);
 //			xmlLssDefinition = (XMLLightSignalSystems)u.unmarshal(saxSource);
@@ -108,7 +104,7 @@ public class MatsimLightSignalSystemsReader {
 				}
 				lightSignalSystems.addLanesToLinkAssignment(l2lAssignment);
 			}
-			
+
 			BasicSignalSystemDefinition lssdef;
 			for (XMLLightSignalSystemDefinitionType xmllssDef : xmlLssDefinition.getLightSignalSystemDefinition()) {
 				lssdef = factory.createLightSignalSystemDefinition(new IdImpl(xmllssDef.getId()));
@@ -136,18 +132,17 @@ public class MatsimLightSignalSystemsReader {
 			e.printStackTrace();
 		}
 		catch (MalformedURLException e) {
-			 e.printStackTrace();
-		 }
+			e.printStackTrace();
+		}
 //		catch (SAXException e) {
 //			 e.printStackTrace();
 //		} 
- catch (SAXException e) {
+		catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 //		} catch (ParserConfigurationException e) {
-	// TODO Auto-generated catch block
-//	e.printStackTrace();
-}
+//			e.printStackTrace();
+		}
 
 	}
 }

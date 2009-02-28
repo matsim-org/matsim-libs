@@ -241,10 +241,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	double stepToTime = 0;
 	
-	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
+	public boolean requestNewTime(final int time, final TimePreference searchDirection) throws RemoteException {
 		// if requested time lies in the past, sorry we cannot do that right now
 		if (time < localTime) {
-			time = localTime;
+			// time = localTime;
 			stepToTime = 0;
 			// if forward search is OK, then the actual timestep is the BEST fit
 			return (searchDirection != TimePreference.EARLIER);
