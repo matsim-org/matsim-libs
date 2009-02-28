@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
@@ -33,8 +34,8 @@ import org.matsim.counts.Volume;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.NetworkLayer;
 
 /**
  * This algorithm can be used to obtain a List of CountSimComparison objects from the
@@ -61,13 +62,13 @@ public class CountsComparisonAlgorithm {
 
 	private Double distanceFilter = null;
 
-	private final NetworkLayer network;
+	private final Network network;
 
 	private double countsScaleFactor;
 
 	private final static Logger log = Logger.getLogger(CountsComparisonAlgorithm.class);
 
-	public CountsComparisonAlgorithm(final CalcLinkStats linkStats, final Counts counts, final NetworkLayer network) {
+	public CountsComparisonAlgorithm(final CalcLinkStats linkStats, final Counts counts, final Network network) {
 		this.linkStats = linkStats;
 		this.counts = counts;
 		this.countSimComp = new ArrayList<CountSimComparison>();
@@ -150,7 +151,7 @@ public class CountsComparisonAlgorithm {
 	 */
 	public void setDistanceFilter(final Double distance, final String nodeId) {
 		this.distanceFilter = distance;
-	  this.distanceFilterNode = this.network.getNode(nodeId);
+	  this.distanceFilterNode = this.network.getNode(new IdImpl(nodeId));
 	}
 
 	public void setCountsScaleFactor(final double countsScaleFactor) {

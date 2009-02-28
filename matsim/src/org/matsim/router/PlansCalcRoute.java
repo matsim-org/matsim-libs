@@ -27,6 +27,7 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -66,7 +67,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	/**
 	 * Creates a rerouting strategy module using the rerouting of the factory
 	 */
-	public PlansCalcRoute(final NetworkLayer network, final TravelCost costCalculator,
+	public PlansCalcRoute(final Network network, final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		super();
 		this.factory = factory;
@@ -79,7 +80,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	/**
 	 * Creates a rerouting strategy module using dijkstra rerouting
 	 */
-	public PlansCalcRoute(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+	public PlansCalcRoute(final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
 

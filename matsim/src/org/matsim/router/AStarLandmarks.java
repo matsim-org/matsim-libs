@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.NetworkLayer;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -76,7 +76,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @param timeFunction Calculates the travel time on links.
 	 * @param costFunction Calculates the travel cost on links.
 	 */
-	public AStarLandmarks(NetworkLayer network, PreProcessLandmarks preProcessData,
+	public AStarLandmarks(Network network, PreProcessLandmarks preProcessData,
 			TravelCost costFunction, TravelTime timeFunction) {
 		this(network, preProcessData, costFunction, timeFunction, 1);
 	}
@@ -87,7 +87,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @param preProcessData The pre-process data (containing the landmarks etc.).
 	 * @param timeFunction Calculates the travel time on links.
 	 */
-	public AStarLandmarks(NetworkLayer network, PreProcessLandmarks preProcessData,
+	public AStarLandmarks(Network network, PreProcessLandmarks preProcessData,
 			TravelTime timeFunction) {
 		this(network, preProcessData, preProcessData.getCostFunction(), timeFunction, 1);
 	}
@@ -102,9 +102,9 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * i.e. it visits less nodes during routing and is thus faster, but for an
 	 * overdo factor > 1, it is not guaranteed that the router returns the
 	 * least-cost paths. Rather it tends to return distance-minimal paths.
-	 * @see #AStarLandmarks(NetworkLayer, PreProcessLandmarks, TravelTime)
+	 * @see #AStarLandmarks(Network, PreProcessLandmarks, TravelTime)
 	 */
-	public AStarLandmarks(NetworkLayer network, PreProcessLandmarks preProcessData,
+	public AStarLandmarks(Network network, PreProcessLandmarks preProcessData,
 			TravelCost costFunction, TravelTime timeFunction, double overdoFactor) {
 		super(network, preProcessData, costFunction, timeFunction, overdoFactor);
 

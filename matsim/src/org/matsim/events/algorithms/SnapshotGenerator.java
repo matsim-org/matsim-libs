@@ -45,7 +45,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.interfaces.basic.v01.BasicNetwork;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
@@ -56,7 +56,7 @@ import org.matsim.utils.vis.snapshots.writers.SnapshotWriter;
 public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
 		LinkLeaveEventHandler, AgentWait2LinkEventHandler, AgentStuckEventHandler {
 
-	private final NetworkLayer network;
+	private final Network network;
 	private int lastSnapshotIndex = -1;
 	private final double snapshotPeriod;
 	protected final HashMap<String, EventLink> eventLinks;
@@ -65,7 +65,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	private final double capCorrectionFactor;
 	private final String snapshotStyle;
 
-	public SnapshotGenerator(final NetworkLayer network, final double snapshotPeriod) {
+	public SnapshotGenerator(final Network network, final double snapshotPeriod) {
 		this.network = network;
 		this.eventLinks = new HashMap<String, EventLink>((int)(network.getLinks().size()*1.1), 0.95f);
 		this.eventAgents = new HashMap<String, EventAgent>(1000, 0.95f);

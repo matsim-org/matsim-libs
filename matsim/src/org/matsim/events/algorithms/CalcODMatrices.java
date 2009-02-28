@@ -23,22 +23,23 @@ package org.matsim.events.algorithms;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
-import org.matsim.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Location;
 import org.matsim.world.ZoneLayer;
 
 public class CalcODMatrices implements AgentArrivalEventHandler, AgentDepartureEventHandler {
 
-	private final NetworkLayer network;
+	private final Network network;
 	private final ZoneLayer tvzLayer;
 	private final TreeMap<String, Location> agents = new TreeMap<String, Location>(); // <AgentID, StartLoc>
 	private final TreeMap<String, Double> agentstime = new TreeMap<String, Double>();
@@ -47,7 +48,7 @@ public class CalcODMatrices implements AgentArrivalEventHandler, AgentDepartureE
 	private double maxTime = Double.POSITIVE_INFINITY;//Integer.MAX_VALUE;
 	public int counter = 0;
 
-	public CalcODMatrices(final NetworkLayer network, final ZoneLayer tvzLayer, final String id) {
+	public CalcODMatrices(final Network network, final ZoneLayer tvzLayer, final String id) {
 		this.network = network;
 		this.tvzLayer = tvzLayer;
 		this.matrix = Matrices.getSingleton().createMatrix(id, tvzLayer, "od for miv");
@@ -115,7 +116,7 @@ public class CalcODMatrices implements AgentArrivalEventHandler, AgentDepartureE
 	}
 
 	private Location getLocation(final String linkId) {
-		Link link = this.network.getLink(linkId);
+		Link link = this.network.getLink(new IdImpl(linkId));
 
 		ArrayList<Location> locs = this.tvzLayer.getNearestLocations(link.getCenter(), null);
 		if (locs.size() > 0) {

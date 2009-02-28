@@ -26,8 +26,8 @@ import java.util.PriorityQueue;
 
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.NetworkLayer;
 import org.matsim.router.util.PreProcessEuclidean;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -88,7 +88,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * @param preProcessData
 	 * @param timeFunction
 	 */
-	public AStarEuclidean(NetworkLayer network, PreProcessEuclidean preProcessData,
+	public AStarEuclidean(Network network, PreProcessEuclidean preProcessData,
 			TravelTime timeFunction) {
 		this(network, preProcessData, timeFunction, 1);
 	}
@@ -103,7 +103,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * overdo factor > 1, it is not guaranteed that the router returns the
 	 * least-cost paths. Rather it tends to return distance-minimal paths.
 	 */
-	public AStarEuclidean(NetworkLayer network, PreProcessEuclidean preProcessData,
+	public AStarEuclidean(Network network, PreProcessEuclidean preProcessData,
 			TravelTime timeFunction, double overdoFactor) {
 		this(network, preProcessData, preProcessData.getCostFunction(),
 				timeFunction, overdoFactor);
@@ -121,7 +121,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * overdo factor > 1, it is not guaranteed that the router returns the
 	 * least-cost paths. Rather it tends to return distance-minimal paths.
 	 */
-	public AStarEuclidean(NetworkLayer network,
+	public AStarEuclidean(Network network,
 			PreProcessEuclidean preProcessData,
 			TravelCost costFunction, TravelTime timeFunction, double overdoFactor) {
 		super(network, costFunction, timeFunction, preProcessData);

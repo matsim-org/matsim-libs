@@ -29,7 +29,7 @@ import java.util.TreeMap;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.io.IOUtils;
@@ -57,21 +57,21 @@ public class CalcLinkStats {
 	private int count = 0;
 	private final Map<String, LinkData> linkData;
 	private final int nofHours;
-	private final NetworkLayer network;
+	private final Network network;
 
 	private static final int MIN = 0;
 	private static final int MAX = 1;
 	private static final int SUM = 2;
 	private static final int NOF_STATS = 3;
 
-	public CalcLinkStats(final NetworkLayer network) {
+	public CalcLinkStats(final Network network) {
 		this.network = network;
 		this.linkData = new TreeMap<String, LinkData>();//((int)(1.1*this.network.getLinks().size()), 0.95f);
 		this.nofHours = 24;
 		reset();
 	}
 
-	public CalcLinkStats(final NetworkLayer network, double vol_scale_factor) {
+	public CalcLinkStats(final Network network, double vol_scale_factor) {
 		this(network);
 		this.volScaleFactor = vol_scale_factor;
 	}

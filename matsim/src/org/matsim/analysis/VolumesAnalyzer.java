@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 
 /**
  * Counts the number of vehicles leaving a link, aggregated into time bins of a specified size.
@@ -40,7 +40,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler {
 	private final int maxSlotIndex;
 	private final Map<String, int[]> links;
 
-	public VolumesAnalyzer(final int timeBinSize, final int maxTime, final NetworkLayer network) {
+	public VolumesAnalyzer(final int timeBinSize, final int maxTime, final Network network) {
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
 		this.maxSlotIndex = (this.maxTime/this.timeBinSize) + 1;

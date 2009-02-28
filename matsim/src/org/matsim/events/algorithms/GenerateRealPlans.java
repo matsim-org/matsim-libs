@@ -42,11 +42,11 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
-import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationImpl;
 import org.matsim.utils.misc.Time;
@@ -66,7 +66,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 
 	private final Population realplans = new PopulationImpl(PopulationImpl.NO_STREAMING);
 	private Population oldplans = null;
-	private NetworkLayer network = null;
+	private Network network = null;
 
 	// routes = TreeMap<agent-id, route-nodes = ArrayList<nodes>>
 	private final TreeMap<String, ArrayList<Node>> routes = new TreeMap<String, ArrayList<Node>>();
@@ -86,7 +86,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 	 *
 	 * @param network the network used for lookups
 	 */
-	public void setNetworkLayer(final NetworkLayer network) {
+	public void setNetworkLayer(final Network network) {
 		this.network = network;
 	}
 
@@ -247,7 +247,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 		if (event.link != null) {
 			link = event.link;
 		} else if (this.network != null) {
-			link = this.network.getLink(event.linkId);
+			link = this.network.getLink(new IdImpl(event.linkId));
 		}
 		if (link != null) {
 			String agentId = event.agentId;

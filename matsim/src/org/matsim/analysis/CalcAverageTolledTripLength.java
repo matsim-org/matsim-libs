@@ -28,7 +28,7 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
@@ -43,10 +43,10 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Agent
 	private double sumLength = 0.0;
 	private int cntTrips = 0;
 	private RoadPricingScheme scheme = null;
-	private NetworkLayer network = null;
+	private Network network = null;
 	private TreeMap<String, Double> agentDistance = null;
 
-	public CalcAverageTolledTripLength(final NetworkLayer network, final RoadPricingScheme scheme) {
+	public CalcAverageTolledTripLength(final Network network, final RoadPricingScheme scheme) {
 		this.scheme = scheme;
 		this.network = network;
 		this.agentDistance = new TreeMap<String, Double>();
@@ -57,7 +57,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Agent
 		if (cost != null) {
 			Link link = event.link;
 			if (link == null) {
-				link = this.network.getLink(event.linkId);
+				link = this.network.getLink(new IdImpl(event.linkId));
 			}
 			if (link != null) {
 				Double length = this.agentDistance.get(event.agentId);

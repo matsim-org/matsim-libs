@@ -54,7 +54,7 @@ import org.matsim.gbl.MatsimResource;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.misc.Time;
@@ -141,7 +141,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	/**
 	 * the network
 	 */
-	private final NetworkLayer network;
+	private final Network network;
 	/**
 	 * the srs transformation used
 	 */
@@ -212,7 +212,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param network
 	 * @param coordTransform
 	 */
-	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final NetworkLayer network, final CoordinateTransformation coordTransform) {
+	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final Network network, final CoordinateTransformation coordTransform) {
 		super(countSimCompList);
 		this.network = network;
 		this.coordTransform = coordTransform;

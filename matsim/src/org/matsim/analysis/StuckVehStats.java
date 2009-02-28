@@ -23,6 +23,7 @@ package org.matsim.analysis;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
@@ -30,7 +31,7 @@ import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.utils.misc.Time;
 
 public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEventHandler, AgentWait2LinkEventHandler {
@@ -42,9 +43,9 @@ public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEven
 	private int[] waitTimes = new int[2*60 + 1]; // the time an agent spends waiting to enter a link from parking; counts per minute up to 2 hours
 	private int[] driveTimes = new int[2*60 + 1]; // the time an agent spends driving until it is stuck; counts per minute up to 2 hours
 	private int[] travelTimes = new int[2*60 + 1]; // the time an agent spends traveling (wait2link + drive) until it is stuck
-	private NetworkLayer network = null;
+	private Network network = null;
 	
-	public StuckVehStats(NetworkLayer network) {
+	public StuckVehStats(Network network) {
 		this.network = network;
 		reset(-1);
 	}
@@ -135,7 +136,7 @@ public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEven
 		System.out.println("LINK\tCAPACITY\tFREESPEED\tLENGTH\tcountStuck\ttimesStuck");
 		for (String linkId : stuckLinkTimes.keySet()) {
 			ArrayList<Double> times = stuckLinkTimes.get(linkId);
-			Link link = network.getLink(linkId);
+			Link link = network.getLink(new IdImpl(linkId));
 			System.out.print(linkId + "\t" + link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\t" + link.getFreespeed(Time.UNDEFINED_TIME) + "\t" + link.getLength() + "\t" + times.size() + "\t");
 			for (Double time : times) System.out.print(time + " ");
 			System.out.println();
