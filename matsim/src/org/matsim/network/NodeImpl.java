@@ -35,22 +35,6 @@ import org.matsim.interfaces.core.v01.Node;
 public class NodeImpl extends BasicNodeImpl implements Node {
 
 	//////////////////////////////////////////////////////////////////////
-	// constants
-	//////////////////////////////////////////////////////////////////////
-
-	/* See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
-	 * for description of node types. It's the graph matching paper. */
-	public final static int EMPTY        = 0;
-	public final static int SOURCE       = 1;
-	public final static int SINK         = 2;
-	public final static int DEADEND      = 3;
-	public final static int PASS1WAY     = 4;
-	public final static int PASS2WAY     = 5;
-	public final static int START1WAY    = 6;
-	public final static int END1WAY      = 7;
-	public final static int INTERSECTION = 8;
-
-	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
