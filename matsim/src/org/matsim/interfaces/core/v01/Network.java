@@ -30,6 +30,8 @@ import org.matsim.network.NetworkFactory;
 // FIXME [MR] still imports NetworkFactory from outside interface
 public interface Network extends BasicNetwork<Node, Link> {
 
+	public String getName();
+	
 	/**
 	 * @param capPeriod the capacity-period in seconds
 	 */
