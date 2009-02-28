@@ -21,16 +21,12 @@ package org.matsim.interfaces.basic.v01;
 
 import java.util.Map;
 
-
 /**
-*
 * @author dgrether
-*
 */
-
 public interface BasicPopulation<T extends BasicPerson> {
-	// Bin inzwischen der Meinung, dass wir es bei "population" lassen sollten, und dafür "households" 
-	// noch einhängen sollten.  kai, feb09
+	// Bin inzwischen der Meinung, dass wir es bei "population" lassen sollten, und dafuer "households" 
+	// noch einhaengen sollten.  kai, feb09
 
 	public String getName();
 	
@@ -42,9 +38,6 @@ public interface BasicPopulation<T extends BasicPerson> {
 
 	public Map<Id, T> getPersons();
 	
-	@Deprecated
-	public T getPerson(String personId);
-
 	public BasicPopulationBuilder getPopulationBuilder();
 	
 	// TODO:

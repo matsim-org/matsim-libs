@@ -28,7 +28,6 @@ import org.matsim.interfaces.basic.v01.BasicPopulation;
 import org.matsim.interfaces.basic.v01.BasicPopulationBuilder;
 import org.matsim.interfaces.basic.v01.Id;
 
-
 public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulation<T> {
 	
 	private String name = null;
@@ -37,9 +36,6 @@ public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulat
 	
 	private BasicPopulationBuilder pb = new BasicPopulationBuilderImpl(this);
 
-	/**
-	 * @see org.matsim.interfaces.basic.v01.BasicPopulation#addPerson(T)
-	 */
 	public void addPerson(T person) {
 		// validation
 		if (this.persons.containsKey(person.getId())) {
@@ -50,10 +46,6 @@ public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulat
 
 	public final T getPerson(Id personId) {
 		return this.persons.get(personId);
-	}
-
-	public final T getPerson(String personId) {
-		return this.persons.get(new IdImpl(personId));
 	}
 
 	protected void clearPersons() {
