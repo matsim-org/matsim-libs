@@ -27,7 +27,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NodeImpl;
 import org.matsim.network.algorithms.NetworkCalcTopoType;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.network.algorithms.NetworkMergeDoubleLinks;
@@ -76,7 +75,7 @@ public class CleanNetwork {
 
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		Iterator<? extends Node> n_it = network.getNodes().values().iterator();
-		while (n_it.hasNext()) { Node n = n_it.next(); if (n.getTopoType() == NodeImpl.EMPTY) { nodes.add(n); } }
+		while (n_it.hasNext()) { Node n = n_it.next(); if (n.getTopoType() == NetworkCalcTopoType.EMPTY) { nodes.add(n); } }
 		System.out.println("    removing " + nodes.size() + " nodes...");
 		for (int i=0; i<nodes.size(); i++) { network.removeNode(nodes.get(i)); }
 		System.out.println("    done.");
