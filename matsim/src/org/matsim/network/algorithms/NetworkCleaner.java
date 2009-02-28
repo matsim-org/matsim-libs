@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.NetworkLayer;
 
 /**
  * Ensures that each link in the network can be reached by any other link. 
@@ -105,7 +104,7 @@ public class NetworkCleaner {
 		return clusterNodes;
 	}
 
-	public void run(final NetworkLayer network) {
+	public void run(final Network network) {
 		final Map<Id, Node> visitedNodes = new TreeMap<Id, Node>();
 		Map<Id, Node> biggestCluster = new TreeMap<Id, Node>();
 

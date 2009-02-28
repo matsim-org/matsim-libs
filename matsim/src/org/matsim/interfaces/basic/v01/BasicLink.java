@@ -20,7 +20,7 @@
 
 package org.matsim.interfaces.basic.v01;
 
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -94,7 +94,7 @@ public interface BasicLink {
 	 * @param time the time at which the capacity is requested. Use {@link Time#UNDEFINED_TIME} to get the default value.
 	 * @return the capacity per network's capperiod timestep
 	 * 
-	 * @see NetworkLayer#getCapacityPeriod()
+	 * @see Network#getCapacityPeriod()
 	 */
 	public double getCapacity(double time);
 

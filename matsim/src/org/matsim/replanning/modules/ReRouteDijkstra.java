@@ -20,7 +20,7 @@
 
 package org.matsim.replanning.modules;
 
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.DijkstraFactory;
@@ -36,9 +36,9 @@ public class ReRouteDijkstra extends MultithreadedModuleA {
 
 	TravelCost costCalculator = null;
 	TravelTime timeCalculator = null;
-	NetworkLayer network = null;
+	Network network = null;
 
-	public ReRouteDijkstra(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+	public ReRouteDijkstra(final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this.network = network;
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;

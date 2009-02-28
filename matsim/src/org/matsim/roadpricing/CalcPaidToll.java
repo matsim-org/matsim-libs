@@ -32,7 +32,7 @@ import org.matsim.events.PersonEvent;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
 /**
@@ -51,11 +51,11 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 
 	final RoadPricingScheme scheme;
 	final TreeMap<String, AgentInfo> agents = new TreeMap<String, AgentInfo>();
-	private final NetworkLayer network;
+	private final Network network;
 
 	private TollBehaviourI handler = null;
 
-	public CalcPaidToll(final NetworkLayer network, final RoadPricingScheme scheme) {
+	public CalcPaidToll(final Network network, final RoadPricingScheme scheme) {
 		super();
 		this.network = network;
 		this.scheme = scheme;
@@ -73,7 +73,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	public void handleEvent(final LinkEnterEvent event) {
 		Link link = event.link;
 		if (link == null) {
-			link = this.network.getLink(event.linkId);
+			link = this.network.getLink(new IdImpl(event.linkId));
 		}
 		this.handler.handleEvent(event, link);
 	}
@@ -81,7 +81,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	public void handleEvent(final AgentWait2LinkEvent event) {
 		Link link = event.link;
 		if (link == null) {
-			link = this.network.getLink(event.linkId);
+			link = this.network.getLink(new IdImpl(event.linkId));
 		}
 		this.handler.handleEvent(event, link);
 	}

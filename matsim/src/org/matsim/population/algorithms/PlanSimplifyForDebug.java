@@ -28,9 +28,9 @@ import java.util.Set;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.network.NetworkLayer;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
@@ -61,7 +61,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 
-	public PlanSimplifyForDebug(final NetworkLayer network) {
+	public PlanSimplifyForDebug(final Network network) {
 		this.homeActs = new HashSet<String>();
 		// this.homeActs.add("h0.5");
 

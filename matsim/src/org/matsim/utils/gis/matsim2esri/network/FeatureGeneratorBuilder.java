@@ -20,18 +20,18 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
-import org.matsim.utils.geometry.geotools.MGC;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
+import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Network;
+import org.matsim.utils.geometry.geotools.MGC;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class FeatureGeneratorBuilder {
 
 
-	private final NetworkLayer network;
+	private final Network network;
 	private CoordinateReferenceSystem crs;
 
 	private Constructor<? extends FeatureGenerator> featureGeneratorPrototypeContructor;
@@ -40,10 +40,10 @@ public class FeatureGeneratorBuilder {
 	private Constructor<? extends WidthCalculator> widthCalculatorPrototypeContructor;
 
 	private double widthCoefficient = 1;
-	private static final Class[] WIDTH_CALCULATOR_PROTOTYPECONSTRUCTOR =  { NetworkLayer.class, Double.class};
+	private static final Class[] WIDTH_CALCULATOR_PROTOTYPECONSTRUCTOR =  { Network.class, Double.class};
 
 
-	public FeatureGeneratorBuilder(final NetworkLayer network) {
+	public FeatureGeneratorBuilder(final Network network) {
 		this.network = network;
 		this.crs = MGC.getCRS(Gbl.getConfig().global().getCoordinateSystem());
 		try {

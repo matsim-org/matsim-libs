@@ -24,7 +24,7 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
@@ -52,7 +52,7 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimator extends FixedRouteLegT
 	public CharyparEtAlCompatibleLegTravelTimeEstimator(
 			TravelTime linkTravelTimeEstimator,
 			TravelCost linkTravelCostEstimator,
-			DepartureDelayAverageCalculator depDelayCalc, NetworkLayer network) {
+			DepartureDelayAverageCalculator depDelayCalc, Network network) {
 		super(linkTravelTimeEstimator, linkTravelCostEstimator, depDelayCalc, network);
 	}
 

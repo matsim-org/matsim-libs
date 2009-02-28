@@ -22,6 +22,7 @@ package org.matsim.planomat.costestimators;
 
 import java.util.HashMap;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
@@ -30,7 +31,7 @@ import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 
@@ -51,7 +52,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 	private final HashMap<EnterEvent, Double> enterEvents = new HashMap<EnterEvent, Double>();
-	private NetworkLayer network = null;
+	private Network network = null;
 	private final HashMap<Link, LinearInterpolatingTravelTimeData> linkData;
 	private final int timeslice;
 
@@ -188,7 +189,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 
 	}
 
-	public LinearInterpolatingTTCalculator(final NetworkLayer network, final int timeslice) {
+	public LinearInterpolatingTTCalculator(final Network network, final int timeslice) {
 		super();
 		this.network = network;
 		this.timeslice = timeslice;
@@ -196,7 +197,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 		resetTravelTimes();
 	}
 
-	public LinearInterpolatingTTCalculator(final NetworkLayer network) {
+	public LinearInterpolatingTTCalculator(final Network network) {
 		this(network, 15*60);
 	}
 
@@ -229,7 +230,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 				Gbl.errorMsg("");
 			}
 			Link link = event.link;
-			if (null == link) link = this.network.getLink(event.linkId);
+			if (null == link) link = this.network.getLink(new IdImpl(event.linkId));
 			if (null != link) {
 				getTravelTimeRole(link).addTravelTime(starttime.intValue(), timediff);
 			}

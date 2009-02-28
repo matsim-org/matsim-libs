@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.geotools.MGC;
@@ -47,15 +48,15 @@ public class Network2ESRIShape {
 	private static Logger log = Logger.getLogger(Network2ESRIShape.class);
 
 	private final FeatureGenerator featureGenerator;
-	private final NetworkLayer network;
+	private final Network network;
 	private final String filename;
 
 
-	public Network2ESRIShape(final NetworkLayer network, final String filename) {
+	public Network2ESRIShape(final Network network, final String filename) {
 		this(network, filename, new FeatureGeneratorBuilder(network));
 	}
 
-	public Network2ESRIShape(final NetworkLayer network, final String filename, final FeatureGeneratorBuilder builder) {
+	public Network2ESRIShape(final Network network, final String filename, final FeatureGeneratorBuilder builder) {
 		this.network = network;
 		this.filename = filename;
 		this.featureGenerator = builder.createFeatureGenerator();

@@ -23,8 +23,8 @@ package org.matsim.population.routes;
 import java.util.Map;
 
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Route;
-import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.SubsequentLinksAnalyzer;
 
 public class CompressedCarRouteFactory implements RouteFactory {
@@ -37,7 +37,7 @@ public class CompressedCarRouteFactory implements RouteFactory {
 	 *
 	 * @param network
 	 */
-	public CompressedCarRouteFactory(final NetworkLayer network) {
+	public CompressedCarRouteFactory(final Network network) {
 		this(new SubsequentLinksAnalyzer(network).getSubsequentLinks());
 	}
 

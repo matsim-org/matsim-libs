@@ -27,8 +27,6 @@ import java.net.URL;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.Schema;
 
@@ -73,7 +71,7 @@ public class MatsimLightSignalSystemsReader {
 			ObjectFactory fac = new ObjectFactory();
 			Unmarshaller u = jc.createUnmarshaller();
 			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-			SAXParser saxParser = parserFactory.newSAXParser();
+//			SAXParser saxParser = parserFactory.newSAXParser();
 //			XMLReader xmlReader = saxParser.getXMLReader();
 //			MatsimXmlEntityResolver resolver = new MatsimXmlEntityResolver();
 //			EntityResolver resolver = new MatsimXmlParser();
@@ -146,9 +144,9 @@ public class MatsimLightSignalSystemsReader {
  catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
+//		} catch (ParserConfigurationException e) {
 	// TODO Auto-generated catch block
-	e.printStackTrace();
+//	e.printStackTrace();
 }
 
 	}

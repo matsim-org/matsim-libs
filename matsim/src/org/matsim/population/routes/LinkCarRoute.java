@@ -28,6 +28,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
 
@@ -60,7 +61,7 @@ public class LinkCarRoute extends AbstractRoute implements CarRoute {
 
 	@Override
 	public void setLinkIds(final List<Id> linkIds) {
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
+		Network network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		if (network == null) {
 			throw new RuntimeException("NetworkLayer does not exist in world.");
 		}

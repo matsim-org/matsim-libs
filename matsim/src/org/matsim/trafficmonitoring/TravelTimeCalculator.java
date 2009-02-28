@@ -22,6 +22,7 @@ package org.matsim.trafficmonitoring;
 
 import java.util.HashMap;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.LinkEnterEvent;
@@ -31,7 +32,7 @@ import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.router.util.TravelTime;
 
 public class TravelTimeCalculator implements TravelTime, LinkEnterEventHandler, LinkLeaveEventHandler, 
@@ -39,7 +40,7 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 	private final HashMap<String, EnterEvent> enterEvents = new HashMap<String, EnterEvent>();
-	private NetworkLayer network = null;
+	private Network network = null;
 	private final HashMap<Link, TravelTimeData> linkData;
 	private final int timeslice;
 	private final int numSlots;
@@ -48,19 +49,19 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 
 
 
-	public TravelTimeCalculator(final NetworkLayer network) {
+	public TravelTimeCalculator(final Network network) {
 		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
 	}
 
-	public TravelTimeCalculator(final NetworkLayer network, final int timeslice) {
+	public TravelTimeCalculator(final Network network, final int timeslice) {
 		this(network, timeslice, 30*3600); // default: 30 hours at most
 	}
 
-	public TravelTimeCalculator(NetworkLayer network, int timeslice,	int maxTime) {
+	public TravelTimeCalculator(Network network, int timeslice,	int maxTime) {
 		this(network, timeslice, maxTime, new TravelTimeAggregatorFactory());
 	}
 
-	public TravelTimeCalculator(final NetworkLayer network, final int timeslice, final int maxTime, TravelTimeAggregatorFactory factory) {
+	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime, TravelTimeAggregatorFactory factory) {
 		this.factory = factory;
 		this.network = network;
 		this.timeslice = timeslice;
@@ -106,7 +107,7 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	public void handleEvent(final LinkLeaveEvent event) {
 		EnterEvent e = this.enterEvents.remove(event.agentId);
 		if ((e != null) && e.linkId.equals(event.linkId)) {
-			if (event.link == null) event.link = this.network.getLink(event.linkId);
+			if (event.link == null) event.link = this.network.getLink(new IdImpl(event.linkId));
 			if (event.link != null) {
 				this.aggregator.addTravelTime(getTravelTimeData(event.link, true),e.time,event.time);
 			}
@@ -123,7 +124,7 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	public void handleEvent(AgentStuckEvent event) {
 		EnterEvent e = this.enterEvents.remove(event.agentId);
 		if ((e != null) && e.linkId.equals(event.linkId)) {
-			if (event.link == null) event.link = this.network.getLink(event.linkId);
+			if (event.link == null) event.link = this.network.getLink(new IdImpl(event.linkId));
 			if (event.link != null) {
 				this.aggregator.addStuckEventTravelTime(getTravelTimeData(event.link, true),e.time,event.time);
 			}

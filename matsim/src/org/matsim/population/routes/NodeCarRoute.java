@@ -24,10 +24,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
@@ -67,7 +69,7 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 	}
 
 	public final void setNodes(final String route) {
-		NetworkLayer layer = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
+		Network layer = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		if (layer == null) {
 			throw new RuntimeException("NetworkLayer does not exist in world.");
 		}
@@ -86,7 +88,7 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 		if ((parts.length > 0) && (parts[0].equals(""))) { min = 1; }
 
 		for (int i = min; i < parts.length; i++) {
-			Node n = layer.getNode(parts[i]);
+			Node n = layer.getNode(new IdImpl(parts[i]));
 			if (n == null) {
 				throw new RuntimeException("Node not found in network. node id = " + parts[i]);
 			}

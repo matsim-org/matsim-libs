@@ -30,8 +30,8 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.network.NetworkLayer;
 import org.matsim.population.PlanImpl;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -43,7 +43,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
  */
 public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 
-	private NetworkLayer network = null;
+	private Network network = null;
 	private Set<Id> aOI = new HashSet<Id>();
 	private PlansCalcRoute router = null;
 
@@ -54,7 +54,7 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 	// count[3] --> # beeline intersect AOI, plan leg intersect AOI
 	public int[] count;
 
-	public RouteAndBeelineTransitionCheck(final NetworkLayer net, final Set<Id> areaOfInterest) {
+	public RouteAndBeelineTransitionCheck(final Network net, final Set<Id> areaOfInterest) {
 		this.network = net;
 		this.aOI = areaOfInterest;
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();

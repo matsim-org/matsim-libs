@@ -20,7 +20,7 @@
 
 package org.matsim.replanning.modules;
 
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.AStarLandmarksFactory;
@@ -32,7 +32,7 @@ public class ReRouteLandmarks extends ReRouteDijkstra {
 
 	private PreProcessLandmarks commonRouterData = null;
 
-	public ReRouteLandmarks(NetworkLayer network, TravelCost costCalculator,
+	public ReRouteLandmarks(Network network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterData) {
 		super(network, costCalculator, timeCalculator);
 		this.commonRouterData  = commonRouterData;

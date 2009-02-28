@@ -27,9 +27,9 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.network.NetworkLayer;
 import org.matsim.router.AStarLandmarks;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.AStarLandmarksFactory;
@@ -61,7 +61,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @param factory
 	 * @param scheme
 	 */
-	public PlansCalcAreaTollRoute(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator,
+	public PlansCalcAreaTollRoute(final Network network, final TravelCost costCalculator, final TravelTime timeCalculator,
 			LeastCostPathCalculatorFactory factory, final RoadPricingScheme scheme) {
 		super(network, costCalculator, timeCalculator, factory);
 		this.scheme = scheme;
@@ -80,7 +80,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @param timeCalculator
 	 * @param scheme
 	 */
-	public PlansCalcAreaTollRoute(final NetworkLayer network, final PreProcessLandmarks preProcessData, final TravelCost costCalculator, final TravelTime timeCalculator, final RoadPricingScheme scheme) {
+	public PlansCalcAreaTollRoute(final Network network, final PreProcessLandmarks preProcessData, final TravelCost costCalculator, final TravelTime timeCalculator, final RoadPricingScheme scheme) {
 		super(network, costCalculator, timeCalculator, new AStarLandmarksFactory(preProcessData));
 		this.scheme = scheme;
 		this.timeCalculator = timeCalculator;
@@ -133,7 +133,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 				Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 				Node endNode = toLink.getFromNode(); // the target is the start of the link
 
-				CarRoute tollRoute = (CarRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, fromLink, toLink);
+				CarRoute tollRoute = (CarRoute) ((Network) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, fromLink, toLink);
 				CarRoute noTollRoute = null;
 
 				// # start searching a route where agent may pay the toll
@@ -165,7 +165,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 					 * will still be a route returned.
 					 */
 					Path path = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
-					noTollRoute = (CarRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, fromLink, toLink);
+					noTollRoute = (CarRoute) ((Network) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, fromLink, toLink);
 					noTollRoute.setNodes(fromLink, path.nodes, toLink);
 					noTollRoute.setTravelTime((int) path.travelTime);
 					noTollRoute.setTravelCost(path.travelCost);

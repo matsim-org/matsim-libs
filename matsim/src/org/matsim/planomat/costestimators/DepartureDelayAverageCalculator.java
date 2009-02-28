@@ -29,7 +29,7 @@ import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 
 /**
  * Computes average departure delay on a link in a given time slot.
@@ -38,7 +38,7 @@ import org.matsim.network.NetworkLayer;
  */
 public class DepartureDelayAverageCalculator implements AgentDepartureEventHandler, LinkLeaveEventHandler {
 
-	private NetworkLayer network;
+	private Network network;
 	private int timeBinSize;
 	private HashMap<DepartureEvent, Double> departureEventsTimes = new HashMap<DepartureEvent, Double>();
 	private final HashMap<Link, DepartureDelayData> linkData;
@@ -49,7 +49,7 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public DepartureDelayAverageCalculator(NetworkLayer network, int timeBinSize) {
+	public DepartureDelayAverageCalculator(Network network, int timeBinSize) {
 		super();
 		this.network = network;
 		this.timeBinSize = timeBinSize;
@@ -150,7 +150,7 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 				throw new RuntimeException("departureDelay cannot be < 0.");
 			}
 			Link link = event.link;
-			if (null == link) link = this.network.getLink(event.linkId);
+			if (null == link) link = this.network.getLink(new IdImpl(event.linkId));
 			if (null != link) {
 				DepartureDelayData ddd = this.getDepartureDelayRole(link);
 				if (ddd == null) {

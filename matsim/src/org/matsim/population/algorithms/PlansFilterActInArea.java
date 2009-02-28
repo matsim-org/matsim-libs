@@ -22,9 +22,9 @@ package org.matsim.population.algorithms;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
-import org.matsim.network.NetworkLayer;
 import org.matsim.population.PopulationImpl;
 
 /**
@@ -33,11 +33,11 @@ import org.matsim.population.PopulationImpl;
  */
 public class PlansFilterActInArea extends AbstractPersonAlgorithm {
 
-	private final NetworkLayer network;
+	private final Network network;
 	private final Population plans;
 	private String actType;
 
-	public PlansFilterActInArea(final NetworkLayer net, final String a){
+	public PlansFilterActInArea(final Network net, final String a){
 		this.network = net;
 		this.actType = a;
 		this.plans =  new PopulationImpl();
@@ -54,7 +54,7 @@ public class PlansFilterActInArea extends AbstractPersonAlgorithm {
 			Act act = (Act) it.next();
 			String type = act.getType();
 			if (type.contains(this.actType)) {
-				if(this.network.getLink(act.getLink().getId().toString()) != null) {
+				if (this.network.getLink(act.getLink().getId()) != null) {
 					this.plans.addPerson(person);
 				}
 				return;

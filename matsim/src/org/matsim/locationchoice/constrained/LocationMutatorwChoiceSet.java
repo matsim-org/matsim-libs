@@ -23,6 +23,7 @@ package org.matsim.locationchoice.constrained;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;

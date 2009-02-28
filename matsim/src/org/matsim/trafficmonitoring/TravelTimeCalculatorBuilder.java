@@ -21,7 +21,7 @@ package org.matsim.trafficmonitoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.groups.ControlerConfigGroup;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.core.v01.Network;
 
 
 /**
@@ -40,7 +40,7 @@ public class TravelTimeCalculatorBuilder {
 		this.controlerConfigGroup = group;
 	}
 	
-	public TravelTimeCalculator createTravelTimeCalculator(NetworkLayer network, int endTime) {
+	public TravelTimeCalculator createTravelTimeCalculator(Network network, int endTime) {
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 		
 		if ("TravelTimeCalculatorHashMap".equals(controlerConfigGroup.getTravelTimeCalculatorType())) {

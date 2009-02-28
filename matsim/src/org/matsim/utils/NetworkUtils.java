@@ -24,12 +24,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.NetworkLayer;
 
 /**
- * Contains several helper methods for working with {@link NetworkLayer networks}. 
+ * Contains several helper methods for working with {@link Network networks}. 
  *
  * @author mrieser
  */
@@ -70,7 +71,7 @@ public class NetworkUtils {
 	 * @return list containing the specified nodes.
 	 * @throws IllegalArgumentException if a specified node is not found in the network
 	 */
-	public static List<Node> getNodes(final NetworkLayer network, final String nodes) {
+	public static List<Node> getNodes(final Network network, final String nodes) {
 		if (nodes == null) {
 			return new ArrayList<Node>(0);
 		}
@@ -82,7 +83,7 @@ public class NetworkUtils {
 		final List<Node> nodesList = new ArrayList<Node>(parts.length);
 
 		for (String id : parts) {
-			Node node = network.getNode(id);
+			Node node = network.getNode(new IdImpl(id));
 			if (node == null) {
 				throw new IllegalArgumentException("no node with id " + id);
 			}
@@ -97,7 +98,7 @@ public class NetworkUtils {
 	 * @return list containing the specified links.
 	 * @throws IllegalArgumentException if a specified node is not found in the network
 	 */
-	public static List<Link> getLinks(final NetworkLayer network, final String links) {
+	public static List<Link> getLinks(final Network network, final String links) {
 		if (links == null) {
 			return new ArrayList<Link>(0);
 		}
@@ -109,7 +110,7 @@ public class NetworkUtils {
 		final List<Link> linksList = new ArrayList<Link>(parts.length);
 		
 		for (String id : parts) {
-			Link link = network.getLink(id);
+			Link link = network.getLink(new IdImpl(id));
 			if (link == null) {
 				throw new IllegalArgumentException("no node with id " + id);
 			}

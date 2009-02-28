@@ -29,8 +29,8 @@ import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Route;
-import org.matsim.network.NetworkLayer;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -56,7 +56,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 			TravelTime linkTravelTimeEstimator,
 			TravelCost linkTravelCostEstimator,
 			DepartureDelayAverageCalculator depDelayCalc,
-			final NetworkLayer network) {
+			final Network network) {
 
 		this.linkTravelTimeEstimator = linkTravelTimeEstimator;
 		this.tDepDelayCalc = depDelayCalc;

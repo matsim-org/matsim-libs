@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Activity;
@@ -107,8 +108,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		this.controler = controler;
 	}
 
-	public void handlePlan(final Plan plan){
-	}
+	public abstract void handlePlan(final Plan plan);
 
 
 	@Override
