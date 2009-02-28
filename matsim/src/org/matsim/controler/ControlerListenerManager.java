@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.controler;
 
 import javax.swing.event.EventListenerList;
@@ -39,11 +40,10 @@ import org.matsim.controler.listener.ScoringListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
 
-
 /**
  * Class encapsulating all behavior concerning the ControlerEvents/Listeners
+ * 
  * @author dgrether
- *
  */
 public final class ControlerListenerManager {
 
@@ -67,7 +67,7 @@ public final class ControlerListenerManager {
 	 * @param l
 	 */
 	@SuppressWarnings("unchecked")
-	protected final void addCoreControlerListener(final ControlerListener l) {
+	protected void addCoreControlerListener(final ControlerListener l) {
 		Class[] interfaces = l.getClass().getInterfaces();
 		for (int i = 0; i < interfaces.length; i++) {
 			if (ControlerListener.class.isAssignableFrom(interfaces[i])) {
@@ -82,7 +82,7 @@ public final class ControlerListenerManager {
 	 * @param l
 	 */
 	@SuppressWarnings("unchecked")
-	public final void addControlerListener(final ControlerListener l) {
+	public void addControlerListener(final ControlerListener l) {
 		Class[] interfaces = l.getClass().getInterfaces();
 		for (int i = 0; i < interfaces.length; i++) {
 			if (ControlerListener.class.isAssignableFrom(interfaces[i])) {
@@ -97,7 +97,7 @@ public final class ControlerListenerManager {
 	 * @param l
 	 */
 	@SuppressWarnings("unchecked")
-	public final void removeControlerListener(final ControlerListener l) {
+	public void removeControlerListener(final ControlerListener l) {
 		Class[] interfaces = l.getClass().getInterfaces();
 		for (int i = 0; i < interfaces.length; i++) {
 			if (ControlerListener.class.isAssignableFrom(interfaces[i])) {
@@ -237,9 +237,5 @@ public final class ControlerListenerManager {
 			listener[i].notifyAfterMobsim(event);
 		}
 	}
-
-	
-	
-	
 
 }

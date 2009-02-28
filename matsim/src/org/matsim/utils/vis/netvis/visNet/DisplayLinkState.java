@@ -50,7 +50,7 @@ public final class DisplayLinkState extends BufferedStateA {
 	 * Not to be called by extending classes.
 	 */
 	@Override
-	public final void writeMyself(DataOutputStream out) throws IOException {
+	public void writeMyself(DataOutputStream out) throws IOException {
 		/*
 		 * (1) write display value count
 		 */
@@ -98,7 +98,7 @@ public final class DisplayLinkState extends BufferedStateA {
 	 * Not to be called by extending classes.
 	 */
 	@Override
-	public final void readMyself(DataInputStream in) throws IOException {
+	public void readMyself(DataInputStream in) throws IOException {
 		DisplayLink displLink = (DisplayLink) link;
 
 		/*
