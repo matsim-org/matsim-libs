@@ -23,6 +23,7 @@ package org.matsim.scoring;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentMoneyEvent;
@@ -93,7 +94,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 			ScoringFunction sf = entry.getValue();
 			sf.finish();
 			double score = sf.getScore();
-			Plan plan = this.population.getPerson(agentId).getSelectedPlan();
+			Plan plan = this.population.getPerson(new IdImpl(agentId)).getSelectedPlan();
 			double oldScore = plan.getScore();
 			if (Double.isNaN(oldScore)) {
 				plan.setScore(score);

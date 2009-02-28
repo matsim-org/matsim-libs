@@ -2,6 +2,7 @@ package org.matsim.mobsim.jdeqsim.scenarios;
 
 import java.util.ArrayList;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -21,7 +22,7 @@ public class EquilPopulationPlans1Modified1 implements PopulationModifier{
 	public Population modifyPopulation(Population population) {
 		// modify population: a plan was needed, which contained some properties to be compared with C++
 		this.population=population;
-		Person p=population.getPerson("1");
+		Person p=population.getPerson(new IdImpl("1"));
 		Plan plan= p.getSelectedPlan();
 		ArrayList<Object> actsLegs =plan.getActsLegs();
 		((Act)actsLegs.get(0)).setEndTime(360);

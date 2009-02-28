@@ -128,7 +128,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 				double endtime = time;
 				String acttype = "unknown";
 				if (this.oldplans != null) {
-					Person person = this.oldplans.getPerson(agentId);
+					Person person = this.oldplans.getPerson(new IdImpl(agentId));
 					Act act = (Act)(person.getSelectedPlan().getActsLegs().get(plan.getActsLegs().size()));
 					acttype = act.getType();
 				}
@@ -284,7 +284,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 	}
 
 	private Plan getPlanForPerson(final String personId) {
-		Person realperson = this.realplans.getPerson(personId);
+		Person realperson = this.realplans.getPerson(new IdImpl(personId));
 		if (realperson == null) {
 			realperson = new PersonImpl(new IdImpl(personId));
 			realperson.createPlan(true);
@@ -294,7 +294,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 	}
 
 	private Plan getOldPlanForPerson(final String personId) {
-		return this.oldplans.getPerson(personId).getSelectedPlan();
+		return this.oldplans.getPerson(new IdImpl(personId)).getSelectedPlan();
 	}
 
 

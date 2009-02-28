@@ -22,7 +22,6 @@ package org.matsim.planomat.costestimators;
 
 import java.util.List;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
@@ -65,7 +64,7 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 		// should result in free speed travel time, without departure delay
 		double departureTime = Time.parseTime("06:03:00");
 		double legTravelTime = testee.getLegTravelTimeEstimation(
-				new IdImpl(TEST_PERSON_ID),
+				TEST_PERSON_ID,
 				departureTime,
 				originAct,
 				destinationAct,
@@ -81,15 +80,15 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 		// next, a departure delay of 5s at the origin link is added
 		departureTime = Time.parseTime("06:05:00");
 		double depDelay = Time.parseTime("00:00:05");
-		AgentDepartureEvent depEvent = new AgentDepartureEvent(departureTime, TEST_PERSON_ID, originAct.getLink().getId().toString(), 0);
-		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(departureTime + depDelay, TEST_PERSON_ID, originAct.getLink().getId().toString(), 0);
+		AgentDepartureEvent depEvent = new AgentDepartureEvent(departureTime, TEST_PERSON_ID.toString(), originAct.getLink().getId().toString(), 0);
+		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(departureTime + depDelay, TEST_PERSON_ID.toString(), originAct.getLink().getId().toString(), 0);
 
 		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
 		}
 
 		legTravelTime = testee.getLegTravelTimeEstimation(
-				new IdImpl(TEST_PERSON_ID),
+				TEST_PERSON_ID,
 				departureTime,
 				originAct,
 				destinationAct,
@@ -114,13 +113,13 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 			for (int linkCnt = 0; linkCnt < links.size(); linkCnt++) {
 				event = new LinkEnterEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
-						TEST_PERSON_ID,
+						TEST_PERSON_ID.toString(),
 						links.get(linkCnt).getId().toString(),
 						TEST_LEG_NR);
 				events.processEvent(event);
 				event = new LinkLeaveEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
-						TEST_PERSON_ID,
+						TEST_PERSON_ID.toString(),
 						links.get(linkCnt).getId().toString(),
 						TEST_LEG_NR);
 				events.processEvent(event);
@@ -130,7 +129,7 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 		// test a start time where all link departures will be in the first time bin
 		departureTime = Time.parseTime("06:10:00");
 		legTravelTime = testee.getLegTravelTimeEstimation(
-				new IdImpl(TEST_PERSON_ID),
+				TEST_PERSON_ID,
 				departureTime,
 				originAct,
 				destinationAct,

@@ -27,6 +27,7 @@ import org.jgap.BaseGeneticOperator;
 import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.WeightedRouletteSelector;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
@@ -71,11 +72,10 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		log.info("Reading plans xml file...done.");
 
 		// init test Plan
-		final String TEST_PERSON_ID = "100";
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = population.getPerson(TEST_PERSON_ID);
+		Person testPerson = population.getPerson(new IdImpl("100"));
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
@@ -127,11 +127,10 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		log.info("Reading plans xml file...done.");
 
 		// init test Plan
-		final String TEST_PERSON_ID = "100";
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = population.getPerson(TEST_PERSON_ID);
+		Person testPerson = population.getPerson(new IdImpl("100"));
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 

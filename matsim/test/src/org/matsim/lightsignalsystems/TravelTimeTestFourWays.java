@@ -17,12 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.lightsignalsystems;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
 import org.matsim.events.ActEndEvent;
@@ -46,15 +46,11 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.utils.io.IOUtils;
 
-
 /**
  * @author aneumann
  * @author dgrether
- *
  */
 public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveEventHandler, LinkEnterEventHandler, ActEndEventHandler, ActStartEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler {
-	private static final Logger log = Logger
-			.getLogger(TravelTimeTestFourWays.class);
 	
 	BufferedWriter writer = null;
   
@@ -139,7 +135,7 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 		}
 	}
 	
-	public void reset(@SuppressWarnings("unused")int iteration) {
+	public void reset(int iteration) {
 		// Not used in that TestCase
 	}
 	

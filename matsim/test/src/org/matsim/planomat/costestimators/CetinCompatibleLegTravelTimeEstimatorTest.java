@@ -22,7 +22,6 @@ package org.matsim.planomat.costestimators;
 
 import java.util.List;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
@@ -82,7 +81,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 		double depDelay = Time.parseTime("00:00:05");
 		AgentDepartureEvent depEvent = new AgentDepartureEvent(
 				departureTime,
-				TEST_PERSON_ID,
+				TEST_PERSON_ID.toString(),
 				originAct.getLink().getId().toString(),
 				TEST_LEG_NR);
 		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(departureTime + depDelay, testPerson.getId().toString(), originAct.getLink().getId().toString(), 0);
@@ -92,7 +91,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 		}
 
 		legTravelTime = testee.getLegTravelTimeEstimation(
-				new IdImpl(TEST_PERSON_ID),
+				TEST_PERSON_ID,
 				departureTime,
 				originAct,
 				destinationAct,
@@ -117,13 +116,13 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 			for (int linkCnt = 0; linkCnt < links.size(); linkCnt++) {
 				event = new LinkEnterEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
-						TEST_PERSON_ID,
+						TEST_PERSON_ID.toString(),
 						links.get(linkCnt).getId().toString(),
 						testLeg.getNum());
 				events.processEvent(event);
 				event = new LinkLeaveEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
-						TEST_PERSON_ID,
+						TEST_PERSON_ID.toString(),
 						links.get(linkCnt).getId().toString(),
 						testLeg.getNum());
 				events.processEvent(event);
@@ -133,7 +132,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 		// test a start time where all link departures will be in the first time bin
 		departureTime = Time.parseTime("06:10:00");
 		legTravelTime = testee.getLegTravelTimeEstimation(
-				new IdImpl(TEST_PERSON_ID),
+				TEST_PERSON_ID,
 				departureTime,
 				originAct,
 				destinationAct,
@@ -149,7 +148,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 		departureTime = Time.parseTime("06:10:00");
 		testLeg.setMode(BasicLeg.Mode.pt);
 		legTravelTime = testee.getLegTravelTimeEstimation(
-				new IdImpl(TEST_PERSON_ID),
+				TEST_PERSON_ID,
 				departureTime,
 				originAct,
 				destinationAct,

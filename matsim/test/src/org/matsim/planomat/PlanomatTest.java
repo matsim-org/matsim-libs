@@ -27,11 +27,13 @@ import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -60,6 +62,8 @@ public class PlanomatTest extends MatsimTestCase {
 
 	private enum PlanomatTestRun {NOEVENTS_CAR, WITHEVENTS_CAR, NOEVENTS_CAR_PT, WITHEVENTS_CAR_PT;}
 
+	private final static Id TEST_PERSON_ID = new IdImpl("100");
+	
 	private static final Logger log = Logger.getLogger(PlanomatTest.class);
 
 	private NetworkLayer network = null;
@@ -157,7 +161,7 @@ public class PlanomatTest extends MatsimTestCase {
 		}
 
 		// init test Plan
-		final String TEST_PERSON_ID = "100";
+		
 		final int TEST_PLAN_NR = 0;
 
 		// first person
@@ -190,7 +194,6 @@ public class PlanomatTest extends MatsimTestCase {
 	public void testInitSampleChromosome() {
 
 		// init test Plan
-		final String TEST_PERSON_ID = "100";
 		final int TEST_PLAN_NR = 0;
 
 		// first person
@@ -222,7 +225,6 @@ public class PlanomatTest extends MatsimTestCase {
 		LegTravelTimeEstimator ltte = null;
 
 		// init test Plan
-		final String TEST_PERSON_ID = "100";
 		final int TEST_PLAN_NR = 0;
 
 		// first person

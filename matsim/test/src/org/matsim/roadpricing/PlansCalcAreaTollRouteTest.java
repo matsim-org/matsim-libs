@@ -20,7 +20,10 @@
 
 package org.matsim.roadpricing;
 
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.config.Config;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Population;
@@ -37,16 +40,11 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		loadConfig(null);
-	}
-
 	/**
 	 * Tests a few cases where the router can decide if it is better to pay the toll or not.
 	 */
 	public void testBestAlternatives() {
+		Config config = loadConfig(null);
 		NetworkLayer network = Fixture.createNetwork2();
 
 		// a basic toll where only the morning hours are tolled
@@ -61,13 +59,14 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		 */
 
 		Population population = Fixture.createPopulation2(network);
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
 		commonRouterData.run(network);
 
-		Leg leg1 = (Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(1));
-		Leg leg2 = (Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(3));
+		Id id1 = new IdImpl("1");
+		Leg leg1 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(1));
+		Leg leg2 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(3));
 
 		// case 1: toll only in morning, it is cheaper to drive around
 		new PlansCalcAreaTollRoute(network, commonRouterData, timeCostCalc, timeCostCalc, toll).run(population);
@@ -104,6 +103,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	 * Tests cases where the agent must pay the toll because one of its activities is on a tolled link
 	 */
 	public void testTolledActLink() {
+		Config config = loadConfig(null);
 		NetworkLayer network = Fixture.createNetwork2();
 
 		// a basic toll where only the morning hours are tolled
@@ -113,13 +113,14 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.addCost(6*3600, 10*3600, 0.06);
 
 		Population population = Fixture.createPopulation2(network);
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
 		commonRouterData.run(network);
 
-		Leg leg1 = (Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(1));
-		Leg leg2 = (Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(3));
+		Id id1 = new IdImpl("1");
+		Leg leg1 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(1));
+		Leg leg2 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(3));
 
 		new PlansCalcAreaTollRoute(network, commonRouterData, timeCostCalc, timeCostCalc, toll).run(population);
 		Fixture.compareRoutes("1 2 4 5", (CarRoute) leg1.getRoute()); // agent should take shortest route
@@ -131,6 +132,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	 * to the next include tolled links
 	 */
 	public void testAllAlternativesTolled() {
+		Config config = loadConfig(null);
 		NetworkLayer network = Fixture.createNetwork2();
 
 		// a basic toll where only the morning hours are tolled
@@ -141,13 +143,14 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.addCost(6*3600, 10*3600, 0.06);
 
 		Population population = Fixture.createPopulation2(network);
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
 		commonRouterData.run(network);
 
-		Leg leg1 = (Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(1));
-		Leg leg2 = (Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(3));
+		Id id1 = new IdImpl("1");
+		Leg leg1 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(1));
+		Leg leg2 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(3));
 
 		new PlansCalcAreaTollRoute(network, commonRouterData, timeCostCalc, timeCostCalc, toll).run(population);
 		Fixture.compareRoutes("1 2 4 5", (CarRoute) leg1.getRoute()); // agent should take shortest route
@@ -155,6 +158,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	}
 
 	public void testOutsideTollTime() {
+		Config config = loadConfig(null);
 		NetworkLayer network = Fixture.createNetwork2();
 
 		// a basic toll where only the morning hours are tolled
@@ -165,13 +169,14 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.addCost(8*3600, 10*3600, 1.0); // high costs!
 
 		Population population = Fixture.createPopulation2(network);
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
 		commonRouterData.run(network);
 
-		Leg leg1 = (Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(1));
-		Leg leg2 = (Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(3));
+		Id id1 = new IdImpl("1");
+		Leg leg1 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(1));
+		Leg leg2 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(3));
 
 		new PlansCalcAreaTollRoute(network, commonRouterData, timeCostCalc, timeCostCalc, toll).run(population);
 		Fixture.compareRoutes("1 2 4 5", (CarRoute) leg1.getRoute()); // agent should take shortest route, as tolls are not active at that time

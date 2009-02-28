@@ -46,12 +46,11 @@ public class EventsHandlerHierarchy extends MatsimTestCase {
 			EventsHandlerHierarchy.this.resetCalled++;
 		}
 
-	};
+	}
 
-	class B extends A {};
+	class B extends A {}
 
-	class C extends A implements BasicEventHandler, LinkLeaveEventHandler {
-		};
+	class C extends A implements BasicEventHandler, LinkLeaveEventHandler {}
 
 	public final void testHandlerHierarchy() {
 		Events events = new Events();
