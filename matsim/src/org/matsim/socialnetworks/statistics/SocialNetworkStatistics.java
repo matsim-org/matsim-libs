@@ -24,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -291,9 +290,9 @@ public class SocialNetworkStatistics {
 	private Vector<Person> getEdgePersons(Edge e, Population plans) {
 		Vector<Person> persons = new Vector<Person>(2);
 		Vertex v1 = (Vertex) e.getEndpoints().getFirst();
-		Person p1 = plans.getPerson(v1.getUserDatum("personId").toString());
+		Person p1 = plans.getPerson((Id) v1.getUserDatum("personId"));
 		Vertex v2 = (Vertex) e.getEndpoints().getSecond();
-		Person p2 = plans.getPerson(v2.getUserDatum("personId").toString());
+		Person p2 = plans.getPerson((Id) v2.getUserDatum("personId"));
 		persons.add(p1);
 		persons.add(p2);
 		return persons;
@@ -313,11 +312,11 @@ public class SocialNetworkStatistics {
 	private double getDyadDistance(Edge myEdge, Population plans) {
 		double dist = 0.;
 		Vertex vFrom = (Vertex) myEdge.getEndpoints().getFirst();
-		Person pFrom = plans.getPerson(vFrom.getUserDatum("personId").toString());
+		Person pFrom = plans.getPerson((Id) vFrom.getUserDatum("personId"));
 		Coord fromCoord = ((Act) pFrom.getSelectedPlan().getActsLegs().get(
 				0)).getCoord();
 		Vertex vTo = (Vertex) myEdge.getEndpoints().getSecond();
-		Person pTo = plans.getPerson(vTo.getUserDatum("personId").toString());
+		Person pTo = plans.getPerson((Id) vTo.getUserDatum("personId"));
 		Coord toCoord = ((Act) pTo.getSelectedPlan().getActsLegs().get(0))
 		.getCoord();
 		dist = fromCoord.calcDistance(toCoord);
@@ -364,7 +363,7 @@ public class SocialNetworkStatistics {
 		while (ivert.hasNext()) {
 
 			Vertex myVert = ivert.next();
-			Person myPerson = plans.getPerson(myVert.getUserDatum("personId").toString());
+			Person myPerson = plans.getPerson((Id) myVert.getUserDatum("personId"));
 			int id = Integer.parseInt(myVert.getUserDatum("personId").toString());
 			// Agent's Home Location ID
 			Act myAct = (Act) myPerson.getSelectedPlan().getActsLegs().get(0);
@@ -494,12 +493,9 @@ public class SocialNetworkStatistics {
 	 * @param plans
 	 */
 	void fillGraph(Graph g, SocialNetwork snet, Population plans) {
-		Collection<Person> personList = plans.getPersons().values();
 		Vertex v;
 		Edge e;
-		Iterator<Person> iperson = personList.iterator();
-		while (iperson.hasNext()) {
-			Person p = iperson.next();
+		for (Person p : plans) {
 			if (snet.isUNDIRECTED()) {
 				v = new UndirectedSparseVertex();
 			}

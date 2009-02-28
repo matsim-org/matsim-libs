@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.handler.ActEndEventHandler;
@@ -27,8 +28,7 @@ public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEvent
 	}
 
 	public void handleEvent(ActStartEvent event) {
-		// TODO Auto-generated method stub
-		Person person = plans.getPerson(event.agentId);
+		Person person = plans.getPerson(new IdImpl(event.agentId));
 		ArrayList<ActStartEvent> startList;
 		if((startMap.get(person)==null)){
 			startList=new ArrayList<ActStartEvent>();
@@ -42,15 +42,13 @@ public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEvent
 	}
 
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
 		startMap.clear();
 		endMap.clear();
 
 	}
 
 	public void handleEvent(ActEndEvent event) {
-		// TODO Auto-generated method stub
-		Person person = plans.getPerson(event.agentId);
+		Person person = plans.getPerson(new IdImpl(event.agentId));
 		ArrayList<ActEndEvent> endList;
 		if((endMap.get(person)== null)){
 			endList=new ArrayList<ActEndEvent>();

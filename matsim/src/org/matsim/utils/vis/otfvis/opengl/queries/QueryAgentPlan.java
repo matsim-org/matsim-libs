@@ -29,6 +29,7 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
@@ -86,15 +87,11 @@ public class QueryAgentPlan implements OTFQuery {
 
 	private static int countLines(Plan plan) {
 		int count = 0;
-		List actslegs = plan.getActsLegs();
-
-		for (int i= 0; i< actslegs.size(); i++) {
-			if(i%2==0) {
-				// handle act
+		for (Object o : plan.getActsLegs()) {
+			if (o instanceof Act) {
 				count++;
-			} else {
-				// handle leg 
-				Leg leg = (Leg)actslegs.get(i);
+			} else if (o instanceof Leg) {
+				Leg leg = (Leg)o;
 
 				if (leg.getMode().equals(Mode.car)) {
 					List<Link> route = ((CarRoute) leg.getRoute()).getLinks();
@@ -131,18 +128,15 @@ public class QueryAgentPlan implements OTFQuery {
 		Color actColor = Color.BLUE;
 		Color ptColor = Color.RED;
 
-		List actslegs = plan.getActsLegs();
-		for (int i= 0; i< actslegs.size(); i++) {
-			if(i%2==0) {
-				// handle act
+		for (Object o : plan.getActsLegs()) {
+			if(o instanceof Act) {
 				Color col = actColor;
-				Act act = (Act)plan.getActsLegs().get(i);
+				Act act = (Act)o;
 				Coord coord = act.getCoord();
 				if (coord == null) coord = act.getLink().getCenter();
 				setCoord(pos++, coord, col);
-			} else {
-				// handle leg 
-				Leg leg = (Leg)actslegs.get(i);
+			} else if (o instanceof Leg) {
+				Leg leg = (Leg)o;
 
 				if (leg.getMode().equals(Mode.car)) {
 					Node last = null;
@@ -160,7 +154,7 @@ public class QueryAgentPlan implements OTFQuery {
 	}
 
 	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
-		Person person = plans.getPerson(this.agentId);
+		Person person = plans.getPerson(new IdImpl(this.agentId));
 		if (person == null) return;
 
 		Plan plan = person.getSelectedPlan();

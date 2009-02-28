@@ -27,6 +27,7 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Act;
@@ -123,7 +124,7 @@ public class QueryAgentPTBus implements OTFQuery {
 		
 		if (allIds.size()==0) return;
 
-		Plan plan = plans.getPerson(allIds.get(0)).getSelectedPlan();
+		Plan plan = plans.getPerson(new IdImpl(allIds.get(0))).getSelectedPlan();
 
 //		this.acts = new Object [plan.getActsLegs().size()/2];
 //		for (int i=0;i< this.acts.length; i++) {

@@ -150,7 +150,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	private ScoringFunction getScoringFunctionForAgent(final String agentId) {
 		ScoringFunction sf = this.agentScorers.get(agentId);
 		if (sf == null) {
-			sf = this.sfFactory.getNewScoringFunction(this.population.getPerson(agentId).getSelectedPlan());
+			sf = this.sfFactory.getNewScoringFunction(this.population.getPerson(new IdImpl(agentId)).getSelectedPlan());
 			this.agentScorers.put(agentId, sf);
 		}
 		return sf;

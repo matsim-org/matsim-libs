@@ -22,7 +22,9 @@ package org.matsim.utils.vis.otfvis.opengl.queries;
 
 import java.util.Collection;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -38,7 +40,7 @@ public class QueryAgentActivityStatus implements OTFQuery {
 
 	private static final long serialVersionUID = -8532403277319196797L;
 
-	private String agentID;
+	private Id agentId = null;
 
 	private double now;
 	//out
@@ -46,7 +48,7 @@ public class QueryAgentActivityStatus implements OTFQuery {
 	double finished = 0;
 
 	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
-		Person person = plans.getPerson(this.agentID);
+		Person person = plans.getPerson(this.agentId);
 		if (person == null) return;
 
 		Plan plan = person.getSelectedPlan();
@@ -59,7 +61,7 @@ public class QueryAgentActivityStatus implements OTFQuery {
 			QueueLink link = net.getQueueLink(act.getLinkId());
 			Collection<QueueVehicle> vehs = link.getAllVehicles();
 			for (QueueVehicle info : vehs) {
-				if (info.getDriver().getPerson().getId().toString().compareTo(this.agentID) == 0) {
+				if (info.getDriver().getPerson().getId().compareTo(this.agentId) == 0) {
 					// we found the little nutty, now lets reason about the length of 1st activity
 					double departure = info.getDepartureTime_s();
 					double diff =  departure - info.getLastMovedTime();
@@ -86,7 +88,7 @@ public class QueryAgentActivityStatus implements OTFQuery {
 	}
 
 	public void setId(String id) {
-		this.agentID = id;
+		this.agentId = new IdImpl(id);
 	}
 
 	public void setNow(double now) {

@@ -29,6 +29,7 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
 import org.matsim.events.PersonEvent;
@@ -90,7 +91,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 			events.addHandler(handler);
 		}
 		
-		Person person = plans.getPerson(this.agentId);
+		Person person = plans.getPerson(new IdImpl(this.agentId));
 		if (person == null) return;
 
 		Plan plan = person.getSelectedPlan();
