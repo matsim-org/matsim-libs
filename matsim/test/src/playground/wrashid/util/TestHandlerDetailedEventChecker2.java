@@ -4,58 +4,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-import org.matsim.events.ActEndEvent;
-import org.matsim.events.ActStartEvent;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.AgentStuckEvent;
-import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.PersonEvent;
-import org.matsim.events.handler.ActEndEventHandler;
-import org.matsim.events.handler.ActStartEventHandler;
-import org.matsim.events.handler.AgentArrivalEventHandler;
-import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.events.handler.AgentStuckEventHandler;
-import org.matsim.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.events.handler.EventHandler;
-import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
-import org.matsim.mobsim.jdeqsim.JDEQSimStarterWithoutController;
-import org.matsim.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.mobsim.jdeqsim.util.DummyPopulationModifier;
 import org.matsim.mobsim.jdeqsim.util.TestHandlerDetailedEventChecker;
 import org.matsim.mobsim.jdeqsim.util.testable.PopulationModifier;
 import org.matsim.mobsim.jdeqsim.util.testable.TestHandler;
-import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.PDES2.Road;
 import playground.wrashid.deqsim.PDESStarter2;
 
 
-public class TestHandlerDetailedEventChecker2 extends TestHandlerDetailedEventChecker {
+public class TestHandlerDetailedEventChecker2 extends TestHandlerDetailedEventChecker implements TestHandler {
 
 	protected HashMap<String, LinkedList<PersonEvent>> events = new HashMap<String, LinkedList<PersonEvent>>();
 	public LinkedList<PersonEvent> allEvents = new LinkedList<PersonEvent>();
 	private HashMap<String, ExpectedNumberOfEvents> expectedNumberOfMessages = new HashMap<String, ExpectedNumberOfEvents>();
 
-	public TestHandlerDetailedEventChecker2() {
-
-	}
-
-	
 
 	// if populationModifier == null, then the DummyPopulationModifier is used
 	// if planFilePath == null, then the plan specified in the config file is

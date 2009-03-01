@@ -7,24 +7,19 @@ import java.util.LinkedList;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.config.Config;
+import org.matsim.controler.ScenarioData;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.PersonEvent;
-import org.matsim.events.handler.ActEndEventHandler;
-import org.matsim.events.handler.ActStartEventHandler;
-import org.matsim.events.handler.AgentArrivalEventHandler;
-import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.events.handler.AgentStuckEventHandler;
-import org.matsim.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.events.handler.EventHandler;
-import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.events.handler.PersonEventHandler;
+import org.matsim.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.CarRoute;
@@ -33,26 +28,18 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
-import org.matsim.mobsim.jdeqsim.JDEQSimStarterWithoutController;
-import org.matsim.mobsim.jdeqsim.SimulationParameters;
+import org.matsim.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.mobsim.jdeqsim.util.testable.PopulationModifier;
-import org.matsim.mobsim.jdeqsim.util.testable.TestHandler;
+import org.matsim.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 
-public class TestHandlerDetailedEventChecker extends MatsimTestCase implements TestHandler,
-		ActEndEventHandler, ActStartEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
-		AgentWait2LinkEventHandler, AgentArrivalEventHandler, EventHandler, LinkEnterEventHandler,
-		LinkLeaveEventHandler {
+public class TestHandlerDetailedEventChecker extends MatsimTestCase implements PersonEventHandler {
 
 	protected HashMap<String, LinkedList<PersonEvent>> events = new HashMap<String, LinkedList<PersonEvent>>();
 	public LinkedList<PersonEvent> allEvents = new LinkedList<PersonEvent>();
 	private HashMap<String, ExpectedNumberOfEvents> expectedNumberOfMessages = new HashMap<String, ExpectedNumberOfEvents>();
 	protected boolean printEvent = true;
 	protected Population population;
-
-	public TestHandlerDetailedEventChecker() {
-
-	}
 
 	public void checkAssertions() {
 
@@ -152,7 +139,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements T
 
 	}
 
-	public void handleEvent(ActEndEvent event) {
+	public void handleEvent(PersonEvent event) {
 		if (!events.containsKey(event.agentId)) {
 			events.put(event.agentId, new LinkedList<PersonEvent>());
 		}
@@ -164,84 +151,6 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements T
 	}
 
 	public void reset(int iteration) {
-
-	}
-
-	public void handleEvent(AgentDepartureEvent event) {
-		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<PersonEvent>());
-		}
-		events.get(event.agentId).add(event);
-		if (printEvent) {
-			System.out.println(event.toString());
-		}
-		allEvents.add(event);
-	}
-
-	public void handleEvent(AgentWait2LinkEvent event) {
-		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<PersonEvent>());
-		}
-		events.get(event.agentId).add(event);
-		if (printEvent) {
-			System.out.println(event.toString());
-		}
-		allEvents.add(event);
-	}
-
-	public void handleEvent(LinkLeaveEvent event) {
-		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<PersonEvent>());
-		}
-		events.get(event.agentId).add(event);
-		if (printEvent) {
-			System.out.println(event.toString());
-		}
-		allEvents.add(event);
-	}
-
-	public void handleEvent(LinkEnterEvent event) {
-		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<PersonEvent>());
-		}
-		events.get(event.agentId).add(event);
-		if (printEvent) {
-			System.out.println(event.toString());
-		}
-		allEvents.add(event);
-	}
-
-	public void handleEvent(AgentArrivalEvent event) {
-		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<PersonEvent>());
-		}
-		events.get(event.agentId).add(event);
-		if (printEvent) {
-			System.out.println(event.toString());
-		}
-		allEvents.add(event);
-	}
-
-	public void handleEvent(ActStartEvent event) {
-		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<PersonEvent>());
-		}
-		events.get(event.agentId).add(event);
-		if (printEvent) {
-			System.out.println(event.toString());
-		}
-		allEvents.add(event);
-	}
-
-	public void handleEvent(AgentStuckEvent event) {
-		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<PersonEvent>());
-		}
-		events.get(event.agentId).add(event);
-		if (printEvent) {
-			System.out.println(event.toString());
-		}
-		allEvents.add(event);
 	}
 
 	// if populationModifier == null, then the DummyPopulationModifier is used
@@ -249,28 +158,26 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements T
 	// used
 	public void startTestDES(String configFilePath, boolean printEvent, String planFilePath,
 			PopulationModifier populationModifier) {
-		String[] args = new String[1];
-		args[0] = configFilePath;
-		this.printEvent = printEvent;
-		SimulationParameters.setTestEventHandler(this);
-
+		Config config = loadConfig(configFilePath);
 		if (planFilePath != null) {
-			SimulationParameters.setTestPlanPath(planFilePath);
-		} else {
-			SimulationParameters.setTestPlanPath(null);
+			config.plans().setInputFile(planFilePath);
 		}
+		this.printEvent = printEvent;
 
+		ScenarioData data = new ScenarioData(config);
+		NetworkLayer network = data.getNetwork();
+		Population population = data.getPopulation();
 		if (populationModifier != null) {
-			SimulationParameters.setTestPopulationModifier(populationModifier);
-		} else {
-			SimulationParameters.setTestPopulationModifier(new DummyPopulationModifier());
+			population = populationModifier.modifyPopulation(population);
 		}
+		Events events = new ParallelEvents(1);
+		events.addHandler(this);
+		events.initProcessing();
+		new JDEQSimulation(network, population, events).run();
+		events.finishProcessing();
 
-		JDEQSimStarterWithoutController.main(args);
-		this
-				.calculateExpectedNumberOfEvents(SimulationParameters.getTestPopulationModifier()
-						.getPopulation());
-		SimulationParameters.getTestEventHandler().checkAssertions();
+		this.calculateExpectedNumberOfEvents(population);
+		this.checkAssertions();
 	}
 
 	public void calculateExpectedNumberOfEvents(Population population) {

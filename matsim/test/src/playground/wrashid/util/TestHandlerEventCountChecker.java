@@ -3,12 +3,15 @@ package playground.wrashid.util;
 import java.util.ArrayList;
 
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.config.Config;
+import org.matsim.controler.ScenarioData;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.ActEndEventHandler;
@@ -20,16 +23,17 @@ import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
-import org.matsim.mobsim.jdeqsim.JDEQSimStarterWithoutController;
-import org.matsim.mobsim.jdeqsim.SimulationParameters;
+import org.matsim.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.mobsim.jdeqsim.util.DummyPopulationModifier;
 import org.matsim.mobsim.jdeqsim.util.testable.PopulationModifier;
 import org.matsim.mobsim.jdeqsim.util.testable.TestHandler;
+import org.matsim.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.deqsim.PDESStarter2;
@@ -153,26 +157,26 @@ LinkEnterEventHandler, LinkLeaveEventHandler  {
 	// if populationModifier == null, then the DummyPopulationModifier is used
 	// if planFilePath == null, then the plan specified in the config file is used
 	public void startTestDES(String configFilePath,boolean printEvent,String planFilePath,PopulationModifier populationModifier) {
-		String[] args = new String[1];
-		args[0] = configFilePath;
-		this.printEvent=printEvent;
-		SimulationParameters.setTestEventHandler(this);
-		
-		if (planFilePath!=null){
-			SimulationParameters.setTestPlanPath(planFilePath);
-		} else {
-			SimulationParameters.setTestPlanPath(null);
+		Config config = loadConfig(configFilePath);
+		if (planFilePath != null) {
+			config.plans().setInputFile(planFilePath);
 		}
+		this.printEvent=printEvent;
+
+		ScenarioData data = new ScenarioData(config);
+		NetworkLayer network = data.getNetwork();
+		Population population = data.getPopulation();
+		if (populationModifier != null) {
+			population = populationModifier.modifyPopulation(population);
+		}
+		Events events = new ParallelEvents(1);
+		events.addHandler(this);
+		events.initProcessing();
+		new JDEQSimulation(network, population, events).run();
+		events.finishProcessing();
 		
-		if (populationModifier!=null){
-			SimulationParameters.setTestPopulationModifier(populationModifier);
-		} else {
-			SimulationParameters.setTestPopulationModifier(new DummyPopulationModifier());
-		}		
-		
-		JDEQSimStarterWithoutController.main(args);
-		this.estimateExpectedNumberOfEvents(SimulationParameters.getTestPopulationModifier().getPopulation());
-		SimulationParameters.getTestEventHandler().checkAssertions();
+		this.estimateExpectedNumberOfEvents(population);
+		this.checkAssertions();
 	}
 	
 	// if populationModifier == null, then the DummyPopulationModifier is used

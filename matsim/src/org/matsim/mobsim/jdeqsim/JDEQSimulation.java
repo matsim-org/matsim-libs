@@ -31,9 +31,6 @@ import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.jdeqsim.util.Timer;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationReader;
 import org.matsim.utils.misc.Time;
 
 public class JDEQSimulation {
@@ -119,29 +116,6 @@ public class JDEQSimulation {
 		} else {
 			log.info("parameter 'endTime' not defined. Using default value [s]: "
 					+ SimulationParameters.getSimulationEndTime());
-		}
-
-
-
-		// enable testing to hook in here as a handler
-		if (SimulationParameters.getTestEventHandler() != null) {
-			SimulationParameters.getProcessEventThread().addHandler(
-					SimulationParameters.getTestEventHandler());
-		}
-
-		if (SimulationParameters.getTestPlanPath() != null) {
-			// read population
-			Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
-			PopulationReader plansReader = new MatsimPopulationReader(pop, this.network);
-			plansReader.readFile(SimulationParameters.getTestPlanPath());
-
-			this.population = pop;
-
-		}
-
-		if (SimulationParameters.getTestPopulationModifier() != null) {
-			this.population = SimulationParameters.getTestPopulationModifier().modifyPopulation(
-					this.population);
 		}
 
 	}
