@@ -41,7 +41,7 @@ public class StandaloneSimTest {
 //		String netFileName = "/TU Berlin/workspace/berlin-wip/network/wip_net.xml";
 //		String popFileName = "/TU Berlin/workspace/berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml";
 		String netFileName = "../../tmp/studies/ivtch/Diss/input/ivtch_red100.xml";
-		String popFileName = "../../tmp/studies/ivtch/Diss/input/plans10p.xml";
+		String popFileName = "../../tmp/studies/ivtch/Diss/input/plans100p.xml";
 
 		Gbl.startMeasurement();
 		final Config config = Gbl.createConfig(args);
@@ -72,8 +72,8 @@ public class StandaloneSimTest {
 		config.simulation().setStuckTime(10);
 //		config.simulation().removeStuckVehicles(false);
 		config.simulation().removeStuckVehicles(true);
-		config.simulation().setFlowCapFactor(.25);
-		config.simulation().setStorageCapFactor(.3);
+		config.simulation().setFlowCapFactor(1.5);
+		config.simulation().setStorageCapFactor(2.5);
 
 //		QueueLink link = (QueueLink)network.getLinks().get("15");
 //		link.setCapacity()
