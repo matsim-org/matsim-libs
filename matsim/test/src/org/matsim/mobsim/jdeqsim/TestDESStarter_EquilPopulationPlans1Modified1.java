@@ -1,13 +1,10 @@
 package org.matsim.mobsim.jdeqsim;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.jdeqsim.scenarios.EquilPopulationPlans1Modified1;
 import org.matsim.mobsim.jdeqsim.util.DEQSimEventFileComparator;
 import org.matsim.mobsim.jdeqsim.util.DEQSimEventFileTravelTimeComparator;
 import org.matsim.mobsim.jdeqsim.util.TestHandlerDetailedEventChecker;
-
 import org.matsim.testcases.MatsimTestCase;
-
 
 public class TestDESStarter_EquilPopulationPlans1Modified1 extends MatsimTestCase {
 
@@ -15,16 +12,12 @@ public class TestDESStarter_EquilPopulationPlans1Modified1 extends MatsimTestCas
 	// make test cases for these assertions.
 
 	public void test_EquilPopulationPlans1Modified1_TestHandlerDetailedEventChecker() {
-		Gbl.reset();
-
 		TestHandlerDetailedEventChecker detailedChecker = new TestHandlerDetailedEventChecker();
 		detailedChecker.startTestDES("test/scenarios/equil/config.xml", false,
 				"test/scenarios/equil/plans1.xml", new EquilPopulationPlans1Modified1());
 	}
 
 	public void test_EquilPopulationPlans1Modified1_DEQSimEventFileComparator() {
-		Gbl.reset();
-
 		DEQSimEventFileComparator deqSimComparator = new DEQSimEventFileComparator(
 				"test/input/org/matsim/mobsim/jdeqsim/deq_events.txt");
 		deqSimComparator.startTestDES("test/scenarios/equil/config.xml", false,
@@ -32,8 +25,6 @@ public class TestDESStarter_EquilPopulationPlans1Modified1 extends MatsimTestCas
 	}
 
 	public void test_EquilPopulationPlans1Modified1_DEQSimEventFileTravelTimeComparator() {
-		Gbl.reset();
-
 		DEQSimEventFileTravelTimeComparator deqSimTravelTimeComparator = new DEQSimEventFileTravelTimeComparator(
 				"test/input/org/matsim/mobsim/jdeqsim/deq_events.txt", 1);
 		deqSimTravelTimeComparator.startTestDES("test/scenarios/equil/config.xml", false,
