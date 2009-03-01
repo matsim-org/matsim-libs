@@ -1,10 +1,8 @@
 package org.matsim.mobsim.jdeqsim.util;
 
 import java.util.ArrayList;
-import org.matsim.mobsim.jdeqsim.EventLog;
-import org.matsim.mobsim.jdeqsim.util.CppEventFileParser;
-import org.matsim.mobsim.jdeqsim.util.EventLibrary;
 
+import org.matsim.mobsim.jdeqsim.EventLog;
 
 public class DEQSimEventFileTravelTimeComparator extends
 TestHandlerDetailedEventChecker {
@@ -27,25 +25,15 @@ TestHandlerDetailedEventChecker {
 	 */
 	public void checkAssertions() {
 		deqSimLog=CppEventFileParser.parseFile(pathToDEQSimEventsFile);
-		assertEquals(true,checkDifferenceTravelTime());
+		assertTrue(checkDifferenceTravelTime());
 	}
-	
-	
 	
 	/*
 	 * - The difference in travel time should be smaller than the tolerenz percent value	 * 
 	 */
 	private boolean checkDifferenceTravelTime(){
-		boolean result=false;
 		double deqSimTravelSum=EventLog.getSumTravelTime(deqSimLog);
 		double javaSimTravelSum=EventLibrary.getSumTravelTime(allEvents);
-		
-		if ((Math.abs(deqSimTravelSum - javaSimTravelSum)/deqSimTravelSum)<tolerenzPercentValue){
-			result=true;
-		}
-		
-		return result;
-	}
-	
-
+		return ((Math.abs(deqSimTravelSum - javaSimTravelSum)/deqSimTravelSum)<tolerenzPercentValue);
+	}	
 }
