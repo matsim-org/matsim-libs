@@ -34,7 +34,6 @@ import org.matsim.utils.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
 import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
-import org.matsim.world.World;
 
 public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer {
 	private  String vehFileName = "";
@@ -149,17 +148,12 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer {
 		int intervall_s = 60;
 
 		Gbl.createConfig(null);
-		Gbl.startMeasurement();
-		World world = Gbl.createWorld();
 
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
-		world.setNetworkLayer(net);
-		world.complete();
 		QueueNetwork qnet = new QueueNetwork(net);
 
-		OTFTVeh2MVI test  = new OTFTVeh2MVI(qnet, vehFileName, outFileName, intervall_s);
-		test.convert();
+		new OTFTVeh2MVI(qnet, vehFileName, outFileName, intervall_s).convert();
 	}
 
 }

@@ -25,13 +25,10 @@ import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
-import org.matsim.world.World;
 
 public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 	private final String eventFileName;
@@ -63,29 +60,31 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 		close();
 	}
 
+	@Deprecated // set to deprecated 20090301/marcel
 	public static void main(String[] args) {
+		throw new RuntimeException("Deprecated. Please use org.matsim.run.OTFVis to convert event-files to visualizer files.");
 
-		// FIXME hard-coded file names
-		if ( args.length==0 )
-			args = new String[] {"../../tmp/studies/berlin-wip/config_ds.xml"};
-
-		Gbl.createConfig(args);
-		Gbl.startMeasurement();
-		World world = Gbl.createWorld();
-
-		String netFileName = Gbl.getConfig().getParam("network","inputNetworkFile");
-		NetworkLayer net = new NetworkLayer();
-		new MatsimNetworkReader(net).readFile(netFileName);
-		world.setNetworkLayer(net);
-		world.complete();
-		QueueNetwork qnet = new QueueNetwork(net);
-
-		String eventFile = null;
-		eventFile = "output/current/ITERS/it.0/0.events.txt.gz";
-		eventFile = "../../tmp/studies/berlin-wip/run125/200.events.txt.gz";
-
-		OTFEvent2MVI test  = new OTFEvent2MVI(qnet, eventFile, "output/ds_fromEvent.mvi",600);
-		test.convert();
+//		// FIXME_ hard-coded file names
+//		if ( args.length==0 )
+//			args = new String[] {"../../tmp/studies/berlin-wip/config_ds.xml"};
+//
+//		Gbl.createConfig(args);
+//		Gbl.startMeasurement();
+//		World world = Gbl.createWorld();
+//
+//		String netFileName = Gbl.getConfig().getParam("network","inputNetworkFile");
+//		NetworkLayer net = new NetworkLayer();
+//		new MatsimNetworkReader(net).readFile(netFileName);
+//		world.setNetworkLayer(net);
+//		world.complete();
+//		QueueNetwork qnet = new QueueNetwork(net);
+//
+//		String eventFile = null;
+//		eventFile = "output/current/ITERS/it.0/0.events.txt.gz";
+//		eventFile = "../../tmp/studies/berlin-wip/run125/200.events.txt.gz";
+//
+//		OTFEvent2MVI test  = new OTFEvent2MVI(qnet, eventFile, "output/ds_fromEvent.mvi",600);
+//		test.convert();
 	}
 
 	@Override
@@ -115,7 +114,7 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 	public void finish() {
 		// TODO Auto-generated method stub
 		/* FIXME must this method really be overwritten? it does NOT call super.finish(), even that
-		 * there is something done. So if this method is here to explicitely NOT call super.finish(), please
+		 * there is something done. So if this method is here to explicitly NOT call super.finish(), please
 		 * add comment. Otherwise one might remove this method completely...
 		 */
 	}
