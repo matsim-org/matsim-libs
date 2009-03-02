@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FakeTravelTimeCost.java
+ * MultiSourceEAF.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -60,7 +60,7 @@ public class MultiSourceEAF {
 	/**
 	 * debug flag
 	 */
-	private static boolean _debug = false;
+	private static boolean _debug = true;
 	private static boolean vertexAlgo = true;
 
 
@@ -146,14 +146,21 @@ public class MultiSourceEAF {
 		}
 
 		String networkfile = null;
-		networkfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_100p_flow_10s_cap.xml";
+		//networkfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_100p_flow_2s_cap.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
+		//networkfile = "./examples/meine_EA/swissold_network_5s.xml";
+		networkfile = "./examples/meine_EA/siouxfalls_network_5s_euclid.xml";
+		
+		
 		//networkfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
 
 
 		String plansfile = null;
-		plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
+		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
 		//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans_simple.xml";
+		//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
+		
+		
 
 
 
@@ -162,28 +169,31 @@ public class MultiSourceEAF {
 
 		String outputplansfile = null;
 		//outputplansfile = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans_10p_5s.xml";
+		//outputplansfile = "./examples/meine_EA/swissold_plans_5s_demands_100.xml";
+		//outputplansfile = "./examples/meine_EA/padang_plans_100p_flow_2s.xml";
+		outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_euclid_demands_100_empty.xml";
+		
 		//outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_demand_100_emptylegs.xml";
-		outputplansfile = "./examples/meine_EA/padang_plans_100p_flow_10s_test.xml";
+		//outputplansfile = "./examples/meine_EA/padang_plans_100p_flow_10s_test.xml";
 
 		int uniformDemands = 100;
 
 		//set parameters
 		int timeHorizon = 200000;
 		int rounds = 100000;
-		String sinkid = "en2";
-		boolean emptylegs = false;
-
+		String sinkid = "supersink";
+		boolean emptylegs = true;		
 
 		//read network
 		NetworkLayer network = new NetworkLayer();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
 		networkReader.readFile(networkfile);
-		Node sink = network.getNode(sinkid);
+		Node sink = network.getNode(sinkid);		
 
 		//read demands
 		HashMap<Node, Integer> demands;
 		if(plansfile!=null){
-			demands = readPopulation(network, plansfile);
+			demands = readPopulation(network, plansfile);			
 		}else if (demandsfile != null){
 			try {
 				demands = readDemands(network,demandsfile);
@@ -200,6 +210,12 @@ public class MultiSourceEAF {
 				}
 			}
 		}
+		
+		int totaldemands = 0;
+		for (int i : demands.values()) {
+			totaldemands += i;
+		}
+		System.out.println("Total demand is " + totaldemands);		
 
 		//check if demands and sink are set
 		if (demands.isEmpty() ) {
@@ -211,7 +227,10 @@ public class MultiSourceEAF {
 		if(_debug){
 			System.out.println("reading input done");
 		}
-
+		
+		
+		String tempstr = null;
+		
 		if(!demands.isEmpty() && (sink != null)) {
 			TimeExpandedPath result = null;
 			FakeTravelTimeCost travelcost = new FakeTravelTimeCost();
@@ -232,6 +251,7 @@ public class MultiSourceEAF {
 			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
 
 			int i;
+			int gain = 0;
 			for (i=0; i<rounds; i++){
 				timer1 = System.currentTimeMillis();
 				result = routingAlgo.doCalculations();
@@ -241,21 +261,27 @@ public class MultiSourceEAF {
 					break;
 				}
 				if(_debug){
-					System.out.println("found path: " +  result);
+					tempstr = "found path " + result;
+					//System.out.println("found path: " +  result);
 				}
 				fluss.augment(result);
 				timer3 = System.currentTimeMillis();
-				fluss.cleanUp();
+				gain += fluss.cleanUp();
+				
 				timeAugment += timer3 - timer2;
 				if (_debug) {
 					if (i % 100 == 0) {
-					  System.out.println("Iteration " + i + ". Total flow: " + fluss.getTotalFlow() + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+					  System.out.println("Iteration " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+					  System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
+					  System.out.println("last " + tempstr);
 					}
 				}
 			}
 			if (_debug) {
 				  long timeStop = System.currentTimeMillis();
-				  System.out.println("Iterations: " + i + ". Total flow: " + fluss.getTotalFlow() + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+				  System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");				  
+				  System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
+				  System.out.println("last " + tempstr);
 			}
 			}
 			else{
