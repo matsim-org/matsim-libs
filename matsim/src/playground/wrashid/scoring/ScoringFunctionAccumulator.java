@@ -15,7 +15,6 @@ import playground.wrashid.scoring.interfaces.MoneyScoringFunction;
 
 public class ScoringFunctionAccumulator implements ScoringFunction {
 
-	protected Plan plan = null;
 	private ArrayList<BasicScoringFunction> basicScoringFunctions = null;
 	private ArrayList<ActivityScoringFunction> activityScoringFunctions = null;
 	private ArrayList<MoneyScoringFunction> moneyScoringFunctions = null;
@@ -81,9 +80,8 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		}
 	}
 
-	public ScoringFunctionAccumulator(Plan plan) {
+	public ScoringFunctionAccumulator() {
 		basicScoringFunctions = new ArrayList<BasicScoringFunction>();
-		this.plan = plan;
 	}
 
 	/**
