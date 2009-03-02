@@ -1,8 +1,10 @@
 package playground.wrashid.scoring;
 
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.scoring.CharyparNagelScoringParameters;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
+import org.matsim.gbl.Gbl;
 
 public class CharyparScoringFunctionFactory implements ScoringFunctionFactory {
 
@@ -17,7 +19,7 @@ public class CharyparScoringFunctionFactory implements ScoringFunctionFactory {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoringFunction(plan));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoringFunction(plan));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoringFunction( plan, new CharyparNagelScoringParameters(Gbl.getConfig().charyparNagelScoring())));
 
 		return scoringFunctionAccumulator;
 	}

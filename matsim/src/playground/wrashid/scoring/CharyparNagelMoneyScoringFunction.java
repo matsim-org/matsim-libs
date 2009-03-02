@@ -14,9 +14,9 @@ import org.matsim.utils.misc.Time;
 
 import playground.wrashid.scoring.interfaces.BasicScoringFunction;
 import playground.wrashid.scoring.interfaces.LegScoringFunction;
+import playground.wrashid.scoring.interfaces.MoneyScoringFunction;
 
-public class CharyparNagelLegScoringFunction implements LegScoringFunction, BasicScoringFunction {
-
+public class CharyparNagelMoneyScoringFunction implements MoneyScoringFunction, BasicScoringFunction  {
 	protected final Person person;
 	protected final Plan plan;
 
@@ -38,7 +38,7 @@ public class CharyparNagelLegScoringFunction implements LegScoringFunction, Basi
 	
 	private static final Logger log = Logger.getLogger(CharyparNagelScoringFunction.class);
 
-	public CharyparNagelLegScoringFunction(final Plan plan, final CharyparNagelScoringParameters params) {
+	public CharyparNagelMoneyScoringFunction(final Plan plan, final CharyparNagelScoringParameters params) {
 		this.params = params;
 		this.reset();
 
@@ -84,9 +84,7 @@ public class CharyparNagelLegScoringFunction implements LegScoringFunction, Basi
 	}
 
 	public void finish() {
-		if (this.index == this.lastActIndex) {
-			handleAct(24*3600); // handle the last act
-		}
+		
 	}
 
 	public double getScore() {
@@ -291,5 +289,4 @@ public class CharyparNagelLegScoringFunction implements LegScoringFunction, Basi
 		this.score += calcLegScore(this.lastTime, time, leg);
 		this.index++;
 	}
-
 }
