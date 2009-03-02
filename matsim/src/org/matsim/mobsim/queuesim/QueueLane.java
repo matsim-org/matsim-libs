@@ -47,7 +47,6 @@ import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
-
 /**
  * 
  * @author dgrether based on prior QueueLink implementations of
@@ -137,8 +136,6 @@ public class QueueLane implements Comparable<QueueLane> {
 
 	private double meterFromLinkEnd = Double.NaN;
 
-//	private double flowCapacityFractionalRest = Double.NaN;
-	
 	private int visualizerLane;
 	
 	/**
@@ -150,17 +147,14 @@ public class QueueLane implements Comparable<QueueLane> {
 
 	private BasicLane laneData;
 
-	private boolean thisTimeStepGreen = false;
-	
+	private boolean thisTimeStepGreen = true;
+
 	/* package */ QueueLane(QueueLink ql, boolean isOriginalLane) {
 		this.queueLink = ql;
 		this.originalLane = isOriginalLane;
 		this.freespeedTravelTime = ql.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
 		this.length_m = ql.getLink().getLength();
 		this.meterFromLinkEnd = 0.0;
-		// yy: I am really not so happy about these indirect constructors with
-		// long argument lists. But be it if other people
-		// like them. kai, nov06
 		/*
 		 * moved capacity calculation to two methods, to be able to call it from
 		 * outside e.g. for reducing cap in case of an incident
@@ -247,29 +241,30 @@ public class QueueLane implements Comparable<QueueLane> {
 		recalcCapacity(now);
 	}
 	
-	/*package*/ void recalculateProperties(double meterFromLinkEnd_m, double lengthOfPseudoLink_m, double numberOfLanes) {
+	/*package*/ void recalculateProperties(double meterFromLinkEnd_m, double laneLength_m,
+			double numberOfRepresentedLanes) {
 		/*variable was given as parameter in original but the method was called everywhere with the expression below, 
 		 * TODO Check if this is correct! dg[jan09]*/
 		double averageSimulatedFlowCapacityPerLane_Veh_s = this.queueLink.getSimulatedFlowCapacity() / this.queueLink.getLink().getLanes(Time.UNDEFINED_TIME);
 		
-		if(lengthOfPseudoLink_m < 15){
+		if(laneLength_m < 15){
 			log.warn("Length of one of link " + this.queueLink.getLink().getId() + " sublinks is less than 15m." +
 					" Will enlarge length to 15m, since I need at least additional 15m space to store 2 vehicles" +
 					" at the original link.");
 			this.length_m = 15.0;
 		} else {
-			this.length_m = lengthOfPseudoLink_m;
+			this.length_m = laneLength_m;
 		}
 		
 		this.meterFromLinkEnd  = meterFromLinkEnd_m;
 		this.freespeedTravelTime = this.length_m / this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 
-		this.simulatedFlowCapacity = numberOfLanes * averageSimulatedFlowCapacityPerLane_Veh_s
+		this.simulatedFlowCapacity = numberOfRepresentedLanes * averageSimulatedFlowCapacityPerLane_Veh_s
 				* SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();
 
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
-		this.storageCapacity = (this.length_m * numberOfLanes) / 
+		this.storageCapacity = (this.length_m * numberOfRepresentedLanes) / 
 								this.queueLink.getQueueNetwork().getNetworkLayer().getEffectiveCellSize() * Gbl.getConfig().simulation().getStorageCapFactor();
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
 
@@ -292,42 +287,30 @@ public class QueueLane implements Comparable<QueueLane> {
 		this.active = false;
 	}
 	
-	public boolean canMoveFirstVehicle() {
+	/**
+	 * This method should replace canMoveFirstVehicle
+	 * @return
+	 */
+	public void updateGreenState(){
 		if (this.signalGroups == null) {
 			log.fatal("This should never happen, since every lane link at a signalized intersection" +
 					" should have at least one signal(group). Please check integrity of traffic light data on link " + 
 					this.queueLink.getLink().getId() + " lane " + this.laneData.getId() + ". Allowing to move anyway.");
 			this.setThisTimeStepGreen(true);
-			if (this.getFirstFromBuffer() != null) {
-				return true;
-			}
-			return false;
+			return;
 		}
 		//else everything normal...
-		boolean signalGroupGreen;
 		for (BasicSignalGroupDefinition signalGroup : this.signalGroups.values()) {
-			signalGroupGreen = signalGroup.isGreen();
-			if (signalGroupGreen) {
-				this.setThisTimeStepGreen(true);
-			}
-			QueueVehicle firstVeh = this.getFirstFromBuffer();
-			if (firstVeh != null){
-				// check if the vehicle's next link is valid according to signal's specification
-				if (!(signalGroup.getToLinkIds().contains(firstVeh.getDriver().chooseNextLink().getId()) ||
-						firstVeh.getDriver().chooseNextLink().getToNode().equals(this.queueLink.getLink().getFromNode()))) {
-					log.error("Person Id: "+ firstVeh.getDriver().getPerson().getId() + " has invalid route according to signal system specification!");
-					return false;
-				}
-				if (signalGroupGreen) {
-					return true;
-				}
-			}
+			this.setThisTimeStepGreen(signalGroup.isGreen());
 		}
-		return false;
 	}
-
+	
 	protected boolean bufferIsEmpty() {
 		return this.buffer.isEmpty();
+	}
+	
+	protected boolean isThisTimeStepGreen(){
+		return this.thisTimeStepGreen ;
 	}
 	
 	protected void setThisTimeStepGreen(boolean b) {
@@ -483,15 +466,15 @@ public class QueueLane implements Comparable<QueueLane> {
 	 * @return 
 	 */
 	protected boolean moveLane(final double now) {
-		if (this.meterFromLinkEnd == 0.0) {
-			if (this.originalLane || this.thisTimeStepGreen) 
-				updateBufferCapacity();
-		}
-		else {
-			updateBufferCapacity();
-		}
-		
-		this.bufferCap = this.simulatedFlowCapacity;
+//		if (this.meterFromLinkEnd == 0.0) {
+//			if (this.originalLane || this.thisTimeStepGreen) 
+//				updateBufferCapacity();
+//		}
+//		else {
+//			updateBufferCapacity();
+//		}
+		updateBufferCapacity();
+//		this.bufferCap = this.simulatedFlowCapacity;
 
 		if (this.originalLane) {
 			// move vehicles from parking into waitingQueue if applicable
@@ -506,7 +489,7 @@ public class QueueLane implements Comparable<QueueLane> {
 			// move vehicles from waitingQueue into buffer if possible
 			moveWaitToBuffer(now);
 		}
-		this.setThisTimeStepGreen(false);
+//		this.setThisTimeStepGreen(false);
 		return this.updateActiveStatus();
 	}
 
@@ -531,7 +514,7 @@ public class QueueLane implements Comparable<QueueLane> {
 		
 		moveBufferToNextLane(now);
 
-		this.setThisTimeStepGreen(false);
+//		this.setThisTimeStepGreen(false);
 		return this.updateActiveStatus();
 	}
 
@@ -560,8 +543,8 @@ public class QueueLane implements Comparable<QueueLane> {
 
 	
 	private void updateBufferCapacity() {
-//		this.bufferCap = this.simulatedFlowCapacity;
-		if (this.buffercap_accumulate < 1.0) {
+		this.bufferCap = this.simulatedFlowCapacity;
+		if (this.thisTimeStepGreen  && (this.buffercap_accumulate < 1.0)) {
 			this.buffercap_accumulate += this.flowCapFraction;
 		}
 	}
@@ -578,28 +561,24 @@ public class QueueLane implements Comparable<QueueLane> {
 	 *          the vehicle
 	 */
 	/*package*/ void add(final QueueVehicle veh, double now) {
-//		log.debug("add(): " + now);
 		activateLane();
 		this.vehQueue.add(veh);
-//		veh.setDepartureTime_s((int) (now + this.queueLink.getLink().getFreespeedTravelTime(now)));
 		double departureTime;
 		if (this.originalLane) {
-			// It's the original link,
+			// It's the original lane,
 			// so we need to start with a 'clean' freeSpeedTravelTime
 			departureTime = (now + this.freespeedTravelTime);
 		} 
 		else {
-			// It's not the original link,
+			// It's not the original lane,
 			// so there is a fractional rest we add to this link's freeSpeedTravelTime
 			departureTime = now + this.freespeedTravelTime
 			+ veh.getDepartureTime_s() - Math.floor(veh.getDepartureTime_s());
-//			veh.setDepartureTime_s(now + this.freespeedTravelTime
-//					+ veh.getDepartureTime_s() - Math.floor(veh.getDepartureTime_s()));
 		}
 		veh.setDepartureTime_s(departureTime);
 		
 		if (this.meterFromLinkEnd == 0.0) {
-			// It's a nodePseudoLink,
+			// It's a QueueLane that is directly connected to a QueueNode,
 			// so we have to floor the freeLinkTravelTime in order the get the same
 			// results compared to the old mobSim
 			veh.setDepartureTime_s(Math.floor(veh.getDepartureTime_s()));
@@ -773,13 +752,6 @@ public class QueueLane implements Comparable<QueueLane> {
 
 		return vehicles;
 	}
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	

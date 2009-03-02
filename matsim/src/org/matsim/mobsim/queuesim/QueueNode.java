@@ -89,7 +89,7 @@ public class QueueNode {
 	// ////////////////////////////////////////////////////////////////////
 	// Queue related movement code
 	// ////////////////////////////////////////////////////////////////////
-	public boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLane currentLane, final double now) {
+	protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLane currentLane, final double now) {
 		Link nextLink = veh.getDriver().chooseNextLink();
 		Link currentLink = veh.getCurrentLink();
 		// veh has to move over node
@@ -175,11 +175,9 @@ public class QueueNode {
 		if (this.signalized) {
 			for (QueueLink link : this.inLinksArrayCache){
 				for (QueueLane lane : link.getToNodeQueueLanes()) {
-					while (lane.canMoveFirstVehicle()) {
-						QueueVehicle veh = lane.getFirstFromBuffer();
-						if (!this.moveVehicleOverNode(veh, lane, now)) {
-							break;
-						}
+					lane.updateGreenState();
+					if (lane.isThisTimeStepGreen()){
+						this.clearLaneBuffer(lane, now);
 					}
 				}
 			}
@@ -189,6 +187,7 @@ public class QueueNode {
 			double inLinksCapSum = 0.0;
 			// Check all incoming links for buffered agents
 			for (QueueLink link : this.inLinksArrayCache) {
+//				link.setLanesToGreen(true);
 				if (!link.bufferIsEmpty()) {
 					this.tempLinks[inLinksCounter] = link;
 					inLinksCounter++;
@@ -218,20 +217,24 @@ public class QueueNode {
 						this.tempLinks[i] = null;
 						//move the link
 						for (QueueLane lane : link.getToNodeQueueLanes()) {
-							while (!lane.bufferIsEmpty()) {
-								QueueVehicle veh = lane.getFirstFromBuffer();
-								if (!moveVehicleOverNode(veh, lane, now)) {
-									break;
-								}
-							}
+							this.clearLaneBuffer(lane, now);
 						}
 						break;
 					}
 				}
 			}
 		}
-
 	}
+	
+	private void clearLaneBuffer(QueueLane lane, double now){
+		while (!lane.bufferIsEmpty()) {
+			QueueVehicle veh = lane.getFirstFromBuffer();
+			if (!moveVehicleOverNode(veh, lane, now)) {
+				break;
+			}
+		}	
+	}
+	
 
 	public void setSignalized(final boolean b) {
 		this.signalized = b;

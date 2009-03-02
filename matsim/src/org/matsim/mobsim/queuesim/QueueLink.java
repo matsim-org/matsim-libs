@@ -203,6 +203,7 @@ public class QueueLink {
 		addUTurn();
 		resortQueueLanes();
 	}
+
 	/**
 	 * 
 	 * @return
@@ -367,13 +368,9 @@ public class QueueLink {
 		this.active = ret;
 		return ret;
 	}
-
+	
 	protected boolean bufferIsEmpty() {
-		//TODO dg refactore concept of setThisTimeStepGreen, too complicated -> tooooo much debugging time in case of errors
-		for (QueueLane lane : this.queueLanes){
-			lane.setThisTimeStepGreen(true);
-		}
-		//if there is only one link...
+		//if there is only one lane...
 		if (this.toNodeQueueLanes == null){
 			return this.originalLane.bufferIsEmpty();
 		}
