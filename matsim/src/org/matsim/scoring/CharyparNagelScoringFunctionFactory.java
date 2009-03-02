@@ -20,6 +20,7 @@
 
 package org.matsim.scoring;
 
+import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.interfaces.core.v01.Plan;
 
 /**
@@ -29,11 +30,14 @@ import org.matsim.interfaces.core.v01.Plan;
  */
 public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.demandmodeling.scoring.ScoringFunctionFactory#getNewScoringFunction(org.matsim.demandmodeling.plans.Plan)
-	 */
+	private final CharyparNagelScoringParameters params;
+	
+	public CharyparNagelScoringFunctionFactory(final CharyparNagelScoringConfigGroup config) {
+		this.params = new CharyparNagelScoringParameters(config);
+	}
+	
 	public ScoringFunction getNewScoringFunction(final Plan plan) {
-		return new CharyparNagelScoringFunction(plan);
+		return new CharyparNagelScoringFunction(plan, this.params);
 	}
 
 }

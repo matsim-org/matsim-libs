@@ -96,7 +96,7 @@ public class PlanomatPerformanceTest extends MatsimTestCase {
 		log.info("Reading events...done.");
 
 		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, network);
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(Gbl.getConfig().charyparNagelScoring());
 
 		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
 		Gbl.printMemoryUsage();

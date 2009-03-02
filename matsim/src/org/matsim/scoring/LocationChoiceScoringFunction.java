@@ -20,9 +20,6 @@
 
 package org.matsim.scoring;
 
-import static org.matsim.scoring.CharyparNagelScoringFunction.marginalUtilityOfEarlyDeparture;
-import static org.matsim.scoring.CharyparNagelScoringFunction.marginalUtilityOfLateArrival;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
@@ -38,14 +35,13 @@ import org.matsim.population.ActUtilityParameters;
 /* 
  * Scoring function factoring in capacity restraints
  */
-
 public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoringFunction {
 
 	private List<ScoringPenalty> penalty = null;
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 
-	public LocationChoiceScoringFunction(final Plan plan, TreeMap<Id, FacilityPenalty> facilityPenalties) {
-		super(plan);
+	public LocationChoiceScoringFunction(final Plan plan, final CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties) {
+		super(plan, params);
 		this.penalty = new Vector<ScoringPenalty>();
 		this.facilityPenalties = facilityPenalties;
 	}
@@ -65,7 +61,7 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
 
-		ActUtilityParameters params = utilParams.get(act.getType());
+		ActUtilityParameters params = this.params.utilParams.get(act.getType());
 		if (params == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
@@ -95,12 +91,12 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 		double typicalDuration = params.getTypicalDuration();
 
 		if (duration > 0) {
-			double utilPerf = marginalUtilityOfPerforming * typicalDuration
+			double utilPerf = this.params.marginalUtilityOfPerforming * typicalDuration
 					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
 			
 			
 
-			double utilWait = marginalUtilityOfWaiting * duration;
+			double utilWait = this.params.marginalUtilityOfWaiting * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 					
 			/* Penalty due to facility load: --------------------------------------------
@@ -115,7 +111,7 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 			//---------------------------------------------------------------------------
 				
 		} else {
-			tmpScore += 2*super.marginalUtilityOfLateArrival*Math.abs(duration);
+			tmpScore += 2*this.params.marginalUtilityOfLateArrival*Math.abs(duration);
 		}
 		
 				
@@ -123,30 +119,30 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 		// disutility if too early
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
-			tmpScore += marginalUtilityOfWaiting * (activityStart - arrivalTime);
+			tmpScore += this.params.marginalUtilityOfWaiting * (activityStart - arrivalTime);
 		}
 
 		// disutility if too late
 		double latestStartTime = params.getLatestStartTime();
 		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
-			tmpScore += marginalUtilityOfLateArrival * (activityStart - latestStartTime);
+			tmpScore += this.params.marginalUtilityOfLateArrival * (activityStart - latestStartTime);
 		}
 
 		// disutility if stopping too early
 		double earliestEndTime = params.getEarliestEndTime();
 		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
-			tmpScore += marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
+			tmpScore += this.params.marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
 		}
 
 		// disutility if going to away to late
 		if (activityEnd < departureTime) {
-			tmpScore += marginalUtilityOfWaiting * (departureTime - activityEnd);
+			tmpScore += this.params.marginalUtilityOfWaiting * (departureTime - activityEnd);
 		}
 
 		// disutility if duration was too short
 		double minimalDuration = params.getMinimalDuration();
 		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
-			tmpScore += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
+			tmpScore += this.params.marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 		}	
 		return tmpScore;
 	}

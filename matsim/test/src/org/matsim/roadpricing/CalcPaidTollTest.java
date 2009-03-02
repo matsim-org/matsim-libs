@@ -27,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueSimulation;
@@ -212,7 +213,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Events events = new Events();
 		CalcPaidToll paidToll = new CalcPaidToll(network, toll);
 		events.addHandler(paidToll);
-		EventsToScore scoring = new EventsToScore(population, new CharyparNagelScoringFunctionFactory());
+		EventsToScore scoring = new EventsToScore(population, new CharyparNagelScoringFunctionFactory(Gbl.getConfig().charyparNagelScoring()));
 		events.addHandler(scoring);
 
 		QueueSimulation sim = new QueueSimulation(network, population, events);

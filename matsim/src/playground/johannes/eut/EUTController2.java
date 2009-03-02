@@ -26,7 +26,6 @@ package playground.johannes.eut;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationStartsListener;
@@ -134,7 +133,7 @@ public class EUTController2 extends WithindayControler {
 		/*
 		 * Replace the default scoring function with the "risk"-scoring function.
 		 */
-		this.scoringFunctionFactory = new EUTScoringFactory(utilFunction);
+		this.scoringFunctionFactory = new EUTScoringFactory(utilFunction, config.charyparNagelScoring());
 		/*
 		 * Remove all scores in the 0-th iteration.
 		 * We have to remove duplicate plans, i.e., plans with the same route and departure time!

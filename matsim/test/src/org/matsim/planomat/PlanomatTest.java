@@ -136,7 +136,7 @@ public class PlanomatTest extends MatsimTestCase {
 		events.addHandler(depDelayCalc);
 
 		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, this.network);
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(Gbl.getConfig().charyparNagelScoring());
 
 		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
 		testee.getSeedGenerator().setSeed(Gbl.getConfig().global().getRandomSeed());
@@ -312,7 +312,7 @@ public class PlanomatTest extends MatsimTestCase {
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.network, 900);
 
 		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, this.network);
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(Gbl.getConfig().charyparNagelScoring());
 
 		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
 

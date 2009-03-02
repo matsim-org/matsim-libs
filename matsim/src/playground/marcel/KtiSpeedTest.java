@@ -96,7 +96,7 @@ public class KtiSpeedTest {
 		events.addHandler(new DepartureDelayAverageCalculator(network, 900));
 		events.addHandler(new CalcLegTimes(population));
 		events.addHandler(new LegHistogram(300));
-		events.addHandler(new EventsToScore(population, new CharyparNagelScoringFunctionFactory()));
+		events.addHandler(new EventsToScore(population, new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring())));
 		events.addHandler(ttime);
 		events.addHandler(new VolumesAnalyzer(900, 30*3600, network));
 		events.addHandler(new EventWriterTXT("testevents.txt"));

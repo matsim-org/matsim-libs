@@ -20,18 +20,25 @@
 
 package org.matsim.scoring;
 
+import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.interfaces.core.v01.Plan;
 
 /**
- * Generates {@link CharyparNagelScoringOpenTimesFunction}s.
+ * Generates {@link CharyparNagelOpenTimesScoringFunction}s.
  * 
  * @author meisterk
  *
  */
 public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunctionFactory {
 
+	private final CharyparNagelScoringParameters params;
+	
+	public CharyparNagelOpenTimesScoringFunctionFactory(final CharyparNagelScoringConfigGroup config) {
+		this.params = new CharyparNagelScoringParameters(config);
+	}
+
 	public ScoringFunction getNewScoringFunction(Plan plan) {
-		return new CharyparNagelOpenTimesScoringFunction(plan);
+		return new CharyparNagelOpenTimesScoringFunction(plan, this.params);
 	}
 
 	

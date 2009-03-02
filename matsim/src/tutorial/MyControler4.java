@@ -56,7 +56,7 @@ public class MyControler4 {
 		EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
 		events.addHandler(eventWriter);
 
-		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory();
+		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
 		EventsToScore scoring = new EventsToScore(population, factory);
 		events.addHandler(scoring);
 

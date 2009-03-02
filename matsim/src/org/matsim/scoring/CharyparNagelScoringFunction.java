@@ -20,12 +20,7 @@
 
 package org.matsim.scoring;
 
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
-import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
@@ -85,12 +80,6 @@ import org.matsim.utils.misc.Time;
  */
 
 public class CharyparNagelScoringFunction implements ScoringFunction {
-
-	/* TODO [MR] this class should take a ScoringFunctionConfigModule on
-	 * initialization once the new config-modules are available, instead
-	 * of reading everything from the config directly.
-	 */
-
 	protected final Person person;
 	protected final Plan plan;
 
@@ -107,20 +96,13 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	
 	private static int firstLastActWarning = 0;
 
-	/* TODO [MR] the following field should not be public, but I need a way to reset the initialized state
-	 * for the test cases.  Once we have the better config-objects, where we do not need to parse the
-	 * values each time from a string, this whole init() concept can be removed and with this
-	 * also this public member.  -marcel, 07aug07
-	 */
-	public static boolean initialized = false;
-
-	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
-	private static boolean scoreActs = true;
-
+	/** The parameters used for scoring */
+	protected final CharyparNagelScoringParameters params;
+	
 	private static final Logger log = Logger.getLogger(CharyparNagelScoringFunction.class);
 
-	public CharyparNagelScoringFunction(final Plan plan) {
-		init();
+	public CharyparNagelScoringFunction(final Plan plan, final CharyparNagelScoringParameters params) {
+		this.params = params;
 		this.reset();
 
 		this.plan = plan;
@@ -174,50 +156,10 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		return this.score;
 	}
 
-	/* At the moment, the following values are all static's. But in the longer run,
-	 * they should be agent-specific or facility-specific values...
-	 */
-	protected static final TreeMap<String, ActUtilityParameters> utilParams = new TreeMap<String, ActUtilityParameters>();
-	protected static double marginalUtilityOfWaiting = Double.NaN;
-	protected static double marginalUtilityOfLateArrival = Double.NaN;
-	protected static double marginalUtilityOfEarlyDeparture = Double.NaN;
-	protected static double marginalUtilityOfTraveling = Double.NaN;
-	private static double marginalUtilityOfTravelingPT = Double.NaN; // public transport
-	private static double marginalUtilityOfTravelingWalk = Double.NaN;
-	protected static double marginalUtilityOfPerforming = Double.NaN;
-	private static double marginalUtilityOfDistance = Double.NaN;
-	private static double abortedPlanScore = Double.NaN;
-
-	protected static void init() {
-		if (initialized) return;
-
-		utilParams.clear();
-		CharyparNagelScoringConfigGroup params = Gbl.getConfig().charyparNagelScoring();
-		marginalUtilityOfWaiting = params.getWaiting() / 3600.0;
-		marginalUtilityOfLateArrival = params.getLateArrival() / 3600.0;
-		marginalUtilityOfEarlyDeparture = params.getEarlyDeparture() / 3600.0;
-		marginalUtilityOfTraveling = params.getTraveling() / 3600.0;
-		marginalUtilityOfTravelingPT = params.getTravelingPt() / 3600.0;
-		marginalUtilityOfTravelingWalk = params.getTravelingWalk() / 3600.0;
-		marginalUtilityOfPerforming = params.getPerforming() / 3600.0;
-
-		marginalUtilityOfDistance = params.getMarginalUtlOfDistance();
-
-		abortedPlanScore = Math.min(
-				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),
-				Math.min(marginalUtilityOfTraveling, marginalUtilityOfWaiting)) * 3600.0 * 24.0; // SCENARIO_DURATION
-		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
-
-		readUtilityValues();
-		scoreActs = (marginalUtilityOfPerforming != 0 || marginalUtilityOfWaiting != 0 ||
-				marginalUtilityOfLateArrival != 0 || marginalUtilityOfEarlyDeparture != 0);
-		initialized = true;
-	}
-
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
 
-		ActUtilityParameters params = utilParams.get(act.getType());
-		if (params == null) {
+		ActUtilityParameters actParams = this.params.utilParams.get(act.getType());
+		if (actParams == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
 
@@ -276,43 +218,43 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		// disutility if too early
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
-			tmpScore += marginalUtilityOfWaiting * (activityStart - arrivalTime);
+			tmpScore += this.params.marginalUtilityOfWaiting * (activityStart - arrivalTime);
 		}
 
 		// disutility if too late
 
-		double latestStartTime = params.getLatestStartTime();
+		double latestStartTime = actParams.getLatestStartTime();
 		if (latestStartTime >= 0 && activityStart > latestStartTime) {
-			tmpScore += marginalUtilityOfLateArrival * (activityStart - latestStartTime);
+			tmpScore += this.params.marginalUtilityOfLateArrival * (activityStart - latestStartTime);
 		}
 
 		// utility of performing an action, duration is >= 1, thus log is no problem
-		double typicalDuration = params.getTypicalDuration();
+		double typicalDuration = actParams.getTypicalDuration();
 
 		if (duration > 0) {
-			double utilPerf = marginalUtilityOfPerforming * typicalDuration
-					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
-			double utilWait = marginalUtilityOfWaiting * duration;
+			double utilPerf = this.params.marginalUtilityOfPerforming * typicalDuration
+					* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration());
+			double utilWait = this.params.marginalUtilityOfWaiting * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
-			tmpScore += 2*marginalUtilityOfLateArrival*Math.abs(duration);
+			tmpScore += 2*this.params.marginalUtilityOfLateArrival*Math.abs(duration);
 		}
 
 		// disutility if stopping too early
-		double earliestEndTime = params.getEarliestEndTime();
+		double earliestEndTime = actParams.getEarliestEndTime();
 		if (earliestEndTime >= 0 && activityEnd < earliestEndTime) {
-			tmpScore += marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
+			tmpScore += this.params.marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
 		}
 
 		// disutility if going to away to late
 		if (activityEnd < departureTime) {
-			tmpScore += marginalUtilityOfWaiting * (departureTime - activityEnd);
+			tmpScore += this.params.marginalUtilityOfWaiting * (departureTime - activityEnd);
 		}
 
 		// disutility if duration was too short
-		double minimalDuration = params.getMinimalDuration();
+		double minimalDuration = actParams.getMinimalDuration();
 		if (minimalDuration >= 0 && duration < minimalDuration) {
-			tmpScore += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
+			tmpScore += this.params.marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 		}
 
 		return tmpScore;
@@ -320,13 +262,13 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 
 	protected double[] getOpeningInterval(final Act act) {
 
-		ActUtilityParameters params = utilParams.get(act.getType());
-		if (params == null) {
+		ActUtilityParameters actParams = this.params.utilParams.get(act.getType());
+		if (actParams == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
 
-		double openingTime = params.getOpeningTime();
-		double closingTime = params.getClosingTime();
+		double openingTime = actParams.getOpeningTime();
+		double closingTime = actParams.getClosingTime();
 
 		// openInterval has two values
 		// openInterval[0] will be the opening time
@@ -341,7 +283,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist = 0.0; // distance in meters
 
-		if (marginalUtilityOfDistance != 0.0) {
+		if (this.params.marginalUtilityOfDistance != 0.0) {
 			/* we only as for the route when we have to calculate a distance cost,
 			 * because route.getDist() may calculate the distance if not yet
 			 * available, which is quite an expensive operation
@@ -358,51 +300,21 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		}
 
 		if (BasicLeg.Mode.car.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTraveling + marginalUtilityOfDistance * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistance * dist;
 		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTravelingPT + marginalUtilityOfDistance * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT + this.params.marginalUtilityOfDistance * dist;
 		} else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTravelingWalk + marginalUtilityOfDistance * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk + this.params.marginalUtilityOfDistance * dist;
 		} else {
 			// use the same values as for "car"
-			tmpScore += travelTime * marginalUtilityOfTraveling + marginalUtilityOfDistance * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistance * dist;
 		}
 
 		return tmpScore;
 	}
 
-	private static double getStuckPenalty() {
-		return abortedPlanScore;
-	}
-
-	/**
-	 * reads all activity utility values from the config-file
-	 */
-	private static final void readUtilityValues() {
-		CharyparNagelScoringConfigGroup config = Gbl.getConfig().charyparNagelScoring();
-
-		for (ActivityParams params : config.getActivityParams()) {
-			String type = params.getType();
-			double priority = params.getPriority();
-			double typDurationSecs = params.getTypicalDuration();
-			ActUtilityParameters actParams = new ActUtilityParameters(type, priority, typDurationSecs);
-			if (params.getMinimalDuration() >= 0) {
-				actParams.setMinimalDuration(params.getMinimalDuration());
-			}
-			if (params.getOpeningTime() >= 0) {
-				actParams.setOpeningTime(params.getOpeningTime());
-			}
-			if (params.getLatestStartTime() >= 0) {
-				actParams.setLatestStartTime(params.getLatestStartTime());
-			}
-			if (params.getEarliestEndTime() >= 0) {
-				actParams.setEarliestEndTime(params.getEarliestEndTime());
-			}
-			if (params.getClosingTime() >= 0) {
-				actParams.setClosingTime(params.getClosingTime());
-			}
-			utilParams.put(type, actParams);
-		}
+	private double getStuckPenalty() {
+		return this.params.abortedPlanScore;
 	}
 
 	protected void handleAct(final double time) {
@@ -415,7 +327,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 				// the first Act and the last Act have the same type
 				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
 			} else {
-				if (scoreActs) {
+				if (this.params.scoreActs) {
 				    if (firstLastActWarning <= 10) {
 				    	log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
 				        if (firstLastActWarning == 10) {

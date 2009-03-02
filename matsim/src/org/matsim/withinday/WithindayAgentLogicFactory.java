@@ -65,7 +65,7 @@ public class WithindayAgentLogicFactory {
 	}
 	
 	public ScoringFunctionFactory createScoringFunctionFactory() {
-		return new CharyparNagelScoringFunctionFactory();
+		return new CharyparNagelScoringFunctionFactory(this.scoringConfig);
 	}
 	
 	

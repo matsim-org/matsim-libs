@@ -22,6 +22,7 @@ package org.matsim.scoring;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
+import org.matsim.config.Config;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
@@ -73,7 +74,6 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 
 		Act act = plan.createAct("no type", testFacility);
 		act.setStartTime(8.0 * 3600);
-		act.setDuration(8.0 * 3600);
 		act.setEndTime(16.0 * 3600);
 		act.setFacility(testFacility);
 	}
@@ -85,12 +85,11 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		super.tearDown();
 	}
 
-	public void testGetOpeningInterval() throws Exception {
-
+	public void testGetOpeningInterval() {
+		final Config config = loadConfig(null);
 		Act act = this.plan.getFirstActivity();
 
-		CharyparNagelOpenTimesScoringFunction.initialized = true;
-		CharyparNagelOpenTimesScoringFunction testee = new CharyparNagelOpenTimesScoringFunction(this.plan);
+		CharyparNagelOpenTimesScoringFunction testee = new CharyparNagelOpenTimesScoringFunction(this.plan, new CharyparNagelScoringParameters(config.charyparNagelScoring()));
 
 		double[] openInterval = null;
 

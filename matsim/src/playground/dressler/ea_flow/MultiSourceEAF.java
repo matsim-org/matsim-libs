@@ -285,7 +285,7 @@ public class MultiSourceEAF {
 					world.setNetworkLayer(network);
 					world.complete();
 
-					CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory();
+					CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
 					PlansCalcRoute router = new PlansCalcRoute(network, new FakeTravelTimeCost(), new FakeTravelTimeCost());
 					//PlansCalcRoute router = new PlansCalcRouteDijkstra(network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), new FakeTravelTimeCost());
 					for (Object O_person : output.getPersons().values()) {

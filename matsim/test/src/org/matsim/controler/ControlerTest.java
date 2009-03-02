@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.Module;
+import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
@@ -41,6 +42,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationImpl;
 import org.matsim.scoring.CharyparNagelScoringFunction;
+import org.matsim.scoring.CharyparNagelScoringParameters;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
@@ -165,7 +167,7 @@ public class ControlerTest extends MatsimTestCase {
 		final Controler controler = new Controler(config, network, population);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
-		controler.setScoringFunctionFactory(new DummyScoringFunctionFactory());
+		controler.setScoringFunctionFactory(new DummyScoringFunctionFactory(config.charyparNagelScoring()));
 		assertTrue("Custom ScoringFunctionFactory was not set.",
 				controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory);
 
@@ -391,14 +393,15 @@ public class ControlerTest extends MatsimTestCase {
 
 	/** A helper class for testSetScoringFunctionFactory() */
 	private static class DummyScoringFunctionFactory implements ScoringFunctionFactory {
-		public DummyScoringFunctionFactory() {
-			/* empty public constructor for private inner class */
+		private final CharyparNagelScoringParameters params; 
+		
+		public DummyScoringFunctionFactory(final CharyparNagelScoringConfigGroup config) {
+			this.params = new CharyparNagelScoringParameters(config);
 		}
 
 		public ScoringFunction getNewScoringFunction(final Plan plan) {
-			return new CharyparNagelScoringFunction(plan);
+			return new CharyparNagelScoringFunction(plan, this.params);
 		}
-
 	}
 
 }

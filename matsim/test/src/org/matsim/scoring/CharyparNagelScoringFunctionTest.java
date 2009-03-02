@@ -77,7 +77,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		params = new CharyparNagelScoringConfigGroup.ActivityParams("w");
 		params.setTypicalDuration(8*3600);
 		scoring.addActivityParams(params);
-
+		
 		this.network = new NetworkLayer();
 		Node node1 = this.network.createNode(new IdImpl("1"), new CoordImpl(    0.0, 0.0));
 		Node node2 = this.network.createNode(new IdImpl("2"), new CoordImpl(  500.0, 0.0));
@@ -123,12 +123,11 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 
 	@Override
 	protected ScoringFunction getScoringFunctionInstance(final Plan somePlan) {
-		return new CharyparNagelScoringFunction(somePlan);
+		return new CharyparNagelScoringFunction(somePlan, new CharyparNagelScoringParameters(this.config.charyparNagelScoring()));
 	}
 
 	private double calcScore() {
-		CharyparNagelScoringFunction.initialized = false;
-		CharyparNagelScoringFunction testee = new CharyparNagelScoringFunction(this.plan);
+		CharyparNagelScoringFunction testee = new CharyparNagelScoringFunction(this.plan, new CharyparNagelScoringParameters(this.config.charyparNagelScoring()));
 		testee.endActivity(07*3600);
 		testee.startLeg(07*3600, (Leg) this.plan.getActsLegs().get(1));
 		testee.endLeg(07*3600 + 30*60);
@@ -340,8 +339,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		this.config.charyparNagelScoring().setLateArrival(-18.0);
 		this.config.charyparNagelScoring().setTraveling(-6.0);
 
-		CharyparNagelScoringFunction.initialized = false;
-		CharyparNagelScoringFunction testee = new CharyparNagelScoringFunction(this.plan);
+		CharyparNagelScoringFunction testee = new CharyparNagelScoringFunction(this.plan, new CharyparNagelScoringParameters(this.config.charyparNagelScoring()));
 		testee.endActivity(07*3600);
 		testee.startLeg(07*3600, (Leg) this.plan.getActsLegs().get(1));
 		testee.endLeg(07*3600 + 30*60);
@@ -358,8 +356,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		this.config.charyparNagelScoring().setLateArrival(-3.0);
 		this.config.charyparNagelScoring().setTraveling(-6.0);
 
-		CharyparNagelScoringFunction.initialized = false;
-		testee = new CharyparNagelScoringFunction(this.plan);
+		testee = new CharyparNagelScoringFunction(this.plan, new CharyparNagelScoringParameters(this.config.charyparNagelScoring()));
 		testee.endActivity(07*3600);
 		testee.startLeg(07*3600, (Leg) this.plan.getActsLegs().get(1));
 		testee.endLeg(07*3600 + 30*60);

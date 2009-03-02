@@ -26,6 +26,7 @@ package playground.johannes.eut;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.CharyparNagelScoringFunction;
+import org.matsim.scoring.CharyparNagelScoringParameters;
 
 /**
  * @author illenberger
@@ -35,15 +36,14 @@ public class EUTScoringFunction extends CharyparNagelScoringFunction {
 
 	private ArrowPrattRiskAversionI utilFunc;
 	
-	public EUTScoringFunction(Plan plan, ArrowPrattRiskAversionI utilFunc) {
-		super(plan);
+	public EUTScoringFunction(Plan plan, final CharyparNagelScoringParameters params, ArrowPrattRiskAversionI utilFunc) {
+		super(plan, params);
 		this.utilFunc = utilFunc;
 	}
 
 	@Override
-	protected double calcLegScore(double departureTime, double arrivalTime,
-			Leg leg) {
-		return marginalUtilityOfTraveling * utilFunc.evaluate(arrivalTime - departureTime);
+	protected double calcLegScore(double departureTime, double arrivalTime, Leg leg) {
+		return this.params.marginalUtilityOfTraveling * utilFunc.evaluate(arrivalTime - departureTime);
 	}
 
 }

@@ -1069,7 +1069,7 @@ public class MyRuns {
 
 		System.out.println("  creating events object... ");
 		final Events events = new Events();
-		final EventsToScore scoring = new EventsToScore(population, new CharyparNagelScoringFunctionFactory());
+		final EventsToScore scoring = new EventsToScore(population, new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring()));
 		events.addHandler(scoring);
 		System.out.println("  done.");
 
@@ -1112,7 +1112,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  creating events object... ");
-		final EventsToScore calcscore = new EventsToScore(population, new CharyparNagelScoringFunctionFactory());
+		final EventsToScore calcscore = new EventsToScore(population, new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring()));
 		final Events events = new Events();
 		events.addHandler(calcscore);
 		System.out.println("  done.");

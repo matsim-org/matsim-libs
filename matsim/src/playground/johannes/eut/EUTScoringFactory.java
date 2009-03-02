@@ -23,7 +23,9 @@
  */
 package playground.johannes.eut;
 
+import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.scoring.CharyparNagelScoringParameters;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 
@@ -34,13 +36,15 @@ import org.matsim.scoring.ScoringFunctionFactory;
 public class EUTScoringFactory implements ScoringFunctionFactory {
 
 	private ArrowPrattRiskAversionI utilFunc;
-	
-	public EUTScoringFactory(ArrowPrattRiskAversionI utilFunc) {
+	private final CharyparNagelScoringParameters params;
+
+	public EUTScoringFactory(ArrowPrattRiskAversionI utilFunc, final CharyparNagelScoringConfigGroup config) {
 		this.utilFunc = utilFunc;
+		this.params = new CharyparNagelScoringParameters(config);
 	}
 	
 	public ScoringFunction getNewScoringFunction(Plan plan) {
-		return new EUTScoringFunction(plan, utilFunc);
+		return new EUTScoringFunction(plan, this.params, utilFunc);
 	}
 
 }

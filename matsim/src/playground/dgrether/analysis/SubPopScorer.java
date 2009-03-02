@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.config.Config;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
@@ -63,14 +64,15 @@ public class SubPopScorer {
 	}
 
   private void calculateScore(Set<Id> idSet) {
-  	String eventsFilePath = Gbl.getConfig().events().getInputFile();
+  	Config config = Gbl.getConfig();
+  	String eventsFilePath = config.events().getInputFile();
   	FilteredEvents events = new FilteredEvents();
   	MatsimEventsReader reader = new MatsimEventsReader(events);
   	//set the filter
   	PersonEventFilter filter = new PersonEventFilter(idSet);
   	events.addFilter(filter);
   	//add the handler to score
-  	EventsToScore scorer = new EventsToScore(this.scenario.getPlans(), new CharyparNagelScoringFunctionFactory());
+  	EventsToScore scorer = new EventsToScore(this.scenario.getPlans(), new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring()));
   	events.addHandler(scorer);
 
   	reader.readFile(eventsFilePath);

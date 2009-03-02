@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
@@ -202,7 +203,7 @@ public class Fixture {
 		NetworkLayer network = createNetwork1();
 		Population referencePopulation = Fixture.createPopulation1(network);
 		Events events = new Events();
-		EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory());
+		EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory(Gbl.getConfig().charyparNagelScoring()));
 		events.addHandler(scoring);
 		QueueSimulation sim = new QueueSimulation(network, referencePopulation, events);
 		sim.run();

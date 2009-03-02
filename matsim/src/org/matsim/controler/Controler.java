@@ -595,8 +595,8 @@ public class Controler {
 	 * @return The ScoringFunctionFactory to be used for plans-scoring.
 	 */
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new CharyparNagelScoringFunctionFactory();
-//	return new CharyparNagelOpenTimesScoringFunctionFactory();
+		return new CharyparNagelScoringFunctionFactory(this.config.charyparNagelScoring());
+//	return new CharyparNagelOpenTimesScoringFunctionFactory(this.config.charyparNagelScoring());
 	}
 
 	/** Loads a default set of {@link org.matsim.controler.listener ControlerListener} to provide basic functionality.

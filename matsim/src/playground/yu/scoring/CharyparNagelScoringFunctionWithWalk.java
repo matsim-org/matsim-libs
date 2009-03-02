@@ -7,6 +7,7 @@ import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.CharyparNagelScoringFunction;
+import org.matsim.scoring.CharyparNagelScoringParameters;
 
 /**
  * change scoring function, because "walk"-mode will be implemented
@@ -18,8 +19,8 @@ public class CharyparNagelScoringFunctionWithWalk extends
 		CharyparNagelScoringFunction {
 	private static double offsetWlk = 6.0;
 
-	public CharyparNagelScoringFunctionWithWalk(Plan plan) {
-		super(plan);
+	public CharyparNagelScoringFunctionWithWalk(Plan plan, final CharyparNagelScoringParameters params) {
+		super(plan, params);
 	}
 
 	@Override
@@ -52,10 +53,10 @@ public class CharyparNagelScoringFunctionWithWalk extends
 		// }
 
 		if (BasicLeg.Mode.car.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTraveling;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
 			System.out.println("car\ttmpScore=" + travelTime + "*"
-					+ marginalUtilityOfTraveling + "=" + travelTime
-					* marginalUtilityOfTraveling);
+					+ this.params.marginalUtilityOfTraveling + "=" + travelTime
+					* this.params.marginalUtilityOfTraveling);
 		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
 			tmpScore += travelTime * (-3.0) / 3600.0;
 			System.out.println("pt\ttmpScore=" + travelTime + "*" + (-3.0)
@@ -67,7 +68,7 @@ public class CharyparNagelScoringFunctionWithWalk extends
 					* (-18.0) / 3600.0);
 		} else {
 			// use the same values as for "car"
-			tmpScore += travelTime * marginalUtilityOfTraveling;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
 		}
 
 		return tmpScore;

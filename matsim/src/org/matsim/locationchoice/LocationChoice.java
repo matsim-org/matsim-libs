@@ -71,7 +71,7 @@ public class LocationChoice extends MultithreadedModuleA {
 		
 		log.info("Scoring with LocationChoiceScoringFunction");
 		controler.setScoringFunctionFactory(
-				new LocationChoiceScoringFunctionFactory(controler.getFacilityPenalties()));
+				new LocationChoiceScoringFunctionFactory(controler.getConfig().charyparNagelScoring(), controler.getFacilityPenalties()));
 				
 		if (Gbl.getConfig().locationchoice().getMode().equals("true")) {
 			this.constrained = true;

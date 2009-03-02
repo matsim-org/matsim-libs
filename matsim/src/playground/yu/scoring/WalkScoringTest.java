@@ -3,7 +3,9 @@
  */
 package playground.yu.scoring;
 
+import org.matsim.config.Config;
 import org.matsim.controler.Controler;
+import org.matsim.gbl.Gbl;
 
 /**
  * @author yu
@@ -23,9 +25,9 @@ public class WalkScoringTest {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
+			Config config = Gbl.createConfig(args);
 			final Controler controler = new Controler(args);
-			controler
-					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk());
+			controler.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(config.charyparNagelScoring()));
 			controler.run();
 		}
 		System.exit(0);
