@@ -51,7 +51,7 @@ import org.matsim.utils.misc.Time;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler, AgentStuckEventHandler {
@@ -61,9 +61,10 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 
 	private final int binSize;
 
-	private final double[] travelTimes, carTravelTimes, ptTravelTimes;
+	private final double[] travelTimes, carTravelTimes, ptTravelTimes,
+			wlkTravelTimes;
 
-	private final int[] arrCount, carArrCount, ptArrCount;
+	private final int[] arrCount, carArrCount, ptArrCount, wlkArrCount;
 
 	/**
 	 * @param arg0
@@ -77,29 +78,25 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 	 *
 	 */
 	public TravelTimeModalSplit(final int binSize, final int nofBins,
-	// final NetworkLayer network,
 			final Population plans) {
-		// this.network = network;
 		this.plans = plans;
 		this.binSize = binSize;
 		this.travelTimes = new double[nofBins + 1];
 		this.arrCount = new int[nofBins + 1];
 		this.carTravelTimes = new double[nofBins + 1];
 		this.ptTravelTimes = new double[nofBins + 1];
+		this.wlkTravelTimes = new double[nofBins + 1];
 		this.carArrCount = new int[nofBins + 1];
 		this.ptArrCount = new int[nofBins + 1];
+		this.wlkArrCount = new int[nofBins + 1];
 	}
 
-	public TravelTimeModalSplit(final int binSize, final NetworkLayer network,
-			final Population plans) {
-		this(binSize, 30 * 3600 / binSize + 1,
-		// network,
-				plans);
+	public TravelTimeModalSplit(final int binSize, final Population plans) {
+		this(binSize, 30 * 3600 / binSize + 1, plans);
 	}
 
-	public TravelTimeModalSplit(final NetworkLayer network,
-			final Population plans) {
-		this(300, network, plans);
+	public TravelTimeModalSplit(final Population plans) {
+		this(300, plans);
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
@@ -130,25 +127,20 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 			this.tmpDptTimes.remove(agentId);
 
 			if (ae.agent == null) {
-				// rebuild event
 				ae.agent = this.plans.getPerson(new IdImpl(ae.agentId));
 			}
 
-			// Plan.Type planType = ae.agent.getSelectedPlan().getType();
 			Plan selectedplan = ae.agent.getSelectedPlan();
-			if (
-			// planType != null && Plan.Type.UNDEFINED != planType
-			!PlanModeJudger.useUndefined(selectedplan)) {
-				if (
-				// planType.equals(Plan.Type.CAR)
-				PlanModeJudger.useCar(selectedplan)) {
+			if (!PlanModeJudger.useUndefined(selectedplan)) {
+				if (PlanModeJudger.useCar(selectedplan)) {
 					this.carTravelTimes[binIdx] += travelTime;
 					this.carArrCount[binIdx]++;
-				} else if (
-				// planType.equals(Plan.Type.PT)
-				PlanModeJudger.usePt(selectedplan)) {
+				} else if (PlanModeJudger.usePt(selectedplan)) {
 					this.ptTravelTimes[binIdx] += travelTime;
 					this.ptArrCount[binIdx]++;
+				} else if (PlanModeJudger.useWalk(selectedplan)) {
+					wlkTravelTimes[binIdx] += travelTime;
+					wlkArrCount[binIdx]++;
 				}
 			} else {
 				this.carTravelTimes[binIdx] += travelTime;
@@ -184,25 +176,33 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 					.write("time\ttimeBin"
 							+ "\tall_traveltimes [s]\tn._arrivals/stucks\tavg. traveltimes [s]"
 							+ "\tcar_traveltimes [s]\tcar_n._arrivals/stucks\tcar_avg. traveltimes [s]"
-							+ "\tpt_traveltimes [s]\tpt_n._arrivals/stucks\tpt_avg. traveltimes [s]\n");
+							+ "\tpt_traveltimes [s]\tpt_n._arrivals/stucks\tpt_avg. traveltimes [s]"
+							+ "\twalk_traveltimes [s]\twalk_n._arrivals/stucks\twalk_avg. traveltimes [s]\n");
 			for (int i = 0; i < this.travelTimes.length; i++)
-				bw.write(Time.writeTime(i * this.binSize) + "\t" + i * this.binSize
-						+ "\t" + this.travelTimes[i] + "\t" + this.arrCount[i] + "\t"
+				bw.write(Time.writeTime(i * this.binSize) + "\t"
+						+ i * this.binSize + "\t" + this.travelTimes[i] + "\t"
+						+ this.arrCount[i] + "\t"
 						+ this.travelTimes[i] / this.arrCount[i] + "\t"
-						+ this.carTravelTimes[i] + "\t" + this.carArrCount[i] + "\t"
-						+ this.carTravelTimes[i] / this.carArrCount[i] + "\t"
-						+ this.ptTravelTimes[i] + "\t" + this.ptArrCount[i] + "\t"
-						+ this.ptTravelTimes[i] / this.ptArrCount[i] + "\n");
+						+ this.carTravelTimes[i] + "\t" + this.carArrCount[i]
+						+ "\t" + this.carTravelTimes[i] / this.carArrCount[i]
+						+ "\t" + this.ptTravelTimes[i] + "\t"
+						+ this.ptArrCount[i] + "\t"
+						+ this.ptTravelTimes[i] / this.ptArrCount[i]
+						+ this.wlkTravelTimes[i] + "\t" + this.wlkArrCount[i]
+						+ "\t" + this.wlkTravelTimes[i] / this.wlkArrCount[i]
+						+ "\n");
 			bw.write("----------------------------------------\n");
-			double ttSum = 0.0, carTtSum = 0.0, ptTtSum = 0.0;
-			int nTrips = 0, nCarTrips = 0, nPtTrips = 0;
+			double ttSum = 0.0, carTtSum = 0.0, ptTtSum = 0.0, wlkTtSum = 0.0;
+			int nTrips = 0, nCarTrips = 0, nPtTrips = 0, nWlkTrips = 0;
 			for (int i = 0; i < this.travelTimes.length; i++) {
 				ttSum += this.travelTimes[i];
 				carTtSum += this.carTravelTimes[i];
 				ptTtSum += this.ptTravelTimes[i];
+				wlkTtSum += this.wlkTravelTimes[i];
 				nTrips += this.arrCount[i];
 				nCarTrips += this.carArrCount[i];
 				nPtTrips += this.ptArrCount[i];
+				nWlkTrips += wlkArrCount[i];
 			}
 
 			bw
@@ -221,7 +221,11 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 							+ "the sum of all the public transit unsers traveltimes [s]: "
 							+ ptTtSum + "\n"
 							+ "the number of all the public users Trips: "
-							+ nPtTrips + "\n");
+							+ nPtTrips + "\n"
+							+ "the sum of all the walkers traveltimes [s]: "
+							+ wlkTtSum + "\n"
+							+ "the number of all the walkers Trips: "
+							+ nWlkTrips + "\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -234,49 +238,47 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 			xs[i] = (double) i * (double) this.binSize / 3600.0;
 		XYLineChart travelTimeSumChart = new XYLineChart("TravelTimes", "time",
 				"sum of TravelTimes [s]");
-		travelTimeSumChart.addSeries("sum of traveltimes of all agents", xs,
-				this.travelTimes);
 		travelTimeSumChart.addSeries("sum of traveltimes of drivers", xs,
 				this.carTravelTimes);
 		travelTimeSumChart.addSeries(
-				"sum of traveltime of public transit users", xs, this.ptTravelTimes);
+				"sum of traveltime of public transit users", xs,
+				this.ptTravelTimes);
+		travelTimeSumChart.addSeries("sum of traveltime of walkers", xs,
+				this.wlkTravelTimes);
+		travelTimeSumChart.addSeries("sum of traveltimes of all agents", xs,
+				this.travelTimes);
 		travelTimeSumChart.saveAsPng(filename + "Sum.png", 1024, 768);
+
 		for (int j = 0; j < xsLength - 1; j++) {
-			this.travelTimes[j] = this.arrCount[j] == 0 ? -1 : this.travelTimes[j]
-					/ this.arrCount[j];
-			this.carTravelTimes[j] = this.carArrCount[j] == 0 ? -1 : this.carTravelTimes[j]
-					/ this.carArrCount[j];
-			this.ptTravelTimes[j] = this.ptArrCount[j] == 0 ? -1 : this.ptTravelTimes[j]
-					/ this.ptArrCount[j];
+			this.travelTimes[j] = this.arrCount[j] == 0 ? -1
+					: this.travelTimes[j] / this.arrCount[j];
+			this.carTravelTimes[j] = this.carArrCount[j] == 0 ? -1
+					: this.carTravelTimes[j] / this.carArrCount[j];
+			this.ptTravelTimes[j] = this.ptArrCount[j] == 0 ? -1
+					: this.ptTravelTimes[j] / this.ptArrCount[j];
+			this.wlkTravelTimes[j] = this.wlkArrCount[j] == 0 ? -1
+					: this.wlkTravelTimes[j] / this.wlkArrCount[j];
 		}
 		XYLineChart avgTravelTimeChart = new XYLineChart(
 				"average LegTravelTime", "time", "average TravelTimes [s]");
-		avgTravelTimeChart.addSeries("average traveltime of all agents", xs,
-				this.travelTimes);
 		avgTravelTimeChart.addSeries("average traveltime of drivers", xs,
 				this.carTravelTimes);
-		avgTravelTimeChart
-				.addSeries("average traveltime of public transit Users", xs,
-						this.ptTravelTimes);
+		avgTravelTimeChart.addSeries(
+				"average traveltime of public transit Users", xs,
+				this.ptTravelTimes);
+		avgTravelTimeChart.addSeries("average traveltime of walkers", xs,
+				this.wlkTravelTimes);
+		avgTravelTimeChart.addSeries("average traveltime of all agents", xs,
+				this.travelTimes);
 		avgTravelTimeChart.saveAsPng(filename + "Avg.png", 1024, 768);
 	}
 
 	public static void main(final String[] args) {
-		final String netFilename = "../psrc/network/psrc-wo-3212.xml.gz";
-		final String plansFilename = "../runs/run668/it.1500/1500.plans.xml.gz";
-		final String eventsFilename = "../runs/run668/it.1500/1500.analysis/6760.txt";
-		final String chartFilename = "../runs/run668/it.1500/1500.analysis/6760.travelTime";
-		final String outFilename = "../runs/run668/it.1500/1500.analysis/6760.travelTime.txt.gz";
-
-		// final String netFilename = "./test/yu/test/input/equil_net.xml";
-		// final String plansFilename =
-		// "./test/yu/test/input/3k.100.plans.xml.gz";
-		// final String eventsFilename =
-		// "./test/yu/test/input/3k.100.events.txt.gz";
-		// // final String volumeTestFilename =
-		// "./test/yu/test/output/3kVolumeTest.txt.gz";
-		// final String chartFilename = "./test/yu/test/output/3kChart.png";
-		// final String outFilename = "./test/yu/test/output/3ktt.txt.gz";
+		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+		final String eventsFilename = "../matsimTests/walk-1Test/it.500/500.events.txt.gz";
+		final String plansFilename = "../matsimTests/walk-1Test/it.500/500.plans.xml.gz";
+		String outFilename = "../matsimTests/walk-1Test/it.500/travelTime.txt.gz";
+		String chartFilename = "../matsimTests/walk-1Test/it.500/travelTime";
 
 		Gbl.startMeasurement();
 		Gbl.createConfig(null);
@@ -290,8 +292,7 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 
 		Events events = new Events();
 
-		TravelTimeModalSplit ttms = new TravelTimeModalSplit(300, network,
-				population);
+		TravelTimeModalSplit ttms = new TravelTimeModalSplit(300, population);
 		events.addHandler(ttms);
 
 		System.out.println("-->reading evetsfile: " + eventsFilename);

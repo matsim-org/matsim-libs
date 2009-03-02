@@ -82,8 +82,7 @@ public class TravelTimeRoadPricingControler extends Controler {
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			Controler c = event.getControler();
 			if (event.getIteration() == c.getLastIteration()) {
-				ttms = new TravelTimeModalSplit(3600, c.getNetwork(), c
-						.getPopulation());
+				ttms = new TravelTimeModalSplit(3600, c.getPopulation());
 				c.getEvents().addHandler(ttms);
 			}
 		}

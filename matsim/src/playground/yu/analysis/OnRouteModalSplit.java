@@ -331,21 +331,21 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 			otherOnRoute[i] = (this.otherOnRoute != null) ? this.otherOnRoute[i]
 					: 0;
 		}
-		onRouteChart.addSeries("all agents on route", category, onRoute);
 		onRouteChart.addSeries("drivers on route", category, carOnRoute);
 		onRouteChart.addSeries("public transit users on route", category,
 				ptOnRoute);
 		onRouteChart.addSeries("walkers on route", category, wlkOnRoute);
 		onRouteChart.addSeries("others on route", category, otherOnRoute);
+		onRouteChart.addSeries("all agents on route", category, onRoute);
 		onRouteChart.saveAsPng(filename, 1024, 768);
 	}
 
 	public static void main(final String[] args) {
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		final String eventsFilename = "D:/tmp/it.100/100.events.txt.gz";
-		String plansFilename = "D:/tmp/it.100/100.plans.xml.gz";
-		String outputFilename = "D:/tmp/it.100/onRoute.txt";
-		String chartFilename = "D:/tmp/it.100/onRoute.png";
+		final String eventsFilename = "../matsimTests/walk-1Test/it.500/500.events.txt.gz";
+		final String plansFilename = "../matsimTests/walk-1Test/it.500/500.plans.xml.gz";
+		String outputFilename = "../matsimTests/walk-1Test/it.500/onRoute.txt";
+		String chartFilename = "../matsimTests/walk-1Test/it.500/onRoute.png";
 
 		Gbl.createConfig(null);
 

@@ -236,7 +236,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	public void write(final String filename) {
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(filename);
-			StringBuffer head = new StringBuffer("avg. Speed\nlinkId\tCapacity");
+			StringBuffer head = new StringBuffer("avg. Speed (car)\nlinkId\tCapacity");
 			for (int i = 0; i < nofBins - 1; i++)
 				head.append("\tH" + Integer.toString(i) + "-"
 						+ Integer.toString(i + 1));
@@ -281,9 +281,9 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		for (int i = 0; i < xsLength; i++)
 			if (speedsCount[i] > 0)
 				ySpeed[i] = speeds[i] / speedsCount[i];
-		XYLineChart avgSpeedChart = new XYLineChart("avg. speed in cityarea",
-				"time", "avg. speed [km/h]");
-		avgSpeedChart.addSeries("avg. speed of all agents", xs, ySpeed);
+		XYLineChart avgSpeedChart = new XYLineChart("avg. speed (car) in cityarea",
+				"time", "avg. speed (car) [km/h]");
+		avgSpeedChart.addSeries("avg. speed of all agents (car)", xs, ySpeed);
 		avgSpeedChart.saveAsPng(chartFilename, 1024, 768);
 	}
 

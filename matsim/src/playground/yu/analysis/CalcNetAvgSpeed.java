@@ -65,9 +65,7 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 	}
 
 	public void handleEvent(LinkEnterEvent enter) {
-		// if (enter.agent.getSelectedPlan().getType().equals("car")) {
 		this.enterTimes.put(enter.agentId, enter.time);
-		// }
 	}
 
 	public void reset(int iteration) {

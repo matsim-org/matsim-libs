@@ -28,8 +28,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
@@ -143,7 +143,7 @@ public class LegDistance implements LinkEnterEventHandler,
 	protected void write(final BufferedWriter bw) {
 		try {
 			bw
-					.write("time\ttimeBin\tlegDistances [m]\tn._Legs\tavg. legDistance [m]\n");
+					.write("time\ttimeBin\tlegDistances (car) [m]\tn._Legs\tavg. legDistance (car) [m]\n");
 
 			for (int i = 0; i < this.legDistances.length; i++) {
 				bw.write(Time.writeTime(i * this.binSize) + "\t" + i
@@ -158,8 +158,8 @@ public class LegDistance implements LinkEnterEventHandler,
 				legDistSum += this.legDistances[i];
 				nLegs += this.legCount[i];
 			}
-			bw.write("the sum of all the legDistances [m]: " + legDistSum
-					+ "\n" + "the number of all the Legs: " + nLegs + "\n");
+			bw.write("the sum of all the legDistances (car) [m]: " + legDistSum
+					+ "\n" + "the number of all the car-Legs: " + nLegs + "\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -175,9 +175,9 @@ public class LegDistance implements LinkEnterEventHandler,
 		for (int i = 0; i < xsLength; i++) {
 			xs[i] = ((double) i) * (double) this.binSize / 3600.0;
 		}
-		XYLineChart legDistanceSumChart = new XYLineChart("legDistances",
-				"time", "sum of legDistances [m]");
-		legDistanceSumChart.addSeries("sum of legDistances of all agents", xs,
+		XYLineChart legDistanceSumChart = new XYLineChart("car-legDistances",
+				"time", "sum of legDistances (car) [m]");
+		legDistanceSumChart.addSeries("sum of legDistances of all agents (car)", xs,
 				this.legDistances);
 		legDistanceSumChart.saveAsPng(filename + "Sum.png", 1024, 768);
 		for (int i = 0; i < xsLength - 1; i++) {
@@ -185,8 +185,8 @@ public class LegDistance implements LinkEnterEventHandler,
 					: this.legDistances[i] / this.legCount[i];
 		}
 		XYLineChart avgLegDistanceChart = new XYLineChart(
-				"average LegDistance", "time", "average legDistances [m]");
-		avgLegDistanceChart.addSeries("average legDistance of all agents", xs,
+				"average car-LegDistance", "time", "average legDistances (car) [m]");
+		avgLegDistanceChart.addSeries("average legDistance of all agents (car)", xs,
 				this.legDistances);
 		avgLegDistanceChart.saveAsPng(filename + "Avg.png", 1024, 768);
 	}

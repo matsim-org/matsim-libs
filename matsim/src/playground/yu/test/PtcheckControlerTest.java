@@ -183,7 +183,7 @@ public class PtcheckControlerTest extends Controler {
 				// nl,
 						ps);
 				es.addHandler(this.orms);
-				this.ttms = new TravelTimeModalSplit(300, nl, ps);
+				this.ttms = new TravelTimeModalSplit(300, ps);
 				es.addHandler(this.ttms);
 				this.ld = new LegDistance(300, nl);
 				es.addHandler(this.ld);

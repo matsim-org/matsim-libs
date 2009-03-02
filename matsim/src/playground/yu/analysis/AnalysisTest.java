@@ -103,7 +103,7 @@ public class AnalysisTest {
 			plans.runAlgorithms();
 
 			orms = new OnRouteModalSplit(scenario, plans);
-			ttms = new TravelTimeModalSplit(network, plans);
+			ttms = new TravelTimeModalSplit(plans);
 
 		}
 
@@ -150,10 +150,10 @@ public class AnalysisTest {
 		if (catl != null)
 			sw.write("avg. Trip length:\t" + catl.getAverageTripLength()
 					+ " [m]\n");
-		sw.write("traffic performance:\t" + ctpf.getTrafficPerformance()
+		sw.write("traffic performance (car):\t" + ctpf.getTrafficPerformance()
 				+ " [Pkm]\n");
-		sw.write("avg. speed of the total network:\t" + cas.getNetAvgSpeed()
-				+ " [km/h]\n");
+		sw.write("avg. speed of the total network (car):\t"
+				+ cas.getNetAvgSpeed() + " [km/h]\n");
 		try {
 			sw.close();
 		} catch (IOException e) {
