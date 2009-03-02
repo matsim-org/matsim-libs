@@ -22,10 +22,10 @@ package org.matsim.signalsystems;
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystems.control.SignalSystemControler;
+import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 
 
@@ -78,7 +78,14 @@ public class PlanBasedSignalSystemControler extends SignalSystemControler {
 			log.error(message);
 			throw new IllegalStateException(message);
 		}
-		int currentSecondInPlan = 1 + ((int) (SimulationTimer.getTime() % this.defaultCirculationTime));
+		double circulationTime;
+		if (activePlan.getCirculationTime() != null){
+			circulationTime = activePlan.getCirculationTime();
+		}
+		else {
+			circulationTime = this.defaultCirculationTime;
+		}
+		int currentSecondInPlan = 1 + ((int) (SimulationTimer.getTime() % circulationTime));
 
 		BasicSignalGroupConfiguration signalGroupConfig = activePlan.getGroupConfigs().get(signalGroup.getId());
 		if ( (signalGroupConfig.getRoughCast() < currentSecondInPlan) 
