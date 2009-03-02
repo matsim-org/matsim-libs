@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * TransitFares.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,24 +18,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt;
+package playground.marcel.pt.interfaces;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.facilities.Facility;
 
-public class AllTests {
+public interface TransitFares {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.marcel.pt");
+	/**
+	 * Returns the cost for a single trip from one stop to another stop.
+	 *
+	 * @param fromStop
+	 * @param toStop
+	 * @return cost for single trip
+	 */
+	public double getSingleTripCost(final Facility fromStop, final Facility toStop); // TODO [MR] how to handle different paths between from/to? and what about time of day?
 
-		suite.addTestSuite(VehicleImplTest.class);
-		suite.addTest(playground.marcel.pt.events.AllTests.suite());
-		suite.addTest(playground.marcel.pt.fares.AllTests.suite());
-		suite.addTest(playground.marcel.pt.transitSchedule.AllTests.suite());
-		suite.addTest(playground.marcel.pt.tryout.AllTests.suite());
-		suite.addTest(playground.marcel.pt.utils.AllTests.suite());
-
-		return suite;
-	}
+	/**
+	 * Returns the total cost for multiple trips. This could allow the agents to choose a ticket
+	 * that's valid the whole day (instead of only a single trip).
+	 *
+	 * @return combined cost for multiple trips.
+	 */
+//	public double getCombinedTripCost(); // TODO_ [MR] define arguments required for this.
 
 }

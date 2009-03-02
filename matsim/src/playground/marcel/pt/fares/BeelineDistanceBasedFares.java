@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * DistanceBasedFares.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,24 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt;
+package playground.marcel.pt.fares;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.facilities.Facility;
 
-public class AllTests {
+import playground.marcel.pt.interfaces.TransitFares;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.marcel.pt");
+public class BeelineDistanceBasedFares implements TransitFares {
 
-		suite.addTestSuite(VehicleImplTest.class);
-		suite.addTest(playground.marcel.pt.events.AllTests.suite());
-		suite.addTest(playground.marcel.pt.fares.AllTests.suite());
-		suite.addTest(playground.marcel.pt.transitSchedule.AllTests.suite());
-		suite.addTest(playground.marcel.pt.tryout.AllTests.suite());
-		suite.addTest(playground.marcel.pt.utils.AllTests.suite());
+	private final double costPerKilometer;
 
-		return suite;
+	public BeelineDistanceBasedFares(final double costPerKilometer) {
+		this.costPerKilometer = costPerKilometer;
+	}
+
+	public double getSingleTripCost(final Facility fromStop, final Facility toStop) {
+		return this.costPerKilometer * (fromStop.calcDistance(toStop.getCenter()) / 1000.0);
 	}
 
 }

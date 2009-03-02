@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * MultipleFareSystems.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,24 +18,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt;
+package playground.marcel.pt.fares;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.ArrayList;
+import java.util.List;
 
-public class AllTests {
+import org.matsim.facilities.Facility;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.marcel.pt");
+import playground.marcel.pt.interfaces.TransitFares;
 
-		suite.addTestSuite(VehicleImplTest.class);
-		suite.addTest(playground.marcel.pt.events.AllTests.suite());
-		suite.addTest(playground.marcel.pt.fares.AllTests.suite());
-		suite.addTest(playground.marcel.pt.transitSchedule.AllTests.suite());
-		suite.addTest(playground.marcel.pt.tryout.AllTests.suite());
-		suite.addTest(playground.marcel.pt.utils.AllTests.suite());
+public class MultipleFareSystems implements TransitFares {
 
-		return suite;
+	final List<TransitFares> allFares = new ArrayList<TransitFares>();
+
+	public void addFares(final TransitFares fares) {
+		this.allFares.add(fares);
+	}
+
+	public double getSingleTripCost(final Facility fromStop, final Facility toStop) {
+		double minFare = Double.NaN;
+		for (TransitFares fareSystem : this.allFares) {
+			double fare = fareSystem.getSingleTripCost(fromStop, toStop);
+			if (!Double.isNaN(fare)) {
+				if (Double.isNaN(minFare) || (fare < minFare)) {
+					minFare = fare;
+				}
+			}
+		}
+		return minFare;
 	}
 
 }

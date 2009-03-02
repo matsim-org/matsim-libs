@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * ZoneBasedFares.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,24 +18,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt;
+package playground.marcel.pt.fares;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.Map;
 
-public class AllTests {
+import org.matsim.facilities.Facility;
+import org.matsim.utils.collections.Tuple;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.marcel.pt");
+import playground.marcel.pt.interfaces.TransitFares;
 
-		suite.addTestSuite(VehicleImplTest.class);
-		suite.addTest(playground.marcel.pt.events.AllTests.suite());
-		suite.addTest(playground.marcel.pt.fares.AllTests.suite());
-		suite.addTest(playground.marcel.pt.transitSchedule.AllTests.suite());
-		suite.addTest(playground.marcel.pt.tryout.AllTests.suite());
-		suite.addTest(playground.marcel.pt.utils.AllTests.suite());
+public class TableLookupFares implements TransitFares {
 
-		return suite;
+	private final Map<Tuple<Facility, Facility>, Double> costs;
+
+	public TableLookupFares(final Map<Tuple<Facility, Facility>, Double> costs) {
+		this.costs = costs;
+	}
+
+	public double getSingleTripCost(final Facility fromStop, final Facility toStop) {
+		Double cost = this.costs.get(new Tuple<Facility, Facility>(fromStop, toStop));
+		if (cost == null) {
+			// not clear if this is a feature or a bug...
+			cost = this.costs.get(new Tuple<Facility, Facility>(toStop, fromStop));
+		}
+		if (cost == null) {
+			if (fromStop == toStop) {
+				return 0.0;
+			}
+			return Double.NaN;
+		}
+		return cost.doubleValue();
 	}
 
 }
