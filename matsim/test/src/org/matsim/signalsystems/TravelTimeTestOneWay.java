@@ -54,14 +54,14 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkEnterEve
 	protected void setUp() throws Exception {
 		super.setUp();
 		QueueNetwork.setSimulateAllLinks(true);
-		QueueNetwork.setSimulateAllNodes(true);
+//		QueueNetwork.setSimulateAllNodes(true);
 	}
 	
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		QueueNetwork.setSimulateAllLinks(false);
-		QueueNetwork.setSimulateAllNodes(false);
+//		QueueNetwork.setSimulateAllNodes(false);
 	}
 		
 	public void testTrafficLightIntersection2arms_w_TrafficLight_0_60(){

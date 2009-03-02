@@ -238,6 +238,10 @@ public class QueueNode {
 	public void setSignalized(final boolean b) {
 		this.signalized = b;
 	}
+	
+	public boolean isSignalized(){
+		return this.signalized;
+	}
 
 	static boolean removeVehInitialized = false;
 

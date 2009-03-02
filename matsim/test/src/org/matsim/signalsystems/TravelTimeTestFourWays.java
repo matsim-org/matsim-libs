@@ -58,14 +58,14 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 	protected void setUp() throws Exception {
 		super.setUp();
 		QueueNetwork.setSimulateAllLinks(true);
-		QueueNetwork.setSimulateAllNodes(true);
+//		QueueNetwork.setSimulateAllNodes(true);
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		QueueNetwork.setSimulateAllLinks(false);
-		QueueNetwork.setSimulateAllNodes(false);
+//		QueueNetwork.setSimulateAllNodes(false);
 	}
 
 	public void testTrafficLightIntersection4arms() {
