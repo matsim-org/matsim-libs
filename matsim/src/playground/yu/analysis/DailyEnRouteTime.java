@@ -146,81 +146,83 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 						this.throughOtherTime += time;
 						break;
 					}
-				} else if (bl.getMode().equals(Mode.car)) {
-					this.carTime += time;
-					carDayTime += time;
-					switch (ats) {
-					case h:
-						this.carHomeTime += time;
-						break;
-					case w:
-						this.carWorkTime += time;
-						break;
-					case e:
-						this.carEducTime += time;
-						break;
-					case s:
-						this.carShopTime += time;
-						break;
-					case l:
-						this.carLeisTime += time;
-						break;
-					default:
-						this.carOtherTime += time;
-						break;
+				} else {
+					if (bl.getMode().equals(Mode.car)) {
+						this.carTime += time;
+						carDayTime += time;
+						switch (ats) {
+						case h:
+							this.carHomeTime += time;
+							break;
+						case w:
+							this.carWorkTime += time;
+							break;
+						case e:
+							this.carEducTime += time;
+							break;
+						case s:
+							this.carShopTime += time;
+							break;
+						case l:
+							this.carLeisTime += time;
+							break;
+						default:
+							this.carOtherTime += time;
+							break;
+						}
+						this.carCounts10[Math.min(20, (int) time / 10)]++;
+						this.carCounts2[Math.min(100, (int) time / 2)]++;
+					} else if (bl.getMode().equals(Mode.pt)) {
+						this.ptTime += time;
+						ptDayTime += time;
+						switch (ats) {
+						case h:
+							this.ptHomeTime += time;
+							break;
+						case w:
+							this.ptWorkTime += time;
+							break;
+						case e:
+							this.ptEducTime += time;
+							break;
+						case s:
+							this.ptShopTime += time;
+							break;
+						case l:
+							this.ptLeisTime += time;
+							break;
+						default:
+							this.ptOtherTime += time;
+							break;
+						}
+						this.ptCounts10[Math.min(20, (int) time / 10)]++;
+						this.ptCounts2[Math.min(100, (int) time / 2)]++;
+					} else if (bl.getMode().equals(Mode.walk)) {
+						this.wlkTime += time;
+						wlkDayTime += time;
+						switch (ats) {
+						case h:
+							this.wlkHomeTime += time;
+							break;
+						case w:
+							this.wlkWorkTime += time;
+							break;
+						case e:
+							this.wlkEducTime += time;
+							break;
+						case s:
+							this.wlkShopTime += time;
+							break;
+						case l:
+							this.wlkLeisTime += time;
+							break;
+						default:
+							this.wlkOtherTime += time;
+							break;
+						}
+						this.wlkCounts10[Math.min(20, (int) time / 10)]++;
+						this.wlkCounts2[Math.min(100, (int) time / 2)]++;
 					}
-					this.carCounts10[Math.min(20, (int) time / 10)]++;
-					this.carCounts2[Math.min(100, (int) time / 2)]++;
-				} else if (bl.getMode().equals(Mode.pt)) {
-					this.ptTime += time;
-					ptDayTime += time;
-					switch (ats) {
-					case h:
-						this.ptHomeTime += time;
-						break;
-					case w:
-						this.ptWorkTime += time;
-						break;
-					case e:
-						this.ptEducTime += time;
-						break;
-					case s:
-						this.ptShopTime += time;
-						break;
-					case l:
-						this.ptLeisTime += time;
-						break;
-					default:
-						this.ptOtherTime += time;
-						break;
-					}
-					this.ptCounts10[Math.min(20, (int) time / 10)]++;
-					this.ptCounts2[Math.min(100, (int) time / 2)]++;
-				} else if (bl.getMode().equals(Mode.walk)) {
-					this.wlkTime += time;
-					wlkDayTime += time;
-					switch (ats) {
-					case h:
-						this.wlkHomeTime += time;
-						break;
-					case w:
-						this.wlkWorkTime += time;
-						break;
-					case e:
-						this.wlkEducTime += time;
-						break;
-					case s:
-						this.wlkShopTime += time;
-						break;
-					case l:
-						this.wlkLeisTime += time;
-						break;
-					default:
-						this.wlkOtherTime += time;
-						break;
-					}
-					this.wlkCounts10[Math.min(20, (int) time / 10)]++;
-					this.wlkCounts2[Math.min(100, (int) time / 2)]++;
 				}
 			}
 		}
