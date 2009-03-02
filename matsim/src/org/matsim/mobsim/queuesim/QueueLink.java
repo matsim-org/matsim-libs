@@ -229,7 +229,7 @@ public class QueueLink {
 	 */
 	private void setToLinks(QueueLane lane, List<Id> toLinkIds) {
 		for (Id linkId : toLinkIds) {
-			QueueLink link = this.queueNetwork.getQueueLink(linkId);
+			QueueLink link = this.getQueueNetwork().getQueueLink(linkId);
 			if (link == null) {
 				String message = "Cannot find Link with Id: " + linkId + " in network. ";
 				log.error(message);
@@ -310,7 +310,7 @@ public class QueueLink {
 //			if (!this.originalLane.isActive()) {
 //				this.originalLane.activateLane();
 		if (!this.active){
-			this.queueNetwork.addActiveLink(this);
+			this.getQueueNetwork().addActiveLink(this);
 			this.active = true;
 		}
 //			}			
@@ -343,7 +343,7 @@ public class QueueLink {
 	
 	public void addParking(QueueVehicle vehicle) {
 		this.originalLane.addParking(vehicle);
-		this.queueNetwork.setLinkActivation(
+		this.getQueueNetwork().setLinkActivation(
 				vehicle.getDepartureTime_s(), this);
 	}
 
