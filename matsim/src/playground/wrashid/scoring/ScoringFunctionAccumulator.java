@@ -1,5 +1,8 @@
 package playground.wrashid.scoring;
 
+import java.util.ArrayList;
+
+import org.matsim.events.AgentMoneyEvent;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
@@ -7,57 +10,82 @@ import org.matsim.scoring.ScoringFunction;
 
 public class ScoringFunctionAccumulator implements ScoringFunction {
 
+	private Plan plan = null;
+	private ArrayList<BasicScoringFunction> basicScoringFunctions = null;
+	private ArrayList<ActivityScoringFunction> activityScoringFunctions = null;
+	private ArrayList<MoneyScoringFunction> moneyScoringFunctions = null;
+	private ArrayList<LegScoringFunction> legScoringFunctions = null;
+	private ArrayList<AgentStuckScoringFunction> agentStuckScoringFunctions = null;
+
 	public void addMoney(double amount) {
-		// TODO Auto-generated method stub
-		
+		for (MoneyScoringFunction moneyScoringFunction : moneyScoringFunctions) {
+			moneyScoringFunction.addMoney(amount);
+		}
 	}
 
 	public void agentStuck(double time) {
-		// TODO Auto-generated method stub
-		
+		for (AgentStuckScoringFunction agentStuckScoringFunction : agentStuckScoringFunctions) {
+			agentStuckScoringFunction.agentStuck(time);
+		}
 	}
 
 	public void endActivity(double time) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void endLeg(double time) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void finish() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public double getScore() {
-		// TODO Auto-generated method stub
-		return 0;
+		int score = 0;
+		for (BasicScoringFunction basicScoringFunction : basicScoringFunctions) {
+			score += basicScoringFunction.getScore();
+		}
+		return score;
 	}
 
 	public void reset() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void startActivity(double time, Act act) {
-		// TODO Auto-generated method stub
-		
+		for (BasicScoringFunction scoringFunction : basicScoringFunctions) {
+			if (scoringFunction instanceof ActivityScoringFunction) {
+				ActivityScoringFunction activityScoringFunction = (ActivityScoringFunction) scoringFunction;
+				activityScoringFunction.startActivity(time, act);
+			}
+		}
 	}
 
 	public void startLeg(double time, Leg leg) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	public ScoringFunctionAccumulator(Plan plan){
-		
+
+	public ScoringFunctionAccumulator(Plan plan) {
+		basicScoringFunctions = new ArrayList<BasicScoringFunction>();
+		this.plan = plan;
 	}
-	
-	public void addScoringFunction(ScoringFunction scoringFunction){
-		
+
+	public void addScoringFunction(BasicScoringFunction scoringFunction) {
+		basicScoringFunctions.add(scoringFunction);
+		if (scoringFunction instanceof ActivityScoringFunction) {
+			activityScoringFunctions.add((ActivityScoringFunction) scoringFunction);
+		}
+
+		if (scoringFunction instanceof LegScoringFunction) {
+			legScoringFunctions.add((LegScoringFunction) scoringFunction);
+		}
+
 	}
 
 }
