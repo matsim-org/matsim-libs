@@ -52,15 +52,20 @@ public class Getagentcoords {
 
 	public static void main(final String[] args) {
 		// choose instance
-		final String netFilename = "./examples/meine_EA/siouxfalls_network_test.xml";
-		//final String netFilename = "/homes/combi/dressler/V/Project/padang/network/padang_net_evac.xml";
-
-		//final String plansFilename = "/homes/combi/dressler/V/Project/padang/plans/padang_plans_10p.xml.gz";
-		//final String plansFilename = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans.xml";
-		final String plansFilename = "./examples/meine_EA/siouxfalls_plans_test.xml";
-
-		final String outputPngFilename = "./output/exitmap_SF_test.png";
+		//final String netFilename = "./examples/meine_EA/siouxfalls_network_5s.xml";
+		//final String netFilename = "./examples/meine_EA/swissold_network_5s.xml";
+		final String netFilename = "/homes/combi/dressler/V/Project/padang/network/padang_net_evac.xml";
+		
+		//final String plansFilename = "/homes/combi/dressler/V/Project/padang/plans/padang_plans_100p_flow_10s_test.xml";
+		final String plansFilename = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padang_plans_100p_flow_10s_test.xml";
+		//final String plansFilename = "./examples/meine_EA/siouxfalls_plans_5s_demand_100.xml";
+		//final String plansFilename = "./output/siouxfalls_5s_eaf/plans_iter100.xml";
+		//final String plansFilename = "./examples/meine_EA/swissold_plans_5s_demands_100.xml";
+		
+		final String outputPngFilename = "./output/exitmap_padang_100p_flow_10s.png";
 		boolean planstats = true;
+		
+		final float alpha = 0.01f; // transparency factor. depends on maximum demands.
 
 		@SuppressWarnings("unused")
 		Config config = Gbl.createConfig(null);
@@ -77,8 +82,8 @@ public class Getagentcoords {
 
 
 		// get evac links
-		Node evac1node = network.getNode("20");
-		Map<Id,? extends Link> evaclinks = null;
+		Node evac1node = network.getNode("en1");
+		Map<Id,? extends Link> evaclinks = null;		
 		if (evac1node != null) {
 			evaclinks = evac1node.getInLinks();
 			/*for (Link link : evaclinks.values()) {
@@ -104,9 +109,9 @@ public class Getagentcoords {
 			Double maxx = -500000000d;
 			Double miny = +500000000d;
 			Double maxy = -500000000d;
-
-			int width = 400;
-			int height = 400;
+			
+			int width = 2000;
+			int height = 2000;
 			BufferedImage image = new BufferedImage(width,
 					height,BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2D = image.createGraphics();
@@ -173,14 +178,15 @@ public class Getagentcoords {
 				//System.out.println(x + " " + y);
 
 
-				boolean found = false;
-				for (Id id : leg.getRoute().getLinkIds()) {
+				boolean found = false; 
+				if (leg.getRoute() != null) if (leg.getRoute().getLinkIds() != null)
+				for (Id id : leg.getRoute().getLinkIds()) {			      
 					if (evaclinks.containsKey(id)) {
 						found = true;
 						//System.out.println("Juhu " + id);
 						foundpeople++;
 						g2D.setColor(colours.get(id.toString()));
-						g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1f));
+						g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
 						//g2D.drawLine(X, Y, X, Y);
 						g2D.fillOval(X-2, Y-2, 5, 5);
 						//g2D.fillOval(X-1, Y-1, 2, 2);
