@@ -2,6 +2,9 @@ package playground.wrashid.scoring;
 
 import org.matsim.interfaces.core.v01.Act;
 
+import playground.wrashid.scoring.interfaces.ActivityScoringFunction;
+import playground.wrashid.scoring.interfaces.BasicScoringFunction;
+
 public class CharyparNagelActivityScoringFunction implements ActivityScoringFunction, BasicScoringFunction {
 
 	public void endActivity(double time) {

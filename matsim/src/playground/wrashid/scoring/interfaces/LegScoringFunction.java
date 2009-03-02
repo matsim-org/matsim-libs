@@ -1,4 +1,4 @@
-package playground.wrashid.scoring;
+package playground.wrashid.scoring.interfaces;
 
 import org.matsim.interfaces.core.v01.Leg;
 

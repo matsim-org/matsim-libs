@@ -8,6 +8,12 @@ import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.ScoringFunction;
 
+import playground.wrashid.scoring.interfaces.ActivityScoringFunction;
+import playground.wrashid.scoring.interfaces.AgentStuckScoringFunction;
+import playground.wrashid.scoring.interfaces.BasicScoringFunction;
+import playground.wrashid.scoring.interfaces.LegScoringFunction;
+import playground.wrashid.scoring.interfaces.MoneyScoringFunction;
+
 public class ScoringFunctionAccumulator implements ScoringFunction {
 
 	private Plan plan = null;
@@ -76,14 +82,27 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		this.plan = plan;
 	}
 
+	/**
+	 * add the scoring function the list of functions, it implemented the interfaces.
+	 * @param scoringFunction
+	 */
 	public void addScoringFunction(BasicScoringFunction scoringFunction) {
 		basicScoringFunctions.add(scoringFunction);
+
 		if (scoringFunction instanceof ActivityScoringFunction) {
 			activityScoringFunctions.add((ActivityScoringFunction) scoringFunction);
 		}
 
+		if (scoringFunction instanceof AgentStuckScoringFunction) {
+			agentStuckScoringFunctions.add((AgentStuckScoringFunction) scoringFunction);
+		}
+
 		if (scoringFunction instanceof LegScoringFunction) {
 			legScoringFunctions.add((LegScoringFunction) scoringFunction);
+		}
+
+		if (scoringFunction instanceof MoneyScoringFunction) {
+			moneyScoringFunctions.add((MoneyScoringFunction) scoringFunction);
 		}
 
 	}

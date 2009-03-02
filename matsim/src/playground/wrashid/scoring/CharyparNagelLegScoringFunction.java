@@ -2,6 +2,9 @@ package playground.wrashid.scoring;
 
 import org.matsim.interfaces.core.v01.Leg;
 
+import playground.wrashid.scoring.interfaces.BasicScoringFunction;
+import playground.wrashid.scoring.interfaces.LegScoringFunction;
+
 public class CharyparNagelLegScoringFunction implements LegScoringFunction, BasicScoringFunction {
 
 	public void endLeg(double time) {

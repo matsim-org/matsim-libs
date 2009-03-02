@@ -1,4 +1,4 @@
-package playground.wrashid.scoring;
+package playground.wrashid.scoring.interfaces;
 
 public interface BasicScoringFunction {
 
