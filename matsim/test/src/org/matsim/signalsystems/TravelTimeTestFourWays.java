@@ -51,23 +51,23 @@ import org.matsim.utils.io.IOUtils;
  * @author dgrether
  */
 public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveEventHandler, LinkEnterEventHandler, ActEndEventHandler, ActStartEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler {
-	
+
 	BufferedWriter writer = null;
-  
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		QueueNetwork.setSimulateAllLinks(true);
 		QueueNetwork.setSimulateAllNodes(true);
 	}
-	
+
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		QueueNetwork.setSimulateAllLinks(false);
 		QueueNetwork.setSimulateAllNodes(false);
 	}
-	
+
 	public void testTrafficLightIntersection4arms() {
 		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
 		String lsaDefinition = this.getClassInputDirectory() + "lsa.xml";
@@ -78,7 +78,7 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 		Events events = new Events();
 		events.addHandler(this);
 		String tempout = this.getOutputDirectory() + "temp.txt.gz";
-		try {		
+		try {
 			this.writer = IOUtils.getBufferedWriter(tempout, true);
 //			new QSim(events, data.getPopulation(), data.getNetwork(), false, lsaDefinition, lsaConfig).run();
 			QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
@@ -86,12 +86,12 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 			sim.run();
 			this.writer.flush();
 			this.writer.close();
-			assertEquals(CRCChecksum.getCRCFromFile(tempout),	CRCChecksum.getCRCFromFile(this.getClassInputDirectory() + "reference.txt.gz"));
+			assertEquals(CRCChecksum.getCRCFromGZFile(this.getClassInputDirectory() + "reference.txt.gz"), CRCChecksum.getCRCFromGZFile(tempout));
 		} catch (IOException e) {
 			e.printStackTrace();
-		}	
+		}
 	}
-	
+
 	public void testTrafficLightIntersection4armsWithUTurn() {
 		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
 		String lsaDefinition = this.getClassInputDirectory() + "lsa.xml";
@@ -103,7 +103,7 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 		Events events = new Events();
 		events.addHandler(this);
 		String tempout = this.getOutputDirectory() + "temp.txt.gz";
-		try {		
+		try {
 			this.writer = IOUtils.getBufferedWriter(tempout, true);
 //			new QSim(events, data.getPopulation(), data.getNetwork(), false, newLSADef, newLSADefCfg).run();
 			QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
@@ -114,19 +114,10 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 			assertEquals(CRCChecksum.getCRCFromFile(tempout),	CRCChecksum.getCRCFromFile(this.getClassInputDirectory() + "reference_uturn.txt.gz"));
 		} catch (IOException e) {
 			e.printStackTrace();
-		}	
+		}
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
-		try {
-			this.writer.write(event.toString());
-			this.writer.newLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}	
-	
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		try {
 			this.writer.write(event.toString());
 			this.writer.newLine();
@@ -134,58 +125,67 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 			e.printStackTrace();
 		}
 	}
-	
-	public void reset(int iteration) {
+
+	public void handleEvent(final LinkLeaveEvent event) {
+		try {
+			this.writer.write(event.toString());
+			this.writer.newLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void reset(final int iteration) {
 		// Not used in that TestCase
 	}
-	
-	public void handleEvent(ActEndEvent event) {
+
+	public void handleEvent(final ActEndEvent event) {
 		try {
 			this.writer.write(event.toString());
 			this.writer.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
-	public void handleEvent(ActStartEvent event) {
+	public void handleEvent(final ActStartEvent event) {
 		try {
 			this.writer.write(event.toString());
 			this.writer.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		try {
 			this.writer.write(event.toString());
 			this.writer.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		try {
 			this.writer.write(event.toString());
 			this.writer.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(final AgentWait2LinkEvent event) {
 		try {
 			this.writer.write(event.toString());
 			this.writer.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 }
