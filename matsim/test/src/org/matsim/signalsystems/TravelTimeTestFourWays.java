@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.lightsignalsystems;
+package org.matsim.signalsystems;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

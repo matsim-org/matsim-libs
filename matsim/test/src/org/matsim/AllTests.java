@@ -53,7 +53,7 @@ public class AllTests {
 		suite.addTest(org.matsim.events.AllTests.suite());
 		suite.addTest(org.matsim.facilities.AllTests.suite());
 		suite.addTest(org.matsim.gbl.AllTests.suite());
-		suite.addTest(org.matsim.lightsignalsystems.AllTests.suite());
+		suite.addTest(org.matsim.signalsystems.AllTests.suite());
 		suite.addTest(org.matsim.locationchoice.AllTests.suite());
 		suite.addTest(org.matsim.mobsim.AllTests.suite());
 		suite.addTest(org.matsim.network.AllTests.suite());

@@ -1,4 +1,4 @@
-package org.matsim.lightsignalsystems;
+package org.matsim.signalsystems;
 
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;

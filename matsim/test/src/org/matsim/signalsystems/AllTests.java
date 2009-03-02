@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.lightsignalsystems;
+package org.matsim.signalsystems;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.lightsignalsystems;
+package org.matsim.signalsystems;
 
 import org.matsim.basic.signalsystems.BasicLane;
 import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
