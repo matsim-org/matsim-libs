@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package org.matsim.signalsystems;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
@@ -36,8 +36,6 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
-import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationReader;
-import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationWriter;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -66,54 +64,43 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkEnterEve
 		QueueNetwork.setSimulateAllNodes(false);
 	}
 		
-	// FIXME [dg] non-working, disabled test case
-	public void estTrafficLightIntersection2arms_w_TrafficLight_0_60(){
+	public void testTrafficLightIntersection2arms_w_TrafficLight_0_60(){
   	Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
 		String lsaDefinition = this.getClassInputDirectory() + "lsa.xml";
 		String lsaConfig = this.getClassInputDirectory() + "lsa_config.xml";
-		String tempFile = this.getOutputDirectory() + "__tempFile__.xml";
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 		
 		ScenarioData data = new ScenarioData(conf);
-//		BasicSignalSystems signalSystems = data.getSignalSystems();
-		
 		Events events = new Events();
 		events.addHandler(this);
 		
 		TreeMap<Integer, MeasurementPoint> results = new TreeMap<Integer, MeasurementPoint>();		
 		
-		int umlaufzeit = 60;
+		int circulationTime = 60;
 
-		for (int i = 1; i <= umlaufzeit; i++) {
+		BasicSignalSystems lssDefs = data.getSignalSystems();
+		List<BasicSignalSystemConfiguration> lssConfigs = data.getSignalSystemsConfiguration();
+
+		for (int dropping = 1; dropping <= circulationTime; dropping=dropping+3) {
 			this.beginningOfLink2 = null;
-
-			List<BasicSignalSystemConfiguration> lssConfigs = new ArrayList<BasicSignalSystemConfiguration>();
-			MatsimLightSignalSystemConfigurationReader reader = new MatsimLightSignalSystemConfigurationReader(lssConfigs);
-			reader.readFile(lsaConfig);
+			
 			for (BasicSignalSystemConfiguration lssConfig : lssConfigs) {
 				BasicPlanBasedSignalSystemControlInfo controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfig.getControlInfo();
 				BasicSignalSystemPlan p = controlInfo.getPlans().get(new IdImpl("2"));
-				p.setCirculationTime((double)umlaufzeit);
+				p.setCirculationTime((double)circulationTime);
 				BasicSignalGroupConfiguration group = p.getGroupConfigs().get(new IdImpl("100"));
-				group.setDropping(i);
+				group.setDropping(dropping);
 			}
-			
-			MatsimLightSignalSystemConfigurationWriter writer = new MatsimLightSignalSystemConfigurationWriter(lssConfigs);
-			writer.writeFile(tempFile);
 			QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
-			sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemsConfiguration());
+			sim.setSignalSystems(lssDefs, lssConfigs);
 			sim.run();
-//			new QSim(events, data.getPopulation(), data.getNetwork(), false, lsaDefinition, tempFile).run();
-			results.put(Integer.valueOf(i), this.beginningOfLink2);
-		}
-		
-		int j = 1;
-		for (MeasurementPoint resMeasurePoint : results.values()) {
-			log.debug(j + ", " + resMeasurePoint.numberOfVehPassedDuringTimeToMeasure_ + ", " + resMeasurePoint.numberOfVehPassed_ + ", " + this.beginningOfLink2.timeToStartMeasurement + ", " + resMeasurePoint.firstVehPassTime_s + ", " + resMeasurePoint.lastVehPassTime_s + ", " + (resMeasurePoint.numberOfVehPassedDuringTimeToMeasure_ - j * 2000 / umlaufzeit));
-			assertEquals((j * 2000 / umlaufzeit), resMeasurePoint.numberOfVehPassedDuringTimeToMeasure_, 1);
-			j++;
-			assertEquals(5000.0, resMeasurePoint.numberOfVehPassed_, EPSILON);
+			results.put(Integer.valueOf(dropping), this.beginningOfLink2);
+			log.debug("circulationTime: " + circulationTime);
+			log.debug("dropping  : " + dropping);
+			
+			assertEquals((dropping * 2000 / circulationTime), this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure, 1);
+			assertEquals(5000.0, beginningOfLink2.numberOfVehPassed, EPSILON);
 		}
 	}	
 	
@@ -130,16 +117,15 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkEnterEve
 		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
 		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemsConfiguration());
 		sim.run();
-//		new QSim(events, data.getPopulation(), data.getNetwork(), false, lsaDefinition, lsaConfig).run();
-		log.debug("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + ", " + this.beginningOfLink2.numberOfVehPassed_ + ", " + this.beginningOfLink2.firstVehPassTime_s + ", " + this.beginningOfLink2.lastVehPassTime_s);
+//		log.debug("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure + ", " + this.beginningOfLink2.numberOfVehPassed + ", " + this.beginningOfLink2.firstVehPassTime_s + ", " + this.beginningOfLink2.lastVehPassTime_s);
 		
 		MeasurementPoint qSim = this.beginningOfLink2;		
 		this.beginningOfLink2 = null;
 		
 		new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
 		if (this.beginningOfLink2 != null) {
-			log.debug("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + 
-					", " + this.beginningOfLink2.numberOfVehPassed_ + 
+			log.debug("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure + 
+					", " + this.beginningOfLink2.numberOfVehPassed + 
 					", " + this.beginningOfLink2.firstVehPassTime_s + 
 					", " + this.beginningOfLink2.lastVehPassTime_s);
 		} else {
@@ -148,11 +134,11 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkEnterEve
 		MeasurementPoint queueSimulation = this.beginningOfLink2;
 				
 		// circle time is 60s, green 60s
-		assertEquals(5000.0, qSim.numberOfVehPassed_, EPSILON);
+		assertEquals(5000.0, qSim.numberOfVehPassed, EPSILON);
 
 		assertEquals(qSim.firstVehPassTime_s, queueSimulation.firstVehPassTime_s, EPSILON);
-		assertEquals(qSim.numberOfVehPassed_, queueSimulation.numberOfVehPassed_, EPSILON);
-		assertEquals(qSim.numberOfVehPassedDuringTimeToMeasure_, queueSimulation.numberOfVehPassedDuringTimeToMeasure_, EPSILON);
+		assertEquals(qSim.numberOfVehPassed, queueSimulation.numberOfVehPassed, EPSILON);
+		assertEquals(qSim.numberOfVehPassedDuringTimeToMeasure, queueSimulation.numberOfVehPassedDuringTimeToMeasure, EPSILON);
 		
   	}  	
 
@@ -163,7 +149,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkEnterEve
 				this.beginningOfLink2 = new MeasurementPoint(event.time + TravelTimeTestOneWay.timeToWaitBeforeMeasure);
 			}
 			
-			this.beginningOfLink2.numberOfVehPassed_++;
+			this.beginningOfLink2.numberOfVehPassed++;
 			
 			if( this.beginningOfLink2.timeToStartMeasurement <= event.time){				
 
@@ -172,7 +158,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkEnterEve
 				}
 				
 				if (event.time < this.beginningOfLink2.timeToStartMeasurement + MeasurementPoint.timeToMeasure_s) {
-					this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_++;
+					this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure++;
 					this.beginningOfLink2.lastVehPassTime_s = event.time;
 				}		
 			}
@@ -189,8 +175,8 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkEnterEve
 		double timeToStartMeasurement;
 		double firstVehPassTime_s = -1;
 		double lastVehPassTime_s;
-		int numberOfVehPassed_ = 0;
-		int numberOfVehPassedDuringTimeToMeasure_ = 0;
+		int numberOfVehPassed = 0;
+		int numberOfVehPassedDuringTimeToMeasure = 0;
 
 		public MeasurementPoint(double time) {
 			this.timeToStartMeasurement = time;
