@@ -48,17 +48,23 @@ public class DDcontroller {
 	public static void main(final String[] args) {
 
     	// choose instance
+		
 		//final String netFilename = "./examples/equil/network.xml";
 		//final String plansFilename = "./examples/equil/plans100.xml";
-		final String netFilename = "./examples/meine_EA/siouxfalls_network_test.xml";
-
+		//final String netFilename = "./examples/meine_EA/siouxfalls_network_5s_euclid.xml";
+		final String netFilename = "/homes/combi/dressler/V/Project/padang/network/padang_net_evac.xml";
+		//final String netFilename = "./examples/meine_EA/swissold_network_5s.xml";
+		
 		//final String netFilename = "/homes/combi/dressler/V/Project/padang/network/padang_net_evac.xml";
 		//final String plansFilename = "/homes/combi/dressler/V/Project/padang/plans/padang_plans_10p.xml.gz";
 		//final String plansFilename = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans.xml";
-		final String plansFilename = "./examples/meine_EA/siouxfalls_plans_test.xml";
-
+		//final String plansFilename = "./examples/meine_EA/siouxfalls_plans_5s_euclid_demands_100_empty.xml";
+		//final String plansFilename = "/homes/combi/dressler/V/Project/testcases/winnipeg/matsimevac/winnipeg_plans_evac.xml";
+		//final String plansFilename = "./examples/meine_EA/swissold_plans_5s_demands_100.xml";
+		final String plansFilename = "./examples/meine_EA/padang_plans_100p_flow_2s.xml";
+		
 		boolean testplans = false; // FIXME !
-		boolean dosim = true;
+		boolean dosim = false;		
 		boolean otfvis = true;
 		boolean netvis = false & (!otfvis);
 
@@ -133,10 +139,9 @@ public class DDcontroller {
 
 		if (otfvis) {
 			QueueNetwork qnet = new QueueNetwork(network);
-
-			//String eventFile = Gbl.getConfig().getParam("events","outputFile");
-			String eventFile = "./output/events.txt";
-			OTFEvent2MVI mviconverter = new OTFEvent2MVI(qnet, eventFile, "./output/otfvis.mvi", 10);
+			
+			String eventFile = "./output/it3events.txt";
+			OTFEvent2MVI mviconverter = new OTFEvent2MVI(qnet, eventFile, "./output/otfvis.mvi", 60);
 			mviconverter.convert();
 
 			String[] visargs = {"./output/otfvis.mvi"};
