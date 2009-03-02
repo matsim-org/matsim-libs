@@ -61,7 +61,7 @@ abstract class ActEvent extends PersonEvent {
 	}
 
 	protected String asString() {
-		return getTimeString(this.time) + this.agentId + "\t0\t"+ this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concat later
+		return getTimeString(this.time) + this.agentId + "\t\t"+ this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concat later
 	}
 
 }

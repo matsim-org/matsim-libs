@@ -33,6 +33,5 @@ public class AgentDepartureEventTest extends MatsimTestCase {
 		assertEquals(25669.05, event.time, EPSILON);
 		assertEquals("921", event.agentId);
 		assertEquals("390", event.linkId);
-		assertEquals(1, event.legId);
 	}
 }

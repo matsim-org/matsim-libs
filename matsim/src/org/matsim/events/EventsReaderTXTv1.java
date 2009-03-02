@@ -111,7 +111,7 @@ public class EventsReaderTXTv1 {
 		if (result.length == 7) {
 			createEvent(this.events, Double.parseDouble(result[0]),	// time
 									result[1],		// vehID
-									Integer.parseInt(result[2]),		// legNumber
+									(result[2].length() == 0 ? -1 : Integer.parseInt(result[2])),		// legNumber
 									result[3],		// linkID
 									//Integer.parseInt(result[4]),		// nodeID
 									Integer.parseInt(result[5]),		// flag

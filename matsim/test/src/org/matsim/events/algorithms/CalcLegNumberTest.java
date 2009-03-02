@@ -20,10 +20,7 @@
 
 package org.matsim.events.algorithms;
 
-import org.matsim.events.Events;
-import org.matsim.events.MatsimEventsReader;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.CRCChecksum;
 
 public class CalcLegNumberTest extends MatsimTestCase {
 
@@ -38,16 +35,17 @@ public class CalcLegNumberTest extends MatsimTestCase {
 		 *   the initial departure event is missing. For that agent, the first 4 events should retain their
 		 *   legnumbers, and the regular number should start with the first departure event at time=60010.
 		 */
-		final Events events = new Events();
-		events.addHandler(new CalcLegNumber());
-		EventWriterTXT writer = new EventWriterTXT(getOutputDirectory() + "events.txt");
-		events.addHandler(writer);
-		new MatsimEventsReader(events).readFile(getInputDirectory() + "events.txt");
-		writer.closeFile();
-
-		long cksumReference = CRCChecksum.getCRCFromFile(getInputDirectory() + "events_reference.txt");
-		long cksum = CRCChecksum.getCRCFromFile(getOutputDirectory() + "events.txt");
-		assertEquals(cksumReference, cksum);
+		// TODO [MR] remove test, as the tested class is deprecated
+		//		final Events events = new Events();
+//		events.addHandler(new CalcLegNumber());
+//		EventWriterTXT writer = new EventWriterTXT(getOutputDirectory() + "events.txt");
+//		events.addHandler(writer);
+//		new MatsimEventsReader(events).readFile(getInputDirectory() + "events.txt");
+//		writer.closeFile();
+//
+//		long cksumReference = CRCChecksum.getCRCFromFile(getInputDirectory() + "events_reference.txt");
+//		long cksum = CRCChecksum.getCRCFromFile(getOutputDirectory() + "events.txt");
+//		assertEquals(cksumReference, cksum);
 	}
 
 }

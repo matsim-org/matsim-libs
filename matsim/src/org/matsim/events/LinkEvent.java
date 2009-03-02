@@ -57,12 +57,11 @@ public abstract class LinkEvent extends PersonEvent {
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_LINK, this.linkId);
-		attr.put(ATTRIBUTE_LEG, Integer.toString(this.legId));
 		return attr;
 	}
 
 	protected String asString() {
-		return getTimeString(this.time) + this.agentId + "\t" + this.legId + "\t" + this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concat later
+		return getTimeString(this.time) + this.agentId + "\t\t" + this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concat later
 	}
 
 }

@@ -33,6 +33,5 @@ public class AgentWait2LinkEventTest extends MatsimTestCase {
 		assertEquals(event1.time, event2.time, EPSILON);
 		assertEquals(event1.agentId, event2.agentId);
 		assertEquals(event1.linkId, event2.linkId);
-		assertEquals(event1.legId, event2.legId);
 	}
 }

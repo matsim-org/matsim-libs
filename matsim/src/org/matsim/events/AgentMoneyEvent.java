@@ -27,7 +27,7 @@ import org.matsim.interfaces.core.v01.Person;
 
 /**
  * This event specifies that an agent has gained (or paid) some money.
- * Scoring functions should handle these Events by adding the amount somehow 
+ * Scoring functions should handle these Events by adding the amount somehow
  * to the score (this can include some kind of normalization with the
  * agent's income or something similar).
  *
@@ -45,7 +45,7 @@ public final class AgentMoneyEvent extends PersonEvent {
 	 * Creates a new event describing that the given <tt>agent</tt> has <em>gained</em>
 	 * some money at the specified <tt>time</tt>. Positive values for <tt>amount</tt>
 	 * mean the agent has gained money, negative values that the agent has paid money.
-	 * 
+	 *
 	 * @param time
 	 * @param agent
 	 * @param amount
@@ -59,7 +59,7 @@ public final class AgentMoneyEvent extends PersonEvent {
 	 * Creates a new event describing that the given <tt>agent</tt> has <em>gained</em>
 	 * some money at the specified <tt>time</tt>. Positive values for <tt>amount</tt>
 	 * mean the agent has gained money, negative values that the agent has paid money.
-	 * 
+	 *
 	 * @param time
 	 * @param agentId
 	 * @param amount
@@ -83,7 +83,7 @@ public final class AgentMoneyEvent extends PersonEvent {
 
 	@Override
 	public String toString() {
-		return getTimeString(this.time) + this.agentId + "\t0\t\t0\t9\t" + EVENT_TYPE + "\t" + this.amount;
+		return getTimeString(this.time) + this.agentId + "\t\t\t0\t9\t" + EVENT_TYPE + "\t" + this.amount;
 	}
 
 }
