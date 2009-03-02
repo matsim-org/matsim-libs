@@ -15,11 +15,11 @@ import playground.wrashid.scoring.interfaces.MoneyScoringFunction;
 
 public class ScoringFunctionAccumulator implements ScoringFunction {
 
-	private ArrayList<BasicScoringFunction> basicScoringFunctions = null;
-	private ArrayList<ActivityScoringFunction> activityScoringFunctions = null;
-	private ArrayList<MoneyScoringFunction> moneyScoringFunctions = null;
-	private ArrayList<LegScoringFunction> legScoringFunctions = null;
-	private ArrayList<AgentStuckScoringFunction> agentStuckScoringFunctions = null;
+	private ArrayList<BasicScoringFunction> basicScoringFunctions = new ArrayList<BasicScoringFunction>();
+	private ArrayList<ActivityScoringFunction> activityScoringFunctions = new ArrayList<ActivityScoringFunction>();
+	private ArrayList<MoneyScoringFunction> moneyScoringFunctions = new ArrayList<MoneyScoringFunction>();
+	private ArrayList<LegScoringFunction> legScoringFunctions = new ArrayList<LegScoringFunction>();
+	private ArrayList<AgentStuckScoringFunction> agentStuckScoringFunctions = new ArrayList<AgentStuckScoringFunction>();
 
 	public void addMoney(double amount) {
 		for (MoneyScoringFunction moneyScoringFunction : moneyScoringFunctions) {
@@ -78,10 +78,6 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		for (BasicScoringFunction basicScoringFunction : basicScoringFunctions) {
 			basicScoringFunction.reset();
 		}
-	}
-
-	public ScoringFunctionAccumulator() {
-		basicScoringFunctions = new ArrayList<BasicScoringFunction>();
 	}
 
 	/**
