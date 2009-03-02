@@ -288,10 +288,10 @@ public class QueueLane implements Comparable<QueueLane> {
 	}
 	
 	/**
-	 * This method should replace canMoveFirstVehicle
+	 * updated the status of the QueueLane's signal system
 	 * @return
 	 */
-	public void updateGreenState(){
+	protected void updateGreenState(){
 		if (this.signalGroups == null) {
 			log.fatal("This should never happen, since every lane link at a signalized intersection" +
 					" should have at least one signal(group). Please check integrity of traffic light data on link " + 
@@ -401,7 +401,7 @@ public class QueueLane implements Comparable<QueueLane> {
 	 * @param now
 	 *          The current time.
 	 */
-	private void moveLinkToBuffer(final double now) {
+	private void moveLaneToBuffer(final double now) {
 		QueueVehicle veh;
 		while ((veh = this.vehQueue.peek()) != null) {
 			//we have an original QueueLink behaviour
@@ -466,22 +466,14 @@ public class QueueLane implements Comparable<QueueLane> {
 	 * @return 
 	 */
 	protected boolean moveLane(final double now) {
-//		if (this.meterFromLinkEnd == 0.0) {
-//			if (this.originalLane || this.thisTimeStepGreen) 
-//				updateBufferCapacity();
-//		}
-//		else {
-//			updateBufferCapacity();
-//		}
 		updateBufferCapacity();
-//		this.bufferCap = this.simulatedFlowCapacity;
 
 		if (this.originalLane) {
 			// move vehicles from parking into waitingQueue if applicable
 			moveParkToWait(now);
 		}
 		// move vehicles from link to buffer
-		moveLinkToBuffer(now);
+		moveLaneToBuffer(now);
 		
 		moveBufferToNextLane(now);
 		
@@ -489,20 +481,12 @@ public class QueueLane implements Comparable<QueueLane> {
 			// move vehicles from waitingQueue into buffer if possible
 			moveWaitToBuffer(now);
 		}
-//		this.setThisTimeStepGreen(false);
 		return this.updateActiveStatus();
 	}
 
 	protected boolean moveLaneWaitFirst(final double now) {
-		if (this.meterFromLinkEnd == 0.0) {
-			if (this.originalLane || this.thisTimeStepGreen) 
-				updateBufferCapacity();
-		}
-		else {
-			updateBufferCapacity();
-		}
+		updateBufferCapacity();
 		
-		this.bufferCap = this.simulatedFlowCapacity;
 		if (this.originalLane) {
 			// move vehicles from parking into waitingQueue if applicable
 			moveParkToWait(now);
@@ -510,11 +494,9 @@ public class QueueLane implements Comparable<QueueLane> {
 			moveWaitToBuffer(now);
 		}
 		// move vehicles from link to buffer
-		moveLinkToBuffer(now);
+		moveLaneToBuffer(now);
 		
 		moveBufferToNextLane(now);
-
-//		this.setThisTimeStepGreen(false);
 		return this.updateActiveStatus();
 	}
 
