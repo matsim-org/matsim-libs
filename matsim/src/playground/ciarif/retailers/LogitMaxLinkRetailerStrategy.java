@@ -23,7 +23,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	private int alternatives;
 	// TODO balmermi: remove all params for the alt-size and replace it here by a config parameter
 	
-	public LogitMaxLinkRetailerStrategy (Controler controler, int alternatives) {
+	public LogitMaxLinkRetailerStrategy (Controler controler) {
 		this.controler = controler;
 		this.alternatives = alternatives;
 	}

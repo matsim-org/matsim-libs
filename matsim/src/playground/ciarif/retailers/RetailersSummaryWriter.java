@@ -20,9 +20,9 @@ public class RetailersSummaryWriter {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public RetailersSummaryWriter(String outfile, Retailers retailers) {
+	public RetailersSummaryWriter(String outfile) {
 		super();
-		this.retailers = retailers;
+		//this.retailers = retailers;
 		try {
 			fw = new FileWriter(outfile);
 			System.out.println(outfile);

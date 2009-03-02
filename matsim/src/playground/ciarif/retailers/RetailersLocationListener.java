@@ -57,10 +57,11 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	
 	public final static String CONFIG_GROUP = "Retailers";
 	public final static String CONFIG_POP_SUM_TABLE = "populationSummaryTable";
+	public final static String CONFIG_RET_SUM_TABLE = "retailersSummaryTable";
 	public final static String CONFIG_RETAILERS = "retailers";
 //	private Retailers retailers = new Retailers();
 	private Retailers retailers;
-	private final RetailersSummaryWriter rs = null;
+	private RetailersSummaryWriter rs = null;
 	private PlansSummaryTable pst = null;
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
@@ -73,49 +74,45 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	}
 
 	public void notifyStartup(StartupEvent event) {
-		Controler controler = event.getControler();
 
+		Controler controler = event.getControler();
 		preprocess.run(controler.getNetwork());
 		pcrl = new PlansCalcRoute(controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess));
-		// TODO see how to avoid the use of the deprecated constructor.
 		String popOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
 		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.pst = new PlansSummaryTable (popOutFile);
-		
-		// createRetailersFromFile();
-						
-		// define all given retailers
-		// DONE balmermi: not necessary when you get the facilities from the input table file
-		// instead read in the file defined by the config and create the retailers according to the file
-		// information (only remove the if statement)
-		
+		String retailersOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
+		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
+		this.rs = new RetailersSummaryWriter (retailersOutFile);
 		this.facilityIdFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
-		ArrayList<Facility> facilities = new ArrayList<Facility>();
-		if (this.facilityIdFile == null) { //decide if throw an exception or permit a way to create retailers without
-			// 
-
+		if (this.facilityIdFile == null) { //Francesco: TODO decide if throw an exception or permit a way to create retailers without an input file
 		}
 		else {
 			try {
-				retailers = new Retailers();
-				facilities =  new ArrayList<Facility>();
+				this.retailers = new Retailers();
 				FileReader fr = new FileReader(this.facilityIdFile);
 				BufferedReader br = new BufferedReader(fr);
 				// Skip header
 				String curr_line = br.readLine();
 				while ((curr_line = br.readLine()) != null) {
 					String[] entries = curr_line.split("\t", -1);
-					// TODO balmermi: extend the file with a second column containing the strategies
 					// header: f_id
 					// index:     0
-					Id rid = new IdImpl(entries[0]);
-					RetailerStrategy rts = null;
-					//Retailer r = new Retailer();
-					Id fid = new IdImpl(entries[1]);
-					System.out.println("read file test1 = " + entries[0]);
-					System.out.println("read file test2 = " + entries[1]);
-					System.out.println("read file test3 = " + entries[2]);
-					facilities.add(controler.getFacilities().getFacility(fid));
+					Id rId = new IdImpl(entries[0]);
+					if (this.retailers.getRetailers().containsKey(rId)) {
+						Id fId = new IdImpl (entries[1]);
+						Facility f = controler.getFacilities().getFacility(fId);
+						this.retailers.getRetailers().get(rId).addFacility(f);
+					}
+					else {
+						Retailer r = new Retailer(rId, null);
+						r.addStrategy(controler, entries[2]);
+						Id fId = new IdImpl (entries[1]);
+						Facility f = controler.getFacilities().getFacility(fId);
+						r.addFacility(f);
+						this.retailers.addRetailer(r);
+						
+					}
 				}
 			} catch (IOException e) {
 				Gbl.errorMsg(e);
@@ -128,7 +125,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
 		controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 		
-		for (Retailer r : retailers.getRetailers().values()) {
+		for (Retailer r : this.retailers.getRetailers().values()) {
 			Map<Id,Facility> facs =  r.runStrategy();
 			movedFacilities.putAll(facs);
 		}
@@ -163,15 +160,5 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 			if (rd < fraction) { fs.add(f); }
 		}
 		return fs;
-	}
-	
-	private final Retailers createRetailers(ArrayList<Facility> retailerFacilities) {
-//		Retailers retailers = new Retailers();
-//		for (Facility f : retailerFacilities) {
-//			Retailer r = new Retailer(f.getId());//Probably is wrong the facility ID is passed as retailer ID
-//			if (!r.addFacility(f)) { throw new RuntimeException("Could not add facility id="+f.getId()+" to retailer."); } 
-//			if (!retailers.addRetailer(r)) { throw new RuntimeException("Could not add retailer id="+r.getId()+" to retailers."); } 
-//		}
-		return retailers;
 	}
 }

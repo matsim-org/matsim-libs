@@ -27,6 +27,13 @@ public class Retailers {
 		return this.retailers;
 	}
 
+	protected Retailer getLastRetailer(){
+		int i = (this.retailers.values().size()-1);
+		if (i==0){return null;} //the container is empty
+		else {
+			return this.retailers.get(i);
+		}
+	}
 //	public static Retailers selectRetailersForRelocation(Retailers retailers, double percentage) {
 //		Retailers retailersForRelocation = new Retailers();
 //		double nr= percentage * retailers.getRetailers().size()/100;

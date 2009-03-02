@@ -3,13 +3,14 @@ package playground.ciarif.retailers;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.matsim.controler.Controler;
 import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.Id;
 
 public class Retailer {
 	private final Id id;
 	private final Map<Id,Facility> facilities = new LinkedHashMap<Id,Facility>();
-	private final RetailerStrategy strategy;
+	private RetailerStrategy strategy;
 		
 	protected Retailer(final Id id, RetailerStrategy rs) { 
 		this.id = id;
@@ -24,6 +25,22 @@ public class Retailer {
 		if (f == null) { return false; }
 		if (this.facilities.containsKey(f.getId())) { return false; }
 		this.facilities.put(f.getId(),f);
+		return true;
+	}
+	
+	public final boolean addStrategy (Controler controler, String strategy) {
+		if (strategy == null) {return false;}
+		
+		if (strategy.compareTo("RandomRetailerStrategy")==0) {
+			this.strategy = new RandomRetailerStrategy(controler.getNetwork());
+		}
+		if (strategy.compareTo("maxLinkRetailerStrategy")==0) {
+			this.strategy = new MaxLinkRetailerStrategy (controler);
+		}
+		
+		if (strategy.compareTo("LogitMaxLinkRetailerStrategy")==0) {
+			this.strategy = new LogitMaxLinkRetailerStrategy (controler);
+		}
 		return true;
 	}
 	

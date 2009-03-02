@@ -39,6 +39,8 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 			System.out.println ("currentlink_volume = " + currentlink_volume);
 			System.out.println ("newlink_volume = " + newlink_volume);
 			if (newlink_volume >= currentlink_volume) {
+				System.out.println ("newlink = " + link);
+				System.out.println ("facility = " + f.getId());
 				Utils.moveFacility(f,link);
 			}
 		}
