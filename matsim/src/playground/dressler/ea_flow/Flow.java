@@ -628,7 +628,9 @@ public class Flow {
 					//Act home = new org.matsim.population.ActImpl("h", path.getPathEdges().getFirst().getEdge());
 					home.setEndTime(0);
 					home.setCoord(path.getPathEdges().getFirst().getEdge().getFromNode().getCoord());
-					home.setEndTime(path.getPathEdges().getFirst().getTime());
+					// no end time for now.
+					//home.setEndTime(path.getPathEdges().getFirst().getTime());
+					
 					BasicActImpl work = new BasicActImpl("w");
 					//Act work = new org.matsim.population.ActImpl("w", path.getPathEdges().getLast().getEdge());
 					work.setEndTime(0);
@@ -705,10 +707,12 @@ public class Flow {
 	/**
 	 * Call the cleanup-method for each edge 
 	 */
-	public void cleanUp() {		
+	public int cleanUp() {		
+		int gain = 0;
 		for (EdgeIntervalls EI : _flow.values()) {
-		  EI.cleanup();	
+		  gain += EI.cleanup();	
 		}
+		return gain;
 	}	
 	
 //////////////////////////////////////////////////////////////////////////////////////
