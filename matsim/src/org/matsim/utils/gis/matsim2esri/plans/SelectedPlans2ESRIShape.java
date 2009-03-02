@@ -181,7 +181,6 @@ public class SelectedPlans2ESRIShape {
 	}
 
 	private Feature getLegFeature(final Leg leg, final String id) {
-		Integer num = leg.getNum();
 		BasicLeg.Mode mode = leg.getMode();
 		Double depTime = leg.getDepartureTime();
 		Double travTime = leg.getTravelTime();
@@ -207,7 +206,7 @@ public class SelectedPlans2ESRIShape {
 		LineString ls = this.geofac.createLineString(coords);
 
 		try {
-			return this.featureTypeLeg.create(new Object[] {ls,id,num,mode,depTime,travTime,arrTime,dist});
+			return this.featureTypeLeg.create(new Object[] {ls,id,mode,depTime,travTime,arrTime,dist});
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
@@ -218,7 +217,7 @@ public class SelectedPlans2ESRIShape {
 
 
 	private void initFeatureType() {
-		AttributeType [] attrAct = new AttributeType[7];
+		AttributeType[] attrAct = new AttributeType[7];
 		attrAct[0] = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, this.crs);
 		attrAct[1] = AttributeTypeFactory.newAttributeType("PERS_ID", String.class);
 		attrAct[2] = AttributeTypeFactory.newAttributeType("TYPE", String.class);
@@ -227,15 +226,14 @@ public class SelectedPlans2ESRIShape {
 		attrAct[5] = AttributeTypeFactory.newAttributeType("DUR", Double.class);
 		attrAct[6] = AttributeTypeFactory.newAttributeType("END_TIME", Double.class);
 
-		AttributeType [] attrLeg = new AttributeType[8];
+		AttributeType[] attrLeg = new AttributeType[7];
 		attrLeg[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, this.crs);
 		attrLeg[1] = AttributeTypeFactory.newAttributeType("PERS_ID", String.class);
-		attrLeg[2] = AttributeTypeFactory.newAttributeType("NUM", Integer.class);
-		attrLeg[3] = AttributeTypeFactory.newAttributeType("MODE", String.class);
-		attrLeg[4] = AttributeTypeFactory.newAttributeType("DEP_TIME", Double.class);
-		attrLeg[5] = AttributeTypeFactory.newAttributeType("TRAV_TIME", Double.class);
-		attrLeg[6] = AttributeTypeFactory.newAttributeType("ARR_TIME", Double.class);
-		attrLeg[7] = AttributeTypeFactory.newAttributeType("DIST", Double.class);
+		attrLeg[2] = AttributeTypeFactory.newAttributeType("MODE", String.class);
+		attrLeg[3] = AttributeTypeFactory.newAttributeType("DEP_TIME", Double.class);
+		attrLeg[4] = AttributeTypeFactory.newAttributeType("TRAV_TIME", Double.class);
+		attrLeg[5] = AttributeTypeFactory.newAttributeType("ARR_TIME", Double.class);
+		attrLeg[6] = AttributeTypeFactory.newAttributeType("DIST", Double.class);
 
 		try {
 			this.featureTypeAct = FeatureTypeBuilder.newFeatureType(attrAct, "activity");

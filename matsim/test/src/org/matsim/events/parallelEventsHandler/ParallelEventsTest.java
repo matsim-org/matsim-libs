@@ -36,7 +36,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 		events.addHandler(handler);
 		events.removeHandler(handler);
 
-		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, "", "", 0);
+		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, "", "");
 
 		for (int i = 0; i < 100; i++) {
 			events.processEvent(linkLeaveEvent);
@@ -57,7 +57,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 			events.addHandler(handlers[i]);
 		}
 
-		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, "", "", 0);
+		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, "", "");
 
 		for (int j = 0; j < numberOfIterations; j++) {
 

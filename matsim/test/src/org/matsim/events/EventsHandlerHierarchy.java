@@ -28,7 +28,6 @@ import org.matsim.testcases.MatsimTestCase;
 public class EventsHandlerHierarchy extends MatsimTestCase {
 
 	int eventHandled = 0;
-
 	int resetCalled = 0;
 
 	class A implements BasicEventHandler, LinkLeaveEventHandler {
@@ -41,25 +40,24 @@ public class EventsHandlerHierarchy extends MatsimTestCase {
 		public void handleEvent(LinkLeaveEvent event) {
 		}
 
-
 		public void reset(final int iteration) {
 			EventsHandlerHierarchy.this.resetCalled++;
 		}
-
 	}
 
 	class B extends A {}
 
+	@SuppressWarnings("unused")
 	class C extends A implements BasicEventHandler, LinkLeaveEventHandler {}
 
 	public final void testHandlerHierarchy() {
 		Events events = new Events();
 
 		EventHandler cc = new B();
-		events.processEvent(new LinkLeaveEvent(0., "", "", 0));
+		events.processEvent(new LinkLeaveEvent(0., "", ""));
 		assertEquals(this.eventHandled, 0);
 		events.addHandler(cc);
-		events.processEvent(new LinkLeaveEvent(0., "", "", 0));
+		events.processEvent(new LinkLeaveEvent(0., "", ""));
 		assertEquals(this.eventHandled, 1);
 	}
 
@@ -67,16 +65,14 @@ public class EventsHandlerHierarchy extends MatsimTestCase {
 		Events events = new Events();
 		//first test if handleEvent is not called twice for A and for C
 		C cc = new C();
-		events.processEvent(new LinkLeaveEvent(0., "", "", 0));
+		events.processEvent(new LinkLeaveEvent(0., "", ""));
 		assertEquals(this.eventHandled, 0);
 		events.addHandler(cc);
-		events.processEvent(new LinkLeaveEvent(0., "", "", 0));
+		events.processEvent(new LinkLeaveEvent(0., "", ""));
 		assertEquals(this.eventHandled, 1);
 		//then test the reset
 		events.resetHandlers(0);
 		assertEquals(1, this.resetCalled);
-
-
 	}
 
 }

@@ -23,6 +23,7 @@ package org.matsim.examples;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
@@ -418,7 +419,7 @@ public class BetaTravelTest extends MatsimTestCase {
 						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
 						act.setDuration(6*3600); // <-- This line differs from the original PlanMutateTimeAllocation, use a fix time to minimize effect of act-duration on score
 						act.setEndTime(Time.UNDEFINED_TIME); // <-- This line differs from the original PlanMutateTimeAllocation
-						now += act.getDuration();
+						now += 6*3600.0;
 					} else {
 						// handle last activity
 						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
@@ -467,6 +468,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	private static class BottleneckTravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
 		private final HashMap<String, Double> agentDepTimes = new HashMap<String, Double>(); // <AgentId, Time>
+		private final HashSet<String> agentSeen = new HashSet<String>();
 		private int agentCounter = 0;
 		private final double[] depTimes;
 		private final double[] arrTimes;
@@ -477,8 +479,9 @@ public class BetaTravelTest extends MatsimTestCase {
 		}
 
 		public void handleEvent(final AgentDepartureEvent event) {
-			if (event.legId == 0) {
+			if (!this.agentSeen.contains(event.agentId)) { // only store first departure
 				this.agentDepTimes.put(event.agentId, Double.valueOf(event.time));
+				this.agentSeen.add(event.agentId);
 			}
 		}
 
@@ -494,6 +497,7 @@ public class BetaTravelTest extends MatsimTestCase {
 
 		public void reset(final int iteration) {
 			this.agentDepTimes.clear();
+			this.agentSeen.clear();
 			this.agentCounter = 0;
 		}
 

@@ -69,7 +69,7 @@ public class SimplePriorityConcurrentListMPDSC {
 		int outEventCount=0;
 		int inEventCount=1000000;
 		for (int i=0;i<inEventCount;i++){
-			queue.add(new AgentArrivalEvent(1,"","",1), 0);
+			queue.add(new AgentArrivalEvent(1,"",""), 0);
 		}
 		
 		BasicEvent be=queue.remove();

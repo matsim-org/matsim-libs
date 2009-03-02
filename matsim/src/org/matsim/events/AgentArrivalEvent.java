@@ -32,8 +32,8 @@ public class AgentArrivalEvent extends AgentEvent {
 		super(time, agent, link, leg);
 	}
 
-	public AgentArrivalEvent(final double time, final String agentId, final String linkId, final int legId) {
-		super(time, agentId, linkId, legId);
+	public AgentArrivalEvent(final double time, final String agentId, final String linkId) {
+		super(time, agentId, linkId);
 	}
 
 	@Override

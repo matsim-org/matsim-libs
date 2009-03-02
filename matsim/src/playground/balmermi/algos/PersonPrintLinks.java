@@ -51,9 +51,11 @@ public class PersonPrintLinks extends AbstractPersonAlgorithm {
 	public void run(Person person) {
 		Plan plan = person.getPlans().get(0);
 		Iterator leg_it = plan.getIteratorLeg();
+		int counter = 0;
 		while (leg_it.hasNext()) {
 			Leg leg = (Leg)leg_it.next();
-			System.out.println("Person id=" + person.getId() + "; Leg nr=" + leg.getNum());
+			System.out.println("Person id=" + person.getId() + "; Leg nr=" + counter);
+			counter++;
 			CarRoute route = (CarRoute) leg.getRoute();
 			for (Link link : route.getLinks()) {
 				System.out.println(link.getOrigId());

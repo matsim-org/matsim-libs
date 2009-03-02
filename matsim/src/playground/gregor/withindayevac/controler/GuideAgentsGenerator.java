@@ -60,7 +60,6 @@ public class GuideAgentsGenerator {
 			Act actA = new org.matsim.population.ActImpl("h", new CoordImpl(12000.0, -12000.0), l);
 			actA.setEndTime(3600 * 3);
 			Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
-			leg.setNum(0);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);

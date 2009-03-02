@@ -34,22 +34,16 @@ public abstract class LinkEvent extends PersonEvent {
 	public String linkId;
 	public transient Link link;
 	public Leg leg = null;
-	/** @deprecated
-	 * The number of the leg in the plans file, starting from 0. */
-	@Deprecated
-	public int legId;
 
 	LinkEvent(final double time, final Person agent, final Link link, final Leg leg) {
 		super(time, agent);
 		this.link = link;
 		this.linkId = link.getId().toString();
 		this.leg = leg;
-		this.legId = leg.getNum();
 	}
 
-	LinkEvent(final double time, final String agentId, final String linkId, final int legNumber) {
+	LinkEvent(final double time, final String agentId, final String linkId) {
 		super(time, agentId);
-		this.legId = legNumber;
 		this.linkId = linkId;
 	}
 
@@ -61,7 +55,7 @@ public abstract class LinkEvent extends PersonEvent {
 	}
 
 	protected String asString() {
-		return getTimeString(this.time) + this.agentId + "\t\t" + this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concat later
+		return getTimeString(this.time) + this.agentId + "\t\t" + this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concatenate later
 	}
 
 }

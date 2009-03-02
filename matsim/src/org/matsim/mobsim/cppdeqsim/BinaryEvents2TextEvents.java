@@ -23,15 +23,12 @@ package org.matsim.mobsim.cppdeqsim;
 import java.io.File;
 
 import org.matsim.events.Events;
-import org.matsim.events.algorithms.CalcLegNumber;
 import org.matsim.events.algorithms.EventWriterTXT;
 
 public class BinaryEvents2TextEvents {
 
 	public static void convert(final String fromFilename, final String toFilename) {
 		final Events events = new Events();
-
-		events.addHandler(new CalcLegNumber());
 
 		EventWriterTXT ew_txt = new EventWriterTXT(toFilename);
 		events.addHandler(ew_txt);

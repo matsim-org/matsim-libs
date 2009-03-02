@@ -23,15 +23,15 @@ public class Mobsim {
 		eve.processEvent( aee ) ;
 
 		int legNumber = 1 ;
-		AgentDepartureEvent ade = new AgentDepartureEvent( time, "agentId", "linkId", legNumber ) ;
+		AgentDepartureEvent ade = new AgentDepartureEvent( time, "agentId", "linkId" ) ;
 
-		AgentWait2LinkEvent aw2le = new AgentWait2LinkEvent(time,"agentId","linkId",legNumber) ;
+		AgentWait2LinkEvent aw2le = new AgentWait2LinkEvent(time,"agentId","linkId") ;
 
-		LinkLeaveEvent lle = new LinkLeaveEvent( time, "agentId", "linkId", legNumber ) ;
+		LinkLeaveEvent lle = new LinkLeaveEvent( time, "agentId", "linkId" ) ;
 
-		LinkEnterEvent lee = new LinkEnterEvent( time, "agentId", "linkId", legNumber ) ;
+		LinkEnterEvent lee = new LinkEnterEvent( time, "agentId", "linkId" ) ;
 
-		AgentArrivalEvent aae = new AgentArrivalEvent( time, "agentId", "linkId", legNumber ) ;
+		AgentArrivalEvent aae = new AgentArrivalEvent( time, "agentId", "linkId" ) ;
 
 		ActStartEvent ase = new ActStartEvent( time, "agentId", "linkId", "acttype" ) ;
 

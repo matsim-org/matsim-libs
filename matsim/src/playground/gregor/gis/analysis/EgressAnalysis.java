@@ -183,7 +183,6 @@ public class EgressAnalysis {
 				Plan plan = new org.matsim.population.PlanImpl(person);
 				plan.addAct(person.getSelectedPlan().getFirstActivity());
 				Leg l = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
-				l.setNum(1);
 				l.setDepartureTime(0.0);
 				l.setTravelTime(0.0);
 				l.setArrivalTime(0.0);

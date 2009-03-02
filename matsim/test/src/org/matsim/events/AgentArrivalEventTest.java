@@ -29,7 +29,7 @@ public class AgentArrivalEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
 		final AgentArrivalEvent event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
-				new AgentArrivalEvent(68423.98, "443", "78-3", 2));
+				new AgentArrivalEvent(68423.98, "443", "78-3"));
 		assertEquals(68423.98, event.time, EPSILON);
 		assertEquals("443", event.agentId);
 		assertEquals("78-3", event.linkId);

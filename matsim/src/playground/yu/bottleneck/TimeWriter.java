@@ -62,8 +62,9 @@ public class TimeWriter implements AgentDepartureEventHandler,
 	 * (agentDepTimes).
 	 */
 	public void handleEvent(final AgentDepartureEvent event) {
-		if (event.legId == 0)
+		if (!this.agentDepTimes.containsKey(event.agentId)) { // only store first departure
 			agentDepTimes.put(event.agentId, event.time);
+		}
 	}
 
 	/**

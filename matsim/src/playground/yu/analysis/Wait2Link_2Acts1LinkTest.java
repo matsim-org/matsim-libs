@@ -35,7 +35,6 @@ import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Act;
-import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -54,18 +53,15 @@ public class Wait2Link_2Acts1LinkTest {
 	public static class AgentLinkPair {
 		private final String agentId;
 		private final String linkId;
-		private final int legNr;
 
-		public AgentLinkPair(final String agentId, final String linkId,
-				final int legNr) {
+		public AgentLinkPair(final String agentId, final String linkId) {
 			this.agentId = agentId;
 			this.linkId = linkId;
-			this.legNr = legNr;
 		}
 
 		@Override
 		public String toString() {
-			return this.legNr + "\t" + this.agentId + "\t" + this.linkId + "\n";
+			return this.agentId + "\t" + this.linkId + "\n";
 		}
 	}
 
@@ -81,7 +77,6 @@ public class Wait2Link_2Acts1LinkTest {
 		 */
 		private final Set<AgentLinkPair> agentLinks = new HashSet<AgentLinkPair>();
 
-		@SuppressWarnings( { "unchecked", "deprecation" })
 		@Override
 		public void run(final Person person) {
 			this.actsAtSameLink = false;
@@ -101,9 +96,7 @@ public class Wait2Link_2Acts1LinkTest {
 									this.actLocCount++;
 									this.actsAtSameLink = true;
 									this.agentLinks.add(new AgentLinkPair(person
-											.getId().toString(), tmpLinkId,
-											((Leg) actsLegs.get(i - 1))
-													.getNum()));
+											.getId().toString(), tmpLinkId));
 								}
 							tmpLinkId = nextTmpLinkId;
 						}
@@ -160,8 +153,7 @@ public class Wait2Link_2Acts1LinkTest {
 		public void handleEvent(final AgentWait2LinkEvent event) {
 			for (AgentLinkPair alp : this.agentLinksPairs)
 				if (alp.agentId.equals(event.agentId)
-						&& alp.linkId.equals(event.linkId)
-						&& alp.legNr == event.legId) {
+						&& alp.linkId.equals(event.linkId)) {
 					try {
 						this.writer.write(alp.toString());
 					} catch (IOException e) {

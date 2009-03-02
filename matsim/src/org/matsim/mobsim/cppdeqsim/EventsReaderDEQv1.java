@@ -81,7 +81,7 @@ public class EventsReaderDEQv1 {
 					int linkId = in.readInt();
 					int eventType = in.readInt();
 					eventComplete = true;
-					this.events.processEvent(createEvent(time, agentId, linkId, eventType, 0));
+					this.events.processEvent(createEvent(time, agentId, linkId, eventType));
 				}
 			} catch (EOFException e) {
 				if (!eventComplete) {
@@ -153,24 +153,24 @@ public class EventsReaderDEQv1 {
 		}
 	}
 
-	public static final BasicEvent createEvent(final double time, final int agentID, final int linkID, final int flag, final int legNumber) {
+	public static final BasicEvent createEvent(final double time, final int agentID, final int linkID, final int flag) {
 		BasicEvent event = null;
 
 		switch (flag) {
 			case 2:
-				event = new LinkLeaveEvent(time, Integer.toString(agentID), Integer.toString(linkID), legNumber);
+				event = new LinkLeaveEvent(time, Integer.toString(agentID), Integer.toString(linkID));
 				break;
 			case 5:
-				event = new LinkEnterEvent(time, Integer.toString(agentID), Integer.toString(linkID), legNumber);
+				event = new LinkEnterEvent(time, Integer.toString(agentID), Integer.toString(linkID));
 				break;
 			case 4:
-				event = new AgentWait2LinkEvent(time, Integer.toString(agentID), Integer.toString(linkID), legNumber);
+				event = new AgentWait2LinkEvent(time, Integer.toString(agentID), Integer.toString(linkID));
 				break;
 			case 6:
-				event = new AgentDepartureEvent(time, Integer.toString(agentID), Integer.toString(linkID), legNumber);
+				event = new AgentDepartureEvent(time, Integer.toString(agentID), Integer.toString(linkID));
 				break;
 			case 0:
-				event = new AgentArrivalEvent(time, Integer.toString(agentID), Integer.toString(linkID), legNumber);
+				event = new AgentArrivalEvent(time, Integer.toString(agentID), Integer.toString(linkID));
 				break;
 		}
 		return event;
@@ -208,7 +208,7 @@ public class EventsReaderDEQv1 {
 				int agentId = this.in.readInt();
 				int linkId = this.in.readInt();
 				int eventType = this.in.readInt();
-				this.next = createEvent(time, agentId, linkId, eventType, 0);
+				this.next = createEvent(time, agentId, linkId, eventType);
 			} catch (EOFException e) {
 				this.next = null;
 				if (!eventComplete) {

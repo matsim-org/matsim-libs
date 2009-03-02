@@ -148,7 +148,6 @@ public class EvacDestinationAssigner implements ScoringListener {
 			CarRoute route = new NodeCarRoute();
 			route.setNodes(evacRoute);
 			leg.setRoute(route);
-			leg.setNum(1);
 			Act act = new org.matsim.population.ActImpl("h",dest);
 			try {
 				route.getLinks();

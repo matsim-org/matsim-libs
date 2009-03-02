@@ -39,7 +39,7 @@ public class EnterRoadMessage extends EventMessage {
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.ENTER_LINK)){
 			//System.out.println(vehicle.getCurrentLink());
-			event=new LinkEnterEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getCurrentLink().getId().toString(),vehicle.getLegIndex()-1);
+			event=new LinkEnterEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getCurrentLink().getId().toString());
 			//event=new LinkEnterEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson(),vehicle.getCurrentLink(),vehicle.getCurrentLeg());
 			if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820")){
 				System.out.println(event.toString());

@@ -141,7 +141,6 @@ public class QueueNode {
 		Simulation.incLost();
 		log.error(
 				"Agent has no or wrong route! agentId=" + veh.getDriver().getPerson().getId()
-						+ " currentLegNumber=" + veh.getCurrentLeg().getNum()
 						+ " currentLink=" + currentLink.getId().toString()
 						+ ". The agent is removed from the simulation.");
 		return true;

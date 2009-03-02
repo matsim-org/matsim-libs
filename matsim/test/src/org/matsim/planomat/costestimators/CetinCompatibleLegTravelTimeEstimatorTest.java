@@ -82,9 +82,8 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 		AgentDepartureEvent depEvent = new AgentDepartureEvent(
 				departureTime,
 				TEST_PERSON_ID.toString(),
-				originAct.getLink().getId().toString(),
-				TEST_LEG_NR);
-		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(departureTime + depDelay, testPerson.getId().toString(), originAct.getLink().getId().toString(), 0);
+				originAct.getLink().getId().toString());
+		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(departureTime + depDelay, testPerson.getId().toString(), originAct.getLink().getId().toString());
 
 		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
@@ -117,14 +116,12 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 				event = new LinkEnterEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
 						TEST_PERSON_ID.toString(),
-						links.get(linkCnt).getId().toString(),
-						testLeg.getNum());
+						links.get(linkCnt).getId().toString());
 				events.processEvent(event);
 				event = new LinkLeaveEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
 						TEST_PERSON_ID.toString(),
-						links.get(linkCnt).getId().toString(),
-						testLeg.getNum());
+						links.get(linkCnt).getId().toString());
 				events.processEvent(event);
 			}
 		}

@@ -238,7 +238,6 @@ public class DistanceAnalysis {
 			Plan plan = new org.matsim.population.PlanImpl(person);
 			plan.addAct(person.getSelectedPlan().getFirstActivity());
 			Leg ll = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
-			ll.setNum(1);
 			ll.setArrivalTime(0.0);
 			ll.setDepartureTime(0.0);
 			ll.setTravelTime(0.0);

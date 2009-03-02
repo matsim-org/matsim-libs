@@ -32,8 +32,8 @@ public class LinkEnterEvent extends LinkEvent {
 		super(time, agent, link, leg);
 	}
 
-	public LinkEnterEvent(final double time, final String agentId, final String linkId, final int legNumber) {
-		super(time, agentId, linkId, legNumber);
+	public LinkEnterEvent(final double time, final String agentId, final String linkId) {
+		super(time, agentId, linkId);
 	}
 
 	@Override

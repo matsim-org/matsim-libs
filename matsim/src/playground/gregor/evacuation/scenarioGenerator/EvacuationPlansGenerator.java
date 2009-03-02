@@ -106,7 +106,6 @@ public class EvacuationPlansGenerator {
 			}
 
 			Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
-			leg.setNum(1);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);

@@ -58,28 +58,28 @@ public class EventsReaderTXTv1 {
 
 	}
 
-	static public final void createEvent(final Events events, final double time, final String agentId, final int legNumber,
+	static public final void createEvent(final Events events, final double time, final String agentId, 
 			final String linkId, final int flag, final String desc, final String acttype) {
 		BasicEvent data = null;
 
 		switch (flag) {
 			case 2:
-				data = new LinkLeaveEvent(time, agentId, linkId, legNumber);
+				data = new LinkLeaveEvent(time, agentId, linkId);
 				break;
 			case 5:
-				data = new LinkEnterEvent(time, agentId, linkId, legNumber);
+				data = new LinkEnterEvent(time, agentId, linkId);
 				break;
 			case 3:
-				data = new AgentStuckEvent(time, agentId, linkId, legNumber);
+				data = new AgentStuckEvent(time, agentId, linkId);
 				break;
 			case 4:
-				data = new AgentWait2LinkEvent(time, agentId, linkId, legNumber);
+				data = new AgentWait2LinkEvent(time, agentId, linkId);
 				break;
 			case 6:
-				data = new AgentDepartureEvent(time, agentId, linkId, legNumber);
+				data = new AgentDepartureEvent(time, agentId, linkId);
 				break;
 			case 0:
-				data = new AgentArrivalEvent(time, agentId, linkId, legNumber);
+				data = new AgentArrivalEvent(time, agentId, linkId);
 				break;
 			case 7:
 				if ("".equals(acttype) && desc != null) {
@@ -111,7 +111,6 @@ public class EventsReaderTXTv1 {
 		if (result.length == 7) {
 			createEvent(this.events, Double.parseDouble(result[0]),	// time
 									result[1],		// vehID
-									(result[2].length() == 0 ? -1 : Integer.parseInt(result[2])),		// legNumber
 									result[3],		// linkID
 									//Integer.parseInt(result[4]),		// nodeID
 									Integer.parseInt(result[5]),		// flag

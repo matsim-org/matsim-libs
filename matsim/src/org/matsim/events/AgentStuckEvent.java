@@ -32,8 +32,8 @@ public AgentStuckEvent(final double time, final Person agent, final Link link, f
 		super(time, agent, link, leg);
 	}
 
-	public AgentStuckEvent(final double time, final String agentId, final String linkId, final int legId) {
-		super(time, agentId, linkId, legId);
+	public AgentStuckEvent(final double time, final String agentId, final String linkId) {
+		super(time, agentId, linkId);
 	}
 
 	@Override

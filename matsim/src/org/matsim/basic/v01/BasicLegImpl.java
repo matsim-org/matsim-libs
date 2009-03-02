@@ -26,7 +26,6 @@ import org.matsim.utils.misc.Time;
 
 public class BasicLegImpl implements BasicLeg {
 
-	protected int num = Integer.MIN_VALUE;
 	protected BasicRoute route = null;
 
 	private double depTime = Time.UNDEFINED_TIME;
@@ -37,16 +36,6 @@ public class BasicLegImpl implements BasicLeg {
 	
 	public BasicLegImpl(BasicLeg.Mode mode) {
 		this.mode = mode;
-	}
-	
-	@Deprecated
-	public final int getNum() {
-		return this.num;
-	}
-
-	@Deprecated
-	public final void setNum(int num) {
-		this.num = num;
 	}
 
 	public BasicRoute getRoute() {

@@ -92,7 +92,6 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 		verifyCreateLeg();
 		Leg leg = new LegImpl(mode);
 		// Override leg number with an appropriate value
-		leg.setNum((this.actsLegs.size()-1) /2);
 		this.actsLegs.add(leg);
 		return leg;
 	}

@@ -56,13 +56,11 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		if (LinkLeaveEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new LinkLeaveEvent(time,
 					atts.getValue(LinkLeaveEvent.ATTRIBUTE_AGENT),
-					atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK),
-					-1));//Integer.parseInt(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LEG))));
+					atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK)));//Integer.parseInt(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LEG))));
 		} else if (LinkEnterEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new LinkEnterEvent(time,
 					atts.getValue(LinkEnterEvent.ATTRIBUTE_AGENT),
-					atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK),
-					-1));//Integer.parseInt(atts.getValue(LinkEnterEvent.ATTRIBUTE_LEG))));
+					atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK)));//Integer.parseInt(atts.getValue(LinkEnterEvent.ATTRIBUTE_LEG))));
 		} else if (ActEndEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new ActEndEvent(time,
 					atts.getValue(ActEndEvent.ATTRIBUTE_AGENT),
@@ -76,23 +74,19 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		} else if (AgentArrivalEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new AgentArrivalEvent(time,
 					atts.getValue(AgentArrivalEvent.ATTRIBUTE_AGENT),
-					atts.getValue(AgentArrivalEvent.ATTRIBUTE_LINK),
-					-1));//Integer.parseInt(atts.getValue(AgentArrivalEvent.ATTRIBUTE_LEG))));
+					atts.getValue(AgentArrivalEvent.ATTRIBUTE_LINK)));//Integer.parseInt(atts.getValue(AgentArrivalEvent.ATTRIBUTE_LEG))));
 		} else if (AgentDepartureEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new AgentDepartureEvent(time,
 					atts.getValue(AgentDepartureEvent.ATTRIBUTE_AGENT),
-					atts.getValue(AgentDepartureEvent.ATTRIBUTE_LINK),
-					-1));//Integer.parseInt(atts.getValue(AgentDepartureEvent.ATTRIBUTE_LEG))));
+					atts.getValue(AgentDepartureEvent.ATTRIBUTE_LINK)));//Integer.parseInt(atts.getValue(AgentDepartureEvent.ATTRIBUTE_LEG))));
 		} else if (AgentWait2LinkEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new AgentWait2LinkEvent(time,
 					atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_AGENT),
-					atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_LINK),
-					-1));//Integer.parseInt(atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_LEG))));
+					atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_LINK)));//Integer.parseInt(atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_LEG))));
 		} else if (AgentStuckEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new AgentStuckEvent(time,
 					atts.getValue(AgentStuckEvent.ATTRIBUTE_AGENT),
-					atts.getValue(AgentStuckEvent.ATTRIBUTE_LINK),
-					-1));//Integer.parseInt(atts.getValue(AgentStuckEvent.ATTRIBUTE_LEG))));
+					atts.getValue(AgentStuckEvent.ATTRIBUTE_LINK)));//Integer.parseInt(atts.getValue(AgentStuckEvent.ATTRIBUTE_LEG))));
 		} else if (AgentMoneyEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new AgentMoneyEvent(time,
 					new IdImpl(atts.getValue(AgentStuckEvent.ATTRIBUTE_AGENT)),

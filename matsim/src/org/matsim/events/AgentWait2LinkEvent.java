@@ -32,8 +32,8 @@ public class AgentWait2LinkEvent extends AgentEvent {
 		super(time, agent, link, leg);
 	}
 
-	public AgentWait2LinkEvent(final double time, final String agentId, final String linkId, final int legId) {
-		super(time, agentId, linkId, legId);
+	public AgentWait2LinkEvent(final double time, final String agentId, final String linkId) {
+		super(time, agentId, linkId);
 	}
 
 	@Override

@@ -128,7 +128,7 @@ public class NetworkFeatureFactory {
 
 	public AbstractFeatureType createLegFeature(Leg leg, StyleType style) {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
-		folder.setName(String.valueOf(leg.getNum()));
+		folder.setName(leg.getMode().toString() + "_" + Time.writeTime(leg.getDepartureTime()));
 
 		for (Link l : ((CarRoute) leg.getRoute()).getLinks()) {
 

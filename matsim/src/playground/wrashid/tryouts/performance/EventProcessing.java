@@ -44,7 +44,7 @@ public class EventProcessing {
 		events.addHandler(ep.new Handler1());
 
 		
-		LinkLeaveEvent linkLeaveEvent=new LinkLeaveEvent(0, "", "", 0);
+		LinkLeaveEvent linkLeaveEvent=new LinkLeaveEvent(0, "", "");
 		
 		for (int i=0;i<1000000;i++){
 				events.processEvent(linkLeaveEvent);

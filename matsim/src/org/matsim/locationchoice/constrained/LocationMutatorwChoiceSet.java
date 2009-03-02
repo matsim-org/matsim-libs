@@ -168,14 +168,12 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
        		act.setCoord(facility.getCenter());
        		return true;
 		}
-		else {
-			return false; 			
-		}	
+		// else ...
+		return false; 			
 	}
 	
 	protected double computeTravelTime(Act fromAct, Act toAct) {	
 		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
-		leg.setNum(0);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(0.0);

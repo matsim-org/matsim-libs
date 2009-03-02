@@ -32,8 +32,8 @@ public class LinkLeaveEvent extends LinkEvent {
 		super(time, agent, link, leg);
 	}
 
-	public LinkLeaveEvent(final double time, final String agentId, final String linkId, final int legNumber) {
-		super(time, agentId, linkId, legNumber);
+	public LinkLeaveEvent(final double time, final String agentId, final String linkId) {
+		super(time, agentId, linkId);
 	}
 
 	@Override

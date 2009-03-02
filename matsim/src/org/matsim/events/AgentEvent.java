@@ -36,20 +36,15 @@ public abstract class AgentEvent extends PersonEvent {
 
 	public String linkId;
 
-	@Deprecated
-	public int legId;
-
 	AgentEvent(final double time, final Person agent, final Link link, final Leg leg) {
 		super(time, agent);
 		this.link = link;
 		this.linkId = link.getId().toString();
 		this.leg = leg;
-		this.legId = leg.getNum();
 	}
 
-	AgentEvent(final double time, final String agentId, final String linkId, final int legId) {
+	AgentEvent(final double time, final String agentId, final String linkId) {
 		super(time, agentId);
-		this.legId = legId;
 		this.linkId = linkId;
 	}
 

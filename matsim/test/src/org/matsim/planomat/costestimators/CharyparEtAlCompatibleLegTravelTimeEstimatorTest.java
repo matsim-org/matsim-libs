@@ -80,8 +80,8 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 		// next, a departure delay of 5s at the origin link is added
 		departureTime = Time.parseTime("06:05:00");
 		double depDelay = Time.parseTime("00:00:05");
-		AgentDepartureEvent depEvent = new AgentDepartureEvent(departureTime, TEST_PERSON_ID.toString(), originAct.getLink().getId().toString(), 0);
-		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(departureTime + depDelay, TEST_PERSON_ID.toString(), originAct.getLink().getId().toString(), 0);
+		AgentDepartureEvent depEvent = new AgentDepartureEvent(departureTime, TEST_PERSON_ID.toString(), originAct.getLink().getId().toString());
+		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(departureTime + depDelay, TEST_PERSON_ID.toString(), originAct.getLink().getId().toString());
 
 		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
@@ -114,14 +114,12 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 				event = new LinkEnterEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
 						TEST_PERSON_ID.toString(),
-						links.get(linkCnt).getId().toString(),
-						TEST_LEG_NR);
+						links.get(linkCnt).getId().toString());
 				events.processEvent(event);
 				event = new LinkLeaveEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
 						TEST_PERSON_ID.toString(),
-						links.get(linkCnt).getId().toString(),
-						TEST_LEG_NR);
+						links.get(linkCnt).getId().toString());
 				events.processEvent(event);
 			}
 		}

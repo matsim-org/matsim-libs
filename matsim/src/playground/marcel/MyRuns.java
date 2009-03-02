@@ -34,17 +34,11 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.FolderType;
-import net.opengis.kml._2.IconStyleType;
 import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.LineStringType;
 import net.opengis.kml._2.LineStyleType;
-import net.opengis.kml._2.LinkType;
 import net.opengis.kml._2.MultiGeometryType;
 import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.PlacemarkType;
@@ -71,7 +65,6 @@ import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.algorithms.CalcLegNumber;
 import org.matsim.events.algorithms.CalcODMatrices;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.GenerateRealPlans;
@@ -142,7 +135,6 @@ import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.KMZWriter;
 import org.matsim.utils.vis.kml.MatsimKMLLogo;
-import org.matsim.utils.vis.kml.MatsimKmlStyleFactory;
 import org.matsim.visum.VisumAnbindungstabelleWriter;
 import org.matsim.visum.VisumMatrixReader;
 import org.matsim.visum.VisumMatrixWriter;
@@ -2194,7 +2186,6 @@ public class MyRuns {
 		System.out.println("RUN: readEvents");
 
 		final Events events = new Events();
-		events.addHandler(new CalcLegNumber());
 		EventWriterTXT writer = new EventWriterTXT("/Volumes/Data/VSP/cvs/vsp-cvs/runs/run212/events_fixed.txt.gz");
 		events.addHandler(writer);
 		new MatsimEventsReader(events).readFile("/Volumes/Data/VSP/cvs/vsp-cvs/runs/run212/events.txt");
@@ -2249,45 +2240,7 @@ public class MyRuns {
 
 	public static void someTest(final String[] args) {
 
-//		KMZWriter writer = new KMZWriter("test.kmz");
 
-		ObjectFactory kmlObjectFactory = new ObjectFactory();
-		KmlType mainKml = kmlObjectFactory.createKmlType();
-		DocumentType mainDoc = kmlObjectFactory.createDocumentType();
-		mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));
-
-		//set car style
-		LinkType iconLink = kmlObjectFactory.createLinkType();
-//		try {
-//			writer.addNonKMLFile(MatsimResource.getAsInputStream("car.png"), "data/car.png");
-			iconLink.setHref("./car.png");
-//		} catch (IOException e1) {
-//			log.warn("Cannot write car icon to kmz, trying to use icon from http://maps.google.com/mapfiles/kml/pal4/icon15.png");
-//			iconLink.setHref("http://maps.google.com/mapfiles/kml/pal4/icon15.png");
-//			e1.printStackTrace();
-//		}
-		StyleType carStyle = kmlObjectFactory.createStyleType();
-		carStyle.setId("redCarStyle");
-		IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
-		carIconStyle.setIcon(iconLink);
-		carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMRED);
-		carIconStyle.setScale(0.5);
-		carStyle.setIconStyle(carIconStyle);
-		mainDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(carStyle));
-
-//		writer.writeMainKml(mainKml);
-
-		JAXBContext jaxbContext;
-		try {
-			jaxbContext = JAXBContext.newInstance("net.opengis.kml._2");
-			Marshaller marshaller = jaxbContext.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			marshaller.marshal(kmlObjectFactory.createKml(mainKml), System.out);
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}
-
-//		writer.close();
 
 	}
 

@@ -41,7 +41,6 @@ public class LegImpl extends BasicLegImpl implements Leg {
 	 */
 	public LegImpl(final Leg leg) {
 		super(leg.getMode());
-		this.num = leg.getNum();
 		this.setDepartureTime(leg.getDepartureTime());
 		this.setTravelTime(leg.getTravelTime());
 		this.setArrivalTime(leg.getArrivalTime());
@@ -62,8 +61,7 @@ public class LegImpl extends BasicLegImpl implements Leg {
 
 	@Override
 	public final String toString() {
-		return "[num=" + this.num + "]" +
-				"[mode=" + this.getMode().toString()  + "]" +
+		return "[mode=" + this.getMode().toString()  + "]" +
 				"[depTime=" + Time.writeTime(this.getDepartureTime()) + "]" +
 				"[travTime=" + Time.writeTime(this.getTravelTime()) + "]" +
 				"[arrTime=" + Time.writeTime(this.getArrivalTime()) + "]" +

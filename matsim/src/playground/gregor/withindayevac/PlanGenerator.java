@@ -57,12 +57,10 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 
 	private Population population;
 	HashMap<String,ArrayList<String>> traces = new HashMap<String, ArrayList<String>>();
-	private int maxPlans;
 	private NetworkLayer network;
 
 	public void notifyStartup(final StartupEvent event) {
 		event.getControler().getEvents().addHandler(this);
-		this.maxPlans = event.getControler().getConfig().strategy().getMaxAgentPlanMemorySize();
 		this.population = event.getControler().getPopulation();
 		this.network = event.getControler().getNetwork();
 	}
@@ -97,7 +95,7 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 				}
 			}
 		}
-System.out.println(count);
+		System.out.println(count);
 	}
 
 
@@ -127,7 +125,6 @@ System.out.println(count);
 		a.setType("h");
 		Leg oldLeg = pers.getSelectedPlan().getNextLeg(oldA);
 		Leg l = new org.matsim.population.LegImpl(oldLeg.getMode());
-		l.setNum(oldLeg.getNum());
 		l.setDepartureTime(oldLeg.getDepartureTime());
 		l.setTravelTime(oldLeg.getTravelTime());
 		l.setArrivalTime(oldLeg.getArrivalTime());

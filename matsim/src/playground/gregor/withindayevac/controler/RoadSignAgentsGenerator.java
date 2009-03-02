@@ -61,7 +61,6 @@ public class RoadSignAgentsGenerator {
 				Act actA = new org.matsim.population.ActImpl("h", link.getCenter(), link);
 				actA.setEndTime(3600 * 3 - 2);
 				Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
-				leg.setNum(0);
 				leg.setDepartureTime(0.0);
 				leg.setTravelTime(0.0);
 				leg.setArrivalTime(0.0);

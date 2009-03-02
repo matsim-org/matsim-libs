@@ -284,7 +284,7 @@ public class AppraisalScorer implements ScoringFunction {
 		this.scoreTraveling += partialScore;
 		tmpScore += partialScore;
 
-		this.traveltime[leg.getNum()] = travelTime;
+//		this.traveltime[leg.getNum()] = travelTime; // leg.getNum() no longer available.
 
 		return tmpScore;
 	}

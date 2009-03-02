@@ -199,7 +199,6 @@ public class SelectedPlans2ESRIShape {
 
 	@SuppressWarnings("deprecation")
 	protected Feature getLegFeature(final Leg leg, final String id) {
-		Integer num = leg.getNum();
 		BasicLeg.Mode mode = leg.getMode();
 		Double depTime = leg.getDepartureTime();
 		Double travTime = leg.getTravelTime();
@@ -226,7 +225,7 @@ public class SelectedPlans2ESRIShape {
 
 		try {
 			return this.getFeatureTypeLeg().create(
-					new Object[] { ls, id, num, mode, depTime, travTime,
+					new Object[] { ls, id, mode, depTime, travTime,
 							arrTime, dist });
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
@@ -251,22 +250,20 @@ public class SelectedPlans2ESRIShape {
 		attrAct[6] = AttributeTypeFactory.newAttributeType("END_TIME",
 				Double.class);
 
-		AttributeType[] attrLeg = new AttributeType[8];
+		AttributeType[] attrLeg = new AttributeType[7];
 		attrLeg[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",
 				LineString.class, true, null, null, this.getCrs());
 		attrLeg[1] = AttributeTypeFactory.newAttributeType("PERS_ID",
 				String.class);
 		attrLeg[2] = AttributeTypeFactory
-				.newAttributeType("NUM", Integer.class);
-		attrLeg[3] = AttributeTypeFactory
 				.newAttributeType("MODE", String.class);
-		attrLeg[4] = AttributeTypeFactory.newAttributeType("DEP_TIME",
+		attrLeg[3] = AttributeTypeFactory.newAttributeType("DEP_TIME",
 				Double.class);
-		attrLeg[5] = AttributeTypeFactory.newAttributeType("TRAV_TIME",
+		attrLeg[4] = AttributeTypeFactory.newAttributeType("TRAV_TIME",
 				Double.class);
-		attrLeg[6] = AttributeTypeFactory.newAttributeType("ARR_TIME",
+		attrLeg[5] = AttributeTypeFactory.newAttributeType("ARR_TIME",
 				Double.class);
-		attrLeg[7] = AttributeTypeFactory
+		attrLeg[6] = AttributeTypeFactory
 				.newAttributeType("DIST", Double.class);
 
 		try {
