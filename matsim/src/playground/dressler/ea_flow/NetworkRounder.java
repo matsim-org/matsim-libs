@@ -61,6 +61,7 @@ public class NetworkRounder {
 			link.setFreespeed(newspeed);
 			
 			link.setLength(link.getLength()*lengthFactor);
+			//link.setLength(link.getEuklideanDistance()*lengthFactor);
 			
 			//double newcapacity =Math.ceil(link.getCapacity(1.)/divisor*flowCapacityFactor);
 			double newcapacity =Math.round(link.getCapacity(1.)/divisor*flowCapacityFactor);
@@ -82,8 +83,9 @@ public class NetworkRounder {
 	public static NetworkLayer roundNetwork(String filename, int newcap, double flowCapacityFactor, double lengthFactor){
 		//read network
 		NetworkLayer network = new NetworkLayer();
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);		
 		networkReader.readFile(filename);
+		System.out.println("Network stats: Nodes = " + network.getNodes().size() + ", Edges = " + network.getLinks().size());
 		roundNetwork(network, newcap, flowCapacityFactor, lengthFactor);
 		return network;
 		
@@ -94,13 +96,15 @@ public class NetworkRounder {
 			System.out.println("USAGE: NetworkRounder <inputfile> <outputfile> <cap> OR JUST: NetworkRounder <cap>");
 			return;
 		}
-		int cap = 10;
-		double flowCapacityFactor = 0.1d;
+		int cap = 5;
+		double flowCapacityFactor = 1.0d; // 12*3600.0d / 60.0d;
 		double lengthFactor = 1.0d;
 		String inputfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac.xml";
+		//String inputfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_network_evac.xml";
 		//String inputfile = "./examples/meine_EA/siouxfalls_network.xml";
-		//String outputfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
-		String outputfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_10p_flow_10s_cap.xml";
+		String outputfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
+		//String outputfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_100p_flow_2s_cap.xml";
+		//String outputfile = "./examples/meine_EA/swissold_network_5s.xml";
 		
 		if(args.length >=2){
 			inputfile  = args[0];
