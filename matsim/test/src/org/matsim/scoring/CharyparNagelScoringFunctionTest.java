@@ -127,7 +127,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 	}
 
 	private double calcScore() {
-		CharyparNagelScoringFunction testee = new CharyparNagelScoringFunction(this.plan, new CharyparNagelScoringParameters(this.config.charyparNagelScoring()));
+		ScoringFunction testee = getScoringFunctionInstance(this.plan); 
 		testee.endActivity(07*3600);
 		testee.startLeg(07*3600, (Leg) this.plan.getActsLegs().get(1));
 		testee.endLeg(07*3600 + 30*60);
