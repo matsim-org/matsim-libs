@@ -79,10 +79,6 @@ public class CharyparNagelLegScoringFunction implements LegScoringFunction, Basi
 		this.score += getStuckPenalty();
 	}
 
-	public void addMoney(final double amount) {
-		this.score += amount; // linear mapping of money to score
-	}
-
 	public void finish() {
 		if (this.index == this.lastActIndex) {
 			handleAct(24*3600); // handle the last act
