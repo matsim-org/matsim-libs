@@ -339,7 +339,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		this.config.charyparNagelScoring().setLateArrival(-18.0);
 		this.config.charyparNagelScoring().setTraveling(-6.0);
 
-		CharyparNagelScoringFunction testee = new CharyparNagelScoringFunction(this.plan, new CharyparNagelScoringParameters(this.config.charyparNagelScoring()));
+		ScoringFunction testee = getScoringFunctionInstance(this.plan); 
 		testee.endActivity(07*3600);
 		testee.startLeg(07*3600, (Leg) this.plan.getActsLegs().get(1));
 		testee.endLeg(07*3600 + 30*60);
@@ -356,7 +356,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		this.config.charyparNagelScoring().setLateArrival(-3.0);
 		this.config.charyparNagelScoring().setTraveling(-6.0);
 
-		testee = new CharyparNagelScoringFunction(this.plan, new CharyparNagelScoringParameters(this.config.charyparNagelScoring()));
+		testee = getScoringFunctionInstance(this.plan); 
 		testee.endActivity(07*3600);
 		testee.startLeg(07*3600, (Leg) this.plan.getActsLegs().get(1));
 		testee.endLeg(07*3600 + 30*60);
