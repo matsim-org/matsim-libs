@@ -26,9 +26,9 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.world.Location;
 import org.matsim.world.World;
@@ -71,7 +71,7 @@ public class WorldWriteFacilityZoneMapping {
 			out.flush();
 			for (Location f : world.getLayer(Facilities.LAYER_TYPE).getLocations().values()) {
 				if (f.getUpMapping().size() == 0) {
-					Collection<ActivityOption> acts = ((Facility)f).getActivities().values();
+					Collection<ActivityOption> acts = ((Facility)f).getActivityOptions().values();
 					if (acts.size() != 1) { Gbl.errorMsg("f_id="+f.getId()+": That must never happen!"); }
 					else if (!acts.iterator().next().getType().equals("tta")) { Gbl.errorMsg("f_id="+f.getId()+": That must never happen either!"); }
 					else { log.info("      f_id="+f.getId()+" has no zone mapping (outside CH, act_type='tta')"); }

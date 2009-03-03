@@ -161,8 +161,8 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 		// have to iterate this over opening times
 		int dayCounter = 0;
 		for (Day day : days) {
-			if (facility.getActivity(ACTIVITY_TYPE_SHOP) != null) {
-				Set<BasicOpeningTime> dailyOpentimes = facility.getActivity(ACTIVITY_TYPE_SHOP).getOpeningTime(day.getAbbrevEnglish());
+			if (facility.getActivityOption(ACTIVITY_TYPE_SHOP) != null) {
+				Set<BasicOpeningTime> dailyOpentimes = facility.getActivityOption(ACTIVITY_TYPE_SHOP).getOpeningTime(day.getAbbrevEnglish());
 				if (dailyOpentimes != null) {
 					for (BasicOpeningTime opentime : dailyOpentimes) {
 

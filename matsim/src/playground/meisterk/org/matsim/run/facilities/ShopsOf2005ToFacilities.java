@@ -59,17 +59,19 @@ import org.apache.commons.io.FileUtils;
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.OpeningTime;
+import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.facilities.algorithms.FacilitiesWriterAlgorithm;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimResource;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
+import org.matsim.interfaces.core.v01.OpeningTime;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -226,7 +228,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void transformGeocodedKMLToFacilities() {
 
-		Facilities shopsOf2005 = new Facilities("shopsOf2005", Facilities.FACILITIES_NO_STREAMING);
+		Facilities shopsOf2005 = new FacilitiesImpl("shopsOf2005", Facilities.FACILITIES_NO_STREAMING);
 
 		JAXBElement<KmlType> kmlElement = null;
 
@@ -773,7 +775,7 @@ public class ShopsOf2005ToFacilities {
 
 				// yeah, we can use the open times
 
-				ActivityOption shopping = theCurrentPickpay.createActivity(ACTIVITY_TYPE_SHOP);
+				ActivityOption shopping = theCurrentPickpay.createActivityOption(ACTIVITY_TYPE_SHOP);
 				openNumbers.clear();
 				closeNumbers.clear();
 
@@ -823,7 +825,7 @@ public class ShopsOf2005ToFacilities {
 						String openTimeString = Time.writeTime(openSeconds);
 						String closeTimeString = Time.writeTime(closeSeconds);
 
-						opentime = new OpeningTime(days[dayPointer].getAbbrevEnglish(), openTimeString, closeTimeString);
+						opentime = new OpeningTimeImpl(days[dayPointer].getAbbrevEnglish(), openTimeString, closeTimeString);
 
 						shopping.addOpeningTime(opentime);
 
@@ -879,7 +881,7 @@ public class ShopsOf2005ToFacilities {
 
 			Facility theCurrentMigrosZH = (Facility) facilities.getLocation(facilityId);
 			if (theCurrentMigrosZH != null) {
-				ActivityOption shopping = theCurrentMigrosZH.createActivity(ACTIVITY_TYPE_SHOP);
+				ActivityOption shopping = theCurrentMigrosZH.createActivityOption(ACTIVITY_TYPE_SHOP);
 				String openTimeString = tokens[6];
 				openHourTokens = openTimeString.split(ANYTHING_BUT_DIGITS);
 				openDayTokens = openTimeString.split(ANYTHING_BUT_LETTERS);
@@ -949,7 +951,7 @@ public class ShopsOf2005ToFacilities {
 								case FRIDAY:
 									System.out.println("Adding times to weekdays...");
 									for (int weekday = 0; weekday <= 4; weekday++) {
-										opentime = new OpeningTime(days[weekday]
+										opentime = new OpeningTimeImpl(days[weekday]
 										                             .getAbbrevEnglish(), Time
 										                             .writeTime(oldTime), Time
 										                             .writeTime(time));
@@ -959,7 +961,7 @@ public class ShopsOf2005ToFacilities {
 								default:
 									DayType englishDayString = day.getAbbrevEnglish();
 								System.out.println("Adding times to " + englishDayString + "...");
-								opentime = new OpeningTime(
+								opentime = new OpeningTimeImpl(
 										englishDayString,
 										Time.writeTime(oldTime),
 										Time.writeTime(time));
@@ -1056,7 +1058,7 @@ public class ShopsOf2005ToFacilities {
 			Facility theCurrentMigrosOstschweiz = (Facility) facilities.getLocation(facilityId);
 			if (theCurrentMigrosOstschweiz != null) {
 
-				ActivityOption shopping = theCurrentMigrosOstschweiz.createActivity(ACTIVITY_TYPE_SHOP);
+				ActivityOption shopping = theCurrentMigrosOstschweiz.createActivityOption(ACTIVITY_TYPE_SHOP);
 
 				// extract numbers
 				for (int tokenPos = 2; tokenPos < openTimeTokens.length; tokenPos++) {
@@ -1079,7 +1081,7 @@ public class ShopsOf2005ToFacilities {
 
 									DayType englishDayString = days[dayPointer].getAbbrevEnglish();
 									System.out.println("Adding times to " + englishDayString + "...");
-									opentime = new OpeningTime(
+									opentime = new OpeningTimeImpl(
 											englishDayString,
 											Time.writeTime(openingHour),
 											Time.writeTime(time));
@@ -1150,7 +1152,7 @@ public class ShopsOf2005ToFacilities {
 			Facility theCurrentCoopZH = (Facility) facilities.getLocation(facilityId);
 			if (theCurrentCoopZH != null) {
 
-				ActivityOption shopping = theCurrentCoopZH.createActivity(ACTIVITY_TYPE_SHOP);
+				ActivityOption shopping = theCurrentCoopZH.createActivityOption(ACTIVITY_TYPE_SHOP);
 
 				for (int tokenPos = START_OPEN_TOKEN_INDEX; tokenPos <= END_OPEN_TOKEN_INDEX; tokenPos++) {
 
@@ -1167,7 +1169,7 @@ public class ShopsOf2005ToFacilities {
 							System.out.println("Open: " + openingHour);
 							System.out.println("Close: " + time);
 							System.out.println("Adding times to " + englishDayString + "...");
-							opentime = new OpeningTime(
+							opentime = new OpeningTimeImpl(
 									englishDayString,
 									openingHour,
 									time);
@@ -1231,7 +1233,7 @@ public class ShopsOf2005ToFacilities {
 			System.out.println(facilityId);
 			Facility theCurrentCoopTG = (Facility) facilities.getLocation(facilityId);
 			if (theCurrentCoopTG != null) {
-				ActivityOption shopping = theCurrentCoopTG.createActivity(ACTIVITY_TYPE_SHOP);
+				ActivityOption shopping = theCurrentCoopTG.createActivityOption(ACTIVITY_TYPE_SHOP);
 
 				for (int tokenPos = START_OPEN_TOKEN_INDEX; tokenPos <= END_OPEN_TOKEN_INDEX; tokenPos++) {
 
@@ -1261,7 +1263,7 @@ public class ShopsOf2005ToFacilities {
 										case START_OPEN_TOKEN_INDEX + 1:
 											System.out.println("Adding times to weekdays...");
 											for (int weekday = 0; weekday <= 4; weekday++) {
-												opentime = new OpeningTime(
+												opentime = new OpeningTimeImpl(
 														days[weekday].getAbbrevEnglish(),
 														Time.writeTime(openingHour),
 														Time.writeTime(time));
@@ -1271,7 +1273,7 @@ public class ShopsOf2005ToFacilities {
 										case START_OPEN_TOKEN_INDEX + 2:
 										case START_OPEN_TOKEN_INDEX + 3:
 											System.out.println("Adding times to saturday...");
-											opentime = new OpeningTime(
+											opentime = new OpeningTimeImpl(
 													Day.getDayByGermanAbbrev("Sa").getAbbrevEnglish(),
 													Time.writeTime(openingHour),
 													Time.writeTime(time));
@@ -1391,7 +1393,7 @@ public class ShopsOf2005ToFacilities {
 
 				Facility theCurrentDenner = (Facility) facilities.getLocation(shopId.getShopId());
 				if (theCurrentDenner != null) {
-					ActivityOption shopping = theCurrentDenner.createActivity(ACTIVITY_TYPE_SHOP);
+					ActivityOption shopping = theCurrentDenner.createActivityOption(ACTIVITY_TYPE_SHOP);
 					for (String openTimeString : new String[]{weekDayToken, saturdayToken}) {
 
 						openHourTokens = openTimeString.split(ANYTHING_BUT_DIGITS);
@@ -1413,7 +1415,7 @@ public class ShopsOf2005ToFacilities {
 										if (openTimeString.equals(weekDayToken)) {
 											System.out.println("Adding times to weekdays...");
 											for (int weekday = 0; weekday <= 4; weekday++) {
-												opentime = new OpeningTime(
+												opentime = new OpeningTimeImpl(
 														days[weekday].getAbbrevEnglish(),
 														Time.writeTime(openingHour),
 														Time.writeTime(time));
@@ -1421,7 +1423,7 @@ public class ShopsOf2005ToFacilities {
 											}
 										} else if (openTimeString.equals(saturdayToken)) {
 											System.out.println("Adding times to saturday...");
-											opentime = new OpeningTime(
+											opentime = new OpeningTimeImpl(
 													Day.getDayByGermanAbbrev("Sa").getAbbrevEnglish(),
 													Time.writeTime(openingHour),
 													Time.writeTime(time));
@@ -1451,7 +1453,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void shopsToTXT() {
 
-		Facilities shopsOf2005 = new Facilities("shopsOf2005", Facilities.FACILITIES_NO_STREAMING);
+		Facilities shopsOf2005 = new FacilitiesImpl("shopsOf2005", Facilities.FACILITIES_NO_STREAMING);
 		ArrayList<String> txtLines = new ArrayList<String>();
 		ShopId shopId = null;
 		String aShopLine = null;
@@ -1515,7 +1517,7 @@ public class ShopsOf2005ToFacilities {
 				(int) facility.getCenter().getX();
 			;
 
-			ActivityOption shopping = facility.getActivity(ACTIVITY_TYPE_SHOP);
+			ActivityOption shopping = facility.getActivityOption(ACTIVITY_TYPE_SHOP);
 			if (shopping != null) {
 
 				// open times (variable length)
@@ -1609,7 +1611,7 @@ public class ShopsOf2005ToFacilities {
 
 		Facilities facilities = null;
 		for (int dataSetIndex : new int[]{SHOPS_OF_2005/*, SHOPS_FROM_ENTERPRISE_CENSUS*/}) {
-			facilities = new Facilities(shopsNames.get(new Integer(dataSetIndex)), Facilities.FACILITIES_NO_STREAMING);
+			facilities = new FacilitiesImpl(shopsNames.get(new Integer(dataSetIndex)), Facilities.FACILITIES_NO_STREAMING);
 
 			System.out.println("Reading facilities xml file... ");
 			FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilities);
@@ -1666,8 +1668,8 @@ public class ShopsOf2005ToFacilities {
 				// have to iterate this over opening times
 				int dayCounter = 0;
 				for (Day day : days) {
-					if (facility.getActivity(ACTIVITY_TYPE_SHOP) != null) {
-						Set<BasicOpeningTime> dailyOpentimes = facility.getActivity(ACTIVITY_TYPE_SHOP).getOpeningTime(day.getAbbrevEnglish());
+					if (facility.getActivityOption(ACTIVITY_TYPE_SHOP) != null) {
+						Set<BasicOpeningTime> dailyOpentimes = facility.getActivityOption(ACTIVITY_TYPE_SHOP).getOpeningTime(day.getAbbrevEnglish());
 						if (dailyOpentimes != null) {
 							for (BasicOpeningTime opentime : dailyOpentimes) {
 
@@ -1713,9 +1715,9 @@ public class ShopsOf2005ToFacilities {
 
 	private static void applyOpentimesToEnterpriseCensus() {
 
-		Facilities facilities_input = new Facilities("Switzerland based on Enterprise census 2000.", Facilities.FACILITIES_USE_STREAMING);
+		Facilities facilities_input = new FacilitiesImpl("Switzerland based on Enterprise census 2000.", Facilities.FACILITIES_USE_STREAMING);
 
-		Facilities facilities_output = new Facilities("Facilities KTI Year 2", Facilities.FACILITIES_NO_STREAMING);
+		Facilities facilities_output = new FacilitiesImpl("Facilities KTI Year 2", Facilities.FACILITIES_NO_STREAMING);
 
 		// init algorithms
 		FacilitiesOpentimesKTIYear2 facilitiesOpentimesKTIYear2 = new FacilitiesOpentimesKTIYear2();

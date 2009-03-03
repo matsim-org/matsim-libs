@@ -55,7 +55,7 @@ public class FacilityImpl extends AbstractLocation implements Facility {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	protected FacilityImpl(final Facilities layer, final Id id, final Coord center) {
+	protected FacilityImpl(final FacilitiesImpl layer, final Id id, final Coord center) {
 		super(layer,id,center);
 	}
 
@@ -72,7 +72,7 @@ public class FacilityImpl extends AbstractLocation implements Facility {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final ActivityOption createActivity(final String type) {
+	public final ActivityOption createActivityOption(final String type) {
 		if (this.activities.containsKey(type)) {
 			Gbl.errorMsg(this + "[type=" + type + " already exists]");
 		}
@@ -155,11 +155,11 @@ public class FacilityImpl extends AbstractLocation implements Facility {
 		return this.desc;
 	}
 	
-	public final TreeMap<String,ActivityOption> getActivities() {
+	public final TreeMap<String,ActivityOption> getActivityOptions() {
 		return this.activities;
 	}
 
-	public final ActivityOption getActivity(final String type) {
+	public final ActivityOption getActivityOption(final String type) {
 		return this.activities.get(type);
 	}
 

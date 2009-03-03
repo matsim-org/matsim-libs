@@ -30,30 +30,43 @@ import org.matsim.interfaces.basic.v01.Id;
  * Root class of the population description (previously also called "plans file")
  */
 public interface Population extends BasicPopulation<Person>, Iterable<Person> {
-
+	// TODO [MR] remove Iterable
+	
 	public void addPerson(final Person p);
 
-	public void runAlgorithms();
-
-	public void clearAlgorithms();
-
-	public boolean removeAlgorithm(final PersonAlgorithm algo);
-
-	public void addAlgorithm(final PersonAlgorithm algo);
+	public PopulationBuilder getPopulationBuilder();
 
 	public Map<Id, Person> getPersons();
+	
 
+	// all the rest is deprecated
+	
+	@Deprecated // "experimental", will be removed in interface
+	public void runAlgorithms();
+
+	@Deprecated // "experimental", will be removed in interface
+	public void clearAlgorithms();
+
+	@Deprecated // "experimental", will be removed in interface
+	public boolean removeAlgorithm(final PersonAlgorithm algo);
+
+	@Deprecated // "experimental", will be removed in interface
+	public void addAlgorithm(final PersonAlgorithm algo);
+
+	@Deprecated
 	public boolean isStreaming();
 
 	/**
 	 * @return the size of the population, i.e. the number of persons in this population.
+	 * @deprecated user getPersons().size()
 	 */
 	public int size();
 
+	@Deprecated
 	public void printPlansCount();
 
+	@Deprecated
 	public Iterator<Person> iterator();
 	
-	public PopulationBuilder getPopulationBuilder();
 
 }

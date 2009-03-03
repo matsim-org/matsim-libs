@@ -26,11 +26,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.ConfigWriter;
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Population;

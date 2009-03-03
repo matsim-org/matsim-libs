@@ -23,8 +23,9 @@ package playground.marcel.pt.utils;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
-import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -37,7 +38,7 @@ import org.matsim.utils.geometry.CoordImpl;
 public class FacilityVisitorsTest extends MatsimTestCase {
 
 	public void testPersonStartAct() {
-		final Facilities facilities = new Facilities();
+		final Facilities facilities = new FacilitiesImpl();
 		final Facility facility = facilities.createFacility(new IdImpl("1"), new CoordImpl(0, 0));
 		final NetworkLayer network = new NetworkLayer();
 		final Link link = network.createLink(new IdImpl("1"), network.createNode(new IdImpl("1"), new CoordImpl(0, 0)), network.createNode(new IdImpl("2"), new CoordImpl(100, 0)), 100, 100, 3600, 1);
@@ -53,7 +54,7 @@ public class FacilityVisitorsTest extends MatsimTestCase {
 	}
 
 	public void testPersonEndAct() {
-		final Facilities facilities = new Facilities();
+		final Facilities facilities = new FacilitiesImpl();
 		final Facility facility = facilities.createFacility(new IdImpl("1"), new CoordImpl(0, 0));
 		final NetworkLayer network = new NetworkLayer();
 		final Link link = network.createLink(new IdImpl("1"), network.createNode(new IdImpl("1"), new CoordImpl(0, 0)), network.createNode(new IdImpl("2"), new CoordImpl(100, 0)), 100, 100, 3600, 1);
@@ -71,7 +72,7 @@ public class FacilityVisitorsTest extends MatsimTestCase {
 	}
 
 	public void testReset() {
-		final Facilities facilities = new Facilities();
+		final Facilities facilities = new FacilitiesImpl();
 		final Facility facility = facilities.createFacility(new IdImpl("1"), new CoordImpl(0, 0));
 		final NetworkLayer network = new NetworkLayer();
 		final Link link = network.createLink(new IdImpl("1"), network.createNode(new IdImpl("1"), new CoordImpl(0, 0)), network.createNode(new IdImpl("2"), new CoordImpl(100, 0)), 100, 100, 3600, 1);

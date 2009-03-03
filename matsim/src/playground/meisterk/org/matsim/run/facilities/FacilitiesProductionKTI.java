@@ -21,10 +21,10 @@
 package playground.meisterk.org.matsim.run.facilities;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.algorithms.FacilitiesRandomizeHectareCoordinates;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Facilities;
 
 import playground.meisterk.org.matsim.facilities.algorithms.FacilitiesAllActivitiesFTE;
 import playground.meisterk.org.matsim.facilities.algorithms.FacilitiesOpentimesKTIYear1;

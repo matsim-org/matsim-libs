@@ -49,7 +49,7 @@ public class FacilitiesActTypeFilter extends AbstractFacilityFilter {
 
 	public boolean judge(final Facility facility) {
 
-		Iterator<String> activityIterator = facility.getActivities().keySet().iterator();
+		Iterator<String> activityIterator = facility.getActivityOptions().keySet().iterator();
 		while (activityIterator.hasNext()) {
 			String activity = activityIterator.next();
 			for (String actTypePattern : this.actTypePatterns) {

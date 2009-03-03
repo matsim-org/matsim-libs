@@ -20,7 +20,7 @@
 
 package org.matsim.socialnetworks.replanning;
 
-import org.matsim.facilities.Facilities;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.MultithreadedModuleA;

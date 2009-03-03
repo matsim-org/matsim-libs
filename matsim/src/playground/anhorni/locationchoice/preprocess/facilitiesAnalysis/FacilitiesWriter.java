@@ -36,27 +36,27 @@ public class FacilitiesWriter {
 			Coord coord = facility.getCenter();
 			
 			
-			if (facility.getActivity("shop_retail_gt2500sqm") != null) {
+			if (facility.getActivityOption("shop_retail_gt2500sqm") != null) {
 				features.add(this.createFeature(coord, facility.getId(), "shop_retail_gt2500sqm"));
 				numberOfShops[0]++;
 			}
-			else if (facility.getActivity("shop_retail_get1000sqm") != null) {
+			else if (facility.getActivityOption("shop_retail_get1000sqm") != null) {
 				features.add(this.createFeature(coord, facility.getId(), "shop_retail_get1000sqm"));
 				numberOfShops[1]++;
 			}
-			else if (facility.getActivity("shop_retail_get400sqm") != null) {
+			else if (facility.getActivityOption("shop_retail_get400sqm") != null) {
 				features.add(this.createFeature(coord, facility.getId(), "shop_retail_get400sqm"));
 				numberOfShops[2]++;
 			}
-			else if (facility.getActivity("shop_retail_get100sqm") != null) {
+			else if (facility.getActivityOption("shop_retail_get100sqm") != null) {
 				features.add(this.createFeature(coord, facility.getId(), "shop_retail_get100sqm"));	
 				numberOfShops[3]++;
 			}
-			else if (facility.getActivity("shop_retail_lt100sqm") != null) {
+			else if (facility.getActivityOption("shop_retail_lt100sqm") != null) {
 				features.add(this.createFeature(coord, facility.getId(), "shop_retail_lt100sqm"));
 				numberOfShops[4]++;
 			}
-			else if (facility.getActivity("shop_other") != null) {
+			else if (facility.getActivityOption("shop_other") != null) {
 				features.add(this.createFeature(coord, facility.getId(), "shop_other"));
 				numberOfShops[5]++;
 			}		

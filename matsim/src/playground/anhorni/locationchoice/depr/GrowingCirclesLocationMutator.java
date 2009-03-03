@@ -26,12 +26,12 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
@@ -173,7 +173,7 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (final Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivity(EDUCATION) != null) {
+			if (f.getActivityOption(EDUCATION) != null) {
 				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
 				if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
@@ -187,7 +187,7 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.educFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		for (final Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivity(EDUCATION) != null) {
+			if (f.getActivityOption(EDUCATION) != null) {
 				this.educFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 			}
 		}
@@ -219,18 +219,18 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		final int[] dist_sum = new int[fs.size()];
 		Iterator<Facility> f_it = fs.iterator();
 		Facility f = f_it.next();
-		dist_sum[i] = f.getActivity(act_type).getCapacity();
+		dist_sum[i] = f.getActivityOption(act_type).getCapacity();
 		if ((dist_sum[i] == 0) || (dist_sum[i] == Integer.MAX_VALUE)) {
 			dist_sum[i] = 1;
-			f.getActivity(act_type).setCapacity(1);
+			f.getActivityOption(act_type).setCapacity(1);
 		}
 		while (f_it.hasNext()) {
 			f = f_it.next();
 			i++;
-			int val = f.getActivity(act_type).getCapacity();
+			int val = f.getActivityOption(act_type).getCapacity();
 			if ((val == 0) || (val == Integer.MAX_VALUE)) {
 				val = 1;
-				f.getActivity(act_type).setCapacity(1);
+				f.getActivityOption(act_type).setCapacity(1);
 			}
 			dist_sum[i] = dist_sum[i-1] + val;
 		}

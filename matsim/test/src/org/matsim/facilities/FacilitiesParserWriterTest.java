@@ -25,6 +25,7 @@ import org.matsim.examples.TriangleScenario;
 import org.matsim.facilities.algorithms.FacilitiesCalcMinDist;
 import org.matsim.facilities.algorithms.FacilitiesCombine;
 import org.matsim.facilities.algorithms.FacilitiesSummary;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.world.MatsimWorldReader;
@@ -95,7 +96,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		final World world = new World();
 
 		System.out.println("  reading facilites xml file independent of the world...");
-		Facilities facilities = new Facilities();
+		Facilities facilities = new FacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		world.complete();
 		System.out.println("  done.");

@@ -3,8 +3,8 @@ package playground.jhackney.algorithms;
 import java.io.File;
 import java.util.Iterator;
 
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;

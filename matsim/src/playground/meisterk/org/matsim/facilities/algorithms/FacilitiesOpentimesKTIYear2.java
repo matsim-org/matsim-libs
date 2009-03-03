@@ -20,7 +20,7 @@
 
 package playground.meisterk.org.matsim.facilities.algorithms;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -29,12 +29,14 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.facilities.OpeningTime;
+import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
+import org.matsim.interfaces.core.v01.OpeningTime;
 import org.matsim.world.Location;
 
 import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
@@ -47,7 +49,7 @@ import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
  */
 public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
-	private final Facilities shopsOf2005 = new Facilities("shopsOf2005", Facilities.FACILITIES_NO_STREAMING);
+	private final Facilities shopsOf2005 = new FacilitiesImpl("shopsOf2005", Facilities.FACILITIES_NO_STREAMING);
 
 	private final String shopsOf2005Filename = "/home/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/facilities_shopsOf2005.xml";
 
@@ -75,14 +77,14 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
 		Map<DayType, SortedSet<BasicOpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<BasicOpeningTime>>();
 
-		ArrayList<Location> closestShops = this.shopsOf2005.getNearestLocations(facility.getCenter());
-		ActivityOption shopsOf2005ShopAct = ((Facility) closestShops.get(0)).getActivity(FacilitiesProductionKTI.ACT_TYPE_SHOP);
+		List<Location> closestShops = this.shopsOf2005.getNearestLocations(facility.getCenter());
+		ActivityOption shopsOf2005ShopAct = ((Facility) closestShops.get(0)).getActivityOption(FacilitiesProductionKTI.ACT_TYPE_SHOP);
 		if (shopsOf2005ShopAct != null) {
 			closestShopOpentimes = shopsOf2005ShopAct.getOpentimes();
 		} else {
 			log.info("shop activity object of closest shop facility is null.");
 		}
-		Map<String, ActivityOption> activities = facility.getActivities();
+		Map<String, ActivityOption> activities = facility.getActivityOptions();
 
 		// remove all existing opentimes
 		for (ActivityOption a : activities.values()) {
@@ -95,7 +97,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 				// standard daily opentimes for industry sector
 				if (activities.containsKey(FacilitiesProductionKTI.WORK_SECTOR2)) {
 					for (DayType day : weekDays) {
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR2).addOpeningTime(new OpeningTime(
+						activities.get(FacilitiesProductionKTI.WORK_SECTOR2).addOpeningTime(new OpeningTimeImpl(
 								day,
 								7.0 * 3600,
 								18.0 * 3600));
@@ -120,7 +122,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 									endTime = ((OpeningTime) dailyOpentime.toArray()[0]).getEndTime();
 									break;
 							}
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
@@ -139,15 +141,15 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_KINDERGARTEN, activityType) ||
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_PRIMARY, activityType)) {
 						for (DayType day : weekDays) {
-							activities.get(activityType).addOpeningTime(new OpeningTime(
+							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
 									8.0 * 3600,
 									12.0 * 3600));
-							activities.get(activityType).addOpeningTime(new OpeningTime(
+							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
 									13.5 * 3600,
 									17.0 * 3600));
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 									day,
 									8.0 * 3600,
 									17.0 * 3600));
@@ -156,11 +158,11 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_SECONDARY, activityType) ||
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_OTHER, activityType)) {
 						for (DayType day : weekDays) {
-							activities.get(activityType).addOpeningTime(new OpeningTime(
+							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
 									8.0 * 3600,
 									18.0 * 3600));
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 									day,
 									8.0 * 3600,
 									18.0 * 3600));
@@ -168,20 +170,20 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 					} else if (
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_HIGHER, activityType)) {
 						for (DayType day : weekDays) {
-							activities.get(activityType).addOpeningTime(new OpeningTime(
+							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
 									7.0 * 3600,
 									22.0 * 3600));
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 									day,
 									7.0 * 3600,
 									22.0 * 3600));
 						}
-						activities.get(activityType).addOpeningTime(new OpeningTime(
+						activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 								DayType.sat,
 								8.0 * 3600,
 								12.0 * 3600));
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 								DayType.sat,
 								8.0 * 3600,
 								12.0 * 3600));
@@ -203,11 +205,11 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 								startTime = 9.0 * 3600;
 								endTime = 18.0 * 3600;
 							}
-							activities.get(activityType).addOpeningTime(new OpeningTime(
+							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
@@ -217,11 +219,11 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 						for (DayType day : days) {
 							startTime = 9.0 * 3600;
 							endTime = 24.0 * 3600;
-							activities.get(activityType).addOpeningTime(new OpeningTime(
+							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
@@ -231,11 +233,11 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 						for (DayType day : days) {
 							startTime = 14.0 * 3600;
 							endTime = 24.0 * 3600;
-							activities.get(activityType).addOpeningTime(new OpeningTime(
+							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));

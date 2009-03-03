@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.MatsimXmlParser;
@@ -97,7 +98,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 	
 	private void startActivity(final Attributes atts) {
-		this.curractivity = this.currfacility.createActivity(atts.getValue("type"));
+		this.curractivity = this.currfacility.createActivityOption(atts.getValue("type"));
 	}
 	
 	private void startCapacity(final Attributes atts) {
@@ -107,7 +108,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	
 	private void startOpentime(final Attributes atts) {
 		DayType day = getDayType(atts.getValue("day"));
-		this.curractivity.addOpeningTime(new OpeningTime(day, Time.parseTime(atts.getValue("start_time")), Time.parseTime(atts.getValue("end_time"))));
+		this.curractivity.addOpeningTime(new OpeningTimeImpl(day, Time.parseTime(atts.getValue("start_time")), Time.parseTime(atts.getValue("end_time"))));
 	}
 
 	

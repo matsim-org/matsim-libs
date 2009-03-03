@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicPopulation;
@@ -35,6 +34,7 @@ import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -257,7 +257,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 
 		this.currfacility = this.facilities.getFacility(new IdImpl(id));
 		if (this.currfacility == null) { Gbl.errorMsg("facility id=" + id + " does not exist!"); }
-		this.curractivity = this.currfacility.getActivity(this.curracttype);
+		this.curractivity = this.currfacility.getActivityOption(this.curracttype);
 		if (this.curractivity == null) { Gbl.errorMsg("facility id=" + id + ": Activity of type=" + this.curracttype + " does not exist!"); }
 		this.currknowledge.addActivity(this.curractivity,isPrimary);
 	}

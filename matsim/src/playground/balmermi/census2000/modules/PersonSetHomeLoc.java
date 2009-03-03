@@ -22,9 +22,9 @@ package playground.balmermi.census2000.modules;
 
 import java.util.Iterator;
 
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -73,7 +73,7 @@ public class PersonSetHomeLoc extends AbstractPersonAlgorithm implements PlanAlg
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivity(HOME) != null) {
+			if (f.getActivityOption(HOME) != null) {
 				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
 				if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
@@ -87,7 +87,7 @@ public class PersonSetHomeLoc extends AbstractPersonAlgorithm implements PlanAlg
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.homeFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		for (Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivity(HOME) != null) {
+			if (f.getActivityOption(HOME) != null) {
 				this.homeFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 			}
 		}

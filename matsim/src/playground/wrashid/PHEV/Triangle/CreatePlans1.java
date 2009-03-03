@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
@@ -46,7 +46,7 @@ public class CreatePlans1 {
 		ActivityOption work=null;
 		ActivityOption shop=null;
 		for (Facility f : facilities.getFacilities().values()) {
-			Iterator<ActivityOption> a_it = f.getActivities().values().iterator();
+			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
 				ActivityOption a = a_it.next();
 				//System.out.println(a.getType());

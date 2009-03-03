@@ -25,10 +25,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -94,7 +94,7 @@ public class PersonXY2Facilitychanged extends AbstractPersonAlgorithm implements
 				String[] type_set = this.getFacilityActTypes(types[i]);
 				boolean ok = false;
 				for (int j=0; j<type_set.length; j++) {
-					if (f.getActivities().keySet().contains(type_set[j])) { ok = true; }
+					if (f.getActivityOptions().keySet().contains(type_set[j])) { ok = true; }
 				}
 				if (ok) {
 					if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
@@ -110,7 +110,7 @@ public class PersonXY2Facilitychanged extends AbstractPersonAlgorithm implements
 				String[] type_set = this.getFacilityActTypes(types[i]);
 				boolean ok = false;
 				for (int j=0; j<type_set.length; j++) {
-					if (f.getActivities().keySet().contains(type_set[j])) { ok = true; }
+					if (f.getActivityOptions().keySet().contains(type_set[j])) { ok = true; }
 				}
 				if (ok) { qt.put(f.getCenter().getX(),f.getCenter().getY(),f); }
 			}

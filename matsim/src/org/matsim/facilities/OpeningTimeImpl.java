@@ -22,9 +22,10 @@ package org.matsim.facilities;
 
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.OpeningTime;
 import org.matsim.utils.misc.Time;
 
-public class OpeningTime implements BasicOpeningTime {
+public class OpeningTimeImpl implements OpeningTime {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -38,11 +39,11 @@ public class OpeningTime implements BasicOpeningTime {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 	@Deprecated
-	public OpeningTime(final DayType day, final String start_time, final String end_time) {
+	public OpeningTimeImpl(final DayType day, final String start_time, final String end_time) {
 		this(day, Time.parseTime(start_time), Time.parseTime(end_time));
 	}
 
-	public OpeningTime(final DayType day, final double startTime, final double endTime) {
+	public OpeningTimeImpl(final DayType day, final double startTime, final double endTime) {
 		this.day = day;
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -111,8 +112,8 @@ public class OpeningTime implements BasicOpeningTime {
 
 	@Override
 	public final boolean equals(final Object o) {
-		if (o instanceof OpeningTime) {
-			OpeningTime other = (OpeningTime)o;
+		if (o instanceof OpeningTimeImpl) {
+			OpeningTimeImpl other = (OpeningTimeImpl)o;
 			if (other.day.equals(this.day) && (other.startTime == this.startTime) && (other.endTime == this.endTime)) {
 				return true;
 			}

@@ -25,7 +25,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -50,7 +50,7 @@ public class CreateTimetableForStopTest extends MatsimTestCase {
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
-		Facilities facilities = new Facilities();
+		FacilitiesImpl facilities = new FacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(inputDir + INPUT_TEST_FILE_FACILITIES);
 
 		World world = new World();

@@ -23,11 +23,11 @@ package org.matsim.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.facilities.OpeningTime;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.interfaces.core.v01.OpeningTime;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;

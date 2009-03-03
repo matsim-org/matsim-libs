@@ -22,8 +22,8 @@ package org.matsim.examples;
 
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;

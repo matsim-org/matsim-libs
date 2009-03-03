@@ -4,9 +4,10 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.controler.ScenarioData;
-import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkCleaner;
@@ -82,8 +83,8 @@ public class Matsim4Urbansim {
 		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year ) ;
 
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
-		Facilities facilities = new Facilities("urbansim locations (gridcells _or_ parcels _or_ ...)", Facilities.FACILITIES_NO_STREAMING) ;
-		Facilities zones      = new Facilities("urbansim zones", Facilities.FACILITIES_NO_STREAMING) ;
+		Facilities facilities = new FacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)", Facilities.FACILITIES_NO_STREAMING) ;
+		Facilities zones      = new FacilitiesImpl("urbansim zones", Facilities.FACILITIES_NO_STREAMING) ;
 		readFromUrbansim.readFacilities( facilities, zones ) ;
 
 		FacilitiesWriter facWriter = new FacilitiesWriter(facilities,PATH_TO_OPUS_MATSIM+"tmp/locations.xml.gz") ;

@@ -21,10 +21,10 @@
 package playground.balmermi;
 
 import org.matsim.config.ConfigWriter;
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;

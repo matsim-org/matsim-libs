@@ -28,8 +28,9 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.network.NetworkLayer;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
@@ -206,7 +207,7 @@ public class World {
 		if (this.layers.containsKey(type)) {
 			throw new IllegalArgumentException("Layer type=" + type + " already exixts.");
 		}
-		if (type.equals(Facilities.LAYER_TYPE)) { return this.createFacilityLayer(); }
+		if (type.equals(Facilities.LAYER_TYPE)) { return (FacilitiesImpl) this.createFacilityLayer(); }
 		if (type.equals(NetworkLayer.LAYER_TYPE)) { return this.createNetworkLayer(); }
 		return this.createZoneLayer(type,name);
 	}
@@ -227,7 +228,7 @@ public class World {
 
 	@Deprecated
 	private final Facilities createFacilityLayer() {
-		Facilities f = new Facilities();
+		FacilitiesImpl f = new FacilitiesImpl();
 		this.setFacilityLayer(f);
 		return f;
 	}
@@ -244,7 +245,7 @@ public class World {
 	//////////////////////////////////////////////////////////////////////
 
 	@Deprecated
-	public void setFacilityLayer(final Facilities facilityLayer) {
+	public void setFacilityLayer(final FacilitiesImpl facilityLayer) {
 		if (facilityLayer == null) { 
 			throw new IllegalArgumentException("facilityLayer=null not allowed!");
 		}

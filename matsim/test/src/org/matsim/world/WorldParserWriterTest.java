@@ -22,8 +22,8 @@ package org.matsim.world;
 
 import org.matsim.config.Config;
 import org.matsim.examples.TriangleScenario;
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;

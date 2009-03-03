@@ -25,12 +25,12 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -83,7 +83,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		double maxy = Double.NEGATIVE_INFINITY;
 		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
 		for (Facility f : this.facilities.getFacilities().values()) {
-			for (ActivityOption a : f.getActivities().values()) {
+			for (ActivityOption a : f.getActivityOptions().values()) {
 				if (a.getType().equals(CAtts.ACT_S1) || a.getType().equals(CAtts.ACT_S2) || a.getType().equals(CAtts.ACT_S3) ||
 				    a.getType().equals(CAtts.ACT_S4) || a.getType().equals(CAtts.ACT_S5) || a.getType().equals(CAtts.ACT_SOTHR)) {
 					acts.add(a);
@@ -114,7 +114,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		double maxy = Double.NEGATIVE_INFINITY;
 		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
 		for (Facility f : this.facilities.getFacilities().values()) {
-			for (ActivityOption a : f.getActivities().values()) {
+			for (ActivityOption a : f.getActivityOptions().values()) {
 				if (a.getType().equals(CAtts.ACT_LC) || a.getType().equals(CAtts.ACT_LG) || a.getType().equals(CAtts.ACT_LS)) {
 					acts.add(a);
 					if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }

@@ -25,11 +25,11 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -94,7 +94,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivity(WORK) != null) {
+			if (f.getActivityOption(WORK) != null) {
 				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
 				if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
@@ -108,7 +108,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.workFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		for (Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivity(WORK) != null) {
+			if (f.getActivityOption(WORK) != null) {
 				this.workFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 			}
 		}
@@ -124,7 +124,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivity(EDUCATION) != null) {
+			if (f.getActivityOption(EDUCATION) != null) {
 				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
 				if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
@@ -138,7 +138,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.educFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		for (Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivity(EDUCATION) != null) {
+			if (f.getActivityOption(EDUCATION) != null) {
 				this.educFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 			}
 		}
@@ -166,13 +166,13 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			}
 
 			Zone z = zones.get(MatsimRandom.random.nextInt(zones.size()));
-			if (f.getActivity(WORK) != null) {
+			if (f.getActivityOption(WORK) != null) {
 				ArrayList<Facility> facs = this.zone_work_fac_mapping.get(z.getId());
 				if (facs == null) { facs = new ArrayList<Facility>(); }
 				facs.add(f);
 				this.zone_work_fac_mapping.put(z.getId(),facs);
 			}
-			if (f.getActivity(EDUCATION) != null) {
+			if (f.getActivityOption(EDUCATION) != null) {
 				ArrayList<Facility> facs = this.zone_educ_fac_mapping.get(z.getId());
 				if (facs == null) { facs = new ArrayList<Facility>(); }
 				facs.add(f);
@@ -224,17 +224,17 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		if (facs.isEmpty()) { Gbl.errorMsg("facs are empty! This should not happen!"); }
 
 		int[] dist_sum = new int[facs.size()];
-		dist_sum[0] = facs.get(0).getActivity(act_type).getCapacity();
+		dist_sum[0] = facs.get(0).getActivityOption(act_type).getCapacity();
 		if ((dist_sum[0] <= 0) || (dist_sum[0] == Integer.MAX_VALUE)) {
 			dist_sum[0] = 1;
-			facs.get(0).getActivity(act_type).setCapacity(1);
+			facs.get(0).getActivityOption(act_type).setCapacity(1);
 		}
 		int n = facs.size();
 		for (int i=1; i<n; i++) {
-			int val = facs.get(i).getActivity(act_type).getCapacity();
+			int val = facs.get(i).getActivityOption(act_type).getCapacity();
 			if ((val <= 0) || (val == Integer.MAX_VALUE)) {
 				val = 1;
-				facs.get(i).getActivity(act_type).setCapacity(1);
+				facs.get(i).getActivityOption(act_type).setCapacity(1);
 			}
 			dist_sum[i] = dist_sum[i-1] + val;
 		}

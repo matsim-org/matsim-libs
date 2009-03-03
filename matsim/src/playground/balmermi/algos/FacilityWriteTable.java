@@ -78,7 +78,7 @@ public class FacilityWriteTable extends AbstractFacilityAlgorithm {
 
 	public void run(Facility facility) {
 		try {
-			Iterator<ActivityOption> a_it = facility.getActivities().values().iterator();
+			Iterator<ActivityOption> a_it = facility.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
 				ActivityOption a = a_it.next();
 				if (a.getType().equals(this.act_type)) {

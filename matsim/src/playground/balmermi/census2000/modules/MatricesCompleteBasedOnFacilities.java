@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
@@ -202,7 +202,7 @@ public class MatricesCompleteBasedOnFacilities {
 		Iterator<? extends Location> f_it = this.facilities.getLocations().values().iterator();
 		while (f_it.hasNext()) {
 			Facility f = (Facility)f_it.next();
-			if (f.getActivity(WORK) != null) {
+			if (f.getActivityOption(WORK) != null) {
 				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
 				if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
@@ -218,7 +218,7 @@ public class MatricesCompleteBasedOnFacilities {
 		f_it = this.facilities.getLocations().values().iterator();
 		while (f_it.hasNext()) {
 			Facility f = (Facility)f_it.next();
-			if (f.getActivity(WORK) != null) {
+			if (f.getActivityOption(WORK) != null) {
 				this.workFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 			}
 		}
@@ -236,7 +236,7 @@ public class MatricesCompleteBasedOnFacilities {
 		Iterator<? extends Location> f_it = this.facilities.getLocations().values().iterator();
 		while (f_it.hasNext()) {
 			Facility f = (Facility)f_it.next();
-			if (f.getActivity(EDUCATION) != null) {
+			if (f.getActivityOption(EDUCATION) != null) {
 				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
 				if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
@@ -252,7 +252,7 @@ public class MatricesCompleteBasedOnFacilities {
 		f_it = this.facilities.getLocations().values().iterator();
 		while (f_it.hasNext()) {
 			Facility f = (Facility)f_it.next();
-			if (f.getActivity(EDUCATION) != null) {
+			if (f.getActivityOption(EDUCATION) != null) {
 				this.educFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 			}
 		}
@@ -289,8 +289,8 @@ public class MatricesCompleteBasedOnFacilities {
 				boolean has_educ = false;
 				for (int i=0; i<facs.size(); i++) {
 					Facility f = facs.get(i);
-					if (f.getActivity(WORK) != null) { has_work = true; }
-					if (f.getActivity(EDUCATION) != null) { has_educ = true; }
+					if (f.getActivityOption(WORK) != null) { has_work = true; }
+					if (f.getActivityOption(EDUCATION) != null) { has_educ = true; }
 				}
 				if (!has_work) {
 					System.out.println("      zone id=" + z.getId() + ": removing all WORK entries ending at this zone:");

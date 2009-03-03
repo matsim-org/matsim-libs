@@ -26,13 +26,13 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.evacuation.EvacuationPlansGeneratorAndNetworkTrimmer;
-import org.matsim.facilities.Facilities;
-import org.matsim.facilities.OpeningTime;
+import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -86,7 +86,7 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 			Act fact = plan.getFirstActivity();
 			Facility f = (Facility) facs.getLocation(fact.getLinkId().toString());
 			fact.setFacility(f);
-			ActivityOption a = f.getActivity("h");
+			ActivityOption a = f.getActivityOption("h");
 			person.getKnowledge().addActivity(a, true);
 			Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 			leg.setDepartureTime(0.0);
@@ -94,7 +94,7 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 			leg.setArrivalTime(0.0);
 			plan.addLeg(leg);
 			Act act = new org.matsim.population.ActImpl("evacuated",fac);
-			person.getKnowledge().addActivity(fac.getActivity("evacuated"),false);
+			person.getKnowledge().addActivity(fac.getActivityOption("evacuated"),false);
 						
 			
 			act.setLink(fac.getLink());
@@ -111,8 +111,8 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 				continue;
 			}
 			Facility fac = facs.createFacility(new IdImpl(link.getId().toString()), link.getCenter());
-			ActivityOption act = fac.createActivity("h");
-			act.addOpeningTime(new OpeningTime(DayType.wk,0,3600*30));
+			ActivityOption act = fac.createActivityOption("h");
+			act.addOpeningTime(new OpeningTimeImpl(DayType.wk,0,3600*30));
 		}
 		new WorldConnectLocations().run(Gbl.getWorld());
 	}

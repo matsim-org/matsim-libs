@@ -20,10 +20,10 @@
 
 package playground.balmermi;
 
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Facilities;
 
 import playground.balmermi.census2000.modules.FacilitiesSetCapacity;
 

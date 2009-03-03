@@ -28,6 +28,7 @@ import java.util.SortedSet;
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.Location;
@@ -98,7 +99,7 @@ public class FacilitiesWriter extends Writer {
 	public final void writeFacility(final Facility f) {
 		try {
 			this.handler.startFacility(f, this.out);
-			Iterator<ActivityOption> a_it = f.getActivities().values().iterator();
+			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
 				ActivityOption a = a_it.next();
 				this.handler.startActivity(a, this.out);

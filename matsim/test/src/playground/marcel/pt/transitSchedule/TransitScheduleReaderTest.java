@@ -27,7 +27,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Route;
@@ -48,7 +48,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
-		Facilities facilities = new Facilities();
+		FacilitiesImpl facilities = new FacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(inputDir + INPUT_TEST_FILE_FACILITIES);
 
 		World world = new World();

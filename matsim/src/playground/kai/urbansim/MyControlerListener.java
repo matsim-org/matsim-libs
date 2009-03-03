@@ -6,27 +6,17 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
-import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.ShutdownEvent;
-import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationReader;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
-import playground.dgrether.analysis.PlanComparison;
-import playground.dgrether.analysis.PlanComparisonFileWriter;
 import playground.toronto.ttimematrix.SpanningTree;
 
 /**
@@ -37,9 +27,9 @@ import playground.toronto.ttimematrix.SpanningTree;
 public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownListener {
 	private static final Logger log = Logger.getLogger(MyControlerListener.class);
 	
-	Layer zones ;
+	Facilities zones ;
 	
-	public MyControlerListener( Layer zones ) {
+	public MyControlerListener( Facilities zones ) {
 		this.zones = zones ;
 	}
 

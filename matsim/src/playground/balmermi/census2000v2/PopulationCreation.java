@@ -21,10 +21,10 @@
 package playground.balmermi.census2000v2;
 
 import org.matsim.config.ConfigWriter;
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;

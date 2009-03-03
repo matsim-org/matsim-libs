@@ -22,8 +22,8 @@ package org.matsim.facilities.algorithms;
 
 import java.util.Iterator;
 
-import org.matsim.facilities.Facilities;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -49,7 +49,7 @@ public class FacilitiesSummary {
 			if (f.getCenter().getX() < min_coord.getX()) { min_coord.setX(f.getCenter().getX()); }
 			if (f.getCenter().getY() < min_coord.getY()) { min_coord.setY(f.getCenter().getY()); }
 
-			Iterator<ActivityOption> a_it = f.getActivities().values().iterator();
+			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
 				ActivityOption a = a_it.next();
 				act_cnt++;

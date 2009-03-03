@@ -30,7 +30,8 @@ import org.matsim.world.ZoneLayer;
 
 public interface Facility extends Location {
 
-	public ActivityOption createActivity(final String type);
+	public ActivityOption createActivityOption(final String type);
+	// TODO [MR] move to Builder
 
 	/**
 	 * Moves a facility to a new {@link Coord coordinate}. It also takes care that
@@ -58,9 +59,9 @@ public interface Facility extends Location {
 	@Deprecated
 	public String getDesc();
 
-	public Map<String, ActivityOption> getActivities();
+	public Map<String, ActivityOption> getActivityOptions();
 
-	public ActivityOption getActivity(final String type);
+	public ActivityOption getActivityOption(final String type);
 
 	public Link getLink();
 

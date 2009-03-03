@@ -31,11 +31,11 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -75,7 +75,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		Iterator<Facility> fac_it = facilities.iterator();
 		while (fac_it.hasNext()) {
 			Facility f = fac_it.next();
-			Map<String, ActivityOption> activities = f.getActivities();
+			Map<String, ActivityOption> activities = f.getActivityOptions();
 			
 			Iterator<ActivityOption> act_it = activities.values().iterator();
 			while (act_it.hasNext()) {

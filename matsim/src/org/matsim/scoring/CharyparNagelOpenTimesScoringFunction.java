@@ -56,7 +56,7 @@ public class CharyparNagelOpenTimesScoringFunction extends
 		boolean foundAct = false;
 
 		Facility facility = act.getFacility();
-		Iterator<String> facilityActTypeIterator = facility.getActivities().keySet().iterator();
+		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
 		String facilityActType = null;
 		Set<BasicOpeningTime> opentimes = null;
 
@@ -69,9 +69,9 @@ public class CharyparNagelOpenTimesScoringFunction extends
 				// choose appropriate opentime:
 				// either wed or wkday
 				// if none is given, use undefined opentimes
-				opentimes = facility.getActivity(facilityActType).getOpeningTime(DayType.wed);
+				opentimes = facility.getActivityOption(facilityActType).getOpeningTime(DayType.wed);
 				if (opentimes == null) {
-					opentimes = facility.getActivity(facilityActType).getOpeningTime(DayType.wkday);
+					opentimes = facility.getActivityOption(facilityActType).getOpeningTime(DayType.wkday);
 				}
 				if (opentimes != null) {
 					// ignoring lunch breaks with the following procedure:

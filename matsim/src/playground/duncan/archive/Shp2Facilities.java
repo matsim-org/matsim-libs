@@ -1,23 +1,27 @@
 package playground.duncan.archive;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.gis.ShapeFileReader;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class Shp2Facilities {
 	private static final Logger log = Logger.getLogger(Shp2Facilities.class);
@@ -25,7 +29,7 @@ public class Shp2Facilities {
 	private static Collection<Feature> getPolygons(final FeatureSource n) {
 		final Collection<Feature> polygons = new ArrayList<Feature>(); // not needed
 
-		Facilities facilities = new Facilities("workplaces",false) ;
+		Facilities facilities = new FacilitiesImpl("workplaces",false) ;
 		long cnt = 0 ;
 		
 		FeatureIterator it = null;
@@ -61,8 +65,8 @@ public class Shp2Facilities {
 			
 			Facility facility = facilities.createFacility(id, coord ) ;
 			
-			facility.createActivity( (String) feature.getAttribute("LU_CODE") ) ;
-			facility.createActivity( (String) feature.getAttribute("LU_DESCRIP") ) ;
+			facility.createActivityOption( (String) feature.getAttribute("LU_CODE") ) ;
+			facility.createActivityOption( (String) feature.getAttribute("LU_DESCRIP") ) ;
 
 		}
 		

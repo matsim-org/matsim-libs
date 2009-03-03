@@ -28,10 +28,11 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.facilities.Facilities;
-import org.matsim.facilities.OpeningTime;
+import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
+import org.matsim.interfaces.core.v01.OpeningTime;
 
 public class FacilitiesOpentimesKTIYear1 {
 
@@ -45,7 +46,7 @@ public class FacilitiesOpentimesKTIYear1 {
 		this.loadOpeningTimes();
 
 		for (Facility f : facilities.getFacilities().values()) {
-			Iterator<ActivityOption> a_it = f.getActivities().values().iterator();
+			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
 
 				ActivityOption a = a_it.next();
@@ -66,9 +67,9 @@ public class FacilitiesOpentimesKTIYear1 {
 	}
 
 	private void loadOpeningTimes() {
-		openingTimes.put("work", new OpeningTime(DayType.wkday, "7:00", "18:00"));
-		openingTimes.put("shop", new OpeningTime(DayType.wkday, "8:00", "20:00"));
-		openingTimes.put("education", new OpeningTime(DayType.wkday, "7:00", "18:00"));
-		openingTimes.put("leisure", new OpeningTime(DayType.wkday, "6:00", "24:00"));
+		openingTimes.put("work", new OpeningTimeImpl(DayType.wkday, "7:00", "18:00"));
+		openingTimes.put("shop", new OpeningTimeImpl(DayType.wkday, "8:00", "20:00"));
+		openingTimes.put("education", new OpeningTimeImpl(DayType.wkday, "7:00", "18:00"));
+		openingTimes.put("leisure", new OpeningTimeImpl(DayType.wkday, "6:00", "24:00"));
 	}
 }

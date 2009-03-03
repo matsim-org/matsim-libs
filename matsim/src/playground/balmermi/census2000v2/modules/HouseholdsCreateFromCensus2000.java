@@ -26,9 +26,9 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.world.Location;
 
@@ -105,7 +105,7 @@ public class HouseholdsCreateFromCensus2000 {
 				Id f_id = new IdImpl(entries[CAtts.I_GEBAEUDE_ID]);
 				Facility f = (Facility)this.facilities.getLocation(f_id);
 				if (f == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" does not exist!"); }
-				if (f.getActivity(CAtts.ACT_HOME) == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" exists but does not have 'home' activity type assigned!"); }
+				if (f.getActivityOption(CAtts.ACT_HOME) == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" exists but does not have 'home' activity type assigned!"); }
 				
 				// check for existing municipality
 				Municipality muni = this.municipalities.getMunicipality(Integer.parseInt(zone_id.toString()));

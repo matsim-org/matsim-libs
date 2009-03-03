@@ -30,7 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.facilities.OpeningTime;
+import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.interfaces.basic.v01.BasicAct;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicLocation;
@@ -40,6 +40,7 @@ import org.matsim.interfaces.basic.v01.BasicPopulation;
 import org.matsim.interfaces.basic.v01.BasicPopulationBuilder;
 import org.matsim.interfaces.basic.v01.BasicRoute;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.OpeningTime;
 import org.matsim.population.Knowledge;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationReader;
@@ -347,7 +348,7 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 			String end = atts.getValue(PopulationSchemaV5Names.ENDTIME);
 			if ((day != null) && (start != null) && (end != null)) {
 				DayType dayt = parseDay(day);
-				this.currentOpeningTime = new OpeningTime(dayt, this.parseTime(start), this.parseTime(end));
+				this.currentOpeningTime = new OpeningTimeImpl(dayt, this.parseTime(start), this.parseTime(end));
 			}
 			else {
 				this.currentOpeningTime = null;

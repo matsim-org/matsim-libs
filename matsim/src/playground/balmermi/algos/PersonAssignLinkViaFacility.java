@@ -22,10 +22,10 @@ package playground.balmermi.algos;
 
 import java.util.Iterator;
 
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -99,11 +99,11 @@ public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {
 		this.sfacs = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		this.lfacs = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		for (Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivity(HOME) != null) { this.hfacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
-			if (f.getActivity(WORK) != null) { this.wfacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
-			if (f.getActivity(EDUCATION) != null) { this.efacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
-			if (f.getActivity(SHOP) != null) { this.sfacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
-			if (f.getActivity(LEISURE) != null) { this.lfacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
+			if (f.getActivityOption(HOME) != null) { this.hfacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
+			if (f.getActivityOption(WORK) != null) { this.wfacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
+			if (f.getActivityOption(EDUCATION) != null) { this.efacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
+			if (f.getActivityOption(SHOP) != null) { this.sfacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
+			if (f.getActivityOption(LEISURE) != null) { this.lfacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
 		}
 		System.out.println("        # homes = " + this.hfacs.size());
 		System.out.println("        # works = " + this.wfacs.size());

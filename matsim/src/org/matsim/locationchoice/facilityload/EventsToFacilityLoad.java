@@ -28,9 +28,9 @@ import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
-import org.matsim.facilities.Facilities;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 
 /*
@@ -55,7 +55,7 @@ public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHa
 			Facility f = iter_fac.next();
 			
 			double capacity = Double.MAX_VALUE;
-			Iterator<? extends ActivityOption> iter_act = f.getActivities().values().iterator();
+			Iterator<? extends ActivityOption> iter_act = f.getActivityOptions().values().iterator();
 			while (iter_act.hasNext()){
 				ActivityOption act = iter_act.next();
 				if (act.getCapacity() < capacity) {

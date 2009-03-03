@@ -23,9 +23,9 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
@@ -47,7 +47,7 @@ public class PlansDefineKnowledge {
 		ArrayList<ActivityOption> work_acts = new ArrayList<ActivityOption>();
 		ArrayList<ActivityOption> other_acts = new ArrayList<ActivityOption>();
 		for (Facility f : this.facilities.getFacilities().values()) {
-			Iterator<ActivityOption> a_it = f.getActivities().values().iterator();
+			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
 				ActivityOption a = a_it.next();
 				if (a.getType().equals("home")) { home_acts.add(a); }

@@ -32,11 +32,11 @@ import org.geotools.feature.Feature;
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.facilities.Facilities;
-import org.matsim.facilities.OpeningTime;
+import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.MatsimNetworkReader;
@@ -87,11 +87,11 @@ public class SheltersReader {
 		this.network.createLink(new IdImpl("shelter" + count), superN1, superN2, 1, 1000000, 1000000, 1);
 //		this.network.createLink(new IdImpl("rev_shelter" + count), superN2, superN1, 1, 1000000, 1000000, 1);	
 		Facility superFac = this.facilities.createFacility(new IdImpl("shelter" + count++), superC);
-		ActivityOption superAct = superFac.createActivity("evacuated");
+		ActivityOption superAct = superFac.createActivityOption("evacuated");
 		superAct.setCapacity(1000000);
 		Map<DayType, SortedSet<BasicOpeningTime>> opentimes = new TreeMap<DayType, SortedSet<BasicOpeningTime>>();
 		DayType dt = DayType.wk;
-		BasicOpeningTime t = new OpeningTime(dt,0,3600*30);
+		BasicOpeningTime t = new OpeningTimeImpl(dt,0,3600*30);
 		TreeSet<BasicOpeningTime> ts = new TreeSet<BasicOpeningTime>();
 		ts.add(t);
 		opentimes.put(dt, ts);
@@ -113,7 +113,7 @@ public class SheltersReader {
 //			this.network.createLink(new IdImpl("rev_shelter" + count), n2, n1, 1, 1.66, flowCap, 1);//just to make this networkcleaner save
 			
 			Facility fac = this.facilities.createFacility(new IdImpl("shelter" + count++), c);
-			ActivityOption act = fac.createActivity("evacuated");
+			ActivityOption act = fac.createActivityOption("evacuated");
 			act.setOpentimes(opentimes);
 			act.setCapacity(storageCap);
 

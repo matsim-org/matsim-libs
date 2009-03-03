@@ -367,7 +367,7 @@ public class EgoNetPlansMakeKML {
 
 			PlacemarkType aFacility = kmlObjectFactory.createPlacemarkType();
 			aFacility.setName(myAct.getType()+" facility");
-			aFacility.setDescription(myAct.getFacility().getActivity(myAct.getType()).toString());
+			aFacility.setDescription(myAct.getFacility().getActivityOption(myAct.getType()).toString());
 			aFacility.setAddress("address");
 			aFacility.setStyleUrl(myStyle.getId());
 

@@ -3,7 +3,7 @@ package playground.anhorni.locationchoice.preprocess;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Facilities;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;

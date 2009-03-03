@@ -31,12 +31,12 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
@@ -96,7 +96,7 @@ public class PlansCreateFromCensus2000 {
 			double maxx = Double.NEGATIVE_INFINITY;
 			double maxy = Double.NEGATIVE_INFINITY;
 			for (Facility f : this.facilities.getFacilities().values()) {
-				if (f.getActivity(types[i]) != null) {
+				if (f.getActivityOption(types[i]) != null) {
 					if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 					if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
 					if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
@@ -107,7 +107,7 @@ public class PlansCreateFromCensus2000 {
 			log.info("        type="+types[i]+": xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 			QuadTree<Facility> qt = new QuadTree<Facility>(minx,miny,maxx,maxy);
 			for (Facility f : this.facilities.getFacilities().values()) {
-				if (f.getActivity(types[i]) != null) { qt.put(f.getCenter().getX(),f.getCenter().getY(),f); }
+				if (f.getActivityOption(types[i]) != null) { qt.put(f.getCenter().getX(),f.getCenter().getY(),f); }
 			}
 			log.info("        "+qt.size()+" facilities of type="+types[i]+" added.");
 			this.fqts.put(types[i],qt);
@@ -125,7 +125,7 @@ public class PlansCreateFromCensus2000 {
 			QuadTree<Facility> qt = this.fqts.get(act_type);
 			Facility home_f = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
 			Facility educ_f = qt.get(home_f.getCenter().getX(),home_f.getCenter().getY());
-			return educ_f.getActivity(act_type);
+			return educ_f.getActivityOption(act_type);
 		}
 		else if (act_type.equals(CAtts.ACT_ESECO)) { // search in home zone and expanding
 			List<ActivityOption> acts = new ArrayList<ActivityOption>();
@@ -139,7 +139,7 @@ public class PlansCreateFromCensus2000 {
 				qt.get(min.getX(),min.getY(),max.getX(),max.getY(),fs);
 				if (!fs.isEmpty()) {
 					for (Facility f : fs) {
-						ActivityOption a = f.getActivity(act_type);
+						ActivityOption a = f.getActivityOption(act_type);
 						for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 					}
 					ActivityOption act = acts.get(MatsimRandom.random.nextInt(acts.size()));
@@ -160,7 +160,7 @@ public class PlansCreateFromCensus2000 {
 			qt.get(qt.getMinEasting()-1.0,qt.getMinNorthing()-1.0,qt.getMaxEasting()+1.0,qt.getMaxNorthing()+1.0,fs);
 			List<ActivityOption> acts = new ArrayList<ActivityOption>();
 			for (Facility f : fs) {
-				ActivityOption a = f.getActivity(act_type);
+				ActivityOption a = f.getActivityOption(act_type);
 				for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 			}
 			ActivityOption act = acts.get(MatsimRandom.random.nextInt(acts.size()));
@@ -206,7 +206,7 @@ public class PlansCreateFromCensus2000 {
 		if (zone != null) {
 			List<ActivityOption> acts = new ArrayList<ActivityOption>();
 			for (Location l : zone.getDownMapping().values()) {
-				ActivityOption a = ((Facility)l).getActivity(act_type);
+				ActivityOption a = ((Facility)l).getActivityOption(act_type);
 				if (a != null) { acts.add(a); }
 			}
 			if (!acts.isEmpty()) {
@@ -231,7 +231,7 @@ public class PlansCreateFromCensus2000 {
 					qt.get(min.getX(),min.getY(),max.getX(),max.getY(),fs);
 					if (!fs.isEmpty()) {
 						for (Facility f : fs) {
-							ActivityOption a = f.getActivity(act_type);
+							ActivityOption a = f.getActivityOption(act_type);
 							for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 						}
 						ActivityOption act = acts.get(MatsimRandom.random.nextInt(acts.size()));
@@ -308,7 +308,7 @@ public class PlansCreateFromCensus2000 {
 		List<Facility> facs = new ArrayList<Facility>();
 		for (Location l : zone.getDownMapping().values()) {
 			Facility f = (Facility)l;
-			Set<String> f_acts = f.getActivities().keySet();
+			Set<String> f_acts = f.getActivityOptions().keySet();
 			boolean has_work = false; for (String w_act : w_acts) { if (f_acts.contains(w_act)) { has_work = true; } }
 			boolean has_othr = false; for (String o_act : o_acts) { if (f_acts.contains(o_act)) { has_othr = true; } }
 			if (has_work && has_othr) { facs.add(f); }
@@ -320,7 +320,7 @@ public class PlansCreateFromCensus2000 {
 			// getting all possible work facilities with additional other act type
 			for (Location l : zone.getDownMapping().values()) {
 				Facility f = (Facility)l;
-				Set<String> f_acts = f.getActivities().keySet();
+				Set<String> f_acts = f.getActivityOptions().keySet();
 				boolean has_work = false; for (String w_act : w_acts) { if (f_acts.contains(w_act)) { has_work = true; } }
 				if (has_work) { facs.add(f); }
 			}
@@ -376,7 +376,7 @@ public class PlansCreateFromCensus2000 {
 		List<ActivityOption> acts_weighted = new ArrayList<ActivityOption>();
 		for (Facility f : facs) {
 			for (String a : w_acts) {
-				ActivityOption act = f.getActivity(a);
+				ActivityOption act = f.getActivityOption(a);
 				if (act != null) { for (int i=0; i<act.getCapacity(); i++) { acts_weighted.add(act); } }
 			}
 		}
@@ -408,21 +408,21 @@ public class PlansCreateFromCensus2000 {
 		if (wkat == 1) {
 			Household hh_w = (Household)p_atts.get(CAtts.HH_W);
 			desc = desc+"("+CAtts.HH_W+":"+hh_w.getId()+")";
-			k.addActivity(hh_w.getFacility().getActivity(CAtts.ACT_HOME), false);
+			k.addActivity(hh_w.getFacility().getActivityOption(CAtts.ACT_HOME), false);
 
 			Household hh_z = (Household)p_atts.get(CAtts.HH_Z);
 			desc = desc+"("+CAtts.HH_Z+":"+hh_z.getId()+")";
-			k.addActivity(hh_z.getFacility().getActivity(CAtts.ACT_HOME), false);
+			k.addActivity(hh_z.getFacility().getActivityOption(CAtts.ACT_HOME), false);
 		}
 		else if (wkat == 3) {
 			Household hh_w = (Household)p_atts.get(CAtts.HH_W);
 			desc = desc+"("+CAtts.HH_W+":"+hh_w.getId()+")";
-			k.addActivity(hh_w.getFacility().getActivity(CAtts.ACT_HOME), false);
+			k.addActivity(hh_w.getFacility().getActivityOption(CAtts.ACT_HOME), false);
 		}
 		else if (wkat == 4) {
 			Household hh_z = (Household)p_atts.get(CAtts.HH_Z);
 			desc = desc+"("+CAtts.HH_Z+":"+hh_z.getId()+")";
-			k.addActivity(hh_z.getFacility().getActivity(CAtts.ACT_HOME), false);
+			k.addActivity(hh_z.getFacility().getActivityOption(CAtts.ACT_HOME), false);
 		}
 		else { Gbl.errorMsg("that should not happen!"); }
 		k.setDescription(k.getDescription()+desc);

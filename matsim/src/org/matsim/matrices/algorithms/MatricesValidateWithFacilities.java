@@ -22,8 +22,8 @@ package org.matsim.matrices.algorithms;
 
 import java.util.Iterator;
 
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
@@ -64,7 +64,7 @@ public class MatricesValidateWithFacilities {
 			if (f == null) { 
 				throw new RuntimeException("SOMETHING IS WRONG!!!");
 			}
-			if (f.getActivities().containsKey(act_type)) {
+			if (f.getActivityOptions().containsKey(act_type)) {
 				return true;
 			}
 		}
@@ -77,7 +77,7 @@ public class MatricesValidateWithFacilities {
 		Iterator<? extends Location> f_it = this.facilities.getLocations().values().iterator();
 		while (f_it.hasNext()) {
 			Facility f = (Facility)f_it.next();
-			if (f.getActivities().containsKey(act_type)) {
+			if (f.getActivityOptions().containsKey(act_type)) {
 				double d = location.calcDistance(f.getCenter());
 				if (d < distance) {
 					distance = d;

@@ -23,9 +23,9 @@ package playground.balmermi.census2000v2.modules;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 
 public class FacilitiesReduceTypes {
@@ -64,26 +64,26 @@ public class FacilitiesReduceTypes {
 			TreeMap<String,ActivityOption> s_map = new TreeMap<String, ActivityOption>();
 			TreeMap<String,ActivityOption> l_map = new TreeMap<String, ActivityOption>();
 			TreeMap<String,ActivityOption> t_map = new TreeMap<String, ActivityOption>();
-			for (String t : f.getActivities().keySet()) {
+			for (String t : f.getActivityOptions().keySet()) {
 				if (t.equals("home")) {
-					h_map.put(t,f.getActivity(t));
+					h_map.put(t,f.getActivityOption(t));
 				}
 				if (t.equals("work_sector2") || t.equals("work_sector3")) {
-					w_map.put(t,f.getActivity(t));
+					w_map.put(t,f.getActivityOption(t));
 				}
 				if (t.equals("education_higher") || t.equals("education_kindergarten") || t.equals("education_other") ||
 				    t.equals("education_primary") || t.equals("education_secondary")) {
-					e_map.put(t,f.getActivity(t));
+					e_map.put(t,f.getActivityOption(t));
 				}
 				if (t.equals("shop_other") || t.equals("shop_retail_get1000sqm") || t.equals("shop_retail_get100sqm") ||
 				    t.equals("shop_retail_get400sqm") || t.equals("shop_retail_gt2500sqm") || t.equals("shop_retail_lt100sqm")) {
-					s_map.put(t,f.getActivity(t));
+					s_map.put(t,f.getActivityOption(t));
 				}
 				if (t.equals("leisure_culture") || t.equals("leisure_gastro") || t.equals("leisure_sports")) {
-					l_map.put(t,f.getActivity(t));
+					l_map.put(t,f.getActivityOption(t));
 				}
 				if (t.equals("tta")) {
-					t_map.put(t,f.getActivity(t));
+					t_map.put(t,f.getActivityOption(t));
 				}
 			}
 			if (h_map.size() > 1) { Gbl.errorMsg("fid="+f.getId()+": more than one home activity!"); }
@@ -104,17 +104,17 @@ public class FacilitiesReduceTypes {
 			
 			if (!s_map.isEmpty()) {
 				ActivityOption old_act = s_map.values().iterator().next();
-				ActivityOption new_act = f.createActivity("shop");
+				ActivityOption new_act = f.createActivityOption("shop");
 				new_act.setCapacity(old_act.getCapacity());
 				new_act.setOpentimes(old_act.getOpentimes());
-				f.getActivities().remove(old_act.getType());
+				f.getActivityOptions().remove(old_act.getType());
 			}
 			if (!l_map.isEmpty()) {
 				ActivityOption old_act = l_map.values().iterator().next();
-				ActivityOption new_act = f.createActivity("leisure");
+				ActivityOption new_act = f.createActivityOption("leisure");
 				new_act.setCapacity(old_act.getCapacity());
 				new_act.setOpentimes(old_act.getOpentimes());
-				f.getActivities().remove(old_act.getType());
+				f.getActivityOptions().remove(old_act.getType());
 			}
 		}
 

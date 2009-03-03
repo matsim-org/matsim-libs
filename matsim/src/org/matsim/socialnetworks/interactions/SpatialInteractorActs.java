@@ -128,7 +128,7 @@ public class SpatialInteractorActs {
 			ActIterator a1Iter =plan1.getIteratorAct();
 			while(a1Iter.hasNext()){
 				Act act1 = (Act) a1Iter.next();
-				ActivityOption activity1=act1.getFacility().getActivity(act1.getType());
+				ActivityOption activity1=act1.getFacility().getActivityOption(act1.getType());
 				ArrayList<Person> actList=new ArrayList<Person>();
 
 				if(!activityMap.keySet().contains(activity1)){

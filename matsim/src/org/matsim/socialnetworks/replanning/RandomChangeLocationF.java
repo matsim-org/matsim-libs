@@ -23,10 +23,10 @@ package org.matsim.socialnetworks.replanning;
 import java.util.ArrayList;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
@@ -160,7 +160,7 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 					newAct.setLink(fFromFacilities.getLink());
 					newAct.setCoord(fFromFacilities.getCenter());
 					newAct.setFacility(fFromFacilities);
-					k.getMentalMap().addActivity(fFromFacilities.getActivity(factype));
+					k.getMentalMap().addActivity(fFromFacilities.getActivityOption(factype));
 					changed = true;
 				}
 			}

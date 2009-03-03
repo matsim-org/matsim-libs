@@ -21,9 +21,9 @@
 package playground.zhang.test;
 
 import org.matsim.controler.Controler;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;

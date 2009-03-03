@@ -20,8 +20,8 @@
 
 package org.matsim.facilities.algorithms;
 
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 
 /**

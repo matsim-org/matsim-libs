@@ -23,6 +23,7 @@ package org.matsim.facilities;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
@@ -35,7 +36,7 @@ import org.matsim.utils.geometry.CoordImpl;
 public class FacilitiesTest extends MatsimTestCase {
 
 	public void testAlgorithms() {
-		final Facilities facilities = new Facilities();
+		final Facilities facilities = new FacilitiesImpl();
 		// create 3 facilities
 		facilities.createFacility(new IdImpl(1), new CoordImpl(1.0, 1.0));
 		facilities.createFacility(new IdImpl(2), new CoordImpl(2.0, 2.0));
@@ -61,7 +62,7 @@ public class FacilitiesTest extends MatsimTestCase {
 	}
 
 	public void testStreaming() {
-		final Facilities facilities = new Facilities("test", true);
+		final Facilities facilities = new FacilitiesImpl("test", true);
 		// create 2 algo and add them to the facilities-object
 		MockAlgo1 algo1 = new MockAlgo1();
 		MockAlgo2 algo2 = new MockAlgo2();

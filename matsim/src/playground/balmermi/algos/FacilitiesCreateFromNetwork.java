@@ -20,8 +20,8 @@
 
 package playground.balmermi.algos;
 
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
@@ -39,8 +39,8 @@ public class FacilitiesCreateFromNetwork {
 		if (!facilities.getFacilities().isEmpty()) { Gbl.errorMsg("Facilities not empty"); }
 		for (Link l : network.getLinks().values()) {
 			Facility f = facilities.createFacility(l.getId(),l.getCenter());
-			f.createActivity("h");
-			f.createActivity("w");
+			f.createActivityOption("h");
+			f.createActivityOption("w");
 		}
 	}
 }

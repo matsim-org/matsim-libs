@@ -29,7 +29,7 @@ import java.util.Map;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.interfaces.basic.v01.BasicAct;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicPerson;
@@ -41,6 +41,7 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Household;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -105,7 +106,7 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		createNetwork(net);
 		//create the household and facility data structures
 		Map<Id, Household> households = new HashMap<Id, Household>();
-		Facilities facilities = new Facilities();
+		Facilities facilities = new FacilitiesImpl();
 		facilities.createFacility(this.id666, this.coord);
 		//do it, do it, do it now
 		PopulationReaderMatsimV5 parser = new PopulationReaderMatsimV5(net, pop, households, facilities, vehicles);

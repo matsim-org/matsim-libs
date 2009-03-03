@@ -59,10 +59,10 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.facilities.ActivityOptionImpl;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.PersonAlgorithm;
@@ -314,7 +314,7 @@ public class PrimlocModule  implements PersonAlgorithm {
 		core.J = new double[ core.numZ ];
 		Facilities facilities = ((Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
 		for( Facility facility : facilities.getFacilities().values() ){
-			ActivityOption act = facility.getActivity( primaryActivityName );
+			ActivityOption act = facility.getActivityOption( primaryActivityName );
 			if( act != null ){
 				ArrayList<Location> list = zoneLayer.getNearestLocations( facility.getCenter(), null);
 				Zone zone = (Zone) list.get(0);

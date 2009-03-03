@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.misc.Time;
 

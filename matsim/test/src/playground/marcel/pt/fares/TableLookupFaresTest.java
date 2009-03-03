@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesImpl;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.collections.Tuple;
@@ -33,7 +34,7 @@ import org.matsim.utils.geometry.CoordImpl;
 public class TableLookupFaresTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost_SameFromAsTo() {
-		final Facilities facilities = new Facilities();
+		final Facilities facilities = new FacilitiesImpl();
 		final Facility stop1 = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
 		final Facility stop2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
 		final Facility stop3 = facilities.createFacility(new IdImpl(3), new CoordImpl(1100, 1200));
@@ -48,7 +49,7 @@ public class TableLookupFaresTest extends MatsimTestCase {
 	}
 
 	public void testGetSingleTripCost_BasicQueries() {
-		final Facilities facilities = new Facilities();
+		final Facilities facilities = new FacilitiesImpl();
 		final Facility stop1 = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
 		final Facility stop2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
 		final Facility stop3 = facilities.createFacility(new IdImpl(3), new CoordImpl(1100, 1200));
@@ -64,7 +65,7 @@ public class TableLookupFaresTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost_ReverseQueries() {
 		// not clear if this is a feature or a bug...
-		final Facilities facilities = new Facilities();
+		final Facilities facilities = new FacilitiesImpl();
 		final Facility stop1 = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
 		final Facility stop2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
 		final Facility stop3 = facilities.createFacility(new IdImpl(3), new CoordImpl(1100, 1200));

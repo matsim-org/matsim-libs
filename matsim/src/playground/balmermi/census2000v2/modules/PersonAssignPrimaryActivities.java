@@ -66,7 +66,7 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 		for (int i=0; i<plan.getActsLegs().size(); i=i+2) {
 			Act act = (Act)plan.getActsLegs().get(i);
 			String curr_type = act.getType();
-			ActivityOption a = act.getFacility().getActivity(curr_type);
+			ActivityOption a = act.getFacility().getActivityOption(curr_type);
 			if (a == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": Inconsistency with f_id="+act.getFacility()+"!"); }
 			if (!prim_acts.contains(a)) { k.addActivity(a,false); }
 		}

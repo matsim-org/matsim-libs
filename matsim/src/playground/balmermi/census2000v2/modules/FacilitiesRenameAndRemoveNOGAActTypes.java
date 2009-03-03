@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Facilities;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 
 public class FacilitiesRenameAndRemoveNOGAActTypes {
@@ -58,12 +58,12 @@ public class FacilitiesRenameAndRemoveNOGAActTypes {
 		for (Facility f : facs) {
 			f.setId(new IdImpl(Integer.parseInt(f.getId().toString())+10000000));
 			ArrayList<String> types = new ArrayList<String>();
-			for (String type : f.getActivities().keySet()) { types.add(type); }
+			for (String type : f.getActivityOptions().keySet()) { types.add(type); }
 			for (int i=0; i<types.size(); i++) {
-				if (types.get(i).startsWith("B")) { f.getActivities().remove(types.get(i)); }
+				if (types.get(i).startsWith("B")) { f.getActivityOptions().remove(types.get(i)); }
 			}
 			Facility ff = facilities.createFacility(f.getId(),f.getCenter());
-			ff.getActivities().putAll(f.getActivities());
+			ff.getActivityOptions().putAll(f.getActivityOptions());
 		}
 
 		log.info("      # facilities = " + facilities.getFacilities().size());

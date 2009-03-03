@@ -29,11 +29,12 @@ import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.algorithms.EventWriterXML;
-import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -71,7 +72,7 @@ public class TryOut {
 		Link link8 = network.getLink("8");
 
 		// create needed facilities
-		final Facilities facilities = createFacilities();
+		final FacilitiesImpl facilities = createFacilities();
 		Facility stop1 = facilities.getFacility(new IdImpl("stop1"));
 		Facility stop2 = facilities.getFacility(new IdImpl("stop2"));
 		Facility stop3 = facilities.getFacility(new IdImpl("stop3"));
@@ -239,9 +240,9 @@ public class TryOut {
 		return network;
 	}
 
-	private Facilities createFacilities() {
+	private FacilitiesImpl createFacilities() {
 		final String filename = "../thesis-data/examples/tryout/facilities.xml";
-		final Facilities facilities = new Facilities();
+		final FacilitiesImpl facilities = new FacilitiesImpl();
 
 //		final Facility home = facilities.createFacility(new IdImpl("home"), new CoordImpl(400, 399));
 //		home.createActivity("home");

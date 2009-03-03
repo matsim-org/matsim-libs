@@ -26,40 +26,35 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.world.Layer;
 
-public class Facilities extends Layer implements Iterable<Facility> {
+public class FacilitiesImpl extends Layer implements Facilities {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
-
-	public static final Id LAYER_TYPE = new IdImpl("facility");
 
 	private final ArrayList<FacilityAlgorithm> algorithms = new ArrayList<FacilityAlgorithm>();
 
 	private long counter = 0;
 	private long nextMsg = 1;
 
-	public static final boolean FACILITIES_USE_STREAMING = true;
-	public static final boolean FACILITIES_NO_STREAMING = false;
+	private boolean isStreaming = FacilitiesImpl.FACILITIES_NO_STREAMING;
 
-	private boolean isStreaming = Facilities.FACILITIES_NO_STREAMING;
-
-	private static final Logger log = Logger.getLogger(Facilities.class);
+	private static final Logger log = Logger.getLogger(FacilitiesImpl.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public Facilities(final String name, final boolean isStreaming) {
+	public FacilitiesImpl(final String name, final boolean isStreaming) {
 		super(LAYER_TYPE, name);
 		this.isStreaming = isStreaming;
 	}
@@ -67,7 +62,7 @@ public class Facilities extends Layer implements Iterable<Facility> {
 	/**
 	 * Creates a new Facilities object with streaming switched off.
 	 */
-	public Facilities() {
+	public FacilitiesImpl() {
 		this(null, false);
 	}
 
@@ -163,7 +158,7 @@ public class Facilities extends Layer implements Iterable<Facility> {
 		Iterator<? extends Facility> iter = this.getFacilities().values().iterator();
 		while (iter.hasNext()){
 			Facility f = iter.next();
-			Map<String, ActivityOption> a = f.getActivities();
+			Map<String, ActivityOption> a = f.getActivityOptions();
 			if(a.containsKey(act_type)){
 				facs.put(f.getId(),f);
 			}

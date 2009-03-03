@@ -1,6 +1,6 @@
 package playground.anhorni.locationchoice.preprocess;
 
-import org.matsim.facilities.Facilities;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 

@@ -23,9 +23,9 @@ package playground.balmermi.census2000v2.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.world.Location;
 import org.matsim.world.World;
@@ -86,7 +86,7 @@ public class WorldFacilityZoneMapping {
 		// add mapping for the remaining facilities (non home facilities)
 		for (Facility f : fs.getFacilities().values()) {
 			if (f.getUpMapping().size() == 0) {
-				if (f.getActivity(CAtts.ACT_HOME) != null) { Gbl.errorMsg("That should not happen!"); }
+				if (f.getActivityOption(CAtts.ACT_HOME) != null) { Gbl.errorMsg("That should not happen!"); }
 				ArrayList<Location> locs = new ArrayList<Location>();
 				Location nearest_loc = null;
 				double min_dist = Double.MAX_VALUE;

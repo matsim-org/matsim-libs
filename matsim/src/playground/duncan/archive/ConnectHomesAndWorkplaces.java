@@ -27,9 +27,10 @@ import java.io.PrintWriter;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.controler.Controler;
-import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.RandomLocationMutator;
@@ -76,7 +77,7 @@ public class ConnectHomesAndWorkplaces {
 		world.setNetworkLayer(network);
 		world.complete();
 
-		Facilities facilities = new Facilities() ;
+		Facilities facilities = new FacilitiesImpl() ;
 		MatsimFacilitiesReader fr = new MatsimFacilitiesReader( facilities ) ;
 		fr.readFile( this.config.facilities().getInputFile() ) ;
 

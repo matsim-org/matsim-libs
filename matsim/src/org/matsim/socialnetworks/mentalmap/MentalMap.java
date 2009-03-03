@@ -31,12 +31,12 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -116,7 +116,7 @@ public class MentalMap {
 				while(myActivity==null){
 					int k = MatsimRandom.random.nextInt(facs.length);
 					Facility f = (Facility) facs[k];
-					myActivity = f.getActivity(myAct.getType());
+					myActivity = f.getActivityOption(myAct.getType());
 					if(myActivity!=null){
 						myAct.setFacility(myActivity.getFacility());
 						//TODO JH add logic to label this activity primary or secondary
@@ -145,7 +145,7 @@ public class MentalMap {
 //			myAct.setFacility(fac);
 //			this.knowledge.addActivity(fac.getActivity(myActivityType));
 			//TODO JH apply some logic to label this a primary or secondary location
-			ActivityOption myActivity=fac.getActivity(myActivityType);
+			ActivityOption myActivity=fac.getActivityOption(myActivityType);
 			this.knowledge.addActivity(myActivity,false);
 		}
 
