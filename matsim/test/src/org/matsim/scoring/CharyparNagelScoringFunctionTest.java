@@ -50,7 +50,7 @@ import org.matsim.utils.geometry.CoordImpl;
  */
 public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 
-	private Config config = null;
+	protected Config config = null;
 	private NetworkLayer network = null;
 	private Person person = null;
 	private Plan plan = null;
