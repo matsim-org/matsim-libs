@@ -21,6 +21,7 @@ package playground.mfeil;
 
 
 import org.matsim.config.groups.StrategyConfigGroup;
+import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -31,8 +32,7 @@ import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
-import org.matsim.scoring.*;
-import org.matsim.controler.Controler;
+import org.matsim.scoring.ScoringFunctionFactory;
 
 
 /**
@@ -77,7 +77,7 @@ public class ControlerMFeil extends Controler {
 			}
 			else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule planomatStrategyModule = new PlanomatModule(this);
+				StrategyModule planomatStrategyModule = new PlanomatModule(this.getNetwork(), this.getEvents(), this.getTravelTimeCalculator(), this.getTravelCostCalculator(), this.getScoringFunctionFactory());
 				strategy.addStrategyModule(planomatStrategyModule);
 			}
 			else if (classname.equals("TimeOptimizer")) {
