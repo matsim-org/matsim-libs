@@ -67,7 +67,7 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 	 * Add the score of all functions.
 	 */
 	public double getScore() {
-		int score = 0;
+		double score = 0;
 		for (BasicScoringFunction basicScoringFunction : basicScoringFunctions) {
 			score += basicScoringFunction.getScore();
 		}
