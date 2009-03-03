@@ -4,6 +4,8 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import playground.mmoyo.PTRouter.*;
+import playground.mmoyo.input.PTLinesReader;
+import playground.mmoyo.input.PTTimeTableReader;
 
 public class PTControler {
 	private static final String NETWORKFILENAME="C://Users/manuel/Desktop/berlinOEV/network.xml";

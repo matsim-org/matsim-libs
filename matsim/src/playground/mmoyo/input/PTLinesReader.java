@@ -1,4 +1,4 @@
-package playground.mmoyo.PTRouter;
+package playground.mmoyo.input;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,6 +11,8 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import playground.mmoyo.PTRouter.PTLine;
+
 
 /** 
  * Parses the xml file of PTLines

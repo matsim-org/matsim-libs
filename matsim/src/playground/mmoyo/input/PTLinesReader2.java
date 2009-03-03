@@ -1,4 +1,4 @@
-package playground.mmoyo.PTCase2;
+package playground.mmoyo.input;
 
 import playground.mmoyo.PTRouter.*;
 
@@ -50,9 +50,7 @@ public class PTLinesReader2 extends MatsimXmlParser {
 
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
-		if (PTLINES.equals(name)) {
-			startLines();
-		} else if (LINE.equals(name)) {
+		if (LINE.equals(name)) {
 			startLine(atts);
 		} else if (NODE.equals(name)){
 			startNode(atts);
@@ -72,9 +70,6 @@ public class PTLinesReader2 extends MatsimXmlParser {
 		} else if (DEPARTURES.equals(name)){
 			endDepartures(content);
 		}
-	}
-
-	private void startLines() {
 	}
 
 	private void startLine(final Attributes atts) {
@@ -114,28 +109,4 @@ public class PTLinesReader2 extends MatsimXmlParser {
 		departureList = null;
 	}
 
-	/*
-	@Override
-	public void characters(char ch[], int start, int length){
-		stringBuffer = new StringBuffer();
-		for (int i = start; i < start + length; i++) {
-			stringBuffer.append(ch[i]);
-		}
-		//System.out.println(stringBuffer);
-	}
-	
-	
-	private List<String>bufferToList(StringBuffer strBuffer){
-		List<String> strList = new ArrayList <String>();
-
-		String [] strArray = strBuffer.toString().split("[ \t\n]+");
-		int ini = 0;
-		if ((strArray.length > 0) && (strArray[0].equals(""))) {ini = 1;}
-		for (int i = ini; i < strArray.length; i++) {
-			strList.add(strArray[i]);
-		}
-		//System.out.println(strList);
-		return strList;
-	}
-	*/
 }// class

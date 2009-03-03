@@ -1,12 +1,16 @@
 package playground.mmoyo.PTCase2;
 
 import java.util.Collection;
+
+import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Node;
-
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.CoordImpl;
-import playground.mmoyo.Validators.*;
+
+import playground.mmoyo.Validators.NetValidator;
+import playground.mmoyo.input.PTNodeFactory;
+import playground.mmoyo.input.PTNodeReader;
 
 public class PTControler2 {
     private static String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
@@ -23,7 +27,7 @@ public class PTControler2 {
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, INPTNETFILE, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
 		
-		int option =-1;
+		int option =8;
 		
 		if (option>0){pt.readPTNet(ZURICHPTN);}
 		switch (option){
@@ -104,9 +108,36 @@ public class PTControler2 {
 	    		boolean unidos= pt.getPtNetworkFactory().areConected(nodeA, nodeB);
 	    		System.out.println(unidos);
 	    		break;
+	    	case 8:
 	    		
+	    		String filePath="C://Users/manuel/Desktop/TU/ZH_Files/bus/Basic_Bus_Network.xml";
+	    		
+	    		PTNodeReader ptNodeReader = new PTNodeReader();  
+	    		ptNodeReader.readFile (filePath);
+	    		Collection<BasicNode> basicNodes = ptNodeReader.getNodes();
+	    		
+	    		PTNodeFactory ptNodeFactory = new PTNodeFactory(pt.getPtNetworkLayer(), pt.getPtTimeTable());
+	    		for (BasicNode basicNode : basicNodes){
+	    			ptNodeFactory.insertNodes(basicNode);
+	    		}
+	    		
+	    
+	    				
+	    		
+	    		
+	    		
+	    		
+	    		
+	    	
+	    		
+	    	
+	    		
+	    		
+
+				
+	    		break;
 		}//switch
-		
 	}//main
+
 	
 }//Class

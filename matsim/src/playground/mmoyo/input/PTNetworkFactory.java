@@ -1,4 +1,4 @@
-package playground.mmoyo.PTCase1;
+package playground.mmoyo.input;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -195,7 +195,7 @@ public class PTNetworkFactory {
 		this.ptNetworkLayer.removeNode(this.ptNetworkLayer.getNode(node2));
 	}
 	
-
+	//->move this methos to LinkFactory
 	// Creates only irrelevant values to create a PTLink. Actually the cost is calculated on other parameters
 	private void createLink(int intId, String strIdFromNode, String strToNode, String type){
 		Id id =  new IdImpl(intId);

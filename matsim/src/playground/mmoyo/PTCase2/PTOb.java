@@ -6,9 +6,11 @@ import java.util.Map;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 
+import playground.mmoyo.input.PTNetworkFactory2;
+
 public class PTOb {
 	private NetworkLayer ptNetworkLayer; 
-	public  PTRouter2 ptRouter2;  //TODO: make private
+	public  PTRouter2 ptRouter2;  //-->: make private
 	private PTTimeTable2 ptTimeTable;
 	private String outPutPlanFile; 
 	private String config;

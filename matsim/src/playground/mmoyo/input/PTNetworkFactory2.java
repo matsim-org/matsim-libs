@@ -1,4 +1,4 @@
-package playground.mmoyo.PTCase2;
+package playground.mmoyo.input;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,7 +17,9 @@ import org.matsim.network.NetworkWriter;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 
-import playground.mmoyo.PTRouter.*;
+import playground.mmoyo.PTCase2.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTNode;
+import playground.mmoyo.PTRouter.PTLine;
 
 public class PTNetworkFactory2 {
 	public Map <Id,Double> linkTravelTimeMap = new TreeMap <Id,Double>();
@@ -53,7 +55,7 @@ public class PTNetworkFactory2 {
 		//Create the PTNetwork with PTNodes
 		//List<PTNode> ptNodeList = new ArrayList<PTNode>();
 		for (Node node: tempNet.getNodes().values()){
-			PTNode ptNode = new PTNode(new IdImpl(node.getId().toString()),node.getCoord(),node.getType());
+			PTNode ptNode = new PTNode(node.getId(),node.getCoord(),node.getType());
 			ptNetworkLayer.getNodes().put(node.getId(),ptNode);
 		}
 	
@@ -122,7 +124,7 @@ public class PTNetworkFactory2 {
 				if (!IntersectionMap.containsKey(strNodeBaseId)){
 	    			List<Id> ch = new ArrayList<Id>();
 	    			IntersectionMap.put(strNodeBaseId, ch);
-	    			//IntersectionMap.get(strBaseIdNode).add(strBaseIdNode); ///por que????????? checar urgentemente
+	    			//IntersectionMap.get(strBaseIdNode).add(strBaseIdNode); ///
 	    			//IntersectionMap.get(strBaseIdNode).add(strBaseIdNode);
 	    		}// if IntersectionMap
 	    		IntersectionMap.get(strNodeBaseId).add(new IdImpl(strIdNode));
@@ -131,7 +133,7 @@ public class PTNetworkFactory2 {
 		return IntersectionMap;
 	}
 	
-	private String getNodeBaseId(String strId){
+	public String getNodeBaseId(String strId){
 		String baseID = strId;
 		if (baseID.charAt(0)=='_' || baseID.charAt(0)=='~')
 			baseID= baseID.substring(1,baseID.length());
@@ -330,6 +332,9 @@ public class PTNetworkFactory2 {
 			System.out.print( ")   " + l.getType() );
 		}
 	}
+	
+	
+	
 	
 	
 	
