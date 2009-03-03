@@ -30,6 +30,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ChangeLegModeTest.class);
 		suite.addTestSuite(TimeAllocationMutatorTest.class);
+		suite.addTestSuite(PlanomatModuleTest.class);
 		//$JUnit-END$
 		return suite;
 	}

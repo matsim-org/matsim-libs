@@ -295,46 +295,6 @@ public class PlanomatTest extends MatsimTestCase {
 
 	}
 
-	public void testGenerateRandomDemand() {
-
-		final int TEST_PLAN_NR = 0;
-
-		// the planomat can be used to generate random demand with respect to the dimensions that are optimized by it
-		// in the following way:
-		// - set the number of generations to 0 (so only the random initialization, and no optimization takes place), and
-		// - set the population size to 1, so there is no sample of the initial random solutions the best individual would be chosen of
-		Gbl.getConfig().planomat().setPopSize(1);
-		Gbl.getConfig().planomat().setJgapMaxGenerations(0);
-		Gbl.getConfig().planomat().setPossibleModes("car,pt");
-
-		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.network, 900);
-		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator);
-		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.network, 900);
-
-		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, this.network);
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(Gbl.getConfig().charyparNagelScoring());
-
-		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
-
-		for (Person person : this.population) {
-
-			Plan plan = person.getPlans().get(TEST_PLAN_NR);
-			testee.run(plan);
-		}
-
-		System.out.println("Writing plans file...");
-		PopulationWriter plans_writer = new PopulationWriter(this.population, this.getOutputDirectory() + "output_plans.xml.gz", "v4");
-		plans_writer.write();
-		System.out.println("Writing plans file...DONE.");
-
-		// actual test: compare checksums of the files
-		final long expectedChecksum = CRCChecksum.getCRCFromGZFile(this.getInputDirectory() + "plans.xml.gz");
-		final long actualChecksum = CRCChecksum.getCRCFromGZFile(this.getOutputDirectory() + "output_plans.xml.gz");
-		log.info("Expected checksum: " + Long.toString(expectedChecksum));
-		log.info("Actual checksum: " + Long.toString(actualChecksum));
-		assertEquals(expectedChecksum, actualChecksum);
-
-	}
 
 	@Override
 	protected void tearDown() throws Exception {
