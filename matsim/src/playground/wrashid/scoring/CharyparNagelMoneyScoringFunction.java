@@ -16,51 +16,32 @@ import playground.wrashid.scoring.interfaces.BasicScoringFunction;
 import playground.wrashid.scoring.interfaces.LegScoringFunction;
 import playground.wrashid.scoring.interfaces.MoneyScoringFunction;
 
-public class CharyparNagelMoneyScoringFunction implements MoneyScoringFunction, BasicScoringFunction  {
-	protected final Person person;
-	protected final Plan plan;
+public class CharyparNagelMoneyScoringFunction implements MoneyScoringFunction, BasicScoringFunction {
 
 	protected double score;
-	private double lastTime;
-	private int index; // the current position in plan.actslegs
-	private double firstActTime;
-	private final int lastActIndex;
 
-	private static final double INITIAL_LAST_TIME = 0.0;
-	private static final int INITIAL_INDEX = 0;
-	private static final double INITIAL_FIRST_ACT_TIME = Time.UNDEFINED_TIME;
 	private static final double INITIAL_SCORE = 0.0;
-	
-	private static int firstLastActWarning = 0;
 
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
-	
-	private static final Logger log = Logger.getLogger(CharyparNagelScoringFunction.class);
 
-	public CharyparNagelMoneyScoringFunction(final Plan plan, final CharyparNagelScoringParameters params) {
+	public CharyparNagelMoneyScoringFunction(final CharyparNagelScoringParameters params) {
 		this.params = params;
 		this.reset();
 
-		this.plan = plan;
-		this.person = this.plan.getPerson();
-		this.lastActIndex = this.plan.getActsLegs().size() - 1;
 	}
 
 	public void reset() {
-		this.lastTime = INITIAL_LAST_TIME;
-		this.index = INITIAL_INDEX;
-		this.firstActTime = INITIAL_FIRST_ACT_TIME;
+
 		this.score = INITIAL_SCORE;
 	}
-
 
 	public void addMoney(final double amount) {
 		this.score += amount; // linear mapping of money to score
 	}
 
 	public void finish() {
-		
+
 	}
 
 	public double getScore() {

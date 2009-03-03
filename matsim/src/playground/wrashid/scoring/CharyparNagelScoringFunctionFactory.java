@@ -21,7 +21,7 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoringFunction( plan, new CharyparNagelScoringParameters(Gbl.getConfig().charyparNagelScoring())));
 		
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoringFunction( plan, new CharyparNagelScoringParameters(Gbl.getConfig().charyparNagelScoring())));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoringFunction(new CharyparNagelScoringParameters(Gbl.getConfig().charyparNagelScoring())));
 		
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoringFunction(new CharyparNagelScoringParameters(Gbl.getConfig().charyparNagelScoring())));
 		
