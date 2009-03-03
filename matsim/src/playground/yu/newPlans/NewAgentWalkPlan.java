@@ -23,6 +23,9 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.config.Config;
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.interfaces.basic.v01.BasicPlan.Type;
 import org.matsim.interfaces.core.v01.Act;
@@ -31,6 +34,10 @@ import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.PersonAlgorithm;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.PopulationImpl;
 
 import playground.yu.analysis.PlanModeJudger;
 
@@ -64,11 +71,12 @@ public class NewAgentWalkPlan extends NewPlan implements PersonAlgorithm {
 			List<Plan> copyPlans = new ArrayList<Plan>();
 			// copyPlans: the copy of the plans.
 			for (Plan pl : person.getPlans()) {
+				if (hasLongLegs(pl))
+					break;
 				// set plan type for car, pt, walk
 				if (PlanModeJudger.usePt(pl)) {
 					Plan walkPlan = new org.matsim.population.PlanImpl(person);
 					walkPlan.setType(Type.WALK);
-
 					List actsLegs = pl.getActsLegs();
 					for (int i = 0; i < actsLegs.size(); i++) {
 						Object o = actsLegs.get(i);
@@ -77,11 +85,10 @@ public class NewAgentWalkPlan extends NewPlan implements PersonAlgorithm {
 						} else {
 							Leg leg = (Leg) o;
 							// -----------------------------------------------
-							// WITHOUT routeSetting!! traveltime of PT can be
-							// calculated
-							// automaticly!!
+							// WITHOUT routeSetting!
 							// -----------------------------------------------
-							Leg walkLeg = new org.matsim.population.LegImpl(Mode.walk);
+							Leg walkLeg = new org.matsim.population.LegImpl(
+									Mode.walk);
 							walkLeg.setDepartureTime(leg.getDepartureTime());
 							walkLeg.setTravelTime(leg.getTravelTime());
 							walkLeg.setArrivalTime(leg.getArrivalTime());
@@ -101,5 +108,31 @@ public class NewAgentWalkPlan extends NewPlan implements PersonAlgorithm {
 			}
 		}
 		this.pw.writePerson(person);
+	}
+
+	private boolean hasLongLegs(Plan plan) {
+		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
+			Leg leg = (Leg) li.next();
+			if (plan.getPreviousActivity(leg).getCoord().calcDistance(
+					plan.getNextActivity(leg).getCoord()) / 1000.0 > 3.0)
+				return true;
+		}
+		return false;
+	}
+
+	public static void main(final String[] args) {
+		Config config = Gbl.createConfig(args);
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(config.network()
+				.getInputFile());
+
+		Population population = new PopulationImpl();
+		NewAgentWalkPlan nawp = new NewAgentWalkPlan(population);
+		population.addAlgorithm(nawp);
+		new MatsimPopulationReader(population, network).readFile(config.plans()
+				.getInputFile());
+		population.runAlgorithms();
+		nawp.writeEndPlans();
 	}
 }

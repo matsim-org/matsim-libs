@@ -67,9 +67,9 @@ import com.vividsolutions.jts.geom.Point;
  * Parameters as defined in the population xml file will be added as attributes
  * to the shape files. There are also some parameters to configure this
  * converter, please consider the corresponding setters in this class."
- *
+ * 
  * @author laemmel
- *
+ * 
  *         this a copy of
  *         org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape.java
  *         of Mr. Laemmel with some changes.
@@ -197,7 +197,6 @@ public class SelectedPlans2ESRIShape {
 		return null;
 	}
 
-	@SuppressWarnings("deprecation")
 	protected Feature getLegFeature(final Leg leg, final String id) {
 		BasicLeg.Mode mode = leg.getMode();
 		Double depTime = leg.getDepartureTime();
@@ -225,8 +224,8 @@ public class SelectedPlans2ESRIShape {
 
 		try {
 			return this.getFeatureTypeLeg().create(
-					new Object[] { ls, id, mode, depTime, travTime,
-							arrTime, dist });
+					new Object[] { ls, id, mode, depTime, travTime, arrTime,
+							dist });
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
