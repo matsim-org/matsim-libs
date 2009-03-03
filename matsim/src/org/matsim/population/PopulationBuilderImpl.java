@@ -31,35 +31,47 @@ import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.BasicLocation;
 import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
-import org.matsim.interfaces.basic.v01.BasicPopulationBuilder;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.interfaces.core.v01.PopulationBuilder;
 import org.matsim.interfaces.core.v01.Route;
+import org.matsim.interfaces.core.v01.Scenario;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.LinkCarRoute;
 
 /**
  * @author dgrether
  */
-public class PopulationBuilderImpl implements BasicPopulationBuilder {
+public class PopulationBuilderImpl implements PopulationBuilder {
 
 	private static final Logger log = Logger.getLogger(PopulationBuilderImpl.class);
 
 	private final Population population;
-	private final NetworkLayer network;
+	private final Network network;
 	private final Facilities facilities;
+	private final Scenario scenario;
 
-	public PopulationBuilderImpl(final NetworkLayer network, final Population population, final Facilities facilities) {
+	@Deprecated
+	public PopulationBuilderImpl(NetworkLayer network, Population population, Facilities facilities) {
 		this.network = network;
 		this.population = population;
 		this.facilities = facilities;
+		this.scenario = null;
+	}
+	
+	public PopulationBuilderImpl(final Scenario scenario) {
+		this.scenario = scenario;
+		this.network = scenario.getNetwork();
+		this.population = scenario.getPopulation();
+		this.facilities = null;
 	}
 
 	public Act createAct(final BasicPlan basicPlan, final String currentActType, final BasicLocation currentlocation) {

@@ -26,11 +26,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPopulationImpl;
+import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.PersonAlgorithm;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.interfaces.core.v01.PopulationBuilder;
+import org.matsim.network.NetworkLayer;
 import org.matsim.utils.misc.Counter;
 
 /**
@@ -54,6 +57,8 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 
 	private static final Logger log = Logger.getLogger(PopulationImpl.class);
 
+	private final PopulationBuilder pb = new PopulationBuilderImpl((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE), this, (Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -194,6 +199,11 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 
 	public Iterator<Person> iterator() {
 		return this.getPersons().values().iterator();
+	}
+	
+	@Override
+	public PopulationBuilder getPopulationBuilder() {
+		return this.pb;
 	}
 
 }

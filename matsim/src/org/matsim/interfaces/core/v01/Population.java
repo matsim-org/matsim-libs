@@ -53,5 +53,7 @@ public interface Population extends BasicPopulation<Person>, Iterable<Person> {
 	public void printPlansCount();
 
 	public Iterator<Person> iterator();
+	
+	public PopulationBuilder getPopulationBuilder();
 
 }
