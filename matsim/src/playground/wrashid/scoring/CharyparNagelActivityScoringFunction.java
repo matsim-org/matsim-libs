@@ -56,7 +56,7 @@ public class CharyparNagelActivityScoringFunction implements ActivityScoringFunc
 	}
 
 	public void startActivity(final double time, final Act act) {
-		// this is handled in endActivity
+		this.lastTime = time;
 	}
 
 	public void endActivity(final double time) {
@@ -70,7 +70,9 @@ public class CharyparNagelActivityScoringFunction implements ActivityScoringFunc
 
 
 	public void finish() {
-		
+		if (this.index == this.lastActIndex) {
+			handleAct(24*3600); // handle the last act
+		}
 	}
 
 	public double getScore() {
