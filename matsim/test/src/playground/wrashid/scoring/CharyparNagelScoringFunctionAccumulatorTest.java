@@ -15,6 +15,7 @@ public class CharyparNagelScoringFunctionAccumulatorTest extends CharyparNagelSc
 		
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoringFunction( somePlan, new CharyparNagelScoringParameters(Gbl.getConfig().charyparNagelScoring())));
 		
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoringFunction(somePlan, new CharyparNagelScoringParameters(Gbl.getConfig().charyparNagelScoring())));
 		
 		return scoringFunctionAccumulator;
 	}
