@@ -32,7 +32,6 @@ public class CharyparNagelMoneyScoringFunction implements MoneyScoringFunction, 
 	}
 
 	public void reset() {
-
 		this.score = INITIAL_SCORE;
 	}
 
