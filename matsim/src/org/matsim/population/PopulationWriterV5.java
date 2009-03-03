@@ -162,7 +162,7 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 			this.writeStartTag(PopulationSchemaV5Names.CAPACITY, this.atts, true);
 		}
 		for (DayType dt : DayType.values()) {
-			SortedSet<BasicOpeningTime> ot = ba.getOpeningTime(dt);
+			SortedSet<BasicOpeningTime> ot = ba.getOpeningTimes(dt);
 			if (ot != null) {
 				for (BasicOpeningTime bot : ot) {
 					this.writeOpeningTime(bot);

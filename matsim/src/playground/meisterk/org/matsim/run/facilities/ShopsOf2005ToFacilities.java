@@ -1523,7 +1523,7 @@ public class ShopsOf2005ToFacilities {
 				// open times (variable length)
 				for (Day day : days) {
 
-					Set<BasicOpeningTime> dailyOpentime = shopping.getOpeningTime(day.getAbbrevEnglish());
+					Set<BasicOpeningTime> dailyOpentime = shopping.getOpeningTimes(day.getAbbrevEnglish());
 
 					if (dailyOpentime != null) {
 
@@ -1669,7 +1669,7 @@ public class ShopsOf2005ToFacilities {
 				int dayCounter = 0;
 				for (Day day : days) {
 					if (facility.getActivityOption(ACTIVITY_TYPE_SHOP) != null) {
-						Set<BasicOpeningTime> dailyOpentimes = facility.getActivityOption(ACTIVITY_TYPE_SHOP).getOpeningTime(day.getAbbrevEnglish());
+						Set<BasicOpeningTime> dailyOpentimes = facility.getActivityOption(ACTIVITY_TYPE_SHOP).getOpeningTimes(day.getAbbrevEnglish());
 						if (dailyOpentimes != null) {
 							for (BasicOpeningTime opentime : dailyOpentimes) {
 

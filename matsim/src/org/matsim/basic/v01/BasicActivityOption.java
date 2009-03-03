@@ -37,7 +37,7 @@ public interface BasicActivityOption {
 
 	public void addOpeningTime(BasicOpeningTime openingTime);
 
-	public SortedSet<BasicOpeningTime> getOpeningTime(DayType day);
+	public SortedSet<BasicOpeningTime> getOpeningTimes(DayType day);
 	
 	public String getType();
 

@@ -69,9 +69,9 @@ public class CharyparNagelOpenTimesScoringFunction extends
 				// choose appropriate opentime:
 				// either wed or wkday
 				// if none is given, use undefined opentimes
-				opentimes = facility.getActivityOption(facilityActType).getOpeningTime(DayType.wed);
+				opentimes = facility.getActivityOption(facilityActType).getOpeningTimes(DayType.wed);
 				if (opentimes == null) {
-					opentimes = facility.getActivityOption(facilityActType).getOpeningTime(DayType.wkday);
+					opentimes = facility.getActivityOption(facilityActType).getOpeningTimes(DayType.wkday);
 				}
 				if (opentimes != null) {
 					// ignoring lunch breaks with the following procedure:

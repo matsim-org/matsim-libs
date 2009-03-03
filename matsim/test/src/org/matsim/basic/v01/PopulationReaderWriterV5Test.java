@@ -235,9 +235,9 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		assertEquals(this.id666, activity.getLocation().getId());
 		assertEquals(LocationType.FACILITY, activity.getLocation().getLocationType());
 		assertEquals(Integer.valueOf(40), activity.getCapacity());
-		assertNotNull(activity.getOpeningTime(DayType.wk));
-		assertEquals(8.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getStartTime(), EPSILON);
-		assertEquals(17.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getEndTime(), EPSILON);
+		assertNotNull(activity.getOpeningTimes(DayType.wk));
+		assertEquals(8.0 * 3600.0, activity.getOpeningTimes(DayType.wk).first().getStartTime(), EPSILON);
+		assertEquals(17.0 * 3600.0, activity.getOpeningTimes(DayType.wk).first().getEndTime(), EPSILON);
 
 		activity = knowledge.getActivities().get(1);
 		assertNotNull(activity);
@@ -253,7 +253,7 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 			assertEquals(new CoordImpl(0.0d, 0.0d), activity.getLocation().getCenter());
 		}
 		assertNull(activity.getCapacity());
-		assertNull(activity.getOpeningTime(DayType.wk));
+		assertNull(activity.getOpeningTimes(DayType.wk));
 
 
 		//now check the contents of plans

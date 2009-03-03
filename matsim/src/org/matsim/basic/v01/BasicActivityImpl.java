@@ -66,7 +66,7 @@ public class BasicActivityImpl implements BasicActivityOption {
 		this.capacity = cap;
 	}
 
-	public SortedSet<BasicOpeningTime> getOpeningTime(DayType day) {
+	public SortedSet<BasicOpeningTime> getOpeningTimes(DayType day) {
 		return this.openingTimes.get(day);
 	}
 

@@ -116,7 +116,7 @@ public class ActivityOptionImpl implements ActivityOption {
 	//////////////////////////////////////////////////////////////////////
 
 	public final boolean containsOpentime(final BasicOpeningTime o) {
-		Set<BasicOpeningTime> o_set = this.getOpeningTime(o.getDay());
+		Set<BasicOpeningTime> o_set = this.getOpeningTimes(o.getDay());
 		if (o_set == null) {
 			return false;
 		}
@@ -162,7 +162,7 @@ public class ActivityOptionImpl implements ActivityOption {
 		return this.opentimes;
 	}
 
-	public final SortedSet<BasicOpeningTime> getOpeningTime(final DayType day) {
+	public final SortedSet<BasicOpeningTime> getOpeningTimes(final DayType day) {
 		return this.opentimes.get(day);
 	}
 
