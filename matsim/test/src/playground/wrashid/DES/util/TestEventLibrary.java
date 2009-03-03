@@ -12,20 +12,20 @@ public class TestEventLibrary extends MatsimTestCase {
 	
 	public void testGetTravelTime(){
 		LinkedList<PersonEvent> events=new LinkedList<PersonEvent>();
-		events.add(new AgentDepartureEvent(20,"2","0"));
-		events.add(new AgentArrivalEvent(30,"2","0"));
-		events.add(new AgentDepartureEvent(90,"1","0"));
-		events.add(new AgentArrivalEvent(110,"1","0"));
+		events.add(new AgentDepartureEvent(20,"2","0",0));
+		events.add(new AgentArrivalEvent(30,"2","0",0));
+		events.add(new AgentDepartureEvent(90,"1","0",0));
+		events.add(new AgentArrivalEvent(110,"1","0",0));
 		
 		assertEquals(20.0, EventLibrary.getTravelTime(events,1), EPSILON);
 	}
 	
 	public void testGetAverageTravelTime(){
 		LinkedList<PersonEvent> events=new LinkedList<PersonEvent>();
-		events.add(new AgentDepartureEvent(20,"2","0"));
-		events.add(new AgentArrivalEvent(30,"2","0"));
-		events.add(new AgentDepartureEvent(90,"1","0"));
-		events.add(new AgentArrivalEvent(110,"1","0"));
+		events.add(new AgentDepartureEvent(20,"2","0",0));
+		events.add(new AgentArrivalEvent(30,"2","0",0));
+		events.add(new AgentDepartureEvent(90,"1","0",0));
+		events.add(new AgentArrivalEvent(110,"1","0",0));
 		
 		assertEquals(30.0, EventLibrary.getSumTravelTime(events), EPSILON);
 	}
