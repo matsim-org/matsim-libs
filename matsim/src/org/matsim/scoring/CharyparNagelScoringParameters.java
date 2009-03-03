@@ -35,7 +35,9 @@ public class CharyparNagelScoringParameters {
 	public final double marginalUtilityOfTravelingPT; // public transport
 	public final double marginalUtilityOfTravelingWalk;
 	public final double marginalUtilityOfPerforming;
-	public final double marginalUtilityOfDistance;
+	public final double marginalUtilityOfDistanceCar;
+	public final double marginalUtilityOfDistancePt;
+	public final double marginalUtilityOfDistanceWalk;
 	public final double abortedPlanScore;
 
 	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
@@ -50,15 +52,17 @@ public class CharyparNagelScoringParameters {
 		marginalUtilityOfTravelingWalk = config.getTravelingWalk() / 3600.0;
 		marginalUtilityOfPerforming = config.getPerforming() / 3600.0;
 
-		marginalUtilityOfDistance = config.getMarginalUtlOfDistance();
+		marginalUtilityOfDistanceCar = config.getMarginalUtlOfDistanceCar();
+		marginalUtilityOfDistancePt = config.getMarginalUtlOfDistancePt();
+		marginalUtilityOfDistanceWalk = config.getMarginalUtlOfDistanceWalk();
 
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),
 				Math.min(marginalUtilityOfTraveling, marginalUtilityOfWaiting)) * 3600.0 * 24.0; // SCENARIO_DURATION
 		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
 
-		scoreActs = (marginalUtilityOfPerforming != 0 || marginalUtilityOfWaiting != 0 ||
-				marginalUtilityOfLateArrival != 0 || marginalUtilityOfEarlyDeparture != 0);
+		scoreActs = ((marginalUtilityOfPerforming != 0) || (marginalUtilityOfWaiting != 0) ||
+				(marginalUtilityOfLateArrival != 0) || (marginalUtilityOfEarlyDeparture != 0));
 
 	
 		for (ActivityParams params : config.getActivityParams()) {

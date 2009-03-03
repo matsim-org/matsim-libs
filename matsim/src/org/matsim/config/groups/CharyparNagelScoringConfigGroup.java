@@ -45,8 +45,13 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private static final String TRAVELING_PT = "travelingPt";
 	private static final String TRAVELING_WALK = "travelingWalk";
 	private static final String WAITING  = "waiting";
+	private static final String MARGINAL_UTL_OF_DISTANCE_CAR = "marginalUtlOfDistanceCar";
+	private static final String MARGINAL_UTL_OF_DISTANCE_PT = "marginalUtlOfDistancePt";
+	private static final String MARGINAL_UTL_OF_DISTANCE_WALK = "marginalUtlOfDistanceWalk";
+	
+	
+	@Deprecated
 	private static final String MARGINAL_UTL_OF_DISTANCE = "marginalUtlOfDistance";
-
 	@Deprecated
 	private static final String DISTANCE_COST = "distanceCost";
 	@Deprecated
@@ -74,7 +79,9 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private double traveling = -6.0;
 	private double travelingPt = -6.0;
 	private double travelingWalk = -6.0;
-	private double marginalUtlOfDistance = 0.0;
+	private double marginalUtlOfDistanceCar = 0.0;
+	private double marginalUtlOfDistancePt = 0.0;
+	private double marginalUtlOfDistanceWalk = 0.0;
 	private double waiting = -0.0;
 
 	private final HashMap<String, ActivityParams> activityTypes = new HashMap<String, ActivityParams>();
@@ -103,31 +110,39 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		} else if (TRAVELING_WALK.equals(key)) {
 			return Double.toString(getTravelingWalk());
 		} else if (MARGINAL_UTL_OF_DISTANCE.equals(key)) {
+			log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE +" is deprecated. Use a mode specific marginal utility of distance instead.");
+			log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE + " is interpreted like the marginal utility of distance for the car mode!");
 			return Double.toString(getMarginalUtlOfDistance());
-		} else if (WAITING.equals(key)) {
+		} else if (MARGINAL_UTL_OF_DISTANCE_CAR.equals(key)){
+			return Double.toString(this.getMarginalUtlOfDistanceCar());
+		} else if (MARGINAL_UTL_OF_DISTANCE_PT.equals(key)){
+			return Double.toString(this.getMarginalUtlOfDistancePt());
+		} else if (MARGINAL_UTL_OF_DISTANCE_WALK.equals(key)){
+			return Double.toString(this.getMarginalUtlOfDistanceWalk());
+		}	else if (WAITING.equals(key)) {
 			return Double.toString(getWaiting());
-		} else if (key != null && key.startsWith(ACTIVITY_TYPE)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_TYPE)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), false);
 			return actParams == null ? null : actParams.getType();
-		} else if (key != null && key.startsWith(ACTIVITY_PRIORITY)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_PRIORITY)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_PRIORITY.length()), false);
 			return Double.toString(actParams.getPriority());
-		} else if (key != null && key.startsWith(ACTIVITY_TYPICAL_DURATION)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_TYPICAL_DURATION)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPICAL_DURATION.length()), false);
 			return Time.writeTime(actParams.getTypicalDuration());
-		} else if (key != null && key.startsWith(ACTIVITY_MINIMAL_DURATION)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_MINIMAL_DURATION)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_MINIMAL_DURATION.length()), false);
 			return Time.writeTime(actParams.getMinimalDuration());
-		} else if (key != null && key.startsWith(ACTIVITY_OPENING_TIME)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_OPENING_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_OPENING_TIME.length()), false);
 			return Time.writeTime(actParams.getOpeningTime());
-		} else if (key != null && key.startsWith(ACTIVITY_LATEST_START_TIME)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_LATEST_START_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_LATEST_START_TIME.length()), false);
 			return Time.writeTime(actParams.getLatestStartTime());
-		} else if (key != null && key.startsWith(ACTIVITY_EARLIEST_END_TIME)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_EARLIEST_END_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_EARLIEST_END_TIME.length()), false);
 			return Time.writeTime(actParams.getEarliestEndTime());
-		} else if (key != null && key.startsWith(ACTIVITY_CLOSING_TIME)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_CLOSING_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_CLOSING_TIME.length()), false);
 			return Time.writeTime(actParams.getClosingTime());
 		} else {
@@ -155,7 +170,15 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			setTravelingPt(Double.parseDouble(value));
 		} else if (TRAVELING_WALK.equals(key)) {
 			setTravelingWalk(Double.parseDouble(value));
-		} else if (MARGINAL_UTL_OF_DISTANCE.equals(key)) {
+		} else if (MARGINAL_UTL_OF_DISTANCE_CAR.equals(key)){
+			setMarginalUtlOfDistanceCar(Double.parseDouble(value));
+		} else if (MARGINAL_UTL_OF_DISTANCE_PT.equals(key)){
+			setMarginalUtlOfDistancePt(Double.parseDouble(value));
+		} else if (MARGINAL_UTL_OF_DISTANCE_WALK.equals(key)){
+			setMarginalUtlOfDistanceWalk(Double.parseDouble(value));
+		}	else if (MARGINAL_UTL_OF_DISTANCE.equals(key)) {
+			log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE +" is deprecated. Use a mode specific marginal utility of distance instead.");
+			log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE + " is interpreted like the marginal utility of distance for the car mode!");
 			setMarginalUtlOfDistance(Double.parseDouble(value));
 		} else if (DISTANCE_COST.equals(key)) {
 			log.warn("The parameter " + DISTANCE_COST + " in module " + GROUP_NAME + " should be replaced by the parameter " + MARGINAL_UTL_OF_DISTANCE + ".");
@@ -167,30 +190,30 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			setWaiting(Double.parseDouble(value));
 		} else if (NUM_ACTIVITIES.equals(key)) {
 			log.warn("The parameter " + NUM_ACTIVITIES + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else if (key != null && key.startsWith(ACTIVITY_TYPE)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_TYPE)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), true);
 			this.activityTypes.remove(actParams.getType());
 			actParams.setType(value);
 			this.activityTypes.put(value, actParams);
-		} else if (key != null && key.startsWith(ACTIVITY_PRIORITY)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_PRIORITY)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_PRIORITY.length()), true);
 			actParams.setPriority(Double.parseDouble(value));
-		} else if (key != null && key.startsWith(ACTIVITY_TYPICAL_DURATION)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_TYPICAL_DURATION)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPICAL_DURATION.length()), true);
 			actParams.setTypicalDuration(Time.parseTime(value));
-		} else if (key != null && key.startsWith(ACTIVITY_MINIMAL_DURATION)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_MINIMAL_DURATION)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_MINIMAL_DURATION.length()), true);
 			actParams.setMinimalDuration(Time.parseTime(value));
-		} else if (key != null && key.startsWith(ACTIVITY_OPENING_TIME)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_OPENING_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_OPENING_TIME.length()), true);
 			actParams.setOpeningTime(Time.parseTime(value));
-		} else if (key != null && key.startsWith(ACTIVITY_LATEST_START_TIME)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_LATEST_START_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_LATEST_START_TIME.length()), true);
 			actParams.setLatestStartTime(Time.parseTime(value));
-		} else if (key != null && key.startsWith(ACTIVITY_EARLIEST_END_TIME)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_EARLIEST_END_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_EARLIEST_END_TIME.length()), true);
 			actParams.setEarliestEndTime(Time.parseTime(value));
-		} else if (key != null && key.startsWith(ACTIVITY_CLOSING_TIME)) {
+		} else if ((key != null) && key.startsWith(ACTIVITY_CLOSING_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_CLOSING_TIME.length()), true);
 			actParams.setClosingTime(Time.parseTime(value));
 		} else {
@@ -212,8 +235,9 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		map.put(TRAVELING_PT, getValue(TRAVELING_PT));
 		map.put(TRAVELING_WALK, getValue(TRAVELING_WALK));
 		map.put(WAITING, getValue(WAITING));
-		map.put(MARGINAL_UTL_OF_DISTANCE, getValue(MARGINAL_UTL_OF_DISTANCE));
-
+		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, Double.toString(this.getMarginalUtlOfDistanceCar()));
+		map.put(MARGINAL_UTL_OF_DISTANCE_PT, Double.toString(this.getMarginalUtlOfDistancePt()));
+		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, Double.toString(this.getMarginalUtlOfDistanceWalk()));
 		for(Entry<String, ActivityParams> entry : this.activityTypesByNumber.entrySet()) {
 			String key = entry.getKey();
 			map.put(ACTIVITY_TYPE + key, getValue(ACTIVITY_TYPE + key));
@@ -231,7 +255,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 
 	private ActivityParams getActivityTypeByNumber(final String number, final boolean createIfMissing) {
 		ActivityParams actType = this.activityTypesByNumber.get(number);
-		if (actType == null && createIfMissing) {
+		if ((actType == null) && createIfMissing) {
 			actType = new ActivityParams(number);
 			this.activityTypesByNumber.put(number, actType);
 			this.activityTypes.put(number, actType);
@@ -330,18 +354,62 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	public void setTravelingWalk(final double travelingWalk) {
 		this.travelingWalk = travelingWalk;
 	}
+	/**
+	 * @return the marginal utility of distance for mode walk per meter
+	 */
+	public double getMarginalUtlOfDistanceWalk() {
+		return this.marginalUtlOfDistanceWalk;
+	}
+	/**
+	 * @param marginalUtlOfDistance the marginal utility of distance for mode walk per meter
+	 */
+	public void setMarginalUtlOfDistanceWalk(final double marginalUtlOfDistanceWalk) {
+		this.marginalUtlOfDistanceWalk = marginalUtlOfDistanceWalk;
+	}
 	
 	/**
-	 * @return the marginal utility of distance per meter
+	 * @return the marginal utility of distance for mode pt per meter
 	 */
+	public double getMarginalUtlOfDistancePt() {
+		return this.marginalUtlOfDistancePt;
+	}
+	/**
+	 * @param marginalUtlOfDistance the marginal utility of distance for mode pt per meter
+	 */
+	public void setMarginalUtlOfDistancePt(final double marginalUtlOfDistancePt) {
+		this.marginalUtlOfDistancePt = marginalUtlOfDistancePt;
+	}
+	/**
+	 * @return the marginal utility of distance for mode car per meter
+	 */
+	public double getMarginalUtlOfDistanceCar() {
+		return this.marginalUtlOfDistanceCar;
+	}
+	/**
+	 * @param marginalUtlOfDistance the marginal utility of distance for mode car per meter
+	 */
+	public void setMarginalUtlOfDistanceCar(final double marginalUtlOfDistanceCar) {
+		this.marginalUtlOfDistanceCar = marginalUtlOfDistanceCar;
+	}
+	/**
+	 * @return the marginal utility of distance per meter
+	 * @deprecated use getMarginalUtlOfDistanceCar instead
+	 */
+	@Deprecated 
 	public double getMarginalUtlOfDistance() {
-		return this.marginalUtlOfDistance;
+		log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE +" is deprecated. Use a mode specific marginal utility of distance instead.");
+		log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE + " is interpreted like the marginal utility of distance for the car mode!");
+		return this.marginalUtlOfDistanceCar;
 	}
 	/**
 	 * @param marginalUtlOfDistance the marginal utility of distance per meter
+	 * @deprecated use setMarginalUtlOfDistanceCar instead
 	 */
+	@Deprecated
 	public void setMarginalUtlOfDistance(final double marginalUtlOfDistance) {
-		this.marginalUtlOfDistance = marginalUtlOfDistance;
+		log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE +" is deprecated. Use a mode specific marginal utility of distance instead.");
+		log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE + " is interpreted like the marginal utility of distance for the car mode!");
+		this.marginalUtlOfDistanceCar = marginalUtlOfDistance;
 	}
 	
 	public double getWaiting() {

@@ -201,13 +201,13 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		double activityStart = arrivalTime;
 		double activityEnd = departureTime;
 
-		if (openingTime >=  0 && arrivalTime < openingTime) {
+		if ((openingTime >=  0) && (arrivalTime < openingTime)) {
 			activityStart = openingTime;
 		}
-		if (closingTime >= 0 && closingTime < departureTime) {
+		if ((closingTime >= 0) && (closingTime < departureTime)) {
 			activityEnd = closingTime;
 		}
-		if (openingTime >= 0 && closingTime >= 0
+		if ((openingTime >= 0) && (closingTime >= 0)
 				&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
 			// agent could not perform action
 			activityStart = departureTime;
@@ -224,7 +224,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		// disutility if too late
 
 		double latestStartTime = actParams.getLatestStartTime();
-		if (latestStartTime >= 0 && activityStart > latestStartTime) {
+		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 			tmpScore += this.params.marginalUtilityOfLateArrival * (activityStart - latestStartTime);
 		}
 
@@ -242,7 +242,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 
 		// disutility if stopping too early
 		double earliestEndTime = actParams.getEarliestEndTime();
-		if (earliestEndTime >= 0 && activityEnd < earliestEndTime) {
+		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
 			tmpScore += this.params.marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
 		}
 
@@ -253,7 +253,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 
 		// disutility if duration was too short
 		double minimalDuration = actParams.getMinimalDuration();
-		if (minimalDuration >= 0 && duration < minimalDuration) {
+		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
 			tmpScore += this.params.marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 		}
 
@@ -281,33 +281,43 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
+
+		/* we only as for the route when we have to calculate a distance cost,
+		 * because route.getDist() may calculate the distance if not yet
+		 * available, which is quite an expensive operation
+		 */
 		double dist = 0.0; // distance in meters
 
-		if (this.params.marginalUtilityOfDistance != 0.0) {
-			/* we only as for the route when we have to calculate a distance cost,
-			 * because route.getDist() may calculate the distance if not yet
-			 * available, which is quite an expensive operation
-			 */
-			Route route = leg.getRoute();
-			dist = route.getDist();
-			/* TODO the route-distance does not contain the length of the first or
-			 * last link of the route, because the route doesn't know those. Should
-			 * be fixed somehow, but how? MR, jan07
-			 */
-			/* TODO in the case of within-day replanning, we cannot be sure that the
-			 * distance in the leg is the actual distance driven by the agent.
-			 */
-		}
 
 		if (BasicLeg.Mode.car.equals(leg.getMode())) {
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistance * dist;
+			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
+				Route route = leg.getRoute();
+				dist = route.getDist();
+				/* TODO the route-distance does not contain the length of the first or
+				 * last link of the route, because the route doesn't know those. Should
+				 * be fixed somehow, but how? MR, jan07
+				 */
+				/* TODO in the case of within-day replanning, we cannot be sure that the
+				 * distance in the leg is the actual distance driven by the agent.
+				 */
+			}
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
 		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT + this.params.marginalUtilityOfDistance * dist;
+			if (this.params.marginalUtilityOfDistancePt != 0.0){
+				dist = leg.getRoute().getDist();
+			}
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT + this.params.marginalUtilityOfDistancePt * dist;
 		} else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk + this.params.marginalUtilityOfDistance * dist;
+			if (this.params.marginalUtilityOfDistanceWalk != 0.0){
+				dist = leg.getRoute().getDist();
+			}
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk + this.params.marginalUtilityOfDistanceWalk * dist;
 		} else {
+			if (this.params.marginalUtilityOfDistanceCar != 0.0){
+				dist = leg.getRoute().getDist();
+			}
 			// use the same values as for "car"
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistance * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
 		}
 
 		return tmpScore;

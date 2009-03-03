@@ -45,7 +45,7 @@ import org.matsim.utils.geometry.CoordImpl;
  *  Generating complete all-day activity plans with genetic algorithms,<br>
  *  Transportation, 32 (4) 369–397.</p>
  * </blockquote>
- *
+ * TODO dg march 09: when walk mode is tested add a walk mode leg and modify at least testMarginalUtilityOfDistance
  * @author mrieser
  */
 public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
@@ -66,7 +66,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		scoring.setPerforming(0.0);
 		scoring.setTraveling(0.0);
 		scoring.setTravelingPt(0.0);
-		scoring.setMarginalUtlOfDistance(0.0);
+		scoring.setMarginalUtlOfDistanceCar(0.0);
 		scoring.setWaiting(0.0);
 
 		// setup activity types h and w for scoring
@@ -371,7 +371,8 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 	}
 
 	public void testMarginalUtilityOfDistance() {
-		this.config.charyparNagelScoring().setMarginalUtlOfDistance(-0.00001);
+		this.config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.00001);
+		this.config.charyparNagelScoring().setMarginalUtlOfDistancePt(-0.00001);
 		assertEquals(-0.45, calcScore(), EPSILON);
 	}
 
