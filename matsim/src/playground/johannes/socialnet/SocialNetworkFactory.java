@@ -25,7 +25,7 @@ package playground.johannes.socialnet;
 
 import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicActivity;
+import org.matsim.basic.v01.BasicActivityOption;
 import org.matsim.basic.v01.BasicKnowledge;
 import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
@@ -37,7 +37,7 @@ import playground.johannes.graph.generators.GraphFactory;
  * @author illenberger
  *
  */
-public class SocialNetworkFactory<P extends BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> implements GraphFactory<SocialNetwork<P>, Ego<P>, SocialTie> {
+public class SocialNetworkFactory<P extends BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> implements GraphFactory<SocialNetwork<P>, Ego<P>, SocialTie> {
 
 	private BasicPopulation<P> population;
 	

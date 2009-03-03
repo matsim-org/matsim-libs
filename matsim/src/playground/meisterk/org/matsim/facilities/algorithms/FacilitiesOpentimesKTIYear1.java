@@ -28,10 +28,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.facilities.OpeningTime;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 
 public class FacilitiesOpentimesKTIYear1 {
 
@@ -45,10 +45,10 @@ public class FacilitiesOpentimesKTIYear1 {
 		this.loadOpeningTimes();
 
 		for (Facility f : facilities.getFacilities().values()) {
-			Iterator<Activity> a_it = f.getActivities().values().iterator();
+			Iterator<ActivityOption> a_it = f.getActivities().values().iterator();
 			while (a_it.hasNext()) {
 
-				Activity a = a_it.next();
+				ActivityOption a = a_it.next();
 				String actType = a.getType();
 
 				// delete all existing open times info

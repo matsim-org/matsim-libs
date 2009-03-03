@@ -98,15 +98,15 @@ public class BasicPopulationBuilderImpl implements BasicPopulationBuilder {
 		return route;
 	}
 
-	public BasicActivity createActivity(final String type, final BasicLocation currentlocation) {
+	public BasicActivityOption createActivity(final String type, final BasicLocation currentlocation) {
 		BasicActivityImpl ba = new BasicActivityImpl(type);
 		ba.setLocation(currentlocation);
 		return ba;
 	}
 
-	public BasicKnowledge createKnowledge(final List<BasicActivity> currentActivities) {
+	public BasicKnowledge createKnowledge(final List<BasicActivityOption> currentActivities) {
 		BasicKnowledgeImpl kn = new BasicKnowledgeImpl();
-		for (BasicActivity ba : currentActivities){
+		for (BasicActivityOption ba : currentActivities){
 			kn.addActivity(ba);
 		}
 		return kn;

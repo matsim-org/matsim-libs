@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.implementations;
 
-import org.matsim.facilities.Facility;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 
 import playground.marcel.pt.interfaces.DriverAgent;

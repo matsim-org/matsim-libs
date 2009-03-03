@@ -23,8 +23,8 @@ package playground.marcel.pt.tryout;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.facilities.Facility;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 

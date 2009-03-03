@@ -23,18 +23,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicActivity;
+import org.matsim.basic.v01.BasicActivityOption;
 import org.matsim.basic.v01.LocationType;
-import org.matsim.facilities.Activity;
+import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.BasicLocation;
 import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Network;
@@ -155,12 +156,12 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		return route;
 	}
 
-	public Activity createActivity(final String type, final BasicLocation loc) {
-		Activity act = null;
+	public ActivityOption createActivity(final String type, final BasicLocation loc) {
+		ActivityOption act = null;
 		if (loc != null) {
 			if ((loc.getLocationType() == LocationType.FACILITY) && this.facilities.getFacilities().containsKey(loc.getId())) {
 				Facility fac = this.facilities.getFacilities().get(loc.getId());
-				act = new Activity(type, fac);
+				act = new ActivityOptionImpl(type, fac);
 				return act;
 			}
 			throw new IllegalArgumentException("No facility exists with id: " + loc.getId());
@@ -168,12 +169,12 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		throw new IllegalArgumentException("Can't create facility without location");
 	}
 
-	public Knowledge createKnowledge(final List<BasicActivity> acts) {
+	public Knowledge createKnowledge(final List<BasicActivityOption> acts) {
 		Knowledge knowledge = null;
 		if ((acts != null) && !acts.isEmpty()) {
 			knowledge = new Knowledge();
-			for (BasicActivity a : acts) {
-				knowledge.addActivity((Activity)a);
+			for (BasicActivityOption a : acts) {
+				knowledge.addActivity((ActivityOption)a);
 			}
 			return knowledge;
 		}

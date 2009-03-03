@@ -20,8 +20,8 @@
 
 package org.matsim.facilities.filters;
 
-import org.matsim.facilities.Facility;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
+import org.matsim.interfaces.core.v01.Facility;
 
 public abstract class AbstractFacilityFilter implements FacilityAlgorithm, FacilityFilter {
 

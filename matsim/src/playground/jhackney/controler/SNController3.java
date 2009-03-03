@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
-import org.matsim.facilities.Facility;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.ReRouteLandmarks;

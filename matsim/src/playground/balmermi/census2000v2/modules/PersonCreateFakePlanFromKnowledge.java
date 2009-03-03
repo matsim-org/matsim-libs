@@ -22,11 +22,11 @@ package playground.balmermi.census2000v2.modules;
 
 import java.util.ArrayList;
 
-import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -65,8 +65,8 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 	public void run(final Person person) {
 		Knowledge k = person.getKnowledge();
 
-		Activity home = null;
-		ArrayList<Activity> home_acts = k.getActivities(CAtts.ACT_HOME);
+		ActivityOption home = null;
+		ArrayList<ActivityOption> home_acts = k.getActivities(CAtts.ACT_HOME);
 		if (home_acts.size()==0) { Gbl.errorMsg("pid="+person.getId()+", kdesc="+k.getDescription()+": no home activity defined"); }
 		else if (home_acts.size()==1) { home = home_acts.get(0); }
 		else if (home_acts.size()==2) {
@@ -77,15 +77,15 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 		}
 		else { Gbl.errorMsg("pid="+person.getId()+", kdesc="+k.getDescription()+": more than 2 home activities defined"); }
 
-		Activity work = null;
+		ActivityOption work = null;
 		for (int i=0; i<this.w_acts.length;i++) {  // that only works if we know that there is at most one work activity
-			ArrayList<Activity> work_acts = k.getActivities(this.w_acts[i]);
+			ArrayList<ActivityOption> work_acts = k.getActivities(this.w_acts[i]);
 			if (!work_acts.isEmpty()) { work = work_acts.get(0); }
 		}
 		
-		Activity educ = null;
+		ActivityOption educ = null;
 		for (int i=0; i<this.e_acts.length;i++) {  // that only works if we know that there is at most one educ activity
-			ArrayList<Activity> educ_acts = k.getActivities(this.e_acts[i]);
+			ArrayList<ActivityOption> educ_acts = k.getActivities(this.e_acts[i]);
 			if (!educ_acts.isEmpty()) { educ = educ_acts.get(0); }
 		}
 		

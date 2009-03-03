@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
+import org.matsim.interfaces.core.v01.Facility;
 
 public class FacilitiesRenameAndRemoveNOGAActTypes {
 

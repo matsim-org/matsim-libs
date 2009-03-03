@@ -27,13 +27,14 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.matsim.basic.v01.BasicActivity;
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 
-public class Activity implements BasicActivity {
+public class ActivityOptionImpl implements ActivityOption {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -51,7 +52,7 @@ public class Activity implements BasicActivity {
 	//////////////////////////////////////////////////////////////////////
 
 	
-	public Activity(final String type, final Facility facility) {
+	public ActivityOptionImpl(final String type, final Facility facility) {
 		this.type = type;
 		this.facility = facility;
 		if (this.facility == null) { Gbl.errorMsg("facility=null not allowed!"); }
@@ -144,15 +145,7 @@ public class Activity implements BasicActivity {
 	public BasicLocation getLocation() {
 		return this.getFacility();
 	}
-	
-	public Integer getFrequency() {
-		return this.frequency;
-	}
-	
-	public void setFrequency(Integer freq) {
-		this.frequency = freq;
-	}
-	
+
 	public final String getType() {
 		return this.type;
 	}

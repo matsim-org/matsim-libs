@@ -25,7 +25,7 @@ package playground.johannes.socialnet;
 
 import java.util.List;
 
-import org.matsim.basic.v01.BasicActivity;
+import org.matsim.basic.v01.BasicActivityOption;
 import org.matsim.basic.v01.BasicKnowledge;
 import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
@@ -37,7 +37,7 @@ import playground.johannes.graph.SparseVertex;
  * @author illenberger
  *
  */
-public class Ego<P extends BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> extends SparseVertex {
+public class Ego<P extends BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> extends SparseVertex {
 
 	private P person;
 	

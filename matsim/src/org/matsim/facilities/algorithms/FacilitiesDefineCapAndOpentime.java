@@ -23,11 +23,11 @@ package org.matsim.facilities.algorithms;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.misc.Time;
 
 public class FacilitiesDefineCapAndOpentime {
@@ -82,9 +82,9 @@ public class FacilitiesDefineCapAndOpentime {
 		System.out.println("      leis_cnt = " + leis_cnt);
 
 		for (Facility f : facilities.getFacilities().values()) {
-			Iterator<Activity> a_it = f.getActivities().values().iterator();
+			Iterator<ActivityOption> a_it = f.getActivities().values().iterator();
 			while (a_it.hasNext()) {
-				Activity a = a_it.next();
+				ActivityOption a = a_it.next();
 				if (a.getType().equals("home")) {
 					a.setCapacity(this.nof_persons/home_cnt);
 					a.addOpeningTime(new OpeningTime(DayType.wk, TIME_0000, TIME_2400));

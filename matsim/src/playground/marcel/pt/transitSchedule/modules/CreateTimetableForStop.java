@@ -23,7 +23,7 @@ package playground.marcel.pt.transitSchedule.modules;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.matsim.facilities.Facility;
+import org.matsim.interfaces.core.v01.Facility;
 
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;

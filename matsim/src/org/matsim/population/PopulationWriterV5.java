@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.matsim.basic.v01.BasicActivity;
+import org.matsim.basic.v01.BasicActivityOption;
 import org.matsim.basic.v01.BasicHousehold;
 import org.matsim.basic.v01.BasicKnowledge;
 import org.matsim.basic.v01.BasicOpeningTime;
@@ -56,13 +56,13 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 
 	private final List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 
-	private final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> population;
+	private final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> population;
 
 	private Map<Id, BasicHousehold> households;
 
 	private MatsimCommonWriter matsimCommonWriter;
 
-	public PopulationWriterV5(final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop) {
+	public PopulationWriterV5(final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> pop) {
 		this.population = pop;
 	}
 
@@ -75,7 +75,7 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 	}
 
 	
-	public PopulationWriterV5(final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop, final Map<Id, BasicHousehold> hh) {
+	public PopulationWriterV5(final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> pop, final Map<Id, BasicHousehold> hh) {
 		this.population = pop;
 		this.households = hh;
 	}
@@ -90,7 +90,7 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 	}
 
 	private void writePopulation(
-			final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop) throws IOException {
+			final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> pop) throws IOException {
 		this.atts.clear();
 		this.atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
 		this.atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
@@ -104,8 +104,8 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 		this.writeEndTag(PopulationSchemaV5Names.POPULATION);
 	}
 
-	private void writePersons(final Collection<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> persons) throws IOException {
-		for (BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>> p : persons) {
+	private void writePersons(final Collection<BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> persons) throws IOException {
+		for (BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>> p : persons) {
 			this.atts.clear();
 			this.atts.add(this.createTuple(PopulationSchemaV5Names.ID, p.getId().toString()));
 			if (p.getSex() != null) {
@@ -133,7 +133,7 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 		}
 	}
 
-	private void writeKnowledge(final BasicKnowledge<BasicActivity> k) throws IOException {
+	private void writeKnowledge(final BasicKnowledge<BasicActivityOption> k) throws IOException {
 		if (k != null) {
 			this.writeStartTag(PopulationSchemaV5Names.KNOWLEDGE, null);
 			if (k.getDescription() != null) {
@@ -142,7 +142,7 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 				this.writeEndTag(PopulationSchemaV5Names.DESCRIPTION);
 			}
 			if (k.getActivities() != null) {
-				for (BasicActivity ba : k.getActivities()) {
+				for (BasicActivityOption ba : k.getActivities()) {
 					this.writeActivity(ba);
 				}
 			}
@@ -150,12 +150,10 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 		}
 	}
 
-	private void writeActivity(final BasicActivity ba) throws IOException {
+	private void writeActivity(final BasicActivityOption ba) throws IOException {
 		this.atts.clear();
 		this.atts.add(this.createTuple(PopulationSchemaV5Names.TYPE, ba.getType()));
-		if (ba.getFrequency() != null) {
-			this.atts.add(this.createTuple(PopulationSchemaV5Names.FREQUENCY, ba.getFrequency()));
-		}
+
 		this.writeStartTag(PopulationSchemaV5Names.ACTIVITY, this.atts);
 		this.matsimCommonWriter.writeLocation(ba.getLocation(), this.getIndentationLevel());
 		if (ba.getCapacity() != null) {

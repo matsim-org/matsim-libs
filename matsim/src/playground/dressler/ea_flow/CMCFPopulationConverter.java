@@ -30,7 +30,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.basic.v01.BasicActivity;
+import org.matsim.basic.v01.BasicActivityOption;
 import org.matsim.basic.v01.BasicKnowledge;
 import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.basic.v01.BasicPopulationImpl;
@@ -58,7 +58,7 @@ public class CMCFPopulationConverter {
 	
 
 	@SuppressWarnings("unchecked")
-	public static BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
+	public static BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
 		BasicPopulationImpl result = new BasicPopulationImpl();
 		SAXBuilder builder = new SAXBuilder();
 		Document cmcfdemands = builder.build(filename);
@@ -146,7 +146,7 @@ public class CMCFPopulationConverter {
 			NetworkLayer network = new NetworkLayer();
 			NetworkReaderMatsimV1 netreader = new NetworkReaderMatsimV1(network);
 			netreader.parse(netfile);
-			BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> population = readCMCFDemands(inputfile,network,coordinates); 
+			BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> population = readCMCFDemands(inputfile,network,coordinates); 
 			PopulationWriterV5 writer = new PopulationWriterV5( population);
 			writer.writeFile(outfile);
 			System.out.println(inputfile+"conveted "+"output written in :"+outfile);

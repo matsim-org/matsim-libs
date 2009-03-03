@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.transitSchedule;
 
-import org.matsim.facilities.Facility;
+import org.matsim.interfaces.core.v01.Facility;
 
 public class TransitRouteStop {
 

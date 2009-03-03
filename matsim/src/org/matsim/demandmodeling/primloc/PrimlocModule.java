@@ -58,17 +58,18 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
-import org.matsim.facilities.Activity;
+import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.PersonAlgorithm;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.Knowledge;
-import org.matsim.population.PlanImpl;	
+import org.matsim.population.PlanImpl;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
@@ -156,7 +157,7 @@ public class PrimlocModule  implements PersonAlgorithm {
 			// Change the knowledge of the person
 			if( overwriteKnowledge )
 				knowledge.removeActivities( primaryActivityName );
-			knowledge.addActivity(new Activity(primaryActivityName, workplace), true);
+			knowledge.addActivity(new ActivityOptionImpl(primaryActivityName, workplace), true);
 		}
 	}
 
@@ -313,7 +314,7 @@ public class PrimlocModule  implements PersonAlgorithm {
 		core.J = new double[ core.numZ ];
 		Facilities facilities = ((Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
 		for( Facility facility : facilities.getFacilities().values() ){
-			Activity act = facility.getActivity( primaryActivityName );
+			ActivityOption act = facility.getActivity( primaryActivityName );
 			if( act != null ){
 				ArrayList<Location> list = zoneLayer.getNearestLocations( facility.getCenter(), null);
 				Zone zone = (Zone) list.get(0);

@@ -59,17 +59,17 @@ import org.apache.commons.io.FileUtils;
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.Facility;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.algorithms.FacilitiesWriterAlgorithm;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimResource;
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -773,7 +773,7 @@ public class ShopsOf2005ToFacilities {
 
 				// yeah, we can use the open times
 
-				Activity shopping = theCurrentPickpay.createActivity(ACTIVITY_TYPE_SHOP);
+				ActivityOption shopping = theCurrentPickpay.createActivity(ACTIVITY_TYPE_SHOP);
 				openNumbers.clear();
 				closeNumbers.clear();
 
@@ -879,7 +879,7 @@ public class ShopsOf2005ToFacilities {
 
 			Facility theCurrentMigrosZH = (Facility) facilities.getLocation(facilityId);
 			if (theCurrentMigrosZH != null) {
-				Activity shopping = theCurrentMigrosZH.createActivity(ACTIVITY_TYPE_SHOP);
+				ActivityOption shopping = theCurrentMigrosZH.createActivity(ACTIVITY_TYPE_SHOP);
 				String openTimeString = tokens[6];
 				openHourTokens = openTimeString.split(ANYTHING_BUT_DIGITS);
 				openDayTokens = openTimeString.split(ANYTHING_BUT_LETTERS);
@@ -1056,7 +1056,7 @@ public class ShopsOf2005ToFacilities {
 			Facility theCurrentMigrosOstschweiz = (Facility) facilities.getLocation(facilityId);
 			if (theCurrentMigrosOstschweiz != null) {
 
-				Activity shopping = theCurrentMigrosOstschweiz.createActivity(ACTIVITY_TYPE_SHOP);
+				ActivityOption shopping = theCurrentMigrosOstschweiz.createActivity(ACTIVITY_TYPE_SHOP);
 
 				// extract numbers
 				for (int tokenPos = 2; tokenPos < openTimeTokens.length; tokenPos++) {
@@ -1150,7 +1150,7 @@ public class ShopsOf2005ToFacilities {
 			Facility theCurrentCoopZH = (Facility) facilities.getLocation(facilityId);
 			if (theCurrentCoopZH != null) {
 
-				Activity shopping = theCurrentCoopZH.createActivity(ACTIVITY_TYPE_SHOP);
+				ActivityOption shopping = theCurrentCoopZH.createActivity(ACTIVITY_TYPE_SHOP);
 
 				for (int tokenPos = START_OPEN_TOKEN_INDEX; tokenPos <= END_OPEN_TOKEN_INDEX; tokenPos++) {
 
@@ -1231,7 +1231,7 @@ public class ShopsOf2005ToFacilities {
 			System.out.println(facilityId);
 			Facility theCurrentCoopTG = (Facility) facilities.getLocation(facilityId);
 			if (theCurrentCoopTG != null) {
-				Activity shopping = theCurrentCoopTG.createActivity(ACTIVITY_TYPE_SHOP);
+				ActivityOption shopping = theCurrentCoopTG.createActivity(ACTIVITY_TYPE_SHOP);
 
 				for (int tokenPos = START_OPEN_TOKEN_INDEX; tokenPos <= END_OPEN_TOKEN_INDEX; tokenPos++) {
 
@@ -1391,7 +1391,7 @@ public class ShopsOf2005ToFacilities {
 
 				Facility theCurrentDenner = (Facility) facilities.getLocation(shopId.getShopId());
 				if (theCurrentDenner != null) {
-					Activity shopping = theCurrentDenner.createActivity(ACTIVITY_TYPE_SHOP);
+					ActivityOption shopping = theCurrentDenner.createActivity(ACTIVITY_TYPE_SHOP);
 					for (String openTimeString : new String[]{weekDayToken, saturdayToken}) {
 
 						openHourTokens = openTimeString.split(ANYTHING_BUT_DIGITS);
@@ -1515,7 +1515,7 @@ public class ShopsOf2005ToFacilities {
 				(int) facility.getCenter().getX();
 			;
 
-			Activity shopping = facility.getActivity(ACTIVITY_TYPE_SHOP);
+			ActivityOption shopping = facility.getActivity(ACTIVITY_TYPE_SHOP);
 			if (shopping != null) {
 
 				// open times (variable length)

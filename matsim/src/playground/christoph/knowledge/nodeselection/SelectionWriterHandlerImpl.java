@@ -24,10 +24,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Map;
 
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;

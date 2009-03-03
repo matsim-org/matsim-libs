@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -42,13 +42,13 @@ public class CreatePlans1 {
 
 
 		// get home and work activity
-		Activity home=null;
-		Activity work=null;
-		Activity shop=null;
+		ActivityOption home=null;
+		ActivityOption work=null;
+		ActivityOption shop=null;
 		for (Facility f : facilities.getFacilities().values()) {
-			Iterator<Activity> a_it = f.getActivities().values().iterator();
+			Iterator<ActivityOption> a_it = f.getActivities().values().iterator();
 			while (a_it.hasNext()) {
-				Activity a = a_it.next();
+				ActivityOption a = a_it.next();
 				//System.out.println(a.getType());
 				if (a.getType().equals("home")) {
 					home=a;
@@ -80,7 +80,7 @@ public class CreatePlans1 {
 			Facility home_facility = person.getKnowledge().getActivities("home").get(0).getFacility();
 			Facility work_facility = person.getKnowledge().getActivities("work").get(0).getFacility();
 			Facility shop_facility = person.getKnowledge().getActivities("shop").get(0).getFacility();
-			ArrayList<Activity> acts = person.getKnowledge().getActivities();
+			ArrayList<ActivityOption> acts = person.getKnowledge().getActivities();
 
 			double depTimeHome=3600*8;
 			double depTimeWork=3600*16;

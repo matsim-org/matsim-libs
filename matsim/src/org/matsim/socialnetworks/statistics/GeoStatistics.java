@@ -3,7 +3,7 @@ package org.matsim.socialnetworks.statistics;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-import org.matsim.facilities.Facility;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;

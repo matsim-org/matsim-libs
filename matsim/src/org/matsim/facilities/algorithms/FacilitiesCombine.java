@@ -25,10 +25,10 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicOpeningTime;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.world.Location;
 
 public class FacilitiesCombine {
@@ -47,15 +47,15 @@ public class FacilitiesCombine {
 
 	private final void combine(Facility f,Facility f2) {
 		System.out.println("      Combining f_id=" + f.getId() + " into f2_id=" + f2.getId());
-		Iterator<Activity> a_it = f.getActivities().values().iterator();
+		Iterator<ActivityOption> a_it = f.getActivities().values().iterator();
 		while (a_it.hasNext()) {
-			Activity a = a_it.next();
+			ActivityOption a = a_it.next();
 			if (f2.getActivity(a.getType()) == null) {
-				Activity a2 = f2.createActivity(a.getType());
+				ActivityOption a2 = f2.createActivity(a.getType());
 				a2.setCapacity(a.getCapacity());
 			}
 			else {
-				Activity a2 = f2.getActivity(a.getType());
+				ActivityOption a2 = f2.getActivity(a.getType());
 				int cap2 = a2.getCapacity();
 				int cap = a.getCapacity();
 				if ((cap < Integer.MAX_VALUE) && (cap2 < Integer.MAX_VALUE)) { a2.setCapacity(cap + cap2); }

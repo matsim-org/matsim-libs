@@ -28,7 +28,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.basic.v01.BasicActivity;
+import org.matsim.basic.v01.BasicActivityOption;
 import org.matsim.basic.v01.BasicKnowledge;
 import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.basic.v01.BasicPopulationImpl;
@@ -96,7 +96,7 @@ public class CMCFtoEvacConverter {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
+	public static BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
 		BasicPopulationImpl result = new BasicPopulationImpl();
 		SAXBuilder builder = new SAXBuilder();
 		Document cmcfdemands = builder.build(filename);
@@ -173,7 +173,7 @@ public class CMCFtoEvacConverter {
 			NetworkWriter writer = new NetworkWriter( network, networkfileout);
 			writer.write();
 			System.out.println(networkfile+"  conveted successfully \n"+"output written in: "+networkfileout);
-			BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> population = readCMCFDemands(demandfile, network, false);
+			BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> population = readCMCFDemands(demandfile, network, false);
 			PopulationWriterV5 pwriter = new PopulationWriterV5( population);
 			pwriter.writeFile(plansfileout);
 			System.out.println(demandfile+"conveted succssfully \n"+"output written in :\n"+plansfileout);

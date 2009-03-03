@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.Knowledge;
@@ -89,7 +89,7 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 			throw new RuntimeException("Knowledge is not defined!");
 		}
 
-		Iterator<Activity> a_it = null;
+		Iterator<ActivityOption> a_it = null;
 		if (activity_type.equals("all")) { a_it = know.getActivities().iterator(); }
 		else { a_it = know.getActivities(this.activity_type).iterator(); }
 		// Creating coordinate list

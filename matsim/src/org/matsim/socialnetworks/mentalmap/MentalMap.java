@@ -31,13 +31,13 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -75,7 +75,7 @@ public class MentalMap {
 
 
 //	The activity score
-	private LinkedHashMap<Activity, Double> activityScore = new LinkedHashMap<Activity, Double>();
+	private LinkedHashMap<ActivityOption, Double> activityScore = new LinkedHashMap<ActivityOption, Double>();
 
 //	Total maximum number of activities (locations + action) an agent can remember
 
@@ -95,7 +95,7 @@ public class MentalMap {
 		while(planActIter.hasNext()){
 			Act myAct = (Act) planActIter.next();
 			if(myAct.getFacility()==null){ // new Acts are assigned a facility in the Plans file
-				Activity myActivity = null;
+				ActivityOption myActivity = null;
 				// If there is already knowledge in the initial plans file, use it
 				if(this.knowledge.getActivities(myAct.getType()).size()>0){
 					myActivity=this.knowledge.getActivities(myAct.getType()).get(MatsimRandom.random.nextInt(this.knowledge.getActivities(myAct.getType()).size()));
@@ -145,7 +145,7 @@ public class MentalMap {
 //			myAct.setFacility(fac);
 //			this.knowledge.addActivity(fac.getActivity(myActivityType));
 			//TODO JH apply some logic to label this a primary or secondary location
-			Activity myActivity=fac.getActivity(myActivityType);
+			ActivityOption myActivity=fac.getActivity(myActivityType);
 			this.knowledge.addActivity(myActivity,false);
 		}
 
@@ -181,7 +181,7 @@ public class MentalMap {
 		}
 	}
 
-	private void forgetActivity (Activity myactivity){
+	private void forgetActivity (ActivityOption myactivity){
 
 		if(this.activityScore.containsKey(myactivity)){
 			this.activityScore.remove(myactivity);
@@ -225,7 +225,7 @@ public class MentalMap {
 
 			SortHashMapByValue shmbv = new SortHashMapByValue();
 //			LinkedHashMap<Activity, ?> sortedScores = SortHashMapByValue.makeSortedMap(this.activityScore);
-			LinkedHashMap<Activity, ?> sortedScores = shmbv.makeSortedMap(this.activityScore);
+			LinkedHashMap<ActivityOption, ?> sortedScores = shmbv.makeSortedMap(this.activityScore);
 
 			// Remove activities if there are too many, but keep one activity
 			// for each act in the current plan. Iterator goes by score.
@@ -234,16 +234,16 @@ public class MentalMap {
 			// Avoid concurrent modification errors
 			// Add to the "forgetlist" the correct number of activities to forget
 			// Since these activities are sorted by score, just take the first ones
-			ArrayList<Activity> forgetList=new ArrayList<Activity>();
+			ArrayList<ActivityOption> forgetList=new ArrayList<ActivityOption>();
 			int counter=0;
 
 			// If there are too many activities 
 //			for (Enumeration<Activity> e = sortedScores.keys() ; e.hasMoreElements() ;) {
 //				Activity myactivity=e.nextElement();
-				Set<Activity> myActivities=sortedScores.keySet();
-				Iterator<Activity> ait= myActivities.iterator();
+				Set<ActivityOption> myActivities=sortedScores.keySet();
+				Iterator<ActivityOption> ait= myActivities.iterator();
 				while(ait.hasNext()) {
-					Activity myactivity=(Activity) ait.next();
+					ActivityOption myactivity=(ActivityOption) ait.next();
 //				double score=(Double) sortedScores.get(myactivity);
 				// note which activity to forget
 
@@ -253,23 +253,23 @@ public class MentalMap {
 				}
 			}
 
-			Iterator<Activity> forget=forgetList.iterator();
+			Iterator<ActivityOption> forget=forgetList.iterator();
 			while(forget.hasNext()){
-				Activity myactivity=forget.next();
+				ActivityOption myactivity=forget.next();
 				forgetActivity(myactivity);
 			}
 		}
 //		System.out.println(this.getClass()+" NumActivities2 "+this.knowledge.getActivities().size()+" "+this.activityScore.values().size());
 	}
 
-	public void addActivity(Activity myActivity){
+	public void addActivity(ActivityOption myActivity){
 		// Adds unmapped activity to mental map without associating it with an act
 		//TODO JH add logic to label this activity primary or secondary
 		this.knowledge.addActivity(myActivity,false);
 		setActivityScore(myActivity);
 	}
 
-	public void setActivityScore(Activity myActivity){
+	public void setActivityScore(ActivityOption myActivity){
 //		Initializes the score of a newly learned or discovered activity to 0
 //		Adds one to the score of the activity each time it is accessed.
 //		Supposed to simulate how frequently it is thought of by agent.
@@ -285,7 +285,7 @@ public class MentalMap {
 			}
 	}
 
-	public Act getActFromActivity (Person person, Activity myActivity){
+	public Act getActFromActivity (Person person, ActivityOption myActivity){
 		Act myAct=null;
 		Iterator<Plan> planIter = person.getPlans().iterator();
 		while(planIter.hasNext()){

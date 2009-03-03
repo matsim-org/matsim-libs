@@ -3,7 +3,7 @@ package playground.ciarif.retailers;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.facilities.Facility;
+import org.matsim.interfaces.core.v01.Facility;
 
 // RetailersWriterHandlerImplV1
 public class RetailersWriterHandlerImpl_1 implements RetailersWriterHandler {

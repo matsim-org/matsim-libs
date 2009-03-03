@@ -29,7 +29,6 @@ import java.util.Map;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.interfaces.basic.v01.BasicAct;
 import org.matsim.interfaces.basic.v01.BasicLeg;
@@ -40,6 +39,7 @@ import org.matsim.interfaces.basic.v01.BasicRoute;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Household;
 import org.matsim.interfaces.core.v01.Leg;
@@ -121,7 +121,7 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		assertNotNull(person);
 		assertNotNull(person.getKnowledge());
 		assertNotNull(person.getKnowledge().getActivities());
-		for (Activity a : person.getKnowledge().getActivities()) {
+		for (ActivityOption a : person.getKnowledge().getActivities()) {
 			assertNotNull(a);
 			assertNotNull(a.getFacility());
 			assertEquals(fac.getFacilities().get(this.id666), a.getFacility());
@@ -182,7 +182,7 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 
 	public void testWriter() throws FileNotFoundException, IOException {
 		//read the file
-		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> population = new BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>>();
+		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> population = new BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>>();
 		Map<Id, BasicHousehold> households = new HashMap<Id, BasicHousehold>();
 		BasicPopulationReaderV5 reader = new BasicPopulationReaderV5(population, households);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
@@ -192,7 +192,7 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		writer.useCompression(false);
 		writer.writeFile(this.getOutputDirectory() + "testPopulationOutput.xml");
 		//read it again and check the content
-		population = new BasicPopulationImpl<BasicPerson<BasicPlan,BasicKnowledge<BasicActivity>>>();
+		population = new BasicPopulationImpl<BasicPerson<BasicPlan,BasicKnowledge<BasicActivityOption>>>();
 		households = new HashMap<Id, BasicHousehold>();
 		reader = new BasicPopulationReaderV5(population, households);
 		reader.readFile(this.getOutputDirectory() + "testPopulationOutput.xml");
@@ -223,14 +223,13 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		assertEquals("ch-HT-2y", pp.getTravelcards().first());
 		assertEquals(this.id23, pp.getFiscalHouseholdId());
 		//check knowledge
-		BasicKnowledge<BasicActivity> knowledge = pp.getKnowledge();
+		BasicKnowledge<BasicActivityOption> knowledge = pp.getKnowledge();
 		assertNotNull(knowledge);
 		assertNotNull(knowledge.getDescription());
 		assertNotNull(knowledge.getActivities());
 		assertEquals(2, knowledge.getActivities().size());
-		BasicActivity activity = knowledge.getActivities().get(0);
+		BasicActivityOption activity = knowledge.getActivities().get(0);
 		assertNotNull(activity);
-		assertEquals(Integer.valueOf(4), activity.getFrequency());
 		assertNotNull(activity.getLocation());
 		assertEquals(this.id666, activity.getLocation().getId());
 		assertEquals(LocationType.FACILITY, activity.getLocation().getLocationType());
@@ -241,7 +240,6 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 
 		activity = knowledge.getActivities().get(1);
 		assertNotNull(activity);
-		assertNull(activity.getFrequency());
 		assertNotNull(activity.getLocation());
 		assertNotNull(activity.getLocation().getId());
 		assertEquals(this.id666, activity.getLocation().getId());

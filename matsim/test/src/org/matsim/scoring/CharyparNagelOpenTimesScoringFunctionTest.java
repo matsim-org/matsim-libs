@@ -23,12 +23,12 @@ package org.matsim.scoring;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.config.Config;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.PersonImpl;
@@ -55,13 +55,13 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		Coord defaultCoord = new CoordImpl(0.0, 0.0);
 		Facility testFacility = facilities.createFacility(new IdImpl(0), defaultCoord);
 
-		Activity noWedAndWkDay = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.UNUSED_OPENTIME_ACTIVITY_TYPE);
+		ActivityOption noWedAndWkDay = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.UNUSED_OPENTIME_ACTIVITY_TYPE);
 		noWedAndWkDay.addOpeningTime(new OpeningTime(DayType.fri, 8.0 * 3600, 16.0 * 3600));
 
-		Activity wkdayActivity = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.ONE_WKDAY_ACTIVITY_TYPE);
+		ActivityOption wkdayActivity = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.ONE_WKDAY_ACTIVITY_TYPE);
 		wkdayActivity.addOpeningTime(new OpeningTime(DayType.wkday, 7.5 * 3600, 18.0 * 3600));
 
-		Activity wednesdayActivity = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.TWO_WEDNESDAY_ACTIVITY_TYPE);
+		ActivityOption wednesdayActivity = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.TWO_WEDNESDAY_ACTIVITY_TYPE);
 		wednesdayActivity.addOpeningTime(new OpeningTime(DayType.wed, 6.0 * 3600, 11.0 * 3600));
 		wednesdayActivity.addOpeningTime(new OpeningTime(DayType.wed, 13.0 * 3600, 19.0 * 3600));
 		// this one should be ignored

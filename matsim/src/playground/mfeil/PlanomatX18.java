@@ -28,11 +28,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
-import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
@@ -162,8 +162,8 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		ArrayList<PlanomatXPlan> solution13				= new ArrayList<PlanomatXPlan>();
 		ArrayList<PlanomatXPlan> solutionLong			= new ArrayList<PlanomatXPlan>();
 		boolean warningTabu;
-		ArrayList<Activity> primActs					= plan.getPerson().getKnowledge().getActivities(true);
-		ArrayList<Activity> actTypes					= plan.getPerson().getKnowledge().getActivities();
+		ArrayList<ActivityOption> primActs					= plan.getPerson().getKnowledge().getActivities(true);
+		ArrayList<ActivityOption> actTypes					= plan.getPerson().getKnowledge().getActivities();
 		
 		/*
 		double [] xs;
@@ -244,7 +244,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	//	stream.println("0\t"+neighbourhood[NEIGHBOURHOOD_SIZE].getScore());
 	//	ys[0]=neighbourhood[NEIGHBOURHOOD_SIZE].getScore();
 		
-		// TODO muss dann wieder raus! Nur für Planomat!
+		// TODO muss dann wieder raus! Nur fï¿½r Planomat!
 		plan.setScore(scorer.getScore(plan));
 		double bestScore = plan.getScore();
 		scoreStat.add(bestScore);
@@ -452,7 +452,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	//////////////////////////////////////////////////////////////////////
 	
 	public void createNeighbourhood (PlanomatXPlan [] neighbourhood, int[][]infoOnNeighbourhood, 
-			ArrayList<Activity> actTypes, ArrayList<Activity> primActs) {
+			ArrayList<ActivityOption> actTypes, ArrayList<ActivityOption> primActs) {
 		
 		if (neighbourhood[0].getActsLegs().size()>=5){
 			int neighbourPos;
@@ -487,7 +487,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			
 	
 	
-	public int[] changeOrder (PlanomatXPlan basePlan, int [] positions, ArrayList<Activity> primActs){
+	public int[] changeOrder (PlanomatXPlan basePlan, int [] positions, ArrayList<ActivityOption> primActs){
 	
 		ArrayList<Object> actslegs = basePlan.getActsLegs();
 		
@@ -525,7 +525,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	}
 	
 	public int[] changeNumber (PlanomatXPlan basePlan, double weight, int [] positions, int [] actsToBeAdded, 
-			ArrayList<Activity> actTypes, ArrayList<Activity> primActs){
+			ArrayList<ActivityOption> actTypes, ArrayList<ActivityOption> primActs){
 				
 		if(MatsimRandom.random.nextDouble()>=weight){
 			
@@ -608,7 +608,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	}
 	
 	
-	private int[] changeNumberShortPlan (PlanomatXPlan basePlan, int []position, int [] actsToBeAdded, ArrayList<Activity> actTypes){
+	private int[] changeNumberShortPlan (PlanomatXPlan basePlan, int []position, int [] actsToBeAdded, ArrayList<ActivityOption> actTypes){
 		
 		if (position[0]==-1) return (new int[]{1,0,0});
 		if (basePlan.getActsLegs().size()==1){
@@ -656,7 +656,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	
 	
 	public int[] changeType (PlanomatXPlan basePlan, int [] position, int[]actsToBeChanged, 
-			ArrayList<Activity> actTypes, ArrayList<Activity> primActs){
+			ArrayList<ActivityOption> actTypes, ArrayList<ActivityOption> primActs){
 		
 		// NEW NEW NEW NEW NEW NEW NEW NEW NE
 		OuterLoop:
@@ -873,7 +873,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	
 	
 	/* Inserts an activity of random type at the given position with the given type of act (but checks whether type is allowed)*/
-	private void insertAct (int position, int [] actToBeAdded, PlanomatXPlan basePlan, ArrayList<Activity> actTypes){
+	private void insertAct (int position, int [] actToBeAdded, PlanomatXPlan basePlan, ArrayList<ActivityOption> actTypes){
 		
 		ArrayList<Object> actslegs = basePlan.getActsLegs();
 		//Act actHelp = new Act ((Act)(actslegs.get((position*2)-2))); //changed the actHelp position to the act "behind" the gap because of conflict with location choice (would otherwise see it as primary activity)
@@ -915,7 +915,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	
 	// NEW NEW NEW NEW NEW NEW NEW NEW NEW
 	/* Checks whether an act is primary*/
-	public boolean checkPrimary (Act act, ArrayList<Activity> primActs){
+	public boolean checkPrimary (Act act, ArrayList<ActivityOption> primActs){
 		
 		for (int i = 0; i<primActs.size();i++){
 			if (act.getFacilityId().equals(primActs.get(i).getFacility().getId())	&&	act.getType().equals((primActs.get(i)).getType())){

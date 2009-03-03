@@ -26,14 +26,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.controler.ScenarioData;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -81,7 +81,7 @@ public class ScenarioCut {
 		Set<Id> toRemove = new HashSet<Id>();
 		for (Person person : population.getPersons().values()) {
 			if (person.getKnowledge() != null) {
-				for (Activity a : person.getKnowledge().getActivities()) {
+				for (ActivityOption a : person.getKnowledge().getActivities()) {
 					Facility f = a.getFacility();
 					if (!isInside(f)) { toRemove.add(person.getId()); break; }
 				}

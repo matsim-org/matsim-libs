@@ -1,6 +1,5 @@
 package org.matsim.interfaces.core.v01;
 
-import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.BasicAct;
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.interfaces.basic.v01.Id;

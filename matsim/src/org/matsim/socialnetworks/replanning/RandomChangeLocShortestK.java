@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.facilities.Activity;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -124,7 +124,7 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 
 //			Pick a random ACTIVITY of this type from knowledge
 
-			List<Activity> actList = k.getActivities(factype);
+			List<ActivityOption> actList = k.getActivities(factype);
 			Facility fFromKnowledge = actList.get(MatsimRandom.random.nextInt( actList.size())).getFacility();
 
 //			And replace the activity in the chain with it (only changes the facility)

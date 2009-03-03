@@ -24,10 +24,10 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
@@ -195,12 +195,12 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 					String act_type = at_it.next();
 					this.handler.startActivity(act_type,this.out);
 					// locations (primary)
-					for (Activity a : k.getActivities(act_type,true)) {
+					for (ActivityOption a : k.getActivities(act_type,true)) {
 						this.handler.startPrimaryLocation(a,this.out);
 						this.handler.endPrimaryLocation(this.out);
 					}
 					// locations (secondary)
-					for (Activity a : k.getActivities(act_type,false)) {
+					for (ActivityOption a : k.getActivities(act_type,false)) {
 						this.handler.startSecondaryLocation(a,this.out);
 						this.handler.endSecondaryLocation(this.out);
 					}

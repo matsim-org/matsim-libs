@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class BasicKnowledgeImpl implements BasicKnowledge<BasicActivity> {
+public class BasicKnowledgeImpl implements BasicKnowledge<BasicActivityOption> {
 
-	private List<BasicActivity> activities;
+	private List<BasicActivityOption> activities;
 	private String description;
 	
-	public void addActivity(BasicActivity activity) {
+	public void addActivity(BasicActivityOption activity) {
 		if (this.activities == null) {
-			this.activities = new ArrayList<BasicActivity>();
+			this.activities = new ArrayList<BasicActivityOption>();
 		}
 		this.activities.add(activity);
 	}
 
-	public List<BasicActivity> getActivities() {
+	public List<BasicActivityOption> getActivities() {
 		return this.activities;
 	}
 

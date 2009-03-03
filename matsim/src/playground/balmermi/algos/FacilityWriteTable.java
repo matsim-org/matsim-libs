@@ -25,9 +25,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.matsim.facilities.Activity;
-import org.matsim.facilities.Facility;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 
 public class FacilityWriteTable extends AbstractFacilityAlgorithm {
 
@@ -78,9 +78,9 @@ public class FacilityWriteTable extends AbstractFacilityAlgorithm {
 
 	public void run(Facility facility) {
 		try {
-			Iterator<Activity> a_it = facility.getActivities().values().iterator();
+			Iterator<ActivityOption> a_it = facility.getActivities().values().iterator();
 			while (a_it.hasNext()) {
-				Activity a = a_it.next();
+				ActivityOption a = a_it.next();
 				if (a.getType().equals(this.act_type)) {
 					out.write(facility.getId() + "\t" + facility.getCenter().getX() + "\t" + facility.getCenter().getY() + "\t" + a.getCapacity() + "\n");
 				}

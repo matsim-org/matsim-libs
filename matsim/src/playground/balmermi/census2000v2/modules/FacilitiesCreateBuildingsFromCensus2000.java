@@ -26,12 +26,12 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
@@ -117,7 +117,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 				if (f == null) {
 					// create new home facility id
 					f = facilities.createFacility(f_id,coord);
-					Activity act = f.createActivity(CAtts.ACT_HOME);
+					ActivityOption act = f.createActivity(CAtts.ACT_HOME);
 					act.setCapacity(1);
 
 					// store some info
@@ -133,7 +133,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 					}
 
 					// add 1 to capacity
-					Activity act = f.getActivity(CAtts.ACT_HOME);
+					ActivityOption act = f.getActivity(CAtts.ACT_HOME);
 					act.setCapacity(act.getCapacity()+1);
 
 					// store some info

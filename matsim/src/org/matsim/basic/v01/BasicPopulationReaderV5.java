@@ -99,7 +99,7 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 
 	private Map<Id, BasicHousehold> households;
 
-	private List<BasicActivity> currentActivities = new ArrayList<BasicActivity>();
+	private List<BasicActivityOption> currentActivities = new ArrayList<BasicActivityOption>();
 
 	private String currentDescription;
 
@@ -181,16 +181,13 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 			this.currentDescription = content.trim();
 		}
 		else if (PopulationSchemaV5Names.ACTIVITY.equalsIgnoreCase(name)){
-			BasicActivity act = populationBuilder.createActivity(this.currentActType, this.currentlocation);
+			BasicActivityOption act = populationBuilder.createActivity(this.currentActType, this.currentlocation);
 			this.currentActType = null;
 			act.setCapacity(this.currentCapacity);
 			this.currentCapacity = null;
 			if (this.currentOpeningTime != null) {
 				act.addOpeningTime(this.currentOpeningTime);
 				this.currentOpeningTime = null;
-			}
-			if (this.currentFrequency != null) {
-				act.setFrequency(this.currentFrequency);
 			}
 			this.currentActivities.add(act);
 		}

@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Route;
 
 public class TransitRoute {

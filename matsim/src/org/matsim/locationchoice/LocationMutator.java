@@ -25,17 +25,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.NetworkLayer;
@@ -74,11 +75,11 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		Iterator<Facility> fac_it = facilities.iterator();
 		while (fac_it.hasNext()) {
 			Facility f = fac_it.next();
-			TreeMap<String, Activity> activities = f.getActivities();
+			Map<String, ActivityOption> activities = f.getActivities();
 			
-			Iterator<Activity> act_it = activities.values().iterator();
+			Iterator<ActivityOption> act_it = activities.values().iterator();
 			while (act_it.hasNext()) {
-				Activity act = act_it.next();
+				ActivityOption act = act_it.next();
 				
 				if (!trees.containsKey(act.getType())) {
 					trees.put(act.getType(), new TreeMap<Id, Facility>());

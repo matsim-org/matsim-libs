@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -137,7 +137,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 
 		// disthw
 		Coord h_coord = person.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility().getCenter();
-		ArrayList<Activity> prim_acts = new ArrayList<Activity>();
+		ArrayList<ActivityOption> prim_acts = new ArrayList<ActivityOption>();
 		prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W2));
 		prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W3));
 		if (prim_acts.isEmpty()) { model.setDistanceHome2Work(0.0); }

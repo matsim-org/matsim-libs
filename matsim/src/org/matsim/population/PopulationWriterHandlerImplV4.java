@@ -23,10 +23,10 @@ package org.matsim.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Node;
@@ -212,7 +212,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 //		out.write("\t\t\t\t</location>\n");
 //	}
 
-	public void startPrimaryLocation(final Activity activity, final BufferedWriter out) throws IOException {
+	public void startPrimaryLocation(final ActivityOption activity, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<location");
 		out.write(" id=\"" + activity.getFacility().getId() + "\"");
 		out.write(" isPrimary=\"" + "yes" + "\"");
@@ -223,7 +223,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 		out.write("\t\t\t\t</location>\n");
 	}
 
-	public void startSecondaryLocation(final Activity activity, final BufferedWriter out) throws IOException {
+	public void startSecondaryLocation(final ActivityOption activity, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<location");
 		out.write(" id=\"" + activity.getFacility().getId() + "\"");
 		out.write(">\n");
@@ -237,7 +237,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <capacity ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startCapacity(final Activity activtiy, final BufferedWriter out) throws IOException {
+	public void startCapacity(final ActivityOption activtiy, final BufferedWriter out) throws IOException {
 		if (activtiy.getCapacity() != Integer.MAX_VALUE) {
 			out.write("\t\t\t\t\t<capacity");
 			out.write(" value=\"" + activtiy.getCapacity() + "\"");

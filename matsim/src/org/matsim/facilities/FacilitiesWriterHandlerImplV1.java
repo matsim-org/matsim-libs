@@ -24,6 +24,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.basic.v01.BasicOpeningTime;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.misc.Time;
 
 public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
@@ -76,7 +78,7 @@ public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
 	// <activity ... > ... </activity>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startActivity(final Activity activity, final BufferedWriter out) throws IOException {
+	public void startActivity(final ActivityOption activity, final BufferedWriter out) throws IOException {
 		out.write("\t\t<activity");
 		out.write(" type=\"" + activity.getType() + "\"");
 		out.write(">\n");
@@ -90,7 +92,7 @@ public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
 	// <capacity ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startCapacity(final Activity activity, final BufferedWriter out) throws IOException {
+	public void startCapacity(final ActivityOption activity, final BufferedWriter out) throws IOException {
 		if (activity.getCapacity() != Integer.MAX_VALUE) {
 			out.write("\t\t\t<capacity");
 			out.write(" value=\"" + activity.getCapacity() + "\"");

@@ -29,6 +29,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
@@ -51,7 +53,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 
 	private final Facilities facilities;
 	private Facility currfacility = null;
-	private Activity curractivity = null;
+	private ActivityOption curractivity = null;
 	
 	public FacilitiesReaderMatsimV1(final Facilities facilities) {
 		this.facilities = facilities;

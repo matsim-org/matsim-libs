@@ -30,7 +30,7 @@ import org.matsim.interfaces.basic.v01.BasicLocation;
 /**
  * @author dgrether
  */
-public class BasicActivityImpl implements BasicActivity {
+public class BasicActivityImpl implements BasicActivityOption {
 	
 	private Integer capacity = null;
 	private BasicLocation location;

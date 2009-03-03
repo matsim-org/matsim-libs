@@ -25,9 +25,9 @@ import java.util.Set;
 
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.utils.misc.Time;
 

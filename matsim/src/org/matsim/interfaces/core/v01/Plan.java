@@ -2,7 +2,6 @@ package org.matsim.interfaces.core.v01;
 
 import java.util.ArrayList;
 
-import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Coord;

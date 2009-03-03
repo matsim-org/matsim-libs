@@ -24,9 +24,9 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Node;
@@ -156,13 +156,13 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <location ... > ... </location>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPrimaryLocation(final Activity activity, final BufferedWriter out) throws IOException {
+	public void startPrimaryLocation(final ActivityOption activity, final BufferedWriter out) throws IOException {
 	}
 
 	public void endPrimaryLocation(final BufferedWriter out) throws IOException {
 	}
 
-	public void startSecondaryLocation(final Activity activity, final BufferedWriter out) throws IOException {
+	public void startSecondaryLocation(final ActivityOption activity, final BufferedWriter out) throws IOException {
 	}
 
 	public void endSecondaryLocation(final BufferedWriter out) throws IOException {
@@ -172,7 +172,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <capacity ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startCapacity(final Activity activtiy, final BufferedWriter out) throws IOException {
+	public void startCapacity(final ActivityOption activtiy, final BufferedWriter out) throws IOException {
 	}
 
 	public void endCapacity(final BufferedWriter out) throws IOException {

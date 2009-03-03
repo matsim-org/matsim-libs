@@ -20,7 +20,7 @@
 
 package org.matsim.facilities.algorithms;
 
-import org.matsim.facilities.Facility;
+import org.matsim.interfaces.core.v01.Facility;
 
 public interface FacilityAlgorithm {
 	public void run(Facility facility);

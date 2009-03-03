@@ -29,12 +29,12 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.facilities.Facility;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.world.Location;
 
 import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
@@ -76,16 +76,16 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 		Map<DayType, SortedSet<BasicOpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<BasicOpeningTime>>();
 
 		ArrayList<Location> closestShops = this.shopsOf2005.getNearestLocations(facility.getCenter());
-		Activity shopsOf2005ShopAct = ((Facility) closestShops.get(0)).getActivity(FacilitiesProductionKTI.ACT_TYPE_SHOP);
+		ActivityOption shopsOf2005ShopAct = ((Facility) closestShops.get(0)).getActivity(FacilitiesProductionKTI.ACT_TYPE_SHOP);
 		if (shopsOf2005ShopAct != null) {
 			closestShopOpentimes = shopsOf2005ShopAct.getOpentimes();
 		} else {
 			log.info("shop activity object of closest shop facility is null.");
 		}
-		TreeMap<String, Activity> activities = facility.getActivities();
+		Map<String, ActivityOption> activities = facility.getActivities();
 
 		// remove all existing opentimes
-		for (Activity a : activities.values()) {
+		for (ActivityOption a : activities.values()) {
 			a.setOpentimes(new TreeMap<DayType, SortedSet<BasicOpeningTime>>());
 		}
 

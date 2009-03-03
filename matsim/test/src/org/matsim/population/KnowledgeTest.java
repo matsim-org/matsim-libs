@@ -26,9 +26,9 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -45,32 +45,32 @@ public class KnowledgeTest extends MatsimTestCase {
 	private static final String S = "s";
 	private static final String L = "l";
 	
-	private static final ArrayList<Activity> actsF1 = new ArrayList<Activity>();
-	private static final ArrayList<Activity> actsF2 = new ArrayList<Activity>();
+	private static final ArrayList<ActivityOption> actsF1 = new ArrayList<ActivityOption>();
+	private static final ArrayList<ActivityOption> actsF2 = new ArrayList<ActivityOption>();
 
-	private static final ArrayList<Activity> actsPrim = new ArrayList<Activity>();
-	private static final ArrayList<Activity> actsSec = new ArrayList<Activity>();
-	private static final ArrayList<Activity> actsAll = new ArrayList<Activity>();
+	private static final ArrayList<ActivityOption> actsPrim = new ArrayList<ActivityOption>();
+	private static final ArrayList<ActivityOption> actsSec = new ArrayList<ActivityOption>();
+	private static final ArrayList<ActivityOption> actsAll = new ArrayList<ActivityOption>();
 
-	private static final ArrayList<Activity> actsHPrim = new ArrayList<Activity>();
-	private static final ArrayList<Activity> actsHSec = new ArrayList<Activity>();
-	private static final ArrayList<Activity> actsHAll = new ArrayList<Activity>();
+	private static final ArrayList<ActivityOption> actsHPrim = new ArrayList<ActivityOption>();
+	private static final ArrayList<ActivityOption> actsHSec = new ArrayList<ActivityOption>();
+	private static final ArrayList<ActivityOption> actsHAll = new ArrayList<ActivityOption>();
 
-	private static final ArrayList<Activity> actsWPrim = new ArrayList<Activity>();
-	private static final ArrayList<Activity> actsWSec = new ArrayList<Activity>();
-	private static final ArrayList<Activity> actsWAll = new ArrayList<Activity>();
+	private static final ArrayList<ActivityOption> actsWPrim = new ArrayList<ActivityOption>();
+	private static final ArrayList<ActivityOption> actsWSec = new ArrayList<ActivityOption>();
+	private static final ArrayList<ActivityOption> actsWAll = new ArrayList<ActivityOption>();
 
-	private static final ArrayList<Activity> actsEPrim = new ArrayList<Activity>();
-	private static final ArrayList<Activity> actsESec = new ArrayList<Activity>();
-	private static final ArrayList<Activity> actsEAll = new ArrayList<Activity>();
+	private static final ArrayList<ActivityOption> actsEPrim = new ArrayList<ActivityOption>();
+	private static final ArrayList<ActivityOption> actsESec = new ArrayList<ActivityOption>();
+	private static final ArrayList<ActivityOption> actsEAll = new ArrayList<ActivityOption>();
 
-	private static final ArrayList<Activity> actsSPrim = new ArrayList<Activity>();
-	private static final ArrayList<Activity> actsSSec = new ArrayList<Activity>();
-	private static final ArrayList<Activity> actsSAll = new ArrayList<Activity>();
+	private static final ArrayList<ActivityOption> actsSPrim = new ArrayList<ActivityOption>();
+	private static final ArrayList<ActivityOption> actsSSec = new ArrayList<ActivityOption>();
+	private static final ArrayList<ActivityOption> actsSAll = new ArrayList<ActivityOption>();
 
-	private static final ArrayList<Activity> actsLPrim = new ArrayList<Activity>();
-	private static final ArrayList<Activity> actsLSec = new ArrayList<Activity>();
-	private static final ArrayList<Activity> actsLAll = new ArrayList<Activity>();
+	private static final ArrayList<ActivityOption> actsLPrim = new ArrayList<ActivityOption>();
+	private static final ArrayList<ActivityOption> actsLSec = new ArrayList<ActivityOption>();
+	private static final ArrayList<ActivityOption> actsLAll = new ArrayList<ActivityOption>();
 
 	private static final Set<String> typesPrim = new TreeSet<String>();
 	private static final Set<String> typesSec = new TreeSet<String>();

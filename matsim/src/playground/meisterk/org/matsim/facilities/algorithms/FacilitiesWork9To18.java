@@ -25,10 +25,10 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.facilities.OpeningTime;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.geometry.CoordImpl;
 
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;
@@ -50,7 +50,7 @@ public class FacilitiesWork9To18 {
 		Integer reli; 
 		String X, Y;
 		Facility f;
-		Activity a;
+		ActivityOption a;
 
 		System.out.println("  creating EnterpriseCensus object... ");
 		this.myCensus = new EnterpriseCensus();

@@ -22,8 +22,8 @@ package org.matsim.socialnetworks.interactions;
 
 import java.util.List;
 
-import org.matsim.facilities.Activity;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.Knowledge;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
@@ -56,17 +56,17 @@ public class PersonExchangeKnowledge {
 
 //		Get a random facility (activity--> facility)
 		//from Person 2's knowledge and add it to Person 1's
-		List<Activity> act2List = k2.getActivities(facType);
+		List<ActivityOption> act2List = k2.getActivities(facType);
 		if(act2List.size()>=1){
-			Activity activity2=act2List.get(MatsimRandom.random.nextInt( act2List.size()));
+			ActivityOption activity2=act2List.get(MatsimRandom.random.nextInt( act2List.size()));
 			k1.getMentalMap().addActivity(activity2);
 		}
 
 //		If person2 has an edge pointed toward person1, let p1 share information with p2
 		if(p2.getKnowledge().getEgoNet().knows(p1)){
-			List<Activity> act1List = k1.getActivities(facType);
+			List<ActivityOption> act1List = k1.getActivities(facType);
 			if(act1List.size()>=1){
-				Activity activity1=act1List.get(MatsimRandom.random.nextInt( act1List.size()));
+				ActivityOption activity1=act1List.get(MatsimRandom.random.nextInt( act1List.size()));
 				k2.getMentalMap().addActivity(activity1);
 			}
 		}

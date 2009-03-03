@@ -21,9 +21,9 @@
 package org.matsim.facilities.algorithms;
 
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Facility;
 
 public class FacilitiesRandomizeHectareCoordinates {
 

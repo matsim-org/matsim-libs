@@ -27,15 +27,15 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicPopulation;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -83,7 +83,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private ActivitySpace curractspace = null;
 	private String curracttype = null;
 	private Facility currfacility = null;
-	private Activity curractivity = null;
+	private ActivityOption curractivity = null;
 	private Plan currplan = null;
 	private Act curract = null;
 	private Leg currleg = null;

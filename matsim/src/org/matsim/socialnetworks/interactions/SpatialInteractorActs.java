@@ -26,10 +26,10 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -47,7 +47,7 @@ public class SpatialInteractorActs {
 
 	String interaction_type = Gbl.getConfig().socnetmodule().getSocNetInteractor2();
 
-	LinkedHashMap<Activity,ArrayList<Person>> activityMap;
+	LinkedHashMap<ActivityOption,ArrayList<Person>> activityMap;
 	LinkedHashMap<Act,ArrayList<Person>> actMap=new LinkedHashMap<Act,ArrayList<Person>>();
 
 	public SpatialInteractorActs(SocialNetwork snet) {
@@ -80,7 +80,7 @@ public class SpatialInteractorActs {
 
 		System.out.println(" "+ this.getClass()+" Looking through plans and tracking which Persons could interact "+iteration);
 
-			activityMap = new LinkedHashMap<Activity,ArrayList<Person>>(); 
+			activityMap = new LinkedHashMap<ActivityOption,ArrayList<Person>>(); 
 			activityMap= makeActivityMap(plans);
 
 		// Activity-(facility)-based interactions
@@ -118,9 +118,9 @@ public class SpatialInteractorActs {
 	 * @param plans
 	 * @return
 	 */
-	private LinkedHashMap<Activity,ArrayList<Person>> makeActivityMap(Population plans){
+	private LinkedHashMap<ActivityOption,ArrayList<Person>> makeActivityMap(Population plans){
 		System.out.println("Making a new activity map for spatial interactions");
-		LinkedHashMap<Activity,ArrayList<Person>> activityMap=new LinkedHashMap<Activity,ArrayList<Person>>();
+		LinkedHashMap<ActivityOption,ArrayList<Person>> activityMap=new LinkedHashMap<ActivityOption,ArrayList<Person>>();
 		Iterator<Person> p1Iter=plans.iterator();
 		while(p1Iter.hasNext()){
 			Plan plan1= ((Person) p1Iter.next()).getSelectedPlan();
@@ -128,7 +128,7 @@ public class SpatialInteractorActs {
 			ActIterator a1Iter =plan1.getIteratorAct();
 			while(a1Iter.hasNext()){
 				Act act1 = (Act) a1Iter.next();
-				Activity activity1=act1.getFacility().getActivity(act1.getType());
+				ActivityOption activity1=act1.getFacility().getActivity(act1.getType());
 				ArrayList<Person> actList=new ArrayList<Person>();
 
 				if(!activityMap.keySet().contains(activity1)){
@@ -205,10 +205,10 @@ public class SpatialInteractorActs {
 	private void makeSocialLinkToAll(LinkedHashMap<String, Double> rndEncounterProbability, int iteration) {
 //		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
 //			Activity myActivity=myActivities.nextElement();
-			Set<Activity> myActivities=activityMap.keySet();
-			Iterator<Activity> ait= myActivities.iterator();
+			Set<ActivityOption> myActivities=activityMap.keySet();
+			Iterator<ActivityOption> ait= myActivities.iterator();
 			while(ait.hasNext()) {
-				Activity myActivity=(Activity) ait.next();
+				ActivityOption myActivity=(ActivityOption) ait.next();
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			// Go through the list of Persons and for each one pick one friend randomly
 			// Must be double loop
@@ -267,10 +267,10 @@ public class SpatialInteractorActs {
 
 //		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
 //			Activity myActivity=myActivities.nextElement();
-			Set<Activity> myActivities=activityMap.keySet();
-			Iterator<Activity> ait= myActivities.iterator();
+			Set<ActivityOption> myActivities=activityMap.keySet();
+			Iterator<ActivityOption> ait= myActivities.iterator();
 			while(ait.hasNext()) {
-				Activity myActivity=(Activity) ait.next();
+				ActivityOption myActivity=(ActivityOption) ait.next();
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			
 			// Go through the list of Persons and for each one pick one friend randomly
@@ -321,10 +321,10 @@ public class SpatialInteractorActs {
 		
 //		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
 //			Activity myActivity=myActivities.nextElement();
-			Set<Activity> myActivities=activityMap.keySet();
-			Iterator<Activity> ait= myActivities.iterator();
+			Set<ActivityOption> myActivities=activityMap.keySet();
+			Iterator<ActivityOption> ait= myActivities.iterator();
 			while(ait.hasNext()) {
-				Activity myActivity=(Activity) ait.next();
+				ActivityOption myActivity=(ActivityOption) ait.next();
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			Iterator<Person> vIt1=visitors.iterator();
 			while(vIt1.hasNext()){
@@ -420,10 +420,10 @@ public class SpatialInteractorActs {
 			int iteration) {
 
 //		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
-		Set<Activity> myActivities=activityMap.keySet();
-		Iterator<Activity> ait= myActivities.iterator();
+		Set<ActivityOption> myActivities=activityMap.keySet();
+		Iterator<ActivityOption> ait= myActivities.iterator();
 		while(ait.hasNext()) {
-			Activity myActivity=(Activity) ait.next();
+			ActivityOption myActivity=(ActivityOption) ait.next();
 //			Activity myActivity=myActivities.nextElement();
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			Iterator<Person> vIt1=visitors.iterator();

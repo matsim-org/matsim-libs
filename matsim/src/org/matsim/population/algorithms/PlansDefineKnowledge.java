@@ -23,10 +23,10 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.Knowledge;
@@ -43,13 +43,13 @@ public class PlansDefineKnowledge {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		// get home, work and other activities
-		ArrayList<Activity> home_acts = new ArrayList<Activity>();
-		ArrayList<Activity> work_acts = new ArrayList<Activity>();
-		ArrayList<Activity> other_acts = new ArrayList<Activity>();
+		ArrayList<ActivityOption> home_acts = new ArrayList<ActivityOption>();
+		ArrayList<ActivityOption> work_acts = new ArrayList<ActivityOption>();
+		ArrayList<ActivityOption> other_acts = new ArrayList<ActivityOption>();
 		for (Facility f : this.facilities.getFacilities().values()) {
-			Iterator<Activity> a_it = f.getActivities().values().iterator();
+			Iterator<ActivityOption> a_it = f.getActivities().values().iterator();
 			while (a_it.hasNext()) {
-				Activity a = a_it.next();
+				ActivityOption a = a_it.next();
 				if (a.getType().equals("home")) { home_acts.add(a); }
 				else if (a.getType().equals("work")) { work_acts.add(a); }
 				else { other_acts.add(a); }

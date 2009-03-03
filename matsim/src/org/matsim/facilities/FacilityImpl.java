@@ -28,6 +28,8 @@ import org.matsim.basic.v01.LocationType;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -38,22 +40,22 @@ import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
-public class Facility extends AbstractLocation {
+public class FacilityImpl extends AbstractLocation implements Facility {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final static Logger log = Logger.getLogger(Facility.class);
+	private final static Logger log = Logger.getLogger(FacilityImpl.class);
 	
-	private final TreeMap<String, Activity> activities = new TreeMap<String, Activity>();
+	private final TreeMap<String, ActivityOption> activities = new TreeMap<String, ActivityOption>();
 	private String desc = null;
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	protected Facility(final Facilities layer, final Id id, final Coord center) {
+	protected FacilityImpl(final Facilities layer, final Id id, final Coord center) {
 		super(layer,id,center);
 	}
 
@@ -70,12 +72,12 @@ public class Facility extends AbstractLocation {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Activity createActivity(final String type) {
+	public final ActivityOption createActivity(final String type) {
 		if (this.activities.containsKey(type)) {
 			Gbl.errorMsg(this + "[type=" + type + " already exists]");
 		}
 		String type2 = type.intern();
-		Activity a = new Activity(type2, this);
+		ActivityOption a = new ActivityOptionImpl(type2, this);
 		this.activities.put(type2, a);
 		return a;
 	}
@@ -153,11 +155,11 @@ public class Facility extends AbstractLocation {
 		return this.desc;
 	}
 	
-	public final TreeMap<String,Activity> getActivities() {
+	public final TreeMap<String,ActivityOption> getActivities() {
 		return this.activities;
 	}
 
-	public final Activity getActivity(final String type) {
+	public final ActivityOption getActivity(final String type) {
 		return this.activities.get(type);
 	}
 

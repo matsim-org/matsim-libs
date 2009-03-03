@@ -26,10 +26,10 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
-import org.matsim.facilities.Activity;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
@@ -143,7 +143,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		ArrayList<Object> al = out.getActsLegs();
 		
 		// NEW NEW NEW NEW NEW NEW NEW
-		ArrayList<Activity> primActs = new ArrayList<Activity>(out.getPerson().getKnowledge().getActivities(true));
+		ArrayList<ActivityOption> primActs = new ArrayList<ActivityOption>(out.getPerson().getKnowledge().getActivities(true));
 		
 		// TODO Check what is better! Condition that home activity is always first and last activity in day plan
 		for (int i=0;i<primActs.size();i++){

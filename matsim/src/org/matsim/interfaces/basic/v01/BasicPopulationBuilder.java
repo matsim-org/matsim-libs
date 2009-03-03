@@ -49,10 +49,10 @@ public interface BasicPopulationBuilder {
 	BasicPlan createPlan(BasicPerson person, boolean selected);
 
 	@Deprecated // to be clarified: this generates an activity opportunity, not an "act"!!!
-	BasicActivity createActivity(String type, BasicLocation currentlocation);
+	BasicActivityOption createActivity(String type, BasicLocation currentlocation);
 
 	@Deprecated // to be clarified
-	BasicKnowledge createKnowledge(List<BasicActivity> currentActivities);
+	BasicKnowledge createKnowledge(List<BasicActivityOption> currentActivities);
 
 //	BasicAct createAct(BasicPlan plan, String string, Coord coord);
 

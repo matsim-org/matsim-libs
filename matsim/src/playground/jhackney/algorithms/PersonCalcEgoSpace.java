@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.Knowledge;
@@ -97,14 +97,14 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 		}
 		
 		// make an arraylist called activities of all the home activities of the ego and his alters
-		ArrayList<Activity> activities=new ArrayList<Activity>();
+		ArrayList<ActivityOption> activities=new ArrayList<ActivityOption>();
 		// use morning home, the first act in each selected plan
 		Iterator<Person> e_it=egoNet.getAlters().iterator();
 		while(e_it.hasNext()){
-			activities.add( (Activity) ((Act)(e_it.next().getSelectedPlan().getActsLegs().get(0))).getFacility().getActivity("home"));
+			activities.add( (ActivityOption) ((Act)(e_it.next().getSelectedPlan().getActsLegs().get(0))).getFacility().getActivity("home"));
 		}
 		
-		Iterator<Activity> a_it = null;
+		Iterator<ActivityOption> a_it = null;
 		// get all home activities of the alters and the ego
 		a_it = activities.iterator();
 		

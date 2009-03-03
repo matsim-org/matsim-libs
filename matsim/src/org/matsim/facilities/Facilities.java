@@ -31,6 +31,8 @@ import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.world.Layer;
 
 public class Facilities extends Layer implements Iterable<Facility> {
@@ -77,7 +79,7 @@ public class Facilities extends Layer implements Iterable<Facility> {
 		if (this.locations.containsKey(id)) {
 			Gbl.errorMsg("Facility id=" + id + " already exists.");
 		}
-		Facility f = new Facility(this,id,center);
+		Facility f = new FacilityImpl(this,id,center);
 		this.locations.put(f.getId(),f);
 
 		// show counter
@@ -161,7 +163,7 @@ public class Facilities extends Layer implements Iterable<Facility> {
 		Iterator<? extends Facility> iter = this.getFacilities().values().iterator();
 		while (iter.hasNext()){
 			Facility f = iter.next();
-			TreeMap<String, Activity> a = f.getActivities();
+			Map<String, ActivityOption> a = f.getActivities();
 			if(a.containsKey(act_type)){
 				facs.put(f.getId(),f);
 			}

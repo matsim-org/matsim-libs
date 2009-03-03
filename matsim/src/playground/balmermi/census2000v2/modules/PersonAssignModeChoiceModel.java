@@ -26,12 +26,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -246,7 +246,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			model.setDistanceTour(this.calcTourDistance(act_indices,p));
 			// dist_h_w; // distance between home and work or education facility (in km)
 			Coord h_coord = person.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility().getCenter();
-			ArrayList<Activity> prim_acts = new ArrayList<Activity>();
+			ArrayList<ActivityOption> prim_acts = new ArrayList<ActivityOption>();
 			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W2));
 			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W3));
 			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EKIGA));

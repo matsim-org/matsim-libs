@@ -23,10 +23,10 @@ package playground.balmermi.census2000v2.modules;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 
 public class FacilitiesReduceTypes {
 
@@ -58,12 +58,12 @@ public class FacilitiesReduceTypes {
 		log.info("    running " + this.getClass().getName() + " module...");
 		
 		for (Facility f : facilities.getFacilities().values()) {
-			TreeMap<String,Activity> h_map = new TreeMap<String, Activity>();
-			TreeMap<String,Activity> w_map = new TreeMap<String, Activity>();
-			TreeMap<String,Activity> e_map = new TreeMap<String, Activity>();
-			TreeMap<String,Activity> s_map = new TreeMap<String, Activity>();
-			TreeMap<String,Activity> l_map = new TreeMap<String, Activity>();
-			TreeMap<String,Activity> t_map = new TreeMap<String, Activity>();
+			TreeMap<String,ActivityOption> h_map = new TreeMap<String, ActivityOption>();
+			TreeMap<String,ActivityOption> w_map = new TreeMap<String, ActivityOption>();
+			TreeMap<String,ActivityOption> e_map = new TreeMap<String, ActivityOption>();
+			TreeMap<String,ActivityOption> s_map = new TreeMap<String, ActivityOption>();
+			TreeMap<String,ActivityOption> l_map = new TreeMap<String, ActivityOption>();
+			TreeMap<String,ActivityOption> t_map = new TreeMap<String, ActivityOption>();
 			for (String t : f.getActivities().keySet()) {
 				if (t.equals("home")) {
 					h_map.put(t,f.getActivity(t));
@@ -103,15 +103,15 @@ public class FacilitiesReduceTypes {
 			f.setDesc(desc.toString());
 			
 			if (!s_map.isEmpty()) {
-				Activity old_act = s_map.values().iterator().next();
-				Activity new_act = f.createActivity("shop");
+				ActivityOption old_act = s_map.values().iterator().next();
+				ActivityOption new_act = f.createActivity("shop");
 				new_act.setCapacity(old_act.getCapacity());
 				new_act.setOpentimes(old_act.getOpentimes());
 				f.getActivities().remove(old_act.getType());
 			}
 			if (!l_map.isEmpty()) {
-				Activity old_act = l_map.values().iterator().next();
-				Activity new_act = f.createActivity("leisure");
+				ActivityOption old_act = l_map.values().iterator().next();
+				ActivityOption new_act = f.createActivity("leisure");
 				new_act.setCapacity(old_act.getCapacity());
 				new_act.setOpentimes(old_act.getOpentimes());
 				f.getActivities().remove(old_act.getType());

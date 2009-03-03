@@ -24,9 +24,9 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.world.Location;
 import org.matsim.world.World;
 import org.matsim.world.Zone;

@@ -23,6 +23,7 @@ package org.matsim.facilities;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 

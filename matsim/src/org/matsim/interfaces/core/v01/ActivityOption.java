@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MockPassengerAgent.java
+ * ActOption.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,22 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.mocks;
+package org.matsim.interfaces.core.v01;
 
-import org.matsim.interfaces.core.v01.Facility;
+import java.util.Map;
+import java.util.SortedSet;
 
-import playground.marcel.pt.interfaces.PassengerAgent;
+import org.matsim.basic.v01.BasicActivityOption;
+import org.matsim.basic.v01.BasicOpeningTime;
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
 
-public class MockPassengerAgent implements PassengerAgent {
+public interface ActivityOption extends BasicActivityOption {
 
-	public boolean arriveAtStop(final Facility stop) {
-		// TODO [MR] Auto-generated method stub
-		return false;
-	}
+	public boolean containsOpentime(final BasicOpeningTime o);
 
-	public boolean ptLineAvailable() {
-		// TODO [MR] Auto-generated method stub
-		return false;
-	}
+	public void setCapacity(final int capacity);
+
+	public void setOpentimes(Map<DayType, SortedSet<BasicOpeningTime>> opentimes);
+
+	public Facility getFacility();
+
+	public Map<DayType, SortedSet<BasicOpeningTime>> getOpentimes();
 
 }

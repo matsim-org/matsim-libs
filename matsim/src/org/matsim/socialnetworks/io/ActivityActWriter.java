@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.facilities.Activity;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -55,7 +55,7 @@ public class ActivityActWriter {
 
 				for (int j=0;j<actsLegs.size()+1;j=j+2){
 					Act myAct= (Act) actsLegs.get(j);
-					Activity myActivity=myAct.getFacility().getActivity(myAct.getType());
+					ActivityOption myActivity=myAct.getFacility().getActivity(myAct.getType());
 //					System.out.println(" AAW DEBUG J=: "+j);
 					try {
 						out.write(iter+" "+myPerson.getId()+" "+myActivity.getFacility().getId()+" "+myActivity.getType());

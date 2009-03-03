@@ -22,9 +22,9 @@ package org.matsim.facilities.algorithms;
 
 import java.util.Iterator;
 
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.geometry.CoordImpl;
 
 public class FacilitiesSummary {
@@ -49,9 +49,9 @@ public class FacilitiesSummary {
 			if (f.getCenter().getX() < min_coord.getX()) { min_coord.setX(f.getCenter().getX()); }
 			if (f.getCenter().getY() < min_coord.getY()) { min_coord.setY(f.getCenter().getY()); }
 
-			Iterator<Activity> a_it = f.getActivities().values().iterator();
+			Iterator<ActivityOption> a_it = f.getActivities().values().iterator();
 			while (a_it.hasNext()) {
-				Activity a = a_it.next();
+				ActivityOption a = a_it.next();
 				act_cnt++;
 				if (a.getCapacity() != Integer.MAX_VALUE) {
 					if (a.getType().equals("home")) {

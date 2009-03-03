@@ -25,9 +25,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.ActivitySpaceBean;
@@ -59,7 +59,7 @@ public class PersonDrawActivitySpace extends AbstractPersonAlgorithm {
 	// private methods
 	// ////////////////////////////////////////////////////////////////////
 
-	private final void writeLocations(Activity a, FileWriter fw)
+	private final void writeLocations(ActivityOption a, FileWriter fw)
 			throws IOException {
 		BufferedWriter out = new BufferedWriter(fw);
 		Coord c = a.getFacility().getCenter();
@@ -103,9 +103,9 @@ public class PersonDrawActivitySpace extends AbstractPersonAlgorithm {
 			out_gpl.write("#unset key\n");
 			out_gpl.write("plot \\\n");
 
-			Iterator<Activity> a_it = person.getKnowledge().getActivities().iterator();
+			Iterator<ActivityOption> a_it = person.getKnowledge().getActivities().iterator();
 			while (a_it.hasNext()) {
-				Activity a = a_it.next();
+				ActivityOption a = a_it.next();
 				String at = a.getType();
 
 				if (at.equals("home")) {

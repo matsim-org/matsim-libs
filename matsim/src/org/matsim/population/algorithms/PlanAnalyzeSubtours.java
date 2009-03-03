@@ -23,9 +23,9 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Plan;
 
 /**

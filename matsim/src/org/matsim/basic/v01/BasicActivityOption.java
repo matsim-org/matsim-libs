@@ -27,18 +27,9 @@ import org.matsim.interfaces.basic.v01.BasicLocation;
 /**
  * @author dgrether
  */
-public interface BasicActivity {
+public interface BasicActivityOption {
 	
 	public BasicLocation getLocation();
-	
-	/**
-	 * FIXME [kai] what is the "frequency"?  kai, feb09
-	 * 
-	 * @return ... what?
-	 */
-	public Integer getFrequency();
-	
-	public void setFrequency(Integer freq);
 	
 	public Integer getCapacity();
 	

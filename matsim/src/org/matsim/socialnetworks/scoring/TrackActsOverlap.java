@@ -26,9 +26,9 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -41,7 +41,7 @@ public class TrackActsOverlap {
 
 	SocialNetwork net;
 
-	LinkedHashMap<Activity,ArrayList<Person>> activityMap;
+	LinkedHashMap<ActivityOption,ArrayList<Person>> activityMap;
 	static final private Logger log = Logger.getLogger(TrackActsOverlap.class);
 
 	/**
@@ -71,7 +71,7 @@ public class TrackActsOverlap {
 
 		log.info(" Looking through plans and mapping social interactions for scoring "+iteration);
 
-		activityMap = new LinkedHashMap<Activity,ArrayList<Person>>(); 
+		activityMap = new LinkedHashMap<ActivityOption,ArrayList<Person>>(); 
 		activityMap= makeActivityMap(plans);
 
 		log.info("...finished");
@@ -90,7 +90,7 @@ public class TrackActsOverlap {
 	 * @param plans
 	 * @return activityMap
 	 */
-	private LinkedHashMap<Activity,ArrayList<Person>> makeActivityMap(Population plans){
+	private LinkedHashMap<ActivityOption,ArrayList<Person>> makeActivityMap(Population plans){
 		log.info("Making a new activity map for spatial scores");
 //		LinkedHashMap<Activity,ArrayList<Person>> activityMap=new LinkedHashMap<Activity,ArrayList<Person>>();
 		Iterator<Person> p1Iter=plans.iterator();
@@ -100,7 +100,7 @@ public class TrackActsOverlap {
 			ActIterator a1Iter =plan1.getIteratorAct();
 			while(a1Iter.hasNext()){
 				Act act1 = (Act) a1Iter.next();
-				Activity activity1=act1.getFacility().getActivity(act1.getType());
+				ActivityOption activity1=act1.getFacility().getActivity(act1.getType());
 				ArrayList<Person> actList=new ArrayList<Person>();
 
 				if(!activityMap.keySet().contains(activity1)){
@@ -142,7 +142,7 @@ public class TrackActsOverlap {
 		ActIterator ait=plan.getIteratorAct();
 		while(ait.hasNext()){
 			Act act = (Act) ait.next();
-			Activity myActivity=act.getFacility().getActivity(act.getType());
+			ActivityOption myActivity=act.getFacility().getActivity(act.getType());
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			// Go through the list of Persons and for each one pick one friend randomly
 			// Must be double loop
@@ -176,7 +176,7 @@ public class TrackActsOverlap {
 		Person p1=plan.getPerson();
 		while(ait.hasNext()){
 			Act act1 = (Act) ait.next();
-			Activity myActivity=act1.getFacility().getActivity(act1.getType());
+			ActivityOption myActivity=act1.getFacility().getActivity(act1.getType());
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			if(!activityMap.keySet().contains(myActivity)){
 				Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
@@ -228,7 +228,7 @@ public class TrackActsOverlap {
 		Person p1=plan.getPerson();
 		while(ait.hasNext()){
 			Act act1 = (Act) ait.next();
-			Activity myActivity=act1.getFacility().getActivity(act1.getType());
+			ActivityOption myActivity=act1.getFacility().getActivity(act1.getType());
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			if(!activityMap.keySet().contains(myActivity)){
 				Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
@@ -287,7 +287,7 @@ public class TrackActsOverlap {
 			double totalTimeWithFriends=0;
 			
 			Act act1 = (Act) ait.next();
-			Activity myActivity=act1.getFacility().getActivity(act1.getType());
+			ActivityOption myActivity=act1.getFacility().getActivity(act1.getType());
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			if(!activityMap.keySet().contains(myActivity)){
 				Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");

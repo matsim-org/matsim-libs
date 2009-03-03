@@ -22,7 +22,7 @@ package playground.marcel.pt.fares;
 
 import java.util.Map;
 
-import org.matsim.facilities.Facility;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.collections.Tuple;
 
 import playground.marcel.pt.interfaces.TransitFares;

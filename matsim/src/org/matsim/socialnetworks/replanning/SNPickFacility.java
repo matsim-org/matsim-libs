@@ -6,11 +6,11 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.facilities.Activity;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -127,11 +127,11 @@ public class SNPickFacility implements PlanAlgorithm {
 //			Get agent's knowledge
 			Knowledge k = person.getKnowledge();
 
-			LinkedHashMap<Activity,Integer> facMap=new LinkedHashMap<Activity,Integer>();
-			ArrayList<Activity> facList=k.getActivities(factype);
-			Iterator<Activity> fIt=facList.iterator();
+			LinkedHashMap<ActivityOption,Integer> facMap=new LinkedHashMap<ActivityOption,Integer>();
+			ArrayList<ActivityOption> facList=k.getActivities(factype);
+			Iterator<ActivityOption> fIt=facList.iterator();
 			while(fIt.hasNext()){
-				Activity activity=fIt.next();
+				ActivityOption activity=fIt.next();
 				if(!(facMap.containsKey(activity))){
 					facMap.put(activity,1);
 				}else{
@@ -155,7 +155,7 @@ public class SNPickFacility implements PlanAlgorithm {
 				fIt=null;
 				fIt=facList.iterator();
 				while(fIt.hasNext()){
-					Activity activity=fIt.next();
+					ActivityOption activity=fIt.next();
 					if(!(facMap.keySet().contains(activity))){
 						facMap.put(activity,1);
 					}else{
@@ -222,7 +222,7 @@ public class SNPickFacility implements PlanAlgorithm {
 		}
 	}
 
-	private Facility getFacByLogit(LinkedHashMap<Activity, Integer> facMap) {
+	private Facility getFacByLogit(LinkedHashMap<ActivityOption, Integer> facMap) {
 		Facility fac=null;
 		Object[] nums=facMap.values().toArray();
 		Double[] p= new Double[nums.length];
@@ -246,7 +246,7 @@ public class SNPickFacility implements PlanAlgorithm {
 				pick=i;
 			}
 		}
-		fac=((Activity) facMap.keySet().toArray()[pick]).getFacility();
+		fac=((ActivityOption) facMap.keySet().toArray()[pick]).getFacility();
 		return fac;
 	}
 

@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * @author dgrether
  */
-public interface BasicKnowledge<A extends BasicActivity> {
+public interface BasicKnowledge<A extends BasicActivityOption> {
 
 	public void setDescription(String desc);
 	

@@ -24,10 +24,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Activity;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
 
@@ -86,8 +86,8 @@ public class PlansFilterPersons {
 				p.getCustomAttributes().remove(CAtts.HH_Z);
 
 				if (p.getKnowledge().getActivities(CAtts.ACT_HOME).size() == 2) {
-					Activity a0 = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0);
-					Activity a1 = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(1);
+					ActivityOption a0 = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0);
+					ActivityOption a1 = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(1);
 					if (a0.getFacility().getId().equals(f.getId())) {
 						if (!p.getKnowledge().removeActivity(a0)) { Gbl.errorMsg("pid="+p.getId()+": That must not happen!"); }
 					}

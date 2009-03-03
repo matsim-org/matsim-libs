@@ -23,8 +23,8 @@ package org.matsim.matrices.algorithms;
 import java.util.Iterator;
 
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
