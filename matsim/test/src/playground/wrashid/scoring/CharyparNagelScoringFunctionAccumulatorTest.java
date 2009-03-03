@@ -9,7 +9,7 @@ import org.matsim.scoring.ScoringFunction;
 public class CharyparNagelScoringFunctionAccumulatorTest extends CharyparNagelScoringFunctionTest {
 	protected ScoringFunction getScoringFunctionInstance(final Plan somePlan) {
 
-		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
+		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(Gbl.getConfig().charyparNagelScoring());
 
 		return charyparNagelScoringFunctionFactory.getNewScoringFunction(somePlan);
 	}
