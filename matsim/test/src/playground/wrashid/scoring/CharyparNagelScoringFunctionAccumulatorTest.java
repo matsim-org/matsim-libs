@@ -8,15 +8,9 @@ import org.matsim.scoring.ScoringFunction;
 
 public class CharyparNagelScoringFunctionAccumulatorTest extends CharyparNagelScoringFunctionTest {
 	protected ScoringFunction getScoringFunctionInstance(final Plan somePlan) {
-		
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoringFunction( somePlan, new CharyparNagelScoringParameters(Gbl.getConfig().charyparNagelScoring())));
-		
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoringFunction( somePlan, new CharyparNagelScoringParameters(Gbl.getConfig().charyparNagelScoring())));
-		
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoringFunction(somePlan, new CharyparNagelScoringParameters(Gbl.getConfig().charyparNagelScoring())));
-		
-		return scoringFunctionAccumulator;
+		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
+
+		return charyparNagelScoringFunctionFactory.getNewScoringFunction(somePlan);
 	}
 }

@@ -6,21 +6,25 @@ import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.gbl.Gbl;
 
-public class CharyparScoringFunctionFactory implements ScoringFunctionFactory {
+public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
 	/**
-	 * puts the scoring fucntions together, which form the
+	 * puts the scoring functions together, which form the
 	 * CharyparScoringFunction
 	 * 
 	 * @param plan
 	 * @return
 	 */
 	public ScoringFunction getNewScoringFunction(Plan plan) {
+		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoringFunction(plan));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoringFunction( plan, new CharyparNagelScoringParameters(Gbl.getConfig().charyparNagelScoring())));
-
+		
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoringFunction( plan, new CharyparNagelScoringParameters(Gbl.getConfig().charyparNagelScoring())));
+		
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoringFunction(new CharyparNagelScoringParameters(Gbl.getConfig().charyparNagelScoring())));
+		
 		return scoringFunctionAccumulator;
 	}
 }
