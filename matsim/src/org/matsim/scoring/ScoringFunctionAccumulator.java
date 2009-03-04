@@ -4,13 +4,11 @@ import java.util.ArrayList;
 
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.interfaces.ActivityScoring;
 import org.matsim.scoring.interfaces.AgentStuckScoring;
 import org.matsim.scoring.interfaces.BasicScoring;
 import org.matsim.scoring.interfaces.LegScoring;
 import org.matsim.scoring.interfaces.MoneyScoring;
-
 
 public class ScoringFunctionAccumulator implements ScoringFunction {
 
