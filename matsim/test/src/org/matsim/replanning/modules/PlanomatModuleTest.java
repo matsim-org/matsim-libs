@@ -117,4 +117,13 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		assertEquals(expectedChecksum, actualChecksum);
 
 	}
+	
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		this.population = null;
+		this.network = null;
+		this.facilities = null;
+	}
+
 }
