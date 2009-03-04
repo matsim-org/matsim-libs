@@ -1,9 +1,14 @@
 package playground.ciarif.retailers;
 
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.Vector;
 
 
 import org.matsim.controler.Controler;
+import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.Coord;
@@ -18,98 +23,64 @@ import playground.ciarif.retailers.RetailerStrategy;
 
 public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	
-	public final static String CONFIG_GROUP = "alternatives";
+	public final static String CONFIG_GROUP = "Retailers";
+	public final static String CONFIG_N_ALTERNATIVES = "alternatives";
 	private Controler controler;
-	private int alternatives;
-	// TODO balmermi: remove all params for the alt-size and replace it here by a config parameter
+	private int alternatives;	
 	
 	public LogitMaxLinkRetailerStrategy (Controler controler) {
 		this.controler = controler;
+		String logitAlternatives = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_N_ALTERNATIVES);
+		int alternatives = Integer.parseInt(logitAlternatives);
 		this.alternatives = alternatives;
 	}
 
 	public void moveFacilities(Map<Id, Facility> facilities) {
 
 		for (Facility f : facilities.values()) {
-//				
-//				boolean changeLocation = false;
-//				changelocation = 
-//				if (changeLocation){
-//					Coord coord = newLink.getCenter();
-//					f.moveTo(coord);
-//				}
-		}
-	}	
-		
-	public void logitUtilityAlgo() {
 			
-//			Object[] links = controler.getNetwork().getLinks().values().toArray();
-//			int rd = MatsimRandom.random.nextInt(links.length);
-//			Link newLink = (Link)links[rd];
-//			
-//			
-//			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
-//			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId().toString());
-//			double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(newLink.getId().toString());
-//			double currentlink_volume =0;
-//			double newlink_volume =0;
-//			for (int j=0; j<currentlink_volumes.length;j=j+1) {
-//				currentlink_volume = currentlink_volume + currentlink_volumes[j];
-//				
-//			}
-//			for (int j=0; j<newlink_volumes.length;j=j+1) {
-//				newlink_volume = newlink_volume + newlink_volumes[j];
-//			}
-//			
-//			
-//			UtilityComputer[] linkUtilityComputers;
-//
-//			final int alternativeCount = volumes.length;
-//
-//			linkUtilityComputers = new UtilityComputer[alternativeCount];
-//
-//			double[] alternativeProbability = new double[alternativeCount];
-//			double sumOfProbabilities = 0;
-//
-//			linkUtilityComputers[0] = ;
-//			linkUtilityComputers[1] = ;
-//			
-//
-//			double[] utilities = new double[alternativeCount];
-//			
-//			for (int i = 0; i < alternativeCount; i++) {
-//					utilities[i] = linkUtilityComputers[i].computeUtility(volume);
-//				}
-//
-//				for (int j = 0; j < alternativeCount; j++) {
-//					alternativeProbability[j] = getLogitProbability(utilities[j], utilities);
-//				}
-//
-//
-//			double r = MatsimRandom.random.nextDouble();
-//			int index = 0;
-//			sumOfProbabilities = alternativeProbability[index];
-//			while (r >= sumOfProbabilities) {
-//				index++;
-//				sumOfProbabilities += alternativeProbability[index];
-//			}
-//		}
-//		
-//		class LogitUtility implements UtilityComputer {
-//
-//			public double computeUtility(Link link) {
-//				
-//				return 0;
-//			}
-			
-	}
-	private double getLogitProbability(double referenceUtility,double[] utilities) {
-		double expSumOfAlternatives = 0.0;
-		for (double utility : utilities) {
-			expSumOfAlternatives += Math.exp(utility);
+			double[] utils = new double[alternatives];
+			Object[] links = controler.getNetwork().getLinks().values().toArray();
+			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
+			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId().toString());
+			ArrayList<Link> newLinks = new ArrayList<Link>(); 
+			newLinks.add(f.getLink());
+			double currentlink_volume =0;
+			for (int j=0; j<currentlink_volumes.length;j=j+1) {
+				currentlink_volume = currentlink_volume + currentlink_volumes[j];
+			}
+			utils [0]= Math.log(currentlink_volume); //If the utility would be defined in a more complex way than it is now here a 
+			// calc_utility method might be called at this point	
+			System.out.println ("Utility [0] " + utils [0]);
+			for (int i=1; i<alternatives;i++) {
+				int rd = MatsimRandom.random.nextInt(links.length);
+				newLinks.add((Link)links[rd]);
+				double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(newLinks.get(i).getId().toString());
+				
+				double newlink_volume =0;
+				
+				for (int j=0; j<newlink_volumes.length;j=j+1) {
+					newlink_volume = newlink_volume + newlink_volumes[j];
+				}
+				utils [i]= Math.log(newlink_volume); // see above calc_utility
+				System.out.println ("Utility [" + i + "] = " + utils [i]);
+			}
+			double r = MatsimRandom.random.nextDouble();
+			double [] probs = calcLogitProbability(utils);
+			System.out.println ("Probs [0] " + probs [0]);
+			System.out.println ("Probs [1] " + probs [1]);
+			for (int k=0;k<probs.length;k++) {
+				if (r<=probs [k]) {
+					f.moveTo(newLinks.get(k).getCenter());
+				}
+			}
 		}
-		return Math.exp(referenceUtility) / expSumOfAlternatives;
 	}
-
-
+	private final double[] calcLogitProbability(double[] utils) {
+		double exp_sum = 0.0;
+		for (int i=0; i<utils.length; i++) { exp_sum += Math.exp(utils[i]); System.out.println ("exp_sum = " + exp_sum);}
+		double [] probs = new double[utils.length];
+		for (int i=0; i<utils.length; i++) { probs[i] = Math.exp(utils[i])/exp_sum; System.out.println ("util [i] exp = " + Math.exp(utils[i]));}
+		return probs;
+	}
 }

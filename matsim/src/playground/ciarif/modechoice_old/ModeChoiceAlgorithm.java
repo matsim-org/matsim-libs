@@ -146,7 +146,6 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 		for (double utility : utilities) {
 			expSumOfAlternatives += Math.exp(utility);
 		}
-
 		return Math.exp(referenceUtility) / expSumOfAlternatives;
 	}
 

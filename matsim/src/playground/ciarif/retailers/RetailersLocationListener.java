@@ -59,7 +59,6 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	public final static String CONFIG_POP_SUM_TABLE = "populationSummaryTable";
 	public final static String CONFIG_RET_SUM_TABLE = "retailersSummaryTable";
 	public final static String CONFIG_RETAILERS = "retailers";
-//	private Retailers retailers = new Retailers();
 	private Retailers retailers;
 	private RetailersSummaryWriter rs = null;
 	private PlansSummaryTable pst = null;
@@ -67,8 +66,6 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
-	//private final String locationStrategy=null;
-	private int alternatives;
 	
 	public RetailersLocationListener() {
 	}
@@ -111,10 +108,10 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 						Facility f = controler.getFacilities().getFacility(fId);
 						r.addFacility(f);
 						this.retailers.addRetailer(r);
-						
 					}
 				}
-			} catch (IOException e) {
+			} 
+			catch (IOException e) {
 				Gbl.errorMsg(e);
 			}
 		} 
@@ -129,7 +126,6 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 			Map<Id,Facility> facs =  r.runStrategy();
 			movedFacilities.putAll(facs);
 		}
-		
 		int iter = controler.getIteration();
 		this.rs.write(this.retailers);
 		
