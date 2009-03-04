@@ -31,15 +31,15 @@ import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
-import org.matsim.basic.xml.lightsignalsystems.ObjectFactory;
-import org.matsim.basic.xml.lightsignalsystems.XMLIdRefType;
-import org.matsim.basic.xml.lightsignalsystems.XMLLaneType;
-import org.matsim.basic.xml.lightsignalsystems.XMLLanesToLinkAssignmentType;
-import org.matsim.basic.xml.lightsignalsystems.XMLLightSignalGroupDefinitionType;
-import org.matsim.basic.xml.lightsignalsystems.XMLLightSignalSystemDefinitionType;
-import org.matsim.basic.xml.lightsignalsystems.XMLLightSignalSystems;
-import org.matsim.basic.xml.lightsignalsystems.XMLMatsimTimeAttributeType;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.jaxb.lightsignalsystems10.ObjectFactory;
+import org.matsim.jaxb.lightsignalsystems10.XMLIdRefType;
+import org.matsim.jaxb.lightsignalsystems10.XMLLaneType;
+import org.matsim.jaxb.lightsignalsystems10.XMLLanesToLinkAssignmentType;
+import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalGroupDefinitionType;
+import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystemDefinitionType;
+import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystems;
+import org.matsim.jaxb.lightsignalsystems10.XMLMatsimTimeAttributeType;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -59,7 +59,7 @@ public class MatsimLightSignalSystemsWriter {
 	public void writeFile(final String filename) {
   	JAXBContext jc;
 		try {
-			jc = JAXBContext.newInstance(org.matsim.basic.xml.lightsignalsystems.ObjectFactory.class);
+			jc = JAXBContext.newInstance(org.matsim.jaxb.lightsignalsystems10.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller(); 
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, 
 					Boolean.TRUE); 

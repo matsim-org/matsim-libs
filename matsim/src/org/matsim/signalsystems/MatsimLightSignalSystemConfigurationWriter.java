@@ -34,16 +34,16 @@ import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.basic.xml.lightsignalsystemsconfig.ObjectFactory;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalGroupConfigurationType;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemConfig;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemConfigurationType;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemPlanType;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLMatsimTimeAttributeType;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLPlanbasedlightSignalSystemControlInfoType;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalGroupConfigurationType.XMLInterimTimeDropping;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemPlanType.XMLStart;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemPlanType.XMLStop;
+import org.matsim.jaxb.lightsignalsystemsconfig10.ObjectFactory;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalGroupConfigurationType;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfig;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfigurationType;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLMatsimTimeAttributeType;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLPlanbasedlightSignalSystemControlInfoType;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalGroupConfigurationType.XMLInterimTimeDropping;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType.XMLStart;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType.XMLStop;
 import org.matsim.utils.io.IOUtils;
 
 
@@ -69,7 +69,7 @@ public class MatsimLightSignalSystemConfigurationWriter {
 	public void writeFile(final String filename) {
   	JAXBContext jc;
 		try {
-			jc = JAXBContext.newInstance(org.matsim.basic.xml.lightsignalsystemsconfig.ObjectFactory.class);
+			jc = JAXBContext.newInstance(org.matsim.jaxb.lightsignalsystemsconfig10.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller(); 
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, 
 					Boolean.TRUE); 

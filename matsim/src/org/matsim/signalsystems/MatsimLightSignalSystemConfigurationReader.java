@@ -38,13 +38,13 @@ import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemsConfigFactory;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLAdaptiveLightSignalSystemControlInfoType;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalGroupConfigurationType;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemConfig;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemConfigurationType;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemControlInfoType;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemPlanType;
-import org.matsim.basic.xml.lightsignalsystemsconfig.XMLPlanbasedlightSignalSystemControlInfoType;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLAdaptiveLightSignalSystemControlInfoType;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalGroupConfigurationType;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfig;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfigurationType;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemControlInfoType;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType;
+import org.matsim.jaxb.lightsignalsystemsconfig10.XMLPlanbasedlightSignalSystemControlInfoType;
 import org.xml.sax.SAXException;
 
 /**
@@ -65,7 +65,7 @@ public class MatsimLightSignalSystemConfigurationReader {
 	public void readFile(final String filename) {
   	JAXBContext jc;
 		try {
-			jc = JAXBContext.newInstance(org.matsim.basic.xml.lightsignalsystemsconfig.ObjectFactory.class);
+			jc = JAXBContext.newInstance(org.matsim.jaxb.lightsignalsystemsconfig10.ObjectFactory.class);
 //			ObjectFactory fac = new ObjectFactory();
 			Unmarshaller u = jc.createUnmarshaller();
 			XMLSchemaFactory schemaFac = new XMLSchemaFactory();
