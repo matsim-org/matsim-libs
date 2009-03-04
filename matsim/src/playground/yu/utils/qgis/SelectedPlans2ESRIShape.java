@@ -34,24 +34,20 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.jfree.util.Log;
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
-import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -74,90 +70,56 @@ import com.vividsolutions.jts.geom.Point;
  *         org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape.java
  *         of Mr. Laemmel with some changes.
  */
-public class SelectedPlans2ESRIShape {
+public class SelectedPlans2ESRIShape extends
+		org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape {
 
 	protected CoordinateReferenceSystem crs;
-	private final Population population;
-	private double outputSample = 1;
+	// private final Population population = null;
+	// private double outputSample = 1;
 	private double actBlurFactor = 0;
 	private double legBlurFactor = 0;
 	protected String outputDir;
-	private boolean writeActs = true;
-	private boolean writeLegs = true;
 	private ArrayList<Plan> outputSamplePlans;
 	private FeatureType featureTypeAct;
 	private FeatureType featureTypeLeg;
 	protected GeometryFactory geofac;
 
-	public SelectedPlans2ESRIShape() {
-		this.crs = null;
-		this.population = null;
-		this.outputDir = null;
-		this.geofac = null;
+	//
+	// public SelectedPlans2ESRIShape() {
+	// this.crs = null;
+	// this.population = null;
+	// this.outputDir = null;
+	// this.geofac = null;
+	// }
+
+	public SelectedPlans2ESRIShape(Population population,
+			CoordinateReferenceSystem crs, String outputDir) {
+		super(population, crs, outputDir);
 	}
 
-	public SelectedPlans2ESRIShape(final Population population,
-			final CoordinateReferenceSystem crs, final String outputDir) {
-		this.population = population;
-		this.crs = crs;
-		this.outputDir = outputDir;
-		this.geofac = new GeometryFactory();
-		initFeatureType();
-	}
-
-	public void setOutputSample(final double sample) {
-		this.outputSample = sample;
-	}
-
-	public void setWriteActs(final boolean writeActs) {
-		this.writeActs = writeActs;
-	}
-
-	public void setWriteLegs(final boolean writeLegs) {
-		this.writeLegs = writeLegs;
-	}
-
-	public void setActBlurFactor(final double actBlurFactor) {
-		this.actBlurFactor = actBlurFactor;
-	}
-
-	public void setLegBlurFactor(final double legBlurFactor) {
-		this.legBlurFactor = legBlurFactor;
-	}
-
-	public void write() throws IOException {
-		drawOutputSample();
-		if (this.writeActs) {
-			writeActs();
-		}
-		if (this.writeLegs) {
-			writeLegs();
-		}
-	}
-
-	private void drawOutputSample() {
-		this.setOutputSamplePlans(new ArrayList<Plan>());
-		for (Person pers : this.population.getPersons().values()) {
-			if (MatsimRandom.random.nextDouble() <= this.outputSample) {
-				this.getOutputSamplePlans().add(pers.getSelectedPlan());
-			}
-		}
-	}
-
-	private void writeActs() throws IOException {
-		String outputFile = this.getOutputDir() + "/acts.shp";
-		ArrayList<Feature> fts = new ArrayList<Feature>();
-		for (Plan plan : this.getOutputSamplePlans()) {
-			String id = plan.getPerson().getId().toString();
-			ActIterator iter = plan.getIteratorAct();
-			while (iter.hasNext()) {
-				Act act = (Act) iter.next();
-				fts.add(getActFeature(id, act));
-			}
-		}
-
-		ShapeFileWriter.writeGeometries(fts, outputFile);
-	}
+	// private void drawOutputSample() {
+	// this.setOutputSamplePlans(new ArrayList<Plan>());
+	// for (Person pers : this.population.getPersons().values()) {
+	// if (MatsimRandom.random.nextDouble() <= this.outputSample) {
+	// this.getOutputSamplePlans().add(pers.getSelectedPlan());
+	// }
+	// }
+	// }
+	//
+	// private void writeActs() throws IOException {
+	// String outputFile = this.getOutputDir() + "/acts.shp";
+	// ArrayList<Feature> fts = new ArrayList<Feature>();
+	// for (Plan plan : this.getOutputSamplePlans()) {
+	// String id = plan.getPerson().getId().toString();
+	// ActIterator iter = plan.getIteratorAct();
+	// while (iter.hasNext()) {
+	// Act act = (Act) iter.next();
+	// fts.add(getActFeature(id, act));
+	// }
+	// }
+	//
+	// ShapeFileWriter.writeGeometries(fts, outputFile);
+	// }
 
 	protected void writeLegs() throws IOException {
 		String outputFile = this.getOutputDir() + "/legs.shp";
@@ -175,27 +137,26 @@ public class SelectedPlans2ESRIShape {
 		ShapeFileWriter.writeGeometries(fts, outputFile);
 	}
 
-	@SuppressWarnings("deprecation")
-	private Feature getActFeature(final String id, final Act act) {
-		String type = act.getType();
-		String linkId = act.getLinkId().toString();
-		Double startTime = act.getStartTime();
-		Double dur = act.getDuration();
-		Double endTime = act.getEndTime();
-		double rx = MatsimRandom.random.nextDouble() * this.actBlurFactor;
-		double ry = MatsimRandom.random.nextDouble() * this.actBlurFactor;
-		Coord cc = act.getLink().getCenter();
-		Coord c = new CoordImpl(cc.getX() + rx, cc.getY() + ry);
-		try {
-			return this.getFeatureTypeAct().create(
-					new Object[] { MGC.coord2Point(c), id, type, linkId,
-							startTime, dur, endTime });
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
+	// private Feature getActFeature(final String id, final Act act) {
+	// String type = act.getType();
+	// String linkId = act.getLinkId().toString();
+	// Double startTime = act.getStartTime();
+	// Double dur = act.getDuration();
+	// Double endTime = act.getEndTime();
+	// double rx = MatsimRandom.random.nextDouble() * this.actBlurFactor;
+	// double ry = MatsimRandom.random.nextDouble() * this.actBlurFactor;
+	// Coord cc = act.getLink().getCenter();
+	// Coord c = new CoordImpl(cc.getX() + rx, cc.getY() + ry);
+	// try {
+	// return this.getFeatureTypeAct().create(
+	// new Object[] { MGC.coord2Point(c), id, type, linkId,
+	// startTime, dur, endTime });
+	// } catch (IllegalAttributeException e) {
+	// e.printStackTrace();
+	// }
+	//
+	// return null;
+	// }
 
 	protected Feature getLegFeature(final Leg leg, final String id) {
 		BasicLeg.Mode mode = leg.getMode();

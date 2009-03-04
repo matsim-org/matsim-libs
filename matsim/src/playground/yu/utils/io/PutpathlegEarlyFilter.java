@@ -136,7 +136,7 @@ public class PutpathlegEarlyFilter extends PutpathlegFilter {
 						line = pef.readLine();
 						if (PutpathlegFilter.isHead(line))
 							break;
-						pef.writeLine(line);
+						pef.writeln(line);
 					} while (line != null);
 
 					pef.writeNewLine(line);// writes "$P...."

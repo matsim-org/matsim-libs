@@ -24,7 +24,7 @@ import playground.yu.analysis.PlanModeJudger;
 /**
  * it is a copy of <class>org.matsim.run.CompareSelectedPlansTable</class>, only
  * some small changes were taken.
- *
+ * 
  */
 public class CompareSelectedPlansTable {
 
@@ -67,7 +67,8 @@ public class CompareSelectedPlansTable {
 		new MatsimNetworkReader(this.network).readFile(networkPath);
 	}
 
-	private void readFiles(final String plansfilePath0, final String plansfilePath1) {
+	private void readFiles(final String plansfilePath0,
+			final String plansfilePath1) {
 		System.out.println("  reading file " + plansfilePath0);
 		PopulationReader plansReader0 = new MatsimPopulationReader(this.plans0,
 				this.network);
@@ -132,15 +133,17 @@ public class CompareSelectedPlansTable {
 				out.write(Double.toString((s1 - s0) / Math.abs(s0)) + ";");
 				relativeDiffs[i] = (s1 - s0) / Math.abs(s0);
 
-				double t0 = this.getTravelTime(person);
+				double t0 = CompareSelectedPlansTable.getTravelTime(person);
 				out.write(t0 + ";");
-				double t1 = this.getTravelTime(person_comp);
+				double t1 = CompareSelectedPlansTable
+						.getTravelTime(person_comp);
 				out.write(t1 + ";");
 				out.write(Double.toString(t1 - t0) + ";");
 
-				double d0 = this.getTravelDist(person);
+				double d0 = CompareSelectedPlansTable.getTravelDist(person);
 				out.write(d0 + ";");
-				double d1 = this.getTravelDist(person_comp);
+				double d1 = CompareSelectedPlansTable
+						.getTravelDist(person_comp);
 				out.write(d1 + ";");
 				out.write(Double.toString(d1 - d0) + ";");
 
@@ -168,9 +171,10 @@ public class CompareSelectedPlansTable {
 				out.write((hact1 ? dpt1 : 0.0) + ";");
 				out.write(((hact0 && hact1) ? (dpt1 - dpt0) : 0.0) + ";");
 
-				int n0 = this.getNumberOfTrips(person);
+				int n0 = CompareSelectedPlansTable.getNumberOfTrips(person);
 				out.write(n0 + ";");
-				int n1 = this.getNumberOfTrips(person_comp);
+				int n1 = CompareSelectedPlansTable
+						.getNumberOfTrips(person_comp);
 				out.write(n1 + ";");
 				out.write(Integer.toString(n1 - n0));
 
@@ -197,7 +201,7 @@ public class CompareSelectedPlansTable {
 	 * to have everything in one single class
 	 */
 
-	private double getTravelTime(final Person person) {
+	protected static double getTravelTime(final Person person) {
 
 		double travelTime = 0.0;
 		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
@@ -208,7 +212,7 @@ public class CompareSelectedPlansTable {
 		return travelTime;
 	}
 
-	private double getTravelDist(final Person person) {
+	protected static double getTravelDist(final Person person) {
 
 		double travelDist = 0.0;
 		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
@@ -220,7 +224,7 @@ public class CompareSelectedPlansTable {
 		return travelDist;
 	}
 
-	private int getNumberOfTrips(final Person person) {
+	protected static int getNumberOfTrips(final Person person) {
 
 		int numberOfLegs = 0;
 		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();

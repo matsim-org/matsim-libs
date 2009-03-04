@@ -23,7 +23,6 @@
  */
 package playground.yu.utils.io;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,13 +30,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.matsim.utils.io.IOUtils;
-
 /**
  * @author yu
  * 
  */
-public class PutpathlegFilter extends TableSplitter {
+public class PutpathlegFilter extends MyFilter {
 	public static SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
 	static class IndexFileReader extends TableSplitter {
@@ -93,7 +90,6 @@ public class PutpathlegFilter extends TableSplitter {
 
 	// /////////////////////////////////////////////////////////////////////////////////////
 	private final Date minDepTime, maxDepTime;
-	private final BufferedWriter writer;
 
 	/**
 	 * @param regex
@@ -108,41 +104,9 @@ public class PutpathlegFilter extends TableSplitter {
 	public PutpathlegFilter(final String regex, final String tableFilename,
 			final String minDepTime, final String maxDepTime,
 			final String outputFilename) throws IOException, ParseException {
-		super(regex, tableFilename);
+		super(regex, tableFilename, outputFilename);
 		this.minDepTime = sdf.parse(minDepTime);
 		this.maxDepTime = sdf.parse(maxDepTime);
-		writer = IOUtils.getBufferedWriter(outputFilename);
-	}
-
-	public void writeLine(final String line) {
-		try {
-			writer.write(line + "\n");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void writeNewLine(final String line) {
-		try {
-			String[] words = split(line);
-			StringBuilder word = new StringBuilder();
-			word.append(words[0]);
-			for (int i = 1; i < words.length; i++) {
-				word.append("\t");
-				word.append(words[i]);
-			}
-			writer.write(word + "\n");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void closeWriter() {
-		try {
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	protected static boolean isHead(final String line) {
@@ -199,7 +163,7 @@ public class PutpathlegFilter extends TableSplitter {
 						line = pf.readLine();
 						if (PutpathlegFilter.isHead(line))
 							break;
-						pf.writeLine(line);
+						pf.writeln(line);
 					} while (line != null);
 
 					pf.writeNewLine(line);// writes "$P...."

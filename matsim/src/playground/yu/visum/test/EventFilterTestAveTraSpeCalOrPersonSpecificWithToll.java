@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventFilterTestAveTraSpeCal_personSpecific_mit_Maut.java
+ * EventFilterTestAveTraSpeCal_ohne_Maut.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -44,15 +44,16 @@ import playground.yu.visum.writer.PrintStreamUDANET;
  * (PersonFilterAlgorithm, PersonIDsExporter)] [to create events reader] [to
  * read plans file] [to running plans algorithms] [to set events algorithms
  * (EventFilterAlgorithm, EventFilterPersonSpecific, AveTraSpeCal)] [to read
- * events file] [to run events algorithms] [to print additive netFile of
+ * events file] [to run events algorithms] [to print additiv netFile of
  * Visum...] [to print attributsFile of link...]
- *
+ * 
  * @author yu chen
  */
-public class EventFilterTestAveTraSpeCal_personSpecific_mit_Maut {
+public class EventFilterTestAveTraSpeCalOrPersonSpecificWithToll {
 
 	/**
 	 * @param args
+	 *            "test/yu/config_hm_ohne_Maut_test.xml config_v1.dtd" or
 	 *            "test/yu/config_hm_mit_Maut_test.xml config_v1.dtd"
 	 * @throws Exception
 	 */
@@ -74,7 +75,6 @@ public class EventFilterTestAveTraSpeCal_personSpecific_mit_Maut {
 		// network
 		System.out.println("  creating network object... ");
 		NetworkLayer network = new NetworkLayer();
-
 		System.out.println("  done.");
 
 		System.out.println("  reading network file... ");
@@ -105,7 +105,7 @@ public class EventFilterTestAveTraSpeCal_personSpecific_mit_Maut {
 		events.addHandler(efa);
 		System.out.println("  done");
 
-		// read file, run algos if streaming is on
+		// read file, run algos
 		System.out.println("  reading events file and running events algos");
 		new MatsimEventsReader(events).readFile(config.events().getInputFile());
 		System.out.println("we have\t" + atsc.getCount()

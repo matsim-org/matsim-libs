@@ -21,9 +21,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.jfree.util.Log;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -41,15 +39,17 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author yu
- *
+ * 
  */
 public class RouteCompare2QGIS extends Route2QGIS {
 	private final Map<List<Id>, Integer> routeCountersB;
 
-	public RouteCompare2QGIS(final CoordinateReferenceSystem crs, final String outputDir,
-			final NetworkLayer network, final Map<List<Id>, Integer> routeCountersA,
+	public RouteCompare2QGIS(Population population,
+			final CoordinateReferenceSystem crs, final String outputDir,
+			final NetworkLayer network,
+			final Map<List<Id>, Integer> routeCountersA,
 			final Map<List<Id>, Integer> routeCountersB) {
-		super(crs, outputDir, network, routeCountersA);
+		super(population, crs, outputDir, network, routeCountersA);
 		this.routeCountersB = routeCountersB;
 	}
 
@@ -93,37 +93,8 @@ public class RouteCompare2QGIS extends Route2QGIS {
 						- routeFlowsA.doubleValue();
 				Double absDiff = Math.abs(diff);
 				double width = 10.0 * Math.min(250.0, absDiff);
-
-				for (int i = 0; i < routeLinkIds.size(); i++) {
-					Link l = this.network.getLink(routeLinkIds.get(i));
-					Coord c = l.getFromNode().getCoord();
-					Coordinate cdn = new Coordinate(c.getX(), c.getY());
-					coordinates[i] = cdn;
-					Coord toCoord = l.getToNode().getCoord();
-					Coordinate to = new Coordinate(toCoord.getX(), toCoord
-							.getY());
-					double xdiff = to.x - cdn.x;
-					double ydiff = to.y - cdn.y;
-					double denominator = Math.sqrt(xdiff * xdiff + ydiff
-							* ydiff);
-					coordinates[coordinates.length - 2 - i] = new Coordinate(
-							cdn.x + width * ydiff / denominator, cdn.y - width
-									* xdiff / denominator);
-				}
-
-				Coord c = this.network.getLink(
-						routeLinkIds.get(routeLinkIds.size() - 1)).getToNode()
-						.getCoord();
-				Coordinate cdn = new Coordinate(c.getX(), c.getY());
-				coordinates[routeLinkIds.size()] = cdn;
-				Coordinate from = coordinates[routeLinkIds.size() - 1];
-				double xdiff = cdn.x - from.x;
-				double ydiff = cdn.y - from.y;
-				double denominator = Math.sqrt(xdiff * xdiff + ydiff * ydiff);
-				coordinates[routeLinkIds.size() + 1] = new Coordinate(from.x
-						+ width * ydiff / denominator, from.y - width * xdiff
-						/ denominator);
-				coordinates[coordinates.length - 1] = coordinates[0];
+				coordinates = calculateCoordinates(coordinates, width,
+						routeLinkIds);
 				try {
 					return getFeatureTypeRoute()
 							.create(
@@ -205,7 +176,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		CoordinateReferenceSystem crs;
 		try {
 			crs = CRS.parseWKT(ch1903);
-			RouteCompare2QGIS r2q = new RouteCompare2QGIS(crs, outputDir,
+			RouteCompare2QGIS r2q = new RouteCompare2QGIS(null, crs, outputDir,
 					network, rsA.getRouteCounters(), rsB.getRouteCounters());
 			r2q.setWriteActs(false);
 			r2q.setWriteLegs(false);

@@ -26,11 +26,9 @@ package playground.yu.utils.qgis;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
-import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -42,16 +40,17 @@ import org.matsim.population.PopulationReader;
 import org.matsim.utils.io.IOUtils;
 
 import playground.yu.analysis.PlanModeJudger;
+import playground.yu.utils.CompareSelectedPlansTable;
 
 /**
  * this class quote codes from
  * <class>org.matsim.run.CompareSelectedPlansTable</class> offered a simplified
  * function
- *
+ * 
  * @author ychen
- *
+ * 
  */
-public class Demography2QGIS {
+public class Demography2QGIS extends CompareSelectedPlansTable {
 	private Population plans;
 	private final String header = "personId;sex;age;license;caravail;employed;homex;homey;homelink;"
 			+ "planType;planScore;departureTime;"
@@ -136,49 +135,10 @@ public class Demography2QGIS {
 		}
 	}
 
-	/*
-	 * TODO: Put the next three methods into a "stats" class and use traveltime,
-	 * numberOfTrips and traveldist as attributes. At the moment it is "nicer"
-	 * to have everything in one single class
-	 */
-
-	private double getTravelTime(final Person person) {
-
-		double travelTime = 0.0;
-		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
-		while (leg_it.hasNext()) {
-			Leg leg = (Leg) leg_it.next();
-			travelTime += leg.getTravelTime();
-		}
-		return travelTime;
-	}
-
-	private double getTravelDist(final Person person) {
-
-		double travelDist = 0.0;
-		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
-
-		while (leg_it.hasNext()) {
-			Leg leg = (Leg) leg_it.next();
-			travelDist += leg.getRoute().getDist();
-		}
-		return travelDist;
-	}
-
-	private int getNumberOfTrips(final Person person) {
-
-		int numberOfLegs = 0;
-		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
-		while (leg_it.hasNext()) {
-			leg_it.next();
-			numberOfLegs++;
-		}
-		return numberOfLegs;
-	}
-
 	// --------------------------------------------------------------------------
 
-	private void run(final String networkPath, final String plansfilePath, final String outfile) {
+	private void run(final String networkPath, final String plansfilePath,
+			final String outfile) {
 		this.init(networkPath);
 		readFiles(plansfilePath);
 		writeSummaryFile(outfile);

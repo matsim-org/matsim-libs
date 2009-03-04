@@ -34,41 +34,17 @@ import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 
 import playground.yu.visum.filter.EventFilterAlgorithm;
-import playground.yu.visum.filter.finalFilters.AveTraSpeCal;
+import playground.yu.visum.filter.finalFilters.AveTraTimeCal;
+import playground.yu.visum.writer.PrintStreamATTA;
 import playground.yu.visum.writer.PrintStreamLinkATT;
 import playground.yu.visum.writer.PrintStreamUDANET;
 
 /**
- * This class offers a test, that contains: [to create Network object] [to read
- * networkfile] [to create plans object] [to set plans algorithms
- * (PersonFilterAlgorithm, PersonIDsExporter)] [to create events reader] [to
- * read plans file] [to running plans algorithms] [to set events algorithms
- * (EventFilterAlgorithm, EventFilterPersonSpecific, AveTraSpeCal)] [to read
- * events file] [to run events algorithms] [to print additiv netFile of
- * Visum...] [to print attributsFile of link...]
- *
  * @author yu chen
  */
-public class EventFilterTestAveTraSpeCal_ohne_Maut {
+public class EventFilterTestAveTraTimeCalOrWithToll {
 
-	/**
-	 * @param args
-	 *            "test/yu/config_hm_ohne_Maut_test.xml config_v1.dtd"
-	 * @throws Exception
-	 */
-	public static void main(final String[] args) throws Exception {
-
-		Gbl.startMeasurement();
-		Gbl.createConfig(args);
-		testRunAveTraSpeCal();
-		Gbl.printElapsedTime();
-	}
-
-	/**
-	 * @throws IOException
-	 */
-
-	public static void testRunAveTraSpeCal() throws IOException {
+	public static void testRunAveTraTimeCal() throws IOException {
 		Config config = Gbl.getConfig();
 
 		// network
@@ -80,7 +56,6 @@ public class EventFilterTestAveTraSpeCal_ohne_Maut {
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 		System.out.println("  done.");
-
 		// plans
 		System.out.println("  creating plans object... ");
 		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
@@ -97,32 +72,54 @@ public class EventFilterTestAveTraSpeCal_ohne_Maut {
 		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 
-		System.out.println("  setting events algorithms...");
-		AveTraSpeCal atsc = new AveTraSpeCal(plans, network);
+		System.out.println("  adding events algorithms...");
+		AveTraTimeCal attc = new AveTraTimeCal(plans, network);
 		EventFilterAlgorithm efa = new EventFilterAlgorithm();
-		efa.setNextFilter(atsc);
+		efa.setNextFilter(attc);
 		events.addHandler(efa);
 		System.out.println("  done");
 
-		// read file, run algos
-		System.out.println("  reading events file and running events algos");
+		// read file, run algos if streaming is on
+		System.out
+				.println("  reading events file and (probably) running events algos");
 		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		System.out.println("we have\t" + atsc.getCount()
-				+ "\tevents\tat last -- AveTraSpeCal.");
+		System.out.println("we have " + efa.getCount()
+				+ " events at last -- EventFilterAlgorithm.");
+		System.out.println("we have " + attc.getCount()
+				+ " events at last -- AveTraTimeCal.");
 		System.out.println("  done.");
+
+		// run algos if needed, only if streaming is off
+		System.out
+				.println("  running events algorithms if they weren't already while reading the events...");
 
 		System.out.println("\tprinting additiv netFile of Visum...");
 		PrintStreamUDANET psUdaNet = new PrintStreamUDANET(config.getParam(
-				"attribut_aveTraSpe", "outputAttNetFile"));
-		psUdaNet.output(atsc);
+				"attribut_aveTraTime", "outputAttNetFile"));
+		psUdaNet.output(attc);
 		psUdaNet.close();
 		System.out.println("\tdone.");
 
 		System.out.println("\tprinting attributsFile of link...");
-		PrintStreamLinkATT psLinkAtt = new PrintStreamLinkATT(config.getParam(
-				"attribut_aveTraSpe", "outputAttFile"), network);
-		psLinkAtt.output(atsc);
+		PrintStreamATTA psLinkAtt = new PrintStreamLinkATT(config.getParam(
+				"attribut_aveTraTime", "outputAttFile"), network);
+		psLinkAtt.output(attc);
 		psLinkAtt.close();
-		System.out.println("\tdone.");
+		System.out.println("  done.");
+	}
+
+	/**
+	 * @param args
+	 *            - test/yu/config_hm_ohne_Maut.xml config_v1.dtd
+	 *            or
+	 *            - test/yu/config_hm_mit_Maut_test.xml config_v1.dtd
+	 * @throws Exception
+	 */
+	public static void main(final String[] args) throws Exception {
+
+		Gbl.startMeasurement();
+		Gbl.createConfig(args);
+		testRunAveTraTimeCal();
+		Gbl.printElapsedTime();
 	}
 }
