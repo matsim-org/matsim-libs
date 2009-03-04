@@ -30,6 +30,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
@@ -94,6 +95,7 @@ public class GeneratePathSets {
 			gen.setODPair(od.getFirst(),od.getSecond());
 			Tuple<Path,List<Path>> paths = gen.getPaths();
 			log.info("done.");
+			Gbl.printMemoryUsage();
 			log.info("----------------------------------------------------------------------");
 			// write least cost path
 			out.write(id.toString()+"\t"+od.getFirst().getId()+"\t"+od.getSecond().getId());
@@ -128,6 +130,8 @@ public class GeneratePathSets {
 			throw new RuntimeException("incorrect number of arguments");
 		}
 		
+		Gbl.printSystemInfo();
+		
 		int nofPaths = Integer.parseInt(args[0]);
 		double variantionFactor = Double.parseDouble(args[1]);
 		String inputNetworkFile = args[2];
@@ -142,12 +146,17 @@ public class GeneratePathSets {
 		
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputNetworkFile);
+		
+		Gbl.printMemoryUsage();
 
 		PathSetGenerator gen = new PathSetGenerator(network);
 		gen.setPathSetSize(nofPaths);
 		gen.setVariationFactor(variantionFactor);
 		
 		Map<Id,Tuple<Node,Node>> ods = GeneratePathSets.parseODs(inputODFile,network);
+
+		Gbl.printMemoryUsage();
+
 		GeneratePathSets.writePathSets(outputPathSetFile,ods,gen);
 	}
 }

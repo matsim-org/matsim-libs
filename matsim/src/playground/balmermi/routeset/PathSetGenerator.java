@@ -26,16 +26,15 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.router.Dijkstra;
+import org.matsim.router.AStarLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
+import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.misc.Time;
@@ -70,7 +69,10 @@ public class PathSetGenerator {
 		if (network == null) { throw new RuntimeException("Network must exist."); }
 		this.network = network;
 		this.frespeedCost = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
-		this.router = new Dijkstra(this.network,this.frespeedCost,this.frespeedCost);
+//		this.router = new Dijkstra(this.network,this.frespeedCost,this.frespeedCost);
+		PreProcessLandmarks preProcessLandmarks = new PreProcessLandmarks(this.frespeedCost);
+		preProcessLandmarks.run(network);
+		this.router = new AStarLandmarks(this.network,preProcessLandmarks,this.frespeedCost);
 	}
 	
 	//////////////////////////////////////////////////////////////////////
