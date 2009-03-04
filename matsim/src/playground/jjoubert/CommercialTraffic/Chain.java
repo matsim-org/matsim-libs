@@ -17,7 +17,7 @@ public class Chain {
 	private ArrayList<Activity> activities;
 	private int duration; // in MINUTES
 	private int distance;
-	private boolean inGauteng;
+	private boolean inStudyArea;
 	
 	// Constructor
 	/**
@@ -26,7 +26,7 @@ public class Chain {
 	public Chain(){
 		this.start = null;
 		this.activities = new ArrayList<Activity>();
-		this.inGauteng = false;
+		this.inStudyArea = false;
 	}
 	
 
@@ -90,23 +90,23 @@ public class Chain {
 	}
 
 	/** 
-	 * Returns the Gauteng status of the chain: <code>true<code> if
-	 * any of the activities of the chain (major or minor) occur in
-	 * Gauteng, <code>false<code> otherwise.
+	 * Returns the area status of the chain: <code>true<code> if any
+	 * of the activities of the chain (major or minor) occur in the
+	 * study area, <code>false<code> otherwise.
 	 * 
-	 * @return inGauteng of type <code>boolean<code>
+	 * @return inStudyArea of type <code>boolean<code>
 	 */
-	public boolean isInGauteng() {
-		return inGauteng;
+	public boolean isInStudyArea() {
+		return inStudyArea;
 	}
 
 	/**
-	 * Sets whether the chain has an activity in Gauteng or not.
+	 * Sets whether the chain has an activity in the study area or not.
 	 * 
-	 * @param inGauteng of type <code>boolean<code>
+	 * @param inStudyArea of type <code>boolean<code>
 	 */
-	public void setInGauteng(boolean inGauteng) {
-		this.inGauteng = inGauteng;
+	public void setInStudyArea(boolean inStudyArea) {
+		this.inStudyArea = inStudyArea;
 	}
 	
 	/**

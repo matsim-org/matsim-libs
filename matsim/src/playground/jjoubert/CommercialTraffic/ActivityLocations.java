@@ -19,17 +19,20 @@ import org.opengis.referencing.operation.MathTransform;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class ActivityLocations {
-	
-	public final long STUDY_START = 1199145600; // 01 January 2008 00:00:00
+	// String value that must be set
+	final static String PROVINCE = "WesternCape";
+	// Derived string values
+	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/" + PROVINCE + "Vehicles/";
+	final static String SOURCEFOLDER = ROOT + "Sorted/";
+	final static String DESTFOLDER = ROOT + "Activities/";
+	final static String VEH_FOLDER = ROOT + "XML/";
+
 	private final static String WGS84 = "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\", 6378137.0, 298.257223563]],PRIMEM[\"Greenwich\", 0.0],UNIT[\"degree\", 0.017453292519943295],AXIS[\"Lon\", EAST],AXIS[\"Lat\", NORTH]]";
 	private final static String WGS84_UTM35S = "PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
 
-	final static String SOURCEFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Sorted/";
-	final static String DESTFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Activities/";
-	final static String VEH_FOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/XML/";
 //	final static String SOURCEFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp/Vehicles/";
 //	final static String DESTFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp/Activities/";
 //	final static String VEH_FOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp/XML/";
@@ -41,8 +44,10 @@ public class ActivityLocations {
 	final static int ACTIVITY_MIN_THRESHOLD = 8; // expressed in MINUTES
 	final static int DISTANCE_THRESHOLD = Vehicle.DISTANCE_THRESHOLD;
 	public static int progressDots;
-	public static Polygon gauteng;
-	public static int numberOfBoinkPoints = 0;
+	public static MultiPolygon studyArea;
+	// a 'BoinkPoint' is an activity that starts and ends at different locations. Currently I don't do anything with them.
+	//TODO Sort out how to handle these 'BoinkPoint's.
+	public static int numberOfBoinkPoints = 0; 
 
 		
 	public static void main( String args[] ) {
@@ -56,14 +61,18 @@ public class ActivityLocations {
 		
 		MathTransform mt = getMathTransform(); // Prepare for geometric transformations
 		
-		System.out.println("Reading study area: Gauteng");
-		gauteng = SelectGautengVehicles.readGautengPolygon();
+		System.out.println("Reading study area: " + PROVINCE );
+		//TODO Redo this part: SelectVehicles is now more general, and may not be reading
+		// 					   only Gauteng, but other study areas as well.	
+		studyArea = SelectVehicles.readStudyAreaPolygon();
 		System.out.println("Done");
 		System.out.println();
 		
 		System.out.println("Processing vehicle files in " + DESTFOLDER + "...");
 		System.out.println();
-		printProgressBar();
+		ProgressBar pb = new ProgressBar('*');
+		pb.printProgressBar();
+		int dotsPrinted = 0;
 		
 		try {
 			File outFolder = new File( DESTFOLDER );
@@ -72,18 +81,18 @@ public class ActivityLocations {
 			vehFolder.mkdir();
 			
 			// Create all the output file writers 
-			BufferedWriter vehicleStats = new BufferedWriter(new FileWriter(new File(DESTFOLDER + "vehicleStats.txt")));
+			BufferedWriter vehicleStats = new BufferedWriter(new FileWriter(new File(DESTFOLDER + PROVINCE + "VehicleStats.txt")));
 			vehicleStats.write(	vehicleStatsHeaderString() );
 			vehicleStats.newLine();			
-			BufferedWriter majorLocations = new BufferedWriter(new FileWriter(new File(DESTFOLDER + "majorLocations.txt")));
+			BufferedWriter majorLocations = new BufferedWriter(new FileWriter(new File(DESTFOLDER + PROVINCE + "MajorLocations.txt")));
 			majorLocations.write( locationHeaderString() );
 			majorLocations.newLine();
-			BufferedWriter minorLocations = new BufferedWriter(new FileWriter(new File(DESTFOLDER + "minorLocations.txt")));
+			BufferedWriter minorLocations = new BufferedWriter(new FileWriter(new File(DESTFOLDER + PROVINCE + "MinorLocations.txt")));
 			minorLocations.write( locationHeaderString() );
 			minorLocations.newLine();
-			BufferedWriter hourOfDayInGauteng = new BufferedWriter(new FileWriter(new File(DESTFOLDER + "hourOfDayInGautengStats.txt")));
-			hourOfDayInGauteng.write( gautengHeaderString() );
-			hourOfDayInGauteng.newLine();
+			BufferedWriter hourOfDayStats = new BufferedWriter(new FileWriter(new File(DESTFOLDER + PROVINCE + "HourOfDayStats.txt")));
+			hourOfDayStats.write( studyAreaHeaderString() );
+			hourOfDayStats.newLine();
 			
 			for(int i = 0; i < vehicles.length; i++ ){
 				File thisFile = vehicles[i];
@@ -110,27 +119,27 @@ public class ActivityLocations {
 						}
 						
 						// Write vehicle statistics	to file					
-						vehicleStats.write(	statsString(thisVehicle) );
+						vehicleStats.write(	vehicleStatsString(thisVehicle) );
 						vehicleStats.newLine();
 		
 						saveVehicleStringToFile(thisVehicle.getVehID(), convertVehicleToXML(thisVehicle) );
 					}
 					
-					// Write hour-of-day-in-Gauteng statistics
-					if(thisVehicle.getGautengActivities().size() > 0){
-						for(int j = 0; j < thisVehicle.getGautengActivities().size(); j++ ){
-							hourOfDayInGauteng.write( gautengString(thisVehicle, j) );
-							hourOfDayInGauteng.newLine();
+					// Write hour-of-day statistics
+					if(thisVehicle.getStudyAreaActivities().size() > 0){
+						for(int j = 0; j < thisVehicle.getStudyAreaActivities().size(); j++ ){
+							hourOfDayStats.write( studyAreaStatsString(thisVehicle, j) );
+							hourOfDayStats.newLine();
 						}
 					}
 					numberOfVehicles++;				
-					updateProgress(numberOfVehicles, totalVehicles);
+					dotsPrinted = pb.updateProgress(dotsPrinted, numberOfVehicles, totalVehicles);
 				}
 			}
 			vehicleStats.close();
 			majorLocations.close();
 			minorLocations.close();
-			hourOfDayInGauteng.close();
+			hourOfDayStats.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -143,7 +152,9 @@ public class ActivityLocations {
 		
 		long endTime = System.currentTimeMillis();
 		
-		System.out.println("-------------- SUMMARY  --------------");
+		System.out.println("--------------------------------------");
+		System.out.println("Summary for: " + PROVINCE );
+		System.out.println("--------------------------------------");
 		System.out.println("Number of vehicles processed: " + numberOfVehicles );
 		System.out.println("Total home locations: " + numberOfMajorActivities );
 		System.out.println("Total activity locations: " + numberOfMinorActivities );
@@ -167,7 +178,7 @@ public class ActivityLocations {
 	}
 
 
-	private static String gautengHeaderString() {
+	private static String studyAreaHeaderString() {
 		return  "Veh_ID" + DELIMITER_OUT + 
 				"Long" + DELIMITER_OUT + 
 				"Lat" + DELIMITER_OUT + 
@@ -175,12 +186,12 @@ public class ActivityLocations {
 				"Duration";
 	}
 
-	private static String gautengString(Vehicle thisVehicle, int i) {
+	private static String studyAreaStatsString(Vehicle thisVehicle, int i) {
 		String outputString = String.valueOf( thisVehicle.getVehID() ) + DELIMITER_OUT +
-							  String.valueOf(thisVehicle.getGautengActivities().get(i).getLocation().getCoordinate().x ) + DELIMITER_OUT +
-							  String.valueOf( thisVehicle.getGautengActivities().get(i).getLocation().getCoordinate().y ) + DELIMITER_OUT +
-							  String.valueOf( thisVehicle.getGautengActivities().get(i).getStartHour() ) + DELIMITER_OUT + 
-							  String.valueOf( thisVehicle.getGautengActivities().get(i).getDuration() );
+							  String.valueOf(thisVehicle.getStudyAreaActivities().get(i).getLocation().getCoordinate().x ) + DELIMITER_OUT +
+							  String.valueOf( thisVehicle.getStudyAreaActivities().get(i).getLocation().getCoordinate().y ) + DELIMITER_OUT +
+							  String.valueOf( thisVehicle.getStudyAreaActivities().get(i).getStartHour() ) + DELIMITER_OUT + 
+							  String.valueOf( thisVehicle.getStudyAreaActivities().get(i).getDuration() );
 		return outputString;
 	}
 
@@ -197,7 +208,7 @@ public class ActivityLocations {
 			   "Gauteng_Chain_Distance";
 	}
 
-	private static String statsString(Vehicle thisVehicle) {
+	private static String vehicleStatsString(Vehicle thisVehicle) {
 		return thisVehicle.getVehID() + DELIMITER_OUT + 
 			   thisVehicle.getHomeLocation().size() + DELIMITER_OUT +
 			   thisVehicle.getChains().size() + DELIMITER_OUT + 
@@ -205,33 +216,11 @@ public class ActivityLocations {
 			   thisVehicle.getAvgChainDistance() + DELIMITER_OUT +
 			   thisVehicle.getAvgActivitesPerChain() + DELIMITER_OUT +
 			   thisVehicle.getTotalActivities() + DELIMITER_OUT +
-			   thisVehicle.getNumberOfGautengActivities() + DELIMITER_OUT +
-			   thisVehicle.getPercentGautengActivities() + DELIMITER_OUT +
-			   thisVehicle.getGautengChainDistance();
+			   thisVehicle.getNumberOfStudyAreaActivities() + DELIMITER_OUT +
+			   thisVehicle.getPercentStudyAreaActivities() + DELIMITER_OUT +
+			   thisVehicle.getStudyAreaChainDistance();
 	}
-	
-	private static void printProgressBar() {
-		System.out.println("0%                 20%                 40%                 60%                 80%               100%");
-		System.out.print("|");
-		for(int i = 1; i <= 10; i++ ){
-			for(int j = 1; j <= 9; j++ ){
-				System.out.print("-");
-			}
-			System.out.print("|");
-		}
-		System.out.println();
-		System.out.print("*");
-	}
-
-	private static void updateProgress(float vehicles, float totalVehicles) {
-		int percentage = (int) (( vehicles / totalVehicles )*100);
-		int dotsAdd = percentage - progressDots;
-		for(int i = 1; i <= dotsAdd; i++ ){
-			System.out.print("*");
-		}
-		progressDots += dotsAdd;
-	}
-	
+		
 	private static String locationHeaderString(){
 		String s = "ID" + DELIMITER_OUT + 
 				   "Long" + DELIMITER_OUT + 
@@ -283,7 +272,7 @@ public class ActivityLocations {
 		findNextVehicleStop(log); // Clean all points until first start		
 		ArrayList<Activity> activityList = extractActivities(file, log); // Find all the activities
 		extractChains(thisVehicle, activityList);
-		thisVehicle.updateVehicleStatistics(gauteng);		
+		thisVehicle.updateVehicleStatistics(studyArea);		
 	}
 
 	private static ArrayList<Activity> extractActivities(File file,
@@ -314,6 +303,8 @@ public class ActivityLocations {
 					System.out.println("There does not seem to be a possible location for this activitiy?!");
 				}
 				log.get(0).setCoordinate(new Coordinate(x, y) );
+				// Using the start position as the location of the activity
+				// TODO When sorting out 'BoinkPoints' I need to address this as well.
 				activityList.add(new Activity( log.get(0).getTime(), log.get(1).getTime(), log.get(0) ) );
 
 				// Check if location where activity stops is within the limits from where activity started 
@@ -328,7 +319,6 @@ public class ActivityLocations {
 				locationList = new ArrayList<GPSPoint>();
 				
 				findNextVehicleStop(log);
-				
 			}
 		}
 		return activityList;

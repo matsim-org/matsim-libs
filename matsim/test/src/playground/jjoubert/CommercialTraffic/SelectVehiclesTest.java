@@ -13,14 +13,14 @@ public class SelectVehiclesTest extends MatsimTestCase{
 		File testFolder = new File("/Users/johanwjoubert/MATSim/workspace/MATSimTestData/");
 		assertTrue(emptyFolder(testFolder) );
 		testFolder.mkdir();
-		assertEquals("Folder should be empty", 0, SelectGautengVehicles.countVehicleFiles(testFolder) );
+		assertEquals("Folder should be empty", 0, SelectVehicles.countVehicleFiles(testFolder) );
 		
 		createTestFiles(testFolder, 4);
-		assertEquals("Folder should contain 4 files.", 4, SelectGautengVehicles.countVehicleFiles(testFolder) );
+		assertEquals("Folder should contain 4 files.", 4, SelectVehicles.countVehicleFiles(testFolder) );
 		
 		File folderFiles[] = testFolder.listFiles();
 		folderFiles[0].delete();
-		assertEquals("Folder should contain 3 files.", 3, SelectGautengVehicles.countVehicleFiles(testFolder) );
+		assertEquals("Folder should contain 3 files.", 3, SelectVehicles.countVehicleFiles(testFolder) );
 		
 		assertTrue(emptyFolder(testFolder) );
 	}	
@@ -37,24 +37,24 @@ public class SelectVehiclesTest extends MatsimTestCase{
 		File copyFolder = new File("/Users/johanwjoubert/MATSim/workspace/MATSimTestData/CopyFolder");
 		assertTrue("Copy folder should have been created", copyFolder.mkdirs() );
 		
-		assertTrue("First file should have been copied.", SelectGautengVehicles.moveVehicleFile(copyFolder, fileOne) );
+		assertTrue("First file should have been copied.", SelectVehicles.copyVehicleFile(copyFolder, fileOne) );
 		assertEquals("There should be one file in copy folder.", 1, copyFolder.listFiles().length);
 		
-		assertTrue("Second file should have been copied.", SelectGautengVehicles.moveVehicleFile(copyFolder, fileTwo) );
+		assertTrue("Second file should have been copied.", SelectVehicles.copyVehicleFile(copyFolder, fileTwo) );
 		assertEquals("There should be two files in copy folder.", 2, copyFolder.listFiles().length);
 	}
 	
 	public void testCheckStudyArea() {
 		
-		Polygon polygon = createTestPolygon();
+		MultiPolygon polygon = createTestPolygon();
 		ArrayList<Point> points = createTestPoints();
 		
-		assertTrue("Point 1 is actually inside", SelectGautengVehicles.testPolygon(polygon, points.get(0) ) );
-		assertFalse("Point 2 is actually outside", SelectGautengVehicles.testPolygon(polygon, points.get(1) ) );
-		assertFalse("Point 3 is actually outside", SelectGautengVehicles.testPolygon(polygon, points.get(2) ) );
-		assertFalse("Point 4 is actually outside", SelectGautengVehicles.testPolygon(polygon, points.get(3) ) );
-		assertTrue("Point 5 is actually inside", SelectGautengVehicles.testPolygon(polygon, points.get(4) ) );
-		assertFalse("Point 6 is actually outside", SelectGautengVehicles.testPolygon(polygon, points.get(5) ) );
+		assertTrue("Point 1 is actually inside", SelectVehicles.testPolygon(polygon, points.get(0) ) );
+		assertFalse("Point 2 is actually outside", SelectVehicles.testPolygon(polygon, points.get(1) ) );
+		assertFalse("Point 3 is actually outside", SelectVehicles.testPolygon(polygon, points.get(2) ) );
+		assertFalse("Point 4 is actually outside", SelectVehicles.testPolygon(polygon, points.get(3) ) );
+		assertTrue("Point 5 is actually inside", SelectVehicles.testPolygon(polygon, points.get(4) ) );
+		assertFalse("Point 6 is actually outside", SelectVehicles.testPolygon(polygon, points.get(5) ) );
 	}
 		
 	private ArrayList<Point> createTestPoints() {
@@ -82,7 +82,7 @@ public class SelectVehiclesTest extends MatsimTestCase{
 		return points;
 	}
 
-	private Polygon createTestPolygon () {
+	private MultiPolygon createTestPolygon () {
 		
 		// Something like a figure of eight
 		Coordinate c1 = new Coordinate(0, 0);
@@ -111,8 +111,11 @@ public class SelectVehiclesTest extends MatsimTestCase{
 		
 		LinearRing lr = gf.createLinearRing(c);
 		Polygon p = gf.createPolygon(lr, null);
+		Polygon p1[] = new Polygon[1];
+		p1[0] = p;
+		MultiPolygon mp = gf.createMultiPolygon(p1);
 		
-		return p;		
+		return mp;		
 	}
 			
 	private void createTestFiles(File folder, int numberoffiles) {

@@ -4,12 +4,13 @@ import java.util.ArrayList;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 /**
  * A vehicle class for the commercial vehicle study in South Africa. 
  * Each vehicle contains major activity locations, minor activity 
- * locations, and a list of all minor activities in Gauteng.
+ * locations, and a list of all minor activities in the given study
+ * area.
  *  
  * @author johanwjoubert
  *
@@ -18,13 +19,14 @@ public class Vehicle {
 	private int vehID;
 	private ArrayList<Activity> homeLocation;
 	private ArrayList<Chain> chains;
-	private ArrayList<Activity> gautengActivities;
+	//TODO Must generalize to cover ANY study area
+	private ArrayList<Activity> studyAreaActivities;
 	private int avgActivitesPerChain;
 	private int avgChainDuration;
 	private int avgChainDistance; 
-	private int numberOfGautengActivities;
-	private float percentGautengActivities;
-	private int gautengChainDistance;
+	private int numberOfStudyAreaActivities;
+	private float percentageStudyAreaActivities;
+	private int studyAreaChainDistance;
 	private int totalActivities;
 	public final static int DISTANCE_THRESHOLD = 2500; // expressed in meters
 	
@@ -32,19 +34,19 @@ public class Vehicle {
 	 * Creates a new vehicle with the ID as obtained from the 
 	 * DigiCore data set.
 	 * 
-	 * @param id of type <code>int<code>
+	 * @param id is the unique vehicle identification number used by DigiCore
 	 */
 	public Vehicle(int id){
 
 		this.setVehID(id);
 		this.homeLocation = new ArrayList<Activity>();
 		this.chains = new ArrayList<Chain>();
-		this.gautengActivities = new ArrayList<Activity>();
+		this.studyAreaActivities = new ArrayList<Activity>();
 		this.avgActivitesPerChain = 0;
 		this.avgChainDuration = 0;
 		this.avgChainDistance = 0;
-		this.numberOfGautengActivities = 0;
-		this.percentGautengActivities = 0;
+		this.numberOfStudyAreaActivities = 0;
+		this.percentageStudyAreaActivities = 0;
 		this.totalActivities = 0;
 	}
 	
@@ -59,24 +61,22 @@ public class Vehicle {
 	 * Note: it is currently assumed that the study area is given in
 	 *       the WGS84_UTM35S coordinate system.
 	 *        
-	 * @param study of type <code>Polygon<code> 
+	 * @param studyArea of type <code>MultiPolygon<code> 
 	 */
-	public void updateVehicleStatistics(Polygon study){
+	public void updateVehicleStatistics(MultiPolygon studyArea){
 		setAvgActivitiesPerChain();
 		setAvgChainDuration();
 		setAvgChainDistance();
-		setNumberOfGautengActivities( study );
+		setNumberOfStudyAreaActivities( studyArea );
 	}
 	
 	private void setAvgActivitiesPerChain(){
-		int activities = 0;
 		int totalActivities = 0;
-		for (Chain chain : this.chains) {
-			activities += (chain.getActivities().size() - 2);
-			totalActivities += activities;
-		}
 		if(this.chains.size() > 0){
-			this.avgActivitesPerChain = ((int) ( activities / this.chains.size() ));
+			for (Chain chain : this.chains) {
+				totalActivities += (chain.getActivities().size() - 2);
+			}
+			this.avgActivitesPerChain = ((int) ( totalActivities / this.chains.size() ));
 		} else{
 			this.avgActivitesPerChain = (0);
 		}
@@ -107,27 +107,28 @@ public class Vehicle {
 		}
 	}
 
-	private void setNumberOfGautengActivities(Polygon study){
+	private void setNumberOfStudyAreaActivities(MultiPolygon studyArea){
 		GeometryFactory gf = new GeometryFactory();
 		if(this.chains.size() > 0){
 			for (Chain chain : this.chains) {
 				if(chain.getActivities().size() > 0){
 					for (int i = 1; i < chain.getActivities().size() - 1; i++ ) { // don't count first and last major locations
-						Point p = gf.createPoint( chain.getActivities().get(i).getLocation().getCoordinate() );
-						if( study.contains(p) ){
-							this.gautengActivities.add( chain.getActivities().get(i) );
-							chain.setInGauteng(true);
+						Activity thisActivity = chain.getActivities().get(i);
+						Point p = gf.createPoint( thisActivity.getLocation().getCoordinate() );
+						if( studyArea.contains(p) ){
+							this.studyAreaActivities.add( thisActivity );
+							chain.setInStudyArea(true);
 						}
 					}
 				}
-				if( chain.isInGauteng() ){
-					this.gautengChainDistance += chain.getDistance();
+				if( chain.isInStudyArea() ){
+					this.studyAreaChainDistance += chain.getDistance();
 				}
 			}
 		}
-		this.numberOfGautengActivities = this.gautengActivities.size();
-		this.percentGautengActivities = (((float) this.numberOfGautengActivities) / 
-										((float) this.totalActivities));
+		this.numberOfStudyAreaActivities = this.studyAreaActivities.size();
+		this.percentageStudyAreaActivities = (((float) this.numberOfStudyAreaActivities) / 
+										((float) this.getTotalActivities() ) );
 	}
 		
 	/**
@@ -139,9 +140,9 @@ public class Vehicle {
 	 * The method adjusts all major location coordinates to the 
 	 * weighted center of the location clusters. A second check is
 	 * then done to see whether cluster centroids are within the 
-	 * distance threshold. If so, the location of the cluster with
-	 * the most locations are used to adjust the dominated clusters'
-	 * locations.
+	 * distance threshold. If so, the dominating cluster is the one
+	 * with the most activity locations, and all dominated clusters'
+	 * locations are adjusted accordingly.
 	 */
 	public void extractMajorLocations(){
 		if(this.chains.size() > 0){
@@ -205,7 +206,7 @@ public class Vehicle {
 //				Polygon p = gf.createPolygon(lr, null);
 //				Coordinate center = p.getCentroid().getCoordinate();
 				
-				// Or just calculate the damn weighted average (gravity method...)
+				// Or just calculate the weighted average (gravity method...)
 				double xSum = 0;
 				double ySum = 0;
 				for(int j = 0; j < thisList.size(); j++ ){
@@ -264,15 +265,11 @@ public class Vehicle {
 		}
 	}
 
-//	private int convertDistance(double distance) {
-//		// Conversion constant (degree to meter) taken from http://www.uwgb.edu/dutchs/UsefulData/UTMFormulas.htm on Sat, 7 Feb 2009 at 11:25 CET
-//		return ((int) (distance*DEG_TO_METER) );
-//	}
-
 	/**
-	 * Considers each chain of the vehicle. If a chain does not 
-	 * contain at least one minor activity between two major 
-	 * activities, the chain is removed.
+	 * Considers each chain of the vehicle. If a chain does not start
+	 * AND end at a major location, or if a chain contain at least one 
+	 * minor activity between two major activities, the chain is 
+	 * removed.
 	 */
 	public void cleanChains() {
 		int i = 0;
@@ -314,8 +311,8 @@ public class Vehicle {
 	 * 
 	 * @return {@code ArrayList<Activity>}
 	 */
-	public ArrayList<Activity> getGautengActivities() {
-		return gautengActivities;
+	public ArrayList<Activity> getStudyAreaActivities() {
+		return studyAreaActivities;
 	}
 	
 	public void addChain(Chain chain){
@@ -350,16 +347,16 @@ public class Vehicle {
 		return avgChainDistance;
 	}
 
-	public float getPercentGautengActivities() {
-		return percentGautengActivities;
+	public float getPercentStudyAreaActivities() {
+		return percentageStudyAreaActivities;
 	}
 		
-	public int getNumberOfGautengActivities() {
-		return numberOfGautengActivities;
+	public int getNumberOfStudyAreaActivities() {
+		return numberOfStudyAreaActivities;
 	}
 
-	public int getGautengChainDistance() {
-		return gautengChainDistance;
+	public int getStudyAreaChainDistance() {
+		return studyAreaChainDistance;
 	}
 
 

@@ -12,25 +12,40 @@ import java.util.Collections;
 import java.util.Scanner;
 
 /**
+ * A class to read vehicle files from the DigiCore data set and sort
+ * them chronologically according to the time stamp filed.
  * 
  * @author johanwjoubert
  *
  */
 
 public class SortVehicleLogs {
-	final static String SOURCEFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp/";
-	final static String DESTFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp/Sorted/";
+	// String value that must be set
+	final static String PROVINCE = "WesternCape";
+	// Derived string values
+	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/" + PROVINCE + "/";
+	final static String SOURCEFOLDER = ROOT + "Unsorted/";
+	final static String DESTFOLDER = ROOT + "Sorted/";
+	// Other variables and parameters
 	final static String DELIMITER = " "; // this could be "," or "\t"
 
 	public static void main (String args[] ){
-		int progress = 0;
+		System.out.println("Sorting vehicle files for: " + PROVINCE );
+		System.out.println();
+		ProgressBar pb = new ProgressBar('*');
+		pb.printProgressBar();
+		int dotsPrinted = 0;
+		
 		File outFolder = new File(DESTFOLDER);
 		outFolder.mkdir();
 		
 		File files = new File(SOURCEFOLDER);
 		File vehicleFiles[] = files.listFiles();
 		int numFiles = vehicleFiles.length;
+		
+		
 		if(vehicleFiles.length > 0){
+			int filesSorted = 0;
 			long maxLines = 0;
 			File maxFile = null;
 			for (File theFile : vehicleFiles) {				
@@ -49,9 +64,10 @@ public class SortVehicleLogs {
 							e.printStackTrace();
 						}
 				}	
-				if(++progress%500 == 0){
-					System.out.println(progress + " of " + numFiles + " files sorted.");
+				if(filesSorted%100 == 0){
+					dotsPrinted = pb.updateProgress(dotsPrinted, filesSorted, numFiles);
 				}
+				filesSorted++;
 			}
 			System.out.println("Largest file is " + maxFile.getName() + " and has " + maxLines + " gps records.");
 		}
