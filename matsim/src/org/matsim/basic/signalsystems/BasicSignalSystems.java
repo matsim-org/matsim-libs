@@ -32,10 +32,6 @@ public class BasicSignalSystems {
 	private List<BasicSignalSystemDefinition> lightSignalSystemDefinitions;
 	private List<BasicSignalGroupDefinition> lightSignalGroupDefinitions;
 
-	
-	
-	
-	
 	public List<BasicLanesToLinkAssignment> getLanesToLinkAssignments() {
 		return lanesToLinkAssignments;
 	}

@@ -439,7 +439,7 @@ public class QueueLane implements Comparable<QueueLane> {
 	
 	/*package*/ boolean updateActiveStatus() {
 		/*
-		 * Leave link active as long as there are vehicles on the link (ignore
+		 * Leave Lane active as long as there are vehicles on the link (ignore
 		 * buffer because the buffer gets emptied by nodes and not links) and leave
 		 * link active until buffercap has accumulated (so a newly arriving vehicle
 		 * is not delayed).
