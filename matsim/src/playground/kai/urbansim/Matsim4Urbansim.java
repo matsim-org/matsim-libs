@@ -83,8 +83,8 @@ public class Matsim4Urbansim {
 		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year ) ;
 
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
-		Facilities facilities = new FacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)", Facilities.FACILITIES_NO_STREAMING) ;
-		Facilities zones      = new FacilitiesImpl("urbansim zones", Facilities.FACILITIES_NO_STREAMING) ;
+		Facilities facilities = new FacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)", FacilitiesImpl.FACILITIES_NO_STREAMING) ;
+		Facilities zones      = new FacilitiesImpl("urbansim zones", FacilitiesImpl.FACILITIES_NO_STREAMING) ;
 		readFromUrbansim.readFacilities( facilities, zones ) ;
 
 		FacilitiesWriter facWriter = new FacilitiesWriter(facilities,PATH_TO_OPUS_MATSIM+"tmp/locations.xml.gz") ;

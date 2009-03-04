@@ -1,17 +1,12 @@
 package playground.ciarif.retailers;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.utils.geometry.CoordImpl;
 
 // Gruss! balmi
 //System.out.println("  reading facilities xml file... ");
@@ -49,7 +44,7 @@ public class Retailers_Old {
 		//facilities.getFacilities().get(key);
 		System.out.println("  Facilities = " + facilities.getFacilities().keySet());
 		IdImpl id = new IdImpl(8);
-		System.out.println("  Facility 8 = " + facilities.getLocation(id));
+		System.out.println("  Facility 8 = " + facilities.getFacilities().get(id));
 		this.retailers.put(id,this.facilities.getFacilities().get(id));
 	}
 
@@ -76,11 +71,11 @@ public class Retailers_Old {
 		this.algorithms.clear();
 	}
 
-	/**
-	 * @param id the id of the retailer
-	 * @param cust_spm the numbers of costumers to be served
-	 * @return the created Retailer object, or null if it could not be created (maybe because it already exists)
-	 */
+//	/**
+//	 * @param id the id of the retailer
+//	 * @param cust_spm the numbers of costumers to be served
+//	 * @return the created Retailer object, or null if it could not be created (maybe because it already exists)
+//	 */
 //	public final Retailer createRetailer(final Id id, final int cust_sqm ) {
 //		// check id string for uniqueness
 //		if (this.Retailers.containsKey(id)) {

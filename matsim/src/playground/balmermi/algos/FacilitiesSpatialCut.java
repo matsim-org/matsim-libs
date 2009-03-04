@@ -21,7 +21,6 @@
 package playground.balmermi.algos;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.interfaces.basic.v01.Coord;
@@ -29,7 +28,6 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.world.Location;
 
 public class FacilitiesSpatialCut {
 
@@ -41,9 +39,7 @@ public class FacilitiesSpatialCut {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		ArrayList<Facility> f_array = new ArrayList<Facility>();
-		Iterator<? extends Location> f_it = facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : facilities.getFacilities().values()) {
 			Coord c = f.getCenter();
 			if ((c.getX() >= this.min.getX()) && (c.getY() >= this.min.getY()) &&
 			    (c.getX() <= this.max.getX()) && (c.getY() <= this.max.getY())) {

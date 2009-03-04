@@ -46,8 +46,11 @@ public class FacilitiesImpl extends Layer implements Facilities {
 	private long counter = 0;
 	private long nextMsg = 1;
 
+	public static final boolean FACILITIES_USE_STREAMING = true;
+	public static final boolean FACILITIES_NO_STREAMING = false;
+	
 	private boolean isStreaming = FacilitiesImpl.FACILITIES_NO_STREAMING;
-
+	
 	private static final Logger log = Logger.getLogger(FacilitiesImpl.class);
 
 	//////////////////////////////////////////////////////////////////////
@@ -146,10 +149,6 @@ public class FacilitiesImpl extends Layer implements Facilities {
 	@SuppressWarnings("unchecked")
 	public final Map<Id, ? extends Facility> getFacilities() {
 		return (Map<Id, ? extends Facility>) getLocations();
-	}
-
-	public final Facility getFacility(final Id id) {
-		return (Facility) getLocation(id);
 	}
 
 	//Added 27.03.08 JH for random secondary location changes

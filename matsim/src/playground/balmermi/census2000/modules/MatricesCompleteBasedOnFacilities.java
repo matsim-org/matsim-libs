@@ -199,9 +199,7 @@ public class MatricesCompleteBasedOnFacilities {
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		Iterator<? extends Location> f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(WORK) != null) {
 				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
@@ -215,9 +213,7 @@ public class MatricesCompleteBasedOnFacilities {
 		maxy += 1.0;
 		System.out.println("building quad tree: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.workFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(WORK) != null) {
 				this.workFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 			}
@@ -233,9 +229,7 @@ public class MatricesCompleteBasedOnFacilities {
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		Iterator<? extends Location> f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(EDUCATION) != null) {
 				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
@@ -249,9 +243,7 @@ public class MatricesCompleteBasedOnFacilities {
 		maxy += 1.0;
 		System.out.println("building quad tree: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.educFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(EDUCATION) != null) {
 				this.educFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 			}

@@ -73,12 +73,12 @@ public class TryOut {
 
 		// create needed facilities
 		final FacilitiesImpl facilities = createFacilities();
-		Facility stop1 = facilities.getFacility(new IdImpl("stop1"));
-		Facility stop2 = facilities.getFacility(new IdImpl("stop2"));
-		Facility stop3 = facilities.getFacility(new IdImpl("stop3"));
-		Facility stop4 = facilities.getFacility(new IdImpl("stop4"));
-		Facility stop5 = facilities.getFacility(new IdImpl("stop5"));
-		Facility stop6 = facilities.getFacility(new IdImpl("stop6"));
+		Facility stop1 = facilities.getFacilities().get(new IdImpl("stop1"));
+		Facility stop2 = facilities.getFacilities().get(new IdImpl("stop2"));
+		Facility stop3 = facilities.getFacilities().get(new IdImpl("stop3"));
+		Facility stop4 = facilities.getFacilities().get(new IdImpl("stop4"));
+		Facility stop5 = facilities.getFacilities().get(new IdImpl("stop5"));
+		Facility stop6 = facilities.getFacilities().get(new IdImpl("stop6"));
 
 		// do some forbidden magic
 		final World world = new World();
@@ -275,16 +275,16 @@ public class TryOut {
 		final Person person = new PersonImpl(new IdImpl("1"));
 		population.addPerson(person);
 		final Plan plan = person.createPlan(true);
-		final Act homeAct = plan.createAct("home", facilities.getFacility(new IdImpl("home")));
+		final Act homeAct = plan.createAct("home", facilities.getFacilities().get(new IdImpl("home")));
 		homeAct.setEndTime(7.0*3600);
 		final Leg walk1 = plan.createLeg(BasicLeg.Mode.walk);
-		final Act changeMode1 = plan.createAct("transitIteraction", facilities.getFacility(new IdImpl("stop2")));
+		final Act changeMode1 = plan.createAct("transitIteraction", facilities.getFacilities().get(new IdImpl("stop2")));
 		changeMode1.setDuration(0.0);
 		final Leg bus = plan.createLeg(BasicLeg.Mode.pt);
-		final Act changeMode2 = plan.createAct("transitIteraction", facilities.getFacility(new IdImpl("stop5")));
+		final Act changeMode2 = plan.createAct("transitIteraction", facilities.getFacilities().get(new IdImpl("stop5")));
 		changeMode2.setDuration(0.0);
 		final Leg walk2 = plan.createLeg(BasicLeg.Mode.walk);
-		final Act workAct = plan.createAct("work", facilities.getFacility(new IdImpl("work")));
+		final Act workAct = plan.createAct("work", facilities.getFacilities().get(new IdImpl("work")));
 		workAct.setDuration(8.0*3600);
 
 		Gbl.createConfig(null); // required for plans.outputSample

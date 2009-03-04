@@ -69,7 +69,7 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 
 		Facilities facs = (Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 		
-		Facility fac = (Facility) facs.getLocation("shelter0");
+		Facility fac = facs.getFacilities().get(new IdImpl("shelter0"));
 		// the remaining persons plans will be routed
 		for (Person person : plans) {
 			if (person.getPlans().size() != 1 ) {
@@ -84,7 +84,7 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 			
 			person.createKnowledge("evac location");
 			Act fact = plan.getFirstActivity();
-			Facility f = (Facility) facs.getLocation(fact.getLinkId().toString());
+			Facility f = facs.getFacilities().get(fact.getLinkId());
 			fact.setFacility(f);
 			ActivityOption a = f.getActivityOption("h");
 			person.getKnowledge().addActivity(a, true);

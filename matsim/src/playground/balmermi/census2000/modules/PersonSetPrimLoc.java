@@ -148,9 +148,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 
 	public final void buildZoneFacilityMapping() {
 		ZoneLayer layer = (ZoneLayer)Gbl.getWorld().getLayer(MUNICIPALITY);
-		Iterator<? extends Location> f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			ArrayList<Zone> zones = new ArrayList<Zone>();
 			Iterator<? extends Location> z_it = layer.getLocations().values().iterator();
 			while (z_it.hasNext()) {

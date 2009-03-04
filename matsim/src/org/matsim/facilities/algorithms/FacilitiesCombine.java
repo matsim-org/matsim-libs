@@ -29,7 +29,6 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.world.Location;
 
 public class FacilitiesCombine {
 
@@ -88,9 +87,7 @@ public class FacilitiesCombine {
 		// TreeMap<XCOORD,TreeMap<YCOORD,FACILITY>>
 		TreeMap<Double,TreeMap<Double,Facility>> facs = new TreeMap<Double, TreeMap<Double,Facility>>();
 
-		Iterator<? extends Location> f_it = facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : facilities.getFacilities().values()) {
 			Double x = f.getCenter().getX();
 			Double y = f.getCenter().getY();
 			if (facs.containsKey(x)) { // same x coord

@@ -107,7 +107,7 @@ public class ReadFromUrbansimParcelModel {
 			Id       parcelId =            entry.getKey();
 			ZoneId   zoneId   = (ZoneId)   entry.getValue() ;
 
-			Location parcel = parcels.getLocation(parcelId) ;
+			Location parcel = parcels.getFacilities().get(parcelId) ;
 			assert( parcel!= null ) ;
 			Coord coord = parcel.getCenter();
 
@@ -165,7 +165,7 @@ public class ReadFromUrbansimParcelModel {
 				flag = false ;
 
 				Id homeParcelId = new IdImpl( parts[idxFromKey.get("parcel_id_home")] ) ;
-				Location homeLocation = facilities.getLocation( homeParcelId ) ;
+				Location homeLocation = facilities.getFacilities().get( homeParcelId ) ;
 				if ( homeLocation==null ) {
 					log.warn( "homeLocation==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
 					continue ;
@@ -186,7 +186,7 @@ public class ReadFromUrbansimParcelModel {
 				} else {
 					newPerson.setEmployed("yes") ;
 					Id workParcelId = new IdImpl( parts[idx] ) ;
-					Location jobLocation = facilities.getLocation( workParcelId ) ;
+					Location jobLocation = facilities.getFacilities().get( workParcelId ) ;
 					if ( jobLocation == null ) {
 						if ( jobLocationIdNullCnt < 1 ) {
 							jobLocationIdNullCnt++ ;

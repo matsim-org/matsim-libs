@@ -10,12 +10,12 @@ import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
+import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.Location;
 
 import playground.toronto.ttimematrix.SpanningTree;
 
@@ -57,8 +57,8 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 			
 			System.out.println("|--------------------------------------------------------------------------------------------------|") ;
 			long cnt = 0 ; long percentDone = 0 ;
-			for ( Location fromZone : zones.getLocations().values() ) {
-				if ( (int) (100.*cnt/zones.getLocations().size()) > percentDone ) { 
+			for ( Facility fromZone : zones.getFacilities().values() ) {
+				if ( (int) (100.*cnt/zones.getFacilities().size()) > percentDone ) { 
 					percentDone++ ; System.out.print('.') ; 
 				}  
 				cnt++ ;
@@ -68,7 +68,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 				assert( fromNode != null ) ;
 				st.setOrigin( fromNode ) ;
 				st.run(network) ;
-				for ( Location toZone : zones.getLocations().values() ) {
+				for ( Facility toZone : zones.getFacilities().values() ) {
 					Coord toCoord = toZone.getCenter() ;
 					Node toNode = network.getNearestNode( toCoord ) ;
 					double arrTime = st.getTree().get(toNode.getId()).getTime();

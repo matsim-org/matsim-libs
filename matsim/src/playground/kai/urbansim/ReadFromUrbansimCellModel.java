@@ -6,7 +6,8 @@ package playground.kai.urbansim;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
@@ -124,7 +125,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 
 				idx = idxFromKey.get("grid_id:i4") ;
 				LocationId homeGridId = new LocationId( parts[idx] ) ;
-				Location homeLocation = facilities.getLocation( homeGridId ) ;
+				Location homeLocation = facilities.getFacilities().get( homeGridId ) ;
 				if ( homeLocation==null ) {
 					log.warn("no home location; hhId: " + hhId.toString() ) ;
 					line = reader.readLine(); // next line

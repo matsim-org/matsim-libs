@@ -155,7 +155,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			if (!primActs.isEmpty()){
 				for (int j=0;j<primActs.size();j++){
 					if (((Act)(bestPlan.getActsLegs().get(i))).getType().equals(primActs.get(j).getType())){
-						Facility fac = (Facility) this.controler.getFacilities().getLocation(primActs.get(j).getFacility().getId());
+						Facility fac = this.controler.getFacilities().getFacilities().get(primActs.get(j).getFacility().getId());
 						((Act)(bestPlan.getActsLegs().get(i))).setFacility(fac);
 						// not only update of fac required but also coord and link; data inconsistencies otherwise
 						((Act)(bestPlan.getActsLegs().get(i))).setCoord(fac.getCenter());

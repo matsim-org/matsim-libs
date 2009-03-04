@@ -23,7 +23,6 @@ package playground.balmermi;
 import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Facilities;
 
 import playground.balmermi.algos.FacilityWriteTable;
 import playground.balmermi.census2000v2.data.CAtts;
@@ -101,7 +100,7 @@ public class ScenarioParsing {
 
 		//////////////////////////////////////////////////////////////////////
 		
-		Facilities facs = new FacilitiesImpl(null,true);
+		FacilitiesImpl facs = new FacilitiesImpl(null,true);
 		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_EHIGH));
 		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_EKIGA));
 		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_EOTHR));

@@ -91,7 +91,7 @@ public class TransitScheduleReader extends MatsimXmlParser {
 			this.currentRouteProfile = new TempRouteProfile();
 		} else if (STOP.equals(name)) {
 			Id id = new IdImpl(atts.getValue(REF));
-			Facility facility = this.facilities.getFacility(id);
+			Facility facility = this.facilities.getFacilities().get(id);
 			if (facility == null) {
 				throw new RuntimeException("no stop/facility with id " + atts.getValue(ID));
 			}

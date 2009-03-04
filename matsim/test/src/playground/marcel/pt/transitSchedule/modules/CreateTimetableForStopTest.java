@@ -65,7 +65,7 @@ public class CreateTimetableForStopTest extends MatsimTestCase {
 		CreateTimetableForStop timetable = new CreateTimetableForStop(line);
 		assertNotNull("could not get transit line.", line);
 
-		double[] departures = timetable.getDeparturesAtStop(facilities.getFacility(new IdImpl("stop3")));
+		double[] departures = timetable.getDeparturesAtStop(facilities.getFacilities().get(new IdImpl("stop3")));
 
 		for (double d : departures) {
 			System.out.println("Departure at " + Time.writeTime(d));

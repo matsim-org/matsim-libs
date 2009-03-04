@@ -22,14 +22,11 @@ package org.matsim.interfaces.core.v01;
 
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.world.Location;
-import org.matsim.world.MappingRule;
 
 public interface Facilities extends Iterable<Facility> {
 	// TODO [MR] remove Iterable
@@ -47,49 +44,20 @@ public interface Facilities extends Iterable<Facility> {
 	@Deprecated
 	public static final Id LAYER_TYPE = new IdImpl("facility");
 
-	@Deprecated
-	public static final boolean FACILITIES_USE_STREAMING = true;
-	@Deprecated
-	public static final boolean FACILITIES_NO_STREAMING = false;
-
 	@Deprecated // to be clarified
 	public String getName();
 	
 	@Deprecated // to be clarified
 	public void setName(String name);
-	
-	@Deprecated // use getFacilities
-	public TreeMap<Id, ? extends Location> getLocations();
-	
+
 	@Deprecated // needs to be clarified, return Facility instead of Location
 	public List<Location> getLocations(final Coord center);
 
 	@Deprecated // needs to be clarified
 	public List<Location> getNearestLocations(final Coord center);
-	
-	@Deprecated // use getFacilities().get(id)
-	public Location getLocation(final Id location_id);
-	
-	@Deprecated // string-based methods are discouraged
-	public Location getLocation(final String location_id);
-	
-	@Deprecated
-	public MappingRule getUpRule();	
-
-	@Deprecated // "experimental", will be removed in interface
-	public void addAlgorithm(final FacilityAlgorithm algo);
-
-	@Deprecated // "experimental", will be removed in interface
-	public void runAlgorithms();
 
 	@Deprecated
 	public void finishFacility(final Facility f);
-
-	@Deprecated // "experimental", will be removed in interface
-	public void clearAlgorithms();
-
-	@Deprecated // use getFacilities().get(id)
-	public Facility getFacility(final Id id);
 
 	@Deprecated
 	public void printFacilitiesCount();

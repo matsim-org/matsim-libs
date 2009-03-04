@@ -3,12 +3,14 @@
  */
 package playground.kai.urbansim;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Person;
@@ -107,7 +109,7 @@ public class PseudoGravityModel {
 		// same for jobs except it's a bit more indirect:
 		for ( Iterator<Id> it = locationFromJob.values().iterator(); it.hasNext(); ) {
 			LocationId gridId = (LocationId) it.next();
-			Coord jobCoord = facilities.getLocation( gridId ).getCenter() ;
+			Coord jobCoord = facilities.getFacilities().get( gridId ).getCenter() ;
 			checkMax(jobCoord) ;
 		}
 			
@@ -122,7 +124,7 @@ public class PseudoGravityModel {
 		// for every job, add it to the pseudoCell
 		for ( Iterator<Id> it = locationFromJob.values().iterator(); it.hasNext(); ) {
 			LocationId parcelId = (LocationId) it.next();
-			Location parcel = facilities.getLocation( parcelId ) ;
+			Location parcel = facilities.getFacilities().get( parcelId ) ;
 			Coord cc = parcel.getCenter() ;
 			int bin = binFromXY( cc.getX() , cc.getY() ) ;
 			PseudoCell pc = pseudoCells.get(bin) ;

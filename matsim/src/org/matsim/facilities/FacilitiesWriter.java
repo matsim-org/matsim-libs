@@ -31,7 +31,6 @@ import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.Location;
 import org.matsim.writer.Writer;
 
 public class FacilitiesWriter extends Writer {
@@ -75,9 +74,7 @@ public class FacilitiesWriter extends Writer {
 	@Override
 	public final void write() {
 		this.writeOpenAndInit();
-		Iterator<? extends Location> f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			this.writeFacility(f);
 		}
 		this.writeFinish();

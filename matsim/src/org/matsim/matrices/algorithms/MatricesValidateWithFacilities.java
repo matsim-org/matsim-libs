@@ -60,7 +60,7 @@ public class MatricesValidateWithFacilities {
 		Iterator<Location> dl_it = loc.getDownMapping().values().iterator();
 		while (dl_it.hasNext()) {
 			Location dl = dl_it.next();
-			Facility f = (Facility)this.facilities.getLocation(dl.getId());
+			Facility f = this.facilities.getFacilities().get(dl.getId());
 			if (f == null) { 
 				throw new RuntimeException("SOMETHING IS WRONG!!!");
 			}
@@ -74,9 +74,7 @@ public class MatricesValidateWithFacilities {
 	private final Location findNearestLocation(final Location location, final String act_type) {
 		Facility nearest_facility = null;
 		double distance = Double.MAX_VALUE;
-		Iterator<? extends Location> f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOptions().containsKey(act_type)) {
 				double d = location.calcDistance(f.getCenter());
 				if (d < distance) {

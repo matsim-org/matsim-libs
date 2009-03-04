@@ -88,11 +88,11 @@ public class BusDriverTest extends MatsimTestCase {
 		Vehicle bus = new VehicleImpl(20, events);
 		driver.setVehicle(bus);
 
-		BusPassenger passenger1 = new BusPassenger(new IdImpl("1"), facilities.getFacility(new IdImpl("stop2")));
-		BusPassenger passenger2 = new BusPassenger(new IdImpl("2"), facilities.getFacility(new IdImpl("stop3")));
-		BusPassenger passenger3 = new BusPassenger(new IdImpl("3"), facilities.getFacility(new IdImpl("stop4")));
-		BusPassenger passenger4 = new BusPassenger(new IdImpl("4"), facilities.getFacility(new IdImpl("stop5")));
-		BusPassenger passenger5 = new BusPassenger(new IdImpl("5"), facilities.getFacility(new IdImpl("stop6")));
+		BusPassenger passenger1 = new BusPassenger(new IdImpl("1"), facilities.getFacilities().get(new IdImpl("stop2")));
+		BusPassenger passenger2 = new BusPassenger(new IdImpl("2"), facilities.getFacilities().get(new IdImpl("stop3")));
+		BusPassenger passenger3 = new BusPassenger(new IdImpl("3"), facilities.getFacilities().get(new IdImpl("stop4")));
+		BusPassenger passenger4 = new BusPassenger(new IdImpl("4"), facilities.getFacilities().get(new IdImpl("stop5")));
+		BusPassenger passenger5 = new BusPassenger(new IdImpl("5"), facilities.getFacilities().get(new IdImpl("stop6")));
 		bus.addPassenger(passenger1);
 		bus.addPassenger(passenger2);
 		bus.addPassenger(passenger3);
@@ -150,13 +150,13 @@ public class BusDriverTest extends MatsimTestCase {
 		events.addHandler(fv);
 		driver.setFacilityVisitorObserver(fv);
 
-		Facility workFacility = facilities.getFacility(new IdImpl("work"));
+		Facility workFacility = facilities.getFacilities().get(new IdImpl("work"));
 
-		BusPassenger passenger1 = createPassenger("1", facilities.getFacility(new IdImpl("stop2")), workFacility);
-		BusPassenger passenger2 = createPassenger("2", facilities.getFacility(new IdImpl("stop3")), workFacility);
-		BusPassenger passenger3 = createPassenger("3", facilities.getFacility(new IdImpl("stop4")), workFacility);
-		BusPassenger passenger4 = createPassenger("4", facilities.getFacility(new IdImpl("stop5")), workFacility);
-		BusPassenger passenger5 = createPassenger("5", facilities.getFacility(new IdImpl("stop6")), workFacility);
+		BusPassenger passenger1 = createPassenger("1", facilities.getFacilities().get(new IdImpl("stop2")), workFacility);
+		BusPassenger passenger2 = createPassenger("2", facilities.getFacilities().get(new IdImpl("stop3")), workFacility);
+		BusPassenger passenger3 = createPassenger("3", facilities.getFacilities().get(new IdImpl("stop4")), workFacility);
+		BusPassenger passenger4 = createPassenger("4", facilities.getFacilities().get(new IdImpl("stop5")), workFacility);
+		BusPassenger passenger5 = createPassenger("5", facilities.getFacilities().get(new IdImpl("stop6")), workFacility);
 		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("3"), (Act) passenger1.getPlans().get(0).getActsLegs().get(0)));
 		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("5"), (Act) passenger2.getPlans().get(0).getActsLegs().get(0)));
 		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("5"), (Act) passenger3.getPlans().get(0).getActsLegs().get(0)));

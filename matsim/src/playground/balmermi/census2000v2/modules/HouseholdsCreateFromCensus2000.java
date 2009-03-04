@@ -99,17 +99,17 @@ public class HouseholdsCreateFromCensus2000 {
 				// check for existing zone
 				Id zone_id = new IdImpl(entries[CAtts.I_ZGDE]);
 				Location zone = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY).getLocation(zone_id);
-				if (zone == null) { Gbl.errorMsg("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
+				if (zone == null) { throw new RuntimeException("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
 				
 				// check for existing facility
 				Id f_id = new IdImpl(entries[CAtts.I_GEBAEUDE_ID]);
-				Facility f = (Facility)this.facilities.getLocation(f_id);
-				if (f == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" does not exist!"); }
+				Facility f = this.facilities.getFacilities().get(f_id);
+				if (f == null) { throw new RuntimeException("Line "+line_cnt+": Facility id="+f_id+" does not exist!"); }
 				if (f.getActivityOption(CAtts.ACT_HOME) == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" exists but does not have 'home' activity type assigned!"); }
 				
 				// check for existing municipality
 				Municipality muni = this.municipalities.getMunicipality(Integer.parseInt(zone_id.toString()));
-				if (muni == null) { Gbl.errorMsg("Line "+line_cnt+": Municipality id="+zone_id+" does not exist!"); }
+				if (muni == null) { throw new RuntimeException("Line "+line_cnt+": Municipality id="+zone_id+" does not exist!"); }
 				
 				// household creation
 				Id hh_id = new IdImpl(entries[CAtts.I_HHNR]);

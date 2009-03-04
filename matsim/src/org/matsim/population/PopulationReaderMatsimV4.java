@@ -255,7 +255,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		if ((x != null) || (y != null)) { log.info("NEW: coords in <location> will be ignored!"); }
 		if (freq != null) { log.info("NEW: Attribute freq in <location> is not supported at the moment!"); }
 
-		this.currfacility = this.facilities.getFacility(new IdImpl(id));
+		this.currfacility = this.facilities.getFacilities().get(new IdImpl(id));
 		if (this.currfacility == null) { Gbl.errorMsg("facility id=" + id + " does not exist!"); }
 		this.curractivity = this.currfacility.getActivityOption(this.curracttype);
 		if (this.curractivity == null) { Gbl.errorMsg("facility id=" + id + ": Activity of type=" + this.curracttype + " does not exist!"); }
@@ -340,7 +340,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		this.curract.setDuration(Time.parseTime(atts.getValue("dur")));
 		this.curract.setEndTime(Time.parseTime(atts.getValue("end_time")));
 		if (atts.getValue("facility") != null) {
-			Facility f = this.facilities.getFacility(new IdImpl(atts.getValue("facility")));
+			Facility f = this.facilities.getFacilities().get(new IdImpl(atts.getValue("facility")));
 			if (f == null) {
 				Gbl.errorMsg("facility id=" + atts.getValue("facility)") + " does not exist!");
 			}

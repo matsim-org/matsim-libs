@@ -98,16 +98,17 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 					Id rId = new IdImpl(entries[0]);
 					if (this.retailers.getRetailers().containsKey(rId)) {
 						Id fId = new IdImpl (entries[1]);
-						Facility f = controler.getFacilities().getFacility(fId);
+						Facility f = controler.getFacilities().getFacilities().get(fId);
 						this.retailers.getRetailers().get(rId).addFacility(f);
 					}
 					else {
 						Retailer r = new Retailer(rId, null);
 						r.addStrategy(controler, entries[2]);
 						Id fId = new IdImpl (entries[1]);
-						Facility f = controler.getFacilities().getFacility(fId);
+						Facility f = controler.getFacilities().getFacilities().get(fId);
 						r.addFacility(f);
 						this.retailers.addRetailer(r);
+						
 					}
 				}
 			} 
@@ -126,6 +127,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 			Map<Id,Facility> facs =  r.runStrategy();
 			movedFacilities.putAll(facs);
 		}
+		
 		int iter = controler.getIteration();
 		this.rs.write(this.retailers);
 		
