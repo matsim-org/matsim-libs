@@ -89,7 +89,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 	private double lastTime=-1;
 	private int cntTimesteps=0;
 
-	private void convert() {
+	public void convert() {
 
 		open();
 		// read and convert data from veh-file

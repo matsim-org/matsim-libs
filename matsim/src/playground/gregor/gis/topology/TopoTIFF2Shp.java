@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MarginalTravelCostCalculatorII.java
+ * TopoTIFF2Shp.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,31 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.systemopt;
+package playground.gregor.gis.topology;
 
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.router.util.TravelCost;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
+import java.util.Iterator;
 
-public class MarginalTravelCostCalculatorII implements TravelCost {
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 
-	
+public class TopoTIFF2Shp {
 
-
-	private final SocialCostCalculatorNetwork sc;
-	private final TravelTimeCalculator tc;
-
-	public MarginalTravelCostCalculatorII(final TravelTimeCalculator tc, final SocialCostCalculatorNetwork sc) {
-		this.tc = tc;
-		this.sc = sc;
+	public static void main(final String [] args) {
+		String tiff = "../../Desktop/padang_200cm_dom1.tif";
+		Iterator readers = ImageIO.getImageReadersByFormatName("tiff");
+		ImageReader reader = (ImageReader)readers.next();
+		
 	}
 	
-
-	public double getLinkTravelCost(final Link link, final double time) {
-		double t = this.tc.getLinkTravelTime(link, time);
-		double s = this.sc.getSocialCost(link, time);
-		return t + s;
-	}
-	
-
 }

@@ -20,28 +20,29 @@
 
 package playground.gregor.systemopt;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Map;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentMoneyEvent;
-import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.NetworkLayer;
-import org.matsim.trafficmonitoring.TravelTimeAggregatorFactory;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.utils.misc.IntegerCache;
 import org.matsim.utils.misc.Time;
 
-public class TravelTimeAndSocialCostCalculatorNetwork extends TravelTimeCalculator implements IterationStartsListener, AgentDepartureEventHandler{
+public class SocialCostCalculatorNetwork implements IterationStartsListener,  AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
 
 	private final int travelTimeBinSize;
 	private final int numSlots;
@@ -59,26 +60,20 @@ public class TravelTimeAndSocialCostCalculatorNetwork extends TravelTimeCalculat
 	static double newCoef = 1;
 	static int iteration = 0;
 	
-	public TravelTimeAndSocialCostCalculatorNetwork(final NetworkLayer network) {
+	public SocialCostCalculatorNetwork(final NetworkLayer network) {
 		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
 	}
 
-	public TravelTimeAndSocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice) {
+	public SocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice) {
 		this(network, timeslice, 30*3600); // default: 30 hours at most
 	}
 
-	public TravelTimeAndSocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice,	final int maxTime) {
-		this(network, timeslice, maxTime, new TravelTimeAggregatorFactory());
-	}
-	
-	public TravelTimeAndSocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice, final int maxTime, final TravelTimeAggregatorFactory factory) {
-		super(network,timeslice,maxTime,factory);
+	public SocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice,	final int maxTime) {
 		this.travelTimeBinSize = timeslice;
 		this.numSlots = (maxTime / this.travelTimeBinSize) + 1;
 		this.network = network;
-		throw new RuntimeException("not implemented yet!!!");
-
 	}
+	
 	public double getSocialCost(final Link link, final double time) {
 		SocialCostRole sc = this.socCosts.get(link.getId().toString());
 		if (sc == null) {
@@ -109,109 +104,116 @@ public class TravelTimeAndSocialCostCalculatorNetwork extends TravelTimeCalculat
 	}
 
 	
-	@Override
 	public void handleEvent(final LinkEnterEvent event) {
-		super.handleEvent(event);
 
 		LinkInfo info = getLinkInfo(event.linkId);
-		AgentInfo aol = this.agentInfos.get(event.agentId);
-		if (aol == null) {
-			aol = new AgentInfo();
-			this.agentInfos.put(event.agentId, aol);
-		} else if (!info.isCongested || info.storageCap > info.agentsOnLink.size()){ //no spill back from downstream link
-			
-			String oldLinkId = aol.currentLink;
-			LinkInfo oldInfo = this.linkInfos.get(oldLinkId);
-			if (oldInfo.isCongested){
-				AgentInfo oldAol = new AgentInfo();
-				oldAol.id = aol.id;
-				oldAol.enterTime = aol.enterTime;
-				oldAol.exitTime = aol.exitTime;
-				oldInfo.agentsLeftLink.add(oldAol);
-			}
-			
-		}
+		AgentInfo ai = getAgentInfo(event.agentId);
 		
-		aol.currentLink = event.linkId;
-		aol.enterTime = event.time;
-		aol.id = event.agentId;
-		info.agentsOnLink.add(aol);
+		if (ai.stucked) {
+			LinkInfo oldInfo = this.linkInfos.get(ai.currentLink);
+
+			if (info.causesSpillback() && info.congested) {
+				oldInfo.getCongestedSlot(getTimeSlotIndex(ai.enterTime)).add(ai.id);
+				oldInfo.con++;
+			} else {
+				oldInfo.getUncongestedSlot(getTimeSlotIndex(ai.enterTime)).add(ai.id);
+				oldInfo.uncon++;
+			}
+		}
+		ai.currentLink = event.linkId;
+		ai.enterTime = event.time;
+		ai.id = event.agentId;
+		info.agentsOnLink++;
 	}
 	
 	
+
 	public void handleEvent(final AgentDepartureEvent event) {
 		LinkInfo info = getLinkInfo(event.linkId);
-		AgentInfo aol = new AgentInfo();
-		aol.enterTime = event.time;
-		aol.id = event.agentId;
-		info.agentsOnLink.add(aol);
+		AgentInfo ai = getAgentInfo(event.agentId);
+		ai.enterTime = event.time;
+		ai.id = event.agentId;
+		ai.currentLink = event.linkId;
+		info.agentsOnLink++;
 	}
 	
-	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
-		super.handleEvent(event);
 		
 		LinkInfo info = getLinkInfo(event.linkId);
-		AgentInfo aol = info.agentsOnLink.poll();
-		aol.exitTime = event.time;
-		
-		if ((event.time - aol.enterTime) <= info.t_free) {
-			if (info.agentsLeftLink.size() > 0){
-				computeSocCost(info,event.linkId,event.time);
+		info.agentsOnLink--;
+		AgentInfo ai = getAgentInfo(event.agentId);
+
+		if ((event.time - ai.enterTime) <= info.t_free){
+//			info.lastFSSlice  = getTimeSlotIndex(event.time);
+			ai.stucked = false;	
+			
+			// optimization
+			if (info.congested) {
+				clacSocCost(info,info.lastFSTime,ai.enterTime);
 			}
-			info.isCongested = false;
-			info.lastFSSlice = getTimeSlotIndex(event.time);
+			info.lastFSTime = ai.enterTime;
 		} else {
-			info.isCongested = true;
+			ai.stucked = true;
+			info.congested = true;// optimization
+		}
+				
+	}
+	
+	private void clacSocCost(final LinkInfo info, final double lastTimeUncongested, final double currentTimeUncongested) {
+		
+				
+		int lB = getTimeSlotIndex(lastTimeUncongested)+1;
+		int uB = getTimeSlotIndex(currentTimeUncongested)-1;
+		
+		if (uB <= lB) {
+			info.cleanUpCongestionInfo();
+			info.congested = false; // optimization
+			return;
 		}
 		
-	}
-	
-	@Override
-	public void handleEvent(final AgentStuckEvent event) {
-		super.handleEvent(event);
-//		this.current.add(event.agentId);
-	}
-
-	
-	private void computeSocCost(final LinkInfo info, final String linkId, final double eventTime) {
-		
-		SocialCostRole sc = this.socCosts.get(linkId);
+		SocialCostRole sc = this.socCosts.get(info.id);
 		if (sc == null) {
 			sc = new SocialCostRole();
-			this.socCosts.put(linkId, sc);
+			this.socCosts.put(info.id, sc);
 		}
 		
-		int lB = Math.max(info.lastFSSlice,getTimeSlotIndex(info.agentsLeftLink.peek().enterTime));
-		int uB = getTimeSlotIndex(eventTime) - 1;
-
+		double p = info.uncon == 0 ? 0. : ((double)info.uncon / (info.uncon + info.con));
 		double socCost = 0;
 		for (int i = uB; i >= lB; i--) {
+			ArrayList<String> toCongested = info.getCongestedSlot(i);
+			ArrayList<String> toUncongested = info.getUncongestedSlot(i);
+		
+			
+//			double p = toUncongested.size() == 0 ? 0 : ((double)toUncongested.size() / (toCongested.size() + toUncongested.size())); 
+			
+			
 			socCost += this.travelTimeBinSize;
+			double socCostCurrent = p * Math.max(0,socCost-this.travelTimeBinSize/2 - info.t_free); 
 //			sc.setSocCost(i,w * (socCost-this.travelTimeBinSize/2));
-			sc.setSocCost(i, Math.max(0,socCost-this.travelTimeBinSize/2 - info.t_free));
+			sc.setSocCost(i, socCostCurrent);
 //			sc.setSocCost(i, Math.max(0,socCost-this.travelTimeBinSize/2));
 //			sc.setSocCost(i, socCost);
-		}
-		
-		while (info.agentsLeftLink.size() > 0) {
-			AgentInfo ai = info.agentsLeftLink.poll();
-			int slot = getTimeSlotIndex(ai.enterTime);
-			if (slot < lB || slot > uB) {
-				continue;
+			
+			double scoringCost =  sc.getSocCost(i) / -600;
+//			double scoringCost =  socCostCurrent / -600;
+			for (String agentId : toCongested) {
+				Id id = new IdImpl(agentId);
+				AgentMoneyEvent e = new AgentMoneyEvent(currentTimeUncongested,id,scoringCost);
+				QueueSimulation.getEvents().processEvent(e);
 			}
-			double tmp  = sc.getSocCost(slot)  ;
-			double cost =  tmp / -600;
-			Id id = new IdImpl(ai.id);
-			AgentMoneyEvent e = new AgentMoneyEvent(eventTime,id,cost);
-			QueueSimulation.getEvents().processEvent(e);
+			for (String agentId : toUncongested) {
+				Id id = new IdImpl(agentId);
+				AgentMoneyEvent e = new AgentMoneyEvent(currentTimeUncongested,id,scoringCost);
+				QueueSimulation.getEvents().processEvent(e);
+			}
 			
 		}
 		
+		info.cleanUpCongestionInfo();
+		info.congested = false; // optimization
 		
 	}
-	
-	
+
 	private int getTimeSlotIndex(final double time) {
 		int slice = ((int) time)/this.travelTimeBinSize;
 		if (slice >= this.numSlots) slice = this.numSlots - 1;
@@ -226,19 +228,24 @@ public class TravelTimeAndSocialCostCalculatorNetwork extends TravelTimeCalculat
 			ret.t_free = Math.ceil(this.network.getLink(id).getFreespeedTravelTime(Time.UNDEFINED_TIME)); //TODO make this dynamic, since we have time variant networks
 			Link link = this.network.getLink(id);
 			ret.storageCap = calcCapacity(link);
-			
+			ret.id = id;
 			this.linkInfos.put(id, ret);
 		}
 		return ret;
 	}
 
+	private AgentInfo getAgentInfo(final String agentId) {
+		AgentInfo ai = this.agentInfos.get(agentId);
+		if (ai == null) {
+			ai = new AgentInfo();
+			ai.stucked = false;
+			this.agentInfos.put(agentId, ai);
+		}
+		return ai;
+	}
 	
 	
 	private int calcCapacity(final Link link) {
-		if (link.getId().toString().contains("el")){
-			int i = 0;
-			i++;
-		}
 		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 
@@ -249,28 +256,68 @@ public class TravelTimeAndSocialCostCalculatorNetwork extends TravelTimeCalculat
 		// first guess at storageCapacity:
 		double storageCapacity = (link.getLength() * link.getLanes(Time.UNDEFINED_TIME))
 				/ ((NetworkLayer) link.getLayer()).getEffectiveCellSize() * storageCapFactor;
-		
+				
 		return (int) Math.floor(storageCapacity);
 	}
 	
 	
 	private static class LinkInfo {
-		public int storageCap;
-		public boolean isCongested = false;
-		ConcurrentLinkedQueue<AgentInfo> agentsOnLink = new ConcurrentLinkedQueue<AgentInfo>();
-		ConcurrentLinkedQueue<AgentInfo> agentsLeftLink = new ConcurrentLinkedQueue<AgentInfo>();
-		double t_free;
-//		double cTime = Time.UNDEFINED_TIME;
-		int lastFSSlice = 0;
 		
-		public boolean isCongested() {
-			return this.agentsOnLink.size() / this.storageCap > CONGESTION_RATION_THRESHOLD;
+		
+		public int con = 0;
+		public int uncon = 0;
+		
+		public double lastFSTime = 0;
+
+		public String id;
+
+		public boolean congested = false;// optimization
+		
+		public int storageCap;
+
+		public int agentsOnLink = 0;
+		
+		private final Map<Integer,ArrayList<String>> agentsLeftToUncongestedLink = new HashMap<Integer,ArrayList<String>>();
+		private final Map<Integer,ArrayList<String>> agentsLeftToCongestedLink = new HashMap<Integer,ArrayList<String>>();
+
+		double t_free;
+		
+		public boolean causesSpillback() {
+			return this.agentsOnLink / this.storageCap > CONGESTION_RATION_THRESHOLD;
 		}
+		
+		public ArrayList<String> getUncongestedSlot(final int slot) {
+			Integer slice = IntegerCache.getInteger(slot);
+			ArrayList<String> al = this.agentsLeftToUncongestedLink.get(slice);
+			if (al == null) {
+				al = new ArrayList<String>();
+				this.agentsLeftToUncongestedLink.put(slice,al);
+			}
+			
+			return al;
+		}
+		public ArrayList<String> getCongestedSlot(final int slot) {
+			Integer slice = IntegerCache.getInteger(slot);
+			ArrayList<String> al = this.agentsLeftToCongestedLink.get(slice);
+			if (al == null) {
+				al = new ArrayList<String>();
+				this.agentsLeftToCongestedLink.put(slice,al);
+			}
+			return al;
+		}
+		
+		public void cleanUpCongestionInfo(){
+			this.agentsLeftToCongestedLink.clear();
+			this.agentsLeftToUncongestedLink.clear();
+			this.con = 0;
+			this.uncon = 0;
+		}
+		
 	}
 	
 	private static class AgentInfo {
 		
-		public double exitTime;
+		public boolean stucked;
 		String id;
 		double enterTime;
 		String currentLink;
@@ -288,17 +335,20 @@ public class TravelTimeAndSocialCostCalculatorNetwork extends TravelTimeCalculat
 		
 		
 		public void setSocCost(final int timeSlice, final double socCost) {
-			SocCostInfo sci = this.socCosts.get(timeSlice);
+			
+			Integer slot = IntegerCache.getInteger(timeSlice);
+			SocCostInfo sci = this.socCosts.get(slot);
 			if (sci == null) {
 				sci = new SocCostInfo();
-				this.socCosts.put(timeSlice, sci);
+				this.socCosts.put(slot, sci);
 			}
 			sci.cost = oldCoef * sci.cost + newCoef * socCost;
 			sci.updated = true;
 		}
 		
 		public double getSocCost(final int timeSlice) {
-			SocCostInfo sci = this.socCosts.get(timeSlice);
+			Integer slot = IntegerCache.getInteger(timeSlice);
+			SocCostInfo sci = this.socCosts.get(slot);
 			if (sci == null) {
 				return 0;
 			}
@@ -313,6 +363,11 @@ public class TravelTimeAndSocialCostCalculatorNetwork extends TravelTimeCalculat
 				sci.updated = false;
 			}
 		}
+	}
+
+	public void reset(final int iteration) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

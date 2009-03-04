@@ -58,11 +58,12 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class EventFilesCompare {
+public class EventFilesEvacuationTimeCompare {
 	
-	private final static Logger log = Logger.getLogger(EventFilesCompare.class);
+	private final static Logger log = Logger.getLogger(EventFilesEvacuationTimeCompare.class);
 	
-	private static final String INPUT_BASE="../../arbeit/svn/shared-svn/runs/";
+//	private static final String INPUT_BASE="../../arbeit/svn/shared-svn/runs/";
+	private static final String INPUT_BASE="../outputs/";
 	
 	private final CoordinateReferenceSystem crs;
 	final NetworkLayer network;
@@ -81,10 +82,10 @@ public class EventFilesCompare {
 
 	private final String outfile;
 	final static Envelope ENVELOPE = new Envelope(648815,655804,9888424,9902468);
-	final static double LENGTH = 250;
+	final static double LENGTH = 500;
 	
 	
-	public EventFilesCompare(final String eventsFile1, final String eventsFile2,
+	public EventFilesEvacuationTimeCompare(final String eventsFile1, final String eventsFile2,
 			final CoordinateReferenceSystem crs, final NetworkLayer network, final String outfile) {
 		
 		this.eventsFile1 = eventsFile1;
@@ -202,23 +203,22 @@ public class EventFilesCompare {
 	}
 	
 	public static void main(final String [] args) {
-//		String eventsFile1 = "../outputs/output_nash_wave/ITERS/it.150/150.events.txt.gz";
-		String eventsFile1 = INPUT_BASE + "run316/output/ITERS/it.201/201.events.txt.gz";
-		String eventsFile2 = INPUT_BASE + "run317/output/ITERS/it.200/200.events.txt.gz";
+		String eventsFile1 = INPUT_BASE + "output_100m_so/ITERS/it.0/0.events.txt.gz";
+		String eventsFile2 = INPUT_BASE + "output_100m/ITERS/it.0/0.events.txt.gz";
 		String network = "../inputs/networks/padang_net_evac_v20080618.xml";
-		String outfile = INPUT_BASE + "run316/analysis/runComp316vs317.shp";
+		String outfile = INPUT_BASE + "output_100m_so/analysis/evacTimeComp.shp";
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(network);
 		
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
-		new EventFilesCompare(eventsFile1, eventsFile2, crs, net, outfile).run();
+		new EventFilesEvacuationTimeCompare(eventsFile1, eventsFile2, crs, net, outfile).run();
 	}
 
 	
 	private class TravelTimesFromEvents implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
 
 		private final HashMap<String,AgentInfo> ttimes;
-		private final QuadTree<AgentInfo> ttimesTree = new QuadTree<AgentInfo>(EventFilesCompare.ENVELOPE.getMinX(),EventFilesCompare.ENVELOPE.getMinY(),EventFilesCompare.ENVELOPE.getMaxX(),EventFilesCompare.ENVELOPE.getMaxY());
+		private final QuadTree<AgentInfo> ttimesTree = new QuadTree<AgentInfo>(EventFilesEvacuationTimeCompare.ENVELOPE.getMinX(),EventFilesEvacuationTimeCompare.ENVELOPE.getMinY(),EventFilesEvacuationTimeCompare.ENVELOPE.getMaxX(),EventFilesEvacuationTimeCompare.ENVELOPE.getMaxY());
 
 		public TravelTimesFromEvents() {
 			this.ttimes = new HashMap<String,AgentInfo>();
@@ -244,7 +244,7 @@ public class EventFilesCompare {
 		public void handleEvent(final AgentDepartureEvent event) {
 			AgentInfo ai = new AgentInfo();
 			ai.time = event.time;
-			Link link = EventFilesCompare.this.network.getLink(event.linkId);
+			Link link = EventFilesEvacuationTimeCompare.this.network.getLink(event.linkId);
 			ai.c = new Coordinate(link.getCenter().getX(),link.getCenter().getY());
 			this.ttimes.put(event.agentId, ai);
 			

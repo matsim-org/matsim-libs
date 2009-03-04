@@ -59,7 +59,8 @@ public class NetworkClearanceAnalysis {
 	
 	private static final Logger log = Logger.getLogger(NetworkClearanceAnalysis.class);
 	
-	private static final String INPUT_BASE="../../arbeit/svn/shared-svn/runs/";
+//	private static final String INPUT_BASE="../../arbeit/svn/shared-svn/runs/";
+	private static final String INPUT_BASE="../outputs/";
 	private final String ev2;
 	private final String ev1;
 	private final NetworkLayer network;
@@ -74,7 +75,7 @@ public class NetworkClearanceAnalysis {
 	private FeatureType ftRunCompare;
 	
 	final static Envelope ENVELOPE = new Envelope(648815,655804,9888424,9902468);
-	final static double LENGTH = 350;
+	final static double LENGTH = 500;
 	private final QuadTree<PolygonInfo> polygons1 = new QuadTree<PolygonInfo>(ENVELOPE.getMinX(),ENVELOPE.getMinY(),ENVELOPE.getMaxX(),ENVELOPE.getMaxY());
 	private final QuadTree<PolygonInfo> polygons2 = new QuadTree<PolygonInfo>(ENVELOPE.getMinX(),ENVELOPE.getMinY(),ENVELOPE.getMaxX(),ENVELOPE.getMaxY());
 	private final Map<String,PolygonInfo> linkMapping1 = new HashMap<String,PolygonInfo>();
@@ -210,8 +211,9 @@ public class NetworkClearanceAnalysis {
 			
 			PolygonInfo pi = this.linkMapping.get(event.linkId);
 			pi.agents++;
-			pi.clearanceTime = 0;
-			
+			if (pi.agents > 1) {
+				pi.clearanceTime = 0;
+			}
 		}
 
 		public void reset(final int iteration) {
@@ -225,7 +227,7 @@ public class NetworkClearanceAnalysis {
 			}
 			PolygonInfo pi = this.linkMapping.get(event.linkId);
 			pi.agents--;
-			if (pi.agents <= 0) {
+			if (pi.agents <= 1 && pi.clearanceTime == 0) {
 				pi.clearanceTime = event.time;
 			}
 
@@ -236,10 +238,12 @@ public class NetworkClearanceAnalysis {
 	}
 	
 	public static void main (final String [] args) {
-		String eventsFile1 = INPUT_BASE + "run316/output/ITERS/it.201/201.events.txt.gz";
-		String eventsFile2 = INPUT_BASE + "run317/output/ITERS/it.200/200.events.txt.gz";
+//		String eventsFile1 = INPUT_BASE + "run316/output/ITERS/it.201/201.events.txt.gz";
+//		String eventsFile2 = INPUT_BASE + "run317/output/ITERS/it.200/200.events.txt.gz";
+		String eventsFile1 = INPUT_BASE + "output_100m_so/ITERS/it.0/0.events.txt.gz";
+		String eventsFile2 = INPUT_BASE + "output_100m/ITERS/it.0/0.events.txt.gz";
 		String network = "../inputs/networks/padang_net_evac_v20080618.xml";
-		String outfile = INPUT_BASE + "run316/analysis/runComp316vs317.shp";
+		String outfile = INPUT_BASE + "output_100m_so/analysis/runComp.shp";
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(network);
 		
