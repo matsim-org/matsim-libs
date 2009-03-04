@@ -28,6 +28,8 @@ public class PlanomatConfigGroup extends Module {
 	public static final String CETIN_COMPATIBLE = "org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator";
 	public static final String CHARYPAR_ET_AL_COMPATIBLE = "org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator";
 
+	public static enum TripStructureAnalysisLayerOption {facility,link};
+	
 	/**
 	 * Holds all planomat parameter names, their default and their actual values.
 	 * 
@@ -111,7 +113,18 @@ public class PlanomatConfigGroup extends Module {
 		 * <h3>Default value</h3>
 		 * "false"
 		 */
-		DO_LOGGING("doLogging", "false", "");
+		DO_LOGGING("doLogging", "false", ""),
+		/**
+		 * This parameter can be used to specify the layer on which basis the trip structure of a plan is analysed.
+		 * <h3>Possible values</h3>
+		 * "link", "facility"
+		 * <h3>Default value</h3>
+		 * "facility"
+		 * <h3>To do</h3>
+		 * TODO This parameter does not really belong to the planomat config group, but can be used by whatever algorithm. Might be moved to {@link GlobalConfigGroup}. 
+		 */
+		TRIP_STRUCTURE_ANALYSIS_LAYER("tripStructureAnalysisLayer", PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.toString(), "");
+		
 
 		private final String parameterName;
 		private final String defaultValue;
@@ -124,18 +137,32 @@ public class PlanomatConfigGroup extends Module {
 			this.actualValue = actualValue;
 		}
 
+		/**
+		 * @return the default string value of this parameter
+		 */
 		public String getDefaultValue() {
 			return defaultValue;
 		}
 
+		/**
+		 * @return the actual string value of this parameter
+		 */
 		public String getActualValue() {
 			return actualValue;
 		}
 
+		/**
+		 * @return the identifier of this parameter
+		 */
 		public String getParameterName() {
 			return parameterName;
 		}
 
+		/**
+		 * Sets the actual value of this parameter.
+		 * 
+		 * @param actualValue the new value of this parameter
+		 */
 		public void setActualValue(String actualValue) {
 			this.actualValue = actualValue;
 		}
@@ -249,4 +276,12 @@ public class PlanomatConfigGroup extends Module {
 		PlanomatConfigParameter.JGAP_MAX_GENERATIONS.setActualValue(Integer.toString(i));
 	}
 
+	public PlanomatConfigGroup.TripStructureAnalysisLayerOption getTripStructureAnalysisLayer() {
+		return PlanomatConfigGroup.TripStructureAnalysisLayerOption.valueOf(PlanomatConfigGroup.PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.getActualValue());
+	}
+	
+	public void setTripStructureAnalysisLayer(String str) {
+		PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.setActualValue(PlanomatConfigGroup.TripStructureAnalysisLayerOption.valueOf(str).toString());
+	}
+	
 }

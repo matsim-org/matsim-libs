@@ -10,6 +10,7 @@
 		<param name="jgapMaxGenerations" value="1000" />
 		<param name="levelOfTimeResolution" value="6" />
 		<param name="doLogging" value="true" />
+		<param name="tripStructureAnalysisLayer" value="link" />
 
 		<!-- This parameter is just for testing purposes for the planomat config module. It is to be ignored. -->
 		<param name="ignoreMe" value="0815" />

@@ -52,6 +52,9 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		assertEquals( 
 				Boolean.parseBoolean(PlanomatConfigGroup.PlanomatConfigParameter.DO_LOGGING.getDefaultValue()), 
 				Gbl.getConfig().planomat().isDoLogging() );
+		assertEquals(
+				PlanomatConfigGroup.TripStructureAnalysisLayerOption.valueOf(PlanomatConfigGroup.PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.getDefaultValue()),
+				Gbl.getConfig().planomat().getTripStructureAnalysisLayer());
 	}
 
 	public void testAddParam() {
@@ -66,6 +69,7 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		assertEquals( 1000, Gbl.getConfig().planomat().getJgapMaxGenerations() );
 		assertEquals( 6, Gbl.getConfig().planomat().getLevelOfTimeResolution() );
 		assertEquals( true, Gbl.getConfig().planomat().isDoLogging() );
+		assertEquals( PlanomatConfigGroup.TripStructureAnalysisLayerOption.link, Gbl.getConfig().planomat().getTripStructureAnalysisLayer());
 	}
 	
 }

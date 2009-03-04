@@ -25,16 +25,22 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Act;
-import org.matsim.interfaces.core.v01.Facilities;
+import org.matsim.interfaces.core.v01.Facility;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.world.Layer;
+import org.matsim.world.Location;
 
 /**
  * Test class for {@link PlanAnalyzeSubtours}.
@@ -46,25 +52,40 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 
-	private Facilities facilities = null;
-
+	public static final String SUBTOUR_ANALYSIS_MODULE_NAME = "subtourAnalysis";
+	public static final String LOCATION_TYPE = "locationType";
 	private static final String CONFIGFILE = "test/scenarios/equil/config.xml";
 
 	private static Logger log = Logger.getLogger(PlanAnalyzeSubtoursTest.class);
 
 	protected void setUp() throws Exception {
-
 		super.setUp();
-
 		super.loadConfig(PlanAnalyzeSubtoursTest.CONFIGFILE);
-
-		log.info("Reading facilities xml file...");
-		facilities = new FacilitiesImpl();
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
-		log.info("Reading facilities xml file...done.");
 	}
 
-	public void testRun() throws Exception {
+	public void testNetworkBased() {
+
+		log.info("Reading network xml file...");
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		log.info("Reading network xml file...done.");
+
+		Gbl.getConfig().planomat().setTripStructureAnalysisLayer("link");
+		this.runDemo((Layer) network);
+	}
+	
+	public void testFacilitiesBased() {
+
+		log.info("Reading facilities xml file...");
+		FacilitiesImpl facilities = new FacilitiesImpl();
+		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		log.info("Reading facilities xml file...done.");
+
+		Gbl.getConfig().planomat().setTripStructureAnalysisLayer("facility");
+		this.runDemo((Layer) facilities);
+	}
+	
+	protected void runDemo(Layer layer) {
 
 		PlanAnalyzeSubtours testee = new PlanAnalyzeSubtours();
 
@@ -146,18 +167,25 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		expectedSubtourIndexations.put(testedActChainLocations, "1 1 0 0 1");
 		expectedNumSubtours.put(testedActChainLocations, 2);
 		
+		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = Gbl.getConfig().planomat().getTripStructureAnalysisLayer();
+		Location location = null;
+		Act act = null;
 		for (Entry<String, String> entry: expectedSubtourIndexations.entrySet()) {
 			String facString  = entry.getKey();
 			log.info("Testing location sequence: " + facString);
 
 			Plan plan = new org.matsim.population.PlanImpl(person);
 
-			String[] facIdSequence = facString.split(" ");
-			for (int aa=0; aa < facIdSequence.length; aa++) {
-				Act act = plan.createAct("actOnLink" + facIdSequence[aa], facilities.getFacilities().get(new IdImpl(facIdSequence[aa])));
+			String[] locationIdSequence = facString.split(" ");
+			for (int aa=0; aa < locationIdSequence.length; aa++) {
+				location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
+				if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
+					act = plan.createAct("actAtFacility" + locationIdSequence[aa], (Facility) location);
+				} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(subtourAnalysisLocationType)) {
+					act = plan.createAct("actOnLink" + locationIdSequence[aa], (Link) location);
+				}
 				act.setEndTime(10*3600);
-				act.setFacility(facilities.getFacilities().get(new IdImpl(facIdSequence[aa])));
-				if (aa != (facIdSequence.length - 1)) {
+				if (aa != (locationIdSequence.length - 1)) {
 					plan.createLeg(BasicLeg.Mode.car);
 				}
 			}
