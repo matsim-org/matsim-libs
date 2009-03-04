@@ -1,4 +1,4 @@
-package playground.wrashid.scoring;
+package playground.wrashid.scoring.charyparNagel;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.BasicLeg;
@@ -12,10 +12,10 @@ import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.CharyparNagelScoringParameters;
 import org.matsim.utils.misc.Time;
 
-import playground.wrashid.scoring.interfaces.BasicScoringFunction;
-import playground.wrashid.scoring.interfaces.LegScoringFunction;
+import playground.wrashid.scoring.interfaces.BasicScoring;
+import playground.wrashid.scoring.interfaces.LegScoring;
 
-public class CharyparNagelLegScoringFunction implements LegScoringFunction, BasicScoringFunction {
+public class LegScoringFunction implements LegScoring, BasicScoring {
 
 	protected final Person person;
 	protected final Plan plan;
@@ -38,7 +38,7 @@ public class CharyparNagelLegScoringFunction implements LegScoringFunction, Basi
 	
 	private static final Logger log = Logger.getLogger(CharyparNagelScoringFunction.class);
 
-	public CharyparNagelLegScoringFunction(final Plan plan, final CharyparNagelScoringParameters params) {
+	public LegScoringFunction(final Plan plan, final CharyparNagelScoringParameters params) {
 		this.params = params;
 		this.reset();
 

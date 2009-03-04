@@ -1,4 +1,4 @@
-package playground.wrashid.scoring;
+package playground.wrashid.scoring.charyparNagel;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.BasicLeg;
@@ -12,11 +12,11 @@ import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.CharyparNagelScoringParameters;
 import org.matsim.utils.misc.Time;
 
-import playground.wrashid.scoring.interfaces.BasicScoringFunction;
-import playground.wrashid.scoring.interfaces.LegScoringFunction;
-import playground.wrashid.scoring.interfaces.MoneyScoringFunction;
+import playground.wrashid.scoring.interfaces.BasicScoring;
+import playground.wrashid.scoring.interfaces.LegScoring;
+import playground.wrashid.scoring.interfaces.MoneyScoring;
 
-public class CharyparNagelMoneyScoringFunction implements MoneyScoringFunction, BasicScoringFunction {
+public class MoneyScoringFunction implements MoneyScoring, BasicScoring {
 
 	protected double score;
 
@@ -25,7 +25,7 @@ public class CharyparNagelMoneyScoringFunction implements MoneyScoringFunction, 
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
 
-	public CharyparNagelMoneyScoringFunction(final CharyparNagelScoringParameters params) {
+	public MoneyScoringFunction(final CharyparNagelScoringParameters params) {
 		this.params = params;
 		this.reset();
 

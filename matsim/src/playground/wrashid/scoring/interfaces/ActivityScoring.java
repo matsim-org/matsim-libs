@@ -2,7 +2,7 @@ package playground.wrashid.scoring.interfaces;
 
 import org.matsim.interfaces.core.v01.Act;
 
-public interface ActivityScoringFunction {
+public interface ActivityScoring {
 
 	public void startActivity(final double time, final Act act);
 

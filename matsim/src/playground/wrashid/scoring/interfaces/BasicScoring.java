@@ -1,6 +1,6 @@
 package playground.wrashid.scoring.interfaces;
 
-public interface BasicScoringFunction {
+public interface BasicScoring {
 
 	public void finish();
 

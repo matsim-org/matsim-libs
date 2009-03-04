@@ -1,5 +1,5 @@
 package playground.wrashid.scoring.interfaces;
 
-public interface AgentStuckScoringFunction {
+public interface AgentStuckScoring {
 	public void agentStuck(final double time);
 }

@@ -1,4 +1,4 @@
-package playground.wrashid.scoring;
+package playground.wrashid.scoring.charyparNagel;
 
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.CharyparNagelScoringFunction;
@@ -7,6 +7,8 @@ import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.gbl.Gbl;
+
+import playground.wrashid.scoring.ScoringFunctionAccumulator;
 
 public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
@@ -29,13 +31,13 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoringFunction( plan, params));
+		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction( plan, params));
 		
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoringFunction( plan, params));
+		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction( plan, params));
 		
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 		
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
 		
 		return scoringFunctionAccumulator;
 	}

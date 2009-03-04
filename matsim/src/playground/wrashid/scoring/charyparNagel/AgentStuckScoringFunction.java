@@ -1,11 +1,11 @@
-package playground.wrashid.scoring;
+package playground.wrashid.scoring.charyparNagel;
 
 import org.matsim.scoring.CharyparNagelScoringParameters;
 
-import playground.wrashid.scoring.interfaces.AgentStuckScoringFunction;
-import playground.wrashid.scoring.interfaces.BasicScoringFunction;
+import playground.wrashid.scoring.interfaces.AgentStuckScoring;
+import playground.wrashid.scoring.interfaces.BasicScoring;
 
-public class CharyparNagelAgentStuckScoringFunction implements AgentStuckScoringFunction, BasicScoringFunction {
+public class AgentStuckScoringFunction implements AgentStuckScoring, BasicScoring {
 
 	protected double score;
 
@@ -14,7 +14,7 @@ public class CharyparNagelAgentStuckScoringFunction implements AgentStuckScoring
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
 
-	public CharyparNagelAgentStuckScoringFunction(final CharyparNagelScoringParameters params) {
+	public AgentStuckScoringFunction(final CharyparNagelScoringParameters params) {
 		this.params = params;
 		this.reset();
 	}
