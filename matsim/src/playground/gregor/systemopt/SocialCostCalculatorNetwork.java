@@ -257,7 +257,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 		double storageCapacity = (link.getLength() * link.getLanes(Time.UNDEFINED_TIME))
 				/ ((NetworkLayer) link.getLayer()).getEffectiveCellSize() * storageCapFactor;
 				
-		return (int) Math.floor(storageCapacity);
+		return (int) Math.max(Math.floor(storageCapacity),1);
 	}
 	
 	
