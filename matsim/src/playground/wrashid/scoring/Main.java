@@ -2,8 +2,8 @@ package playground.wrashid.scoring;
 
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 
-import playground.wrashid.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 
 public class Main {
 	public static void main(String[] args) {

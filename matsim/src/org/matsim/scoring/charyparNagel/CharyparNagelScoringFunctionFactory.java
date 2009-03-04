@@ -1,14 +1,14 @@
-package playground.wrashid.scoring.charyparNagel;
+package org.matsim.scoring.charyparNagel;
 
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.CharyparNagelScoringParameters;
 import org.matsim.scoring.ScoringFunction;
+import org.matsim.scoring.ScoringFunctionAccumulator;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.gbl.Gbl;
 
-import playground.wrashid.scoring.ScoringFunctionAccumulator;
 
 public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 

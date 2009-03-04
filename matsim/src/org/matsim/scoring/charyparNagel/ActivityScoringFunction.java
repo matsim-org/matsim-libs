@@ -1,4 +1,4 @@
-package playground.wrashid.scoring.charyparNagel;
+package org.matsim.scoring.charyparNagel;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.BasicLeg;
@@ -10,10 +10,10 @@ import org.matsim.interfaces.core.v01.Route;
 import org.matsim.population.ActUtilityParameters;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.CharyparNagelScoringParameters;
+import org.matsim.scoring.interfaces.ActivityScoring;
+import org.matsim.scoring.interfaces.BasicScoring;
 import org.matsim.utils.misc.Time;
 
-import playground.wrashid.scoring.interfaces.ActivityScoring;
-import playground.wrashid.scoring.interfaces.BasicScoring;
 
 public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 

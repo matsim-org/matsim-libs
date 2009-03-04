@@ -1,17 +1,16 @@
-package playground.wrashid.scoring;
+package org.matsim.scoring;
 
 import java.util.ArrayList;
 
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.scoring.ScoringFunction;
+import org.matsim.scoring.interfaces.ActivityScoring;
+import org.matsim.scoring.interfaces.AgentStuckScoring;
+import org.matsim.scoring.interfaces.BasicScoring;
+import org.matsim.scoring.interfaces.LegScoring;
+import org.matsim.scoring.interfaces.MoneyScoring;
 
-import playground.wrashid.scoring.interfaces.ActivityScoring;
-import playground.wrashid.scoring.interfaces.AgentStuckScoring;
-import playground.wrashid.scoring.interfaces.BasicScoring;
-import playground.wrashid.scoring.interfaces.LegScoring;
-import playground.wrashid.scoring.interfaces.MoneyScoring;
 
 public class ScoringFunctionAccumulator implements ScoringFunction {
 

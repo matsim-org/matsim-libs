@@ -1,9 +1,9 @@
-package playground.wrashid.scoring.charyparNagel;
+package org.matsim.scoring.charyparNagel;
 
 import org.matsim.scoring.CharyparNagelScoringParameters;
+import org.matsim.scoring.interfaces.AgentStuckScoring;
+import org.matsim.scoring.interfaces.BasicScoring;
 
-import playground.wrashid.scoring.interfaces.AgentStuckScoring;
-import playground.wrashid.scoring.interfaces.BasicScoring;
 
 public class AgentStuckScoringFunction implements AgentStuckScoring, BasicScoring {
 
