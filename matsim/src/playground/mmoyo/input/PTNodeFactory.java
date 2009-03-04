@@ -8,7 +8,7 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.network.NetworkLayer;
 
-import playground.mmoyo.PTCase2.PTStation;
+import playground.mmoyo.PTCase2.PTStationMap;
 import playground.mmoyo.PTCase2.PTTimeTable2;
 import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.Validators.StationValidator;
@@ -16,37 +16,35 @@ import playground.mmoyo.Validators.StationValidator;
 public class PTNodeFactory {
 
 	NetworkLayer net;
-	PTTimeTable2 ptTimeTable;
-	
+	PTStationMap ptStationMap;;
+	StationValidator sValidator;
+
 	/**
 	 * @param net
 	 */
 	public PTNodeFactory(NetworkLayer net, PTTimeTable2 ptTimeTable) {
 		this.net = net;
-		this.ptTimeTable = ptTimeTable;
+		this.ptStationMap = new PTStationMap(ptTimeTable);
+		this.sValidator = new StationValidator(net);
+		this.sValidator.hasValidCoordinates(this.ptStationMap);
 	}
 
-	public void insertNodes(BasicNode basicNode){
+	public BasicNode[] CreatePTNodes(BasicNode basicNode){
+		BasicNode[] pair = new BasicNode[2];
+		
 		Coord newCoord = basicNode.getCoord();	    		
 		String strBaseId = basicNode.getId().toString();
 		String strNode1 = "~" + strBaseId;
 		String strNode2 = "_" + strBaseId;
 		
-		PTStation ptStation = new PTStation(ptTimeTable);
-		
-		List <Id> list = ptStation.getIntersecionMap().get(strBaseId);
+		List <Id> list = this.ptStationMap.getIntersecionMap().get(strBaseId);
 		if(list != null){
-    		//System.out.println(list.toString());
-
     		Id firstId= list.get(0);
     		Coord coord = net.getNode(firstId).getCoord();
     		
-    		StationValidator sValidator = new StationValidator();
-    		if (sValidator.validateStations(net, ptStation)){
-    			if (!coord.equals(newCoord)){
-    				throw new IllegalArgumentException("Wrong coordinates in node: " + strBaseId + " " + newCoord);
-    			}
-    		}
+   			if (!coord.equals(newCoord)){
+    			throw new IllegalArgumentException("Wrong coordinates in node: " + strBaseId + " " + newCoord);
+   			}
     		
     		char greatestChar = 'a';
     		for (Id id : list){
@@ -65,14 +63,17 @@ public class PTNodeFactory {
     		strNode2 = strNode2 + nextChar;
 		}
 
-		insertNode(strNode1, newCoord);
-		insertNode(strNode2, newCoord);
+		pair[0]= insertNode(strNode1, newCoord);
+		pair[1]=  insertNode(strNode2, newCoord);
+	
+		return pair;
 	}
 
-	private void insertNode(String strId, Coord coord){
+	private BasicNode insertNode(String strId, Coord coord){
 		Id idPTNode = new IdImpl(strId);
-		PTNode newPTnode = new PTNode(idPTNode, coord,"");
-		net.getNodes().put(idPTNode,newPTnode);
+		PTNode ptNode = new PTNode(idPTNode, coord, "");
+		net.getNodes().put(idPTNode, ptNode);
+		return ptNode;
 	}
 	
 }

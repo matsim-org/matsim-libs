@@ -6,33 +6,20 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
-import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
-/*
-<<<<<<< .mine
-import org.matsim.network.Node;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
 import org.matsim.population.routes.LinkCarRoute;
-=======
-*/
-import org.matsim.population.routes.LinkCarRoute;
-//>>>>>>> .r5540
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 
-
+import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.input.PTNetworkFactory2;
 
-
-//import playground.mmoyo.PTRouter.PTNProximity;   //24 feb
-import playground.mmoyo.PTRouter.PTNode;
 /** 
  * Second version of Router using Matsims Class Dijkstra  
  * We avoid the relationship with the city network and use coordinate search instead

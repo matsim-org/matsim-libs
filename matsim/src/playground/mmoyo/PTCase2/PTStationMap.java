@@ -7,17 +7,14 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.network.NetworkLayer;
-
 import playground.mmoyo.PTRouter.PTLine;
-import playground.mmoyo.Validators.StationValidator;
 
-public class PTStation {
+public class PTStationMap {
 
 	Map<String, List<Id>> IntersectionMap = new TreeMap<String, List<Id>>(); 
 		
 	
-	public PTStation(PTTimeTable2 ptTimeTable) {
+	public PTStationMap(PTTimeTable2 ptTimeTable) {
 		this.createIntersecionMap(ptTimeTable);
 	}
 	
@@ -40,7 +37,7 @@ public class PTStation {
 		return this.IntersectionMap;
 	}
 	
-	//-> eliminate this method from factory
+	//-> eliminate this method from networkFactory
 	public String getNodeBaseId(String strId){
 		String baseID = strId;
 		if (baseID.charAt(0)=='_' || baseID.charAt(0)=='~')
@@ -49,5 +46,5 @@ public class PTStation {
 			baseID= baseID.substring(0,baseID.length()-1);
 		return baseID;
 	}
-	
+		
 }

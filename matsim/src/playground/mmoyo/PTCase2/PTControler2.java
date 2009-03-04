@@ -1,6 +1,8 @@
 package playground.mmoyo.PTCase2;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.interfaces.basic.v01.Coord;
@@ -11,6 +13,7 @@ import org.matsim.utils.geometry.CoordImpl;
 import playground.mmoyo.Validators.NetValidator;
 import playground.mmoyo.input.PTNodeFactory;
 import playground.mmoyo.input.PTNodeReader;
+import playground.mmoyo.input.PTLinkFactory;
 
 public class PTControler2 {
     private static String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
@@ -31,6 +34,53 @@ public class PTControler2 {
 		
 		if (option>0){pt.readPTNet(ZURICHPTN);}
 		switch (option){
+			
+			case -3:
+				String filePath="C://Users/manuel/Desktop/TU/ZH_Files/bus/Basic_Bus_Network.xml";
+	    	
+				
+				PTNodeReader ptNodeReader = new PTNodeReader();
+	    		ptNodeReader.readFile (filePath);
+	    		
+	    		List<List<BasicNode>> nodeListList = ptNodeReader.getNodeLists();
+	    		PTNodeFactory ptNodeFactory = new PTNodeFactory(pt.getPtNetworkLayer(), pt.getPtTimeTable());
+	    		PTLinkFactory ptLinkFactory= new PTLinkFactory (pt.getPtNetworkLayer());
+
+	    		//System.out.println(nodeListList.size());
+	    		
+	    		int iniNodes= pt.getPtNetworkLayer().getNodes().size();
+	    		int iniLinks= pt.getPtNetworkLayer().getLinks().size();
+	    		System.out.println("creating new nodes and links...");
+	    		
+	    		BasicNode[] basicNodeArr = new BasicNode[2];
+	    		List<BasicNode> basicNodeList1 = new ArrayList<BasicNode>();
+	    		List<BasicNode> basicNodeList2 = new ArrayList<BasicNode>();
+	    		for(List<BasicNode> basicNodeList: nodeListList){
+	    			for (BasicNode basicNode : basicNodeList){
+	    				basicNodeArr = ptNodeFactory.CreatePTNodes(basicNode);
+	    				basicNodeList1.add(basicNodeArr[0]);
+	    				basicNodeList2.add(basicNodeArr[1]);
+	    			}
+	    			ptLinkFactory.createLinks(basicNodeList1);
+	    			ptLinkFactory.createLinks(basicNodeList2);
+	    		}
+	    		System.out.println("Done.");
+	    		
+	    		int finNodes= pt.getPtNetworkLayer().getNodes().size() - iniNodes;
+	    		int finLinks= pt.getPtNetworkLayer().getLinks().size() - iniLinks;
+	    		
+	    		System.out.println("created Nodes:" + finNodes);
+	    		System.out.println("created Links:" + finLinks);
+	    		
+	    		System.out.println(pt.getPtNetworkLayer().toString());
+	    		
+	    		//--<y despues de crear los nuevos nodos y links hay que volver a crear los transfers and detached links
+
+				
+				
+				
+		
+				break;
 			case -2:
 				pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
 	    		pt.readPTNet(ZURICHPTN);
@@ -109,33 +159,7 @@ public class PTControler2 {
 	    		System.out.println(unidos);
 	    		break;
 	    	case 8:
-	    		
-	    		String filePath="C://Users/manuel/Desktop/TU/ZH_Files/bus/Basic_Bus_Network.xml";
-	    		
-	    		PTNodeReader ptNodeReader = new PTNodeReader();  
-	    		ptNodeReader.readFile (filePath);
-	    		Collection<BasicNode> basicNodes = ptNodeReader.getNodes();
-	    		
-	    		PTNodeFactory ptNodeFactory = new PTNodeFactory(pt.getPtNetworkLayer(), pt.getPtTimeTable());
-	    		for (BasicNode basicNode : basicNodes){
-	    			ptNodeFactory.insertNodes(basicNode);
-	    		}
-	    		
-	    
-	    				
-	    		
-	    		
-	    		
-	    		
-	    		
-	    	
-	    		
-	    	
-	    		
-	    		
-
-				
-	    		break;
+	    		    		break;
 		}//switch
 	}//main
 
