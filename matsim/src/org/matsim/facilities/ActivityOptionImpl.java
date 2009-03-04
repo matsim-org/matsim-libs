@@ -39,7 +39,6 @@ public class ActivityOptionImpl implements ActivityOption {
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
-	private Integer frequency = null;
 	private final String type;
 	private Integer capacity = Integer.MAX_VALUE; // MAX_VALUE == unlimited capcacity
 	private final Facility facility;
