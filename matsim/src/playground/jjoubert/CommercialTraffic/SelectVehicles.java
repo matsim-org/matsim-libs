@@ -16,15 +16,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.matsim.utils.gis.ShapeFileReader;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
@@ -49,7 +46,7 @@ public class SelectVehicles {
 		System.out.println("Processing: " + PROVINCE );
 		System.out.println("Initializing... ");
 		long startTime = System.currentTimeMillis();
-		MultiPolygon studyArea = readStudyAreaPolygon();
+		MultiPolygon studyArea = ReadStudyAreaShapeFile.readStudyAreaPolygon( shapeFileSource );
 		
 		final MathTransform mt = getMathTransform(); // Prepare for geometric transformations
 		
@@ -170,27 +167,7 @@ public class SelectVehicles {
 		boolean inPolygon = mp.contains(point);		
 		return inPolygon;
 	}
-	
-	public static MultiPolygon readStudyAreaPolygon() {
 		
-		FeatureSource fs = null;
-		MultiPolygon mp = null;
-		try {	
-			fs = ShapeFileReader.readDataFile( shapeFileSource );
-			for(Object o: fs.getFeatures() ){
-				Geometry geo = ((Feature)o).getDefaultGeometry();
-				if(geo instanceof MultiPolygon){
-					mp = (MultiPolygon)geo;
-				} else{
-					System.out.println("The shapefile is not a multipolygon");
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return mp;
-	}
-	
 	private static MathTransform getMathTransform() {
 		MathTransform mt = null;
 		try{

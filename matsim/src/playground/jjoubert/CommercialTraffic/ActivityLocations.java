@@ -25,20 +25,18 @@ public class ActivityLocations {
 	// String value that must be set
 	final static String PROVINCE = "WesternCape";
 	// Mac
-//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/" + PROVINCE + "/";
+//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-	final static String ROOT = "/home/jjoubert/" + PROVINCE + "/";
+	final static String ROOT = "/home/jjoubert/";
 	// Derived string values:
-	final static String SOURCEFOLDER = ROOT + "Sorted/";
-	final static String DESTFOLDER = ROOT + "Activities/";
-	final static String VEH_FOLDER = ROOT + "XML/";
+	final static String SOURCEFOLDER = ROOT + PROVINCE + "/Sorted/";
+	final static String DESTFOLDER = ROOT + PROVINCE+ "/Activities/";
+	final static String VEH_FOLDER = ROOT + PROVINCE + "/XML/";
+	final static String shapeFileSource = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
 
 	private final static String WGS84 = "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\", 6378137.0, 298.257223563]],PRIMEM[\"Greenwich\", 0.0],UNIT[\"degree\", 0.017453292519943295],AXIS[\"Lon\", EAST],AXIS[\"Lat\", NORTH]]";
 	private final static String WGS84_UTM35S = "PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
 
-//	final static String SOURCEFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp/Vehicles/";
-//	final static String DESTFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp/Activities/";
-//	final static String VEH_FOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp/XML/";
 	final static String DELIMITER_IN = " "; // Could also be ',' or other;
 	final static String DELIMITER_OUT = ","; // Could also be ' ';
 	final static int[] statusStart = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,20};
@@ -68,7 +66,7 @@ public class ActivityLocations {
 		System.out.println("Reading study area: " + PROVINCE );
 		//TODO Redo this part: SelectVehicles is now more general, and may not be reading
 		// 					   only Gauteng, but other study areas as well.	
-		studyArea = SelectVehicles.readStudyAreaPolygon();
+		studyArea = ReadStudyAreaShapeFile.readStudyAreaPolygon( shapeFileSource );
 		studyAreaCentroid = studyArea.getCentroid();
 		System.out.println("Done");
 		System.out.println();
@@ -485,5 +483,6 @@ public class ActivityLocations {
 		}
 		return vehicle;
 	}
+
 	
 }
