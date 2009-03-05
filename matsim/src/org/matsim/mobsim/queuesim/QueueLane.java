@@ -116,8 +116,6 @@ public class QueueLane implements Comparable<QueueLane> {
 	 */
 	private double buffercap_accumulate = 1.0;
 
-//	private boolean active = false;
-	
 	private QueueLink queueLink;
 	/**
 	 * This collection contains all Lanes downstream, if null it is the last lane 
@@ -180,7 +178,6 @@ public class QueueLane implements Comparable<QueueLane> {
 		this.queueLink = ql;
 		this.laneData = laneData;
 		this.originalLane = isOriginalLane;
-//		this.freespeedTravelTime = ql.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
 	}
 	
 	protected void addLightSignalGroupDefinition(BasicSignalGroupDefinition signalGroupDefinition) {
@@ -288,7 +285,6 @@ public class QueueLane implements Comparable<QueueLane> {
 	// ////////////////////////////////////////////////////////////////////
 	/*package*/ void finishInit() {
 		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
-//		this.active = false;
 	}
 	
 	/**

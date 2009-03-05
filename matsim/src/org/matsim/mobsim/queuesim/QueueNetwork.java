@@ -154,18 +154,6 @@ public class QueueNetwork{
 		QueueLink link;
 		boolean isActive;
 
-		// TODO [kn] this is in my view unstable code.  Should be
-		// while (links.hasNext()) {
-		//    link = links.next();
-		//    if ( moveWaitFirst ) {
-		//        isActive = link.moveLinkWaitFirst(time);
-		//    } else {
-		//          isActive = ...isActive;
-		//    }
-		//    if ( !isActive ...
-		// kai, nov07
-		/* well, we just moved the if (moveWaitFirst) outside of the while-loop,
-		 * so we have the if only once and not for every link. marcel, dez07 */
 		while (simLinks.hasNext()) {
 			link = simLinks.next();
 			isActive = link.moveLink(time);
@@ -173,28 +161,6 @@ public class QueueNetwork{
 				simLinks.remove();
 			}
 		}
-		
-//		if (this.moveWaitFirst) {
-//
-//			while (simLinks.hasNext()) {
-//				link = simLinks.next();
-//				isActive = link.moveLinkWaitFirst(time);
-//				if (!isActive && !simulateAllLinks) {
-//					simLinks.remove();
-//				}
-//			}
-//
-//		} else {
-//
-//			while (simLinks.hasNext()) {
-//				link = simLinks.next();
-//				isActive = link.moveLink(time);
-//				if (!isActive && !simulateAllLinks) {
-//					simLinks.remove();
-//				}
-//			}
-//
-//		}
 	}
 
 	/**

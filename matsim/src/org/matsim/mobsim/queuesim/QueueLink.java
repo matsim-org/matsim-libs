@@ -129,8 +129,6 @@ public class QueueLink {
 	
 	private boolean active = false;
 
-//	private List<QueueLane> simLanes = new ArrayList<QueueLane>();
-
 	/**
 	 * Initializes a QueueLink with one QueueLane.
 	 * @param l
