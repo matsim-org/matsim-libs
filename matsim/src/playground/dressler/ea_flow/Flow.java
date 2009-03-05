@@ -597,7 +597,7 @@ public class Flow {
 	
 	
 	@SuppressWarnings("unchecked")
-	public BasicPopulation createPoulation(boolean emptylegs){
+	public BasicPopulation createPoulation(boolean emptylegs,String oldfile){
 		//construct Population
 		BasicPopulation result =
 			new BasicPopulationImpl();
@@ -612,7 +612,9 @@ public class Flow {
 				
 				
 				if (!emptylegs) { // normal case, write the routes!
-					BasicRouteImpl route;				
+					BasicRouteImpl route;
+				
+					
 					route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
 					
 					if (ids.size() > 1) {

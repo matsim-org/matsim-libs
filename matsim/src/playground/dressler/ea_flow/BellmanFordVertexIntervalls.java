@@ -283,11 +283,11 @@ public class BellmanFordVertexIntervalls {
 					queue.add(w);
 				}
 			}
-			if(_debug>0){
+			if(_debug>3){
 				printStatus();
 			}
 		}
-		if (_debug>0) {
+		if (_debug>3) {
 		  System.out.println("Removed " + gain + " intervals.");
 		}
 		//System.out.println("finale labels: \n");
