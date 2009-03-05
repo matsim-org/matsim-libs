@@ -27,7 +27,9 @@ public class WalkScoringTest {
 		} else {
 			Config config = Gbl.createConfig(args);
 			final Controler controler = new Controler(args);
-			controler.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(config.charyparNagelScoring()));
+			controler
+					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
+							config.charyparNagelScoring()));
 			controler.run();
 		}
 		System.exit(0);

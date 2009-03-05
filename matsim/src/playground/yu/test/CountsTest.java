@@ -5,7 +5,7 @@ import org.matsim.counts.MatsimCountsReader;
 
 public class CountsTest {
 
-	/**
+	/**test the legality of countsfile (.xml)
 	 * @param args
 	 */
 	public static void main(String[] args) {
