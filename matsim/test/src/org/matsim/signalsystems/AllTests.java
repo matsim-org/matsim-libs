@@ -29,7 +29,7 @@ public class AllTests {
 
 	public static Test suite() {
 
-		TestSuite suite = new TestSuite("Tests for org.matsim.lightsignalsystems");
+		TestSuite suite = new TestSuite("Tests for org.matsim.signalsystems");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(LightSignalSystemsReaderTest.class);
 		suite.addTestSuite(LightSignalSystemsConfigReaderTest.class);
