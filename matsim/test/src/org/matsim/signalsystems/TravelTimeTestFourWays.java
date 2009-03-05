@@ -40,7 +40,6 @@ import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
@@ -57,13 +56,11 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		QueueNetwork.setSimulateAllLinks(true);
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		QueueNetwork.setSimulateAllLinks(false);
 	}
 
 	public void testTrafficLightIntersection4arms() {
@@ -83,7 +80,7 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 			sim.run();
 			this.writer.flush();
 			this.writer.close();
-			assertEquals(CRCChecksum.getCRCFromGZFile(this.getClassInputDirectory() + "reference.txt.gz"), CRCChecksum.getCRCFromGZFile(tempout));
+			assertEquals(CRCChecksum.getCRCFromGZFile(this.getClassInputDirectory() + "reference4armsWoUTurn.txt.gz"), CRCChecksum.getCRCFromGZFile(tempout));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
