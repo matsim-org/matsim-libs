@@ -159,7 +159,9 @@ public class PathSetGenerator {
 		List<Set<Link>> newExcludingLinkSets = new LinkedList<Set<Link>>();
 		
 		// go through all given link sets for THIS level
+		int setCnt = 0;
 		for (Set<Link> linkSet : excludingLinkSets) {
+			setCnt++;
 			
 			// remove the links from the network, calculate the least cost path and put the links back where they were
 			for (Link l : linkSet) { removeLinkFromNetwork(l); }
@@ -172,7 +174,7 @@ public class PathSetGenerator {
 				// add path to the path set (if not yet exists)
 				if (!containsPath(paths,path)) {
 					paths.add(path);
-					log.info("  path added (nofPath="+paths.size()+")");
+					log.info("  path added (nofPath="+paths.size()+"; nofRemainingSets="+(excludingLinkSets.size()-setCnt)+")");
 				}
 				
 				// this is not very nice...: keep the leastCostPath in mind (path on level zero)
