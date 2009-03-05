@@ -172,6 +172,7 @@ public class PathSetGenerator {
 				// add path to the path set (if not yet exists)
 				if (!containsPath(paths,path)) {
 					paths.add(path);
+					log.info("  path added (nofPath="+paths.size()+")");
 				}
 				
 				// this is not very nice...: keep the leastCostPath in mind (path on level zero)
@@ -181,8 +182,8 @@ public class PathSetGenerator {
 				// need to go through the whole level anymore. Therefore,
 				// if the number of paths is already enough, stop the process right here
 				if (paths.size() >= (nofPaths*variationFactor)) {
-					log.info("number of paths("+paths.size()+") >= nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
-					log.info("==> found enough paths from node "+origin.getId()+" to node "+destination.getId()+".");
+					log.info("  number of paths("+paths.size()+") >= nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
+					log.info("  ==> found enough paths from node "+origin.getId()+" to node "+destination.getId()+".");
 					log.info("end level "+level);
 					return;
 				}
@@ -202,8 +203,8 @@ public class PathSetGenerator {
 		
 		// nothing more to expand and therefore, no next tree level
 		if (newExcludingLinkSets.isEmpty()) {
-			log.info("number of paths("+paths.size()+") < nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
-			log.info("==> there are no more paths from node "+origin.getId()+" to node "+destination.getId()+".");
+			log.info("  number of paths("+paths.size()+") < nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
+			log.info("  ==> there are no more paths from node "+origin.getId()+" to node "+destination.getId()+".");
 			log.info("end level "+level);
 		}
 		// not enough paths found yet and therefore go into the next tree level
