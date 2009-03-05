@@ -23,8 +23,6 @@ import org.geotools.referencing.CRS;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -104,17 +102,20 @@ public class SelectVehicles {
 				if(inputString.length > 5){
 					double x = Double.valueOf(inputString[2]).doubleValue();
 					double y = Double.valueOf(inputString[3]).doubleValue();
-					Coordinate c = new Coordinate(x, y);
-					try {
-						JTS.transform(c, c, mt);
-					} catch (TransformException e) {
-						// Points with coordinates outside the range (±90¼) are ignored, but is not removed.
-//						e.printStackTrace();
-						;
-					}
-					Point p = gf.createPoint(c);
+					//TODO Create a more general "check" for point validity
+					if( (x > 0) && (x < 90) && (y > -90) && (y < 0) ){
+						Coordinate c = new Coordinate(x, y);
+						try {
+							JTS.transform(c, c, mt);
+						} catch (Exception e) {
+							// Points with coordinates outside the range (±90¼) are ignored, but is not removed.
+//							e.printStackTrace();
+							;
+						}
+						Point p = gf.createPoint(c);
 
-					inStatus = testPolygon(mp, p);
+						inStatus = testPolygon(mp, p);
+					}
 				}
 			}		
 		} catch (FileNotFoundException e) {
