@@ -12,7 +12,6 @@ import java.util.Scanner;
 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.operation.projection.PointOutsideEnvelopeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
@@ -413,7 +412,7 @@ public class ActivityLocations {
 						log.add( new GPSPoint(vehID, time, status, c) );
 					} catch(NumberFormatException e2){
 						System.out.print("");
-					} catch(PointOutsideEnvelopeException e3){
+					} catch(Exception e3){
 						// Points with coordinates outside the range (±90¼) are ignored.
 						System.out.print("");						
 					}
