@@ -64,7 +64,7 @@ public class DDcontroller {
 		final String plansFilename = "./examples/meine_EA/padang_plans_100p_flow_2s.xml";
 		
 		boolean testplans = false; // FIXME !
-		boolean dosim = false;		
+		boolean dosim = true;		
 		boolean otfvis = true;
 		boolean netvis = false & (!otfvis);
 
@@ -140,7 +140,7 @@ public class DDcontroller {
 		if (otfvis) {
 			QueueNetwork qnet = new QueueNetwork(network);
 			
-			String eventFile = "./output/it3events.txt";
+			String eventFile = "./output/events.txt";
 			OTFEvent2MVI mviconverter = new OTFEvent2MVI(qnet, eventFile, "./output/otfvis.mvi", 60);
 			mviconverter.convert();
 
