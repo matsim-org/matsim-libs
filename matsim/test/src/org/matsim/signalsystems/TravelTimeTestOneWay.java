@@ -34,7 +34,6 @@ import org.matsim.controler.ScenarioData;
 import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -53,15 +52,11 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkEnterEve
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-//		QueueNetwork.setSimulateAllLinks(true);
-//		QueueNetwork.setSimulateAllNodes(true);
 	}
 	
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		QueueNetwork.setSimulateAllLinks(false);
-//		QueueNetwork.setSimulateAllNodes(false);
 	}
 		
 	public void testTrafficLightIntersection2arms_w_TrafficLight_0_60(){
