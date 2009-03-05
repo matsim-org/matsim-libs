@@ -58,14 +58,12 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 	protected void setUp() throws Exception {
 		super.setUp();
 		QueueNetwork.setSimulateAllLinks(true);
-//		QueueNetwork.setSimulateAllNodes(true);
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		QueueNetwork.setSimulateAllLinks(false);
-//		QueueNetwork.setSimulateAllNodes(false);
 	}
 
 	public void testTrafficLightIntersection4arms() {
@@ -80,7 +78,6 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 		String tempout = this.getOutputDirectory() + "temp.txt.gz";
 		try {
 			this.writer = IOUtils.getBufferedWriter(tempout, true);
-//			new QSim(events, data.getPopulation(), data.getNetwork(), false, lsaDefinition, lsaConfig).run();
 			QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
 			sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemsConfiguration());
 			sim.run();

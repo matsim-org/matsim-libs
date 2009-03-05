@@ -112,7 +112,7 @@ public class QueueLane implements Comparable<QueueLane> {
 	 */
 	private double buffercap_accumulate = 1.0;
 
-	private boolean active = false;
+//	private boolean active = false;
 	
 	private QueueLink queueLink;
 	/**
@@ -284,7 +284,7 @@ public class QueueLane implements Comparable<QueueLane> {
 	// ////////////////////////////////////////////////////////////////////
 	/*package*/ void finishInit() {
 		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
-		this.active = false;
+//		this.active = false;
 	}
 	
 	/**
@@ -437,28 +437,17 @@ public class QueueLane implements Comparable<QueueLane> {
 		} // end while
 	}
 	
-	/*package*/ boolean updateActiveStatus() {
+	/*package*/ boolean isActive() {
 		/*
 		 * Leave Lane active as long as there are vehicles on the link (ignore
 		 * buffer because the buffer gets emptied by nodes and not links) and leave
 		 * link active until buffercap has accumulated (so a newly arriving vehicle
 		 * is not delayed).
 		 */
-		this.active = (this.buffercap_accumulate < 1.0) || (this.vehQueue.size() != 0) || (this.waitingList.size() != 0);
-		return this.active;
+		boolean active = (this.buffercap_accumulate < 1.0) || (this.vehQueue.size() != 0) || (this.waitingList.size() != 0);
+		return active;
 	}
 
-	/*package*/ void activateLane() {
-		if (!this.active) {
-			this.queueLink.addActiveLane(this);
-			this.active = true;
-		}
-	}
-	
-	/*package*/ boolean isActive() {
-		return this.active;
-	}
-	
 	
 	/** called from framework, do everything related to link movement here
 	 * 
@@ -481,7 +470,7 @@ public class QueueLane implements Comparable<QueueLane> {
 			// move vehicles from waitingQueue into buffer if possible
 			moveWaitToBuffer(now);
 		}
-		return this.updateActiveStatus();
+		return this.isActive();
 	}
 
 	protected boolean moveLaneWaitFirst(final double now) {
@@ -497,7 +486,7 @@ public class QueueLane implements Comparable<QueueLane> {
 		moveLaneToBuffer(now);
 		
 		moveBufferToNextLane(now);
-		return this.updateActiveStatus();
+		return this.isActive();
 	}
 
 	
@@ -543,7 +532,7 @@ public class QueueLane implements Comparable<QueueLane> {
 	 *          the vehicle
 	 */
 	/*package*/ void add(final QueueVehicle veh, double now) {
-		activateLane();
+//		activateLane();
 		this.vehQueue.add(veh);
 		double departureTime;
 		if (this.originalLane) {

@@ -166,28 +166,35 @@ public class QueueNetwork{
 		// kai, nov07
 		/* well, we just moved the if (moveWaitFirst) outside of the while-loop,
 		 * so we have the if only once and not for every link. marcel, dez07 */
-
-		if (this.moveWaitFirst) {
-
-			while (simLinks.hasNext()) {
-				link = simLinks.next();
-				isActive = link.moveLinkWaitFirst(time);
-				if (!isActive && !simulateAllLinks) {
-					simLinks.remove();
-				}
+		while (simLinks.hasNext()) {
+			link = simLinks.next();
+			isActive = link.moveLink(time);
+			if (!isActive && !simulateAllLinks) {
+				simLinks.remove();
 			}
-
-		} else {
-
-			while (simLinks.hasNext()) {
-				link = simLinks.next();
-				isActive = link.moveLink(time);
-				if (!isActive && !simulateAllLinks) {
-					simLinks.remove();
-				}
-			}
-
 		}
+		
+//		if (this.moveWaitFirst) {
+//
+//			while (simLinks.hasNext()) {
+//				link = simLinks.next();
+//				isActive = link.moveLinkWaitFirst(time);
+//				if (!isActive && !simulateAllLinks) {
+//					simLinks.remove();
+//				}
+//			}
+//
+//		} else {
+//
+//			while (simLinks.hasNext()) {
+//				link = simLinks.next();
+//				isActive = link.moveLink(time);
+//				if (!isActive && !simulateAllLinks) {
+//					simLinks.remove();
+//				}
+//			}
+//
+//		}
 	}
 
 	/**
@@ -251,6 +258,10 @@ public class QueueNetwork{
 
 	public void setMoveWaitFirst(final boolean moveWaitFirst){
 		this.moveWaitFirst = moveWaitFirst;
+	}
+	
+	protected boolean isMoveWaitFirst() {
+		return this.moveWaitFirst;
 	}
 
 	public Map<Id, QueueLink> getLinks() {

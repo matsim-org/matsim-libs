@@ -35,7 +35,6 @@ import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -60,15 +59,11 @@ public class SignalSystemBasicsTest extends MatsimTestCase implements
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		QueueNetwork.setSimulateAllLinks(true);
-//		QueueNetwork.setSimulateAllNodes(true);
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		QueueNetwork.setSimulateAllLinks(false);
-//		QueueNetwork.setSimulateAllNodes(false);
 	}
 	
 	public void testTrafficLightIntersection2arms1Agent() {

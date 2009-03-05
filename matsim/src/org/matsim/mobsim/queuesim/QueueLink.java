@@ -128,7 +128,7 @@ public class QueueLink {
 	
 	private boolean active = false;
 
-	private List<QueueLane> simLanes = new ArrayList<QueueLane>();
+//	private List<QueueLane> simLanes = new ArrayList<QueueLane>();
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -287,34 +287,17 @@ public class QueueLink {
 	// ////////////////////////////////////////////////////////////////////
 	public void finishInit() {
 		for (QueueLane lane : this.queueLanes){
-//			this.originalLane.finishInit();
 			lane.finishInit();
 		}
-//		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
 		this.active = false;
 	}
 
-//	/*package*/ boolean updateActiveStatus() {
-//		/*
-//		 * Leave link active as long as there are vehicles on the link (ignore
-//		 * buffer because the buffer gets emptied by nodes and not links) and leave
-//		 * link active until buffercap has accumulated (so a newly arriving vehicle
-//		 * is not delayed).
-//		 */
-//		this.active = (this.buffercap_accumulate < 1.0) || (this.vehQueue.size() != 0) || (this.waitingList.size() != 0);
-//		return this.active;
-//	}
 
 	public void activateLink() {
-//		if (!simulateAllLanes){
-//			if (!this.originalLane.isActive()) {
-//				this.originalLane.activateLane();
 		if (!this.active){
 			this.getQueueNetwork().addActiveLink(this);
 			this.active = true;
 		}
-//			}			
-//		}
 	}
 
 	/**
@@ -347,27 +330,28 @@ public class QueueLink {
 				vehicle.getDepartureTime_s(), this);
 	}
 
-	protected boolean moveLinkWaitFirst(double time) {
-		boolean ret = false;	
-		for (QueueLane lane : this.queueLanes){
-			if (lane.moveLaneWaitFirst(time)){
-				ret = true;
-			}
-		}
-		this.active = ret;
-		return ret;
-	}
-
 	protected boolean moveLink(double now) {
 		boolean ret = false;	
-		for (QueueLane lane : this.queueLanes){
-			if (lane.moveLane(now)){
-				ret = true;
+		if (this.queueNetwork.isMoveWaitFirst()){
+			for (QueueLane lane : this.queueLanes){
+				if (lane.moveLaneWaitFirst(now)){
+					ret = true;
+				}
+			}
+		}
+		else {
+			for (QueueLane lane : this.queueLanes){
+				if (lane.moveLane(now)){
+					ret = true;
+				}
 			}
 		}
 		this.active = ret;
 		return ret;
 	}
+	
+	
+	
 	
 	protected boolean bufferIsEmpty() {
 		//if there is only one lane...
@@ -386,17 +370,26 @@ public class QueueLink {
 	public boolean hasSpace() {
 		return this.originalLane.hasSpace();
 	}
-
+	/**
+	 * TODO dg
+	 * @param time
+	 */
 	public void recalcTimeVariantAttributes(double time) {
 		this.originalLane.recalcTimeVariantAttributes(time);
 	}
 
-
+	/**
+	 * TODO dg
+	 * @param agentId
+	 * @return
+	 */
 	public QueueVehicle getVehicle(Id agentId) {
 		return this.originalLane.getVehicle(agentId);
 	}
-
-
+	/**
+	 * TODO dg 
+	 * @return
+	 */
 	public Collection<QueueVehicle> getAllVehicles() {
 		return this.originalLane.getAllVehicles();
 	}
@@ -418,11 +411,6 @@ public class QueueLink {
 		return this.originalLane.vehOnLinkCount();
 	}
 
-
-	public void addActiveLane(QueueLane queueLane) {
-		this.simLanes.add(queueLane);
-	}
-	
 	public Link getLink() {
 		return this.link;
 	}

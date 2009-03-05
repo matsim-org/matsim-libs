@@ -53,7 +53,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkEnterEve
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		QueueNetwork.setSimulateAllLinks(true);
+//		QueueNetwork.setSimulateAllLinks(true);
 //		QueueNetwork.setSimulateAllNodes(true);
 	}
 	
@@ -82,7 +82,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkEnterEve
 		BasicSignalSystems lssDefs = data.getSignalSystems();
 		List<BasicSignalSystemConfiguration> lssConfigs = data.getSignalSystemsConfiguration();
 
-		for (int dropping = 1; dropping <= circulationTime; dropping=dropping+3) {
+		for (int dropping = 1; dropping <= circulationTime; dropping=dropping+1) {
 			this.beginningOfLink2 = null;
 			
 			for (BasicSignalSystemConfiguration lssConfig : lssConfigs) {
