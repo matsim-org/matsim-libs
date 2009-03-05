@@ -48,6 +48,10 @@ import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 /**
+ * A QueueLane has no own active state and only offers isActive() for a 
+ * stateless check for activation, a QueueLink is active as long as at least one 
+ * of its QueueLanes is active.
+ * 
  * 
  * @author dgrether based on prior QueueLink implementations of
  * @author dstrippgen

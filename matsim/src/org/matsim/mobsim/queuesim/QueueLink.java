@@ -93,7 +93,8 @@ import org.matsim.utils.misc.Time;
  *    </li>
  *   <li>All QueueLane instances which are connected to the ToQueueNode are 
  *   held in the attribute toNodeQueueLanes</li>
- *   <li>...</li>
+ *   <li>QueueLink is active as long as at least one 
+ * of its QueueLanes is active.</li>
  * </ul>
  */
 public class QueueLink {
