@@ -30,15 +30,14 @@ import org.matsim.interfaces.core.v01.Plan;
  */
 public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
-	//private final CharyparNagelScoringParameters params;
-	private org.matsim.scoring.charyparNagel.CharyparNagelScoringFunctionFactory factory=null;
+private final CharyparNagelScoringParameters params;
 	
 	public CharyparNagelScoringFunctionFactory(final CharyparNagelScoringConfigGroup config) {
-		this.factory = new org.matsim.scoring.charyparNagel.CharyparNagelScoringFunctionFactory(config);
+		this.params = new CharyparNagelScoringParameters(config);
 	}
 	
 	public ScoringFunction getNewScoringFunction(final Plan plan) {
-		return this.factory.getNewScoringFunction(plan);
+		return new CharyparNagelScoringFunction(plan, this.params);
 	}
 
 }
