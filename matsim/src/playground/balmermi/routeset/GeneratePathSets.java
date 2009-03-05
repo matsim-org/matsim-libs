@@ -107,6 +107,7 @@ public class GeneratePathSets {
 				for (Link l : path.links) { out.write("\t"+l.getId()); }
 				out.write("\t-1\t0\t-1\n");
 			}
+			out.flush();
 		}
 		
 		out.close();

@@ -20,6 +20,7 @@
 
 package playground.balmermi.routeset;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,7 +70,6 @@ public class PathSetGenerator {
 		if (network == null) { throw new RuntimeException("Network must exist."); }
 		this.network = network;
 		this.frespeedCost = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
-//		this.router = new Dijkstra(this.network,this.frespeedCost,this.frespeedCost);
 		PreProcessLandmarks preProcessLandmarks = new PreProcessLandmarks(this.frespeedCost);
 		preProcessLandmarks.run(network);
 		this.router = new AStarLandmarks(this.network,preProcessLandmarks,this.frespeedCost);
@@ -103,7 +103,7 @@ public class PathSetGenerator {
 	
 	public final Tuple<Path,List<Path>> getPaths() {
 		// setup and run the recursion
-		Set<Set<Link>> excludingLinkSets = new HashSet<Set<Link>>();
+		List<Set<Link>> excludingLinkSets = new LinkedList<Set<Link>>();
 		excludingLinkSets.add(new HashSet<Link>());
 		Set<Path> paths = new HashSet<Path>();
 		generate(0,excludingLinkSets,paths);
@@ -142,18 +142,21 @@ public class PathSetGenerator {
 		return false;
 	}
 	
-	private final boolean containsLinkIdSet(Set<Set<Link>> linkSets, Set<Link> linkSet) {
+	private final boolean containsLinkIdSet(List<Set<Link>> linkSets, Set<Link> linkSet) {
 		for (Set<Link> set : linkSets) {
 			if (set.equals(linkSet)) { return true; }
 		}
 		return false;
 	}
 
-	private final void generate(int level, Set<Set<Link>> excludingLinkSets, Set<Path> paths) {
+	private final void generate(int level, List<Set<Link>> excludingLinkSets, Set<Path> paths) {
 		log.info("start level "+level);
+		
+		// for EARLY ABORT: shuffle the excludingLinkSets
+		Collections.shuffle(excludingLinkSets,MatsimRandom.random);
 
 		// the set of excluding link sets for the NEXT tree level
-		Set<Set<Link>> newExcludingLinkSets = new HashSet<Set<Link>>();
+		List<Set<Link>> newExcludingLinkSets = new LinkedList<Set<Link>>();
 		
 		// go through all given link sets for THIS level
 		for (Set<Link> linkSet : excludingLinkSets) {
@@ -173,6 +176,16 @@ public class PathSetGenerator {
 				
 				// this is not very nice...: keep the leastCostPath in mind (path on level zero)
 				if (level == 0) { leastCostPath = path; }
+
+				// EARLY ABORT: if the excludingLinkSets are shuffled already, there is no
+				// need to go through the whole level anymore. Therefore,
+				// if the number of paths is already enough, stop the process right here
+				if (paths.size() >= (nofPaths*variationFactor)) {
+					log.info("number of paths("+paths.size()+") >= nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
+					log.info("==> found enough paths from node "+origin.getId()+" to node "+destination.getId()+".");
+					log.info("end level "+level);
+					return;
+				}
 				
 				// no matter if the path already exists in the path list, that element of the recursion tree needs to be expanded.
 				// Therefore, add new excluding link set for the NEXT tree level
@@ -187,23 +200,17 @@ public class PathSetGenerator {
 			}
 		}
 		
-		// tree level finished. Now, decide if the next tree level must be done.
-		log.info("  newExcludingLinkIdSets.size() = "+newExcludingLinkSets.size());
-		log.info("  paths.size()                  = "+paths.size());
-		log.info("end level "+level);
-		
-		// if the number of paths is already enough, do not enter the next tree level
-		if (paths.size() >= (nofPaths*variationFactor)) {
-			log.info("number of paths("+paths.size()+") >= nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
-			log.info("==> found enough paths from node "+origin.getId()+" to node "+destination.getId()+".");
-		}
 		// nothing more to expand and therefore, no next tree level
-		else if (newExcludingLinkSets.isEmpty()) {
+		if (newExcludingLinkSets.isEmpty()) {
 			log.info("number of paths("+paths.size()+") < nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
 			log.info("==> there are no more paths from node "+origin.getId()+" to node "+destination.getId()+".");
+			log.info("end level "+level);
 		}
 		// not enough paths found yet and therefore go into the next tree level
 		else {
+			log.info("  newExcludingLinkIdSets.size() = "+newExcludingLinkSets.size());
+			log.info("  paths.size()                  = "+paths.size());
+			log.info("end level "+level);
 			level++;
 			generate(level,newExcludingLinkSets,paths);
 		}
