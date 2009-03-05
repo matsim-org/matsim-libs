@@ -20,12 +20,16 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
 
 public class ActivityLocations {
 	// String value that must be set
 	final static String PROVINCE = "WesternCape";
-	// Derived string values
-	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/" + PROVINCE + "Vehicles/";
+	// Mac
+//	final static String ROOT = "Users/johanwjoubert/MATSim/workspace/MATSimData/" + PROVINCE + "/";
+	// IVT-Sim0
+	final static String ROOT = "home/jjoubert/" + PROVINCE + "/";
+	// Derived string values:
 	final static String SOURCEFOLDER = ROOT + "Sorted/";
 	final static String DESTFOLDER = ROOT + "Activities/";
 	final static String VEH_FOLDER = ROOT + "XML/";
@@ -45,6 +49,7 @@ public class ActivityLocations {
 	final static int DISTANCE_THRESHOLD = Vehicle.DISTANCE_THRESHOLD;
 	public static int progressDots;
 	public static MultiPolygon studyArea;
+	public static Point studyAreaCentroid;
 	// a 'BoinkPoint' is an activity that starts and ends at different locations. Currently I don't do anything with them.
 	//TODO Sort out how to handle these 'BoinkPoint's.
 	public static int numberOfBoinkPoints = 0; 
@@ -65,6 +70,7 @@ public class ActivityLocations {
 		//TODO Redo this part: SelectVehicles is now more general, and may not be reading
 		// 					   only Gauteng, but other study areas as well.	
 		studyArea = SelectVehicles.readStudyAreaPolygon();
+		studyAreaCentroid = studyArea.getCentroid();
 		System.out.println("Done");
 		System.out.println();
 		
@@ -144,11 +150,7 @@ public class ActivityLocations {
 			e.printStackTrace();
 		}
 		
-		System.out.println();
-		System.out.println();
-		System.out.print("Writing locations to file... " );
-		System.out.println("Done" );
-		System.out.println();
+		System.out.printf("\n\n");
 		
 		long endTime = System.currentTimeMillis();
 		
@@ -272,7 +274,7 @@ public class ActivityLocations {
 		findNextVehicleStop(log); // Clean all points until first start		
 		ArrayList<Activity> activityList = extractActivities(file, log); // Find all the activities
 		extractChains(thisVehicle, activityList);
-		thisVehicle.updateVehicleStatistics(studyArea);		
+		thisVehicle.updateVehicleStatistics(studyArea, studyAreaCentroid);		
 	}
 
 	private static ArrayList<Activity> extractActivities(File file,

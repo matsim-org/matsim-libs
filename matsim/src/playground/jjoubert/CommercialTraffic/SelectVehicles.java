@@ -33,9 +33,12 @@ import com.vividsolutions.jts.geom.Point;
 
 public class SelectVehicles {
 	// String value that must be set
-	final static String PROVINCE = "WesternCape";
+	final static String PROVINCE = "KZN";
+	// Mac
+//	final static String ROOT = "Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	// IVT-Sim0
+	final static String ROOT = "home/jjoubert/";
 	// Derived string values
-	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	final static String shapeFileSource = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
 	final static String vehicleSource = ROOT + "VehicleFiles/";
 	final static String vehicleDestination = ROOT + PROVINCE + "Vehicles/Unsorted/";

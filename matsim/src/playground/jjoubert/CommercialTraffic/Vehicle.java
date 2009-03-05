@@ -63,11 +63,11 @@ public class Vehicle {
 	 *        
 	 * @param studyArea of type <code>MultiPolygon<code> 
 	 */
-	public void updateVehicleStatistics(MultiPolygon studyArea){
+	public void updateVehicleStatistics(MultiPolygon studyArea, Point centroid){
 		setAvgActivitiesPerChain();
 		setAvgChainDuration();
 		setAvgChainDistance();
-		setNumberOfStudyAreaActivities( studyArea );
+		setNumberOfStudyAreaActivities( studyArea, centroid );
 	}
 	
 	private void setAvgActivitiesPerChain(){
@@ -107,7 +107,7 @@ public class Vehicle {
 		}
 	}
 
-	private void setNumberOfStudyAreaActivities(MultiPolygon studyArea){
+	private void setNumberOfStudyAreaActivities(MultiPolygon studyArea, Point centroid){
 		GeometryFactory gf = new GeometryFactory();
 		if(this.chains.size() > 0){
 			for (Chain chain : this.chains) {
@@ -115,9 +115,13 @@ public class Vehicle {
 					for (int i = 1; i < chain.getActivities().size() - 1; i++ ) { // don't count first and last major locations
 						Activity thisActivity = chain.getActivities().get(i);
 						Point p = gf.createPoint( thisActivity.getLocation().getCoordinate() );
-						if( studyArea.contains(p) ){
-							this.studyAreaActivities.add( thisActivity );
-							chain.setInStudyArea(true);
+						//TODO The following indicates maximum distance (meters) from the study area centroid:
+						//		Western Cape: 400000
+						if (centroid.distance(p) <= 400000 ){
+							if( studyArea.contains(p) ){
+								this.studyAreaActivities.add( thisActivity );
+								chain.setInStudyArea(true);
+							}
 						}
 					}
 				}

@@ -21,7 +21,7 @@ import java.util.Scanner;
 
 public class SortVehicleLogs {
 	// String value that must be set
-	final static String PROVINCE = "WesternCape";
+	final static String PROVINCE = "KZN";
 	// Derived string values
 	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/" + PROVINCE + "/";
 	final static String SOURCEFOLDER = ROOT + "Unsorted/";
@@ -69,6 +69,7 @@ public class SortVehicleLogs {
 				}
 				filesSorted++;
 			}
+			System.out.printf("\n\n");
 			System.out.println("Largest file is " + maxFile.getName() + " and has " + maxLines + " gps records.");
 		}
 	}
