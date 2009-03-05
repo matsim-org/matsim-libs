@@ -22,8 +22,11 @@ import java.util.Scanner;
 public class SortVehicleLogs {
 	// String value that must be set
 	final static String PROVINCE = "KZN";
+	// Mac
+//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	// IVT-Sim0
+	final static String ROOT = "/home/jjoubert/" + PROVINCE + "/";
 	// Derived string values
-	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/" + PROVINCE + "/";
 	final static String SOURCEFOLDER = ROOT + "Unsorted/";
 	final static String DESTFOLDER = ROOT + "Sorted/";
 	// Other variables and parameters

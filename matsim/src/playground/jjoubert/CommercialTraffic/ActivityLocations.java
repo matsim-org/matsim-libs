@@ -26,9 +26,9 @@ public class ActivityLocations {
 	// String value that must be set
 	final static String PROVINCE = "WesternCape";
 	// Mac
-//	final static String ROOT = "Users/johanwjoubert/MATSim/workspace/MATSimData/" + PROVINCE + "/";
+//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/" + PROVINCE + "/";
 	// IVT-Sim0
-	final static String ROOT = "home/jjoubert/" + PROVINCE + "/";
+	final static String ROOT = "/home/jjoubert/" + PROVINCE + "/";
 	// Derived string values:
 	final static String SOURCEFOLDER = ROOT + "Sorted/";
 	final static String DESTFOLDER = ROOT + "Activities/";

@@ -35,13 +35,13 @@ public class SelectVehicles {
 	// String value that must be set
 	final static String PROVINCE = "KZN";
 	// Mac
-//	final static String ROOT = "Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-	final static String ROOT = "home/jjoubert/";
+//	final static String ROOT = "/home/jjoubert/";
 	// Derived string values
 	final static String shapeFileSource = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
 	final static String vehicleSource = ROOT + "VehicleFiles/";
-	final static String vehicleDestination = ROOT + PROVINCE + "Vehicles/Unsorted/";
+	final static String vehicleDestination = ROOT + PROVINCE + "/Unsorted/";
 	
 	// Other paramaters and variables
 	private final static String WGS84 = "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\", 6378137.0, 298.257223563]],PRIMEM[\"Greenwich\", 0.0],UNIT[\"degree\", 0.017453292519943295],AXIS[\"Lon\", EAST],AXIS[\"Lat\", NORTH]]";
