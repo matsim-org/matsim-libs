@@ -92,22 +92,26 @@ public class GeneratePathSets {
 			
 			log.info("----------------------------------------------------------------------");
 			log.info("generating path sets for segment id="+id+", O="+od.getFirst().getId()+" and D="+od.getSecond().getId()+"...");
-			gen.setODPair(od.getFirst(),od.getSecond());
-			Tuple<Path,List<Path>> paths = gen.getPaths();
-			log.info("done.");
+			if (gen.setODPair(od.getFirst(),od.getSecond())) {
+				Tuple<Path,List<Path>> paths = gen.getPaths();
+				log.info("done.");
+				// write least cost path
+				out.write(id.toString()+"\t"+od.getFirst().getId()+"\t"+od.getSecond().getId());
+				for (Link l : paths.getFirst().links) { out.write("\t"+l.getId()); }
+				out.write("\t-1\t1\t-1\n");
+				// write other paths
+				for (Path path : paths.getSecond()) {
+					out.write(id.toString()+"\t"+od.getFirst().getId()+"\t"+od.getSecond().getId());
+					for (Link l : path.links) { out.write("\t"+l.getId()); }
+					out.write("\t-1\t0\t-1\n");
+				}
+				out.flush();
+			}
+			else {
+				log.warn("triple id="+id+", O="+od.getFirst().getId()+" and D="+od.getSecond().getId()+" is omitted.");
+			}
 			Gbl.printMemoryUsage();
 			log.info("----------------------------------------------------------------------");
-			// write least cost path
-			out.write(id.toString()+"\t"+od.getFirst().getId()+"\t"+od.getSecond().getId());
-			for (Link l : paths.getFirst().links) { out.write("\t"+l.getId()); }
-			out.write("\t-1\t1\t-1\n");
-			// write other paths
-			for (Path path : paths.getSecond()) {
-				out.write(id.toString()+"\t"+od.getFirst().getId()+"\t"+od.getSecond().getId());
-				for (Link l : path.links) { out.write("\t"+l.getId()); }
-				out.write("\t-1\t0\t-1\n");
-			}
-			out.flush();
 		}
 		
 		out.close();

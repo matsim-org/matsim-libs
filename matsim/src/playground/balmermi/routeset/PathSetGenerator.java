@@ -89,16 +89,17 @@ public class PathSetGenerator {
 		else { this.variationFactor = variationFactor; }
 	}
 
-	public final void setODPair(Node fromNode, Node toNode) {
-		if (fromNode == null) { throw new RuntimeException("Origin node must exist."); }
-		if (network.getNode(fromNode.getId()) == null) { throw new RuntimeException("Origin node does not exist in the network."); }
+	public final boolean setODPair(Node fromNode, Node toNode) {
+		if (fromNode == null) { log.warn("Origin node must exist."); return false; }
+		if (network.getNode(fromNode.getId()) == null) { log.warn("Origin node does not exist in the network."); return false; }
 
-		if (toNode == null) { throw new RuntimeException("Destination node must exist."); }
-		if (network.getNode(toNode.getId()) == null) { throw new RuntimeException("Destination node does not exist in the network."); }
+		if (toNode == null) { log.warn("Destination node must exist."); return false; }
+		if (network.getNode(toNode.getId()) == null) { log.warn("Destination node does not exist in the network."); return false; }
 
-		if (fromNode.equals(toNode)) { throw new RuntimeException("Origin equals to Destination not allowed."); }
+		if (fromNode.equals(toNode)) { log.warn("Origin equals to Destination not allowed."); return false; }
 		origin = fromNode;
 		destination = toNode;
+		return true;
 	}
 	
 	public final Tuple<Path,List<Path>> getPaths() {
