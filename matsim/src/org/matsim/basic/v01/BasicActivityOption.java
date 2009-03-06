@@ -28,12 +28,19 @@ import org.matsim.interfaces.basic.v01.BasicLocation;
  * @author dgrether
  */
 public interface BasicActivityOption {
+	// FIXME: needs to go into basic interfaces
 	
+	/**
+	 * @deprecated If anything, then the facility has a location
+	 */
+	@Deprecated
 	public BasicLocation getLocation();
 	
 	public Integer getCapacity();
+	// FIXME this should use Double
 	
 	public void setCapacity(Integer cap);
+	// FIXME this should use Double
 
 	public void addOpeningTime(BasicOpeningTime openingTime);
 
