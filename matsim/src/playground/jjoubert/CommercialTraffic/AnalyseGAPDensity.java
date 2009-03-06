@@ -236,6 +236,12 @@ public class AnalyseGAPDensity {
 			BufferedWriter outputMajor = new BufferedWriter(new FileWriter( new File ( OUTPUT_MAJOR ) ) );
 			
 			String header = createHeaderString();
+			
+			// Update zone activity counts
+			for (SAZone zone : zoneList) {
+				zone.updateSAZoneCounts(true); // Update minor
+				zone.updateSAZoneCounts(false); // Update major
+			}
 
 			// Write minor activities
 			try{

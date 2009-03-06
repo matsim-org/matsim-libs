@@ -96,9 +96,6 @@ public class ActivityLocations {
 			BufferedWriter minorLocations = new BufferedWriter(new FileWriter(new File(DESTFOLDER + PROVINCE + "MinorLocations.txt")));
 			minorLocations.write( locationHeaderString() );
 			minorLocations.newLine();
-			BufferedWriter hourOfDayStats = new BufferedWriter(new FileWriter(new File(DESTFOLDER + PROVINCE + "HourOfDayStats.txt")));
-			hourOfDayStats.write( studyAreaHeaderString() );
-			hourOfDayStats.newLine();
 			
 			for(int i = 0; i < vehicles.length; i++ ){
 				File thisFile = vehicles[i];
@@ -130,14 +127,6 @@ public class ActivityLocations {
 		
 						saveVehicleStringToFile(thisVehicle.getVehID(), convertVehicleToXML(thisVehicle) );
 					}
-					
-					// Write hour-of-day statistics
-					if(thisVehicle.getStudyAreaActivities().size() > 0){
-						for(int j = 0; j < thisVehicle.getStudyAreaActivities().size(); j++ ){
-							hourOfDayStats.write( studyAreaStatsString(thisVehicle, j) );
-							hourOfDayStats.newLine();
-						}
-					}
 					numberOfVehicles++;				
 					dotsPrinted = pb.updateProgress(dotsPrinted, numberOfVehicles, totalVehicles);
 				}
@@ -145,7 +134,6 @@ public class ActivityLocations {
 			vehicleStats.close();
 			majorLocations.close();
 			minorLocations.close();
-			hourOfDayStats.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -177,24 +165,6 @@ public class ActivityLocations {
 			e.printStackTrace();
 		}
 		return mt;
-	}
-
-
-	private static String studyAreaHeaderString() {
-		return  "Veh_ID" + DELIMITER_OUT + 
-				"Long" + DELIMITER_OUT + 
-				"Lat" + DELIMITER_OUT + 
-				"Hour_of_Day_Start" + DELIMITER_OUT + 
-				"Duration";
-	}
-
-	private static String studyAreaStatsString(Vehicle thisVehicle, int i) {
-		String outputString = String.valueOf( thisVehicle.getVehID() ) + DELIMITER_OUT +
-							  String.valueOf(thisVehicle.getStudyAreaActivities().get(i).getLocation().getCoordinate().x ) + DELIMITER_OUT +
-							  String.valueOf( thisVehicle.getStudyAreaActivities().get(i).getLocation().getCoordinate().y ) + DELIMITER_OUT +
-							  String.valueOf( thisVehicle.getStudyAreaActivities().get(i).getStartHour() ) + DELIMITER_OUT + 
-							  String.valueOf( thisVehicle.getStudyAreaActivities().get(i).getDuration() );
-		return outputString;
 	}
 
 	private static String vehicleStatsHeaderString() {
