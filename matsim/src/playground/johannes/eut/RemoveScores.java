@@ -38,7 +38,7 @@ public class RemoveScores implements StartupListener {
 	 * @see org.matsim.controler.listener.StartupListener#notifyStartup(org.matsim.controler.events.StartupEvent)
 	 */
 	public void notifyStartup(StartupEvent event) {
-		for(Person p : event.getControler().getPopulation()) {
+		for(Person p : event.getControler().getPopulation().getPersons().values()) {
 			for(Plan plan : p.getPlans())
 				plan.setScore(0);
 		}

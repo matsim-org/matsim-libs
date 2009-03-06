@@ -51,7 +51,7 @@ public class RemoveDuplicatePlans implements BeforeMobsimListener {
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		int counter = 0;
-		for (Person p : event.getControler().getPopulation()) {
+		for (Person p : event.getControler().getPopulation().getPersons().values()) {
 			Plan selected = p.getSelectedPlan();
 			int cnt = p.getPlans().size();
 			for(int i = 0; i < cnt; i++) {
