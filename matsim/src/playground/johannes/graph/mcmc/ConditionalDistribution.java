@@ -30,6 +30,6 @@ package playground.johannes.graph.mcmc;
  */
 public interface ConditionalDistribution {
 
-	public double evaluate(AdjacencyMatrix m, int i, int j);
+	public double evaluate(AdjacencyMatrix m, int i, int j, boolean y_ij);
 	
 }

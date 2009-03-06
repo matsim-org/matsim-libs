@@ -26,6 +26,7 @@ package playground.johannes.graph.mcmc;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Locale;
 
 import playground.johannes.graph.Graph;
 import playground.johannes.graph.GraphStatistics;
@@ -41,18 +42,19 @@ import playground.johannes.graph.generators.PlainGraphFactory;
  */
 public class ThetaExplorer {
 
-	private static final double theta_min = -1;
+	private static final double theta_min = 0.5;
 	
-	private static final double theta_max = 1;
+	private static final double theta_max = 0.6;
 	
-	private static final double theta_step = 0.1;
+	private static final double theta_step = 0.001;
 	
-	private static final int burninTime = (int)1E8;
+	private static final int burninTime = (int)1E7;
 	
-	private static final int N = 1000;
+	private static int N;
 	
 	public static void main(String[] args) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(args[0]));
+		N = 200;//Integer.parseInt(args[0]);
+		BufferedWriter writer = new BufferedWriter(new FileWriter(args[1]));
 		writer.write("theta_density\ttheta_twostars\ttheta_triangles\tm\t<k>\tc\tsigma_2");
 		writer.newLine();
 		
@@ -72,18 +74,22 @@ public class ThetaExplorer {
 		
 		ergm.setErgmTerms(terms);
 		
-		for(double theta_density = theta_min; theta_density <= theta_max; theta_density += theta_step) {
-			for(double theta_twostars = theta_min; theta_twostars <= theta_max; theta_twostars += theta_step) {
+//		for(double theta_density = theta_min; theta_density <= theta_max; theta_density += theta_step) {
+		double theta_density = Math.log(0.01/(1-0.01));
+//			for(double theta_twostars = theta_min; theta_twostars <= theta_max; theta_twostars += theta_step) {
+		double theta_twostars = 0.004;
 				for(double theta_triangles = theta_min; theta_triangles <= theta_max; theta_triangles += theta_step) {
 					terms[0].setTheta(theta_density);
 					terms[1].setTheta(theta_twostars);
+//					double theta_triangles = 0.5;
 					terms[2].setTheta(theta_triangles);
 					
 					AdjacencyMatrix m = new AdjacencyMatrix(graph);
 					
 					System.out.println(String.format("Simulation with theta_density=%1$s, theta_twostars=%2$s, theta_triangles=%3$s", theta_density, theta_twostars, theta_triangles));
-					
+					long time = System.currentTimeMillis();
 					sampler.sample(m, ergm, burninTime);
+					System.out.println("Simualtion took "+(System.currentTimeMillis() - time)+" ms.");
 					
 					Graph g = m.getGraph(new PlainGraphFactory());
 					dump(g);
@@ -93,11 +99,11 @@ public class ThetaExplorer {
 					double c = GraphStatistics.getClusteringStatistics(g).getMean();
 					int sigma_2 = GraphStatistics.getNumTwoStars(g);
 					
-					writer.write(String.valueOf((float)theta_density));
+					writer.write(String.format(Locale.US, "%1$.2f", theta_density));
 					writer.write("\t");
-					writer.write(String.valueOf((float)theta_twostars));
+					writer.write(String.format(Locale.US, "%1$.2f", theta_twostars));
 					writer.write("\t");
-					writer.write(String.valueOf((float)theta_triangles));
+					writer.write(String.format(Locale.US, "%1$.2f", theta_triangles));
 					writer.write("\t");
 					writer.write(String.valueOf(edges));
 					writer.write("\t");
@@ -108,9 +114,9 @@ public class ThetaExplorer {
 					writer.write(String.valueOf(sigma_2));
 					writer.newLine();
 					writer.flush();
-				}
+//				}
 			}
-		}
+//		}
 		
 		
 		

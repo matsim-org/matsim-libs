@@ -40,6 +40,6 @@ public abstract class ErgmTerm {
 		return theta;
 	}
 	
-	abstract public double evaluate(AdjacencyMatrix m, int i, int j);
+	abstract public double evaluate(AdjacencyMatrix m, int i, int j, boolean y_ij);
 	
 }

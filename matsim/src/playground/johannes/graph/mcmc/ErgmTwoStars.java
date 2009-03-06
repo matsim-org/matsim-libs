@@ -29,8 +29,12 @@ package playground.johannes.graph.mcmc;
  */
 public class ErgmTwoStars extends ErgmTerm {
 
-	public double evaluate(AdjacencyMatrix m, int i, int j) {
-		return getTheta() * (m.countNeighbours(i) + m.countNeighbours(j));
+	public double evaluate(AdjacencyMatrix m, int i, int j, boolean y_ij) {
+		if(y_ij) {
+			return getTheta() * (m.countNeighbours(i) + m.countNeighbours(j) - 2);
+		} else {
+			return getTheta() * (m.countNeighbours(i) + m.countNeighbours(j));
+		}
 	}
 
 }
