@@ -112,7 +112,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 		if (ai.stucked) {
 			LinkInfo oldInfo = this.linkInfos.get(ai.currentLink);
 
-			if (info.causesSpillback() && info.congested) {
+			if (info.causesSpillback()) {
 				oldInfo.getCongestedSlot(getTimeSlotIndex(ai.enterTime)).add(ai.id);
 				oldInfo.con++;
 			} else {
