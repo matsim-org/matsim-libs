@@ -21,7 +21,6 @@ package org.matsim.population;
 
 import java.util.Map;
 
-import org.matsim.basic.v01.BasicVehicle;
 import org.matsim.basic.v01.BasicVehicleBuilder;
 import org.matsim.basic.v01.BasicVehicleType;
 import org.matsim.interfaces.basic.v01.Id;
@@ -41,7 +40,7 @@ public class VehicleBuilderImpl extends BasicVehicleBuilder {
 	}
 
 	@Override
-	public BasicVehicle createVehicle(Id id, String type) {
+	public Vehicle createVehicle(Id id, String type) {
 		BasicVehicleType t = this.getVehicleTypes().get(type);
 		if (t == null) {
 			throw new IllegalArgumentException("Cannot create vehicle for unknown VehicleType: "+ type);
