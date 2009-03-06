@@ -61,7 +61,7 @@ public class SimplifyPersons {
 		
 		Population pop = data.getPopulation();
 		List<Person> remove = new LinkedList<Person>();
-		for(Person p : pop) {
+		for(Person p : pop.getPersons().values()) {
 			for(int i = 1; i < p.getPlans().size(); i = 1)
 				p.getPlans().remove(i);
 			

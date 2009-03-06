@@ -44,7 +44,7 @@ public class ActivityActWriter {
 	}
 	public void write(int iter, Population myPlans){
 //		System.out.println("AAW will write to"+out.toString());
-		Iterator<Person> pIt = myPlans.iterator();
+		Iterator<Person> pIt = myPlans.getPersons().values().iterator();
 		while(pIt.hasNext()){
 			Person myPerson = (Person) pIt.next();
 			List<Plan> myPersonPlans = myPerson.getPlans();

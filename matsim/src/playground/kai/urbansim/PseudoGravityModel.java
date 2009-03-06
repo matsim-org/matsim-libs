@@ -100,7 +100,7 @@ public class PseudoGravityModel {
 		// NOTE: For the time being, I need this model only for U_CELL, not for U_PARCEL.  So it does not need to be general.
 		
 		// compute the extent of the coordinates for persons:
-		for ( Person person : population ) {
+		for ( Person person : population.getPersons().values() ) {
 			Plan plan = person.getSelectedPlan() ;
 			Act act = plan.getFirstActivity();
 			Coord homeCoord = act.getCoord() ;

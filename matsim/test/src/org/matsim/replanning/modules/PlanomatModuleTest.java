@@ -96,7 +96,7 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		PlanomatModule testee = new PlanomatModule(this.network, emptyEvents, tTravelEstimator, travelCostEstimator, scoringFunctionFactory);
 		
 		testee.init();
-		for (Person person : this.population) {
+		for (Person person : this.population.getPersons().values()) {
 
 			Plan plan = person.getPlans().get(TEST_PLAN_NR);
 			testee.handlePlan(plan);

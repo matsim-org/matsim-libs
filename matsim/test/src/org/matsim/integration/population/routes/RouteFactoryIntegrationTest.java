@@ -67,7 +67,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		controler.run();
 
 		Population population = controler.getPopulation();
-		for (Person person : population) {
+		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (LegIterator iter = plan.getIteratorLeg(); iter.hasNext(); ) {
 					BasicLeg leg = iter.next();
@@ -86,7 +86,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		controler2.run();
 
 		Population population2 = controler2.getPopulation();
-		for (Person person : population2) {
+		for (Person person : population2.getPersons().values()) {
 			int planCounter = 0;
 			for (Plan plan : person.getPlans()) {
 				planCounter++;

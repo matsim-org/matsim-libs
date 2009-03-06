@@ -21,7 +21,6 @@
 package org.matsim.population;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -197,10 +196,6 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 		log.info(" person # " + this.counter);
 	}
 
-	public Iterator<Person> iterator() {
-		return this.getPersons().values().iterator();
-	}
-	
 	@Override
 	public PopulationBuilder getPopulationBuilder() {
 		return this.pb;

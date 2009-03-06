@@ -20,7 +20,6 @@
 
 package org.matsim.interfaces.core.v01;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.BasicPopulation;
@@ -29,7 +28,7 @@ import org.matsim.interfaces.basic.v01.Id;
 /**
  * Root class of the population description (previously also called "plans file")
  */
-public interface Population extends BasicPopulation<Person>, Iterable<Person> {
+public interface Population extends BasicPopulation<Person> {
 	// TODO [MR] remove Iterable
 	
 	public void addPerson(final Person p);
@@ -64,9 +63,5 @@ public interface Population extends BasicPopulation<Person>, Iterable<Person> {
 
 	@Deprecated
 	public void printPlansCount();
-
-	@Deprecated
-	public Iterator<Person> iterator();
-	
 
 }

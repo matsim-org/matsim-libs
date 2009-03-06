@@ -98,7 +98,7 @@ public class ParallelCreateKnownNodesMap {
 		
 		// distribute workload between threads, as long as threads are not yet started, so we don't need synchronized data structures
 		int i = 0;
-		for (Person person : population) 
+		for (Person person : population.getPersons().values()) 
 		{
 			selectorThreads[i % numOfThreads].handlePerson(person);
 			i++;

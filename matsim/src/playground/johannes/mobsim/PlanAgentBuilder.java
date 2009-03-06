@@ -77,7 +77,7 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 	public List<PlanAgent> buildAgents() {
 		List<PlanAgent> agents = new ArrayList<PlanAgent>(population.getPersons().size());
 		int countInvalid = 0;
-		for(Person p : population) {
+		for(Person p : population.getPersons().values()) {
 			if(validatePerson(p)) {
 				agents.add(buildAgent(p));
 			} else

@@ -93,7 +93,7 @@ public class TrackActsOverlap {
 	private LinkedHashMap<ActivityOption,ArrayList<Person>> makeActivityMap(Population plans){
 		log.info("Making a new activity map for spatial scores");
 //		LinkedHashMap<Activity,ArrayList<Person>> activityMap=new LinkedHashMap<Activity,ArrayList<Person>>();
-		Iterator<Person> p1Iter=plans.iterator();
+		Iterator<Person> p1Iter=plans.getPersons().values().iterator();
 		while(p1Iter.hasNext()){
 			Plan plan1= ((Person) p1Iter.next()).getSelectedPlan();
 			Person p1=plan1.getPerson();

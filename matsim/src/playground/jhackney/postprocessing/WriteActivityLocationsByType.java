@@ -13,7 +13,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class WriteActivityLocationsByType implements PlanAlgorithm{
 
 	public WriteActivityLocationsByType(Population plans) {
-		Iterator<Person> planIt=plans.iterator();
+		Iterator<Person> planIt=plans.getPersons().values().iterator();
 		while(planIt.hasNext()){
 		Plan myPlan=planIt.next().getSelectedPlan();
 		run(myPlan);

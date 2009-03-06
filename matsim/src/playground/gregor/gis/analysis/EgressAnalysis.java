@@ -175,7 +175,7 @@ public class EgressAnalysis {
 
 	private void handlePlans() {
 			log.info("handle plans");
-			for (Person person : this.population) {
+			for (Person person : this.population.getPersons().values()) {
 				Leg leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
 				List<Node> route = ((CarRoute) leg.getRoute()).getNodes();
 				Node node = route.get(route.size()-2);

@@ -121,7 +121,7 @@ public class SpatialInteractorActs {
 	private LinkedHashMap<ActivityOption,ArrayList<Person>> makeActivityMap(Population plans){
 		System.out.println("Making a new activity map for spatial interactions");
 		LinkedHashMap<ActivityOption,ArrayList<Person>> activityMap=new LinkedHashMap<ActivityOption,ArrayList<Person>>();
-		Iterator<Person> p1Iter=plans.iterator();
+		Iterator<Person> p1Iter=plans.getPersons().values().iterator();
 		while(p1Iter.hasNext()){
 			Plan plan1= ((Person) p1Iter.next()).getSelectedPlan();
 			Person p1=plan1.getPerson();

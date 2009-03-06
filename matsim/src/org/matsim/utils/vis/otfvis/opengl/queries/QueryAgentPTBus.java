@@ -118,7 +118,7 @@ public class QueryAgentPTBus implements OTFQuery {
 		//Person person = plans.getPerson(this.agentID);
 		String prefix = agentId + "-";
 		
-		for(Person person : plans) {
+		for(Person person : plans.getPersons().values()) {
 			if(person.getId().toString().startsWith(prefix, 0)) allIds.add(person.getId().toString());
 		}
 		

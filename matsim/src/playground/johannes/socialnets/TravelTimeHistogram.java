@@ -174,7 +174,7 @@ public class TravelTimeHistogram {
 		int count = 0;
 		for(Ego ego : egos.values()) {
 			TDoubleDoubleHashMap hist = new TDoubleDoubleHashMap();
-			for(Person p2 : population) {
+			for(Person p2 : population.getPersons().values()) {
 				Coord c1 = ego.homeloc;
 				Coord c2 = p2.getSelectedPlan().getFirstActivity().getCoord();
 				double d = c1.calcDistance(c2);

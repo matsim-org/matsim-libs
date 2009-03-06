@@ -25,17 +25,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
-import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Knowledge;
@@ -58,11 +52,11 @@ public class GenerateKnowledge {
 	}
 	
 	
-	// F�hrt alle Schritte durch, um das Wissen (in diesem Fall die Kenntnis der Umgegung)
-	// der Personen des aktuellen Objekts zu beschr�nken.
+	// Fuehrt alle Schritte durch, um das Wissen (in diesem Fall die Kenntnis der Umgegung)
+	// der Personen des aktuellen Objekts zu beschraenken.
 	protected void getPersons()
 	{
-		Iterator<Person> PersonIterator = population.iterator();
+		Iterator<Person> PersonIterator = population.getPersons().values().iterator();
 		while (PersonIterator.hasNext())
 		{
 			Person person = PersonIterator.next();
@@ -71,14 +65,14 @@ public class GenerateKnowledge {
 			
 			setKnowledge(person, links);
 			
-			// alte Version - Berechnung �ber Abstand Node zu Node und nicht Node zu Link
+			// alte Version - Berechnung ueber Abstand Node zu Node und nicht Node zu Link
 			//ArrayList<Node> nodes = getNodes(links);
 			//setKnowledge(person, nodes);
 		}
 	}
 	
 	
-	// Liefert eine ArrayList aller Nodes, welche Teil der �bergebenen Links sind.
+	// Liefert eine ArrayList aller Nodes, welche Teil der uebergebenen Links sind.
 	protected ArrayList<Node> getNodes(ArrayList<Link> links)
 	{
 		ArrayList<Node> nodes = new ArrayList<Node>();
@@ -103,7 +97,7 @@ public class GenerateKnowledge {
 	} //getNodes(ArrayList<Link>)
 	
 	
-	// Beschr�nkt die Kenntnis der Umgebung der �bergebenen Person.
+	// Beschraenkt die Kenntnis der Umgebung der uebergebenen Person.
 	protected void setKnowledge(Person person, ArrayList<Link> links)
 	{		
 		Knowledge knowledge = person.getKnowledge();
@@ -116,7 +110,7 @@ public class GenerateKnowledge {
 		// ... und daraus die Links innerhalb der vorgegebenen Distanz generieren.
 		ArrayList<Link> includedLinks = getIncludedLinks(includedNodes);
 		
-		// Links zum Knowledge der Person hinzuf�gen
+		// Links zum Knowledge der Person hinzufuegen
 		for(int i = 0; i < includedLinks.size(); i++)
 		{
 			Id id = includedLinks.get(i).getId();
@@ -126,7 +120,7 @@ public class GenerateKnowledge {
 	} //setKnowledge(ArrayList<Node>)
 
 	
-	// Gibt eine ArrayList mit Knoten zur�ck, die innerhalb eines vorgegebenen
+	// Gibt eine ArrayList mit Knoten zurueck, die innerhalb eines vorgegebenen
 	// Abstands zu einer vorgeggebenen Route liegen.
 	protected ArrayList<Node> getIncludedNodes(ArrayList<Link> links)
 	{
@@ -139,14 +133,14 @@ public class GenerateKnowledge {
 		
 		while(nodeIterator.hasNext())
 		{
-			// Wir wissen ja, was f�r Elemente zur�ckgegeben werden :)
+			// Wir wissen ja, was fuer Elemente zurueckgegeben werden :)
 			Map.Entry<Id, Node> nextLink = (Map.Entry<Id, Node>)nodeIterator.next();
 			//Id id = nextLink.getKey();
 			Node node = nextLink.getValue();
 			
 			Coord coord = node.getCoord();
 			
-			// Abstand zu allen Links der �bergebenen Person untersuchen
+			// Abstand zu allen Links der uebergebenen Person untersuchen
 			for (int i = 0; i < links.size(); i++)
 			{
 				double dist = links.get(i).calcDistance(coord);
@@ -167,7 +161,7 @@ public class GenerateKnowledge {
 	}
 	
 	
-	// Gibt eine ArrayList mit Links zur�ck, die innerhalb eines vorgegebenen
+	// Gibt eine ArrayList mit Links zurueck, die innerhalb eines vorgegebenen
 	// Abstands zu einer vorgeggebenen Route liegen.
 	protected ArrayList<Link> getIncludedLinks(ArrayList<Node> includedNodes)
 	{
@@ -176,19 +170,19 @@ public class GenerateKnowledge {
 		// Alle Links des Netzwerks holen
 		TreeMap<Id, Link> linkMap = (TreeMap<Id, Link>)network.getLinks();
 		
-		Iterator linkIterator = linkMap.entrySet().iterator();
+		Iterator<Map.Entry<Id, Link>> linkIterator = linkMap.entrySet().iterator();
 		
 		while(linkIterator.hasNext())
 		{
-			// Wir wissen ja, was f�r Elemente zur�ckgegeben werden :)
-			Map.Entry<Id, Link> nextLink = (Map.Entry<Id, Link>)linkIterator.next();
+			// Wir wissen ja, was fuer Elemente zurueckgegeben werden :)
+			Map.Entry<Id, Link> nextLink = linkIterator.next();
 			//Id id = nextLink.getKey();
 			Link link = nextLink.getValue();
 			
 			Node fromNode = link.getFromNode();
 			Node toNode = link.getToNode();
 			
-			// Pr�fen, ob der Node in der �bergebenen Liste enthalten ist
+			// Pruefen, ob der Node in der uebergebenen Liste enthalten ist
 			if(includedNodes.contains(fromNode) && includedNodes.contains(toNode))
 			{
 				//... also beide Nodes enthalten -> Link enthalten

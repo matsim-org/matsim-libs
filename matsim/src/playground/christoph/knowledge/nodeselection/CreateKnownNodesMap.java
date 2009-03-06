@@ -43,7 +43,7 @@ public class CreateKnownNodesMap {
 	
 	public static void collectAllSelectedNodes(Population population)
 	{
-		for (Person person : population) 
+		for (Person person : population.getPersons().values()) 
 		{
 			collectAllSelectedNodes(person);
 		}

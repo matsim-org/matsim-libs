@@ -61,7 +61,7 @@ public class TRBAnalysis implements AgentDepartureEventHandler, AgentArrivalEven
 		// analyze population
 		double[] allTravelTimes = new double[this.sumTravelTimes[0].length];
 		int[] allCounts = new int[allTravelTimes.length];
-		for (Person person : this.population) {
+		for (Person person : this.population.getPersons().values()) {
 			Plan ptPlan = getPtPlan(person);
 			if (ptPlan != null) {
 				Plan selectedPlan = person.getSelectedPlan();

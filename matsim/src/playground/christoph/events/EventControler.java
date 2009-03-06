@@ -272,7 +272,7 @@ public class EventControler extends Controler{
 	{
 		int counter = 0;
 		
-		Iterator<Person> PersonIterator = this.getPopulation().iterator();
+		Iterator<Person> PersonIterator = this.getPopulation().getPersons().values().iterator();
 		while (PersonIterator.hasNext())
 		{		
 			Person p = PersonIterator.next();
@@ -313,7 +313,7 @@ public class EventControler extends Controler{
 	 */
 	protected void setReplanners()
 	{
-		Iterator<Person> PersonIterator = this.getPopulation().iterator();
+		Iterator<Person> PersonIterator = this.getPopulation().getPersons().values().iterator();
 		while (PersonIterator.hasNext())
 		{
 			Person p = PersonIterator.next();
@@ -344,7 +344,7 @@ public class EventControler extends Controler{
 	{
 //		int counter = 0;
 		
-		Iterator<Person> PersonIterator = this.getPopulation().iterator();
+		Iterator<Person> PersonIterator = this.getPopulation().getPersons().values().iterator();
 		while (PersonIterator.hasNext())
 		{			
 			Person p = PersonIterator.next();

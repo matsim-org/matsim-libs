@@ -71,7 +71,7 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 		
 		Facility fac = facs.getFacilities().get(new IdImpl("shelter0"));
 		// the remaining persons plans will be routed
-		for (Person person : plans) {
+		for (Person person : plans.getPersons().values()) {
 			if (person.getPlans().size() != 1 ) {
 				throw new RuntimeException("For each agent only one initial evacuation plan is allowed!");
 			}

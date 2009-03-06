@@ -386,7 +386,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		int countPiAvrUsers = 0;
 		int countPiGuidedUsers = 0;
 		int t_last_guided = 327;
-		for(Person p : controler.getPopulation()) {
+		for(Person p : controler.getPopulation().getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			int starttime = (int) plan.getFirstActivity().getEndTime();
 			int t_good = (int)avrRiskyGoodTriptimes.get(starttime);

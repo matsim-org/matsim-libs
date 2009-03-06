@@ -58,7 +58,7 @@ public class PopDensityGrid {
 		double maxY = 0;
 		double minX = Double.MAX_VALUE;
 		double minY = Double.MAX_VALUE;
-		for(Person person : population) {
+		for(Person person : population.getPersons().values()) {
 			Coord homeLoc = person.getSelectedPlan().getFirstActivity().getCoord();
 			maxX = Math.max(maxX, homeLoc.getX());
 			maxY = Math.max(maxY, homeLoc.getY());
@@ -84,7 +84,7 @@ public class PopDensityGrid {
 		}
 		gridWriter.close();
 		
-		for(Person person : population) {
+		for(Person person : population.getPersons().values()) {
 			Coord homeLoc = person.getSelectedPlan().getFirstActivity().getCoord();
 			
 			popWriter.write(String.valueOf(homeLoc.getX()));

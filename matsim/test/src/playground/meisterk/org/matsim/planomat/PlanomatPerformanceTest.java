@@ -105,7 +105,7 @@ public class PlanomatPerformanceTest extends MatsimTestCase {
 		int personCounter = 0;
 		int nextCounter = 1;
 		Random rng = MatsimRandom.getLocalInstance();
-		for (Person person : population) {
+		for (Person person : population.getPersons().values()) {
 			if (rng.nextDouble() < 0.1) {
 				Plan plan = person.getRandomPlan();
 				testee.run(plan);

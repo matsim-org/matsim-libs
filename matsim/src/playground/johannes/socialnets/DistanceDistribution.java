@@ -60,7 +60,7 @@ public class DistanceDistribution {
 		double ymin = 243000;
 		double xmax = 687000;
 		double ymax = 254000;
-		for(Person p : population) {
+		for(Person p : population.getPersons().values()) {
 			Coord c = p.getSelectedPlan().getFirstActivity().getCoord();
 			if(c.getX() >= xmin && c.getX() <= xmax && c.getY() >= ymin && c.getY() <= ymax)
 				persons2.add(p);
@@ -69,7 +69,7 @@ public class DistanceDistribution {
 		TDoubleDoubleHashMap hist = new TDoubleDoubleHashMap();
 		double binsize = 1000;
 		int count = 0;
-		for(Person p1 : population) {
+		for(Person p1 : population.getPersons().values()) {
 			persons2.remove(p1);
 			for(Person p2 : persons2) {
 				Coord c1 = p1.getSelectedPlan().getFirstActivity().getCoord();

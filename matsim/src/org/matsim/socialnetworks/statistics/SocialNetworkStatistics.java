@@ -495,7 +495,7 @@ public class SocialNetworkStatistics {
 	void fillGraph(Graph g, SocialNetwork snet, Population plans) {
 		Vertex v;
 		Edge e;
-		for (Person p : plans) {
+		for (Person p : plans.getPersons().values()) {
 			if (snet.isUNDIRECTED()) {
 				v = new UndirectedSparseVertex();
 			}

@@ -18,7 +18,7 @@ public abstract class TripFilter {
 	private final static Logger log = Logger.getLogger(TripFilter.class);
 		
 	public List<ChoiceSet> apply(Population population, String mode) {	
-		Iterator<Person> person_it = population.iterator();
+		Iterator<Person> person_it = population.getPersons().values().iterator();
 		while (person_it.hasNext()) {
 			Person person = person_it.next();		
 			// Person only has one plan at this stage

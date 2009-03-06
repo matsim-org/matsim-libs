@@ -45,7 +45,7 @@ public class StartingTimeRandomizer {
 	}
 
 	public void run(){
-		for (Person pers : this.pop) {
+		for (Person pers : this.pop.getPersons().values()) {
 			Plan plan = pers.getSelectedPlan();
 			Act act = plan.getFirstActivity();
 			double endTime = getRandomTime(act.getEndTime());

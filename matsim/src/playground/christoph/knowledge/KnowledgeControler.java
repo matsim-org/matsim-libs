@@ -73,12 +73,12 @@ public class KnowledgeControler extends Controler {
 	
 		
 	// Workaround!
-	// Wo wird der TravelCostCalculator festgelegt? Gibt's daf�r ein Feld in der Konfigurationsdatei?
+	// Wo wird der TravelCostCalculator festgelegt? Gibt's dafuer ein Feld in der Konfigurationsdatei?
 	@Override
 	protected void setup() {
 		
-		// Diese beiden Befehle m�ssen sind unabh�ngig vom initialisieren der CostCalculators.
-		// Auch wenn diese via Configfile geladen werden, werden die Zeilen ben�tigt!
+		// Diese beiden Befehle muessen sind unabhaengig vom initialisieren der CostCalculators.
+		// Auch wenn diese via Configfile geladen werden, werden die Zeilen benoetigt!
 		initKnowledge();	// neu...
 		setKnowledge();		// neu...
 		
@@ -112,14 +112,14 @@ public class KnowledgeControler extends Controler {
 		// Eigenen TravenCostCalculator verwenden...
 		this.travelCostCalculator = new OldKnowledgeTravelCost(this.travelTimeCalculator);
 		
-		// ... dieser wird von nun folgenden Setup nicht mehr �berschrieben.
+		// ... dieser wird von nun folgenden Setup nicht mehr ueberschrieben.
 		super.setup();
 	}
 	
 	// Hier werden die neuen Knowledge-Attribute erzeugt.
 	protected void initKnowledge()
 	{
-		Iterator<Person> PersonIterator = this.getPopulation().iterator();
+		Iterator<Person> PersonIterator = this.getPopulation().getPersons().values().iterator();
 		while (PersonIterator.hasNext())
 		{
 			Person p = PersonIterator.next();
@@ -128,7 +128,7 @@ public class KnowledgeControler extends Controler {
 				p.createKnowledge("Knowledgemodels");
 			}
 			
-			// Kosten f�r Links fixieren bzw. je Person beeinflussen
+			// Kosten fuer Links fixieren bzw. je Person beeinflussen
 			ArrayList<Id> linkIds = new ArrayList<Id>();
 			ArrayList<Double> costs = new ArrayList<Double>();
 			
@@ -144,11 +144,11 @@ public class KnowledgeControler extends Controler {
 
 	}
 	
-	// Hier werden die neuen Knowledge-Attribute bef�llt.
-	// Aktuell h�ndisch erstellt, sp�ter aus Configfiles geladen.
+	// Hier werden die neuen Knowledge-Attribute befaellt.
+	// Aktuell haendisch erstellt, spaeter aus Configfiles geladen.
 	protected void setKnowledge()
 	{
-		Iterator<Person> PersonIterator = this.getPopulation().iterator();
+		Iterator<Person> PersonIterator = this.getPopulation().getPersons().values().iterator();
 		while (PersonIterator.hasNext())
 		{
 			Person p = PersonIterator.next();

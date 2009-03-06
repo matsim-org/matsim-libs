@@ -107,7 +107,7 @@ public class ActivityDurationAnalyser {
 			plansParser.readFile(file);
 			ActivityDurationCounter adc = new ActivityDurationCounter();
 			System.out.println("Handling plans: " + file);
-			for (Person person : plans) {
+			for (Person person : plans.getPersons().values()) {
 //				if (!RoadPricingUtilities.hasActInTollArea(person.getSelectedPlan(), this.roadPricingScheme)){
 //					continue;
 //				}

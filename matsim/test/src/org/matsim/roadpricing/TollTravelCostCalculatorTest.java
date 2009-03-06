@@ -153,7 +153,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 	 * @param population
 	 */
 	private void clearRoutes(final Population population) {
-		for (Person person : population) {
+		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (LegIterator i = plan.getIteratorLeg(); i.hasNext(); ) {
 					BasicLeg leg = i.next();

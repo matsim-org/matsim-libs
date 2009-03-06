@@ -84,7 +84,7 @@ public class KtiPtTester {
 		Gbl.printRoundTime();
 		Counter counter = new Counter("handle person #");
 		PlansCalcRouteKti calcPtLeg = new PlansCalcRouteKti(this.data.getNetwork(), commonRoutingData, fttc, fttc, this.ptTravelTimes, haltestellen, this.world.getLayer("municipality"));
-		for (Person person : population) {
+		for (Person person : population.getPersons().values()) {
 			counter.incCounter();
 			calcPtLeg.run(person.getSelectedPlan());
 		}
