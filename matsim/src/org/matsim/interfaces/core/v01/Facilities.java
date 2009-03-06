@@ -20,13 +20,11 @@
 
 package org.matsim.interfaces.core.v01;
 
-import java.util.List;
 import java.util.Map;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.world.Location;
 
 public interface Facilities extends Iterable<Facility> {
 	// TODO [MR] remove Iterable
@@ -50,16 +48,7 @@ public interface Facilities extends Iterable<Facility> {
 	@Deprecated // to be clarified
 	public void setName(String name);
 
-	@Deprecated // needs to be clarified, return Facility instead of Location
-	public List<Location> getLocations(final Coord center);
-
-	@Deprecated // needs to be clarified
-	public List<Location> getNearestLocations(final Coord center);
-
 	@Deprecated
 	public void finishFacility(final Facility f);
-
-	@Deprecated
-	public void printFacilitiesCount();
 
 }
