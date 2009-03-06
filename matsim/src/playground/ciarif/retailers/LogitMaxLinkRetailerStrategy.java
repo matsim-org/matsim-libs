@@ -13,7 +13,7 @@ import org.matsim.interfaces.core.v01.Link;
 
 public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	
-	public static final String NAME = "RandomRetailerStrategy";
+	public static final String NAME = "LogitMaxLinkRetailerStrategy";
 
 	public final static String CONFIG_GROUP = "Retailers";
 	public final static String CONFIG_N_ALTERNATIVES = "alternatives";
@@ -35,12 +35,6 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 
 		for (Facility f : facilities.values()) {
 			
-			// example of the use of a by code style, but works anyway....
-//			QuadTree<Person> personQuadTree = Utils.getPersonQuadTree();
-//			if (personQuadTree == null) { throw new RuntimeException("QuadTree not set!"); }
-//			Collection<Person> persons = personQuadTree.get(f.getCenter().getX(),f.getCenter().getY(),10000);
-			
-			
 			double[] utils = new double[alternatives];
 			Object[] links = controler.getNetwork().getLinks().values().toArray();
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
@@ -51,7 +45,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 			for (int j=0; j<currentlink_volumes.length;j=j+1) {
 				currentlink_volume = currentlink_volume + currentlink_volumes[j];
 			}
-			utils [0]= Math.log(currentlink_volume); //If the utility would be defined in a more complex way than it is now here a 
+			utils [0]= Math.log(currentlink_volume); //If the utility would be defined in a more complex way than it is now, a 
 			// calc_utility method might be called at this point
 			for (int i=1; i<alternatives;i++) {
 				int rd = MatsimRandom.random.nextInt(links.length);

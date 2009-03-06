@@ -1,6 +1,7 @@
 package playground.ciarif.retailers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import org.matsim.controler.Controler;
@@ -9,28 +10,33 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.utils.collections.QuadTree;
 
-import playground.balmermi.census2000.data.Person;
-
-public class MarketSupportLogitRetailerStrategy {
+public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
+	public static final String NAME = "maxLinkRetailerStrategy";
+	public final static String CONFIG_GROUP = "Retailers";
+	public final static String CONFIG_N_ALTERNATIVES = "alternatives";
+	public final static String CONFIG_RAD_CATCHMENT = "radius_catchment";
+	private Controler controler;
+	private int alternatives;	
 		
-		public final static String CONFIG_GROUP = "Retailers";
-		public final static String CONFIG_N_ALTERNATIVES = "alternatives";
-		public final static String CONFIG_RAD_CATCHMENT = "radius_catchment";
-		private Controler controler;
-		private int alternatives;	
-		
-		public MarketSupportLogitRetailerStrategy (Controler controler) {
-			this.controler = controler;
-			String logitAlternatives = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_N_ALTERNATIVES);
-			int alternatives = Integer.parseInt(logitAlternatives);
-			this.alternatives = alternatives;
-		}
+	public CatchmentAreaRetailerStrategy (Controler controler) {
+		this.controler = controler;
+		String logitAlternatives = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_N_ALTERNATIVES);
+		int alternatives = Integer.parseInt(logitAlternatives);
+		this.alternatives = alternatives;
+	}
 
 		public void moveFacilities(Map<Id, Facility> facilities) {
 
 			for (Facility f : facilities.values()) {
-				Person p = new Person(null,null);
+				
+				// example of the use of a bad code style, but works anyway....
+				QuadTree<Person> personQuadTree = Utils.getPersonQuadTree();
+				if (personQuadTree == null) { throw new RuntimeException("QuadTree not set!"); }
+				Collection<Person> persons = personQuadTree.get(f.getCenter().getX(),f.getCenter().getY(),1000);
+				
 				
 				double[] utils = new double[alternatives];
 				Object[] links = controler.getNetwork().getLinks().values().toArray();

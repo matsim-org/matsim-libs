@@ -34,28 +34,4 @@ public class Retailers {
 			return this.retailers.get(i);
 		}
 	}
-//	public static Retailers selectRetailersForRelocation(Retailers retailers, double percentage) {
-//		Retailers retailersForRelocation = new Retailers();
-//		double nr= percentage * retailers.getRetailers().size()/100;
-//		long numberRetailers = Math.round (nr);
-//		Iterator<Facility> ret_iter = retailers.getRetailers().values().iterator();
-//		Vector<Facility> ret = new Vector<Facility>();
-//		
-//		while (ret_iter.hasNext()){
-//			ret.add(ret_iter.next());
-//		}
-//		int ii =0;
-//		
-//		while (ii<numberRetailers) {
-//			
-//			int randomKey = MatsimRandom.random.nextInt(ret.size());
-//						retailersForRelocation.getRetailers().put(new IdImpl(ii), ret.get(randomKey));
-//			ret.remove(randomKey);
-//			ii=ii+1;
-//		}
-//		//System.out.println("  retailers_a = " + retailersForRelocation.getRetailers().keySet());
-//		return retailersForRelocation;
-//	}
-
-	
 }

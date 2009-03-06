@@ -56,8 +56,6 @@ import org.matsim.router.util.AStarLandmarksFactory;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.utils.collections.QuadTree;
 
-import playground.balmermi.census2000v2.data.CAtts;
-
 
 public class RetailersLocationListener implements StartupListener, BeforeMobsimListener {
 	
@@ -67,7 +65,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	public final static String CONFIG_RETAILERS = "retailers";
 	public final static String CONFIG_LINKS = "links";
 	private Retailers retailers;
-	//private TreeMap<Link> links;
+	private TreeMap<Id,Link> links;
 	private RetailersSummaryWriter rs = null;
 	private PlansSummaryTable pst = null;
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
@@ -91,7 +89,9 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.rs = new RetailersSummaryWriter (retailersOutFile);
 		this.facilityIdFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
+		System.out.println("facility file = " + this.facilityIdFile);
 		if (this.facilityIdFile == null) { //Francesco: TODO decide if throw an exception or permit a way to create retailers without an input file
+			System.out.println("facility file = " + facilityIdFile);
 		}
 		else {
 			try {
@@ -113,6 +113,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 					else { // retailer does not exists yet
 						Retailer r = new Retailer(rId, null);
 						r.addStrategy(controler, entries[2]);
+						System.out.println("Strategy = " + entries[2]);
 						Id fId = new IdImpl (entries[1]);
 						Facility f = controler.getFacilities().getFacilities().get(fId);
 						r.addFacility(f);
@@ -124,24 +125,28 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 				Gbl.errorMsg(e);
 			}
 		} 
-		this.linkIdFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
-		if (this.linkIdFile == null) { //Francesco: if no file is defined stating which links are allowed any link is allowed
-		}
-		else {
+		this.linkIdFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_LINKS);
+		if (this.linkIdFile != null) { 
+			
 			try {
 				//this.links = new ArrayList();
+				System.out.println("link file " + this.linkIdFile);
 				FileReader fr = new FileReader(this.linkIdFile);
 				BufferedReader br = new BufferedReader(fr);
 				// Skip header
 				String curr_line = br.readLine();
 				while ((curr_line = br.readLine()) != null) {
-					
+					String[] entries = curr_line.split("\t", -1);
+					// header: l_id  max_fac
+					// index:   0       1   
 				}
 			} 
 			catch (IOException e) {
 				Gbl.errorMsg(e);
 			}
-		} 
+		}
+		else {//Francesco: if no file is defined stating which links are allowed any link is allowed
+		}
 	}
 	
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
@@ -149,13 +154,13 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
 		
 		// works, but it is not nicely programmed. shouldn't be a global container, should be
-		// controled by the controler (or acutally added to the population)
+		// controlled by the controler (or actually added to the population)
 		Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
 		
 		controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 		
 		for (Retailer r : this.retailers.getRetailers().values()) {
-			Map<Id,Facility> facs =  r.runStrategy();
+			Map<Id,Facility> facs = r.runStrategy();
 			movedFacilities.putAll(facs);
 		}
 		
@@ -181,22 +186,13 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 			}
 		}
 	}	
-
-	private final ArrayList<Facility> getFraction(Map<Id,Facility> facs, double fraction) {
-		ArrayList<Facility> fs = new ArrayList<Facility>();
-		for (Facility f : facs.values()) {
-			double rd = MatsimRandom.random.nextDouble();
-			if (rd < fraction) { fs.add(f); }
-		}
-		return fs;
-	}
 	
 	private final QuadTree<Person> createPersonQuadTree(Controler controler) {
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
+		//ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
 		for (Facility f : controler.getFacilities().getFacilities().values()) {
 			if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 			if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }

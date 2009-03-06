@@ -29,8 +29,7 @@ public class Retailer {
 	}
 	
 	public final boolean addStrategy (Controler controler, String strategyName) {
-		if (strategyName == null) {return false;}
-		
+			
 		if (strategyName.equals(RandomRetailerStrategy.NAME)) {
 			this.strategy = new RandomRetailerStrategy(controler.getNetwork());
 			return true;
@@ -41,6 +40,10 @@ public class Retailer {
 		}
 		else if (strategyName.equals(LogitMaxLinkRetailerStrategy.NAME)) {
 			this.strategy = new LogitMaxLinkRetailerStrategy (controler);
+			return true;
+		}
+		else if (strategyName.equals(CatchmentAreaRetailerStrategy.NAME)) {
+			this.strategy = new CatchmentAreaRetailerStrategy (controler);
 			return true;
 		}
 		else { return false; }
@@ -55,6 +58,7 @@ public class Retailer {
 	}
 
 	public final Map<Id,Facility> runStrategy() {
+		System.out.println("Strategy = " + strategy);
 		strategy.moveFacilities(this.facilities);
 		return this.facilities;
 	}
