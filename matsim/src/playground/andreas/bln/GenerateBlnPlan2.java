@@ -28,60 +28,44 @@ import org.matsim.utils.misc.Time;
 public class GenerateBlnPlan2 {
 
 	private static final Logger log = Logger.getLogger(TabReader.class);
-	private static final String plansOutFile = "z:/raw_plans_out.xml";
 	private static final int spreadingTime = 900; // 15min
 	
 	// statistics
 	private int[] actTypes = new int[14];
+	private int[] modalSplit = new int[9];
 		
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		try {
-		Gbl.createConfig(new String[] { "./src/playground/andreas/bln/config.xml" });
-		
-		GenerateBlnPlan2 myBlnPlanGenerator = new GenerateBlnPlan2();
-		
-		HashMap<Id, PersonImpl> personMap;
-		personMap = myBlnPlanGenerator.generatePersons("Z:/PERSONEN.csv");
-				
-		HashMap<Id, ArrayList<String[]>> tripMap = myBlnPlanGenerator.readTrips("Z:/WEGE.csv");
-		
-		myBlnPlanGenerator.countPersonsPlans(personMap, tripMap);
-		tripMap = myBlnPlanGenerator.filterPersonsWithOneTrip(tripMap);
-		
-		tripMap = myBlnPlanGenerator.filterTripsWithoutCoord(tripMap);
-		tripMap = myBlnPlanGenerator.filterPersonsWithOneTrip(tripMap);
-		
-		myBlnPlanGenerator.addPlansToPersons(personMap, tripMap);
-		
-		personMap = myBlnPlanGenerator.removePersonsWithoutPlan(personMap, tripMap);
-		
-		myBlnPlanGenerator.writePopulationToFile(personMap.values(), "z:/raw_plans_out.xml");
-		
-//		
-//		ArrayList<PersonImpl> persons = myBlnPlanGenerator.getPersonList();
-//		
-//		persons = myBlnPlanGenerator.filterPersonsWithZeroPlans(persons);
-//		persons = myBlnPlanGenerator.filterPersonsWithOneAct(persons);
-//		myBlnPlanGenerator.writePopulation(persons);
-		
-//		log.info("...finished generating " + numberOfPlansAdded + " Plans.");
-//		log.info("...used " + numberOfTripsUsed + " trips.");
-//		log.info("...whereas " + homeCounter + " home, " + workCounter + " work, " + educationCounter + 
-//				" education, " + leisureCounter + " leisure, " + shoppingcounter + " shopping and " + 
-//				otherCounter + " other acts were counted.");
-//		log.info("...ModalSplit: " + modalSplit[0] + " keine Angabe, " + modalSplit[1] + " Fuss, " +
-//				modalSplit[2] +	" Rad, " + modalSplit[3] + " MIV, " + modalSplit[4] + " OEV, " +
-//				modalSplit[5] + " Rad/OEV, " + modalSplit[6] + " MIV/OEV, " + modalSplit[7] + " Sonst.");
-//		log.error(personsNotStartingAtHome + " persons not starting at home");
-		
+			Gbl.createConfig(new String[] { "./src/playground/andreas/bln/config.xml" });
+
+			GenerateBlnPlan2 myBlnPlanGenerator = new GenerateBlnPlan2();
+
+			HashMap<Id, PersonImpl> personMap;
+			personMap = myBlnPlanGenerator.generatePersons("Z:/PERSONEN.csv");
+
+			HashMap<Id, ArrayList<String[]>> tripMap = myBlnPlanGenerator.readTrips("Z:/WEGE.csv");
+
+			myBlnPlanGenerator.countPersonsPlans(personMap, tripMap);
+			tripMap = myBlnPlanGenerator.filterPersonsWithOneTrip(tripMap);
+
+//			tripMap = myBlnPlanGenerator.filterTripsWithoutCoord(tripMap);
+			tripMap = myBlnPlanGenerator.filterTripsWithoutCoordButEntryInCoordMap(tripMap, "z:/resultat_20090306.csv");
+			tripMap = myBlnPlanGenerator.filterPersonsWithOneTrip(tripMap);
+
+			myBlnPlanGenerator.addPlansToPersons(personMap, tripMap);
+
+			personMap = myBlnPlanGenerator.removePersonsWithoutPlan(personMap, tripMap);
+
+			myBlnPlanGenerator.writePopulationToFile(personMap.values(), "z:/raw_plans_out.xml");
+
+			myBlnPlanGenerator.printStatistic();
+
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 	
 	private HashMap<Id,PersonImpl> generatePersons(String personsFileName) throws IOException{
@@ -210,15 +194,9 @@ public class GenerateBlnPlan2 {
 			
 			for (String[] dataString : unfilteredTripData.get(personsId)) {
 				
-				// Ignore all trips with coord -1.0
-				if (Double.parseDouble(dataString[11]) != -1.0 && Double.parseDouble(dataString[12]) != -1.0){
-
-					// Ignore all trips with coord 0.0
-					if (Double.parseDouble(dataString[11]) != 0.0 && Double.parseDouble(dataString[12]) != 0.0){
-						filteredArrayList.add(dataString);
-					} else {
-						numberOfTripsWithInvalidCoord++;
-					}
+				// Ignore trips with invalid coordinates
+				if (Double.parseDouble(dataString[11]) > 1.0 && Double.parseDouble(dataString[12]) > 1.0){
+					filteredArrayList.add(dataString);
 				} else {
 					numberOfTripsWithInvalidCoord++;
 				}
@@ -229,11 +207,64 @@ public class GenerateBlnPlan2 {
 		log.info("Filtered " + numberOfTripsWithInvalidCoord + " trips, cause coords weren't specified.");
 		return filteredTripData;
 	}
+	
+	private HashMap<Id, ArrayList<String[]>> filterTripsWithoutCoordButEntryInCoordMap(HashMap<Id, ArrayList<String[]>> unfilteredTripData, String filename) throws IOException {
+		HashMap<Id, ArrayList<String[]>> filteredTripData = new HashMap<Id, ArrayList<String[]>>();
+		int numberOfTripsWithInvalidCoord = 0;
+		int numberOfReplacedCoords = 0;
+		
+		log.info("Start reading file " + filename);
+		ArrayList<String[]> unsortedCoordMapData = TabReader.readFile(filename);
+		log.info("...finished reading " + unsortedCoordMapData.size() + " entries in coordMap file.");
+		
+		HashMap<Id, ArrayList<String[]>> sortedCoordMapData = new HashMap<Id, ArrayList<String[]>>();
+		for (String[] coordMapEntry : unsortedCoordMapData) {
+			IdImpl personId = new IdImpl(coordMapEntry[0]);
+			if(sortedCoordMapData.get(personId) != null){
+				sortedCoordMapData.get(personId).add(coordMapEntry);
+			} else {
+				ArrayList<String[]> newArrayList = new ArrayList<String[]>();
+				newArrayList.add(coordMapEntry);
+				sortedCoordMapData.put(personId, newArrayList);
+			}
+		}		
+		
+		for (Id personsId : unfilteredTripData.keySet()) {
+			ArrayList<String[]> filteredArrayList = new ArrayList<String[]>();
+			
+			for (String[] dataString : unfilteredTripData.get(personsId)) {
+				
+				// Ignore trips with invalid coordinates
+				if (Double.parseDouble(dataString[11]) > 1.0 && Double.parseDouble(dataString[12]) > 1.0){
+					filteredArrayList.add(dataString);
+				} else {
+					
+					if (sortedCoordMapData.get(personsId) != null){
+						for (String[] coordMapEntry : sortedCoordMapData.get(personsId)) {
+							
+							// replace coord, if possible
+							if (dataString[2].equalsIgnoreCase(coordMapEntry[1])){
+								dataString[11] = coordMapEntry[3];
+								dataString[12] = coordMapEntry[4];
+								filteredArrayList.add(dataString);
+								numberOfReplacedCoords++;
+							} else {
+								numberOfTripsWithInvalidCoord++;
+							}							
+						}
+					} else {				
+						numberOfTripsWithInvalidCoord++;
+					}
+				}
+			}
+			filteredTripData.put(personsId, filteredArrayList);			
+		}
+		
+		log.info("Filtered " + numberOfTripsWithInvalidCoord + " trips, cause coords weren't specified.");
+		return filteredTripData;
+	}
 
 	private void addPlansToPersons(HashMap<Id,PersonImpl> personList, HashMap<Id,ArrayList<String[]>> tripData) {
-			
-		// Statistics
-		int[] modalSplit = new int[8];
 		
 		for (Id personId : tripData.keySet()) {
 			
@@ -251,11 +282,6 @@ public class GenerateBlnPlan2 {
 			
 			for (Iterator<String[]> iterator = curTripList.iterator(); iterator.hasNext();) {
 				String[] tripEntry = iterator.next();
-				
-				// Register ModalSplit
-				if (!tripEntry[49].equalsIgnoreCase("")){
-					modalSplit[Integer.parseInt(tripEntry[48])]++;
-				}
 				
 				// Read Activity from survey
 				ActImpl newAct = new ActImpl(this.getActType(tripEntry), new CoordImpl(Double.parseDouble(tripEntry[11]), Double.parseDouble(tripEntry[12])));
@@ -284,17 +310,16 @@ public class GenerateBlnPlan2 {
 					} else {
 						lastAct.setEndTime(endTime);
 					}
-				}
 					
-				lastAct = newAct;
-				curPlan.addAct(newAct);
-				
-				if(iterator.hasNext()){
-					// TODO [an] Reihenfolge stimmt eventuell nicht -> Test
 					curPlan.addLeg(this.createLeg(tripEntry));
-				} else {
-					lastAct.setEndTime(86400.0);
+					
+					if(!iterator.hasNext()){
+						newAct.setEndTime(86400.0);
+					}
 				}
+				
+				curPlan.addAct(newAct);	
+				lastAct = newAct;				 
 			}
 		}				
 	}
@@ -318,7 +343,7 @@ public class GenerateBlnPlan2 {
 		}		
 		PopulationWriter writer = new PopulationWriter(pop, filename, "v4");
 		writer.write();
-		log.info(numberOfPersonWithPlans + " persons written to " + filename);
+		log.info(numberOfPersonWithPlans + " persons were written to " + filename);
 	}
 		
 	private String getActType(String[] tripData){
@@ -412,38 +437,47 @@ public class GenerateBlnPlan2 {
 		case 0:
 			// "keine Angabe"
 			leg = new LegImpl(BasicLeg.Mode.undefined);
+			this.modalSplit[0]++;
 			break;
 		case 1:
 			// "Fuss"
 			leg = new LegImpl(BasicLeg.Mode.walk);
+			this.modalSplit[1]++;
 			break;
 		case 2:
 			// "Rad"
 			leg = new LegImpl(BasicLeg.Mode.bike);
+			this.modalSplit[2]++;
 			break;
 		case 3:
 			// "MIV" TODO [an] BasicLeg.Mode.miv cannot be handled by PersonPrepareForSim.1
 			leg = new LegImpl(BasicLeg.Mode.car);
+			this.modalSplit[3]++;
 			break;
 		case 4:
 			// "OEV"
 			leg = new LegImpl(BasicLeg.Mode.pt);
+			this.modalSplit[4]++;
 			break;
 		case 5:
 			// "Rad/OEV"
 			leg = new LegImpl(BasicLeg.Mode.pt);
+			this.modalSplit[5]++;
 			break;
 		case 6:
 			// "IV/OEV"
 			leg = new LegImpl(BasicLeg.Mode.pt);
+			this.modalSplit[6]++;
 			break;
 		case 7:
 			// "sonstiges"
 			leg = new LegImpl(BasicLeg.Mode.undefined);
+			this.modalSplit[7]++;
 			break;
 		default:
 			log.error("transport mode not defined");
 			leg = new LegImpl(BasicLeg.Mode.walk);
+			this.modalSplit[8]++;
 		}
 
 		// Read travel trip time from survey (min) 
@@ -453,6 +487,20 @@ public class GenerateBlnPlan2 {
 //			log.info("empty String");
 		}
 		return leg;
+	}
+
+	private void printStatistic() {
+		log.info("\nActivity Split:\n" + (this.actTypes[0] + this.actTypes[8]) + " home | " 
+				+ this.actTypes[1] + " work | " + this.actTypes[2] + " education | " 
+				+ this.actTypes[3] + " business | " + (this.actTypes[4] + this.actTypes[5]) + " shopping | " 
+				+ (this.actTypes[6] + this.actTypes[7]) + " leisure | "
+				+ this.actTypes[9] + " see a doctor | " + this.actTypes[10] + " holiday | "
+				+ (this.actTypes[11] + this.actTypes[12] + this.actTypes[13]) + " other, multiple or not defined");
+		log.info("\nModal Split: " + this.modalSplit[3] + " car | " 
+				+ (this.modalSplit[4] + this.modalSplit[5] + this.modalSplit[6]) + " public transport | "
+				+ this.modalSplit[2] +	" bike | " + this.modalSplit[1] + " walk | " 
+				+ (this.modalSplit[0] + this.modalSplit[7]) + " not definied | " 
+				+ this.modalSplit[8] + " no data");		
 	}
 
 }
