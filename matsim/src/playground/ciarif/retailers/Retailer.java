@@ -28,20 +28,22 @@ public class Retailer {
 		return true;
 	}
 	
-	public final boolean addStrategy (Controler controler, String strategy) {
-		if (strategy == null) {return false;}
+	public final boolean addStrategy (Controler controler, String strategyName) {
+		if (strategyName == null) {return false;}
 		
-		if (strategy.compareTo("RandomRetailerStrategy")==0) {
+		if (strategyName.equals(RandomRetailerStrategy.NAME)) {
 			this.strategy = new RandomRetailerStrategy(controler.getNetwork());
+			return true;
 		}
-		if (strategy.compareTo("maxLinkRetailerStrategy")==0) {
+		else if (strategyName.equals(MaxLinkRetailerStrategy.NAME)) {
 			this.strategy = new MaxLinkRetailerStrategy (controler);
+			return true;
 		}
-		
-		if (strategy.compareTo("LogitMaxLinkRetailerStrategy")==0) {
+		else if (strategyName.equals(LogitMaxLinkRetailerStrategy.NAME)) {
 			this.strategy = new LogitMaxLinkRetailerStrategy (controler);
+			return true;
 		}
-		return true;
+		else { return false; }
 	}
 	
 	public final Facility getFacility(final Id facId) {

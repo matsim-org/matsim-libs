@@ -97,22 +97,21 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 				String curr_line = br.readLine();
 				while ((curr_line = br.readLine()) != null) {
 					String[] entries = curr_line.split("\t", -1);
-					// header: f_id
-					// index:     0
+					// header: r_id  f_id  strat
+					// index:     0     1      2
 					Id rId = new IdImpl(entries[0]);
-					if (this.retailers.getRetailers().containsKey(rId)) {
+					if (this.retailers.getRetailers().containsKey(rId)) { // retailer exists already
 						Id fId = new IdImpl (entries[1]);
 						Facility f = controler.getFacilities().getFacilities().get(fId);
 						this.retailers.getRetailers().get(rId).addFacility(f);
 					}
-					else {
+					else { // retailer does not exists yet
 						Retailer r = new Retailer(rId, null);
 						r.addStrategy(controler, entries[2]);
 						Id fId = new IdImpl (entries[1]);
 						Facility f = controler.getFacilities().getFacilities().get(fId);
 						r.addFacility(f);
 						this.retailers.addRetailer(r);
-						
 					}
 				}
 			} 

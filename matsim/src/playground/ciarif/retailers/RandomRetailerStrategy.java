@@ -12,6 +12,8 @@ import org.matsim.network.NetworkLayer;
 public class RandomRetailerStrategy implements RetailerStrategy {
 	private final ArrayList<Link> links;
 	
+	public static final String NAME = "RandomRetailerStrategy";
+	
 	public RandomRetailerStrategy (NetworkLayer network) {
 		links = new ArrayList<Link>(network.getLinks().values());
 	}

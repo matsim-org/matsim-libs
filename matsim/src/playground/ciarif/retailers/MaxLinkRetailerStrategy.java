@@ -9,6 +9,9 @@ import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 
 public class MaxLinkRetailerStrategy implements RetailerStrategy {
+	
+	public static final String NAME = "maxLinkRetailerStrategy";
+	
 	private Controler controler;
 	// TODO balmermi: do the same speed optimization here
 

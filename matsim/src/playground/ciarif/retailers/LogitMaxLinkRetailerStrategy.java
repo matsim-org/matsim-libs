@@ -14,6 +14,8 @@ import playground.ciarif.retailers.RetailerStrategy;
 
 public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	
+	public static final String NAME = "RandomRetailerStrategy";
+
 	public final static String CONFIG_GROUP = "Retailers";
 	public final static String CONFIG_N_ALTERNATIVES = "alternatives";
 	private Controler controler;
