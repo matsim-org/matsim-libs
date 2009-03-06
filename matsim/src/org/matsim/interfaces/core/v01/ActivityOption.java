@@ -29,7 +29,8 @@ import org.matsim.basic.v01.BasicOpeningTime.DayType;
 
 public interface ActivityOption extends BasicActivityOption {
 
-	public boolean containsOpentime(final BasicOpeningTime o);
+// not used (I think).  kn, mar09	
+//	public boolean containsOpentime(final BasicOpeningTime o);
 
 	public void setCapacity(final int capacity);
 
@@ -38,5 +39,6 @@ public interface ActivityOption extends BasicActivityOption {
 	public Facility getFacility();
 
 	public Map<DayType, SortedSet<BasicOpeningTime>> getOpentimes();
-
+	// FIXME: Opentimes vs. Openingtimes, and sometimes they are maps and sometimes sets!!!!
+	
 }
