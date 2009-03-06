@@ -9,7 +9,6 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
-import playground.ciarif.retailers.RetailerStrategy;
 
 
 public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
@@ -29,8 +28,18 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	}
 
 	public void moveFacilities(Map<Id, Facility> facilities) {
+		
+		// example to get the facilities (locations) of a link 
+//		controler.getNetwork().getLink("").getUpMapping();
+		
 
 		for (Facility f : facilities.values()) {
+			
+			// example of the use of a by code style, but works anyway....
+//			QuadTree<Person> personQuadTree = Utils.getPersonQuadTree();
+//			if (personQuadTree == null) { throw new RuntimeException("QuadTree not set!"); }
+//			Collection<Person> persons = personQuadTree.get(f.getCenter().getX(),f.getCenter().getY(),10000);
+			
 			
 			double[] utils = new double[alternatives];
 			Object[] links = controler.getNetwork().getLinks().values().toArray();

@@ -42,8 +42,10 @@ import org.matsim.controler.listener.BeforeMobsimListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -52,6 +54,9 @@ import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.AStarLandmarksFactory;
 import org.matsim.router.util.PreProcessLandmarks;
+import org.matsim.utils.collections.QuadTree;
+
+import playground.balmermi.census2000v2.data.CAtts;
 
 
 public class RetailersLocationListener implements StartupListener, BeforeMobsimListener {
@@ -142,6 +147,11 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
 		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
+		
+		// works, but it is not nicely programmed. shouldn't be a global container, should be
+		// controled by the controler (or acutally added to the population)
+		Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
+		
 		controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 		
 		for (Retailer r : this.retailers.getRetailers().values()) {
@@ -179,5 +189,27 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 			if (rd < fraction) { fs.add(f); }
 		}
 		return fs;
+	}
+	
+	private final QuadTree<Person> createPersonQuadTree(Controler controler) {
+		double minx = Double.POSITIVE_INFINITY;
+		double miny = Double.POSITIVE_INFINITY;
+		double maxx = Double.NEGATIVE_INFINITY;
+		double maxy = Double.NEGATIVE_INFINITY;
+		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
+		for (Facility f : controler.getFacilities().getFacilities().values()) {
+			if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
+			if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
+			if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
+			if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+		}
+		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
+		
+		QuadTree<Person> personQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
+		for (Person p : controler.getPopulation().getPersons().values()) {
+			Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCenter();
+			personQuadTree.put(c.getX(),c.getY(),p);
+		}
+		return personQuadTree;
 	}
 }
