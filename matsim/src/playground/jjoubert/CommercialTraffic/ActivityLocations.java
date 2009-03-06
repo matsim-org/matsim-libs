@@ -23,7 +23,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class ActivityLocations {
 	// String value that must be set
-	final static String PROVINCE = "WesternCape";
+	final static String PROVINCE = "Gauteng";
 	// Mac
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
@@ -53,6 +53,9 @@ public class ActivityLocations {
 
 		
 	public static void main( String args[] ) {
+		System.out.println("==========================================================================================");
+		System.out.println("Identifying vehicle activity locations for vehicles travelling through: " + PROVINCE );
+		System.out.println();
 		long startTime = System.currentTimeMillis();
 		final File inFolder = new File( SOURCEFOLDER );
 		final File vehicles[] = inFolder.listFiles();

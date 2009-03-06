@@ -30,9 +30,9 @@ public class SelectVehicles {
 	// String value that must be set
 	final static String PROVINCE = "KZN";
 	// Mac
-//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-	final static String ROOT = "/home/jjoubert/";
+//	final static String ROOT = "/home/jjoubert/";
 	// Derived string values
 	final static String shapeFileSource = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
 	final static String vehicleSource = ROOT + "VehicleFiles/";
@@ -43,7 +43,9 @@ public class SelectVehicles {
 	private final static String WGS84_UTM35S = "PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
 
 	public static void main(String[] args) {
-		System.out.println("Processing: " + PROVINCE );
+		System.out.println("===========================================================================================");
+		System.out.println("Selecting vehicles from the DigiCore data set that are within: " + PROVINCE );
+		System.out.println();
 		System.out.println("Initializing... ");
 		long startTime = System.currentTimeMillis();
 		MultiPolygon studyArea = ReadStudyAreaShapeFile.readStudyAreaPolygon( shapeFileSource );
