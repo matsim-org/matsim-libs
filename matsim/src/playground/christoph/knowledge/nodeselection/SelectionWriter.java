@@ -21,7 +21,6 @@
 package playground.christoph.knowledge.nodeselection;
 
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -194,7 +193,7 @@ public class SelectionWriter extends Writer {
 	public void write(int n)
 	{
 		// don't allow zero persons per file
-		if(n == 0) n = this.population.size();
+		if(n == 0) n = this.population.getPersons().size();
 
 		// counter variable
 		int i = 0;

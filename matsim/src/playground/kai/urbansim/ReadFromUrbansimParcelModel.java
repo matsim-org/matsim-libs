@@ -250,21 +250,21 @@ public class ReadFromUrbansimParcelModel {
 			e.printStackTrace();
 		}
 
-		log.info(" samplingRate: " + samplingRate + " oldPopSize: " + oldPop.size() + " newPopSize: " + newPop.size()
-				+ " bakPopSize: " + backupPop.size() + " NUrbansimPersons: " + NUrbansimPersons ) ;
+		log.info(" samplingRate: " + samplingRate + " oldPopSize: " + oldPop.getPersons().size() + " newPopSize: " + newPop.getPersons().size()
+				+ " bakPopSize: " + backupPop.getPersons().size() + " NUrbansimPersons: " + NUrbansimPersons ) ;
 		log.warn("why is bakPopSize not approx as large as samplingRate*NUrbansimPersons?" ) ;
 
 		List<Person> bakPersons = new ArrayList<Person>( backupPop.getPersons().values() ) ; // Population data structure not needed!
 		Collections.shuffle( bakPersons ) ;
 		for ( Person person : bakPersons ) {
-			if ( newPop.size() >= samplingRate*NUrbansimPersons ) {
+			if ( newPop.getPersons().size() >= samplingRate*NUrbansimPersons ) {
 				break ;
 			}
 			newPop.addPerson( person ) ;
 		}
 
-		log.info(" samplingRate: " + samplingRate + " oldPopSize: " + oldPop.size() + " newPopSize: " + newPop.size()
-				+ " bakPopSize: " + backupPop.size() + " NUrbansimPersons: " + NUrbansimPersons ) ;
+		log.info(" samplingRate: " + samplingRate + " oldPopSize: " + oldPop.getPersons().size() + " newPopSize: " + newPop.getPersons().size()
+				+ " bakPopSize: " + backupPop.getPersons().size() + " NUrbansimPersons: " + NUrbansimPersons ) ;
 
 		log.info( "Done with reading persons." ) ;
 	}

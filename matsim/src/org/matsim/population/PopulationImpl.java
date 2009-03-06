@@ -173,13 +173,6 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 		return this.isStreaming;
 	}
 
-	/**
-	 * @return the size of the population, i.e. the number of persons in this population.
-	 */
-	public int size() {
-		return this.getPersons().size();
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////

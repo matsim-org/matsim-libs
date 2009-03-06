@@ -29,7 +29,6 @@ import org.matsim.interfaces.basic.v01.Id;
  * Root class of the population description (previously also called "plans file")
  */
 public interface Population extends BasicPopulation<Person> {
-	// TODO [MR] remove Iterable
 	
 	public void addPerson(final Person p);
 
@@ -54,12 +53,6 @@ public interface Population extends BasicPopulation<Person> {
 
 	@Deprecated
 	public boolean isStreaming();
-
-	/**
-	 * @return the size of the population, i.e. the number of persons in this population.
-	 * @deprecated user getPersons().size()
-	 */
-	public int size();
 
 	@Deprecated
 	public void printPlansCount();

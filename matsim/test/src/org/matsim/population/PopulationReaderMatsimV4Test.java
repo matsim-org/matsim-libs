@@ -51,7 +51,7 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(population, network);
 		reader.parse(getInputDirectory() + "plans2.xml");
 
-		assertEquals("population size.", 2, population.size());
+		assertEquals("population size.", 2, population.getPersons().size());
 		Person person1 = population.getPerson(new IdImpl("1"));
 		Plan plan1 = person1.getPlans().get(0);
 		Leg leg1a = (Leg) plan1.getActsLegs().get(1);
