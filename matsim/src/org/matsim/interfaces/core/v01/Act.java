@@ -28,6 +28,8 @@ public interface Act extends BasicAct {
 	 * If the duration could neither be calculated nor the act.dur attribute is set to a value
 	 * not equal to Time.UNDEFINED_TIME an exception is thrown.
 	 * @return the duration in seconds
+	 * 
+	 * @deprecated duration is deprecated.  kn, mar09
 	 */
 	@Deprecated // duration is deprecated.  kn, mar09
 	public double calculateDuration();
