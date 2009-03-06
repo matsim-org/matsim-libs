@@ -45,6 +45,7 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Facility;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.router.PlansCalcRoute;
@@ -59,13 +60,16 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	public final static String CONFIG_POP_SUM_TABLE = "populationSummaryTable";
 	public final static String CONFIG_RET_SUM_TABLE = "retailersSummaryTable";
 	public final static String CONFIG_RETAILERS = "retailers";
+	public final static String CONFIG_LINKS = "links";
 	private Retailers retailers;
+	//private TreeMap<Link> links;
 	private RetailersSummaryWriter rs = null;
 	private PlansSummaryTable pst = null;
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
+	private String linkIdFile = null;
 	
 	public RetailersLocationListener() {
 	}
@@ -110,6 +114,24 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 						this.retailers.addRetailer(r);
 						
 					}
+				}
+			} 
+			catch (IOException e) {
+				Gbl.errorMsg(e);
+			}
+		} 
+		this.linkIdFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
+		if (this.linkIdFile == null) { //Francesco: if no file is defined stating which links are allowed any link is allowed
+		}
+		else {
+			try {
+				//this.links = new ArrayList();
+				FileReader fr = new FileReader(this.linkIdFile);
+				BufferedReader br = new BufferedReader(fr);
+				// Skip header
+				String curr_line = br.readLine();
+				while ((curr_line = br.readLine()) != null) {
+					
 				}
 			} 
 			catch (IOException e) {
