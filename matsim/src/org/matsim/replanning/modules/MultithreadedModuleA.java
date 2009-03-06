@@ -139,6 +139,7 @@ abstract public class MultithreadedModuleA implements StrategyModule {
 		if (this.counter == this.nextCounter) {
 			log.info("[" + this.name + "] handled plan # " + this.counter);
 			this.nextCounter *= 2;
+			Gbl.printMemoryUsage();
 		}
 	}
 
