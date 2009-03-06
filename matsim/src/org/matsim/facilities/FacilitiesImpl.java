@@ -106,7 +106,7 @@ public class FacilitiesImpl extends Layer implements Facilities {
 		if (!this.isStreaming) {
 			for (int i = 0; i < this.algorithms.size(); i++) {
 				FacilityAlgorithm algo = this.algorithms.get(i);
-				for (Facility f : this) {
+				for (Facility f : getFacilities().values()) {
 					algo.run(f);
 				}
 			}
@@ -163,12 +163,6 @@ public class FacilitiesImpl extends Layer implements Facilities {
 			}
 		}
 		return facs;
-	}
-
-	// implementation of Iterable
-	@SuppressWarnings("unchecked")
-	public final Iterator<Facility> iterator() {
-		return (Iterator<Facility>) getFacilities().values().iterator();
 	}
 
 	//////////////////////////////////////////////////////////////////////

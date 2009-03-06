@@ -26,8 +26,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 
-public interface Facilities extends Iterable<Facility> {
-	// TODO [MR] remove Iterable
+public interface Facilities {
 
 	public Map<Id, ? extends Facility> getFacilities();
 

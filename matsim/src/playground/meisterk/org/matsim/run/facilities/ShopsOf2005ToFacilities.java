@@ -1648,7 +1648,7 @@ public class ShopsOf2005ToFacilities {
 			shopIconLink.setHref("http://maps.google.com/mapfiles/kml/paddle/S.png");
 			System.out.println("Initializing KML...done.");
 
-			Iterator<Facility> facilityIterator = facilities.iterator();
+			Iterator<? extends Facility> facilityIterator = facilities.getFacilities().values().iterator();
 
 			while (facilityIterator.hasNext()) {
 				Facility facility = facilityIterator.next();

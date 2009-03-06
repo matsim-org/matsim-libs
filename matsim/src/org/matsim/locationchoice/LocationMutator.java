@@ -72,9 +72,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		TreeMap<String, TreeMap<Id, Facility>> trees = new TreeMap<String, TreeMap<Id, Facility>>();
 		
 		// get all types of activities
-		Iterator<Facility> fac_it = facilities.iterator();
-		while (fac_it.hasNext()) {
-			Facility f = fac_it.next();
+		for (Facility f : facilities.getFacilities().values()) {
 			Map<String, ActivityOption> activities = f.getActivityOptions();
 			
 			Iterator<ActivityOption> act_it = activities.values().iterator();
