@@ -51,8 +51,6 @@ public class PersonImpl implements Person{
 
 	private Customizable customizableDelegate;
 
-	private String visualizerData = null;
-
 	private Household household;
 
 	protected Plan selectedPlan = null;
@@ -306,16 +304,6 @@ public class PersonImpl implements Person{
 			((BasicPersonImpl)this.delegate).setKnowledge(k);
 		}
 		return this.delegate.getKnowledge();
-	}
-
-	@Deprecated
-	public void setVisualizerData(final String visualizerData) {
-		this.visualizerData = visualizerData;
-	}
-
-	@Deprecated
-	public String getVisualizerData() {
-		return this.visualizerData ;
 	}
 
 	public void addTravelcard(final String type) {

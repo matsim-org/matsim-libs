@@ -432,7 +432,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 			double speed = (now > cmp) ? 0.0 : this.realLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 
 			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.realLink.getLink(),
-					queueEnd, lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
+					queueEnd, lane, speed, PositionInfo.VehicleState.Driving, null);
 			positions.add(position);
 			cnt++;
 			queueEnd -= vehLen;
@@ -474,7 +474,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 			double speed = (now > cmp) ? 0.0 : this.realLink.getLink().getFreespeed(now);
 			int lane = this.visualizerLane;
 			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.realLink.getLink(),
-					distanceOnLink, lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
+					distanceOnLink, lane, speed, PositionInfo.VehicleState.Driving, null);
 			positions.add(position);
 			lastDistance = distanceOnLink;
 		}
@@ -490,7 +490,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		for (QueueVehicle veh : this.parkToLinkQueue) {
 			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.realLink.getLink(),
 					((NetworkLayer) this.realLink.getLink().getLayer()).getEffectiveCellSize(), lane, 0.0,
-					PositionInfo.VehicleState.Parking, veh.getDriver().getPerson().getVisualizerData());
+					PositionInfo.VehicleState.Parking, null);
 			positions.add(position);
 		}
 
@@ -503,7 +503,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		for (QueueVehicle veh : this.parkingQueue) {
 			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.realLink.getLink(),
 					((NetworkLayer) this.realLink.getLink().getLayer()).getEffectiveCellSize(), lane, 0.0,
-					PositionInfo.VehicleState.Parking, veh.getDriver().getPerson().getVisualizerData());
+					PositionInfo.VehicleState.Parking, null);
 			positions.add(position);
 		}
 

@@ -893,7 +893,7 @@ public class QueueLane implements Comparable<QueueLane> {
 				double speed = (now > cmp) ? 0.0 : queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), queueLink.getLink(), queueEnd,
-						lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
+						lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
 				queueEnd -= vehLen;
 			}
@@ -933,7 +933,7 @@ public class QueueLane implements Comparable<QueueLane> {
 				double speed = (now > cmp) ? 0.0 : queueLink.getLink().getFreespeed(now);
 				int lane = 1 + (Integer.parseInt(veh.getId().toString()) % queueLink.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), queueLink.getLink(), distanceOnLink,
-						lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
+						lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
 				lastDistance = distanceOnLink;
 			}
@@ -947,7 +947,7 @@ public class QueueLane implements Comparable<QueueLane> {
 			for (QueueVehicle veh : waitingList) {
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), queueLink.getLink(),
 						((NetworkLayer) queueLink.getLink().getLayer()).getEffectiveCellSize(), lane, 0.0,
-						PositionInfo.VehicleState.Parking, veh.getDriver().getPerson().getVisualizerData());
+						PositionInfo.VehicleState.Parking, null);
 				positions.add(position);
 			}
 
@@ -960,7 +960,7 @@ public class QueueLane implements Comparable<QueueLane> {
 			for (QueueVehicle veh : parkingList) {
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), queueLink.getLink(),
 						((NetworkLayer) queueLink.getLink().getLayer()).getEffectiveCellSize(), lane, 0.0,
-						PositionInfo.VehicleState.Parking, veh.getDriver().getPerson().getVisualizerData());
+						PositionInfo.VehicleState.Parking, null);
 				positions.add(position);
 			}
 		}
