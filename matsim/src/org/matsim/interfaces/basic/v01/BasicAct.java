@@ -48,14 +48,30 @@ public interface BasicAct {
 
 	public void setStartTime(double seconds);
 
+	/**
+	 * Note: There is no corresponding setter, since keeping things consistent at the "pointer" level
+	 * would become awkward.
+	 * 
+	 * @return
+	 */
 	public Id getLinkId();
-	// TODO: Does this really make sense without a setter?
 
+	/**
+	 * Note: There is no corresponding setter, since keeping things consistent at the "pointer" level
+	 * would become awkward.
+	 * 
+	 * @return
+	 */
 	public Id getFacilityId();
-	// TODO: Does this really make sense without a setter?
 
+	/**
+	 * @deprecated
+	 */
 	@Deprecated
 	public double getDuration();
+	/**
+	 * @deprecated
+	 */
 	@Deprecated
 	public void setDuration(double duration);
 
