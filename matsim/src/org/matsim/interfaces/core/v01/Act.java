@@ -15,9 +15,9 @@ public interface Act extends BasicAct {
 
 	public Facility getFacility();
 
-	public Id getLinkId();
+//	public Id getLinkId(); // already in BasicAct
 
-	public Id getFacilityId();
+//	public Id getFacilityId(); // already in BasicAct
 
 	/**
 	 * This method calculates the duration of the activity from the start and endtimes if set.
@@ -29,6 +29,7 @@ public interface Act extends BasicAct {
 	 * not equal to Time.UNDEFINED_TIME an exception is thrown.
 	 * @return the duration in seconds
 	 */
+	@Deprecated // duration is deprecated.  kn, mar09
 	public double calculateDuration();
 
 }
