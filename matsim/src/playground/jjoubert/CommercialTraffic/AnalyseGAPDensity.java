@@ -36,15 +36,15 @@ public class AnalyseGAPDensity {
 	// Derived string values
 	final static String GAP_SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "GAP_UTM35S.shp";
 	final static String SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
-//	final static String INPUT_MINOR = ROOT + PROVINCE + "/Vehicles/Activities/" + PROVINCE + "MinorLocations.txt";
-//	final static String INPUT_MAJOR = ROOT + PROVINCE + "/Vehicles/Activities/" + PROVINCE + "MajorLocations.txt";
-//	final static String OUTPUT_MINOR = ROOT + PROVINCE + "/Vehicles/Activities/" + PROVINCE + "MinorGapStats.txt";
-//	final static String OUTPUT_MAJOR = ROOT + PROVINCE + "/Vehicles/Activities/" + PROVINCE + "MajorGapStats.txt";
+	final static String INPUT_MINOR = ROOT + PROVINCE + "/Vehicles/Activities/" + PROVINCE + "MinorLocations.txt";
+	final static String INPUT_MAJOR = ROOT + PROVINCE + "/Vehicles/Activities/" + PROVINCE + "MajorLocations.txt";
+	final static String OUTPUT_MINOR = ROOT + PROVINCE + "/Vehicles/Activities/" + PROVINCE + "MinorGapStats.txt";
+	final static String OUTPUT_MAJOR = ROOT + PROVINCE + "/Vehicles/Activities/" + PROVINCE + "MajorGapStats.txt";
 
-	final static String INPUT_MINOR = ROOT + PROVINCE + "/Activities/20090225-2030/" + PROVINCE + "MinorLocations.txt";
-	final static String INPUT_MAJOR = ROOT + PROVINCE + "/Activities/20090225-2030/" + PROVINCE + "MajorLocations.txt";
-	final static String OUTPUT_MINOR = ROOT + PROVINCE + "/Activities/20090225-2030/" + PROVINCE + "MinorGapStats.txt";
-	final static String OUTPUT_MAJOR = ROOT + PROVINCE + "/Activities/20090225-2030/" + PROVINCE + "MajorGapStats.txt";
+//	final static String INPUT_MINOR = ROOT + PROVINCE + "/Activities/20090225-2030/" + PROVINCE + "MinorLocations.txt";
+//	final static String INPUT_MAJOR = ROOT + PROVINCE + "/Activities/20090225-2030/" + PROVINCE + "MajorLocations.txt";
+//	final static String OUTPUT_MINOR = ROOT + PROVINCE + "/Activities/20090225-2030/" + PROVINCE + "MinorGapStats.txt";
+//	final static String OUTPUT_MAJOR = ROOT + PROVINCE + "/Activities/20090225-2030/" + PROVINCE + "MajorGapStats.txt";
 
 	public static final String DELIMITER = ",";
 	final static int GAP_SEARCH_AREA = 20000; // in METERS
