@@ -21,14 +21,14 @@
 package org.matsim.controler;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.network.BasicLaneDefinitions;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -45,8 +45,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
-import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationReader;
-import org.matsim.signalsystems.MatsimLightSignalSystemsReader;
+import org.matsim.signalsystems.MatsimSignalSystemConfigurationReader;
+import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
@@ -76,8 +76,9 @@ public class ScenarioData implements BasicScenario {
 	private NetworkLayer network = null;
 	private Facilities facilities = null;
 	private Population population = null;
+	private BasicLaneDefinitions laneDefinitions = null;
 	private BasicSignalSystems signalSystems = null;
-	private List<BasicSignalSystemConfiguration> signalSystemConfigurations = null;
+	private BasicSignalSystemConfigurations signalSystemConfigurations = null;
 
 	private final NetworkFactory networkFactory;
 	private Config config;
@@ -213,6 +214,15 @@ public class ScenarioData implements BasicScenario {
 		}
 		return this.population;
 	}
+	
+	public BasicLaneDefinitions getLaneDefinitions(){
+		if (this.laneDefinitions == null){
+			this.laneDefinitions = new BasicLaneDefinitions();
+			//TODO dg remove the warning and write a parser
+			log.warn("LaneDefinitions are not yet parsed separately!!!");
+		}
+		return this.laneDefinitions;
+	}
 
 	public BasicSignalSystems getSignalSystems() {
 		if ((this.config == null) || (this.config.signalSystems() == null)){
@@ -220,20 +230,20 @@ public class ScenarioData implements BasicScenario {
 		}
 		if (this.signalSystems == null) {
 			this.signalSystems = new BasicSignalSystems();
-			MatsimLightSignalSystemsReader reader = new MatsimLightSignalSystemsReader(this.signalSystems);
+			MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(this.getLaneDefinitions(), this.signalSystems);
 			log.info("loading signalsystems from " + this.config.signalSystems().getSignalSystemFile());
 			reader.readFile(this.config.signalSystems().getSignalSystemFile());
 		}
 		return this.signalSystems;
 	}
 
-	public List<BasicSignalSystemConfiguration> getSignalSystemsConfiguration() {
+	public BasicSignalSystemConfigurations getSignalSystemsConfiguration() {
 		if ((this.config == null) || (this.config.signalSystems() == null)){
 			throw new IllegalStateException("SignalSystems can only be loaded if set in config");
 		}
 		if (this.signalSystemConfigurations == null){
-			this.signalSystemConfigurations = new ArrayList<BasicSignalSystemConfiguration>();
-			MatsimLightSignalSystemConfigurationReader reader = new MatsimLightSignalSystemConfigurationReader(this.signalSystemConfigurations);
+			this.signalSystemConfigurations = new BasicSignalSystemConfigurationsImpl();
+			MatsimSignalSystemConfigurationReader reader = new MatsimSignalSystemConfigurationReader(this.signalSystemConfigurations);
 			log.info("loading signalsystemsconfiguration from " + this.config.signalSystems().getSignalSystemConfigFile());
 			reader.readFile(this.config.signalSystems().getSignalSystemConfigFile());
 		}

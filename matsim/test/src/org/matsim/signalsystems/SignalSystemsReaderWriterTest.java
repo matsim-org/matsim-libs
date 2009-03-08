@@ -19,22 +19,29 @@
 
 package org.matsim.signalsystems;
 
-import org.matsim.basic.signalsystems.BasicLane;
-import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
+import java.io.IOException;
+
+import org.apache.log4j.Logger;
+import org.matsim.basic.network.BasicLane;
+import org.matsim.basic.network.BasicLaneDefinitions;
+import org.matsim.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.signalsystems.MatsimLightSignalSystemsReader;
-import org.matsim.signalsystems.MatsimLightSignalSystemsWriter;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
+ * Test case for the readers and writers for the (light-)signalSystems_v1.*.xsd file
+ * format.
  * @author dgrether
  */
-public class LightSignalSystemsReaderTest extends MatsimTestCase {
-
+public class SignalSystemsReaderWriterTest extends MatsimTestCase {
+	
+	private static final Logger log = Logger
+			.getLogger(SignalSystemsReaderWriterTest.class);
+	
   private static final String TESTXML  = "testLightSignalSystems.xml";
   
   private Id id1 = new IdImpl("1");
@@ -49,37 +56,44 @@ public class LightSignalSystemsReaderTest extends MatsimTestCase {
   
   private Id id42 = new IdImpl("42");
   
-  public void testParser() {
+  public void testParser() throws IOException {
+  	BasicLaneDefinitions laneDefs = new BasicLaneDefinitions();
   	BasicSignalSystems lss = new BasicSignalSystems();
-  	MatsimLightSignalSystemsReader reader = new MatsimLightSignalSystemsReader(lss);
+  	MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(laneDefs, lss);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
   	
-  	checkContent(lss);
+  	checkContent(laneDefs, lss);
   }
   
   public void testWriter() {
   	String testoutput = this.getOutputDirectory()  + "testLssOutput.xml";
+  	log.debug("reading file...");
   	//read the test file
   	BasicSignalSystems lss = new BasicSignalSystems();
-  	MatsimLightSignalSystemsReader reader = new MatsimLightSignalSystemsReader(lss);
+  	BasicLaneDefinitions laneDefs = new BasicLaneDefinitions();
+  	MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(laneDefs, lss);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
-
+  	
+  	
   	//write the test file
-  	MatsimLightSignalSystemsWriter writer = new MatsimLightSignalSystemsWriter(lss);
+  	log.debug("write the test file...");
+  	MatsimLightSignalSystemsWriter writer = new MatsimLightSignalSystemsWriter(laneDefs, lss);
   	writer.writeFile(testoutput);
   	
+  	log.debug("and read it again");
   	lss = new BasicSignalSystems();
-  	reader = new MatsimLightSignalSystemsReader(lss);
+  	laneDefs = new BasicLaneDefinitions();
+  	reader = new MatsimSignalSystemsReader(laneDefs, lss);
   	reader.readFile(testoutput);
-  	checkContent(lss);
+  	checkContent(laneDefs, lss);
   }
 
-  private void checkContent(BasicSignalSystems lss) {
-  	assertEquals(1, lss.getLanesToLinkAssignments().size());
+  private void checkContent(BasicLaneDefinitions lanedefs, BasicSignalSystems lss) {
+  	assertEquals(1, lanedefs.getLanesToLinkAssignments().size());
   	assertEquals(2, lss.getSignalSystemDefinitions().size());
   	assertEquals(2, lss.getSignalGroupDefinitions().size());
   	BasicLanesToLinkAssignment l2la;
-  	l2la = lss.getLanesToLinkAssignments().get(0);
+  	l2la = lanedefs.getLanesToLinkAssignments().get(0);
   	assertNotNull(l2la);
   	assertEquals(id23, l2la.getLinkId());
   	BasicLane lane = l2la.getLanes().get(0);

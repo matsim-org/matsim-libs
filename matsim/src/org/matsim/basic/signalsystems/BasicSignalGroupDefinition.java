@@ -16,76 +16,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.basic.signalsystems;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.signalsystems.control.SignalSystemControler;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Id;
-
+import org.matsim.signalsystems.control.SignalSystemControler;
 /**
+ * 
  * @author dgrether
+ *
  */
-public class BasicSignalGroupDefinition {
-  
-	private final Id id;
-	private Id lightSignalSystemDefinitionId;
-	private List<Id> laneIds;
-	private List<Id> toLinkIds;
-	private final Id linkRefId;
-	
-	private org.matsim.basic.signalsystems.control.SignalSystemControler signalSystemControler = null;
+public interface BasicSignalGroupDefinition {
 
-	public BasicSignalGroupDefinition(Id linkRefId, Id id) {
-		this.linkRefId = linkRefId;
-		this.id = id;
-	}
+	public void setLightSignalSystemDefinitionId(IdImpl id);
 
-	public void setLightSignalSystemDefinitionId(IdImpl id) {
-		this.lightSignalSystemDefinitionId = id;
-	}
+	public void addLaneId(Id laneId);
 
-	public void addLaneId(Id laneId) {
-		if (this.laneIds == null)
-			this.laneIds = new ArrayList<Id>();
-		this.laneIds.add(laneId);
-	}
-	
-	public Id getLinkRefId() {
-		return linkRefId;
-	}
+	public Id getLinkRefId();
 
-	public void addToLinkId(Id linkId) {
-		if (this.toLinkIds == null)
-			this.toLinkIds = new ArrayList<Id>();
-		this.toLinkIds.add(linkId);
-	}
+	public void addToLinkId(Id linkId);
 
-	public Id getId() {
-		return id;
-	}
+	public Id getId();
 
-	public Id getLightSignalSystemDefinitionId() {
-		return lightSignalSystemDefinitionId;
-	}
+	public Id getLightSignalSystemDefinitionId();
 
-	public List<Id> getLaneIds() {
-		return laneIds;
-	}
+	public List<Id> getLaneIds();
 
-	public List<Id> getToLinkIds() {
-		return toLinkIds;
-	}
+	public List<Id> getToLinkIds();
 
-	public void setResponsibleLSAControler(SignalSystemControler signalSystemControler) {
-		this.signalSystemControler = signalSystemControler;		
-	}
-	
-	public boolean isGreen(){
-		return this.signalSystemControler.givenSignalGroupIsGreen(this);
-	}
-	
+	public void setResponsibleLSAControler(
+			SignalSystemControler signalSystemControler);
+
+	public boolean isGreen();
+
 }

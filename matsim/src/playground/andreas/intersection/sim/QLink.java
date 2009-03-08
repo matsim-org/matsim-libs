@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.signalsystems.BasicLane;
-import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
+import org.matsim.basic.network.BasicLane;
+import org.matsim.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.gbl.Gbl;

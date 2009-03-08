@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicSignalSystemConfigurationsImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,46 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.basic.signalsystemsconfig;
 
-package org.matsim.basic.signalsystems;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.Id;
 
+
 /**
  * @author dgrether
+ *
  */
-public class BasicLanesToLinkAssignment {
+public class BasicSignalSystemConfigurationsImpl implements
+		BasicSignalSystemConfigurations {
 
-	private Id linkId;
+	private Map<Id, BasicSignalSystemConfiguration> signalSystemConfigs = new HashMap<Id, BasicSignalSystemConfiguration>();
 
-	private List<BasicLane> lanes;
-	
-	/**
-	 * @param linkId
-	 */
-	public BasicLanesToLinkAssignment(Id linkId) {
-		this.linkId = linkId;
-	}
-
-	public List<BasicLane> getLanes() {
-		return this.lanes;
+	public BasicSignalSystemConfigurationsImpl(){
 	}
 	
 	/**
-	 * @param lane
+	 * @see org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations#getSignalSystemConfigurations()
 	 */
-	public void addLane(BasicLane lane) {
-		if (this.lanes == null) {
-			this.lanes = new ArrayList<BasicLane>();
-		}
-		this.lanes.add(lane); 
-	}
-	
-	public Id getLinkId() {
-		return linkId;
+	public Map<Id, BasicSignalSystemConfiguration> getSignalSystemConfigurations() {
+		return this.signalSystemConfigs;
 	}
 
 }

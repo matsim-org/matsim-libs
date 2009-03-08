@@ -19,158 +19,39 @@
 
 package org.matsim.signalsystems;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-
-import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.jaxb.lightsignalsystemsconfig10.ObjectFactory;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalGroupConfigurationType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfig;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfigurationType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLMatsimTimeAttributeType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLPlanbasedlightSignalSystemControlInfoType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalGroupConfigurationType.XMLInterimTimeDropping;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType.XMLStart;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType.XMLStop;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
+import org.matsim.utils.io.MatsimJaxbXmlWriter;
 
 
 /**
+ * Writes a light signal system definition to xml.
  * @author dgrether
  */
 public class MatsimLightSignalSystemConfigurationWriter {
-
-	private List<BasicSignalSystemConfiguration> blssconfs;
-	private XMLLightSignalSystemConfig xmllssconfig;
-
-	public MatsimLightSignalSystemConfigurationWriter(List<BasicSignalSystemConfiguration> basiclssconfigs) {
-		this.blssconfs = basiclssconfigs;
-		try {
-			this.xmllssconfig = convertBasicToXml();
-		} catch (DatatypeConfigurationException e) {
-			e.printStackTrace();
-		}
+	
+	private MatsimJaxbXmlWriter writerDelegate;
+	
+	/**
+	 * Use this constructor to write the default xml format.
+	 * @param basiclss
+	 */
+	public MatsimLightSignalSystemConfigurationWriter(BasicSignalSystemConfigurations basiclss) {
+		this(new LightSignalSystemConfigurationsWriter10(basiclss));
+	}
+	
+	/**
+	 * Customize the verion of the written xml by using this constructor with
+	 * the SignalSystemsWriter of your choice (there is no specific type SignalSystemsWriter)
+	 * @param basiclss
+	 * @param writer
+	 */
+	public MatsimLightSignalSystemConfigurationWriter(MatsimJaxbXmlWriter writer){
+		this.writerDelegate = writer;
 	}
 	
 	
-	
-	public void writeFile(final String filename) {
-  	JAXBContext jc;
-		try {
-			jc = JAXBContext.newInstance(org.matsim.jaxb.lightsignalsystemsconfig10.ObjectFactory.class);
-			Marshaller m = jc.createMarshaller(); 
-			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, 
-					Boolean.TRUE); 
-			
-			m.marshal(this.xmllssconfig, IOUtils.getBufferedWriter(filename)); 
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private XMLLightSignalSystemConfig convertBasicToXml() throws DatatypeConfigurationException {
-		ObjectFactory fac = new ObjectFactory();
-		XMLLightSignalSystemConfig xmllssconf = fac.createXMLLightSignalSystemConfig();
-		
-		for (BasicSignalSystemConfiguration lssconf : this.blssconfs) {
-			XMLLightSignalSystemConfigurationType xmllssconfiguration = fac.createXMLLightSignalSystemConfigurationType();
-			xmllssconfiguration.setRefId(lssconf.getLightSignalSystemId().toString());
-			
-			if (lssconf.getControlInfo() instanceof BasicPlanBasedSignalSystemControlInfo) {
-				XMLPlanbasedlightSignalSystemControlInfoType xmlplanlsscontrolinfo = fac.createXMLPlanbasedlightSignalSystemControlInfoType();
-				BasicPlanBasedSignalSystemControlInfo pbcontrolinfo = (BasicPlanBasedSignalSystemControlInfo) lssconf.getControlInfo();
-				for (BasicSignalSystemPlan plan : pbcontrolinfo.getPlans().values()) {
-					XMLLightSignalSystemPlanType xmlplan = fac.createXMLLightSignalSystemPlanType();
-					xmlplan.setId(plan.getId().toString());
-					XMLStart start = new XMLStart();
-					start.setDaytime(getXmlGregorianCalendar(plan.getStartTime()));
-					xmlplan.setStart(start);
-					
-					XMLStop stop = new XMLStop();
-					stop.setDaytime(getXmlGregorianCalendar(plan.getEndTime()));
-					xmlplan.setStop(stop);
-					
-					XMLMatsimTimeAttributeType xmlct = fac.createXMLMatsimTimeAttributeType();
-					if (plan.getCirculationTime() != null) {
-						xmlct.setSeconds(plan.getCirculationTime());
-						xmlplan.setCirculationTime(xmlct);
-					}
-					if (plan.getSyncronizationOffset() != null) {
-						XMLMatsimTimeAttributeType xmlso = fac.createXMLMatsimTimeAttributeType();
-						xmlso.setSeconds(plan.getSyncronizationOffset());
-						xmlplan.setSyncronizationOffset(xmlso);
-					}
-					
-					
-
-					//write lightSignalGroupConfigurations
-					for (BasicSignalGroupConfiguration lsgc : plan.getGroupConfigs().values()) {
-						XMLLightSignalGroupConfigurationType xmllsgc = fac.createXMLLightSignalGroupConfigurationType();
-						xmllsgc.setRefId(lsgc.getReferencedSignalGroupId().toString());
-						XMLLightSignalGroupConfigurationType.XMLRoughcast xmlrc = new XMLLightSignalGroupConfigurationType.XMLRoughcast();
-						//FIXME change in dataformat from int to double
-						xmlrc.setSec((int)lsgc.getRoughCast());
-						xmllsgc.setRoughcast(xmlrc);
-						
-						XMLLightSignalGroupConfigurationType.XMLDropping xmldropping = new XMLLightSignalGroupConfigurationType.XMLDropping();
-						xmldropping.setSec((int)lsgc.getDropping());
-						xmllsgc.setDropping(xmldropping);
-						if (lsgc.getInterimTimeDropping() != null) {
-							XMLLightSignalGroupConfigurationType.XMLInterimTimeDropping xmlitd = new XMLInterimTimeDropping();
-							xmlitd.setSec((int) lsgc.getInterimTimeDropping().doubleValue());
-							xmllsgc.setInterimTimeDropping(xmlitd);
-						}
-
-						if (lsgc.getInterimTimeRoughcast() != null) {
-							XMLLightSignalGroupConfigurationType.XMLInterimTimeRoughcast xmlitr = new XMLLightSignalGroupConfigurationType.XMLInterimTimeRoughcast();
-							xmlitr.setSec((int) lsgc.getInterimTimeRoughcast().doubleValue());
-							xmllsgc.setInterimTimeRoughcast(xmlitr);
-						}
-						
-						xmlplan.getLightSignalGroupConfiguration().add(xmllsgc);
-					}
-					xmlplanlsscontrolinfo.getLightSignalSystemPlan().add(xmlplan);
-				}
-				xmllssconfiguration.setLightSignalSystemControlInfo(xmlplanlsscontrolinfo);
-			}
-			else {
-			//TODO implement adaptive control
-				throw new UnsupportedOperationException("has to be implemented!");
-			}
-			xmllssconf.getLightSignalSystemConfiguration().add(xmllssconfiguration);
-		}
-		return xmllssconf;
+	public void writeFile(String filename){
+		this.writerDelegate.writeFile(filename);
 	}
 
-
-
-	private XMLGregorianCalendar getXmlGregorianCalendar(double seconds) throws DatatypeConfigurationException {
-		XMLGregorianCalendar time = DatatypeFactory.newInstance().newXMLGregorianCalendar();
-		int s = (int) seconds;
-		int h = (s / 3600);
-		s = s % 3600;
-		int m = (s / 60);
-		s = s % 60;
-		time.setSecond(s);
-		time.setMinute(m);
-		time.setHour(h);
-		return time;
-	}
-	
 }

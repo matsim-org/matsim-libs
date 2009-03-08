@@ -20,23 +20,20 @@
 package org.matsim.signalsystems;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
+import java.io.IOException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.validation.Schema;
+import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.xerces.jaxp.validation.XMLSchemaFactory;
+import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemsConfigFactory;
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLAdaptiveLightSignalSystemControlInfoType;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalGroupConfigurationType;
@@ -45,35 +42,39 @@ import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfigurat
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemControlInfoType;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLPlanbasedlightSignalSystemControlInfoType;
+import org.matsim.utils.io.MatsimJaxbXmlParser;
 import org.xml.sax.SAXException;
 
 /**
+ * Reader for the lightSignalSystemConfigurations_v1.0 file format.
  * @author dgrether
  */
-public class MatsimLightSignalSystemConfigurationReader {
+public class LightSignalSystemConfigurationsReader10 extends MatsimJaxbXmlParser {
 
   private XMLLightSignalSystemConfig xmlLssConfig;
 	
   private BasicSignalSystemsConfigFactory factory = new BasicSignalSystemsConfigFactory();
 
-	private List<BasicSignalSystemConfiguration> lssConfigurations;
+	private BasicSignalSystemConfigurations lssConfigurations;
   
-	public MatsimLightSignalSystemConfigurationReader(List<BasicSignalSystemConfiguration> lssConfigs) {
+	public LightSignalSystemConfigurationsReader10(BasicSignalSystemConfigurations lssConfigs, String schemaLocation) {
+		super(schemaLocation);
 		this.lssConfigurations = lssConfigs;
 	}
 	
-	public void readFile(final String filename) {
+	@Override
+	public void readFile(final String filename) throws ParserConfigurationException, IOException, JAXBException, SAXException {
   	JAXBContext jc;
-		try {
 			jc = JAXBContext.newInstance(org.matsim.jaxb.lightsignalsystemsconfig10.ObjectFactory.class);
 //			ObjectFactory fac = new ObjectFactory();
 			Unmarshaller u = jc.createUnmarshaller();
-			XMLSchemaFactory schemaFac = new XMLSchemaFactory();
-			Schema schema = schemaFac.newSchema(new URL("http://www.matsim.org/files/dtd/lightSignalSystemsConfig_v1.0.xsd"));
-			u.setSchema(schema);
+			//validate file
+			super.validateFile(filename, u);
+			
 			xmlLssConfig = (XMLLightSignalSystemConfig)u.unmarshal( 
 					new FileInputStream( filename ) );
 
+		//convert the parsed xml-instances to basic instances
 			for (XMLLightSignalSystemConfigurationType xmlLssConfiguration : xmlLssConfig.getLightSignalSystemConfiguration()){
 				BasicSignalSystemConfiguration blssc = factory.createLightSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
 				
@@ -114,20 +115,8 @@ public class MatsimLightSignalSystemConfigurationReader {
 					throw new UnsupportedOperationException("has to be implemented!");
 				}
 				
-				this.lssConfigurations.add(blssc);
+				this.lssConfigurations.getSignalSystemConfigurations().put(blssc.getLightSignalSystemId(), blssc);
 			} // end outer for
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			 e.printStackTrace();
-		 } catch (SAXException e) {
-			 e.printStackTrace();
-		} 
-		
-		
-		
 	}
 
 	private double getSeconds(XMLGregorianCalendar daytime) {

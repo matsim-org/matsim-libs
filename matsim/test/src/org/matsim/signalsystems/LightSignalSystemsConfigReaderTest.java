@@ -19,20 +19,19 @@
 
 package org.matsim.signalsystems;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationReader;
-import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationWriter;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
+ * Test for the readers and writers of the (light)signalSystemConfigurations_v1.*.xsd
+ * file formats.
  * @author dgrether
  */
 public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
@@ -49,33 +48,33 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
 
   
   
-  public void estParser() {
-  	List<BasicSignalSystemConfiguration> lssConfigs = new ArrayList<BasicSignalSystemConfiguration>();
-  	MatsimLightSignalSystemConfigurationReader reader = new MatsimLightSignalSystemConfigurationReader(lssConfigs);
+  public void testParser() {
+  	BasicSignalSystemConfigurations lssConfigs = new BasicSignalSystemConfigurationsImpl();
+  	MatsimSignalSystemConfigurationReader reader = new MatsimSignalSystemConfigurationReader(lssConfigs);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
   }
   
   public void testWriter() {
   	String testoutput = this.getOutputDirectory()  + "testLssConfigOutput.xml";
   	//read the test file
-  	List<BasicSignalSystemConfiguration> lssConfigs = new ArrayList<BasicSignalSystemConfiguration>();
-  	MatsimLightSignalSystemConfigurationReader reader = new MatsimLightSignalSystemConfigurationReader(lssConfigs);
+  	BasicSignalSystemConfigurations lssConfigs = new BasicSignalSystemConfigurationsImpl();
+  	MatsimSignalSystemConfigurationReader reader = new MatsimSignalSystemConfigurationReader(lssConfigs);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
 
   	//write the test file
   	MatsimLightSignalSystemConfigurationWriter writer = new MatsimLightSignalSystemConfigurationWriter(lssConfigs);
   	writer.writeFile(testoutput);
   	
-  	lssConfigs = new ArrayList<BasicSignalSystemConfiguration>();
-  	reader = new MatsimLightSignalSystemConfigurationReader(lssConfigs);
+  	lssConfigs = new BasicSignalSystemConfigurationsImpl();
+  	reader = new MatsimSignalSystemConfigurationReader(lssConfigs);
   	reader.readFile(testoutput);
   	checkContent(lssConfigs);
   }
 
-	private void checkContent(List<BasicSignalSystemConfiguration> lssConfigs) {
-		assertEquals(2, lssConfigs.size());
+	private void checkContent(BasicSignalSystemConfigurations lssConfigs) {
+		assertEquals(2, lssConfigs.getSignalSystemConfigurations().size());
 		//test first
-		BasicSignalSystemConfiguration lssConfiguration = lssConfigs.get(0);
+		BasicSignalSystemConfiguration lssConfiguration = lssConfigs.getSignalSystemConfigurations().get(id23);
 		assertNotNull(lssConfiguration);
 		assertEquals(id23, lssConfiguration.getLightSignalSystemId());
 		BasicPlanBasedSignalSystemControlInfo controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfiguration.getControlInfo();
@@ -97,7 +96,7 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
 		assertEquals(3.0, groupConfig.getInterimTimeDropping());
 		
 		//test second
-		lssConfiguration = lssConfigs.get(1);
+		lssConfiguration = lssConfigs.getSignalSystemConfigurations().get(id42);
 		assertNotNull(lssConfiguration);
 		assertEquals(id42, lssConfiguration.getLightSignalSystemId());
 		controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfiguration.getControlInfo();

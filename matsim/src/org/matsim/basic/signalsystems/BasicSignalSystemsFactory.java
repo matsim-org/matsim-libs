@@ -19,6 +19,9 @@
 
 package org.matsim.basic.signalsystems;
 
+import org.matsim.basic.network.BasicLaneImpl;
+import org.matsim.basic.network.BasicLanesToLinkAssignment;
+import org.matsim.basic.network.BasicLanesToLinkAssignmentImpl;
 import org.matsim.interfaces.basic.v01.Id;
 
 /**
@@ -27,21 +30,21 @@ import org.matsim.interfaces.basic.v01.Id;
 public class BasicSignalSystemsFactory {
 	
 	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id id) {
-		return new BasicLanesToLinkAssignment(id);
+		return new BasicLanesToLinkAssignmentImpl(id);
 	}
 
-	public BasicLane createLane(Id id) {
-		return new BasicLane(id);
+	public BasicLaneImpl createLane(Id id) {
+		return new BasicLaneImpl(id);
 	}
 
 	public BasicSignalSystemDefinition createLightSignalSystemDefinition(
 			Id id) {
-		return new BasicSignalSystemDefinition(id);
+		return new BasicSignalSystemDefinitionImpl(id);
 	}
 
 	public BasicSignalGroupDefinition createLightSignalGroupDefinition(
 			Id linkRefId, Id id) {
-		return new BasicSignalGroupDefinition(linkRefId, id);
+		return new BasicSignalGroupDefinitionImpl(linkRefId, id);
 	}
 	
 }

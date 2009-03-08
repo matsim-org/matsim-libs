@@ -29,7 +29,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.signalsystems.BasicLane;
+import org.matsim.basic.network.BasicLane;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;

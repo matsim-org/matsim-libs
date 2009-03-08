@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.signalsystems;
 
-import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -27,6 +26,7 @@ import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
@@ -75,12 +75,12 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkEnterEve
 		int circulationTime = 60;
 
 		BasicSignalSystems lssDefs = data.getSignalSystems();
-		List<BasicSignalSystemConfiguration> lssConfigs = data.getSignalSystemsConfiguration();
+		BasicSignalSystemConfigurations lssConfigs = data.getSignalSystemsConfiguration();
 
 		for (int dropping = 1; dropping <= circulationTime; dropping=dropping+1) {
 			this.beginningOfLink2 = null;
 			
-			for (BasicSignalSystemConfiguration lssConfig : lssConfigs) {
+			for (BasicSignalSystemConfiguration lssConfig : lssConfigs.getSignalSystemConfigurations().values()) {
 				BasicPlanBasedSignalSystemControlInfo controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfig.getControlInfo();
 				BasicSignalSystemPlan p = controlInfo.getPlans().get(new IdImpl("2"));
 				p.setCirculationTime((double)circulationTime);
@@ -88,6 +88,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkEnterEve
 				group.setDropping(dropping);
 			}
 			QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
+			sim.setLaneDefinitions(data.getLaneDefinitions());
 			sim.setSignalSystems(lssDefs, lssConfigs);
 			sim.run();
 			results.put(Integer.valueOf(dropping), this.beginningOfLink2);
@@ -110,6 +111,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkEnterEve
 		Events events = new Events();
 		events.addHandler(this);
 		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
+		sim.setLaneDefinitions(data.getLaneDefinitions());
 		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemsConfiguration());
 		sim.run();
 //		log.debug("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure + ", " + this.beginningOfLink2.numberOfVehPassed + ", " + this.beginningOfLink2.firstVehPassTime_s + ", " + this.beginningOfLink2.lastVehPassTime_s);

@@ -21,17 +21,18 @@
 package playground.andreas.intersection.sim;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
-import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
+import org.matsim.basic.network.BasicLaneDefinitions;
+import org.matsim.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.events.Events;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Population;
@@ -39,8 +40,8 @@ import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.NetworkLayer;
-import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationReader;
-import org.matsim.signalsystems.MatsimLightSignalSystemsReader;
+import org.matsim.signalsystems.MatsimSignalSystemConfigurationReader;
+import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.utils.vis.otfvis.executables.OnTheFlyClientQuadSwing;
 import org.matsim.utils.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientQuad;
@@ -68,20 +69,19 @@ public class QSim extends QueueSimulation {
 		this.newLSADefCfg = newLSADefCfg;
 		this.useOTF = useOTF;
 	}
-  //dg jan 09 this method is never used
 	private void readSignalSystemControler(){
-		
+		BasicLaneDefinitions lanedef = new BasicLaneDefinitions();
 		BasicSignalSystems newSignalSystems = new BasicSignalSystems();
-		MatsimLightSignalSystemsReader lsaReader = new MatsimLightSignalSystemsReader(newSignalSystems);
+		MatsimSignalSystemsReader lsaReader = new MatsimSignalSystemsReader(lanedef, newSignalSystems);
 
-		List<BasicSignalSystemConfiguration> newSignalSystemsConfig = new ArrayList<BasicSignalSystemConfiguration>();
-	  	MatsimLightSignalSystemConfigurationReader lsaReaderConfig = new MatsimLightSignalSystemConfigurationReader(newSignalSystemsConfig);
+		BasicSignalSystemConfigurations newSignalSystemsConfig = new BasicSignalSystemConfigurationsImpl();
+		MatsimSignalSystemConfigurationReader lsaReaderConfig = new MatsimSignalSystemConfigurationReader(newSignalSystemsConfig);
 		
 		lsaReader.readFile(this.newLSADef);
 		lsaReaderConfig.readFile(this.newLSADefCfg);
 		
 		// Create SubNetLinks
-		for (BasicLanesToLinkAssignment laneToLink : newSignalSystems.getLanesToLinkAssignments()) {
+		for (BasicLanesToLinkAssignment laneToLink : lanedef.getLanesToLinkAssignments()) {
 			QLink qLink = (QLink) this.network.getQueueLink(laneToLink.getLinkId());
 			qLink.reconfigure(laneToLink, this.network);
 		}
@@ -90,7 +90,7 @@ public class QSim extends QueueSimulation {
 
 		// Create a SignalSystemControler for every signal system configuration found
 		if (null != this.newLSADefCfg) {
-			for (BasicSignalSystemConfiguration basicLightSignalSystemConfiguration : newSignalSystemsConfig) {
+			for (BasicSignalSystemConfiguration basicLightSignalSystemConfiguration : newSignalSystemsConfig.getSignalSystemConfigurations().values()) {
 				NewSignalSystemControlerImpl newLSAControler = new NewSignalSystemControlerImpl(basicLightSignalSystemConfiguration);
 				sortedLSAControlerMap.put(basicLightSignalSystemConfiguration.getLightSignalSystemId(), newLSAControler);
 			}

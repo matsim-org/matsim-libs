@@ -20,47 +20,25 @@
 package org.matsim.basic.signalsystems;
 
 import org.matsim.interfaces.basic.v01.Id;
-
 /**
+ * 
  * @author dgrether
+ *
  */
-public class BasicSignalSystemDefinition {
+public interface BasicSignalSystemDefinition {
 
-  private Id id;
-  private double defaultCirculationTime;
-  private double syncronizationOffset;
-  private double defaultInterimTime;
-	
-  public BasicSignalSystemDefinition(Id id) {
-  	this.id = id;
-  }
-  
-	public Id getId() {
-		return id;
-	}
-	
-	public double getDefaultCirculationTime() {
-		return defaultCirculationTime;
-	}
-	
-	public void setDefaultCirculationTime(double defaultCirculationTime) {
-		this.defaultCirculationTime = defaultCirculationTime;
-	}
-	
-	public double getDefaultSyncronizationOffset() {
-		return syncronizationOffset;
-	}
-	
-	public void setDefaultSyncronizationOffset(double syncronizationOffset) {
-		this.syncronizationOffset = syncronizationOffset;
-	}
-	
-	public double getDefaultInterimTime() {
-		return defaultInterimTime;
-	}
-	
-	public void setDefaultInterimTime(double defaultInterimTime) {
-		this.defaultInterimTime = defaultInterimTime;
-	}
+	public Id getId();
+
+	public double getDefaultCirculationTime();
+
+	public void setDefaultCirculationTime(double defaultCirculationTime);
+
+	public double getDefaultSyncronizationOffset();
+
+	public void setDefaultSyncronizationOffset(double syncronizationOffset);
+
+	public double getDefaultInterimTime();
+
+	public void setDefaultInterimTime(double defaultInterimTime);
 
 }

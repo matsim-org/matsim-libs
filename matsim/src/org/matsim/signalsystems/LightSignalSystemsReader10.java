@@ -20,18 +20,17 @@
 package org.matsim.signalsystems;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.IOException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
+import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.xerces.jaxp.validation.XMLSchemaFactory;
-import org.matsim.basic.signalsystems.BasicLane;
-import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
+import org.apache.log4j.Logger;
+import org.matsim.basic.network.BasicLaneImpl;
+import org.matsim.basic.network.BasicLaneDefinitions;
+import org.matsim.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
@@ -44,80 +43,95 @@ import org.matsim.jaxb.lightsignalsystems10.XMLLanesToLinkAssignmentType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalGroupDefinitionType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystemDefinitionType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystems;
+import org.matsim.utils.io.MatsimJaxbXmlParser;
 import org.xml.sax.SAXException;
 
 /**
+ * Reader for the lightSignalSystems_v1.0.xsd file format.
  * @author dgrether
  */
-public class MatsimLightSignalSystemsReader {
+public class LightSignalSystemsReader10 extends MatsimJaxbXmlParser {
 
+	private static final Logger log = Logger
+			.getLogger(LightSignalSystemsReader10.class);
+	
 	private BasicSignalSystems lightSignalSystems;
+	private BasicLaneDefinitions laneDefinitions;
 
 	private BasicSignalSystemsFactory factory = new BasicSignalSystemsFactory();
 
-	public MatsimLightSignalSystemsReader(BasicSignalSystems lightSignalSystems) {
+
+
+	public LightSignalSystemsReader10(BasicLaneDefinitions laneDefs,
+			BasicSignalSystems lightSignalSystems, String schemaLocation) {
+		super(schemaLocation);
+		this.laneDefinitions = laneDefs;
 		this.lightSignalSystems = lightSignalSystems;
 	}
 
-	public void readFile(final String filename) {
+	@Override
+	public void readFile(final String filename) throws JAXBException, SAXException, ParserConfigurationException, IOException {
+		//create jaxb infrastructure
 		JAXBContext jc;
 		XMLLightSignalSystems xmlLssDefinition;
-		try {
-
-			jc = JAXBContext.newInstance(org.matsim.jaxb.lightsignalsystems10.ObjectFactory.class);
+			jc = JAXBContext
+					.newInstance(org.matsim.jaxb.lightsignalsystems10.ObjectFactory.class);
 			ObjectFactory fac = new ObjectFactory();
 			Unmarshaller u = jc.createUnmarshaller();
-//			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-//			SAXParser saxParser = parserFactory.newSAXParser();
-//			XMLReader xmlReader = saxParser.getXMLReader();
-//			MatsimXmlEntityResolver resolver = new MatsimXmlEntityResolver();
-//			EntityResolver resolver = new MatsimXmlParser();
-//			xmlReader.setEntityResolver(resolver);
-//			xmlReader.setContentHandler(resolver);
+			// validate XML file
+			super.validateFile(filename, u);
+			log.info("starting unmarshalling " + filename);
+			xmlLssDefinition = (XMLLightSignalSystems) u
+					.unmarshal(new FileInputStream(filename));
 
-//			SAXSource saxSource = new SAXSource(xmlReader, new InputSource(new FileInputStream(filename)));
-
-			XMLSchemaFactory schemaFac = new XMLSchemaFactory();
-			Schema schema = schemaFac.newSchema(new URL("http://www.matsim.org/files/dtd/lightSignalSystems_v1.0.xsd"));
-			u.setSchema(schema);
-//			xmlLssDefinition = (XMLLightSignalSystems)u.unmarshal(saxSource);
-			xmlLssDefinition = (XMLLightSignalSystems)u.unmarshal(new FileInputStream(filename));
-
+			//convert the parsed xml-instances to basic instances
 			BasicLanesToLinkAssignment l2lAssignment;
-			BasicLane lane = null;
-			for (XMLLanesToLinkAssignmentType lldef : xmlLssDefinition.getLanesToLinkAssignment()) {
-				l2lAssignment = factory.createLanesToLinkAssignment(new IdImpl(lldef.getLinkIdRef()));
+			BasicLaneImpl lane = null;
+			for (XMLLanesToLinkAssignmentType lldef : xmlLssDefinition
+					.getLanesToLinkAssignment()) {
+				l2lAssignment = factory.createLanesToLinkAssignment(new IdImpl(lldef
+						.getLinkIdRef()));
 				for (XMLLaneType laneType : lldef.getLane()) {
 					lane = factory.createLane(new IdImpl(laneType.getId()));
 					for (XMLIdRefType toLinkId : laneType.getToLink()) {
 						lane.addToLinkId(new IdImpl(toLinkId.getRefId()));
 					}
 					if (laneType.getRepresentedLanes() == null) {
-						laneType.setRepresentedLanes(fac.createXMLLaneTypeXMLRepresentedLanes());
+						laneType.setRepresentedLanes(fac
+								.createXMLLaneTypeXMLRepresentedLanes());
 					}
-					lane.setNumberOfRepresentedLanes(laneType.getRepresentedLanes().getNumber());
+					lane.setNumberOfRepresentedLanes(laneType.getRepresentedLanes()
+							.getNumber());
 					if (laneType.getLength() == null) {
 						laneType.setLength(fac.createXMLLaneTypeXMLLength());
 					}
 					lane.setLength(laneType.getLength().getMeter());
 					l2lAssignment.addLane(lane);
 				}
-				lightSignalSystems.addLanesToLinkAssignment(l2lAssignment);
+				this.laneDefinitions.addLanesToLinkAssignment(l2lAssignment);
 			}
 
 			BasicSignalSystemDefinition lssdef;
-			for (XMLLightSignalSystemDefinitionType xmllssDef : xmlLssDefinition.getLightSignalSystemDefinition()) {
-				lssdef = factory.createLightSignalSystemDefinition(new IdImpl(xmllssDef.getId()));
-				lssdef.setDefaultCirculationTime(xmllssDef.getDefaultCirculationTime().getSeconds());
-				lssdef.setDefaultInterimTime(xmllssDef.getDefaultInterimTime().getSeconds());
-				lssdef.setDefaultSyncronizationOffset(xmllssDef.getDefaultSyncronizationOffset().getSeconds());
+			for (XMLLightSignalSystemDefinitionType xmllssDef : xmlLssDefinition
+					.getLightSignalSystemDefinition()) {
+				lssdef = factory.createLightSignalSystemDefinition(new IdImpl(xmllssDef
+						.getId()));
+				lssdef.setDefaultCirculationTime(xmllssDef.getDefaultCirculationTime()
+						.getSeconds());
+				lssdef.setDefaultInterimTime(xmllssDef.getDefaultInterimTime()
+						.getSeconds());
+				lssdef.setDefaultSyncronizationOffset(xmllssDef
+						.getDefaultSyncronizationOffset().getSeconds());
 				lightSignalSystems.addSignalSystemDefinition(lssdef);
 			}
-			//parsing lightSignalGroupDefinitions
+			// parsing lightSignalGroupDefinitions
 			BasicSignalGroupDefinition lsgdef;
-			for (XMLLightSignalGroupDefinitionType xmllsgdef : xmlLssDefinition.getLightSignalGroupDefinition()) {
-				lsgdef = factory.createLightSignalGroupDefinition(new IdImpl(xmllsgdef.getLinkIdRef()), new IdImpl(xmllsgdef.getId()));
-				lsgdef.setLightSignalSystemDefinitionId(new IdImpl(xmllsgdef.getLightSignalSystemDefinition().getRefId()));
+			for (XMLLightSignalGroupDefinitionType xmllsgdef : xmlLssDefinition
+					.getLightSignalGroupDefinition()) {
+				lsgdef = factory.createLightSignalGroupDefinition(new IdImpl(xmllsgdef
+						.getLinkIdRef()), new IdImpl(xmllsgdef.getId()));
+				lsgdef.setLightSignalSystemDefinitionId(new IdImpl(xmllsgdef
+						.getLightSignalSystemDefinition().getRefId()));
 				for (XMLIdRefType refIds : xmllsgdef.getLane()) {
 					lsgdef.addLaneId(new IdImpl(refIds.getRefId()));
 				}
@@ -126,23 +140,6 @@ public class MatsimLightSignalSystemsReader {
 				}
 				lightSignalSystems.addSignalGroupDefinition(lsgdef);
 			}
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-//		catch (SAXException e) {
-//			 e.printStackTrace();
-//		} 
-		catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-//		} catch (ParserConfigurationException e) {
-//			e.printStackTrace();
-		}
 
 	}
 }

@@ -31,12 +31,13 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
+import org.matsim.basic.network.BasicLaneDefinitions;
+import org.matsim.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
-import org.matsim.basic.signalsystems.control.SignalSystemControler;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.events.AgentArrivalEvent;
@@ -50,6 +51,7 @@ import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkLayer;
 import org.matsim.signalsystems.PlanBasedSignalSystemControler;
+import org.matsim.signalsystems.control.SignalSystemControler;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.VisConfig;
@@ -117,7 +119,9 @@ public class QueueSimulation {
 
 	private BasicSignalSystems signalSystems;
 
-	private List<BasicSignalSystemConfiguration> signalSystemsConfig;
+	private BasicSignalSystemConfigurations signalSystemsConfig;
+
+	private BasicLaneDefinitions laneDefintions;
 
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -136,20 +140,28 @@ public class QueueSimulation {
 		this.networkLayer = network;
 		this.agentFactory = new AgentFactory();
 	}
+	
+	/**
+	 * Set the lanes used in the simulation
+	 * @param laneDefs
+	 */
+	public void setLaneDefinitions(BasicLaneDefinitions laneDefs){
+		this.laneDefintions = laneDefs;
+	}
 
 	/**
 	 * Set the signal systems to be used in simulation
 	 * @param signalSystems
-	 * @param signalSystemsConfig
+	 * @param basicSignalSystemConfigurations
 	 */
-	public void setSignalSystems(BasicSignalSystems signalSystems, List<BasicSignalSystemConfiguration> signalSystemsConfig){
+	public void setSignalSystems(BasicSignalSystems signalSystems, BasicSignalSystemConfigurations basicSignalSystemConfigurations){
 		this.signalSystems = signalSystems;
-		this.signalSystemsConfig = signalSystemsConfig;
+		this.signalSystemsConfig = basicSignalSystemConfigurations;
 	}
 	
 	
-	private void initLanes(List<BasicLanesToLinkAssignment> lanesToLinkAssignments) {
-		for (BasicLanesToLinkAssignment laneToLink : lanesToLinkAssignments){
+	private void initLanes(BasicLaneDefinitions lanedefs) {
+		for (BasicLanesToLinkAssignment laneToLink : lanedefs.getLanesToLinkAssignments()){
 			QueueLink link = this.network.getQueueLink(laneToLink.getLinkId());
 			if (link == null) {
 				String message = "No Link with Id: " + laneToLink.getLinkId() + ". Cannot create lanes, check lanesToLinkAssignment of signalsystems definition!";
@@ -182,9 +194,9 @@ public class QueueSimulation {
 		}
 	}
 	
-	private void initSignalSystemController(List<BasicSignalSystemConfiguration> signalSystemsConfig) {
+	private void initSignalSystemController(BasicSignalSystemConfigurations basicSignalSystemConfigurations) {
 		this.signalSystemControlerBySystemId = new TreeMap<Id, SignalSystemControler>();
-		for (BasicSignalSystemConfiguration config : signalSystemsConfig) {
+		for (BasicSignalSystemConfiguration config : basicSignalSystemConfigurations.getSignalSystemConfigurations().values()) {
 			//TODO consider adaptive controlers
 			//create the controler
 			PlanBasedSignalSystemControler controler = new PlanBasedSignalSystemControler(config);
@@ -352,6 +364,8 @@ public class QueueSimulation {
 
 		prepareNetwork();
 
+		prepareLanes();
+		
 		prepareSignalSystems();
 		
 		double startTime = this.config.simulation().getStartTime();
@@ -373,12 +387,18 @@ public class QueueSimulation {
 
 		prepareNetworkChangeEventsQueue();
 	}
+	
+	private void prepareLanes(){
+		if (this.laneDefintions != null){
+			initLanes(this.laneDefintions);
+		}
+	}
+	
 	/**
 	 * Initialize the signal systems
 	 */
 	private void prepareSignalSystems() {
 		if (this.signalSystems != null) {
-			initLanes(this.signalSystems.getLanesToLinkAssignments());
 			initSignalSystems(this.signalSystems);
 		}
 		if (this.signalSystemsConfig != null) {

@@ -19,14 +19,13 @@
  * *********************************************************************** */
 package org.matsim.signalsystems;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
@@ -39,15 +38,18 @@ import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
+ * Simple test case for the QueueSim signal system implementation.
+ * One agent drives one round in the signal system default simple test
+ * network.
  * @author dgrether
  * 
  */
-public class SignalSystemBasicsTest extends MatsimTestCase implements
+public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 		LinkEnterEventHandler {
 
 	
 	private static final Logger log = Logger
-			.getLogger(SignalSystemBasicsTest.class);
+			.getLogger(SignalSystemsOneAgentTest.class);
 	
 	private Id id1 = new IdImpl(1);
 	private Id id2 = new IdImpl(2);
@@ -71,7 +73,6 @@ public class SignalSystemBasicsTest extends MatsimTestCase implements
 		String plansFile = this.getClassInputDirectory() + "plans1Agent.xml";
 		String lsaDefinition = this.getClassInputDirectory() + "lsa.xml";
 		String lsaConfig = this.getClassInputDirectory() + "lsa_config.xml";
-//		String tempFile = this.getOutputDirectory() + "__tempFile__.xml";
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 		conf.plans().setInputFile(plansFile);
@@ -81,11 +82,10 @@ public class SignalSystemBasicsTest extends MatsimTestCase implements
 		Events events = new Events();
 		events.addHandler(this);
 
-		List<BasicSignalSystemConfiguration> lssConfigs = new ArrayList<BasicSignalSystemConfiguration>();
-		MatsimLightSignalSystemConfigurationReader reader = new MatsimLightSignalSystemConfigurationReader(
-				lssConfigs);
+		BasicSignalSystemConfigurations lssConfigs = new BasicSignalSystemConfigurationsImpl();
+  	MatsimSignalSystemConfigurationReader reader = new MatsimSignalSystemConfigurationReader(lssConfigs);
 		reader.readFile(lsaConfig);
-		for (BasicSignalSystemConfiguration lssConfig : lssConfigs) {
+		for (BasicSignalSystemConfiguration lssConfig : lssConfigs.getSignalSystemConfigurations().values()) {
 			BasicPlanBasedSignalSystemControlInfo controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfig
 					.getControlInfo();
 			BasicSignalSystemPlan p = controlInfo.getPlans()
@@ -98,6 +98,7 @@ public class SignalSystemBasicsTest extends MatsimTestCase implements
 
 		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data
 				.getPopulation(), events);
+		sim.setLaneDefinitions(data.getLaneDefinitions());
 		sim.setSignalSystems(signalSystems, lssConfigs);
 		sim.run();
 		

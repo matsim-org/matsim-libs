@@ -29,7 +29,7 @@ import java.util.Queue;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.signalsystems.BasicLane;
+import org.matsim.basic.network.BasicLane;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.interfaces.basic.v01.Id;
@@ -405,7 +405,11 @@ public class QueueLink {
 		return this.originalLane.getVehiclesOnParkingList();
 	}
 	
-
+	/**
+	 * TODO think about the need for this method
+	 * because it is only called by one testcase
+	 * @return
+	 */
 	protected int vehOnLinkCount() {
 		return this.originalLane.vehOnLinkCount();
 	}

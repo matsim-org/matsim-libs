@@ -28,15 +28,9 @@ import java.util.List;
  */
 public class BasicSignalSystems {
 
-	private List<BasicLanesToLinkAssignment> lanesToLinkAssignments;
 	private List<BasicSignalSystemDefinition> lightSignalSystemDefinitions;
 	private List<BasicSignalGroupDefinition> lightSignalGroupDefinitions;
 
-	public List<BasicLanesToLinkAssignment> getLanesToLinkAssignments() {
-		return lanesToLinkAssignments;
-	}
-
-	
 	public List<BasicSignalSystemDefinition> getSignalSystemDefinitions() {
 		return lightSignalSystemDefinitions;
 	}
@@ -44,16 +38,6 @@ public class BasicSignalSystems {
 	
 	public List<BasicSignalGroupDefinition> getSignalGroupDefinitions() {
 		return lightSignalGroupDefinitions;
-	}
-
-	/**
-	 * @param assignment
-	 */
-	public void addLanesToLinkAssignment(BasicLanesToLinkAssignment assignment) {
-		if (this.lanesToLinkAssignments == null) {
-			this.lanesToLinkAssignments = new ArrayList<BasicLanesToLinkAssignment>();
-		}
-		this.lanesToLinkAssignments.add(assignment);
 	}
 
 	/**

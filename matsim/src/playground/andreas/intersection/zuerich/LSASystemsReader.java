@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
+import org.matsim.basic.signalsystems.BasicSignalSystemDefinitionImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
@@ -33,7 +34,7 @@ public class LSASystemsReader implements TabularFileHandler {
 			BasicSignalSystemDefinition lsa = this.lsaMap.get(Integer.valueOf(row[0]));
 			
 			if(lsa == null){
-				lsa = new BasicSignalSystemDefinition(new IdImpl(Integer.parseInt(row[0])));
+				lsa = new BasicSignalSystemDefinitionImpl(new IdImpl(Integer.parseInt(row[0])));
 				this.lsaMap.put(Integer.valueOf(row[0]), lsa);
 			}
 			
