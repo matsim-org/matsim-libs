@@ -23,7 +23,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class ActivityLocations {
 	// String value that must be set
-	final static String PROVINCE = "Gauteng";
+	final static String PROVINCE = "KZN";
 	// Mac
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
