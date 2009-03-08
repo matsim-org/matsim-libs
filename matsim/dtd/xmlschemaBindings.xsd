@@ -6,7 +6,7 @@
   <annotation>
     <appinfo>
     <jaxb:schemaBindings>
-      <jaxb:package name="org.matsim.basic.xml"/>
+      <jaxb:package name="org.matsim.jaxb"/>
     </jaxb:schemaBindings>
     </appinfo>
   </annotation>
