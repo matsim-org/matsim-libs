@@ -205,11 +205,9 @@ public class ExternalModule implements StrategyModule {
 	private void reReadPlans() {
 		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		PopulationReader plansReader = getPlansReader(plans);
-		plans.addAlgorithm(new PersonCalcTimes());
-		plans.addAlgorithm(new UpdatePlansAlgo(this.persons));
 		plansReader.readFile(this.outFileRoot + this.moduleId + ExternalOutFileName);
-		plans.printPlansCount();
-		plans.runAlgorithms();
+		new PersonCalcTimes().run(plans);
+		new UpdatePlansAlgo(this.persons).run(plans);
 	}
 
 	protected PopulationReader getPlansReader(final Population plans) {

@@ -65,11 +65,11 @@ import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.PersonAlgorithm;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.Knowledge;
 import org.matsim.population.PlanImpl;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
@@ -77,7 +77,7 @@ import org.matsim.world.ZoneLayer;
 
 import Jama.Matrix;
 
-public class PrimlocModule  implements PersonAlgorithm {
+public class PrimlocModule extends AbstractPersonAlgorithm {
 
 	final static String module_name = "primary location choice";
 

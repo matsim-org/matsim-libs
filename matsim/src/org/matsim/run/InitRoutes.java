@@ -24,7 +24,6 @@ import java.util.Iterator;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
@@ -34,7 +33,6 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.AStarLandmarksFactory;
-import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.utils.misc.ArgumentParser;
 
 /**
@@ -122,13 +120,11 @@ public class InitRoutes {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 
-		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final PopulationImpl plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
-		preprocess.run(network);
-		plans.addAlgorithm(new PlansCalcRoute(network, timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess)));
+		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		plans.addAlgorithm(new PlansCalcRoute(network, timeCostCalc, timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc)));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();

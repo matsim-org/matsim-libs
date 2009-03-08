@@ -103,7 +103,7 @@ public class StrategyManagerConfigLoader {
 				strategy.addStrategyModule(new ReRouteDijkstra(network, travelCostCalc, travelTimeCalc));
 			} else if (classname.equals("ReRoute_Landmarks")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
+				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost(config.charyparNagelScoring()));
 				preProcessRoutingData.run(network);
 				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
 			} else if (classname.equals("TimeAllocationMutator") || classname.equals("threaded.TimeAllocationMutator")) {
@@ -112,7 +112,7 @@ public class StrategyManagerConfigLoader {
 			} else if (classname.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				strategy.addStrategyModule(new TimeAllocationMutator(7200));
-				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
+				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost(config.charyparNagelScoring()));
 				preProcessRoutingData.run(network);
 				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
 			} else if (classname.equals("ExternalModule")) {
@@ -124,13 +124,13 @@ public class StrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				StrategyModule planomatStrategyModule = new PlanomatModule(controler.getNetwork(), controler.getEvents(), controler.getTravelTimeCalculator(), controler.getTravelCostCalculator(), controler.getScoringFunctionFactory());
 				strategy.addStrategyModule(planomatStrategyModule);
-//				setDecayingModuleProbability(manager, strategy, 100, rate); // FIXME [KM] Why "100" and not controler.firstIteration as in "PlanomatReRoute"
+//				setDecayingModuleProbability(manager, strategy, 100, rate); // Why "100" and not controler.firstIteration as in "PlanomatReRoute"
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				StrategyModule planomatStrategyModule = new PlanomatModule(controler.getNetwork(), controler.getEvents(), controler.getTravelTimeCalculator(), controler.getTravelCostCalculator(), controler.getScoringFunctionFactory());
 				strategy.addStrategyModule(planomatStrategyModule);
 				strategy.addStrategyModule(new ReRoute(controler));
-				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);
+//				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);
 			} else if (classname.equals("BestScore")) {
 				strategy = new PlanStrategy(new BestPlanSelector());
 			} else if (classname.equals("SelectExpBeta")) {
@@ -163,7 +163,7 @@ public class StrategyManagerConfigLoader {
 			} else if (classname.equals("LocationChoice")) {
 		    	strategy = new PlanStrategy(new ExpBetaPlanSelector());
 		    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
-				final PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
+				final PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost(config.charyparNagelScoring()));
 				preProcessRoutingData.run(network);
 				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
 				strategy.addStrategyModule(new TimeAllocationMutator());
@@ -230,7 +230,7 @@ public class StrategyManagerConfigLoader {
 	 * @author kmeister
 	 * @author mrieser
 	 */
-	private static void setDecayingModuleProbability(final StrategyManager manager, final PlanStrategy strategy, final int iterationStartDecay, final double pReplanInit) {
+/*	private static void setDecayingModuleProbability(final StrategyManager manager, final PlanStrategy strategy, final int iterationStartDecay, final double pReplanInit) {
 		// Originally from PlanomatStrategyManagerConfigLoader
 //		double pReplan = 0.0;
 
@@ -255,7 +255,7 @@ public class StrategyManagerConfigLoader {
 //
 //			manager.addChangeRequest(iter, strategy, pReplan);
 
-//			new code: TODO [KM] please check that this does the same as the old code above. /marcel,18jan2008
+//			new code: TODO_ [KM] please check that this does the same as the old code above. /marcel,18jan2008
 			if (iter > iterationStartDecay) {
 				double pReplan = Math.min(pReplanInit, slope / (iter - iterationStartDecay + iterOffset) + pReplanFinal);
 				manager.addChangeRequest(iter, strategy, pReplan);
@@ -263,5 +263,5 @@ public class StrategyManagerConfigLoader {
 
 		}
 	}
-
+*/
 }

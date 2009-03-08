@@ -70,12 +70,13 @@ public class CleanNetwork {
 		for (int i=0; i<links.size(); i++) { network.removeLink(links.get(i)); }
 		System.out.println("    done.");
 
-		new NetworkCalcTopoType().run(network);
+		NetworkCalcTopoType topoTypes = new NetworkCalcTopoType();
+		topoTypes.run(network);
 		new NetworkSummary().run(network);
 
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		Iterator<? extends Node> n_it = network.getNodes().values().iterator();
-		while (n_it.hasNext()) { Node n = n_it.next(); if (n.getTopoType() == NetworkCalcTopoType.EMPTY) { nodes.add(n); } }
+		while (n_it.hasNext()) { Node n = n_it.next(); if (topoTypes.getTopoType(n) == NetworkCalcTopoType.EMPTY.intValue()) { nodes.add(n); } }
 		System.out.println("    removing " + nodes.size() + " nodes...");
 		for (int i=0; i<nodes.size(); i++) { network.removeNode(nodes.get(i)); }
 		System.out.println("    done.");

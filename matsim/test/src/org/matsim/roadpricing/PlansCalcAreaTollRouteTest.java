@@ -30,7 +30,7 @@ import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.PreProcessLandmarks;
+import org.matsim.router.util.AStarLandmarksFactory;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -61,28 +61,27 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		Population population = Fixture.createPopulation2(network);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
-		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
-		commonRouterData.run(network);
+		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 
 		Id id1 = new IdImpl("1");
 		Leg leg1 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(1));
 		Leg leg2 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(3));
 
 		// case 1: toll only in morning, it is cheaper to drive around
-		new PlansCalcAreaTollRoute(network, commonRouterData, timeCostCalc, timeCostCalc, toll).run(population);
+		new PlansCalcAreaTollRoute(network, timeCostCalc, timeCostCalc, factory, toll).run(population);
 		Fixture.compareRoutes("1 2 3 4 5", (CarRoute) leg1.getRoute());
 		Fixture.compareRoutes("6 7 9 10", (CarRoute) leg2.getRoute());
 
 		// case 2: now add a toll in the afternoon too, so it is cheaper to pay the toll
 		Cost afternoonCost = toll.addCost(14*3600, 18*3600, 0.06);
-		new PlansCalcAreaTollRoute(network, commonRouterData, timeCostCalc, timeCostCalc, toll).run(population);
+		new PlansCalcAreaTollRoute(network, timeCostCalc, timeCostCalc, factory, toll).run(population);
 		Fixture.compareRoutes("1 2 4 5", (CarRoute) leg1.getRoute());
 		Fixture.compareRoutes("6 7 9 10", (CarRoute) leg2.getRoute());
 
 		// case 3: change the second leg to a non-car mode, than it should be the same as case 1
 		BasicLeg.Mode oldMode = leg2.getMode();
 		leg2.setMode(BasicLeg.Mode.pt);
-		new PlansCalcAreaTollRoute(network, commonRouterData, timeCostCalc, timeCostCalc, toll).run(population);
+		new PlansCalcAreaTollRoute(network, timeCostCalc, timeCostCalc, factory, toll).run(population);
 		Fixture.compareRoutes("1 2 3 4 5", (CarRoute) leg1.getRoute());
 		Fixture.compareRoutes("6 7 9 10", (CarRoute) leg2.getRoute());
 		// and change the mode back
@@ -94,7 +93,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.addCost(6*3600, 10*3600, 0.7);
 		toll.addCost(14*3600, 18*3600, 0.7);
 		// the agent should now decide to drive around
-		new PlansCalcAreaTollRoute(network, commonRouterData, timeCostCalc, timeCostCalc, toll).run(population);
+		new PlansCalcAreaTollRoute(network, timeCostCalc, timeCostCalc, factory, toll).run(population);
 		Fixture.compareRoutes("1 2 3 4 5", (CarRoute) leg1.getRoute());
 		Fixture.compareRoutes("6 7 8 9 10", (CarRoute) leg2.getRoute());
 	}
@@ -115,14 +114,13 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		Population population = Fixture.createPopulation2(network);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
-		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
-		commonRouterData.run(network);
+		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 
 		Id id1 = new IdImpl("1");
 		Leg leg1 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(1));
 		Leg leg2 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(3));
 
-		new PlansCalcAreaTollRoute(network, commonRouterData, timeCostCalc, timeCostCalc, toll).run(population);
+		new PlansCalcAreaTollRoute(network, timeCostCalc, timeCostCalc, factory, toll).run(population);
 		Fixture.compareRoutes("1 2 4 5", (CarRoute) leg1.getRoute()); // agent should take shortest route
 		Fixture.compareRoutes("6 7 9 10", (CarRoute) leg2.getRoute());
 	}
@@ -145,14 +143,13 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		Population population = Fixture.createPopulation2(network);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
-		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
-		commonRouterData.run(network);
-
+		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
+		
 		Id id1 = new IdImpl("1");
 		Leg leg1 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(1));
 		Leg leg2 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(3));
 
-		new PlansCalcAreaTollRoute(network, commonRouterData, timeCostCalc, timeCostCalc, toll).run(population);
+		new PlansCalcAreaTollRoute(network, timeCostCalc, timeCostCalc, factory, toll).run(population);
 		Fixture.compareRoutes("1 2 4 5", (CarRoute) leg1.getRoute()); // agent should take shortest route
 		Fixture.compareRoutes("6 7 9 10", (CarRoute) leg2.getRoute());
 	}
@@ -171,14 +168,13 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		Population population = Fixture.createPopulation2(network);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
-		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
-		commonRouterData.run(network);
+		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 
 		Id id1 = new IdImpl("1");
 		Leg leg1 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(1));
 		Leg leg2 = (Leg) (population.getPerson(id1).getPlans().get(0).getActsLegs().get(3));
 
-		new PlansCalcAreaTollRoute(network, commonRouterData, timeCostCalc, timeCostCalc, toll).run(population);
+		new PlansCalcAreaTollRoute(network, timeCostCalc, timeCostCalc, factory, toll).run(population);
 		Fixture.compareRoutes("1 2 4 5", (CarRoute) leg1.getRoute()); // agent should take shortest route, as tolls are not active at that time
 		Fixture.compareRoutes("6 7 9 10", (CarRoute) leg2.getRoute());
 	}

@@ -113,11 +113,6 @@ public class NodeImpl extends BasicNodeImpl implements Node {
 		this.origid = id;
 	}
 
-	@Deprecated
-	public final void setTopoType(final int topotype) {
-		this.topoType = topotype;
-	}
-
 	public final void setType(final String type) {
 		this.type = type == null ? null : type.intern();
 	}
@@ -179,11 +174,6 @@ public class NodeImpl extends BasicNodeImpl implements Node {
 		Map<Id, Node> nodes = new TreeMap<Id, Node>(getInNodes());
 		nodes.putAll(getOutNodes());
 		return nodes;
-	}
-
-	@Deprecated
-	public int getTopoType() {
-		return this.topoType;
 	}
 
 	@Override

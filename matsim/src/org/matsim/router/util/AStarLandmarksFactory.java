@@ -46,9 +46,6 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 		this.preProcessData = preProcessData;
 	}
 	
-	/**
-	 * @see org.matsim.router.util.LeastCostPathCalculatorFactory#createPathCalculator(org.matsim.network.Network, org.matsim.router.util.TravelCost, org.matsim.router.util.TravelTime)
-	 */
 	public LeastCostPathCalculator createPathCalculator(Network network,
 			TravelCost travelCosts, TravelTime travelTimes) {
 		return new AStarLandmarks(network, this.preProcessData, travelCosts, travelTimes);

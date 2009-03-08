@@ -29,9 +29,6 @@ public interface Node extends BasicNode, Comparable<Node> {
 
 	public void setOrigId(final String id);
 
-	@Deprecated
-	public void setTopoType(final int topotype);
-
 	public void setType(final String type);
 
 	public void removeInLink(final Link inlink);
@@ -49,9 +46,6 @@ public interface Node extends BasicNode, Comparable<Node> {
 	public Map<Id, ? extends Node> getOutNodes();
 
 	public Map<Id, ? extends Node> getIncidentNodes();
-
-	@Deprecated
-	public int getTopoType();
 
 	public Map<Id, ? extends Link> getInLinks();
 

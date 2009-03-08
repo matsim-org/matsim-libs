@@ -30,18 +30,18 @@ import org.matsim.router.util.TravelTime;
 
 public class ReRouteLandmarks extends ReRouteDijkstra {
 
-	private PreProcessLandmarks commonRouterData = null;
+	private final AStarLandmarksFactory factory;
 
 	public ReRouteLandmarks(Network network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterData) {
 		super(network, costCalculator, timeCalculator);
-		this.commonRouterData  = commonRouterData;
+		this.factory = new AStarLandmarksFactory(commonRouterData);
 	}
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		return new PlansCalcRoute(
-				this.network, this.costCalculator, this.timeCalculator, new AStarLandmarksFactory(this.commonRouterData));
+				this.network, this.costCalculator, this.timeCalculator, this.factory);
 	}
 
 }

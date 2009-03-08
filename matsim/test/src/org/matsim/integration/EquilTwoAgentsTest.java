@@ -119,7 +119,6 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 		controler.run();
 	}
-
 	
 	private class TestControler extends Controler {
 
@@ -130,24 +129,20 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 		@Override
 		protected Population loadPopulation() {
 			Population pop = super.loadPopulation();
-			pop.addAlgorithm(new PlanCalcType());
-			pop.runAlgorithms();
+			new PlanCalcType().run(pop);
 			PopulationWriterV5 writer = new PopulationWriterV5(pop);
 			PopulationWriter writerOld = new PopulationWriter(pop, getOutputDirectory() + "loadedPlansV4.xml", "v4");
 			try {
 				writer.writeFile(getOutputDirectory() + "loadedPlansV5.xml");
 				writerOld.write();
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 			return pop;
 		}		
 	}
-	
 
 	private class TestSingleIterationEventHandler implements LinkEnterEventHandler, ActStartEventHandler, ActEndEventHandler {
 

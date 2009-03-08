@@ -20,48 +20,52 @@
 
 package org.matsim.network.algorithms;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 
-/* See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
+/** See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
  * for a description of node types. It's the graph matching paper. */
-
 public class NetworkCalcTopoType {
 
-	public final static int EMPTY        = 0;
-	public final static int SOURCE       = 1;
-	public final static int SINK         = 2;
-	public final static int DEADEND      = 3;
-	public final static int PASS1WAY     = 4;
-	public final static int PASS2WAY     = 5;
-	public final static int START1WAY    = 6;
-	public final static int END1WAY      = 7;
-	public final static int INTERSECTION = 8;
+	public final static Integer EMPTY        = Integer.valueOf(0);
+	public final static Integer SOURCE       = Integer.valueOf(1);
+	public final static Integer SINK         = Integer.valueOf(2);
+	public final static Integer DEADEND      = Integer.valueOf(3);
+	public final static Integer PASS1WAY     = Integer.valueOf(4);
+	public final static Integer PASS2WAY     = Integer.valueOf(5);
+	public final static Integer START1WAY    = Integer.valueOf(6);
+	public final static Integer END1WAY      = Integer.valueOf(7);
+	public final static Integer INTERSECTION = Integer.valueOf(8);
+
+	private final Map<Node, Integer> topoTypePerNode = new HashMap<Node, Integer>();
 	
 	public void run(final Network network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		for (Node n : network.getNodes().values()) {
-			if (n.getIncidentLinks().size() == 0) { n.setTopoType(EMPTY); }
-			else if (n.getInLinks().size() == 0) { n.setTopoType(SOURCE); }
-			else if (n.getOutLinks().size() == 0) {n.setTopoType(SINK); }
-			else if (n.getIncidentNodes().size() == 1) { n.setTopoType(DEADEND); }
+			if (n.getIncidentLinks().size() == 0) { setTopoType(n, EMPTY); }
+			else if (n.getInLinks().size() == 0) { setTopoType(n, SOURCE); }
+			else if (n.getOutLinks().size() == 0) {setTopoType(n, SINK); }
+			else if (n.getIncidentNodes().size() == 1) { setTopoType(n, DEADEND); }
 			else if (n.getIncidentNodes().size() == 2) {
-				if ((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 1)) { n.setTopoType(PASS1WAY); }
-				else if ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 2)) { n.setTopoType(PASS2WAY); }
-				else if ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 1)) { n.setTopoType(START1WAY); }
-				else if ((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 2)) { n.setTopoType(END1WAY); }
+				if ((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 1)) { setTopoType(n, PASS1WAY); }
+				else if ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 2)) { setTopoType(n, PASS2WAY); }
+				else if ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 1)) { setTopoType(n, START1WAY); }
+				else if ((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 2)) { setTopoType(n, END1WAY); }
 				else { Gbl.errorMsg("Node=" + n.toString() + " cannot be assigned to a topo type!"); }
 			}
 			else { // more than two neighbour nodes and no sink or source
-				n.setTopoType(INTERSECTION);
+				setTopoType(n, INTERSECTION);
 			}
 		}
 
 		int [] cnt = {0,0,0,0,0,0,0,0,0};
 		for (Node n : network.getNodes().values()) {
-			cnt[n.getTopoType()]++;
+			cnt[getTopoType(n)]++;
 		}
 
 		System.out.println("      #nodes        = " + network.getNodes().size());
@@ -76,5 +80,17 @@ public class NetworkCalcTopoType {
 		System.out.println("      #INTERSECTION = " + cnt[INTERSECTION]);
 
 		System.out.println("    done.");
+	}
+	
+	private void setTopoType(final Node node, final Integer topoType) {
+		this.topoTypePerNode.put(node, topoType);
+	}
+	
+	public int getTopoType(final Node node) {
+		Integer i = this.topoTypePerNode.get(node);
+		if (i == null) {
+			return Integer.MIN_VALUE;
+		}
+		return i.intValue();
 	}
 }

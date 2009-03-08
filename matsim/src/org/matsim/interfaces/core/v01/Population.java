@@ -46,9 +46,6 @@ public interface Population extends BasicPopulation<Person> {
 	public void clearAlgorithms();
 
 	@Deprecated // "experimental", will be removed in interface
-	public boolean removeAlgorithm(final PersonAlgorithm algo);
-
-	@Deprecated // "experimental", will be removed in interface
 	public void addAlgorithm(final PersonAlgorithm algo);
 
 	@Deprecated
