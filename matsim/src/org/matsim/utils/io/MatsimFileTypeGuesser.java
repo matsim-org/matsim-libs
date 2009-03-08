@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel;
+package org.matsim.utils.io;
 
 import java.io.IOException;
 
@@ -26,7 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.matsim.utils.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -39,15 +39,20 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author mrieser
  */
 public class MatsimFileTypeGuesser extends DefaultHandler {
-
-	public enum FileType {Config, Network, Facilities, Population, World, Counts, Events, Households, TransimsVehicle, OTFVis}
+	
+	private static final Logger log = Logger
+			.getLogger(MatsimFileTypeGuesser.class);
+	/**
+	 * This enum only informs about the correct container, not about the version of the input file.
+	 */
+	public enum FileType {Config, Network, Facilities, Population, World, 
+		Counts, Events, Households, TransimsVehicle, OTFVis, SignalSystems, SignalSystemsConfig };
 
 	private FileType fileType = null;
 	private String xmlPublicId = null;
 	private String xmlSystemId = null;
 
 	public MatsimFileTypeGuesser(final String fileName) throws IOException {
-
 		String name = fileName.toLowerCase();
 		if (name.endsWith(".xml.gz") || name.toLowerCase().endsWith(".xml")) {
 			guessFileTypeXml(fileName);
@@ -125,12 +130,23 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 		} catch (EntityException e) {
 			this.xmlPublicId = e.publicId;
 			this.xmlSystemId = e.systemId;
+			log.debug("Detected public id: " + this.xmlPublicId);
+			log.debug("Detected system Id: " + this.xmlSystemId);
 		} catch (RootTagException e) {
 			if ("events".equals(e.rootTag)) {
 				this.fileType = FileType.Events;
-			} else {
-				System.out.println("got unexpected rootTag: " + e.rootTag);
+			} else if ("lightSignalSystems".equals(e.rootTag)){
+				this.fileType = FileType.SignalSystems;
+			}	else if ("lightSignalSystemConfiguration".equals(e.rootTag)){
+				this.fileType = FileType.SignalSystemsConfig;
+			} else if ("signalSystems".equals(e.rootTag)){
+				this.fileType = FileType.SignalSystems;
+			}	else if ("signalSystemConfiguration".equals(e.rootTag)){
+				this.fileType = FileType.SignalSystemsConfig;
+			}	else {
+				log.warn("got unexpected rootTag: " + e.rootTag);
 			}
+			log.debug("Detected root tag: " +  e.rootTag);
 		}
 	}
 

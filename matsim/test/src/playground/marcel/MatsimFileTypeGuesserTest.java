@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.io.MatsimFileTypeGuesser;
 
 /**
  * @author mrieser
