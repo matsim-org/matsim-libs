@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * MatsimLaneDefinitionWriter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,46 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.signalsystems;
+package org.matsim.network;
 
 import org.matsim.basic.network.BasicLaneDefinitions;
-import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.utils.io.MatsimJaxbXmlWriter;
 
+
 /**
- * Writes a light signal system definition to xml.
+ * Writes the lane definitions according to
+ * the http://www.matsim.org/files/dtd/laneDefinitions_v*.xsd
+ * grammar.
  * @author dgrether
+ *
  */
-public class MatsimLightSignalSystemsWriter {
+public class MatsimLaneDefinitionsWriter {
 	
 	private MatsimJaxbXmlWriter writerDelegate;
-	
+	 
 	/**
-	 * Use this constructor to write the default xml format.
-	 * @param basiclss
-	 * @deprecated lanedefinitions can be written separately 
+	 * Writes the file with the default format for 
+	 * LaneDefinitions within MATSim.
+	 * @param lanedefs
 	 */
-	@Deprecated 
-	public MatsimLightSignalSystemsWriter(BasicLaneDefinitions lanedefs, BasicSignalSystems basiclss) {
-		this(new LightSignalSystemsWriter10(lanedefs, basiclss));
-	}
-	
-	/**
-	 * Customize the verion of the written xml by using this constructor with
-	 * the SignalSystemsWriter of your choice (there is no specific type SignalSystemsWriter)
-	 * @param basiclss
-	 * @param writer
-	 */
-	public MatsimLightSignalSystemsWriter(MatsimJaxbXmlWriter writer){
-		this.writerDelegate = writer;
+	public MatsimLaneDefinitionsWriter(BasicLaneDefinitions lanedefs){
+		this.writerDelegate = new LaneDefinitionsWriter11(lanedefs);
 	}
 	
 	
 	public void writeFile(String filename){
 		this.writerDelegate.writeFile(filename);
 	}
-	
-	
 	
 }

@@ -20,7 +20,7 @@
 package org.matsim.signalsystems;
 
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
@@ -62,7 +62,7 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
 
   	//write the test file
-  	MatsimLightSignalSystemConfigurationWriter writer = new MatsimLightSignalSystemConfigurationWriter(lssConfigs);
+  	MatsimSignalSystemConfigurationsWriter writer = new MatsimSignalSystemConfigurationsWriter(lssConfigs);
   	writer.writeFile(testoutput);
   	
   	lssConfigs = new BasicSignalSystemConfigurationsImpl();
@@ -76,7 +76,7 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
 		//test first
 		BasicSignalSystemConfiguration lssConfiguration = lssConfigs.getSignalSystemConfigurations().get(id23);
 		assertNotNull(lssConfiguration);
-		assertEquals(id23, lssConfiguration.getLightSignalSystemId());
+		assertEquals(id23, lssConfiguration.getSignalSystemId());
 		BasicPlanBasedSignalSystemControlInfo controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfiguration.getControlInfo();
 		assertNotNull(controlInfo);
 		BasicSignalSystemPlan plan =   controlInfo.getPlans().get(id5);
@@ -84,21 +84,21 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
 		assertEquals(id5, plan.getId());
 		assertEquals(0.0, plan.getStartTime(), EPSILON);
 		assertEquals(0.0, plan.getEndTime(), EPSILON);
-		assertEquals(40.0, plan.getCirculationTime());
-		assertEquals(3.0, plan.getSyncronizationOffset());
+		assertEquals(Integer.valueOf(40), plan.getCirculationTime());
+		assertEquals(Integer.valueOf(3), plan.getSyncronizationOffset());
 		
 		assertEquals(1, plan.getGroupConfigs().size());
-		BasicSignalGroupConfiguration groupConfig = plan.getGroupConfigs().get(id23);
+		BasicSignalGroupSettings groupConfig = plan.getGroupConfigs().get(id23);
 		assertNotNull(groupConfig);
 		assertEquals(0.0, groupConfig.getRoughCast(), EPSILON);
 		assertEquals(45.0, groupConfig.getDropping(), EPSILON);
-		assertEquals(2.0, groupConfig.getInterimTimeRoughcast());
-		assertEquals(3.0, groupConfig.getInterimTimeDropping());
+		assertEquals(Integer.valueOf(2), groupConfig.getInterimTimeRoughcast());
+		assertEquals(Integer.valueOf(3), groupConfig.getInterimTimeDropping());
 		
 		//test second
 		lssConfiguration = lssConfigs.getSignalSystemConfigurations().get(id42);
 		assertNotNull(lssConfiguration);
-		assertEquals(id42, lssConfiguration.getLightSignalSystemId());
+		assertEquals(id42, lssConfiguration.getSignalSystemId());
 		controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfiguration.getControlInfo();
 		assertNotNull(controlInfo);
 		plan =   controlInfo.getPlans().get(id8);

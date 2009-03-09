@@ -26,7 +26,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.network.BasicLaneDefinitions;
+import org.matsim.basic.network.BasicLaneDefinitionsImpl;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
+import org.matsim.basic.signalsystems.BasicSignalSystemsImpl;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.basic.v01.IdImpl;
@@ -217,7 +219,7 @@ public class ScenarioData implements BasicScenario {
 	
 	public BasicLaneDefinitions getLaneDefinitions(){
 		if (this.laneDefinitions == null){
-			this.laneDefinitions = new BasicLaneDefinitions();
+			this.laneDefinitions = new BasicLaneDefinitionsImpl();
 			//TODO dg remove the warning and write a parser
 			log.warn("LaneDefinitions are not yet parsed separately!!!");
 		}
@@ -229,7 +231,7 @@ public class ScenarioData implements BasicScenario {
 			throw new IllegalStateException("SignalSystems can only be loaded if set in config");
 		}
 		if (this.signalSystems == null) {
-			this.signalSystems = new BasicSignalSystems();
+			this.signalSystems = new BasicSignalSystemsImpl();
 			MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(this.getLaneDefinitions(), this.signalSystems);
 			log.info("loading signalsystems from " + this.config.signalSystems().getSignalSystemFile());
 			reader.readFile(this.config.signalSystems().getSignalSystemFile());

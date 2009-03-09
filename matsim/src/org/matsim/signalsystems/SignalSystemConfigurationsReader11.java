@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * SignalSystemConfigurationsReader11
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,7 +17,6 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.signalsystems;
 
 import java.io.FileInputStream;
@@ -35,69 +35,68 @@ import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsBuilder;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLAdaptiveLightSignalSystemControlInfoType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalGroupConfigurationType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfig;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfigurationType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemControlInfoType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLPlanbasedlightSignalSystemControlInfoType;
+import org.matsim.jaxb.signalsystemsconfig11.XMLAdaptiveSignalSystemControlInfoType;
+import org.matsim.jaxb.signalsystemsconfig11.XMLPlanbasedSignalSystemControlInfoType;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalGroupSettingsType;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfig;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfigurationType;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemControlInfoType;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType;
 import org.matsim.utils.io.MatsimJaxbXmlParser;
 import org.xml.sax.SAXException;
 
-/**
- * Reader for the lightSignalSystemConfigurations_v1.0 file format.
- * @author dgrether
- * @deprecated use singalSystemConfigurations_v1.1 reader instead
- */
-@Deprecated
-public class LightSignalSystemConfigurationsReader10 extends MatsimJaxbXmlParser {
 
-  private XMLLightSignalSystemConfig xmlLssConfig;
+/**
+ * @author dgrether
+ *
+ */
+public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
+
+  private XMLSignalSystemConfig xmlLssConfig;
 	
   private BasicSignalSystemConfigurationsBuilder builder;
 
 	private BasicSignalSystemConfigurations lssConfigurations;
   
-	LightSignalSystemConfigurationsReader10(BasicSignalSystemConfigurations lssConfigs, String schemaLocation) {
+	public SignalSystemConfigurationsReader11(BasicSignalSystemConfigurations lssConfigs, String schemaLocation) {
 		super(schemaLocation);
 		this.lssConfigurations = lssConfigs;
-		this.builder = lssConfigs.getBuilder();
+		this.builder = this.lssConfigurations.getBuilder();
 	}
 	
 	@Override
 	public void readFile(final String filename) throws ParserConfigurationException, IOException, JAXBException, SAXException {
   	JAXBContext jc;
-			jc = JAXBContext.newInstance(org.matsim.jaxb.lightsignalsystemsconfig10.ObjectFactory.class);
+			jc = JAXBContext.newInstance(org.matsim.jaxb.signalsystemsconfig11.ObjectFactory.class);
 //			ObjectFactory fac = new ObjectFactory();
 			Unmarshaller u = jc.createUnmarshaller();
 			//validate file
 			super.validateFile(filename, u);
 			
-			xmlLssConfig = (XMLLightSignalSystemConfig)u.unmarshal( 
+			xmlLssConfig = (XMLSignalSystemConfig)u.unmarshal( 
 					new FileInputStream( filename ) );
 
 		//convert the parsed xml-instances to basic instances
-			for (XMLLightSignalSystemConfigurationType xmlLssConfiguration : xmlLssConfig.getLightSignalSystemConfiguration()){
+			for (XMLSignalSystemConfigurationType xmlLssConfiguration : xmlLssConfig.getSignalSystemConfiguration()){
 				BasicSignalSystemConfiguration blssc = builder.createSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
 				
-				XMLLightSignalSystemControlInfoType xmlcit = xmlLssConfiguration.getLightSignalSystemControlInfo();
-				if (xmlcit instanceof XMLPlanbasedlightSignalSystemControlInfoType) {
-					XMLPlanbasedlightSignalSystemControlInfoType xmlpcit = (XMLPlanbasedlightSignalSystemControlInfoType) xmlcit;
+				XMLSignalSystemControlInfoType xmlcit = xmlLssConfiguration.getSignalSystemControlInfo();
+				if (xmlcit instanceof XMLPlanbasedSignalSystemControlInfoType) {
+					XMLPlanbasedSignalSystemControlInfoType xmlpcit = (XMLPlanbasedSignalSystemControlInfoType) xmlcit;
 					
 					BasicPlanBasedSignalSystemControlInfo controlInfo = builder.createPlanBasedSignalSystemControlInfo();
 					
-					for (XMLLightSignalSystemPlanType xmlplan : xmlpcit.getLightSignalSystemPlan()) {
+					for (XMLSignalSystemPlanType xmlplan : xmlpcit.getSignalSystemPlan()) {
 						BasicSignalSystemPlan plan = builder.createSignalSystemPlan(new IdImpl(xmlplan.getId()));					
 						plan.setStartTime(getSeconds(xmlplan.getStart().getDaytime()));
 						plan.setEndTime(getSeconds(xmlplan.getStop().getDaytime()));
 						if (xmlplan.getCirculationTime() != null) {
-							plan.setCirculationTime((int)xmlplan.getCirculationTime().getSeconds());
+							plan.setCirculationTime(xmlplan.getCirculationTime().getSec());
 						}
 						if (xmlplan.getSyncronizationOffset() != null) {
-							plan.setSyncronizationOffset((int)xmlplan.getSyncronizationOffset().getSeconds());
+							plan.setSyncronizationOffset(xmlplan.getSyncronizationOffset().getSec());
 						}
-						for (XMLLightSignalGroupConfigurationType xmlgroupconfig : xmlplan.getLightSignalGroupConfiguration()) {
+						for (XMLSignalGroupSettingsType xmlgroupconfig : xmlplan.getSignalGroupSettings()) {
 							BasicSignalGroupSettings groupConfig = builder.createSignalGroupSettings(new IdImpl(xmlgroupconfig.getRefId()));
 							groupConfig.setRoughCast(xmlgroupconfig.getRoughcast().getSec());
 							groupConfig.setDropping(xmlgroupconfig.getDropping().getSec());
@@ -113,8 +112,9 @@ public class LightSignalSystemConfigurationsReader10 extends MatsimJaxbXmlParser
 					}
 					blssc.setSignalSystemControlInfo(controlInfo);
 				}
-				else if (xmlcit instanceof XMLAdaptiveLightSignalSystemControlInfoType) {
-					throw new UnsupportedOperationException("Implemented in version 1.1 of data format, please convert!");
+				else if (xmlcit instanceof XMLAdaptiveSignalSystemControlInfoType) {
+					//TODO implement adaptive control
+					throw new UnsupportedOperationException("has to be implemented!");
 				}
 				
 				this.lssConfigurations.getSignalSystemConfigurations().put(blssc.getSignalSystemId(), blssc);
@@ -127,5 +127,5 @@ public class LightSignalSystemConfigurationsReader10 extends MatsimJaxbXmlParser
 		sec += daytime.getSecond();
 		return sec;
 	}
-	
+
 }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,83 +16,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.basic.signalsystemsconfig;
 
 import org.matsim.interfaces.basic.v01.Id;
-
 /**
+ * 
  * @author dgrether
+ *
  */
-public class BasicSignalGroupConfiguration {
+public interface BasicSignalGroupSettings {
 
-	private Id referencedSignalGroupId;
+	public Integer getRoughCast();
 
+	public void setRoughCast(Integer roughCast);
 
-	private double roughCast;
-	private double dropping;
+	public Integer getDropping();
 
-	private Double interimTimeRoughcast = null;
-	private Double interimTimeDropping = null;
-	
-	
-	public BasicSignalGroupConfiguration(Id referencedSignalGroupId) {
-		this.referencedSignalGroupId = referencedSignalGroupId;
-	}
+	public void setDropping(Integer dropping);
 
+	public Integer getInterimTimeRoughcast();
 
-	
-	public double getRoughCast() {
-		return roughCast;
-	}
+	public void setInterimTimeRoughcast(Integer interimTimeRoughcast);
 
+	public Integer getInterimTimeDropping();
 
-	
-	public void setRoughCast(double roughCast) {
-		this.roughCast = roughCast;
-	}
+	public void setInterimTimeDropping(Integer interimTimeDropping);
 
-
-	
-	public double getDropping() {
-		return dropping;
-	}
-
-
-	
-	public void setDropping(double dropping) {
-		this.dropping = dropping;
-	}
-
-
-	
-	public Double getInterimTimeRoughcast() {
-		return interimTimeRoughcast;
-	}
-
-
-	
-	public void setInterimTimeRoughcast(Double interimTimeRoughcast) {
-		this.interimTimeRoughcast = interimTimeRoughcast;
-	}
-
-
-	
-	public Double getInterimTimeDropping() {
-		return interimTimeDropping;
-	}
-
-
-	
-	public void setInterimTimeDropping(Double interimTimeDropping) {
-		this.interimTimeDropping = interimTimeDropping;
-	}
-
-
-	
-	public Id getReferencedSignalGroupId() {
-		return referencedSignalGroupId;
-	}
-	
+	public Id getReferencedSignalGroupId();
 
 }

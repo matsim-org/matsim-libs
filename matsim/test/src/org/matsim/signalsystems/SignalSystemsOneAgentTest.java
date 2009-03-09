@@ -22,7 +22,7 @@ package org.matsim.signalsystems;
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
@@ -90,8 +90,8 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 					.getControlInfo();
 			BasicSignalSystemPlan p = controlInfo.getPlans()
 					.get(new IdImpl("2"));
-			p.setCirculationTime(60.0);
-			BasicSignalGroupConfiguration group = p.getGroupConfigs().get(
+			p.setCirculationTime(60);
+			BasicSignalGroupSettings group = p.getGroupConfigs().get(
 					new IdImpl("100"));
 			group.setDropping(60);
 		}

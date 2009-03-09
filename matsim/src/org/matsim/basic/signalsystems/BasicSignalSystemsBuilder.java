@@ -17,41 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.signalsystems;
+package org.matsim.basic.signalsystems;
 
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
-import org.matsim.utils.io.MatsimJaxbXmlWriter;
-
+import org.matsim.interfaces.basic.v01.Id;
 
 /**
- * Writes a light signal system definition to xml.
+ * Builder for Objects to be used within BasicSignalSystems container
+ * Even if more a Factory t
+ * his class is called builder to be consistent with ohter
+ * MATSim container content builders which are in fact builder due to their more
+ * complex build behavior. 
  * @author dgrether
  */
-public class MatsimLightSignalSystemConfigurationWriter {
+public class BasicSignalSystemsBuilder {
 	
-	private MatsimJaxbXmlWriter writerDelegate;
+	BasicSignalSystemsBuilder(){}
 	
-	/**
-	 * Use this constructor to write the default xml format.
-	 * @param basiclss
-	 */
-	public MatsimLightSignalSystemConfigurationWriter(BasicSignalSystemConfigurations basiclss) {
-		this(new LightSignalSystemConfigurationsWriter10(basiclss));
-	}
-	
-	/**
-	 * Customize the verion of the written xml by using this constructor with
-	 * the SignalSystemsWriter of your choice (there is no specific type SignalSystemsWriter)
-	 * @param basiclss
-	 * @param writer
-	 */
-	public MatsimLightSignalSystemConfigurationWriter(MatsimJaxbXmlWriter writer){
-		this.writerDelegate = writer;
-	}
-	
-	
-	public void writeFile(String filename){
-		this.writerDelegate.writeFile(filename);
+	public BasicSignalSystemDefinition createLightSignalSystemDefinition(
+			Id id) {
+		return new BasicSignalSystemDefinitionImpl(id);
 	}
 
+	public BasicSignalGroupDefinition createLightSignalGroupDefinition(
+			Id linkRefId, Id id) {
+		return new BasicSignalGroupDefinitionImpl(linkRefId, id);
+	}
+	
 }

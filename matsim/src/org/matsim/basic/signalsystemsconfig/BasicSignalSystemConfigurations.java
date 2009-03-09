@@ -30,6 +30,9 @@ import org.matsim.interfaces.basic.v01.Id;
  *
  */
 public interface BasicSignalSystemConfigurations {
+	
+	
+	public BasicSignalSystemConfigurationsBuilder getBuilder();
 	/**
 	 * 
 	 * @return a map containing all signal system configurations organized 

@@ -32,6 +32,8 @@ import org.matsim.interfaces.basic.v01.Id;
 public class BasicSignalSystemConfigurationsImpl implements
 		BasicSignalSystemConfigurations {
 
+	private BasicSignalSystemConfigurationsBuilder builder = new BasicSignalSystemConfigurationsBuilder();
+	
 	private Map<Id, BasicSignalSystemConfiguration> signalSystemConfigs = new HashMap<Id, BasicSignalSystemConfiguration>();
 
 	public BasicSignalSystemConfigurationsImpl(){
@@ -42,6 +44,10 @@ public class BasicSignalSystemConfigurationsImpl implements
 	 */
 	public Map<Id, BasicSignalSystemConfiguration> getSignalSystemConfigurations() {
 		return this.signalSystemConfigs;
+	}
+
+	public BasicSignalSystemConfigurationsBuilder getBuilder() {
+		return this.builder;
 	}
 
 }

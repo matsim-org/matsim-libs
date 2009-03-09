@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatsimSignalSystemConfigurationReader
+ * MatsimLaneDefinitionReader
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems;
+package org.matsim.network;
 
 import java.io.IOException;
 
@@ -25,57 +25,51 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
+import org.matsim.basic.network.BasicLaneDefinitions;
 import org.matsim.utils.io.MatsimFileTypeGuesser;
 import org.matsim.utils.io.MatsimJaxbXmlParser;
 import org.xml.sax.SAXException;
 
 
 /**
- * Reader for (Light)SignalSystemConfigurations and the corresponding
- * file format (light)signalSystemConfigurations_v1.*.xsd. The correct parser is 
- * selected automatically if the xml file has a correct header.
  * @author dgrether
  *
  */
-public class MatsimSignalSystemConfigurationReader {
-
+public class MatsimLaneDefinitionsReader {
+	
 	private static final Logger log = Logger
-			.getLogger(MatsimSignalSystemConfigurationReader.class);
+			.getLogger(MatsimLaneDefinitionsReader.class);
+	
+	public static final String SCHEMALOCATIONV11 = "http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd";
+	
+	private BasicLaneDefinitions laneDefinitions;
 
-	public static final String SIGNALSYSTEMSCONFIG10 = "http://www.matsim.org/files/dtd/lightSignalSystemsConfig_v1.0.xsd";
-
-	public static final String SIGNALSYSTEMSCONFIG11 = "http://www.matsim.org/files/dtd/signalSystemsConfig_v1.0.xsd";
-
-	private BasicSignalSystemConfigurations lightSignalSystemConfigs;
-
-
-	public MatsimSignalSystemConfigurationReader(BasicSignalSystemConfigurations lssConfigs) {
-		this.lightSignalSystemConfigs = lssConfigs;
+	/**
+	 * @param laneDefs
+	 */
+	public MatsimLaneDefinitionsReader(BasicLaneDefinitions laneDefs) {
+		this.laneDefinitions = laneDefs;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void readFile(final String filename) {
 		try {
 			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(
 					filename);
 			String sid = fileTypeGuesser.getSystemId();
+			
 			MatsimJaxbXmlParser reader = null;
 			if (sid != null) {
-				if (sid.compareTo(SIGNALSYSTEMSCONFIG10) == 0) {
-					reader = new LightSignalSystemConfigurationsReader10(this.lightSignalSystemConfigs, sid);
-					log.info("Using LightSignalSystemConfigurationsReader11 ...");
-					log.warn("This file format is deprecated, use signalSystemsConfig_v1.1.xsd instead");
-				}
-				else if (sid.compareTo(SIGNALSYSTEMSCONFIG11)== 0){
-					reader = new SignalSystemConfigurationsReader11(this.lightSignalSystemConfigs, sid);
-					log.info("Using SignalSystemConfigurationsReader11 .. ");
+				log.debug("creating parser for system id: " + sid);
+				if (sid.compareTo(SCHEMALOCATIONV11) == 0) {
+					reader = new LaneDefinitionsReader11(this.laneDefinitions, sid);
+					log.info("Using LaneDefinitionReader11...");
 				}
 			}
 			else {
-				throw new IllegalArgumentException(
-						"System Id of xml document couldn't be detected. Make shure that you try to read a xml document with a valid header.");
+				log.error(MatsimFileTypeGuesser.SYSTEMIDNOTFOUNDMESSAGE);
+				throw new IllegalArgumentException(MatsimFileTypeGuesser.SYSTEMIDNOTFOUNDMESSAGE);
 			}
+			log.debug("reading file " + filename);
 			reader.readFile(filename);
 		} catch (JAXBException e) {
 			e.printStackTrace();
@@ -88,4 +82,8 @@ public class MatsimSignalSystemConfigurationReader {
 		}
 
 	}
+
+	
+	
+	
 }

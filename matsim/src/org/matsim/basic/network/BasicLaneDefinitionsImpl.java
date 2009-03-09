@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicLaneDefinitions
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,20 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.basic.signalsystemsconfig;
+package org.matsim.basic.network;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.interfaces.basic.v01.Id;
+
 /**
- * 
  * @author dgrether
  *
  */
-public interface BasicPlanBasedSignalSystemControlInfo extends BasicSignalSystemControlInfo {
+public class BasicLaneDefinitionsImpl implements BasicLaneDefinitions {
+	
+	private List<BasicLanesToLinkAssignment> lanesToLinkAssignments;
 
-	public Map<Id, BasicSignalSystemPlan> getPlans();
+	private BasicLaneDefinitionsBuilder builder = new BasicLaneDefinitionsBuilderImpl();
+	
+	/**
+	 * @see org.matsim.basic.network.BasicLaneDefinitions#getLanesToLinkAssignments()
+	 */
+	public List<BasicLanesToLinkAssignment> getLanesToLinkAssignments() {
+		return lanesToLinkAssignments;
+	}
 
-	public void addPlan(BasicSignalSystemPlan plan);
-
+	/**
+	 * @see org.matsim.basic.network.BasicLaneDefinitions#addLanesToLinkAssignment(org.matsim.basic.network.BasicLanesToLinkAssignment)
+	 */
+	public void addLanesToLinkAssignment(BasicLanesToLinkAssignment assignment) {
+		if (this.lanesToLinkAssignments == null) {
+			this.lanesToLinkAssignments = new ArrayList<BasicLanesToLinkAssignment>();
+		}
+		this.lanesToLinkAssignments.add(assignment);
+	}
+	
+	/**
+	 * @see org.matsim.basic.network.BasicLaneDefinitions#getLaneDefinitionBuilder()
+	 */
+	public BasicLaneDefinitionsBuilder getLaneDefinitionBuilder(){
+		return this.builder;
+	}
 }

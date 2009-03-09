@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,37 +16,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.basic.signalsystemsconfig;
 
 import org.matsim.interfaces.basic.v01.Id;
-
 /**
+ * 
  * @author dgrether
+ *
  */
-public class BasicSignalSystemConfiguration {
+public interface BasicSignalSystemConfiguration {
 
-	private final Id lightSignalSystemId;
+	public void setSignalSystemControlInfo(
+			final BasicSignalSystemControlInfo controlInfo);
 
-	private BasicPlanBasedSignalSystemControlInfo controlInfo;
+	public Id getSignalSystemId();
 
-	public BasicSignalSystemConfiguration(final Id lightSignalSystemId) {
-		this.lightSignalSystemId = lightSignalSystemId;
-	}
-
-	public void setLightSignalSystemControlInfo(
-			final BasicPlanBasedSignalSystemControlInfo controlInfo) {
-		this.controlInfo = controlInfo;
-	}
-
-	public Id getLightSignalSystemId() {
-		return this.lightSignalSystemId;
-	}
-
-	public BasicSignalSystemControlInfo getControlInfo() {
-		return this.controlInfo;
-	}
-
-
+	public BasicSignalSystemControlInfo getControlInfo();
 
 }

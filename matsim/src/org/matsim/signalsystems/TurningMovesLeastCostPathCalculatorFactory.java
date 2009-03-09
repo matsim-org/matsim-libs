@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * TurningMovesLeastCostPathCalculatorFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,35 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.signalsystems;
 
-package org.matsim.basic.signalsystems;
+import org.matsim.interfaces.core.v01.Network;
+import org.matsim.router.util.LeastCostPathCalculator;
+import org.matsim.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 
-import org.matsim.basic.network.BasicLaneImpl;
-import org.matsim.basic.network.BasicLanesToLinkAssignment;
-import org.matsim.basic.network.BasicLanesToLinkAssignmentImpl;
-import org.matsim.interfaces.basic.v01.Id;
 
 /**
  * @author dgrether
+ *
  */
-public class BasicSignalSystemsFactory {
-	
-	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id id) {
-		return new BasicLanesToLinkAssignmentImpl(id);
-	}
+public class TurningMovesLeastCostPathCalculatorFactory implements
+		LeastCostPathCalculatorFactory {
 
-	public BasicLaneImpl createLane(Id id) {
-		return new BasicLaneImpl(id);
-	}
-
-	public BasicSignalSystemDefinition createLightSignalSystemDefinition(
-			Id id) {
-		return new BasicSignalSystemDefinitionImpl(id);
-	}
-
-	public BasicSignalGroupDefinition createLightSignalGroupDefinition(
-			Id linkRefId, Id id) {
-		return new BasicSignalGroupDefinitionImpl(linkRefId, id);
+	public TurningMovesLeastCostPathCalculatorFactory(){
+		
 	}
 	
+	/**
+	 * @see org.matsim.router.util.LeastCostPathCalculatorFactory#createPathCalculator(org.matsim.interfaces.core.v01.Network, org.matsim.router.util.TravelCost, org.matsim.router.util.TravelTime)
+	 */
+	public LeastCostPathCalculator createPathCalculator(Network network,
+			TravelCost travelCosts, TravelTime travelTimes) {
+
+		
+		return null;
+	}
+
 }

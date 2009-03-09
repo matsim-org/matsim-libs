@@ -26,10 +26,12 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.basic.network.BasicLaneDefinitions;
+import org.matsim.basic.network.BasicLaneDefinitionsImpl;
 import org.matsim.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
+import org.matsim.basic.signalsystems.BasicSignalSystemsImpl;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
@@ -70,8 +72,8 @@ public class QSim extends QueueSimulation {
 		this.useOTF = useOTF;
 	}
 	private void readSignalSystemControler(){
-		BasicLaneDefinitions lanedef = new BasicLaneDefinitions();
-		BasicSignalSystems newSignalSystems = new BasicSignalSystems();
+		BasicLaneDefinitions lanedef = new BasicLaneDefinitionsImpl();
+		BasicSignalSystems newSignalSystems = new BasicSignalSystemsImpl();
 		MatsimSignalSystemsReader lsaReader = new MatsimSignalSystemsReader(lanedef, newSignalSystems);
 
 		BasicSignalSystemConfigurations newSignalSystemsConfig = new BasicSignalSystemConfigurationsImpl();
@@ -92,7 +94,7 @@ public class QSim extends QueueSimulation {
 		if (null != this.newLSADefCfg) {
 			for (BasicSignalSystemConfiguration basicLightSignalSystemConfiguration : newSignalSystemsConfig.getSignalSystemConfigurations().values()) {
 				NewSignalSystemControlerImpl newLSAControler = new NewSignalSystemControlerImpl(basicLightSignalSystemConfiguration);
-				sortedLSAControlerMap.put(basicLightSignalSystemConfiguration.getLightSignalSystemId(), newLSAControler);
+				sortedLSAControlerMap.put(basicLightSignalSystemConfiguration.getSignalSystemId(), newLSAControler);
 			}
 			
 			// Set the defaultCirculationTime for every SignalLightControler

@@ -24,8 +24,11 @@ import org.matsim.replanning.selectors.RandomPlanSelector;
 
 /**
  * @author dgrether
- * 
+ * @deprecated this class is no longer needed due to new routing infrastructure
+ * where a common LeastCostPathCalculator is used that is to be set in the 
+ * Controler
  */
+@Deprecated
 public class SignalSystemRoutePlanStrategy extends PlanStrategy {
 
 	public SignalSystemRoutePlanStrategy(Controler controler) {

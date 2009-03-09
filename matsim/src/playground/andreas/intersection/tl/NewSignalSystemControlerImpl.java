@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
-import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
@@ -44,7 +44,7 @@ public class NewSignalSystemControlerImpl extends SignalSystemControler {
 		
 		int currentSecondInPlan = 1 + ((int) (SimulationTimer.getTime() % this.defaultCirculationTime));
 		
-		BasicSignalGroupConfiguration tempSGConfig = this.activePlan.getGroupConfigs().get(signalGroup.getId());
+		BasicSignalGroupSettings tempSGConfig = this.activePlan.getGroupConfigs().get(signalGroup.getId());
 		if ( (tempSGConfig.getRoughCast() < currentSecondInPlan) && (currentSecondInPlan <= tempSGConfig.getDropping())){
 			// Debug only
 //			System.out.println("green " + signalGroupSetting.getSignalGroupDefinition().toString());

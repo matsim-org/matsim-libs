@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicLaneDefinitionBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,32 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.basic.signalsystemsconfig;
+package org.matsim.basic.network;
 
 import org.matsim.interfaces.basic.v01.Id;
 
+
 /**
  * @author dgrether
+ *
  */
-public class BasicSignalSystemsConfigFactory {
+public interface BasicLaneDefinitionsBuilder {
 
-	public BasicSignalSystemConfiguration createLightSignalSystemConfiguration(
-			Id refId) {
-		return new BasicSignalSystemConfiguration(refId);
-	}
+	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id id);
 
-	public BasicPlanBasedSignalSystemControlInfo createPlanBasedLightSignalSystemControlInfo() {
-		return new BasicPlanBasedSignalSystemControlInfo();
-	}
-
-	public BasicSignalSystemPlan createLightSignalSystemPlan(Id id) {
-		return new BasicSignalSystemPlan(id);
-	}
-
-	public BasicSignalGroupConfiguration createLightSignalGroupConfiguration(
-			Id refid) {
-		return new BasicSignalGroupConfiguration(refid);
-	}
-
+	public BasicLane createLane(Id id);
 }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,20 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.basic.signalsystemsconfig;
 
-import java.util.Map;
-
 import org.matsim.interfaces.basic.v01.Id;
+
 /**
- * 
  * @author dgrether
- *
  */
-public interface BasicPlanBasedSignalSystemControlInfo extends BasicSignalSystemControlInfo {
+public class BasicSignalSystemConfigurationsBuilder {
 
-	public Map<Id, BasicSignalSystemPlan> getPlans();
+	BasicSignalSystemConfigurationsBuilder(){}
+	
+	public BasicSignalSystemConfiguration createSignalSystemConfiguration(
+			Id refId) {
+		return new BasicSignalSystemConfigurationImpl(refId);
+	}
 
-	public void addPlan(BasicSignalSystemPlan plan);
+	public BasicPlanBasedSignalSystemControlInfo createPlanBasedSignalSystemControlInfo() {
+		return new BasicPlanBasedSignalSystemControlInfoImpl();
+	}
+
+	public BasicSignalSystemPlan createSignalSystemPlan(Id id) {
+		return new BasicSignalSystemPlanImpl(id);
+	}
+
+	public BasicSignalGroupSettings createSignalGroupSettings(
+			Id refid) {
+		return new BasicSignalGroupSettingsImpl(refid);
+	}
 
 }

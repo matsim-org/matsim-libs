@@ -28,13 +28,14 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.network.BasicLaneImpl;
+import org.matsim.basic.network.BasicLane;
 import org.matsim.basic.network.BasicLaneDefinitions;
+import org.matsim.basic.network.BasicLaneDefinitionsBuilder;
 import org.matsim.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
-import org.matsim.basic.signalsystems.BasicSignalSystemsFactory;
+import org.matsim.basic.signalsystems.BasicSignalSystemsBuilder;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.jaxb.lightsignalsystems10.ObjectFactory;
 import org.matsim.jaxb.lightsignalsystems10.XMLIdRefType;
@@ -58,15 +59,18 @@ public class LightSignalSystemsReader10 extends MatsimJaxbXmlParser {
 	private BasicSignalSystems lightSignalSystems;
 	private BasicLaneDefinitions laneDefinitions;
 
-	private BasicSignalSystemsFactory factory = new BasicSignalSystemsFactory();
+	private BasicSignalSystemsBuilder builder;
+
+	private BasicLaneDefinitionsBuilder laneBuilder;
 
 
-
-	public LightSignalSystemsReader10(BasicLaneDefinitions laneDefs,
+	LightSignalSystemsReader10(BasicLaneDefinitions laneDefs,
 			BasicSignalSystems lightSignalSystems, String schemaLocation) {
 		super(schemaLocation);
 		this.laneDefinitions = laneDefs;
 		this.lightSignalSystems = lightSignalSystems;
+		this.laneBuilder = this.laneDefinitions.getLaneDefinitionBuilder();
+		this.builder = this.lightSignalSystems.getSignalSystemsBuilder();
 	}
 
 	@Override
@@ -86,13 +90,13 @@ public class LightSignalSystemsReader10 extends MatsimJaxbXmlParser {
 
 			//convert the parsed xml-instances to basic instances
 			BasicLanesToLinkAssignment l2lAssignment;
-			BasicLaneImpl lane = null;
+			BasicLane lane = null;
 			for (XMLLanesToLinkAssignmentType lldef : xmlLssDefinition
 					.getLanesToLinkAssignment()) {
-				l2lAssignment = factory.createLanesToLinkAssignment(new IdImpl(lldef
+				l2lAssignment = laneBuilder.createLanesToLinkAssignment(new IdImpl(lldef
 						.getLinkIdRef()));
 				for (XMLLaneType laneType : lldef.getLane()) {
-					lane = factory.createLane(new IdImpl(laneType.getId()));
+					lane = laneBuilder.createLane(new IdImpl(laneType.getId()));
 					for (XMLIdRefType toLinkId : laneType.getToLink()) {
 						lane.addToLinkId(new IdImpl(toLinkId.getRefId()));
 					}
@@ -114,7 +118,7 @@ public class LightSignalSystemsReader10 extends MatsimJaxbXmlParser {
 			BasicSignalSystemDefinition lssdef;
 			for (XMLLightSignalSystemDefinitionType xmllssDef : xmlLssDefinition
 					.getLightSignalSystemDefinition()) {
-				lssdef = factory.createLightSignalSystemDefinition(new IdImpl(xmllssDef
+				lssdef = builder.createLightSignalSystemDefinition(new IdImpl(xmllssDef
 						.getId()));
 				lssdef.setDefaultCirculationTime(xmllssDef.getDefaultCirculationTime()
 						.getSeconds());
@@ -128,7 +132,7 @@ public class LightSignalSystemsReader10 extends MatsimJaxbXmlParser {
 			BasicSignalGroupDefinition lsgdef;
 			for (XMLLightSignalGroupDefinitionType xmllsgdef : xmlLssDefinition
 					.getLightSignalGroupDefinition()) {
-				lsgdef = factory.createLightSignalGroupDefinition(new IdImpl(xmllsgdef
+				lsgdef = builder.createLightSignalGroupDefinition(new IdImpl(xmllsgdef
 						.getLinkIdRef()), new IdImpl(xmllsgdef.getId()));
 				lsgdef.setLightSignalSystemDefinitionId(new IdImpl(xmllsgdef
 						.getLightSignalSystemDefinition().getRefId()));

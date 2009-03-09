@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LightSignalSystems10Writer
+ * LightSignalSystemsWriter11
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -27,44 +27,35 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.network.BasicLane;
-import org.matsim.basic.network.BasicLaneDefinitions;
-import org.matsim.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.jaxb.lightsignalsystems10.ObjectFactory;
-import org.matsim.jaxb.lightsignalsystems10.XMLIdRefType;
-import org.matsim.jaxb.lightsignalsystems10.XMLLaneType;
-import org.matsim.jaxb.lightsignalsystems10.XMLLanesToLinkAssignmentType;
-import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalGroupDefinitionType;
-import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystemDefinitionType;
-import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystems;
-import org.matsim.jaxb.lightsignalsystems10.XMLMatsimTimeAttributeType;
+import org.matsim.jaxb.signalsystems11.ObjectFactory;
+import org.matsim.jaxb.signalsystems11.XMLIdRefType;
+import org.matsim.jaxb.signalsystems11.XMLMatsimTimeAttributeType;
+import org.matsim.jaxb.signalsystems11.XMLSignalGroupDefinitionType;
+import org.matsim.jaxb.signalsystems11.XMLSignalSystemDefinitionType;
+import org.matsim.jaxb.signalsystems11.XMLSignalSystems;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.io.MatsimJaxbXmlWriter;
 
 
 /**
- * Writer for the lightSignalSystems_v1.0.xsd file format.
  * @author dgrether
- * @deprecated use 1.1 writer 
+ *
  */
-@Deprecated
-public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
+public class SignalSystemsWriter11 extends MatsimJaxbXmlWriter {
 
 	private static final Logger log = Logger
-			.getLogger(LightSignalSystemsWriter10.class);
+			.getLogger(SignalSystemsWriter11.class);
 	
 	private BasicSignalSystems blss;
 
-	private XMLLightSignalSystems xmlLightSignalSystems;
+	private XMLSignalSystems xmlLightSignalSystems;
 
-	private BasicLaneDefinitions lanes;
 
-	LightSignalSystemsWriter10(BasicLaneDefinitions lanes, BasicSignalSystems basiclss) {
-		this.lanes = lanes;
+	SignalSystemsWriter11(BasicSignalSystems basiclss) {
 		this.blss = basiclss;
 		this.xmlLightSignalSystems = convertBasicToXml();
 	}	
@@ -74,9 +65,9 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 		log.info("writing file: " + filename);
   	JAXBContext jc;
 		try {
-			jc = JAXBContext.newInstance(org.matsim.jaxb.lightsignalsystems10.ObjectFactory.class);
+			jc = JAXBContext.newInstance(org.matsim.jaxb.signalsystems11.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
-			super.setMarshallerProperties(MatsimSignalSystemsReader.SIGNALSYSTEMS10, m);
+			super.setMarshallerProperties(MatsimSignalSystemsReader.SIGNALSYSTEMS11, m);
 			m.marshal(this.xmlLightSignalSystems, IOUtils.getBufferedWriter(filename)); 
 		} catch (JAXBException e) {
 			e.printStackTrace();
@@ -88,40 +79,13 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 	}
 	
 	
-	private XMLLightSignalSystems convertBasicToXml() {
+	private XMLSignalSystems convertBasicToXml() {
 		ObjectFactory fac = new ObjectFactory();
-		XMLLightSignalSystems xmllss = fac.createXMLLightSignalSystems();
-		
-		for (BasicLanesToLinkAssignment ltla : this.lanes.getLanesToLinkAssignments()) {
-			XMLLanesToLinkAssignmentType xmlltla = fac.createXMLLanesToLinkAssignmentType();
-			xmlltla.setLinkIdRef(ltla.getLinkId().toString());
-			
-			for (BasicLane bl : ltla.getLanes()) {
-				XMLLaneType xmllane = fac.createXMLLaneType();
-				xmllane.setId(bl.getId().toString());
-				
-				for (Id id : bl.getToLinkIds()) {
-					XMLIdRefType xmlToLink = fac.createXMLIdRefType();
-					xmlToLink.setRefId(id.toString());
-					xmllane.getToLink().add(xmlToLink);
-				}
-
-				XMLLaneType.XMLRepresentedLanes lanes = new XMLLaneType.XMLRepresentedLanes();
-				lanes.setNumber(Integer.valueOf(bl.getNumberOfRepresentedLanes()));
-				xmllane.setRepresentedLanes(lanes);
-				
-				XMLLaneType.XMLLength length = new XMLLaneType.XMLLength();
-				length.setMeter(Double.valueOf(bl.getLength()));
-				xmllane.setLength(length);
-				
-				xmlltla.getLane().add(xmllane);
-			}
-			xmllss.getLanesToLinkAssignment().add(xmlltla);
-		} //end writing lanesToLinkAssignments
+		XMLSignalSystems xmllss = fac.createXMLSignalSystems();
 		
 		//writing lightSignalSystemDefinitions
 		for (BasicSignalSystemDefinition lssd : this.blss.getSignalSystemDefinitions()) {
-			XMLLightSignalSystemDefinitionType xmllssd = fac.createXMLLightSignalSystemDefinitionType();
+			XMLSignalSystemDefinitionType xmllssd = fac.createXMLSignalSystemDefinitionType();
 			xmllssd.setId(lssd.getId().toString());
 			
 			XMLMatsimTimeAttributeType xmlcirculationtime = fac.createXMLMatsimTimeAttributeType();
@@ -136,18 +100,18 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 			xmlinterimtime.setSeconds(lssd.getDefaultInterimTime());
 			xmllssd.setDefaultInterimTime(xmlinterimtime);
 			
-			xmllss.getLightSignalSystemDefinition().add(xmllssd);
+			xmllss.getSignalSystemDefinition().add(xmllssd);
 		}
 		
 		//writing lightSignalGroupDefinitions
 		for (BasicSignalGroupDefinition lsgd : this.blss.getSignalGroupDefinitions()) {
-			XMLLightSignalGroupDefinitionType xmllsgd = fac.createXMLLightSignalGroupDefinitionType();
+			XMLSignalGroupDefinitionType xmllsgd = fac.createXMLSignalGroupDefinitionType();
 			xmllsgd.setLinkIdRef(lsgd.getLinkRefId().toString());
 			xmllsgd.setId(lsgd.getId().toString());
 			
 			XMLIdRefType lssdef = fac.createXMLIdRefType();
 			lssdef.setRefId(lsgd.getLightSignalSystemDefinitionId().toString());
-			xmllsgd.setLightSignalSystemDefinition(lssdef);
+			xmllsgd.setSignalSystemDefinition(lssdef);
 			
 			for (Id laneid : lsgd.getLaneIds()) {
 				XMLIdRefType xmllaneid = fac.createXMLIdRefType();
@@ -161,7 +125,7 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 				xmllsgd.getToLink().add(xmltolinkid);
 			}
 			
-			xmllss.getLightSignalGroupDefinition().add(xmllsgd);
+			xmllss.getSignalGroupDefinition().add(xmllsgd);
 		}
 		return xmllss;
 	}

@@ -24,10 +24,12 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.basic.network.BasicLane;
 import org.matsim.basic.network.BasicLaneDefinitions;
+import org.matsim.basic.network.BasicLaneDefinitionsImpl;
 import org.matsim.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
+import org.matsim.basic.signalsystems.BasicSignalSystemsImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
@@ -57,8 +59,8 @@ public class SignalSystemsReaderWriterTest extends MatsimTestCase {
   private Id id42 = new IdImpl("42");
   
   public void testParser() throws IOException {
-  	BasicLaneDefinitions laneDefs = new BasicLaneDefinitions();
-  	BasicSignalSystems lss = new BasicSignalSystems();
+  	BasicLaneDefinitions laneDefs = new BasicLaneDefinitionsImpl();
+  	BasicSignalSystems lss = new BasicSignalSystemsImpl();
   	MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(laneDefs, lss);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
   	
@@ -69,20 +71,20 @@ public class SignalSystemsReaderWriterTest extends MatsimTestCase {
   	String testoutput = this.getOutputDirectory()  + "testLssOutput.xml";
   	log.debug("reading file...");
   	//read the test file
-  	BasicSignalSystems lss = new BasicSignalSystems();
-  	BasicLaneDefinitions laneDefs = new BasicLaneDefinitions();
+  	BasicSignalSystems lss = new BasicSignalSystemsImpl();
+  	BasicLaneDefinitions laneDefs = new BasicLaneDefinitionsImpl();
   	MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(laneDefs, lss);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
   	
   	
   	//write the test file
   	log.debug("write the test file...");
-  	MatsimLightSignalSystemsWriter writer = new MatsimLightSignalSystemsWriter(laneDefs, lss);
+  	MatsimSignalSystemsWriter writer = new MatsimSignalSystemsWriter(laneDefs, lss);
   	writer.writeFile(testoutput);
   	
   	log.debug("and read it again");
-  	lss = new BasicSignalSystems();
-  	laneDefs = new BasicLaneDefinitions();
+  	lss = new BasicSignalSystemsImpl();
+  	laneDefs = new BasicLaneDefinitionsImpl();
   	reader = new MatsimSignalSystemsReader(laneDefs, lss);
   	reader.readFile(testoutput);
   	checkContent(laneDefs, lss);

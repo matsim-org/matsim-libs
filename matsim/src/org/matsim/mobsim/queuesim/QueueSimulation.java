@@ -200,15 +200,15 @@ public class QueueSimulation {
 			//TODO consider adaptive controlers
 			//create the controler
 			PlanBasedSignalSystemControler controler = new PlanBasedSignalSystemControler(config);
-			this.signalSystemControlerBySystemId.put(config.getLightSignalSystemId(), controler);
+			this.signalSystemControlerBySystemId.put(config.getSignalSystemId(), controler);
 			
-			BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getLightSignalSystemId());
+			BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getSignalSystemId());
 			//TODO set other defaults of xml
 			controler.setDefaultCirculationTime(systemDef.getDefaultCirculationTime());
 
-			List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getLightSignalSystemId());
+			List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getSignalSystemId());
 			if ((groups == null) || groups.isEmpty()) {
-				String message = "SignalSystemControler for SignalSystem Id: " + config.getLightSignalSystemId() + "without any SignalGroups defined in SignalSystemConfiguration!";
+				String message = "SignalSystemControler for SignalSystem Id: " + config.getSignalSystemId() + "without any SignalGroups defined in SignalSystemConfiguration!";
 				log.warn(message);
 			}
 			else {

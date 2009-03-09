@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,20 +16,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.basic.signalsystemsconfig;
 
-import java.util.Map;
-
 import org.matsim.interfaces.basic.v01.Id;
+
 /**
- * 
  * @author dgrether
- *
  */
-public interface BasicPlanBasedSignalSystemControlInfo extends BasicSignalSystemControlInfo {
+public class BasicSignalSystemConfigurationImpl implements BasicSignalSystemConfiguration {
 
-	public Map<Id, BasicSignalSystemPlan> getPlans();
+	private final Id lightSignalSystemId;
 
-	public void addPlan(BasicSignalSystemPlan plan);
+	private BasicSignalSystemControlInfo controlInfo;
+
+	public BasicSignalSystemConfigurationImpl(final Id lightSignalSystemId) {
+		this.lightSignalSystemId = lightSignalSystemId;
+	}
+
+	/**
+	 * @see org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration#setSignalSystemControlInfo(org.matsim.basic.signalsystemsconfig.BasicSignalSystemControlInfo)
+	 */
+	public void setSignalSystemControlInfo(
+			final BasicSignalSystemControlInfo controlInfo) {
+		this.controlInfo = controlInfo;
+	}
+
+	/**
+	 * @see org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration#getSignalSystemId()
+	 */
+	public Id getSignalSystemId() {
+		return this.lightSignalSystemId;
+	}
+
+	/**
+	 * @see org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration#getControlInfo()
+	 */
+	public BasicSignalSystemControlInfo getControlInfo() {
+		return this.controlInfo;
+	}
+
+
 
 }

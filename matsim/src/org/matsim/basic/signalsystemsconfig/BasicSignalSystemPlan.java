@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,76 +16,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.basic.signalsystemsconfig;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.Id;
-
 /**
+ * 
  * @author dgrether
+ *
  */
-public class BasicSignalSystemPlan {
+public interface BasicSignalSystemPlan {
 
-	private Id id;
-	private double startTime;
-	private double endTime;
-	private Map<Id, BasicSignalGroupConfiguration> groupConfigs;
-	private Double syncronizationOffset = null;
-	private Double circulationTime = null;
+	public void setStartTime(double seconds);
 
-	public BasicSignalSystemPlan(Id id) {
-		this.id = id;
-	}
+	public void setEndTime(double seconds);
 
-	public void setStartTime(double seconds) {
-		this.startTime = seconds;
-	}
-
-	public void setEndTime(double seconds) {
-		this.endTime = seconds;
-	}
-
-	public Id getId() {
-		return id;
-	}
+	public Id getId();
 
 	public void addLightSignalGroupConfiguration(
-			BasicSignalGroupConfiguration groupConfig) {
-		if (this.groupConfigs == null) {
-			this.groupConfigs = new HashMap<Id, BasicSignalGroupConfiguration>();
-		}
-		this.groupConfigs.put(groupConfig.getReferencedSignalGroupId(), groupConfig);
-	}
-	
-	public double getStartTime() {
-		return startTime;
-	}
-	
-	public double getEndTime() {
-		return endTime;
-	}
-	
-	public Map<Id, BasicSignalGroupConfiguration> getGroupConfigs() {
-		return groupConfigs;
-	}
+			BasicSignalGroupSettings groupConfig);
 
-	public void setCirculationTime(Double seconds) {
-		this.circulationTime = seconds;
-	}
-	
-	public void setSyncronizationOffset(Double seconds) {
-		this.syncronizationOffset = seconds;
-	}
+	public double getStartTime();
 
-	public Double getSyncronizationOffset() {
-		return syncronizationOffset;
-	}
+	public double getEndTime();
 
-	public Double getCirculationTime() {
-		return circulationTime;
-	}
+	public Map<Id, BasicSignalGroupSettings> getGroupConfigs();
+
+	public void setCirculationTime(Integer circulationTimeSec);
+
+	public void setSyncronizationOffset(Integer seconds);
+
+	public Integer getSyncronizationOffset();
+
+	public Integer getCirculationTime();
 
 }

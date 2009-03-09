@@ -22,12 +22,23 @@ package org.matsim.utils.io;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.basic.network.BasicLaneDefinitions;
+import org.matsim.basic.network.BasicLaneDefinitionsImpl;
+import org.matsim.basic.signalsystems.BasicSignalSystems;
+import org.matsim.basic.signalsystems.BasicSignalSystemsImpl;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.network.MatsimLaneDefinitionsWriter;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriterV5;
+import org.matsim.signalsystems.MatsimSignalSystemConfigurationReader;
+import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
+import org.matsim.signalsystems.MatsimSignalSystemsReader;
+import org.matsim.signalsystems.MatsimSignalSystemsWriter;
 
 /**
  * This class provides helper methods to convert the
@@ -38,6 +49,15 @@ import org.matsim.population.PopulationWriterV5;
  */
 public class MatsimXMLFormatConverter {
 
+	
+	/**
+	 * Converts a population file in the v4 file format to a population file using the v5 format
+	 * @param popv4 path to the v4 file
+	 * @param popv5 path to that the v5 file is written
+	 * @param network path to the network needed to parse v4
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public static void convertPopulationV4ToV5(final String popv4, final String popv5, final String network) throws FileNotFoundException, IOException{
 		NetworkLayer net = new NetworkLayer();
 		MatsimNetworkReader reader = new MatsimNetworkReader(net);
@@ -51,4 +71,44 @@ public class MatsimXMLFormatConverter {
 		writer.writeFile(popv5);
 	}
 
+	
+	/**
+	 * Converts a signalsystemdefinition v1.0 to a signalsystemdefinition in the v1.1 version.
+	 * As the v1.0 version also includes lane definitions an additional output path for the
+	 * separate lane definitions in file format version 1.1 is needed.
+	 * @param signalsv10 input path of the v1.0 signal system definition
+	 * @param signalsv11 output path for the signal systems v.1.1
+	 * @param lanesv11 output path for the lane definitions v.1.1
+	 */
+	public static void convertSignalSystemsV10ToV11(String signalsv10, String signalsv11, String lanesv11){
+		//create containers
+		BasicLaneDefinitions lanedefs = new BasicLaneDefinitionsImpl();
+		BasicSignalSystems signalSystems = new BasicSignalSystemsImpl();
+		//read old format
+		MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(lanedefs, signalSystems);
+		reader.readFile(signalsv10);
+		//write new formats
+		MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(lanedefs);
+		laneWriter.writeFile(lanesv11);
+		MatsimSignalSystemsWriter writer = new MatsimSignalSystemsWriter(signalSystems);
+		writer.writeFile(signalsv11);
+		
+	}
+	
+	/**
+	 * Converts a signalsystemconfigurations v1.0 to a signalsystemconfigurations in the v1.1 version.
+	 */
+	public static void convertSignalSystemsV10ToV11(String signalsystemconfigsv10, String signalsystemconfigsv11){
+		//create containers
+		BasicSignalSystemConfigurations signalSystemConfigs = new BasicSignalSystemConfigurationsImpl();
+		//read old format
+		MatsimSignalSystemConfigurationReader reader = new MatsimSignalSystemConfigurationReader(signalSystemConfigs);
+		reader.readFile(signalsystemconfigsv10);
+		//write new formats
+		MatsimSignalSystemConfigurationsWriter writer = new MatsimSignalSystemConfigurationsWriter(signalSystemConfigs);
+		writer.writeFile(signalsystemconfigsv11);
+		
+	}
+	
+	
 }

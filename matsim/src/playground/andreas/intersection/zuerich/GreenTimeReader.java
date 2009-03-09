@@ -5,8 +5,10 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
@@ -26,6 +28,8 @@ public class GreenTimeReader implements TabularFileHandler {
 	
 	private HashMap<Integer, BasicSignalSystemConfiguration> lsaConfigMap = new HashMap<Integer, BasicSignalSystemConfiguration>();
 
+	private BasicSignalSystemConfigurations lsaConfigs = new BasicSignalSystemConfigurationsImpl();
+	
 	public void startRow(String[] row) throws IllegalArgumentException {
 				
 		if(row[0].contains("LSAID")){
@@ -36,27 +40,27 @@ public class GreenTimeReader implements TabularFileHandler {
 			BasicSignalSystemConfiguration lsa = this.lsaConfigMap.get(Integer.valueOf(row[0]));
 			
 			if(lsa == null){
-				lsa = new BasicSignalSystemConfiguration(new IdImpl(Integer.parseInt(row[0])));
-				BasicPlanBasedSignalSystemControlInfo controlInfo = new BasicPlanBasedSignalSystemControlInfo();
-				BasicSignalSystemPlan plan = new BasicSignalSystemPlan(new IdImpl("1"));
-				plan.setCirculationTime(new Double(99.0));
+				lsa = lsaConfigs.getBuilder().createSignalSystemConfiguration(new IdImpl(Integer.parseInt(row[0])));
+				BasicPlanBasedSignalSystemControlInfo controlInfo = lsaConfigs.getBuilder().createPlanBasedSignalSystemControlInfo();
+				BasicSignalSystemPlan plan = lsaConfigs.getBuilder().createSignalSystemPlan(new IdImpl("1"));
+				plan.setCirculationTime(new Integer(99));
 				plan.setStartTime(0);
 				plan.setEndTime(86399);
-				plan.setSyncronizationOffset(new Double(0.0));
+				plan.setSyncronizationOffset(new Integer(0));
 				controlInfo.addPlan(plan);
-				lsa.setLightSignalSystemControlInfo(controlInfo);
+				lsa.setSignalSystemControlInfo(controlInfo);
 				
 				this.lsaConfigMap.put(Integer.valueOf(row[0]), lsa);
 			}
 			
-			BasicSignalGroupConfiguration sgConfig = new BasicSignalGroupConfiguration(new IdImpl(row[1]));
-			sgConfig.setRoughCast(0.0);
-			sgConfig.setDropping(Double.parseDouble(row[2]));
-			sgConfig.setInterimTimeRoughcast(new Double(2.0));
-			sgConfig.setInterimTimeDropping(new Double(3.0));
+			BasicSignalGroupSettings sgConfig = this.lsaConfigs.getBuilder().createSignalGroupSettings(new IdImpl(row[1]));
+			sgConfig.setRoughCast(0);
+			sgConfig.setDropping(Integer.parseInt(row[2]));
+			sgConfig.setInterimTimeRoughcast(new Integer(2));
+			sgConfig.setInterimTimeDropping(new Integer(3));
 			((BasicPlanBasedSignalSystemControlInfo) lsa.getControlInfo()).getPlans().get(new IdImpl(1)).addLightSignalGroupConfiguration(sgConfig);
 
-		}
+		} 
 		
 	}
 	

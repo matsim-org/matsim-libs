@@ -22,7 +22,7 @@ package org.matsim.signalsystems;
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.mobsim.queuesim.SimulationTimer;
@@ -75,7 +75,7 @@ public class PlanBasedSignalSystemControler extends SignalSystemControler {
 			BasicSignalGroupDefinition signalGroup) {
 		BasicSignalSystemPlan activePlan = this.plans.getPlans().values().iterator().next();
 		if (activePlan == null) {
-			String message = "No active plan for signalsystem id " + config.getLightSignalSystemId();
+			String message = "No active plan for signalsystem id " + config.getSignalSystemId();
 			log.error(message);
 			throw new IllegalStateException(message);
 		}
@@ -88,7 +88,7 @@ public class PlanBasedSignalSystemControler extends SignalSystemControler {
 		}
 		int currentSecondInPlan = 1 + ((int) (SimulationTimer.getTime() % circulationTime));
 
-		BasicSignalGroupConfiguration signalGroupConfig = activePlan.getGroupConfigs().get(signalGroup.getId());
+		BasicSignalGroupSettings signalGroupConfig = activePlan.getGroupConfigs().get(signalGroup.getId());
 		if ( (signalGroupConfig.getRoughCast() < currentSecondInPlan) 
 				&& (currentSecondInPlan <= signalGroupConfig.getDropping())){
 			return true;

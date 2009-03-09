@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,45 +18,21 @@
  * *********************************************************************** */
 package org.matsim.basic.signalsystems;
 
-import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * @author dgrether
- *
- */
-public class BasicSignalSystems {
-
-	private List<BasicSignalSystemDefinition> lightSignalSystemDefinitions;
-	private List<BasicSignalGroupDefinition> lightSignalGroupDefinitions;
-
-	public List<BasicSignalSystemDefinition> getSignalSystemDefinitions() {
-		return lightSignalSystemDefinitions;
-	}
-
+public interface BasicSignalSystems {
 	
-	public List<BasicSignalGroupDefinition> getSignalGroupDefinitions() {
-		return lightSignalGroupDefinitions;
-	}
+	public BasicSignalSystemsBuilder getSignalSystemsBuilder();
+
+	public List<BasicSignalSystemDefinition> getSignalSystemDefinitions();
+
+	public List<BasicSignalGroupDefinition> getSignalGroupDefinitions();
 
 	/**
 	 * @param lssdef
 	 */
-	public void addSignalSystemDefinition(
-			BasicSignalSystemDefinition lssdef) {
-		if (this.lightSignalSystemDefinitions == null) {
-			this.lightSignalSystemDefinitions = new ArrayList<BasicSignalSystemDefinition>();
-		}
-		this.lightSignalSystemDefinitions.add(lssdef);
-	}
-	
-	public void addSignalGroupDefinition(BasicSignalGroupDefinition lsgdef) {
-		if (this.lightSignalGroupDefinitions == null) {
-			this.lightSignalGroupDefinitions = new ArrayList<BasicSignalGroupDefinition>();
-		}
-		this.lightSignalGroupDefinitions.add(lsgdef);
-	}
+	public void addSignalSystemDefinition(BasicSignalSystemDefinition lssdef);
 
-	
+	public void addSignalGroupDefinition(BasicSignalGroupDefinition lsgdef);
+
 }

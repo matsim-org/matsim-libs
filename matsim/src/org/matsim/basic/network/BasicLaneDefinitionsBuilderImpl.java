@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicLaneDefinitionsBuilderImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,20 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.basic.signalsystemsconfig;
-
-import java.util.Map;
+package org.matsim.basic.network;
 
 import org.matsim.interfaces.basic.v01.Id;
+
+
 /**
  * 
  * @author dgrether
- *
+ * @see org.matsim.basic.network.BasicLaneDefinitionsBuilder
  */
-public interface BasicPlanBasedSignalSystemControlInfo extends BasicSignalSystemControlInfo {
-
-	public Map<Id, BasicSignalSystemPlan> getPlans();
-
-	public void addPlan(BasicSignalSystemPlan plan);
-
+public class BasicLaneDefinitionsBuilderImpl implements BasicLaneDefinitionsBuilder {
+	/**
+	 * @see org.matsim.basic.network.BasicLaneDefinitionsBuilder#createLanesToLinkAssignment(org.matsim.interfaces.basic.v01.Id)
+	 */
+	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id id) {
+		return new BasicLanesToLinkAssignmentImpl(id);
+	}
+	/**
+	 * @see org.matsim.basic.network.BasicLaneDefinitionsBuilder#createLane(org.matsim.interfaces.basic.v01.Id)
+	 */
+	public BasicLane createLane(Id id) {
+		return new BasicLaneImpl(id);
+	}
 }

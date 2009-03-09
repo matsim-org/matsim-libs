@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LightSignalSystemConfigurationsWriter10
+ * SignalSystemConfigurationsWriter11
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -34,33 +34,27 @@ import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
-import org.matsim.jaxb.lightsignalsystemsconfig10.ObjectFactory;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalGroupConfigurationType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfig;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfigurationType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLMatsimTimeAttributeType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLPlanbasedlightSignalSystemControlInfoType;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalGroupConfigurationType.XMLInterimTimeDropping;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType.XMLStart;
-import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType.XMLStop;
+import org.matsim.jaxb.signalsystemsconfig11.ObjectFactory;
+import org.matsim.jaxb.signalsystemsconfig11.XMLPlanbasedSignalSystemControlInfoType;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalGroupSettingsType;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfig;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfigurationType;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalGroupSettingsType.XMLInterimTimeDropping;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLCirculationTime;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLStart;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLStop;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLSyncronizationOffset;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.io.MatsimJaxbXmlWriter;
 
-
-/**
- * Writer for the lightSignalSystemConfiguration_v1.0.xsd file format.
- * @author dgrether
- * @deprecated use signalSystemConfigurationsWriter11 instead
- */
-@Deprecated
-public class LightSignalSystemConfigurationsWriter10 extends MatsimJaxbXmlWriter{
+public class SignalSystemConfigurationsWriter11 extends MatsimJaxbXmlWriter{
 
 	
 	private BasicSignalSystemConfigurations blssconfs;
-	private XMLLightSignalSystemConfig xmllssconfig;
+	private XMLSignalSystemConfig xmllssconfig;
 
-	LightSignalSystemConfigurationsWriter10(BasicSignalSystemConfigurations basiclssconfigs) {
+	SignalSystemConfigurationsWriter11(BasicSignalSystemConfigurations basiclssconfigs) {
 		this.blssconfs = basiclssconfigs;
 		try {
 			this.xmllssconfig = convertBasicToXml();
@@ -75,9 +69,9 @@ public class LightSignalSystemConfigurationsWriter10 extends MatsimJaxbXmlWriter
 	public void writeFile(final String filename) {
   	JAXBContext jc;
 		try {
-			jc = JAXBContext.newInstance(org.matsim.jaxb.lightsignalsystemsconfig10.ObjectFactory.class);
+			jc = JAXBContext.newInstance(org.matsim.jaxb.signalsystemsconfig11.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller(); 
-			super.setMarshallerProperties(MatsimSignalSystemConfigurationReader.SIGNALSYSTEMSCONFIG10, m);
+			super.setMarshallerProperties(MatsimSignalSystemConfigurationReader.SIGNALSYSTEMSCONFIG11, m);
 			m.marshal(this.xmllssconfig, IOUtils.getBufferedWriter(filename)); 
 		} catch (JAXBException e) {
 			e.printStackTrace();
@@ -88,19 +82,19 @@ public class LightSignalSystemConfigurationsWriter10 extends MatsimJaxbXmlWriter
 		}
 	}
 	
-	private XMLLightSignalSystemConfig convertBasicToXml() throws DatatypeConfigurationException {
+	private XMLSignalSystemConfig convertBasicToXml() throws DatatypeConfigurationException {
 		ObjectFactory fac = new ObjectFactory();
-		XMLLightSignalSystemConfig xmllssconf = fac.createXMLLightSignalSystemConfig();
+		XMLSignalSystemConfig xmllssconf = fac.createXMLSignalSystemConfig();
 		
 		for (BasicSignalSystemConfiguration lssconf : this.blssconfs.getSignalSystemConfigurations().values()) {
-			XMLLightSignalSystemConfigurationType xmllssconfiguration = fac.createXMLLightSignalSystemConfigurationType();
+			XMLSignalSystemConfigurationType xmllssconfiguration = fac.createXMLSignalSystemConfigurationType();
 			xmllssconfiguration.setRefId(lssconf.getSignalSystemId().toString());
 			
 			if (lssconf.getControlInfo() instanceof BasicPlanBasedSignalSystemControlInfo) {
-				XMLPlanbasedlightSignalSystemControlInfoType xmlplanlsscontrolinfo = fac.createXMLPlanbasedlightSignalSystemControlInfoType();
+				XMLPlanbasedSignalSystemControlInfoType xmlplanlsscontrolinfo = fac.createXMLPlanbasedSignalSystemControlInfoType();
 				BasicPlanBasedSignalSystemControlInfo pbcontrolinfo = (BasicPlanBasedSignalSystemControlInfo) lssconf.getControlInfo();
 				for (BasicSignalSystemPlan plan : pbcontrolinfo.getPlans().values()) {
-					XMLLightSignalSystemPlanType xmlplan = fac.createXMLLightSignalSystemPlanType();
+					XMLSignalSystemPlanType xmlplan = fac.createXMLSignalSystemPlanType();
 					xmlplan.setId(plan.getId().toString());
 					XMLStart start = new XMLStart();
 					start.setDaytime(getXmlGregorianCalendar(plan.getStartTime()));
@@ -110,53 +104,52 @@ public class LightSignalSystemConfigurationsWriter10 extends MatsimJaxbXmlWriter
 					stop.setDaytime(getXmlGregorianCalendar(plan.getEndTime()));
 					xmlplan.setStop(stop);
 					
-					XMLMatsimTimeAttributeType xmlct = fac.createXMLMatsimTimeAttributeType();
+					XMLCirculationTime xmlct = new XMLCirculationTime();
 					if (plan.getCirculationTime() != null) {
-						xmlct.setSeconds(plan.getCirculationTime());
+						xmlct.setSec(plan.getCirculationTime());
 						xmlplan.setCirculationTime(xmlct);
 					}
 					if (plan.getSyncronizationOffset() != null) {
-						XMLMatsimTimeAttributeType xmlso = fac.createXMLMatsimTimeAttributeType();
-						xmlso.setSeconds(plan.getSyncronizationOffset());
+						XMLSyncronizationOffset xmlso = new XMLSyncronizationOffset();
+						xmlso.setSec(plan.getSyncronizationOffset());
 						xmlplan.setSyncronizationOffset(xmlso);
 					}
 					
 					
 
-					//write lightSignalGroupConfigurations
+					//write SignalGroupConfigurations
 					for (BasicSignalGroupSettings lsgc : plan.getGroupConfigs().values()) {
-						XMLLightSignalGroupConfigurationType xmllsgc = fac.createXMLLightSignalGroupConfigurationType();
+						XMLSignalGroupSettingsType xmllsgc = fac.createXMLSignalGroupSettingsType();
 						xmllsgc.setRefId(lsgc.getReferencedSignalGroupId().toString());
-						XMLLightSignalGroupConfigurationType.XMLRoughcast xmlrc = new XMLLightSignalGroupConfigurationType.XMLRoughcast();
-						//FIXME change in dataformat from int to double
+						XMLSignalGroupSettingsType.XMLRoughcast xmlrc = new XMLSignalGroupSettingsType.XMLRoughcast();
 						xmlrc.setSec((int)lsgc.getRoughCast());
 						xmllsgc.setRoughcast(xmlrc);
 						
-						XMLLightSignalGroupConfigurationType.XMLDropping xmldropping = new XMLLightSignalGroupConfigurationType.XMLDropping();
+						XMLSignalGroupSettingsType.XMLDropping xmldropping = new XMLSignalGroupSettingsType.XMLDropping();
 						xmldropping.setSec((int)lsgc.getDropping());
 						xmllsgc.setDropping(xmldropping);
 						if (lsgc.getInterimTimeDropping() != null) {
-							XMLLightSignalGroupConfigurationType.XMLInterimTimeDropping xmlitd = new XMLInterimTimeDropping();
+							XMLSignalGroupSettingsType.XMLInterimTimeDropping xmlitd = new XMLInterimTimeDropping();
 							xmlitd.setSec((int) lsgc.getInterimTimeDropping().doubleValue());
 							xmllsgc.setInterimTimeDropping(xmlitd);
 						}
 
 						if (lsgc.getInterimTimeRoughcast() != null) {
-							XMLLightSignalGroupConfigurationType.XMLInterimTimeRoughcast xmlitr = new XMLLightSignalGroupConfigurationType.XMLInterimTimeRoughcast();
+							XMLSignalGroupSettingsType.XMLInterimTimeRoughcast xmlitr = new XMLSignalGroupSettingsType.XMLInterimTimeRoughcast();
 							xmlitr.setSec((int) lsgc.getInterimTimeRoughcast().doubleValue());
 							xmllsgc.setInterimTimeRoughcast(xmlitr);
 						}
 						
-						xmlplan.getLightSignalGroupConfiguration().add(xmllsgc);
+						xmlplan.getSignalGroupSettings().add(xmllsgc);
 					}
-					xmlplanlsscontrolinfo.getLightSignalSystemPlan().add(xmlplan);
+					xmlplanlsscontrolinfo.getSignalSystemPlan().add(xmlplan);
 				}
-				xmllssconfiguration.setLightSignalSystemControlInfo(xmlplanlsscontrolinfo);
+				xmllssconfiguration.setSignalSystemControlInfo(xmlplanlsscontrolinfo);
 			}
 			else {
 				throw new UnsupportedOperationException("Implemented in v1.1 version of data format, please convert your files!");
 			}
-			xmllssconf.getLightSignalSystemConfiguration().add(xmllssconfiguration);
+			xmllssconf.getSignalSystemConfiguration().add(xmllssconfiguration);
 		}
 		return xmllssconf;
 	}
@@ -175,7 +168,4 @@ public class LightSignalSystemConfigurationsWriter10 extends MatsimJaxbXmlWriter
 		time.setHour(h);
 		return time;
 	}
-
-	
-	
 }
