@@ -91,12 +91,10 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 
 	public void handleEvent(ActStartEvent event) {
 		getScoringFunctionForAgent(event.agentId).startActivity(event.time, event.act);
-
 	}
 
 	public void handleEvent(ActEndEvent event) {
 		getScoringFunctionForAgent(event.agentId).endActivity(event.time);
-
 	}
 
 	/**
