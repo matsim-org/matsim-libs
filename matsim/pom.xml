@@ -112,6 +112,16 @@
         <artifactId>maven-surefire-report-plugin</artifactId>
         <version>2.4.2</version>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>javancss-maven-plugin</artifactId>
+        <version>2.0-beta-2</version>
+        <configuration>
+          <includes>
+            <include>org/matsim/**/*.java</include>
+          </includes>
+        </configuration>
+      </plugin>
     </plugins>
   </reporting>
   
@@ -125,6 +135,10 @@
       <id>ibiblio</id>
       <name>Ibiblio - the public's library and digital archive</name>
       <url>http://www.ibiblio.org/maven2</url>
+    </repository>
+    <repository>
+      <id>org.codehaus.mojo</id>
+      <url>http://repository.codehaus.org/org/codehaus/mojo/</url>
     </repository>
   </repositories>
   
