@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class AnalyseGAPDensity {
 	// String value that must be set
-	final static String PROVINCE = "WesternCape";
+	final static String PROVINCE = "KZN";
 	// Mac
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
