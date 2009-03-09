@@ -48,6 +48,12 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 	public enum FileType {Config, Network, Facilities, Population, World, 
 		Counts, Events, Households, TransimsVehicle, OTFVis, SignalSystems, SignalSystemsConfig };
 
+	public static final String SYSTEMIDNOTFOUNDMESSAGE = "System Id of xml document couldn't be detected. " +
+	"Make sure that you try to read a xml document with a valid header. " +
+	"If your header seems to be ok, make shure that there is no / at the " +
+	"end of the first part of the tuple used as value for xsi:schemaLocation.";
+		
+		
 	private FileType fileType = null;
 	private String xmlPublicId = null;
 	private String xmlSystemId = null;
