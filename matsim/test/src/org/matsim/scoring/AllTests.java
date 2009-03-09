@@ -30,6 +30,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(CharyparNagelScoringFunctionTest.class);
 		suite.addTestSuite(CharyparNagelOpenTimesScoringFunctionTest.class);
+		suite.addTestSuite(CharyparNagelScoringFunctionAccumulatorTest.class);
 		suite.addTestSuite(EventsToScoreTest.class);
 		//$JUnit-END$
 		return suite;
