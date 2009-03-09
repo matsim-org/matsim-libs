@@ -60,13 +60,24 @@ public class NetworkCreateL2ZMapping {
 		double maxy = Double.NEGATIVE_INFINITY;
 		ArrayList<Node> ns = new ArrayList<Node>();
 		for (Node n : nodes.values()) {
-			if (Integer.parseInt(n.getId().toString()) < 10000) {
-				ns.add(n);
-				if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
-				if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
-				if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
-				if (n.getCoord().getY() > maxy) { maxy = n.getCoord().getY(); }
+			try {
+				int nid = Integer.parseInt(n.getId().toString());
+				if (nid < 10000) {
+					ns.add(n);
+					if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
+					if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
+					if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
+					if (n.getCoord().getY() > maxy) { maxy = n.getCoord().getY(); }
+				}
+			} catch (NumberFormatException e) {
 			}
+//			if (Integer.parseInt(n.getId().toString()) < 10000) {
+//				ns.add(n);
+//				if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
+//				if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
+//				if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
+//				if (n.getCoord().getY() > maxy) { maxy = n.getCoord().getY(); }
+//			}
 		}
 		minx -= 1.0;
 		miny -= 1.0;
