@@ -36,7 +36,6 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.referencing.CRS;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandler;
@@ -48,24 +47,25 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * This class founds on many codes of Gregor Laemmel. man should for this "run"
  * install com.sun.media.jai and javax.media.jai from http://jai.dev.java.net
- *
+ * 
  * @author ychen
- *
+ * 
  */
-public class MATSimNet2QGIS {
+public class MATSimNet2QGIS implements X2QGIS {
 	/**
 	 * this class is only a copy of
 	 * <class>playground.gregor.shapeFileToMATSim.ShapeFileWriter</class> Gregor
 	 * Laemmel's
-	 *
+	 * 
 	 * @author ychen
-	 *
+	 * 
 	 */
 	public static class ShapeFileWriter2 {
 
@@ -98,11 +98,7 @@ public class MATSimNet2QGIS {
 	 *            the crs to set
 	 */
 	public void setCrs(final String wkt) {
-		try {
-			this.crs = CRS.parseWKT(wkt);
-		} catch (FactoryException e) {
-			e.printStackTrace();
-		}
+		this.crs = MGC.getCRS(wkt);
 		this.n2g = new Network2PolygonGraph(this.network, this.crs);
 	}// TODO override
 
@@ -120,7 +116,8 @@ public class MATSimNet2QGIS {
 	 */
 	public void writeShapeFile(final String ShapeFilename) {
 		try {
-			ShapeFileWriter2.writeGeometries(this.n2g.getFeatures(), ShapeFilename);
+			ShapeFileWriter2.writeGeometries(this.n2g.getFeatures(),
+					ShapeFilename);
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
 		} catch (SchemaException e) {
@@ -159,7 +156,8 @@ public class MATSimNet2QGIS {
 			final AbstractPersonAlgorithm pa) {
 		Population population = new PopulationImpl();
 		population.addAlgorithm(pa);
-		new MatsimPopulationReader(population, this.network).readFile(plansFilename);
+		new MatsimPopulationReader(population, this.network)
+				.readFile(plansFilename);
 		population.runAlgorithms();
 	}
 
@@ -173,5 +171,15 @@ public class MATSimNet2QGIS {
 	 */
 	public void setN2g(final Network2PolygonGraph n2g) {
 		this.n2g = n2g;
+	}
+
+	public static void main(final String[] args) {
+		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+
+		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
+		mn2q.readNetwork(netFilename);
+		mn2q.setCrs(ch1903);
+		mn2q
+				.writeShapeFile("../schweiz-ivtch-SVN/baseCase/network/polygon2correct.shp");
 	}
 }

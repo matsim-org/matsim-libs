@@ -31,9 +31,9 @@ public class CountsCapacityComparison {
 	public static void main(String[] args) throws IOException {
 		Gbl.startMeasurement();
 
-		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm-opt.xml";
+		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String countsFilename = "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.xml";
-		final String outputFilename = "../matsimTests/countsCapacityComparison/output.txt";
+		final String outputFilename = "../matsimTests/countsCapacityComparison/output_zurich.txt";
 
 		Gbl.createConfig(null);
 
@@ -44,7 +44,7 @@ public class CountsCapacityComparison {
 		new MatsimCountsReader(counts).readFile(countsFilename);
 
 		SimpleWriter sw = new SimpleWriter(outputFilename);
-		sw.writeln("linkId\tCapacity [veh/h]\tmax Value of Counts");
+		sw.writeln("linkId\tx\ty\tCapacity [veh/h]\tmax Value of Counts");
 
 		for (Id linkId : counts.getCounts().keySet()) {
 			Link link = network.getLink(linkId);
@@ -54,7 +54,9 @@ public class CountsCapacityComparison {
 				double countsvalue = counts.getCount(linkId).getMaxVolume()
 						.getValue();
 				if (capacity <= countsvalue) {
-					sw.writeln(linkId.toString() + "\t" + capacity + "\t"
+					sw.writeln(linkId.toString() + "\t"
+							+ link.getCenter().getX() + "\t"
+							+ link.getCenter().getY() + "\t" + capacity + "\t"
 							+ countsvalue);
 					sw.flush();
 				}

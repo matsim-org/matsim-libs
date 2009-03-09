@@ -56,9 +56,9 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		// String netfile = "test/scenarios/berlin/network.xml.gz";
 		// String outputFileLs = "output/bvg/berlinLinks.shp";
 		// String outputFileP = "output/bvg/berlinPolygon.shp";
-		String netfile = "../psrc/network/psrc-wo-3212.xml.gz";
-		String outputFileLs = "../psrc/network/shp/psrc-wo-3212.Links.shp";
-		String outputFileP = "../psrc/network/shp/psrc-wo-3212.Polygon.shp";
+		String netfile = "../berlin data/network.xml";
+		String outputFileLs = "../berlin data/Links.shp";
+		String outputFileP = "../berlin data/Polygon.shp";
 
 		// String coordinateSys = ch1903;
 		String coordinateSys = "DHDN_GK4";
