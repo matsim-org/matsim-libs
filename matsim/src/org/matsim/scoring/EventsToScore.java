@@ -24,10 +24,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.events.ActEndEvent;
+import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentMoneyEvent;
 import org.matsim.events.AgentStuckEvent;
+import org.matsim.events.handler.ActEndEventHandler;
+import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentMoneyEventHandler;
@@ -42,13 +46,14 @@ import org.matsim.interfaces.core.v01.Population;
  * Calculates continuously the score of the selected plans of a given population
  * based on events.<br>
  * Departure- and Arrival-Events *must* be provided to calculate the score,
- * AgentStuck-Events are used if available to add a penalty to the score.
- * The final score are written to the selected plans of each person in the
+ * AgentStuck-Events are used if available to add a penalty to the score. The
+ * final score are written to the selected plans of each person in the
  * population.
- *
+ * 
  * @author mrieser
  */
-public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler {
+public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
+		AgentMoneyEventHandler, ActStartEventHandler, ActEndEventHandler {
 
 	private Population population = null;
 	private ScoringFunctionFactory sfFactory = null;
@@ -84,6 +89,16 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		getScoringFunctionForAgent(event.agentId).addMoney(event.amount);
 	}
 
+	public void handleEvent(ActStartEvent event) {
+		getScoringFunctionForAgent(event.agentId).startActivity(event.time, event.act);
+
+	}
+
+	public void handleEvent(ActEndEvent event) {
+		getScoringFunctionForAgent(event.agentId).endActivity(event.time);
+
+	}
+
 	/**
 	 * Finishes the calculation of the plans' scores and assigns the new scores
 	 * to the plans.
@@ -99,7 +114,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 			if (Double.isNaN(oldScore)) {
 				plan.setScore(score);
 			} else {
-				plan.setScore(this.learningRate * score + (1-this.learningRate) * oldScore);
+				plan.setScore(this.learningRate * score + (1 - this.learningRate) * oldScore);
 			}
 
 			this.scoreSum += score;
@@ -108,27 +123,30 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	}
 
 	/**
-	 * Returns the actual average plans' score before it was assigned to the plan
-	 * and possibility mixed with old scores (learningrate).
-	 *
-	 * @return the average score of the plans before mixing with the old scores (learningrate)
+	 * Returns the actual average plans' score before it was assigned to the
+	 * plan and possibility mixed with old scores (learningrate).
+	 * 
+	 * @return the average score of the plans before mixing with the old scores
+	 *         (learningrate)
 	 */
 	public double getAveragePlanPerformance() {
-		if (this.scoreSum == 0) return BasicPlan.UNDEF_SCORE;
+		if (this.scoreSum == 0)
+			return BasicPlan.UNDEF_SCORE;
 		return (this.scoreSum / this.scoreCount);
 	}
 
 	/**
-	 * Returns the score of a single agent. This method only returns useful values
-	 * if the method {@link #finish() } was called before.
-	 * description
-	 *
-	 * @param agentId The id of the agent the score is requested for.
+	 * Returns the score of a single agent. This method only returns useful
+	 * values if the method {@link #finish() } was called before. description
+	 * 
+	 * @param agentId
+	 *            The id of the agent the score is requested for.
 	 * @return The score of the specified agent.
 	 */
 	public double getAgentScore(final Id agentId) {
 		ScoringFunction sf = this.agentScorers.get(agentId.toString());
-		if (sf == null) return BasicPlan.UNDEF_SCORE;
+		if (sf == null)
+			return BasicPlan.UNDEF_SCORE;
 		return sf.getScore();
 	}
 
@@ -139,12 +157,13 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	}
 
 	/**
-	 * Returns the scoring function for the specified agent. If the agent already
-	 * has a scoring function, that one is returned. If the agent does not yet
-	 * have a scoring function, a new one is created and assigned to the agent
-	 * and returned.
-	 *
-	 * @param agentId The id of the agent the scoring function is requested for.
+	 * Returns the scoring function for the specified agent. If the agent
+	 * already has a scoring function, that one is returned. If the agent does
+	 * not yet have a scoring function, a new one is created and assigned to the
+	 * agent and returned.
+	 * 
+	 * @param agentId
+	 *            The id of the agent the scoring function is requested for.
 	 * @return The scoring function for the specified agent.
 	 */
 	private ScoringFunction getScoringFunctionForAgent(final String agentId) {
