@@ -110,11 +110,9 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		System.out.println("Writing plans file...DONE.");
 
 		// actual test: compare checksums of the files
-		final long expectedChecksum = CRCChecksum.getCRCFromGZFile(this.getInputDirectory() + "plans.xml.gz");
-		final long actualChecksum = CRCChecksum.getCRCFromGZFile(this.getOutputDirectory() + "output_plans.xml.gz");
-		log.info("Expected checksum: " + Long.toString(expectedChecksum));
-		log.info("Actual checksum: " + Long.toString(actualChecksum));
-		assertEquals(expectedChecksum, actualChecksum);
+		final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + "plans.xml.gz");
+		final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + "output_plans.xml.gz");
+		assertEquals("different plans files.", expectedChecksum, actualChecksum);
 
 	}
 	

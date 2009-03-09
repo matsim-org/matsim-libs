@@ -40,22 +40,16 @@ public class EvacuationQSimTest extends MatsimTestCase {
 		controler.setWriteEventsInterval(10);
 		controler.run();
 
-		System.out.println("checking network file ...");
 		long checksum1 = CRCChecksum.getCRCFromFile(referenceNetFile);
 		long checksum2 = CRCChecksum.getCRCFromFile(netFile);
-		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 		assertEquals("different network files", checksum1, checksum2);
 
-		System.out.println("checking events file ...");
-		checksum1 = CRCChecksum.getCRCFromGZFile(referenceEventsFile);
-		checksum2 = CRCChecksum.getCRCFromGZFile(eventsFile);
-		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
+		checksum1 = CRCChecksum.getCRCFromFile(referenceEventsFile);
+		checksum2 = CRCChecksum.getCRCFromFile(eventsFile);
 		assertEquals("different events files", checksum1, checksum2);
 
-		System.out.println("checking plans file ...");
-		checksum1 = CRCChecksum.getCRCFromGZFile(referencePlansFile);
-		checksum2 = CRCChecksum.getCRCFromGZFile(plansFile);
-		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
+		checksum1 = CRCChecksum.getCRCFromFile(referencePlansFile);
+		checksum2 = CRCChecksum.getCRCFromFile(plansFile);
 		assertEquals("different plans files", checksum1, checksum2);
 	}
 

@@ -92,7 +92,7 @@ public class ReadWriteAnalyze extends MatsimTestCase {
 			e.printStackTrace();
 		}
 		
-		double reference = CRCChecksum.getCRCFromGZFile(getPackageInputDirectory() + GRAPH_INPUT_FILE);
+		double reference = CRCChecksum.getCRCFromFile(getPackageInputDirectory() + GRAPH_INPUT_FILE);
 		double actual = CRCChecksum.getCRCFromFile(getOutputDirectory() + GRAPH_OUTPUT_FILE);
 		
 		assertEquals(reference, actual);

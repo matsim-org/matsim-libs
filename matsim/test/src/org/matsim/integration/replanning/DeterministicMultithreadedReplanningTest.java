@@ -68,8 +68,8 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
 		new TestControler(config, strategyManager).run();
 
-		long cksum1 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "/run1/ITERS/it.5/5.events.txt.gz");
-		long cksum2 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "/run2/ITERS/it.5/5.events.txt.gz");
+		long cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it.5/5.events.txt.gz");
+		long cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it.5/5.events.txt.gz");
 
 		assertEquals("The checksums of events must be the same, even when multiple threads are used.", cksum1, cksum2);
 	}
@@ -104,8 +104,8 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		strategy2.addStrategyModule(new ReRoute(controler));
 		controler2.run();
 
-		long cksum1 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "/run1/ITERS/it.5/5.events.txt.gz");
-		long cksum2 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "/run2/ITERS/it.5/5.events.txt.gz");
+		long cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it.5/5.events.txt.gz");
+		long cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it.5/5.events.txt.gz");
 
 		assertEquals("The checksums of events must be the same, even when multiple threads are used.", cksum1, cksum2);
 	}

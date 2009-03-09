@@ -59,8 +59,8 @@ public class CoopersBerlinIntegrationTest extends MatsimTestCase {
 				
 		controler.run();
 
-		long checksum1 = CRCChecksum.getCRCFromGZFile(referenceFileName);
-		long checksum2 = CRCChecksum.getCRCFromGZFile(eventsFileName);
+		long checksum1 = CRCChecksum.getCRCFromFile(referenceFileName);
+		long checksum2 = CRCChecksum.getCRCFromFile(eventsFileName);
 		assertEquals("different events-files.", checksum1, checksum2);
 	}
 
@@ -86,8 +86,8 @@ public class CoopersBerlinIntegrationTest extends MatsimTestCase {
 				
 		controler.run();
 		
-		long checksum1 = CRCChecksum.getCRCFromGZFile(referenceFileName);
-		long checksum2 = CRCChecksum.getCRCFromGZFile(eventsFileName);
+		long checksum1 = CRCChecksum.getCRCFromFile(referenceFileName);
+		long checksum2 = CRCChecksum.getCRCFromFile(eventsFileName);
 		assertEquals("different events-files.", checksum1, checksum2);
 	}
 	

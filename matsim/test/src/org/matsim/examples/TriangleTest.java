@@ -93,8 +93,8 @@ public class TriangleTest extends MatsimTestCase {
 
 	private final void compareOutputPlans() {
 		log.info("  comparing reference and output plans file... ");
-		long checksum_ref = CRCChecksum.getCRCFromGZFile(getInputDirectory() + "plans.xml.gz");
-		long checksum_run = CRCChecksum.getCRCFromGZFile(this.config.plans().getOutputFile());
+		long checksum_ref = CRCChecksum.getCRCFromFile(getInputDirectory() + "plans.xml.gz");
+		long checksum_run = CRCChecksum.getCRCFromFile(this.config.plans().getOutputFile());
 		assertEquals("different plans files", checksum_ref, checksum_run);
 		log.info("  done.");
 	}

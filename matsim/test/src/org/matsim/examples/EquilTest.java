@@ -61,7 +61,7 @@ public class EquilTest extends MatsimTestCase {
 
 		writer.closeFile();
 
-		final long checksum1 = CRCChecksum.getCRCFromGZFile(referenceFileName);
+		final long checksum1 = CRCChecksum.getCRCFromFile(referenceFileName);
 		long checksum2 = CRCChecksum.getCRCFromFile(eventsFileName);
 		assertEquals("different event files.", checksum1, checksum2);
 	}

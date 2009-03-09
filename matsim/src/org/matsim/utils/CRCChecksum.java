@@ -52,6 +52,14 @@ public class CRCChecksum {
 		return check;
 	}
 
+	/**
+	 * Calculates the checksum of the content of the given file. If the filename ends in ".gz",
+	 * the file is assumed to be gzipped and the checksum over the <em>uncompressed</em> content 
+	 * will be calculated. 
+	 * 
+	 * @param filename
+	 * @return CRC32-Checksum of the file's content.
+	 */
 	public static long getCRCFromFile(final String filename) {
 		InputStream in = null;
 		try {
@@ -68,17 +76,4 @@ public class CRCChecksum {
 		}
 	}
 
-	public static long getCRCFromGZFile(final String filename) {
-		InputStream in = null;
-	    try {
-			if (filename.endsWith(".gz") || filename.endsWith(".zip")) {
-				in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(filename)));
-			} else {
-			    in = new FileInputStream(filename);
-			}
-			return getCRCFromStream(in);
-		} catch (IOException e1) {
-			throw new RuntimeException(e1);
-		}
-	}
 }

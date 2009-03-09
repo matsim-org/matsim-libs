@@ -31,7 +31,7 @@ public class MarginalCostControlerTest extends MatsimTestCase {
 		String ref = getInputDirectory() + "events.txt.gz";
 		String compare = getOutputDirectory() + "ITERS/it.10/10.events.txt.gz";
 		new MarginalCostControler(new String [] {config}).run();
-		assertEquals(CRCChecksum.getCRCFromGZFile(ref),	CRCChecksum.getCRCFromGZFile(compare));
+		assertEquals("different events-files.", CRCChecksum.getCRCFromFile(ref),	CRCChecksum.getCRCFromFile(compare));
 		MatsimRandom.reset();
 	}
 }

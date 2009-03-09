@@ -63,15 +63,13 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		sp.setWriteLegs(false);
 		sp.write();
 
-		System.out.println("calculating *.shp file checksums...");
 		long checksum1 = CRCChecksum.getCRCFromFile(refShp);
-		long checksum2 = CRCChecksum.getCRCFromGZFile(outShp);
-		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
-		assertEquals(checksum1, checksum2);
+		long checksum2 = CRCChecksum.getCRCFromFile(outShp);
+		assertEquals("different shp-files.", checksum1, checksum2);
 
 //		System.out.println("calculating *.dbf file checksums...");
 //		checksum1 = CRCChecksum.getCRCFromFile(refDbf);
-//		checksum2 = CRCChecksum.getCRCFromGZFile(outDbf);
+//		checksum2 = CRCChecksum.getCRCFromFile(outDbf);
 //		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 //		assertEquals(checksum1, checksum2);
 	}
@@ -102,15 +100,13 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		sp.setWriteLegs(true);
 		sp.write();
 
-		System.out.println("calculating *.shp file checksums...");
 		long checksum1 = CRCChecksum.getCRCFromFile(refShp);
-		long checksum2 = CRCChecksum.getCRCFromGZFile(outShp);
-		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
-		assertEquals(checksum1, checksum2);
+		long checksum2 = CRCChecksum.getCRCFromFile(outShp);
+		assertEquals("different shp-files.", checksum1, checksum2);
 
 //		System.out.println("calculating *.dbf file checksums...");
 //		checksum1 = CRCChecksum.getCRCFromFile(refDbf);
-//		checksum2 = CRCChecksum.getCRCFromGZFile(outDbf);
+//		checksum2 = CRCChecksum.getCRCFromFile(outDbf);
 //		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 //		assertEquals(checksum1, checksum2);
 	}

@@ -25,7 +25,6 @@ import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -58,7 +57,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		PopulationImpl population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(popFileName);
 		population.printPlansCount();
@@ -74,11 +73,9 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 		writer.closeFile();
 
-		log.info("calculating checksums...");
-		final long checksum1 = CRCChecksum.getCRCFromGZFile(referenceFileName);
+		final long checksum1 = CRCChecksum.getCRCFromFile(referenceFileName);
 		final long checksum2 = CRCChecksum.getCRCFromFile(eventsFileName);
-		log.info("checksum = " + checksum2 + " should be: " + checksum1);
-		assertEquals(checksum1, checksum2);
+		assertEquals("different event files", checksum1, checksum2);
 	}
 
 }

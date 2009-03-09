@@ -35,7 +35,7 @@ public class WithindayEvacTest extends MatsimTestCase {
 		new WithindayControler(new String [] {config}).run();
 		
 		MatsimRandom.reset();
-		assertEquals(CRCChecksum.getCRCFromGZFile(ref),	CRCChecksum.getCRCFromGZFile(compare));
+		assertEquals("different events-files.", CRCChecksum.getCRCFromFile(ref),	CRCChecksum.getCRCFromFile(compare));
 		
 	}
 

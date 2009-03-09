@@ -63,16 +63,16 @@ public class ResumableRunsTest extends MatsimTestCase {
 		controler2.run();
 
 		// comparison
-		long cksum1 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "/run1/ITERS/it.10/10.plans.xml.gz");
-		long cksum2 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "/run2/ITERS/it.10/10.plans.xml.gz");
+		long cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it.10/10.plans.xml.gz");
+		long cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it.10/10.plans.xml.gz");
 		assertEquals("Plans must not be altered just be reading in and writing out again.", cksum1, cksum2);
 
-		cksum1 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "/run1/ITERS/it.10/10.events.txt.gz");
-		cksum2 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "/run2/ITERS/it.10/10.events.txt.gz");
+		cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it.10/10.events.txt.gz");
+		cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it.10/10.events.txt.gz");
 		assertEquals("The checksums of events must be the same when resuming runs.", cksum1, cksum2);
 
-		cksum1 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "/run1/ITERS/it.11/11.events.txt.gz");
-		cksum2 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "/run2/ITERS/it.11/11.events.txt.gz");
+		cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it.11/11.events.txt.gz");
+		cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it.11/11.events.txt.gz");
 		assertEquals("The checksums of events must be the same when resuming runs.", cksum1, cksum2);
 	}
 

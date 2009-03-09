@@ -81,7 +81,7 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 			sim.run();
 			this.writer.flush();
 			this.writer.close();
-			assertEquals(CRCChecksum.getCRCFromGZFile(this.getClassInputDirectory() + "reference4armsWoUTurn.txt.gz"), CRCChecksum.getCRCFromGZFile(tempout));
+			assertEquals(CRCChecksum.getCRCFromFile(this.getClassInputDirectory() + "reference4armsWoUTurn.txt.gz"), CRCChecksum.getCRCFromFile(tempout));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

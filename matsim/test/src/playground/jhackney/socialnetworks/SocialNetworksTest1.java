@@ -30,14 +30,14 @@ public class SocialNetworksTest1 extends MatsimTestCase{
 		long checksum2 = 0;
 
 		System.out.println("checking events file ...");
-		checksum1 = CRCChecksum.getCRCFromGZFile(referenceEventsFile);
-		checksum2 = CRCChecksum.getCRCFromGZFile(eventsFile);
+		checksum1 = CRCChecksum.getCRCFromFile(referenceEventsFile);
+		checksum2 = CRCChecksum.getCRCFromFile(eventsFile);
 		System.out.println(eventsFile+" checksum = " + checksum2 + " should be: " + referenceEventsFile + checksum1);
 		assertEquals("different events files", checksum1, checksum2);
 
 		System.out.println("checking plans file ...");
-		checksum1 = CRCChecksum.getCRCFromGZFile(referencePlansFile);
-		checksum2 = CRCChecksum.getCRCFromGZFile(plansFile);
+		checksum1 = CRCChecksum.getCRCFromFile(referencePlansFile);
+		checksum2 = CRCChecksum.getCRCFromFile(plansFile);
 		System.out.println(plansFile+" checksum = " + checksum2 + " should be: " + referencePlansFile + checksum1);
 		assertEquals("different plans files", checksum1, checksum2);
 		

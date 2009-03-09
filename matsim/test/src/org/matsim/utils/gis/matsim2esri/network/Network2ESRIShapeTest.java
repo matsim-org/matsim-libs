@@ -52,11 +52,9 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setCoordinateReferenceSystem(crs);
 		new Network2ESRIShape(network,outputFileP, builder).write();
 		
-		System.out.println("calculating *.shp file checksums...");
 		long checksum1 = CRCChecksum.getCRCFromFile(ref);
-		long checksum2 = CRCChecksum.getCRCFromGZFile(outputFileP);
-		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
-		assertEquals(checksum1, checksum2);
+		long checksum2 = CRCChecksum.getCRCFromFile(outputFileP);
+		assertEquals("different shp-files.", checksum1, checksum2);
 		
 
 	}
@@ -81,11 +79,9 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setCoordinateReferenceSystem(crs);
 		new Network2ESRIShape(network,outputFileP, builder).write();
 		
-		System.out.println("calculating *.shp file checksums...");
 		long checksum1 = CRCChecksum.getCRCFromFile(ref);
-		long checksum2 = CRCChecksum.getCRCFromGZFile(outputFileP);
-		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
-		assertEquals(checksum1, checksum2);
+		long checksum2 = CRCChecksum.getCRCFromFile(outputFileP);
+		assertEquals("different shp-files.", checksum1, checksum2);
 	}
 	
 	public void testPolygonFreespeedShape() {
@@ -108,11 +104,9 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setCoordinateReferenceSystem(crs);
 		new Network2ESRIShape(network,outputFileP, builder).write();
 		
-		System.out.println("calculating *.shp file checksums...");
 		long checksum1 = CRCChecksum.getCRCFromFile(ref);
-		long checksum2 = CRCChecksum.getCRCFromGZFile(outputFileP);
-		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
-		assertEquals(checksum1, checksum2);
+		long checksum2 = CRCChecksum.getCRCFromFile(outputFileP);
+		assertEquals("different shp-files.", checksum1, checksum2);
 	}
 	
 	public void testLineStringShape() {
@@ -137,15 +131,13 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setCoordinateReferenceSystem(crs);
 		new Network2ESRIShape(network,outputFileShp, builder).write();
 		
-		System.out.println("calculating *.shp file checksums...");
 		long checksum1 = CRCChecksum.getCRCFromFile(refShp);
-		long checksum2 = CRCChecksum.getCRCFromGZFile(outputFileShp);
-		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
-		assertEquals(checksum1, checksum2);
+		long checksum2 = CRCChecksum.getCRCFromFile(outputFileShp);
+		assertEquals("different shp-files.", checksum1, checksum2);
 		
 //		System.out.println("calculating *.dbf file checksums...");
 //		checksum1 = CRCChecksum.getCRCFromFile(refDbf);;
-//		checksum2 = CRCChecksum.getCRCFromGZFile(outputFileDbf);
+//		checksum2 = CRCChecksum.getCRCFromFile(outputFileDbf);
 //		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 //		assertEquals(checksum1, checksum2);
 	}

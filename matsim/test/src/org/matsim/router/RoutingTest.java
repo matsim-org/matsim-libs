@@ -114,7 +114,7 @@ public class RoutingTest extends MatsimTestCase {
 		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		new MatsimPopulationReader(population, network).readFile(inPlansName);
 		population.printPlansCount();
-		long referenceChecksum = CRCChecksum.getCRCFromGZFile(inPlansName);
+		long referenceChecksum = CRCChecksum.getCRCFromFile(inPlansName);
 		log.info("Reference checksum = " + referenceChecksum + " file: " + inPlansName);
 
 		String outPlansName = getOutputDirectory() + provider.getName() + ".plans.xml.gz";
@@ -123,9 +123,9 @@ public class RoutingTest extends MatsimTestCase {
 		PopulationWriter plansWriter = new PopulationWriter(population, outPlansName,
 				config.plans().getOutputVersion());
 		plansWriter.write();
-		final long routerChecksum = CRCChecksum.getCRCFromGZFile(outPlansName);
+		final long routerChecksum = CRCChecksum.getCRCFromFile(outPlansName);
 		log.info("routerChecksum = " + routerChecksum + " file: " + outPlansName);
-		assertEquals(referenceChecksum, routerChecksum);
+		assertEquals("different plans files.", referenceChecksum, routerChecksum);
 	}
 
 	private void calcRoute(final RouterProvider provider, final NetworkLayer network, final Population population) {
