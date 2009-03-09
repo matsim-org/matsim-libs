@@ -54,11 +54,17 @@ public class CRCChecksum {
 
 	public static long getCRCFromFile(final String filename) {
 		InputStream in = null;
-	  try {
-			in = new BufferedInputStream(new FileInputStream(filename));
+		try {
+			if (filename.endsWith(".gz")) {
+				in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(filename)));
+			} else {
+			   in = new BufferedInputStream(new FileInputStream( filename ));
+			}
 			return getCRCFromStream(in);
 		} catch (FileNotFoundException e1) {
 			throw new RuntimeException(e1);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -68,7 +74,7 @@ public class CRCChecksum {
 			if (filename.endsWith(".gz") || filename.endsWith(".zip")) {
 				in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(filename)));
 			} else {
-			    in = new FileInputStream( filename );
+			    in = new FileInputStream(filename);
 			}
 			return getCRCFromStream(in);
 		} catch (IOException e1) {
