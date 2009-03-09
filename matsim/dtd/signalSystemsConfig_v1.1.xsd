@@ -33,7 +33,7 @@ the simulation -->
     </xs:documentation>
   </xs:annotation>
   <xs:complexContent>
-    <xs:extension base="matsimObjectType">
+    <xs:extension base="idRefType">
 		<xs:sequence>
 			<xs:element name="signalSystemControlInfo" type="signalSystemControlInfoType" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
@@ -158,7 +158,7 @@ the simulation -->
 					  <xs:attribute name="sec" type="xs:nonNegativeInteger" use="required"/>
 					</xs:complexType>
    		 	</xs:element>
-				<xs:element name="syncTime" minOccurs="0" maxOccurs="1" >
+				<xs:element name="syncronizationOffset" minOccurs="0" maxOccurs="1" >
     			<xs:annotation>
 		    		<xs:documentation>The second of the circulation time which is used
     				for synchronization.</xs:documentation>
