@@ -236,7 +236,8 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	public void write(final String filename) {
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(filename);
-			StringBuffer head = new StringBuffer("avg. Speed (car)\nlinkId\tCapacity");
+			StringBuffer head = new StringBuffer(
+					"avg. Speed (car)\nlinkId\tCapacity");
 			for (int i = 0; i < nofBins - 1; i++)
 				head.append("\tH" + Integer.toString(i) + "-"
 						+ Integer.toString(i + 1));
@@ -281,8 +282,9 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		for (int i = 0; i < xsLength; i++)
 			if (speedsCount[i] > 0)
 				ySpeed[i] = speeds[i] / speedsCount[i];
-		XYLineChart avgSpeedChart = new XYLineChart("avg. speed (car) in cityarea",
-				"time", "avg. speed (car) [km/h]");
+		XYLineChart avgSpeedChart = new XYLineChart(
+				"avg. speed (car) in cityarea", "time",
+				"avg. speed (car) [km/h]");
 		avgSpeedChart.addSeries("avg. speed of all agents (car)", xs, ySpeed);
 		avgSpeedChart.saveAsPng(chartFilename, 1024, 768);
 	}
@@ -327,8 +329,8 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
-		clas.write(outputPath + "avgSpeed.txt.gz");
-		clas.writeChart(outputPath + "avgSpeed.png");
+		clas.write(outputPath + "gauteng_avgSpeed.txt.gz");
+		clas.writeChart(outputPath + "gauteng_avgSpeed.png");
 
 		System.out.println("-> Done run_Gauteng!");
 		Gbl.printElapsedTime();
@@ -372,8 +374,8 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
-		clas.write(outputPath + "avgSpeed.txt.gz");
-		clas.writeChart(outputPath + "avgSpeed.png");
+		clas.write(outputPath + "roadpricing_avgSpeed.txt.gz");
+		clas.writeChart(outputPath + "roadpricing_avgSpeed.png");
 
 		System.out.println("-> Done!");
 		Gbl.printElapsedTime();

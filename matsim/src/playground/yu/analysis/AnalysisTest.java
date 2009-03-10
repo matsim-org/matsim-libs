@@ -38,6 +38,7 @@ import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
 
+import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -68,7 +69,8 @@ public class AnalysisTest {
 	private static void runIntern(final String[] args, final String scenario) {
 		final String netFilename = args[0];
 		final String eventsFilename = args[1];
-		final String outputpath = args[2];
+		String eventsOutputFilename=args[1].replaceFirst("events", "events4mvi");
+		final String outputpath = args[2]+args[args.length-1]+".";
 		String plansFilename = null;
 		if (args.length >= 4) {
 			if (args[3].endsWith("xml") || args[3].endsWith("xml.gz"))
@@ -163,8 +165,29 @@ public class AnalysisTest {
 		dd.write(outputpath);
 		dert.write(outputpath);
 
-		new OTFEvent2MVI(new QueueNetwork(network), eventsFilename, outputpath
-				+ "vis.mvi", Integer.parseInt(args[args.length - 1])).convert();
+		SimpleReader sr = new SimpleReader(eventsFilename);
+		SimpleWriter sw2 = new SimpleWriter(eventsOutputFilename);
+
+		String line = sr.readLine();
+		sw2.writeln(line);
+		// after filehead
+		double time = 0;
+		while (line != null && time < 108000.0) {
+			line = sr.readLine();
+			if (line != null) {
+				sw2.writeln(line);
+				time = Double.parseDouble(line.split("\t")[0]);
+			}
+		}
+		try {
+			sr.close();
+			sw2.close();
+		} catch (Exception e) {
+			System.err.println(e);
+		}
+		
+		new OTFEvent2MVI(new QueueNetwork(network), eventsOutputFilename, outputpath
+				+ "vis.mvi", Integer.parseInt(args[args.length - 2])).convert();
 
 		System.out.println("done.");
 	}
