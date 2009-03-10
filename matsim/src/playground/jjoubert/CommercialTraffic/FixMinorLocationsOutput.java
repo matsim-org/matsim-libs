@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class FixMinorLocationsOutput {
 	// String value that must be set
-	final static String PROVINCE = "KZN";
+	final static String PROVINCE = "WesternCape";
 	// Mac
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
