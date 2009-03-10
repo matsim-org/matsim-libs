@@ -236,7 +236,7 @@ public class QueueSimulation {
 		cleanupSim();
 	}
 
-	protected final void createAgents() {
+	protected void createAgents() {
 		if (this.plans == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
