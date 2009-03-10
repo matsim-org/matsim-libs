@@ -31,6 +31,8 @@ public class FixMinorLocationsOutput {
 			try{
 				String header = input.nextLine();
 				output.write( header );
+				output.newLine();
+				
 				while(input.hasNextLine() ){
 					String line = input.nextLine();
 					String [] lineSplit = line.split( DELIMITER );
