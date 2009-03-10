@@ -59,7 +59,7 @@ public class LightSignalSystemConfigurationsReader10 extends MatsimJaxbXmlParser
 
 	private BasicSignalSystemConfigurations lssConfigurations;
   
-	LightSignalSystemConfigurationsReader10(BasicSignalSystemConfigurations lssConfigs, String schemaLocation) {
+	public LightSignalSystemConfigurationsReader10(BasicSignalSystemConfigurations lssConfigs, String schemaLocation) {
 		super(schemaLocation);
 		this.lssConfigurations = lssConfigs;
 		this.builder = lssConfigs.getBuilder();

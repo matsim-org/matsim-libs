@@ -73,7 +73,7 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter {
 		log.info("writing to file: " + filename);
   	JAXBContext jc;
 		try {
-			jc = JAXBContext.newInstance(org.matsim.jaxb.lightsignalsystems10.ObjectFactory.class);
+			jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions11.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
 			super.setMarshallerProperties(MatsimLaneDefinitionsReader.SCHEMALOCATIONV11, m);
 			m.marshal(this.xmlLaneDefinitions, IOUtils.getBufferedWriter(filename)); 

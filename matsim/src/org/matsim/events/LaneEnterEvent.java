@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * LaneEnterEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.events;
 
-package org.matsim.network;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-public class AllTests {
-
-	public static Test suite() {
-
-		TestSuite suite = new TestSuite("Tests for org.matsim.network");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(KmlNetworkWriterTest.class);
-		suite.addTestSuite(LinkImplTest.class);
-		suite.addTestSuite(NetworkChangeEventsParserWriterTest.class);
-		suite.addTestSuite(NetworkFactoryTest.class);
-		suite.addTestSuite(NetworkParserWriterTest.class);
-		suite.addTestSuite(TimeVariantLinkImplTest.class);
-		suite.addTestSuite(LaneDefinitionsReaderWriterTest.class);
-		suite.addTest(org.matsim.network.algorithms.AllTests.suite());
-		//$JUnit-END$
-		return suite;
-	}
+/**
+ * @author dgrether
+ *
+ */
+public class LaneEnterEvent {
 
 }

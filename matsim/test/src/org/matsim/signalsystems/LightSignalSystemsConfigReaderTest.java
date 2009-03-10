@@ -36,7 +36,7 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
 
-  private static final String TESTXML  = "testLightSignalSystemsConfig.xml";
+  private static final String TESTXML  = "testSignalSystemConfigurations_v1.1.xml";
 
   private Id id8 = new IdImpl("8");
 
@@ -50,7 +50,7 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
   
   public void testParser() {
   	BasicSignalSystemConfigurations lssConfigs = new BasicSignalSystemConfigurationsImpl();
-  	MatsimSignalSystemConfigurationReader reader = new MatsimSignalSystemConfigurationReader(lssConfigs);
+  	MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(lssConfigs);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
   }
   
@@ -58,7 +58,7 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
   	String testoutput = this.getOutputDirectory()  + "testLssConfigOutput.xml";
   	//read the test file
   	BasicSignalSystemConfigurations lssConfigs = new BasicSignalSystemConfigurationsImpl();
-  	MatsimSignalSystemConfigurationReader reader = new MatsimSignalSystemConfigurationReader(lssConfigs);
+  	MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(lssConfigs);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
 
   	//write the test file
@@ -66,7 +66,7 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
   	writer.writeFile(testoutput);
   	
   	lssConfigs = new BasicSignalSystemConfigurationsImpl();
-  	reader = new MatsimSignalSystemConfigurationReader(lssConfigs);
+  	reader = new MatsimSignalSystemConfigurationsReader(lssConfigs);
   	reader.readFile(testoutput);
   	checkContent(lssConfigs);
   }
@@ -106,7 +106,7 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
 		assertEquals(id8, plan.getId());
 		assertEquals(0.0, plan.getStartTime(), EPSILON);
 		assertEquals(0.0, plan.getEndTime(), EPSILON);
-		assertNull(plan.getCirculationTime());
+		assertEquals(Integer.valueOf(60), plan.getCirculationTime());
 		assertNull(plan.getSyncronizationOffset());
 		assertEquals(1, plan.getGroupConfigs().size());
 		groupConfig = plan.getGroupConfigs().get(id23);

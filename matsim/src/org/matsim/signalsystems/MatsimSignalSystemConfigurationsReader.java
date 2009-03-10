@@ -38,19 +38,19 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-public class MatsimSignalSystemConfigurationReader {
+public class MatsimSignalSystemConfigurationsReader {
 
 	private static final Logger log = Logger
-			.getLogger(MatsimSignalSystemConfigurationReader.class);
+			.getLogger(MatsimSignalSystemConfigurationsReader.class);
 
 	public static final String SIGNALSYSTEMSCONFIG10 = "http://www.matsim.org/files/dtd/lightSignalSystemsConfig_v1.0.xsd";
 
-	public static final String SIGNALSYSTEMSCONFIG11 = "http://www.matsim.org/files/dtd/signalSystemsConfig_v1.0.xsd";
+	public static final String SIGNALSYSTEMSCONFIG11 = "http://www.matsim.org/files/dtd/signalSystemsConfig_v1.1.xsd";
 
 	private BasicSignalSystemConfigurations lightSignalSystemConfigs;
 
 
-	public MatsimSignalSystemConfigurationReader(BasicSignalSystemConfigurations lssConfigs) {
+	public MatsimSignalSystemConfigurationsReader(BasicSignalSystemConfigurations lssConfigs) {
 		this.lightSignalSystemConfigs = lssConfigs;
 	}
 

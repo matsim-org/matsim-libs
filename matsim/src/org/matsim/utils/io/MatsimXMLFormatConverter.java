@@ -35,7 +35,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriterV5;
-import org.matsim.signalsystems.MatsimSignalSystemConfigurationReader;
+import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
@@ -102,7 +102,7 @@ public class MatsimXMLFormatConverter {
 		//create containers
 		BasicSignalSystemConfigurations signalSystemConfigs = new BasicSignalSystemConfigurationsImpl();
 		//read old format
-		MatsimSignalSystemConfigurationReader reader = new MatsimSignalSystemConfigurationReader(signalSystemConfigs);
+		MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(signalSystemConfigs);
 		reader.readFile(signalsystemconfigsv10);
 		//write new formats
 		MatsimSignalSystemConfigurationsWriter writer = new MatsimSignalSystemConfigurationsWriter(signalSystemConfigs);

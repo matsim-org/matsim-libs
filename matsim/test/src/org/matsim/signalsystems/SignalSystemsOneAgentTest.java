@@ -20,6 +20,7 @@
 package org.matsim.signalsystems;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.network.BasicLaneDefinitions;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
@@ -71,19 +72,22 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 	public void testTrafficLightIntersection2arms1Agent() {
 		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
 		String plansFile = this.getClassInputDirectory() + "plans1Agent.xml";
-		String lsaDefinition = this.getClassInputDirectory() + "lsa.xml";
-		String lsaConfig = this.getClassInputDirectory() + "lsa_config.xml";
+		String laneDefinitions = this.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
+		String lsaDefinition = this.getClassInputDirectory() + "testSignalSystems_v1.1.xml";
+		String lsaConfig = this.getClassInputDirectory() + "testSignalSystemConfigurations_v1.1.xml";
+		conf.network().setLaneDefinitionsFile(laneDefinitions);
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 		conf.plans().setInputFile(plansFile);
 		ScenarioData data = new ScenarioData(conf);
+		BasicLaneDefinitions lanedefs = data.getLaneDefinitions();
 		BasicSignalSystems signalSystems = data.getSignalSystems();
 
 		Events events = new Events();
 		events.addHandler(this);
 
 		BasicSignalSystemConfigurations lssConfigs = new BasicSignalSystemConfigurationsImpl();
-  	MatsimSignalSystemConfigurationReader reader = new MatsimSignalSystemConfigurationReader(lssConfigs);
+  	MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(lssConfigs);
 		reader.readFile(lsaConfig);
 		for (BasicSignalSystemConfiguration lssConfig : lssConfigs.getSignalSystemConfigurations().values()) {
 			BasicPlanBasedSignalSystemControlInfo controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfig
@@ -98,7 +102,7 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 
 		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data
 				.getPopulation(), events);
-		sim.setLaneDefinitions(data.getLaneDefinitions());
+		sim.setLaneDefinitions(lanedefs);
 		sim.setSignalSystems(signalSystems, lssConfigs);
 		sim.run();
 		

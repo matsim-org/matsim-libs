@@ -64,7 +64,7 @@ public class LightSignalSystemsReader10 extends MatsimJaxbXmlParser {
 	private BasicLaneDefinitionsBuilder laneBuilder;
 
 
-	LightSignalSystemsReader10(BasicLaneDefinitions laneDefs,
+	public LightSignalSystemsReader10(BasicLaneDefinitions laneDefs,
 			BasicSignalSystems lightSignalSystems, String schemaLocation) {
 		super(schemaLocation);
 		this.laneDefinitions = laneDefs;

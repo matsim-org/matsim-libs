@@ -53,7 +53,7 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 
 	private BasicSignalSystemsBuilder builder;
 
-	SignalSystemsReader11(BasicSignalSystems lightSignalSystems, String schemaLocation) {
+	public SignalSystemsReader11(BasicSignalSystems lightSignalSystems, String schemaLocation) {
 		super(schemaLocation);
 		this.lightSignalSystems = lightSignalSystems;
 		this.builder = this.lightSignalSystems.getSignalSystemsBuilder();

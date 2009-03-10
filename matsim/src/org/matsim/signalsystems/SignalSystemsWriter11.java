@@ -55,7 +55,7 @@ public class SignalSystemsWriter11 extends MatsimJaxbXmlWriter {
 	private XMLSignalSystems xmlLightSignalSystems;
 
 
-	SignalSystemsWriter11(BasicSignalSystems basiclss) {
+	public SignalSystemsWriter11(BasicSignalSystems basiclss) {
 		this.blss = basiclss;
 		this.xmlLightSignalSystems = convertBasicToXml();
 	}	

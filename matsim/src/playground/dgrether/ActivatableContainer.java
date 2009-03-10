@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * ActivatableContainer
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,51 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.dgrether;
 
-package org.matsim.network;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
-public class AllTests {
 
-	public static Test suite() {
+/**
+ * @author dgrether
+ *
+ */
+public class ActivatableContainer<T> implements Comparable<ActivatableContainer<T>>{
+	private final double time;
+	private final T activatableObject;
 
-		TestSuite suite = new TestSuite("Tests for org.matsim.network");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(KmlNetworkWriterTest.class);
-		suite.addTestSuite(LinkImplTest.class);
-		suite.addTestSuite(NetworkChangeEventsParserWriterTest.class);
-		suite.addTestSuite(NetworkFactoryTest.class);
-		suite.addTestSuite(NetworkParserWriterTest.class);
-		suite.addTestSuite(TimeVariantLinkImplTest.class);
-		suite.addTestSuite(LaneDefinitionsReaderWriterTest.class);
-		suite.addTest(org.matsim.network.algorithms.AllTests.suite());
-		//$JUnit-END$
-		return suite;
+
+	public ActivatableContainer(final double time, final T activatableObject){
+		this.time = time;
+		this.activatableObject = activatableObject;
+	}
+	
+	public int compareTo(final ActivatableContainer<T> o) {
+		if (this.time < o.time) return -1;
+		if (this.time > o.time) return +1;
+		return 0;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) return false;
+		if (!(obj instanceof ActivatableContainer)) return false;
+		ActivatableContainer<T> la = (ActivatableContainer<T>)obj;
+		return (this.time == la.time) && (this.activatableObject.equals(la.activatableObject));
+	}
+
+	@Override
+	public int hashCode() {
+		return this.activatableObject.hashCode();
+	}
+	
+	public T getActivatableObject(){
+		return this.activatableObject;
+	}
+
+	public double getTime() {
+		return this.time;
 	}
 
 }

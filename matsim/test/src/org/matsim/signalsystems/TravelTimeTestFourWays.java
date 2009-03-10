@@ -65,11 +65,17 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 
 	public void testTrafficLightIntersection4arms() {
 		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
-		String lsaDefinition = this.getClassInputDirectory() + "lsa.xml";
-		String lsaConfig = this.getClassInputDirectory() + "lsa_config.xml";
+		String laneDefinitions = this.getClassInputDirectory()
+				+ "testLaneDefinitions_v1.1.xml";
+		String lsaDefinition = this.getClassInputDirectory()
+				+ "testSignalSystems_v1.1.xml";
+		String lsaConfig = this.getClassInputDirectory()
+				+ "testSignalSystemConfigurations_v1.1.xml";
+		conf.network().setLaneDefinitionsFile(laneDefinitions);
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 		ScenarioData data = new ScenarioData(conf);
+
 		Events events = new Events();
 		events.addHandler(this);
 		String tempout = this.getOutputDirectory() + "temp.txt.gz";
@@ -89,8 +95,13 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 
 	public void testTrafficLightIntersection4armsWithUTurn() {
 		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
-		String lsaDefinition = this.getClassInputDirectory() + "lsa.xml";
-		String lsaConfig = this.getClassInputDirectory() + "lsa_config.xml";
+		String laneDefinitions = this.getClassInputDirectory()
+				+ "testLaneDefinitions_v1.1.xml";
+		String lsaDefinition = this.getClassInputDirectory()
+				+ "testSignalSystems_v1.1.xml";
+		String lsaConfig = this.getClassInputDirectory()
+				+ "testSignalSystemConfigurations_v1.1.xml";
+		conf.network().setLaneDefinitionsFile(laneDefinitions);
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 		conf.plans().setInputFile(this.getClassInputDirectory() + "plans_uturn.xml.gz");

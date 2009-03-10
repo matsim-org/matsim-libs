@@ -42,7 +42,7 @@ import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.NetworkLayer;
-import org.matsim.signalsystems.MatsimSignalSystemConfigurationReader;
+import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.utils.vis.otfvis.executables.OnTheFlyClientQuadSwing;
 import org.matsim.utils.vis.otfvis.gui.PreferencesDialog;
@@ -77,7 +77,7 @@ public class QSim extends QueueSimulation {
 		MatsimSignalSystemsReader lsaReader = new MatsimSignalSystemsReader(lanedef, newSignalSystems);
 
 		BasicSignalSystemConfigurations newSignalSystemsConfig = new BasicSignalSystemConfigurationsImpl();
-		MatsimSignalSystemConfigurationReader lsaReaderConfig = new MatsimSignalSystemConfigurationReader(newSignalSystemsConfig);
+		MatsimSignalSystemConfigurationsReader lsaReaderConfig = new MatsimSignalSystemConfigurationsReader(newSignalSystemsConfig);
 		
 		lsaReader.readFile(this.newLSADef);
 		lsaReaderConfig.readFile(this.newLSADefCfg);

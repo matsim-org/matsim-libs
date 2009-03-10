@@ -40,6 +40,7 @@ import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.network.MatsimLaneDefinitionsReader;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkChangeEventsParser;
 import org.matsim.network.NetworkFactory;
@@ -47,7 +48,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
-import org.matsim.signalsystems.MatsimSignalSystemConfigurationReader;
+import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.MatsimWorldReader;
@@ -220,8 +221,8 @@ public class ScenarioData implements BasicScenario {
 	public BasicLaneDefinitions getLaneDefinitions(){
 		if (this.laneDefinitions == null){
 			this.laneDefinitions = new BasicLaneDefinitionsImpl();
-			//TODO dg remove the warning and write a parser
-			log.warn("LaneDefinitions are not yet parsed separately!!!");
+			MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(this.laneDefinitions);
+			reader.readFile(this.config.network().getLaneDefinitionsFile());
 		}
 		return this.laneDefinitions;
 	}
@@ -230,9 +231,17 @@ public class ScenarioData implements BasicScenario {
 		if ((this.config == null) || (this.config.signalSystems() == null)){
 			throw new IllegalStateException("SignalSystems can only be loaded if set in config");
 		}
-		if (this.signalSystems == null) {
+		//we try to parse the deprecated format
+		if ((this.signalSystems == null) && (this.laneDefinitions == null)) {
+			this.laneDefinitions = new BasicLaneDefinitionsImpl();
 			this.signalSystems = new BasicSignalSystemsImpl();
-			MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(this.getLaneDefinitions(), this.signalSystems);
+			MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(this.laneDefinitions, this.signalSystems);
+			log.info("loading signalsystems from " + this.config.signalSystems().getSignalSystemFile());
+			reader.readFile(this.config.signalSystems().getSignalSystemFile());
+		}
+		else if (this.signalSystems == null){
+			this.signalSystems = new BasicSignalSystemsImpl();
+			MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(this.signalSystems);
 			log.info("loading signalsystems from " + this.config.signalSystems().getSignalSystemFile());
 			reader.readFile(this.config.signalSystems().getSignalSystemFile());
 		}
@@ -245,7 +254,7 @@ public class ScenarioData implements BasicScenario {
 		}
 		if (this.signalSystemConfigurations == null){
 			this.signalSystemConfigurations = new BasicSignalSystemConfigurationsImpl();
-			MatsimSignalSystemConfigurationReader reader = new MatsimSignalSystemConfigurationReader(this.signalSystemConfigurations);
+			MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(this.signalSystemConfigurations);
 			log.info("loading signalsystemsconfiguration from " + this.config.signalSystems().getSignalSystemConfigFile());
 			reader.readFile(this.config.signalSystems().getSignalSystemConfigFile());
 		}

@@ -63,7 +63,7 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 
 	private BasicLaneDefinitions lanes;
 
-	LightSignalSystemsWriter10(BasicLaneDefinitions lanes, BasicSignalSystems basiclss) {
+	public LightSignalSystemsWriter10(BasicLaneDefinitions lanes, BasicSignalSystems basiclss) {
 		this.lanes = lanes;
 		this.blss = basiclss;
 		this.xmlLightSignalSystems = convertBasicToXml();

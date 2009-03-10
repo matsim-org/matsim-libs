@@ -41,6 +41,8 @@ public class NetworkConfigGroup extends Module {
 	private static final String TIME_VARIANT_NETWORK = "timeVariantNetwork";
 	private static final String CHANGE_EVENTS_INPUT_FILE = "inputChangeEventsFile";
 	private static final String CHANGE_EVENTS_OUTPUT_FILE = "outputChangeEventsFile";
+	
+	public static final String LANEDEFINITIONSINPUTFILE = "laneDefinitionsFile";
 
 	private String inputFile = null;
 	private String outputFile = null;
@@ -49,6 +51,8 @@ public class NetworkConfigGroup extends Module {
 	private String changeEventsOutputFile = null;
 
 	private boolean timeVariantNetwork = false;
+
+	private String laneDefinitionsFile = null;
 
 	private static final Logger log = Logger.getLogger(NetworkConfigGroup.class);
 
@@ -68,7 +72,10 @@ public class NetworkConfigGroup extends Module {
 			return getChangeEventsOutputFile();
 		} else if (NetworkConfigGroup.TIME_VARIANT_NETWORK.equals(key)) {
 			return isTimeVariantNetwork() ? "true" : "false";
-		} else {
+		} else if (NetworkConfigGroup.LANEDEFINITIONSINPUTFILE.equals(key)){
+			return getLaneDefinitionsFile();
+		}
+		else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -87,7 +94,9 @@ public class NetworkConfigGroup extends Module {
 			setChangeEventOutputFile(value.replace('\\', '/'));
 		} else if (NetworkConfigGroup.TIME_VARIANT_NETWORK.equals(key)) {
 			setTimeVariantNetwork("true".equals(value) || "yes".equals(value));
-		} else {
+		} else if (NetworkConfigGroup.LANEDEFINITIONSINPUTFILE.equals(key)){
+			setLaneDefinitionsFile(value.replace('\\', '/'));
+		}	else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -100,6 +109,7 @@ public class NetworkConfigGroup extends Module {
 		map.put(NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE, getValue(NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE));
 		map.put(NetworkConfigGroup.CHANGE_EVENTS_OUTPUT_FILE, getValue(NetworkConfigGroup.CHANGE_EVENTS_OUTPUT_FILE));
 		map.put(NetworkConfigGroup.TIME_VARIANT_NETWORK, getValue(NetworkConfigGroup.TIME_VARIANT_NETWORK));
+		map.put(NetworkConfigGroup.LANEDEFINITIONSINPUTFILE, getValue(NetworkConfigGroup.LANEDEFINITIONSINPUTFILE));
 		return map;
 	}
 
@@ -138,6 +148,14 @@ public class NetworkConfigGroup extends Module {
 	}
 	public boolean isTimeVariantNetwork() {
 		return this.timeVariantNetwork;
+	}
+
+	public void setLaneDefinitionsFile(String laneDefinitions) {
+		this.laneDefinitionsFile = laneDefinitions;
+	}
+	
+	public String getLaneDefinitionsFile(){
+		return this.laneDefinitionsFile;
 	}
 
 

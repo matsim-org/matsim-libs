@@ -60,7 +60,7 @@ public class LightSignalSystemConfigurationsWriter10 extends MatsimJaxbXmlWriter
 	private BasicSignalSystemConfigurations blssconfs;
 	private XMLLightSignalSystemConfig xmllssconfig;
 
-	LightSignalSystemConfigurationsWriter10(BasicSignalSystemConfigurations basiclssconfigs) {
+	public LightSignalSystemConfigurationsWriter10(BasicSignalSystemConfigurations basiclssconfigs) {
 		this.blssconfs = basiclssconfigs;
 		try {
 			this.xmllssconfig = convertBasicToXml();
@@ -77,7 +77,7 @@ public class LightSignalSystemConfigurationsWriter10 extends MatsimJaxbXmlWriter
 		try {
 			jc = JAXBContext.newInstance(org.matsim.jaxb.lightsignalsystemsconfig10.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller(); 
-			super.setMarshallerProperties(MatsimSignalSystemConfigurationReader.SIGNALSYSTEMSCONFIG10, m);
+			super.setMarshallerProperties(MatsimSignalSystemConfigurationsReader.SIGNALSYSTEMSCONFIG10, m);
 			m.marshal(this.xmllssconfig, IOUtils.getBufferedWriter(filename)); 
 		} catch (JAXBException e) {
 			e.printStackTrace();
