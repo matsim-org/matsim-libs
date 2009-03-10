@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008, 2009 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -32,6 +32,8 @@ import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PopulationImpl;
+import org.matsim.utils.io.MatsimFileTypeGuesser;
+import org.matsim.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
 import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientFileQuad;
 import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientQuad;
@@ -54,9 +56,10 @@ public class OTFVis {
 		System.out.println("usage 1: OTFVis mvi-file");
 		System.out.println("usage 2: OTFVis veh-file network-file");
 		System.out.println("usage 3: OTFVis config-file");
-		System.out.println("usage 4: OTFVis -convert event-file network-file mvi-file [snapshot-period]");
+		System.out.println("usage 4: OTFVis network-file");
+		System.out.println("usage 5: OTFVis -convert event-file network-file mvi-file [snapshot-period]");
 		System.out.println();
-		System.out.println("Usages 1-3: Starts the Visualizer");
+		System.out.println("Usages 1-4: Starts the Visualizer");
 		System.out.println("mvi-file:      A MATSim visualizer file that contains a pre-recorder state");
 		System.out.println("               to be visualized (*.mvi).");
 		System.out.println("veh-file:      A TRANSIMS vehicle file to be visualized (*.veh).");
@@ -65,12 +68,12 @@ public class OTFVis {
 		System.out.println("               a QueueSimulation will be started and visualized in real-time, ");
 		System.out.println("               allowing to interactively query the state of single agents");
 		System.out.println();
-		System.out.println("Usage 4: Convert events into a mvi-file");
+		System.out.println("Usage 5: Convert events into a mvi-file");
 		System.out.println("snapshot-period:  Optional. Specify how often a snapshot should be taken when");
 		System.out.println("                  reading the events, in seconds. Default: 600 seconds");
 		System.out.println();
-		System.out.println("----------------");
-		System.out.println("2008, matsim.org");
+		System.out.println("---------------------");
+		System.out.println("2008-2009, matsim.org");
 		System.out.println();
 	}
 
@@ -84,8 +87,19 @@ public class OTFVis {
 			playVEH(args);
 		} else if (arg0l.endsWith(".mvi")) {
 			playMVI(args);
-		} else if (arg0l.contains("config") && (arg0l.endsWith(".xml") || arg0l.endsWith(".xml.gz"))) {
-			playConfig(args);
+		} else if ((arg0l.endsWith(".xml") || arg0l.endsWith(".xml.gz"))) {
+			FileType type;
+			try {
+				type = new MatsimFileTypeGuesser(args[0]).getGuessedFileType();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			}
+			if (FileType.Config.equals(type)) {
+				playConfig(args);
+			} else if (FileType.Network.equals(type)) {
+				playNetwork(args);
+			}
 		} else if (arg0l.equals("-convert")) {
 			convert(args);
 		} else {
@@ -136,6 +150,17 @@ public class OTFVis {
 		}
 
 		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(data.getNetwork(), pop, events);
+		client.run();
+	}
+	
+	public static final void playNetwork(final String[] args) {
+		Gbl.createConfig(null);
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(args[0]);
+		Population population = new PopulationImpl();
+		Events events = new Events();
+		
+		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(network, population, events);
 		client.run();
 	}
 
