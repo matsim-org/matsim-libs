@@ -36,7 +36,7 @@ public class IOUtilsTest extends MatsimTestCase {
 	 */
 	public void testInitOutputDirLogging() throws IOException {
 		String outDir = this.getOutputDirectory();
-		IOUtils.initOutputDirLogging(outDir, null);
+		IOUtils.initOutputDirLogging(outDir, null, null);
 		
 		File l = new File(outDir + IOUtils.LOGFILE);
 		File errorLog = new File(outDir + IOUtils.WARNLOGFILE);

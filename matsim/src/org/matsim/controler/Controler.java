@@ -462,7 +462,7 @@ public class Controler {
 	private void initLogging() {
 		Logger.getRootLogger().removeAppender(this.collectLogMessagesAppender);
 		try {
-			IOUtils.initOutputDirLogging(this.config.controler().getOutputDirectory(), this.collectLogMessagesAppender.getLogEvents());
+			IOUtils.initOutputDirLogging(this.config.controler().getOutputDirectory(), this.collectLogMessagesAppender.getLogEvents(), this.config.controler().getRunId());
 		} catch (IOException e) {
 			log.error("Cannot create logfiles: " + e.getMessage());
 			e.printStackTrace();

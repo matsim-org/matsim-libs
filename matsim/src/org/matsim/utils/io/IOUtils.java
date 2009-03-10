@@ -69,16 +69,29 @@ public class IOUtils {
 	 * @author dgrether
 	 */
 	public static void initOutputDirLogging(final String outputDirectory, final List<LoggingEvent> logEvents) throws IOException {
+		IOUtils.initOutputDirLogging(outputDirectory, logEvents, null);
+	}
+	
+	/**
+	 * Can be used to add a prefix (e.g. specifying the runId) to the logfiles
+	 * @see IOUtils#initOutputDirLogging(String, List);
+	 */
+	public static void initOutputDirLogging(final String outputDirectory, final List<LoggingEvent> logEvents, final String runIdPrefix) throws IOException {
+		String prefix = runIdPrefix;
+		if (prefix == null) {
+			prefix = ""; 
+		}
+		else{
+			prefix = prefix + ".";
+		}
 		Logger root = Logger.getRootLogger();
 		FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory +
-				System.getProperty("file.separator") + LOGFILE);
+				System.getProperty("file.separator") + prefix + LOGFILE);
 		appender.setName(LOGFILE);
 		root.addAppender(appender);
 		FileAppender warnErrorAppender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory +
-				System.getProperty("file.separator") + WARNLOGFILE);
+				System.getProperty("file.separator") + prefix + WARNLOGFILE);
 		warnErrorAppender.setName(WARNLOGFILE);
-		//dg dec 08: the following deprecated line should, in theory, be replaced by the code commented below,
-		//however it is only working with the deprecated method
 		warnErrorAppender.setThreshold(Level.WARN);
 //		LevelRangeFilter filter = new LevelRangeFilter();
 //		filter.setLevelMax(Level.ALL);
@@ -95,6 +108,7 @@ public class IOUtils {
 			}
 		}
 	}
+	
 	/**
 	 * Call this method to close the log file streams opened by a call of IOUtils.initOutputDirLogging().
 	 * This avoids problems concerning open streams after the termination of the program.

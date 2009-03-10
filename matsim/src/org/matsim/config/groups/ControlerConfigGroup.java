@@ -43,6 +43,7 @@ public class ControlerConfigGroup extends Module {
 	private static final String TRAVEL_TIME_BIN_SIZE = "travelTimeBinSize";
 	private static final String TRAVEL_TIME_AGGREGATOR = "travelTimeAggregator";
 	private static final String ROUTINGALGORITHMTYPE = "routingAlgorithmType";
+	private static final String RUNID = "runId";
 	
 	private String outputDirectory = "./output";
 	private int firstIteration = 0;
@@ -51,6 +52,8 @@ public class ControlerConfigGroup extends Module {
 	private String travelTimeAggregator = "optimistic";
 	private int traveltimeBinSize = 15 * 60; // use a default of 15min time-bins for analyzing the travel times
 	private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.AStarLandmarks;
+
+	private String runId = null;
 	
 	public ControlerConfigGroup() {
 		super(GROUP_NAME);
@@ -72,7 +75,10 @@ public class ControlerConfigGroup extends Module {
 			return Integer.toString(getTraveltimeBinSize());
 		} else if (ROUTINGALGORITHMTYPE.equals(key)){
 			return this.getRoutingAlgorithmType().toString();
-		} else {
+		} else if (RUNID.equals(key)){
+			return this.getRunId();
+		}
+		else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -101,6 +107,8 @@ public class ControlerConfigGroup extends Module {
 			else {
 				throw new IllegalArgumentException(value + " is not a valid parameter value for key: "+ key + " of config group " + this.GROUP_NAME);
 			}
+		} else if (RUNID.equals(key)){
+			this.setRunId(value.trim());
 		}
 		else {
 			throw new IllegalArgumentException(key);
@@ -117,6 +125,7 @@ public class ControlerConfigGroup extends Module {
 		map.put(TRAVEL_TIME_AGGREGATOR, getValue(TRAVEL_TIME_AGGREGATOR));
 		map.put(TRAVEL_TIME_BIN_SIZE, getValue(TRAVEL_TIME_BIN_SIZE));		
 		map.put(ROUTINGALGORITHMTYPE, getValue(ROUTINGALGORITHMTYPE));
+		map.put(RUNID, getValue(RUNID));
 		return map;
 	}
 	
@@ -125,6 +134,7 @@ public class ControlerConfigGroup extends Module {
 		Map<String,String> map = super.getComments();
 		map.put(TRAVEL_TIME_BIN_SIZE, "The size of the time bin (in sec) into which the link travel times are aggregated for the router") ;
 		map.put(ROUTINGALGORITHMTYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + " or " + RoutingAlgorithmType.AStarLandmarks);
+		map.put(RUNID, "An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc.");
 		return map;
 	}
 
@@ -195,6 +205,14 @@ public class ControlerConfigGroup extends Module {
 	
 	public void setRoutingAlgorithmType(RoutingAlgorithmType type){
 		this.routingAlgorithmType = type;
+	}
+	
+	public String getRunId(){
+		return this.runId;
+	}
+	
+	public void setRunId(String runid){
+		this.runId = runid;
 	}
 	
 }
