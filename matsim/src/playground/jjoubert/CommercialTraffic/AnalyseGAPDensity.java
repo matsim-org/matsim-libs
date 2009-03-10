@@ -22,8 +22,12 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * Class to 
- * @author johanwjoubert
+ * Class to read minor and major activity files for a given study area. The study area
+ * is demarcated according to the Geospatial Analysis Platform (GAP) mesozones as 
+ * developed by the CSIR Built Environment. The activities are then split on an hour-
+ * by-hour basis using the start time of the activity. 
+ * 
+ * @author johanwjoubert	
  *
  */
 public class AnalyseGAPDensity {

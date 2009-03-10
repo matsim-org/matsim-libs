@@ -105,7 +105,7 @@ public class ActivityLocations {
 					processVehicleActivities(thisVehicle, thisFile, log);
 
 					if(thisVehicle.getChains().size() > 0){
-						// Write home locations to file
+						// Write major locations to file
 						for(Activity majorActivity: thisVehicle.getHomeLocation() ){
 							majorLocations.write( locationString(majorActivity) );
 							majorLocations.newLine();
@@ -114,8 +114,9 @@ public class ActivityLocations {
 						
 						// Write activity locations to file 
 						for(Chain thisChain: thisVehicle.getChains() ){
-							for(Activity minorActivity: thisChain.getActivities() ){
-								minorLocations.write( locationString(minorActivity) );
+							// Do NOT consider the major locations at the end-points of each chain
+							for(int j = 1; j < thisChain.getActivities().size() - 1; j++){ 
+								minorLocations.write( locationString(thisChain.getActivities().get(j) ) );
 								minorLocations.newLine();
 								numberOfMinorActivities++;
 							}
