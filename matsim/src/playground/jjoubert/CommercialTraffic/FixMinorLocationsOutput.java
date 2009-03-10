@@ -27,16 +27,20 @@ public class FixMinorLocationsOutput {
 		try {
 			Scanner input = new Scanner(new BufferedReader(new FileReader( new File(IN_FILE ) ) ) );
 			BufferedWriter output = new BufferedWriter(new FileWriter(new File(OUT_FILE ) ) );
-			
-			String header = input.nextLine();
-			output.write( header );
-			while(input.hasNextLine() ){
-				String line = input.nextLine();
-				String [] lineSplit = line.split( DELIMITER );
-				if( Integer.parseInt(lineSplit[4]) < THRESHOLD ){
-					output.write( line );
-					output.newLine();
+
+			try{
+				String header = input.nextLine();
+				output.write( header );
+				while(input.hasNextLine() ){
+					String line = input.nextLine();
+					String [] lineSplit = line.split( DELIMITER );
+					if( Integer.parseInt(lineSplit[4]) < THRESHOLD ){
+						output.write( line );
+						output.newLine();
+					}
 				}
+			} finally{
+				output.close();
 			}
 			
 		} catch (FileNotFoundException e) {
