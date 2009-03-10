@@ -4,29 +4,35 @@
 <transitSchedule>
 
 	<transitLine id="T1">
-		<transitRoutes>
-			<transitRoute id="1">
-				<description></description>
-				<routeProfile>
-					 <!-- arrival is optional, departure required for all but last, time infos are just offsets -->
-					<stop ref="stop1" departure="00:00:00" /><!-- implicitly specify link1 -->
+		<transitRoute id="1">
+			<description></description>
+			<routeProfile>
+				 <!-- arrival is optional, departure required for all but last, time infos are just offsets -->
+				<link ref="1">
+					<stop ref="stop1" departure="00:00:00" />
+				</link>
+				<link ref="3">
 					<stop ref="stop2" arrival="00:01:20" departure="00:01:40" />
-					<link ref="4" />
+				</link>
+				<link ref="4" />
+				<link ref="5">
 					<stop ref="stop3" departure="00:03:00" />
 					<stop ref="stop4" departure="00:03:50" />
+				</link>
+				<link ref="6">
 					<stop ref="stop5" departure="00:04:50" />
+				</link>
+				<link ref="8">
 					<stop ref="stop6" arrival="00:05:30" />
-				</routeProfile>
+				</link>
+			</routeProfile>
 
-				<departures>
-					<departure id="T1.1" departureTime="07:00:00" />
-					<departure id="T1.2" departureTime="07:10:00" />
-					<departure id="T1.3" departureTime="07:20:00" />
-				</departures>
-			</transitRoute>
-			
-		</transitRoutes><!-- braucht es den Container transitRoutes ueberhaupt? -->
-		
+			<departures>
+				<departure id="T1.1" departureTime="07:00:00" />
+				<departure id="T1.2" departureTime="07:10:00" />
+				<departure id="T1.3" departureTime="07:20:00" />
+			</departures>
+		</transitRoute>
 		
 	</transitLine>
 

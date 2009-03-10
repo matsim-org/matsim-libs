@@ -89,6 +89,12 @@ public class TransitScheduleReader extends MatsimXmlParser {
 			this.currentTransitRoute.departures.put(id, departure);
 		} else if (ROUTE_PROFILE.equals(name)) {
 			this.currentRouteProfile = new TempRouteProfile();
+		} else if (LINK.equals(name)) {
+			Link link = this.network.getLink(atts.getValue(REF));
+			if (link == null) {
+				throw new RuntimeException("no link with id " + atts.getValue(REF));
+			}
+			this.currentRouteProfile.addLink(link);
 		} else if (STOP.equals(name)) {
 			Id id = new IdImpl(atts.getValue(REF));
 			Facility facility = this.facilities.getFacilities().get(id);
@@ -105,12 +111,6 @@ public class TransitScheduleReader extends MatsimXmlParser {
 				stop.departure = Time.parseTime(departure);
 			}
 			this.currentRouteProfile.addStop(stop);
-		} else if (LINK.equals(name)) {
-			Link link = this.network.getLink(atts.getValue(REF));
-			if (link == null) {
-				throw new RuntimeException("no link with id " + atts.getValue(REF));
-			}
-			this.currentRouteProfile.addLink(link);
 		}
 
 	}
@@ -161,7 +161,6 @@ public class TransitScheduleReader extends MatsimXmlParser {
 		/*package*/ List<Link> links = new ArrayList<Link>();
 		/*package*/ Link firstLink = null;
 		/*package*/ Link lastLink = null;
-		private Link prevLink = null;
 
 		public TempRouteProfile() {
 			// public constructor for private inner class
@@ -169,20 +168,16 @@ public class TransitScheduleReader extends MatsimXmlParser {
 
 		public void addStop(final TempStop stop) {
 			this.stops.add(stop);
-			this.addLink(stop.stop.getLink());
 		}
 
 		public void addLink(final Link link) {
-			if (this.prevLink != link) {
-				if (this.firstLink == null) {
-					this.firstLink = link;
-				} else if (this.lastLink == null) {
-					this.lastLink = link;
-				} else {
-					this.links.add(this.lastLink);
-					this.lastLink = link;
-				}
-				this.prevLink = link;
+			if (this.firstLink == null) {
+				this.firstLink = link;
+			} else if (this.lastLink == null) {
+				this.lastLink = link;
+			} else {
+				this.links.add(this.lastLink);
+				this.lastLink = link;
 			}
 		}
 
