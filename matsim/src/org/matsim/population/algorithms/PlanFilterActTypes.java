@@ -61,7 +61,7 @@ public class PlanFilterActTypes extends AbstractPersonAlgorithm {
 		for (Iterator<Plan> iter = person.getPlans().iterator(); iter.hasNext(); ) {
 			Plan plan = iter.next();
 			boolean match = false;
-			List actsLegs = plan.getActsLegs();
+			List actsLegs = plan.getPlanElements();
 			for (int i = 0, max = actsLegs.size(); i < max; i += 2) {
 				Act act = (Act) actsLegs.get(i);
 				if (this.matchingActs.contains(act.getType())) {

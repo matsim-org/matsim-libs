@@ -15,7 +15,7 @@ public class ActTypeFilter extends PersonFilterA {
 	@Override
 	public boolean judge(Person person) {
 		for (Plan plan : person.getPlans()) {
-			List actsLegs = plan.getActsLegs();
+			List actsLegs = plan.getPlanElements();
 			for (int i = 0; i < actsLegs.size(); i += 2) {
 				Act act = (Act) actsLegs.get(i);
 				result=(act.getType().equals(criterion));

@@ -92,7 +92,7 @@ public class XY2LinksTest extends MatsimTestCase {
 		assertNotNull("person 1 missing", person2);
 		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
 		Plan plan2 = person2.getPlans().get(0);
-		Act act2 = (Act) plan2.getActsLegs().get(0);
+		Act act2 = (Act) plan2.getPlanElements().get(0);
 		assertNotNull("no link assigned.", act2.getLink());
 	}
 

@@ -75,8 +75,8 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 			int legNr = this.agentLegs.get(event.agentId);
 			Plan plan = agent.getSelectedPlan();
 			int index = (legNr - 1) * 2;
-			String fromActType = ((Act)plan.getActsLegs().get(index)).getType();
-			String toActType = ((Act)plan.getActsLegs().get(index + 2)).getType();
+			String fromActType = ((Act)plan.getPlanElements().get(index)).getType();
+			String toActType = ((Act)plan.getPlanElements().get(index + 2)).getType();
 			String legType = fromActType + "---" + toActType;
 			int[] stats = this.legStats.get(legType);
 			if (stats == null) {

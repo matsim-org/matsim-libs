@@ -55,7 +55,7 @@ public class PersonSimplify extends AbstractPersonAlgorithm {
 			Plan plan = (Plan)plans.get(i);
 
 			// set the first and last activty to home
-			ArrayList acts_legs = plan.getActsLegs();
+			ArrayList acts_legs = plan.getPlanElements();
 			((Act)acts_legs.get(0)).setType("h");
 			((Act)acts_legs.get(acts_legs.size()-1)).setType("h");
 

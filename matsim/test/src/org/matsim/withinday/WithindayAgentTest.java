@@ -193,7 +193,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		assertNotSame("The selected plan should be exchanged by a new one", this.plan, agent.getPerson().getSelectedPlan());
 		//going into the details
 	  // first testing the plan of the person
-		Leg newPlansLeg = (Leg) agent.getPerson().getSelectedPlan().getActsLegs().get(1);
+		Leg newPlansLeg = (Leg) agent.getPerson().getSelectedPlan().getPlanElements().get(1);
 		List<Node> newPlansRoute = ((CarRoute) newPlansLeg.getRoute()).getNodes();
 		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newPlansRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newPlansRoute.get(1));
@@ -216,7 +216,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		assertNotSame("The selected plan should be exchanged by a new one", this.plan, agent.getPerson().getSelectedPlan());
 		//going into the details
 	  // first testing the plan of the person
-		newPlansLeg = (Leg) agent.getPerson().getSelectedPlan().getActsLegs().get(1);
+		newPlansLeg = (Leg) agent.getPerson().getSelectedPlan().getPlanElements().get(1);
 		newPlansRoute = ((CarRoute) newPlansLeg.getRoute()).getNodes();
 		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newPlansRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newPlansRoute.get(2));
@@ -239,7 +239,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		assertNotSame("The selected plan should be exchanged by a new one", this.plan, agent.getPerson().getSelectedPlan());
 		//going into the details
 	  // first testing the plan of the person
-		newPlansLeg = (Leg) agent.getPerson().getSelectedPlan().getActsLegs().get(1);
+		newPlansLeg = (Leg) agent.getPerson().getSelectedPlan().getPlanElements().get(1);
 		newPlansRoute = ((CarRoute) newPlansLeg.getRoute()).getNodes();
 		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newPlansRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newPlansRoute.get(2));

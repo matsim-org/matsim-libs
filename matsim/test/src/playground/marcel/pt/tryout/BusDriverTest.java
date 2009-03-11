@@ -157,11 +157,11 @@ public class BusDriverTest extends MatsimTestCase {
 		BusPassenger passenger3 = createPassenger("3", facilities.getFacilities().get(new IdImpl("stop4")), workFacility);
 		BusPassenger passenger4 = createPassenger("4", facilities.getFacilities().get(new IdImpl("stop5")), workFacility);
 		BusPassenger passenger5 = createPassenger("5", facilities.getFacilities().get(new IdImpl("stop6")), workFacility);
-		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("3"), (Act) passenger1.getPlans().get(0).getActsLegs().get(0)));
-		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("5"), (Act) passenger2.getPlans().get(0).getActsLegs().get(0)));
-		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("5"), (Act) passenger3.getPlans().get(0).getActsLegs().get(0)));
-		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("6"), (Act) passenger4.getPlans().get(0).getActsLegs().get(0)));
-		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("8"), (Act) passenger5.getPlans().get(0).getActsLegs().get(0)));
+		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("3"), (Act) passenger1.getPlans().get(0).getPlanElements().get(0)));
+		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("5"), (Act) passenger2.getPlans().get(0).getPlanElements().get(0)));
+		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("5"), (Act) passenger3.getPlans().get(0).getPlanElements().get(0)));
+		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("6"), (Act) passenger4.getPlans().get(0).getPlanElements().get(0)));
+		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("8"), (Act) passenger5.getPlans().get(0).getPlanElements().get(0)));
 
 		assertEquals("wrong number of passengers.", 0, bus.getPassengers().size());
 

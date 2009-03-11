@@ -43,7 +43,7 @@ public class PersonRemovePlansWithoutLegs extends AbstractPersonAlgorithm {
 		for (int i = 0; i < person.getPlans().size(); i++) {
 			Plan plan = person.getPlans().get(i);
 
-			int size = plan.getActsLegs().size();
+			int size = plan.getPlanElements().size();
 			if (size < 3) {
 				// there cannot be a leg between two acts with at most 2 entries in the list!
 				person.getPlans().remove(i);

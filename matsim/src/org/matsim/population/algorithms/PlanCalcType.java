@@ -41,8 +41,8 @@ public class PlanCalcType extends AbstractPersonAlgorithm implements PlanAlgorit
 		boolean hasWalk = false;
 		boolean hasBike = false;
 
-		for (int i = 1, max = plan.getActsLegs().size(); i < max; i += 2) {
-			Leg leg = (Leg)plan.getActsLegs().get(i);
+		for (int i = 1, max = plan.getPlanElements().size(); i < max; i += 2) {
+			Leg leg = (Leg)plan.getPlanElements().get(i);
 			if (leg.getMode().equals(BasicLeg.Mode.car)) hasCar = true;
 			else if (leg.getMode().equals(BasicLeg.Mode.pt)) hasPt = true;
 			else if (leg.getMode().equals(BasicLeg.Mode.ride)) hasRide = true;

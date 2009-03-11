@@ -142,7 +142,7 @@ public class JavaPDEQSim2 {
 
 			// TODO: we could make this more precise (e.g. take all act links or also path links)
 			Plan plan = person.getSelectedPlan();
-			ArrayList<Object> actsLegs = plan.getActsLegs();
+			ArrayList<Object> actsLegs = plan.getPlanElements();
 			// assumption, an action is followed by a let always
 			// and a plan starts with a action
 			Act act=null;

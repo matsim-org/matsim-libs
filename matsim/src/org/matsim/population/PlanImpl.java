@@ -190,7 +190,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final ArrayList<Object> getActsLegs() {
+	public final ArrayList<Object> getPlanElements() {
 		return this.actsLegs;
 	}
 
@@ -240,7 +240,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 		setScore(in.getScore());
 		this.setType(in.getType());
 		this.person = in.getPerson();
-		List<?> actl = in.getActsLegs();
+		List<?> actl = in.getPlanElements();
 		for (int i= 0; i< actl.size() ; i++) {
 			try {
 				if (i % 2 == 0) {

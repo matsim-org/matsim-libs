@@ -111,7 +111,7 @@ public class PajekWriter {
 				if (know == null) {
 					Gbl.errorMsg("Knowledge is not defined!");
 				}
-				Coord xy = ((Act) p.getSelectedPlan().getActsLegs().get(0)).getCoord();
+				Coord xy = ((Act) p.getSelectedPlan().getPlanElements().get(0)).getCoord();
 				double x=(xy.getX()-this.minCoord.getX())/(this.maxCoord.getX()-this.minCoord.getX());
 				double y=(xy.getY()-this.minCoord.getY())/(this.maxCoord.getY()-this.minCoord.getY());
 				pjnet.write(iperson + " \"" + p.getId() + "\" "+x +" "+y+"\r\n");
@@ -131,8 +131,8 @@ public class PajekWriter {
 				Person printPerson1 = printLink.getPersonFrom();
 				Person printPerson2 = printLink.getPersonTo();
 
-				Coord xy1 = ((Act) printPerson1.getSelectedPlan().getActsLegs().get(0)).getCoord();
-				Coord xy2 = ((Act) printPerson2.getSelectedPlan().getActsLegs().get(0)).getCoord();
+				Coord xy1 = ((Act) printPerson1.getSelectedPlan().getPlanElements().get(0)).getCoord();
+				Coord xy2 = ((Act) printPerson2.getSelectedPlan().getPlanElements().get(0)).getCoord();
 				double dist = xy1.calcDistance(xy2);
 
 				pjnet.write(" " + this.pajekIndex.get(printPerson1.getId()) + " "+ this.pajekIndex.get(printPerson2.getId())+" "+dist+" "+age+"\r\n");

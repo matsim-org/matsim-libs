@@ -88,7 +88,7 @@ public class NewPtWalkPlan extends NewPlan implements PersonAlgorithm,
 		ptPlan.setType(Type.PT);
 		Plan walkPlan = new org.matsim.population.PlanImpl(person);
 		walkPlan.setType(Type.WALK);
-		List actsLegs = plan.getActsLegs();
+		List actsLegs = plan.getPlanElements();
 		for (int i = 0; i < actsLegs.size(); i++) {
 			Object o = actsLegs.get(i);
 			if (i % 2 == 0) {

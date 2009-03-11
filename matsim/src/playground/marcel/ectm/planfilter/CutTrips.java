@@ -64,16 +64,16 @@ public class CutTrips implements PersonAlgorithm {
 		int firstOutsideLeg = -1;
 		Link firstOutsideLink = null;
 
-		boolean startInside = this.aoi.containsKey(((Act) plan.getActsLegs().get(0)).getLink().getId());
+		boolean startInside = this.aoi.containsKey(((Act) plan.getPlanElements().get(0)).getLink().getId());
 
-		for (int legNr = 1, n = plan.getActsLegs().size(); legNr < n; legNr += 2) {
-			Leg leg = (Leg) plan.getActsLegs().get(legNr);
+		for (int legNr = 1, n = plan.getPlanElements().size(); legNr < n; legNr += 2) {
+			Leg leg = (Leg) plan.getPlanElements().get(legNr);
 			if (leg.getRoute() == null) {
 				throw new RuntimeException("route is null. person=" + person.getId().toString());
 			}
 
-			Link depLink = ((Act) plan.getActsLegs().get(legNr - 1)).getLink();
-			Link arrLink = ((Act) plan.getActsLegs().get(legNr + 1)).getLink();
+			Link depLink = ((Act) plan.getPlanElements().get(legNr - 1)).getLink();
+			Link arrLink = ((Act) plan.getPlanElements().get(legNr + 1)).getLink();
 
 			// test departure link
 			if (this.aoi.containsKey(depLink.getId())) {
@@ -144,16 +144,16 @@ public class CutTrips implements PersonAlgorithm {
 		if (!startInside) {
 			// move all acts before firstInsideLeg to firstInsideLink
 			for (int actNr = 0; actNr < firstInsideLeg; actNr += 2) {
-				Act act = (Act) plan.getActsLegs().get(actNr);
+				Act act = (Act) plan.getPlanElements().get(actNr);
 				act.setLink(firstInsideLink);
 			}
 			// remove all routes from legs before firstInsideLeg, as they are now all at the same location
 			for (int legNr = 1; legNr < firstInsideLeg; legNr += 2) {
-				Leg leg = (Leg) plan.getActsLegs().get(legNr);
+				Leg leg = (Leg) plan.getPlanElements().get(legNr);
 				leg.setRoute(null);
 			}
 			// find the time the agent is entering the AOI, and use that time as from-act endtime
-			Leg leg = (Leg) plan.getActsLegs().get(firstInsideLeg);
+			Leg leg = (Leg) plan.getPlanElements().get(firstInsideLeg);
 			CarRoute route = (CarRoute) leg.getRoute();
 			double traveltime = 0.0;
 			for (Link link : route.getLinks()) {
@@ -162,7 +162,7 @@ public class CutTrips implements PersonAlgorithm {
 					break;
 				}
 			}
-			Act fromAct = (Act) plan.getActsLegs().get(firstInsideLeg - 1);
+			Act fromAct = (Act) plan.getPlanElements().get(firstInsideLeg - 1);
 			if (fromAct.getDuration() != Time.UNDEFINED_TIME) {
 				fromAct.setDuration(fromAct.getDuration() + traveltime);
 			}
@@ -186,21 +186,21 @@ public class CutTrips implements PersonAlgorithm {
 		}
 
 		// move all acts after firstOutsideLeg to lastInsideLink
-		for (int actNr = firstOutsideLeg+1; actNr < plan.getActsLegs().size(); actNr += 2) {
-			Act act = (Act) plan.getActsLegs().get(actNr);
+		for (int actNr = firstOutsideLeg+1; actNr < plan.getPlanElements().size(); actNr += 2) {
+			Act act = (Act) plan.getPlanElements().get(actNr);
 			act.setLink(lastInsideLink);
 		}
 
 		if (firstOutsideLink != null) {
 			// remove all routes from legs after firstOutsideLeg, as they are now all at the same location
-			for (int legNr = firstOutsideLeg + 2; legNr < plan.getActsLegs().size(); legNr += 2) {
-				Leg leg = (Leg) plan.getActsLegs().get(legNr);
+			for (int legNr = firstOutsideLeg + 2; legNr < plan.getPlanElements().size(); legNr += 2) {
+				Leg leg = (Leg) plan.getPlanElements().get(legNr);
 				leg.setRoute(null);
 			}
 
 			// adapt route of leg that leads out of the AOI
 			boolean removing = false;
-			Leg leg = (Leg) plan.getActsLegs().get(firstOutsideLeg);
+			Leg leg = (Leg) plan.getPlanElements().get(firstOutsideLeg);
 			CarRoute route = (CarRoute) leg.getRoute();
 			List<Node> nodes = route.getNodes();
 			Iterator<Node> iter = nodes.iterator();

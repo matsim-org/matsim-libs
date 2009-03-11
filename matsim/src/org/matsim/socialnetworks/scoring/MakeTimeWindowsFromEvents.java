@@ -76,7 +76,7 @@ public class MakeTimeWindowsFromEvents {
 //30.12					endTime=30.*3600.;
 //30.12				}
 				
-				Act act = (Act) plan.getActsLegs().get(j*2);
+				Act act = (Act) plan.getPlanElements().get(j*2);
 				TimeWindow tw=new TimeWindow(startTime, endTime, person, act);
 				if(!(timeWindowMap.containsKey(act.getFacility()))){
 					twList=new ArrayList<TimeWindow>();

@@ -162,7 +162,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			this.currfacility = null;
 			this.curractivity = null;
 		} else if (PLAN.equals(name)) {
-			this.currplan.getActsLegs().trimToSize();
+			this.currplan.getPlanElements().trimToSize();
 			this.currplan = null;
 		} else if (ACT.equals(name)) {
 			this.prevAct = this.curract;

@@ -85,9 +85,9 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 		ActivityOption prev_work = null;
 		ActivityOption prev_educ = null;
 		
-		for (int i=0; i<plan.getActsLegs().size(); i++) {
+		for (int i=0; i<plan.getPlanElements().size(); i++) {
 			if (i%2 == 0) {
-				Act act = (Act)plan.getActsLegs().get(i);
+				Act act = (Act)plan.getPlanElements().get(i);
 				if (act.getType().startsWith("h")) {
 					if (prev_home != null) { log.warn("TODO pid="+person.getId()+": Two home acts in a row. Not sure yet how to handle that..."); }
 					act.setType(home_act.getType());

@@ -61,7 +61,7 @@ public class PersonRoundTimes extends AbstractPersonAlgorithm implements PlanAlg
 
 	@Override
 	public void run(Person person) {
-		ArrayList<Object> acts_legs = person.getSelectedPlan().getActsLegs();
+		ArrayList<Object> acts_legs = person.getSelectedPlan().getPlanElements();
 
 		// getting durations
 		double[] durs = new double[(acts_legs.size()-1)/2];

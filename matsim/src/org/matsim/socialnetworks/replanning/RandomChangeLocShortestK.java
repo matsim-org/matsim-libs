@@ -132,13 +132,13 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 			if(newAct.getLinkId()!=fFromKnowledge.getLink().getId()){
 				// If the first activity was chosen, make sure the last activity is also changed
 				if(newAct.getType() == plan.getFirstActivity().getType() && newAct.getLink() == plan.getFirstActivity().getLink()){
-					Act lastAct = (Act) newPlan.getActsLegs().get(newPlan.getActsLegs().size()-1);
+					Act lastAct = (Act) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
 					lastAct.setLink(fFromKnowledge.getLink());
 					lastAct.setCoord(fFromKnowledge.getCenter());
 					lastAct.setFacility(fFromKnowledge);
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
-				if(newAct.getType() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getType() && newAct.getLink() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getLink()){
+				if(newAct.getType() == ((Act)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType() && newAct.getLink() == ((Act)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink()){
 					Act firstAct = (Act) newPlan.getFirstActivity();
 					firstAct.setLink(fFromKnowledge.getLink());
 					firstAct.setCoord(fFromKnowledge.getCenter());
@@ -159,7 +159,7 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 
 			if(changed){
 				//		 loop over all <leg>s, remove route-information
-				ArrayList<?> bestactslegs = newPlan.getActsLegs();
+				ArrayList<?> bestactslegs = newPlan.getPlanElements();
 //				ArrayList<?> bestactslegs = plan.getActsLegs();
 				for (int j = 1; j < bestactslegs.size(); j=j+2) {
 					Leg leg = (Leg)bestactslegs.get(j);
@@ -218,9 +218,9 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 	public double getPlanLength(Plan plan){
 
 		double length=0.;
-		for (int i = 0, max= plan.getActsLegs().size(); i < max-2; i += 2) {
-			Act act1 = (Act)(plan.getActsLegs().get(i));
-			Act act2 = (Act)(plan.getActsLegs().get(i+2));
+		for (int i = 0, max= plan.getPlanElements().size(); i < max-2; i += 2) {
+			Act act1 = (Act)(plan.getPlanElements().get(i));
+			Act act2 = (Act)(plan.getPlanElements().get(i+2));
 
 			if (act2 != null && act1 != null) {
 				double dist = act1.getCoord().calcDistance(act2.getCoord());

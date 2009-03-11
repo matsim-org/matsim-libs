@@ -88,7 +88,7 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
 		this.now = 0.0;
 
-		this.actslegs = this.plan.getActsLegs();
+		this.actslegs = this.plan.getPlanElements();
 		this.numActs = this.actslegs.size() / 2;
 
 		this.legCounter = 0;

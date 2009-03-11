@@ -62,17 +62,17 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	
 	private final void moveTravTimeToNextAct(Plan p) {
 		double prev_ttime = Time.UNDEFINED_TIME;
-		double tod = ((Act)p.getActsLegs().get(0)).getEndTime();
-		for (int i=1; i<p.getActsLegs().size(); i++) {
-			if (i == p.getActsLegs().size()-1) { // last act
-				Act a = (Act)p.getActsLegs().get(i);
+		double tod = ((Act)p.getPlanElements().get(0)).getEndTime();
+		for (int i=1; i<p.getPlanElements().size(); i++) {
+			if (i == p.getPlanElements().size()-1) { // last act
+				Act a = (Act)p.getPlanElements().get(i);
 				if (prev_ttime == Time.UNDEFINED_TIME) { Gbl.errorMsg("That must not happen!"); }
 				double dur = prev_ttime;
 				a.setStartTime(tod); a.setDuration(dur); a.setEndTime(tod+dur);
 				prev_ttime = Time.UNDEFINED_TIME;
 			}
 			else if (i % 2 == 0) { // in between acts
-				Act a = (Act)p.getActsLegs().get(i);
+				Act a = (Act)p.getPlanElements().get(i);
 				double dur = a.getDuration();
 				if (prev_ttime == Time.UNDEFINED_TIME) { Gbl.errorMsg("That must not happen!"); }
 				dur += prev_ttime;
@@ -82,7 +82,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 				prev_ttime = Time.UNDEFINED_TIME;
 			}
 			else {
-				Leg l = (Leg)p.getActsLegs().get(i);
+				Leg l = (Leg)p.getPlanElements().get(i);
 				prev_ttime = l.getTravelTime();
 				l.setDepartureTime(tod); l.setTravelTime(0.0); l.setArrivalTime(tod);
 			}
@@ -92,16 +92,16 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	//////////////////////////////////////////////////////////////////////
 
 	private final void normalizeTimes(Plan p) {
-		if (p.getActsLegs().size() == 1) {
-			Act a = (Act)p.getActsLegs().get(0);
+		if (p.getPlanElements().size() == 1) {
+			Act a = (Act)p.getPlanElements().get(0);
 			a.setStartTime(0.0); a.setDuration(Time.MIDNIGHT); a.setEndTime(Time.MIDNIGHT);
 			return;
 		}
-		double home_dur = ((Act)p.getActsLegs().get(0)).getEndTime();
+		double home_dur = ((Act)p.getPlanElements().get(0)).getEndTime();
 		double othr_dur = 0.0;
-		for (int i=2; i<p.getActsLegs().size()-2; i=i+2) { othr_dur += ((Act)p.getActsLegs().get(i)).getDuration(); }
+		for (int i=2; i<p.getPlanElements().size()-2; i=i+2) { othr_dur += ((Act)p.getPlanElements().get(i)).getDuration(); }
 		if (othr_dur <= (Time.MIDNIGHT - HOME_MIN)) {
-			Act a = (Act)p.getActsLegs().get(p.getActsLegs().size()-1);
+			Act a = (Act)p.getPlanElements().get(p.getPlanElements().size()-1);
 			a.setDuration(Time.UNDEFINED_TIME); a.setEndTime(Time.UNDEFINED_TIME);
 			return;
 		}
@@ -109,20 +109,20 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		// normalize the other activity durations
 		log.info("pid="+p.getPerson().getId()+": normalizing times (othr_dur="+Time.writeTime(othr_dur)+").");
 		double tod = home_dur;
-		for (int i=1; i<p.getActsLegs().size(); i++) {
-			if (i == p.getActsLegs().size()-1) {
-				Act a = (Act)p.getActsLegs().get(i);
+		for (int i=1; i<p.getPlanElements().size(); i++) {
+			if (i == p.getPlanElements().size()-1) {
+				Act a = (Act)p.getPlanElements().get(i);
 				a.setStartTime(tod); a.setDuration(Time.UNDEFINED_TIME); a.setEndTime(Time.UNDEFINED_TIME);
 			}
 			else if (i % 2 == 0) {
-				Act a = (Act)p.getActsLegs().get(i);
+				Act a = (Act)p.getPlanElements().get(i);
 				a.setStartTime(tod);
 				a.setDuration((Time.MIDNIGHT - HOME_MIN)*a.getDuration()/othr_dur);
 				a.setEndTime(tod+a.getDuration());
 				tod = a.getEndTime();
 			}
 			else {
-				Leg l = (Leg)p.getActsLegs().get(i);
+				Leg l = (Leg)p.getPlanElements().get(i);
 				l.setDepartureTime(tod); l.setTravelTime(0.0); l.setArrivalTime(tod);
 			}
 		}
@@ -133,21 +133,21 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	private final void assignDesires(Plan p) {
 		Desires d = p.getPerson().createDesires(null);
 		double othr_dur = 0.0;
-		for (int i=2; i<p.getActsLegs().size()-2; i=i+2) {
-			Act a = (Act)p.getActsLegs().get(i);
+		for (int i=2; i<p.getPlanElements().size()-2; i=i+2) {
+			Act a = (Act)p.getPlanElements().get(i);
 			if (a.getDuration() <= 0.0) { log.fatal("pid="+p.getPerson().getId()+": That must not happen!"); }
 			d.accumulateActivityDuration(a.getType(),a.getDuration());
 			othr_dur += a.getDuration();
 		}
 		double home_dur = Time.MIDNIGHT - othr_dur;
 		if (home_dur <= 0.0) { Gbl.errorMsg("pid="+p.getPerson().getId()+": That must not happen!"); }
-		d.accumulateActivityDuration(((Act)p.getActsLegs().get(0)).getType(),home_dur);
+		d.accumulateActivityDuration(((Act)p.getPlanElements().get(0)).getType(),home_dur);
 	}
 	
 	//////////////////////////////////////////////////////////////////////
 
 	private final void varyTimes(Plan p) {
-		ArrayList<Object> acts_legs = p.getActsLegs();
+		ArrayList<Object> acts_legs = p.getPlanElements();
 
 		// draw a new random number until the new end time >= 0.0
 		double bias = MatsimRandom.random.nextInt(3600)-1800.0; // [-1800,1800[

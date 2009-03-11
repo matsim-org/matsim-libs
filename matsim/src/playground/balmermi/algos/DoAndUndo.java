@@ -56,8 +56,8 @@ public class DoAndUndo extends AbstractPersonAlgorithm implements PlanAlgorithm 
 	private final void doIt(Person p) {
 		if (!leg_modes.isEmpty()) { Gbl.errorMsg("Something is wrong!"); }
 		Plan plan = p.getSelectedPlan();
-		for (int i=1; i<plan.getActsLegs().size(); i=i+2) {
-			Leg leg = (Leg)plan.getActsLegs().get(i);
+		for (int i=1; i<plan.getPlanElements().size(); i=i+2) {
+			Leg leg = (Leg)plan.getPlanElements().get(i);
 			leg_modes.add(leg.getMode());
 			leg.setMode(BasicLeg.Mode.car);
 		}
@@ -66,8 +66,8 @@ public class DoAndUndo extends AbstractPersonAlgorithm implements PlanAlgorithm 
 	private final void undoIt(Person p) {
 		if (leg_modes.isEmpty()) { Gbl.errorMsg("Something is wrong!"); }
 		Plan plan = p.getSelectedPlan();
-		for (int i=1; i<plan.getActsLegs().size(); i=i+2) {
-			Leg leg = (Leg)plan.getActsLegs().get(i);
+		for (int i=1; i<plan.getPlanElements().size(); i=i+2) {
+			Leg leg = (Leg)plan.getPlanElements().get(i);
 			leg.setMode(leg_modes.get((i-1)/2));
 		}
 		leg_modes.clear();

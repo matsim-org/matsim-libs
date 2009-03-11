@@ -129,13 +129,13 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 	private double calcScore() {
 		ScoringFunction testee = getScoringFunctionInstance(this.plan); 
 		testee.endActivity(07*3600);
-		testee.startLeg(07*3600, (Leg) this.plan.getActsLegs().get(1));
+		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);
-		testee.startActivity(07*3600 + 30*60, (Act) this.plan.getActsLegs().get(2));
+		testee.startActivity(07*3600 + 30*60, (Act) this.plan.getPlanElements().get(2));
 		testee.endActivity(16*3600);
-		testee.startLeg(16*3600, (Leg) this.plan.getActsLegs().get(3));
+		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(3));
 		testee.endLeg(16*3600 + 15*60);
-		testee.startActivity(16*3600 + 15*60, (Act) this.plan.getActsLegs().get(4));
+		testee.startActivity(16*3600 + 15*60, (Act) this.plan.getPlanElements().get(4));
 		testee.finish();
 		return testee.getScore();
 	}
@@ -341,11 +341,11 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 
 		ScoringFunction testee = getScoringFunctionInstance(this.plan); 
 		testee.endActivity(07*3600);
-		testee.startLeg(07*3600, (Leg) this.plan.getActsLegs().get(1));
+		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);
-		testee.startActivity(07*3600 + 30*60, (Act) this.plan.getActsLegs().get(2));
+		testee.startActivity(07*3600 + 30*60, (Act) this.plan.getPlanElements().get(2));
 		testee.endActivity(16*3600);
-		testee.startLeg(16*3600, (Leg) this.plan.getActsLegs().get(3));
+		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(3));
 		testee.agentStuck(16*3600 + 7.5*60);
 		testee.finish();
 		testee.getScore();
@@ -358,11 +358,11 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 
 		testee = getScoringFunctionInstance(this.plan); 
 		testee.endActivity(07*3600);
-		testee.startLeg(07*3600, (Leg) this.plan.getActsLegs().get(1));
+		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);
-		testee.startActivity(07*3600 + 30*60, (Act) this.plan.getActsLegs().get(2));
+		testee.startActivity(07*3600 + 30*60, (Act) this.plan.getPlanElements().get(2));
 		testee.endActivity(16*3600);
-		testee.startLeg(16*3600, (Leg) this.plan.getActsLegs().get(3));
+		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(3));
 		testee.agentStuck(16*3600 + 7.5*60);
 		testee.finish();
 		testee.getScore();
@@ -381,7 +381,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 	 */
 	public void testDifferentFirstLastAct() {
 		// change the last act to something different than the first act
-		((Act) this.plan.getActsLegs().get(4)).setType("h2");
+		((Act) this.plan.getPlanElements().get(4)).setType("h2");
 
 		CharyparNagelScoringConfigGroup.ActivityParams params = new CharyparNagelScoringConfigGroup.ActivityParams("h2");
 		params.setTypicalDuration(8*3600);

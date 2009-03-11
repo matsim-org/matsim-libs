@@ -138,8 +138,8 @@ public class RecyclingModule implements StrategyModule {
 		
 		for (int i=0;i<list[0].size();i++){
 			assignment.print(list[0].get(i).getPerson().getId()+"\t"+list[0].get(i).getScore()+"\t");
-			for (int j=0;j<list[0].get(i).getActsLegs().size();j+=2){
-				assignment.print(((Act)(list[0].get(i).getActsLegs().get(j))).getType()+"\t");
+			for (int j=0;j<list[0].get(i).getPlanElements().size();j+=2){
+				assignment.print(((Act)(list[0].get(i).getPlanElements().get(j))).getType()+"\t");
 			}
 			assignment.println();
 		}
@@ -173,9 +173,9 @@ public class RecyclingModule implements StrategyModule {
 		for (int i=0;i<this.testAgentsNumber-1;i++){
 			for (int j=i+1;j<this.testAgentsNumber;j++){
 				distanceMatrix[i][j]=0;
-				if (list.get(i).getActsLegs().size()!=list.get(j).getActsLegs().size()) distanceMatrix[i][j]+=1;
-				for (int x=0;x<java.lang.Math.min(list.get(i).getActsLegs().size(), list.get(j).getActsLegs().size());x+=2){
-					if (((Act)(list.get(i).getActsLegs().get(x))).getType()!=((Act)(list.get(i).getActsLegs().get(x))).getType()) distanceMatrix[i][j]+=1;
+				if (list.get(i).getPlanElements().size()!=list.get(j).getPlanElements().size()) distanceMatrix[i][j]+=1;
+				for (int x=0;x<java.lang.Math.min(list.get(i).getPlanElements().size(), list.get(j).getPlanElements().size());x+=2){
+					if (((Act)(list.get(i).getPlanElements().get(x))).getType()!=((Act)(list.get(i).getPlanElements().get(x))).getType()) distanceMatrix[i][j]+=1;
 				}
 				System.out.println(i+""+j+" = "+distanceMatrix[i][j]);
 			}

@@ -66,8 +66,8 @@ public class SimplifyPersons {
 				p.getPlans().remove(i);
 			
 			Plan selected = p.getSelectedPlan();
-			for(int i = 1; i < selected.getActsLegs().size(); i = 1) {
-				selected.getActsLegs().remove(i);
+			for(int i = 1; i < selected.getPlanElements().size(); i = 1) {
+				selected.getPlanElements().remove(i);
 			}
 			Coord c = p.getPlans().get(0).getFirstActivity().getCoord();
 			if(!(c.getX() >= minX && c.getX() <= maxX && c.getY() >= minY && c.getY() <= maxY))

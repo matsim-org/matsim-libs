@@ -90,9 +90,9 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		plan.createLeg(BasicLeg.Mode.car);
 		plan.createAct("home", new CoordImpl(0, 0));
 		algo.run(plan);
-		assertEquals("unexpected leg mode in leg 1.", BasicLeg.Mode.pt, ((BasicLeg) plan.getActsLegs().get(1)).getMode());
-		assertEquals("unexpected leg mode in leg 2.", BasicLeg.Mode.pt, ((BasicLeg) plan.getActsLegs().get(3)).getMode());
-		assertEquals("unexpected leg mode in leg 3.", BasicLeg.Mode.pt, ((BasicLeg) plan.getActsLegs().get(5)).getMode());
+		assertEquals("unexpected leg mode in leg 1.", BasicLeg.Mode.pt, ((BasicLeg) plan.getPlanElements().get(1)).getMode());
+		assertEquals("unexpected leg mode in leg 2.", BasicLeg.Mode.pt, ((BasicLeg) plan.getPlanElements().get(3)).getMode());
+		assertEquals("unexpected leg mode in leg 3.", BasicLeg.Mode.pt, ((BasicLeg) plan.getPlanElements().get(5)).getMode());
 	}
 
 }

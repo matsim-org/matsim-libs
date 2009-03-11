@@ -88,8 +88,8 @@ public class ScenarioCut {
 			}
 			List<Plan> plans = person.getPlans();
 			for (Plan plan : plans) {
-				for (int i=0, n=plan.getActsLegs().size(); i<n; i+=2) {
-					Act act = (Act)plan.getActsLegs().get(i);
+				for (int i=0, n=plan.getPlanElements().size(); i<n; i+=2) {
+					Act act = (Act)plan.getPlanElements().get(i);
 					Facility f = act.getFacility();
 					if (!isInside(f)) { toRemove.add(person.getId()); break; }
 				}
@@ -103,9 +103,9 @@ public class ScenarioCut {
 		System.out.println("remove all routes and links... " + (new Date()));
 		for (Person p : population.getPersons().values()) {
 			for (Plan plan : p.getPlans()) {
-				for (int i=0, n=plan.getActsLegs().size(); i<n; i++) {
-					if (i%2 == 1) { ((Leg)plan.getActsLegs().get(i)).setRoute(null); }
-					else { ((Act)plan.getActsLegs().get(i)).setLink(null); }
+				for (int i=0, n=plan.getPlanElements().size(); i<n; i++) {
+					if (i%2 == 1) { ((Leg)plan.getPlanElements().get(i)).setRoute(null); }
+					else { ((Act)plan.getPlanElements().get(i)).setLink(null); }
 				}
 			}
 		}
@@ -156,8 +156,8 @@ public class ScenarioCut {
 		System.out.println("setting links in plan act... " + (new Date()));
 		for (Person p : population.getPersons().values()) {
 			for (Plan plan : p.getPlans()) {
-				for (int i=0, n=plan.getActsLegs().size(); i<n; i+=2) {
-					Act act = (Act)plan.getActsLegs().get(i);
+				for (int i=0, n=plan.getPlanElements().size(); i<n; i+=2) {
+					Act act = (Act)plan.getPlanElements().get(i);
 					act.setLink(act.getFacility().getLink());
 				}
 			}

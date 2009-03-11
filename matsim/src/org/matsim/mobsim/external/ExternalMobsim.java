@@ -140,13 +140,13 @@ public class ExternalMobsim {
 				handler.startPlan(plan, writer);
 
 				// act/leg
-				for (int jj = 0; jj < plan.getActsLegs().size(); jj++) {
+				for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
 					if (jj % 2 == 0) {
-						Act act = (Act)plan.getActsLegs().get(jj);
+						Act act = (Act)plan.getPlanElements().get(jj);
 						handler.startAct(act, writer);
 						handler.endAct(writer);
 					} else {
-						Leg leg = (Leg)plan.getActsLegs().get(jj);
+						Leg leg = (Leg)plan.getPlanElements().get(jj);
 						handler.startLeg(leg, writer);
 						// route
 						if (leg.getRoute() != null) {

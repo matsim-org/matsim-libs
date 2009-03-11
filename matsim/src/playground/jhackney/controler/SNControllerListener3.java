@@ -231,7 +231,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 				Person p = iperson.next();
 //				Remember a number of activities equal to at least the number of
 //				acts per plan times the number of plans in memory
-				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*p.getPlans().size()*1.5);
+				int max_memory = (int) (p.getSelectedPlan().getPlanElements().size()/2*p.getPlans().size()*1.5);
 				p.getKnowledge().getMentalMap().manageMemory(max_memory, p.getPlans());
 			}
 			this.log.info(" ... forgetting knowledge done");

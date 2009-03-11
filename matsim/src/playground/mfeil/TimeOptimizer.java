@@ -71,16 +71,16 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	
 	public void run (Plan basePlan){
 		
-		if (basePlan.getActsLegs().size()==1) return;
+		if (basePlan.getPlanElements().size()==1) return;
 		
 		
 		/* Initial clean-up of plan for the case actslegs is not sound*/
-		double move = this.cleanSchedule (((Act)(basePlan.getActsLegs().get(0))).getEndTime(), basePlan);
+		double move = this.cleanSchedule (((Act)(basePlan.getPlanElements().get(0))).getEndTime(), basePlan);
 		int loops=1;
 		while (move!=0.0){
 			if (loops>3) {
-				for (int i=0;i<basePlan.getActsLegs().size()-2;i+=2){
-					((Act)basePlan.getActsLegs().get(i)).setDuration(this.minimumTime);
+				for (int i=0;i<basePlan.getPlanElements().size()-2;i+=2){
+					((Act)basePlan.getPlanElements().get(i)).setDuration(this.minimumTime);
 				}
 				move = this.cleanSchedule(this.minimumTime, basePlan);
 				if (move!=0.0){
@@ -92,10 +92,10 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 				else break;
 			}
 			loops++;
-			for (int i=0;i<basePlan.getActsLegs().size()-2;i=i+2){
-				((Act)basePlan.getActsLegs().get(i)).setDuration(java.lang.Math.max(((Act)basePlan.getActsLegs().get(i)).getDuration()*0.9, this.minimumTime));
+			for (int i=0;i<basePlan.getPlanElements().size()-2;i=i+2){
+				((Act)basePlan.getPlanElements().get(i)).setDuration(java.lang.Math.max(((Act)basePlan.getPlanElements().get(i)).getDuration()*0.9, this.minimumTime));
 			}
-			move = this.cleanSchedule(((Act)(basePlan.getActsLegs().get(0))).getDuration(), basePlan);
+			move = this.cleanSchedule(((Act)(basePlan.getPlanElements().get(0))).getDuration(), basePlan);
 		}
 		
 		this.processPlan(basePlan);
@@ -111,7 +111,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		
 		/* Initializing */ 
 		int neighbourhood_size = 0;
-		for (int i = plan.getActsLegs().size()-1;i>0;i=i-2){
+		for (int i = plan.getPlanElements().size()-1;i>0;i=i-2){
 			neighbourhood_size += i;
 		}
 		int [][] moves 									= new int [neighbourhood_size][2];
@@ -149,11 +149,11 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		
 		/* Copy the plan into all fields of the array neighbourhood */
 		for (int i = 0; i < initialNeighbourhood.length; i++){
-			initialNeighbourhood[i] = this.copyActsLegs(plan.getActsLegs());
+			initialNeighbourhood[i] = this.copyActsLegs(plan.getPlanElements());
 		}
 		
 		/* Set the given plan as bestSolution */
-		bestSolution = this.copyActsLegs(plan.getActsLegs());
+		bestSolution = this.copyActsLegs(plan.getPlanElements());
 		double bestScore = plan.getScore();
 		
 		
@@ -208,7 +208,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		
 		/* Update the plan with the final solution */ 		
 	//	stream.println("Selected solution\t"+bestScore);
-		ArrayList<Object> al = basePlan.getActsLegs();
+		ArrayList<Object> al = basePlan.getPlanElements();
 		basePlan.setScore(bestScore);
 		
 		double time;
@@ -397,43 +397,43 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	
 	private double cleanSchedule (double now, Plan plan){
 		
-		((Act)(plan.getActsLegs().get(0))).setEndTime(now);
-		((Act)(plan.getActsLegs().get(0))).setDuration(now);
+		((Act)(plan.getPlanElements().get(0))).setEndTime(now);
+		((Act)(plan.getPlanElements().get(0))).setDuration(now);
 			
 		double travelTime;
-		for (int i=1;i<=plan.getActsLegs().size()-2;i=i+2){
-			((Leg)(plan.getActsLegs().get(i))).setDepartureTime(now);
-			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Act)(plan.getActsLegs().get(i-1)), (Act)(plan.getActsLegs().get(i+1)), (Leg)(plan.getActsLegs().get(i)));
-			((Leg)(plan.getActsLegs().get(i))).setArrivalTime(now+travelTime);
-			((Leg)(plan.getActsLegs().get(i))).setTravelTime(travelTime);
+		for (int i=1;i<=plan.getPlanElements().size()-2;i=i+2){
+			((Leg)(plan.getPlanElements().get(i))).setDepartureTime(now);
+			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Act)(plan.getPlanElements().get(i-1)), (Act)(plan.getPlanElements().get(i+1)), (Leg)(plan.getPlanElements().get(i)));
+			((Leg)(plan.getPlanElements().get(i))).setArrivalTime(now+travelTime);
+			((Leg)(plan.getPlanElements().get(i))).setTravelTime(travelTime);
 			now+=travelTime;
 			
-			if (i!=plan.getActsLegs().size()-2){
-				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
-				travelTime = java.lang.Math.max(((Act)(plan.getActsLegs().get(i+1))).getDuration()/*-travelTime*/, this.minimumTime);
-				((Act)(plan.getActsLegs().get(i+1))).setDuration(travelTime);	
-				((Act)(plan.getActsLegs().get(i+1))).setEndTime(now+travelTime);	
+			if (i!=plan.getPlanElements().size()-2){
+				((Act)(plan.getPlanElements().get(i+1))).setStartTime(now);
+				travelTime = java.lang.Math.max(((Act)(plan.getPlanElements().get(i+1))).getDuration()/*-travelTime*/, this.minimumTime);
+				((Act)(plan.getPlanElements().get(i+1))).setDuration(travelTime);	
+				((Act)(plan.getPlanElements().get(i+1))).setEndTime(now+travelTime);	
 				now+=travelTime;
 			}
 			else {
-				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
+				((Act)(plan.getPlanElements().get(i+1))).setStartTime(now);
 				/* NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW*/
 				if (86400>now+this.minimumTime){
-					((Act)(plan.getActsLegs().get(i+1))).setDuration(86400-now);
-					((Act)(plan.getActsLegs().get(i+1))).setEndTime(86400);
+					((Act)(plan.getPlanElements().get(i+1))).setDuration(86400-now);
+					((Act)(plan.getPlanElements().get(i+1))).setEndTime(86400);
 				}
-				else if (86400+((Act)(plan.getActsLegs().get(0))).getDuration()>now+this.minimumTime){
+				else if (86400+((Act)(plan.getPlanElements().get(0))).getDuration()>now+this.minimumTime){
 					if (now<86400){
-						((Act)(plan.getActsLegs().get(i+1))).setDuration(86400-now);
-						((Act)(plan.getActsLegs().get(i+1))).setEndTime(86400);
+						((Act)(plan.getPlanElements().get(i+1))).setDuration(86400-now);
+						((Act)(plan.getPlanElements().get(i+1))).setEndTime(86400);
 					}
 					else {
-					((Act)(plan.getActsLegs().get(i+1))).setDuration(this.minimumTime);
-					((Act)(plan.getActsLegs().get(i+1))).setEndTime(now+this.minimumTime);
+					((Act)(plan.getPlanElements().get(i+1))).setDuration(this.minimumTime);
+					((Act)(plan.getPlanElements().get(i+1))).setEndTime(now+this.minimumTime);
 					}
 				}
 				else {
-					return (now+this.minimumTime-(86400+((Act)(plan.getActsLegs().get(0))).getDuration()));
+					return (now+this.minimumTime-(86400+((Act)(plan.getPlanElements().get(0))).getDuration()));
 				}
 			}
 		}

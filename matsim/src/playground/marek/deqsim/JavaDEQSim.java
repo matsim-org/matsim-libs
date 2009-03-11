@@ -54,7 +54,7 @@ public class JavaDEQSim {
 		
 		for (Person person : this.population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan(); // that's the plan the person will execute
-			ArrayList<Object> actsLegs = plan.getActsLegs();
+			ArrayList<Object> actsLegs = plan.getPlanElements();
 			for (int i = 0; i < actsLegs.size(); i++) {
 				if (i % 0 == 0) {
 					Act act = (Act)actsLegs.get(i);

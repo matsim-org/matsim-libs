@@ -56,8 +56,8 @@ public class PlanReplaceLegModes extends AbstractPersonAlgorithm implements Plan
 	}
 
 	public void run(final Plan plan) {
-		for (int i = 1, max = plan.getActsLegs().size(); i < max; i += 2) {
-			Leg leg = (Leg)plan.getActsLegs().get(i);
+		for (int i = 1, max = plan.getPlanElements().size(); i < max; i += 2) {
+			Leg leg = (Leg)plan.getPlanElements().get(i);
 			BasicLeg.Mode mode = leg.getMode();
 			for (int idx = 1; idx < this.fromMode.length; idx++) {
 				if (this.fromMode[idx].equals(mode)) {

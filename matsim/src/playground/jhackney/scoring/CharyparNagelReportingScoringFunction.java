@@ -123,7 +123,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 
 		this.plan = plan;
 		this.person = this.plan.getPerson();
-		this.lastActIndex = this.plan.getActsLegs().size() - 1;
+		this.lastActIndex = this.plan.getPlanElements().size() - 1;
 	}
 
 	public void reset() {
@@ -554,12 +554,12 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 
 	private void handleAct(final double time) {
 		double actScore=0;
-		Act act = (Act)this.plan.getActsLegs().get(this.index);
+		Act act = (Act)this.plan.getPlanElements().get(this.index);
 		if (this.index == 0) {
 			this.firstActTime = time;
 		} else if (this.index == this.lastActIndex) {
 			String lastActType = act.getType();
-			if (lastActType.equals(((Act) this.plan.getActsLegs().get(0)).getType())) {
+			if (lastActType.equals(((Act) this.plan.getPlanElements().get(0)).getType())) {
 				// the first Act and the last Act have the same type
 				actScore= calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
 				this.score += actScore;
@@ -567,7 +567,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 				if (scoreActs) {
 					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
 					// score first activity
-					Act firstAct = (Act)this.plan.getActsLegs().get(0);
+					Act firstAct = (Act)this.plan.getPlanElements().get(0);
 					actScore=calcActScore(0.0, this.firstActTime, firstAct);
 					this.score += actScore;
 					// score last activity
@@ -585,7 +585,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 	}
 
 	private void handleLeg(final double time) {
-		Leg leg = (Leg)this.plan.getActsLegs().get(this.index);
+		Leg leg = (Leg)this.plan.getPlanElements().get(this.index);
 //		this.score += calcLegScore(this.lastTime, time, leg);
 		double temp=calcLegScore(this.lastTime, time, leg);
 		this.score += temp;

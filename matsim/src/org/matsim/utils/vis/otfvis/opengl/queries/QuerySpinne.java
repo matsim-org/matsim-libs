@@ -75,11 +75,11 @@ public class QuerySpinne implements OTFQuery {
 
 		for (Person person : plans.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
-			List actslegs = plan.getActsLegs();
+			List actslegs = plan.getPlanElements();
 			for (int i= 0; i< actslegs.size(); i++) {
 				if( i%2 == 0) {
 					// handle act
-					Act act = (Act)plan.getActsLegs().get(i);
+					Act act = (Act)plan.getPlanElements().get(i);
 					Id id2 = act.getLink().getId();
 					if(id2.equals(this.linkId)) {
 						actPersons.add(plan);
@@ -110,11 +110,11 @@ public class QuerySpinne implements OTFQuery {
 		List<Plan> actPersons = getPersons(plans, net);
 
 		for (Plan plan : actPersons) {
-			List actslegs = plan.getActsLegs();
+			List actslegs = plan.getPlanElements();
 			for (int i= 0; i< actslegs.size(); i++) {
 				if( i%2 == 0) {
 					// handle act
-					Act act = (Act)plan.getActsLegs().get(i);
+					Act act = (Act)plan.getPlanElements().get(i);
 					addLink(act.getLink());
 				} else {
 					// handle leg

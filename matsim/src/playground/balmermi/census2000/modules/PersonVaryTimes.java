@@ -57,7 +57,7 @@ public class PersonVaryTimes extends AbstractPersonAlgorithm implements PlanAlgo
 
 	@Override
 	public void run(Person person) {
-		ArrayList<Object> acts_legs = person.getSelectedPlan().getActsLegs();
+		ArrayList<Object> acts_legs = person.getSelectedPlan().getPlanElements();
 
 		double bias = MatsimRandom.random.nextInt(3600)-1800.0; // [-1800,1800[
 

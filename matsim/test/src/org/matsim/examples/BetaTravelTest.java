@@ -397,14 +397,14 @@ public class BetaTravelTest extends MatsimTestCase {
 		}
 
 		private void mutatePlan(final Plan plan) {
-			int max = plan.getActsLegs().size();
+			int max = plan.getPlanElements().size();
 			int now = 0;
 
 			// apply mutation to all activities except the last home activity
 			for (int i = 0; i < max; i++ ) {
 
 				if (i % 2 == 0) {
-					Act act = (Act)(plan.getActsLegs().get(i));
+					Act act = (Act)(plan.getPlanElements().get(i));
 					// invalidate previous activity times because durations will change
 					act.setStartTime(Time.UNDEFINED_TIME);
 
@@ -430,7 +430,7 @@ public class BetaTravelTest extends MatsimTestCase {
 
 				} else {
 
-					Leg leg = (Leg)(plan.getActsLegs().get(i));
+					Leg leg = (Leg)(plan.getPlanElements().get(i));
 
 					// assume that there will be no delay between end time of previous activity and departure time
 					leg.setDepartureTime(now);

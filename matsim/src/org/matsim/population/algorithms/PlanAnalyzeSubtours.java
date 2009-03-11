@@ -58,7 +58,7 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = Gbl.getConfig().planomat().getTripStructureAnalysisLayer();
 
 		Id locationId = null;
-		ArrayList<Object> actsLegs = plan.getActsLegs();
+		ArrayList<Object> actsLegs = plan.getPlanElements();
 		for (int ii=0; ii < actsLegs.size(); ii++) {
 			if (actsLegs.get(ii) instanceof Act) {
 				if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {

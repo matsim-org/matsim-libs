@@ -37,7 +37,7 @@ public class ActTypeAndAreaTripFilter extends TripFilter {
 	}
 	protected boolean filterPlan(final Plan plan, String mode) {
 		boolean choiceSetAdded = false;		
-		final ArrayList<?> actslegs = plan.getActsLegs();
+		final ArrayList<?> actslegs = plan.getPlanElements();
 		Act previousAct = (Act)actslegs.get(0);
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			Act act = (Act)actslegs.get(j);

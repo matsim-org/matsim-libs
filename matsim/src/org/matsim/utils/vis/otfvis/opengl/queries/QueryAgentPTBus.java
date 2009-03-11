@@ -84,11 +84,11 @@ public class QueryAgentPTBus implements OTFQuery {
 		float[] vertex = null;
 		List<Link> drivenLinks = new LinkedList<Link> ();
 		
-		List actslegs = plan.getActsLegs();
+		List actslegs = plan.getPlanElements();
 		for (int i= 0; i< actslegs.size(); i++) {
 			if(i%2==0) {
 				// handle act
-				Act act = (Act)plan.getActsLegs().get(i);
+				Act act = (Act)plan.getPlanElements().get(i);
 				drivenLinks.add(act.getLink());
 			} else {
 				// handle leg

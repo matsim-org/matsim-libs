@@ -116,7 +116,7 @@ public class PlansWriteTableForLoechl extends AbstractPersonAlgorithm implements
 
 	public void handlePlan(Plan plan) throws Exception {
 		try {
-			ArrayList actslegs = plan.getActsLegs();
+			ArrayList actslegs = plan.getPlanElements();
 
 			for (int i=0; i<actslegs.size()-2; i=i+2) {
 				Act from_act = (Act)actslegs.get(i);

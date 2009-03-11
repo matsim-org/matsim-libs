@@ -57,7 +57,7 @@ public class ReroutingStrategy implements IntradayStrategy {
 			 * TODO: Do some route validation, e.g. check if departure and
 			 * destination links are consistent.
 			 */
-			adaptRoute(newRoute, (Leg) copy.getActsLegs().get(
+			adaptRoute(newRoute, (Leg) copy.getPlanElements().get(
 					agent.getCurrentPlanIndex()), agent.getCurrentRouteIndex(), time);
 
 			return copy;

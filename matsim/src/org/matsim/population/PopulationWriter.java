@@ -223,14 +223,14 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 				Plan plan = p.getPlans().get(ii);
 				this.handler.startPlan(plan, this.out);
 				// act/leg
-				for (int jj = 0; jj < plan.getActsLegs().size(); jj++) {
+				for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
 					if (jj % 2 == 0) {
-						Act act = (Act)plan.getActsLegs().get(jj);
+						Act act = (Act)plan.getPlanElements().get(jj);
 						this.handler.startAct(act, this.out);
 						this.handler.endAct(this.out);
 					}
 					else {
-						Leg leg = (Leg)plan.getActsLegs().get(jj);
+						Leg leg = (Leg)plan.getPlanElements().get(jj);
 						this.handler.startLeg(leg, this.out);
 						// route
 						if (leg.getRoute() != null) {

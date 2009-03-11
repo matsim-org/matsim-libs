@@ -57,7 +57,7 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 	}
 
 	private void processPlan(final Plan plan) {
-		ArrayList<?> actslegs = plan.getActsLegs();
+		ArrayList<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			Act act = (Act)actslegs.get(j);
 			Link link = this.network.getNearestLink(act.getCoord());

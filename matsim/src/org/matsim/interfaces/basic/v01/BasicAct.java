@@ -48,21 +48,13 @@ public interface BasicAct {
 
 	public void setStartTime(double seconds);
 
-	/**
-	 * Note: There is no corresponding setter, since keeping things consistent at the "pointer" level
-	 * would become awkward.
-	 * 
-	 * @return
-	 */
 	public Id getLinkId();
 
-	/**
-	 * Note: There is no corresponding setter, since keeping things consistent at the "pointer" level
-	 * would become awkward.
-	 * 
-	 * @return
-	 */
+	public void setLinkId(final Id id);
+	
 	public Id getFacilityId();
+	
+	public void setFacilityId(final Id id);
 
 	/**
 	 * @deprecated

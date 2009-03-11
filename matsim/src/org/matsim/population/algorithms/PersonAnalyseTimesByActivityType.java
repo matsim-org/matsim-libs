@@ -227,7 +227,7 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 		String actType = null;
 		int oldLength;
 
-		for (Object o : plan.getActsLegs()) {
+		for (Object o : plan.getPlanElements()) {
 
 			if (o instanceof Act) {
 

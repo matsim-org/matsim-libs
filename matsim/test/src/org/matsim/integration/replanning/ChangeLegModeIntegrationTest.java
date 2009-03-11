@@ -84,7 +84,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		// test that everything worked as expected
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
 		Plan newPlan = person.getSelectedPlan();
-		Leg newLeg = (Leg) newPlan.getActsLegs().get(1);
+		Leg newLeg = (Leg) newPlan.getPlanElements().get(1);
 		assertEquals(BasicLeg.Mode.walk, newLeg.getMode());
 		assertNotNull("the leg should now have a route.", newLeg.getRoute());
 	}

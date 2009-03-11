@@ -68,7 +68,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		for (Plan plan : person.getPlans()) {
 			boolean needsXY2Links = false;
 			boolean needsReRoute = false;
-			ArrayList<Object> actslegs = plan.getActsLegs();
+			ArrayList<Object> actslegs = plan.getPlanElements();
 			for (int i = 0; i < actslegs.size(); i++) {
 				if (i % 2 == 0) {
 					Act act = (Act)actslegs.get(i);

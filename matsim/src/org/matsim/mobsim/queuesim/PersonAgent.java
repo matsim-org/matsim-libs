@@ -70,7 +70,7 @@ public class PersonAgent {
 	 * @return list of {@link Act}s and {@link Leg}s of this agent's plan
 	 */
 	public List<Object> getActsLegs() {
-		return this.person.getSelectedPlan().getActsLegs();
+		return this.person.getSelectedPlan().getPlanElements();
 	}
 
 	public void setVehicle(final QueueVehicle veh) {

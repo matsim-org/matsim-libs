@@ -301,10 +301,10 @@ public class SocialNetworkStatistics {
 	private double getDyadDistance(SocialNetEdge myEdge) {
 		double dist = 0.;
 		Person pFrom = myEdge.getPersonFrom();
-		Coord fromCoord = ((Act) pFrom.getSelectedPlan().getActsLegs().get(
+		Coord fromCoord = ((Act) pFrom.getSelectedPlan().getPlanElements().get(
 				0)).getCoord();
 		Person pTo = myEdge.getPersonTo();
-		Coord toCoord = ((Act) pTo.getSelectedPlan().getActsLegs().get(0))
+		Coord toCoord = ((Act) pTo.getSelectedPlan().getPlanElements().get(0))
 		.getCoord();
 		dist = fromCoord.calcDistance(toCoord);
 		return dist;
@@ -313,11 +313,11 @@ public class SocialNetworkStatistics {
 		double dist = 0.;
 		Vertex vFrom = (Vertex) myEdge.getEndpoints().getFirst();
 		Person pFrom = plans.getPerson((Id) vFrom.getUserDatum("personId"));
-		Coord fromCoord = ((Act) pFrom.getSelectedPlan().getActsLegs().get(
+		Coord fromCoord = ((Act) pFrom.getSelectedPlan().getPlanElements().get(
 				0)).getCoord();
 		Vertex vTo = (Vertex) myEdge.getEndpoints().getSecond();
 		Person pTo = plans.getPerson((Id) vTo.getUserDatum("personId"));
-		Coord toCoord = ((Act) pTo.getSelectedPlan().getActsLegs().get(0))
+		Coord toCoord = ((Act) pTo.getSelectedPlan().getPlanElements().get(0))
 		.getCoord();
 		dist = fromCoord.calcDistance(toCoord);
 		return dist;
@@ -366,7 +366,7 @@ public class SocialNetworkStatistics {
 			Person myPerson = plans.getPerson((Id) myVert.getUserDatum("personId"));
 			int id = Integer.parseInt(myVert.getUserDatum("personId").toString());
 			// Agent's Home Location ID
-			Act myAct = (Act) myPerson.getSelectedPlan().getActsLegs().get(0);
+			Act myAct = (Act) myPerson.getSelectedPlan().getPlanElements().get(0);
 			String homeId = myAct.getLinkId().toString();
 			// Agent's approx activity space diameter (radius to all alters)
 			double aSd1 = pcasd1.getPersonASD1(plans, myPerson);
@@ -394,7 +394,7 @@ public class SocialNetworkStatistics {
 //			myPerson.getKnowledge().clearActivitySpaces();
 
 			//Geographical aggregation
-			Facility myHome=((Act)(myPerson.getSelectedPlan().getActsLegs().get(0))).getFacility();
+			Facility myHome=((Act)(myPerson.getSelectedPlan().getPlanElements().get(0))).getFacility();
 			Location myLoc=myHome.getUpMapping().get(myHome.getUpMapping().firstKey());
 			Vertex myVertex=gstat.getLocVertex().get(myLoc);
 			double pop=(Integer) myVertex.getUserDatum("population");

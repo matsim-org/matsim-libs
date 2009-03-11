@@ -52,8 +52,8 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 			int s_cnt = 0;
 			double prev_endtime = 0;
 
-			for (int j=0; j<plan.getActsLegs().size(); j=j+2) {
-				Act act = (Act)plan.getActsLegs().get(j);
+			for (int j=0; j<plan.getPlanElements().size(); j=j+2) {
+				Act act = (Act)plan.getPlanElements().get(j);
 
 				if (j == 0) {
 					int endtime = EARLIEST_ENDTIME +
@@ -65,7 +65,7 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 
 					prev_endtime = act.getEndTime();
 				}
-				else if (j == plan.getActsLegs().size()-1) {
+				else if (j == plan.getPlanElements().size()-1) {
 					act.setStartTime(Time.UNDEFINED_TIME);
 					act.setDuration(Time.UNDEFINED_TIME);
 					act.setEndTime(Time.UNDEFINED_TIME);
@@ -80,8 +80,8 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 				}
 			}
 
-			for (int j=0; j<plan.getActsLegs().size(); j=j+2) {
-				Act act = (Act)plan.getActsLegs().get(j);
+			for (int j=0; j<plan.getPlanElements().size(); j=j+2) {
+				Act act = (Act)plan.getPlanElements().get(j);
 
 				if (act.getType().equals("w")) {
 					if (w_cnt == 0) { throw new RuntimeException("HAE?: w_cnt=0"); }
@@ -130,7 +130,7 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 					act.setStartTime(0);
 					act.setDuration(act.getEndTime());
 				}
-				else if (j == plan.getActsLegs().size()-1) {
+				else if (j == plan.getPlanElements().size()-1) {
 					act.setStartTime(prev_endtime);
 				}
 				else {
@@ -141,13 +141,13 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 			}
 
 			double act_end_time = 0;
-			for (int j=0; j<plan.getActsLegs().size(); j++) {
+			for (int j=0; j<plan.getPlanElements().size(); j++) {
 				if (j % 2 == 0) {
-					Act act = (Act)plan.getActsLegs().get(j);
+					Act act = (Act)plan.getPlanElements().get(j);
 					act_end_time = act.getEndTime();
 				}
 				else {
-					Leg leg = (Leg)plan.getActsLegs().get(j);
+					Leg leg = (Leg)plan.getPlanElements().get(j);
 					leg.setDepartureTime(act_end_time);
 					leg.setTravelTime(0);
 					leg.setArrivalTime(act_end_time);

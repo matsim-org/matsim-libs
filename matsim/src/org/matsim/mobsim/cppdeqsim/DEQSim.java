@@ -158,20 +158,20 @@ public class DEQSim extends ExternalMobsim {
 
 		Plan plan = person.getSelectedPlan();
 		// # legs, int, 32bit
-		out.writeInt((plan.getActsLegs().size()-1) / 2);
+		out.writeInt((plan.getPlanElements().size()-1) / 2);
 
 		Act nextAct = null;
-		if (plan.getActsLegs().size() > 2) {
+		if (plan.getPlanElements().size() > 2) {
 			// we have at least one leg
-			nextAct = (Act) plan.getActsLegs().get(0);
+			nextAct = (Act) plan.getPlanElements().get(0);
 		}
 
 		// for each leg...
 		double time = 0;
-		for (int i = 1, max = plan.getActsLegs().size(); i < max; i += 2) {
-			Leg leg = (Leg) plan.getActsLegs().get(i);
+		for (int i = 1, max = plan.getPlanElements().size(); i < max; i += 2) {
+			Leg leg = (Leg) plan.getPlanElements().get(i);
 			Act act = nextAct;
-			nextAct = (Act) plan.getActsLegs().get(i+1);
+			nextAct = (Act) plan.getPlanElements().get(i+1);
 
 			// TODO [MR] this is functionality that's regularly used, maybe generalize it?
 			// also see below

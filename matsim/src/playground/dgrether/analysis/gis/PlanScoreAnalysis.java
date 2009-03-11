@@ -175,7 +175,7 @@ public class PlanScoreAnalysis {
 				id = person.getId();
 				score1 = plan.getScore();
 				score2 = plans2.getPerson(id).getSelectedPlan().getScore();
-				loc = ((Act) plan.getActsLegs().get(0)).getCoord();
+				loc = ((Act) plan.getPlanElements().get(0)).getCoord();
 				writer.addLine(id.toString(), Double.toString(loc.getX()), Double
 						.toString(loc.getY()), Double.toString(score1), Double
 						.toString(score2));

@@ -60,7 +60,7 @@ public class NewAgentPtPlan2 extends NewPlan {
 		if (person.getLicense().equals("yes")) {
 			// copyPlans: the copy of the plans.
 			for (Plan pl : person.getPlans()) {
-				Leg firstLeg = (Leg) pl.getActsLegs().get(1);
+				Leg firstLeg = (Leg) pl.getPlanElements().get(1);
 				BasicLeg.Mode legMode = firstLeg.getMode();
 				// pl.setType(getPlanType(legMode));//????????????
 
@@ -76,7 +76,7 @@ public class NewAgentPtPlan2 extends NewPlan {
 					this.copyPlansModes.add(BasicLeg.Mode.pt);
 				}
 
-				List actsLegs = pl.getActsLegs();
+				List actsLegs = pl.getPlanElements();
 				int actsLegsSize = actsLegs.size();
 				for (
 				// Plan copyPlan : this.copyPlans

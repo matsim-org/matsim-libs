@@ -73,8 +73,8 @@ public class PlansScenarioCut {
 		Map<Id,Person> persons = plans.getPersons();
 		for (Person p : persons.values()) {
 			Plan plan = p.getSelectedPlan();
-			for (int i=0; i<plan.getActsLegs().size(); i=i+2) {
-				Act act = (Act)plan.getActsLegs().get(i);
+			for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
+				Act act = (Act)plan.getPlanElements().get(i);
 				Coord c = act.getCoord();
 				if ((c.getX()<min.getX()) || (c.getX()>max.getX()) || (c.getY()<min.getY()) || (c.getY()>max.getY())) {
 					removeids.add(p.getId());

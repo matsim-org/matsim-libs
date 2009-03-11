@@ -79,7 +79,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 	//////////////////////////////////////////////////////////////////////
 
 	public void handlePlan(final Plan plan) throws Exception {
-		ArrayList<?> actslegs = plan.getActsLegs();
+		ArrayList<?> actslegs = plan.getPlanElements();
 		Act fromAct = (Act)actslegs.get(0);
 
 		// loop over all <act>s

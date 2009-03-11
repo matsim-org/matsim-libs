@@ -65,9 +65,9 @@ public class TRBAnalysis implements AgentDepartureEventHandler, AgentArrivalEven
 			Plan ptPlan = getPtPlan(person);
 			if (ptPlan != null) {
 				Plan selectedPlan = person.getSelectedPlan();
-				for (int i = 1; i < ptPlan.getActsLegs().size(); i += 2) {
-					double travTime = ((Leg) ptPlan.getActsLegs().get(i)).getTravelTime();
-					double depTime = ((Leg) selectedPlan.getActsLegs().get(i)).getDepartureTime();
+				for (int i = 1; i < ptPlan.getPlanElements().size(); i += 2) {
+					double travTime = ((Leg) ptPlan.getPlanElements().get(i)).getTravelTime();
+					double depTime = ((Leg) selectedPlan.getPlanElements().get(i)).getDepartureTime();
 					int slot = getTimeSlot(depTime);
 					allTravelTimes[slot] += travTime;
 					allCounts[slot]++;

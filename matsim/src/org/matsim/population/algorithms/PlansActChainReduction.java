@@ -59,8 +59,8 @@ public class PlansActChainReduction {
 			}
 			String chain = "";
 			Plan plan = p.getPlans().get(0);
-			for (int i=0; i<plan.getActsLegs().size(); i+=2) {
-				Act act = (Act)plan.getActsLegs().get(i);
+			for (int i=0; i<plan.getPlanElements().size(); i+=2) {
+				Act act = (Act)plan.getPlanElements().get(i);
 				chain = chain.concat(act.getType());
 			}
 			if (!chains.containsKey(chain)) {

@@ -56,7 +56,7 @@ public class GenerateBlnPlan {
 		ArrayList<PersonImpl> outPersons  = new ArrayList<PersonImpl>();
 		
 		for (PersonImpl person : inPersons) {
-			if (person.getSelectedPlan().getActsLegs().size() == 1){
+			if (person.getSelectedPlan().getPlanElements().size() == 1){
 				numberOfRemovedPersons++;
 //				log.info("Removed person due to no selected plan");
 			} else {

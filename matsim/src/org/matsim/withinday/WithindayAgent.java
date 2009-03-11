@@ -170,14 +170,14 @@ public class WithindayAgent extends PersonAgent {
 		//put new route into the new plan
 		//first determine index of current leg in the plan
 		int currentLegIndex = 0;
-		for (int i = 1; i < oldPlan.getActsLegs().size(); i = i + 2)	{
-			if (oldPlan.getActsLegs().get(i).equals(currentLeg)) {
+		for (int i = 1; i < oldPlan.getPlanElements().size(); i = i + 2)	{
+			if (oldPlan.getPlanElements().get(i).equals(currentLeg)) {
 				currentLegIndex = i;
 				break;
 			}
 		}
 		//remove the old leg in the plan and replace it with the new one
-    Leg oldLeg = (Leg) newPlan.getActsLegs().remove(currentLegIndex);
+    Leg oldLeg = (Leg) newPlan.getPlanElements().remove(currentLegIndex);
     Leg newLeg = new org.matsim.population.LegImpl(oldLeg);
     //concat the Route of already passed nodes with the new route
     ArrayList<Node> newRouteConcatedList = new ArrayList<Node>(passedNodesList.size() + alternativeRoute.getNodes().size());
@@ -187,7 +187,7 @@ public class WithindayAgent extends PersonAgent {
     newRoute.setNodes(oldRoute.getStartLink(), newRouteConcatedList, oldRoute.getEndLink());
     //put the new route in the leg and the leg in the plan
     newLeg.setRoute(newRoute);
-    newPlan.getActsLegs().add(currentLegIndex, newLeg);
+    newPlan.getPlanElements().add(currentLegIndex, newLeg);
     //score plans and select best
     double currentScore = this.planScorer.getScore(oldPlan);
     double newScore = this.planScorer.getScore(newPlan);

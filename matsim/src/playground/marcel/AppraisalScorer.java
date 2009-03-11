@@ -95,13 +95,13 @@ public class AppraisalScorer implements ScoringFunction {
 		this.toll = toll;
 		this.plan = plan;
 		this.person = this.plan.getPerson();
-		this.lastActIndex = this.plan.getActsLegs().size() - 1;
+		this.lastActIndex = this.plan.getPlanElements().size() - 1;
 		this.persontype = calcPersontype();
 	}
 
 	private int calcPersontype() {
-		Link homeLink = ((Act)(this.plan.getActsLegs().get(0))).getLink();
-		Link workLink = ((Act)(this.plan.getActsLegs().get(2))).getLink();
+		Link homeLink = ((Act)(this.plan.getPlanElements().get(0))).getLink();
+		Link workLink = ((Act)(this.plan.getPlanElements().get(2))).getLink();
 		boolean homeInside = this.toll.getLinkIds().contains(homeLink.getId());
 		boolean workInside = this.toll.getLinkIds().contains(workLink.getId());
 
@@ -388,7 +388,7 @@ public class AppraisalScorer implements ScoringFunction {
 	}
 
 	private void handleAct(final double time) {
-		Act act = (Act)this.plan.getActsLegs().get(this.index);
+		Act act = (Act)this.plan.getPlanElements().get(this.index);
 		if (this.index == 0) {
 			this.firstActTime = time;
 			this.firstActType = act.getType();
@@ -401,7 +401,7 @@ public class AppraisalScorer implements ScoringFunction {
 	}
 
 	private void handleLeg(final double time) {
-		Leg leg = (Leg)this.plan.getActsLegs().get(this.index);
+		Leg leg = (Leg)this.plan.getPlanElements().get(this.index);
 		this.score += calcLegScore(this.lastTime, time, leg);
 		this.index++;
 	}

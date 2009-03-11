@@ -107,13 +107,21 @@ public class ActImpl extends BasicActImpl implements Act {
 		return this.facility;
 	}
 
+	public void setFacilityId(final Id id) {
+		throw new UnsupportedOperationException("not yet, please wait...");
+	}
+	
 	@Override
 	public final Id getLinkId() { // convenience method
 		if (this.link != null)
 			return this.link.getId();
 		return null;
 	}
-
+	
+	public void setLinkId(final Id id) {
+		throw new UnsupportedOperationException("not yet, please wait...");
+	}
+	
 	@Override
 	public final Id getFacilityId() {
 		if (this.facility != null)

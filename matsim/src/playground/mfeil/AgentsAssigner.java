@@ -140,7 +140,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected void writePlan (Plan in, Plan out){
 		Plan bestPlan = new org.matsim.population.PlanImpl (in.getPerson());
 		bestPlan.copyPlan(in);
-		ArrayList<Object> al = out.getActsLegs();
+		ArrayList<Object> al = out.getPlanElements();
 		
 		// NEW NEW NEW NEW NEW NEW NEW
 		ArrayList<ActivityOption> primActs = new ArrayList<ActivityOption>(out.getPerson().getKnowledge().getActivities(true));
@@ -151,15 +151,15 @@ public class AgentsAssigner implements PlanAlgorithm{
 			if (primActs.get(i).getType().toString().equals("home")) primActs.remove(i);
 		}
 		
-		for (int i=2;i<bestPlan.getActsLegs().size()-2;i+=2){
+		for (int i=2;i<bestPlan.getPlanElements().size()-2;i+=2){
 			if (!primActs.isEmpty()){
 				for (int j=0;j<primActs.size();j++){
-					if (((Act)(bestPlan.getActsLegs().get(i))).getType().equals(primActs.get(j).getType())){
+					if (((Act)(bestPlan.getPlanElements().get(i))).getType().equals(primActs.get(j).getType())){
 						Facility fac = this.controler.getFacilities().getFacilities().get(primActs.get(j).getFacility().getId());
-						((Act)(bestPlan.getActsLegs().get(i))).setFacility(fac);
+						((Act)(bestPlan.getPlanElements().get(i))).setFacility(fac);
 						// not only update of fac required but also coord and link; data inconsistencies otherwise
-						((Act)(bestPlan.getActsLegs().get(i))).setCoord(fac.getCenter());
-						((Act)(bestPlan.getActsLegs().get(i))).setLink(fac.getLink());
+						((Act)(bestPlan.getPlanElements().get(i))).setCoord(fac.getCenter());
+						((Act)(bestPlan.getPlanElements().get(i))).setLink(fac.getLink());
 						primActs.remove(j);
 						break;
 					}
@@ -167,44 +167,44 @@ public class AgentsAssigner implements PlanAlgorithm{
 			}
 		}
 		
-		if(al.size()>bestPlan.getActsLegs().size()){ 
+		if(al.size()>bestPlan.getPlanElements().size()){ 
 			int i;
-			for (i = 2; i<bestPlan.getActsLegs().size()-2;i++){
+			for (i = 2; i<bestPlan.getPlanElements().size()-2;i++){
 				al.remove(i);
-				al.add(i, bestPlan.getActsLegs().get(i));	
+				al.add(i, bestPlan.getPlanElements().get(i));	
 			}
 			for (int j = i; j<al.size()-2;j=j+0){
 				al.remove(j);
 			}
 		}
-		else if(al.size()<bestPlan.getActsLegs().size()){
+		else if(al.size()<bestPlan.getPlanElements().size()){
 			int i;
 			for (i = 2; i<al.size()-2;i++){
 				al.remove(i);
-				al.add(i, bestPlan.getActsLegs().get(i));	
+				al.add(i, bestPlan.getPlanElements().get(i));	
 			}
-			for (int j = i; j<bestPlan.getActsLegs().size()-2;j++){			
-				al.add(j, bestPlan.getActsLegs().get(j));
+			for (int j = i; j<bestPlan.getPlanElements().size()-2;j++){			
+				al.add(j, bestPlan.getPlanElements().get(j));
 			}
 		}
 		else {
 			for (int i = 2; i<al.size()-2;i++){
 			al.remove(i);
-			al.add(i, bestPlan.getActsLegs().get(i));	
+			al.add(i, bestPlan.getPlanElements().get(i));	
 			}
 		}
 	}
 	
 	@Deprecated
 	private void cleanUpPlan (Plan plan){
-		double move = this.cleaner.run(((Act)(plan.getActsLegs().get(0))).getEndTime(), plan);
+		double move = this.cleaner.run(((Act)(plan.getPlanElements().get(0))).getEndTime(), plan);
 		int loops=1;
 		while (move!=0.0){
 			loops++;
-			move = this.cleaner.run(java.lang.Math.max(((Act)(plan.getActsLegs().get(0))).getEndTime()-move,0), plan);
+			move = this.cleaner.run(java.lang.Math.max(((Act)(plan.getPlanElements().get(0))).getEndTime()-move,0), plan);
 			if (loops>3) {
-				for (int i=2;i< plan.getActsLegs().size()-4;i+=2){
-					((Act)(plan.getActsLegs().get(i))).setDuration(this.minimumTime);
+				for (int i=2;i< plan.getPlanElements().size()-4;i+=2){
+					((Act)(plan.getPlanElements().get(i))).setDuration(this.minimumTime);
 				}
 				move = this.cleaner.run(this.minimumTime, plan);
 				if (move!=0.0){

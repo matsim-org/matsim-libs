@@ -117,9 +117,9 @@ public class ItsumoSim extends ExternalMobsim {
 				out.write("   <routes>"); out.newLine();
 
 				// act/leg
-				for (int jj = 0; jj < plan.getActsLegs().size(); jj++) {
+				for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
 					if (jj % 2 == 0) {
-						Act act = (Act)plan.getActsLegs().get(jj);
+						Act act = (Act)plan.getPlanElements().get(jj);
 
 						out.write("    <route>"); out.newLine();
 						out.write("     <laneset>" + act.getLinkId() + "</laneset>"); out.newLine();
@@ -129,7 +129,7 @@ public class ItsumoSim extends ExternalMobsim {
 							break ;  // we write only the first leg for itsumo!
 						}
 					} else {
-						Leg leg = (Leg)plan.getActsLegs().get(jj);
+						Leg leg = (Leg)plan.getPlanElements().get(jj);
 						// route
 						if (leg.getRoute() == null) {
 							System.err.println ( " WARNING: Empty route.  Not sure if itsumo can deal with this.  Continuing anyway ... " ) ;

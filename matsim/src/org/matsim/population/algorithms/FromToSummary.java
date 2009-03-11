@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -126,7 +127,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 	 * @see org.matsim.population.algorithms.PlanAlgorithm#run(org.matsim.interfaces.core.v01.Plan)
 	 */
 	public void run(Plan plan) {
-		ArrayList actslegs = plan.getActsLegs();
+		List actslegs = plan.getPlanElements();
 		Act fromAct = (Act) actslegs.get(0);
 		Node fromNode = fromAct.getLink().getToNode();
 

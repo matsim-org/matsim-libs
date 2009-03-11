@@ -51,7 +51,7 @@ public class PersonSubTourExtractor extends AbstractPersonAlgorithm implements P
 		boolean last_leaf = false;
 		ArrayList<Integer> last_subtour = new ArrayList<Integer>();
 		last_subtour = subtours.get(subtour_idx);
-		if (last_subtour.contains(plan.getActsLegs().size()-1) && last_subtour.contains(0)){
+		if (last_subtour.contains(plan.getPlanElements().size()-1) && last_subtour.contains(0)){
 			last_leaf = true;
 		}
 		return last_leaf;
@@ -81,13 +81,13 @@ public class PersonSubTourExtractor extends AbstractPersonAlgorithm implements P
 		int leaf_start = start;
 		int leaf_end = end;
 		TreeMap<Integer,Act> acts = new	TreeMap<Integer,Act>();
-		Act act0 = ((Act)plan.getActsLegs().get(tour.get(start)));
+		Act act0 = ((Act)plan.getPlanElements().get(tour.get(start)));
 		acts.put(0,act0);
 		while (is_leaf == false && i<=tour.size()-2){
 			i=i+1;
-			Act acti = ((Act)plan.getActsLegs().get(tour.get(i)));
+			Act acti = ((Act)plan.getPlanElements().get(tour.get(i)));
 			for (int j=i-1;j>=tour.get(start);j=j-1){
-				Act actj = (Act)plan.getActsLegs().get(tour.get(j));
+				Act actj = (Act)plan.getPlanElements().get(tour.get(j));
 				if ((acti.getCoord().getX() == actj.getCoord().getX()) &&
 					    (acti.getCoord().getY() == actj.getCoord().getY())){
 					is_leaf=true;
@@ -105,7 +105,7 @@ public class PersonSubTourExtractor extends AbstractPersonAlgorithm implements P
 	}
 		
 	private final void registerPlan (Plan plan, ArrayList<Integer> tour) {
-		for (int i=0; i<=plan.getActsLegs().size()-1;i=i+2) {
+		for (int i=0; i<=plan.getPlanElements().size()-1;i=i+2) {
 			tour.add(i);
 		}
 	}

@@ -575,9 +575,9 @@ public class EgoNetPlansItersMakeKML {
 
 		LineStringType lineString = kmlObjectFactory.createLineStringType();
 				
-		Coord coordFrom = trafo.transform(((Act)myPerson.getSelectedPlan().getActsLegs().get(0)).getCoord());
+		Coord coordFrom = trafo.transform(((Act)myPerson.getSelectedPlan().getPlanElements().get(0)).getCoord());
 		lineString.getCoordinates().add(Double.toString(coordFrom.getX()) + "," + Double.toString(coordFrom.getY()) + ",0.0");
-		Coord coordTo = trafo.transform(((Act)ai.getSelectedPlan().getActsLegs().get(0)).getCoord());
+		Coord coordTo = trafo.transform(((Act)ai.getSelectedPlan().getPlanElements().get(0)).getCoord());
 		lineString.getCoordinates().add(Double.toString(coordTo.getX()) + "," + Double.toString(coordTo.getY()) + ",0.0");
 		socialLink.setAbstractGeometryGroup(kmlObjectFactory.createLineString(lineString));
 		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(socialLink));
@@ -603,9 +603,9 @@ public class EgoNetPlansItersMakeKML {
 		socialLink.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
 		
 		LineStringType lineString = kmlObjectFactory.createLineStringType();
-		Coord coordFrom = trafo.transform(((Act)myPerson.getSelectedPlan().getActsLegs().get(0)).getCoord());
+		Coord coordFrom = trafo.transform(((Act)myPerson.getSelectedPlan().getPlanElements().get(0)).getCoord());
 		lineString.getCoordinates().add(Double.toString(coordFrom.getX()) + "," +Double.toString(coordFrom.getY()) + ",0.0");
-		Coord coordTo = trafo.transform(((Act)ego.getSelectedPlan().getActsLegs().get(0)).getCoord());
+		Coord coordTo = trafo.transform(((Act)ego.getSelectedPlan().getPlanElements().get(0)).getCoord());
 		lineString.getCoordinates().add(Double.toString(coordTo.getX()) + "," +Double.toString(coordTo.getY()) + ",0.0");
 		socialLink.setAbstractGeometryGroup(kmlObjectFactory.createLineString(lineString));
 		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(socialLink));

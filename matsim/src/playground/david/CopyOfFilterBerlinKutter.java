@@ -51,10 +51,10 @@ class FilterPersonsNonCarMode extends AbstractPersonAlgorithm{
 	public void run(final Person person) {
 		// check for selected plans routes, if any of the relevant nodes shows up
 		Plan plan = person.getSelectedPlan();
-		for (int jj = 0; jj < plan.getActsLegs().size(); jj++) {
+		for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
 			if (jj % 2 == 0) {
 			} else {
-				Leg leg = (Leg)plan.getActsLegs().get(jj);
+				Leg leg = (Leg)plan.getPlanElements().get(jj);
 				// route
 				if (!leg.getMode().equals(BasicLeg.Mode.car)  && (this.count < 10)) {
 					try {

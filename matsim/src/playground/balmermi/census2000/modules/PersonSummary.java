@@ -147,7 +147,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			Plan plan = person.getPlans().get(i);
 
 			int acts = 0;
-			for (int j=0; j<plan.getActsLegs().size(); j=j+2) {
+			for (int j=0; j<plan.getPlanElements().size(); j=j+2) {
 				acts++;
 				act_cnt++;
 			}
@@ -157,7 +157,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			av_act_per_plan = av_act_per_plan / plan_cnt;
 		}
 
-		ArrayList<Object> acts_legs = person.getSelectedPlan().getActsLegs();
+		ArrayList<Object> acts_legs = person.getSelectedPlan().getPlanElements();
 		double plan_dist = 0.0;
 		int plan_row = -1; // plan mode defined as last mode
 		                   // (it's just a trick, since the mode is the same for a plan) (just temporary)

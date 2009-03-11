@@ -72,12 +72,12 @@ public class RemoveDuplicatePlans implements BeforeMobsimListener {
 	}
 
 	private boolean comparePlans(Plan plan1, Plan plan2) {
-		if (plan1.getActsLegs().size() > 1 && plan2.getActsLegs().size() > 1) {
+		if (plan1.getPlanElements().size() > 1 && plan2.getPlanElements().size() > 1) {
 			boolean plansDiffer = false;
 			
-			for (int i = 1; i < plan1.getActsLegs().size(); i += 2) {
-				Leg leg2 = (Leg) plan2.getActsLegs().get(i);
-				Leg leg1 = (Leg) plan1.getActsLegs().get(i);
+			for (int i = 1; i < plan1.getPlanElements().size(); i += 2) {
+				Leg leg2 = (Leg) plan2.getPlanElements().get(i);
+				Leg leg1 = (Leg) plan1.getPlanElements().get(i);
 				/*
 				 * Compare sequence of nodes.
 				 */

@@ -87,7 +87,7 @@ public class QueryAgentPlan implements OTFQuery {
 
 	private static int countLines(Plan plan) {
 		int count = 0;
-		for (Object o : plan.getActsLegs()) {
+		for (Object o : plan.getPlanElements()) {
 			if (o instanceof Act) {
 				count++;
 			} else if (o instanceof Leg) {
@@ -128,7 +128,7 @@ public class QueryAgentPlan implements OTFQuery {
 		Color actColor = Color.BLUE;
 		Color ptColor = Color.RED;
 
-		for (Object o : plan.getActsLegs()) {
+		for (Object o : plan.getPlanElements()) {
 			if(o instanceof Act) {
 				Color col = actColor;
 				Act act = (Act)o;
@@ -159,10 +159,10 @@ public class QueryAgentPlan implements OTFQuery {
 
 		Plan plan = person.getSelectedPlan();
 
-		this.acts = new Object [plan.getActsLegs().size()/2];
+		this.acts = new Object [plan.getPlanElements().size()/2];
 
 		for (int i=0;i< this.acts.length; i++) {
-			Act act = (Act)plan.getActsLegs().get(i*2);
+			Act act = (Act)plan.getPlanElements().get(i*2);
 			Coord coord = act.getCoord();
 			if (coord == null) coord = act.getLink().getCenter();
 			this.acts[i] = new MyInfoText( (float)coord.getX(), (float)coord.getY(), act.getType());

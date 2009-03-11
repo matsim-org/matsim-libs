@@ -52,8 +52,8 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 	}
 
 	public void run(final Plan plan) {
-		if (plan.getActsLegs().size() > 1) {
-			final BasicLeg.Mode currentMode = ((BasicLeg) (plan.getActsLegs().get(1))).getMode();
+		if (plan.getPlanElements().size() > 1) {
+			final BasicLeg.Mode currentMode = ((BasicLeg) (plan.getPlanElements().get(1))).getMode();
 			int newModeIdx = this.rng.nextInt(this.possibleModes.length - 1);
 			for (int i = 0; i <= newModeIdx; i++) {
 				if (this.possibleModes[i].equals(currentMode)) {

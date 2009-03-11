@@ -59,7 +59,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		List<SubChain> subChains = this.calcActChains(plan);
 		this.handleSubChains(plan, subChains);
 			
-		final ArrayList<?> actslegs = plan.getActsLegs();
+		final ArrayList<?> actslegs = plan.getPlanElements();
 		// loop over all <leg>s, remove route-information
 		// routing is done after location choice
 		for (int j = 1; j < actslegs.size(); j=j+2) {
@@ -191,7 +191,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			movablePrimaryActivities = defineMovablePrimaryActivities(plan);
 		}
 				
-		final ArrayList<?> actslegs = plan.getActsLegs();
+		final ArrayList<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
 			
@@ -230,7 +230,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	public List<SubChain> calcActChainsHavingOneFlexibleActivityType(final Plan plan, String firstOfFlexibleActivityType) {
 		ManageSubchains manager = new ManageSubchains();	
 		
-		final ArrayList<?> actslegs = plan.getActsLegs();
+		final ArrayList<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
 						

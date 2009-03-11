@@ -186,7 +186,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 		for (Person p : population.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			ExpectedNumberOfEvents expected = new ExpectedNumberOfEvents();
-			ArrayList<Object> actsLegs = plan.getActsLegs();
+			ArrayList<Object> actsLegs = plan.getPlanElements();
 			expected.expectedDepartureEvents += actsLegs.size() / 2;
 
 			LegIterator iter = plan.getIteratorLeg();

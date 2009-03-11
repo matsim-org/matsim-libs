@@ -40,13 +40,13 @@ public class PersonCalculateActivitySpaces {
 
 		double aSd = 0.;
 
-		Act myAct = (Act) ego.getSelectedPlan().getActsLegs().get(0);
+		Act myAct = (Act) ego.getSelectedPlan().getPlanElements().get(0);
 		Coord egoHomeCoord = myAct.getCoord();
 		EgoNet personNet = ego.getKnowledge().getEgoNet();
 		ArrayList<Person> alters = personNet.getAlters();
 		for (Person myAlter : alters) {
 			//Coord myAlterCoord = (Coord) pfc.personGetCoords(myAlter,"home").get(0);
-			myAct = (Act) myAlter.getSelectedPlan().getActsLegs().get(0);
+			myAct = (Act) myAlter.getSelectedPlan().getPlanElements().get(0);
 			Coord myAlterCoord = myAct.getCoord();
 			aSd = aSd + egoHomeCoord.calcDistance(myAlterCoord);
 		}
@@ -63,10 +63,10 @@ public class PersonCalculateActivitySpaces {
 
 		double aSd = 0.;
 		int numAct = 0;
-		Act myAct = (Act) plan.getActsLegs().get(0);//Note this is not safe if ego is not sleeping at home
+		Act myAct = (Act) plan.getPlanElements().get(0);//Note this is not safe if ego is not sleeping at home
 
-		for (int i = 2, max = plan.getActsLegs().size() - 2; i < max; i += 2) {
-			Act act1 = (Act) (plan.getActsLegs().get(i));
+		for (int i = 2, max = plan.getPlanElements().size() - 2; i < max; i += 2) {
+			Act act1 = (Act) (plan.getPlanElements().get(i));
 
 			if (myAct != null && act1 != null) {
 				double dist = act1.getCoord().calcDistance(myAct.getCoord());

@@ -39,9 +39,9 @@ public class CalcAverageTripLength extends AbstractPersonAlgorithm implements Pl
 	}
 
 	public void run(final Plan plan) {
-		for (int i = 2, max = plan.getActsLegs().size(); i < max; i += 2) {
-			Act act = (Act) plan.getActsLegs().get(i);
-			Leg leg = (Leg) plan.getActsLegs().get(i - 1);
+		for (int i = 2, max = plan.getPlanElements().size(); i < max; i += 2) {
+			Act act = (Act) plan.getPlanElements().get(i);
+			Leg leg = (Leg) plan.getPlanElements().get(i - 1);
 			Route route = leg.getRoute();
 			if (route != null) {
 				double dist = route.getDist();

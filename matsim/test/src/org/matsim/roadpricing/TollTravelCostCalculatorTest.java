@@ -66,11 +66,11 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		commonRouterData.run(network);
 
 		Person person1 = population.getPerson(new IdImpl("1"));
-		Leg leg = ((Leg) (person1.getPlans().get(0).getActsLegs().get(1)));
+		Leg leg = ((Leg) (person1.getPlans().get(0).getPlanElements().get(1)));
 
 		// 1st case: without toll, agent chooses shortest path
 		new PlansCalcRoute(network, costCalc, timeCostCalc, new DijkstraFactory()).run(population);
-		Fixture.compareRoutes("1 2 4 5", (CarRoute) ((Leg) (person1.getPlans().get(0).getActsLegs().get(1))).getRoute());
+		Fixture.compareRoutes("1 2 4 5", (CarRoute) ((Leg) (person1.getPlans().get(0).getPlanElements().get(1))).getRoute());
 		// also test it with A*-Landmarks
 		clearRoutes(population);
 		assertNull(leg.getRoute()); // make sure the cleaning worked. we do this only once, then we believe it.
@@ -115,7 +115,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
 
 		Person person1 = population.getPerson(new IdImpl("1"));
-		Leg leg = ((Leg) (person1.getPlans().get(0).getActsLegs().get(1)));
+		Leg leg = ((Leg) (person1.getPlans().get(0).getPlanElements().get(1)));
 
 		// 1st case: without toll, agent chooses shortest path
 		new PlansCalcRoute(network, costCalc, timeCostCalc).run(population);

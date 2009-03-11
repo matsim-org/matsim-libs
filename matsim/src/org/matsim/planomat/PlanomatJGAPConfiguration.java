@@ -68,7 +68,7 @@ public class PlanomatJGAPConfiguration extends Configuration {
 			// - population size: equal to the string length, if not specified otherwise (de Jong, 1975)
 			if (Gbl.getConfig().planomat().getPopSize() == Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.POPSIZE.getDefaultValue())) {
 				
-				int numActs = plan.getActsLegs().size() / 2;
+				int numActs = plan.getPlanElements().size() / 2;
 				int populationSize = Gbl.getConfig().planomat().getLevelOfTimeResolution() * numActs;
 				if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
 					populationSize += Gbl.getConfig().planomat().getPossibleModes().length * planAnalyzeSubtours.getNumSubtours();

@@ -89,7 +89,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 
 	// changed the method from public to private. use run(plan) instead
 	protected void handlePlan(Plan plan) {
-		ArrayList<?> actslegs = plan.getActsLegs();
+		ArrayList<?> actslegs = plan.getPlanElements();
 		Act fromAct = (Act)actslegs.get(0);
 		double travTime = 0;
 		double now = fromAct.getEndTime(); // must be available according spec

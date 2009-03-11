@@ -77,6 +77,10 @@ public class BasicPlanImpl implements BasicPlan {
 		return Double.isNaN(this.getScore());
 	}
 
+	public ArrayList<Object> getPlanElements() {
+		return this.actsLegs;
+	}
+
 	/**
 	 * Iterator that steps through all Activities ignoring the Legs
 	 */

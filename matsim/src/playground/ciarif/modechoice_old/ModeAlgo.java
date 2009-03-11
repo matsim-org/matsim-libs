@@ -52,7 +52,7 @@ public class ModeAlgo extends AbstractPersonAlgorithm{
 		
 		double rd = MatsimRandom.random.nextDouble();
 		Plan plan = person.getSelectedPlan();
-		ArrayList<Object> acts_legs = plan.getActsLegs();
+		ArrayList<Object> acts_legs = plan.getPlanElements();
 
 		for (int i=1; i<acts_legs.size()-1; i=i+2) {
 			Leg leg = (Leg)acts_legs.get(i);
@@ -66,7 +66,7 @@ public class ModeAlgo extends AbstractPersonAlgorithm{
 		
 		double dist=0;
 		Plan plan = person.getSelectedPlan();
-		ArrayList<Object> acts_legs = plan.getActsLegs();
+		ArrayList<Object> acts_legs = plan.getPlanElements();
 		
 		for (int i=2; i<acts_legs.size(); i=i+2) {
 			Act act = (Act)acts_legs.get(i);

@@ -72,7 +72,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 
 		boolean agentPaysToll = false;
 
-		ArrayList<?> actslegs = plan.getActsLegs();
+		ArrayList<?> actslegs = plan.getPlanElements();
 		Act fromAct = (Act)actslegs.get(0);
 
 		final int TOLL_INDEX = 0;

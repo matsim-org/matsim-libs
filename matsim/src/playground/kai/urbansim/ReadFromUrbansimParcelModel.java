@@ -229,8 +229,8 @@ public class ReadFromUrbansimParcelModel {
 					}
 
 					// check if work act has changed:
-					Act oldWorkAct = (Act) oldPerson.getSelectedPlan().getActsLegs().get(2) ;
-					Act newWorkAct = (Act)    newPerson.getSelectedPlan().getActsLegs().get(2) ;
+					Act oldWorkAct = (Act) oldPerson.getSelectedPlan().getPlanElements().get(2) ;
+					Act newWorkAct = (Act)    newPerson.getSelectedPlan().getPlanElements().get(2) ;
 					if ( actHasChanged ( oldWorkAct, newWorkAct, network ) ) {
 						newPop.addPerson(newPerson) ;
 						break ;

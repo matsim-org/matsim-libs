@@ -67,7 +67,7 @@ public class CMCFPlansMerger {
 			Plan plan = p.getSelectedPlan();
 			int legNumber = Integer.parseInt(idLegNumber[1]);
 			legNumber = (legNumber * 2) + 1;
-			Leg leg = (Leg) plan.getActsLegs().get(legNumber);
+			Leg leg = (Leg) plan.getPlanElements().get(legNumber);
 			leg.setRoute(person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity()).getRoute());
 		}
 		

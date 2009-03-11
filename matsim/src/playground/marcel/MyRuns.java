@@ -511,8 +511,8 @@ public class MyRuns {
 		for (final Person person : plans.getPersons().values()) {
 			boolean passesLink = false;
 			for (final Plan plan : person.getPlans()) {
-				for (int i = 1, max = plan.getActsLegs().size(); i < max; i +=2) {
-					final Leg leg = (Leg)plan.getActsLegs().get(i);
+				for (int i = 1, max = plan.getPlanElements().size(); i < max; i +=2) {
+					final Leg leg = (Leg)plan.getPlanElements().get(i);
 					final CarRoute route = (CarRoute) leg.getRoute();
 					final List<Node> nodes = route.getNodes();
 					final int fromNodeIdx = nodes.indexOf(fromNode);
@@ -923,10 +923,10 @@ public class MyRuns {
 				System.out.println("plan # " + counter);
 			}
 			final Plan plan = person.getPlans().get(0);
-			Coord depCoord = ((Act)plan.getActsLegs().get(0)).getCoord();
-			for (int i = 2, maxi = plan.getActsLegs().size(); i < maxi; i = i + 2) {
-				final Leg leg = ((Leg)plan.getActsLegs().get(i-1));
-				final Coord arrCoord = ((Act)plan.getActsLegs().get(i)).getCoord();
+			Coord depCoord = ((Act)plan.getPlanElements().get(0)).getCoord();
+			for (int i = 2, maxi = plan.getPlanElements().size(); i < maxi; i = i + 2) {
+				final Leg leg = ((Leg)plan.getPlanElements().get(i-1));
+				final Coord arrCoord = ((Act)plan.getPlanElements().get(i)).getCoord();
 				final double depTime = leg.getDepartureTime();
 				try {
 					final Path path = ptNetwork.dijkstraGetCheapestRoute(depCoord, arrCoord, depTime, radius);
@@ -1827,7 +1827,7 @@ public class MyRuns {
 						}
 
 						public void run(final Plan plan) {
-							final List actslegs = plan.getActsLegs();
+							final List actslegs = plan.getPlanElements();
 							for (int i = 1, max = actslegs.size(); i < max; i+=2) {
 								final Leg leg = (Leg)actslegs.get(i);
 								run((CarRoute) leg.getRoute(), leg.getDepartureTime());

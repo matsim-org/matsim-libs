@@ -113,7 +113,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 			this.currperson = null;
 		}
 		else if (PLAN.equals(name)) {
-			this.currplan.getActsLegs().trimToSize();
+			this.currplan.getPlanElements().trimToSize();
 			this.currplan = null;
 		}
 		else if (LEG.equals(name)) {

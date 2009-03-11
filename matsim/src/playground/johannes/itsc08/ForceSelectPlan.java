@@ -46,7 +46,7 @@ public class ForceSelectPlan implements PlanSelector {
 	public Plan selectPlan(Person person) {
 		Plan plan = null;
 		for(Plan p : person.getPlans()) {
-			Leg leg = (Leg) p.getActsLegs().get(1);
+			Leg leg = (Leg) p.getPlanElements().get(1);
 			if(leg.getRoute().getLinkIds().contains(link.getId())) {
 				plan = p;
 				break;

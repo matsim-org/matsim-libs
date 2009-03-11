@@ -51,7 +51,7 @@ public class ActivityActWriter {
 
 			for (int i=0;i<myPersonPlans.size();i++){
 				Plan myPlan = myPersonPlans.get(i);
-				ArrayList<Object> actsLegs=myPlan.getActsLegs();
+				ArrayList<Object> actsLegs=myPlan.getPlanElements();
 
 				for (int j=0;j<actsLegs.size()+1;j=j+2){
 					Act myAct= (Act) actsLegs.get(j);

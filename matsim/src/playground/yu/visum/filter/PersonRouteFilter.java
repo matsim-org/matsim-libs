@@ -56,7 +56,7 @@ public class PersonRouteFilter extends PersonFilterA {
 		List<Plan> plans = person.getPlans();
 		for (Plan plan : plans) {
 			if (plan.isSelected()) {
-				List<Object> acts_Legs = plan.getActsLegs();
+				List<Object> acts_Legs = plan.getPlanElements();
 				boolean even = false;
 				for (Object obj : acts_Legs) {
 					if (even) {

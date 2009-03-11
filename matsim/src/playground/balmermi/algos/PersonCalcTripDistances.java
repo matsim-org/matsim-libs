@@ -57,10 +57,10 @@ public class PersonCalcTripDistances extends AbstractPersonAlgorithm implements 
 	public void run(Person person) {
 		Plan plan = person.getSelectedPlan();
 		if (plan == null) { throw new RuntimeException("Person id=" + person.getId() + "does not have a selected plan assigned!"); }
-		for (int i=1; i<plan.getActsLegs().size()-1; i=i+2) {
-			Act prev = (Act)plan.getActsLegs().get(i-1);
-			Leg leg = (Leg)plan.getActsLegs().get(i);
-			Act next = (Act)plan.getActsLegs().get(i+1);
+		for (int i=1; i<plan.getPlanElements().size()-1; i=i+2) {
+			Act prev = (Act)plan.getPlanElements().get(i-1);
+			Leg leg = (Leg)plan.getPlanElements().get(i);
+			Act next = (Act)plan.getPlanElements().get(i+1);
 
 			if (prev.getLinkId().equals(next.getLinkId())) {
 				if (!((CarRoute) leg.getRoute()).getNodes().isEmpty()) { throw new RuntimeException("Person id=" + person.getId() + ": route should be empty!"); }

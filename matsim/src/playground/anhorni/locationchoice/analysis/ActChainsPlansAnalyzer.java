@@ -99,7 +99,7 @@ public class ActChainsPlansAnalyzer {
 				Person person = person_iter.next();
 				counter.incCounter();
 				Plan selectedPlan = person.getSelectedPlan();
-				final ArrayList<?> actslegs = selectedPlan.getActsLegs();
+				final ArrayList<?> actslegs = selectedPlan.getPlanElements();
 
 				int countSL = 0;
 				for (int j = 0; j < actslegs.size(); j=j+2) {

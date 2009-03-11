@@ -59,9 +59,9 @@ public class PersonActChainGrouping extends AbstractPersonAlgorithm {
 		}
 
 		Plan plan = person.getPlans().get(0);
-		StringBuilder chainBuilder = new StringBuilder((plan.getActsLegs().size() + 1) / 2);
-		for (int j = 0; j < plan.getActsLegs().size(); j = j + 2) {
-			Act act = (Act)plan.getActsLegs().get(j);
+		StringBuilder chainBuilder = new StringBuilder((plan.getPlanElements().size() + 1) / 2);
+		for (int j = 0; j < plan.getPlanElements().size(); j = j + 2) {
+			Act act = (Act)plan.getPlanElements().get(j);
 			chainBuilder = chainBuilder.append(act.getType().substring(0, 1));
 		}
 

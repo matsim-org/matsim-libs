@@ -63,8 +63,8 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 		if (k == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no knowledge defined!"); }
 		if (!k.setPrimaryFlag(true)) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no activities defined!"); }
 		ArrayList<ActivityOption> prim_acts = k.getActivities(true);
-		for (int i=0; i<plan.getActsLegs().size(); i=i+2) {
-			Act act = (Act)plan.getActsLegs().get(i);
+		for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
+			Act act = (Act)plan.getPlanElements().get(i);
 			String curr_type = act.getType();
 			ActivityOption a = act.getFacility().getActivityOption(curr_type);
 			if (a == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": Inconsistency with f_id="+act.getFacility()+"!"); }

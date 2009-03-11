@@ -159,7 +159,7 @@ public class PlanScore implements AgentContentment {
 //		distance -= leg.getRoute().getDestinationLink().getLength_m();
 
 		int planIdx = 0;
-		for (Object o : this.agent.getPerson().getSelectedPlan().getActsLegs()) {
+		for (Object o : this.agent.getPerson().getSelectedPlan().getPlanElements()) {
 			if (o.equals(this.agent.getVehicle().getCurrentLeg())) {
 				break;
 			}
@@ -214,11 +214,11 @@ public class PlanScore implements AgentContentment {
 
 	private void calcReferenceVals() {
 		Plan plan = this.agent.getPerson().getSelectedPlan();
-		int planEntries = plan.getActsLegs().size();
+		int planEntries = plan.getPlanElements().size();
 		this.referenceScore = new double[planEntries + 1];
 		this.zeroUtilDuration = new double[planEntries + 1];
 		int index = 0;
-		for (Object o : plan.getActsLegs()) {
+		for (Object o : plan.getPlanElements()) {
 			if (o instanceof Leg) {
 				Leg leg = (Leg)o;
 				Act nextAct = this.agent.getPerson().getSelectedPlan().getNextActivity(leg);

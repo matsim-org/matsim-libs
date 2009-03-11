@@ -85,7 +85,7 @@ public class Wait2Link_2Acts1LinkTest {
 			if (person != null) {
 				Plan p = person.getSelectedPlan();
 				if (p != null) {
-					List actsLegs = p.getActsLegs();
+					List actsLegs = p.getPlanElements();
 					int max = actsLegs.size();
 					for (int i = 0; i < max; i++)
 						if (i % 2 == 0) {

@@ -130,7 +130,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		Id id = event.getControler().getNetwork().getLink("4").getId();
 		for(Person p : event.getControler().getPopulation().getPersons().values()) {
 			for(Plan plan : p.getPlans()) {
-				Leg leg = (Leg) plan.getActsLegs().get(1);
+				Leg leg = (Leg) plan.getPlanElements().get(1);
 				if(leg.getRoute().getLinkIds().contains(id)) {
 					riskyPlans.add(plan);
 				} else {
@@ -312,7 +312,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			events.remove(event.agent);
 			double triptime = event.time - e.time;
 			traveltimes.put(event.agent, triptime);
-			if (((CarRoute) ((Leg)event.agent.getSelectedPlan().getActsLegs().get(1)).getRoute()).getNodes().get(1).getId().toString().equals("3")) {
+			if (((CarRoute) ((Leg)event.agent.getSelectedPlan().getPlanElements().get(1)).getRoute()).getNodes().get(1).getId().toString().equals("3")) {
 				riskyTriptime += triptime;
 				if(controler.getIteration() % 2 == 0) { //FIXME: needs to be consistent with IncidentGenerator!!!
 					// bad day

@@ -47,7 +47,7 @@ public class EndLegMessage extends EventMessage {
 		vehicle.setLinkIndex(-1);
 
 		Plan plan = vehicle.getOwnerPerson().getSelectedPlan();
-		ArrayList<Object> actsLegs = plan.getActsLegs();
+		ArrayList<Object> actsLegs = plan.getPlanElements();
 		if ((actsLegs.size() > vehicle.getLegIndex())) {
 			vehicle.setCurrentLeg((Leg) actsLegs.get(vehicle.getLegIndex()));
 			// current act

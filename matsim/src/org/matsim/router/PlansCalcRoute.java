@@ -126,7 +126,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	//////////////////////////////////////////////////////////////////////
 
 	protected void handlePlan(final Plan plan) {
-		ArrayList<?> actslegs = plan.getActsLegs();
+		ArrayList<?> actslegs = plan.getPlanElements();
 		Act fromAct = (Act)actslegs.get(0);
 		double now = 0;
 

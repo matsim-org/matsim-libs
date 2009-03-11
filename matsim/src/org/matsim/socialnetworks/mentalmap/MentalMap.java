@@ -201,7 +201,7 @@ public class MentalMap {
 	 */
 	public void manageMemory(int max, List<Plan> myPlans){
 
-		if(myPlans.get(0).getActsLegs().size()*myPlans.size()/2 >max){
+		if(myPlans.get(0).getPlanElements().size()*myPlans.size()/2 >max){
 			this.log.info("No activities removed from memory");
 			return;
 		}

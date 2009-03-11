@@ -113,13 +113,13 @@ public class ExternalModule implements StrategyModule {
 			this.handler.startPlan(plan, this.writer);
 
 			// act/leg
-			for (int jj = 0; jj < plan.getActsLegs().size(); jj++) {
+			for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
 				if (jj % 2 == 0) {
-					Act act = (Act)plan.getActsLegs().get(jj);
+					Act act = (Act)plan.getPlanElements().get(jj);
 					this.handler.startAct(act, this.writer);
 					this.handler.endAct(this.writer);
 				} else {
-					Leg leg = (Leg)plan.getActsLegs().get(jj);
+					Leg leg = (Leg)plan.getPlanElements().get(jj);
 					this.handler.startLeg(leg, this.writer);
 					// route
 					if (leg.getRoute() != null) {

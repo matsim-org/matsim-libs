@@ -79,7 +79,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 		Location currentLocation = null, requiredLocation = null, nextLocation = null;
 		
 		// how many mode combinations are possible?
-		int numLegs = plan.getActsLegs().size() / 2;
+		int numLegs = plan.getPlanElements().size() / 2;
 
 		int numCombinations = (int) Math.pow(this.modeSet.size(), numLegs);
 

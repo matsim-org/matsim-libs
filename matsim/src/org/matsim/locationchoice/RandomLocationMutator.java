@@ -52,7 +52,7 @@ public class RandomLocationMutator extends LocationMutator {
 			movablePrimaryActivities = defineMovablePrimaryActivities(plan);
 		}
 		
-		final ArrayList<?> actslegs = plan.getActsLegs();
+		final ArrayList<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
 			

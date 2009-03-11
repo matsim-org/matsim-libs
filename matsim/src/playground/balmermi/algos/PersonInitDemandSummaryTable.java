@@ -116,7 +116,7 @@ public class PersonInitDemandSummaryTable extends AbstractPersonAlgorithm implem
 			// ignored
 
 			// home coordinates
-			Act home_act = (Act)person.getSelectedPlan().getActsLegs().get(0);
+			Act home_act = (Act)person.getSelectedPlan().getPlanElements().get(0);
 			out.write(home_act.getCoord().getX() + "\t");
 			out.write(home_act.getCoord().getY() + "\t");
 

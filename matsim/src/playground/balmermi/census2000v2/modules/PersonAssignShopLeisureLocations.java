@@ -234,17 +234,17 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 	}
 	
 	private final void assignRemainingLocations(Plan plan, int start, int end) {
-		Coord c_start = ((Act)plan.getActsLegs().get(start)).getFacility().getCenter();
-		Coord c_end   = ((Act)plan.getActsLegs().get(end)).getFacility().getCenter();
+		Coord c_start = ((Act)plan.getPlanElements().get(start)).getFacility().getCenter();
+		Coord c_end   = ((Act)plan.getPlanElements().get(end)).getFacility().getCenter();
 		
 		double dx = c_end.getX() - c_start.getX();
 		double dy = c_end.getX() - c_start.getX();
 		if ((dx == 0.0) && (dy == 0.0)) {
 			// c_start and c_end equal
-			Zone z = (Zone)((Act)plan.getActsLegs().get(start)).getFacility().getUpMapping().values().iterator().next();
+			Zone z = (Zone)((Act)plan.getPlanElements().get(start)).getFacility().getUpMapping().values().iterator().next();
 			double r = 0.5*Math.sqrt((z.getMax().getX()-z.getMin().getX())*(z.getMax().getY()-z.getMin().getY()));
 			for (int i=start+2; i<end; i=i+2) {
-				Act act = (Act)plan.getActsLegs().get(i);
+				Act act = (Act)plan.getPlanElements().get(i);
 				ActivityOption activity = this.getActivity(c_start,r,act.getType());
 				act.setType(activity.getType());
 				act.setFacility(activity.getFacility());
@@ -259,7 +259,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			Coord c1 = new CoordImpl(c_start.getX()+dx,c_start.getY()+dy);
 			Coord c2 = new CoordImpl(c_end.getX()-dx,c_end.getY()+dy);
 			for (int i=start+2; i<end; i=i+2) {
-				Act act = (Act)plan.getActsLegs().get(i);
+				Act act = (Act)plan.getPlanElements().get(i);
 				ActivityOption activity = this.getActivity(c1,c2,r,act.getType());
 				act.setType(activity.getType());
 				act.setFacility(activity.getFacility());
@@ -280,19 +280,19 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 	}
 
 	public void run(Plan plan) {
-		for (int i=0; i<plan.getActsLegs().size(); i=i+2) {
-			Act act = (Act)plan.getActsLegs().get(i);
+		for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
+			Act act = (Act)plan.getPlanElements().get(i);
 			if (act.getFacility() == null) {
 				// get the prev act with a facility
 				Facility start = null;
 				for (int b=i-2; b>=0; b=b-2) {
-					Act b_act = (Act)plan.getActsLegs().get(b);
+					Act b_act = (Act)plan.getPlanElements().get(b);
 					if (b_act.getFacility() != null) { start = b_act.getFacility(); break; }
 				}
 				// get the next act with a facility
 				Facility end = null;
-				for (int a=i+2; a<plan.getActsLegs().size(); a=a+2) {
-					Act a_act = (Act)plan.getActsLegs().get(a);
+				for (int a=i+2; a<plan.getPlanElements().size(); a=a+2) {
+					Act a_act = (Act)plan.getPlanElements().get(a);
 					if (a_act.getFacility() != null) { end = a_act.getFacility(); break; }
 				}
 				if ((start == null) || (end == null)) { Gbl.errorMsg("That should not happen!"); }

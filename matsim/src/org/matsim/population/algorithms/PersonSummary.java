@@ -120,7 +120,7 @@ public class PersonSummary extends AbstractPersonAlgorithm {
 		for (int i=0; i<person.getPlans().size(); i++) {
 			Plan plan = person.getPlans().get(i);
 
-			int acts = plan.getActsLegs().size() / 2 + 1;
+			int acts = plan.getPlanElements().size() / 2 + 1;
 			this.act_cnt += acts;
 
 			this.av_act_per_plan = this.av_act_per_plan * this.plan_cnt + acts;

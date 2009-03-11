@@ -60,7 +60,7 @@ public class ModeChoicePlan extends NewPlan {
 
 		// Plan.Type t = sp.getType();
 		Plan cp = new org.matsim.population.PlanImpl(person);
-		List actsLegs = sp.getActsLegs();
+		List actsLegs = sp.getPlanElements();
 
 		if (
 		// t.equals(Plan.Type.CAR)

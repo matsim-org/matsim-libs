@@ -62,7 +62,7 @@ public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithm {
 		// if (person.getLicense().equals("yes")) {
 		// copyPlans: the copy of the plans.
 		for (Plan pl : person.getPlans()) {
-			Leg firstLeg = (Leg) pl.getActsLegs().get(1);
+			Leg firstLeg = (Leg) pl.getPlanElements().get(1);
 			BasicLeg.Mode legMode = firstLeg.getMode();
 			//pl.setType(NewAgentPtPlan2.getPlanType(legMode));//???????????????
 
@@ -79,7 +79,7 @@ public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithm {
 				copyPlans.add(copyPlan);
 			}
 
-			List actsLegs = pl.getActsLegs();
+			List actsLegs = pl.getPlanElements();
 			int actsLegsSize = actsLegs.size();
 			for (Plan copyPlan : copyPlans)
 				for (int i = 0; i < actsLegsSize; i++) {

@@ -102,8 +102,8 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		assignment.println("Individual optimization");
 		for (int i=0;i<list[0].size();i++){
 			assignment.print(list[0].get(i).getPerson().getId()+"\t\t"+list[0].get(i).getScore()+"\t");
-			for (int j=0;j<list[0].get(i).getActsLegs().size();j+=2){
-				assignment.print(((Act)(list[0].get(i).getActsLegs().get(j))).getType()+"\t");
+			for (int j=0;j<list[0].get(i).getPlanElements().size();j+=2){
+				assignment.print(((Act)(list[0].get(i).getPlanElements().get(j))).getType()+"\t");
 			}
 			assignment.println();
 			if (i==this.testAgentsNumber-1) {
@@ -172,8 +172,8 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 				for (int x=0;x<this.list[1].size();x++){
 					if (this.list[1].get(x).getPerson().getId().toString().equals(st)){
 						assignment.print(this.list[1].get(x).getPerson().getId()+"\t\t"+this.list[1].get(x).getScore()+"\t");
-						for (int j=0;j<this.list[1].get(x).getActsLegs().size();j+=2){
-							assignment.print(((Act)(this.list[1].get(x).getActsLegs().get(j))).getType()+"\t");
+						for (int j=0;j<this.list[1].get(x).getPlanElements().size();j+=2){
+							assignment.print(((Act)(this.list[1].get(x).getPlanElements().get(j))).getType()+"\t");
 						}
 						assignment.println();
 						break;

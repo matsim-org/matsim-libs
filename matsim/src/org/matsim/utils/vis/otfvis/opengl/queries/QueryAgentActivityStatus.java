@@ -56,8 +56,8 @@ public class QueryAgentActivityStatus implements OTFQuery {
 		// find the actual activity by searching all activity links
 		// for a vehicle with this agent id
 
-		for (int i=0;i< plan.getActsLegs().size(); i+=2) {
-			Act act = (Act)plan.getActsLegs().get(i);
+		for (int i=0;i< plan.getPlanElements().size(); i+=2) {
+			Act act = (Act)plan.getPlanElements().get(i);
 			QueueLink link = net.getQueueLink(act.getLinkId());
 			Collection<QueueVehicle> vehs = link.getAllVehicles();
 			for (QueueVehicle info : vehs) {

@@ -41,13 +41,13 @@ public class PersonRemoveCertainActs extends AbstractPersonAlgorithm {
 		for (int i = 0; i < person.getPlans().size(); i++) {
 			Plan plan = person.getPlans().get(i);
 
-			int size = plan.getActsLegs().size();
+			int size = plan.getPlanElements().size();
 			if (size >= 5) {
 				// otherwise it's either all at home or something weird
 
 				int start = size - 3; // index of second last act
 				for (int jj = start; jj >= 1; jj = jj - 2) {
-					Act act = (Act)plan.getActsLegs().get(jj);
+					Act act = (Act)plan.getPlanElements().get(jj);
 
 					String act_type = act.getType();
 
@@ -57,7 +57,7 @@ public class PersonRemoveCertainActs extends AbstractPersonAlgorithm {
 				}
 			}
 
-			if (plan.getActsLegs().size() == 3) {
+			if (plan.getPlanElements().size() == 3) {
 				plan.removeAct(2); // new method! See Plan.java.
 			}
 		}

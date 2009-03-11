@@ -85,8 +85,8 @@ public class PlansFilterArea {
 			int cntOutside = 0;
 			Plan plan = person.getPlans().get(i);
 
-			for (int j=0; j<plan.getActsLegs().size(); j+=2) {
-				Act act = (Act)plan.getActsLegs().get(j);
+			for (int j=0; j<plan.getPlanElements().size(); j+=2) {
+				Act act = (Act)plan.getPlanElements().get(j);
 				cntActs++;
 				double x = act.getCoord().getX();
 				double y = act.getCoord().getY();

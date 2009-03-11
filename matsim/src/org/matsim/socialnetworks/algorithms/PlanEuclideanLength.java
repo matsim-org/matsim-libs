@@ -28,9 +28,9 @@ public class PlanEuclideanLength {
 	public double getPlanLength(Plan plan) {
 
 		double length = 0.;
-		Act fromAct = (Act) plan.getActsLegs().get(0);
-		for (int i = 2, max = plan.getActsLegs().size(); i < max; i += 2) {
-			Act toAct = (Act) (plan.getActsLegs().get(i));
+		Act fromAct = (Act) plan.getPlanElements().get(0);
+		for (int i = 2, max = plan.getPlanElements().size(); i < max; i += 2) {
+			Act toAct = (Act) (plan.getPlanElements().get(i));
 
 			if (fromAct != null && toAct != null) {
 				double dist = fromAct.getCoord().calcDistance(toAct.getCoord());

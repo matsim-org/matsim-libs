@@ -80,7 +80,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 	}
 
 	public void addLinks(final Plan p) {
-		List<?> actl = p.getActsLegs();
+		List<?> actl = p.getPlanElements();
 		for (int i= 0; i< actl.size() ; i++) {
 				if (i % 2 == 0) {
 					// activity
@@ -102,13 +102,13 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 	}
 	Plan copyPlanToPT(final Plan in) {
 		Plan erg = new PlanImpl(in.getPerson());
-		List<?> actl = in.getActsLegs();
+		List<?> actl = in.getPlanElements();
 		for (int i= 0; i< actl.size() ; i++) {
 			try {
 				if (i % 2 == 0) {
 					// activity
 					Act a = (Act)actl.get(i);
-					erg.getActsLegs().add(new ActImpl(a));
+					erg.getPlanElements().add(new ActImpl(a));
 				} else {
 					// Leg
 					Leg l = (Leg) actl.get(i);
@@ -116,7 +116,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 					l2.setDepartureTime(l.getDepartureTime());
 					l2.setTravelTime(l.getTravelTime());
 					l2.setArrivalTime(l.getArrivalTime());
-					erg.getActsLegs().add(l2);
+					erg.getPlanElements().add(l2);
 				}
 			} catch (Exception e) {
 				// copying a plan is fairly basic. if an exception occurs here, something

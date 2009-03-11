@@ -35,7 +35,7 @@ public class EndRoadMessage extends EventMessage {
 			
 			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the
 			// person will execute
-			ArrayList<Object> actsLegs = plan.getActsLegs();
+			ArrayList<Object> actsLegs = plan.getPlanElements();
 			vehicle.setCurrentLink(((Act) actsLegs.get(vehicle.getLegIndex()+1)).getLink());
 			
 			//System.out.println(vehicle.getCurrentLink().getId().toString());

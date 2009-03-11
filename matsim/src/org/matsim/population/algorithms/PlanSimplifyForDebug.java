@@ -89,7 +89,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		for (Iterator<Plan> iter = person.getPlans().iterator(); iter.hasNext();) {
 			Plan plan = iter.next();
 			run(plan);
-			if (plan.getActsLegs().size() != 5) {
+			if (plan.getPlanElements().size() != 5) {
 				iter.remove();
 			}
 		}
@@ -111,7 +111,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 	 * @param plan
 	 */
 	private void removeUnwantedActs(final Plan plan) {
-		List<?> actsLegs = plan.getActsLegs();
+		List<?> actsLegs = plan.getPlanElements();
 		for (int i = 0; i < actsLegs.size(); i += 2) {
 			Act act = (Act) actsLegs.get(i);
 			if (this.homeActs.contains(act.getType())) {
@@ -135,7 +135,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 	 * @param plan
 	 */
 	private void shortenPlan(final Plan plan) {
-		List<?> actsLegs = plan.getActsLegs();
+		List<?> actsLegs = plan.getPlanElements();
 		while (actsLegs.size() > 5) {
 			plan.removeAct(4);
 		}
@@ -143,21 +143,21 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 
 	private void setTimes(final Plan plan) {
 		// we assume we get simple h-X-h-Plans at this stage
-		if (plan.getActsLegs().size() != 5)
+		if (plan.getPlanElements().size() != 5)
 			return;
 
-		Act act = (Act) plan.getActsLegs().get(0);
+		Act act = (Act) plan.getPlanElements().get(0);
 		int time = 6 * 3600 + (int) (MatsimRandom.random.nextDouble() * 3600 * 3);
 		act.setStartTime(0);
 		act.setEndTime(time);
 		act.setDuration(time);
 
-		Leg leg = (Leg) plan.getActsLegs().get(1);
+		Leg leg = (Leg) plan.getPlanElements().get(1);
 		leg.setDepartureTime(time);
 		leg.setArrivalTime(time);
 		leg.setTravelTime(0);
 
-		act = (Act) plan.getActsLegs().get(2);
+		act = (Act) plan.getPlanElements().get(2);
 		act.setStartTime(time);
 		act.setEndTime(24 * 3600);
 		act.setDuration(8 * 3600);
@@ -165,12 +165,12 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		// work
 		// before duration is over when they arrived late
 
-		leg = (Leg) plan.getActsLegs().get(3);
+		leg = (Leg) plan.getPlanElements().get(3);
 		leg.setDepartureTime(time + 8 * 3600);
 		leg.setArrivalTime(time + 8 * 3600);
 		leg.setTravelTime(0);
 
-		act = (Act) plan.getActsLegs().get(4);
+		act = (Act) plan.getPlanElements().get(4);
 		act.setStartTime(time + 8 * 3600);
 		act.setEndTime(24 * 3600);
 		act.setDuration(16 * 3600 - time);
@@ -178,7 +178,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 
 	private void restoreRoutes(final Plan plan) {
 		boolean needsRouter = false;
-		List<?> actsLegs = plan.getActsLegs();
+		List<?> actsLegs = plan.getPlanElements();
 		for (int i = 1, max = actsLegs.size(); i < max; i += 2) {
 			Leg leg = (Leg) actsLegs.get(i);
 			if (leg.getRoute() == null) {

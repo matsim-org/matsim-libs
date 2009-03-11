@@ -335,7 +335,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 				Person p = iperson.next();
 //				Remember a number of activities equal to at least the number of
 //				acts per plan times the number of plans in memory
-				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*p.getPlans().size()*1.5);
+				int max_memory = (int) (p.getSelectedPlan().getPlanElements().size()/2*p.getPlans().size()*1.5);
 //				this.log.info("NOTE that manageMemory is turned off");
 				p.getKnowledge().getMentalMap().manageMemory(max_memory, p.getPlans());
 			}

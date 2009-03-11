@@ -174,13 +174,13 @@ public class SNPickFacility implements PlanAlgorithm {
 			if(newAct.getLinkId()!=f.getLink().getId()){
 				// If the first activity was chosen, make sure the last activity is also changed
 				if(newAct.getType() == plan.getFirstActivity().getType() && newAct.getLink() == plan.getFirstActivity().getLink()){
-					Act lastAct = (Act) newPlan.getActsLegs().get(newPlan.getActsLegs().size()-1);
+					Act lastAct = (Act) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
 					lastAct.setLink(f.getLink());
 					lastAct.setCoord(f.getCenter());
 					lastAct.setFacility(f);
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
-				if(newAct.getType() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getType() && newAct.getLink() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getLink()){
+				if(newAct.getType() == ((Act)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType() && newAct.getLink() == ((Act)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink()){
 					Act firstAct = (Act) newPlan.getFirstActivity();
 					firstAct.setLink(f.getLink());
 					firstAct.setCoord(f.getCenter());
@@ -198,7 +198,7 @@ public class SNPickFacility implements PlanAlgorithm {
 				k.getMentalMap().addActivity(f.getActivityOption(factype));
 //				System.out.println(" Activity locatoin changed this many activities:"+k.getActivities().size());
 				//		 loop over all <leg>s, remove route-information
-				ArrayList<?> bestactslegs = newPlan.getActsLegs();
+				ArrayList<?> bestactslegs = newPlan.getPlanElements();
 				for (int j = 1; j < bestactslegs.size(); j=j+2) {
 					Leg leg = (Leg)bestactslegs.get(j);
 					leg.setRoute(null);

@@ -63,7 +63,7 @@ public class PersonCalcTimes extends AbstractPersonAlgorithm {
 		for (int i=0; i<plans.size(); i++) {
 			Plan plan = plans.get(i);
 
-			ArrayList acts_legs = plan.getActsLegs();
+			ArrayList acts_legs = plan.getPlanElements();
 			Act act = null;
 			Leg leg = null;
 			for (int j=0; j<acts_legs.size(); j++) {

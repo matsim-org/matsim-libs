@@ -79,16 +79,16 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 	public boolean judge(final Person person) {
 		List<Plan> plans = person.getPlans();
 		for (Plan plan : plans) {
-			for (int i = 1, n = plan.getActsLegs().size(); i < n; i+=2) {
-				Leg leg = (Leg) plan.getActsLegs().get(i);
+			for (int i = 1, n = plan.getPlanElements().size(); i < n; i+=2) {
+				Leg leg = (Leg) plan.getPlanElements().get(i);
 				if (leg.getRoute() == null) {
-					if (judgeByBeeline((Act) plan.getActsLegs().get(i-1), (Act) plan.getActsLegs().get(i+1))) {
+					if (judgeByBeeline((Act) plan.getPlanElements().get(i-1), (Act) plan.getPlanElements().get(i+1))) {
 						return true;
 					}
 				} else {
 					List<Link> links = ((CarRoute) leg.getRoute()).getLinks();
 					if (links.size() == 0) {
-						if (judgeByBeeline((Act) plan.getActsLegs().get(i-1), (Act) plan.getActsLegs().get(i+1))) {
+						if (judgeByBeeline((Act) plan.getPlanElements().get(i-1), (Act) plan.getPlanElements().get(i+1))) {
 							return true;
 						}
 					} else {
@@ -96,12 +96,12 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 							if (this.areaOfInterest.containsKey(link.getId())) return true;
 						}
 						// test departure link
-						Link link = ((Act) plan.getActsLegs().get(i-1)).getLink();
+						Link link = ((Act) plan.getPlanElements().get(i-1)).getLink();
 						if (link != null) {
 							if (this.areaOfInterest.containsKey(link.getId())) return true;
 						}
 						// test arrival link
-						link = ((Act) plan.getActsLegs().get(i+1)).getLink();
+						link = ((Act) plan.getPlanElements().get(i+1)).getLink();
 						if (link != null) {
 							if (this.areaOfInterest.containsKey(link.getId())) return true;
 						}

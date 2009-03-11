@@ -85,7 +85,7 @@ public class PlanTest extends MatsimTestCase {
 		Act workAct = plan.createAct("w", new CoordImpl(100, 200));
 
 		// precondition
-		assertEquals(3, plan.getActsLegs().size());
+		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
 		Act a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));
@@ -93,12 +93,12 @@ public class PlanTest extends MatsimTestCase {
 		plan.insertLegAct(1, l, a);
 
 		// test
-		assertEquals(5, plan.getActsLegs().size());
-		assertEquals(homeAct, plan.getActsLegs().get(0));
-		assertEquals(l, plan.getActsLegs().get(1));
-		assertEquals(a, plan.getActsLegs().get(2));
-		assertEquals(leg1, plan.getActsLegs().get(3));
-		assertEquals(workAct, plan.getActsLegs().get(4));
+		assertEquals(5, plan.getPlanElements().size());
+		assertEquals(homeAct, plan.getPlanElements().get(0));
+		assertEquals(l, plan.getPlanElements().get(1));
+		assertEquals(a, plan.getPlanElements().get(2));
+		assertEquals(leg1, plan.getPlanElements().get(3));
+		assertEquals(workAct, plan.getPlanElements().get(4));
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class PlanTest extends MatsimTestCase {
 		Act workAct = plan.createAct("w", new CoordImpl(100, 200));
 
 		// precondition
-		assertEquals(3, plan.getActsLegs().size());
+		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
 		Act a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));
@@ -119,12 +119,12 @@ public class PlanTest extends MatsimTestCase {
 		plan.insertLegAct(3, l, a);
 
 		// test
-		assertEquals(5, plan.getActsLegs().size());
-		assertEquals(homeAct, plan.getActsLegs().get(0));
-		assertEquals(leg1, plan.getActsLegs().get(1));
-		assertEquals(workAct, plan.getActsLegs().get(2));
-		assertEquals(l, plan.getActsLegs().get(3));
-		assertEquals(a, plan.getActsLegs().get(4));
+		assertEquals(5, plan.getPlanElements().size());
+		assertEquals(homeAct, plan.getPlanElements().get(0));
+		assertEquals(leg1, plan.getPlanElements().get(1));
+		assertEquals(workAct, plan.getPlanElements().get(2));
+		assertEquals(l, plan.getPlanElements().get(3));
+		assertEquals(a, plan.getPlanElements().get(4));
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class PlanTest extends MatsimTestCase {
 		plan.createAct("w", new CoordImpl(100, 200));
 
 		// precondition
-		assertEquals(3, plan.getActsLegs().size());
+		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
 		Act a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));
@@ -160,7 +160,7 @@ public class PlanTest extends MatsimTestCase {
 		plan.createAct("w", new CoordImpl(100, 200));
 
 		// precondition
-		assertEquals(3, plan.getActsLegs().size());
+		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
 		Act a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));
@@ -184,7 +184,7 @@ public class PlanTest extends MatsimTestCase {
 		plan.createAct("w", new CoordImpl(100, 200));
 
 		// precondition
-		assertEquals(3, plan.getActsLegs().size());
+		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
 		Act a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));

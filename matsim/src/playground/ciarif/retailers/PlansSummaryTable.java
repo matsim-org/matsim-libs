@@ -50,9 +50,9 @@ public class PlansSummaryTable implements PlanAlgorithm {
 			Plan plan = person.getSelectedPlan();
 			out.write(person.getId() + "\t");
 			//out.write(plan.getScore() + "\t");
-			for (int i=1; i<plan.getActsLegs().size()-2; i=i+2) {
+			for (int i=1; i<plan.getPlanElements().size()-2; i=i+2) {
 				//Leg l = (Leg)plan.getActsLegs().get(i);
-				Act a = (Act)plan.getActsLegs().get(i+1);
+				Act a = (Act)plan.getPlanElements().get(i+1);
 				//Link arr_link = a.getLink();
 				out.write(a.getType() + "\t");
 				out.write(a.getLinkId() + "\t");

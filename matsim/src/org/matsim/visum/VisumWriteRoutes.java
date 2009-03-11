@@ -68,8 +68,8 @@ public class VisumWriteRoutes extends AbstractPersonAlgorithm implements PlanAlg
 	}
 
 	public void run(Plan plan) {
-		for (int i = 1; i < plan.getActsLegs().size(); i += 2) {
-			Leg leg = (Leg)plan.getActsLegs().get(i);
+		for (int i = 1; i < plan.getPlanElements().size(); i += 2) {
+			Leg leg = (Leg)plan.getPlanElements().get(i);
 			StringBuilder visum = new StringBuilder();
 			List<Node> route = ((CarRoute) leg.getRoute()).getNodes();
 

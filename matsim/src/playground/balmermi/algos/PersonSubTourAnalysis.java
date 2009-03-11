@@ -82,7 +82,7 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 
 		// get the subtour mode
 		int idx = -1;
-		BasicLeg.Mode mode = ((Leg)plan.getActsLegs().get(start+1)).getMode();
+		BasicLeg.Mode mode = ((Leg)plan.getPlanElements().get(start+1)).getMode();
 		if (mode.equals(BasicLeg.Mode.walk)) { idx = WALK; }
 		else if (mode.equals(BasicLeg.Mode.bike)) { idx = BIKE; }
 		else if (mode.equals(BasicLeg.Mode.car)) { idx = CAR; }
@@ -92,15 +92,15 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 
 		// calculate the SubTour distance (in 1 km time bins)
 		double d = 0.0;
-		Coord prev = ((Act)plan.getActsLegs().get(start)).getCoord();
+		Coord prev = ((Act)plan.getPlanElements().get(start)).getCoord();
 		for (int k=start+2; k<=i; k=k+2) {
-			Coord curr = ((Act)plan.getActsLegs().get(k)).getCoord();
+			Coord curr = ((Act)plan.getPlanElements().get(k)).getCoord();
 			d = d + curr.calcDistance(prev);
 			prev = curr;
 		}
-		prev = ((Act)plan.getActsLegs().get(j)).getCoord();
+		prev = ((Act)plan.getPlanElements().get(j)).getCoord();
 		for (int k=j+2; k<=end; k=k+2) {
-			Coord curr = ((Act)plan.getActsLegs().get(k)).getCoord();
+			Coord curr = ((Act)plan.getPlanElements().get(k)).getCoord();
 			d = d + curr.calcDistance(prev);
 			prev = curr;
 		}
@@ -135,9 +135,9 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 	private final void extractSubTours(Plan plan, int start, int end) {
 		boolean is_leaf = true;
 		for (int i=start+2; i<end-1; i=i+2) {
-			Act acti = (Act)plan.getActsLegs().get(i);
+			Act acti = (Act)plan.getPlanElements().get(i);
 			for (int j=end-2; j>i; j=j-2) {
-				Act actj = (Act)plan.getActsLegs().get(j);
+				Act actj = (Act)plan.getPlanElements().get(j);
 				if ((acti.getCoord().getX() == actj.getCoord().getX()) &&
 				    (acti.getCoord().getY() == actj.getCoord().getY())) {
 					// subtour found: start..i & j..end
@@ -148,12 +148,12 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 					int ii = i;
 					Act actii = acti;
 					for (int jj=i+2; jj<=j; jj=jj+2) {
-						Act actjj = (Act)plan.getActsLegs().get(jj);
+						Act actjj = (Act)plan.getPlanElements().get(jj);
 						if ((actii.getCoord().getX() == actjj.getCoord().getX()) &&
 						    (actii.getCoord().getY() == actjj.getCoord().getY())) {
 							this.extractSubTours(plan,ii,jj);
 							ii = jj;
-							actii = (Act)plan.getActsLegs().get(ii);
+							actii = (Act)plan.getPlanElements().get(ii);
 						}
 					}
 					return;
@@ -184,7 +184,7 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 //		for (int i=0; i<plan.getActsLegs().size(); i=i+2) {
 //			System.out.println("  " + i + ": " + ((Act)plan.getActsLegs().get(i)).getCoord());
 //		}
-		this.extractSubTours(plan,0,plan.getActsLegs().size()-1);
+		this.extractSubTours(plan,0,plan.getPlanElements().size()-1);
 //		System.out.println("----------------------------------------");
 	}
 

@@ -70,7 +70,7 @@ public class NewAgentPtPlan extends NewPlan {
 //				Plan walkPlan = new org.matsim.population.PlanImpl(person);
 //				walkPlan.setType(Type.WALK);
 
-				List actsLegs = pl.getActsLegs();
+				List actsLegs = pl.getPlanElements();
 				for (int i = 0; i < actsLegs.size(); i++) {
 					Object o = actsLegs.get(i);
 					if (i % 2 == 0) {

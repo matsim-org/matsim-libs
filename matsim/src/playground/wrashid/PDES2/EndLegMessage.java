@@ -31,7 +31,7 @@ public class EndLegMessage extends EventMessage {
 		
 			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the
 														// person will execute
-			ArrayList<Object> actsLegs = plan.getActsLegs();
+			ArrayList<Object> actsLegs = plan.getPlanElements();
 		if ((actsLegs.size()>vehicle.getLegIndex())){	
 			vehicle.setCurrentLeg((Leg) actsLegs.get(vehicle.getLegIndex()));
 			// the leg the agent performs

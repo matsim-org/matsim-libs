@@ -100,7 +100,7 @@ public class LocationModifier extends Modifier {
 	private void exchangeFacilities(final String type, ArrayList<Facility>  exchange_facilities,
 			final Plan plan) {
 
-			final ArrayList<?> actslegs = plan.getActsLegs();
+			final ArrayList<?> actslegs = plan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
 				final Act act = (Act)actslegs.get(j);
 				if (act.getType().startsWith(type)) {

@@ -109,7 +109,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 			 * 4			Other means */
 
 			Plan plan = person.getSelectedPlan();
-			ArrayList<Object> acts_legs = plan.getActsLegs();
+			ArrayList<Object> acts_legs = plan.getPlanElements();
 			if (index == 0) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
 					Leg leg = (Leg)acts_legs.get(i);
@@ -213,7 +213,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 		if (plan == null) {
 			return 0;
 		}
-		ArrayList<Object> acts_legs = plan.getActsLegs();
+		ArrayList<Object> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
 			double distX = (((Act)acts_legs.get(i)).getCoord().getX() - ((Act)acts_legs.get(i-2)).getCoord().getX());
@@ -229,7 +229,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 
 		String main_type = "o";
 		Plan plan = person.getSelectedPlan();
-		ArrayList<Object> acts_legs = plan.getActsLegs();
+		ArrayList<Object> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
 			String type = ((Act)acts_legs.get(i)).getType();
@@ -258,7 +258,7 @@ public int detectTourMainActivity2 (Person person){
 
 		int main_type = 2;
 		Plan plan = person.getSelectedPlan();
-		ArrayList<Object> acts_legs = plan.getActsLegs();
+		ArrayList<Object> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
 			String type = ((Act)acts_legs.get(i)).getType();

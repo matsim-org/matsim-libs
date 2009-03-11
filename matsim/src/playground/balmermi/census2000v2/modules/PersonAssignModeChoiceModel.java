@@ -121,9 +121,9 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	
 	private final int getPrevMode(int s_act_idx, Plan p) {
 		// prev_mode; // 0= car; 1= Pt; 2= Car passenger; 3= Bike; 4= Walk; -1: subtour is starting from home;
-		Act act = (Act)p.getActsLegs().get(s_act_idx);
+		Act act = (Act)p.getPlanElements().get(s_act_idx);
 		if (act.getType().startsWith(H)) { return -1; }
-		Leg leg = (Leg)p.getActsLegs().get(s_act_idx-1);
+		Leg leg = (Leg)p.getPlanElements().get(s_act_idx-1);
 		if (leg.getMode().equals(BasicLeg.Mode.car)) { return 0; }
 		else if (leg.getMode().equals(BasicLeg.Mode.pt)) { return 1; }
 		else if (leg.getMode().equals(BasicLeg.Mode.ride)) { return 2; }
@@ -135,7 +135,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	//////////////////////////////////////////////////////////////////////
 
 	private final int getUrbanDegree(ArrayList<Integer> act_indices, Plan p) {
-		Act act = (Act)p.getActsLegs().get(act_indices.get(0));
+		Act act = (Act)p.getPlanElements().get(act_indices.get(0));
 		Zone zone = (Zone)act.getFacility().getUpMapping().values().iterator().next();
 		return this.municipalities.getMunicipality(zone.getId()).getRegType();
 	}
@@ -145,8 +145,8 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	private final double calcTourDistance(ArrayList<Integer> act_indices, Plan p) {
 		double dist = 0.0;
 		for (int j=1; j<act_indices.size(); j++) {
-			Act from_act = (Act)p.getActsLegs().get(act_indices.get(j-1));
-			Act to_act = (Act)p.getActsLegs().get(act_indices.get(j));
+			Act from_act = (Act)p.getPlanElements().get(act_indices.get(j-1));
+			Act to_act = (Act)p.getPlanElements().get(act_indices.get(j));
 			dist += to_act.getFacility().getCenter().calcDistance(from_act.getFacility().getCenter());
 		}
 		return dist/1000.0;
@@ -176,7 +176,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		//   GET the mainpurpose of the subtour
 		int mainpurpose = 3; // 0 := work; 1 := edu; 2 := shop 3:=leisure
 		for (int j=1; j<act_indices.size()-1; j++) {
-			Act act = (Act)p.getActsLegs().get(act_indices.get(j));
+			Act act = (Act)p.getPlanElements().get(act_indices.get(j));
 			String type = act.getType().substring(0,1); // h,w,e,s,l
 			if (mainpurpose == 3) {
 				if (type.equals(H)) { mainpurpose = 0; }
@@ -292,7 +292,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 			// SET the mode for the legs of the subtour
 			for (int j=0; j<leg_indices.size(); j++) {
-				Leg l = (Leg)p.getActsLegs().get(leg_indices.get(j));
+				Leg l = (Leg)p.getPlanElements().get(leg_indices.get(j));
 				l.setMode(mode);
 			}
 			
@@ -320,8 +320,8 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 				else if (prev_mode == -1) { out.write(BasicLeg.Mode.undefined.toString() + "\t"); }
 				else { Gbl.errorMsg("pid="+person.getId()+": prev_mode="+prev_mode+" knot known!"); }
 				out.write(mode.toString()+"\t");
-				Act st_startact = (Act)person.getSelectedPlan().getActsLegs().get(act_indices.get(0));
-				Act st_endact = (Act)person.getSelectedPlan().getActsLegs().get(act_indices.get(act_indices.size()-1));
+				Act st_startact = (Act)person.getSelectedPlan().getPlanElements().get(act_indices.get(0));
+				Act st_endact = (Act)person.getSelectedPlan().getPlanElements().get(act_indices.get(act_indices.size()-1));
 				Coord start_coord = st_startact.getFacility().getCenter();
 				Zone zone = (Zone)st_startact.getFacility().getUpMapping().values().iterator().next();
 				out.write(start_coord.getX()+"\t");

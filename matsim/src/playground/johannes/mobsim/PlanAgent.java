@@ -102,7 +102,7 @@ public class PlanAgent implements MobsimAgent {
 			if (index % 2 != 0) {
 				index++;
 			}
-			return ((Act) person.getSelectedPlan().getActsLegs().get(index))
+			return ((Act) person.getSelectedPlan().getPlanElements().get(index))
 					.getEndTime();
 		}
 	}
@@ -125,7 +125,7 @@ public class PlanAgent implements MobsimAgent {
 				index++;
 			}
 		}
-		return ((Leg) person.getSelectedPlan().getActsLegs().get(index))
+		return ((Leg) person.getSelectedPlan().getPlanElements().get(index))
 				.getMode();
 	}
 
@@ -152,10 +152,10 @@ public class PlanAgent implements MobsimAgent {
 			if (isDone())
 				return getLink();
 			else
-				return ((Act) person.getSelectedPlan().getActsLegs().get(
+				return ((Act) person.getSelectedPlan().getPlanElements().get(
 						currentPlanIndex + 2)).getLink();
 		else
-			return ((Act) person.getSelectedPlan().getActsLegs().get(
+			return ((Act) person.getSelectedPlan().getPlanElements().get(
 					currentPlanIndex + 1)).getLink();
 	}
 
@@ -171,7 +171,7 @@ public class PlanAgent implements MobsimAgent {
 		currentRouteIndex = -1;
 		currentPlanIndex = 0;
 
-		Act act = (Act) person.getSelectedPlan().getActsLegs().get(
+		Act act = (Act) person.getSelectedPlan().getPlanElements().get(
 				currentPlanIndex);
 		act.setStartTime(0);
 		if (act.getEndTime() != Time.UNDEFINED_TIME
@@ -189,7 +189,7 @@ public class PlanAgent implements MobsimAgent {
 	 *         <tt>false</tt> otherwise.
 	 */
 	public boolean isDone() {
-		if (currentPlanIndex < person.getSelectedPlan().getActsLegs().size() - 1)
+		if (currentPlanIndex < person.getSelectedPlan().getPlanElements().size() - 1)
 			return false;
 		else
 			return true;
@@ -208,14 +208,14 @@ public class PlanAgent implements MobsimAgent {
 	 *            the current simulation time.
 	 */
 	public void arrival(double time) {
-		Leg leg = (Leg) person.getSelectedPlan().getActsLegs().get(
+		Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(
 				currentPlanIndex);
 		leg.setArrivalTime(time);
 		leg.setTravelTime(leg.getArrivalTime() - leg.getDepartureTime());
 		currentRouteIndex = -1;
 		currentPlanIndex++;
 
-		Act act = (Act) person.getSelectedPlan().getActsLegs().get(
+		Act act = (Act) person.getSelectedPlan().getPlanElements().get(
 				currentPlanIndex);
 		act.setStartTime(time);
 		if (act.getEndTime() != Time.UNDEFINED_TIME
@@ -236,13 +236,13 @@ public class PlanAgent implements MobsimAgent {
 	 *            the current simulation time.
 	 */
 	public void departure(double time) {
-		Act act = (Act) person.getSelectedPlan().getActsLegs().get(
+		Act act = (Act) person.getSelectedPlan().getPlanElements().get(
 				currentPlanIndex);
 		act.setEndTime(time);
 		act.setDuration(act.getEndTime() - act.getStartTime());
 		currentPlanIndex++;
 
-		Leg leg = (Leg) person.getSelectedPlan().getActsLegs().get(
+		Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(
 				currentPlanIndex);
 		leg.setDepartureTime(time);
 		currentRouteIndex = 0;
@@ -264,7 +264,7 @@ public class PlanAgent implements MobsimAgent {
 	public void enterLink(Link link, double time) {
 		currentLink = link;
 		currentRouteIndex++;
-		Link desiredLink = ((CarRoute) ((Leg) person.getSelectedPlan().getActsLegs().get(
+		Link desiredLink = ((CarRoute) ((Leg) person.getSelectedPlan().getPlanElements().get(
 				currentPlanIndex)).getRoute()).getLinks().get(currentRouteIndex);
 		if (currentLink != desiredLink)
 			currentRouteIndex--;

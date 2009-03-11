@@ -176,7 +176,7 @@ public class Planomat implements PlanAlgorithm {
 		ArrayList<Gene> sampleGenes = new ArrayList<Gene>();
 		try {
 
-			int numActs = plan.getActsLegs().size() / 2;
+			int numActs = plan.getPlanElements().size() / 2;
 			for (int ii=0; ii < numActs; ii++) {
 				sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Planomat.NUM_TIME_INTERVALS - 1));
 			}
@@ -218,12 +218,12 @@ public class Planomat implements PlanAlgorithm {
 
 		Route tempRoute = null;
 
-		int max = plan.getActsLegs().size();
+		int max = plan.getPlanElements().size();
 		double now = 0.0;
 
 		for (int ii = 0; ii < max; ii++) {
 
-			Object o = plan.getActsLegs().get(ii);
+			Object o = plan.getPlanElements().get(ii);
 
 			if (o instanceof Act) {
 
@@ -272,8 +272,8 @@ public class Planomat implements PlanAlgorithm {
 				}
 
 				// set arrival time to estimation
-				Act origin = ((Act) plan.getActsLegs().get(ii - 1));
-				Act destination = ((Act) plan.getActsLegs().get(ii + 1));
+				Act origin = ((Act) plan.getPlanElements().get(ii - 1));
+				Act destination = ((Act) plan.getPlanElements().get(ii + 1));
 
 				double travelTimeEstimation = this.legTravelTimeEstimator.getLegTravelTimeEstimation(
 						plan.getPerson().getId(),

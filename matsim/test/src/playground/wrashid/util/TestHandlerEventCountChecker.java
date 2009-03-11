@@ -82,7 +82,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler  {
 		
 		for (Person p:population.getPersons().values()){
 			Plan plan= p.getSelectedPlan();
-			ArrayList<Object> actsLegs =plan.getActsLegs();
+			ArrayList<Object> actsLegs =plan.getPlanElements();
 			expectedDepartureEvents+=actsLegs.size() / 2 ;
 			
 			LegIterator iter=plan.getIteratorLeg();

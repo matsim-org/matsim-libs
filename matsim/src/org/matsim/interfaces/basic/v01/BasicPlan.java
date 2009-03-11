@@ -20,6 +20,8 @@
 
 package org.matsim.interfaces.basic.v01;
 
+import java.util.ArrayList;
+
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
@@ -35,7 +37,7 @@ public interface BasicPlan {
 	 * instead to test if a plan has an undefined score.
 	 */
 	public static final double UNDEF_SCORE = Double.NaN;
-	// TODO [kai] Eigentlich ist Double.NaN besonders fehleranf�llig, weil jeder Vergleich falsch ist.  M�glichkeiten
+	// TODO [kai] Eigentlich ist Double.NaN besonders fehleranfaellig, weil jeder Vergleich falsch ist.  Moeglichkeiten
 	// *  -Double.INFINITY
 	// *  -99999999
 	// *  diese Konstante "private" machen
@@ -55,14 +57,19 @@ public interface BasicPlan {
 	/** @return true if the score of this plan is not defined */
 	public boolean hasUndefinedScore();
 
+	public ArrayList<Object> getPlanElements(); // TODO [MR] change return type to List
+
 	/**
 	 * Getter for the Iterator class defined above
 	 * @return A special iterator over acts and legs.
 	 */
+	@Deprecated
 	public ActLegIterator getIterator();
 
+	@Deprecated
 	public LegIterator getIteratorLeg();
 
+	@Deprecated
 	public ActIterator getIteratorAct();
 
 	public void addLeg(final BasicLeg leg);

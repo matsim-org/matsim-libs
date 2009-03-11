@@ -109,7 +109,7 @@ public class LegCountTest2 {
 		public void run(final Person person) {
 			Plan p = person.getSelectedPlan();
 			if (p != null) {
-				int nLegs = (p.getActsLegs().size() + 1) / 2;
+				int nLegs = (p.getPlanElements().size() + 1) / 2;
 				try {
 					this.writer.write(person.getId() + "\t" + nLegs + "\n");
 					this.writer.flush();

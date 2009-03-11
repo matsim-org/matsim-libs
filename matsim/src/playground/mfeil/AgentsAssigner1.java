@@ -100,19 +100,19 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 			// All prim acts in potential agent's plan
 			for (int i=0;i<plan.getPerson().getKnowledge().getActivities(true).size();i++){
 				boolean in = false;
-				for (int x=0;x<agents.getAgentPlan(j).getActsLegs().size()-2;x=x+2){
+				for (int x=0;x<agents.getAgentPlan(j).getPlanElements().size()-2;x=x+2){
 					// try statement with print block to analyze some strange exceptions in Zurich scenario
 					try {
-					if (((Act)(agents.getAgentPlan(j).getActsLegs().get(x))).getType().equals(plan.getPerson().getKnowledge().getActivities(true).get(i).getType())){
+					if (((Act)(agents.getAgentPlan(j).getPlanElements().get(x))).getType().equals(plan.getPerson().getKnowledge().getActivities(true).get(i).getType())){
 						in = true;
 						break;
 					}
 					} catch (Exception e){
 						log.warn(e);
 						System.out.println("Acts im Plan des schon optimierten Agenten:");
-						for (int k=0;k<agents.getAgentPlan(j).getActsLegs().size();k++) {
-							if (agents.getAgentPlan(j).getActsLegs().get(k).getClass().getName().equals("org.matsim.population.Act")) System.out.print(((Act)(agents.getAgentPlan(j).getActsLegs().get(k))).getType()+" ");
-							else System.out.print(((Leg)(agents.getAgentPlan(j).getActsLegs().get(k))).getMode()+" ");
+						for (int k=0;k<agents.getAgentPlan(j).getPlanElements().size();k++) {
+							if (agents.getAgentPlan(j).getPlanElements().get(k).getClass().getName().equals("org.matsim.population.Act")) System.out.print(((Act)(agents.getAgentPlan(j).getPlanElements().get(k))).getType()+" ");
+							else System.out.print(((Leg)(agents.getAgentPlan(j).getPlanElements().get(k))).getMode()+" ");
 						}
 						System.out.println();
 						System.out.println("Primacts im Knowledge des zuzuordnenden Agenten:");
@@ -225,9 +225,9 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 		this.locator.handlePlan(plan);
 		// TODO check this with Konrad or someone who knows the router
 		if (Gbl.getConfig().planomat().getPossibleModes().length>0){
-			for (int z=1;z<plan.getActsLegs().size();z+=2){
+			for (int z=1;z<plan.getPlanElements().size();z+=2){
 				//((Leg)(plan.getActsLegs().get(z))).setMode(Gbl.getConfig().planomat().getPossibleModes()[y]);
-				((Leg)(plan.getActsLegs().get(z))).setMode(BasicLeg.Mode.car);
+				((Leg)(plan.getPlanElements().get(z))).setMode(BasicLeg.Mode.car);
 			}
 		}
 		this.router.run(plan);
@@ -238,8 +238,8 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 			prt.add(""+plan.getPerson().getId().toString());
 			prt.add(""+agents.getAgentPerson(assignedAgent).getId().toString());
 			prt.add(""+plan.getScore());
-			for (int y=0;y<plan.getActsLegs().size();y+=2){
-				prt.add(((Act)(plan.getActsLegs().get(y))).getType());
+			for (int y=0;y<plan.getPlanElements().size();y+=2){
+				prt.add(((Act)(plan.getPlanElements().get(y))).getType());
 			}
 			Statistics.list.add(prt);	
 		}	

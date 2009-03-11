@@ -143,7 +143,7 @@ public class DeliberateAgent extends MobsimAgentDecorator<PlanAgent> {
 				 * Do some simple plan validation. The new plan size must be
 				 * greater then the current plan index and odd.
 				 */
-				int size = newPlan.getActsLegs().size();
+				int size = newPlan.getPlanElements().size();
 				if (size > agent.getCurrentPlanIndex() && size % 2 != 0) {
 					/*
 					 * Replace the selected plan. In future we may append the

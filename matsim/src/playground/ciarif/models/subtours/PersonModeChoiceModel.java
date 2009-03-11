@@ -220,8 +220,8 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			personSubtour.getSubtours().get(i).setStart_udeg(udeg);
 			
 			for (int k=1; k<sub.getNodes().size(); k=k+1){
-				((Leg)plan.getActsLegs().get(sub.getNodes().get(k)-1)).setMode(mode);
-				System.out.println("leg = " + ((Leg)plan.getActsLegs().get(sub.getNodes().get(k)-1)));
+				((Leg)plan.getPlanElements().get(sub.getNodes().get(k)-1)).setMode(mode);
+				System.out.println("leg = " + ((Leg)plan.getPlanElements().get(sub.getNodes().get(k)-1)));
 								
 			}
 		}

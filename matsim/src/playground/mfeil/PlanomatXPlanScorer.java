@@ -49,14 +49,14 @@ public class PlanomatXPlanScorer extends PlanScorer {
 	public double getScore(final Plan plan) {
 		ScoringFunction function = this.factory.getNewScoringFunction(plan);
 		org.matsim.interfaces.core.v01.Leg leg;
-		for (int i = 1; i < plan.getActsLegs().size(); i++) {
+		for (int i = 1; i < plan.getPlanElements().size(); i++) {
 			if (i % 2 != 0) {
-				leg = (Leg) plan.getActsLegs().get(i);
+				leg = (Leg) plan.getPlanElements().get(i);
 				double depTime = 0;
 				double arrTime = 0;
 				for (int x = 0;x<i;x++){
 					if (x % 2 == 0){
-						Act actHelp = (Act) (plan.getActsLegs().get(x));
+						Act actHelp = (Act) (plan.getPlanElements().get(x));
 						if (actHelp.getDuration()>=0){
 								depTime = actHelp.getDuration() + depTime;
 						}

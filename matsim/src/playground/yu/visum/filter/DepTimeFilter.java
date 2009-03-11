@@ -18,7 +18,7 @@ public class DepTimeFilter extends PersonFilterA {
 	@Override
 	public boolean judge(Person person) {
 		for (Plan plan : person.getPlans()) {
-			List actsLegs = plan.getActsLegs();
+			List actsLegs = plan.getPlanElements();
 			for (int i = 1; i < actsLegs.size(); i += 2) {
 				Leg leg = (Leg) actsLegs.get(i);
 				result = ((criterionMIN < leg.getDepartureTime()) && (leg

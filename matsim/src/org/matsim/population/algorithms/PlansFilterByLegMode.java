@@ -81,8 +81,8 @@ public class PlansFilterByLegMode {
 				boolean hasSearchedLegMode = false;
 				boolean hasOtherLegMode = false;
 
-				for (int j=1; j<plan.getActsLegs().size(); j+=2) {
-					Leg leg = (Leg)plan.getActsLegs().get(j);
+				for (int j=1; j<plan.getPlanElements().size(); j+=2) {
+					Leg leg = (Leg)plan.getPlanElements().get(j);
 					if (leg.getMode().equals(this.legMode)) {
 						hasSearchedLegMode = true;
 					} else {

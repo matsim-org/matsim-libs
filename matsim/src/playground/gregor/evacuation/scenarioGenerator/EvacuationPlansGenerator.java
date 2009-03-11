@@ -82,7 +82,7 @@ public class EvacuationPlansGenerator {
 		while (it.hasNext()) {
 			Person pers = it.next();
 
-			Id id = ((Act)pers.getPlans().get(0).getActsLegs().get(0)).getLink().getId();
+			Id id = ((Act)pers.getPlans().get(0).getPlanElements().get(0)).getLink().getId();
 
 			if (this.network.getLink(id) == null) {
 				it.remove();
@@ -101,7 +101,7 @@ public class EvacuationPlansGenerator {
 
 			Plan plan = pers.getPlans().get(0);
 
-			if (plan.getActsLegs().size() != 1 ) {
+			if (plan.getPlanElements().size() != 1 ) {
 				Gbl.errorMsg("For each initial evacuation plan only one Act is allowed - and no Leg at all");
 			}
 

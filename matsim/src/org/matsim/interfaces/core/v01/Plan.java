@@ -1,7 +1,5 @@
 package org.matsim.interfaces.core.v01;
 
-import java.util.ArrayList;
-
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Coord;
@@ -35,8 +33,6 @@ public interface Plan extends BasicPlan {
 	 * @param index
 	 */
 	public void removeLeg(final int index);
-
-	public ArrayList<Object> getActsLegs();
 
 	public Person getPerson();
 

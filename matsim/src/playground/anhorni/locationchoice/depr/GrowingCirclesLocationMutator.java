@@ -332,7 +332,7 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 			}
 
 			// clear the route
-			final ArrayList<?> actslegs = plan.getActsLegs();
+			final ArrayList<?> actslegs = plan.getPlanElements();
 			for (int j = 1; j < actslegs.size(); j=j+2) {
 				final Leg leg = (Leg)actslegs.get(j);
 				leg.setRoute(null);

@@ -105,7 +105,7 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		} else {
 			StringBuilder builder = new StringBuilder();
 			builder.append("Act number: ");
-			builder.append(((Plan)basicPlan).getActsLegs().size());
+			builder.append(((Plan)basicPlan).getPlanElements().size());
 			builder.append(" of Person Id: " );
 			builder.append(((Plan)basicPlan).getPerson().getId());
 			builder.append(" has no location information. This is not possible to prevent by the XML Grammar used, however it should result in incorrect behaviour of the framework. Only use with expert knowledge!");
