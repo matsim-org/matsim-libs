@@ -23,7 +23,7 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -64,11 +64,11 @@ public class PersonCalcTimes extends AbstractPersonAlgorithm {
 			Plan plan = plans.get(i);
 
 			ArrayList acts_legs = plan.getPlanElements();
-			Act act = null;
+			Activity act = null;
 			Leg leg = null;
 			for (int j=0; j<acts_legs.size(); j++) {
 				if (j % 2 == 0) {
-					act = (Act)acts_legs.get(j);
+					act = (Activity)acts_legs.get(j);
 
 					if (j == 0) {
 						act.setStartTime(0);

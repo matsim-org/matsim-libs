@@ -28,7 +28,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -126,7 +126,7 @@ public class PlansAnalyzer {
 
 				final ArrayList<?> actslegs = selectedPlan.getPlanElements();
 				for (int j = 0; j < actslegs.size(); j=j+2) {
-					final Act act = (Act)actslegs.get(j);
+					final Activity act = (Activity)actslegs.get(j);
 					if (act.getType().startsWith(type)) {
 						out.write(person.getId().toString()+"\t"+
 								String.valueOf(act.getDuration())+"\t"+
@@ -171,7 +171,7 @@ public class PlansAnalyzer {
 
 
 			for (int j = 0; j < actslegs.size(); j=j+2) {
-				final Act act = (Act)actslegs.get(j);
+				final Activity act = (Activity)actslegs.get(j);
 				if (act.getType().startsWith("s")) {
 					countS++;
 					if (!personSet) {
@@ -217,7 +217,7 @@ public class PlansAnalyzer {
 
 				int countSL = 0;
 				for (int j = 0; j < actslegs.size(); j=j+2) {
-					final Act act = (Act)actslegs.get(j);
+					final Activity act = (Activity)actslegs.get(j);
 					if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
 						countSL++;
 					}

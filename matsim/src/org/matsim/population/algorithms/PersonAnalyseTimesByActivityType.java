@@ -22,7 +22,7 @@ package org.matsim.population.algorithms;
 
 import java.util.Iterator;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -100,7 +100,7 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 		Iterator actIter = plan.getIteratorAct();
 		while (actIter.hasNext()) {
 
-			Act act = (Act) actIter.next();
+			Activity act = (Activity) actIter.next();
 			String actType = act.getType().substring(0, 1);
 			double depTime = act.getEndTime();
 			if (depTime != Time.UNDEFINED_TIME) {
@@ -162,7 +162,7 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 		Iterator actIter = plan.getIteratorAct();
 		while (actIter.hasNext()) {
 
-			Act act = (Act) actIter.next();
+			Activity act = (Activity) actIter.next();
 			String actType = act.getType().substring(0, 1);
 			double arrTime = act.getStartTime();
 			if (arrTime != 0.0) {
@@ -229,10 +229,10 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 
 		for (Object o : plan.getPlanElements()) {
 
-			if (o instanceof Act) {
+			if (o instanceof Activity) {
 
 				if (depTime != -1.0) {
-					actType = ((Act) o).getType().substring(0, 1);
+					actType = ((Activity) o).getType().substring(0, 1);
 //					System.out.println(actType);
 					actIndex = Activities.valueOf(actType).getPosition();
 

@@ -30,7 +30,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -64,7 +64,7 @@ public class StaticPopulationGenerator {
 		this.geofac  = new GeometryFactory();
 		this.linksTree = new QuadTree<Link>(646000,9800000,674000,9999000);
 		for (final Link link : network.getLinks().values()) {
-			this.linksTree.put(link.getCenter().getX(), link.getCenter().getY(), link);
+			this.linksTree.put(link.getCoord().getX(), link.getCoord().getY(), link);
 		}
 	}
 
@@ -82,7 +82,7 @@ public class StaticPopulationGenerator {
 			this.linksTree.get(e.getMinX(), e.getMinY(),e.getMaxX(), e.getMaxY(),links);
 			final ArrayList<Link> tmp = new ArrayList<Link>();
 			for (final Link link : links) {
-				final Point point = this.geofac.createPoint(new Coordinate(link.getCenter().getX(),link.getCenter().getY()));
+				final Point point = this.geofac.createPoint(new Coordinate(link.getCoord().getX(),link.getCoord().getY()));
 				if (p.contains(point)) {
 					tmp.add(link);
 				}
@@ -104,7 +104,7 @@ public class StaticPopulationGenerator {
 				for (int i = 0; i < li ; i++) {
 					final Person pers = new PersonImpl(new IdImpl(id++));
 					final Plan plan = new org.matsim.population.PlanImpl(pers);
-					final Act act = new org.matsim.population.ActImpl("h",link.getCenter(),link);
+					final Activity act = new org.matsim.population.ActImpl("h",link.getCoord(),link);
 					act.setStartTime(3 * 3600.0);
 					// (I still think it would make more sense to leave the starting time of the first activity undefined. kai)
 					act.setEndTime(3 *3600.0);

@@ -101,7 +101,7 @@ public class NetworkCreateL2ZMapping {
 			FileWriter fw = new FileWriter(outfile);
 			BufferedWriter out = new BufferedWriter(fw);
 			for (Link l : network.getLinks().values()) {
-				Node n = qt.get(l.getCenter().getX(),l.getCenter().getY());
+				Node n = qt.get(l.getCoord().getX(),l.getCoord().getY());
 				out.write(l.getId().toString()+"\t"+n.getId().toString()+"\n");
 			}
 			out.close();

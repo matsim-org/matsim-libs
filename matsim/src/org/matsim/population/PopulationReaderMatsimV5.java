@@ -24,7 +24,6 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPopulationReaderV5;
-import org.matsim.basic.v01.PopulationSchemaV5Names;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Household;
@@ -43,23 +42,23 @@ public class PopulationReaderMatsimV5 extends BasicPopulationReaderV5 {
 	
 	public PopulationReaderMatsimV5(final NetworkLayer network, final Population population, Map<Id, Household> households, Facilities fac) {
 		super();
-		super.setPopulationBuilder(new PopulationBuilderImpl(network, population, fac));
-		super.setHouseholdBuilder(new HouseholdBuilderImpl(population, households, fac));
-		log.warn("Using the PopulationReader without vehicle informations will ignore all vehicle information stored in the households db!");
+//		super.setPopulationBuilder(new PopulationBuilderImpl(network, population, fac));
+//		super.setHouseholdBuilder(new HouseholdBuilderImpl(population, households, fac));
+//		log.warn("Using the PopulationReader without vehicle informations will ignore all vehicle information stored in the households db!");
 	}
 
 	public PopulationReaderMatsimV5(final NetworkLayer network, final Population population, Map<Id, Household> households, Facilities fac, Map<Id, Vehicle> vehicles) {
 		super();
-		super.setPopulationBuilder(new PopulationBuilderImpl(network, population, fac));
-		super.setHouseholdBuilder(new HouseholdBuilderImpl(population, households, fac, vehicles));		
+//		super.setPopulationBuilder(new PopulationBuilderImpl(network, population, fac));
+//		super.setHouseholdBuilder(new HouseholdBuilderImpl(population, households, fac, vehicles));		
 	}
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
-		if (!PopulationSchemaV5Names.FISCALHOUSEHOLDID.equalsIgnoreCase(name)){
-			//do nothing in case of hhId, as it is set by builder, otherwise proceed normally
-			super.startTag(name, atts, context);
-		}
+//		if (!PopulationSchemaV5Names.FISCALHOUSEHOLDID.equalsIgnoreCase(name)){
+//			//do nothing in case of hhId, as it is set by builder, otherwise proceed normally
+//			super.startTag(name, atts, context);
+//		}
 	}
 
 }

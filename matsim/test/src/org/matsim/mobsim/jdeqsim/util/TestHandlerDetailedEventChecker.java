@@ -21,7 +21,7 @@ import org.matsim.events.PersonEvent;
 import org.matsim.events.handler.PersonEventHandler;
 import org.matsim.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -76,7 +76,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 			ActIterator actIter = plan.getIteratorAct();
 			LegIterator legIter = plan.getIteratorLeg();
 
-			Act act = (Act) actIter.next();
+			Activity act = (Activity) actIter.next();
 			while (legIter.hasNext()) {
 
 				Leg leg = (Leg) legIter.next();
@@ -121,7 +121,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 				}
 
 				// get next act
-				act = (Act) actIter.next();
+				act = (Activity) actIter.next();
 
 				// each leg ends with arrival on act link
 				assertTrue(list.get(index) instanceof AgentArrivalEvent);

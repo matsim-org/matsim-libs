@@ -55,8 +55,8 @@ public class FacilitiesCombine {
 			}
 			else {
 				ActivityOption a2 = f2.getActivityOption(a.getType());
-				int cap2 = a2.getCapacity();
-				int cap = a.getCapacity();
+				double cap2 = a2.getCapacity();
+				double cap = a.getCapacity();
 				if ((cap < Integer.MAX_VALUE) && (cap2 < Integer.MAX_VALUE)) { a2.setCapacity(cap + cap2); }
 				else { a2.setCapacity(Integer.MAX_VALUE); }
 			}
@@ -88,8 +88,8 @@ public class FacilitiesCombine {
 		TreeMap<Double,TreeMap<Double,Facility>> facs = new TreeMap<Double, TreeMap<Double,Facility>>();
 
 		for (Facility f : facilities.getFacilities().values()) {
-			Double x = f.getCenter().getX();
-			Double y = f.getCenter().getY();
+			Double x = f.getCoord().getX();
+			Double y = f.getCoord().getY();
 			if (facs.containsKey(x)) { // same x coord
 				TreeMap<Double,Facility> tree = facs.get(x);
 				if (tree.containsKey(y)) { // and same y coord

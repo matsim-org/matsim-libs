@@ -34,7 +34,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -79,7 +79,7 @@ public class QuerySpinne implements OTFQuery {
 			for (int i= 0; i< actslegs.size(); i++) {
 				if( i%2 == 0) {
 					// handle act
-					Act act = (Act)plan.getPlanElements().get(i);
+					Activity act = (Activity)plan.getPlanElements().get(i);
 					Id id2 = act.getLink().getId();
 					if(id2.equals(this.linkId)) {
 						actPersons.add(plan);
@@ -114,7 +114,7 @@ public class QuerySpinne implements OTFQuery {
 			for (int i= 0; i< actslegs.size(); i++) {
 				if( i%2 == 0) {
 					// handle act
-					Act act = (Act)plan.getPlanElements().get(i);
+					Activity act = (Activity)plan.getPlanElements().get(i);
 					addLink(act.getLink());
 				} else {
 					// handle leg

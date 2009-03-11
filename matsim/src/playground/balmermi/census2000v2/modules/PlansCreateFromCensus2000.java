@@ -33,9 +33,9 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
@@ -97,17 +97,17 @@ public class PlansCreateFromCensus2000 {
 			double maxy = Double.NEGATIVE_INFINITY;
 			for (Facility f : this.facilities.getFacilities().values()) {
 				if (f.getActivityOption(types[i]) != null) {
-					if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-					if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-					if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-					if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+					if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+					if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+					if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+					if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 				}
 			}
 			minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 			log.info("        type="+types[i]+": xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 			QuadTree<Facility> qt = new QuadTree<Facility>(minx,miny,maxx,maxy);
 			for (Facility f : this.facilities.getFacilities().values()) {
-				if (f.getActivityOption(types[i]) != null) { qt.put(f.getCenter().getX(),f.getCenter().getY(),f); }
+				if (f.getActivityOption(types[i]) != null) { qt.put(f.getCoord().getX(),f.getCoord().getY(),f); }
 			}
 			log.info("        "+qt.size()+" facilities of type="+types[i]+" added.");
 			this.fqts.put(types[i],qt);
@@ -124,7 +124,7 @@ public class PlansCreateFromCensus2000 {
 		if (act_type.equals(CAtts.ACT_EKIGA) || act_type.equals(CAtts.ACT_EPRIM)) { // assign nearest act
 			QuadTree<Facility> qt = this.fqts.get(act_type);
 			Facility home_f = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
-			Facility educ_f = qt.get(home_f.getCenter().getX(),home_f.getCenter().getY());
+			Facility educ_f = qt.get(home_f.getCoord().getX(),home_f.getCoord().getY());
 			return educ_f.getActivityOption(act_type);
 		}
 		else if (act_type.equals(CAtts.ACT_ESECO)) { // search in home zone and expanding

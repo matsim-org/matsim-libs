@@ -25,7 +25,7 @@ import java.util.HashMap;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -66,7 +66,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		Person person = new PersonImpl(new IdImpl("1"));
 		Plan plan = person.createPlan(true);
 
-		Act act1 = plan.createAct("h", link0);
+		Activity act1 = plan.createAct("h", link0);
 		act1.setEndTime(8.0*3600);
 
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);

@@ -90,7 +90,7 @@ public class DistanceCalculator {
 			Path path = router.calcLeastCostPath(home, act, 0);
 			CarRoute route = new NodeCarRoute();
 			route.setNodes(path.nodes);
-			double dist = route.getDist();
+			double dist = route.getDistance();
 			writer.writeLine(new String [] {excId,id,Double.toString(dist)});
 			
 			

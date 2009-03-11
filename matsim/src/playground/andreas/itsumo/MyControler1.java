@@ -28,7 +28,7 @@ import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -122,27 +122,27 @@ public class MyControler1 extends Controler {
 
 			try {
 				Plan plan1 = new org.matsim.population.PlanImpl(p);
-				Act act1a = plan1.createAct("h", new CoordImpl(100., 100.));
+				Activity act1a = plan1.createAct("h", new CoordImpl(100., 100.));
 				act1a.setLink(link9);
 				act1a.setEndTime(0*60*60.);
 				Leg leg = plan1.createLeg(BasicLeg.Mode.car);
 				CarRoute route = new NodeCarRoute(link9, link15);
 				route.setNodes(link9, NetworkUtils.getNodes(this.network, "3 4"), link15);
 				leg.setRoute(route);
-				Act act1b = plan1.createAct("h", new CoordImpl(200., 200.));
+				Activity act1b = plan1.createAct("h", new CoordImpl(200., 200.));
 				act1b.setLink(link15);
 				act1b.setStartTime(8*60*60);
 				p.addPlan(plan1);
 
 				Plan plan2 = new org.matsim.population.PlanImpl(p);
-				Act act2a = plan1.createAct("h", new CoordImpl(100., 100.));
+				Activity act2a = plan1.createAct("h", new CoordImpl(100., 100.));
 				act2a.setLink(link9);
 				act2a.setEndTime(0*60*60.);
 				Leg leg2 = plan2.createLeg(BasicLeg.Mode.car);
 				CarRoute route2 = new NodeCarRoute(link9, link15);
 				route2.setNodes(link9, NetworkUtils.getNodes(this.network, "3 6 4"), link15);
 				leg2.setRoute(route2);
-				Act act2b = plan1.createAct("h", new CoordImpl(200., 200.));
+				Activity act2b = plan1.createAct("h", new CoordImpl(200., 200.));
 				act2b.setLink(link15);
 				act2b.setStartTime(8*60*60);
 				p.addPlan(plan2);
@@ -327,13 +327,13 @@ public class MyControler1 extends Controler {
 		Person p = new PersonImpl(new IdImpl(ii));
 		Plan plan = new org.matsim.population.PlanImpl(p);
 		try {
-			Act act1 = plan.createAct("h", new CoordImpl(100., 100.));
+			Activity act1 = plan.createAct("h", new CoordImpl(100., 100.));
 			act1.setLink(sourceLink);
 			act1.setStartTime(0.);
 			act1.setEndTime(0 * 60 * 60.);
 
 			plan.createLeg(BasicLeg.Mode.car);
-			Act act2 = plan.createAct("h", new CoordImpl(200., 200.));
+			Activity act2 = plan.createAct("h", new CoordImpl(200., 200.));
 			act2.setLink(destLink);
 			act2.setStartTime(8 * 60 * 60);
 

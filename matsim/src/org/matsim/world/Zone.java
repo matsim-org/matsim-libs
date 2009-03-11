@@ -22,8 +22,8 @@ package org.matsim.world;
 
 import org.matsim.basic.v01.LocationType;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
 /**
@@ -105,7 +105,7 @@ public class Zone extends AbstractLocation {
 	 * </p>
 	 *
 	 * @param coord
-	 * @see org.matsim.world.AbstractLocation#calcDistance(org.matsim.interfaces.basic.v01.Coord)
+	 * @see org.matsim.world.AbstractLocation#calcDistance(org.matsim.interfaces.core.v01.Coord)
 	 * @return distance to that zone
 	 */
 	@Override

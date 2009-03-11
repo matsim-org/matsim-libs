@@ -103,7 +103,7 @@ public class NetworkCalibrationWithCounts {
 	public void run(Network network) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 //		for (Link l : network.getLinks().values()) { l.setCapacity(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)*1.5); }
-		for (Link l : network.getLinks().values()) { l.setCapacity(10000.0); l.setLanes(5.0); l.setFreespeed(36.0/3.6); }
+		for (Link l : network.getLinks().values()) { l.setCapacity(10000.0); l.setNumberOfLanes(5.0); l.setFreespeed(36.0/3.6); }
 		this.writeGTFfile(network);
 		System.out.println("    done.");
 	}

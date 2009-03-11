@@ -123,14 +123,14 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 				// worst plan -----------------------------------------------------
 				if (worstPlan == null) {
 					worstPlan = plan;
-				} else if (plan.getScore() < worstPlan.getScore()) {
+				} else if (plan.getScoreAsPrimitiveType() < worstPlan.getScoreAsPrimitiveType()) {
 					worstPlan = plan;
 				}
 
 				// best plan -------------------------------------------------------
 				if (bestPlan == null) {
 					bestPlan = plan;
-				} else if (plan.getScore() > bestPlan.getScore()) {
+				} else if (plan.getScoreAsPrimitiveType() > bestPlan.getScoreAsPrimitiveType()) {
 					bestPlan = plan;
 				}
 
@@ -228,7 +228,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		final LegIterator leg_it = plan.getIteratorLeg();
 		while (leg_it.hasNext()) {
 			final Leg leg = (Leg)leg_it.next();
-			planTravelDistance+=leg.getRoute().getDist();
+			planTravelDistance+=leg.getRoute().getDistance();
 			numberOfLegs++;
 		}
 		if (numberOfLegs>0) {

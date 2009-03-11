@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 
@@ -49,7 +49,7 @@ public class EndLegMessage extends EventMessage {
 	
 			
 			// this is the link, where the first activity took place
-			vehicle.setCurrentLink(((Act) actsLegs.get(vehicle.getLegIndex()-1)).getLink());
+			vehicle.setCurrentLink(((Activity) actsLegs.get(vehicle.getLegIndex()-1)).getLink());
 	
 			Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
 			vehicle.scheduleStartingLegMessage(departureTime, road);

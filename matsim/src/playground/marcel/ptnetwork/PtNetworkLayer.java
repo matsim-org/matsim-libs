@@ -33,8 +33,8 @@ import java.util.TreeSet;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
@@ -491,7 +491,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 				for(Iterator<? extends Link> it = routeNodes.get(i).getOutLinks().values().iterator();it.hasNext();){
 					Link link = it.next();
 					if(link.getToNode().equals(routeNodes.get(i+1))){
-						link.setLanes(5);
+						link.setNumberOfLanes(5);
 					}
 				}
 			}

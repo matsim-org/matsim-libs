@@ -28,4 +28,8 @@ public interface Leg extends BasicLeg {
 
 	public String toString();
 
+	public double getArrivalTime();
+
+	public void setArrivalTime(final double seconds);
+
 }

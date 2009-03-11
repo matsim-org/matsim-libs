@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
@@ -109,9 +109,9 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 //		Get all instances of this facility type in the plan
 
 		ActIterator planIter= newPlan.getIteratorAct();
-		ArrayList<Act> actsOfFacType= new ArrayList<Act>();
+		ArrayList<Activity> actsOfFacType= new ArrayList<Activity>();
 		while(planIter.hasNext()){
-			Act nextAct=(Act) planIter.next();
+			Activity nextAct=(Activity) planIter.next();
 			if(nextAct.getType()== factype){
 				actsOfFacType.add(nextAct);
 			}
@@ -123,7 +123,7 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 			person.getPlans().remove(newPlan);
 			return;
 		}else{
-			Act newAct = (Act)(actsOfFacType.get(MatsimRandom.random.nextInt(actsOfFacType.size())));
+			Activity newAct = (Activity)(actsOfFacType.get(MatsimRandom.random.nextInt(actsOfFacType.size())));
 
 //			Get agent's knowledge
 			Knowledge k = person.getKnowledge();
@@ -143,22 +143,22 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 				if(newAct.getLinkId()!=fFromFacilities.getLink().getId()){
 					// If the first activity was chosen, make sure the last activity is also changed
 					if(newAct.getType() == plan.getFirstActivity().getType() && newAct.getLink() == plan.getFirstActivity().getLink()){
-						Act lastAct = (Act) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
+						Activity lastAct = (Activity) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
 						lastAct.setLink(fFromFacilities.getLink());
-						lastAct.setCoord(fFromFacilities.getCenter());
+						lastAct.setCoord(fFromFacilities.getCoord());
 						lastAct.setFacility(fFromFacilities);
 					}
 					// If the last activity was chosen, make sure the first activity is also changed
-					if(newAct.getType() == ((Act)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType() && newAct.getLink() == ((Act)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink()){
-						Act firstAct = (Act) newPlan.getFirstActivity();
+					if(newAct.getType() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType() && newAct.getLink() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink()){
+						Activity firstAct = (Activity) newPlan.getFirstActivity();
 						firstAct.setLink(fFromFacilities.getLink());
-						firstAct.setCoord(fFromFacilities.getCenter());
+						firstAct.setCoord(fFromFacilities.getCoord());
 						firstAct.setFacility(fFromFacilities);
 					}
 					// Change the activity
 //					System.out.println("  ##### Act at "+newAct.getFacility().getId()+" of type "+newAct.getType()+" ID "+newAct.getLink().getId()+" was changed for person "+plan.getPerson().getId()+" to "+fFromKnowledge.getLink().getId());
 					newAct.setLink(fFromFacilities.getLink());
-					newAct.setCoord(fFromFacilities.getCenter());
+					newAct.setCoord(fFromFacilities.getCoord());
 					newAct.setFacility(fFromFacilities);
 					k.getMentalMap().addActivity(fFromFacilities.getActivityOption(factype));
 					changed = true;

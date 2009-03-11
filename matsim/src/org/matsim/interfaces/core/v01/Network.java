@@ -23,7 +23,6 @@ package org.matsim.interfaces.core.v01;
 import java.util.Collection;
 
 import org.matsim.interfaces.basic.v01.BasicNetwork;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.NetworkFactory;
 
@@ -98,4 +97,12 @@ public interface Network extends BasicNetwork<Node, Link> {
 	 */
 	public boolean removeNode(final Node node);
 
+  /**
+   * Connects this network in the following sense: After a call to this
+   * function, all contained nodes and links must know about all of their
+   * adjacent network elements.
+   */
+  public void connect();
+
+	
 }

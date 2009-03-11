@@ -29,13 +29,6 @@ import java.util.Map;
 public interface BasicNetwork<N extends BasicNode, L extends BasicLink> {
 
     /**
-     * Connects this network in the following sense: After a call to this
-     * function, all contained nodes and links must know about all of their
-     * adjacent network elements.
-     */
-    public void connect();
-
-    /**
      * Returns a set of this network's nodes. This set might be empty, but it
      * must not be <code>null</code>.
      *

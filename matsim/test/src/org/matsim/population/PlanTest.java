@@ -23,7 +23,7 @@ package org.matsim.population;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.testcases.MatsimTestCase;
@@ -80,15 +80,15 @@ public class PlanTest extends MatsimTestCase {
 	 */
 	public void testInsertActLeg_Between() {
 		Plan plan = new org.matsim.population.PlanImpl(new PersonImpl(new IdImpl(1)));
-		Act homeAct = plan.createAct("h", new CoordImpl(0, 0));
+		Activity homeAct = plan.createAct("h", new CoordImpl(0, 0));
 		Leg leg1 = plan.createLeg(Mode.car);
-		Act workAct = plan.createAct("w", new CoordImpl(100, 200));
+		Activity workAct = plan.createAct("w", new CoordImpl(100, 200));
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		Act a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));
+		Activity a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));
 		Leg l = new org.matsim.population.LegImpl(Mode.car);
 		plan.insertLegAct(1, l, a);
 
@@ -106,15 +106,15 @@ public class PlanTest extends MatsimTestCase {
 	 */
 	public void testInsertActLeg_AtEnd() {
 		Plan plan = new org.matsim.population.PlanImpl(new PersonImpl(new IdImpl(1)));
-		Act homeAct = plan.createAct("h", new CoordImpl(0, 0));
+		Activity homeAct = plan.createAct("h", new CoordImpl(0, 0));
 		Leg leg1 = plan.createLeg(Mode.car);
-		Act workAct = plan.createAct("w", new CoordImpl(100, 200));
+		Activity workAct = plan.createAct("w", new CoordImpl(100, 200));
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		Act a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));
+		Activity a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));
 		Leg l = new org.matsim.population.LegImpl(Mode.car);
 		plan.insertLegAct(3, l, a);
 
@@ -140,7 +140,7 @@ public class PlanTest extends MatsimTestCase {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		Act a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));
+		Activity a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));
 		Leg l = new org.matsim.population.LegImpl(Mode.car);
 		try {
 			plan.insertLegAct(2, l, a);
@@ -163,7 +163,7 @@ public class PlanTest extends MatsimTestCase {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		Act a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));
+		Activity a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));
 		Leg l = new org.matsim.population.LegImpl(Mode.car);
 		try {
 			plan.insertLegAct(0, l, a);
@@ -187,7 +187,7 @@ public class PlanTest extends MatsimTestCase {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		Act a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));
+		Activity a = new org.matsim.population.ActImpl("l", new CoordImpl(200, 100));
 		Leg l = new org.matsim.population.LegImpl(Mode.car);
 		try {
 			plan.insertLegAct(4, l, a);

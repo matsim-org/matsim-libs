@@ -93,7 +93,7 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 		if (BasicLeg.Mode.car.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
 				Route route = leg.getRoute();
-				dist = route.getDist();
+				dist = route.getDistance();
 				/*
 				 * TODO the route-distance does not contain the length of the
 				 * first or last link of the route, because the route doesn't
@@ -108,17 +108,17 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
 		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistancePt != 0.0) {
-				dist = leg.getRoute().getDist();
+				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT + this.params.marginalUtilityOfDistancePt * dist;
 		} else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceWalk != 0.0) {
-				dist = leg.getRoute().getDist();
+				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk + this.params.marginalUtilityOfDistanceWalk * dist;
 		} else {
 			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
-				dist = leg.getRoute().getDist();
+				dist = leg.getRoute().getDistance();
 			}
 			// use the same values as for "car"
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;

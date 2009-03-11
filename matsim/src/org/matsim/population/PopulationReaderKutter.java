@@ -25,8 +25,8 @@ import java.io.IOException;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -235,7 +235,7 @@ public class PopulationReaderKutter implements PopulationReader {
 				l.setTravelTime(travTime);
 				l.setArrivalTime(arrTime);
 				this.currTime = this.currTime + duration;
-				Act a = this.currPlan.createAct(activity, coord);
+				Activity a = this.currPlan.createAct(activity, coord);
 				a.setStartTime(arrTime);
 				a.setEndTime(this.currTime);
 				a.setDuration(duration);
@@ -291,7 +291,7 @@ public class PopulationReaderKutter implements PopulationReader {
 			}
 
 
-			Act a = this.currPlan.createAct("home", this.currHome);
+			Activity a = this.currPlan.createAct("home", this.currHome);
 			a.setEndTime(duration);
 			this.currTime = (int)duration;
 

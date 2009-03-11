@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.ScoringFunction;
@@ -45,7 +45,7 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 //	private final playground.jhackney.scoring.CharyparNagelScoringFunctiosuperon;
 	private final Plan plan;
 //	private final TrackEventsOverlap teo;
-	private final LinkedHashMap<Act,ArrayList<Double>> actStats;
+	private final LinkedHashMap<Activity,ArrayList<Double>> actStats;
 	private final String factype;
 
 	private double friendFoeRatio=0.;
@@ -58,11 +58,11 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 	private double betaNFriends= Double.parseDouble(socnetConfig.getBeta2());
 	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
 	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
-	LinkedHashMap<Act,Double> usoc=new LinkedHashMap<Act,Double>();
-	LinkedHashMap<Act,Double> dusoc=new LinkedHashMap<Act,Double>();
+	LinkedHashMap<Activity,Double> usoc=new LinkedHashMap<Activity,Double>();
+	LinkedHashMap<Activity,Double> dusoc=new LinkedHashMap<Activity,Double>();
 
 //	public SocScoringFunctionEvent(final Plan plan, final playground.jhackney.scoring.CharyparNagelScoringFunction scoringFunction, String factype, final LinkedHashMap<Act,ArrayList<Double>> actStats) {
-	public EventSocScoringFunction(final Plan plan, String factype, final LinkedHashMap<Act,ArrayList<Double>> actStats) {
+	public EventSocScoringFunction(final Plan plan, String factype, final LinkedHashMap<Activity,ArrayList<Double>> actStats) {
 //		this.paidToll = paidToll;
 		super(plan);
 		this.plan = plan;
@@ -73,29 +73,29 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 			log.warn("Utility function values linear AND log number of Friends in spatial meeting");
 		}
 	}
-	public double getUsoc(Act a){
+	public double getUsoc(Activity a){
 //		if(usoc.size()>0&&usoc.contains(a)){
 			return usoc.get(a);
 //			}else{
 //				return 0;
 //			}
 	}
-	public double getUdur(Act a){
+	public double getUdur(Activity a){
 		return super.getUdur(a);
 	}
-	public double getUw(Act a){
+	public double getUw(Activity a){
 		return super.getUw(a);
 	}
-	public double getUs(Act a){
+	public double getUs(Activity a){
 		return super.getUs(a);
 	}
-	public double getUla(Act a){
+	public double getUla(Activity a){
 		return super.getUla(a);
 	}
-	public double getUed(Act a){
+	public double getUed(Activity a){
 		return super.getUed(a);
 	}
-	public double getUld(Act a){
+	public double getUld(Activity a){
 		return super.getUld(a);
 	}
 	public double getUlegt(Leg l){
@@ -105,25 +105,25 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 		return super.getUlegd(l);
 	}
 
-	public double getDusoc(Act a){
+	public double getDusoc(Activity a){
 		return dusoc.get(a);
 	}
-	public double getDudur(Act a){
+	public double getDudur(Activity a){
 		return super.getDudur(a);
 	}
-	public double getDuw(Act a){
+	public double getDuw(Activity a){
 		return super.getDuw(a);
 	}
-	public double getDus(Act a){
+	public double getDus(Activity a){
 		return super.getDus(a);
 	}
-	public double getDula(Act a){
+	public double getDula(Activity a){
 		return super.getDula(a);
 	}
-	public double getDued(Act a){
+	public double getDued(Activity a){
 		return super.getDued(a);
 	}
-	public double getDuld(Act a){
+	public double getDuld(Activity a){
 		return super.getDuld(a);
 	}
 	public double getDulegt(Leg l){
@@ -145,7 +145,7 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 		while(ait.hasNext()){
 			double temp=0;
 			double dtemp=0;
-			Act act = (Act)ait.next();
+			Activity act = (Activity)ait.next();
 			if(act.getType().equals(factype)){
 //				this.friendFoeRatio+=actStats.get(act).get(0);
 //				this.nFriends+=actStats.get(act).get(1);

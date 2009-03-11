@@ -25,7 +25,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -105,7 +105,7 @@ public class PlansAnalyse {
 			Plan plan = p.getPlans().get(0);
 			Iterator<?> a_it = plan.getIteratorAct();
 			while (a_it.hasNext()) {
-				Act a = (Act)a_it.next();
+				Activity a = (Activity)a_it.next();
 				if (a.getType().substring(0,1).equals(H))      { at_cnt[0]++; }
 				else if (a.getType().substring(0,1).equals(W)) { at_cnt[1]++; }
 				else if (a.getType().substring(0,1).equals(E)) { at_cnt[2]++; }

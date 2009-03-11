@@ -27,7 +27,7 @@ import java.util.Map;
 import org.matsim.config.Config;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -121,14 +121,14 @@ public class ActivityDurationAnalyser {
 		}
 	}
 
-	private void calculateActivityDurations(final Map<String, List<Act>> typeActivityMap) {
+	private void calculateActivityDurations(final Map<String, List<Activity>> typeActivityMap) {
 		System.out.println("Calculating activity durations...");
 		System.out.println("activity type \t number of activities \t absolute duration \t average duration" );
-		for (List<Act> actList : typeActivityMap.values()) {
+		for (List<Activity> actList : typeActivityMap.values()) {
 			double durations = 0.0;
 			double dur, startTime, endTime;
 //			System.out.println("Processing activity type: " + actList.get(0).getType());
-			for (Act act : actList) {
+			for (Activity act : actList) {
 				dur = act.getDuration();
 				ActivityParams actParams = this.config.charyparNagelScoring().getActivityParams(act.getType());
 				if (!(Double.isInfinite(dur) || Double.isNaN(dur))) {
@@ -172,27 +172,27 @@ public class ActivityDurationAnalyser {
 	 */
 	private class ActivityDurationCounter  {
 
-		private final Map<String, List<Act>> typeActivityMap;
-		private final Map<String, List<Act>> simpleTypeActivityMap;
+		private final Map<String, List<Activity>> typeActivityMap;
+		private final Map<String, List<Activity>> simpleTypeActivityMap;
 
 		ActivityDurationCounter() {
-			this.typeActivityMap = new HashMap<String, List<Act>>();
-			this.simpleTypeActivityMap = new HashMap<String, List<Act>>();
+			this.typeActivityMap = new HashMap<String, List<Activity>>();
+			this.simpleTypeActivityMap = new HashMap<String, List<Activity>>();
 		}
 
 		public void handlePlan(final Plan plan) {
 //			System.out.println("handling plan " + typeActivityMap);
 			for (Iterator it =  plan.getIteratorAct(); it.hasNext();) {
-				Act activity = (Act) it.next();
+				Activity activity = (Activity) it.next();
 //				System.out.println("handling act: " + activity.getType());
-				List<Act> acts = this.typeActivityMap.get(activity.getType());
-				List<Act> acts2 = this.simpleTypeActivityMap.get(activity.getType().substring(0,1));
+				List<Activity> acts = this.typeActivityMap.get(activity.getType());
+				List<Activity> acts2 = this.simpleTypeActivityMap.get(activity.getType().substring(0,1));
 				if (acts == null) {
-					acts = new ArrayList<Act>();
+					acts = new ArrayList<Activity>();
 					this.typeActivityMap.put(activity.getType(), acts);
 				}
 				if (acts2 == null) {
-					acts2 = new ArrayList<Act>();
+					acts2 = new ArrayList<Activity>();
 					this.simpleTypeActivityMap.put(activity.getType().substring(0,1), acts2);
 				}
 				acts.add(activity);
@@ -200,11 +200,11 @@ public class ActivityDurationAnalyser {
 			}
 		}
 
-		public Map<String, List<Act>> getTypeActivityMap() {
+		public Map<String, List<Activity>> getTypeActivityMap() {
 			return this.typeActivityMap;
 		}
 
-		public Map<String, List<Act>> getSimpleTypeActivityMap() {
+		public Map<String, List<Activity>> getSimpleTypeActivityMap() {
 			return this.simpleTypeActivityMap;
 		}
 	};

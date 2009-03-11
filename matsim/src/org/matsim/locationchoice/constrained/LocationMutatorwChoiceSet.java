@@ -28,8 +28,8 @@ import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
@@ -114,9 +114,9 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		if (trialNr > this.maxRecursions) {		
 			this.unsuccessfullLC += 1;
 					
-			Iterator<Act> act_it = subChain.getSlActs().iterator();
+			Iterator<Activity> act_it = subChain.getSlActs().iterator();
 			while (act_it.hasNext()) {
-				Act act = act_it.next();
+				Activity act = act_it.next();
 				this.modifyLocation(act, subChain.getStartCoord(), subChain.getEndCoord(), Double.MAX_VALUE, 0);
 			}
 			return 0;
@@ -126,11 +126,11 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		Coord endCoord = subChain.getEndCoord();
 		double ttBudget = subChain.getTtBudget();		
 		
-		Act prevAct = subChain.getFirstPrimAct();
+		Activity prevAct = subChain.getFirstPrimAct();
 		
-		Iterator<Act> act_it = subChain.getSlActs().iterator();
+		Iterator<Activity> act_it = subChain.getSlActs().iterator();
 		while (act_it.hasNext()) {
-			Act act = act_it.next();
+			Activity act = act_it.next();
 			double radius = (ttBudget * speed) / 2.0;	
 			if (!this.modifyLocation(act, startCoord, endCoord, radius, 0)) {
 				return 1;
@@ -153,7 +153,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	}
 
 	
-	protected boolean modifyLocation(Act act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
+	protected boolean modifyLocation(Activity act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
 		
 		ArrayList<Facility> choiceSet = this.computeChoiceSetCircle
 		(startCoord, endCoord, radius, act.getType());
@@ -164,15 +164,15 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			final Facility facility=(Facility)choiceSet.get(MatsimRandom.random.nextInt(choiceSet.size()));
 			
 			act.setFacility(facility);
-       		act.setLink(this.network.getNearestLink(facility.getCenter()));
-       		act.setCoord(facility.getCenter());
+       		act.setLink(this.network.getNearestLink(facility.getCoord()));
+       		act.setCoord(facility.getCoord());
        		return true;
 		}
 		// else ...
 		return false; 			
 	}
 	
-	protected double computeTravelTime(Act fromAct, Act toAct) {	
+	protected double computeTravelTime(Activity fromAct, Activity toAct) {	
 		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
@@ -186,14 +186,14 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	public List<SubChain> calcActChains(final Plan plan) {
 		
 		ManageSubchains manager = new ManageSubchains();	
-		List<Act> movablePrimaryActivities = null; 
+		List<Activity> movablePrimaryActivities = null; 
 		if (Gbl.getConfig().locationchoice().getFixByActType().equals("false")) {
 			movablePrimaryActivities = defineMovablePrimaryActivities(plan);
 		}
 				
 		final ArrayList<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Act act = (Act)actslegs.get(j);
+			final Activity act = (Activity)actslegs.get(j);
 			
 			boolean isPrimary = false;
 			boolean movable = false;
@@ -232,7 +232,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		
 		final ArrayList<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Act act = (Act)actslegs.get(j);
+			final Activity act = (Activity)actslegs.get(j);
 						
 			// found secondary activity
 			if (act.getType().startsWith(firstOfFlexibleActivityType)) {			

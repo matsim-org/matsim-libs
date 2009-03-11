@@ -25,9 +25,9 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.Knowledge;
@@ -101,7 +101,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 		// use morning home, the first act in each selected plan
 		Iterator<Person> e_it=egoNet.getAlters().iterator();
 		while(e_it.hasNext()){
-			activities.add( (ActivityOption) ((Act)(e_it.next().getSelectedPlan().getPlanElements().get(0))).getFacility().getActivityOption("home"));
+			activities.add( (ActivityOption) ((Activity)(e_it.next().getSelectedPlan().getPlanElements().get(0))).getFacility().getActivityOption("home"));
 		}
 		
 		Iterator<ActivityOption> a_it = null;
@@ -111,7 +111,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 		
 		// Creating coordinate list
 		ArrayList<Coord> coords = new ArrayList<Coord>();
-		while (a_it.hasNext()) { coords.add(a_it.next().getFacility().getCenter()); }
+		while (a_it.hasNext()) { coords.add(a_it.next().getFacility().getCoord()); }
 
 		System.out.println("----------------------------------------------------------------------");
 		System.out.println("Person id           = " + person.getId());

@@ -41,9 +41,9 @@ import org.matsim.evacuation.EvacuationAreaLink;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
@@ -309,16 +309,16 @@ public class MyMonsterClass {
 			nperson.setCarAvail(person.getCarAvail());
 			nperson.setEmployed(person.getEmployed());
 
-			Act act = null;
+			Activity act = null;
 			Iterator it = person.getPlans().get(0).getIteratorAct();
 
 			while (it.hasNext()){
-				act  = (Act) it.next();
+				act  = (Activity) it.next();
 				if (act.getType().contains("w")) break;
 			}
 
 
-			Act nact = new org.matsim.population.ActImpl("w", act.getLink().getCenter(), act.getLink());
+			Activity nact = new org.matsim.population.ActImpl("w", act.getLink().getCoord(), act.getLink());
 			nact.setStartTime(0);
 			nact.setEndTime(39600);
 			nact.setDuration(39600);
@@ -671,8 +671,8 @@ int three=0;
 			double max = Double.NEGATIVE_INFINITY;
 
 			for (Plan plan : pers.getPlans()){
-				if (plan.getScore() < min) min = plan.getScore();
-				if (plan.getScore() > max) max = plan.getScore();
+				if (plan.getScoreAsPrimitiveType() < min) min = plan.getScoreAsPrimitiveType();
+				if (plan.getScoreAsPrimitiveType() > max) max = plan.getScoreAsPrimitiveType();
 			}
 			try {
 				out.write(min + " " + max + "\n");

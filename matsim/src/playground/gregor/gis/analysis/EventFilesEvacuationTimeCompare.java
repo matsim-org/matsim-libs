@@ -245,7 +245,7 @@ public class EventFilesEvacuationTimeCompare {
 			AgentInfo ai = new AgentInfo();
 			ai.time = event.time;
 			Link link = EventFilesEvacuationTimeCompare.this.network.getLink(event.linkId);
-			ai.c = new Coordinate(link.getCenter().getX(),link.getCenter().getY());
+			ai.c = new Coordinate(link.getCoord().getX(),link.getCoord().getY());
 			this.ttimes.put(event.agentId, ai);
 			
 		}

@@ -36,7 +36,7 @@ import org.matsim.config.ConfigWriter;
 import org.matsim.config.Module;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -160,18 +160,18 @@ public class DEQSim extends ExternalMobsim {
 		// # legs, int, 32bit
 		out.writeInt((plan.getPlanElements().size()-1) / 2);
 
-		Act nextAct = null;
+		Activity nextAct = null;
 		if (plan.getPlanElements().size() > 2) {
 			// we have at least one leg
-			nextAct = (Act) plan.getPlanElements().get(0);
+			nextAct = (Activity) plan.getPlanElements().get(0);
 		}
 
 		// for each leg...
 		double time = 0;
 		for (int i = 1, max = plan.getPlanElements().size(); i < max; i += 2) {
 			Leg leg = (Leg) plan.getPlanElements().get(i);
-			Act act = nextAct;
-			nextAct = (Act) plan.getPlanElements().get(i+1);
+			Activity act = nextAct;
+			nextAct = (Activity) plan.getPlanElements().get(i+1);
 
 			// TODO [MR] this is functionality that's regularly used, maybe generalize it?
 			// also see below

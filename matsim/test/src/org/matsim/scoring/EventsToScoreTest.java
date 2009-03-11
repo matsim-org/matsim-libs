@@ -23,7 +23,7 @@ package org.matsim.scoring;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentMoneyEvent;
 import org.matsim.events.Events;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -124,7 +124,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 			this.cntReset++;
 		}
 
-		public void startActivity(final double time, final Act act) {
+		public void startActivity(final double time, final Activity act) {
 			this.cntStartAct++;
 		}
 

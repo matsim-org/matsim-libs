@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -80,14 +80,14 @@ public class PersonSubTourExtractor extends AbstractPersonAlgorithm implements P
 		int i=0;
 		int leaf_start = start;
 		int leaf_end = end;
-		TreeMap<Integer,Act> acts = new	TreeMap<Integer,Act>();
-		Act act0 = ((Act)plan.getPlanElements().get(tour.get(start)));
+		TreeMap<Integer,Activity> acts = new	TreeMap<Integer,Activity>();
+		Activity act0 = ((Activity)plan.getPlanElements().get(tour.get(start)));
 		acts.put(0,act0);
 		while (is_leaf == false && i<=tour.size()-2){
 			i=i+1;
-			Act acti = ((Act)plan.getPlanElements().get(tour.get(i)));
+			Activity acti = ((Activity)plan.getPlanElements().get(tour.get(i)));
 			for (int j=i-1;j>=tour.get(start);j=j-1){
-				Act actj = (Act)plan.getPlanElements().get(tour.get(j));
+				Activity actj = (Activity)plan.getPlanElements().get(tour.get(j));
 				if ((acti.getCoord().getX() == actj.getCoord().getX()) &&
 					    (acti.getCoord().getY() == actj.getCoord().getY())){
 					is_leaf=true;

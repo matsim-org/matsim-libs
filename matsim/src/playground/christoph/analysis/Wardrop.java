@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
@@ -112,7 +112,7 @@ public class Wardrop {
 	
 	public int getZone(Link link)
 	{
-		return getZone(link.getCenter());
+		return getZone(link.getCoord());
 	}
 	
 	public int getZone(Node node)

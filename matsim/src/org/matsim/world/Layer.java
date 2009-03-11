@@ -27,8 +27,8 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.network.NetworkLayer;
 
@@ -164,7 +164,7 @@ public abstract class Layer {
 		Iterator<Location> loc_it = this.locations.values().iterator();
 		while (loc_it.hasNext()) {
 			Location loc = loc_it.next();
-			if (loc.getCenter().equals(center)) { locs.add(loc); }
+			if (loc.getCoord().equals(center)) { locs.add(loc); }
 		}
 		return locs;
 	}

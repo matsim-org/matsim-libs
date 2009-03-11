@@ -47,14 +47,14 @@ public class LinkCarRoute extends AbstractRoute implements CarRoute {
 	}
 	
 	@Override
-	public double getDist() {
-		double dist = super.getDist();
+	public double getDistance() {
+		double dist = super.getDistance();
 		if (Double.isNaN(dist)) {
 			dist = 0;
 			for (Link link : this.route) {
 				dist += link.getLength();
 			}
-			this.setDist(dist);
+			this.setDistance(dist);
 		}
 		return dist;
 	}

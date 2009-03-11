@@ -156,7 +156,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Controler controler1 = new Controler(config);
 		controler1.setCreateGraphs(false);
 		controler1.run();
-		double scoreBasecase = controler1.getPopulation().getPerson(new IdImpl("1")).getPlans().get(0).getScore();
+		double scoreBasecase = controler1.getPopulation().getPerson(new IdImpl("1")).getPlans().get(0).getScoreAsPrimitiveType();
 
 		// now run toll case
 		Gbl.reset();
@@ -165,7 +165,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Controler controler2 = new Controler(config);
 		controler2.setCreateGraphs(false);
 		controler2.run();
-		double scoreTollcase = controler2.getPopulation().getPerson(new IdImpl("1")).getPlans().get(0).getScore();
+		double scoreTollcase = controler2.getPopulation().getPerson(new IdImpl("1")).getPlans().get(0).getScoreAsPrimitiveType();
 
 		// there should be a score difference
 		assertEquals(3.0, scoreBasecase - scoreTollcase, EPSILON); // toll amount: 10000*0.00020 + 5000*0.00020

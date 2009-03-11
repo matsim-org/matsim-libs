@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 
@@ -49,18 +49,18 @@ public class PersonSubtourHandler {
 			Subtour sub = new Subtour();
 			sub.setNodes(subtours.get(i));
 			sub.setMode(100);
-			Act start_act = (Act)plan.getPlanElements().get(sub.getNodes().get(0));
+			Activity start_act = (Activity)plan.getPlanElements().get(sub.getNodes().get(0));
 			sub.setStart_coord(start_act.getCoord());
 			sub.setId(i);
 			System.out.println("sub nodes" + sub.getNodes());
 			ArrayList<Integer> subtour = subtours.get(i);
 			int mainpurpose = 3; //mainpurpose:  0 := work; 1 := edu; 2 := shop 3:=leisure
 			double d = 0.0;
-			Coord start = ((Act)plan.getPlanElements().get(subtour.get(0))).getCoord();
+			Coord start = ((Activity)plan.getPlanElements().get(subtour.get(0))).getCoord();
 			Coord prev = start;
 			String type = null;
 			for (int k=1; k<subtour.size()-1; k=k+1) { 
-				type = ((Act)plan.getPlanElements().get(subtour.get(k))).getType().substring(0,1);
+				type = ((Activity)plan.getPlanElements().get(subtour.get(k))).getType().substring(0,1);
 				if (mainpurpose == 1){
 					if (type.equals(W)) { mainpurpose = 0;}
 				}
@@ -73,7 +73,7 @@ public class PersonSubtourHandler {
 					else if (type.equals(E)) {mainpurpose = 1;}
 					else if (type.equals(S)) {mainpurpose = 2;}
 				} 
-				Coord curr = ((Act)plan.getPlanElements().get(subtour.get(k))).getCoord();
+				Coord curr = ((Activity)plan.getPlanElements().get(subtour.get(k))).getCoord();
 				if (curr.getX()>0 && curr.getY()>0) {d = d + curr.calcDistance(prev);}
 				prev = curr;
 				

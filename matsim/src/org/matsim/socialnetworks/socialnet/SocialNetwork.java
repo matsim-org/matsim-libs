@@ -29,8 +29,8 @@ import org.apache.log4j.Logger;
 import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.socialnetworks.io.MakeSocialNetworkFromFile;
@@ -154,8 +154,8 @@ public class SocialNetwork {
 //			for (int i = 0; i < numLinks; i++) {
 			Person person1 = personList[MatsimRandom.random.nextInt(personList.length)];
 			Person person2 = personList[MatsimRandom.random.nextInt(personList.length)];
-			Coord home1=((Act)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCenter();
-			Coord home2=((Act)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCenter();
+			Coord home1=((Activity)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
+			Coord home2=((Activity)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
 			double distance = home1.calcDistance(home2);
 			double pdist=c*Math.pow((distance+rmin),-alpha);
 
@@ -279,8 +279,8 @@ public class SocialNetwork {
 //		for (int i = 0; i < numLinks; i++) {
 			Person person1 = personList[MatsimRandom.random.nextInt(personList.length)];
 			Person person2 = personList[MatsimRandom.random.nextInt(personList.length)];
-			Coord home1=((Act)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCenter();
-			Coord home2=((Act)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCenter();
+			Coord home1=((Activity)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
+			Coord home2=((Activity)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
 			double distance = home1.calcDistance(home2);
 			
 //			makeSocialContact( person1, person2, -1);

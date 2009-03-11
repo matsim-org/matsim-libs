@@ -48,7 +48,7 @@ public class NetworkLinkDistanceFilter implements NetworkLinkFilter {
 	 * distance specified by the distance filter from the center node of the filter.
 	 */	
 	public boolean judgeLink(Link l) {
-		double dist = l.getCenter().calcDistance(this.distanceFilterNode.getCoord());
+		double dist = l.getCoord().calcDistance(this.distanceFilterNode.getCoord());
 		return dist < this.distanceFilter;
 	}
 		

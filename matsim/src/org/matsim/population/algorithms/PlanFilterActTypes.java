@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 
@@ -63,7 +63,7 @@ public class PlanFilterActTypes extends AbstractPersonAlgorithm {
 			boolean match = false;
 			List actsLegs = plan.getPlanElements();
 			for (int i = 0, max = actsLegs.size(); i < max; i += 2) {
-				Act act = (Act) actsLegs.get(i);
+				Activity act = (Activity) actsLegs.get(i);
 				if (this.matchingActs.contains(act.getType())) {
 					match = true;
 					break;

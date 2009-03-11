@@ -30,7 +30,7 @@ import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
@@ -60,7 +60,7 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 		while (it.hasNext()) {
 			Person pers = it.next();
 
-			Id id = ((Act)pers.getPlans().get(0).getPlanElements().get(0)).getLink().getId();
+			Id id = ((Activity)pers.getPlans().get(0).getPlanElements().get(0)).getLink().getId();
 
 			if (network.getLink(id) == null) {
 				it.remove();
@@ -83,7 +83,7 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 			}
 			
 			person.createKnowledge("evac location");
-			Act fact = plan.getFirstActivity();
+			Activity fact = plan.getFirstActivity();
 			Facility f = facs.getFacilities().get(fact.getLinkId());
 			fact.setFacility(f);
 			ActivityOption a = f.getActivityOption("h");
@@ -93,7 +93,7 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);
 			plan.addLeg(leg);
-			Act act = new org.matsim.population.ActImpl("evacuated",fac);
+			Activity act = new org.matsim.population.ActImpl("evacuated",fac);
 			person.getKnowledge().addActivity(fac.getActivityOption("evacuated"),false);
 						
 			
@@ -110,7 +110,7 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 			if (link.getId().toString().contains("shelter")) {
 				continue;
 			}
-			Facility fac = facs.createFacility(new IdImpl(link.getId().toString()), link.getCenter());
+			Facility fac = facs.createFacility(new IdImpl(link.getId().toString()), link.getCoord());
 			ActivityOption act = fac.createActivityOption("h");
 			act.addOpeningTime(new OpeningTimeImpl(DayType.wk,0,3600*30));
 		}

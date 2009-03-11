@@ -21,7 +21,7 @@
 package org.matsim.utils.vis.snapshots.writers;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -82,7 +82,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 		Person pers = new PersonImpl(position.getAgentId());
 
 		Plan plan = new PlanImpl(pers);
-		Act actA = new org.matsim.population.ActImpl("h", new CoordImpl(position.getEasting(), position.getNorthing()),
+		Activity actA = new org.matsim.population.ActImpl("h", new CoordImpl(position.getEasting(), position.getNorthing()),
 				position.getLink());
 		actA.setEndTime(this.currenttime);
 		plan.addAct(actA);

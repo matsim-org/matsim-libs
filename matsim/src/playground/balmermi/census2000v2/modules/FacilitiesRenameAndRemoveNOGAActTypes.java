@@ -62,7 +62,7 @@ public class FacilitiesRenameAndRemoveNOGAActTypes {
 			for (int i=0; i<types.size(); i++) {
 				if (types.get(i).startsWith("B")) { f.getActivityOptions().remove(types.get(i)); }
 			}
-			Facility ff = facilities.createFacility(f.getId(),f.getCenter());
+			Facility ff = facilities.createFacility(f.getId(),f.getCoord());
 			ff.getActivityOptions().putAll(f.getActivityOptions());
 		}
 

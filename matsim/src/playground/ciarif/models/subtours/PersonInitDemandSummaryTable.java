@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.ArrayList;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;

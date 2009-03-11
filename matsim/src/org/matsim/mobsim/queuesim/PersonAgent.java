@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -67,7 +67,7 @@ public class PersonAgent {
 
 	/**
 	 * Convenience method delegating to person's selected plan
-	 * @return list of {@link Act}s and {@link Leg}s of this agent's plan
+	 * @return list of {@link Activity}s and {@link Leg}s of this agent's plan
 	 */
 	public List<Object> getActsLegs() {
 		return this.person.getSelectedPlan().getPlanElements();
@@ -120,7 +120,7 @@ public class PersonAgent {
 
 	public boolean initialize() {
 		this.nextActivity = 0;
-		Act firstAct = (Act) this.getActsLegs().get(0);
+		Activity firstAct = (Activity) this.getActsLegs().get(0);
 
 		SimulationTimer.updateSimStartTime(firstAct.getEndTime());
 		setCurrentLink(firstAct.getLink());
@@ -135,7 +135,7 @@ public class PersonAgent {
 
 	private boolean initNextLeg() {
 		double now = SimulationTimer.getTime();
-		Act act = (Act)this.getActsLegs().get(this.nextActivity);
+		Activity act = (Activity)this.getActsLegs().get(this.nextActivity);
 
 		if (act.getLink() != this.currentLink) {
 			log.error("The vehicle with driver " + this.getPerson().getId() + " should be on link " + act.getLink().getId().toString()
@@ -166,7 +166,7 @@ public class PersonAgent {
 		}
 		setDepartureTime(departure);
 
-		this.destinationLink = ((Act)this.getActsLegs().get(this.nextActivity +2)).getLink();
+		this.destinationLink = ((Activity)this.getActsLegs().get(this.nextActivity +2)).getLink();
 
 		// set the route according to the next leg
 		Leg leg = (Leg) this.getActsLegs().get(this.nextActivity+1);
@@ -185,7 +185,7 @@ public class PersonAgent {
 	 * @param now the current time
 	 */
 	public void leaveActivity(final double now) {
-		Act act = (Act)this.getActsLegs().get(this.nextActivity - 2);
+		Activity act = (Activity)this.getActsLegs().get(this.nextActivity - 2);
 		QueueSimulation.getEvents().processEvent(new ActEndEvent(now, this.getPerson(), this.currentLink, act));
 	}
 
@@ -196,7 +196,7 @@ public class PersonAgent {
 	 * @param currentQueueLink
 	 */
 	public void reachActivity(final double now, final QueueLink currentQueueLink) {
-		Act act = (Act)this.getActsLegs().get(this.nextActivity);
+		Activity act = (Activity)this.getActsLegs().get(this.nextActivity);
 		// no actStartEvent for first act.
 		QueueSimulation.getEvents().processEvent(new ActStartEvent(now, this.getPerson(), this.currentLink, act));
 		// 	 this is the starting point for our vehicle, so put it in the queue

@@ -29,9 +29,9 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -71,7 +71,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	private Leg currleg = null;
 	private CarRoute currroute = null;
 
-	private Act prevAct = null;
+	private Activity prevAct = null;
 	private String routeNodes = null;
 
 	private static final Logger log = Logger.getLogger(PopulationReaderMatsimV0.class);
@@ -166,7 +166,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 		
 		Link link = null;
 		Coord coord = null;
-		Act act;
+		Activity act;
 		if (atts.getValue("link") != null) {
 			link = this.network.getLink(atts.getValue("link"));
 			act = this.currplan.createAct(atts.getValue("type"), link);

@@ -23,7 +23,7 @@ package playground.balmermi.census2000.modules;
 import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
@@ -74,10 +74,10 @@ public class PersonSetHomeLoc extends AbstractPersonAlgorithm implements PlanAlg
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(HOME) != null) {
-				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-				if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-				if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+				if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+				if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 			}
 		}
 		minx -= 1.0;
@@ -88,7 +88,7 @@ public class PersonSetHomeLoc extends AbstractPersonAlgorithm implements PlanAlg
 		this.homeFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(HOME) != null) {
-				this.homeFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
+				this.homeFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
 		}
 		System.out.println("      done.");
@@ -107,9 +107,9 @@ public class PersonSetHomeLoc extends AbstractPersonAlgorithm implements PlanAlg
 		Plan plan = person.getSelectedPlan();
 		Iterator act_it = plan.getIteratorAct();
 		while (act_it.hasNext()) {
-			Act act = (Act)act_it.next();
+			Activity act = (Activity)act_it.next();
 			if (H.equals(act.getType())) {
-				act.setCoord(f.getCenter());
+				act.setCoord(f.getCoord());
 			}
 		}
 	}

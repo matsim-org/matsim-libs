@@ -34,7 +34,7 @@ import org.matsim.controler.Controler;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
@@ -142,7 +142,7 @@ public class ExternalMobsim {
 				// act/leg
 				for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
 					if (jj % 2 == 0) {
-						Act act = (Act)plan.getPlanElements().get(jj);
+						Activity act = (Activity)plan.getPlanElements().get(jj);
 						handler.startAct(act, writer);
 						handler.endAct(writer);
 					} else {

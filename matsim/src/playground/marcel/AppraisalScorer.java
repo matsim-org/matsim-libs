@@ -24,7 +24,7 @@ import java.util.TreeMap;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -100,8 +100,8 @@ public class AppraisalScorer implements ScoringFunction {
 	}
 
 	private int calcPersontype() {
-		Link homeLink = ((Act)(this.plan.getPlanElements().get(0))).getLink();
-		Link workLink = ((Act)(this.plan.getPlanElements().get(2))).getLink();
+		Link homeLink = ((Activity)(this.plan.getPlanElements().get(0))).getLink();
+		Link workLink = ((Activity)(this.plan.getPlanElements().get(2))).getLink();
 		boolean homeInside = this.toll.getLinkIds().contains(homeLink.getId());
 		boolean workInside = this.toll.getLinkIds().contains(workLink.getId());
 
@@ -139,7 +139,7 @@ public class AppraisalScorer implements ScoringFunction {
 		initialized = true;
 	}
 
-	public final double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
+	public final double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
 		ActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
@@ -273,7 +273,7 @@ public class AppraisalScorer implements ScoringFunction {
 			 * available, which is quite an expensive operation
 			 */
 			Route route = leg.getRoute();
-			dist = route.getDist();
+			dist = route.getDistance();
 			/* TODO the route-distance does not contain the length of the first or
 			 * last link of the route, because the route doesn't know those. Should
 			 * be fixed somehow, but how? MR, jan07
@@ -347,7 +347,7 @@ public class AppraisalScorer implements ScoringFunction {
 		}
 	}
 
-	public void startActivity(final double time, final Act act) {
+	public void startActivity(final double time, final Activity act) {
 		// we do not use this "event" at the moment
 	}
 
@@ -388,7 +388,7 @@ public class AppraisalScorer implements ScoringFunction {
 	}
 
 	private void handleAct(final double time) {
-		Act act = (Act)this.plan.getPlanElements().get(this.index);
+		Activity act = (Activity)this.plan.getPlanElements().get(this.index);
 		if (this.index == 0) {
 			this.firstActTime = time;
 			this.firstActType = act.getType();

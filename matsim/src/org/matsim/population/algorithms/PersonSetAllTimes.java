@@ -21,7 +21,7 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -53,7 +53,7 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 			double prev_endtime = 0;
 
 			for (int j=0; j<plan.getPlanElements().size(); j=j+2) {
-				Act act = (Act)plan.getPlanElements().get(j);
+				Activity act = (Activity)plan.getPlanElements().get(j);
 
 				if (j == 0) {
 					int endtime = EARLIEST_ENDTIME +
@@ -81,7 +81,7 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 			}
 
 			for (int j=0; j<plan.getPlanElements().size(); j=j+2) {
-				Act act = (Act)plan.getPlanElements().get(j);
+				Activity act = (Activity)plan.getPlanElements().get(j);
 
 				if (act.getType().equals("w")) {
 					if (w_cnt == 0) { throw new RuntimeException("HAE?: w_cnt=0"); }
@@ -143,7 +143,7 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 			double act_end_time = 0;
 			for (int j=0; j<plan.getPlanElements().size(); j++) {
 				if (j % 2 == 0) {
-					Act act = (Act)plan.getPlanElements().get(j);
+					Activity act = (Activity)plan.getPlanElements().get(j);
 					act_end_time = act.getEndTime();
 				}
 				else {

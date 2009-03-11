@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
@@ -47,7 +47,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		int time = 7*3600 + (MatsimRandom.random.nextInt(2*3600));
 
 		// first act (= home)
-		Act a = p.createAct("home", home_facility.getCenter());
+		Activity a = p.createAct("home", home_facility.getCoord());
 		a.setLink(home_facility.getLink());
 		a.setStartTime(0.0);
 		a.setDuration(time);
@@ -66,7 +66,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 			int act_index = MatsimRandom.random.nextInt(acts.size());
 			ActivityOption act = acts.get(act_index);
 			Facility f = act.getFacility();
-			a = p.createAct(act.getType(),f.getCenter());
+			a = p.createAct(act.getType(),f.getCoord());
 			a.setLink(f.getLink());
 			a.setStartTime(time);
 			a.setDuration(dur);
@@ -80,7 +80,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		}
 
 		// last act (= home)
-		a = p.createAct("home",home_facility.getCenter());
+		a = p.createAct("home",home_facility.getCoord());
 		a.setLink(home_facility.getLink());
 		a.setStartTime(time);
 		a.setEndTime(24*3600);

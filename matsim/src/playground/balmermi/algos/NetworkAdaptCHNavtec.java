@@ -38,15 +38,15 @@ public class NetworkAdaptCHNavtec {
 			int type = Integer.parseInt(l.getType());
 			if ((type == 13) || (type == 16)) {
 				System.out.println("        link id=" + l.getId() + "; type=" + l.getType() + "; lanes=" + l.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + " ==> lanes=3");
-				l.setLanes(3);
+				l.setNumberOfLanes(3);
 			}
 			if (type == 31) {
 				System.out.println("        link id=" + l.getId() + "; type=" + l.getType() + "; lanes=" + l.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + " ==> lanes=1");
-				l.setLanes(1);
+				l.setNumberOfLanes(1);
 			}
 			if (l.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) == 3) {
 				System.out.println("        link id=" + l.getId() + "; lanes=" + l.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + " ==> lanes=2");
-				l.setLanes(2);
+				l.setNumberOfLanes(2);
 			}
 			int lanes = l.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 			if (lanes == 1) { l.setCapacity(2000.0); }      // Info from CH Norm

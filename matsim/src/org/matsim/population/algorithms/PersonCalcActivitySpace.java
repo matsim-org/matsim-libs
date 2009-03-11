@@ -25,8 +25,8 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.Knowledge;
@@ -94,7 +94,7 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 		else { a_it = know.getActivities(this.activity_type).iterator(); }
 		// Creating coordinate list
 		ArrayList<Coord> coords = new ArrayList<Coord>();
-		while (a_it.hasNext()) { coords.add(a_it.next().getFacility().getCenter()); }
+		while (a_it.hasNext()) { coords.add(a_it.next().getFacility().getCoord()); }
 		
 		System.out.println("----------------------------------------------------------------------");
 		System.out.println("Person id           = " + person.getId());

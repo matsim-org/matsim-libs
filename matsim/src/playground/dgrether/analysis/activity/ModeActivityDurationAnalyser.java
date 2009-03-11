@@ -23,8 +23,7 @@ import java.io.File;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicPlan;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -89,25 +88,25 @@ public class ModeActivityDurationAnalyser {
 		for (Person pers : plans.getPersons().values()){
 			Plan p = pers.getSelectedPlan();
 			for (ActIterator it = p.getIteratorAct(); it.hasNext(); ) {
-				Act act = (Act) it.next();
+				Activity act = (Activity) it.next();
 				try {
 				  durTemp = act.calculateDuration();
 				if (act.getType().equalsIgnoreCase("h")) {
-					if (p.getType().equals(BasicPlan.Type.CAR)) {
+					if (p.getType().equals(Plan.Type.CAR)) {
 						homeActivityDurationsCar += durTemp;
 						homeActivityCarCount++;
 					}
-					else if (p.getType().equals(BasicPlan.Type.PT)){
+					else if (p.getType().equals(Plan.Type.PT)){
 						homeActivityDurationsNonCar += durTemp;
 						homeActivityNonCarCount++;
 					}
 				}
 				else if (act.getType().equalsIgnoreCase("w")) {
-					if (p.getType().equals(BasicPlan.Type.CAR)) {
+					if (p.getType().equals(Plan.Type.CAR)) {
 						workActivityDurationsCar += durTemp;
 						workActivityCarCount++;
 					}
-					else if (p.getType().equals(BasicPlan.Type.PT)){
+					else if (p.getType().equals(Plan.Type.PT)){
 						workActivityDurationsNonCar += durTemp;
 						workActivityNonCarCount++;
 					}

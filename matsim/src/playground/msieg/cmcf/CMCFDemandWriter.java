@@ -28,7 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Plan;
@@ -186,7 +186,7 @@ public class CMCFDemandWriter{
 		Commodities<Node> com = new Commodities<Node>();
 
 		Plan plan;
-		Act act1, act2;
+		Activity act1, act2;
 		Leg leg;
 		for (Id id : this.plans.getPersons().keySet()) {
 			plan = this.plans.getPerson(id).getSelectedPlan();

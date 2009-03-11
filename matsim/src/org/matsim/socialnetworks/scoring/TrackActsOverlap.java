@@ -27,7 +27,7 @@ import java.util.LinkedHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -99,7 +99,7 @@ public class TrackActsOverlap {
 			Person p1=plan1.getPerson();
 			ActIterator a1Iter =plan1.getIteratorAct();
 			while(a1Iter.hasNext()){
-				Act act1 = (Act) a1Iter.next();
+				Activity act1 = (Activity) a1Iter.next();
 				ActivityOption activity1=act1.getFacility().getActivityOption(act1.getType());
 				ArrayList<Person> actList=new ArrayList<Person>();
 
@@ -141,7 +141,7 @@ public class TrackActsOverlap {
 		double score = 0;
 		ActIterator ait=plan.getIteratorAct();
 		while(ait.hasNext()){
-			Act act = (Act) ait.next();
+			Activity act = (Activity) ait.next();
 			ActivityOption myActivity=act.getFacility().getActivityOption(act.getType());
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			// Go through the list of Persons and for each one pick one friend randomly
@@ -175,7 +175,7 @@ public class TrackActsOverlap {
 		ActIterator ait=plan.getIteratorAct();
 		Person p1=plan.getPerson();
 		while(ait.hasNext()){
-			Act act1 = (Act) ait.next();
+			Activity act1 = (Activity) ait.next();
 			ActivityOption myActivity=act1.getFacility().getActivityOption(act1.getType());
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			if(!activityMap.keySet().contains(myActivity)){
@@ -191,7 +191,7 @@ public class TrackActsOverlap {
 				Plan plan2=p2.getSelectedPlan();
 				ActIterator act2It=plan2.getIteratorAct();
 				while(act2It.hasNext()){
-					Act act2 = (Act) act2It.next();
+					Activity act2 = (Activity) act2It.next();
 					if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
 						EgoNet net = p1.getKnowledge().getEgoNet();
 						if(net.getAlters().contains(p2)){
@@ -227,7 +227,7 @@ public class TrackActsOverlap {
 		ActIterator ait=plan.getIteratorAct();
 		Person p1=plan.getPerson();
 		while(ait.hasNext()){
-			Act act1 = (Act) ait.next();
+			Activity act1 = (Activity) ait.next();
 			ActivityOption myActivity=act1.getFacility().getActivityOption(act1.getType());
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			if(!activityMap.keySet().contains(myActivity)){
@@ -243,7 +243,7 @@ public class TrackActsOverlap {
 				Plan plan2=p2.getSelectedPlan();
 				ActIterator act2It=plan2.getIteratorAct();
 				while(act2It.hasNext()){
-					Act act2 = (Act) act2It.next();
+					Activity act2 = (Activity) act2It.next();
 					if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
 						EgoNet net = p1.getKnowledge().getEgoNet();
 						if(net.getAlters().contains(p2)){
@@ -273,9 +273,9 @@ public class TrackActsOverlap {
 	 * @param plan
 	 * @return
 	 */
-	public LinkedHashMap<Act,ArrayList<Double>> calculateTimeWindowActStats(Plan plan) {
+	public LinkedHashMap<Activity,ArrayList<Double>> calculateTimeWindowActStats(Plan plan) {
 
-		LinkedHashMap<Act,ArrayList<Double>> actStats = new LinkedHashMap<Act,ArrayList<Double>>();
+		LinkedHashMap<Activity,ArrayList<Double>> actStats = new LinkedHashMap<Activity,ArrayList<Double>>();
 		// stats(0)=friendFoeRatio
 		// stats(1)=nFriends
 		// stats(2)=totalTimeWithFriends
@@ -286,7 +286,7 @@ public class TrackActsOverlap {
 			double foe=0.;
 			double totalTimeWithFriends=0;
 			
-			Act act1 = (Act) ait.next();
+			Activity act1 = (Activity) ait.next();
 			ActivityOption myActivity=act1.getFacility().getActivityOption(act1.getType());
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			if(!activityMap.keySet().contains(myActivity)){
@@ -302,7 +302,7 @@ public class TrackActsOverlap {
 				Plan plan2=p2.getSelectedPlan();
 				ActIterator act2It=plan2.getIteratorAct();
 				while(act2It.hasNext()){
-					Act act2 = (Act) act2It.next();
+					Activity act2 = (Activity) act2It.next();
 					if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
 						EgoNet net = p1.getKnowledge().getEgoNet();
 						if(net.getAlters().contains(p2)){
@@ -341,7 +341,7 @@ public class TrackActsOverlap {
 		return actStats;
 	}	
 	
-	private double getTimeWindowDuration(Act act1, Act act2) {
+	private double getTimeWindowDuration(Activity act1, Activity act2) {
 		double duration=0.;
 		duration = Math.min(act1.getEndTime(),act2.getEndTime())-Math.max(act1.getStartTime(),act2.getStartTime());
 		return duration;

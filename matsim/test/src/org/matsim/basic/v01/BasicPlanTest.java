@@ -22,7 +22,7 @@ package org.matsim.basic.v01;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -52,14 +52,14 @@ public class BasicPlanTest extends MatsimTestCase {
 		assertFalse(iter.hasNextLeg());
 
 		// add one act, no legs yet, test again
-		Act act1 = plan.createAct("h", new CoordImpl(0.0, 0.0));
+		Activity act1 = plan.createAct("h", new CoordImpl(0.0, 0.0));
 		iter = plan.getIterator();
 		assertEquals(act1, iter.nextAct());
 		assertFalse(iter.hasNextLeg());
 
 		// add leg + act, test again
 		Leg leg1 = plan.createLeg(BasicLeg.Mode.car);
-		Act act2 = plan.createAct("w", new CoordImpl(100.0, 100.0));
+		Activity act2 = plan.createAct("w", new CoordImpl(100.0, 100.0));
 		iter = plan.getIterator();
 		assertEquals(act1, iter.nextAct());
 		assertTrue(iter.hasNextLeg());
@@ -70,7 +70,7 @@ public class BasicPlanTest extends MatsimTestCase {
 
 		// add leg + act, test again. Now we have a generic plan with real first act, real last act, and real middle acts.
 		Leg leg2 = plan.createLeg(BasicLeg.Mode.car);
-		Act act3 = plan.createAct("h", new CoordImpl(0.0, 0.0));
+		Activity act3 = plan.createAct("h", new CoordImpl(0.0, 0.0));
 		iter = plan.getIterator();
 		assertEquals(act1, iter.nextAct());
 		assertTrue(iter.hasNextLeg());
@@ -188,14 +188,14 @@ public class BasicPlanTest extends MatsimTestCase {
 		assertFalse(iter.hasNext());
 
 		// add one act, no legs yet, test again
-		Act act1 = plan.createAct("h", new CoordImpl(0.0, 0.0));
+		Activity act1 = plan.createAct("h", new CoordImpl(0.0, 0.0));
 		iter = plan.getIteratorAct();
 		assertEquals(act1, iter.next());
 		assertFalse(iter.hasNext());
 
 		// add leg + act, test again
 		plan.createLeg(BasicLeg.Mode.car);
-		Act act2 = plan.createAct("w", new CoordImpl(100.0, 100.0));
+		Activity act2 = plan.createAct("w", new CoordImpl(100.0, 100.0));
 		iter = plan.getIteratorAct();
 		assertEquals(act1, iter.next());
 		assertTrue(iter.hasNext());
@@ -204,7 +204,7 @@ public class BasicPlanTest extends MatsimTestCase {
 
 		// add leg + act, test again. Now we have a generic plan with real first act, real last act, and real middle acts.
 		plan.createLeg(BasicLeg.Mode.car);
-		Act act3 = plan.createAct("h", new CoordImpl(0.0, 0.0));
+		Activity act3 = plan.createAct("h", new CoordImpl(0.0, 0.0));
 		iter = plan.getIteratorAct();
 		assertEquals(act1, iter.next());
 		assertTrue(iter.hasNext());

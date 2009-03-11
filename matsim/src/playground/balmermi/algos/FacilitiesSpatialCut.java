@@ -23,8 +23,8 @@ package playground.balmermi.algos;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.geometry.CoordImpl;
@@ -40,7 +40,7 @@ public class FacilitiesSpatialCut {
 
 		ArrayList<Facility> f_array = new ArrayList<Facility>();
 		for (Facility f : facilities.getFacilities().values()) {
-			Coord c = f.getCenter();
+			Coord c = f.getCoord();
 			if ((c.getX() >= this.min.getX()) && (c.getY() >= this.min.getY()) &&
 			    (c.getX() <= this.max.getX()) && (c.getY() <= this.max.getY())) {
 				// inside

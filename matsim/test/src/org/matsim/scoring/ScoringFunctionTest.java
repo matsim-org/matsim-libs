@@ -26,7 +26,7 @@ import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.events.AgentMoneyEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -86,9 +86,9 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 		// score the same plan twice
 		Person person1 = new PersonImpl(new IdImpl(1));
 		Plan plan1 = person1.createPlan(true);
-		Act act1a = plan1.createAct("home", (Link)null);//, 0, 7.0*3600, 7*3600, false);
+		Activity act1a = plan1.createAct("home", (Link)null);//, 0, 7.0*3600, 7*3600, false);
 		Leg leg1 = plan1.createLeg(BasicLeg.Mode.car);//, 7*3600, 100, 7*3600+100);
-		Act act1b = plan1.createAct("work", (Link)null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+		Activity act1b = plan1.createAct("work", (Link)null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
 		ScoringFunction sf1 = getScoringFunctionInstance(plan1);
 		sf1.startActivity(0, act1a);
 		sf1.endActivity(7*3600);

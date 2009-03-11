@@ -3,7 +3,7 @@ package playground.wrashid.PDES2;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -72,7 +72,7 @@ public class Vehicle extends SimUnit {
 		// activity
 
 		// this is the link, where the first activity took place
-		currentLink = ((Act) actsLegs.get(legIndex - 1)).getLink();
+		currentLink = ((Activity) actsLegs.get(legIndex - 1)).getLink();
 
 		Road road=Road.allRoads.get(getCurrentLink().getId().toString());
 		scheduleStartingLegMessage(departureTime, road);
@@ -187,7 +187,7 @@ public class Vehicle extends SimUnit {
 		if (this.getLinkIndex()==0){
 			Plan plan = ownerPerson.getSelectedPlan(); 
 			ArrayList<Object> actsLegs = plan.getPlanElements();
-			previousLink = ((Act) actsLegs.get(legIndex - 1)).getLink();
+			previousLink = ((Activity) actsLegs.get(legIndex - 1)).getLink();
 			//System.out.println("AscheduleLeavePreviousRoadMessage:"+previousLink.getId().toString());
 			previousRoad=Road.allRoads.get(previousLink.getId().toString());
 		} else if (this.getLinkIndex()>=1){

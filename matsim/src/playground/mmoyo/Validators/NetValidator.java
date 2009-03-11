@@ -1,8 +1,8 @@
 package playground.mmoyo.Validators;
 
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.interfaces.basic.v01.Coord;
 import playground.mmoyo.PTCase2.PTTimeTable2;
 
 public class NetValidator {

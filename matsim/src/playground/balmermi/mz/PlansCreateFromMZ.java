@@ -32,10 +32,10 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -216,7 +216,7 @@ public class PlansCreateFromMZ {
 
 				// adding acts/legs
 				if (plan.getPlanElements().size() != 0) { // already lines parsed and added
-					Act from_act = (Act)plan.getPlanElements().get(plan.getPlanElements().size()-1);
+					Activity from_act = (Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 					from_act.setEndTime(departure);
 					from_act.setDuration(from_act.getEndTime()-from_act.getStartTime());
 					Leg leg = plan.createLeg(mode);
@@ -225,9 +225,9 @@ public class PlansCreateFromMZ {
 					leg.setArrivalTime(arrival);
 					CarRoute route = new NodeCarRoute();
 					leg.setRoute(route);
-					route.setDist(distance);
+					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
-					Act act = plan.createAct(acttype,to);
+					Activity act = plan.createAct(acttype,to);
 					act.setStartTime(arrival);
 
 					// coordinate consistency check
@@ -237,7 +237,7 @@ public class PlansCreateFromMZ {
 					}
 				}
 				else {
-					Act homeAct = plan.createAct(HOME,from);
+					Activity homeAct = plan.createAct(HOME,from);
 					homeAct.setEndTime(departure);
 					Leg leg = plan.createLeg(mode);
 					leg.setDepartureTime(departure);
@@ -245,9 +245,9 @@ public class PlansCreateFromMZ {
 					leg.setArrivalTime(arrival);
 					CarRoute route = new NodeCarRoute(); 
 					leg.setRoute(route);
-					route.setDist(distance);
+					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
-					Act act = plan.createAct(acttype,to);
+					Activity act = plan.createAct(acttype,to);
 					act.setStartTime(arrival);
 				}
 			}
@@ -279,9 +279,9 @@ public class PlansCreateFromMZ {
 	private final void setHomeLocations(final Population plans, final Map<Id,String> person_strings) {
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
-			Act home = plan.getFirstActivity();
+			Activity home = plan.getFirstActivity();
 			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
-				Act act = (Act)plan.getPlanElements().get(i);
+				Activity act = (Activity)plan.getPlanElements().get(i);
 				if ((act.getCoord().getX() == home.getCoord().getX()) && (act.getCoord().getY() == home.getCoord().getY())) {
 					if (!act.getType().equals(HOME)) {
 						act.setType(HOME);
@@ -298,7 +298,7 @@ public class PlansCreateFromMZ {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
-			Act last = (Act)plan.getPlanElements().get(plan.getPlanElements().size()-1);
+			Activity last = (Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 			if (!last.getType().equals(HOME)) { ids.add(p.getId()); }
 		}
 		return ids;
@@ -312,7 +312,7 @@ public class PlansCreateFromMZ {
 			Plan plan = p.getSelectedPlan();
 			ActIterator act_it = plan.getIteratorAct();
 			while (act_it.hasNext()) {
-				Act act = (Act)act_it.next();
+				Activity act = (Activity)act_it.next();
 				if (act.getType().equals(OTHR)) { ids.add(p.getId()); }
 			}
 		}
@@ -341,9 +341,9 @@ public class PlansCreateFromMZ {
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			ActIterator act_it = plan.getIteratorAct();
-			Act prev_act = (Act)act_it.next();
+			Activity prev_act = (Activity)act_it.next();
 			while (act_it.hasNext()) {
-				Act curr_act = (Act)act_it.next();
+				Activity curr_act = (Activity)act_it.next();
 				Coord prevc = prev_act.getCoord();
 				Coord currc = curr_act.getCoord();
 				if ((currc.getX()==prevc.getX())&& (currc.getY()==currc.getY())) { ids.add(p.getId()); }
@@ -364,17 +364,17 @@ public class PlansCreateFromMZ {
 			Plan plan = p.getSelectedPlan();
 			Plan plan2 = new org.matsim.population.PlanImpl(p);
 			plan2.setSelected(true);
-			plan2.setScore(plan.getScore());
-			plan2.addAct((Act)plan.getPlanElements().get(0));
+			plan2.setScore(plan.getScoreAsPrimitiveType());
+			plan2.addAct((Activity)plan.getPlanElements().get(0));
 
 			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
-				Act prev_act = (Act)plan.getPlanElements().get(i-2);
+				Activity prev_act = (Activity)plan.getPlanElements().get(i-2);
 				Leg leg = (Leg)plan.getPlanElements().get(i-1);
-				Act curr_act = (Act)plan.getPlanElements().get(i);
+				Activity curr_act = (Activity)plan.getPlanElements().get(i);
 				Coord prevc = prev_act.getCoord();
 				Coord currc = curr_act.getCoord();
 				if ((currc.getX()==prevc.getX())&&(currc.getY()==prevc.getY())) {
-					Act act2 = (Act)plan2.getPlanElements().get(plan2.getPlanElements().size()-1);
+					Activity act2 = (Activity)plan2.getPlanElements().get(plan2.getPlanElements().size()-1);
 					act2.setEndTime(curr_act.getEndTime());
 					act2.setDuration(act2.getEndTime()-act2.getStartTime());
 //					System.out.println("        pid=" + p.getId() + ": merging act_nr="+((i-2)/2)+" with act_nr=" + (i/2) + ".");
@@ -415,7 +415,7 @@ public class PlansCreateFromMZ {
 
 			// complete the last act with time info
 			if (p.getSelectedPlan().getPlanElements().size() == 1) {
-				Act act = (Act)p.getSelectedPlan().getPlanElements().get(0);
+				Activity act = (Activity)p.getSelectedPlan().getPlanElements().get(0);
 				act.setStartTime(0); act.setDuration(24*3600); act.setEndTime(24*3600);
 			}
 		}
@@ -433,7 +433,7 @@ public class PlansCreateFromMZ {
 			LegIterator leg_it = plan.getIteratorLeg();
 			while (leg_it.hasNext()) {
 				Leg leg = (Leg)leg_it.next();
-				if (leg.getRoute().getDist() < 0) { ids.add(p.getId()); }
+				if (leg.getRoute().getDistance() < 0) { ids.add(p.getId()); }
 			}
 		}
 		return ids;
@@ -447,7 +447,7 @@ public class PlansCreateFromMZ {
 			Plan plan = p.getSelectedPlan();
 			ActIterator act_it = plan.getIteratorAct();
 			while (act_it.hasNext()) {
-				Act act = (Act)act_it.next();
+				Activity act = (Activity)act_it.next();
 				if ((act.getCoord().getX()<0) || (act.getCoord().getY()<0)) { ids.add(p.getId()); }
 			}
 		}
@@ -463,7 +463,7 @@ public class PlansCreateFromMZ {
 			LegIterator leg_it = plan.getIteratorLeg();
 			while (leg_it.hasNext()) {
 				Leg leg = (Leg)leg_it.next();
-				if ((leg.getMode().equals(BasicLeg.Mode.walk))&&(leg.getRoute().getDist()>10000.0)) {ids.add(p.getId()); }
+				if ((leg.getMode().equals(BasicLeg.Mode.walk))&&(leg.getRoute().getDistance()>10000.0)) {ids.add(p.getId()); }
 			}
 		}
 		return ids;
@@ -476,7 +476,7 @@ public class PlansCreateFromMZ {
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			for (int i=0; i<plan.getPlanElements().size()-2; i=i+2) {
-				Act act = (Act)plan.getPlanElements().get(i);
+				Activity act = (Activity)plan.getPlanElements().get(i);
 				if (act.getEndTime()<act.getStartTime()) { ids.add(p.getId()); }
 			}
 		}

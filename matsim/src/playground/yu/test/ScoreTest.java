@@ -75,29 +75,29 @@ public class ScoreTest extends AbstractPersonAlgorithm {
 			// worst plan
 			if (worstPlan == null)
 				worstPlan = plan;
-			else if (plan.getScore() < worstPlan.getScore())
+			else if (plan.getScoreAsPrimitiveType() < worstPlan.getScoreAsPrimitiveType())
 				worstPlan = plan;
 			// best plan
 			if (bestPlan == null)
 				bestPlan = plan;
-			else if (plan.getScore() > bestPlan.getScore())
+			else if (plan.getScoreAsPrimitiveType() > bestPlan.getScoreAsPrimitiveType())
 				bestPlan = plan;
 			// avg. score
-			sumScores += plan.getScore();
+			sumScores += plan.getScoreAsPrimitiveType();
 			cntScores++;
 			// executed plan?
 			if (plan.isSelected()) {
-				this.sumExecutedScores += plan.getScore();
+				this.sumExecutedScores += plan.getScoreAsPrimitiveType();
 				this.nofExecutedScores++;
 			}
 		}
 		if (worstPlan != null) {
 			this.nofScoreWorst++;
-			this.sumScoreWorst += worstPlan.getScore();
+			this.sumScoreWorst += worstPlan.getScoreAsPrimitiveType();
 		}
 		if (bestPlan != null) {
 			this.nofScoreBest++;
-			this.sumScoreBest += bestPlan.getScore();
+			this.sumScoreBest += bestPlan.getScoreAsPrimitiveType();
 		}
 		if (cntScores > 0) {
 			this.sumAvgScores += sumScores / cntScores;

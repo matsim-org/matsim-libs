@@ -28,7 +28,7 @@ import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
@@ -43,8 +43,8 @@ import org.matsim.socialnetworks.mentalmap.TimeWindow;
 public class TrackEventsOverlapII implements ActStartEventHandler, ActEndEventHandler {
 
 	LinkedHashMap<Facility,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<Facility,ArrayList<TimeWindow>>();
-	LinkedHashMap<Act,Double> startMap = new LinkedHashMap<Act,Double>();
-	LinkedHashMap<Act,Double> endMap = new LinkedHashMap<Act,Double>();
+	LinkedHashMap<Activity,Double> startMap = new LinkedHashMap<Activity,Double>();
+	LinkedHashMap<Activity,Double> endMap = new LinkedHashMap<Activity,Double>();
 
 	static final private Logger log = Logger.getLogger(TrackEventsOverlapII.class);
 

@@ -30,8 +30,8 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.LocationType;
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.interfaces.basic.v01.BasicNode;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
@@ -222,7 +222,7 @@ public class TransitRouterNetworkWrapper implements Network {
 		}
 
 		public Coord getCoord() {
-			return this.node.stop.getStopFacility().getCenter();
+			return this.node.stop.getStopFacility().getCoord();
 		}
 
 		public Id getId() {
@@ -296,7 +296,7 @@ public class TransitRouterNetworkWrapper implements Network {
 			return this.id;
 		}
 
-		public double getLanes(double time) {
+		public double getNumberOfLanes(double time) {
 			return 1;
 		}
 
@@ -305,7 +305,7 @@ public class TransitRouterNetworkWrapper implements Network {
 		}
 
 		public double getLength() {
-			return this.link.toNode.stop.getStopFacility().calcDistance(this.link.fromNode.stop.getStopFacility().getCenter());
+			return this.link.toNode.stop.getStopFacility().calcDistance(this.link.fromNode.stop.getStopFacility().getCoord());
 		}
 
 		public void setCapacity(double capacity) {
@@ -320,7 +320,7 @@ public class TransitRouterNetworkWrapper implements Network {
 			throw new UnsupportedOperationException();
 		}
 
-		public void setLanes(double lanes) {
+		public void setNumberOfLanes(double lanes) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -372,7 +372,7 @@ public class TransitRouterNetworkWrapper implements Network {
 			throw new UnsupportedOperationException();
 		}
 
-		public Coord getCenter() {
+		public Coord getCoord() {
 			throw new UnsupportedOperationException();
 		}
 

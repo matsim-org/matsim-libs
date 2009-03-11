@@ -20,7 +20,7 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 
@@ -47,7 +47,7 @@ public class PersonRemoveCertainActs extends AbstractPersonAlgorithm {
 
 				int start = size - 3; // index of second last act
 				for (int jj = start; jj >= 1; jj = jj - 2) {
-					Act act = (Act)plan.getPlanElements().get(jj);
+					Activity act = (Activity)plan.getPlanElements().get(jj);
 
 					String act_type = act.getType();
 

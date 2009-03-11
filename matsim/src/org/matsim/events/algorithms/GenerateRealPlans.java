@@ -38,7 +38,7 @@ import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -129,10 +129,10 @@ public class GenerateRealPlans implements ActStartEventHandler,
 				String acttype = "unknown";
 				if (this.oldplans != null) {
 					Person person = this.oldplans.getPerson(new IdImpl(agentId));
-					Act act = (Act)(person.getSelectedPlan().getPlanElements().get(plan.getPlanElements().size()));
+					Activity act = (Activity)(person.getSelectedPlan().getPlanElements().get(plan.getPlanElements().size()));
 					acttype = act.getType();
 				}
-				Act a = plan.createAct(acttype, event.link);
+				Activity a = plan.createAct(acttype, event.link);
 				a.setStartTime(starttime);
 				a.setEndTime(endtime);
 				a.setDuration(endtime - starttime);
@@ -179,9 +179,9 @@ public class GenerateRealPlans implements ActStartEventHandler,
 			if (link == null) {
 				Plan oldPlan = getOldPlanForPerson(agentId);
 				int idx = plan.getPlanElements().size() - 2;
-				link = ((Act)oldPlan.getPlanElements().get(idx)).getLink();
+				link = ((Activity)oldPlan.getPlanElements().get(idx)).getLink();
 			}
-			Act a = plan.createAct("stuck", link);
+			Activity a = plan.createAct("stuck", link);
 			a.setStartTime(time);
 			a.setEndTime(time);
 		} catch (Exception e) {
@@ -198,11 +198,11 @@ public class GenerateRealPlans implements ActStartEventHandler,
 		}
 		try {
 			if (event.act == null) {
-				Act a = plan.createAct("unknown", event.link);
+				Activity a = plan.createAct("unknown", event.link);
 				a.setStartTime(event.time);
 				a.setEndTime(event.time);
 			} else {
-				Act a = plan.createAct(event.act.getType(), event.act.getLink());
+				Activity a = plan.createAct(event.act.getType(), event.act.getLink());
 				a.setStartTime(event.time);
 				a.setEndTime(event.time);
 			}
@@ -223,10 +223,10 @@ public class GenerateRealPlans implements ActStartEventHandler,
 			// so create this first activity now with an assumed start-time of midnight
 			try {
 				if (event.act == null) {
-					Act a = plan.createAct("unknown", event.link);
+					Activity a = plan.createAct("unknown", event.link);
 					a.setEndTime(event.time);
 				} else {
-					Act a = plan.createAct(event.act.getType(), event.act.getLink());
+					Activity a = plan.createAct(event.act.getType(), event.act.getLink());
 					a.setEndTime(event.time);
 				}
 			} catch (Exception e) {
@@ -234,7 +234,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 			}
 		}
 		try {
-			Act act = (Act)plan.getPlanElements().get(plan.getPlanElements().size() - 1);
+			Activity act = (Activity)plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 			act.setDuration(event.time - act.getStartTime());
 			act.setEndTime(event.time);
 		} catch (Exception e) {
@@ -311,8 +311,8 @@ public class GenerateRealPlans implements ActStartEventHandler,
 				// the person does not have any activity at all
 				try {
 					Plan oldPlan = getPlanForPerson(person);
-					Act act = (Act)oldPlan.getPlanElements().get(0);
-					Act act2 = plan.createAct(act.getType(), act.getLink());
+					Activity act = (Activity)oldPlan.getPlanElements().get(0);
+					Activity act2 = plan.createAct(act.getType(), act.getLink());
 					act2.setStartTime(0.0);
 					act2.setEndTime(24.0*3600);
 					act2.setDuration(24.0*3600);
@@ -322,7 +322,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 			} else if (plan.getPlanElements().size() % 2 == 0) {
 				// the final act seems missing
 				try {
-					Act act = (Act)plan.getPlanElements().get(0);
+					Activity act = (Activity)plan.getPlanElements().get(0);
 					Leg leg = (Leg)plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 					double startTime = leg.getArrivalTime();
 					double endTime = 24*3600;
@@ -333,7 +333,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 					if (endTime < startTime) {
 						endTime = startTime + 900; // startTime+15min
 					}
-					Act act2 = plan.createAct(act.getType(), act.getLink());
+					Activity act2 = plan.createAct(act.getType(), act.getLink());
 					act2.setStartTime(startTime);
 					act2.setEndTime(endTime);
 					act2.setDuration(endTime - startTime);
@@ -342,7 +342,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 				}
 			} else {
 				// we have a final act, make sure it ends at 24:00
-				Act act = (Act)plan.getPlanElements().get(plan.getPlanElements().size() - 1);
+				Activity act = (Activity)plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 				act.setEndTime(24*3600);
 				act.setDuration(act.getEndTime() - act.getStartTime());
 			}

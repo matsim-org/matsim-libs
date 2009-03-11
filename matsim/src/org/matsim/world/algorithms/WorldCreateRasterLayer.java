@@ -26,8 +26,8 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Location;
 import org.matsim.world.World;
@@ -121,7 +121,7 @@ public class WorldCreateRasterLayer {
 			ArrayList<Location> lowers = new ArrayList<Location>();
 			boolean found = false;
 			for (Location lower : layer.getLocations().values()) {
-				if (upper.calcDistance(lower.getCenter()) == 0.0) {
+				if (upper.calcDistance(lower.getCoord()) == 0.0) {
 					lowers.add(lower);
 					if (lower.getUpMapping().isEmpty()) {
 						lower.addUpMapping(upper);

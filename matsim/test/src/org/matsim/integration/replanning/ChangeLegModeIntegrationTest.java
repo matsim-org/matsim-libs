@@ -25,7 +25,7 @@ import org.matsim.config.Config;
 import org.matsim.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.controler.Controler;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
@@ -66,7 +66,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		Person person = new PersonImpl(new IdImpl(1));
 		population.addPerson(person);
 		Plan plan = person.createPlan(true);
-		Act act = plan.createAct("home", new CoordImpl(0, 0));
+		Activity act = plan.createAct("home", new CoordImpl(0, 0));
 		act.setLink(link);
 		act.setEndTime(8.0 * 3600);
 		plan.createLeg(BasicLeg.Mode.car);

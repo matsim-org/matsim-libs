@@ -51,11 +51,11 @@ public class BasicRouteImpl implements BasicRoute {
 	}
 	
 	
-	public double getDist() {
+	public double getDistance() {
 		return dist;
 	}
 
-	public final void setDist(final double dist) {
+	public final void setDistance(final double dist) {
 		this.dist = dist;
 	}
 

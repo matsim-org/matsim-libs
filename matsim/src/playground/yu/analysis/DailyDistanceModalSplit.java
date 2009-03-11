@@ -82,7 +82,7 @@ public class DailyDistanceModalSplit extends AbstractPersonAlgorithm implements
 		String carAvail = this.person.getCarAvail();
 		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
 			Leg leg = (Leg) li.next();
-			double legDist = leg.getRoute().getDist() / 1000.0;
+			double legDist = leg.getRoute().getDistance() / 1000.0;
 			if (Integer.parseInt(this.person.getId().toString()) < 1000000000
 					&& leg.getDepartureTime() < 86400)
 				if (leg.getMode().equals(Mode.car)) {

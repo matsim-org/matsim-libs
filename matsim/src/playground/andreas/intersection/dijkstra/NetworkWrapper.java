@@ -40,7 +40,7 @@ public class NetworkWrapper {
 							outLink.getLength(),
 							outLink.getFreespeed(Time.UNDEFINED_TIME),
 							outLink.getCapacity(Time.UNDEFINED_TIME),
-							outLink.getLanes(Time.UNDEFINED_TIME));
+							outLink.getNumberOfLanes(Time.UNDEFINED_TIME));
 					link.setType(outLink.getType());
 					numberOfLinksGenerated++;
 				}

@@ -11,9 +11,9 @@ import java.util.Map;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -128,7 +128,7 @@ public class Converter {
 					tmpCoord = this.tmpHome;
 				}
 
-				Act act = pl.createAct(tabs[7], tmpCoord);
+				Activity act = pl.createAct(tabs[7], tmpCoord);
 				act.setEndTime(convertTime(tabs[3]));
 				act.setDuration(dur);
 
@@ -149,7 +149,7 @@ public class Converter {
 					if (this.tmpTabs[10].equals("H")) {
 						tmpCoord2 = this.tmpHome;
 					}
-					Act lastAct = tmpPl.createAct(this.tmpTabs[10], tmpCoord2);
+					Activity lastAct = tmpPl.createAct(this.tmpTabs[10], tmpCoord2);
 
 					// make a copy of the just finished plan and set it to use public transit mode
 					Plan nonCarPlan = new org.matsim.population.PlanImpl(p);
@@ -166,7 +166,7 @@ public class Converter {
 				endTime = convertTime(tabs[3]);
 
 				this.tmpHome = getRandomCoordInZone(tabs[9]);
-				Act homeAct = pl.createAct(tabs[7], this.tmpHome);
+				Activity homeAct = pl.createAct(tabs[7], this.tmpHome);
 				homeAct.setEndTime(convertTime(tabs[3]));
 				p.addPlan(pl);
 				this.pop.addPerson(p);

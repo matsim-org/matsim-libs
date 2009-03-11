@@ -26,8 +26,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -136,13 +136,13 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		if (person.getLicense().equals(YES)) { model.setLicenseOwnership(true); } else { model.setLicenseOwnership(false); }
 
 		// disthw
-		Coord h_coord = person.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility().getCenter();
+		Coord h_coord = person.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility().getCoord();
 		ArrayList<ActivityOption> prim_acts = new ArrayList<ActivityOption>();
 		prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W2));
 		prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W3));
 		if (prim_acts.isEmpty()) { model.setDistanceHome2Work(0.0); }
 		else {
-			Coord p_coord = prim_acts.get(MatsimRandom.random.nextInt(prim_acts.size())).getFacility().getCenter();
+			Coord p_coord = prim_acts.get(MatsimRandom.random.nextInt(prim_acts.size())).getFacility().getCoord();
 			model.setDistanceHome2Work(h_coord.calcDistance(p_coord));
 		}
 

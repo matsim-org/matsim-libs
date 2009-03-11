@@ -21,6 +21,8 @@ package org.matsim.basic.v01;
 
 import java.util.List;
 
+import org.matsim.interfaces.basic.v01.BasicActivityOption;
+
 /**
  * @author dgrether
  */

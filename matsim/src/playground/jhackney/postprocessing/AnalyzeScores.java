@@ -25,7 +25,7 @@ import java.util.LinkedHashMap;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
@@ -77,7 +77,7 @@ public class AnalyzeScores {
 		Events events = new Events();
 		EventsMapStartEndTimes epp;
 		MakeTimeWindowsFromEvents teo=null;
-		LinkedHashMap<Act,ArrayList<Double>> actStats=null;
+		LinkedHashMap<Activity,ArrayList<Double>> actStats=null;
 		LinkedHashMap<Facility,ArrayList<TimeWindow>> twm=null;
 		playground.jhackney.scoring.EventsToScoreAndReport scoring =null;
 		

@@ -26,8 +26,8 @@ import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -77,9 +77,9 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		Coord home_coord = null;
 		Coord work_coord = null;
 		act_it.hasNext(); // first act is always 'home'
-		Act prev_act = (Act)act_it.next();
+		Activity prev_act = (Activity)act_it.next();
 		while (act_it.hasNext()) {
-			Act act = (Act)act_it.next();
+			Activity act = (Activity)act_it.next();
 			if (H.equals(act.getType())) { home_coord = act.getCoord(); }
 			else if (W.equals(act.getType())) { work_coord = act.getCoord(); }
 			plan_dist += act.getCoord().calcDistance(prev_act.getCoord());

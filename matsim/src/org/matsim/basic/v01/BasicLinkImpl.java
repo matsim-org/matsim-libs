@@ -22,8 +22,8 @@ package org.matsim.basic.v01;
 
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.interfaces.basic.v01.BasicNode;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.AbstractLocation;
@@ -118,7 +118,7 @@ implements BasicLink
 		this.length = length;
 	}
 
-	public double getLanes(final double time) {
+	public double getNumberOfLanes(final double time) {
 		return this.nofLanes;
 	}
 
@@ -126,7 +126,7 @@ implements BasicLink
 		return Math.round((float)Math.max(this.nofLanes,1.0d));
 	}
 
-	public void setLanes(final double lanes) {
+	public void setNumberOfLanes(final double lanes) {
 		this.nofLanes = lanes;
 	}
 

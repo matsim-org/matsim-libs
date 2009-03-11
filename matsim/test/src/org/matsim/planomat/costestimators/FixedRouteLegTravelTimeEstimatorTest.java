@@ -33,7 +33,7 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -64,8 +64,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 	protected Person testPerson = null;
 	protected Plan testPlan = null;
 	protected Leg testLeg = null;
-	protected Act originAct = null;
-	protected Act destinationAct = null;
+	protected Activity originAct = null;
+	protected Activity destinationAct = null;
 
 	protected TravelTimeCalculator linkTravelTimeEstimator = null;
 	protected TravelCost linkTravelCostEstimator = null;
@@ -104,8 +104,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		ArrayList<Object> actsLegs = this.testPlan.getPlanElements();
 		this.testLeg = (Leg) actsLegs.get(TEST_LEG_NR + 1);
 		// activities before and after leg
-		this.originAct = (Act) actsLegs.get(TEST_LEG_NR);
-		this.destinationAct = (Act) actsLegs.get(TEST_LEG_NR + 2);
+		this.originAct = (Activity) actsLegs.get(TEST_LEG_NR);
+		this.destinationAct = (Activity) actsLegs.get(TEST_LEG_NR + 2);
 
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network, TIME_BIN_SIZE);
 		this.linkTravelTimeEstimator = new TravelTimeCalculator(this.network, TIME_BIN_SIZE);

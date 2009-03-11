@@ -126,8 +126,8 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 					FacilityPenalty facilityPenalty = facilityPenalties.get(facility.getId());
 												
 					out.write(facility.getId().toString() + "\t"+
-							facility.getCenter().getX() + "\t"+
-							facility.getCenter().getY() + "\t"+
+							facility.getCoord().getX() + "\t"+
+							facility.getCoord().getY() + "\t"+
 							facilityPenalty.getFacilityLoad().getNumberOfVisitorsPerDay() + "\t" +
 							facilityPenalty.getFacilityLoad().getAllVisitors() + "\t" +
 							facilityPenalty.getCapacity() + "\t" +

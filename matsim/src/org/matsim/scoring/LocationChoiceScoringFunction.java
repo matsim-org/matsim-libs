@@ -26,7 +26,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
@@ -59,7 +59,7 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 		this.penalty.clear();
 	}
 
-	protected double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
+	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
 		ActUtilityParameters params = this.params.utilParams.get(act.getType());
 		if (params == null) {

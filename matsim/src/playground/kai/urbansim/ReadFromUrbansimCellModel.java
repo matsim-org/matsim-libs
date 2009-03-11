@@ -11,8 +11,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
@@ -131,7 +131,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 					line = reader.readLine(); // next line
 					continue ;
 				}
-				Coord homeCoord = homeLocation.getCenter() ;
+				Coord homeCoord = homeLocation.getCoord() ;
 
 				// generate persons only after it's clear that they have a home location:
 				for ( int ii=0 ; ii<nPersons ; ii++ ) {

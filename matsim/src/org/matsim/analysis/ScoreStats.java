@@ -121,24 +121,24 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 				// worst plan
 				if (worstPlan == null) {
 					worstPlan = plan;
-				} else if (plan.getScore() < worstPlan.getScore()) {
+				} else if (plan.getScoreAsPrimitiveType() < worstPlan.getScoreAsPrimitiveType()) {
 					worstPlan = plan;
 				}
 
 				// best plan
 				if (bestPlan == null) {
 					bestPlan = plan;
-				} else if (plan.getScore() > bestPlan.getScore()) {
+				} else if (plan.getScoreAsPrimitiveType() > bestPlan.getScoreAsPrimitiveType()) {
 					bestPlan = plan;
 				}
 
 				// avg. score
-				sumScores += plan.getScore();
+				sumScores += plan.getScoreAsPrimitiveType();
 				cntScores++;
 
 				// executed plan?
 				if (plan.isSelected()) {
-					sumExecutedScores += plan.getScore();
+					sumExecutedScores += plan.getScoreAsPrimitiveType();
 					nofExecutedScores++;
 					if (plan.getType() == Plan.Type.CAR) {
 						nofExecutedIvPlans ++;
@@ -151,11 +151,11 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 
 			if (worstPlan != null) {
 				nofScoreWorst++;
-				sumScoreWorst += worstPlan.getScore();
+				sumScoreWorst += worstPlan.getScoreAsPrimitiveType();
 			}
 			if (bestPlan != null) {
 				nofScoreBest++;
-				sumScoreBest += bestPlan.getScore();
+				sumScoreBest += bestPlan.getScoreAsPrimitiveType();
 			}
 			if (cntScores > 0) {
 				sumAvgScores += (sumScores / cntScores);

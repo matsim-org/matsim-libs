@@ -28,10 +28,10 @@ import java.util.Set;
 import org.matsim.controler.ScenarioData;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
@@ -57,7 +57,7 @@ public class ScenarioCut {
 	
 	private static boolean isInside(Facility f) {
 		if (f == null) { return false; }
-		Coord c = f.getCenter();
+		Coord c = f.getCoord();
 		if (c.getX() < min.getX()) { return false; }
 		if (c.getX() > max.getX()) { return false; }
 		if (c.getY() < min.getY()) { return false; }
@@ -89,7 +89,7 @@ public class ScenarioCut {
 			List<Plan> plans = person.getPlans();
 			for (Plan plan : plans) {
 				for (int i=0, n=plan.getPlanElements().size(); i<n; i+=2) {
-					Act act = (Act)plan.getPlanElements().get(i);
+					Activity act = (Activity)plan.getPlanElements().get(i);
 					Facility f = act.getFacility();
 					if (!isInside(f)) { toRemove.add(person.getId()); break; }
 				}
@@ -105,7 +105,7 @@ public class ScenarioCut {
 			for (Plan plan : p.getPlans()) {
 				for (int i=0, n=plan.getPlanElements().size(); i<n; i++) {
 					if (i%2 == 1) { ((Leg)plan.getPlanElements().get(i)).setRoute(null); }
-					else { ((Act)plan.getPlanElements().get(i)).setLink(null); }
+					else { ((Activity)plan.getPlanElements().get(i)).setLink(null); }
 				}
 			}
 		}
@@ -114,7 +114,7 @@ public class ScenarioCut {
 		System.out.println("remove facilities... " + (new Date()));
 		toRemove.clear();
 		for (Facility f : facilities.getFacilities().values()) {
-			Coord c = f.getCenter();
+			Coord c = f.getCoord();
 			if (c.getX() < min.getX()) { toRemove.add(f.getId()); continue; }
 			if (c.getX() > max.getX()) { toRemove.add(f.getId()); continue; }
 			if (c.getY() < min.getY()) { toRemove.add(f.getId()); continue; }
@@ -157,7 +157,7 @@ public class ScenarioCut {
 		for (Person p : population.getPersons().values()) {
 			for (Plan plan : p.getPlans()) {
 				for (int i=0, n=plan.getPlanElements().size(); i<n; i+=2) {
-					Act act = (Act)plan.getPlanElements().get(i);
+					Activity act = (Activity)plan.getPlanElements().get(i);
 					act.setLink(act.getFacility().getLink());
 				}
 			}

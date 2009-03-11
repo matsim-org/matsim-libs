@@ -27,7 +27,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -103,7 +103,7 @@ public class ActChainsPlansAnalyzer {
 
 				int countSL = 0;
 				for (int j = 0; j < actslegs.size(); j=j+2) {
-					final Act act = (Act)actslegs.get(j);
+					final Activity act = (Activity)actslegs.get(j);
 					if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
 						countSL++;
 					}

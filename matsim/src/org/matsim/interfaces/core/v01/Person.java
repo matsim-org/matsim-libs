@@ -19,14 +19,18 @@
 
 package org.matsim.interfaces.core.v01;
 
+import java.util.TreeSet;
+
 import org.matsim.interfaces.basic.v01.BasicPerson;
+import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.population.Desires;
 import org.matsim.population.Knowledge;
 import org.matsim.utils.customize.Customizable;
 
 /**
  * @author dgrether
  */
-public interface Person extends BasicPerson<Plan, Knowledge>, Customizable{
+public interface Person extends BasicPerson<Plan>, Customizable{
 	
 	public Plan createPlan(final boolean selected);
 	
@@ -102,6 +106,57 @@ public interface Person extends BasicPerson<Plan, Knowledge>, Customizable{
 	public void setHousehold(Household hh);
 	
 	public Household getHousehold();
+
+	
+	
+	public String getSex();
+
+	public int getAge();
+
+	public String getLicense();
+
+	public boolean hasLicense();
+
+	public String getCarAvail();
+
+	/**
+	 * @return "yes" if the person has a job
+	 * @deprecated use {@link #isEmployed()}
+	 */
+	@Deprecated
+	public String getEmployed();
+
+	public boolean isEmployed();
+	// TODO [kn]: need setter
+
+	public void setAge(final int age);
+
+	public void setSex(final String sex);
+
+	public void setLicence(final String licence);
+
+	public void setCarAvail(final String carAvail);
+
+	public void setEmployed(final String employed);
+
+//	public Knowledge createKnowledge(final String desc);
+
+	@Deprecated // should either be in Builder, or not there at all (too new)
+	public Desires createDesires(final String desc);
+
+	public void addTravelcard(final String type);
+
+	public TreeSet<String> getTravelcards();
+
+	@Deprecated // not yet well enough understood
+	public Knowledge getKnowledge();
+
+	@Deprecated // not yet well enough understood
+	public Desires getDesires();
+
+	public Id getFiscalHouseholdId();
+
+	
 	
 }
 

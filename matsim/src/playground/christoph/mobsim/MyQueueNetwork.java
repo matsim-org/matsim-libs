@@ -28,7 +28,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.mobsim.queuesim.PersonAgent;
@@ -183,7 +183,7 @@ public class MyQueueNetwork extends QueueNetwork{
 	{
 		// Act End Replanning Objects
 		ArrayList<QueueVehicle> vehiclesToReplanActEnd = new ArrayList<QueueVehicle>();
-		ArrayList<Act> fromActActEnd = new ArrayList<Act>();
+		ArrayList<Activity> fromActActEnd = new ArrayList<Activity>();
 		/*
 		 * Checking only Links that leed to active Nodes is not allowed here!
 		 * If a Person enters an inative Link, this Link is reactivated - but
@@ -213,7 +213,7 @@ public class MyQueueNetwork extends QueueNetwork{
 						vehiclesToReplanActEnd.add(vehicle);
 						
 						PersonAgent personAgent = vehicle.getDriver();
-						Act fromAct = (Act)personAgent.getActsLegs().get(personAgent.getNextActivity() - 2);
+						Activity fromAct = (Activity)personAgent.getActsLegs().get(personAgent.getNextActivity() - 2);
 						fromActActEnd.add(fromAct);
 						if (fromAct == null) log.error("Found fromAct that is null!");
 					}
@@ -249,7 +249,7 @@ public class MyQueueNetwork extends QueueNetwork{
 	{
 		// Act End Replanning Objects
 		ArrayList<QueueVehicle> vehiclesToReplanActEnd = new ArrayList<QueueVehicle>();
-		ArrayList<Act> fromActActEnd = new ArrayList<Act>();
+		ArrayList<Activity> fromActActEnd = new ArrayList<Activity>();
 		/*
 		 * Checking if the current QueueNode is active is not allowed here!
 		 * A Node may be inactive when an Agent ends his Activity at one of the
@@ -283,7 +283,7 @@ public class MyQueueNetwork extends QueueNetwork{
 							vehiclesToReplanActEnd.add(vehicle);
 							
 							PersonAgent personAgent = vehicle.getDriver();
-							Act fromAct = (Act)personAgent.getActsLegs().get(personAgent.getNextActivity() - 2);
+							Activity fromAct = (Activity)personAgent.getActsLegs().get(personAgent.getNextActivity() - 2);
 							fromActActEnd.add(fromAct);
 							if (fromAct == null) log.error("Found fromAct that is null!");
 						}

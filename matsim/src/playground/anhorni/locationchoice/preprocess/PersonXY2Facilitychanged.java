@@ -26,8 +26,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
@@ -97,10 +97,10 @@ public class PersonXY2Facilitychanged extends AbstractPersonAlgorithm implements
 					if (f.getActivityOptions().keySet().contains(type_set[j])) { ok = true; }
 				}
 				if (ok) {
-					if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-					if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-					if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-					if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+					if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+					if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+					if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+					if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 				}
 			}
 			minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
@@ -112,7 +112,7 @@ public class PersonXY2Facilitychanged extends AbstractPersonAlgorithm implements
 				for (int j=0; j<type_set.length; j++) {
 					if (f.getActivityOptions().keySet().contains(type_set[j])) { ok = true; }
 				}
-				if (ok) { qt.put(f.getCenter().getX(),f.getCenter().getY(),f); }
+				if (ok) { qt.put(f.getCoord().getX(),f.getCoord().getY(),f); }
 			}
 			log.info("        "+qt.size()+" facilities of type="+types[i]+" added.");
 			this.fqts.put(types[i],qt);
@@ -152,7 +152,7 @@ public class PersonXY2Facilitychanged extends AbstractPersonAlgorithm implements
 	public void run(Plan plan) {
 		Iterator<?> act_it = plan.getIteratorAct();
 		while (act_it.hasNext()) {
-			Act act = (Act)act_it.next();
+			Activity act = (Activity)act_it.next();
 			Coord coord = act.getCoord();
 			QuadTree<Facility> qt = null;
 			if (act.getType().startsWith(H)) { qt = this.fqts.get(H); }
@@ -171,7 +171,7 @@ public class PersonXY2Facilitychanged extends AbstractPersonAlgorithm implements
 
 			act.setFacility(f);
 			act.setLink(l);
-			Coord coord_f = f.getCenter();
+			Coord coord_f = f.getCoord();
 			act.setCoord(coord_f);
 		}
 	}

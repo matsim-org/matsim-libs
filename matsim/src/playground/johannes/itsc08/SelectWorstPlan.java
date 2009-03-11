@@ -40,9 +40,9 @@ public class SelectWorstPlan implements PlanSelector {
 		Plan worst = null;
 		double worstScore = Double.MAX_VALUE;
 		for(Plan p : person.getPlans()) {
-			if(p.getScore() < worstScore) {
+			if(p.getScoreAsPrimitiveType() < worstScore) {
 				worst = p;
-				worstScore = p.getScore();
+				worstScore = p.getScoreAsPrimitiveType();
 			}
 		}
 		return worst;

@@ -24,7 +24,7 @@ package playground.mfeil;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
@@ -103,7 +103,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 				for (int x=0;x<agents.getAgentPlan(j).getPlanElements().size()-2;x=x+2){
 					// try statement with print block to analyze some strange exceptions in Zurich scenario
 					try {
-					if (((Act)(agents.getAgentPlan(j).getPlanElements().get(x))).getType().equals(plan.getPerson().getKnowledge().getActivities(true).get(i).getType())){
+					if (((Activity)(agents.getAgentPlan(j).getPlanElements().get(x))).getType().equals(plan.getPerson().getKnowledge().getActivities(true).get(i).getType())){
 						in = true;
 						break;
 					}
@@ -111,7 +111,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 						log.warn(e);
 						System.out.println("Acts im Plan des schon optimierten Agenten:");
 						for (int k=0;k<agents.getAgentPlan(j).getPlanElements().size();k++) {
-							if (agents.getAgentPlan(j).getPlanElements().get(k).getClass().getName().equals("org.matsim.population.Act")) System.out.print(((Act)(agents.getAgentPlan(j).getPlanElements().get(k))).getType()+" ");
+							if (agents.getAgentPlan(j).getPlanElements().get(k).getClass().getName().equals("org.matsim.population.Act")) System.out.print(((Activity)(agents.getAgentPlan(j).getPlanElements().get(k))).getType()+" ");
 							else System.out.print(((Leg)(agents.getAgentPlan(j).getPlanElements().get(k))).getMode()+" ");
 						}
 						System.out.println();
@@ -181,20 +181,20 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 				double tmpDistance=0;
 				if (plan.getPerson().getKnowledge().getActivities(true).size()>1){
 					for (int k=0;k<plan.getPerson().getKnowledge().getActivities(true).size()-1;k++){
-						tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCenter());
+						tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCoord().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCoord());
 					}
-					tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(plan.getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter());
+					tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(plan.getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCoord().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord());
 				}
 				distanceAgent+=	this.coefficients.getSingleCoef("primActsDistance")*(java.lang.Math.abs(tmpDistance-this.module.getOptimizedAgents().getAgentDistance(j)));		
 			}
 			
 			// Distance between home location of potential agent to copy from and home location of agent in question
 			if (this.homeLocation=="yes"){			
-				double homelocationAgentX = plan.getPerson().getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getX();
-				double homelocationAgentY = plan.getPerson().getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getY();
+				double homelocationAgentX = plan.getPerson().getKnowledge().getActivities("home", true).get(0).getFacility().getCoord().getX();
+				double homelocationAgentY = plan.getPerson().getKnowledge().getActivities("home", true).get(0).getFacility().getCoord().getY();
 			
-				distanceAgent += this.coefficients.getSingleCoef("homeLocationDistance")*java.lang.Math.sqrt(java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getX()-homelocationAgentX),2)+
-						java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getY()-homelocationAgentY),2));
+				distanceAgent += this.coefficients.getSingleCoef("homeLocationDistance")*java.lang.Math.sqrt(java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCoord().getX()-homelocationAgentX),2)+
+						java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCoord().getY()-homelocationAgentY),2));
 			}
 			
 			// TODO @mfeil: exception handling missing
@@ -237,9 +237,9 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 			ArrayList<String> prt = new ArrayList<String>();
 			prt.add(""+plan.getPerson().getId().toString());
 			prt.add(""+agents.getAgentPerson(assignedAgent).getId().toString());
-			prt.add(""+plan.getScore());
+			prt.add(""+plan.getScoreAsPrimitiveType());
 			for (int y=0;y<plan.getPlanElements().size();y+=2){
-				prt.add(((Act)(plan.getPlanElements().get(y))).getType());
+				prt.add(((Activity)(plan.getPlanElements().get(y))).getType());
 			}
 			Statistics.list.add(prt);	
 		}	

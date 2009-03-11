@@ -210,7 +210,7 @@ public class QueueLane implements Comparable<QueueLane> {
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 
 		// first guess at storageCapacity:
-		this.storageCapacity = (this.length_m * this.queueLink.getLink().getLanes(time))
+		this.storageCapacity = (this.length_m * this.queueLink.getLink().getNumberOfLanes(time))
 				/ ((NetworkLayer) this.queueLink.getLink().getLayer()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
@@ -246,7 +246,7 @@ public class QueueLane implements Comparable<QueueLane> {
 			double numberOfRepresentedLanes) {
 		/*variable was given as parameter in original but the method was called everywhere with the expression below, 
 		 * TODO Check if this is correct! dg[jan09]*/
-		double averageSimulatedFlowCapacityPerLane_Veh_s = this.queueLink.getSimulatedFlowCapacity() / this.queueLink.getLink().getLanes(Time.UNDEFINED_TIME);
+		double averageSimulatedFlowCapacityPerLane_Veh_s = this.queueLink.getSimulatedFlowCapacity() / this.queueLink.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
 		
 		if(laneLength_m < 15){
 			log.warn("Length of one of link " + this.queueLink.getLink().getId() + " sublinks is less than 15m." +

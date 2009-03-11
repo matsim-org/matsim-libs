@@ -26,15 +26,7 @@ import java.util.Map;
 /**
  * A topological representation of an network node.
  */
-public interface BasicNode {
-
-  /**
-   * Returns a non-<code>null</code> instance of <code>IdI</code> that
-   * uniquely identifies this object.
-   *
-   * @return this object's identifier
-   */
-  public Id getId();
+public interface BasicNode extends BasicLocation {
 
     /**
      * Adds a non-<code>null</code> link to this node's set of ingoing links.
@@ -81,5 +73,4 @@ public interface BasicNode {
      */
     public Map<Id, ? extends BasicLink> getOutLinks();
 
-    public Coord getCoord();
 }

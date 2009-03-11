@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicAct;
+import org.matsim.interfaces.basic.v01.BasicActivity;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.CarRoute;
@@ -334,7 +334,7 @@ public class KMLPersonWriter {
 				
 				while(iterator.hasNext())
 				{
-					BasicAct act = iterator.next();
+					BasicActivity act = iterator.next();
 									
 					activityLinks.add(network.getLink(act.getLinkId()));
 				}

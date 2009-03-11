@@ -40,7 +40,7 @@ public class NetworkCalcLanes {
 			else if (cap1h <= 6000) lanes = 3;
 			else if (cap1h <= 8500) lanes = 4;
 			else lanes = 5;
-			link.setLanes(lanes);
+			link.setNumberOfLanes(lanes);
 		}
 	}
 }

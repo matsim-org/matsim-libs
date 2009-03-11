@@ -27,9 +27,9 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
@@ -87,10 +87,10 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 				if (a.getType().equals(CAtts.ACT_S1) || a.getType().equals(CAtts.ACT_S2) || a.getType().equals(CAtts.ACT_S3) ||
 				    a.getType().equals(CAtts.ACT_S4) || a.getType().equals(CAtts.ACT_S5) || a.getType().equals(CAtts.ACT_SOTHR)) {
 					acts.add(a);
-					if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-					if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-					if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-					if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+					if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+					if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+					if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+					if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 				}
 			}
 		}
@@ -101,7 +101,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		log.info("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.shopActQuadTree = new QuadTree<ActivityOption>(minx, miny, maxx, maxy);
 		for (ActivityOption a : acts) {
-			this.shopActQuadTree.put(a.getFacility().getCenter().getX(),a.getFacility().getCenter().getY(),a);
+			this.shopActQuadTree.put(a.getFacility().getCoord().getX(),a.getFacility().getCoord().getY(),a);
 		}
 		log.info("      done.");
 	}
@@ -117,10 +117,10 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			for (ActivityOption a : f.getActivityOptions().values()) {
 				if (a.getType().equals(CAtts.ACT_LC) || a.getType().equals(CAtts.ACT_LG) || a.getType().equals(CAtts.ACT_LS)) {
 					acts.add(a);
-					if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-					if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-					if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-					if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+					if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+					if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+					if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+					if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 				}
 			}
 		}
@@ -131,7 +131,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		log.info("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.leisActQuadTree = new QuadTree<ActivityOption>(minx, miny, maxx, maxy);
 		for (ActivityOption a : acts) {
-			this.leisActQuadTree.put(a.getFacility().getCenter().getX(),a.getFacility().getCenter().getY(),a);
+			this.leisActQuadTree.put(a.getFacility().getCoord().getX(),a.getFacility().getCoord().getY(),a);
 		}
 		log.info("      done.");
 	}
@@ -204,9 +204,9 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void assignRemainingLocations(Act act, Facility start, Facility end) {
-		Coord c_start = start.getCenter();
-		Coord c_end   = end.getCenter();
+	private final void assignRemainingLocations(Activity act, Facility start, Facility end) {
+		Coord c_start = start.getCoord();
+		Coord c_end   = end.getCoord();
 
 		double dx = c_end.getX() - c_start.getX();
 		double dy = c_end.getX() - c_start.getX();
@@ -217,7 +217,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			ActivityOption activity = this.getActivity(c_start,r,act.getType());
 			act.setType(activity.getType());
 			act.setFacility(activity.getFacility());
-			act.setCoord(act.getFacility().getCenter());
+			act.setCoord(act.getFacility().getCoord());
 		}
 		else {
 			// c_start and c_end different
@@ -229,26 +229,26 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			ActivityOption activity = this.getActivity(c1,c2,r,act.getType());
 			act.setType(activity.getType());
 			act.setFacility(activity.getFacility());
-			act.setCoord(act.getFacility().getCenter());
+			act.setCoord(act.getFacility().getCoord());
 		}
 	}
 	
 	private final void assignRemainingLocations(Plan plan, int start, int end) {
-		Coord c_start = ((Act)plan.getPlanElements().get(start)).getFacility().getCenter();
-		Coord c_end   = ((Act)plan.getPlanElements().get(end)).getFacility().getCenter();
+		Coord c_start = ((Activity)plan.getPlanElements().get(start)).getFacility().getCoord();
+		Coord c_end   = ((Activity)plan.getPlanElements().get(end)).getFacility().getCoord();
 		
 		double dx = c_end.getX() - c_start.getX();
 		double dy = c_end.getX() - c_start.getX();
 		if ((dx == 0.0) && (dy == 0.0)) {
 			// c_start and c_end equal
-			Zone z = (Zone)((Act)plan.getPlanElements().get(start)).getFacility().getUpMapping().values().iterator().next();
+			Zone z = (Zone)((Activity)plan.getPlanElements().get(start)).getFacility().getUpMapping().values().iterator().next();
 			double r = 0.5*Math.sqrt((z.getMax().getX()-z.getMin().getX())*(z.getMax().getY()-z.getMin().getY()));
 			for (int i=start+2; i<end; i=i+2) {
-				Act act = (Act)plan.getPlanElements().get(i);
+				Activity act = (Activity)plan.getPlanElements().get(i);
 				ActivityOption activity = this.getActivity(c_start,r,act.getType());
 				act.setType(activity.getType());
 				act.setFacility(activity.getFacility());
-				act.setCoord(act.getFacility().getCenter());
+				act.setCoord(act.getFacility().getCoord());
 			}
 		}
 		else {
@@ -259,11 +259,11 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			Coord c1 = new CoordImpl(c_start.getX()+dx,c_start.getY()+dy);
 			Coord c2 = new CoordImpl(c_end.getX()-dx,c_end.getY()+dy);
 			for (int i=start+2; i<end; i=i+2) {
-				Act act = (Act)plan.getPlanElements().get(i);
+				Activity act = (Activity)plan.getPlanElements().get(i);
 				ActivityOption activity = this.getActivity(c1,c2,r,act.getType());
 				act.setType(activity.getType());
 				act.setFacility(activity.getFacility());
-				act.setCoord(act.getFacility().getCenter());
+				act.setCoord(act.getFacility().getCoord());
 			}
 		}
 	}
@@ -281,18 +281,18 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 
 	public void run(Plan plan) {
 		for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
-			Act act = (Act)plan.getPlanElements().get(i);
+			Activity act = (Activity)plan.getPlanElements().get(i);
 			if (act.getFacility() == null) {
 				// get the prev act with a facility
 				Facility start = null;
 				for (int b=i-2; b>=0; b=b-2) {
-					Act b_act = (Act)plan.getPlanElements().get(b);
+					Activity b_act = (Activity)plan.getPlanElements().get(b);
 					if (b_act.getFacility() != null) { start = b_act.getFacility(); break; }
 				}
 				// get the next act with a facility
 				Facility end = null;
 				for (int a=i+2; a<plan.getPlanElements().size(); a=a+2) {
-					Act a_act = (Act)plan.getPlanElements().get(a);
+					Activity a_act = (Activity)plan.getPlanElements().get(a);
 					if (a_act.getFacility() != null) { end = a_act.getFacility(); break; }
 				}
 				if ((start == null) || (end == null)) { Gbl.errorMsg("That should not happen!"); }

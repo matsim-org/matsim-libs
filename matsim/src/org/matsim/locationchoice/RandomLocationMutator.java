@@ -25,7 +25,7 @@ import java.util.List;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
@@ -47,14 +47,14 @@ public class RandomLocationMutator extends LocationMutator {
 	@Override
 	public void handlePlan(final Plan plan){
 		
-		List<Act> movablePrimaryActivities = null; 
+		List<Activity> movablePrimaryActivities = null; 
 		if (Gbl.getConfig().locationchoice().getFixByActType().equals("false")) {
 			movablePrimaryActivities = defineMovablePrimaryActivities(plan);
 		}
 		
 		final ArrayList<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Act act = (Act)actslegs.get(j);
+			final Activity act = (Activity)actslegs.get(j);
 			
 			boolean isPrimary = false;
 			boolean movable = false;
@@ -75,8 +75,8 @@ public class RandomLocationMutator extends LocationMutator {
 					Facility facility = this.facilities_of_type.get(act.getType())[MatsimRandom.random.nextInt(length)];
 					
 					act.setFacility(facility);
-					act.setLink(this.network.getNearestLink(facility.getCenter()));
-					act.setCoord(facility.getCenter());
+					act.setLink(this.network.getNearestLink(facility.getCoord()));
+					act.setCoord(facility.getCoord());
 				}		
 			}	
 		}

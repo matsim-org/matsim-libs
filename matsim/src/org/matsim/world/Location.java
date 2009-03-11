@@ -3,8 +3,8 @@ package org.matsim.world;
 import java.util.TreeMap;
 
 import org.matsim.interfaces.basic.v01.BasicLocation;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 
 public interface Location extends BasicLocation {
 
@@ -58,7 +58,5 @@ public interface Location extends BasicLocation {
 
 	@Deprecated
 	public abstract TreeMap<Id, Location> getDownMapping();
-
-	public abstract String toString();
 
 }

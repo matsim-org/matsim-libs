@@ -119,10 +119,10 @@ public class MatricesCompleteBasedOnFacilities {
 			Iterator<? extends Location> z_it = this.layer.getLocations().values().iterator();
 			while (z_it.hasNext()) {
 				Zone z = (Zone)z_it.next();
-				if (z.contains(f.getCenter())) { zones.add(z); }
+				if (z.contains(f.getCoord())) { zones.add(z); }
 			}
 			if (zones.isEmpty()) {
-				ArrayList<Location> zs = this.layer.getNearestLocations(f.getCenter(),null);
+				ArrayList<Location> zs = this.layer.getNearestLocations(f.getCoord(),null);
 				for (int i=0; i<zs.size(); i++) {
 					zones.add((Zone)zs.get(i));
 				}
@@ -201,10 +201,10 @@ public class MatricesCompleteBasedOnFacilities {
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(WORK) != null) {
-				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-				if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-				if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+				if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+				if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 			}
 		}
 		minx -= 1.0;
@@ -215,7 +215,7 @@ public class MatricesCompleteBasedOnFacilities {
 		this.workFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(WORK) != null) {
-				this.workFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
+				this.workFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
 		}
 		Gbl.printRoundTime();
@@ -231,10 +231,10 @@ public class MatricesCompleteBasedOnFacilities {
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(EDUCATION) != null) {
-				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-				if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-				if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+				if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+				if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 			}
 		}
 		minx -= 1.0;
@@ -245,7 +245,7 @@ public class MatricesCompleteBasedOnFacilities {
 		this.educFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(EDUCATION) != null) {
-				this.educFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
+				this.educFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
 		}
 		Gbl.printRoundTime();
@@ -301,13 +301,13 @@ public class MatricesCompleteBasedOnFacilities {
 			Zone z = (Zone)z_it.next();
 
 			if (!work_m.getFromLocations().containsKey(z.getId())) {
-				Facility f = this.workFacQuadTree.get(z.getCenter().getX(),z.getCenter().getY());
+				Facility f = this.workFacQuadTree.get(z.getCoord().getX(),z.getCoord().getY());
 				Zone to_zone = this.fac_zone_map.get(f.getId());
 				work_m.setEntry(z,to_zone, 1);
 				System.out.println("      zone id=" + z.getId() + ": added a WORK entry to zone id=" + to_zone.getId() + " (fac id=" + f.getId() + ").");
 			}
 			if (!educ_m.getFromLocations().containsKey(z.getId())) {
-				Facility f = this.educFacQuadTree.get(z.getCenter().getX(),z.getCenter().getY());
+				Facility f = this.educFacQuadTree.get(z.getCoord().getX(),z.getCoord().getY());
 				Zone to_zone = this.fac_zone_map.get(f.getId());
 				educ_m.setEntry(z,to_zone, 1);
 				System.out.println("      zone id=" + z.getId() + ": added a EDUC entry to zone id=" + to_zone.getId() + " (fac id=" + f.getId() + ").");

@@ -28,7 +28,7 @@ import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -110,7 +110,7 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 				out.write(person.isEmployed() + ";");
 
 				Plan sp = person.getSelectedPlan();
-				Act fa = sp.getFirstActivity();
+				Activity fa = sp.getFirstActivity();
 				if (fa.getType().substring(0, 1).equals("h")) {
 					out.write(fa.getCoord().getX() + ";");
 					out.write(fa.getCoord().getY() + ";");
@@ -121,7 +121,7 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 					out.write("-;-;-;");
 				}
 
-				out.write(PlanModeJudger.getMode(sp) + ";" + sp.getScore()
+				out.write(PlanModeJudger.getMode(sp) + ";" + sp.getScoreAsPrimitiveType()
 						+ ";" + fa.getEndTime() + ";");
 				out.write(getTravelTime(person) + ";");
 				out.write(getTravelDist(person) + ";");

@@ -38,7 +38,7 @@ public class FacilitiesCreateFromNetwork {
 	public void run(Facilities facilities) {
 		if (!facilities.getFacilities().isEmpty()) { Gbl.errorMsg("Facilities not empty"); }
 		for (Link l : network.getLinks().values()) {
-			Facility f = facilities.createFacility(l.getId(),l.getCenter());
+			Facility f = facilities.createFacility(l.getId(),l.getCoord());
 			f.createActivityOption("h");
 			f.createActivityOption("w");
 		}

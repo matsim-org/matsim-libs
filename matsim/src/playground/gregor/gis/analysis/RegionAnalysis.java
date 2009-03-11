@@ -250,7 +250,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 		}
 		String lID = event.linkId;
 		Link l = this.network.getLink(lID);
-		Point p = this.geofac.createPoint(MGC.coord2Coordinate(l.getCenter()));
+		Point p = this.geofac.createPoint(MGC.coord2Coordinate(l.getCoord()));
 		if (this.tree.get(p.getX(), p.getY(), 1).size() <= 0) {
 			this.dests.put(id,p);
 			this.tree.put(p.getX(),p.getY(), p);

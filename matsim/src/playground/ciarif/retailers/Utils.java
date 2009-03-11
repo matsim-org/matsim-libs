@@ -1,6 +1,6 @@
 package playground.ciarif.retailers;
 
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -15,7 +15,7 @@ public abstract class Utils {
 		vector[1] = -(link.getToNode().getCoord().getX()-link.getFromNode().getCoord().getX());
 		double length = Math.sqrt(vector[0]*vector[0]+vector[1]*vector[1]);
 		System.out.println("length = " + length);
-		Coord coord = new CoordImpl(link.getCenter().getX()+vector[0],link.getCenter().getY()+vector[1]);
+		Coord coord = new CoordImpl(link.getCoord().getX()+vector[0],link.getCoord().getY()+vector[1]);
 		f.moveTo(coord);
 	}
 	

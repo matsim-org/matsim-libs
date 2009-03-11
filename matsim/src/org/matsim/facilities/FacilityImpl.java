@@ -26,9 +26,9 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.LocationType;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Plan;
@@ -167,6 +167,10 @@ public class FacilityImpl extends AbstractLocation implements Facility {
 		if (this.down_mapping.isEmpty()) { return null; }
 		if (this.down_mapping.size() > 1) { Gbl.errorMsg("Something is wrong!!! A facility contains at most one Link (as specified for the moment)!"); }
 		return (Link)this.getDownMapping().get(this.down_mapping.firstKey());
+	}
+	
+	public Id getLinkId() {
+		return getLink().getId();
 	}
 
 	//////////////////////////////////////////////////////////////////////

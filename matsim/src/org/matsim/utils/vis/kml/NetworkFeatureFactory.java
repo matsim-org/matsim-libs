@@ -28,9 +28,9 @@ import net.opengis.kml._2.PointType;
 import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
@@ -84,7 +84,7 @@ public class NetworkFeatureFactory {
 		p.setDescription(description);
 		
 		PlacemarkType pointPlacemark = this.kmlObjectFactory.createPlacemarkType();
-		Coord centerCoord = this.coordTransform.transform(l.getCenter());
+		Coord centerCoord = this.coordTransform.transform(l.getCoord());
 		PointType point = this.kmlObjectFactory.createPointType();
 		point.getCoordinates().add(Double.toString(centerCoord.getX()) + "," + Double.toString(centerCoord.getY()) + ",0.0");
 		pointPlacemark.setAbstractGeometryGroup(this.kmlObjectFactory.createPoint(point));
@@ -112,7 +112,7 @@ public class NetworkFeatureFactory {
 		return p;
 	}
 	
-	public AbstractFeatureType createActFeature(Act act, StyleType style) {
+	public AbstractFeatureType createActFeature(Activity act, StyleType style) {
 
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
 		p.setName("Activity on link: " + act.getLinkId().toString());
@@ -187,7 +187,7 @@ public class NetworkFeatureFactory {
 		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("Number of Lanes: ");
-		buffer.append(l.getLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+		buffer.append(l.getNumberOfLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("Length: ");

@@ -33,7 +33,7 @@ import java.util.HashSet;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
 

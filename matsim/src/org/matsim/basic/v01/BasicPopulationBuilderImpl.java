@@ -22,7 +22,7 @@ package org.matsim.basic.v01;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.interfaces.basic.v01.BasicAct;
+import org.matsim.interfaces.basic.v01.BasicActivityOption;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicLocation;
 import org.matsim.interfaces.basic.v01.BasicPerson;
@@ -42,26 +42,6 @@ public class BasicPopulationBuilderImpl implements BasicPopulationBuilder {
 
 	public BasicPopulationBuilderImpl(final BasicPopulation pop) {
 		this.population = pop;
-	}
-
-	public BasicAct createAct(final BasicPlan basicPlan, final String currentActType,
-			final BasicLocation currentlocation) {
-		BasicActImpl act = new BasicActImpl(currentActType);
-		basicPlan.addAct(act);
-		if (currentlocation != null) {
-			if (currentlocation.getCenter() != null) {
-				act.setCoord(currentlocation.getCenter());
-			}
-			else if (currentlocation.getId() != null){
-				if (currentlocation.getLocationType() == LocationType.FACILITY) {
-					act.setFacilityId(currentlocation.getId());
-				}
-				else if (currentlocation.getLocationType() == LocationType.LINK) {
-					act.setLinkId(currentlocation.getId());
-				}
-			}
-		}
-		return act;
 	}
 
 	public BasicLeg createLeg(final BasicPlan basicPlan, final Mode legMode) {
@@ -99,7 +79,7 @@ public class BasicPopulationBuilderImpl implements BasicPopulationBuilder {
 	}
 
 	public BasicActivityOption createActivity(final String type, final BasicLocation currentlocation) {
-		BasicActivityImpl ba = new BasicActivityImpl(type);
+		BasicActivityOptionImpl ba = new BasicActivityOptionImpl(type);
 		ba.setLocation(currentlocation);
 		return ba;
 	}

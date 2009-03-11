@@ -25,9 +25,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -74,7 +74,7 @@ public class PlansScenarioCut {
 		for (Person p : persons.values()) {
 			Plan plan = p.getSelectedPlan();
 			for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
-				Act act = (Act)plan.getPlanElements().get(i);
+				Activity act = (Activity)plan.getPlanElements().get(i);
 				Coord c = act.getCoord();
 				if ((c.getX()<min.getX()) || (c.getX()>max.getX()) || (c.getY()<min.getY()) || (c.getY()>max.getY())) {
 					removeids.add(p.getId());

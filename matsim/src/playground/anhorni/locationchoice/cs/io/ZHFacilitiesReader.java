@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
@@ -64,7 +64,7 @@ public class ZHFacilitiesReader {
 				
 				facilities.addFacilityByLink(closestLink.getId(), new ZHFacility(
 									new IdImpl(shopID),
-									closestLink.getCenter(),
+									closestLink.getCoord(),
 									exactPosition, 
 									closestLink.getId(),
 									new IdImpl(retailerID),

@@ -27,8 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.basic.v01.BasicActivityOption;
-import org.matsim.basic.v01.BasicKnowledge;
 import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.BasicPopulation;
@@ -40,7 +38,7 @@ import playground.johannes.graph.SparseVertex;
  * @author illenberger
  *
  */
-public class SocialNetwork<P extends BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> extends AbstractSparseGraph {
+public class SocialNetwork<P extends BasicPerson<BasicPlan>> extends AbstractSparseGraph {
 	
 	private Map<P, Ego<P>> personEgoMapping = new HashMap<P, Ego<P>>();
 	

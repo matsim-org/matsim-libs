@@ -21,7 +21,7 @@
 package org.matsim.facilities.algorithms;
 
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 
@@ -31,7 +31,7 @@ public class FacilitiesRandomizeHectareCoordinates {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		for (Facility f : facilities.getFacilities().values()) {
-			Coord coord = f.getCenter();
+			Coord coord = f.getCoord();
 			coord.setX((Double.valueOf(coord.getX()).intValue() / 100) * 100 + MatsimRandom.random.nextInt(99));
 			coord.setY((Double.valueOf(coord.getY()).intValue() / 100) * 100 + MatsimRandom.random.nextInt(99));
 		}

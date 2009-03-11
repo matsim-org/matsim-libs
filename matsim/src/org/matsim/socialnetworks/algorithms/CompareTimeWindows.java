@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
@@ -28,9 +28,9 @@ public class CompareTimeWindows {
 	 * @param plan
 	 * @return
 	 */
-	public static LinkedHashMap<Act,ArrayList<Double>> calculateTimeWindowEventActStats(LinkedHashMap<Facility,ArrayList<TimeWindow>> timeWindowMap) {
+	public static LinkedHashMap<Activity,ArrayList<Double>> calculateTimeWindowEventActStats(LinkedHashMap<Facility,ArrayList<TimeWindow>> timeWindowMap) {
 
-		LinkedHashMap<Act,ArrayList<Double>> actStats = new LinkedHashMap<Act,ArrayList<Double>>();
+		LinkedHashMap<Activity,ArrayList<Double>> actStats = new LinkedHashMap<Activity,ArrayList<Double>>();
 		int count=0;
 		// stats(0)=friendFoeRatio
 		// stats(1)=nFriends
@@ -110,8 +110,8 @@ public class CompareTimeWindows {
 		if(tw1.act.getFacility().getActivityOption(tw1.act.getType())==null){
 			System.out.println("It's act1 "+tw1.act.getType()+" "+tw1.act.getFacility().getId()+": "+tw2.act.getType()+" "+tw2.act.getFacility().getId());
 		}
-		Act act1=tw1.act;
-		Act act2=tw2.act;
+		Activity act1=tw1.act;
+		Activity act2=tw2.act;
 		boolean overlap=false;
 		if(act2.getFacility().getActivityOption(act2.getType()).equals(act1.getFacility().getActivityOption(act1.getType()))){
 			if(act2.getEndTime() >=act1.getStartTime() && act2.getStartTime()<=act1.getEndTime()){
@@ -128,8 +128,8 @@ public class CompareTimeWindows {
 		if(tw1.act.getFacility().getActivityOption(tw1.act.getType())==null){
 			System.out.println("It's act1 "+tw1.act.getType()+" "+tw1.act.getFacility().getId()+": "+tw2.act.getType()+" "+tw2.act.getFacility().getId());
 		}
-		Act act1=tw1.act;
-		Act act2=tw2.act;
+		Activity act1=tw1.act;
+		Activity act2=tw2.act;
 		boolean overlap=false;
 		if(act2.getFacility().getActivityOption(act2.getType()).equals(act1.getFacility().getActivityOption(act1.getType()))){
 			if(act2.getEndTime() >=act1.getStartTime() && act2.getStartTime()<=act1.getEndTime() && tw1.person.getKnowledge().getEgoNet().knows(tw2.person)){

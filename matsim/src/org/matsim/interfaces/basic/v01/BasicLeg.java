@@ -26,8 +26,7 @@ package org.matsim.interfaces.basic.v01;
 */
 public interface BasicLeg {
 
-	public enum Mode {miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, undefined}
-	// TODO [kai] Haette hier gerne noch ein "other" drin (nicht identisch mit "undefined")
+	public enum Mode {miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, other, undefined}
 
 	public Mode getMode();
 
@@ -44,11 +43,5 @@ public interface BasicLeg {
 	public double getTravelTime();
 
 	public void setTravelTime(final double seconds);
-
-	public double getArrivalTime();
-
-	public void setArrivalTime(final double seconds);
-	
-	// TODO [kai] Waere "makeConsistent" dann eigentlich eine Methode, welche durch das Interface erzwungen werden sollte?
 
 }

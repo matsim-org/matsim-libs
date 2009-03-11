@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -64,7 +64,7 @@ public class CutTrips implements PersonAlgorithm {
 		int firstOutsideLeg = -1;
 		Link firstOutsideLink = null;
 
-		boolean startInside = this.aoi.containsKey(((Act) plan.getPlanElements().get(0)).getLink().getId());
+		boolean startInside = this.aoi.containsKey(((Activity) plan.getPlanElements().get(0)).getLink().getId());
 
 		for (int legNr = 1, n = plan.getPlanElements().size(); legNr < n; legNr += 2) {
 			Leg leg = (Leg) plan.getPlanElements().get(legNr);
@@ -72,8 +72,8 @@ public class CutTrips implements PersonAlgorithm {
 				throw new RuntimeException("route is null. person=" + person.getId().toString());
 			}
 
-			Link depLink = ((Act) plan.getPlanElements().get(legNr - 1)).getLink();
-			Link arrLink = ((Act) plan.getPlanElements().get(legNr + 1)).getLink();
+			Link depLink = ((Activity) plan.getPlanElements().get(legNr - 1)).getLink();
+			Link arrLink = ((Activity) plan.getPlanElements().get(legNr + 1)).getLink();
 
 			// test departure link
 			if (this.aoi.containsKey(depLink.getId())) {
@@ -144,7 +144,7 @@ public class CutTrips implements PersonAlgorithm {
 		if (!startInside) {
 			// move all acts before firstInsideLeg to firstInsideLink
 			for (int actNr = 0; actNr < firstInsideLeg; actNr += 2) {
-				Act act = (Act) plan.getPlanElements().get(actNr);
+				Activity act = (Activity) plan.getPlanElements().get(actNr);
 				act.setLink(firstInsideLink);
 			}
 			// remove all routes from legs before firstInsideLeg, as they are now all at the same location
@@ -162,7 +162,7 @@ public class CutTrips implements PersonAlgorithm {
 					break;
 				}
 			}
-			Act fromAct = (Act) plan.getPlanElements().get(firstInsideLeg - 1);
+			Activity fromAct = (Activity) plan.getPlanElements().get(firstInsideLeg - 1);
 			if (fromAct.getDuration() != Time.UNDEFINED_TIME) {
 				fromAct.setDuration(fromAct.getDuration() + traveltime);
 			}
@@ -187,7 +187,7 @@ public class CutTrips implements PersonAlgorithm {
 
 		// move all acts after firstOutsideLeg to lastInsideLink
 		for (int actNr = firstOutsideLeg+1; actNr < plan.getPlanElements().size(); actNr += 2) {
-			Act act = (Act) plan.getPlanElements().get(actNr);
+			Activity act = (Activity) plan.getPlanElements().get(actNr);
 			act.setLink(lastInsideLink);
 		}
 

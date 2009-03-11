@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -119,13 +119,13 @@ public class PlansWriteTableForLoechl extends AbstractPersonAlgorithm implements
 			ArrayList actslegs = plan.getPlanElements();
 
 			for (int i=0; i<actslegs.size()-2; i=i+2) {
-				Act from_act = (Act)actslegs.get(i);
+				Activity from_act = (Activity)actslegs.get(i);
 				Leg leg = (Leg)actslegs.get(i+1);
 
 				out.write("\t" + from_act.getType());
-				out.write("\t" + leg.getRoute().getDist());
+				out.write("\t" + leg.getRoute().getDistance());
 			}
-			Act last_act = (Act)actslegs.get(actslegs.size()-1);
+			Activity last_act = (Activity)actslegs.get(actslegs.size()-1);
 			out.write("\t" + last_act.getType());
 			out.write("\n");
 			out.flush();

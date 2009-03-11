@@ -23,7 +23,7 @@
  */
 package playground.johannes.itsc08;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.scoring.ScoringFunction;
 
@@ -88,7 +88,7 @@ public class SimpleScoring implements ScoringFunction {
 		score = 0;
 	}
 
-	public void startActivity(double time, Act act) {
+	public void startActivity(double time, Activity act) {
 	}
 
 	public void startLeg(double time, Leg leg) {

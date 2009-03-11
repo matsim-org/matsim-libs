@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -116,7 +116,7 @@ public class PersonInitDemandSummaryTable extends AbstractPersonAlgorithm implem
 			// ignored
 
 			// home coordinates
-			Act home_act = (Act)person.getSelectedPlan().getPlanElements().get(0);
+			Activity home_act = (Activity)person.getSelectedPlan().getPlanElements().get(0);
 			out.write(home_act.getCoord().getX() + "\t");
 			out.write(home_act.getCoord().getY() + "\t");
 

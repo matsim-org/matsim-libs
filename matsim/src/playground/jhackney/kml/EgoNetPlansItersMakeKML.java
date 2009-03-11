@@ -50,10 +50,10 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.config.Config;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
@@ -400,7 +400,7 @@ public class EgoNetPlansItersMakeKML {
 		}
 
 		ActLegIterator actLegIter = myPlan.getIterator();
-		Act act0 = (Act) actLegIter.nextAct();
+		Activity act0 = (Activity) actLegIter.nextAct();
 		makeActKML(alter, act0, 0, planFolder, agentLinkStyle, iter);
 		int actNumber=0;
 		while(actLegIter.hasNextLeg()){//alternates Act-Leg-Act-Leg and ends with Act
@@ -422,7 +422,7 @@ public class EgoNetPlansItersMakeKML {
 					planFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(agentLinkL));
 				}
 			}
-			Act act = (Act) actLegIter.nextAct();
+			Activity act = (Activity) actLegIter.nextAct();
 			actNumber++;
 			makeActKML(alter, act,actNumber, planFolder,agentLinkStyle, iter);
 		}
@@ -433,7 +433,7 @@ public class EgoNetPlansItersMakeKML {
 
 		ActIterator aIter = myPlan.getIteratorAct();
 		while(aIter.hasNext()){
-			Act myAct = (Act) aIter.next();
+			Activity myAct = (Activity) aIter.next();
 //			Activity myActivity =myPerson.getKnowledge().getMentalMap().getActivity(myAct).getFacility().toString();
 			String myActivity=myAct.getFacility().getActivityOption(myAct.getType()).toString();
 			//Above lines call code that results in a null pointer. Test
@@ -575,9 +575,9 @@ public class EgoNetPlansItersMakeKML {
 
 		LineStringType lineString = kmlObjectFactory.createLineStringType();
 				
-		Coord coordFrom = trafo.transform(((Act)myPerson.getSelectedPlan().getPlanElements().get(0)).getCoord());
+		Coord coordFrom = trafo.transform(((Activity)myPerson.getSelectedPlan().getPlanElements().get(0)).getCoord());
 		lineString.getCoordinates().add(Double.toString(coordFrom.getX()) + "," + Double.toString(coordFrom.getY()) + ",0.0");
-		Coord coordTo = trafo.transform(((Act)ai.getSelectedPlan().getPlanElements().get(0)).getCoord());
+		Coord coordTo = trafo.transform(((Activity)ai.getSelectedPlan().getPlanElements().get(0)).getCoord());
 		lineString.getCoordinates().add(Double.toString(coordTo.getX()) + "," + Double.toString(coordTo.getY()) + ",0.0");
 		socialLink.setAbstractGeometryGroup(kmlObjectFactory.createLineString(lineString));
 		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(socialLink));
@@ -603,9 +603,9 @@ public class EgoNetPlansItersMakeKML {
 		socialLink.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
 		
 		LineStringType lineString = kmlObjectFactory.createLineStringType();
-		Coord coordFrom = trafo.transform(((Act)myPerson.getSelectedPlan().getPlanElements().get(0)).getCoord());
+		Coord coordFrom = trafo.transform(((Activity)myPerson.getSelectedPlan().getPlanElements().get(0)).getCoord());
 		lineString.getCoordinates().add(Double.toString(coordFrom.getX()) + "," +Double.toString(coordFrom.getY()) + ",0.0");
-		Coord coordTo = trafo.transform(((Act)ego.getSelectedPlan().getPlanElements().get(0)).getCoord());
+		Coord coordTo = trafo.transform(((Activity)ego.getSelectedPlan().getPlanElements().get(0)).getCoord());
 		lineString.getCoordinates().add(Double.toString(coordTo.getX()) + "," +Double.toString(coordTo.getY()) + ",0.0");
 		socialLink.setAbstractGeometryGroup(kmlObjectFactory.createLineString(lineString));
 		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(socialLink));
@@ -779,7 +779,7 @@ public class EgoNetPlansItersMakeKML {
 //
 //	}
 
-	private static void makeActKML(Person myPerson, Act act, int actNo, FolderType planFolder, StyleType agentLinkStyle, int iter) {
+	private static void makeActKML(Person myPerson, Activity act, int actNo, FolderType planFolder, StyleType agentLinkStyle, int iter) {
 
 		String styleUrl = null;
 		String fullActName = null;

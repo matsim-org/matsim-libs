@@ -76,9 +76,9 @@ public class WorldWriterHandlerImplV2 implements WorldWriterHandler {
 	public void startZone(final Zone zone, final BufferedWriter out) throws IOException {
 		out.write("\t\t<zone");
 		out.write(" id=\"" + zone.getId() + "\"");
-		if (zone.getCenter() != null) {
-			out.write(" center_x=\"" + zone.getCenter().getX() + "\"");
-			out.write(" center_y=\"" + zone.getCenter().getY() + "\"");
+		if (zone.getCoord() != null) {
+			out.write(" center_x=\"" + zone.getCoord().getX() + "\"");
+			out.write(" center_y=\"" + zone.getCoord().getY() + "\"");
 		}
 		if (zone.getMin() != null) {
 			out.write(" min_x=\"" + zone.getMin().getX() + "\"");

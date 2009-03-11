@@ -33,9 +33,9 @@ import org.geotools.feature.Feature;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -97,7 +97,7 @@ public class PrimaryLocationDrawing {
 
 		this.linksTree = new QuadTree<Link>(646000,9800000,674000,9999000);
 		for (final Link link : this.network.getLinks().values()) {
-			this.linksTree.put(link.getCenter().getX(), link.getCenter().getY(), link);
+			this.linksTree.put(link.getCoord().getX(), link.getCoord().getY(), link);
 		}
 
 	}
@@ -128,7 +128,7 @@ public class PrimaryLocationDrawing {
 
 		final ArrayList<Link> tmp = new ArrayList<Link>();
 		for (final Link link : links) {
-			final Point point = this.geofac.createPoint(new Coordinate(link.getCenter().getX(),link.getCenter().getY()));
+			final Point point = this.geofac.createPoint(new Coordinate(link.getCoord().getX(),link.getCoord().getY()));
 			if (p.contains(point)) {
 				tmp.add(link);
 			}
@@ -169,7 +169,7 @@ public class PrimaryLocationDrawing {
 			for (int i = 0; i < li ; i++) {
 				final Person pers = new PersonImpl(new IdImpl(this.id++));
 				final Plan plan = new org.matsim.population.PlanImpl(pers);
-				final Act act = new org.matsim.population.ActImpl("h",link.getCenter(),link);
+				final Activity act = new org.matsim.population.ActImpl("h",link.getCoord(),link);
 				act.setEndTime(6*3600);
 				plan.addAct(act);
 				pers.addPlan(plan);
@@ -240,7 +240,7 @@ public class PrimaryLocationDrawing {
 				leg.setArrivalTime(Time.UNDEFINED_TIME);
 				leg.setDepartureTime(Time.UNDEFINED_TIME);
 				leg.setTravelTime(Time.UNDEFINED_TIME);
-				Act act = new org.matsim.population.ActImpl("w",link.getCenter(),link);
+				Activity act = new org.matsim.population.ActImpl("w",link.getCoord(),link);
 				pers.getSelectedPlan().addLeg(leg);
 				pers.getSelectedPlan().addAct(act);
 				try {

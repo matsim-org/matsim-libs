@@ -11,8 +11,8 @@ import java.util.Vector;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
@@ -226,7 +226,7 @@ public class CompareTrips {
 			outString = "Tram";
 		}
 		else if (inString.equals("-97")) {
-			outString = "unvollständiger Ausgang";
+			outString = "unvollstï¿½ndiger Ausgang";
 		}
 		else if (inString.equals("5")) {
 			outString = "bus";

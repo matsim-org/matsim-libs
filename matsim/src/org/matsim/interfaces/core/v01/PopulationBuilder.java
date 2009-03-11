@@ -21,7 +21,6 @@ package org.matsim.interfaces.core.v01;
 
 import java.util.List;
 
-import org.matsim.interfaces.basic.v01.BasicLocation;
 import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.BasicPopulationBuilder;
@@ -37,8 +36,8 @@ public interface PopulationBuilder extends BasicPopulationBuilder {
 
 	Plan createPlan(BasicPerson currentPerson);
 
-	@Deprecated // to be clarified
-	Act createAct(BasicPlan basicPlan, String currentActType, BasicLocation currentlocation);
+//	@Deprecated // to be clarified
+//	Activity createAct(BasicPlan basicPlan, String currentActType, BasicLocation currentlocation);
 
 	Leg createLeg(BasicPlan basicPlan, Mode legMode);
 

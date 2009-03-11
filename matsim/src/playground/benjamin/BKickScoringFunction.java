@@ -25,7 +25,7 @@ import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -97,7 +97,7 @@ public class BKickScoringFunction implements ScoringFunction {
 		this.score = INITIAL_SCORE;
 	}
 
-	public void startActivity(final double time, final Act act) {
+	public void startActivity(final double time, final Activity act) {
 		// the activity is currently handled by startLeg()
 	}
 
@@ -164,7 +164,7 @@ public class BKickScoringFunction implements ScoringFunction {
 		initialized = true;
 	}
 
-	protected double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
+	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
 		ActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
@@ -268,7 +268,7 @@ public class BKickScoringFunction implements ScoringFunction {
 		return tmpScore;
 	}
 
-	protected double[] getOpeningInterval(final Act act) {
+	protected double[] getOpeningInterval(final Activity act) {
 
 		ActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
@@ -299,7 +299,7 @@ public class BKickScoringFunction implements ScoringFunction {
 				 * available, which is quite an expensive operation
 				 */
 				Route route = leg.getRoute();
-				dist = route.getDist();
+				dist = route.getDistance();
 				/* TODO the route-distance does not contain the length of the first or
 				 * last link of the route, because the route doesn't know those. Should
 				 * be fixed somehow, but how? MR, jan07
@@ -314,7 +314,7 @@ public class BKickScoringFunction implements ScoringFunction {
 		else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
 			if (marginalUtilityOfPtFare != 0.0) {
 				Route route = leg.getRoute();
-				dist = route.getDist();
+				dist = route.getDistance();
 			}
 			tmpScore = tmpScore + travelTime * marginalUtilityOfTravelingPT + marginalUtilityOfPtFare * 0.28d/1000.0d * dist;
 		} 
@@ -364,19 +364,19 @@ public class BKickScoringFunction implements ScoringFunction {
 	}
 
 	protected void handleAct(final double time) {
-		Act act = (Act)this.plan.getPlanElements().get(this.index);
+		Activity act = (Activity)this.plan.getPlanElements().get(this.index);
 		if (this.index == 0) {
 			this.firstActTime = time;
 		} else if (this.index == this.lastActIndex) {
 			String lastActType = act.getType();
-			if (lastActType.equals(((Act) this.plan.getPlanElements().get(0)).getType())) {
+			if (lastActType.equals(((Activity) this.plan.getPlanElements().get(0)).getType())) {
 				// the first Act and the last Act have the same type
 				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
 			} else {
 				if (scoreActs) {
 					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
 					// score first activity
-					Act firstAct = (Act)this.plan.getPlanElements().get(0);
+					Activity firstAct = (Activity)this.plan.getPlanElements().get(0);
 					this.score += calcActScore(0.0, this.firstActTime, firstAct);
 					// score last activity
 					this.score += calcActScore(this.lastTime, 24*3600, act); // SCENARIO_DURATION

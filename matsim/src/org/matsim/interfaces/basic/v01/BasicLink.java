@@ -26,15 +26,7 @@ import org.matsim.utils.misc.Time;
 /**
  * A topological representation of a network link.
  */
-public interface BasicLink {
-
-	/**
-	 * Returns a non-<code>null</code> instance of <code>IdI</code> that
-	 * uniquely identifies this object.
-	 *
-	 * @return this object's identifier
-	 */
-	public Id getId();
+public interface BasicLink extends Identifiable {
 
 	/**
 	 * Sets this link's non-<code>null</code> upstream node.
@@ -81,9 +73,7 @@ public interface BasicLink {
 
 	public double getLength();
 
-	public double getLanes(double time);
-
-	public int getLanesAsInt(double time);
+	public double getNumberOfLanes(double time);
 
 	public double getFreespeed(final double time);
 
@@ -102,7 +92,7 @@ public interface BasicLink {
 
 	public void setLength(double length);
 
-	public void setLanes(double lanes);
+	public void setNumberOfLanes(double lanes);
 
 	public void setCapacity(double capacity);
 

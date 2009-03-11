@@ -1,16 +1,32 @@
 package org.matsim.interfaces.core.v01;
 
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicPlan;
-import org.matsim.interfaces.basic.v01.Coord;
 
 public interface Plan extends BasicPlan {
 
-	public Act createAct(final String type, final Coord coord) throws IllegalStateException;
+	/**
+	 * @deprecated use Leg.Mode instead
+	 */
+	@Deprecated
+	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED}
+	
+	/**
+	 * Constant describing the score of an unscored plan. <b>Do not use this constant in
+	 * comparisons</b>, but use {@link #hasUndefinedScore()}
+	 * instead to test if a plan has an undefined score.
+	 */
+	@Deprecated
+	public static final double UNDEF_SCORE = Double.NaN;
 
-	public Act createAct(final String type, final Facility fac) throws IllegalStateException;
+	public Activity createAct(final String type, final Coord coord) throws IllegalStateException;
 
-	public Act createAct(final String type, final Link link) throws IllegalStateException;
+	public Activity createAct(final String type, final Facility fac) throws IllegalStateException;
+
+	public Activity createAct(final String type, final Link link) throws IllegalStateException;
 
 	public Leg createLeg(final BasicLeg.Mode mode) throws IllegalStateException;
 
@@ -60,11 +76,11 @@ public interface Plan extends BasicPlan {
 	 * @param act the act to insert, following the leg
 	 * @throws IllegalArgumentException If the leg and act cannot be inserted at the specified position without retaining the correct order of legs and acts.
 	 */
-	public void insertLegAct(final int pos, final Leg leg, final Act act) throws IllegalArgumentException;
+	public void insertLegAct(final int pos, final Leg leg, final Activity act) throws IllegalArgumentException;
 
-	public Leg getPreviousLeg(final Act act);
+	public Leg getPreviousLeg(final Activity act);
 
-	public Act getPreviousActivity(final Leg leg);
+	public Activity getPreviousActivity(final Leg leg);
 
 	/**
 	 * Returns the leg following the specified act. <b>Important Note: </b> This method (together with
@@ -78,11 +94,11 @@ public interface Plan extends BasicPlan {
 	 * @see #getIteratorAct()
 	 * @see #getIteratorLeg()
 	 */
-	public Leg getNextLeg(final Act act);
+	public Leg getNextLeg(final Activity act);
 
 	/**
 	 * Returns the activity following the specified leg. <b>Important Note: </b> This method (together with
-	 * {@link #getNextLeg(Act)}) has a very bad performance if it is used to iterate over all Acts and Legs of
+	 * {@link #getNextLeg(Activity)}) has a very bad performance if it is used to iterate over all Acts and Legs of
 	 * a plan. In that case, it is advised to use one of the special iterators.
 	 *
 	 * @param leg
@@ -92,10 +108,39 @@ public interface Plan extends BasicPlan {
 	 * @see #getIteratorAct()
 	 * @see #getIteratorLeg()
 	 */
-	public Act getNextActivity(final Leg leg);
+	public Activity getNextActivity(final Leg leg);
 
-	public Act getFirstActivity();
+	public Activity getFirstActivity();
 
-	public Act getLastActivity();
+	public Activity getLastActivity();
+
+	
+	/**
+	 * Getter for the Iterator class defined above
+	 * @return A special iterator over acts and legs.
+	 */
+	@Deprecated
+	public ActLegIterator getIterator();
+
+	@Deprecated
+	public LegIterator getIteratorLeg();
+
+	@Deprecated
+	public ActIterator getIteratorAct();
+
+	public double getScoreAsPrimitiveType();
+	
+	public Double getScore();
+
+	@Deprecated
+	public void setScore(final double score);
+
+	/** @return true if the score of this plan is not defined */
+	public boolean hasUndefinedScore();
+	
+	@Deprecated
+	public void setType(Plan.Type type);
+	@Deprecated
+	public Plan.Type getType();
 
 }

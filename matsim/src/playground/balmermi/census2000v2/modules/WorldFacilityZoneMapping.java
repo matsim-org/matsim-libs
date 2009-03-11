@@ -80,7 +80,7 @@ public class WorldFacilityZoneMapping {
 			Zone z = h.getMunicipality().getZone();
 			Facility f = h.getFacility();
 			world.addMapping(z,f);
-			if (!z.contains(f.getCenter())) { log.warn("      mapping via census info produces dist(f["+f.getId()+"]->z["+z.getId()+"])="+z.calcDistance(f.getCenter())); }
+			if (!z.contains(f.getCoord())) { log.warn("      mapping via census info produces dist(f["+f.getId()+"]->z["+z.getId()+"])="+z.calcDistance(f.getCoord())); }
 		}
 		
 		// add mapping for the remaining facilities (non home facilities)
@@ -91,7 +91,7 @@ public class WorldFacilityZoneMapping {
 				Location nearest_loc = null;
 				double min_dist = Double.MAX_VALUE;
 				for (Location z : ms.getLocations().values()) {
-					double dist = z.calcDistance(f.getCenter());
+					double dist = z.calcDistance(f.getCoord());
 					if (dist == 0.0) { locs.add(z); }
 					if (min_dist > dist) { min_dist = dist; nearest_loc = z; }
 				}

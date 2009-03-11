@@ -24,9 +24,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.BasicAct;
+import org.matsim.interfaces.basic.v01.BasicActivity;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicPlan;
+import org.matsim.interfaces.core.v01.Plan;
 
 /**
  * @author david
@@ -37,22 +38,18 @@ public class BasicPlanImpl implements BasicPlan {
 
 	protected ArrayList<Object> actsLegs = new ArrayList<Object>();
 
-	private double score = UNDEF_SCORE;
+	private Double score = Plan.UNDEF_SCORE;
 
-	private Type type = null;
+	private Plan.Type type = null;
 
 	private boolean isSelected;
 
-	public final double getScore() {
+	public final Double getScore() {
 		return this.score;
 	}
-
-	public final void setScore(final double score) {
-		if (Double.isInfinite(score)) {
-			log.warn("Infinite score is not supported! Score is not changed");
-		} else {
-			this.score = score;
-		}
+	
+	public void setScore(final Double score) {
+		this.score = score;
 	}
 
 	public boolean isSelected() {
@@ -64,17 +61,13 @@ public class BasicPlanImpl implements BasicPlan {
 	}
 
 
-	public Type getType() {
+	public Plan.Type getType() {
 		return this.type;
 	}
 
 
-	public void setType(Type type) {
+	public void setType(Plan.Type type) {
 		this.type = type;
-	}
-
-	public final boolean hasUndefinedScore() {
-		return Double.isNaN(this.getScore());
 	}
 
 	public ArrayList<Object> getPlanElements() {
@@ -142,9 +135,9 @@ public class BasicPlanImpl implements BasicPlan {
 			return leg;
 		}
 
-		public BasicAct nextAct() {
+		public BasicActivity nextAct() {
 			if (this.index % 2 != 0 ) throw new IndexOutOfBoundsException("Requested Act on Leg-Position");
-			BasicAct act = (BasicAct)BasicPlanImpl.this.actsLegs.get(this.index);
+			BasicActivity act = (BasicActivity)BasicPlanImpl.this.actsLegs.get(this.index);
 			this.index+=1;
 			return act;
 		}
@@ -173,7 +166,7 @@ public class BasicPlanImpl implements BasicPlan {
 		this.actsLegs.add(leg);
 	}
 
-	public void addAct(final BasicAct act) {
+	public void addAct(final BasicActivity act) {
 		if (this.actsLegs.size() %2 != 0 ) throw (new IndexOutOfBoundsException("Error: Tried to insert act at non-act position"));
 		this.actsLegs.add(act);
 	}

@@ -40,7 +40,7 @@ public class ActivityOptionImpl implements ActivityOption {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 	private final String type;
-	private Integer capacity = Integer.MAX_VALUE; // MAX_VALUE == unlimited capcacity
+	private Double capacity = Double.valueOf(Integer.MAX_VALUE);
 	private final Facility facility;
 
 	// TreeMap(String day,TreeSet(Opentime opentime))
@@ -126,7 +126,7 @@ public class ActivityOptionImpl implements ActivityOption {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void setCapacity(final int capacity) {
+	public final void setCapacity(Double capacity) {
 		if (capacity < 0) {
 			throw new NumberFormatException("A capacity of an activity must be >= 0.");
 		}
@@ -153,7 +153,7 @@ public class ActivityOptionImpl implements ActivityOption {
 		return this.facility;
 	}
 
-	public final Integer getCapacity() {
+	public final Double getCapacity() {
 		return this.capacity;
 	}
 
@@ -178,7 +178,7 @@ public class ActivityOptionImpl implements ActivityOption {
 	}
 
 
-	public void setCapacity(Integer cap) {
-		this.capacity = cap;
+	public void setCapacity(int cap) {
+		setCapacity((double) cap);
 	}
 }

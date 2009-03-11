@@ -158,7 +158,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		CarRoute route = getCarRouteInstance(link1, link4);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 		
-		assertEquals("different distance calculated.", 4000.0, route.getDist(), EPSILON);
+		assertEquals("different distance calculated.", 4000.0, route.getDistance(), EPSILON);
 	}
 
 	public void testGetLinkIds() {

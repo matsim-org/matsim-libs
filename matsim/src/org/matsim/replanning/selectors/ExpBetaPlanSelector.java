@@ -22,7 +22,6 @@ package org.matsim.replanning.selectors;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 
@@ -49,8 +48,8 @@ public class ExpBetaPlanSelector implements PlanSelector {
 		// Build the weights of all plans
 		// - first find the max. score of all plans of this person
 		double maxScore = Double.NEGATIVE_INFINITY;
-		for (BasicPlan plan : person.getPlans()) {
-			if (plan.getScore() > maxScore) maxScore = plan.getScore();
+		for (Plan plan : person.getPlans()) {
+			if (plan.getScoreAsPrimitiveType() > maxScore) maxScore = plan.getScoreAsPrimitiveType();
 		}
 
 		// - now calculate the weights
@@ -92,7 +91,7 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	 * @return the weight of the plan
 	 */
 	private double calcPlanWeight(final Plan plan, final double maxScore) {
-		double weight = Math.exp(this.beta * (plan.getScore() - maxScore));
+		double weight = Math.exp(this.beta * (plan.getScoreAsPrimitiveType() - maxScore));
 		if (weight < MIN_WEIGHT) weight = MIN_WEIGHT;
 		return weight;
 	}

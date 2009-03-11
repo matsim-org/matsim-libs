@@ -25,8 +25,8 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -113,12 +113,12 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 			Coord primaryCoord = WorldUtils.getRandomCoordInZone(primaryZone, this.zoneLayer);
 			double homeEndTime = SIXOCLOCK + MatsimRandom.random.nextDouble() * TWOHOURS;
 
-			Act act1 = plan.createAct(ACTTYPE_HOME, homeCoord);
+			Activity act1 = plan.createAct(ACTTYPE_HOME, homeCoord);
 			act1.setEndTime(homeEndTime);
 
 			plan.createLeg(BasicLeg.Mode.car);
 
-			Act act2 = plan.createAct(row[5], primaryCoord);
+			Activity act2 = plan.createAct(row[5], primaryCoord);
 			act2.setDuration(WORKDURATION);
 
 			plan.createLeg(BasicLeg.Mode.car);

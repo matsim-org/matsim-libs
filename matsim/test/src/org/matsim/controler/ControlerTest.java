@@ -30,7 +30,7 @@ import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -86,7 +86,7 @@ public class ControlerTest extends MatsimTestCase {
 
 		person1 = new PersonImpl(new IdImpl(1));
 		Plan plan1 = person1.createPlan(true);
-		Act a1 = plan1.createAct("h", link1);
+		Activity a1 = plan1.createAct("h", link1);
 		a1.setEndTime(7.0*3600);
 		Leg leg1 = plan1.createLeg(Mode.car);
 		CarRoute route1 = (CarRoute)network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
@@ -100,7 +100,7 @@ public class ControlerTest extends MatsimTestCase {
 
 		Person person2 = new PersonImpl(new IdImpl(2));
 		Plan plan2 = person2.createPlan(true);
-		Act a2 = plan2.createAct("h", link1);
+		Activity a2 = plan2.createAct("h", link1);
 		a2.setEndTime(7.0*3600);
 		Leg leg2 = plan2.createLeg(Mode.car);
 		CarRoute route2 = (CarRoute)network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
@@ -213,14 +213,14 @@ public class ControlerTest extends MatsimTestCase {
 		person1 = new PersonImpl(new IdImpl(1));
 		// --- plan 1 ---
 		Plan plan1 = person1.createPlan(true);
-		Act a1 = plan1.createAct("h", link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
+		Activity a1 = plan1.createAct("h", link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 		a1.setEndTime(7.0*3600);
 		leg1 = plan1.createLeg(Mode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
 		plan1.createAct("h", link3);
 		// --- plan 2 ---
 		Plan plan2 = person1.createPlan(true);
-		Act a2 = plan2.createAct("h", link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
+		Activity a2 = plan2.createAct("h", link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 		a2.setEndTime(7.0*3600);
 
 		leg2 = plan2.createLeg(Mode.car);
@@ -282,10 +282,10 @@ public class ControlerTest extends MatsimTestCase {
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
 		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		Person person1 = null;
-		Act act1a = null;
-		Act act1b = null;
-		Act act2a = null;
-		Act act2b = null;
+		Activity act1a = null;
+		Activity act1b = null;
+		Activity act2a = null;
+		Activity act2b = null;
 		Leg leg1 = null;
 		Leg leg2 = null;
 

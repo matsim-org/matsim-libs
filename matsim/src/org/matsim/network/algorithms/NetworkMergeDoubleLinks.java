@@ -65,7 +65,7 @@ public class NetworkMergeDoubleLinks {
 //			String origid = "add-merge(" + link1.getId() + "," + link2.getId() + ")";
 			link1.setCapacity(cap);
 			link1.setFreespeed(fs);
-			link1.setLanes(lanes);
+			link1.setNumberOfLanes(lanes);
 			link1.setLength(length);
 			network.removeLink(link2);
 		}
@@ -78,7 +78,7 @@ public class NetworkMergeDoubleLinks {
 //			String origid = "max-merge(" + link1.getId() + "," + link2.getId() + ")";
 			link1.setCapacity(cap);
 			link1.setFreespeed(fs);
-			link1.setLanes(lanes);
+			link1.setNumberOfLanes(lanes);
 			link1.setLength(length);
 			network.removeLink(link2);
 		}

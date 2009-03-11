@@ -22,7 +22,7 @@ package playground.marcel.pt.router;
 
 import java.util.Collection;
 
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkWriter;
@@ -93,7 +93,7 @@ public class TransitRouter {
 		
 		// connect all stops with walking links if they're located less than 100m from each other
 		for (TransitRouterNetworkNode node : network.getNodes()) {
-			for (TransitRouterNetworkNode node2 : network.getNearestNodes(node.stop.getStopFacility().getCenter(), 100)) {
+			for (TransitRouterNetworkNode node2 : network.getNearestNodes(node.stop.getStopFacility().getCoord(), 100)) {
 				if (node != node2) {
 					network.createLink(node, node2, null, null); // not sure if null is correct here
 				}
@@ -104,7 +104,7 @@ public class TransitRouter {
 	}
 	
 	/*package*/ void getNextDeparturesAtStop(final Facility stop, final double time) {
-		Collection<TransitRouterNetworkNode> nodes = this.transitNetwork.getNearestNodes(stop.getCenter(), 0);
+		Collection<TransitRouterNetworkNode> nodes = this.transitNetwork.getNearestNodes(stop.getCoord(), 0);
 		for (TransitRouterNetworkNode node : nodes) {
 			double depDelay = node.stop.getDepartureDelay();
 			double routeStartTime = time - depDelay;

@@ -26,7 +26,7 @@ import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -133,7 +133,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		this.score = INITIAL_SCORE;
 	}
 
-	public void startActivity(final double time, final Act act) {
+	public void startActivity(final double time, final Activity act) {
 		// the activity is currently handled by startLeg()
 	}
 
@@ -171,34 +171,34 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 	public double getScore() {
 		return this.score;
 	}
-	public double getDudur(Act a){
+	public double getDudur(Activity a){
 		if(dudur.size()>0&&dudur.keySet().contains(a)){
 			return dudur.get(a);
 			}else{
 				return -999;
 			}
 	}
-	public double getDuw(Act a){
+	public double getDuw(Activity a){
 		if(duw.size()>0&&duw.keySet().contains(a)){
 			return duw.get(a);
 			}else{
 				return 0;
 			}
 	}
-	public double getDus(Act a){
+	public double getDus(Activity a){
 		if(dus.size()>0&&dus.keySet().contains(a)){
 			return dus.get(a);
 			}else{
 				return 0;
 			}
 	}
-	public double getDula(Act a){
+	public double getDula(Activity a){
 		if(dula.size()>0&&dula.keySet().contains(a)){
 		return dula.get(a);
 		}else
 			return 0;
 	}
-	public double getDued(Act a){
+	public double getDued(Activity a){
 		if(dued.size()>0&&dued.keySet().contains(a)){
 		return dued.get(a);
 		}else{
@@ -206,7 +206,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		}
 		
 	}
-	public double getDuld(Act a){
+	public double getDuld(Activity a){
 		if(duld.size()>0&&duld.keySet().contains(a)){
 			return duld.get(a);
 			}else{
@@ -228,34 +228,34 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 			}
 	}
 	
-	public double getUdur(Act a){
+	public double getUdur(Activity a){
 		if(udur.size()>0&&udur.keySet().contains(a)){
 			return udur.get(a);
 			}else{
 				return -999;
 			}
 	}
-	public double getUw(Act a){
+	public double getUw(Activity a){
 		if(uw.size()>0&&uw.keySet().contains(a)){
 			return uw.get(a);
 			}else{
 				return 0;
 			}
 	}
-	public double getUs(Act a){
+	public double getUs(Activity a){
 		if(us.size()>0&&us.keySet().contains(a)){
 			return us.get(a);
 			}else{
 				return 0;
 			}
 	}
-	public double getUla(Act a){
+	public double getUla(Activity a){
 		if(ula.size()>0&&ula.keySet().contains(a)){
 		return ula.get(a);
 		}else
 			return 0;
 	}
-	public double getUed(Act a){
+	public double getUed(Activity a){
 		if(ued.size()>0&&ued.keySet().contains(a)){
 		return ued.get(a);
 		}else{
@@ -263,7 +263,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		}
 		
 	}
-	public double getUld(Act a){
+	public double getUld(Activity a){
 		if(uld.size()>0&&uld.keySet().contains(a)){
 			return uld.get(a);
 			}else{
@@ -298,20 +298,20 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 	private static double marginalUtilityOfDistance = Double.NaN;
 	private static double abortedPlanScore = Double.NaN;
 	
-	private LinkedHashMap<Act,Double> udur=new LinkedHashMap<Act,Double>();
-	private LinkedHashMap<Act,Double> uw=new LinkedHashMap<Act,Double>();
-	private LinkedHashMap<Act,Double> us=new LinkedHashMap<Act,Double>();
-	private LinkedHashMap<Act,Double> ula=new LinkedHashMap<Act,Double>();
-	private LinkedHashMap<Act,Double> ued=new LinkedHashMap<Act,Double>();
-	private LinkedHashMap<Act,Double> uld=new LinkedHashMap<Act,Double>();
+	private LinkedHashMap<Activity,Double> udur=new LinkedHashMap<Activity,Double>();
+	private LinkedHashMap<Activity,Double> uw=new LinkedHashMap<Activity,Double>();
+	private LinkedHashMap<Activity,Double> us=new LinkedHashMap<Activity,Double>();
+	private LinkedHashMap<Activity,Double> ula=new LinkedHashMap<Activity,Double>();
+	private LinkedHashMap<Activity,Double> ued=new LinkedHashMap<Activity,Double>();
+	private LinkedHashMap<Activity,Double> uld=new LinkedHashMap<Activity,Double>();
 	private LinkedHashMap<Leg,Double> ulegt=new LinkedHashMap<Leg,Double>();
 	private LinkedHashMap<Leg,Double> ulegd = new LinkedHashMap<Leg,Double>();
-	private LinkedHashMap<Act,Double> dudur=new LinkedHashMap<Act,Double>();
-	private LinkedHashMap<Act,Double> duw=new LinkedHashMap<Act,Double>();
-	private LinkedHashMap<Act,Double> dus=new LinkedHashMap<Act,Double>();
-	private LinkedHashMap<Act,Double> dula=new LinkedHashMap<Act,Double>();
-	private LinkedHashMap<Act,Double> dued=new LinkedHashMap<Act,Double>();
-	private LinkedHashMap<Act,Double> duld=new LinkedHashMap<Act,Double>();
+	private LinkedHashMap<Activity,Double> dudur=new LinkedHashMap<Activity,Double>();
+	private LinkedHashMap<Activity,Double> duw=new LinkedHashMap<Activity,Double>();
+	private LinkedHashMap<Activity,Double> dus=new LinkedHashMap<Activity,Double>();
+	private LinkedHashMap<Activity,Double> dula=new LinkedHashMap<Activity,Double>();
+	private LinkedHashMap<Activity,Double> dued=new LinkedHashMap<Activity,Double>();
+	private LinkedHashMap<Activity,Double> duld=new LinkedHashMap<Activity,Double>();
 	private LinkedHashMap<Leg,Double> dulegt=new LinkedHashMap<Leg,Double>();
 	private LinkedHashMap<Leg,Double> dulegd = new LinkedHashMap<Leg,Double>();
 	
@@ -341,7 +341,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		initialized = true;
 	}
 
-	private final double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
+	private final double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
 		ActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
@@ -464,7 +464,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		return tmpScore;
 	}
 
-	protected double[] getOpeningInterval(final Act act) {
+	protected double[] getOpeningInterval(final Activity act) {
 
 		ActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
@@ -494,7 +494,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 			 * available, which is quite an expensive operation
 			 */
 			Route route = leg.getRoute();
-			dist = route.getDist();
+			dist = route.getDistance();
 			/* TODO the route-distance does not contain the length of the first or
 			 * last link of the route, because the route doesn't know those. Should
 			 * be fixed somehow, but how? MR, jan07
@@ -554,12 +554,12 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 
 	private void handleAct(final double time) {
 		double actScore=0;
-		Act act = (Act)this.plan.getPlanElements().get(this.index);
+		Activity act = (Activity)this.plan.getPlanElements().get(this.index);
 		if (this.index == 0) {
 			this.firstActTime = time;
 		} else if (this.index == this.lastActIndex) {
 			String lastActType = act.getType();
-			if (lastActType.equals(((Act) this.plan.getPlanElements().get(0)).getType())) {
+			if (lastActType.equals(((Activity) this.plan.getPlanElements().get(0)).getType())) {
 				// the first Act and the last Act have the same type
 				actScore= calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
 				this.score += actScore;
@@ -567,7 +567,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 				if (scoreActs) {
 					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
 					// score first activity
-					Act firstAct = (Act)this.plan.getPlanElements().get(0);
+					Activity firstAct = (Activity)this.plan.getPlanElements().get(0);
 					actScore=calcActScore(0.0, this.firstActTime, firstAct);
 					this.score += actScore;
 					// score last activity

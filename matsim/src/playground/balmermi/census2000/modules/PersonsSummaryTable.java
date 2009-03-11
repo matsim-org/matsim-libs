@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.interfaces.basic.v01.BasicAct;
+import org.matsim.interfaces.basic.v01.BasicActivity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -129,7 +129,7 @@ public class PersonsSummaryTable extends AbstractPersonAlgorithm implements Plan
 		int w = 0;
 		Iterator<BasicActImpl> act_it = plan.getIteratorAct();
 		while (act_it.hasNext()) {
-			BasicAct act = act_it.next();
+			BasicActivity act = act_it.next();
 			if (L.equals(act.getType())) { l = 1; }
 			if (S.equals(act.getType())) { s = 1; }
 			if (E.equals(act.getType())) { e = 1; }

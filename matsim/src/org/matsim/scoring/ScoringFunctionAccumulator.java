@@ -22,7 +22,7 @@ package org.matsim.scoring;
 
 import java.util.ArrayList;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.scoring.interfaces.ActivityScoring;
 import org.matsim.scoring.interfaces.AgentStuckScoring;
@@ -50,7 +50,7 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		}
 	}
 
-	public void startActivity(double time, Act act) {
+	public void startActivity(double time, Activity act) {
 		for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
 			activityScoringFunction.startActivity(time, act);
 		}

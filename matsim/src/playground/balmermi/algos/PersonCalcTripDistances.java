@@ -20,7 +20,7 @@
 
 package playground.balmermi.algos;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -58,22 +58,22 @@ public class PersonCalcTripDistances extends AbstractPersonAlgorithm implements 
 		Plan plan = person.getSelectedPlan();
 		if (plan == null) { throw new RuntimeException("Person id=" + person.getId() + "does not have a selected plan assigned!"); }
 		for (int i=1; i<plan.getPlanElements().size()-1; i=i+2) {
-			Act prev = (Act)plan.getPlanElements().get(i-1);
+			Activity prev = (Activity)plan.getPlanElements().get(i-1);
 			Leg leg = (Leg)plan.getPlanElements().get(i);
-			Act next = (Act)plan.getPlanElements().get(i+1);
+			Activity next = (Activity)plan.getPlanElements().get(i+1);
 
 			if (prev.getLinkId().equals(next.getLinkId())) {
 				if (!((CarRoute) leg.getRoute()).getNodes().isEmpty()) { throw new RuntimeException("Person id=" + person.getId() + ": route should be empty!"); }
-				leg.getRoute().setDist(0.0);
+				leg.getRoute().setDistance(0.0);
 			}
 			else {
-				if (((CarRoute) leg.getRoute()).getNodes().isEmpty()) { leg.getRoute().setDist(next.getCoord().calcDistance(prev.getCoord())); }
+				if (((CarRoute) leg.getRoute()).getNodes().isEmpty()) { leg.getRoute().setDistance(next.getCoord().calcDistance(prev.getCoord())); }
 				else {
 					double dist = prev.getLink().getLength();
 					for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
 						dist += link.getLength();
 					}
-					leg.getRoute().setDist(dist);
+					leg.getRoute().setDistance(dist);
 				}
 			}
 		}

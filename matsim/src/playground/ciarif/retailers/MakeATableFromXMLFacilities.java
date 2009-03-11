@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
@@ -66,8 +66,8 @@ public class MakeATableFromXMLFacilities {
 			for (Facility f : facilities.getFacilities().values()) {
 				if (f.getActivityOption("shop")!=null){
 					out.write(f.getId()+ "\t");
-					out.write(f.getCenter().getX()+ "\t");
-					out.write(f.getCenter().getY()+"\t");
+					out.write(f.getCoord().getX()+ "\t");
+					out.write(f.getCoord().getY()+"\t");
 					out.write(f.getLink().getId()+"\t");
 					out.write(f.getActivityOption("shop").getCapacity()+"\n");
 					}

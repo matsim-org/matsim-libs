@@ -29,9 +29,9 @@ import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -121,7 +121,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	
 	private final int getPrevMode(int s_act_idx, Plan p) {
 		// prev_mode; // 0= car; 1= Pt; 2= Car passenger; 3= Bike; 4= Walk; -1: subtour is starting from home;
-		Act act = (Act)p.getPlanElements().get(s_act_idx);
+		Activity act = (Activity)p.getPlanElements().get(s_act_idx);
 		if (act.getType().startsWith(H)) { return -1; }
 		Leg leg = (Leg)p.getPlanElements().get(s_act_idx-1);
 		if (leg.getMode().equals(BasicLeg.Mode.car)) { return 0; }
@@ -135,7 +135,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	//////////////////////////////////////////////////////////////////////
 
 	private final int getUrbanDegree(ArrayList<Integer> act_indices, Plan p) {
-		Act act = (Act)p.getPlanElements().get(act_indices.get(0));
+		Activity act = (Activity)p.getPlanElements().get(act_indices.get(0));
 		Zone zone = (Zone)act.getFacility().getUpMapping().values().iterator().next();
 		return this.municipalities.getMunicipality(zone.getId()).getRegType();
 	}
@@ -145,9 +145,9 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	private final double calcTourDistance(ArrayList<Integer> act_indices, Plan p) {
 		double dist = 0.0;
 		for (int j=1; j<act_indices.size(); j++) {
-			Act from_act = (Act)p.getPlanElements().get(act_indices.get(j-1));
-			Act to_act = (Act)p.getPlanElements().get(act_indices.get(j));
-			dist += to_act.getFacility().getCenter().calcDistance(from_act.getFacility().getCenter());
+			Activity from_act = (Activity)p.getPlanElements().get(act_indices.get(j-1));
+			Activity to_act = (Activity)p.getPlanElements().get(act_indices.get(j));
+			dist += to_act.getFacility().getCoord().calcDistance(from_act.getFacility().getCoord());
 		}
 		return dist/1000.0;
 	}
@@ -176,7 +176,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		//   GET the mainpurpose of the subtour
 		int mainpurpose = 3; // 0 := work; 1 := edu; 2 := shop 3:=leisure
 		for (int j=1; j<act_indices.size()-1; j++) {
-			Act act = (Act)p.getPlanElements().get(act_indices.get(j));
+			Activity act = (Activity)p.getPlanElements().get(act_indices.get(j));
 			String type = act.getType().substring(0,1); // h,w,e,s,l
 			if (mainpurpose == 3) {
 				if (type.equals(H)) { mainpurpose = 0; }
@@ -245,7 +245,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			// dist_subtour; // distance of the sub-tour (in kilometers)
 			model.setDistanceTour(this.calcTourDistance(act_indices,p));
 			// dist_h_w; // distance between home and work or education facility (in km)
-			Coord h_coord = person.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility().getCenter();
+			Coord h_coord = person.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility().getCoord();
 			ArrayList<ActivityOption> prim_acts = new ArrayList<ActivityOption>();
 			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W2));
 			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W3));
@@ -256,7 +256,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EOTHR));
 			if (prim_acts.isEmpty()) { model.setDistanceHome2Work(0.0); }
 			else {
-				Coord p_coord = prim_acts.get(MatsimRandom.random.nextInt(prim_acts.size())).getFacility().getCenter();
+				Coord p_coord = prim_acts.get(MatsimRandom.random.nextInt(prim_acts.size())).getFacility().getCoord();
 				model.setDistanceHome2Work(h_coord.calcDistance(p_coord)/1000.0);
 			}
 			// tickets; // holds some kind of season tickets 
@@ -320,9 +320,9 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 				else if (prev_mode == -1) { out.write(BasicLeg.Mode.undefined.toString() + "\t"); }
 				else { Gbl.errorMsg("pid="+person.getId()+": prev_mode="+prev_mode+" knot known!"); }
 				out.write(mode.toString()+"\t");
-				Act st_startact = (Act)person.getSelectedPlan().getPlanElements().get(act_indices.get(0));
-				Act st_endact = (Act)person.getSelectedPlan().getPlanElements().get(act_indices.get(act_indices.size()-1));
-				Coord start_coord = st_startact.getFacility().getCenter();
+				Activity st_startact = (Activity)person.getSelectedPlan().getPlanElements().get(act_indices.get(0));
+				Activity st_endact = (Activity)person.getSelectedPlan().getPlanElements().get(act_indices.get(act_indices.size()-1));
+				Coord start_coord = st_startact.getFacility().getCoord();
 				Zone zone = (Zone)st_startact.getFacility().getUpMapping().values().iterator().next();
 				out.write(start_coord.getX()+"\t");
 				out.write(start_coord.getY()+"\t");

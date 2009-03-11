@@ -34,7 +34,7 @@ import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -89,7 +89,7 @@ public class Wait2Link_2Acts1LinkTest {
 					int max = actsLegs.size();
 					for (int i = 0; i < max; i++)
 						if (i % 2 == 0) {
-							Act a = (Act) actsLegs.get(i);
+							Activity a = (Activity) actsLegs.get(i);
 							nextTmpLinkId = a.getLink().getId().toString();
 							if (tmpLinkId != null && nextTmpLinkId != null)
 								if (tmpLinkId.equals(nextTmpLinkId)) {

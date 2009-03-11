@@ -26,7 +26,7 @@ import java.util.Date;
 import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
@@ -76,11 +76,11 @@ public class PlanComparator {
 		this.population = loadPlansFile(firstPlanPath);
 		this._result = new PlanComparison(this.population.getPersons().keySet().size());
 		Plan plan;
-		Act act;
+		Activity act;
 		for (Id id : this.population.getPersons().keySet()) {
 			plan = this.population.getPerson(id).getSelectedPlan();
-			act = (Act) plan.getIteratorAct().next();
-			this._result.addFirstPlansData(id, plan.getScore(), act);
+			act = (Activity) plan.getIteratorAct().next();
+			this._result.addFirstPlansData(id, plan.getScoreAsPrimitiveType(), act);
 		}
 		// many people can be in one pop -> care about memory
 		this.population = null;
@@ -89,7 +89,7 @@ public class PlanComparator {
 		this.population = loadPlansFile(secondPlanPath);
 		for (Id id : this.population.getPersons().keySet()) {
 			plan = this.population.getPerson(id).getSelectedPlan();
-			this._result.addSecondPlansData(id, plan.getScore());
+			this._result.addSecondPlansData(id, plan.getScoreAsPrimitiveType());
 		}
 
 		if (outpath == null) {

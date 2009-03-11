@@ -20,12 +20,14 @@
 
 package org.matsim.interfaces.basic.v01;
 
+import org.matsim.interfaces.core.v01.Coord;
+
 
 /**
  *
  * @author dgrether
  */
-public interface BasicAct {
+public interface BasicActivity {
 
 	public double getEndTime();
 
@@ -40,8 +42,10 @@ public interface BasicAct {
 
 	public void setType(final String type);
 
+	@Deprecated // not yet clear what will happen, may not survive
 	public Coord getCoord();
 
+	@Deprecated // not yet clear what will happen, may not survive
 	public void setCoord(Coord coordinates);
 
 	public double getStartTime();
@@ -55,16 +59,5 @@ public interface BasicAct {
 	public Id getFacilityId();
 	
 	public void setFacilityId(final Id id);
-
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	public double getDuration();
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	public void setDuration(double duration);
 
 }

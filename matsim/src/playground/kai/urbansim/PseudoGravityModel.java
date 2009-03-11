@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -102,14 +102,14 @@ public class PseudoGravityModel {
 		// compute the extent of the coordinates for persons:
 		for ( Person person : population.getPersons().values() ) {
 			Plan plan = person.getSelectedPlan() ;
-			Act act = plan.getFirstActivity();
+			Activity act = plan.getFirstActivity();
 			Coord homeCoord = act.getCoord() ;
 			checkMax( homeCoord ) ;
 		}
 		// same for jobs except it's a bit more indirect:
 		for ( Iterator<Id> it = locationFromJob.values().iterator(); it.hasNext(); ) {
 			LocationId gridId = (LocationId) it.next();
-			Coord jobCoord = facilities.getFacilities().get( gridId ).getCenter() ;
+			Coord jobCoord = facilities.getFacilities().get( gridId ).getCoord() ;
 			checkMax(jobCoord) ;
 		}
 			
@@ -125,7 +125,7 @@ public class PseudoGravityModel {
 		for ( Iterator<Id> it = locationFromJob.values().iterator(); it.hasNext(); ) {
 			LocationId parcelId = (LocationId) it.next();
 			Location parcel = facilities.getFacilities().get( parcelId ) ;
-			Coord cc = parcel.getCenter() ;
+			Coord cc = parcel.getCoord() ;
 			int bin = binFromXY( cc.getX() , cc.getY() ) ;
 			PseudoCell pc = pseudoCells.get(bin) ;
 			pc.addJob( cc ) ;

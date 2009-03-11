@@ -4,7 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -52,7 +52,7 @@ public class PlansSummaryTable implements PlanAlgorithm {
 			//out.write(plan.getScore() + "\t");
 			for (int i=1; i<plan.getPlanElements().size()-2; i=i+2) {
 				//Leg l = (Leg)plan.getActsLegs().get(i);
-				Act a = (Act)plan.getPlanElements().get(i+1);
+				Activity a = (Activity)plan.getPlanElements().get(i+1);
 				//Link arr_link = a.getLink();
 				out.write(a.getType() + "\t");
 				out.write(a.getLinkId() + "\t");

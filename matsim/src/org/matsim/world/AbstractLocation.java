@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 
@@ -190,10 +190,7 @@ public abstract class AbstractLocation implements Location {
 		return this.layer;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.world.Location#getCenter()
-	 */
-	public final Coord getCenter() {
+	public final Coord getCoord() {
 		return this.center;
 	}
 

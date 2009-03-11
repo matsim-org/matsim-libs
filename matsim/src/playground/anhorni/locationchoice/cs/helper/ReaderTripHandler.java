@@ -2,9 +2,9 @@ package playground.anhorni.locationchoice.cs.helper;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
@@ -22,7 +22,7 @@ public class ReaderTripHandler {
 		
 		Coord beforeShoppingCoord = new CoordImpl(
 				Double.parseDouble(entries[38].trim()), Double.parseDouble(entries[39].trim()));
-		Act beforeShoppingAct = new org.matsim.population.ActImpl("start", beforeShoppingCoord);
+		Activity beforeShoppingAct = new org.matsim.population.ActImpl("start", beforeShoppingCoord);
 		// in seconds after midnight
 		double endTimeBeforeShoppingAct = 60.0 * Double.parseDouble(entries[12].trim());
 		beforeShoppingAct.setEndTime(endTimeBeforeShoppingAct);
@@ -33,8 +33,8 @@ public class ReaderTripHandler {
 		ZHFacility chosenFacility = facilities.getZhFacilities().get(chosenFacilityId);
 		Link link = network.getLink(chosenFacility.getLinkId());
 
-		Act shoppingAct = new org.matsim.population.ActImpl("shop", link);
-		shoppingAct.setCoord(link.getCenter());
+		Activity shoppingAct = new org.matsim.population.ActImpl("shop", link);
+		shoppingAct.setCoord(link.getCoord());
 		
 		double startTimeShoppingAct = 60.0 * Double.parseDouble(entries[15].trim());
 		shoppingAct.setStartTime(startTimeShoppingAct);
@@ -44,7 +44,7 @@ public class ReaderTripHandler {
 		this.chosenFacilityId = chosenFacilityId;
 			
 		Coord afterShoppingCoord = mzTrip.getCoord();
-		Act afterShoppingAct = new org.matsim.population.ActImpl("end", afterShoppingCoord);
+		Activity afterShoppingAct = new org.matsim.population.ActImpl("end", afterShoppingCoord);
 		afterShoppingAct.setLink(network.getNearestLink(afterShoppingCoord));
 		
 		if (!(mzTrip.getEndTime() > 0.0)) {

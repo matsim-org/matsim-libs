@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;

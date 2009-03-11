@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.utils.io.IOUtils;
 
@@ -140,7 +140,7 @@ public class Utils {
 	 * @param workCoord
 	 */
 	public static void completePlanToHwh ( Plan plan, Coord workCoord ) {
-		Act act = plan.getFirstActivity();
+		Activity act = plan.getFirstActivity();
 		act.setEndTime( 7.*3600. ) ;
 		Coord homeCoord = act.getCoord();
 

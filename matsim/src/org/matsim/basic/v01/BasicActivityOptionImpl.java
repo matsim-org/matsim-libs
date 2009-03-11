@@ -25,20 +25,20 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
+import org.matsim.interfaces.basic.v01.BasicActivityOption;
 import org.matsim.interfaces.basic.v01.BasicLocation;
 
 /**
  * @author dgrether
  */
-public class BasicActivityImpl implements BasicActivityOption {
+public class BasicActivityOptionImpl implements BasicActivityOption {
 	
-	private Integer capacity = null;
+	private Double capacity = null;
 	private BasicLocation location;
 	private Map<DayType,SortedSet<BasicOpeningTime>> openingTimes = new HashMap<DayType, SortedSet<BasicOpeningTime>>();
-	private Integer frequency = null;
 	private String type;
 	
-	public BasicActivityImpl(String type) {
+	public BasicActivityOptionImpl(String type) {
 		this.type = type;
 	}
 
@@ -46,23 +46,15 @@ public class BasicActivityImpl implements BasicActivityOption {
 		return this.type;
 	}
 	
-	public Integer getCapacity() {
+	public Double getCapacity() {
 		return this.capacity;
 	}
 	
-	public Integer getFrequency() {
-		return this.frequency;
-	}
-	
-	public void setFrequency(Integer freq) {
-		this.frequency = freq;
-	}
-
 	public BasicLocation getLocation() {
 		return this.location;
 	}
 
-	public void setCapacity(Integer cap) {
+	public void setCapacity(Double cap) {
 		this.capacity = cap;
 	}
 

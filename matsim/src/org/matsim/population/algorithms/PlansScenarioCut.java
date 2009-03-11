@@ -23,9 +23,9 @@ package org.matsim.population.algorithms;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -75,7 +75,7 @@ public class PlansScenarioCut {
 				Plan plan = person.getPlans().get(0);
 				Iterator<?> a_it = plan.getIteratorAct();
 				while (a_it.hasNext()) {
-					Act a = (Act)a_it.next();
+					Activity a = (Activity)a_it.next();
 					Coord coord = a.getCoord();
 					if (coord == null) { 
 						throw new RuntimeException("Module requires 'act coord'");

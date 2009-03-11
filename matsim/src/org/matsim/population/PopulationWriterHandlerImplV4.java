@@ -24,7 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
@@ -270,7 +270,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	public void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
 		out.write("\t\t<plan");
 		if (!plan.hasUndefinedScore())
-			out.write(" score=\"" + plan.getScore() + "\"");
+			out.write(" score=\"" + plan.getScoreAsPrimitiveType() + "\"");
 		if (plan.isSelected())
 			out.write(" selected=\"" + "yes" + "\"");
 		else
@@ -288,7 +288,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <act ... > ... </act>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startAct(final Act act, final BufferedWriter out) throws IOException {
+	public void startAct(final Activity act, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<act");
 		out.write(" type=\"" + act.getType() + "\"");
 		if (act.getLink() != null)
@@ -336,8 +336,8 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 
 	public void startRoute(final CarRoute route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route");
-		if (!Double.isNaN(route.getDist()))
-			out.write(" dist=\"" + route.getDist() + "\"");
+		if (!Double.isNaN(route.getDistance()))
+			out.write(" dist=\"" + route.getDistance() + "\"");
 		if (route.getTravelTime() != Time.UNDEFINED_TIME)
 			out.write(" trav_time=\"" + Time.writeTime(route.getTravelTime()) + "\"");
 		out.write(">\n");

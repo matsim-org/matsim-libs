@@ -23,7 +23,7 @@ package org.matsim.locationchoice.constrained;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 
 public class ManageSubchains {
@@ -36,7 +36,7 @@ public class ManageSubchains {
 	private double ttBudget = 0.0;
 	private double totalTravelDistance = 0.0;
 		
-	public void secondaryActivityFound(Act act, Leg leg) {
+	public void secondaryActivityFound(Activity act, Leg leg) {
 		/* 
 		 * No plan starts with secondary activity!
 		 */
@@ -44,10 +44,10 @@ public class ManageSubchains {
 		this.subChains.get(subChainIndex).addAct(act);
 		this.secondaryActFound = true;	
 		this.ttBudget += leg.getTravelTime();
-		this.totalTravelDistance += leg.getRoute().getDist();	
+		this.totalTravelDistance += leg.getRoute().getDistance();	
 	}
 	
-	public void primaryActivityFound(Act act, Leg leg) {
+	public void primaryActivityFound(Activity act, Leg leg) {
 		/* 
 		 * close chain
 		 */
@@ -74,7 +74,7 @@ public class ManageSubchains {
 			this.chainStarted = true;
 			this.secondaryActFound = false;
 			this.ttBudget = leg.getTravelTime();
-			this.totalTravelDistance = leg.getRoute().getDist();
+			this.totalTravelDistance = leg.getRoute().getDistance();
 			this.subChains.get(subChainIndex).defineMode(leg.getMode());
 		}			
 	}

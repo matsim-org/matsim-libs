@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.utils.misc.Time;
@@ -51,7 +51,7 @@ public class EndLegMessage extends EventMessage {
 		if ((actsLegs.size() > vehicle.getLegIndex())) {
 			vehicle.setCurrentLeg((Leg) actsLegs.get(vehicle.getLegIndex()));
 			// current act
-			Act currentAct = (Act) actsLegs.get(vehicle.getLegIndex() - 1);
+			Activity currentAct = (Activity) actsLegs.get(vehicle.getLegIndex() - 1);
 			// the leg the agent performs
 
 			// if only duration or end time of act is defined, take that
@@ -100,7 +100,7 @@ public class EndLegMessage extends EventMessage {
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
 		// schedule ActStartEvent
-		Act nextAct = vehicle.getNextActivity();
+		Activity nextAct = vehicle.getNextActivity();
 		double actStartEventTime = nextAct.getStartTime();
 
 		if (this.getMessageArrivalTime() > actStartEventTime) {

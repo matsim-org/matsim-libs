@@ -51,9 +51,9 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
@@ -329,7 +329,7 @@ public class EgoNetPlansMakeKML {
 		myKMLDocument.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(facilitiesFolder));
 
 		ActLegIterator actLegIter = myPlan.getIterator();
-		Act act0 = (Act) actLegIter.nextAct();
+		Activity act0 = (Activity) actLegIter.nextAct();
 		makeActKML(myPerson, act0, agentFolder, agentLinkStyle);
 		while(actLegIter.hasNextLeg()){//alternates Act-Leg-Act-Leg and ends with Act
 
@@ -352,7 +352,7 @@ public class EgoNetPlansMakeKML {
 					agentFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(agentLinkL));
 				}
 			}
-			Act act = (Act) actLegIter.nextAct();
+			Activity act = (Activity) actLegIter.nextAct();
 			makeActKML(myPerson, act, agentFolder,agentLinkStyle);
 		}
 
@@ -362,7 +362,7 @@ public class EgoNetPlansMakeKML {
 
 		ActIterator aIter = myPlan.getIteratorAct();
 		while(aIter.hasNext()){
-			Act myAct = (Act) aIter.next();
+			Activity myAct = (Activity) aIter.next();
 			StyleType myStyle=facStyle.get(myAct.getType());
 
 			PlacemarkType aFacility = kmlObjectFactory.createPlacemarkType();
@@ -469,7 +469,7 @@ public class EgoNetPlansMakeKML {
 
 	}
 
-	private static void makeActKML(Person myPerson, Act act, FolderType agentFolder, StyleType agentLinkStyle) {
+	private static void makeActKML(Person myPerson, Activity act, FolderType agentFolder, StyleType agentLinkStyle) {
 		// TODO Auto-generated method stub
 
 		String styleUrl = null;

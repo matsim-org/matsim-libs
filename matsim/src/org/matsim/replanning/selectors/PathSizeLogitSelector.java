@@ -97,7 +97,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 		//the very first and the very last link of a path will be ignored - gl
 		for (Plan plan : plans) {
 
-			if (plan.getScore() > wc.maxScore) wc.maxScore = plan.getScore();
+			if (plan.getScoreAsPrimitiveType() > wc.maxScore) wc.maxScore = plan.getScoreAsPrimitiveType();
 
 			double pathSize = 0;
 			double currentEndTime = 0.0;
@@ -106,7 +106,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 					Leg leg = ((Leg)it.next());
 					currentEndTime = leg.getDepartureTime();
 					CarRoute r = (CarRoute) leg.getRoute();
-					pathSize += r.getDist();
+					pathSize += r.getDistance();
 					for (Link link : r.getLinks()){
 						ArrayList<Double> lit = linksInTime.get(link.getId());
 						if (lit == null){
@@ -142,7 +142,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 
 			}
 			double PSi = Math.pow(tmp/planLength.get(plan.hashCode()), this.beta);
-			double weight = Math.exp(this.tau * (plan.getScore() - wc.maxScore))*PSi;
+			double weight = Math.exp(this.tau * (plan.getScoreAsPrimitiveType() - wc.maxScore))*PSi;
 			if (weight <= 0.0) weight = 0;
 			wc.weights[idx] = weight;
 			sumweight += weight;

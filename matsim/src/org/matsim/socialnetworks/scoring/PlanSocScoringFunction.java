@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.ScoringFunction;
@@ -78,10 +78,10 @@ public class PlanSocScoringFunction implements ScoringFunction{
 
 		ActIterator ait = this.plan.getIteratorAct();
 
-		LinkedHashMap<Act,ArrayList<Double>> actStats = this.spatialScorer.calculateTimeWindowActStats(plan);
+		LinkedHashMap<Activity,ArrayList<Double>> actStats = this.spatialScorer.calculateTimeWindowActStats(plan);
 //		ArrayList<Double> stats = this.spatialScorer.calculateTimeWindowStats(plan);
 		while(ait.hasNext()){
-			Act act = (Act)ait.next();
+			Activity act = (Activity)ait.next();
 			if(act.getType().equals(factype)){
 //				this.friendFoeRatio+=stats.get(0);
 //				this.nFriends+=stats.get(1);
@@ -124,7 +124,7 @@ public class PlanSocScoringFunction implements ScoringFunction{
 		this.scoringFunction.finish();
 	}
 
-	public void startActivity(final double time, final Act act) {
+	public void startActivity(final double time, final Activity act) {
 		this.scoringFunction.startActivity(time, act);
 	}
 

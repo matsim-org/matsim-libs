@@ -33,8 +33,8 @@ import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.feature.Feature;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
@@ -709,7 +709,7 @@ public class TeleatlasParser {
 			Node n = network.createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
 			newNodes.add(n);
 			nodeIdCnt++;
-			network.createLink(inlink.getId(),inlink.getFromNode(),n,inlink.getLength(),inlink.getFreespeed(Time.UNDEFINED_TIME),inlink.getCapacity(Time.UNDEFINED_TIME),inlink.getLanes(Time.UNDEFINED_TIME),inlink.getOrigId(),inlink.getType());
+			network.createLink(inlink.getId(),inlink.getFromNode(),n,inlink.getLength(),inlink.getFreespeed(Time.UNDEFINED_TIME),inlink.getCapacity(Time.UNDEFINED_TIME),inlink.getNumberOfLanes(Time.UNDEFINED_TIME),inlink.getOrigId(),inlink.getType());
 		}
 		for (Link outlink : outlinks.values()) {
 			Coord c = node.getCoord();
@@ -721,7 +721,7 @@ public class TeleatlasParser {
 			Node n = network.createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
 			newNodes.add(n);
 			nodeIdCnt++;
-			network.createLink(outlink.getId(),n,outlink.getToNode(),outlink.getLength(),outlink.getFreespeed(Time.UNDEFINED_TIME),outlink.getCapacity(Time.UNDEFINED_TIME),outlink.getLanes(Time.UNDEFINED_TIME),outlink.getOrigId(),outlink.getType());
+			network.createLink(outlink.getId(),n,outlink.getToNode(),outlink.getLength(),outlink.getFreespeed(Time.UNDEFINED_TIME),outlink.getCapacity(Time.UNDEFINED_TIME),outlink.getNumberOfLanes(Time.UNDEFINED_TIME),outlink.getOrigId(),outlink.getType());
 		}
 		
 		// add virtual links for the turn restrictions
@@ -729,7 +729,7 @@ public class TeleatlasParser {
 			Tuple<Id,Id> turn = turns.get(i);
 			Link fromLink = network.getLink(turn.getFirst());
 			Link toLink = network.getLink(turn.getSecond());
-			Link l = network.createLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),toLink.getFromNode().getCoord().calcDistance(fromLink.getToNode().getCoord()),fromLink.getFreespeed(Time.UNDEFINED_TIME),fromLink.getCapacity(Time.UNDEFINED_TIME),fromLink.getLanes(Time.UNDEFINED_TIME));
+			Link l = network.createLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),toLink.getFromNode().getCoord().calcDistance(fromLink.getToNode().getCoord()),fromLink.getFreespeed(Time.UNDEFINED_TIME),fromLink.getCapacity(Time.UNDEFINED_TIME),fromLink.getNumberOfLanes(Time.UNDEFINED_TIME));
 			newLinks.add(l);
 		}
 		return new Tuple<ArrayList<Node>, ArrayList<Link>>(newNodes,newLinks);

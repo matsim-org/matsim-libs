@@ -134,7 +134,7 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 		for (LegIterator li = person.getSelectedPlan().getIteratorLeg(); li
 				.hasNext();) {
 			Leg l = (Leg) li.next();
-			double dist = (((int) l.getRoute().getDist()) / 1000 * 1000);
+			double dist = (((int) l.getRoute().getDistance()) / 1000 * 1000);
 			if (dist < 320000) {
 				if (l.getMode().equals(Mode.car)) {
 					Double carLegsCounter = this.carLegs.get(dist);

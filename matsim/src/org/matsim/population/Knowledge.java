@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.basic.v01.BasicKnowledge;
+import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.ActivityOption;
@@ -260,12 +261,12 @@ public class Knowledge extends CustomizableImpl implements BasicKnowledge<Activi
 	 * @param isPrimary To define which of the {@link ActivityOption Activities} should be returned
 	 * @return The list of {@link ActivityOption Activities} of the given flag. The list may be empty
 	 */
-	public final ArrayList<ActivityOption> getActivities(boolean isPrimary) {
-		if (activities == null) { return new ArrayList<ActivityOption>(0); }
-		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>(INIT_ACTIVITY_CAPACITY);
+	public final ArrayList<ActivityOptionImpl> getActivities(boolean isPrimary) {
+		if (activities == null) { return new ArrayList<ActivityOptionImpl>(0); }
+		ArrayList<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>(INIT_ACTIVITY_CAPACITY);
 		for (KActivity ka : activities) {
 			if (ka.isPrimary == isPrimary) {
-				acts.add(ka.activity);
+				acts.add((ActivityOptionImpl) ka.activity);
 			}
 		}
 		return acts;

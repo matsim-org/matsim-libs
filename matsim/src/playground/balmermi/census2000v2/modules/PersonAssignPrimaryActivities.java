@@ -23,8 +23,9 @@ package playground.balmermi.census2000v2.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -62,9 +63,9 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 		Knowledge k = plan.getPerson().getKnowledge();
 		if (k == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no knowledge defined!"); }
 		if (!k.setPrimaryFlag(true)) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no activities defined!"); }
-		ArrayList<ActivityOption> prim_acts = k.getActivities(true);
+		ArrayList<ActivityOptionImpl> prim_acts = k.getActivities(true);
 		for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
-			Act act = (Act)plan.getPlanElements().get(i);
+			Activity act = (Activity)plan.getPlanElements().get(i);
 			String curr_type = act.getType();
 			ActivityOption a = act.getFacility().getActivityOption(curr_type);
 			if (a == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": Inconsistency with f_id="+act.getFacility()+"!"); }

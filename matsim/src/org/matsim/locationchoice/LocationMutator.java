@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
@@ -133,10 +133,10 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		double maxy = Double.NEGATIVE_INFINITY;
 
 		for (final Facility f : facilities_of_type.values()) {
-			if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-			if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-			if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-			if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 		}
 		minx -= 1.0;
 		miny -= 1.0;
@@ -145,7 +145,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		QuadTree<Facility> quadtree = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		for (final Facility f : facilities_of_type.values()) {
-			quadtree.put(f.getCenter().getX(),f.getCenter().getY(),f);
+			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 		}
 		log.info("    done");
 		Gbl.printRoundTime();
@@ -161,13 +161,13 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	}
 	
 	
-	protected List<Act>  defineMovablePrimaryActivities(final Plan plan) {
+	protected List<Activity>  defineMovablePrimaryActivities(final Plan plan) {
 	
-		List<Act> primaryActivities = new Vector<Act>();
+		List<Activity> primaryActivities = new Vector<Activity>();
 		
 		final ArrayList<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Act act = (Act)actslegs.get(j);
+			final Activity act = (Activity)actslegs.get(j);
 			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
 			
 			if (isPrimary) {
@@ -176,14 +176,14 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		}
 		Collections.shuffle(primaryActivities);
 		
-		List<Act> movablePrimaryActivities = new Vector<Act>();
+		List<Activity> movablePrimaryActivities = new Vector<Activity>();
 		
 		// key: activity.type + activity.facility
 		HashMap<String, Boolean> fixPrimaries = new HashMap<String, Boolean>();
 				
-		Iterator<Act> it = primaryActivities.iterator();
+		Iterator<Activity> it = primaryActivities.iterator();
 		while (it.hasNext()) {
-			Act a = it.next();		
+			Activity a = it.next();		
 			String key = a.getType()+a.getFacility().getId().toString();
 			if (fixPrimaries.containsKey(key)) {
 				// there is already one activity performed of the specific type at this location

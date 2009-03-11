@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.mfeil;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.PlanScorer;
@@ -56,7 +56,7 @@ public class PlanomatXPlanScorer extends PlanScorer {
 				double arrTime = 0;
 				for (int x = 0;x<i;x++){
 					if (x % 2 == 0){
-						Act actHelp = (Act) (plan.getPlanElements().get(x));
+						Activity actHelp = (Activity) (plan.getPlanElements().get(x));
 						if (actHelp.getDuration()>=0){
 								depTime = actHelp.getDuration() + depTime;
 						}

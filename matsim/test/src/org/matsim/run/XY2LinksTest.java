@@ -26,7 +26,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -64,7 +64,7 @@ public class XY2LinksTest extends MatsimTestCase {
 		Person person = new PersonImpl(new IdImpl("1"));
 		population.addPerson(person);
 		Plan plan = person.createPlan(true);
-		Act a1 = plan.createAct("h", new CoordImpl(50, 25));
+		Activity a1 = plan.createAct("h", new CoordImpl(50, 25));
 		a1.setEndTime(3600);
 
 		// write person to file
@@ -92,7 +92,7 @@ public class XY2LinksTest extends MatsimTestCase {
 		assertNotNull("person 1 missing", person2);
 		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
 		Plan plan2 = person2.getPlans().get(0);
-		Act act2 = (Act) plan2.getPlanElements().get(0);
+		Activity act2 = (Activity) plan2.getPlanElements().get(0);
 		assertNotNull("no link assigned.", act2.getLink());
 	}
 

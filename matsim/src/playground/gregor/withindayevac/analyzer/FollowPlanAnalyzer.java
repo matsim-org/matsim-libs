@@ -48,12 +48,12 @@ public class FollowPlanAnalyzer implements Analyzer {
 		List<Link> linklist = ((CarRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinks();
 		this.links = linklist.toArray(new Link[linklist.size()]);
 		this.startLink = plan.getFirstActivity().getLink();
-		if (plan.getScore() == Plan.UNDEF_SCORE){
+		if (plan.getScoreAsPrimitiveType() == Plan.UNDEF_SCORE){
 			this.isScored = false;
 			this.estArivalTime = Double.POSITIVE_INFINITY;
 		} else {
 			this.isScored = true;
-			this.estArivalTime = plan.getFirstActivity().getEndTime() + plan.getScore() * -600;
+			this.estArivalTime = plan.getFirstActivity().getEndTime() + plan.getScoreAsPrimitiveType() * -600;
 		}
 		this.destLink = plan.getNextActivity(plan.getNextLeg(plan.getFirstActivity())).getLink(); 
 		initLinkHashSet();

@@ -21,7 +21,7 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
@@ -51,7 +51,7 @@ public class PlansFilterActInArea extends AbstractPersonAlgorithm {
 	public void run(final Person person) {
 		ActIterator it = person.getSelectedPlan().getIteratorAct();
 		while (it.hasNext()){
-			Act act = (Act) it.next();
+			Activity act = (Activity) it.next();
 			String type = act.getType();
 			if (type.contains(this.actType)) {
 				if (this.network.getLink(act.getLink().getId()) != null) {

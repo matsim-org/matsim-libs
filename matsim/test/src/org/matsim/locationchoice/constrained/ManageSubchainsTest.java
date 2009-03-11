@@ -1,7 +1,7 @@
 package org.matsim.locationchoice.constrained;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.locationchoice.Initializer;
@@ -32,7 +32,7 @@ public class ManageSubchainsTest extends MatsimTestCase {
 	
 	public void testPrimarySecondaryActivityFound() {
 		Plan plan = this.initializer.getControler().getPopulation().getPerson(new IdImpl("1")).getSelectedPlan();
-		Act act = plan.getFirstActivity();
+		Activity act = plan.getFirstActivity();
 		Leg leg = plan.getNextLeg(act);
 		this.manager.primaryActivityFound(act, leg);
 		assertEquals(act, manager.getSubChains().get(0).getFirstPrimAct());

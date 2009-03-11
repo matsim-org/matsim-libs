@@ -23,7 +23,7 @@ package org.matsim.replanning.modules;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
@@ -113,7 +113,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 
 		// setup person
 		Plan plan;
-		Act act1, act2;
+		Activity act1, act2;
 		try {
 			/* The chosen times for the activity durations are such that it is likely
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).

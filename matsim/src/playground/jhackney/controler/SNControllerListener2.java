@@ -35,7 +35,7 @@ import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ScoringListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.scoring.EventsToScore;
@@ -98,7 +98,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 
 	private EventsMapStartEndTimes epp=null;//static? I just need one
 	private MakeTimeWindowsFromEvents teo=null;// static? I just need one
-	private LinkedHashMap<Act,ArrayList<Double>> actStats=null;// static? I just need one
+	private LinkedHashMap<Activity,ArrayList<Double>> actStats=null;// static? I just need one
 	private LinkedHashMap<Facility,ArrayList<TimeWindow>> twm=null;// static? I just need one
 	//
 	private LinkedHashMap<String,Double> rndEncounterProbs= new LinkedHashMap<String,Double>();// static? I just need one

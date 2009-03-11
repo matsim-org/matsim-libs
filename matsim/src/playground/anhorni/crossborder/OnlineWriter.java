@@ -76,8 +76,8 @@ class OnlineWriter {
 		
 		// use coords not links
 		//Home act		
-		double xHome=this.network.getLink(plan.getStartLink()).getCenter().getX();
-		double yHome=this.network.getLink(plan.getStartLink()).getCenter().getY();	
+		double xHome=this.network.getLink(plan.getStartLink()).getCoord().getX();
+		double yHome=this.network.getLink(plan.getStartLink()).getCoord().getY();	
 		this.out.write("\t\t\t<act");
 		this.out.write(" type=\"" + plan.getTempHomeType() + "\"");
 		this.out.write(" x=\"" + xHome + "\" y=\"" +yHome+ "\"");	
@@ -96,8 +96,8 @@ class OnlineWriter {
 		if (plan.getActivityType().equals("l3")) {actDur=3*3600;}
 		
 		
-		double xAct=this.network.getLink(plan.getEndLink()).getCenter().getX();
-		double yAct=this.network.getLink(plan.getEndLink()).getCenter().getY();		
+		double xAct=this.network.getLink(plan.getEndLink()).getCoord().getX();
+		double yAct=this.network.getLink(plan.getEndLink()).getCoord().getY();		
 		this.out.write("\t\t\t<act");
 		this.out.write(" type=\"" + plan.getActivityType() + "\"");
 		this.out.write(" x=\"" + xAct + "\" y=\"" +yAct+ "\"");	

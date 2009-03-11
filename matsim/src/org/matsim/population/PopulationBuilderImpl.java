@@ -23,19 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicActivityOption;
-import org.matsim.basic.v01.LocationType;
-import org.matsim.facilities.ActivityOptionImpl;
-import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.interfaces.basic.v01.BasicActivityOption;
 import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Network;
@@ -73,45 +68,6 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		this.network = scenario.getNetwork();
 		this.population = scenario.getPopulation();
 		this.facilities = null;
-	}
-
-	public Act createAct(final BasicPlan basicPlan, final String currentActType, final BasicLocation currentlocation) {
-		Act act = null;
-		if (currentlocation != null) {
-			if (currentlocation.getCenter() != null) {
-				act = ((Plan)basicPlan).createAct(currentActType, currentlocation.getCenter());
-			}
-
-			if (currentlocation.getId() != null){
-				if (currentlocation.getLocationType() == LocationType.FACILITY) {
-					Facility fac = this.facilities.getFacilities().get(currentlocation.getId());
-					if (act == null) {
-						act = ((Plan)basicPlan).createAct(currentActType, fac);
-					}
-					else {
-						act.setFacility(fac);
-					}
-				}
-				else if (currentlocation.getLocationType() == LocationType.LINK) {
-					Link link = this.network.getLink(currentlocation.getId());
-					if (act == null) {
-						act = ((Plan)basicPlan).createAct(currentActType, link);
-					}
-					else {
-						act.setLink(link);
-					}
-				}
-			}
-		} else {
-			StringBuilder builder = new StringBuilder();
-			builder.append("Act number: ");
-			builder.append(((Plan)basicPlan).getPlanElements().size());
-			builder.append(" of Person Id: " );
-			builder.append(((Plan)basicPlan).getPerson().getId());
-			builder.append(" has no location information. This is not possible to prevent by the XML Grammar used, however it should result in incorrect behaviour of the framework. Only use with expert knowledge!");
-			log.warn(builder.toString());
-		}
-		return act;
 	}
 
 	public Leg createLeg(final BasicPlan basicPlan, final Mode legMode) {
@@ -154,19 +110,6 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		}
 		route.setLinks(start, links, end);
 		return route;
-	}
-
-	public ActivityOption createActivity(final String type, final BasicLocation loc) {
-		ActivityOption act = null;
-		if (loc != null) {
-			if ((loc.getLocationType() == LocationType.FACILITY) && this.facilities.getFacilities().containsKey(loc.getId())) {
-				Facility fac = this.facilities.getFacilities().get(loc.getId());
-				act = new ActivityOptionImpl(type, fac);
-				return act;
-			}
-			throw new IllegalArgumentException("No facility exists with id: " + loc.getId());
-		}
-		throw new IllegalArgumentException("Can't create facility without location");
 	}
 
 	public Knowledge createKnowledge(final List<BasicActivityOption> acts) {

@@ -41,8 +41,8 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -226,7 +226,7 @@ public class DistanceAnalysis {
 
 		for (Person person : persons) {
 			Leg leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
-			double l1 = leg.getRoute().getDist();
+			double l1 = leg.getRoute().getDistance();
 			List<Link> ls = ((CarRoute) leg.getRoute()).getLinks();
 			Link l = ls.get(ls.size()-1);
 			String destS  = l.getId().toString().replace("el", "");
@@ -234,7 +234,7 @@ public class DistanceAnalysis {
 			dests[dest]++;
 
 			dist[0] +=  l1;
-			dist[2] += person.getSelectedPlan().getScore();
+			dist[2] += person.getSelectedPlan().getScoreAsPrimitiveType();
 			Plan plan = new org.matsim.population.PlanImpl(person);
 			plan.addAct(person.getSelectedPlan().getFirstActivity());
 			Leg ll = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
@@ -245,7 +245,7 @@ public class DistanceAnalysis {
 			plan.addAct(person.getSelectedPlan().getNextActivity(leg));
 			this.router.run(plan);
 			Leg leg2 = plan.getNextLeg(plan.getFirstActivity());
-			double l2 = leg2.getRoute().getDist();
+			double l2 = leg2.getRoute().getDistance();
 			dist[1] = l2;
 
 			diff += dist[0] - dist[1];

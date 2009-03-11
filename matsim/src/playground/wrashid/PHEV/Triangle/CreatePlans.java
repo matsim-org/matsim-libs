@@ -7,7 +7,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
@@ -81,14 +81,14 @@ public class CreatePlans {
 			double depTime=3600*8;
 			double duration=3600*8;
 
-			Act a = plan.createAct("home",home_facility.getCenter());
+			Activity a = plan.createAct("home",home_facility.getCoord());
 			a.setLink(home_facility.getLink());
 			a.setEndTime(depTime);
 			Leg l = plan.createLeg(BasicLeg.Mode.car);
 			l.setArrivalTime(depTime);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTime);
-			a = plan.createAct("work",work_facility.getCenter());
+			a = plan.createAct("work",work_facility.getCoord());
 			a.setLink(work_facility.getLink());
 			a.setStartTime(depTime);
 			a.setEndTime(depTime+duration);
@@ -97,7 +97,7 @@ public class CreatePlans {
 			l.setArrivalTime(depTime+duration);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTime+duration);
-			a = plan.createAct("home",home_facility.getCenter());
+			a = plan.createAct("home",home_facility.getCoord());
 			a.setLink(home_facility.getLink());
 			// assign home-work-home activities to each person
 

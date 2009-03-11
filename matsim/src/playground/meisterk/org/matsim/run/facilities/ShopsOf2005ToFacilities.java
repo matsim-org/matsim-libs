@@ -67,8 +67,8 @@ import org.matsim.facilities.algorithms.FacilitiesWriterAlgorithm;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimResource;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.OpeningTime;
@@ -1513,8 +1513,8 @@ public class ShopsOf2005ToFacilities {
 				shopId.getStreet() + ShopsOf2005ToFacilities.FIELD_DELIM +
 				shopId.getPostcode() + ShopsOf2005ToFacilities.FIELD_DELIM +
 				shopId.getCity() + ShopsOf2005ToFacilities.FIELD_DELIM +
-				(int) facility.getCenter().getY() + ShopsOf2005ToFacilities.FIELD_DELIM +
-				(int) facility.getCenter().getX();
+				(int) facility.getCoord().getY() + ShopsOf2005ToFacilities.FIELD_DELIM +
+				(int) facility.getCoord().getX();
 			;
 
 			ActivityOption shopping = facility.getActivityOption(ACTIVITY_TYPE_SHOP);
@@ -1662,7 +1662,7 @@ public class ShopsOf2005ToFacilities {
 				aShop.setDescription(facilityId);
 
 				// transform coordinates incl. toggle easting and northing
-				northWestCH1903 = new CoordImpl(facility.getCenter().getX(), facility.getCenter().getY());
+				northWestCH1903 = new CoordImpl(facility.getCoord().getX(), facility.getCoord().getY());
 				northWestWGS84 = trafo.transform(northWestCH1903);
 
 				// have to iterate this over opening times

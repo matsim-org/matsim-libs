@@ -30,7 +30,7 @@ import org.matsim.controler.events.ScoringEvent;
 import org.matsim.controler.listener.ScoringListener;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -95,7 +95,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 			}
 				
 			
-			Link dest = ((Act)plan.getPlanElements().get(2)).getLink();
+			Link dest = ((Activity)plan.getPlanElements().get(2)).getLink();
 				
 			
 			
@@ -148,7 +148,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 			CarRoute route = new NodeCarRoute();
 			route.setNodes(evacRoute);
 			leg.setRoute(route);
-			Act act = new org.matsim.population.ActImpl("h",dest);
+			Activity act = new org.matsim.population.ActImpl("h",dest);
 			try {
 				route.getLinks();
 			} catch (Exception e) {
@@ -183,8 +183,8 @@ public class EvacDestinationAssigner implements ScoringListener {
 		Plan bestPlan = null;
 		double bestScore = Double.NEGATIVE_INFINITY;
 		for (Plan plan : this.linkPlanMapping.get(link)) {
-			if (plan.getScore() > bestScore) {
-				bestScore = plan.getScore();
+			if (plan.getScoreAsPrimitiveType() > bestScore) {
+				bestScore = plan.getScoreAsPrimitiveType();
 				bestPlan = plan;
 			}
 		}
@@ -263,7 +263,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 		
 		double scoreSum = 0;
 		for (Plan plan : plans) {
-			scoreSum += plan.getScore();
+			scoreSum += plan.getScoreAsPrimitiveType();
 		}
 		
 		return scoreSum / plans.size();
@@ -282,7 +282,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 			}
 			coPlans.add(plan);
 			if (this.linkColor.get(link) == null) {
-				this.linkColor.put(link, ((Act)plan.getPlanElements().get(2)).getLinkId());
+				this.linkColor.put(link, ((Activity)plan.getPlanElements().get(2)).getLinkId());
 			}
 		}
 	}

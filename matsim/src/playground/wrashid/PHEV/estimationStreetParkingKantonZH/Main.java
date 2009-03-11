@@ -8,8 +8,8 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkReaderMatsimV1;
@@ -120,7 +120,7 @@ public class Main {
 		for (Link link:network.getLinks().values()){
 			for (Iterator iter=layer.getLocations().values().iterator();iter.hasNext();){
 				Zone zone=(Zone)iter.next();
-				if (zone.contains(link.getCenter())){
+				if (zone.contains(link.getCoord())){
 					LinkedList<Link> list=streetsInCommunities.get((Integer.parseInt(zone.getId().toString())));
 					list.add(link);
 					break;
@@ -311,14 +311,14 @@ public class Main {
 			
 			// Find out, which links are in the selected area
 			for (int i=0;i<linksOfZurichCity.size();i++){
-				if (xMin<linksOfZurichCity.get(i).getCenter().getX() && xMax>linksOfZurichCity.get(i).getCenter().getX() && yMin<linksOfZurichCity.get(i).getCenter().getY() && yMax<linksOfZurichCity.get(i).getCenter().getY()){
+				if (xMin<linksOfZurichCity.get(i).getCoord().getX() && xMax>linksOfZurichCity.get(i).getCoord().getX() && yMin<linksOfZurichCity.get(i).getCoord().getY() && yMax<linksOfZurichCity.get(i).getCoord().getY()){
 					allContainingLinks.add(linksOfZurichCity.get(i));
 				}
 			}
 			
 			// the links, which contain parkings
 			for (Link link:numberOfStreetParkingsPerLink.keySet()){
-				if (xMin<link.getCenter().getX() && xMax>link.getCenter().getX() && yMin<link.getCenter().getY() && yMax<link.getCenter().getY()){
+				if (xMin<link.getCoord().getX() && xMax>link.getCoord().getX() && yMin<link.getCoord().getY() && yMax<link.getCoord().getY()){
 					linksWithParking.put(link, numberOfStreetParkingsPerLink.get(link));
 				}
 			}

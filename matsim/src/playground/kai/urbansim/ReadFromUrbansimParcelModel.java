@@ -17,9 +17,9 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
@@ -109,7 +109,7 @@ public class ReadFromUrbansimParcelModel {
 
 			Location parcel = parcels.getFacilities().get(parcelId) ;
 			assert( parcel!= null ) ;
-			Coord coord = parcel.getCenter();
+			Coord coord = parcel.getCoord();
 
 			PseudoZone pseudoZone = pseudoZones.get(zoneId) ;
 			if ( pseudoZone==null ) {
@@ -170,7 +170,7 @@ public class ReadFromUrbansimParcelModel {
 					log.warn( "homeLocation==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
 					continue ;
 				}
-				Coord homeCoord = homeLocation.getCenter() ;
+				Coord homeCoord = homeLocation.getCoord() ;
 				if ( homeCoord==null ) {
 					log.warn( "homeCoord==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
 					continue ;
@@ -196,7 +196,7 @@ public class ReadFromUrbansimParcelModel {
 						flag = true ;
 						continue ;
 					}
-					Coord workCoord = jobLocation.getCenter() ;
+					Coord workCoord = jobLocation.getCoord() ;
 					Utils.completePlanToHwh(plan, workCoord) ;
 				}
 
@@ -215,8 +215,8 @@ public class ReadFromUrbansimParcelModel {
 						newPop.addPerson(newPerson) ;
 						break ;
 					}
-					Act oldHomeAct = oldPerson.getSelectedPlan().getFirstActivity();
-					Act newHomeAct =    newPerson.getSelectedPlan().getFirstActivity() ;
+					Activity oldHomeAct = oldPerson.getSelectedPlan().getFirstActivity();
+					Activity newHomeAct =    newPerson.getSelectedPlan().getFirstActivity() ;
 					if ( actHasChanged ( oldHomeAct, newHomeAct, network ) ) { // act changed.  Accept new person:
 						newPop.addPerson(newPerson) ;
 						break ;
@@ -229,8 +229,8 @@ public class ReadFromUrbansimParcelModel {
 					}
 
 					// check if work act has changed:
-					Act oldWorkAct = (Act) oldPerson.getSelectedPlan().getPlanElements().get(2) ;
-					Act newWorkAct = (Act)    newPerson.getSelectedPlan().getPlanElements().get(2) ;
+					Activity oldWorkAct = (Activity) oldPerson.getSelectedPlan().getPlanElements().get(2) ;
+					Activity newWorkAct = (Activity)    newPerson.getSelectedPlan().getPlanElements().get(2) ;
 					if ( actHasChanged ( oldWorkAct, newWorkAct, network ) ) {
 						newPop.addPerson(newPerson) ;
 						break ;
@@ -269,7 +269,7 @@ public class ReadFromUrbansimParcelModel {
 		log.info( "Done with reading persons." ) ;
 	}
 
-	private boolean actHasChanged ( final Act oldAct, final Act newAct, final NetworkLayer network ) {
+	private boolean actHasChanged ( final Activity oldAct, final Activity newAct, final NetworkLayer network ) {
 		if ( !oldAct.getCoord().equals( newAct.getCoord() ) ) {
 //			log.info( "act location changed" ) ;
 			return true ;

@@ -23,7 +23,7 @@ package playground.gregor.withindayevac.controler;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
@@ -58,13 +58,13 @@ public class RoadSignAgentsGenerator {
 			
 			for (Link dest : node.getOutLinks().values()){
 				Plan plan  = new org.matsim.population.PlanImpl(p);
-				Act actA = new org.matsim.population.ActImpl("h", link.getCenter(), link);
+				Activity actA = new org.matsim.population.ActImpl("h", link.getCoord(), link);
 				actA.setEndTime(3600 * 3 - 2);
 				Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 				leg.setDepartureTime(0.0);
 				leg.setTravelTime(0.0);
 				leg.setArrivalTime(0.0);
-				Act actB = new org.matsim.population.ActImpl("h",dest.getCenter(), dest);
+				Activity actB = new org.matsim.population.ActImpl("h",dest.getCoord(), dest);
 				plan.addAct(actA);
 				plan.addLeg(leg);
 				plan.addAct(actB);

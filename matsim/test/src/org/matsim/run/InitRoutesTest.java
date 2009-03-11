@@ -27,7 +27,7 @@ import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
@@ -66,7 +66,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		Person person = new PersonImpl(new IdImpl("1"));
 		population.addPerson(person);
 		Plan plan = person.createPlan(true);
-		Act a1 = plan.createAct("h", network.getLink(new IdImpl("1")));
+		Activity a1 = plan.createAct("h", network.getLink(new IdImpl("1")));
 		a1.setEndTime(3600);
 		plan.createLeg(BasicLeg.Mode.car);
 		plan.createAct("w", network.getLink(new IdImpl("20")));

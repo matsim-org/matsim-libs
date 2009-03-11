@@ -192,7 +192,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * encode the (min) width of the link to calculate the flow capacity - [GL] 13may08
 	 */
 	@Override
-	public double getLanes(final double time) {
+	public double getNumberOfLanes(final double time) {
 		
 		
 		if (this.aLanesTimes == null || this.aLanesTimes.length != this.aLanesEvents) {

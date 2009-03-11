@@ -20,7 +20,7 @@
 
 package org.matsim.analysis;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -40,11 +40,11 @@ public class CalcAverageTripLength extends AbstractPersonAlgorithm implements Pl
 
 	public void run(final Plan plan) {
 		for (int i = 2, max = plan.getPlanElements().size(); i < max; i += 2) {
-			Act act = (Act) plan.getPlanElements().get(i);
+			Activity act = (Activity) plan.getPlanElements().get(i);
 			Leg leg = (Leg) plan.getPlanElements().get(i - 1);
 			Route route = leg.getRoute();
 			if (route != null) {
-				double dist = route.getDist();
+				double dist = route.getDistance();
 				if (act.getLink() != null) {
 					dist += act.getLink().getLength();
 				}

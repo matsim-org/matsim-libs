@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -55,7 +55,7 @@ public class ActLinkFilter extends AbstractPlanFilter {
 	public boolean judge(final Plan plan) {
 		ActIterator actIter = plan.getIteratorAct();
 		while (actIter.hasNext()) {
-			Act act = (Act)actIter.next();
+			Activity act = (Activity)actIter.next();
 			if (Pattern.matches(actTypePattern, act.getType())) {
 				if (this.linkIds.contains(act.getLink().getId())) {
 					return true;

@@ -33,7 +33,7 @@ public class BeelineDistanceBasedFares implements TransitFares {
 	}
 
 	public double getSingleTripCost(final Facility fromStop, final Facility toStop) {
-		return this.costPerKilometer * (fromStop.calcDistance(toStop.getCenter()) / 1000.0);
+		return this.costPerKilometer * (fromStop.calcDistance(toStop.getCoord()) / 1000.0);
 	}
 
 }

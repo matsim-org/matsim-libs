@@ -25,13 +25,13 @@ import java.util.List;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.basic.v01.BasicPlan.Type;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.PersonAlgorithm;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.interfaces.core.v01.Plan.Type;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
@@ -83,17 +83,17 @@ public class NewPtWalkPlan extends NewPlan implements PersonAlgorithm,
 
 	@SuppressWarnings("unchecked")
 	public void run(Plan plan) {
-		plan.setType(Type.CAR);
+		plan.setType(Plan.Type.CAR);
 		Plan ptPlan = new org.matsim.population.PlanImpl(person);
-		ptPlan.setType(Type.PT);
+		ptPlan.setType(Plan.Type.PT);
 		Plan walkPlan = new org.matsim.population.PlanImpl(person);
-		walkPlan.setType(Type.WALK);
+		walkPlan.setType(Plan.Type.WALK);
 		List actsLegs = plan.getPlanElements();
 		for (int i = 0; i < actsLegs.size(); i++) {
 			Object o = actsLegs.get(i);
 			if (i % 2 == 0) {
-				ptPlan.addAct((Act) o);
-				walkPlan.addAct((Act) o);
+				ptPlan.addAct((Activity) o);
+				walkPlan.addAct((Activity) o);
 			} else {
 				Leg leg = (Leg) o;
 				Leg ptLeg = new org.matsim.population.LegImpl(leg);

@@ -21,7 +21,6 @@
 package org.matsim.replanning.selectors;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.PersonImpl;
@@ -61,24 +60,24 @@ public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 		BestPlanSelector selector = new BestPlanSelector();
 
 		plan = selector.selectPlan(person);
-		assertEquals(40.0, plan.getScore(), 0.0);
-		plan.setScore(BasicPlan.UNDEF_SCORE);
+		assertEquals(40.0, plan.getScoreAsPrimitiveType(), 0.0);
+		plan.setScore(Plan.UNDEF_SCORE);
 
 		plan = selector.selectPlan(person);
-		assertEquals(30.0, plan.getScore(), 0.0);
-		plan.setScore(BasicPlan.UNDEF_SCORE);
+		assertEquals(30.0, plan.getScoreAsPrimitiveType(), 0.0);
+		plan.setScore(Plan.UNDEF_SCORE);
 
 		plan = selector.selectPlan(person);
-		assertEquals(10.0, plan.getScore(), 0.0);
-		plan.setScore(BasicPlan.UNDEF_SCORE);
+		assertEquals(10.0, plan.getScoreAsPrimitiveType(), 0.0);
+		plan.setScore(Plan.UNDEF_SCORE);
 
 		plan = selector.selectPlan(person);
-		assertEquals(-20.0, plan.getScore(), 0.0);
-		plan.setScore(BasicPlan.UNDEF_SCORE);
+		assertEquals(-20.0, plan.getScoreAsPrimitiveType(), 0.0);
+		plan.setScore(Plan.UNDEF_SCORE);
 
 		plan = selector.selectPlan(person);
-		assertEquals(-50.0, plan.getScore(), 0.0);
-		plan.setScore(BasicPlan.UNDEF_SCORE);
+		assertEquals(-50.0, plan.getScoreAsPrimitiveType(), 0.0);
+		plan.setScore(Plan.UNDEF_SCORE);
 
 		plan = selector.selectPlan(person);
 		assertTrue(plan.hasUndefinedScore());

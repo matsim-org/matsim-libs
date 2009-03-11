@@ -23,16 +23,16 @@ package org.matsim.locationchoice.constrained;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 
 public class SubChain {
 	
-	private Act firstPrimAct = null;
-	private Act lastPrimAct = null;
+	private Activity firstPrimAct = null;
+	private Activity lastPrimAct = null;
 	
-	private List<Act> secondaryActs = null;
+	private List<Activity> secondaryActs = null;
 	private double ttBudget = 0.0;
 	private double totalTravelDistance = 0.0;
 	
@@ -56,10 +56,10 @@ public class SubChain {
 	}
 	
 	public SubChain() {
-		secondaryActs = new Vector<Act>();		
+		secondaryActs = new Vector<Activity>();		
 	}
 	
-	public void addAct(Act act) {
+	public void addAct(Activity act) {
 		this.secondaryActs.add(act);
 	}
 
@@ -89,27 +89,27 @@ public class SubChain {
 		this.endCoord = endCoord;
 	}
 
-	public List<Act> getSlActs() {
+	public List<Activity> getSlActs() {
 		return secondaryActs;
 	}
 
-	public void setSlActs(List<Act> slActs) {
+	public void setSlActs(List<Activity> slActs) {
 		this.secondaryActs = slActs;
 	}
 
-	public Act getFirstPrimAct() {
+	public Activity getFirstPrimAct() {
 		return firstPrimAct;
 	}
 
-	public void setFirstPrimAct(Act firstPrimAct) {
+	public void setFirstPrimAct(Activity firstPrimAct) {
 		this.firstPrimAct = firstPrimAct;
 	}
 
-	public Act getLastPrimAct() {
+	public Activity getLastPrimAct() {
 		return lastPrimAct;
 	}
 
-	public void setLastPrimAct(Act lastPrimAct) {
+	public void setLastPrimAct(Activity lastPrimAct) {
 		this.lastPrimAct = lastPrimAct;
 	}
 

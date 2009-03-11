@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -145,12 +145,12 @@ public class JavaPDEQSim2 {
 			ArrayList<Object> actsLegs = plan.getPlanElements();
 			// assumption, an action is followed by a let always
 			// and a plan starts with a action
-			Act act=null;
+			Activity act=null;
 			Leg leg=null;
 			for (int i=0;i<actsLegs.size();i++){
 
-				if (actsLegs.get(i) instanceof Act){
-					act=(Act) actsLegs.get(i);
+				if (actsLegs.get(i) instanceof Activity){
+					act=(Activity) actsLegs.get(i);
 					//System.out.print(".");
 					bucketCount[getZone(act.getLink().getFromNode().getCoord().getX(),bucketBoundries)]++;
 				} else {

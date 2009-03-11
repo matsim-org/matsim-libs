@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Plan;
@@ -132,7 +132,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		ArrayList<String> prt = new ArrayList<String>();
 		prt.add(""+plan.getPerson().getId().toString());
 		prt.add(""+agents.getAgentPerson(assignedAgent).getId().toString());
-		prt.add(""+plan.getScore());
+		prt.add(""+plan.getScoreAsPrimitiveType());
 		Statistics.list.add(prt);	
 				
 	}	
@@ -154,12 +154,12 @@ public class AgentsAssigner implements PlanAlgorithm{
 		for (int i=2;i<bestPlan.getPlanElements().size()-2;i+=2){
 			if (!primActs.isEmpty()){
 				for (int j=0;j<primActs.size();j++){
-					if (((Act)(bestPlan.getPlanElements().get(i))).getType().equals(primActs.get(j).getType())){
+					if (((Activity)(bestPlan.getPlanElements().get(i))).getType().equals(primActs.get(j).getType())){
 						Facility fac = this.controler.getFacilities().getFacilities().get(primActs.get(j).getFacility().getId());
-						((Act)(bestPlan.getPlanElements().get(i))).setFacility(fac);
+						((Activity)(bestPlan.getPlanElements().get(i))).setFacility(fac);
 						// not only update of fac required but also coord and link; data inconsistencies otherwise
-						((Act)(bestPlan.getPlanElements().get(i))).setCoord(fac.getCenter());
-						((Act)(bestPlan.getPlanElements().get(i))).setLink(fac.getLink());
+						((Activity)(bestPlan.getPlanElements().get(i))).setCoord(fac.getCoord());
+						((Activity)(bestPlan.getPlanElements().get(i))).setLink(fac.getLink());
 						primActs.remove(j);
 						break;
 					}
@@ -197,14 +197,14 @@ public class AgentsAssigner implements PlanAlgorithm{
 	
 	@Deprecated
 	private void cleanUpPlan (Plan plan){
-		double move = this.cleaner.run(((Act)(plan.getPlanElements().get(0))).getEndTime(), plan);
+		double move = this.cleaner.run(((Activity)(plan.getPlanElements().get(0))).getEndTime(), plan);
 		int loops=1;
 		while (move!=0.0){
 			loops++;
-			move = this.cleaner.run(java.lang.Math.max(((Act)(plan.getPlanElements().get(0))).getEndTime()-move,0), plan);
+			move = this.cleaner.run(java.lang.Math.max(((Activity)(plan.getPlanElements().get(0))).getEndTime()-move,0), plan);
 			if (loops>3) {
 				for (int i=2;i< plan.getPlanElements().size()-4;i+=2){
-					((Act)(plan.getPlanElements().get(i))).setDuration(this.minimumTime);
+					((Activity)(plan.getPlanElements().get(i))).setDuration(this.minimumTime);
 				}
 				move = this.cleaner.run(this.minimumTime, plan);
 				if (move!=0.0){

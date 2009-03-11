@@ -30,7 +30,7 @@ public class PersonTimeDistanceCalculator {
 		while (leg_it.hasNext()) {
 			final Leg leg = (Leg)leg_it.next();
 			planTravelTime+=leg.getTravelTime();
-			planTravelDistance+=leg.getRoute().getDist();
+			planTravelDistance+=leg.getRoute().getDistance();
 			numberOfLegs++;
 		}
 	}

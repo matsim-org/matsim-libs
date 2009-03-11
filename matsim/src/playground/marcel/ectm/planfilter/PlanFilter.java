@@ -168,7 +168,7 @@ public class PlanFilter {
 				}
 				subnet.createLink(link.getId(), subnet.getNode(fromNode.getId()), subnet.getNode(toNode.getId()),
 						link.getLength(), link.getFreespeed(Time.UNDEFINED_TIME),
-						link.getCapacity(Time.UNDEFINED_TIME), link.getLanes(Time.UNDEFINED_TIME));
+						link.getCapacity(Time.UNDEFINED_TIME), link.getNumberOfLanes(Time.UNDEFINED_TIME));
 			}
 		}
 		new NetworkWriter(subnet, "ivtch-osm_zrh14km.xml").write();

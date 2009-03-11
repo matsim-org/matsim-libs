@@ -26,7 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.events.AgentReplanEvent;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -146,7 +146,7 @@ public class WithindayAgent extends PersonAgent {
 			log.trace("time: " + hours + ":" + min);
 		}
 		Link currentLink = this.getCurrentLink();
-		Act nextAct = this.getPerson().getSelectedPlan().getNextActivity(this.getCurrentLeg());
+		Activity nextAct = this.getPerson().getSelectedPlan().getNextActivity(this.getCurrentLeg());
 		Link destinationLink = nextAct.getLink();
 		CarRoute alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
 		Plan oldPlan = this.getPerson().getSelectedPlan();

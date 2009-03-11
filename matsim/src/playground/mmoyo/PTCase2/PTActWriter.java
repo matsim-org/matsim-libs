@@ -9,10 +9,10 @@ import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
@@ -72,13 +72,13 @@ public class PTActWriter {
 
 			boolean first =true;
 			boolean addPerson= true;
-			Act lastAct = null;
-			Act thisAct= null;
+			Activity lastAct = null;
+			Activity thisAct= null;
 			int legNum=0;
 
 			Plan newPlan = new org.matsim.population.PlanImpl(person);
 			for (Iterator<BasicActImpl> iter= plan.getIteratorAct(); iter.hasNext();){
-				thisAct= (Act)iter.next();
+				thisAct= (Activity)iter.next();
 
 				if (!first) {
 					Coord lastActCoord = lastAct.getCoord();
@@ -317,8 +317,8 @@ public class PTActWriter {
 		return legNum;
 	}//insert
 
-	private Act newPTAct(final String type, final Coord coord, final Link link, final double startTime, final double dur, final double endTime){
-		Act ptAct= new org.matsim.population.ActImpl(type, coord);
+	private Activity newPTAct(final String type, final Coord coord, final Link link, final double startTime, final double dur, final double endTime){
+		Activity ptAct= new org.matsim.population.ActImpl(type, coord);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
 		//ptAct.setDuration(dur); Deprecated?
@@ -336,7 +336,7 @@ public class PTActWriter {
 		}
 		
 		legRoute.setTravelTime(travTime);
-		legRoute.setDist(distance);
+		legRoute.setDistance(distance);
 		Leg leg = new LegImpl(mode);
 		//leg.setNum(num); deprecated
 		leg.setRoute(legRoute);
@@ -346,7 +346,7 @@ public class PTActWriter {
 		return leg;
 	}
 
-	private Leg walkLeg(final int legNum, final Act act1, final Act act2){
+	private Leg walkLeg(final int legNum, final Activity act1, final Activity act2){
 		double distance= coordDistance(act1.getCoord(), act2.getCoord());
 		double walkTravelTime = walkTravelTime(distance); 
 		double depTime = act1.getEndTime();

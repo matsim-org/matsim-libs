@@ -26,7 +26,7 @@ import java.util.TreeSet;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 
@@ -61,7 +61,7 @@ public class PersonActChainGrouping extends AbstractPersonAlgorithm {
 		Plan plan = person.getPlans().get(0);
 		StringBuilder chainBuilder = new StringBuilder((plan.getPlanElements().size() + 1) / 2);
 		for (int j = 0; j < plan.getPlanElements().size(); j = j + 2) {
-			Act act = (Act)plan.getPlanElements().get(j);
+			Activity act = (Activity)plan.getPlanElements().get(j);
 			chainBuilder = chainBuilder.append(act.getType().substring(0, 1));
 		}
 

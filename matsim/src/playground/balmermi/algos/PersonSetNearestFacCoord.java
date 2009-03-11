@@ -23,8 +23,8 @@ package playground.balmermi.algos;
 import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
@@ -97,7 +97,7 @@ public class PersonSetNearestFacCoord extends AbstractPersonAlgorithm implements
 	public void run(Plan plan) {
 		Iterator<?> act_it = plan.getIteratorAct();
 		while (act_it.hasNext()) {
-			Act act = (Act)act_it.next();
+			Activity act = (Activity)act_it.next();
 			String type = this.getFacilityActType(act.getType());
 			Coord coord = act.getCoord();
 			if (coord == null) { Gbl.errorMsg("Each act must have a coord!"); }
@@ -117,7 +117,7 @@ public class PersonSetNearestFacCoord extends AbstractPersonAlgorithm implements
 			if (nearest_f == null) {
 				Gbl.errorMsg("p_id=" + plan.getPerson().getId() + ": no facility found for act=" + act);
 			}
-			act.setCoord(nearest_f.getCenter());
+			act.setCoord(nearest_f.getCoord());
 			System.out.println("  p_id=" + plan.getPerson().getId() + ", act=" + act.getType() + ": nearest dist=" + nearest_dist);
 		}
 	}

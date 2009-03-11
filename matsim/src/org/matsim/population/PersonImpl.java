@@ -29,7 +29,6 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPersonImpl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Household;
@@ -47,7 +46,7 @@ public class PersonImpl implements Person{
 
 	private final static Logger log = Logger.getLogger(Person.class);
 
-	private final BasicPerson<Plan, Knowledge> delegate;
+	private final BasicPersonImpl delegate;
 
 	private Customizable customizableDelegate;
 
@@ -114,12 +113,12 @@ public class PersonImpl implements Person{
 			return null;
 		}
 		int index = (int)(MatsimRandom.random.nextDouble()*this.delegate.getPlans().size());
-		return this.delegate.getPlans().get(index);
+		return this.getPlans().get(index);
 	}
 
 	public Plan getRandomUnscoredPlan() {
 		int cntUnscored = 0;
-		for (Plan plan : this.delegate.getPlans()) {
+		for (Plan plan : this.getPlans()) {
 			if (plan.hasUndefinedScore()) {
 				cntUnscored++;
 			}
@@ -128,7 +127,7 @@ public class PersonImpl implements Person{
 			// select one of the unscored plans
 			int idxUnscored = MatsimRandom.random.nextInt(cntUnscored);
 			cntUnscored = 0;
-			for (Plan plan : this.delegate.getPlans()) {
+			for (Plan plan : this.getPlans()) {
 				if (plan.hasUndefinedScore()) {
 					if (cntUnscored == idxUnscored) {
 						return plan;
@@ -233,7 +232,7 @@ public class PersonImpl implements Person{
 		}
 		HashMap<Plan.Type, Integer> typeCounts = new HashMap<Plan.Type, Integer>();
 		// initialize list of types
-		for (Plan plan : this.delegate.getPlans()) {
+		for (Plan plan : this.getPlans()) {
 			Integer cnt = typeCounts.get(plan.getType());
 			if (cnt == null) {
 				typeCounts.put(plan.getType(), Integer.valueOf(1));
@@ -244,15 +243,15 @@ public class PersonImpl implements Person{
 		while (this.delegate.getPlans().size() > maxSize) {
 			Plan worst = null;
 			double worstScore = Double.POSITIVE_INFINITY;
-			for (Plan plan : this.delegate.getPlans()) {
+			for (Plan plan : this.getPlans()) {
 				if (typeCounts.get(plan.getType()).intValue() > 1) {
 					if (plan.hasUndefinedScore()) {
 						worst = plan;
 						// make sure no other score could be less than this
 						worstScore = Double.NEGATIVE_INFINITY;
-					} else if (plan.getScore() < worstScore) {
+					} else if (plan.getScoreAsPrimitiveType() < worstScore) {
 						worst = plan;
-						worstScore = plan.getScore();
+						worstScore = plan.getScoreAsPrimitiveType();
 					}
 				}
 			}
@@ -303,7 +302,7 @@ public class PersonImpl implements Person{
 			k.setDescription(desc);
 			((BasicPersonImpl)this.delegate).setKnowledge(k);
 		}
-		return this.delegate.getKnowledge();
+		return (Knowledge) this.delegate.getKnowledge();
 	}
 
 	public void addTravelcard(final String type) {
@@ -340,7 +339,7 @@ public class PersonImpl implements Person{
 	}
 
 	public Knowledge getKnowledge() {
-		return this.delegate.getKnowledge();
+		return (Knowledge) this.delegate.getKnowledge();
 	}
 
 	public String getLicense() {

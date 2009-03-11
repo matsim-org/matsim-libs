@@ -126,7 +126,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 				
 		Knowledge knowledge = guy.getKnowledge();
 		Facility home = knowledge.getActivities("home").get(0).getFacility();
-		Zone homezone = (Zone) zoneLayer.getNearestLocations( home.getCenter(), null).get(0);
+		Zone homezone = (Zone) zoneLayer.getNearestLocations( home.getCoord(), null).get(0);
 		if( homezone == null )
 			log.warn("Homeless person (poor guy)" );
 		else{			
@@ -288,7 +288,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		for (Person guy : population.getPersons().values()) 
 			if( agentHasPrimaryActivityInPlan( guy ) ){
 				Facility homeOfGuy = guy.getKnowledge().getActivities("home").get(0).getFacility();
-				ArrayList<Location> list = zoneLayer.getNearestLocations(homeOfGuy.getCenter(), null);
+				ArrayList<Location> list = zoneLayer.getNearestLocations(homeOfGuy.getCoord(), null);
 				Zone homezone = (Zone) list.get(0);
 				if( homezone == null )
 					log.warn("Homeless employed person (poor guy)" );
@@ -316,7 +316,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		for( Facility facility : facilities.getFacilities().values() ){
 			ActivityOption act = facility.getActivityOption( primaryActivityName );
 			if( act != null ){
-				ArrayList<Location> list = zoneLayer.getNearestLocations( facility.getCenter(), null);
+				ArrayList<Location> list = zoneLayer.getNearestLocations( facility.getCoord(), null);
 				Zone zone = (Zone) list.get(0);
 				core.J[ zoneids.get(zone) ] += act.getCapacity();
 				primActFacilitiesPerZone.get( zone ).add( facility );
@@ -351,7 +351,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 
 		for( int i=0; i<core.numZ; i++){
 			for( int j=0; j<core.numZ; j++)
-				core.cij.set( i, j, zones[i].calcDistance( zones[j].getCenter() ) );
+				core.cij.set( i, j, zones[i].calcDistance( zones[j].getCoord() ) );
 
 			// The method requires cii > 0 therefore we set
 			// cii = length of the diagonal of the bounding box of Zone #i

@@ -76,7 +76,7 @@ public class MatricesValidateWithFacilities {
 		double distance = Double.MAX_VALUE;
 		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOptions().containsKey(act_type)) {
-				double d = location.calcDistance(f.getCenter());
+				double d = location.calcDistance(f.getCoord());
 				if (d < distance) {
 					distance = d;
 					nearest_facility = f;

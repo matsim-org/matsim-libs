@@ -164,10 +164,10 @@ public class NetworkClearanceAnalysis {
 
 	private void classifyLinks() {
 		for (Link link : this.network.getLinks().values()) {
-			PolygonInfo pi1 = this.polygons1.get(link.getCenter().getX(),link.getCenter().getY());
+			PolygonInfo pi1 = this.polygons1.get(link.getCoord().getX(),link.getCoord().getY());
 
 			this.linkMapping1.put(link.getId().toString(),pi1);
-			PolygonInfo pi2 = this.polygons2.get(link.getCenter().getX(),link.getCenter().getY());
+			PolygonInfo pi2 = this.polygons2.get(link.getCoord().getX(),link.getCoord().getY());
 			this.linkMapping2.put(link.getId().toString(),pi2);
 		}
 	}

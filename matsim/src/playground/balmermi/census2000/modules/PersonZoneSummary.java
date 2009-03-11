@@ -28,7 +28,7 @@ import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -162,7 +162,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		int w = 0; int e = 0; int s = 0; int l = 0;
 		Iterator<?> act_it = plan.getIteratorAct();
 		while (act_it.hasNext()) {
-			Act act = (Act)act_it.next();
+			Activity act = (Activity)act_it.next();
 			if (H.equals(act.getType())) { ; }
 			else if (W.equals(act.getType())) { w = 1; }
 			else if (E.equals(act.getType())) { e = 1; }
@@ -178,9 +178,9 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		double dist = 0.0;
 		Iterator<?> act_it = plan.getIteratorAct();
 		act_it.hasNext();
-		Act prev_act = (Act)act_it.next();
+		Activity prev_act = (Activity)act_it.next();
 		while (act_it.hasNext()) {
-			Act act = (Act)act_it.next();
+			Activity act = (Activity)act_it.next();
 			double curr_dist = act.getCoord().calcDistance(prev_act.getCoord());
 			dist += curr_dist;
 			prev_act = act;
@@ -206,9 +206,9 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		int[] cnts = {0,0,0,0,0};
 		Iterator<?> act_it = plan.getIteratorAct();
 		act_it.hasNext();
-		Act prev_act = (Act)act_it.next();
+		Activity prev_act = (Activity)act_it.next();
 		while (act_it.hasNext()) {
-			Act act = (Act)act_it.next();
+			Activity act = (Activity)act_it.next();
 			double dist = act.getCoord().calcDistance(prev_act.getCoord());
 			if (dist < 1000.0) { cnts[0]++; }
 			else if (dist < 5000.0) { cnts[1]++; }

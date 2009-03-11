@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -120,7 +120,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 		ArrayList<Object> actsLegs = plan.getPlanElements();
 		for (int j=0; j<actsLegs.size(); j=j+2) {
 			this.actCnt++;
-			Act act = (Act)actsLegs.get(j);
+			Activity act = (Activity)actsLegs.get(j);
 			String actType = act.getType();
 			double dur = act.getDuration();
 			int idx = getActTypeIndex(actType);

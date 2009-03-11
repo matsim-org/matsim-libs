@@ -28,7 +28,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
@@ -95,10 +95,10 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(WORK) != null) {
-				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-				if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-				if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+				if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+				if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 			}
 		}
 		minx -= 1.0;
@@ -109,7 +109,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		this.workFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(WORK) != null) {
-				this.workFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
+				this.workFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
 		}
 		System.out.println("      done.");
@@ -125,10 +125,10 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(EDUCATION) != null) {
-				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-				if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-				if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+				if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+				if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 			}
 		}
 		minx -= 1.0;
@@ -139,7 +139,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		this.educFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(EDUCATION) != null) {
-				this.educFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
+				this.educFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
 		}
 		System.out.println("      done.");
@@ -153,13 +153,13 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			Iterator<? extends Location> z_it = layer.getLocations().values().iterator();
 			while (z_it.hasNext()) {
 				Zone z = (Zone)z_it.next();
-				if (z.contains(f.getCenter())) { zones.add(z); }
+				if (z.contains(f.getCoord())) { zones.add(z); }
 			}
 
 			if (zones.isEmpty()) {
 				System.out.println("      No zone found for facility id=" + f.getId() + "...");
 				z_it = layer.getLocations().values().iterator();
-				zones.add((Zone)layer.getNearestLocations(f.getCenter(),null).get(0));
+				zones.add((Zone)layer.getNearestLocations(f.getCoord(),null).get(0));
 				System.out.println("      Therefore added a neighbor zone id=" + zones.get(0).getId());
 			}
 
@@ -222,14 +222,14 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		if (facs.isEmpty()) { Gbl.errorMsg("facs are empty! This should not happen!"); }
 
 		int[] dist_sum = new int[facs.size()];
-		dist_sum[0] = facs.get(0).getActivityOption(act_type).getCapacity();
+		dist_sum[0] = facs.get(0).getActivityOption(act_type).getCapacity().intValue();
 		if ((dist_sum[0] <= 0) || (dist_sum[0] == Integer.MAX_VALUE)) {
 			dist_sum[0] = 1;
 			facs.get(0).getActivityOption(act_type).setCapacity(1);
 		}
 		int n = facs.size();
 		for (int i=1; i<n; i++) {
-			int val = facs.get(i).getActivityOption(act_type).getCapacity();
+			int val = facs.get(i).getActivityOption(act_type).getCapacity().intValue();
 			if ((val <= 0) || (val == Integer.MAX_VALUE)) {
 				val = 1;
 				facs.get(i).getActivityOption(act_type).setCapacity(1);
@@ -252,11 +252,11 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 
 	@Override
 	public void run(final Person person) {
-		ArrayList<Act> work_list = new ArrayList<Act>();
-		ArrayList<Act> educ_list = new ArrayList<Act>();
+		ArrayList<Activity> work_list = new ArrayList<Activity>();
+		ArrayList<Activity> educ_list = new ArrayList<Activity>();
 		Iterator<?> act_it = person.getSelectedPlan().getIteratorAct();
 		while (act_it.hasNext()) {
-			Act act = (Act)act_it.next();
+			Activity act = (Activity)act_it.next();
 			if (W.equals(act.getType())) {
 				work_list.add(act);
 			}
@@ -274,15 +274,15 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			if (to_facs == null) {
 				System.out.println("      Person id=" + person.getId() + ": no work fac in to_zone id=" +
 				                   to_zone.getId() + ". Getting a close one...");
-				to_fac = this.workFacQuadTree.get(to_zone.getCenter().getX(),to_zone.getCenter().getY());
+				to_fac = this.workFacQuadTree.get(to_zone.getCoord().getX(),to_zone.getCoord().getY());
 				System.out.println("      done. (to_fac id=" + to_fac.getId() + ")");
 			}
 			else {
 				to_fac = this.getPrimActFacility(to_facs,WORK);
 			}
-			CoordImpl coord = (CoordImpl)to_fac.getCenter();
+			CoordImpl coord = (CoordImpl)to_fac.getCoord();
 			for (int i= 0; i<work_list.size(); i++) {
-				Act a = work_list.get(i);
+				Activity a = work_list.get(i);
 				a.setCoord(coord);
 			}
 		}
@@ -296,15 +296,15 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			if (to_facs == null) {
 				System.out.println("      Person id=" + person.getId() + ": no educ fac in to_zone id=" +
 				                   to_zone.getId() + ". Getting a close one...");
-				to_fac = this.educFacQuadTree.get(to_zone.getCenter().getX(),to_zone.getCenter().getY());
+				to_fac = this.educFacQuadTree.get(to_zone.getCoord().getX(),to_zone.getCoord().getY());
 				System.out.println("      done. (to_fac id=" + to_fac.getId() + ")");
 			}
 			else {
 				to_fac = this.getPrimActFacility(to_facs,EDUCATION);
 			}
-			CoordImpl coord = (CoordImpl)to_fac.getCenter();
+			CoordImpl coord = (CoordImpl)to_fac.getCoord();
 			for (int i= 0; i<educ_list.size(); i++) {
-				Act a = educ_list.get(i);
+				Activity a = educ_list.get(i);
 				a.setCoord(coord);
 			}
 		}

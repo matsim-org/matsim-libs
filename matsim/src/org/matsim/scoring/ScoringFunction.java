@@ -21,7 +21,7 @@
 package org.matsim.scoring;
 
 import org.matsim.events.AgentMoneyEvent;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 
 /**
@@ -49,7 +49,7 @@ public interface ScoringFunction {
 	 * @param act The activity the agent starts. Can be used to get the activity
 	 * type, exact location, facility, opening times and other information.
 	 */
-	public void startActivity(final double time, final Act act);
+	public void startActivity(final double time, final Activity act);
 
 	/**
 	 * Tells the scoring function that the agent stops with an activity.

@@ -254,7 +254,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 //		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 
 		// first guess at storageCapacity:
-		double storageCapacity = (link.getLength() * link.getLanes(Time.UNDEFINED_TIME))
+		double storageCapacity = (link.getLength() * link.getNumberOfLanes(Time.UNDEFINED_TIME))
 				/ ((NetworkLayer) link.getLayer()).getEffectiveCellSize() * storageCapFactor;
 				
 		return (int) Math.max(Math.floor(storageCapacity),1);

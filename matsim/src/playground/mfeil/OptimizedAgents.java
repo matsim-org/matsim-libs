@@ -48,9 +48,9 @@ public class OptimizedAgents {
 			double tmpDistance=0;
 			if (this.list.get(i).getPerson().getKnowledge().getActivities(true).size()>1){
 				for (int k=0;k<this.list.get(i).getPerson().getKnowledge().getActivities(true).size()-1;k++){
-					tmpDistance+=this.list.get(i).getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCenter().calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCenter());
+					tmpDistance+=this.list.get(i).getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCoord().calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCoord());
 				}
-				tmpDistance+=this.list.get(i).getPerson().getKnowledge().getActivities(true).get(this.list.get(i).getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCenter().calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter());
+				tmpDistance+=this.list.get(i).getPerson().getKnowledge().getActivities(true).get(this.list.get(i).getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCoord().calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord());
 			}
 			this.distancesTestAgents.add(tmpDistance);
 		}
@@ -77,9 +77,9 @@ public class OptimizedAgents {
 		double tmpDistance=0;
 		if (plan.getPerson().getKnowledge().getActivities(true).size()>1){
 			for (int k=0;k<plan.getPerson().getKnowledge().getActivities(true).size()-1;k++){
-				tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCenter());
+				tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCoord().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCoord());
 			}
-			tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(plan.getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter());
+			tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(plan.getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCoord().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord());
 		}
 		this.distancesTestAgents.add(tmpDistance);
 	}

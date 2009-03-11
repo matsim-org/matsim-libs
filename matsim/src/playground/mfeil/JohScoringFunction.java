@@ -25,7 +25,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -130,7 +130,7 @@ public class JohScoringFunction implements ScoringFunction {
 	}
 	
 	// the activity is currently handled by startLeg()
-	public void startActivity(final double time, final Act act) {
+	public void startActivity(final double time, final Activity act) {
 	}
 
 	public void endActivity(final double time) {
@@ -177,7 +177,7 @@ public class JohScoringFunction implements ScoringFunction {
 		initialized = true;
 	}
 
-	private final double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
+	private final double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 		
 		JohActUtilityParameters params = utilParams.get(act.getType());
 		
@@ -275,7 +275,7 @@ public class JohScoringFunction implements ScoringFunction {
 		return tmpScore;
 	}
 
-	protected double[] getOpeningInterval(final Act act) {
+	protected double[] getOpeningInterval(final Activity act) {
 
 		JohActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
@@ -437,13 +437,13 @@ public class JohScoringFunction implements ScoringFunction {
 	}
 
 	private void handleAct(final double time) {
-		Act act = (Act)this.plan.getPlanElements().get(this.index);
+		Activity act = (Activity)this.plan.getPlanElements().get(this.index);
 
 		if (this.index == 0) {
 			this.firstActTime = time;
 		} else if (this.index == this.lastActIndex) {
 			String lastActType = act.getType();
-			if (lastActType.equals(((Act) this.plan.getPlanElements().get(0)).getType())) {
+			if (lastActType.equals(((Activity) this.plan.getPlanElements().get(0)).getType())) {
 				// the first Act and the last Act have the same type
 				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
 				
@@ -451,7 +451,7 @@ public class JohScoringFunction implements ScoringFunction {
 				if (scoreActs) {
 					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
 					// score first activity
-					Act firstAct = (Act)this.plan.getPlanElements().get(0);
+					Activity firstAct = (Activity)this.plan.getPlanElements().get(0);
 					this.score += calcActScore(0.0, this.firstActTime, firstAct);
 					// score last activity
 					this.score += calcActScore(this.lastTime, 24*3600, act); // SCENARIO_DURATION

@@ -3,7 +3,7 @@ package playground.yu.visum.filter;
 import java.util.List;
 
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -79,7 +79,7 @@ public class PersonRouteFilter extends PersonFilterA {
 								}
 						}
 					} else {
-						Act act = (Act) obj;
+						Activity act = (Activity) obj;
 						if (this.criterionLinkIds.contains(act.getLink()
 								.getId()))
 							return false;

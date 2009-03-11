@@ -23,8 +23,8 @@ package org.matsim.facilities.algorithms;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 
@@ -51,7 +51,7 @@ public class FacilitiesScenarioCut {
 		while (fid_it.hasNext()) {
 			Id fid = fid_it.next();
 			Facility f = facilities.getFacilities().get(fid);
-			Coord coord = f.getCenter();
+			Coord coord = f.getCoord();
 			double x = coord.getX();
 			double y = coord.getY();
 			if (!((x < this.maxX) && (this.minX < x) && (y < this.maxY) && (this.minY < y))) {

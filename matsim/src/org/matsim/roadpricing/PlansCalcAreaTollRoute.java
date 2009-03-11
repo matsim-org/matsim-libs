@@ -23,7 +23,7 @@ package org.matsim.roadpricing;
 import java.util.ArrayList;
 
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -73,7 +73,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 		boolean agentPaysToll = false;
 
 		ArrayList<?> actslegs = plan.getPlanElements();
-		Act fromAct = (Act)actslegs.get(0);
+		Activity fromAct = (Activity)actslegs.get(0);
 
 		final int TOLL_INDEX = 0;
 		final int NOTOLL_INDEX = 1;
@@ -94,7 +94,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 		for (int i = 2, n = actslegs.size(); i < n; i += 2) {
 
 			Leg leg = (Leg)actslegs.get(i-1);
-			Act toAct = (Act)actslegs.get(i);
+			Activity toAct = (Activity)actslegs.get(i);
 			isCarLeg[routeIndex] = BasicLeg.Mode.car.equals(leg.getMode());
 			if (!isCarLeg[routeIndex]) {
 				super.handleLeg(leg, fromAct, toAct, depTimes[NOTOLL_INDEX][routeIndex]);
@@ -129,7 +129,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 					tollRoute.setTravelCost(path.travelCost); 
 				} else {
 					// do not drive/walk around, if we stay on the same link
-					tollRoute.setDist(0.0);
+					tollRoute.setDistance(0.0);
 					tollRoute.setTravelTime(0.0);
 					// if we don't drive around, it doesn't matter  if we're in or out the toll area, so use "false"
 				}

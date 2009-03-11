@@ -22,15 +22,15 @@ package org.matsim.population;
 
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.interfaces.basic.v01.BasicLink;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
-public class ActImpl extends BasicActImpl implements Act {
+public class ActImpl extends BasicActImpl implements Activity {
 
 	private BasicLink link = null;
 	private Facility facility = null;
@@ -59,7 +59,7 @@ public class ActImpl extends BasicActImpl implements Act {
 		this.setCoord(coord);
 	}
 
-	public ActImpl(final Act act) {
+	public ActImpl(final Activity act) {
 		super(act.getType());
 		// Act coord could be null according to first c'tor!
 		Coord c = act.getCoord() == null ? null : new CoordImpl(act.getCoord());
@@ -69,7 +69,7 @@ public class ActImpl extends BasicActImpl implements Act {
 		this.setEndTime(act.getEndTime());
 		this.setDuration(act.getDuration());
 		this.setFacility(act.getFacility());
-		this.setLinkId(this.link.getId());
+//		this.setLinkId(this.link.getId());
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -82,9 +82,9 @@ public class ActImpl extends BasicActImpl implements Act {
 
 	public void setLink(final BasicLink link) {
 		this.link = link;
-		if (link != null) {
-			this.setLinkId(link.getId());
-		}
+//		if (link != null) {
+//			this.setLinkId(link.getId());
+//		}
 	}
 
 	@Override

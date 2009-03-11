@@ -1,10 +1,9 @@
 package org.matsim.interfaces.core.v01;
 
-import org.matsim.interfaces.basic.v01.BasicAct;
+import org.matsim.interfaces.basic.v01.BasicActivity;
 import org.matsim.interfaces.basic.v01.BasicLink;
-import org.matsim.interfaces.basic.v01.Id;
 
-public interface Act extends BasicAct {
+public interface Activity extends BasicActivity {
 
 	public void setFacility(final Facility facility);
 
@@ -14,7 +13,7 @@ public interface Act extends BasicAct {
 	public Link getLink();
 
 	public Facility getFacility();
-
+	
 //	public Id getLinkId(); // already in BasicAct
 
 //	public Id getFacilityId(); // already in BasicAct
@@ -33,5 +32,16 @@ public interface Act extends BasicAct {
 	 */
 	@Deprecated // duration is deprecated.  kn, mar09
 	public double calculateDuration();
+
+	/**
+	 * @deprecated
+	 */
+	@Deprecated
+	public double getDuration();
+	/**
+	 * @deprecated
+	 */
+	@Deprecated
+	public void setDuration(double duration);
 
 }

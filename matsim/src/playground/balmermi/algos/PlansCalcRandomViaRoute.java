@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -90,13 +90,13 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 	// changed the method from public to private. use run(plan) instead
 	protected void handlePlan(Plan plan) {
 		ArrayList<?> actslegs = plan.getPlanElements();
-		Act fromAct = (Act)actslegs.get(0);
+		Activity fromAct = (Activity)actslegs.get(0);
 		double travTime = 0;
 		double now = fromAct.getEndTime(); // must be available according spec
 
 		// loop over all <act>s
 		for (int j = 2; j < actslegs.size(); j=j+2) {
-			Act toAct = (Act)actslegs.get(j);
+			Activity toAct = (Activity)actslegs.get(j);
 			Leg leg = (Leg)actslegs.get(j-1);
 
 			travTime = handleLeg(leg, fromAct, toAct, now);
@@ -140,7 +140,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		}
 	}
 
-	protected double handleLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
+	protected double handleLeg(Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		String legmode = leg.getMode().toString();
 
 		if (legmode == "car") {
@@ -163,7 +163,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		}
 	}
 
-	private double handleCarLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
+	private double handleCarLeg(Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		double travTime = 0;
 		Link fromLink = fromAct.getLink();
 		Link toLink = toAct.getLink();
@@ -224,18 +224,18 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		return travTime;
 	}
 
-	private double handleRideLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
+	private double handleRideLeg(Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		// handle a ride exactly the same was as a car
 		// the simulation has to take car that this leg is not really simulated as a stand-alone driver
 		return handleCarLeg(leg, fromAct, toAct, depTime);
 	}
 
-	private double handlePtLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
+	private double handlePtLeg(Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		// currently: exactly the same as for Car Leg, because i'm just too lazy...
 		return handleCarLeg(leg, fromAct, toAct, depTime);
 	}
 
-	private double handleWalkLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
+	private double handleWalkLeg(Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		// make simple assumption about distance and walking speed
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 3.0 / 3.6; // 3.0 km/h --> m/s
@@ -250,7 +250,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		return travTime;
 	}
 
-	private double handleBikeLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
+	private double handleBikeLeg(Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		// make simple assumption about distance and cycling speed
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 15.0 / 3.6; // 15.0 km/h --> m/s
@@ -265,7 +265,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		return travTime;
 	}
 
-	private double handleUndefLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
+	private double handleUndefLeg(Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		// make simple assumption about distance and a dummy speed (50 km/h)
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 50.0 / 3.6; // 50.0 km/h --> m/s

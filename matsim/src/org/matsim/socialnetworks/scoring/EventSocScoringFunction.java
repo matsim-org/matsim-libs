@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.ScoringFunction;
@@ -45,7 +45,7 @@ public class EventSocScoringFunction implements ScoringFunction{
 	private final ScoringFunction scoringFunction;
 	private final Plan plan;
 //	private final TrackEventsOverlap teo;
-	private final LinkedHashMap<Act,ArrayList<Double>> actStats;
+	private final LinkedHashMap<Activity,ArrayList<Double>> actStats;
 	private final String factype;
 
 	private double friendFoeRatio=0.;
@@ -59,7 +59,7 @@ public class EventSocScoringFunction implements ScoringFunction{
 	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
 	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
 
-	public EventSocScoringFunction(final Plan plan, final ScoringFunction scoringFunction, String factype, final LinkedHashMap<Act,ArrayList<Double>> actStats) {
+	public EventSocScoringFunction(final Plan plan, final ScoringFunction scoringFunction, String factype, final LinkedHashMap<Activity,ArrayList<Double>> actStats) {
 //		this.paidToll = paidToll;
 		this.scoringFunction = scoringFunction;
 		this.plan = plan;
@@ -83,7 +83,7 @@ public class EventSocScoringFunction implements ScoringFunction{
 		ActIterator ait = this.plan.getIteratorAct();
 
 		while(ait.hasNext()){
-			Act act = (Act)ait.next();
+			Activity act = (Activity)ait.next();
 			if(act.getType().equals(factype)){
 				this.friendFoeRatio+=actStats.get(act).get(0);
 				this.nFriends+=actStats.get(act).get(1);
@@ -122,7 +122,7 @@ public class EventSocScoringFunction implements ScoringFunction{
 		this.scoringFunction.reset();
 	}
 
-	public void startActivity(final double time, final Act act) {
+	public void startActivity(final double time, final Activity act) {
 		this.scoringFunction.startActivity(time, act);
 	}
 

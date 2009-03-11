@@ -8,8 +8,8 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 
@@ -82,7 +82,7 @@ public class SpatialAnalysisFacilities {
 		while (shop_iter.hasNext()) {
 			Facility facility = shop_iter.next();
 			
-			if (this.insideArea(facility.getCenter())) {
+			if (this.insideArea(facility.getCoord())) {
 				zhShopFacilities.add(facility);
 			}
 		}

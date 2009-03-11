@@ -118,7 +118,7 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 		out.write(" length=\"" + link.getLength() + "\"");
 		out.write(" freespeed=\"" + link.getFreespeed(Time.UNDEFINED_TIME) + "\"");
 		out.write(" capacity=\"" + link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\"");
-		out.write(" permlanes=\"" + link.getLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\"");
+		out.write(" permlanes=\"" + link.getNumberOfLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\"");
 		out.write(" oneway=\"" + "1" + "\"");
 		if (link.getOrigId() != null) {
 			out.write(" origid=\"" + link.getOrigId() + "\"");

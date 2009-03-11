@@ -27,7 +27,7 @@ import org.jgap.IChromosome;
 import org.jgap.impl.IntegerGene;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Route;
@@ -68,7 +68,7 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 	private double now;
 	private double planScore;
 	private double travelTime;
-	private Act origin, destination;
+	private Activity origin, destination;
 	private Leg legIntermediate;
 	private Route tempRoute;
 	private ArrayList<Object> actslegs;

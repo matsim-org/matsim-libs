@@ -35,7 +35,7 @@ import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ScoringListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
@@ -107,7 +107,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 
 	private EventsMapStartEndTimes epp=null;
 	private MakeTimeWindowsFromEvents teo=null;
-	private LinkedHashMap<Act,ArrayList<Double>> actStats=null;
+	private LinkedHashMap<Activity,ArrayList<Double>> actStats=null;
 //	private LinkedHashMap<Facility,ArrayList<TimeWindow>> twm=null;
 	private EventsToScore scoring = null;
 

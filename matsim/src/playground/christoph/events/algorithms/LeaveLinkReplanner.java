@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -61,8 +61,8 @@ import playground.christoph.router.KnowledgePlansCalcRoute;
 
 public class LeaveLinkReplanner {
 
-	protected Act nextAct;
-	protected Act prevAct;
+	protected Activity nextAct;
+	protected Activity prevAct;
 	protected Leg leg;
 	protected double time;
 	protected PersonAgent personAgent;
@@ -111,8 +111,8 @@ public class LeaveLinkReplanner {
 
 		leg = personAgent.getCurrentLeg();
 
-		prevAct = (Act)plan.getPreviousActivity(leg);
-		nextAct = (Act)plan.getNextActivity(leg);	
+		prevAct = (Activity)plan.getPreviousActivity(leg);
+		nextAct = (Activity)plan.getNextActivity(leg);	
 		
 		// if there is a next Activity...
 		if(nextAct != null)
@@ -149,7 +149,7 @@ public class LeaveLinkReplanner {
 		// This would be the "correct" Type - but it is slower and is not necessary
 		//String type = this.plan.getPreviousActivity(leg).getType();
 		
-		Act newFromAct = new org.matsim.population.ActImpl(type, this.personAgent.getCurrentLink().getToNode().getCoord(), this.personAgent.getCurrentLink());
+		Activity newFromAct = new org.matsim.population.ActImpl(type, this.personAgent.getCurrentLink().getToNode().getCoord(), this.personAgent.getCurrentLink());
 		newFromAct.setStartTime(time);
 		newFromAct.setEndTime(time);
 		newFromAct.setDuration(0);

@@ -27,7 +27,7 @@ import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -177,7 +177,7 @@ public class CMCFScenarioGenerator {
 			if ((i-1) % 3 == 0){
 				homeEndTime++;
 			}
-			Act act1 = plan.createAct("h", l1.getCenter());
+			Activity act1 = plan.createAct("h", l1.getCoord());
 			act1.setLink(l1);
 			act1.setEndTime(homeEndTime);
 			//leg to home
@@ -190,7 +190,7 @@ public class CMCFScenarioGenerator {
 				route.setNodes(l1, NetworkUtils.getNodes(this.network, "2 3 5 6"), l6);
 			}
 			leg.setRoute(route);
-			Act act2 = plan.createAct("h", l6.getCenter());
+			Activity act2 = plan.createAct("h", l6.getCoord());
 			act2.setLink(l6);
 			this.plans.addPerson(p);
 		}

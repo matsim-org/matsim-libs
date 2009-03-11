@@ -2,7 +2,7 @@ package playground.yu.visum.filter;
 
 import java.util.List;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 
@@ -17,7 +17,7 @@ public class ActTypeFilter extends PersonFilterA {
 		for (Plan plan : person.getPlans()) {
 			List actsLegs = plan.getPlanElements();
 			for (int i = 0; i < actsLegs.size(); i += 2) {
-				Act act = (Act) actsLegs.get(i);
+				Activity act = (Activity) actsLegs.get(i);
 				result=(act.getType().equals(criterion));
 				if (result) return result;
 			}

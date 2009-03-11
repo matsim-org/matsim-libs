@@ -23,7 +23,7 @@ package playground.mfeil;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.replanning.modules.StrategyModule;
 import java.util.ArrayList;
@@ -101,9 +101,9 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		assignment.println("Iteration "+Controler.getIteration());
 		assignment.println("Individual optimization");
 		for (int i=0;i<list[0].size();i++){
-			assignment.print(list[0].get(i).getPerson().getId()+"\t\t"+list[0].get(i).getScore()+"\t");
+			assignment.print(list[0].get(i).getPerson().getId()+"\t\t"+list[0].get(i).getScoreAsPrimitiveType()+"\t");
 			for (int j=0;j<list[0].get(i).getPlanElements().size();j+=2){
-				assignment.print(((Act)(list[0].get(i).getPlanElements().get(j))).getType()+"\t");
+				assignment.print(((Activity)(list[0].get(i).getPlanElements().get(j))).getType()+"\t");
 			}
 			assignment.println();
 			if (i==this.testAgentsNumber-1) {
@@ -171,9 +171,9 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 				String st = naa.next();
 				for (int x=0;x<this.list[1].size();x++){
 					if (this.list[1].get(x).getPerson().getId().toString().equals(st)){
-						assignment.print(this.list[1].get(x).getPerson().getId()+"\t\t"+this.list[1].get(x).getScore()+"\t");
+						assignment.print(this.list[1].get(x).getPerson().getId()+"\t\t"+this.list[1].get(x).getScoreAsPrimitiveType()+"\t");
 						for (int j=0;j<this.list[1].get(x).getPlanElements().size();j+=2){
-							assignment.print(((Act)(this.list[1].get(x).getPlanElements().get(j))).getType()+"\t");
+							assignment.print(((Activity)(this.list[1].get(x).getPlanElements().get(j))).getType()+"\t");
 						}
 						assignment.println();
 						break;
@@ -344,7 +344,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		}
 		assignmentModule.finish();
 		for (int j=0;j<java.lang.Math.min(this.noOfAgents, list[1].size());j++){
-			score += this.list[1].get(j).getScore(); 
+			score += this.list[1].get(j).getScoreAsPrimitiveType(); 
 		}
 		return score;
 	}

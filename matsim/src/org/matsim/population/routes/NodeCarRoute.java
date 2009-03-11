@@ -55,7 +55,7 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 
 	public NodeCarRoute(final CarRoute route) {
 		super(route.getStartLink(), route.getEndLink());
-		super.setDist(route.getDist());
+		super.setDistance(route.getDistance());
 		super.setTravelTime(route.getTravelTime());
 		this.route.addAll(route.getNodes());
 		this.route.trimToSize();
@@ -143,11 +143,11 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 	}
 
 	@Override
-	public final double getDist() {
-		if (Double.isNaN(super.getDist())) {
-			super.setDist(this.calcDistance());
+	public final double getDistance() {
+		if (Double.isNaN(super.getDistance())) {
+			super.setDistance(this.calcDistance());
 		}
-		return super.getDist();
+		return super.getDistance();
 	}
 
 	public final void setTravelCost(final double travelCost) {
@@ -295,7 +295,7 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 	public final String toString() {
 		StringBuilder b = new StringBuilder();
 		b.append("NodeCarRoute: [dist=");
-		b.append(this.getDist());
+		b.append(this.getDistance());
 		b.append("]");
 		b.append("[trav_time=" );
 		b.append(Time.writeTime(this.getTravelTime()));

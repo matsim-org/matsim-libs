@@ -220,7 +220,7 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 			this.timeCap = this.link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * capCorrectionFactor;
 			this.inverseTimeCap = 1.0 / this.timeCap;
 			this.effectiveCellSize = effectiveCellSize;
-			this.spaceCap = (this.link.getLength() * this.link.getLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME)) / this.effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
+			this.spaceCap = (this.link.getLength() * this.link.getNumberOfLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME)) / this.effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
 		}
 
 		public void enter(final EventAgent agent) {

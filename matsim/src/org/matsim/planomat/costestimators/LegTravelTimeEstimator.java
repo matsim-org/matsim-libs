@@ -21,7 +21,7 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 
 /**
@@ -47,8 +47,8 @@ public interface LegTravelTimeEstimator {
 	public double getLegTravelTimeEstimation(
 			Id personId,
 			double departureTime,
-			Act actOrigin,
-			Act actDestination,
+			Activity actOrigin,
+			Activity actDestination,
 			Leg legIntermediate);
 	
 	public void reset();

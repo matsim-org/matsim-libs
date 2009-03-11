@@ -35,7 +35,7 @@ public class LanesBasedWidthCalculator implements WidthCalculator{
 	}
 
 	public double getWidth(final Link link) {
-		return link.getLanes(Time.UNDEFINED_TIME) * this.effectiveLaneWidth * this.widthCoefficient;
+		return link.getNumberOfLanes(Time.UNDEFINED_TIME) * this.effectiveLaneWidth * this.widthCoefficient;
 	}
 
 

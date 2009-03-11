@@ -29,7 +29,7 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -84,7 +84,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 		for (int i= 0; i< actl.size() ; i++) {
 				if (i % 2 == 0) {
 					// activity
-					Act a = (Act)actl.get(i);
+					Activity a = (Activity)actl.get(i);
 					this.usedlinkList.add(a.getLink());
 				} else {
 					// Leg
@@ -107,7 +107,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 			try {
 				if (i % 2 == 0) {
 					// activity
-					Act a = (Act)actl.get(i);
+					Activity a = (Activity)actl.get(i);
 					erg.getPlanElements().add(new ActImpl(a));
 				} else {
 					// Leg

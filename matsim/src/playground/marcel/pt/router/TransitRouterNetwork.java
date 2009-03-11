@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.utils.collections.QuadTree;
 
 import playground.marcel.pt.transitSchedule.TransitLine;
@@ -100,7 +100,7 @@ import playground.marcel.pt.transitSchedule.TransitRouteStop;
 		double maxY = Double.NEGATIVE_INFINITY;
 		
 		for (TransitRouterNetworkNode node : this.nodes) {
-			Coord c = node.stop.getStopFacility().getCenter();
+			Coord c = node.stop.getStopFacility().getCoord();
 			if (c.getX() < minX) {
 				minX = c.getX();
 			}
@@ -117,7 +117,7 @@ import playground.marcel.pt.transitSchedule.TransitRouteStop;
 		
 		QuadTree<TransitRouterNetworkNode> quadTree = new QuadTree<TransitRouterNetworkNode>(minX, minY, maxX, maxY);
 		for (TransitRouterNetworkNode node : this.nodes) {
-			Coord c = node.stop.getStopFacility().getCenter();
+			Coord c = node.stop.getStopFacility().getCoord();
 			quadTree.put(c.getX(), c.getY(), node);
 		}
 		this.qtNodes = quadTree;

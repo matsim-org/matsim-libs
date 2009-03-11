@@ -38,9 +38,9 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -137,7 +137,7 @@ public class SelectedPlans2ESRIShape {
 			String id = plan.getPerson().getId().toString();
 			ActIterator iter = plan.getIteratorAct();
 			while (iter.hasNext()) {
-				Act act = (Act) iter.next();
+				Activity act = (Activity) iter.next();
 				fts.add(getActFeature(id, act));
 			}
 		}
@@ -153,7 +153,7 @@ public class SelectedPlans2ESRIShape {
 			LegIterator iter = plan.getIteratorLeg();
 			while (iter.hasNext()) {
 				Leg leg = (Leg) iter.next();
-				if (leg.getRoute().getDist() > 0) {
+				if (leg.getRoute().getDistance() > 0) {
 					fts.add(getLegFeature(leg, id));
 				}
 			}
@@ -161,7 +161,7 @@ public class SelectedPlans2ESRIShape {
 		ShapeFileWriter.writeGeometries(fts, outputFile);
 	}
 
-	private Feature getActFeature(final String id, final Act act) {
+	private Feature getActFeature(final String id, final Activity act) {
 		String type = act.getType();
 		String linkId = act.getLinkId().toString();
 		Double startTime = act.getStartTime();
@@ -169,7 +169,7 @@ public class SelectedPlans2ESRIShape {
 		Double endTime = act.getEndTime();
 		double rx = MatsimRandom.random.nextDouble() * this.actBlurFactor;
 		double ry = MatsimRandom.random.nextDouble() * this.actBlurFactor;
-		Coord cc = act.getLink().getCenter();
+		Coord cc = act.getLink().getCoord();
 		Coord c = new CoordImpl(cc.getX()+rx,cc.getY()+ry);
 		try {
 			return this.featureTypeAct.create(new Object [] {MGC.coord2Point(c),id, type, linkId, startTime, dur, endTime});
@@ -185,7 +185,7 @@ public class SelectedPlans2ESRIShape {
 		Double depTime = leg.getDepartureTime();
 		Double travTime = leg.getTravelTime();
 		Double arrTime = leg.getArrivalTime();
-		Double dist = leg.getRoute().getDist();
+		Double dist = leg.getRoute().getDistance();
 
 		List<Link> links = ((CarRoute) leg.getRoute()).getLinks();
 		Coordinate [] coords = new Coordinate[links.size() + 1];

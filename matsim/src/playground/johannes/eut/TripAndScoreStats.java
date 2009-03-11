@@ -175,7 +175,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		
 		double sum = 0;
 		for(Person p : persons) {
-			sum += p.getSelectedPlan().getScore();
+			sum += p.getSelectedPlan().getScoreAsPrimitiveType();
 		}
 		
 		return sum/(double)persons.size();

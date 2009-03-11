@@ -34,7 +34,7 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
@@ -93,7 +93,7 @@ public class MentalMap {
 		ActIterator planActIter = myPlan.getIteratorAct();
 
 		while(planActIter.hasNext()){
-			Act myAct = (Act) planActIter.next();
+			Activity myAct = (Activity) planActIter.next();
 			if(myAct.getFacility()==null){ // new Acts are assigned a facility in the Plans file
 				ActivityOption myActivity = null;
 				// If there is already knowledge in the initial plans file, use it
@@ -134,7 +134,7 @@ public class MentalMap {
 //		this.log.info("READING ACT-ACTIVITY MAP FROM FILE PERSON "+myPlan.getPerson().getId());
 		ActIterator planActIter = myPlan.getIteratorAct();
 		while(planActIter.hasNext()){
-			Act myAct = (Act) planActIter.next();
+			Activity myAct = (Activity) planActIter.next();
 
 			TreeMap<Id,String> nextFac = aar.getNextPoint();
 			Id myFacilityId = nextFac.firstKey();
@@ -161,7 +161,7 @@ public class MentalMap {
 		ActIterator planActIter = myPlan.getIteratorAct();
 
 		while(planActIter.hasNext()){
-			Act myAct = (Act) planActIter.next();
+			Activity myAct = (Activity) planActIter.next();
 
 			String type="none";
 			char typechar=myAct.getType().charAt(0);
@@ -216,7 +216,7 @@ public class MentalMap {
 				Plan myPlan = (Plan) planIter.next();
 				ActIterator actIter = myPlan.getIteratorAct();
 				while( actIter.hasNext() ){
-					Act act = (Act) actIter.next();
+					Activity act = (Activity) actIter.next();
 					currentActivities.add(act.getFacility().getId());
 				}
 			}
@@ -285,14 +285,14 @@ public class MentalMap {
 			}
 	}
 
-	public Act getActFromActivity (Person person, ActivityOption myActivity){
-		Act myAct=null;
+	public Activity getActFromActivity (Person person, ActivityOption myActivity){
+		Activity myAct=null;
 		Iterator<Plan> planIter = person.getPlans().iterator();
 		while(planIter.hasNext()){
 			Plan myPlan = (Plan) planIter.next();
 			ActIterator actIter = myPlan.getIteratorAct();
 			while( actIter.hasNext() ){
-				Act act = (Act) actIter.next();
+				Activity act = (Activity) actIter.next();
 				if(act.getFacility()==myActivity.getFacility()){
 					myAct=act;
 				}

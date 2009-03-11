@@ -26,7 +26,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
@@ -225,7 +225,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 				// act/leg
 				for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
 					if (jj % 2 == 0) {
-						Act act = (Act)plan.getPlanElements().get(jj);
+						Activity act = (Activity)plan.getPlanElements().get(jj);
 						this.handler.startAct(act, this.out);
 						this.handler.endAct(this.out);
 					}

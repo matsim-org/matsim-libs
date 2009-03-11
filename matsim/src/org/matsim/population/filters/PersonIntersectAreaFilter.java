@@ -23,10 +23,10 @@ package org.matsim.population.filters;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -82,13 +82,13 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 			for (int i = 1, n = plan.getPlanElements().size(); i < n; i+=2) {
 				Leg leg = (Leg) plan.getPlanElements().get(i);
 				if (leg.getRoute() == null) {
-					if (judgeByBeeline((Act) plan.getPlanElements().get(i-1), (Act) plan.getPlanElements().get(i+1))) {
+					if (judgeByBeeline((Activity) plan.getPlanElements().get(i-1), (Activity) plan.getPlanElements().get(i+1))) {
 						return true;
 					}
 				} else {
 					List<Link> links = ((CarRoute) leg.getRoute()).getLinks();
 					if (links.size() == 0) {
-						if (judgeByBeeline((Act) plan.getPlanElements().get(i-1), (Act) plan.getPlanElements().get(i+1))) {
+						if (judgeByBeeline((Activity) plan.getPlanElements().get(i-1), (Activity) plan.getPlanElements().get(i+1))) {
 							return true;
 						}
 					} else {
@@ -96,12 +96,12 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 							if (this.areaOfInterest.containsKey(link.getId())) return true;
 						}
 						// test departure link
-						Link link = ((Act) plan.getPlanElements().get(i-1)).getLink();
+						Link link = ((Activity) plan.getPlanElements().get(i-1)).getLink();
 						if (link != null) {
 							if (this.areaOfInterest.containsKey(link.getId())) return true;
 						}
 						// test arrival link
-						link = ((Act) plan.getPlanElements().get(i+1)).getLink();
+						link = ((Activity) plan.getPlanElements().get(i+1)).getLink();
 						if (link != null) {
 							if (this.areaOfInterest.containsKey(link.getId())) return true;
 						}
@@ -112,7 +112,7 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 		return false;
 	}
 
-	private boolean judgeByBeeline(final Act fromAct, final Act toAct) {
+	private boolean judgeByBeeline(final Activity fromAct, final Activity toAct) {
 		if (this.aoiCenter == null) {
 			// we cannot use the bee-line decision if we don't know the alternative aoi-center
 			return false;
@@ -121,10 +121,10 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 		Coord toCoord = toAct.getCoord();
 
 		if (fromCoord == null) {
-			fromCoord = fromAct.getLink().getCenter();
+			fromCoord = fromAct.getLink().getCoord();
 		}
 		if (toCoord == null) {
-			toCoord = toAct.getLink().getCenter();
+			toCoord = toAct.getLink().getCoord();
 		}
 
 		return (WorldUtils.distancePointLinesegment(fromCoord, toCoord, this.aoiCenter) <= this.aoiRadius);

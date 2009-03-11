@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.ActivitySpaceBean;
@@ -61,7 +61,7 @@ public class PersonDrawActivtiySpaces extends AbstractPersonAlgorithm {
 	private final void writeLocations(ActivityOption a, FileWriter fw)
 			throws IOException {
 		BufferedWriter out = new BufferedWriter(fw);
-		Coord c = a.getFacility().getCenter();
+		Coord c = a.getFacility().getCoord();
 		out.write(c.getX() + "\t" + c.getY() + "\n");
 		out.flush();
 		out.close();

@@ -25,7 +25,7 @@ import java.util.List;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -70,7 +70,7 @@ public class ModeChoicePlan extends NewPlan {
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);
 				if (i % 2 == 0) {
-					cp.addAct((Act) o);
+					cp.addAct((Activity) o);
 				} else {
 					Leg cl = new org.matsim.population.LegImpl((Leg) o);
 					cl.setMode(
@@ -88,7 +88,7 @@ public class ModeChoicePlan extends NewPlan {
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);
 				if (i % 2 == 0) {
-					cp.addAct((Act) o);
+					cp.addAct((Activity) o);
 				} else {
 					Leg cl = new org.matsim.population.LegImpl((Leg) o);
 					cl.setMode(

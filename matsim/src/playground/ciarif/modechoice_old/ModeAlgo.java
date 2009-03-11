@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -69,10 +69,10 @@ public class ModeAlgo extends AbstractPersonAlgorithm{
 		ArrayList<Object> acts_legs = plan.getPlanElements();
 		
 		for (int i=2; i<acts_legs.size(); i=i+2) {
-			Act act = (Act)acts_legs.get(i);
-			double distX = (((Act)acts_legs.get(i)).getCoord().getX() - ((Act)acts_legs.get(i-2)).getCoord().getX());
+			Activity act = (Activity)acts_legs.get(i);
+			double distX = (((Activity)acts_legs.get(i)).getCoord().getX() - ((Activity)acts_legs.get(i-2)).getCoord().getX());
 			// Position variation on the x axis 
-			double distY = (((Act)acts_legs.get(i)).getCoord().getY() - ((Act)acts_legs.get(i-2)).getCoord().getY());
+			double distY = (((Activity)acts_legs.get(i)).getCoord().getY() - ((Activity)acts_legs.get(i-2)).getCoord().getY());
 			// Position variation on the y axis
 			dist = dist + Math.sqrt(Math.pow(distX, 2)+ Math.pow(distY, 2));
 		}

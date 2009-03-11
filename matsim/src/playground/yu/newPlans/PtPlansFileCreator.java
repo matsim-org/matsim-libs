@@ -9,7 +9,7 @@ import java.util.List;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -145,7 +145,7 @@ public class PtPlansFileCreator {
 			Plan pl = new org.matsim.population.PlanImpl(p);
 			p.addPlan(pl);
 			Link startLink = this.network.getLink(new IdImpl(startLinkId));
-			Act a = pl.createAct("h", startLink);
+			Activity a = pl.createAct("h", startLink);
 			a.setEndTime(Time.parseTime(endTime));
 			Leg leg = pl.createLeg(Mode.car);
 			leg.setDepartureTime(Time.parseTime(endTime));

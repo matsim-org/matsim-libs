@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
@@ -70,7 +70,7 @@ public class ActTimeEstimator extends AbstractPersonAlgorithm {
 	public void run(final Person person) {
 		for (ActIterator ai = person.getSelectedPlan().getIteratorAct(); ai
 				.hasNext();) {
-			Act a = (Act) ai.next();
+			Activity a = (Activity) ai.next();
 			String actType = a.getType();
 			ActDurCounter adc = this.actDurs.get(actType);
 			if (adc == null) {

@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -24,7 +24,7 @@ public class WriteActivityLocationsByType implements PlanAlgorithm{
 		// TODO Auto-generated method stub
 		ActIterator aIt=plan.getIteratorAct();
 		while(aIt.hasNext()){
-			Act act = (Act) aIt.next();
+			Activity act = (Activity) aIt.next();
 			Id id = (Id) act.getFacilityId();
 			String type = (String) act.getType();
 			System.out.println(type+"\t"+id);

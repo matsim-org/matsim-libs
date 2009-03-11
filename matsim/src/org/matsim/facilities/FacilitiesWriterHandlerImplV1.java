@@ -65,8 +65,8 @@ public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
 	public void startFacility(final Facility facility, final BufferedWriter out) throws IOException {
 		out.write("\t<facility");
 		out.write(" id=\"" + facility.getId() + "\"");
-		out.write(" x=\"" + facility.getCenter().getX() + "\"");
-		out.write(" y=\"" + facility.getCenter().getY() + "\"");
+		out.write(" x=\"" + facility.getCoord().getX() + "\"");
+		out.write(" y=\"" + facility.getCoord().getY() + "\"");
 		if (facility.getDesc() != null) { out.write(" desc=\"" + facility.getDesc() + "\""); }
 		out.write(">\n");
 	}

@@ -24,11 +24,9 @@ import java.util.Map;
 
 import org.matsim.basic.v01.BasicHousehold;
 import org.matsim.basic.v01.HouseholdBuilder;
-import org.matsim.basic.v01.LocationType;
 import org.matsim.interfaces.basic.v01.BasicLocation;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Household;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
@@ -72,18 +70,19 @@ public class HouseholdBuilderImpl implements HouseholdBuilder {
 				throw new IllegalArgumentException("Household member with Id: " + id + " is not part of population!");
 			}
 		}
-		if (loc.getLocationType() == LocationType.FACILITY){
-			Facility f = this.facilities.getFacilities().get(loc.getId());
-			if (f != null) {
-				hh.setLocation(f);
-			}
-			else {
-				throw new IllegalStateException("Facility with Id: " + loc.getId() + " doesn't exist, however household with Id: "+ householdId + " is specified to be located there!");
-			}
-		}
-		else {
-			hh.setLocation(loc);
-		}
+		// FIXME [DG]
+//		if (loc.getLocationType() == LocationType.FACILITY){
+//			Facility f = this.facilities.getFacilities().get(loc.getId());
+//			if (f != null) {
+//				hh.setLocation(f);
+//			}
+//			else {
+//				throw new IllegalStateException("Facility with Id: " + loc.getId() + " doesn't exist, however household with Id: "+ householdId + " is specified to be located there!");
+//			}
+//		}
+//		else {
+//			hh.setLocation(loc);
+//		}
 		if (this.vehicles != null) {
 			for (Id id : vehicleIds) {
 				Vehicle v = this.vehicles.get(id);

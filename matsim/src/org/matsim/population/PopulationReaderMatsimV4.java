@@ -30,10 +30,10 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicPopulation;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
@@ -85,12 +85,12 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private Facility currfacility = null;
 	private ActivityOption curractivity = null;
 	private Plan currplan = null;
-	private Act curract = null;
+	private Activity curract = null;
 	private Leg currleg = null;
 	private CarRoute currroute = null;
 	private String routeNodes = null;
 
-	private Act prevAct = null;
+	private Activity prevAct = null;
 
 	private final static Logger log = Logger.getLogger(PopulationReaderMatsimV4.class);
 
@@ -364,7 +364,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		this.currroute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, this.prevAct.getLink(), this.prevAct.getLink());
 		this.currleg.setRoute(this.currroute);
 		if (atts.getValue("dist") != null) {
-			this.currroute.setDist(Double.parseDouble(atts.getValue("dist")));
+			this.currroute.setDistance(Double.parseDouble(atts.getValue("dist")));
 		}
 		if (atts.getValue("trav_time") != null) {
 			this.currroute.setTravelTime(Time.parseTime(atts.getValue("trav_time")));

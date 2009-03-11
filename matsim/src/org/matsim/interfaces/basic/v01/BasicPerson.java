@@ -20,18 +20,13 @@
 package org.matsim.interfaces.basic.v01;
 
 import java.util.List;
-import java.util.TreeSet;
-
-import org.matsim.basic.v01.BasicKnowledge;
-import org.matsim.population.Desires;
 
 /**
  *
 * @author dgrether
 *
 */
-
-public interface BasicPerson<T extends BasicPlan, K extends BasicKnowledge> {
+public interface BasicPerson<T extends BasicPlan> extends Identifiable {
 
 //	TODO [kai]: Would make more sense to be to have something like "getAttributes" and "getPlans".  Current version seems a bit
 //	over-specified to me.  kai, feb09
@@ -40,55 +35,6 @@ public interface BasicPerson<T extends BasicPlan, K extends BasicKnowledge> {
 
 	public List<T> getPlans();
 
-	public Id getId();
-
 	public void setId(final Id id);
-
-	public String getSex();
-
-	public int getAge();
-
-	public String getLicense();
-
-	public boolean hasLicense();
-
-	public String getCarAvail();
-
-	/**
-	 * @return "yes" if the person has a job
-	 * @deprecated use {@link #isEmployed()}
-	 */
-	@Deprecated
-	public String getEmployed();
-
-	public boolean isEmployed();
-	// TODO [kn]: need setter
-
-	public void setAge(final int age);
-
-	public void setSex(final String sex);
-
-	public void setLicence(final String licence);
-
-	public void setCarAvail(final String carAvail);
-
-	public void setEmployed(final String employed);
-
-//	public Knowledge createKnowledge(final String desc);
-
-	@Deprecated // should either be in Builder, or not there at all (too new)
-	public Desires createDesires(final String desc);
-
-	public void addTravelcard(final String type);
-
-	public TreeSet<String> getTravelcards();
-
-	@Deprecated // not yet well enough understood
-	public K getKnowledge();
-
-	@Deprecated // not yet well enough understood
-	public Desires getDesires();
-
-	public Id getFiscalHouseholdId();
 
 }

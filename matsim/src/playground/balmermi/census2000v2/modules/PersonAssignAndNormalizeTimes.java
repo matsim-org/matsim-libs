@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -62,17 +62,17 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	
 	private final void moveTravTimeToNextAct(Plan p) {
 		double prev_ttime = Time.UNDEFINED_TIME;
-		double tod = ((Act)p.getPlanElements().get(0)).getEndTime();
+		double tod = ((Activity)p.getPlanElements().get(0)).getEndTime();
 		for (int i=1; i<p.getPlanElements().size(); i++) {
 			if (i == p.getPlanElements().size()-1) { // last act
-				Act a = (Act)p.getPlanElements().get(i);
+				Activity a = (Activity)p.getPlanElements().get(i);
 				if (prev_ttime == Time.UNDEFINED_TIME) { Gbl.errorMsg("That must not happen!"); }
 				double dur = prev_ttime;
 				a.setStartTime(tod); a.setDuration(dur); a.setEndTime(tod+dur);
 				prev_ttime = Time.UNDEFINED_TIME;
 			}
 			else if (i % 2 == 0) { // in between acts
-				Act a = (Act)p.getPlanElements().get(i);
+				Activity a = (Activity)p.getPlanElements().get(i);
 				double dur = a.getDuration();
 				if (prev_ttime == Time.UNDEFINED_TIME) { Gbl.errorMsg("That must not happen!"); }
 				dur += prev_ttime;
@@ -93,15 +93,15 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 
 	private final void normalizeTimes(Plan p) {
 		if (p.getPlanElements().size() == 1) {
-			Act a = (Act)p.getPlanElements().get(0);
+			Activity a = (Activity)p.getPlanElements().get(0);
 			a.setStartTime(0.0); a.setDuration(Time.MIDNIGHT); a.setEndTime(Time.MIDNIGHT);
 			return;
 		}
-		double home_dur = ((Act)p.getPlanElements().get(0)).getEndTime();
+		double home_dur = ((Activity)p.getPlanElements().get(0)).getEndTime();
 		double othr_dur = 0.0;
-		for (int i=2; i<p.getPlanElements().size()-2; i=i+2) { othr_dur += ((Act)p.getPlanElements().get(i)).getDuration(); }
+		for (int i=2; i<p.getPlanElements().size()-2; i=i+2) { othr_dur += ((Activity)p.getPlanElements().get(i)).getDuration(); }
 		if (othr_dur <= (Time.MIDNIGHT - HOME_MIN)) {
-			Act a = (Act)p.getPlanElements().get(p.getPlanElements().size()-1);
+			Activity a = (Activity)p.getPlanElements().get(p.getPlanElements().size()-1);
 			a.setDuration(Time.UNDEFINED_TIME); a.setEndTime(Time.UNDEFINED_TIME);
 			return;
 		}
@@ -111,11 +111,11 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		double tod = home_dur;
 		for (int i=1; i<p.getPlanElements().size(); i++) {
 			if (i == p.getPlanElements().size()-1) {
-				Act a = (Act)p.getPlanElements().get(i);
+				Activity a = (Activity)p.getPlanElements().get(i);
 				a.setStartTime(tod); a.setDuration(Time.UNDEFINED_TIME); a.setEndTime(Time.UNDEFINED_TIME);
 			}
 			else if (i % 2 == 0) {
-				Act a = (Act)p.getPlanElements().get(i);
+				Activity a = (Activity)p.getPlanElements().get(i);
 				a.setStartTime(tod);
 				a.setDuration((Time.MIDNIGHT - HOME_MIN)*a.getDuration()/othr_dur);
 				a.setEndTime(tod+a.getDuration());
@@ -134,14 +134,14 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		Desires d = p.getPerson().createDesires(null);
 		double othr_dur = 0.0;
 		for (int i=2; i<p.getPlanElements().size()-2; i=i+2) {
-			Act a = (Act)p.getPlanElements().get(i);
+			Activity a = (Activity)p.getPlanElements().get(i);
 			if (a.getDuration() <= 0.0) { log.fatal("pid="+p.getPerson().getId()+": That must not happen!"); }
 			d.accumulateActivityDuration(a.getType(),a.getDuration());
 			othr_dur += a.getDuration();
 		}
 		double home_dur = Time.MIDNIGHT - othr_dur;
 		if (home_dur <= 0.0) { Gbl.errorMsg("pid="+p.getPerson().getId()+": That must not happen!"); }
-		d.accumulateActivityDuration(((Act)p.getPlanElements().get(0)).getType(),home_dur);
+		d.accumulateActivityDuration(((Activity)p.getPlanElements().get(0)).getType(),home_dur);
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -151,12 +151,12 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 
 		// draw a new random number until the new end time >= 0.0
 		double bias = MatsimRandom.random.nextInt(3600)-1800.0; // [-1800,1800[
-		double first_end_time = ((Act)acts_legs.get(0)).getEndTime();
+		double first_end_time = ((Activity)acts_legs.get(0)).getEndTime();
 		while (first_end_time+bias < 0.0) { bias = MatsimRandom.random.nextInt(3600)-1800.0; }
 		
 		for (int i=0; i<acts_legs.size(); i++) {
 			if (i % 2 == 0) {
-				Act act = (Act)acts_legs.get(i);
+				Activity act = (Activity)acts_legs.get(i);
 				if (i == 0) { // first act
 					act.setStartTime(0.0);
 					act.setDuration(act.getDuration()+bias);

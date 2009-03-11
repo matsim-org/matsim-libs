@@ -3,8 +3,8 @@ package playground.mmoyo.PTCase2;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -34,11 +34,11 @@ public class PTTester {
 			Plan plan = person.getPlans().get(0);
 
 			boolean val =false;
-			Act lastAct = null;
-			Act thisAct= null;
+			Activity lastAct = null;
+			Activity thisAct= null;
 
 			for (Iterator<BasicActImpl> iter= plan.getIteratorAct(); iter.hasNext();) {
-		    	thisAct= (Act)iter.next();
+		    	thisAct= (Activity)iter.next();
 		    	if (val) {
 					Coord lastActCoord = lastAct.getCoord();
 		    		Coord actCoord = thisAct.getCoord();

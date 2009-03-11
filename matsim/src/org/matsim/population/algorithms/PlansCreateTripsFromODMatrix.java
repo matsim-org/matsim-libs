@@ -26,8 +26,8 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -90,7 +90,7 @@ public class PlansCreateTripsFromODMatrix {
 						}
 					}
 
-					Act a = plan.createAct("work", coord);
+					Activity a = plan.createAct("work", coord);
 					a.setEndTime(endTime);
 					plan.createLeg(BasicLeg.Mode.car);
 					a = plan.createAct("work", coord);

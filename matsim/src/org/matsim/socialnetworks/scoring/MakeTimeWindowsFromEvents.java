@@ -31,7 +31,7 @@ import java.util.LinkedHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -76,7 +76,7 @@ public class MakeTimeWindowsFromEvents {
 //30.12					endTime=30.*3600.;
 //30.12				}
 				
-				Act act = (Act) plan.getPlanElements().get(j*2);
+				Activity act = (Activity) plan.getPlanElements().get(j*2);
 				TimeWindow tw=new TimeWindow(startTime, endTime, person, act);
 				if(!(timeWindowMap.containsKey(act.getFacility()))){
 					twList=new ArrayList<TimeWindow>();

@@ -32,7 +32,6 @@ import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -113,14 +112,14 @@ public class TRBAnalysis implements AgentDepartureEventHandler, AgentArrivalEven
 	}
 
 	private int getModeSlot(final Person person) {
-		final BasicPlan.Type type = person.getSelectedPlan().getType();
-		if (type == null || BasicPlan.Type.UNDEFINED.equals(type)) {
+		final Plan.Type type = person.getSelectedPlan().getType();
+		if (type == null || Plan.Type.UNDEFINED.equals(type)) {
 			return 2; // through traffic
 		}
-		if (BasicPlan.Type.PT.equals(type)) {
+		if (Plan.Type.PT.equals(type)) {
 			return 1;
 		}
-		if (BasicPlan.Type.CAR.equals(type)) {
+		if (Plan.Type.CAR.equals(type)) {
 			return 0;
 		}
 		System.out.println(type);
@@ -129,7 +128,7 @@ public class TRBAnalysis implements AgentDepartureEventHandler, AgentArrivalEven
 
 	private Plan getPtPlan(final Person person) {
 		for (Plan plan : person.getPlans()) {
-			if (BasicPlan.Type.PT.equals(plan.getType())) {
+			if (Plan.Type.PT.equals(plan.getType())) {
 				return plan;
 			}
 		}

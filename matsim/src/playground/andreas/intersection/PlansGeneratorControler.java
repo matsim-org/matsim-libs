@@ -28,7 +28,7 @@ import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -164,13 +164,13 @@ public class PlansGeneratorControler extends Controler {
 		Person p = new PersonImpl(new IdImpl(String.valueOf(ii)));
 		Plan plan = new org.matsim.population.PlanImpl(p);
 		try {
-			Act act1 = plan.createAct("h", new CoordImpl(100., 100.));
+			Activity act1 = plan.createAct("h", new CoordImpl(100., 100.));
 			act1.setLink(fromLink);
 			act1.setStartTime(0.);
 			act1.setEndTime(3 * 60 * 60.);
 //			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60. + 3600 * MatsimRandom.getLocalInstance().nextDouble(), Time.UNDEFINED_TIME, true);
 			plan.createLeg(BasicLeg.Mode.car);
-			Act act2 = plan.createAct("h", new CoordImpl(200., 200.));
+			Activity act2 = plan.createAct("h", new CoordImpl(200., 200.));
 			act2.setLink(toLink);
 			act2.setStartTime(8 * 60 * 60);
 

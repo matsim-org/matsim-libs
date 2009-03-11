@@ -44,10 +44,10 @@ public class FacilitiesSummary {
 		int unlimit_cap_cnt = 0;
 		for (Facility f : facilities.getFacilities().values()) {
 			f_cnt++;
-			if (f.getCenter().getX() > max_coord.getX()) { max_coord.setX(f.getCenter().getX()); }
-			if (f.getCenter().getY() > max_coord.getY()) { max_coord.setY(f.getCenter().getY()); }
-			if (f.getCenter().getX() < min_coord.getX()) { min_coord.setX(f.getCenter().getX()); }
-			if (f.getCenter().getY() < min_coord.getY()) { min_coord.setY(f.getCenter().getY()); }
+			if (f.getCoord().getX() > max_coord.getX()) { max_coord.setX(f.getCoord().getX()); }
+			if (f.getCoord().getY() > max_coord.getY()) { max_coord.setY(f.getCoord().getY()); }
+			if (f.getCoord().getX() < min_coord.getX()) { min_coord.setX(f.getCoord().getX()); }
+			if (f.getCoord().getY() < min_coord.getY()) { min_coord.setY(f.getCoord().getY()); }
 
 			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {

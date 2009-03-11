@@ -27,9 +27,9 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -62,24 +62,24 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 		return new PlanImpl(p) ;
 	}
 
-	public final Act createAct(final String type, final Coord coord) throws IllegalStateException {
+	public final Activity createAct(final String type, final Coord coord) throws IllegalStateException {
 		verifyCreateAct(Time.UNDEFINED_TIME);
-		Act a = new ActImpl(type, coord);
+		Activity a = new ActImpl(type, coord);
 		this.actsLegs.add(a);
 		return a;
 	}
 
-	public final Act createAct(final String type, final Facility fac) throws IllegalStateException {
+	public final Activity createAct(final String type, final Facility fac) throws IllegalStateException {
 		verifyCreateAct(Time.UNDEFINED_TIME);
-		Act a = new ActImpl(type, fac);
+		Activity a = new ActImpl(type, fac);
 		this.actsLegs.add(a);
 		return a;
 	}
 
 
-	public final Act createAct(final String type, final Link link) throws IllegalStateException {
+	public final Activity createAct(final String type, final Link link) throws IllegalStateException {
 		verifyCreateAct(Time.UNDEFINED_TIME);
-		Act a = new ActImpl(type, link);
+		Activity a = new ActImpl(type, link);
 		this.actsLegs.add(a);
 		return a;
 	}
@@ -228,7 +228,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 
 	@Override
 	public final String toString() {
-		return "[score=" + this.getScore() + "]" +
+		return "[score=" + this.getScoreAsPrimitiveType() + "]" +
 				"[selected=" + this.isSelected() + "]" +
 				"[nof_acts_legs=" + this.actsLegs.size() + "]";
 	}
@@ -237,7 +237,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	 * @param in a plan who's data will be loaded into this plan
 	 **/
 	public void copyPlan(final Plan in) {
-		setScore(in.getScore());
+		setScore(in.getScoreAsPrimitiveType());
 		this.setType(in.getType());
 		this.person = in.getPerson();
 		List<?> actl = in.getPlanElements();
@@ -245,7 +245,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 			try {
 				if (i % 2 == 0) {
 					// activity
-					Act a = (Act)actl.get(i);
+					Activity a = (Activity)actl.get(i);
 					this.actsLegs.add(new ActImpl(a));
 				} else {
 					// Leg
@@ -275,7 +275,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	 * @param act the act to insert, following the leg
 	 * @throws IllegalArgumentException If the leg and act cannot be inserted at the specified position without retaining the correct order of legs and acts.
 	 */
-	public void insertLegAct(final int pos, final Leg leg, final Act act) throws IllegalArgumentException {
+	public void insertLegAct(final int pos, final Leg leg, final Activity act) throws IllegalArgumentException {
 		if (pos < this.actsLegs.size()) {
 			Object o = this.actsLegs.get(pos);
 			if (!(o instanceof Leg)) {
@@ -289,7 +289,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 		this.actsLegs.add(pos, leg);
 	}
 
-	public Leg getPreviousLeg(final Act act) {
+	public Leg getPreviousLeg(final Activity act) {
 		int index = this.getActLegIndex(act);
 		if (index != -1) {
 			return (Leg) this.actsLegs.get(index-1);
@@ -297,10 +297,10 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 		return null;
 	}
 
-	public Act getPreviousActivity(final Leg leg) {
+	public Activity getPreviousActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {
-			return (Act) this.actsLegs.get(index-1);
+			return (Activity) this.actsLegs.get(index-1);
 		}
 		return null;
 	}
@@ -317,7 +317,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	 * @see #getIteratorAct()
 	 * @see #getIteratorLeg()
 	 */
-	public Leg getNextLeg(final Act act) {
+	public Leg getNextLeg(final Activity act) {
 		int index = this.getActLegIndex(act);
 		if ((index < this.actsLegs.size() - 1) && (index != -1)) {
 			return (Leg) this.actsLegs.get(index+1);
@@ -327,7 +327,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 
 	/**
 	 * Returns the activity following the specified leg. <b>Important Note: </b> This method (together with
-	 * {@link #getNextLeg(Act)}) has a very bad performance if it is used to iterate over all Acts and Legs of
+	 * {@link #getNextLeg(Activity)}) has a very bad performance if it is used to iterate over all Acts and Legs of
 	 * a plan. In that case, it is advised to use one of the special iterators.
 	 *
 	 * @param leg
@@ -337,16 +337,16 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	 * @see #getIteratorAct()
 	 * @see #getIteratorLeg()
 	 */
-	public Act getNextActivity(final Leg leg) {
+	public Activity getNextActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {
-			return (Act) this.actsLegs.get(index+1);
+			return (Activity) this.actsLegs.get(index+1);
 		}
 		return null;
 	}
 
 	private int getActLegIndex(final Object o) {
-		if ((o instanceof Leg) || (o instanceof Act)) {
+		if ((o instanceof Leg) || (o instanceof Activity)) {
 			for (int i = 0; i < this.actsLegs.size(); i++) {
 				if (this.actsLegs.get(i).equals(o)) {
 					return i;
@@ -357,12 +357,33 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 		throw new IllegalArgumentException("Method call only valid with a Leg or Act instance as parameter!");
 	}
 
-	public Act getFirstActivity() {
-		return (Act) this.actsLegs.get(0);
+	public Activity getFirstActivity() {
+		return (Activity) this.actsLegs.get(0);
 	}
 
-	public Act getLastActivity() {
-		return (Act) this.actsLegs.get(this.actsLegs.size() - 1);
+	public Activity getLastActivity() {
+		return (Activity) this.actsLegs.get(this.actsLegs.size() - 1);
 	}
 
+	public final double getScoreAsPrimitiveType() {
+		if (getScore() == null) {
+			return Plan.UNDEF_SCORE;
+		}
+		return getScore().doubleValue();
+	}
+
+	public boolean hasUndefinedScore() {
+		if (getScore() == null) {
+			return true;
+		}
+		if (Double.isNaN(getScore())) {
+			return true;
+		}
+		return false;
+	}
+
+	public void setScore(double score) {
+		super.setScore(score);
+	}
+	
 }

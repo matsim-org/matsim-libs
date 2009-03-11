@@ -23,7 +23,7 @@ package org.matsim.router;
 import java.util.ArrayList;
 
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -127,12 +127,12 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	protected void handlePlan(final Plan plan) {
 		ArrayList<?> actslegs = plan.getPlanElements();
-		Act fromAct = (Act)actslegs.get(0);
+		Activity fromAct = (Activity)actslegs.get(0);
 		double now = 0;
 
 		// loop over all <act>s
 		for (int j = 2; j < actslegs.size(); j=j+2) {
-			Act toAct = (Act)actslegs.get(j);
+			Activity toAct = (Activity)actslegs.get(j);
 			Leg leg = (Leg)actslegs.get(j-1);
 
 			double endTime = fromAct.getEndTime();
@@ -164,7 +164,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * @param depTime the time (seconds from midnight) the leg starts
 	 * @return the estimated travel time for this leg
 	 */
-	public double handleLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+	public double handleLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		BasicLeg.Mode legmode = leg.getMode();
 
 		if (legmode == BasicLeg.Mode.car) {
@@ -187,7 +187,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		}
 	}
 
-	protected double handleCarLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+	protected double handleCarLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		double travTime = 0;
 		Link fromLink = fromAct.getLink();
 		Link toLink = toAct.getLink();
@@ -223,13 +223,13 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		return travTime;
 	}
 
-	private double handleRideLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+	private double handleRideLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		// handle a ride exactly the same was as a car
 		// the simulation has to take care that this leg is not really simulated as a stand-alone driver
 		return handleCarLeg(leg, fromAct, toAct, depTime);
 	}
 
-	private double handlePtLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+	private double handlePtLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		// currently: calc route in empty street network, use twice the traveltime
 		// TODO [MR] later: use special pt-router
 
@@ -270,7 +270,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		return travTime;
 	}
 
-	private double handleWalkLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+	private double handleWalkLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		// make simple assumption about distance and walking speed
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 3.0 / 3.6; // 3.0 km/h --> m/s
@@ -285,7 +285,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		return travTime;
 	}
 
-	private double handleBikeLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+	private double handleBikeLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		// make simple assumption about distance and cycling speed
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 15.0 / 3.6; // 15.0 km/h --> m/s
@@ -300,7 +300,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		return travTime;
 	}
 
-	private double handleUndefLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+	private double handleUndefLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		// make simple assumption about distance and a dummy speed (50 km/h)
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 50.0 / 3.6; // 50.0 km/h --> m/s

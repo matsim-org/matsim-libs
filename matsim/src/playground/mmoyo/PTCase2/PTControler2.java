@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.matsim.interfaces.basic.v01.BasicNode;
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.CoordImpl;

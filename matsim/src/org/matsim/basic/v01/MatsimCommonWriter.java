@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.interfaces.basic.v01.BasicLocation;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.writer.MatsimXmlWriter;
 
@@ -49,12 +49,13 @@ public class MatsimCommonWriter extends MatsimXmlWriter {
 	 * @throws IOException
 	 */
 	public void writeLocation(BasicLocation loc, int indentationLevel) throws IOException {
-		if (loc.getLocationType() == LocationType.FACILITY){
-			this.writeLocation(null, loc.getId(), loc.getCenter(), indentationLevel);
-		}
-		else {
-			this.writeLocation(loc.getId(), null, loc.getCenter(), indentationLevel);
-		}
+//		if (loc.getLocationType() == LocationType.FACILITY){
+//			this.writeLocation(null, loc.getId(), loc.getCoord(), indentationLevel);
+//		}
+//		else {
+//			this.writeLocation(loc.getId(), null, loc.getCoord(), indentationLevel);
+//		}
+		// FIXME [DG]
 	}
 	/**
 	 * Write a location to the XML file, i.e. a link OR a facility Id and a coordinate

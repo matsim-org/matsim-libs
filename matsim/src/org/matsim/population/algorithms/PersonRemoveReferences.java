@@ -23,7 +23,7 @@ package org.matsim.population.algorithms;
 import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -64,7 +64,7 @@ public class PersonRemoveReferences extends AbstractPersonAlgorithm {
 
 			Iterator<?> a_it = p.getIteratorAct();
 			while (a_it.hasNext()) {
-				Act a = (Act)a_it.next();
+				Activity a = (Activity)a_it.next();
 				Link link = a.getLink();
 				if (link == null) {
 					if (a.getCoord() == null) { Gbl.errorMsg("Something is worng!"); }
@@ -74,7 +74,7 @@ public class PersonRemoveReferences extends AbstractPersonAlgorithm {
 						a.setLink(null);
 					}
 					else {
-						a.setCoord(a.getLink().getCenter());
+						a.setCoord(a.getLink().getCoord());
 						a.setLink(null);
 					}
 				}

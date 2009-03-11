@@ -7,7 +7,7 @@ import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
@@ -120,11 +120,11 @@ public class CompareSelectedPlansTable {
 					out.write("-;-;-;");
 				}
 
-				double s0 = person.getSelectedPlan().getScore();
+				double s0 = person.getSelectedPlan().getScoreAsPrimitiveType();
 				out.write(s0 + ";");
 				score0s[i] = s0;
 				Person person_comp = this.plans1.getPerson(person_id);
-				double s1 = person_comp.getSelectedPlan().getScore();
+				double s1 = person_comp.getSelectedPlan().getScoreAsPrimitiveType();
 				out.write(s1 + ";");
 				score1s[i] = s1;
 
@@ -161,11 +161,11 @@ public class CompareSelectedPlansTable {
 				out.write(tp1 + ";");
 				out.write(tp0 + "->" + tp1 + ";");
 
-				Act fa0 = person.getSelectedPlan().getFirstActivity();
+				Activity fa0 = person.getSelectedPlan().getFirstActivity();
 				double dpt0 = fa0.getEndTime();
 				boolean hact0 = fa0.getType().startsWith("h");
 				out.write((hact0 ? dpt0 : 0.0) + ";");
-				Act fa1 = person_comp.getSelectedPlan().getFirstActivity();
+				Activity fa1 = person_comp.getSelectedPlan().getFirstActivity();
 				double dpt1 = fa1.getEndTime();
 				boolean hact1 = fa1.getType().startsWith("h");
 				out.write((hact1 ? dpt1 : 0.0) + ";");
@@ -219,7 +219,7 @@ public class CompareSelectedPlansTable {
 
 		while (leg_it.hasNext()) {
 			Leg leg = (Leg) leg_it.next();
-			travelDist += leg.getRoute().getDist();
+			travelDist += leg.getRoute().getDistance();
 		}
 		return travelDist;
 	}

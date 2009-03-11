@@ -76,7 +76,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
 		Map<DayType, SortedSet<BasicOpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<BasicOpeningTime>>();
 
-		List<Location> closestShops = this.shopsOf2005.getNearestLocations(facility.getCenter());
+		List<Location> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
 		ActivityOption shopsOf2005ShopAct = ((Facility) closestShops.get(0)).getActivityOption(FacilitiesProductionKTI.ACT_TYPE_SHOP);
 		if (shopsOf2005ShopAct != null) {
 			closestShopOpentimes = shopsOf2005ShopAct.getOpentimes();

@@ -27,14 +27,4 @@ package org.matsim.interfaces.basic.v01;
  */
 public interface Id extends Comparable<Id> {
 
-    /**
-     * This function must return a unique, non-<code>null</code> <code>String</code>
-     * representation of this identifier. For more verbose stuff,
-     * <code>toString()</code> should be used.
-     *
-     * @return a unique, non-<code>null</code> <code>String</code>-representation
-     *         of this identifier
-     */
-    public String toString();
-
 }

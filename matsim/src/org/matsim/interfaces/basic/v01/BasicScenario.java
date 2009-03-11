@@ -1,13 +1,13 @@
 package org.matsim.interfaces.basic.v01;
 
 import org.matsim.config.Config;
+import org.matsim.interfaces.core.v01.Coord;
 
 public interface BasicScenario {
 
 	public BasicNetwork getNetwork() ;
 
-//	@Deprecated
-//	public BasicFacilities getFacilities() ;
+	public BasicFacilities getFacilities() ;
 
 	public BasicPopulation getPopulation() ;
 

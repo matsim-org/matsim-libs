@@ -55,8 +55,8 @@ public class ExpBetaPlanChanger implements PlanSelector {
 			return null;
 		}
 
-		double currentScore = currentPlan.getScore();
-		double otherScore = otherPlan.getScore();
+		double currentScore = currentPlan.getScoreAsPrimitiveType();
+		double otherScore = otherPlan.getScoreAsPrimitiveType();
 
 		if ( betaFlag ) {
 //			System.err.println( "ExpBetaPlanChanger: The following beta should be replaced by beta/2.  Not fatal.") ; // ask kai.  Jul08

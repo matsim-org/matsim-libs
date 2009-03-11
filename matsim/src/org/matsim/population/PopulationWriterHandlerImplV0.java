@@ -24,7 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
@@ -194,8 +194,8 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 
 	public void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
 		out.write("\t\t<plan");
-		if (!Double.isNaN(plan.getScore()))
-			out.write(" score=\"" + plan.getScore() + "\"");
+		if (!Double.isNaN(plan.getScoreAsPrimitiveType()))
+			out.write(" score=\"" + plan.getScoreAsPrimitiveType() + "\"");
 		if (plan.isSelected())
 			out.write(" selected=\"" + "yes" + "\"");
 		else
@@ -211,7 +211,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <act ... > ... </act>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startAct(final Act act, final BufferedWriter out) throws IOException {
+	public void startAct(final Activity act, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<act");
 		out.write(" type=\"" + act.getType() + "\"");
 		if (act.getCoord() != null) {

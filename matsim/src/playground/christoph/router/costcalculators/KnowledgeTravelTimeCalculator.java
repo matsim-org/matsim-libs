@@ -65,7 +65,7 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 		if(vehicles == 0.0) return link.getFreespeedTravelTime(time);
 		
 		// normalize link to one lane
-		vehicles = vehicles / link.getLanes(time);
+		vehicles = vehicles / link.getNumberOfLanes(time);
 		
 		double length = link.getLength();
 		

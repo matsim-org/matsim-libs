@@ -18,7 +18,7 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.cppdeqsim.EventsReaderDEQv1;
@@ -429,14 +429,14 @@ public class CompareScenarios {
 					}
 				}
 
-				Act homeActivity = null;
+				Activity homeActivity = null;
 				if (analysis.intValue() == ROUTE_SWITCHERS_ANALYSIS_NAME) {
 					if (scenarioName.equals(this.scenarioNames[0])) {
 						this.routeSwitchersLines.add("person\thome_link\thome_x\thome_y");
 						for (Person person : plansSubPop.getPersons().values()) {
 							ActIterator actIterator = person.getSelectedPlan().getIteratorAct();
 							while (actIterator.hasNext()) {
-								homeActivity = (Act) actIterator.next();
+								homeActivity = (Activity) actIterator.next();
 								if (Pattern.matches(".*h.*", homeActivity.getType())) {
 									continue;
 								}

@@ -1,13 +1,14 @@
 package org.matsim.interfaces.core.v01;
 
 import org.matsim.interfaces.basic.v01.BasicLink;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.world.Location;
 
 public interface Link extends BasicLink, Location {
 
 	public double calcDistance(final Coord coord);
 
+	public int getLanesAsInt(double time);
+	
 	public Node getFromNode();
 
 	public Node getToNode();

@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.listener.ShutdownListener;
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Node;
@@ -62,14 +62,14 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 					percentDone++ ; System.out.print('.') ; 
 				}  
 				cnt++ ;
-				Coord coord = fromZone.getCenter() ;
+				Coord coord = fromZone.getCoord() ;
 				assert( coord != null ) ;
 				Node fromNode = network.getNearestNode( coord ) ;
 				assert( fromNode != null ) ;
 				st.setOrigin( fromNode ) ;
 				st.run(network) ;
 				for ( Facility toZone : zones.getFacilities().values() ) {
-					Coord toCoord = toZone.getCenter() ;
+					Coord toCoord = toZone.getCoord() ;
 					Node toNode = network.getNearestNode( toCoord ) ;
 					double arrTime = st.getTree().get(toNode.getId()).getTime();
 					double ttime = arrTime - dpTime ;

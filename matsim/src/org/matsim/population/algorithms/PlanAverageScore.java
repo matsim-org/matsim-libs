@@ -60,7 +60,7 @@ public class PlanAverageScore extends AbstractPersonAlgorithm implements PlanAlg
 	}
 	
 	public final void run(Plan plan) {
-		double score = plan.getScore();
+		double score = plan.getScoreAsPrimitiveType();
 
 		if (!(Double.isInfinite(score) || Double.isNaN(score) || (score < limit))) {
 			sumScores += score;

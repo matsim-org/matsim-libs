@@ -64,7 +64,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 			double [] probs = calcLogitProbability(utils);
 			for (int k=0;k<probs.length;k++) {
 				if (r<=probs [k]) {
-					f.moveTo(newLinks.get(k).getCenter());
+					f.moveTo(newLinks.get(k).getCoord());
 				}
 			}
 		}

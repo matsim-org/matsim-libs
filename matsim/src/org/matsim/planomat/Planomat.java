@@ -35,7 +35,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Route;
@@ -213,7 +213,7 @@ public class Planomat implements PlanAlgorithm {
 			final Plan plan,
 			final PlanAnalyzeSubtours planAnalyzeSubtours ) {
 
-		Act activity = null;
+		Activity activity = null;
 		Leg leg = null;
 
 		Route tempRoute = null;
@@ -225,9 +225,9 @@ public class Planomat implements PlanAlgorithm {
 
 			Object o = plan.getPlanElements().get(ii);
 
-			if (o instanceof Act) {
+			if (o instanceof Activity) {
 
-				activity = ((Act) o);
+				activity = ((Activity) o);
 
 				// handle first activity and middle activities
 				if (ii < (max - 1)) {
@@ -272,8 +272,8 @@ public class Planomat implements PlanAlgorithm {
 				}
 
 				// set arrival time to estimation
-				Act origin = ((Act) plan.getPlanElements().get(ii - 1));
-				Act destination = ((Act) plan.getPlanElements().get(ii + 1));
+				Activity origin = ((Activity) plan.getPlanElements().get(ii - 1));
+				Activity destination = ((Activity) plan.getPlanElements().get(ii + 1));
 
 				double travelTimeEstimation = this.legTravelTimeEstimator.getLegTravelTimeEstimation(
 						plan.getPerson().getId(),

@@ -23,9 +23,9 @@ package org.matsim.population.algorithms;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -86,7 +86,7 @@ public class PlansFilterArea {
 			Plan plan = person.getPlans().get(i);
 
 			for (int j=0; j<plan.getPlanElements().size(); j+=2) {
-				Act act = (Act)plan.getPlanElements().get(j);
+				Activity act = (Activity)plan.getPlanElements().get(j);
 				cntActs++;
 				double x = act.getCoord().getX();
 				double y = act.getCoord().getY();

@@ -23,7 +23,7 @@ package playground.balmermi.census2000v2.modules;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.NetworkLayer;
@@ -73,7 +73,7 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 	public void run(Plan plan) {
 		Iterator<?> act_it = plan.getIteratorAct();
 		while (act_it.hasNext()) {
-			Act act = (Act)act_it.next();
+			Activity act = (Activity)act_it.next();
 			act.setLink(act.getFacility().getLink());
 		}
 		this.router.run(plan);

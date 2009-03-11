@@ -20,11 +20,11 @@
 
 package org.matsim.scoring.interfaces;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 
 public interface ActivityScoring {
 
-	public void startActivity(final double time, final Act act);
+	public void startActivity(final double time, final Activity act);
 
 	public void endActivity(final double time);
 

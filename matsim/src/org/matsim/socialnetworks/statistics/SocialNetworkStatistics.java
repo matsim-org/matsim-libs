@@ -33,9 +33,9 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -301,10 +301,10 @@ public class SocialNetworkStatistics {
 	private double getDyadDistance(SocialNetEdge myEdge) {
 		double dist = 0.;
 		Person pFrom = myEdge.getPersonFrom();
-		Coord fromCoord = ((Act) pFrom.getSelectedPlan().getPlanElements().get(
+		Coord fromCoord = ((Activity) pFrom.getSelectedPlan().getPlanElements().get(
 				0)).getCoord();
 		Person pTo = myEdge.getPersonTo();
-		Coord toCoord = ((Act) pTo.getSelectedPlan().getPlanElements().get(0))
+		Coord toCoord = ((Activity) pTo.getSelectedPlan().getPlanElements().get(0))
 		.getCoord();
 		dist = fromCoord.calcDistance(toCoord);
 		return dist;
@@ -313,11 +313,11 @@ public class SocialNetworkStatistics {
 		double dist = 0.;
 		Vertex vFrom = (Vertex) myEdge.getEndpoints().getFirst();
 		Person pFrom = plans.getPerson((Id) vFrom.getUserDatum("personId"));
-		Coord fromCoord = ((Act) pFrom.getSelectedPlan().getPlanElements().get(
+		Coord fromCoord = ((Activity) pFrom.getSelectedPlan().getPlanElements().get(
 				0)).getCoord();
 		Vertex vTo = (Vertex) myEdge.getEndpoints().getSecond();
 		Person pTo = plans.getPerson((Id) vTo.getUserDatum("personId"));
-		Coord toCoord = ((Act) pTo.getSelectedPlan().getPlanElements().get(0))
+		Coord toCoord = ((Activity) pTo.getSelectedPlan().getPlanElements().get(0))
 		.getCoord();
 		dist = fromCoord.calcDistance(toCoord);
 		return dist;
@@ -366,7 +366,7 @@ public class SocialNetworkStatistics {
 			Person myPerson = plans.getPerson((Id) myVert.getUserDatum("personId"));
 			int id = Integer.parseInt(myVert.getUserDatum("personId").toString());
 			// Agent's Home Location ID
-			Act myAct = (Act) myPerson.getSelectedPlan().getPlanElements().get(0);
+			Activity myAct = (Activity) myPerson.getSelectedPlan().getPlanElements().get(0);
 			String homeId = myAct.getLinkId().toString();
 			// Agent's approx activity space diameter (radius to all alters)
 			double aSd1 = pcasd1.getPersonASD1(plans, myPerson);
@@ -394,7 +394,7 @@ public class SocialNetworkStatistics {
 //			myPerson.getKnowledge().clearActivitySpaces();
 
 			//Geographical aggregation
-			Facility myHome=((Act)(myPerson.getSelectedPlan().getPlanElements().get(0))).getFacility();
+			Facility myHome=((Activity)(myPerson.getSelectedPlan().getPlanElements().get(0))).getFacility();
 			Location myLoc=myHome.getUpMapping().get(myHome.getUpMapping().firstKey());
 			Vertex myVertex=gstat.getLocVertex().get(myLoc);
 			double pop=(Integer) myVertex.getUserDatum("population");
@@ -406,7 +406,7 @@ public class SocialNetworkStatistics {
 				planTypeString = new StringBuilder();
 				ActIterator a_it = thisPlan.getIteratorAct();
 				while (a_it.hasNext()) {
-					Act nextAct = (Act) a_it.next();
+					Activity nextAct = (Activity) a_it.next();
 					planTypeString.append(nextAct.getType().charAt(0));
 				}
 			}

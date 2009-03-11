@@ -169,7 +169,7 @@ public class QueueLink {
 
 				lane.recalculateProperties(0.0, signalLane.getLength(), signalLane.getNumberOfRepresentedLanes());
 				this.originalLane.recalculateProperties(signalLane.getLength(), this.getLink().getLength() - signalLane.getLength(),
-						this.getLink().getLanes(Time.UNDEFINED_TIME));
+						this.getLink().getNumberOfLanes(Time.UNDEFINED_TIME));
 				this.queueLanes.add(lane);
 				firstNodeLinkInitialized = true;
 			} 

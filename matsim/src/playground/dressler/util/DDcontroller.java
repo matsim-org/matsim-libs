@@ -24,7 +24,7 @@ import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
@@ -88,7 +88,7 @@ public class DDcontroller {
 					System.out.println("Person " + person.getId() + " has no plan.");
 					continue;
 				}
-				Act act = plan.getFirstActivity();
+				Activity act = plan.getFirstActivity();
 				if (act == null) {
 					System.out.println("Person " + person.getId() + " has no act.");
 					continue;

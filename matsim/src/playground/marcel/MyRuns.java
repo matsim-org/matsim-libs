@@ -71,10 +71,10 @@ import org.matsim.events.algorithms.GenerateRealPlans;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -923,10 +923,10 @@ public class MyRuns {
 				System.out.println("plan # " + counter);
 			}
 			final Plan plan = person.getPlans().get(0);
-			Coord depCoord = ((Act)plan.getPlanElements().get(0)).getCoord();
+			Coord depCoord = ((Activity)plan.getPlanElements().get(0)).getCoord();
 			for (int i = 2, maxi = plan.getPlanElements().size(); i < maxi; i = i + 2) {
 				final Leg leg = ((Leg)plan.getPlanElements().get(i-1));
-				final Coord arrCoord = ((Act)plan.getPlanElements().get(i)).getCoord();
+				final Coord arrCoord = ((Activity)plan.getPlanElements().get(i)).getCoord();
 				final double depTime = leg.getDepartureTime();
 				try {
 					final Path path = ptNetwork.dijkstraGetCheapestRoute(depCoord, arrCoord, depTime, radius);
@@ -2240,7 +2240,8 @@ public class MyRuns {
 
 	public static void someTest(final String[] args) {
 
-
+		Double UNDEF = null;
+		double score = UNDEF;
 
 	}
 

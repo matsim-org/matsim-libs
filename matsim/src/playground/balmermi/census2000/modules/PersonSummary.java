@@ -23,7 +23,7 @@ package playground.balmermi.census2000.modules;
 import java.util.ArrayList;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -162,9 +162,9 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 		int plan_row = -1; // plan mode defined as last mode
 		                   // (it's just a trick, since the mode is the same for a plan) (just temporary)
 		for (int i=1; i<acts_legs.size()-1; i=i+2) {
-			Act prev_act = (Act)acts_legs.get(i-1);
+			Activity prev_act = (Activity)acts_legs.get(i-1);
 			Leg leg = (Leg)acts_legs.get(i);
-			Act next_act = (Act)acts_legs.get(i+1);
+			Activity next_act = (Activity)acts_legs.get(i+1);
 
 			// get row (mode type)
 			String trip_mode = leg.getMode().toString();

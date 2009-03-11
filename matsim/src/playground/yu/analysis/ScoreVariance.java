@@ -99,7 +99,7 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements
 	}
 
 	public void run(final Plan plan) {
-		this.scores.add(plan.getScore());
+		this.scores.add(plan.getScoreAsPrimitiveType());
 	}
 
 	public void writeVariance() {

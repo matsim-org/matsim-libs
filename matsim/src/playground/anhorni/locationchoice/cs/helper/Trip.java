@@ -1,17 +1,17 @@
 package playground.anhorni.locationchoice.cs.helper;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 
 public class Trip {
 	
 	int tripNr;
-	Act beforeShoppingAct = null;
+	Activity beforeShoppingAct = null;
 	// TODO: handle multiple shopping acts
-	Act shoppingAct = null;
-	Act afterShoppingAct = null;
+	Activity shoppingAct = null;
+	Activity afterShoppingAct = null;
 	
-	public Trip(int tripNr, Act beforeShoppingAct, Act shoppingAct,
-			Act afterShoppingAct) {
+	public Trip(int tripNr, Activity beforeShoppingAct, Activity shoppingAct,
+			Activity afterShoppingAct) {
 		super();
 		this.tripNr = tripNr;
 		this.beforeShoppingAct = beforeShoppingAct;
@@ -20,22 +20,22 @@ public class Trip {
 	}
 		
 	// --------------------------------------------------------
-	public Act getBeforeShoppingAct() {
+	public Activity getBeforeShoppingAct() {
 		return beforeShoppingAct;
 	}
-	public void setBeforeShoppingAct(Act beforeShoppingAct) {
+	public void setBeforeShoppingAct(Activity beforeShoppingAct) {
 		this.beforeShoppingAct = beforeShoppingAct;
 	}
-	public Act getShoppingAct() {
+	public Activity getShoppingAct() {
 		return shoppingAct;
 	}
-	public void setShoppingAct(Act shoppingAct) {
+	public void setShoppingAct(Activity shoppingAct) {
 		this.shoppingAct = shoppingAct;
 	}
-	public Act getAfterShoppingAct() {
+	public Activity getAfterShoppingAct() {
 		return afterShoppingAct;
 	}
-	public void setAfterShoppingAct(Act afterShoppingAct) {
+	public void setAfterShoppingAct(Activity afterShoppingAct) {
 		this.afterShoppingAct = afterShoppingAct;
 	}
 	public int getTripNr() {

@@ -28,10 +28,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -150,10 +150,10 @@ public class RandomPlansGenerator {
 				randTime = startTime+this.rand.nextInt(endTime-startTime);
 				lPath = this.routingAlgo.calcLeastCostPath(lHome.getToNode(), lWork.getFromNode(), randTime);
 			}while(lPath == null);
-			Coord homeCoord = lHome.getCenter(), workCoord = lWork.getCenter();
+			Coord homeCoord = lHome.getCoord(), workCoord = lWork.getCoord();
 
 			//create home act
-			Act a = plan.createAct("h", homeCoord);
+			Activity a = plan.createAct("h", homeCoord);
 			a.setLink(lHome);
 			a.setStartTime(startTime);
 			a.setEndTime(endTime);

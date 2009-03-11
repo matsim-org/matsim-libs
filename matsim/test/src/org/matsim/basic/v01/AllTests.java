@@ -30,7 +30,6 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(BasicPlanTest.class);
 		suite.addTestSuite(BasicHouseholdsReaderV1Test.class);
-		suite.addTestSuite(PopulationReaderWriterV5Test.class);
 		suite.addTestSuite(VehicleReaderWriterV1Test.class);
 		//$JUnit-END$
 		return suite;

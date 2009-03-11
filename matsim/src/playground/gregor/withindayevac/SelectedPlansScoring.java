@@ -44,7 +44,6 @@ import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
@@ -128,7 +127,7 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 			}
 			
 			final Plan plan = this.population.getPerson(new IdImpl(guideId)).getSelectedPlan();
-			final double oldScore = plan.getScore();
+			final double oldScore = plan.getScoreAsPrimitiveType();
 //			if (Double.isNaN(oldScore)) {
 //				plan.setScore(scoreSum);
 //			} else {
@@ -181,7 +180,7 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 	 * @return the average score of the plans before mixing with the old scores (learningrate)
 	 */
 	public double getAveragePlanPerformance() {
-		if (this.scoreSum == 0) return BasicPlan.UNDEF_SCORE;
+		if (this.scoreSum == 0) return Plan.UNDEF_SCORE;
 		return (this.scoreSum / this.scoreCount);
 	}
 
@@ -195,7 +194,7 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 	 */
 	public double getAgentScore(final Id agentId) {
 		final ScoringFunction sf = this.agentScorers.get(agentId.toString());
-		if (sf == null) return BasicPlan.UNDEF_SCORE;
+		if (sf == null) return Plan.UNDEF_SCORE;
 		return sf.getScore();
 	}
 

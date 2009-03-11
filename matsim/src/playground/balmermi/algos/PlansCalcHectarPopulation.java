@@ -28,8 +28,8 @@ import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicPlan;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.PersonAlgorithm;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -110,7 +110,7 @@ public class PlansCalcHectarPopulation extends AbstractPersonAlgorithm implement
 			Gbl.errorMsg("Person id=" + person.getId() + " does not have a single plan");
 		}
 		BasicPlan plan = person.getPlans().get(0);
-		Act act = (Act)plan.getIteratorAct().next();
+		Activity act = (Activity)plan.getPlanElements().get(0);
 		if (act == null) {
 			Gbl.errorMsg("Person id=" + person.getId() + " does not have a first act");
 		}

@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.basic.v01.BasicPlan.Type;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.interfaces.core.v01.Plan.Type;
 
 import playground.yu.newPlans.NewPlan;
 
@@ -64,9 +64,9 @@ public class NewAgentPtPlan extends NewPlan {
 			// copyPlans: the copy of the plans.
 			for (Plan pl : person.getPlans()) {
 				// set plan type for car, pt, walk
-				pl.setType(Type.CAR);
+				pl.setType(Plan.Type.CAR);
 				Plan ptPlan = new org.matsim.population.PlanImpl(person);
-				ptPlan.setType(Type.PT);
+				ptPlan.setType(Plan.Type.PT);
 //				Plan walkPlan = new org.matsim.population.PlanImpl(person);
 //				walkPlan.setType(Type.WALK);
 
@@ -74,7 +74,7 @@ public class NewAgentPtPlan extends NewPlan {
 				for (int i = 0; i < actsLegs.size(); i++) {
 					Object o = actsLegs.get(i);
 					if (i % 2 == 0) {
-						ptPlan.addAct((Act) o);
+						ptPlan.addAct((Activity) o);
 //						walkPlan.addAct((Act) o);
 					} else {
 						Leg leg = (Leg) o;

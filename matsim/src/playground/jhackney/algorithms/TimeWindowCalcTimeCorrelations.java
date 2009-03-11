@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Vector;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
@@ -76,7 +76,7 @@ public class TimeWindowCalcTimeCorrelations {
 				double tdur_egonet=tf_egonet-ti_egonet;
 				tdur_egonet=(tdur_egonet+numbins*binwidth)%(numbins*binwidth);
 				int n_egonet=0;
-				double dist_egonet=tw1.act.getFacility().calcDistance(((Act)(tw1.person.getSelectedPlan().getPlanElements().get(0))).getFacility().getCenter());
+				double dist_egonet=tw1.act.getFacility().calcDistance(((Activity)(tw1.person.getSelectedPlan().getPlanElements().get(0))).getFacility().getCoord());
 
 				double ti_act=tw1.startTime;
 				ti_act=(ti_act+numbins*binwidth)%(numbins*binwidth);
@@ -89,7 +89,7 @@ public class TimeWindowCalcTimeCorrelations {
 
 				for (int iii=ii+1;iii<visits.length;iii++){
 					TimeWindow tw2 = (TimeWindow) visits[iii];
-					double dist_alter=tw2.act.getFacility().calcDistance(((Act)(tw2.person.getSelectedPlan().getPlanElements().get(0))).getFacility().getCenter());
+					double dist_alter=tw2.act.getFacility().calcDistance(((Activity)(tw2.person.getSelectedPlan().getPlanElements().get(0))).getFacility().getCoord());
 
 					// Others there who are friends
 					if(CompareTimeWindows.overlapTimePlaceTypeFriend(tw1, tw2)){

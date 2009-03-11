@@ -13,8 +13,8 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileWriter;
@@ -33,7 +33,7 @@ public class FacilitiesWriter {
 		Iterator<Facility> facilities_it = facilities.iterator();
 		while (facilities_it.hasNext()) {
 			Facility facility = facilities_it.next();
-			Coord coord = facility.getCenter();
+			Coord coord = facility.getCoord();
 			
 			
 			if (facility.getActivityOption("shop_retail_gt2500sqm") != null) {

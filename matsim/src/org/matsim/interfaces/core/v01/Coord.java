@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * CoordI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.basic.v01;
+package org.matsim.interfaces.core.v01;
 
-import java.util.SortedSet;
-
-import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.interfaces.basic.v01.BasicCoord;
 
 /**
- * @author dgrether
+ * In MATSim, generally Cartesian Coordinates are used, with x increasing
+ * to the right, and y increasing to the top:
+ * 
+ *     ^
+ *   y |
+ *     |     x
+ *   (0/0) ---->
  */
-public interface BasicActivityOption {
-	// FIXME: needs to go into basic interfaces
-	
-	/**
-	 * @deprecated If anything, then the facility has a location
-	 */
-	@Deprecated
-	public BasicLocation getLocation();
-	
-	public Integer getCapacity();
-	// FIXME this should use Double
-	
-	public void setCapacity(Integer cap);
-	// FIXME this should use Double
+public interface Coord extends BasicCoord {
 
-	public void addOpeningTime(BasicOpeningTime openingTime);
-
-	public SortedSet<BasicOpeningTime> getOpeningTimes(DayType day);
+ 	public double calcDistance(final Coord other);
 	
-	public String getType();
-
 }

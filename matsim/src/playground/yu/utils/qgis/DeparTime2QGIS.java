@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -67,7 +67,7 @@ public class DeparTime2QGIS implements X2QGIS {
 		}
 
 		public void run(Plan plan) {
-			Act fa = plan.getFirstActivity();
+			Activity fa = plan.getFirstActivity();
 			if (fa.getType().startsWith("h")) {
 				Id linkId = fa.getLinkId();
 				Integer c = dpCnt.get(linkId);

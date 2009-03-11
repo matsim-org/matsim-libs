@@ -277,8 +277,8 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 	}
 
 	@Override
-	public double getDist() {
-		double dist = super.getDist();
+	public double getDistance() {
+		double dist = super.getDistance();
 		if (Double.isNaN(dist)) {
 			dist = calcDistance();
 		}
@@ -290,7 +290,7 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 		for (Link link : getLinks()) {
 			dist += link.getLength();
 		}
-		setDist(dist);
+		setDistance(dist);
 		return dist;
 	}
 

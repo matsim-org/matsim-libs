@@ -91,7 +91,7 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 		attribs[4] = link.getLength();
 		attribs[5] = link.getFreespeed(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 		attribs[6] = link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
-		attribs[7] = link.getLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+		attribs[7] = link.getNumberOfLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 		attribs[8] = width;
 
 		try {

@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -82,7 +82,7 @@ public class EvacuationPlansGenerator {
 		while (it.hasNext()) {
 			Person pers = it.next();
 
-			Id id = ((Act)pers.getPlans().get(0).getPlanElements().get(0)).getLink().getId();
+			Id id = ((Activity)pers.getPlans().get(0).getPlanElements().get(0)).getLink().getId();
 
 			if (this.network.getLink(id) == null) {
 				it.remove();
@@ -111,7 +111,7 @@ public class EvacuationPlansGenerator {
 			leg.setArrivalTime(0.0);
 			plan.addLeg(leg);
 
-			Act actB = new org.matsim.population.ActImpl("h", new CoordImpl(12000.0, -12000.0), this.network.getLink(saveLinkId));
+			Activity actB = new org.matsim.population.ActImpl("h", new CoordImpl(12000.0, -12000.0), this.network.getLink(saveLinkId));
 			plan.addAct(actB);
 
 			router.run(plan);

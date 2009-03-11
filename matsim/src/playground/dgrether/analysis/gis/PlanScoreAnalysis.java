@@ -39,9 +39,9 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.factory.GeotoolsFactory;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -173,9 +173,9 @@ public class PlanScoreAnalysis {
 			for (Person person : plans.getPersons().values()) {
 				plan = person.getSelectedPlan();
 				id = person.getId();
-				score1 = plan.getScore();
-				score2 = plans2.getPerson(id).getSelectedPlan().getScore();
-				loc = ((Act) plan.getPlanElements().get(0)).getCoord();
+				score1 = plan.getScoreAsPrimitiveType();
+				score2 = plans2.getPerson(id).getSelectedPlan().getScoreAsPrimitiveType();
+				loc = ((Activity) plan.getPlanElements().get(0)).getCoord();
 				writer.addLine(id.toString(), Double.toString(loc.getX()), Double
 						.toString(loc.getY()), Double.toString(score1), Double
 						.toString(score2));

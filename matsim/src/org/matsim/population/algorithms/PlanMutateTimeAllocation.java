@@ -22,7 +22,7 @@ package org.matsim.population.algorithms;
 
 import java.util.Random;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.utils.misc.Time;
@@ -61,7 +61,7 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 		for (int i = 0; i < max; i++ ) {
 
 			if (i % 2 == 0) {
-				Act act = (Act)(plan.getPlanElements().get(i));
+				Activity act = (Activity)(plan.getPlanElements().get(i));
 
 				// handle first activity
 				if (i == 0) {

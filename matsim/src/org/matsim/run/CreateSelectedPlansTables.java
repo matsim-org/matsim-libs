@@ -186,7 +186,7 @@ public class CreateSelectedPlansTables {
 				}
 
 				// plan0 ----------------------------------------------
-				out.write(person.getSelectedPlan().getScore()+"\t");
+				out.write(person.getSelectedPlan().getScoreAsPrimitiveType()+"\t");
 				out.write(this.getTravelTime(person)+"\t");
 				this.sumPlanTraveltime[0]+=this.getTravelTime(person);
 
@@ -202,7 +202,7 @@ public class CreateSelectedPlansTables {
 				if (this.twoPlans) {
 
 					final Person person_comp=this.plans1.getPerson(person_id);
-					out.write(person_comp.getSelectedPlan().getScore()+"\t");
+					out.write(person_comp.getSelectedPlan().getScoreAsPrimitiveType()+"\t");
 					out.write(this.getTravelTime(person_comp)+"\t");
 					this.sumPlanTraveltime[1]+=this.getTravelTime(person_comp);
 
@@ -246,7 +246,7 @@ public class CreateSelectedPlansTables {
 
 		while (leg_it.hasNext()) {
 			final Leg leg = (Leg)leg_it.next();
-			travelDist+=leg.getRoute().getDist();
+			travelDist+=leg.getRoute().getDistance();
 		}
 		return travelDist;
 	}

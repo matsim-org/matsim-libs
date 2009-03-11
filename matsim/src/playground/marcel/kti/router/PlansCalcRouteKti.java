@@ -23,9 +23,9 @@ package playground.marcel.kti.router;
 import java.util.List;
 
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
@@ -67,14 +67,14 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	}
 
 	@Override
-	public double handleLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+	public double handleLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		if (BasicLeg.Mode.pt.equals(leg.getMode())) {
 			return handleSwissPtLeg(fromAct, leg, toAct);
 		}
 		return super.handleLeg(leg, fromAct, toAct, depTime);
 	}
 
-	public double handleSwissPtLeg(final Act fromAct, final Leg leg, final Act toAct) {
+	public double handleSwissPtLeg(final Activity fromAct, final Leg leg, final Activity toAct) {
 		Coord fromStop = this.haltestellen.getClosestLocation(fromAct.getCoord());
 		Coord toStop = this.haltestellen.getClosestLocation(toAct.getCoord());
 

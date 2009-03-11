@@ -23,7 +23,7 @@ package org.matsim.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
@@ -151,7 +151,7 @@ public interface PopulationWriterHandler extends WriterHandler {
 	// <act ... > ... </act>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startAct(final Act act, final BufferedWriter out) throws IOException;
+	public void startAct(final Activity act, final BufferedWriter out) throws IOException;
 
 	public void endAct(final BufferedWriter out) throws IOException;
 

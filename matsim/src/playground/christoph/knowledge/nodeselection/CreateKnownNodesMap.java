@@ -27,7 +27,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -95,8 +95,8 @@ public class CreateKnownNodesMap {
 			ActIterator actIterator = plan.getIteratorAct();
 				
 			// get all acts of the selected plan
-			ArrayList<Act> acts = new ArrayList<Act>();					
-			while(actIterator.hasNext()) acts.add((Act)actIterator.next());
+			ArrayList<Activity> acts = new ArrayList<Activity>();					
+			while(actIterator.hasNext()) acts.add((Activity)actIterator.next());
 			
 			for(int j = 1; j < acts.size(); j++)
 			{						

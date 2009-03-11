@@ -268,7 +268,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		
 		double scoresum = 0;
 		for(Plan p : plans) {
-			scoresum += p.getScore();
+			scoresum += p.getScoreAsPrimitiveType();
 		}
 		double result = scoresum/(double)plans.size();
 		if(Double.isNaN(result))
@@ -283,7 +283,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		
 		double scoresum = 0;
 		for(Person p : persons) {
-			scoresum += p.getSelectedPlan().getScore();
+			scoresum += p.getSelectedPlan().getScoreAsPrimitiveType();
 		}
 		return scoresum/(double)persons.size();
 	}

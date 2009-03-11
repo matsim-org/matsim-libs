@@ -35,7 +35,7 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 				// example of the use of a bad code style, but works anyway....
 				QuadTree<Person> personQuadTree = Utils.getPersonQuadTree();
 				if (personQuadTree == null) { throw new RuntimeException("QuadTree not set!"); }
-				Collection<Person> persons = personQuadTree.get(f.getCenter().getX(),f.getCenter().getY(),1000);
+				Collection<Person> persons = personQuadTree.get(f.getCoord().getX(),f.getCoord().getY(),1000);
 				
 				
 				double[] utils = new double[alternatives];
@@ -67,7 +67,7 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 				double [] probs = calcLogitProbability(utils);
 				for (int k=0;k<probs.length;k++) {
 					if (r<=probs [k]) {
-						f.moveTo(newLinks.get(k).getCenter());
+						f.moveTo(newLinks.get(k).getCoord());
 					}
 				}
 			}

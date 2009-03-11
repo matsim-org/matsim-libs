@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
@@ -71,14 +71,14 @@ public abstract class WorldUtils {
 		double x, y;
 		// min is not defined --> place the random point within a circle around the center
 		// first, determine radius of circle. for this, search the nearest (neighbor) zone
-		Coord center = zone.getCenter();
+		Coord center = zone.getCoord();
 		ArrayList<Location> nearestZones = layer.getNearestLocations(center, zone);
 		double shortestDistance = Double.MAX_VALUE;
 		Iterator<Location> zoneIter = nearestZones.iterator();
 		while (zoneIter.hasNext()) {
 			Zone aZone = (Zone)zoneIter.next();
 			Coord zoneMin = aZone.getMin();
-			Coord zoneCenter = aZone.getCenter();
+			Coord zoneCenter = aZone.getCoord();
 			double radius;
 			if (zoneMin == null || zoneMin.equals(aZone.getMax())) {
 				// the distance is center-to-center, only take 0.7 times the distance as radius

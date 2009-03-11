@@ -23,7 +23,7 @@ package org.matsim.withinday.contentment;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -165,7 +165,7 @@ public class PlanScore implements AgentContentment {
 			}
 			planIdx++;
 		}
-		Act nextAct = this.agent.getPerson().getSelectedPlan().getNextActivity(leg);
+		Activity nextAct = this.agent.getPerson().getSelectedPlan().getNextActivity(leg);
 		double nextActDuration = (nextAct.getEndTime() - nextAct.getStartTime());
 
 		double score = calcPlanScore(time + duration, leg.getArrivalTime(), nextActDuration, this.zeroUtilDuration[planIdx]);
@@ -221,7 +221,7 @@ public class PlanScore implements AgentContentment {
 		for (Object o : plan.getPlanElements()) {
 			if (o instanceof Leg) {
 				Leg leg = (Leg)o;
-				Act nextAct = this.agent.getPerson().getSelectedPlan().getNextActivity(leg);
+				Activity nextAct = this.agent.getPerson().getSelectedPlan().getNextActivity(leg);
 				double actDur = Math.max((nextAct.getEndTime() - nextAct.getStartTime()), 0.0d);
 				double endTime = Math.max(leg.getArrivalTime(), 0.0d);
 

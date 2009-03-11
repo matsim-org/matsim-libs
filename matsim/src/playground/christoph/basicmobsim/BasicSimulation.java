@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -92,7 +92,7 @@ public class BasicSimulation {
 		{
 			ArrayList<Node> routeNodes = new ArrayList<Node>();
 			
-			Act act = (Act)actIterator.next();
+			Activity act = (Activity)actIterator.next();
 			
 			Leg leg = (Leg)legIterator.next();
 			
@@ -102,7 +102,7 @@ public class BasicSimulation {
 				System.exit(0);
 			}
 			
-			Act nextAct = plan.getNextActivity(leg);
+			Activity nextAct = plan.getNextActivity(leg);
 			
 			// Ziellink holen
 			Link destinationLink = nextAct.getLink();

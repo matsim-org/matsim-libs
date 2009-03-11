@@ -55,8 +55,8 @@ public class CountsCapacityComparison {
 						.getValue();
 				if (capacity <= maxCountsValue) {
 					sw.writeln(linkId.toString() + "\t"
-							+ link.getCenter().getX() + "\t"
-							+ link.getCenter().getY() + "\t" + capacity + "\t"
+							+ link.getCoord().getX() + "\t"
+							+ link.getCoord().getY() + "\t" + capacity + "\t"
 							+ maxCountsValue);
 					// TODO what about the upward and downward links??
 					// upward
@@ -74,8 +74,8 @@ public class CountsCapacityComparison {
 							for (Link inLink : link.getFromNode().getInLinks()
 									.values()) {
 								sw.writeln(inLink.getId().toString() + "\t"
-										+ inLink.getCenter().getX() + "\t"
-										+ inLink.getCenter().getY() + "\t"
+										+ inLink.getCoord().getX() + "\t"
+										+ inLink.getCoord().getY() + "\t"
 										+ inLink.getCapacity(0) / capPeriod);
 							}
 						}
@@ -97,8 +97,8 @@ public class CountsCapacityComparison {
 							for (Link outLink : link.getToNode().getOutLinks()
 									.values()) {
 								sw.writeln(outLink.getId().toString() + "\t"
-										+ outLink.getCenter().getX() + "\t"
-										+ outLink.getCenter().getY() + "\t"
+										+ outLink.getCoord().getX() + "\t"
+										+ outLink.getCoord().getY() + "\t"
 										+ outLink.getCapacity(0) / capPeriod);
 							}
 						}

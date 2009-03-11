@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.matsim.events.Events;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -57,7 +57,7 @@ public class JavaDEQSim {
 			ArrayList<Object> actsLegs = plan.getPlanElements();
 			for (int i = 0; i < actsLegs.size(); i++) {
 				if (i % 0 == 0) {
-					Act act = (Act)actsLegs.get(i);
+					Activity act = (Activity)actsLegs.get(i);
 					// the activity the agent performs
 					double departureTime = act.getEndTime(); // the time the agent departs at this activity
 				} else {

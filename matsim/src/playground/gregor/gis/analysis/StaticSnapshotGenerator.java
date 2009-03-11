@@ -41,7 +41,7 @@ import org.matsim.events.EventsReaderTXTv1;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -157,14 +157,14 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 	private MultiPoint getMultiPoint() {
 		HashSet<Link> links = new HashSet<Link>();
 		for (Link link : this.agentsOnLink.values()) {
-			if (isInBoundingBox(link.getCenter())) {
+			if (isInBoundingBox(link.getCoord())) {
 				links.add(link);
 			}
 		}
 		Point [] points = new Point[links.size()];
 		int c = 0;
 		for (Link link : links) {
-			points[c++] = MGC.coord2Point(link.getCenter());
+			points[c++] = MGC.coord2Point(link.getCoord());
 		}
 
 		return this.geofac.createMultiPoint(points);

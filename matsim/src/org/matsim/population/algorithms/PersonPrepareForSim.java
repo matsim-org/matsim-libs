@@ -23,7 +23,7 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -71,7 +71,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			ArrayList<Object> actslegs = plan.getPlanElements();
 			for (int i = 0; i < actslegs.size(); i++) {
 				if (i % 2 == 0) {
-					Act act = (Act)actslegs.get(i);
+					Activity act = (Activity)actslegs.get(i);
 					if (act.getLink() == null) {
 						needsXY2Links = true;
 						needsReRoute = true;

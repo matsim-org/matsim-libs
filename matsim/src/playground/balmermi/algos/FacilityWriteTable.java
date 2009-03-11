@@ -82,7 +82,7 @@ public class FacilityWriteTable extends AbstractFacilityAlgorithm {
 			while (a_it.hasNext()) {
 				ActivityOption a = a_it.next();
 				if (a.getType().equals(this.act_type)) {
-					out.write(facility.getId() + "\t" + facility.getCenter().getX() + "\t" + facility.getCenter().getY() + "\t" + a.getCapacity() + "\n");
+					out.write(facility.getId() + "\t" + facility.getCoord().getX() + "\t" + facility.getCoord().getY() + "\t" + a.getCapacity() + "\n");
 				}
 			}
 			out.flush();

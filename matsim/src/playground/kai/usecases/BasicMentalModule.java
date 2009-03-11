@@ -1,18 +1,36 @@
 package playground.kai.usecases;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
-
-// ok:
-import org.matsim.interfaces.basic.v01.*;
-
-// not ok:
-//import org.matsim.basic.v01.*;
-//import org.matsim.basic.v01.BasicPlanImpl;
-import org.matsim.basic.v01.BasicPlanImpl;
-import org.matsim.events.*;
-import org.matsim.events.handler.*;
+import org.matsim.events.ActEndEvent;
+import org.matsim.events.ActStartEvent;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.LinkEnterEvent;
+import org.matsim.events.LinkLeaveEvent;
+import org.matsim.events.handler.ActEndEventHandler;
+import org.matsim.events.handler.ActStartEventHandler;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicLink;
+import org.matsim.interfaces.basic.v01.BasicNetwork;
+import org.matsim.interfaces.basic.v01.BasicNode;
+import org.matsim.interfaces.basic.v01.BasicPerson;
+import org.matsim.interfaces.basic.v01.BasicPlan;
+import org.matsim.interfaces.basic.v01.BasicPopulation;
+import org.matsim.interfaces.basic.v01.BasicPopulationBuilder;
+import org.matsim.interfaces.basic.v01.BasicRoute;
+import org.matsim.interfaces.basic.v01.BasicScenario;
+import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 
 @SuppressWarnings("unused")
 public class BasicMentalModule implements 
@@ -49,7 +67,7 @@ ActStartEventHandler
 
 			double fs = bl.getFreespeed(0.) ; 
 			double cap = bl.getCapacity(0.) ;
-			double nLanes = bl.getLanes(0.) ; // TODO: getNumberOfLanes??
+			double nLanes = bl.getNumberOfLanes(0.) ; // TODO: getNumberOfLanes??
 			// TODO: also getters w/o time argument?  I think that would contribute to robustness ...			
 			
 		}
@@ -59,46 +77,46 @@ ActStartEventHandler
 			
 			Id id = person.getId();
 			
-			double age = person.getAge();
-			String carAvail = person.getCarAvail(); // TODO: String??
-			person.getDesires(); // TODO: Do we understand this well enough to have it in the basic interface? 
+//			double age = person.getAge();
+//			String carAvail = person.getCarAvail(); // TODO: String??
+//			person.getDesires(); // TODO: Do we understand this well enough to have it in the basic interface? 
 
 			List<BasicPlan> plans = person.getPlans() ;
 			
 			for ( BasicPlan plan : plans ) {
-				BasicPlanImpl.ActLegIterator it = plan.getIterator() ;
+//				BasicPlanImpl.ActLegIterator it = plan.getIterator() ;
 				// TODO ActLegIterator not in the basic interfaces
 				
 				// TODO: is the following how it is meant?  not terribly beautiful.  But what else?
 
 				// TODO: Can you check if the first act exists?
-				BasicAct act = it.nextAct();
-				Coord coord = act.getCoord();
-				double sTime = act.getStartTime() ;
-				double eTime = act.getEndTime() ;
-				Id fId = act.getFacilityId() ;
-				Id lId = act.getLinkId() ;
-				String type = act.getType() ;
-				
-				while ( it.hasNextLeg() ) {
-					BasicLeg leg = it.nextLeg();
-					double dTime = leg.getDepartureTime();
-					double aTime = leg.getArrivalTime() ;
-					double tTime = leg.getTravelTime() ;
-					
-					BasicLeg.Mode mode = leg.getMode() ;
-
-					BasicRoute route = leg.getRoute();
-					
-					double dist = route.getDist();
-					double ttime = route.getTravelTime() ;
-					Id slId = route.getStartLinkId() ;
-					Id elId = route.getEndLinkId() ;
-					
-					List<Id> linkIds = route.getLinkIds() ;
-					
-					BasicAct nextAct = it.nextAct();
-				}
+//				BasicActivity act = it.nextAct();
+//				Coord coord = act.getCoord();
+//				double sTime = act.getStartTime() ;
+//				double eTime = act.getEndTime() ;
+//				Id fId = act.getFacilityId() ;
+//				Id lId = act.getLinkId() ;
+//				String type = act.getType() ;
+//				
+//				while ( it.hasNextLeg() ) {
+//					BasicLeg leg = it.nextLeg();
+//					double dTime = leg.getDepartureTime();
+////					double aTime = leg.getArrivalTime() ;
+//					double tTime = leg.getTravelTime() ;
+//					
+//					BasicLeg.Mode mode = leg.getMode() ;
+//
+//					BasicRoute route = leg.getRoute();
+//					
+//					double dist = route.getDistance();
+//					double ttime = route.getTravelTime() ;
+//					Id slId = route.getStartLinkId() ;
+//					Id elId = route.getEndLinkId() ;
+//					
+//					List<Id> linkIds = route.getLinkIds() ;
+//					
+//					BasicActivity nextAct = it.nextAct();
+//				}
 			}
 		}
 		

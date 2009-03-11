@@ -26,7 +26,7 @@ import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -60,7 +60,7 @@ public class PlansActChainReduction {
 			String chain = "";
 			Plan plan = p.getPlans().get(0);
 			for (int i=0; i<plan.getPlanElements().size(); i+=2) {
-				Act act = (Act)plan.getPlanElements().get(i);
+				Activity act = (Activity)plan.getPlanElements().get(i);
 				chain = chain.concat(act.getType());
 			}
 			if (!chains.containsKey(chain)) {

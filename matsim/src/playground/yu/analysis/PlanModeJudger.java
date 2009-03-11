@@ -3,9 +3,11 @@
  */
 package playground.yu.analysis;
 
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
+import java.util.Iterator;
+
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicPlan;
+import org.matsim.interfaces.core.v01.Leg;
 
 /**
  * @author yu
@@ -13,9 +15,13 @@ import org.matsim.interfaces.basic.v01.BasicPlan;
  */
 public class PlanModeJudger {
 	private static boolean useMode(BasicPlan plan, BasicLeg.Mode mode) {
-		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
-			if (!li.next().getMode().equals(mode)) {
-				return false;
+		for (Iterator li = plan.getPlanElements().iterator(); li.hasNext();) {
+			Object o = li.next();
+			if (o instanceof Leg) {
+				Leg l = (Leg) o;
+				if (!l.getMode().equals(mode)) {
+					return false;
+				}
 			}
 		}
 		return true;
@@ -23,15 +29,18 @@ public class PlanModeJudger {
 
 	public static BasicLeg.Mode getMode(BasicPlan plan) {
 		BasicLeg.Mode tmpMode = null;
-		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
-			BasicLeg.Mode tmpMode2 = li.next().getMode();
-			;
-			if (tmpMode != null) {
-				if (!tmpMode.equals(tmpMode2)) {
-					return BasicLeg.Mode.undefined;
+		for (Iterator li = plan.getPlanElements().iterator(); li.hasNext();) {
+			Object o = li.next();
+			if (o instanceof Leg) {
+				Leg l = (Leg)o;
+				BasicLeg.Mode tmpMode2 = l.getMode();
+				if (tmpMode != null) {
+					if (!tmpMode.equals(tmpMode2)) {
+						return BasicLeg.Mode.undefined;
+					}
 				}
+				tmpMode = tmpMode2;
 			}
-			tmpMode = tmpMode2;
 		}
 		return tmpMode;
 	}

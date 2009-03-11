@@ -33,7 +33,7 @@ import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
@@ -127,20 +127,20 @@ public class TryOut {
 		// run/simulate the things
 
 		// - initialize
-		Act act = (Act) plan.getPlanElements().get(0);
+		Activity act = (Activity) plan.getPlanElements().get(0);
 		fv.handleEvent(new ActStartEvent(0.0, person1, link2, act));
 
 		busDriver.enterNextLink();//link1
 
 		// - person departs at home
-		act = (Act) plan.getPlanElements().get(0);
+		act = (Activity) plan.getPlanElements().get(0);
 		fv.handleEvent(new ActEndEvent(7.0*3600, person1, link2, act));
 
 		// - bus departs at stop1
 		new DepartureAtFacilityEvent(7.25*3600, bus, stop1);
 
 		// - person waits at stop2
-		act = (Act) plan.getPlanElements().get(2);
+		act = (Activity) plan.getPlanElements().get(2);
 		fv.handleEvent(new ActStartEvent(7.20*3600, person1, link3, act));
 
 		// - bus crosses node 3
@@ -153,7 +153,7 @@ public class TryOut {
 		new ArrivalAtFacilityEvent(7.30*3600, bus, stop2);
 
 		// - passengers in/out
-		act = (Act) plan.getPlanElements().get(2);
+		act = (Activity) plan.getPlanElements().get(2);
 		fv.handleEvent(new ActEndEvent(7.31*3600, person1, link3, act));
 
 
@@ -171,20 +171,20 @@ public class TryOut {
 		// - bus arrives/departs at stop5, person getting out
 		new ArrivalAtFacilityEvent(7.50*3600, bus, stop5);
 
-		act = (Act) plan.getPlanElements().get(4);
+		act = (Activity) plan.getPlanElements().get(4);
 		fv.handleEvent(new ActStartEvent(7.51*3600, person1, link6, act));
 
 		new DepartureAtFacilityEvent(7.52*3600, bus, stop5);
 
 		// - person starts walking
-		act = (Act) plan.getPlanElements().get(4);
+		act = (Activity) plan.getPlanElements().get(4);
 		fv.handleEvent(new ActEndEvent(7.51*3600, person1, link6, act));
 
 		// - bus arrives at stop6
 		new ArrivalAtFacilityEvent(7.60*3600, bus, stop6);
 
 		// - person arrives at work
-		act = (Act) plan.getPlanElements().get(6);
+		act = (Activity) plan.getPlanElements().get(6);
 		fv.handleEvent(new ActStartEvent(7.60*3600, person1, link7, act));
 
 		// finish things
@@ -275,16 +275,16 @@ public class TryOut {
 		final Person person = new PersonImpl(new IdImpl("1"));
 		population.addPerson(person);
 		final Plan plan = person.createPlan(true);
-		final Act homeAct = plan.createAct("home", facilities.getFacilities().get(new IdImpl("home")));
+		final Activity homeAct = plan.createAct("home", facilities.getFacilities().get(new IdImpl("home")));
 		homeAct.setEndTime(7.0*3600);
 		final Leg walk1 = plan.createLeg(BasicLeg.Mode.walk);
-		final Act changeMode1 = plan.createAct("transitIteraction", facilities.getFacilities().get(new IdImpl("stop2")));
+		final Activity changeMode1 = plan.createAct("transitIteraction", facilities.getFacilities().get(new IdImpl("stop2")));
 		changeMode1.setDuration(0.0);
 		final Leg bus = plan.createLeg(BasicLeg.Mode.pt);
-		final Act changeMode2 = plan.createAct("transitIteraction", facilities.getFacilities().get(new IdImpl("stop5")));
+		final Activity changeMode2 = plan.createAct("transitIteraction", facilities.getFacilities().get(new IdImpl("stop5")));
 		changeMode2.setDuration(0.0);
 		final Leg walk2 = plan.createLeg(BasicLeg.Mode.walk);
-		final Act workAct = plan.createAct("work", facilities.getFacilities().get(new IdImpl("work")));
+		final Activity workAct = plan.createAct("work", facilities.getFacilities().get(new IdImpl("work")));
 		workAct.setDuration(8.0*3600);
 
 		Gbl.createConfig(null); // required for plans.outputSample

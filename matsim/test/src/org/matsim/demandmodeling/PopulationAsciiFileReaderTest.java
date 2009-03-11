@@ -22,7 +22,7 @@ package org.matsim.demandmodeling;
 import java.io.IOException;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -60,14 +60,14 @@ public class PopulationAsciiFileReaderTest extends MatsimTestCase {
 		Plan plan2 = p2.getSelectedPlan();
 		assertNotNull(plan1);
 		assertNotNull(plan2);
-		Act a11 = plan1.getFirstActivity();
-		Act a12 = plan1.getNextActivity(plan1.getNextLeg(a11));
+		Activity a11 = plan1.getFirstActivity();
+		Activity a12 = plan1.getNextActivity(plan1.getNextLeg(a11));
 		assertNotNull(a11);
 		assertNotNull(a12);
 		assertEquals("h", a11.getType());
 		assertEquals("w", a12.getType());
-		Act a21 = plan2.getFirstActivity();
-		Act a22 = plan2.getNextActivity(plan2.getNextLeg(a21));
+		Activity a21 = plan2.getFirstActivity();
+		Activity a22 = plan2.getNextActivity(plan2.getNextLeg(a21));
 		assertNotNull(a21);
 		assertNotNull(a22);
 		assertEquals("h", a21.getType());

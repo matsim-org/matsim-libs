@@ -293,7 +293,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 
 		// test base values
-		assertEquals(1.0, link.getLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+		assertEquals(1.0, link.getNumberOfLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
 
 		// add an absolute change
 		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
@@ -302,8 +302,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		link.applyEvent(change);
 
 		// do the tests
-		assertEquals(1.0, link.getLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
-		assertEquals(2.0, link.getLanes(7*3600), EPSILON);
+		assertEquals(1.0, link.getNumberOfLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+		assertEquals(2.0, link.getNumberOfLanes(7*3600), EPSILON);
 
 		// test derived values
 		// TODO e.g. test storage capacity on a queuelink based on this time-variant link

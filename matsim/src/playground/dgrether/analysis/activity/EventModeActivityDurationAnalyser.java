@@ -33,7 +33,6 @@ import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -136,21 +135,21 @@ public class EventModeActivityDurationAnalyser {
 				this.durTemp = event.time - startEvent.time;
 			}
 			if (event.acttype.equalsIgnoreCase("h")) {
-				if (p.getType().equals(BasicPlan.Type.CAR)) {
+				if (p.getType().equals(Plan.Type.CAR)) {
 					this.homeActivityDurationsCar += this.durTemp;
 					this.homeActivityCarCount++;
 				}
-				else if (p.getType().equals(BasicPlan.Type.PT)){
+				else if (p.getType().equals(Plan.Type.PT)){
 					this.homeActivityDurationsNonCar += this.durTemp;
 					this.homeActivityNonCarCount++;
 				}
 			}
 			else if (event.acttype.equalsIgnoreCase("w")) {
-				if (p.getType().equals(BasicPlan.Type.CAR)) {
+				if (p.getType().equals(Plan.Type.CAR)) {
 					this.workActivityDurationsCar += this.durTemp;
 					this.workActivityCarCount++;
 				}
-				else if (p.getType().equals(BasicPlan.Type.PT)){
+				else if (p.getType().equals(Plan.Type.PT)){
 					this.workActivityDurationsNonCar += this.durTemp;
 					this.workActivityNonCarCount++;
 				}
@@ -161,10 +160,10 @@ public class EventModeActivityDurationAnalyser {
 			this.eventMap.put(new IdImpl(event.agentId), event);
 			Plan p = this.plans.getPerson(new IdImpl(event.agentId)).getSelectedPlan();
 			if (event.acttype.equalsIgnoreCase("w")) {
-				if (p.getType().equals(BasicPlan.Type.PT)) {
+				if (p.getType().equals(Plan.Type.PT)) {
 					this.ptStartTimeMap.incrementValue(event.time);
 				}
-				else if (p.getType().equals(BasicPlan.Type.CAR)) {
+				else if (p.getType().equals(Plan.Type.CAR)) {
 					this.carStartTimeMap.incrementValue(event.time);
 			  }
 			}

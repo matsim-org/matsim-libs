@@ -43,7 +43,7 @@ import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -404,7 +404,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			for (int i = 0; i < max; i++ ) {
 
 				if (i % 2 == 0) {
-					Act act = (Act)(plan.getPlanElements().get(i));
+					Activity act = (Activity)(plan.getPlanElements().get(i));
 					// invalidate previous activity times because durations will change
 					act.setStartTime(Time.UNDEFINED_TIME);
 

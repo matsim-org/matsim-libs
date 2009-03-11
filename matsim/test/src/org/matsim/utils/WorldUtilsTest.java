@@ -21,7 +21,7 @@
 package org.matsim.utils;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.World;
@@ -107,8 +107,8 @@ public class WorldUtilsTest extends MatsimTestCase {
 		ZoneLayer layer = (ZoneLayer) world.createLayer(new IdImpl("zones"), "zones for test");
 		Zone zone = layer.createZone("1", "4.5", "9", null, null, null, null, null, "center zone");
 		Zone zone2 = layer.createZone("2", "30", "15", "9", null, null, null, null, "another zone");
-		Coord center = zone.getCenter();
-		final double distance = center.calcDistance(zone2.getCenter());
+		Coord center = zone.getCoord();
+		final double distance = center.calcDistance(zone2.getCoord());
 
 		for (int i = 0; i < 700; i++) {
 			Coord c = WorldUtils.getRandomCoordInZone(zone, layer);

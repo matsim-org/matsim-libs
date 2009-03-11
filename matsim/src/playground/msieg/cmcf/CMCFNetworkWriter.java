@@ -152,7 +152,7 @@ public class CMCFNetworkWriter implements NetworkReader {
 			log(tab+"\t\t<to>"+l.getToNode().getId()+"</to>\n", out);
 			//now read link parameters
 			double 	length = l.getLength(),
-					capacity = length/7.5 * l.getLanes(0),
+					capacity = length/7.5 * l.getNumberOfLanes(0),
 					alpha = l.getFreespeedTravelTime(0),
 					beta = 2.0,
 					gamma = capacity + 1;

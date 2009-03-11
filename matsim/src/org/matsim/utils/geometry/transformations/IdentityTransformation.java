@@ -20,7 +20,7 @@
 
 package org.matsim.utils.geometry.transformations;
 
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.utils.geometry.CoordinateTransformation;
 
 /**

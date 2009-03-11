@@ -25,13 +25,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.basic.v01.BasicActivityOption;
-import org.matsim.basic.v01.BasicKnowledge;
 import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.basic.v01.BasicPersonImpl;
 import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.BasicPopulationImpl;
-import org.matsim.basic.v01.BasicPopulationReaderV5;
 import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
@@ -58,14 +55,14 @@ public class BkTestPlansCreator {
 	private Id id6 = new IdImpl(6);
 	private Id id7 = new IdImpl(7);
 	
-	public BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> createPlans() {
+	public BasicPopulation<BasicPerson<BasicPlan>> createPlans() {
 		double firstHomeEndTime = 6.0 * 3600.0;
 		double homeEndTime = firstHomeEndTime;
 		log.info("starting plans creation...");
-		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> pop = new BasicPopulationImpl();
+		BasicPopulation<BasicPerson<BasicPlan>> pop = new BasicPopulationImpl();
 		
 		for (int i = 1; i <= 1000; i++) {
-			BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>> p = new BasicPersonImpl(new IdImpl(i));
+			BasicPerson<BasicPlan> p = new BasicPersonImpl(new IdImpl(i));
 			BasicPlan plan = new BasicPlanImpl();
 			plan.setSelected(true);
 			p.addPlan(plan);
@@ -120,14 +117,14 @@ public class BkTestPlansCreator {
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		String outfile = "../bkick/oneRouteNoModeTest/plans.xml";
 		BkTestPlansCreator pc = new BkTestPlansCreator();
-		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivityOption>>> pop = pc.createPlans();
+		BasicPopulation<BasicPerson<BasicPlan>> pop = pc.createPlans();
 		PopulationWriterV5 writer = new PopulationWriterV5(pop, null);
 		writer.writeFile(outfile);
 		log.info("plans written");
 		//test if correct...
         pop = new BasicPopulationImpl();
-		BasicPopulationReaderV5 reader = new BasicPopulationReaderV5(pop, null);
-		reader.readFile(outfile);
+//		BasicPopulationReaderV5 reader = new BasicPopulationReaderV5(pop, null);
+//		reader.readFile(outfile);
 		log.info("plans tested.");
 		log.info("finished!");
 	}

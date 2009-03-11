@@ -26,7 +26,7 @@ import java.util.List;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -75,7 +75,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 		person = new PersonImpl(new IdImpl("1"));
 		plan = person.createPlan(true);
-		Act a = plan.createAct("h", link1);
+		Activity a = plan.createAct("h", link1);
 		a.setEndTime(7.0 * 3600);
 		leg = plan.createLeg(Mode.car);
 		route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link20);
@@ -86,7 +86,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 		person = new PersonImpl(new IdImpl("2"));
 		plan = person.createPlan(true);
-		Act a2 = plan.createAct("h", link1);
+		Activity a2 = plan.createAct("h", link1);
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
 		leg = plan.createLeg(Mode.car);
 		route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link20);
@@ -97,7 +97,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 		person = new PersonImpl(new IdImpl("3"));
 		plan = person.createPlan(true);
-		Act a3 = plan.createAct("h", link1);
+		Activity a3 = plan.createAct("h", link1);
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
 		leg = plan.createLeg(Mode.car);
 		route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link20);

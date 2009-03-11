@@ -19,23 +19,15 @@
 
 package org.matsim.interfaces.basic.v01;
 
-import org.matsim.basic.v01.LocationType;
+import org.matsim.interfaces.core.v01.Coord;
 
 /**
  * @author dgrether
  */
-@Deprecated // not yet clear
-public interface BasicLocation {
+public interface BasicLocation extends Identifiable {
+
+	// TODO should not extend from BasicIdentifiable
 	
-	public Coord getCenter();
-	// FIXME [kn] rename to getCoord ... and then make all interfaces with getCoord to inherit from this.
-	
-	public Id getId();
-	
-	/**
-	 * @deprecated not yet clear
-	 */
-	@Deprecated // not yet clear
-	public LocationType getLocationType();
+	public Coord getCoord();
 	
 }

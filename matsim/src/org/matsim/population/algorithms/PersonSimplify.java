@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 
@@ -56,20 +56,20 @@ public class PersonSimplify extends AbstractPersonAlgorithm {
 
 			// set the first and last activty to home
 			ArrayList acts_legs = plan.getPlanElements();
-			((Act)acts_legs.get(0)).setType("h");
-			((Act)acts_legs.get(acts_legs.size()-1)).setType("h");
+			((Activity)acts_legs.get(0)).setType("h");
+			((Activity)acts_legs.get(acts_legs.size()-1)).setType("h");
 
 			// set all "m" activities (unspecified ones) to "l" (what else should i do....)
 			for (int j=0; j<acts_legs.size(); j+=2) {
-				Act act = (Act)acts_legs.get(j);
+				Activity act = (Activity)acts_legs.get(j);
 				if (act.getType().equals("m")) {
 					act.setType("l");
 				}
 			}
 
 			// if start time is after midnight subtract 24 hours
-			double end_time = ((Act)acts_legs.get(0)).getEndTime();
-			if (end_time >= 24*3600) { ((Act)acts_legs.get(0)).setEndTime(end_time-24*3600); }
+			double end_time = ((Activity)acts_legs.get(0)).getEndTime();
+			if (end_time >= 24*3600) { ((Activity)acts_legs.get(0)).setEndTime(end_time-24*3600); }
 
 			// group the durations to predefined ones. (manually choosen according to the
 			// duration distributions of the given microcensus2000)
@@ -84,7 +84,7 @@ public class PersonSimplify extends AbstractPersonAlgorithm {
 			// leis:
 			// 0-3 => 2 ; 3-19 => 5
 			for (int j=2; j<acts_legs.size()-2; j+=2) {
-				Act act = (Act)acts_legs.get(j);
+				Activity act = (Activity)acts_legs.get(j);
 				if (act.getType().equals("h")) {
 					if (act.getDuration() < 3*3600) { act.setDuration((int)(1.5*3600)); }
 					else { act.setDuration(5*3600); }

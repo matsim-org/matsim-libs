@@ -125,7 +125,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				ats = ActTypeStart.l;
 			else
 				ats = ActTypeStart.o;
-			double dist = bl.getRoute().getDist() / 1000.0;
+			double dist = bl.getRoute().getDistance() / 1000.0;
 			if (bl.getDepartureTime() < 86400) {
 				if (Long.parseLong(this.person.getId().toString()) > 1000000000) {
 					this.otherDist += dist;

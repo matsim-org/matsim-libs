@@ -28,9 +28,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -72,7 +72,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	private CarRoute currroute = null;
 	private String routeNodes = null;
 
-	private Act prevAct = null;
+	private Activity prevAct = null;
 
 	public PopulationReaderMatsimV1(final Population plans, final NetworkLayer network) {
 		this.plans = plans;
@@ -183,7 +183,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	private void startAct(final Attributes atts) {
 		Link link = null;
 		Coord coord = null;
-		Act act = null;
+		Activity act = null;
 		if (atts.getValue("link") != null) {
 			link = this.network.getLink(atts.getValue("link"));
 			act = this.currplan.createAct(atts.getValue("type"), link);
@@ -220,7 +220,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 		this.currroute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, this.prevAct.getLink(), this.prevAct.getLink());
 		this.currleg.setRoute(this.currroute);
 		if (atts.getValue("dist") != null) {
-			this.currroute.setDist(Double.parseDouble(atts.getValue("dist")));
+			this.currroute.setDistance(Double.parseDouble(atts.getValue("dist")));
 		}
 		if (atts.getValue("trav_time") != null) {
 			this.currroute.setTravelTime(Time.parseTime(atts.getValue("trav_time")));

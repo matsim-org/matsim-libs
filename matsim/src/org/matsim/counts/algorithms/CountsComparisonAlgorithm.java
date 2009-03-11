@@ -127,7 +127,7 @@ public class CountsComparisonAlgorithm {
 			log.warn("Cannot find requested link: " + linkid.toString());
 			return false;
 		}
-		double dist = l.getCenter().calcDistance(this.distanceFilterNode.getCoord());
+		double dist = l.getCoord().calcDistance(this.distanceFilterNode.getCoord());
 		return dist < this.distanceFilter.doubleValue();
 	}
 

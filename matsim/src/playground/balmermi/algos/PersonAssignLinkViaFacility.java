@@ -23,8 +23,8 @@ package playground.balmermi.algos;
 import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
@@ -86,10 +86,10 @@ public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (Facility f : this.facilities.getFacilities().values()) {
-			if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-			if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-			if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-			if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 		}
 		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
@@ -99,11 +99,11 @@ public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {
 		this.sfacs = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		this.lfacs = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		for (Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivityOption(HOME) != null) { this.hfacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
-			if (f.getActivityOption(WORK) != null) { this.wfacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
-			if (f.getActivityOption(EDUCATION) != null) { this.efacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
-			if (f.getActivityOption(SHOP) != null) { this.sfacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
-			if (f.getActivityOption(LEISURE) != null) { this.lfacs.put(f.getCenter().getX(),f.getCenter().getY(),f); }
+			if (f.getActivityOption(HOME) != null) { this.hfacs.put(f.getCoord().getX(),f.getCoord().getY(),f); }
+			if (f.getActivityOption(WORK) != null) { this.wfacs.put(f.getCoord().getX(),f.getCoord().getY(),f); }
+			if (f.getActivityOption(EDUCATION) != null) { this.efacs.put(f.getCoord().getX(),f.getCoord().getY(),f); }
+			if (f.getActivityOption(SHOP) != null) { this.sfacs.put(f.getCoord().getX(),f.getCoord().getY(),f); }
+			if (f.getActivityOption(LEISURE) != null) { this.lfacs.put(f.getCoord().getX(),f.getCoord().getY(),f); }
 		}
 		System.out.println("        # homes = " + this.hfacs.size());
 		System.out.println("        # works = " + this.wfacs.size());
@@ -131,7 +131,7 @@ public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {
 
 			Iterator<?> a_it = p.getIteratorAct();
 			while (a_it.hasNext()) {
-				Act a = (Act)a_it.next();
+				Activity a = (Activity)a_it.next();
 				Coord coord = a.getCoord();
 				if (coord == null) { Gbl.errorMsg("Something is wrong!"); }
 				char type = a.getType().charAt(0);
@@ -148,7 +148,7 @@ public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {
 				if (link == null) { Gbl.errorMsg("Something is wrong!"); }
 
 				a.setLink(link);
-				a.setCoord(f.getCenter());
+				a.setCoord(f.getCoord());
 			}
 		}
 	}

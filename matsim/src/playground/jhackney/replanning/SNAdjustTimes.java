@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -36,7 +36,7 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		ActIterator planIter= newPlan.getIteratorAct();
 
 		while(planIter.hasNext()){
-			Act thisAct=(Act) planIter.next();
+			Activity thisAct=(Activity) planIter.next();
 			// Ideally,
 			// last Act new departure time =
 			// last Act current departure time +
@@ -55,7 +55,7 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		newPlan.setScore(Plan.UNDEF_SCORE);
 		person.setSelectedPlan(newPlan);
 	}
-	private double getAvgFriendArrTime(Act act) {
+	private double getAvgFriendArrTime(Activity act) {
 		LinkedHashMap<Facility,ArrayList<TimeWindow>> twm = controler.getTwm();
 		int count=0;
 		double avgStartTime=0;

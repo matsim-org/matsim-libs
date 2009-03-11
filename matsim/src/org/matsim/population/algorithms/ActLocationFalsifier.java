@@ -24,8 +24,8 @@ import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -58,7 +58,7 @@ public class ActLocationFalsifier extends AbstractPersonAlgorithm implements Pla
 	public void run(Plan plan) {
 		Iterator<BasicActImpl> actIter = plan.getIteratorAct();
 		while (actIter.hasNext()) {
-			Act act = (Act) actIter.next();
+			Activity act = (Activity) actIter.next();
 			Coord coord = act.getCoord();
 			coord.setXY(coord.getX() + (MatsimRandom.random.nextDouble() - 0.5) *  this.totalDistance,
 					coord.getY() + (MatsimRandom.random.nextDouble() - 0.5) * this.totalDistance);

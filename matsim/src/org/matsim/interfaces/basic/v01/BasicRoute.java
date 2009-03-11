@@ -28,9 +28,9 @@ import java.util.List;
 */
 public interface BasicRoute {
 
-	public double getDist();
+	public double getDistance();
 
-	public void setDist(final double dist);
+	public void setDistance(final double distance);
 
 	public double getTravelTime();
 

@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -69,7 +69,7 @@ public class Vehicle extends SimUnit {
 		// actsLegs(0) is the first activity, actsLegs(1) is the first leg
 		legIndex = 1;
 		setCurrentLeg((Leg) actsLegs.get(legIndex));
-		Act firstAct=(Act) actsLegs.get(0);
+		Activity firstAct=(Activity) actsLegs.get(0);
 		// an agent starts the first leg at the end_time of the fist act
 		double departureTime = firstAct.getEndTime();
 
@@ -87,13 +87,13 @@ public class Vehicle extends SimUnit {
 	 * 
 	 * @return
 	 */
-	public Act getPreviousActivity() {
+	public Activity getPreviousActivity() {
 		Plan plan = ownerPerson.getSelectedPlan();
 		List<Object> actsLegs = plan.getPlanElements();
 
 		for (int i = 0; i < actsLegs.size(); i++) {
 			if (actsLegs.get(i) == currentLeg) {
-				return ((Act) actsLegs.get(i - 1));
+				return ((Activity) actsLegs.get(i - 1));
 			}
 		}
 		return null;
@@ -105,13 +105,13 @@ public class Vehicle extends SimUnit {
 	 * 
 	 * @return
 	 */
-	public Act getNextActivity() {
+	public Activity getNextActivity() {
 		Plan plan = ownerPerson.getSelectedPlan();
 		List<Object> actsLegs = plan.getPlanElements();
 
 		for (int i = 0; i < actsLegs.size(); i++) {
 			if (actsLegs.get(i) == currentLeg) {
-				return ((Act) actsLegs.get(i + 1));
+				return ((Activity) actsLegs.get(i + 1));
 			}
 		}
 		return null;
@@ -177,7 +177,7 @@ public class Vehicle extends SimUnit {
 	public void moveToFirstLinkInNextLeg() {
 		Plan plan = getOwnerPerson().getSelectedPlan();
 		ArrayList<Object> actsLegs = plan.getPlanElements();
-		setCurrentLink(((Act) actsLegs.get(getLegIndex() + 1)).getLink());
+		setCurrentLink(((Activity) actsLegs.get(getLegIndex() + 1)).getLink());
 	}
 
 	/**
@@ -230,7 +230,7 @@ public class Vehicle extends SimUnit {
 		if (this.getLinkIndex() == 0) {
 			Plan plan = ownerPerson.getSelectedPlan();
 			ArrayList<Object> actsLegs = plan.getPlanElements();
-			previousLink = ((Act) actsLegs.get(legIndex - 1)).getLink();
+			previousLink = ((Activity) actsLegs.get(legIndex - 1)).getLink();
 			previousRoad = Road.getRoad(previousLink.getId().toString());
 		} else if (this.getLinkIndex() >= 1) {
 			previousLink = this.getCurrentLinkRoute()[this.getLinkIndex() - 1];

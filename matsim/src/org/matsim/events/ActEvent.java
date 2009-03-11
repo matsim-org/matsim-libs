@@ -22,7 +22,7 @@ package org.matsim.events;
 
 import java.util.Map;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 
@@ -35,9 +35,9 @@ abstract class ActEvent extends PersonEvent {
 	public String acttype;
 
 	public transient Link link;
-	public transient Act act;
+	public transient Activity act;
 
-	ActEvent(final double time, final Person agent, final Link link, final Act act) {
+	ActEvent(final double time, final Person agent, final Link link, final Activity act) {
 		super(time, agent);
 		this.act = act;
 		this.link = link;

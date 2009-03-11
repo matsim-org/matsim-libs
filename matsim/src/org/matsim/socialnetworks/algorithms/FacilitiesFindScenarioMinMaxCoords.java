@@ -20,7 +20,7 @@
 
 package org.matsim.socialnetworks.algorithms;
 
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.geometry.CoordImpl;
@@ -44,7 +44,7 @@ public class FacilitiesFindScenarioMinMaxCoords {
 		double max_y = Double.MIN_VALUE;
 
 		for (Facility f : facilities.getFacilities().values()) {
-			Coord c = f.getCenter();
+			Coord c = f.getCoord();
 			if(c.getX()<=min_x){
 				min_x=c.getX();
 			}

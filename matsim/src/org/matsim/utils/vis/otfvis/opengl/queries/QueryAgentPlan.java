@@ -32,10 +32,10 @@ import javax.media.opengl.GL;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
@@ -88,7 +88,7 @@ public class QueryAgentPlan implements OTFQuery {
 	private static int countLines(Plan plan) {
 		int count = 0;
 		for (Object o : plan.getPlanElements()) {
-			if (o instanceof Act) {
+			if (o instanceof Activity) {
 				count++;
 			} else if (o instanceof Leg) {
 				Leg leg = (Leg)o;
@@ -129,11 +129,11 @@ public class QueryAgentPlan implements OTFQuery {
 		Color ptColor = Color.RED;
 
 		for (Object o : plan.getPlanElements()) {
-			if(o instanceof Act) {
+			if(o instanceof Activity) {
 				Color col = actColor;
-				Act act = (Act)o;
+				Activity act = (Activity)o;
 				Coord coord = act.getCoord();
-				if (coord == null) coord = act.getLink().getCenter();
+				if (coord == null) coord = act.getLink().getCoord();
 				setCoord(pos++, coord, col);
 			} else if (o instanceof Leg) {
 				Leg leg = (Leg)o;
@@ -162,9 +162,9 @@ public class QueryAgentPlan implements OTFQuery {
 		this.acts = new Object [plan.getPlanElements().size()/2];
 
 		for (int i=0;i< this.acts.length; i++) {
-			Act act = (Act)plan.getPlanElements().get(i*2);
+			Activity act = (Activity)plan.getPlanElements().get(i*2);
 			Coord coord = act.getCoord();
-			if (coord == null) coord = act.getLink().getCenter();
+			if (coord == null) coord = act.getLink().getCoord();
 			this.acts[i] = new MyInfoText( (float)coord.getX(), (float)coord.getY(), act.getType());
 		}
 

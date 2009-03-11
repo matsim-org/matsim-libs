@@ -23,10 +23,10 @@ package org.matsim.interfaces.core.v01;
 import java.util.Map;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.basic.v01.BasicFacilities;
 import org.matsim.interfaces.basic.v01.Id;
 
-public interface Facilities {
+public interface Facilities extends BasicFacilities {
 
 	public Map<Id, ? extends Facility> getFacilities();
 

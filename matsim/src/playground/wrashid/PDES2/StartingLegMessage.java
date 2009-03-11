@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Plan;
 
@@ -37,7 +37,7 @@ public class StartingLegMessage extends EventMessage {
 		} else {
 			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the
 			ArrayList<Object> actsLegs = plan.getPlanElements();
-			Link nextLink = ((Act) actsLegs.get(vehicle.getLegIndex() + 1)).getLink();
+			Link nextLink = ((Activity) actsLegs.get(vehicle.getLegIndex() + 1)).getLink();
 			Road road=Road.allRoads.get(nextLink.getId().toString());
 			//vehicle.setCurrentLink(nextLink); //perhaps this line of code is needed (it helped in the single cpu variant)
 			vehicle.scheduleEndLegMessage(messageArrivalTime+vehicle.getCurrentLeg().getTravelTime(), road);

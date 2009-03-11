@@ -112,7 +112,7 @@ public class WorldConnectLocations {
 			Node ntn = subNetwork.getNode(tn.getId());
 			if (ntn == null) { ntn = subNetwork.createNode(tn.getId(),tn.getCoord()); }
 
-			subNetwork.createLink(l.getId(),nfn,ntn,l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getLanes(Time.UNDEFINED_TIME));
+			subNetwork.createLink(l.getId(),nfn,ntn,l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME));
 		}
 		log.info("  done.");
 		return subNetwork;
@@ -142,7 +142,7 @@ public class WorldConnectLocations {
 			if (!f.removeAllDownMappings()) { throw new RuntimeException("could not remove old factivity<-->link mappings"); }
 			// add the nearest right entry link mapping to the facility f
 			// note: network could be a temporal copy of the one in the world. Therefore, get the original one.
-			Location l = network.getNearestRightEntryLink(f.getCenter());
+			Location l = network.getNearestRightEntryLink(f.getCoord());
 			l = world.getLayer(NetworkLayer.LAYER_TYPE).getLocation(l.getId());
 			if (!world.addMapping(f,l)) { throw new RuntimeException("could not add nearest right entry factivity<-->link mappings"); }
 		}
@@ -168,13 +168,13 @@ public class WorldConnectLocations {
 			// remove previous mappings for facility f
 			if (!f.removeAllUpMappings()) { throw new RuntimeException("could not remove old zone<-->facility mappings"); }
 			// add the zone mapping to facility f
-			ArrayList<Location> nearestZones = zones.getNearestLocations(f.getCenter());
+			ArrayList<Location> nearestZones = zones.getNearestLocations(f.getCoord());
 			if (nearestZones.isEmpty()) { /* facility does not belong to a zone */ }
 			else {
 				// choose the first of the list (The list is generated via a defined order of the zones,
 				// therefore the chosen zone is deterministic). 
 				Zone z = (Zone)nearestZones.get(0);
-				if (!z.contains(f.getCenter())) { /* f is not located IN any of the nearest zones */ }
+				if (!z.contains(f.getCoord())) { /* f is not located IN any of the nearest zones */ }
 				else {
 					if (!world.addMapping(z,f)) { throw new RuntimeException("could not add zone<-->facility mapping"); }
 				}
@@ -202,13 +202,13 @@ public class WorldConnectLocations {
 			// remove previous mappings for link l
 			if (!l.removeAllUpMappings()) { throw new RuntimeException("could not remove old zone<-->link mappings");  }
 			// add the zone mapping to link l
-			ArrayList<Location> nearestZones = zones.getNearestLocations(l.getCenter());
+			ArrayList<Location> nearestZones = zones.getNearestLocations(l.getCoord());
 			if (nearestZones.isEmpty()) { /* link does not belong to a zone */ }
 			else {
 				// choose the first of the list (The list is generated via a defined order of the zone,
 				// therefore the chosen zone is deterministic). 
 				Zone z = (Zone)nearestZones.get(0);
-				if (!z.contains(l.getCenter())) { /* link center is not located IN any of the nearest zones */ }
+				if (!z.contains(l.getCoord())) { /* link center is not located IN any of the nearest zones */ }
 				else {
 					if (!world.addMapping(z,l)) { throw new RuntimeException("could not add zone<-->link mapping"); }
 				}

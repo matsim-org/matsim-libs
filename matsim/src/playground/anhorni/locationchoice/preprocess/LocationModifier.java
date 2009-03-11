@@ -7,9 +7,9 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
@@ -102,7 +102,7 @@ public class LocationModifier extends Modifier {
 
 			final ArrayList<?> actslegs = plan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
-				final Act act = (Act)actslegs.get(j);
+				final Activity act = (Activity)actslegs.get(j);
 				if (act.getType().startsWith(type)) {
 
 					Facility facility=exchange_facilities.get(
@@ -110,7 +110,7 @@ public class LocationModifier extends Modifier {
 
 					act.setFacility(facility);
 					act.setLink(facility.getLink());
-					act.setCoord(facility.getCenter());
+					act.setCoord(facility.getCoord());
 				}
 			}
 			// loop over all <leg>s, remove route-information
@@ -129,10 +129,10 @@ public class LocationModifier extends Modifier {
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (final Facility f : facilities_of_type.values()) {
-			if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-			if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-			if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-			if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 		}
 		minx -= 1.0;
 		miny -= 1.0;
@@ -141,7 +141,7 @@ public class LocationModifier extends Modifier {
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		QuadTree<Facility> quadtree = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		for (final Facility f : facilities_of_type.values()) {
-			quadtree.put(f.getCenter().getX(),f.getCenter().getY(),f);
+			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 		}
 		System.out.println("      done.");
 		Gbl.printRoundTime();

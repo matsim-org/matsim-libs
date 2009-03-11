@@ -27,7 +27,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.utils.collections.Tuple;
@@ -142,7 +142,7 @@ public class MicroCensus {
 	private final void create(Population pop) {
 		double weight_sum = 0.0;
 		for (Person p : pop.getPersons().values()) {
-			weight_sum += p.getSelectedPlan().getScore();
+			weight_sum += p.getSelectedPlan().getScoreAsPrimitiveType();
 		}
 		for (Person p : pop.getPersons().values()) {
 			int age = p.getAge();
@@ -152,7 +152,7 @@ public class MicroCensus {
 			boolean has_educ = false;
 			Iterator<?> a_it = p.getSelectedPlan().getIteratorAct();
 			while (a_it.hasNext()) {
-				Act a = (Act)a_it.next();
+				Activity a = (Activity)a_it.next();
 				if (a.getType().equals(WORK)) { has_work = true; }
 				if (a.getType().equals(EDUC)) { has_educ = true; }
 			}
@@ -160,7 +160,7 @@ public class MicroCensus {
 			int index = this.group2index(age,sex,lic,has_work,has_educ);
 			Group g = groups[index];
 			if (g == null) { g = new Group(); groups[index] = g; }
-			g.addTuple(p.getSelectedPlan().getScore()/weight_sum,p);
+			g.addTuple(p.getSelectedPlan().getScoreAsPrimitiveType()/weight_sum,p);
 		}
 		
 		for (int i=0; i<this.groups.length; i++) {

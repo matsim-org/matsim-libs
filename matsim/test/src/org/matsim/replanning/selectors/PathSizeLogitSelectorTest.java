@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -76,8 +76,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		// test with only one plan...
 		Person person = new PersonImpl(new IdImpl(1));
 		Plan p1 = new org.matsim.population.PlanImpl(person);
-		Act a = new org.matsim.population.ActImpl("h", l6);
-		Act b = new org.matsim.population.ActImpl("w", l7);
+		Activity a = new org.matsim.population.ActImpl("h", l6);
+		Activity b = new org.matsim.population.ActImpl("w", l7);
 		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
@@ -180,8 +180,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		
 		Person person = new PersonImpl(new IdImpl(1));
 		Plan p1 = new org.matsim.population.PlanImpl(person);
-		Act a = new org.matsim.population.ActImpl("h", l6);
-		Act b = new org.matsim.population.ActImpl("w", l7);
+		Activity a = new org.matsim.population.ActImpl("h", l6);
+		Activity b = new org.matsim.population.ActImpl("w", l7);
 		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
@@ -215,8 +215,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 		Person person = new PersonImpl(new IdImpl(1));
 		Plan p1 = new org.matsim.population.PlanImpl(person);
-		Act a = new org.matsim.population.ActImpl("h", l6);
-		Act b = new org.matsim.population.ActImpl("w", l7);
+		Activity a = new org.matsim.population.ActImpl("h", l6);
+		Activity b = new org.matsim.population.ActImpl("w", l7);
 		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);

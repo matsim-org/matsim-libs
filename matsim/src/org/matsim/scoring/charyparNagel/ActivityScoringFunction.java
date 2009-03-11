@@ -22,7 +22,7 @@ package org.matsim.scoring.charyparNagel;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -75,7 +75,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		this.score = INITIAL_SCORE;
 	}
 
-	public void startActivity(final double time, final Act act) {
+	public void startActivity(final double time, final Activity act) {
 		this.lastTime = time;
 	}
 
@@ -99,7 +99,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		return this.score;
 	}
 
-	protected double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
+	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
 		ActUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
@@ -203,7 +203,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		return tmpScore;
 	}
 
-	protected double[] getOpeningInterval(final Act act) {
+	protected double[] getOpeningInterval(final Activity act) {
 
 		ActUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
@@ -235,7 +235,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		if (BasicLeg.Mode.car.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
 				Route route = leg.getRoute();
-				dist = route.getDist();
+				dist = route.getDistance();
 				/* TODO the route-distance does not contain the length of the first or
 				 * last link of the route, because the route doesn't know those. Should
 				 * be fixed somehow, but how? MR, jan07
@@ -247,17 +247,17 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
 		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistancePt != 0.0){
-				dist = leg.getRoute().getDist();
+				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT + this.params.marginalUtilityOfDistancePt * dist;
 		} else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceWalk != 0.0){
-				dist = leg.getRoute().getDist();
+				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk + this.params.marginalUtilityOfDistanceWalk * dist;
 		} else {
 			if (this.params.marginalUtilityOfDistanceCar != 0.0){
-				dist = leg.getRoute().getDist();
+				dist = leg.getRoute().getDistance();
 			}
 			// use the same values as for "car"
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
@@ -271,12 +271,12 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 	}
 
 	protected void handleAct(final double time) {
-		Act act = (Act)this.plan.getPlanElements().get(this.index);
+		Activity act = (Activity)this.plan.getPlanElements().get(this.index);
 		if (this.index == 0) {
 			this.firstActTime = time;
 		} else if (this.index == this.lastActIndex) {
 			String lastActType = act.getType();
-			if (lastActType.equals(((Act) this.plan.getPlanElements().get(0)).getType())) {
+			if (lastActType.equals(((Activity) this.plan.getPlanElements().get(0)).getType())) {
 				// the first Act and the last Act have the same type
 				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
 			} else {
@@ -290,7 +290,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 				    }					
 					
 					// score first activity
-					Act firstAct = (Act)this.plan.getPlanElements().get(0);
+					Activity firstAct = (Activity)this.plan.getPlanElements().get(0);
 					this.score += calcActScore(0.0, this.firstActTime, firstAct);
 					// score last activity
 					this.score += calcActScore(this.lastTime, 24*3600, act); // SCENARIO_DURATION

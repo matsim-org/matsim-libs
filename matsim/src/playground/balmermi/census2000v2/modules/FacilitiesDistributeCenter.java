@@ -23,7 +23,7 @@ package playground.balmermi.census2000v2.modules;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 
@@ -59,7 +59,7 @@ public class FacilitiesDistributeCenter {
 		log.info("      # facilities = " + facilities.getFacilities().size());
 		
 		for (Facility f : facilities.getFacilities().values()) {
-			Coord c = f.getCenter();
+			Coord c = f.getCoord();
 			if (c.getX()%100 != 0) { Gbl.errorMsg("f_id="+f.getId()+" xccord is not a heactar!"); }
 			if (c.getY()%100 != 0) { Gbl.errorMsg("f_id="+f.getId()+" xccord is not a heactar!"); }
 			c.setX(c.getX()+MatsimRandom.random.nextDouble()*100.0);

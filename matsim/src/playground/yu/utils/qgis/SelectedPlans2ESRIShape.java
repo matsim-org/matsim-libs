@@ -38,8 +38,8 @@ import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Plan;
@@ -129,7 +129,7 @@ public class SelectedPlans2ESRIShape extends
 			LegIterator iter = plan.getIteratorLeg();
 			while (iter.hasNext()) {
 				Leg leg = (Leg) iter.next();
-				if (leg.getRoute().getDist() > 0) {
+				if (leg.getRoute().getDistance() > 0) {
 					fts.add(getLegFeature(leg, id));
 				}
 			}
@@ -163,7 +163,7 @@ public class SelectedPlans2ESRIShape extends
 		Double depTime = leg.getDepartureTime();
 		Double travTime = leg.getTravelTime();
 		Double arrTime = leg.getArrivalTime();
-		Double dist = leg.getRoute().getDist();
+		Double dist = leg.getRoute().getDistance();
 
 		List<Link> links = ((CarRoute) leg.getRoute()).getLinks();
 		Coordinate[] coords = new Coordinate[links.size() + 1];

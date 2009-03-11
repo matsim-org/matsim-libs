@@ -3,7 +3,7 @@ package playground.andreas.intersection.dijkstra;
 import java.util.ArrayList;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -48,7 +48,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 	 * @see org.matsim.router.PlansCalcRoute#handleCarLeg(org.matsim.population.Leg, org.matsim.population.Act, org.matsim.population.Act, double)
 	 */
 	@Override
-	protected double handleCarLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+	protected double handleCarLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		double travTime = 0;
 		Link fromLink = fromAct.getLink();
 		Link toLink = toAct.getLink();

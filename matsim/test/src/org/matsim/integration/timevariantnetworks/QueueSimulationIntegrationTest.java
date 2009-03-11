@@ -30,7 +30,7 @@ import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -199,7 +199,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		for(int i = 0; i < count; i++) {
 			Person person = new PersonImpl(new IdImpl(i + (int)departureTime));
 			Plan plan1 = person.createPlan(true);
-			Act a1 = plan1.createAct("h", depLink);
+			Activity a1 = plan1.createAct("h", depLink);
 			a1.setEndTime(departureTime);
 			Leg leg1 = plan1.createLeg(BasicLeg.Mode.car);
 			leg1.setDepartureTime(departureTime);

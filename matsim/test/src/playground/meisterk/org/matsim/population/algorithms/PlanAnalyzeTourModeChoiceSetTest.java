@@ -33,7 +33,7 @@ import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -374,7 +374,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		Person person = new PersonImpl(new IdImpl("1000"));
 		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = Gbl.getConfig().planomat().getTripStructureAnalysisLayer();
 		Location location = null;
-		Act act = null;
+		Activity act = null;
 		for (Entry<String, ArrayList<BasicLeg.Mode[]>> entry : testCases.entrySet()) {
 
 			String facString  = entry.getKey();

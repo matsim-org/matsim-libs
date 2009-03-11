@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.matsim.events.BasicEvent;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Plan;
@@ -36,7 +36,7 @@ public class EndRoadMessage extends EventMessage {
 			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the
 			// person will execute
 			ArrayList<Object> actsLegs = plan.getPlanElements();
-			vehicle.setCurrentLink(((Act) actsLegs.get(vehicle.getLegIndex()+1)).getLink());
+			vehicle.setCurrentLink(((Activity) actsLegs.get(vehicle.getLegIndex()+1)).getLink());
 			
 			//System.out.println(vehicle.getCurrentLink().getId().toString());
 			

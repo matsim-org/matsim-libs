@@ -23,7 +23,7 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -80,11 +80,11 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 
 	public void handlePlan(final Plan plan) throws Exception {
 		ArrayList<?> actslegs = plan.getPlanElements();
-		Act fromAct = (Act)actslegs.get(0);
+		Activity fromAct = (Activity)actslegs.get(0);
 
 		// loop over all <act>s
 		for (int j = 2; j < actslegs.size(); j=j+2) {
-			Act toAct = (Act)actslegs.get(j);
+			Activity toAct = (Activity)actslegs.get(j);
 			Leg leg = (Leg)actslegs.get(j-1);
 
 			Link startlink = fromAct.getLink();
@@ -100,7 +100,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 
 			double dist = calcDistance(nodes);
 
-			route.setDist(dist);
+			route.setDistance(dist);
 
 			fromAct = toAct;
 		}
