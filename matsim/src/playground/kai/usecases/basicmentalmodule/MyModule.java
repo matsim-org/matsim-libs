@@ -1,21 +1,22 @@
-package playground.kai.usecases;
+package playground.kai.usecases.basicmentalmodule;
 
 import java.util.*;
 
 import org.apache.log4j.Logger;
 
-// ok:
 import org.matsim.interfaces.basic.v01.*;
 
-// not ok:
-//import org.matsim.basic.v01.*;
-//import org.matsim.basic.v01.BasicPlanImpl;
+import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.replanning.modules.StrategyModule;
+
 import org.matsim.basic.v01.BasicPlanImpl;
+import org.matsim.controler.Controler;
 import org.matsim.events.*;
 import org.matsim.events.handler.*;
 
 @SuppressWarnings("unused")
-public class MentalModule implements 
+public class MyModule implements
+StrategyModule,
 ActEndEventHandler,
 AgentDepartureEventHandler,
 AgentWait2LinkEventHandler,
@@ -25,19 +26,26 @@ AgentArrivalEventHandler,
 ActStartEventHandler
 // TODO: names of these events handlers ok?
 {
-	private static final Logger log = Logger.getLogger(MentalModule.class);
+	private static final Logger log = Logger.getLogger(MyModule.class);
 	
-	public MentalModule ( BasicScenario sc ) {
-//		public MentalModule ( BasicPopulation<BasicPerson> pop, BasicNetwork<BasicNode,BasicLink> net, Gbl gbl ) {
-		// TODO What is the recommended type safety approach?
+	BasicScenario sc ; 
+	BasicNetwork<BasicNode,BasicLink> net ;
+	BasicPopulation<BasicPerson> pop ;
+	
+	public MyModule(Controler controler) {
 		
-		BasicNetwork<BasicNode,BasicLink> net = (BasicNetwork   ) sc.getNetwork() ;
-		BasicPopulation<BasicPerson>      pop = (BasicPopulation) sc.getPopulation() ;
-				
+		sc = controler.getScenarioData() ; // TODO in controler
+		net = sc.getNetwork() ;
+		pop = sc.getPopulation() ;
+		
+	}
+	
+	public void init() { // initReplanning() 
+		
 		// go through network and copy to my personal network:
 		for ( BasicNode bn : net.getNodes().values() ) {
 			Id id = bn.getId();
-			Coord coord = bn.getCoord(); // TODO: Coord not basic
+			Coord coord = bn.getCoord(); 
 		}
 		for ( BasicLink bl : net.getLinks().values() ) {
 
@@ -67,7 +75,7 @@ ActStartEventHandler
 			
 			for ( BasicPlan plan : plans ) {
 				BasicPlanImpl.ActLegIterator it = plan.getIterator() ;
-				// TODO ActLegIterator not in the basic interfaces
+				// TODO wie lšsen wir das?
 				
 				// TODO: is the following how it is meant?  not terribly beautiful.  But what else?
 
@@ -101,25 +109,29 @@ ActStartEventHandler
 				}
 			}
 		}
+	}
+	
+	public void handlePlan(Plan ppp) { // need handlePlan(BasicPlan) ??????
+		BasicPlan plan = (BasicPlan) ppp ;
 		
-		// need to be able to construct a person:
 		BasicPopulationBuilder pb = pop.getPopulationBuilder() ; 
 		
 		try {
 			Id id = sc.createId("1") ; 
 			BasicPerson person = pb.createPerson(id) ;
+			// (can't be used at this level, but useful anyways)
 			
-			BasicPlan plan = pb.createPlan(person) ;
-			person.addPlan(plan) ;
+			BasicPlan newPlan = pb.createPlan(person) ; // replace (??) the plan by a completely new plan
+			person.addPlan(newPlan) ; // now the person has the plan twice. 
 			
 			Coord coord = sc.createCoord(1.,1.) ;
 			Id linkId = sc.createId("2" ) ;
 			Id facId = sc.createId("3") ;
 			
-//			BasicLocation loc = pb.createFacility( coord ) ;
+			// BasicLocation loc = pb.createFacility( coord ) ; // currently not possible (ok at this level)
 			
 			BasicLink link ;
-//			BasicAct hAct = pb.createAct( "home", link ) ;
+//			BasicAct hAct = pb.createAct( "home", link ) ; // does not really make sense since there may be more than one facility at link
 //			
 //			BasicFacility fac ;
 //			BasicAct h2Act = pb.createAct( "home", fac ) ;
@@ -176,4 +188,8 @@ ActStartEventHandler
 
 	public void reset(int iteration) {
 	}
+
+	public void finish() {		
+	}
+
 }

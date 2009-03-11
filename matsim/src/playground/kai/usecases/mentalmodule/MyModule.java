@@ -4,18 +4,23 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 
-// ok:
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.*;
+import org.matsim.interfaces.core.v01.*;
+import org.matsim.network.NetworkLayer;
+import org.matsim.replanning.PlanStrategy;
+import org.matsim.replanning.modules.StrategyModule;
+import org.matsim.replanning.selectors.RandomPlanSelector;
 
-// not ok:
-//import org.matsim.basic.v01.*;
-//import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.BasicPlanImpl;
+import org.matsim.controler.Controler;
+import org.matsim.controler.ScenarioData;
 import org.matsim.events.*;
 import org.matsim.events.handler.*;
 
 @SuppressWarnings("unused")
-public class MentalModule implements 
+public class MyModule implements
+StrategyModule,
 ActEndEventHandler,
 AgentDepartureEventHandler,
 AgentWait2LinkEventHandler,
@@ -25,19 +30,26 @@ AgentArrivalEventHandler,
 ActStartEventHandler
 // TODO: names of these events handlers ok?
 {
-	private static final Logger log = Logger.getLogger(MentalModule.class);
+	private static final Logger log = Logger.getLogger(MyModule.class);
 	
-	public MentalModule ( BasicScenario sc ) {
-//		public MentalModule ( BasicPopulation<BasicPerson> pop, BasicNetwork<BasicNode,BasicLink> net, Gbl gbl ) {
-		// TODO What is the recommended type safety approach?
+	ScenarioData sc ;
+	NetworkLayer net ;
+	Population pop ;
+	
+	public MyModule(Controler controler) {
 		
-		BasicNetwork<BasicNode,BasicLink> net = (BasicNetwork   ) sc.getNetwork() ;
-		BasicPopulation<BasicPerson>      pop = (BasicPopulation) sc.getPopulation() ;
-				
+		sc = controler.getScenarioData() ; // TODO in controler
+		net = sc.getNetwork() ;
+		pop = sc.getPopulation() ;
+		
+	}
+	
+	public void init() { // initReplanning() 
+		
 		// go through network and copy to my personal network:
 		for ( BasicNode bn : net.getNodes().values() ) {
 			Id id = bn.getId();
-			Coord coord = bn.getCoord(); // TODO: Coord not basic
+			Coord coord = bn.getCoord(); 
 		}
 		for ( BasicLink bl : net.getLinks().values() ) {
 
@@ -55,7 +67,7 @@ ActStartEventHandler
 		}
 		
 		// go through population and copy to my personal population:
-		for ( BasicPerson person : pop.getPersons().values() ) {
+		for ( Person person : pop.getPersons().values() ) {
 			
 			Id id = person.getId();
 			
@@ -63,7 +75,7 @@ ActStartEventHandler
 			String carAvail = person.getCarAvail(); // TODO: String??
 			person.getDesires(); // TODO: Do we understand this well enough to have it in the basic interface? 
 
-			List<BasicPlan> plans = person.getPlans() ;
+			List<Plan> plans = person.getPlans() ;
 			
 			for ( BasicPlan plan : plans ) {
 				BasicPlanImpl.ActLegIterator it = plan.getIterator() ;
@@ -101,16 +113,19 @@ ActStartEventHandler
 				}
 			}
 		}
+	}
+	
+	public void handlePlan(Plan plan) {
 		
-		// need to be able to construct a person:
-		BasicPopulationBuilder pb = pop.getPopulationBuilder() ; 
+		PopulationBuilder pb = pop.getPopulationBuilder() ; 
 		
 		try {
 			Id id = sc.createId("1") ; 
-			BasicPerson person = pb.createPerson(id) ;
+//			Person person = pb.createPerson(id) ;
+			// (can't be used at this level, but useful anyways)
 			
-			BasicPlan plan = pb.createPlan(person) ;
-			person.addPlan(plan) ;
+//			plan = pb.createPlan(person) ; // replace the plan by a completely new plan
+//			person.addPlan(plan) ; // now the person has the plan twice.  to be clarified
 			
 			Coord coord = sc.createCoord(1.,1.) ;
 			Id linkId = sc.createId("2" ) ;
@@ -176,4 +191,8 @@ ActStartEventHandler
 
 	public void reset(int iteration) {
 	}
+
+	public void finish() {		
+	}
+
 }

@@ -23,20 +23,36 @@ package playground.kai.usecases.mentalmodule;
  */
 
 import org.matsim.controler.Controler;
+import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.vis.netvis.NetVis;
+import org.matsim.interfaces.core.v01.Population;
+import org.matsim.network.NetworkLayer;
+import org.matsim.replanning.PlanStrategy;
+import org.matsim.replanning.modules.StrategyModule;
+import org.matsim.replanning.selectors.PlanSelector;
+import org.matsim.replanning.selectors.RandomPlanSelector;
 
 
-public class MyControler1 {
+public class MyStrategy extends PlanStrategy {
+	
+	
+
+	public MyStrategy(Controler controler) {
+		super(new RandomPlanSelector());
+		
+		MyModule mod = new MyModule( controler ) ;
+		
+		addStrategyModule(mod) ;
+		
+		Events events = controler.getEvents() ;
+		events.addHandler( mod ) ;
+		
+	}
 
 	public static void main(final String[] args) {
 
 		if ( args.length==0 ) {
-//			Gbl.createConfig(new String[] {"../studies/schweiz/6-9SepFmaZurichOnly_rad=26000m-hwh/config-10pct.xml"});
-//			Gbl.createConfig(new String[] {"./examples/roundabout/config.xml"});
 			Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
-//			Gbl.createConfig(new String[] {"../padang/dlr-network/pconfig.xml"});
-//			Gbl.createConfig(new String[] {"/home/nagel/vsp-cvs/studies/ivtch-schweiz/plans/kaiconfig.xml"});
 		} else {
 			Gbl.createConfig(args) ;
 		}
@@ -44,10 +60,6 @@ public class MyControler1 {
 		final Controler controler = new Controler(Gbl.getConfig());
 		controler.setOverwriteFiles(true);
 		controler.run();
-
-//		// Visualize
-//		String[] visargs = {"./output/ITERS/it.100/Snapshot"};
-//		NetVis.main(visargs);
 
 	}
 
