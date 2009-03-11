@@ -49,7 +49,7 @@ import org.matsim.utils.io.IOUtils;
  * @author aneumann
  * @author dgrether
  */
-public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveEventHandler, LinkEnterEventHandler, ActEndEventHandler, ActStartEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler {
+public class TravelTimeFourWaysTest extends MatsimTestCase implements	LinkLeaveEventHandler, LinkEnterEventHandler, ActEndEventHandler, ActStartEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler {
 
 	BufferedWriter writer = null;
 

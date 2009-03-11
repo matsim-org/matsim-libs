@@ -25,7 +25,7 @@ import org.matsim.events.handler.EventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.testcases.MatsimTestCase;
 
-public class EventsHandlerHierarchy extends MatsimTestCase {
+public class EventsHandlerHierarchyTest extends MatsimTestCase {
 
 	int eventHandled = 0;
 	int resetCalled = 0;
@@ -34,14 +34,14 @@ public class EventsHandlerHierarchy extends MatsimTestCase {
 
 		public void handleEvent(final BasicEvent event) {
 			System.out.println("Event handled");
-			EventsHandlerHierarchy.this.eventHandled++;
+			EventsHandlerHierarchyTest.this.eventHandled++;
 		}
 
 		public void handleEvent(LinkLeaveEvent event) {
 		}
 
 		public void reset(final int iteration) {
-			EventsHandlerHierarchy.this.resetCalled++;
+			EventsHandlerHierarchyTest.this.resetCalled++;
 		}
 	}
 

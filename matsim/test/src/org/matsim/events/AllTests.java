@@ -39,7 +39,7 @@ public class AllTests {
 		suite.addTestSuite(AgentWait2LinkEventTest.class);
 		suite.addTestSuite(LinkEnterEventTest.class);
 		suite.addTestSuite(LinkLeaveEventTest.class);
-		suite.addTestSuite(EventsHandlerHierarchy.class);
+		suite.addTestSuite(EventsHandlerHierarchyTest.class);
 		suite.addTestSuite(EventsReadersTest.class);
 
 		return suite;

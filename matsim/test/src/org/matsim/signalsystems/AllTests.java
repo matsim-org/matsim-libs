@@ -35,8 +35,8 @@ public class AllTests {
 		suite.addTestSuite(LightSignalSystemsConfigReaderTest.class);
 		suite.addTestSuite(CalculateAngleTest.class);
 		suite.addTestSuite(SignalSystemsOneAgentTest.class);
-		suite.addTestSuite(TravelTimeTestOneWay.class);
-		suite.addTestSuite(TravelTimeTestFourWays.class);
+		suite.addTestSuite(TravelTimeOneWayTest.class);
+		suite.addTestSuite(TravelTimeFourWaysTest.class);
 		//$JUnit-END$
 		return suite;
 	}

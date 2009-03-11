@@ -42,11 +42,11 @@ import org.matsim.testcases.MatsimTestCase;
  * @author aneumann
  * @author dgrether
  */
-public class TravelTimeTestOneWay extends MatsimTestCase implements
+public class TravelTimeOneWayTest extends MatsimTestCase implements
 		LinkEnterEventHandler {
 
 	private static final Logger log = Logger
-			.getLogger(TravelTimeTestOneWay.class);
+			.getLogger(TravelTimeOneWayTest.class);
 
 	private MeasurementPoint beginningOfLink2 = null;
 
@@ -178,7 +178,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements
 		if (event.linkId.equalsIgnoreCase("2")) {
 			if (this.beginningOfLink2 == null) {
 				this.beginningOfLink2 = new MeasurementPoint(event.time
-						+ TravelTimeTestOneWay.timeToWaitBeforeMeasure);
+						+ TravelTimeOneWayTest.timeToWaitBeforeMeasure);
 			}
 
 			this.beginningOfLink2.numberOfVehPassed++;
