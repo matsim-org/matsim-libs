@@ -952,6 +952,14 @@ public class Controler {
 	}
 
 	/**
+	 * This is here for testing purposes only.  Kai, mar08
+	 */
+	@Deprecated
+	public final ScenarioData getScenarioData() {
+		return this.scenarioData ;
+	}
+
+	/**
 	 * @return real-world traffic counts if available, <code>null</code> if no data is available.
 	 */
 	public final Counts getCounts() {
@@ -1140,7 +1148,7 @@ public class Controler {
 				this.eventWriter.closeFile();
 			}
 		}
-
+		
 	}
 
 	/* ===================================================================
