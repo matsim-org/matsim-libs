@@ -68,6 +68,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	private TreeMap<Id,Link> links;
 	private RetailersSummaryWriter rs = null;
 	private PlansSummaryTable pst = null;
+	private MakeATableFromXMLFacilities mtxf = null; 
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
@@ -85,6 +86,8 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		String popOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
 		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.pst = new PlansSummaryTable (popOutFile);
+		this.mtxf = new MakeATableFromXMLFacilities ("output/FacilityTable/facilities.txt");
+		this.mtxf.write(controler.getFacilities());
 		String retailersOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
 		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.rs = new RetailersSummaryWriter (retailersOutFile);
@@ -93,6 +96,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		if (this.facilityIdFile == null) { //Francesco: TODO decide if throw an exception or permit a way to create retailers without an input file
 			System.out.println("facility file = " + facilityIdFile);
 		}
+	
 		else {
 			try {
 				this.retailers = new Retailers();
@@ -111,9 +115,9 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 						this.retailers.getRetailers().get(rId).addFacility(f);
 					}
 					else { // retailer does not exists yet
+						System.out.println("The new retailer " + rId + " has been added");
 						Retailer r = new Retailer(rId, null);
 						r.addStrategy(controler, entries[2]);
-						System.out.println("Strategy = " + entries[2]);
 						Id fId = new IdImpl (entries[1]);
 						Facility f = controler.getFacilities().getFacilities().get(fId);
 						r.addFacility(f);
@@ -145,7 +149,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 				Gbl.errorMsg(e);
 			}
 		}
-		else {//Francesco: if no file is defined stating which links are allowed any link is allowed
+		else {//Francesco: if no file stating which links are allowed is defined, any link is allowed.
 		}
 	}
 	

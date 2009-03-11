@@ -59,6 +59,7 @@ public class Retailer {
 
 	public final Map<Id,Facility> runStrategy() {
 		System.out.println("Strategy = " + strategy);
+		System.out.println("Facilities = " + facilities);
 		strategy.moveFacilities(this.facilities);
 		return this.facilities;
 	}

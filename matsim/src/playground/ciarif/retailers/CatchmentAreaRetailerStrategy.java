@@ -14,7 +14,7 @@ import org.matsim.interfaces.core.v01.Person;
 import org.matsim.utils.collections.QuadTree;
 
 public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
-	public static final String NAME = "maxLinkRetailerStrategy";
+	public static final String NAME = "catchmentAreaRetailerStrategy";
 	public final static String CONFIG_GROUP = "Retailers";
 	public final static String CONFIG_N_ALTERNATIVES = "alternatives";
 	public final static String CONFIG_RAD_CATCHMENT = "radius_catchment";
