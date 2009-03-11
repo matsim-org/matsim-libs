@@ -38,7 +38,7 @@ public class BasicPlanImpl implements BasicPlan {
 
 	protected ArrayList<Object> actsLegs = new ArrayList<Object>();
 
-	private Double score = Plan.UNDEF_SCORE;
+	private Double score = null;
 
 	private Plan.Type type = null;
 
