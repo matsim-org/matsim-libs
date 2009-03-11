@@ -40,7 +40,6 @@ public abstract class TriangleScenario {
 	//////////////////////////////////////////////////////////////////////
 
 	public static final long CHECKSUM_WORLD_EMPTY = 565556558;
-	public static final long CHECKSUM_FACILITIES_ENRICHED = 1006843383;
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

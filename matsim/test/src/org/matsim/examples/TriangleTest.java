@@ -79,7 +79,8 @@ public class TriangleTest extends MatsimTestCase {
 	private final void checkEnrichedOutputFacilities() {
 		log.info("  checksum check of enriched output facilities... ");
 		long checksum_facilities = CRCChecksum.getCRCFromFile(this.config.facilities().getOutputFile());
-		assertEquals("different facilities files", TriangleScenario.CHECKSUM_FACILITIES_ENRICHED,checksum_facilities);
+		long refChecksum = CRCChecksum.getCRCFromFile(getInputDirectory() + "facilities.xml");
+		assertEquals("different facilities files", refChecksum, checksum_facilities);
 		log.info("  done.");
 	}
 
