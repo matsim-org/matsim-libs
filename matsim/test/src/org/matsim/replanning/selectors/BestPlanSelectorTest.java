@@ -61,23 +61,23 @@ public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 
 		plan = selector.selectPlan(person);
 		assertEquals(40.0, plan.getScoreAsPrimitiveType(), 0.0);
-		plan.setScore(Plan.UNDEF_SCORE);
+		plan.setScore(null);
 
 		plan = selector.selectPlan(person);
 		assertEquals(30.0, plan.getScoreAsPrimitiveType(), 0.0);
-		plan.setScore(Plan.UNDEF_SCORE);
+		plan.setScore(null);
 
 		plan = selector.selectPlan(person);
 		assertEquals(10.0, plan.getScoreAsPrimitiveType(), 0.0);
-		plan.setScore(Plan.UNDEF_SCORE);
+		plan.setScore(null);
 
 		plan = selector.selectPlan(person);
 		assertEquals(-20.0, plan.getScoreAsPrimitiveType(), 0.0);
-		plan.setScore(Plan.UNDEF_SCORE);
+		plan.setScore(null);
 
 		plan = selector.selectPlan(person);
 		assertEquals(-50.0, plan.getScoreAsPrimitiveType(), 0.0);
-		plan.setScore(Plan.UNDEF_SCORE);
+		plan.setScore(null);
 
 		plan = selector.selectPlan(person);
 		assertTrue(plan.hasUndefinedScore());
