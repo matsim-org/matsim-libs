@@ -30,45 +30,21 @@ public class PTNetworkFactory2 {
 	}
 	
 	public NetworkLayer createNetwork(String inFileName, PTTimeTable2 ptTimeTable, String OutFileName){
-		NetworkLayer ptNetworkLayer1 = readNetFile(inFileName);
-		readTimeTable(ptNetworkLayer1, ptTimeTable);
-		createTransferLinks(ptNetworkLayer1, ptTimeTable);
-		return ptNetworkLayer1;
+		PTNetworkReader ptNetworkReader = new PTNetworkReader();
+		NetworkLayer ptNetworkLayer = ptNetworkReader.readNetFile(inFileName);
+		readTimeTable(ptNetworkLayer, ptTimeTable);
+		createTransferLinks(ptNetworkLayer, ptTimeTable);
+		return ptNetworkLayer;
 	}
 	
 	public NetworkLayer readNetwork(String inFileName, PTTimeTable2 ptTimeTable){
-		NetworkLayer ptNetworkLayer = readNetFile(inFileName);
+		PTNetworkReader ptNetworkReader = new PTNetworkReader();
+		NetworkLayer ptNetworkLayer = ptNetworkReader.readNetFile(inFileName);
 		readTimeTable(ptNetworkLayer, ptTimeTable);
 		return ptNetworkLayer;
 	}
 	
-	private NetworkLayer readNetFile(String inFileName){
-		NetworkFactory networkFactory = new NetworkFactory();
 	
-		NetworkLayer tempNet= new NetworkLayer(networkFactory);
-		NetworkLayer ptNetworkLayer= new NetworkLayer(networkFactory);
-		
-		//Create a temporal network with normal Nodes
-		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(tempNet);
-		matsimNetworkReader.readFile(inFileName);
-		
-		//Create the PTNetwork with PTNodes
-		//List<PTNode> ptNodeList = new ArrayList<PTNode>();
-		for (Node node: tempNet.getNodes().values()){
-			PTNode ptNode = new PTNode(node.getId(),node.getCoord(),node.getType());
-			ptNetworkLayer.getNodes().put(node.getId(),ptNode);
-		}
-	
-		//Add Links
-		for (Link l: tempNet.getLinks().values()){
-			createPTLink(ptNetworkLayer, l.getId().toString(), l.getFromNode().getId().toString(), l.getToNode().getId().toString(), l.getType());
-		}
-
-		tempNet= null;
-		networkFactory= null;
-		matsimNetworkReader= null;
-		return ptNetworkLayer;
-	}
 	
 	private PTTimeTable2 readTimeTable(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable){
 		PTNode ptLastNode = null;

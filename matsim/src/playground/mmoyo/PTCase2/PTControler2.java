@@ -159,7 +159,8 @@ public class PTControler2 {
 	    		System.out.println(unidos);
 	    		break;
 	    	case 8:
-	    		    		break;
+	    		//Temporal only for the refactoring    	
+	    		break;
 		}//switch
 	}//main
 

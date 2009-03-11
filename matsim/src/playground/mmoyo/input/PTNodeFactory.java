@@ -6,6 +6,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicNode;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
 
 import playground.mmoyo.PTCase2.PTStationMap;
@@ -19,9 +20,10 @@ public class PTNodeFactory {
 	PTStationMap ptStationMap;;
 	StationValidator sValidator;
 
-	/**
-	 * @param net
-	 */
+	public PTNodeFactory(){
+		
+	}
+			
 	public PTNodeFactory(NetworkLayer net, PTTimeTable2 ptTimeTable) {
 		this.net = net;
 		this.ptStationMap = new PTStationMap(ptTimeTable);
@@ -29,6 +31,15 @@ public class PTNodeFactory {
 		this.sValidator.hasValidCoordinates(this.ptStationMap);
 	}
 
+	public NetworkLayer TransformToPTNodes(NetworkLayer NetWithNodes, NetworkLayer NetWithPTNodes){
+		for (Node node: NetWithNodes.getNodes().values()){
+			PTNode ptNode = new PTNode(node.getId(),node.getCoord(),node.getType());
+			NetWithPTNodes.getNodes().put(node.getId(),ptNode);
+		}
+		return NetWithPTNodes;
+	}
+	
+	
 	public BasicNode[] CreatePTNodes(BasicNode basicNode){
 		BasicNode[] pair = new BasicNode[2];
 		
