@@ -143,19 +143,19 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		getScoringFunctionForAgent(event.agentId).startLeg(event.time, event.leg);
+		getScoringFunctionForAgent(event.agentId).startLeg(event.getTime(), event.getLeg());
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		getScoringFunctionForAgent(event.agentId).endLeg(event.time);
+		getScoringFunctionForAgent(event.agentId).endLeg(event.getTime());
 	}
 
 	public void handleEvent(final AgentMoneyEvent event) {
-		getScoringFunctionForAgent(event.agentId).addMoney(event.amount);
+		getScoringFunctionForAgent(event.agentId).addMoney(event.getAmount());
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		getScoringFunctionForAgent(event.agentId).agentStuck(event.time);
+		getScoringFunctionForAgent(event.agentId).agentStuck(event.getTime());
 		this.stuckPenalty += -144.0;
 	}
 	

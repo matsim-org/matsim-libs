@@ -69,15 +69,15 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 
 		assertTrue(collector.events.get(0) instanceof AgentMoneyEvent);
 		AgentMoneyEvent e1 = (AgentMoneyEvent) collector.events.get(0);
-		assertEquals(event1.time, e1.time, EPSILON);
+		assertEquals(event1.getTime(), e1.getTime(), EPSILON);
 		assertEquals(event1.agentId, e1.agentId);
-		assertEquals(event1.amount, e1.amount, EPSILON);
+		assertEquals(event1.getAmount(), e1.getAmount(), EPSILON);
 
 		assertTrue(collector.events.get(1) instanceof AgentMoneyEvent);
 		AgentMoneyEvent e2 = (AgentMoneyEvent) collector.events.get(1);
-		assertEquals(event2.time, e2.time, EPSILON);
+		assertEquals(event2.getTime(), e2.getTime(), EPSILON);
 		assertEquals(event2.agentId, e2.agentId);
-		assertEquals(event2.amount, e2.amount, EPSILON);
+		assertEquals(event2.getAmount(), e2.getAmount(), EPSILON);
 	}
 
 	public void testWriteReadXML() {
@@ -111,15 +111,15 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 
 		assertTrue(collector.events.get(0) instanceof AgentMoneyEvent);
 		AgentMoneyEvent e1 = (AgentMoneyEvent) collector.events.get(0);
-		assertEquals(event1.time, e1.time, EPSILON);
+		assertEquals(event1.getTime(), e1.getTime(), EPSILON);
 		assertEquals(event1.agentId, e1.agentId);
-		assertEquals(event1.amount, e1.amount, EPSILON);
+		assertEquals(event1.getAmount(), e1.getAmount(), EPSILON);
 
 		assertTrue(collector.events.get(1) instanceof AgentMoneyEvent);
 		AgentMoneyEvent e2 = (AgentMoneyEvent) collector.events.get(1);
-		assertEquals(event2.time, e2.time, EPSILON);
+		assertEquals(event2.getTime(), e2.getTime(), EPSILON);
 		assertEquals(event2.agentId, e2.agentId);
-		assertEquals(event2.amount, e2.amount, EPSILON);
+		assertEquals(event2.getAmount(), e2.getAmount(), EPSILON);
 	}
 
 	private static class EventCollector implements BasicEventHandler {

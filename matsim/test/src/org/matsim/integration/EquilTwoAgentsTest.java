@@ -158,57 +158,57 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 		}
 
 		public void handleEvent(final LinkEnterEvent e) {
-			log.debug("Enter Link:" + e.linkId + " at Time: " + e.time);
+			log.debug("Enter Link:" + e.linkId + " at Time: " + e.getTime());
 			if (e.link.getId().equals(id6)) {
 				this.agentOneTime = this.agent1LeaveHomeTime + 1.0;
-				assertEquals(this.agentOneTime, e.time, EPSILON);
+				assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 			}
 			else if (e.link.getId().equals(id15)) {
 				this.agentOneTime = this.agentOneTime + 359.0 + 1.0;
-				assertEquals(this.agentOneTime, e.time, EPSILON);
+				assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 			}
 			else if (e.link.getId().equals(id20)) {
 				this.agentOneTime = this.agentOneTime + 179.0 + 1.0;
-				assertEquals(this.agentOneTime, e.time, EPSILON);
+				assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 			}
 			else if (e.link.getId().equals(id21)) {
 				this.agentOneTime = this.agentOneTime + 1.0;
-				assertEquals(this.agentOneTime, e.time, EPSILON);
+				assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 			}
 			else if (e.link.getId().equals(id22)) {
 				this.agentOneTime = this.agentOneTime + 359.0 + 1.0;
-				assertEquals(this.agentOneTime, e.time, EPSILON);
+				assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 			}
 			else if (e.link.getId().equals(id23)) {
 				this.agentOneTime = this.agentOneTime + 1259.0 + 1.0;
-				assertEquals(this.agentOneTime, e.time, EPSILON);
+				assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 			}
 			else if (e.link.getId().equals(id1)) {
 				this.agentOneTime = this.agentOneTime + 359.0 + 1.0;
-				assertEquals(this.agentOneTime, e.time, EPSILON);
+				assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 			}
 		}
 
 		public void handleEvent(final ActStartEvent e) {
-			log.debug("Start Activity " + e.acttype + " : Time: " + Time.writeTime(e.time) + " Agent: " + e.agentId);
-			log.debug("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.agent.getId()));
-			if (e.agent.getId().equals(id1)) {
-				if (e.acttype.equalsIgnoreCase("w")) {
+			log.debug("Start Activity " + e.getActType() + " : Time: " + Time.writeTime(e.getTime()) + " Agent: " + e.agentId);
+			log.debug("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getAgent().getId()));
+			if (e.getAgent().getId().equals(id1)) {
+				if (e.getActType().equalsIgnoreCase("w")) {
 					//test the time
 					//time is time till link 15 + freespeed of link 20
 					this.agentOneTime = this.agentOneTime + 359.0;
 					log.debug("Car tt to work is: " + (this.agentOneTime - this.agent1LeaveHomeTime));
-					assertEquals(this.agentOneTime, e.time, EPSILON);
+					assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 
 					//test the score
 					//0.25 h = 15 min = 900 s fstt of agent 1 (car)
 					this.agentOneScore = 0.25 * -6.0;
-					assertEquals(this.agentOneScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.agent.getId()), EPSILON);
+					assertEquals(this.agentOneScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getAgent().getId()), EPSILON);
 				}
 				else { // it is home
 					//test the time
 					this.agentOneTime = this.agentOneTime + 359.0;
-					assertEquals(this.agentOneTime, e.time, EPSILON);
+					assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 
 					//test the score
 					//must be negative score for traveling to work (i.e. value of agentOneScore)
@@ -218,28 +218,28 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 					this.agentOneScore = this.agentOneScore + deltaScore;
 					//plus negative score for traveling home 39 minutes
 					this.agentOneScore = this.agentOneScore + (39.0/60.0 * -6.0);
-					assertEquals(this.agentOneScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.agent.getId()), EPSILON);
+					assertEquals(this.agentOneScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getAgent().getId()), EPSILON);
 				}
 			}
-			else if (e.agent.getId().equals(id2)) {
-				if (e.acttype.equalsIgnoreCase("w")) {
+			else if (e.getAgent().getId().equals(id2)) {
+				if (e.getActType().equalsIgnoreCase("w")) {
 					//test the time
 					//this is the version used in speech:	agentTwoTime = agentTwoTime + 30.0 * 60.0;
 					//this is the version used in code:
 					this.agentTwoTime = this.agentTwoTime + 1797.0; // 30.0 * 60.0 - 3.0
-					assertEquals(this.agentTwoTime, e.time, EPSILON);
+					assertEquals(this.agentTwoTime, e.getTime(), EPSILON);
 
 					//test the score
 					//1097s free speed travel time of agent 2 (non-car)
 					this.agentTwoScore = 1797.0/3600.0 * -3.0;
-					assertEquals(this.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.agent.getId()), EPSILON);
+					assertEquals(this.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getAgent().getId()), EPSILON);
 				}
 				else {
 					//test the time
 					//				this is the version used in speech:	agentTwoTime = agentTwoTime + 78.0 * 60.0;
 					//this is the version used in code:
 					this.agentTwoTime = this.agentTwoTime + 4677.0; // 78.0 * 60.0 - 3.0
-					assertEquals(this.agentTwoTime, e.time, EPSILON);
+					assertEquals(this.agentTwoTime, e.getTime(), EPSILON);
 
 					//test the score
 					//must be negative score for traveling to work (i.e. value of agentTwoScore)
@@ -249,36 +249,36 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 					this.agentTwoScore = this.agentTwoScore + (this.agent2LeaveHomeTime + 1797.0 - 7.0*3600) * (-18.0 / 3600.0);
 					//plus negative score for traveling home 4677.0 seconds by non-car mode (should be 78 min but is less!)
 					this.agentTwoScore = this.agentTwoScore + (4677.0/3600.0 * -3.0);
-					assertEquals(this.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.agent.getId()), EPSILON);
+					assertEquals(this.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getAgent().getId()), EPSILON);
 
 					EquilTwoAgentsTest.this.planScorer.finish();
 					log.debug("Score 1: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(id1));
-					log.debug("Score 2: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.agent.getId()));
+					log.debug("Score 2: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getAgent().getId()));
 				}
 			}
 		}
 
 		public void handleEvent(final ActEndEvent e) {
-			log.debug("End Activity " + e.acttype + " : Time: " + Time.writeTime(e.time) + " Agent: " + e.agentId);
-			log.debug("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.agent.getId()));
+			log.debug("End Activity " + e.getActType() + " : Time: " + Time.writeTime(e.getTime()) + " Agent: " + e.agentId);
+			log.debug("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getAgent().getId()));
 
-			if (e.agent.getId().equals(id1)) {
-				if (e.acttype.equalsIgnoreCase("w")) {
+			if (e.getAgent().getId().equals(id1)) {
+				if (e.getActType().equalsIgnoreCase("w")) {
 					this.agentOneTime = this.agentOneTime + 8.0 * 3600;
-					assertEquals(this.agentOneTime, e.time, EPSILON);
+					assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 				}
 				else {
-					assertEquals(this.agent1LeaveHomeTime, e.time, EPSILON);
+					assertEquals(this.agent1LeaveHomeTime, e.getTime(), EPSILON);
 				}
 			}
-			else if (e.agent.getId().equals(id2)) {
-				if (e.acttype.equalsIgnoreCase("w")) {
+			else if (e.getAgent().getId().equals(id2)) {
+				if (e.getActType().equalsIgnoreCase("w")) {
 					this.agentTwoTime = this.agentTwoTime + 8.0 * 3600;
-					assertEquals(this.agentTwoTime, e.time, EPSILON);
+					assertEquals(this.agentTwoTime, e.getTime(), EPSILON);
 				}
 				else {
 					this.agentTwoTime = this.agent2LeaveHomeTime;
-					assertEquals(this.agentTwoTime, e.time, EPSILON);
+					assertEquals(this.agentTwoTime, e.getTime(), EPSILON);
 				}
 			}
 		}

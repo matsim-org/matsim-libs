@@ -237,11 +237,11 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	public void handleEvent(AgentArrivalEvent event) {
 		AgentDepartureEvent dEvent = departures.remove(event.agentId);
 		if (dEvent == null) throw new RuntimeException("Missing AgentDepartureEvent for AgentArrivalEvent: " + event.toString());
-		else if (event.time < hour*3600) {
+		else if (event.getTime() < hour*3600) {
 			throw new RuntimeException("At hour "+hour+": AgentArrivalEvent too early! ("+event.toString()+")");
 		}
 		
-		if (event.time >= (hour+1)*3600) {
+		if (event.getTime() >= (hour+1)*3600) {
 			if (hours.contains(hour)) {
 				log.info("finishing hour " + hour + " ...");
 				storeMatrix();
@@ -252,7 +252,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 		}
 		
 		if (hours.contains(hour)) {
-			double ttime = event.time - dEvent.time;
+			double ttime = event.getTime() - dEvent.getTime();
 			Id fzone = l2zMapping.get(new IdImpl(dEvent.linkId));
 			Id tzone = l2zMapping.get(new IdImpl(event.linkId));
 			addTTime(fzone,tzone,ttime);

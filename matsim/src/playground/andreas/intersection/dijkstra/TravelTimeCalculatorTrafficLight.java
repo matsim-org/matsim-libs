@@ -68,7 +68,7 @@ public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 			event.link = this.network.getLink(event.linkId);
 		}
 		
-		EnterEvent newEvent = new EnterEvent(event.link, event.time);
+		EnterEvent newEvent = new EnterEvent(event.link, event.getTime());
 		
 		if(this.enterEvents.containsKey(event.agentId)){
 			

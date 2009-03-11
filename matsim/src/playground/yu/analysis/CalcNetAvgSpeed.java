@@ -65,7 +65,7 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 	}
 
 	public void handleEvent(LinkEnterEvent enter) {
-		this.enterTimes.put(enter.agentId, enter.time);
+		this.enterTimes.put(enter.agentId, enter.getTime());
 	}
 
 	public void reset(int iteration) {
@@ -83,7 +83,7 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 			}
 			if (l != null) {
 				this.lengthSum += l.getLength() / 1000.0;
-				this.timeSum += (leave.time - enterTime.doubleValue()) / 3600.0;
+				this.timeSum += (leave.getTime() - enterTime.doubleValue()) / 3600.0;
 			}
 		}
 	}

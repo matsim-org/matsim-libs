@@ -54,7 +54,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler {
 			volumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs
 			this.links.put(linkid, volumes);
 		}
-		int timeslot = getTimeSlotIndex(event.time);
+		int timeslot = getTimeSlotIndex(event.getTime());
 		volumes[timeslot]++;
 	}
 

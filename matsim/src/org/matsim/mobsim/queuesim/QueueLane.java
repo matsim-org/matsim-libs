@@ -590,7 +590,7 @@ public class QueueLane implements Comparable<QueueLane> {
 			v2.setLastMovedTime(now);
 		}
 
-		QueueSimulation.getEvents().processEvent(new LinkLeaveEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), veh.getCurrentLeg()));
+		QueueSimulation.getEvents().processEvent(new LinkLeaveEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink()));
 
 		return veh;
 	}

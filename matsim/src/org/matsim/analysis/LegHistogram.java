@@ -86,28 +86,28 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	/* Implementation of EventHandler-Interfaces */
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		int index = getBinIndex(event.time);
+		int index = getBinIndex(event.getTime());
 		allModesData.countsDep[index]++;
-		if (event.leg != null) {
-			ModeData modeData = getDataForMode(event.leg.getMode());
+		if (event.getLeg() != null) {
+			ModeData modeData = getDataForMode(event.getLeg().getMode());
 			modeData.countsDep[index]++;
 		}
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		int index = getBinIndex(event.time);
+		int index = getBinIndex(event.getTime());
 		allModesData.countsArr[index]++;
-		if (event.leg != null) {
-			ModeData modeData = getDataForMode(event.leg.getMode());
+		if (event.getLeg() != null) {
+			ModeData modeData = getDataForMode(event.getLeg().getMode());
 			modeData.countsArr[index]++;
 		}
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		int index = getBinIndex(event.time);
+		int index = getBinIndex(event.getTime());
 		allModesData.countsStuck[index]++;
-		if (event.leg != null) {
-			ModeData modeData = getDataForMode(event.leg.getMode());
+		if (event.getLeg() != null) {
+			ModeData modeData = getDataForMode(event.getLeg().getMode());
 			modeData.countsStuck[index]++;
 		}
 	}

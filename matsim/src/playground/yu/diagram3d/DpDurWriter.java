@@ -130,7 +130,7 @@ public class DpDurWriter implements AgentDepartureEventHandler, AgentArrivalEven
 
 	public void handleEvent(AgentDepartureEvent event) {
 		String agentId=event.agentId;
-		agentDepTimes.put(agentId, (int) event.time);
+		agentDepTimes.put(agentId, (int) event.getTime());
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
@@ -139,7 +139,7 @@ public class DpDurWriter implements AgentDepartureEventHandler, AgentArrivalEven
 			int depT = agentDepTimes.remove(agentId);
 			int depH = depT / 3600;
 			int depM = (depT - depH * 3600) / 60;
-			int arrT = (int) event.time;
+			int arrT = (int) event.getTime();
 			int dur = arrT - depT;
 			if (dur > maxDur) {
 				maxDur = dur;

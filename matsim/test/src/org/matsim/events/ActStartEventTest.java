@@ -30,9 +30,9 @@ public class ActStartEventTest extends MatsimTestCase {
 	public void testWriteReadXml() {
 		final ActStartEvent event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
 				new ActStartEvent(5668.27, "a92", "l081", "work"));
-		assertEquals(5668.27, event.time, EPSILON);
+		assertEquals(5668.27, event.getTime(), EPSILON);
 		assertEquals("a92", event.agentId);
 		assertEquals("l081", event.linkId);
-		assertEquals("work", event.acttype);
+		assertEquals("work", event.getActType());
 	}
 }

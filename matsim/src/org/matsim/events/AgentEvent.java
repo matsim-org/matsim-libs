@@ -31,8 +31,8 @@ public abstract class AgentEvent extends PersonEvent {
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_LEG = "leg";
 
-	public Link link;
-	public Leg leg;
+	private Link link;
+	private Leg leg;
 
 	public String linkId;
 
@@ -56,7 +56,15 @@ public abstract class AgentEvent extends PersonEvent {
 	}
 
 	protected String asString() {
-		return getTimeString(this.time) + this.agentId + "\t\t"+ this.linkId + "\t0\t"; // FLAG + DESCRIPTION is mising here: concat later
+		return getTimeString(this.getTime()) + this.agentId + "\t\t"+ this.linkId + "\t0\t"; // FLAG + DESCRIPTION is mising here: concat later
+	}
+
+	public Link getLink() {
+		return link;
+	}
+
+	public Leg getLeg() {
+		return leg;
 	}
 
 }

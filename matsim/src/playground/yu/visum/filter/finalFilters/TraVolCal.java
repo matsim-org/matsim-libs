@@ -34,7 +34,7 @@ public class TraVolCal extends FinalEventFilterA {
 	public void handleEvent(final BasicEvent enter) {
 		if (enter instanceof LinkEnterEvent) {
 			count();
-			long hour = (long) (enter.time / 3600);
+			long hour = (long) (enter.getTime() / 3600);
 			if (hour > timeBinMax)
 				timeBinMax = hour;
 			if (hour < timeBinMin)

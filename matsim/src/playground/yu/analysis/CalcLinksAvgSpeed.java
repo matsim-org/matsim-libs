@@ -193,13 +193,13 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 						i * 86400.0 / nofBins);
 			sc = new SpeedCounter(nofBins, freeSpeeds);
 		}
-		sc.setTmpEnterTime(enter.agentId, enter.time);
+		sc.setTmpEnterTime(enter.agentId, enter.getTime());
 		speedCounters.put(linkId, sc);
 	}
 
 	@Override
 	public void handleEvent(final LinkLeaveEvent leave) {
-		double time = leave.time;
+		double time = leave.getTime();
 		int timeBin = getBinIdx(time);
 		String linkId = leave.linkId;
 		SpeedCounter sc = speedCounters.get(linkId);

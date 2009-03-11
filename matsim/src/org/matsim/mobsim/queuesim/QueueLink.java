@@ -313,7 +313,7 @@ public class QueueLink {
 		veh.getDriver().setCurrentLink(this.getLink());
 		QueueSimulation.getEvents().processEvent(
 				new LinkEnterEvent(now, veh.getDriver().getPerson(),
-						this.getLink(), veh.getCurrentLeg()));
+						this.getLink()));
 	}
 	
 	public void clearVehicles() {

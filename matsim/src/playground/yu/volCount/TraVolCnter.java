@@ -70,7 +70,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 		// TODO save entertime into agentTimer
 		String agentId = event.agentId;
 		if (!agentTimer.containsKey(agentId))
-			agentTimer.put(agentId, event.time);
+			agentTimer.put(agentId, event.getTime());
 		else
 			System.err
 					.println("error: a left link event of this agent dispears!");
@@ -86,7 +86,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 	public void handleEvent(LinkLeaveEvent event) {
 		String agentId = event.agentId;
 		if (agentTimer.containsKey(agentId)) {
-			for (int tbIdx = agentTimer.remove(agentId).intValue(); tbIdx <= event.time; tbIdx++) {
+			for (int tbIdx = agentTimer.remove(agentId).intValue(); tbIdx <= event.getTime(); tbIdx++) {
 				Integer vol = netVols.get(tbIdx);
 				if (vol == null)
 					vol = 0;

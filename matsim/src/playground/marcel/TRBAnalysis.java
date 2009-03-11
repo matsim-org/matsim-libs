@@ -88,7 +88,7 @@ public class TRBAnalysis implements AgentDepartureEventHandler, AgentArrivalEven
 	}
 
 	public void handleEvent(AgentDepartureEvent event) {
-		this.agentDepartures.put(event.agentId, Double.valueOf(event.time));
+		this.agentDepartures.put(event.agentId, Double.valueOf(event.getTime()));
 	}
 
 	public void reset(int iteration) {
@@ -97,7 +97,7 @@ public class TRBAnalysis implements AgentDepartureEventHandler, AgentArrivalEven
 
 	public void handleEvent(AgentArrivalEvent event) {
 		double depTime = this.agentDepartures.remove(event.agentId).doubleValue();
-		double travTime = event.time - depTime;
+		double travTime = event.getTime() - depTime;
 		int slot = getTimeSlot(depTime);
 		final Person person = this.population.getPerson(new IdImpl(event.agentId));
 		int modeSlot = getModeSlot(person);

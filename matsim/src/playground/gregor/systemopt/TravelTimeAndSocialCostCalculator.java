@@ -129,7 +129,7 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 
 		LinkInfo info = getLinkInfo(event.linkId);
 		AgentInfo aol = new AgentInfo();
-		aol.enterTime = event.time;
+		aol.enterTime = event.getTime();
 		aol.id = event.agentId;
 		info.agentsOnLink.add(aol);
 	}
@@ -137,7 +137,7 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 	public void handleEvent(final AgentDepartureEvent event) {
 		LinkInfo info = getLinkInfo(event.linkId);
 		AgentInfo aol = new AgentInfo();
-		aol.enterTime = event.time;
+		aol.enterTime = event.getTime();
 		aol.id = event.agentId;
 		info.agentsOnLink.add(aol);
 	}
@@ -148,13 +148,13 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 		
 		LinkInfo info = getLinkInfo(event.linkId);
 		AgentInfo aol = info.agentsOnLink.poll();
-		aol.exitTime = event.time;
+		aol.exitTime = event.getTime();
 		
-		if ((event.time - aol.enterTime) <= info.t_free) {
+		if ((event.getTime() - aol.enterTime) <= info.t_free) {
 			if (info.agentsLeftLink.size() > 0){
-				computeSocCost(info,event.linkId,event.time);
+				computeSocCost(info,event.linkId,event.getTime());
 			}
-			info.lastFSSlice = getTimeSlotIndex(event.time);
+			info.lastFSSlice = getTimeSlotIndex(event.getTime());
 		} else {
 			info.agentsLeftLink.add(aol);
 		}

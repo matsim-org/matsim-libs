@@ -172,17 +172,17 @@ public class BetaTravelTest extends MatsimTestCase {
 
 		public void handleEvent(final LinkEnterEvent event) {
 			if (event.linkId.equals(this.linkId)) {
-				this.enterTimes.add(Double.valueOf(event.time));
-				if (event.time < this.firstCarEnter) this.firstCarEnter = event.time;
-				if (event.time > this.lastCarEnter) this.lastCarEnter = event.time;
+				this.enterTimes.add(Double.valueOf(event.getTime()));
+				if (event.getTime() < this.firstCarEnter) this.firstCarEnter = event.getTime();
+				if (event.getTime() > this.lastCarEnter) this.lastCarEnter = event.getTime();
 			}
 		}
 
 		public void handleEvent(final LinkLeaveEvent event) {
 			if (event.linkId.equals(this.linkId)) {
-				this.leaveTimes.add(Double.valueOf(event.time));
-				if (event.time < this.firstCarLeave) this.firstCarLeave = event.time;
-				if (event.time > this.lastCarLeave) this.lastCarLeave = event.time;
+				this.leaveTimes.add(Double.valueOf(event.getTime()));
+				if (event.getTime() < this.firstCarLeave) this.firstCarLeave = event.getTime();
+				if (event.getTime() > this.lastCarLeave) this.lastCarLeave = event.getTime();
 			}
 		}
 
@@ -480,7 +480,7 @@ public class BetaTravelTest extends MatsimTestCase {
 
 		public void handleEvent(final AgentDepartureEvent event) {
 			if (!this.agentSeen.contains(event.agentId)) { // only store first departure
-				this.agentDepTimes.put(event.agentId, Double.valueOf(event.time));
+				this.agentDepTimes.put(event.agentId, Double.valueOf(event.getTime()));
 				this.agentSeen.add(event.agentId);
 			}
 		}
@@ -490,7 +490,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			Double depTime = this.agentDepTimes.remove(agentId);
 			if (depTime != null) {
 				this.depTimes[this.agentCounter] = depTime.doubleValue() / 3600.0;
-				this.arrTimes[this.agentCounter] = event.time / 3600.0;
+				this.arrTimes[this.agentCounter] = event.getTime() / 3600.0;
 				this.agentCounter++;
 			}
 		}

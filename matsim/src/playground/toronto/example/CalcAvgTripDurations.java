@@ -46,12 +46,12 @@ public class CalcAvgTripDurations implements AgentDepartureEventHandler, AgentAr
 	private int[] travelTimeCnt = new int[NUM_OF_HOURS];
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		this.agentDepartures.put(event.agentId, event.time);
+		this.agentDepartures.put(event.agentId, event.getTime());
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
 		double departureTime = this.agentDepartures.get(event.agentId);
-		double travelTime = event.time - departureTime;
+		double travelTime = event.getTime() - departureTime;
 		int hour = (int) (departureTime / 3600);
 		this.travelTimeSum[hour] += travelTime;
 		this.travelTimeCnt[hour]++;

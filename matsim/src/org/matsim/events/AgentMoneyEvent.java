@@ -39,7 +39,7 @@ public final class AgentMoneyEvent extends PersonEvent {
 
 	public static final String EVENT_TYPE = "agentMoney";
 
-	public final double amount;
+	private final double amount;
 
 	/**
 	 * Creates a new event describing that the given <tt>agent</tt> has <em>gained</em>
@@ -83,7 +83,11 @@ public final class AgentMoneyEvent extends PersonEvent {
 
 	@Override
 	public String toString() {
-		return getTimeString(this.time) + this.agentId + "\t\t\t0\t9\t" + EVENT_TYPE + "\t" + this.amount;
+		return getTimeString(this.getTime()) + this.agentId + "\t\t\t0\t9\t" + EVENT_TYPE + "\t" + this.amount;
+	}
+
+	public double getAmount() {
+		return amount;
 	}
 
 }

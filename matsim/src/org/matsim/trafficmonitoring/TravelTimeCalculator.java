@@ -100,7 +100,7 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void handleEvent(final LinkEnterEvent event) {
-		EnterEvent e = new EnterEvent(event.linkId, event.time);
+		EnterEvent e = new EnterEvent(event.linkId, event.getTime());
 		this.enterEvents.put(event.agentId, e);
 	}
 
@@ -109,7 +109,7 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 		if ((e != null) && e.linkId.equals(event.linkId)) {
 			if (event.link == null) event.link = this.network.getLink(new IdImpl(event.linkId));
 			if (event.link != null) {
-				this.aggregator.addTravelTime(getTravelTimeData(event.link, true),e.time,event.time);
+				this.aggregator.addTravelTime(getTravelTimeData(event.link, true),e.time,event.getTime());
 			}
 		}
 	}
@@ -124,9 +124,12 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	public void handleEvent(AgentStuckEvent event) {
 		EnterEvent e = this.enterEvents.remove(event.agentId);
 		if ((e != null) && e.linkId.equals(event.linkId)) {
-			if (event.link == null) event.link = this.network.getLink(new IdImpl(event.linkId));
-			if (event.link != null) {
-				this.aggregator.addStuckEventTravelTime(getTravelTimeData(event.link, true),e.time,event.time);
+			Link link = event.getLink();
+			if (link == null) {
+				link = this.network.getLink(new IdImpl(event.linkId));
+			}
+			if (link != null) {
+				this.aggregator.addStuckEventTravelTime(getTravelTimeData(link, true),e.time,event.getTime());
 			}
 		}
 	}

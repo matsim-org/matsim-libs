@@ -85,7 +85,7 @@ public class QVDiagramm implements LinkEnterEventHandler, LinkLeaveEventHandler,
 	public void handleEvent(final LinkEnterEvent event) {
 		// Store the enter time of this agent if it's on the link we're interested in.
 		if (this.linkId.equals(event.linkId)) {
-			this.agents.put(event.agentId, Double.valueOf(event.time));
+			this.agents.put(event.agentId, Double.valueOf(event.getTime()));
 		}
 	}
 
@@ -98,17 +98,17 @@ public class QVDiagramm implements LinkEnterEventHandler, LinkLeaveEventHandler,
 
 	public void handleEvent(final LinkLeaveEvent event) {
 		if (this.linkId.equals(event.linkId)) {
-			if ((int)event.time / this.binSize != this.timeBinIndex) {
+			if ((int)event.getTime() / this.binSize != this.timeBinIndex) {
 				// the event is from a new time bin, finish the old one.
 				this.updateGraphValues();
-				this.timeBinIndex = (int)event.time / this.binSize;
+				this.timeBinIndex = (int)event.getTime() / this.binSize;
 			}
 			// we have one more vehicle leaving this link
 			this.flowCount++;
 			Double enterTime = this.agents.remove(event.agentId);
 			if (enterTime == null) return;
 			// we have the enter time of this vehicle, calculate its speed.
-			double traveltime = event.time - enterTime.doubleValue();
+			double traveltime = event.getTime() - enterTime.doubleValue();
 			double speed = this.linkLength / traveltime * 3.6; // the speed in km/h
 			this.speedCnt++;
 			this.speedSum += speed;

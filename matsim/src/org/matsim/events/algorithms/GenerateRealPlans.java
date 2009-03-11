@@ -92,9 +92,9 @@ public class GenerateRealPlans implements ActStartEventHandler,
 
 	public void handleEvent(final AgentArrivalEvent event) {
 		Plan plan;
-		double time = event.time;
-		if (event.agent != null) {
-			plan = getPlanForPerson(event.agent);
+		double time = event.getTime();
+		if (event.getAgent() != null) {
+			plan = getPlanForPerson(event.getAgent());
 		} else {
 			plan = getPlanForPerson(event.agentId);
 		}
@@ -107,10 +107,10 @@ public class GenerateRealPlans implements ActStartEventHandler,
 	public void handleEvent(final AgentDepartureEvent event) {
 		Plan plan;
 		String agentId;
-		double time = event.time;
-		if (event.agent != null) {
-			plan = getPlanForPerson(event.agent);
-			agentId = event.agent.getId().toString();
+		double time = event.getTime();
+		if (event.getAgent() != null) {
+			plan = getPlanForPerson(event.getAgent());
+			agentId = event.getAgent().getId().toString();
 		} else {
 			plan = getPlanForPerson(event.agentId);
 			agentId = event.agentId;
@@ -132,15 +132,15 @@ public class GenerateRealPlans implements ActStartEventHandler,
 					Activity act = (Activity)(person.getSelectedPlan().getPlanElements().get(plan.getPlanElements().size()));
 					acttype = act.getType();
 				}
-				Activity a = plan.createAct(acttype, event.link);
+				Activity a = plan.createAct(acttype, event.getLink());
 				a.setStartTime(starttime);
 				a.setEndTime(endtime);
 				a.setDuration(endtime - starttime);
 			}
 
 			Leg leg;
-			if (event.leg != null) {
-				leg = plan.createLeg(event.leg.getMode());
+			if (event.getLeg() != null) {
+				leg = plan.createLeg(event.getLeg().getMode());
 				leg.setDepartureTime(time);
 			} else {
 				leg = plan.createLeg(BasicLeg.Mode.car); // maybe get the leg mode from oldplans if available?
@@ -156,12 +156,12 @@ public class GenerateRealPlans implements ActStartEventHandler,
 
 	public void handleEvent(final AgentStuckEvent event) {
 		Plan plan;
-		double time = event.time;
+		double time = event.getTime();
 		String agentId;
 		try {
-			if (event.agent != null) {
-				plan = getPlanForPerson(event.agent);
-				agentId = event.agent.getId().toString();
+			if (event.getAgent() != null) {
+				plan = getPlanForPerson(event.getAgent());
+				agentId = event.getAgent().getId().toString();
 			} else {
 				plan = getPlanForPerson(event.agentId);
 				agentId = event.agentId;
@@ -169,13 +169,13 @@ public class GenerateRealPlans implements ActStartEventHandler,
 			if (plan.getPlanElements().size() % 2 != 0) {
 				// not all agents must get stuck on a trip: if the simulation is ended early, some agents may still be doing some activity
 				// insert for those a dummy leg so we can safely create the stuck-act afterwards
-				Leg leg = plan.createLeg(event.leg.getMode());
+				Leg leg = plan.createLeg(event.getLeg().getMode());
 				leg.setDepartureTime(time);
 				leg.setTravelTime(0.0);
 				leg.setArrivalTime(time);
 				finishLeg(event.agentId, leg);
 			}
-			Link link = event.link;
+			Link link = event.getLink();
 			if (link == null) {
 				Plan oldPlan = getOldPlanForPerson(agentId);
 				int idx = plan.getPlanElements().size() - 2;
@@ -191,20 +191,20 @@ public class GenerateRealPlans implements ActStartEventHandler,
 
 	public void handleEvent(final ActStartEvent event) {
 		Plan plan;
-		if (event.agent != null) {
-			plan = getPlanForPerson(event.agent);
+		if (event.getAgent() != null) {
+			plan = getPlanForPerson(event.getAgent());
 		} else {
 			plan = getPlanForPerson(event.agentId);
 		}
 		try {
-			if (event.act == null) {
-				Activity a = plan.createAct("unknown", event.link);
-				a.setStartTime(event.time);
-				a.setEndTime(event.time);
+			if (event.getAct() == null) {
+				Activity a = plan.createAct("unknown", event.getLink());
+				a.setStartTime(event.getTime());
+				a.setEndTime(event.getTime());
 			} else {
-				Activity a = plan.createAct(event.act.getType(), event.act.getLink());
-				a.setStartTime(event.time);
-				a.setEndTime(event.time);
+				Activity a = plan.createAct(event.getAct().getType(), event.getAct().getLink());
+				a.setStartTime(event.getTime());
+				a.setEndTime(event.getTime());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -213,8 +213,8 @@ public class GenerateRealPlans implements ActStartEventHandler,
 
 	public void handleEvent(final ActEndEvent event) {
 		Plan plan;
-		if (event.agent != null) {
-			plan = getPlanForPerson(event.agent);
+		if (event.getAgent() != null) {
+			plan = getPlanForPerson(event.getAgent());
 		} else {
 			plan = getPlanForPerson(event.agentId);
 		}
@@ -222,12 +222,12 @@ public class GenerateRealPlans implements ActStartEventHandler,
 			// this is the first act that ends, we didn't get any ActStartEvent for that,
 			// so create this first activity now with an assumed start-time of midnight
 			try {
-				if (event.act == null) {
-					Activity a = plan.createAct("unknown", event.link);
-					a.setEndTime(event.time);
+				if (event.getAct() == null) {
+					Activity a = plan.createAct("unknown", event.getLink());
+					a.setEndTime(event.getTime());
 				} else {
-					Activity a = plan.createAct(event.act.getType(), event.act.getLink());
-					a.setEndTime(event.time);
+					Activity a = plan.createAct(event.getAct().getType(), event.getAct().getLink());
+					a.setEndTime(event.getTime());
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -235,8 +235,8 @@ public class GenerateRealPlans implements ActStartEventHandler,
 		}
 		try {
 			Activity act = (Activity)plan.getPlanElements().get(plan.getPlanElements().size() - 1);
-			act.setDuration(event.time - act.getStartTime());
-			act.setEndTime(event.time);
+			act.setDuration(event.getTime() - act.getStartTime());
+			act.setEndTime(event.getTime());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

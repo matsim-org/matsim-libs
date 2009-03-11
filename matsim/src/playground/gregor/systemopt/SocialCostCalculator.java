@@ -99,7 +99,7 @@ public class SocialCostCalculator  implements IterationStartsListener, AgentDepa
 	public void handleEvent(final LinkEnterEvent event) {
 		LinkInfo info = getLinkInfo(event.linkId);
 		AgentInfo aol = new AgentInfo();
-		aol.enterTime = event.time;
+		aol.enterTime = event.getTime();
 		aol.id = event.agentId;
 		info.agentsOnLink.add(aol);
 		
@@ -108,19 +108,19 @@ public class SocialCostCalculator  implements IterationStartsListener, AgentDepa
 	public void handleEvent(final LinkLeaveEvent event) {
 		LinkInfo info = getLinkInfo(event.linkId);
 		AgentInfo aol = info.agentsOnLink.poll();
-		aol.exitTime = event.time;
+		aol.exitTime = event.getTime();
 		info.agentsLeftLink.add(aol);
-		if ((event.time - aol.enterTime) <= info.t_free) {
+		if ((event.getTime() - aol.enterTime) <= info.t_free) {
 			while (info.agentsLeftLink.size() > 0) {
 				AgentInfo ai = info.agentsLeftLink.poll();
-				computeSocCost(info,event.linkId,ai,event.time);
+				computeSocCost(info,event.linkId,ai,event.getTime());
 			}
 		} 
 	}
 	public void handleEvent(final AgentDepartureEvent event) {
 		LinkInfo info = getLinkInfo(event.linkId);
 		AgentInfo aol = new AgentInfo();
-		aol.enterTime = event.time;
+		aol.enterTime = event.getTime();
 		aol.id = event.agentId;
 		info.agentsOnLink.add(aol);
 		

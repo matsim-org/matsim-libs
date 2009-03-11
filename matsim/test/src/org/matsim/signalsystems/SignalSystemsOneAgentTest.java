@@ -115,12 +115,12 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 	}
 
 	public void handleEvent(LinkEnterEvent e) {
-		log.info("LinkEnter: " + e.linkId + " time: " + e.time);
+		log.info("LinkEnter: " + e.linkId + " time: " + e.getTime());
 		if (e.link.getId().equals(id1)){
-			assertEquals(1.0, e.time, EPSILON);
+			assertEquals(1.0, e.getTime(), EPSILON);
 		}
 		else if (e.link.getId().equals(id2)){
-			assertEquals(38.0, e.time, EPSILON);
+			assertEquals(38.0, e.getTime(), EPSILON);
 		}
 	}
 

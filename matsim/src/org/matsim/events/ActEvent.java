@@ -32,10 +32,10 @@ abstract class ActEvent extends PersonEvent {
 	public static final String ATTRIBUTE_ACTTYPE = "actType";
 
 	public String linkId;
-	public String acttype;
+	private String acttype;
 
-	public transient Link link;
-	public transient Activity act;
+	private transient Link link;
+	private transient Activity act;
 
 	ActEvent(final double time, final Person agent, final Link link, final Activity act) {
 		super(time, agent);
@@ -61,7 +61,24 @@ abstract class ActEvent extends PersonEvent {
 	}
 
 	protected String asString() {
-		return getTimeString(this.time) + this.agentId + "\t\t"+ this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concat later
+		return getTimeString(this.getTime()) + this.agentId + "\t\t"+ this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concat later
+	}
+
+	public String getActType() {
+		return acttype;
+	}
+
+	@Deprecated // should be set in Constructor
+	public void setLink(Link link) {
+		this.link = link;
+	}
+
+	public Link getLink() {
+		return link;
+	}
+
+	public Activity getAct() {
+		return act;
 	}
 
 }

@@ -256,9 +256,9 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 
 	public void handleEvent(LinkEnterEvent event) { 
 		if(event.link.getId().toString().equals("4"))
-			riskyUsers.add(event.agent);
+			riskyUsers.add(event.getAgent());
 		else if(event.link.getId().toString().equals("5"))
-			safeUsers.add(event.agent);
+			safeUsers.add(event.getAgent());
 		
 	}
 
@@ -300,33 +300,33 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 	}
 	
 	public void handleEvent(AgentDepartureEvent event) {
-		if(event.link.getId().toString().equals("1"))
-			events.put(event.agent, event);
+		if(event.getLink().getId().toString().equals("1"))
+			events.put(event.getAgent(), event);
 		else
-			eventsReturn.put(event.agent, event);
+			eventsReturn.put(event.getAgent(), event);
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
-		AgentDepartureEvent e = events.get(event.agent);
+		AgentDepartureEvent e = events.get(event.getAgent());
 		if(e != null) {
-			events.remove(event.agent);
-			double triptime = event.time - e.time;
-			traveltimes.put(event.agent, triptime);
-			if (((CarRoute) ((Leg)event.agent.getSelectedPlan().getPlanElements().get(1)).getRoute()).getNodes().get(1).getId().toString().equals("3")) {
+			events.remove(event.getAgent());
+			double triptime = event.getTime() - e.getTime();
+			traveltimes.put(event.getAgent(), triptime);
+			if (((CarRoute) ((Leg)event.getAgent().getSelectedPlan().getPlanElements().get(1)).getRoute()).getNodes().get(1).getId().toString().equals("3")) {
 				riskyTriptime += triptime;
 				if(controler.getIteration() % 2 == 0) { //FIXME: needs to be consistent with IncidentGenerator!!!
 					// bad day
-					addTravelTime(riskyBadTripTimes, (int)e.time, triptime);
+					addTravelTime(riskyBadTripTimes, (int)e.getTime(), triptime);
 				} else {
 					// good day
-					addTravelTime(riskyGoodTripTimes, (int)e.time, triptime);
+					addTravelTime(riskyGoodTripTimes, (int)e.getTime(), triptime);
 				}
 				
 			} else
 				safeTriptime += triptime;
 			
-			if(controler.getGuidedPersons().contains(event.agent))
-				addTravelTime(guidedTripTimes, (int)e.time, triptime);
+			if(controler.getGuidedPersons().contains(event.getAgent()))
+				addTravelTime(guidedTripTimes, (int)e.getTime(), triptime);
 			
 			
 //			
@@ -340,10 +340,10 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			
 		}
 		
-		e = eventsReturn.get(event.agent);
+		e = eventsReturn.get(event.getAgent());
 		if(e != null) {
-			events.remove(event.agent);
-			double triptime = event.time - e.time;
+			events.remove(event.getAgent());
+			double triptime = event.getTime() - e.getTime();
 			returnTripTime += triptime;
 //			System.err.println(triptime);
 		}

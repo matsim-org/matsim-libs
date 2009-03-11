@@ -19,7 +19,7 @@ public class EventDepTimeFilter extends EventFilterA {
 	@Override
 	public boolean judge(BasicEvent event) {
 		if (event.getClass().equals(AgentDepartureEvent.class)) {
-			return (event.time<criterionMAX)&&(event.time>criterionMIN);
+			return (event.getTime()<criterionMAX)&&(event.getTime()>criterionMIN);
 		}
 		return isResult();
 	}

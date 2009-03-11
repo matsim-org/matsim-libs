@@ -240,10 +240,10 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		// count the agents on the route links
 
 		if (event.linkId.equals(this.firstLinkOnMainRoute)) {
-			this.enterEvents1.put(event.agentId, event.time);
+			this.enterEvents1.put(event.agentId, event.getTime());
 		}
 		else if (event.linkId.equals(this.firstLinkOnAlternativeRoute)) {
-			this.enterEvents2.put(event.agentId, event.time);
+			this.enterEvents2.put(event.agentId, event.getTime());
 		}
 
 		if (this.numberOfAgents.containsKey(event.linkId)) {
@@ -270,8 +270,8 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		if (event.linkId.equals(this.lastLinkOnMainRoute)) {
 			Double t1 = this.enterEvents1.remove(event.agentId);
 			if (t1 != null) {
-				double deltaT = event.time - t1;
-				this.ttMeasuredMainRoute.put(event.time, deltaT);
+				double deltaT = event.getTime() - t1;
+				this.ttMeasuredMainRoute.put(event.getTime(), deltaT);
 				if (deltaT >= 0) {
 					this.lastTimeMainRoute = deltaT;
 					timeDifferenceHasChanged = true;
@@ -285,8 +285,8 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		else if (event.linkId.equals(this.lastLinkOnAlternativeRoute)) {
 			Double t1 = this.enterEvents2.remove(event.agentId);
 			if (t1 != null) {
-				double deltaT = event.time - t1;
-				this.ttMeasuredAlternativeRoute.put(event.time, deltaT);
+				double deltaT = event.getTime() - t1;
+				this.ttMeasuredAlternativeRoute.put(event.getTime(), deltaT);
 				if (deltaT >= 0) {
 					this.lastTimeAlternativeRoute = deltaT;
 					timeDifferenceHasChanged = true;
@@ -364,14 +364,14 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 				.get(event.linkId);
 		if (list.size() == flowResolution) {
 			list.removeFirst();
-			list.addLast(event.time);
+			list.addLast(event.getTime());
 		}
 		else if ((1 < list.size()) || (list.size() < flowResolution)) {
-			list.add(event.time);
+			list.add(event.getTime());
 		}
 		else if (list.size() == 0) {
-			list.addLast(event.time - 1);
-			list.addLast(event.time);
+			list.addLast(event.getTime() - 1);
+			list.addLast(event.getTime());
 		}
 		else {
 			System.err
@@ -419,11 +419,11 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
 				.get(event.linkId);
 		// Remove times older than flowUpdateTime
-			while (!list.isEmpty() && ((list.getFirst() + flowUpdateTime) < event.time)) {
+			while (!list.isEmpty() && ((list.getFirst() + flowUpdateTime) < event.getTime())) {
 				list.removeFirst();
 			}
 		// Add new values
-		list.addLast(event.time);
+		list.addLast(event.getTime());
 
 		// Flow = agents / seconds:
 		double flow = (list.size() - 1) / (list.getLast() - list.getFirst());

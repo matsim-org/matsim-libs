@@ -28,7 +28,7 @@ public class AgentReplanEvent extends PersonEvent {
 
 	public static final String EVENT_TYPE = "replan";
 
-	public CarRoute replannedRoute;
+	private CarRoute replannedRoute;
 
 	public AgentReplanEvent(final double time, final String agentId, final CarRoute alternativeRoute) {
 		super(time, agentId);
@@ -46,11 +46,15 @@ public class AgentReplanEvent extends PersonEvent {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(Double.valueOf(this.time));
+		builder.append(Double.valueOf(this.getTime()));
 		builder.append(' ');
 		builder.append(this.agentId);
 
 		return builder.toString();
+	}
+
+	public CarRoute getReplannedRoute() {
+		return replannedRoute;
 	}
 
 }

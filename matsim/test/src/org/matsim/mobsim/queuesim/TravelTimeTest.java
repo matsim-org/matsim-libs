@@ -101,20 +101,20 @@ public class TravelTimeTest extends MatsimTestCase implements
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		Map<Id, Double> travelTimes = this.agentTravelTimes.get(event.agent.getId());
+		Map<Id, Double> travelTimes = this.agentTravelTimes.get(event.getAgent().getId());
 		if (travelTimes == null) {
 			travelTimes = new HashMap<Id, Double>();
-			this.agentTravelTimes.put(event.agent.getId(), travelTimes);
+			this.agentTravelTimes.put(event.getAgent().getId(), travelTimes);
 		}
-		travelTimes.put(event.link.getId(), Double.valueOf(event.time));
+		travelTimes.put(event.link.getId(), Double.valueOf(event.getTime()));
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		Map<Id, Double> travelTimes = this.agentTravelTimes.get(event.agent.getId());
+		Map<Id, Double> travelTimes = this.agentTravelTimes.get(event.getAgent().getId());
 		if (travelTimes != null) {
 			Double d = travelTimes.get(event.link.getId());
 			if (d != null) {
-				double time = event.time - d.doubleValue();
+				double time = event.getTime() - d.doubleValue();
 				travelTimes.put(event.link.getId(), Double.valueOf(time));
 			}
 		}

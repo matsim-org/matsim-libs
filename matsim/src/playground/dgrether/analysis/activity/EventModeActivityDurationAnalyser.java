@@ -129,12 +129,12 @@ public class EventModeActivityDurationAnalyser {
 			ActStartEvent startEvent = this.eventMap.get(new IdImpl(event.agentId));
 			Plan p = this.plans.getPerson(new IdImpl(event.agentId)).getSelectedPlan();
 			if (startEvent == null) { // must be the end of home_0
-				this.durTemp = event.time;
+				this.durTemp = event.getTime();
 			}
 			else {
-				this.durTemp = event.time - startEvent.time;
+				this.durTemp = event.getTime() - startEvent.getTime();
 			}
-			if (event.acttype.equalsIgnoreCase("h")) {
+			if (event.getActType().equalsIgnoreCase("h")) {
 				if (p.getType().equals(Plan.Type.CAR)) {
 					this.homeActivityDurationsCar += this.durTemp;
 					this.homeActivityCarCount++;
@@ -144,7 +144,7 @@ public class EventModeActivityDurationAnalyser {
 					this.homeActivityNonCarCount++;
 				}
 			}
-			else if (event.acttype.equalsIgnoreCase("w")) {
+			else if (event.getActType().equalsIgnoreCase("w")) {
 				if (p.getType().equals(Plan.Type.CAR)) {
 					this.workActivityDurationsCar += this.durTemp;
 					this.workActivityCarCount++;
@@ -159,12 +159,12 @@ public class EventModeActivityDurationAnalyser {
 		public void handleEvent(final ActStartEvent event) {
 			this.eventMap.put(new IdImpl(event.agentId), event);
 			Plan p = this.plans.getPerson(new IdImpl(event.agentId)).getSelectedPlan();
-			if (event.acttype.equalsIgnoreCase("w")) {
+			if (event.getActType().equalsIgnoreCase("w")) {
 				if (p.getType().equals(Plan.Type.PT)) {
-					this.ptStartTimeMap.incrementValue(event.time);
+					this.ptStartTimeMap.incrementValue(event.getTime());
 				}
 				else if (p.getType().equals(Plan.Type.CAR)) {
-					this.carStartTimeMap.incrementValue(event.time);
+					this.carStartTimeMap.incrementValue(event.getTime());
 			  }
 			}
 		}

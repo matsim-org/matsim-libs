@@ -29,7 +29,7 @@ public abstract class BasicEvent {
 
 	public final static String ATTRIBUTE_TYPE = "type";
 
-	public final double time;
+	private final double time;
 
 	private static String timeString = null;
 	private static double timeCache = Time.UNDEFINED_TIME;
@@ -70,6 +70,10 @@ public abstract class BasicEvent {
 			timeString = Long.toString((long) timeCache) + "\t";
 		}
 		return timeString;
+	}
+
+	public double getTime() {
+		return time;
 	}
 }
 

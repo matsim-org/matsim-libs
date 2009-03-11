@@ -396,7 +396,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		QueueVehicle veh = this.flowQueue.poll();
 
 		QueueSimulation.getEvents().processEvent(
-				new LinkLeaveEvent(now, veh.getDriver().getPerson(), this.realLink.getLink(), veh.getCurrentLeg()));
+				new LinkLeaveEvent(now, veh.getDriver().getPerson(), this.realLink.getLink()));
 
 		return veh;
 	}

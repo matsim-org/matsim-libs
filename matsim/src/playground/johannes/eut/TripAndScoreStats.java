@@ -182,7 +182,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 	}
 	
 	public void handleEvent(AgentWait2LinkEvent event) {
-		departures.put(event.agent, event.time);
+		departures.put(event.getAgent(), event.getTime());
 	}
 
 	public void reset(int iteration) {
@@ -191,11 +191,11 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
-		Double time = departures.get(event.agent);
+		Double time = departures.get(event.getAgent());
 		if(time != null) {
-			double deltaT = event.time - time;
-			tripDurations.put(event.agent, deltaT); // TODO: Does not work with round trips!
-			departures.remove(event.agent);
+			double deltaT = event.getTime() - time;
+			tripDurations.put(event.getAgent(), deltaT); // TODO: Does not work with round trips!
+			departures.remove(event.getAgent());
 		}
 		
 	}

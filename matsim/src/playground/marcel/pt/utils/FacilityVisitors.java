@@ -46,28 +46,28 @@ public class FacilityVisitors implements ActEndEventHandler, ActStartEventHandle
 	private final Map<Facility, Map<String, List<Person>>> facilities = new HashMap<Facility, Map<String, List<Person>>>();
 
 	public void handleEvent(final ActStartEvent event) {
-		Facility facility = event.act.getFacility();
+		Facility facility = event.getAct().getFacility();
 		if (facility != null) {
 			Map<String, List<Person>> actTypes = this.facilities.get(facility);
 			if (actTypes == null) {
 				actTypes = new HashMap<String, List<Person>>();
 				this.facilities.put(facility, actTypes);
 			}
-			List<Person> persons = actTypes.get(event.act.getType());
+			List<Person> persons = actTypes.get(event.getAct().getType());
 			if (persons == null) {
 				persons = new LinkedList<Person>();
-				actTypes.put(event.act.getType(), persons);
+				actTypes.put(event.getAct().getType(), persons);
 			}
-			persons.add(event.agent);
+			persons.add(event.getAgent());
 		}
 	}
 
 	public void handleEvent(final ActEndEvent event) {
-		Facility facility = event.act.getFacility();
+		Facility facility = event.getAct().getFacility();
 		if (facility != null) {
-			List<Person> persons = this.facilities.get(facility).get(event.act.getType());
+			List<Person> persons = this.facilities.get(facility).get(event.getAct().getType());
 			if (persons != null) {
-				persons.remove(event.agent);
+				persons.remove(event.getAgent());
 			}
 		}
 	}

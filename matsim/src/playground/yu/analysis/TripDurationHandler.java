@@ -73,11 +73,11 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		this.tmpDptTimes.put(event.agentId, event.time);
+		this.tmpDptTimes.put(event.agentId, event.getTime());
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		double time = event.time;
+		double time = event.getTime();
 		String agentId = event.agentId;
 		Double dptTime = this.tmpDptTimes.get(agentId);
 		if (dptTime != null) {
@@ -86,13 +86,13 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 			this.arrCount++;
 			this.tmpDptTimes.remove(agentId);
 
-			if (event.agent == null) {
+			if (event.getAgent() == null) {
 				// rebuild event
-				event.agent = this.plans.getPerson(new IdImpl(event.agentId));
+				event.setAgent(this.plans.getPerson(new IdImpl(event.agentId)));
 			}
 
 			// Type planType = event.agent.getSelectedPlan().getType();d
-			Plan selectedPlan = event.agent.getSelectedPlan();
+			Plan selectedPlan = event.getAgent().getSelectedPlan();
 			if (
 			// planType != null && Plan.Type.UNDEFINED != planType
 			!PlanModeJudger.useUndefined(selectedPlan)) {

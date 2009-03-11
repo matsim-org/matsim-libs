@@ -218,14 +218,14 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 
 	public void handleEvent(final LinkEnterEvent event) {
 		EnterEvent e = new EnterEvent(event.linkId, event.agentId);
-		this.enterEvents.put(e, event.time);
+		this.enterEvents.put(e, event.getTime());
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
 		EnterEvent e = new EnterEvent(event.linkId, event.agentId);
 		Double starttime = this.enterEvents.remove(e);
 		if (starttime != null) {
-			double timediff = event.time - starttime.intValue();
+			double timediff = event.getTime() - starttime.intValue();
 			if (timediff < 0) {
 				Gbl.errorMsg("");
 			}

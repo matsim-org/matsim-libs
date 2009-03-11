@@ -63,7 +63,7 @@ public class TimeWriter implements AgentDepartureEventHandler,
 	 */
 	public void handleEvent(final AgentDepartureEvent event) {
 		if (!this.agentDepTimes.containsKey(event.agentId)) { // only store first departure
-			agentDepTimes.put(event.agentId, event.time);
+			agentDepTimes.put(event.agentId, event.getTime());
 		}
 	}
 
@@ -79,7 +79,7 @@ public class TimeWriter implements AgentDepartureEventHandler,
 			int depH = depT / 3600;
 			int depMin = (depT - depH * 3600) / 60;
 			int depSec = depT - depH * 3600 - depMin * 60;
-			int time = (int) event.time;
+			int time = (int) event.getTime();
 			arrTimes.add((double) time);
 			int h = time / 3600;
 			int min = (time - h * 3600) / 60;

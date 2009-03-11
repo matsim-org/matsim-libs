@@ -31,7 +31,7 @@ public abstract class PersonEvent extends BasicEvent {
 
 	public static final String ATTRIBUTE_AGENT = "agent";
 
-	public Person agent;
+	private Person agent;
 	public final String agentId;
 
 	public PersonEvent(final double time, final Person person) {
@@ -50,6 +50,15 @@ public abstract class PersonEvent extends BasicEvent {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_AGENT, this.agentId);
 		return attr;
+	}
+
+	@Deprecated // should be set via Constructor...
+	public void setAgent(Person agent) {
+		this.agent = agent;
+	}
+
+	public Person getAgent() {
+		return agent;
 	}
 
 }

@@ -177,22 +177,22 @@ public class TravelTimeOneWayTest extends MatsimTestCase implements
 		// log.info("link enter event id :" + event.linkId);
 		if (event.linkId.equalsIgnoreCase("2")) {
 			if (this.beginningOfLink2 == null) {
-				this.beginningOfLink2 = new MeasurementPoint(event.time
+				this.beginningOfLink2 = new MeasurementPoint(event.getTime()
 						+ TravelTimeOneWayTest.timeToWaitBeforeMeasure);
 			}
 
 			this.beginningOfLink2.numberOfVehPassed++;
 
-			if (this.beginningOfLink2.timeToStartMeasurement <= event.time) {
+			if (this.beginningOfLink2.timeToStartMeasurement <= event.getTime()) {
 
 				if (this.beginningOfLink2.firstVehPassTime_s == -1) {
-					this.beginningOfLink2.firstVehPassTime_s = event.time;
+					this.beginningOfLink2.firstVehPassTime_s = event.getTime();
 				}
 
-				if (event.time < this.beginningOfLink2.timeToStartMeasurement
+				if (event.getTime() < this.beginningOfLink2.timeToStartMeasurement
 						+ MeasurementPoint.timeToMeasure_s) {
 					this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure++;
-					this.beginningOfLink2.lastVehPassTime_s = event.time;
+					this.beginningOfLink2.lastVehPassTime_s = event.getTime();
 				}
 			}
 		}

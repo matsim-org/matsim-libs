@@ -243,7 +243,7 @@ public class EventFilesEvacuationTimeCompare {
 
 		public void handleEvent(final AgentDepartureEvent event) {
 			AgentInfo ai = new AgentInfo();
-			ai.time = event.time;
+			ai.time = event.getTime();
 			Link link = EventFilesEvacuationTimeCompare.this.network.getLink(event.linkId);
 			ai.c = new Coordinate(link.getCoord().getX(),link.getCoord().getY());
 			this.ttimes.put(event.agentId, ai);
@@ -257,7 +257,7 @@ public class EventFilesEvacuationTimeCompare {
 
 		public void handleEvent(final AgentArrivalEvent event) {
 			AgentInfo ai = this.ttimes.get(event.agentId);
-			ai.time = event.time - ai.time;
+			ai.time = event.getTime() - ai.time;
 			this.ttimesTree.put(ai.c.x, ai.c.y, ai);
 			
 		}

@@ -38,7 +38,7 @@ public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEvent
 		startList.add(event);
 		startMap.remove(person);
 		startMap.put(person,startList);
-		if(event.time>=maxtime) maxtime=event.time;
+		if(event.getTime()>=maxtime) maxtime=event.getTime();
 	}
 
 	public void reset(int iteration) {
@@ -58,7 +58,7 @@ public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEvent
 		endList.add(event);
 		endMap.remove(person);
 		endMap.put(person,endList);
-		if(event.time>=maxtime) maxtime=event.time;
+		if(event.getTime()>=maxtime) maxtime=event.getTime();
 	}
 	public double getMaxTime(){
 		return maxtime;

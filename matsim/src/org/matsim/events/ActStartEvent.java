@@ -43,7 +43,7 @@ public class ActStartEvent extends ActEvent {
 
 	@Override
 	public String toString() {
-		return asString() + "7\t" + EVENT_TYPE + " " + this.acttype;
+		return asString() + "7\t" + EVENT_TYPE + " " + this.getActType();
 	}
 
 }

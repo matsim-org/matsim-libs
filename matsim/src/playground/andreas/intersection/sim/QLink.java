@@ -107,7 +107,7 @@ public class QLink extends QueueLink {
 		this.originalLink.addVehicle(veh);
 
 		QueueSimulation.getEvents().processEvent(
-				new LinkEnterEvent(now, veh.getDriver().getPerson(), this.getLink(), veh.getCurrentLeg()));
+				new LinkEnterEvent(now, veh.getDriver().getPerson(), this.getLink()));
 	}
 
 	public List<PseudoLink> getNodePseudoLinks(){

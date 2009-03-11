@@ -84,32 +84,32 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		testForSnapshot(event.time);
+		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.linkId).departure(getEventAgent(event));
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		testForSnapshot(event.time);
+		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.linkId).arrival(getEventAgent(event));
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
-		testForSnapshot(event.time);
+		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.linkId).enter(getEventAgent(event));
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
-		testForSnapshot(event.time);
+		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.linkId).leave(getEventAgent(event));
 	}
 
 	public void handleEvent(final AgentWait2LinkEvent event) {
-		testForSnapshot(event.time);
+		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.linkId).wait2link(getEventAgent(event));
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		testForSnapshot(event.time);
+		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.linkId).stuck(getEventAgent(event));
 	}
 
@@ -125,10 +125,10 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	private EventAgent getEventAgent(final PersonEvent event) {
 		EventAgent agent = this.eventAgents.get(event.agentId);
 		if (agent == null) {
-			agent = new EventAgent(event.agentId, event.time);
+			agent = new EventAgent(event.agentId, event.getTime());
 			this.eventAgents.put(event.agentId, agent);
 		}
-		agent.time = event.time;
+		agent.time = event.getTime();
 		return agent;
 	}
 

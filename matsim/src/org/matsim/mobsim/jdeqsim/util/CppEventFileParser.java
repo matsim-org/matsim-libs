@@ -106,7 +106,7 @@ public class CppEventFileParser {
 			CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 			return false;
 		}
-		if (personEvent.time != deqSimEvent.getTime()) {
+		if (personEvent.getTime() != deqSimEvent.getTime()) {
 			CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 			return false;
 		}

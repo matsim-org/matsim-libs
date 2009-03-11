@@ -122,7 +122,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 
 
 	public void handleEvent(final LinkEnterEvent event) {
-		double time = event.time;
+		double time = event.getTime();
 		if (time > this.oldTime + SNAPSHOT_PERIOD) {
 			this.oldTime = time;
 			doSnapshot();

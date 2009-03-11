@@ -30,7 +30,7 @@ public class AgentWait2LinkEventTest extends MatsimTestCase {
 	public void testWriteReadXml() {
 		final AgentWait2LinkEvent event1 = new AgentWait2LinkEvent(8463.7301, "483", "783");
 		final AgentWait2LinkEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
-		assertEquals(event1.time, event2.time, EPSILON);
+		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
 		assertEquals(event1.agentId, event2.agentId);
 		assertEquals(event1.linkId, event2.linkId);
 	}

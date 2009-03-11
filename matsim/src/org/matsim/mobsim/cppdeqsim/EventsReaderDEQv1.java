@@ -134,7 +134,7 @@ public class EventsReaderDEQv1 {
 			earliestEvent = readers[0].event;
 			for (int i = 1; i < nofReaders; i++) {
 				// test if reader i has an earlier event
-				if (readers[i].event.time < earliestEvent.time) {
+				if (readers[i].event.getTime() < earliestEvent.getTime()) {
 					idxEarliestEvent = i;
 					earliestEvent = readers[i].event;
 				}

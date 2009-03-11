@@ -28,7 +28,7 @@ public class AgentStuckEvent extends AgentEvent {
 
 	public static final String EVENT_TYPE = "stuckAndAbort";
 
-public AgentStuckEvent(final double time, final Person agent, final Link link, final Leg leg) {
+	public AgentStuckEvent(final double time, final Person agent, final Link link, final Leg leg) {
 		super(time, agent, link, leg);
 	}
 

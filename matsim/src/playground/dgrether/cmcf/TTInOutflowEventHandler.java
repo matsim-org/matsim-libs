@@ -66,14 +66,14 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	public void handleEvent(LinkEnterEvent event) {
 		Id id = new IdImpl(event.linkId);
 		if (linkIdIn.equals(id)) {
-			Integer in = getInflowMap().get(event.time);
+			Integer in = getInflowMap().get(event.getTime());
 			if (in == null) {
 				in = Integer.valueOf(1);
-			  getInflowMap().put(event.time, in);
+			  getInflowMap().put(event.getTime(), in);
 			}
 			else {
 				in = Integer.valueOf(in.intValue() + 1);
-			  getInflowMap().put(event.time, in);
+			  getInflowMap().put(event.getTime(), in);
 			}
 			this.enterEvents.put(new IdImpl(event.agentId), event);
 		}
@@ -83,25 +83,25 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	public void handleEvent(LinkLeaveEvent event) {
 		Id id = new IdImpl(event.linkId);
 		if (linkIdOut.equals(id)) {
-			Integer out = getOutflowMap().get(event.time);
+			Integer out = getOutflowMap().get(event.getTime());
 			if (out == null) {
 				out = Integer.valueOf(1);
-				getOutflowMap().put(event.time, out);
+				getOutflowMap().put(event.getTime(), out);
 			}
 			else {
 				out = Integer.valueOf(out.intValue() + 1);
-				getOutflowMap().put(event.time, out);
+				getOutflowMap().put(event.getTime(), out);
 			}
 			
 			LinkEnterEvent enterEvent = this.enterEvents.get(new IdImpl(event.agentId));
-			double tt = event.time - enterEvent.time;
-			Double ttravel = getTravelTimesMap().get(enterEvent.time);
+			double tt = event.getTime() - enterEvent.getTime();
+			Double ttravel = getTravelTimesMap().get(enterEvent.getTime());
 			if (ttravel == null) {
-				getTravelTimesMap().put(Double.valueOf(enterEvent.time), Double.valueOf(tt));
+				getTravelTimesMap().put(Double.valueOf(enterEvent.getTime()), Double.valueOf(tt));
 			}
 			else {
 				ttravel = Double.valueOf(((ttravel.doubleValue() * (out.doubleValue() - 1)) + tt) / out.doubleValue());
-				getTravelTimesMap().put(Double.valueOf(enterEvent.time), ttravel);
+				getTravelTimesMap().put(Double.valueOf(enterEvent.getTime()), ttravel);
 			}
 		}
 	}

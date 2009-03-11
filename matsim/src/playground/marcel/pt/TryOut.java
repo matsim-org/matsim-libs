@@ -145,8 +145,8 @@ public class TryOut {
 
 		// - bus crosses node 3
 		busDriver.leaveCurrentLink();//link1
-		new LinkLeaveEvent(7.27*3600, null/*bus*/, link1, null/*leg*/);
-		new LinkEnterEvent(7.27*3600, null/*bus*/, link3, null/*leg*/);
+		new LinkLeaveEvent(7.27*3600, null/*bus*/, link1);
+		new LinkEnterEvent(7.27*3600, null/*bus*/, link3);
 		busDriver.enterNextLink();//link3
 
 		// - bus arrives at stop2

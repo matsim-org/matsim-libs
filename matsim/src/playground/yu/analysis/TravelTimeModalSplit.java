@@ -100,7 +100,7 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		this.tmpDptTimes.put(event.agentId, event.time);
+		this.tmpDptTimes.put(event.agentId, event.getTime());
 	}
 
 	public void reset(final int iteration) {
@@ -116,7 +116,7 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 	}
 
 	private void handleEventIntern(final AgentEvent ae) {
-		double time = ae.time;
+		double time = ae.getTime();
 		String agentId = ae.agentId;
 		Double dptTime = this.tmpDptTimes.get(agentId);
 		if (dptTime != null) {
@@ -126,11 +126,11 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 			this.arrCount[binIdx]++;
 			this.tmpDptTimes.remove(agentId);
 
-			if (ae.agent == null) {
-				ae.agent = this.plans.getPerson(new IdImpl(ae.agentId));
+			if (ae.getAgent() == null) {
+				ae.setAgent(this.plans.getPerson(new IdImpl(ae.agentId)));
 			}
 
-			Plan selectedplan = ae.agent.getSelectedPlan();
+			Plan selectedplan = ae.getAgent().getSelectedPlan();
 			if (!PlanModeJudger.useUndefined(selectedplan)) {
 				if (PlanModeJudger.useCar(selectedplan)) {
 					this.carTravelTimes[binIdx] += travelTime;

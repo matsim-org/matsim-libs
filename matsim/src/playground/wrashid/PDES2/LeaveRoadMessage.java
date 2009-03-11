@@ -47,7 +47,7 @@ public class LeaveRoadMessage extends EventMessage {
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.LEAVE_LINK)){
 			
-			event=new LinkLeaveEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson(),road.getLink(),vehicle.getCurrentLeg());
+			event=new LinkLeaveEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson(),road.getLink());
 			if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820")){
 				System.out.println(event.toString());
 			}

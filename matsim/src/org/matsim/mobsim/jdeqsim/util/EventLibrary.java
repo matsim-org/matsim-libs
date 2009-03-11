@@ -22,9 +22,9 @@ public class EventLibrary {
 		for (int i = 0; i < events.size(); i++) {
 			if (Integer.parseInt(events.get(i).agentId) == agentId) {
 				if (events.get(i) instanceof AgentDepartureEvent) {
-					startLegTime = events.get(i).time;
+					startLegTime = events.get(i).getTime();
 				} else if (events.get(i) instanceof AgentArrivalEvent) {
-					travelTime += events.get(i).time - startLegTime;
+					travelTime += events.get(i).getTime() - startLegTime;
 				}
 			}
 		}
@@ -45,16 +45,16 @@ public class EventLibrary {
 		for (int i = 0; i < events.size(); i++) {
 			currentEvent = events.get(i);
 			if (currentEvent instanceof AgentDepartureEvent) {
-				if (currentEvent.time < 0) {
+				if (currentEvent.getTime() < 0) {
 					// the problem is, that some agent departure events are
 					// negative.
 					// this solves this problem
 					startingTime.put(currentEvent.agentId, 0.0);
 				} else {
-					startingTime.put(currentEvent.agentId, currentEvent.time);
+					startingTime.put(currentEvent.agentId, currentEvent.getTime());
 				}
 			} else if (currentEvent instanceof AgentArrivalEvent) {
-				travelTime += currentEvent.time
+				travelTime += currentEvent.getTime()
 						- startingTime.get(currentEvent.agentId);
 			}
 		}

@@ -22,7 +22,6 @@ package org.matsim.events;
 
 import java.util.Map;
 
-import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 
@@ -33,13 +32,11 @@ public abstract class LinkEvent extends PersonEvent {
 
 	public String linkId;
 	public transient Link link;
-	public Leg leg = null;
 
-	LinkEvent(final double time, final Person agent, final Link link, final Leg leg) {
+	LinkEvent(final double time, final Person agent, final Link link) {
 		super(time, agent);
 		this.link = link;
 		this.linkId = link.getId().toString();
-		this.leg = leg;
 	}
 
 	LinkEvent(final double time, final String agentId, final String linkId) {
@@ -55,7 +52,7 @@ public abstract class LinkEvent extends PersonEvent {
 	}
 
 	protected String asString() {
-		return getTimeString(this.time) + this.agentId + "\t\t" + this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concatenate later
+		return getTimeString(this.getTime()) + this.agentId + "\t\t" + this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concatenate later
 	}
 
 }

@@ -92,12 +92,12 @@ public class ActEndReplanner implements ActEndEventHandler {
 		// TODO Auto-generated method stub
 
 		// If replanning flag is set in the Person
-		boolean replanning = (Boolean)event.agent.getCustomAttributes().get("endActivityReplanning");
+		boolean replanning = (Boolean)event.getAgent().getCustomAttributes().get("endActivityReplanning");
 		if(replanning) 
 		{
-			this.time = event.time;
-			this.person = event.agent;
-			this.fromAct = event.act;
+			this.time = event.getTime();
+			this.person = event.getAgent();
+			this.fromAct = event.getAct();
 			
 			Plan plan = person.getSelectedPlan();
 			this.betweenLeg = plan.getNextLeg(fromAct);

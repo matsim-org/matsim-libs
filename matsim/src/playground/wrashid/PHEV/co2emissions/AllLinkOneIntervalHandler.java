@@ -38,7 +38,7 @@ public class AllLinkOneIntervalHandler implements LinkLeaveEventHandler {
 	
 	public void handleEvent(LinkLeaveEvent event) {
 		// only the events in the given interval are considered
-		if (event.time<intervalStart  || event.time>intervalEnd){
+		if (event.getTime()<intervalStart  || event.getTime()>intervalEnd){
 			return;
 		}
 		

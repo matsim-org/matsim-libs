@@ -69,7 +69,7 @@ public class LegDistance implements LinkEnterEventHandler,
 	}
 
 	protected void handleEventIntern(AgentEvent ae) {
-		int binIdx = getBinIndex(ae.time);
+		int binIdx = getBinIndex(ae.getTime());
 		Double distance = this.distances.remove(ae.agentId);
 		if (distance != null) {
 			this.legDistances[binIdx] += distance;

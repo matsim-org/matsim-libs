@@ -267,7 +267,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 		// Must be done before super.handleEvent as that removes entries
 		if (this.ttMeasured.containsKey(event.linkId)) {
-			this.enterLinkEvents.put(event.agentId, event.time);
+			this.enterLinkEvents.put(event.agentId, event.getTime());
 		}
 
 		// handle flows on outLinks
@@ -290,7 +290,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		if (this.ttMeasured.containsKey(event.linkId)
 				&& (this.enterLinkEvents.get(event.agentId) != null)) {
 			Double enterTime = this.enterLinkEvents.remove(event.agentId);
-			Double travelTime = event.time - enterTime;
+			Double travelTime = event.getTime() - enterTime;
 			this.ttMeasured.put(event.linkId, travelTime);
 		}
 

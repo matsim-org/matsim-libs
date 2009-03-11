@@ -59,7 +59,7 @@ public class CalcODMatrices implements AgentArrivalEventHandler, AgentDepartureE
 	//////////////////////////////////////////////////////////////////////
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		double time = event.time;
+		double time = event.getTime();
 		if ((time < this.minTime) || (time >= this.maxTime)) {
 			return;
 		}
@@ -72,7 +72,7 @@ public class CalcODMatrices implements AgentArrivalEventHandler, AgentDepartureE
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		double time = event.time;
+		double time = event.getTime();
 		if (time < this.minTime) {
 			return;
 		}

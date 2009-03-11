@@ -53,7 +53,7 @@ public class CalcAvgTripLengthPerHour implements AgentDepartureEventHandler, Age
 	}
 	
 	public void handleEvent(final AgentDepartureEvent event) {
-		this.travelStartPerAgent.put(event.agentId.intern(), event.time);
+		this.travelStartPerAgent.put(event.agentId.intern(), event.getTime());
 		this.travelDistancePerAgent.put(event.agentId.intern(), 0.0);
 	}
 	

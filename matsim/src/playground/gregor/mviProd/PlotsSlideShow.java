@@ -103,14 +103,14 @@ public class PlotsSlideShow implements AgentArrivalEventHandler  {
 	public void handleEvent(final AgentArrivalEvent event) {
 		this.evacuated++;
 		if (this.time == 0) {
-			this.offset = (int)event.time;
+			this.offset = (int)event.getTime();
 			this.time = 1;
 			addDataPoint();
 		}
 		
 		
-		if ((event.time -this.offset)> this.time && ((int)(event.time-this.offset) % RESOLUTION == 0)){
-			this.time = (int) event.time - this.offset;
+		if ((event.getTime() -this.offset)> this.time && ((int)(event.getTime()-this.offset) % RESOLUTION == 0)){
+			this.time = (int) event.getTime() - this.offset;
 			addDataPoint();
 		}
 	}

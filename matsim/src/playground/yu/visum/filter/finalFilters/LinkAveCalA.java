@@ -127,8 +127,8 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 						.equals(((LinkLeaveEvent) event).linkId)) {
 					count();
 					count();
-					compute(this.enters.remove(agentId), event.time);
-					timeBinReg((long) (event.time / 900));
+					compute(this.enters.remove(agentId), event.getTime());
+					timeBinReg((long) (event.getTime() / 900));
 				}
 		}
 	}

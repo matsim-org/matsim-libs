@@ -53,7 +53,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Agent
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
-		Cost cost = this.scheme.getLinkCost(new IdImpl(event.linkId), event.time);
+		Cost cost = this.scheme.getLinkCost(new IdImpl(event.linkId), event.getTime());
 		if (cost != null) {
 			Link link = event.link;
 			if (link == null) {

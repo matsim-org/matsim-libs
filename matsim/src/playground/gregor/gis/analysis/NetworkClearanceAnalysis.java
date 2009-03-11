@@ -228,7 +228,7 @@ public class NetworkClearanceAnalysis {
 			PolygonInfo pi = this.linkMapping.get(event.linkId);
 			pi.agents--;
 			if (pi.agents <= 1 && pi.clearanceTime == 0) {
-				pi.clearanceTime = event.time;
+				pi.clearanceTime = event.getTime();
 			}
 
 		}

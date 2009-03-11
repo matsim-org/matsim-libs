@@ -36,18 +36,18 @@ public class MyEventHandler implements LinkEnterEventHandler,
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		this.travelTime -= event.time;
+		this.travelTime -= event.getTime();
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		this.travelTime += event.time;
+		this.travelTime += event.getTime();
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
-		this.travelTime += event.time;
+		this.travelTime += event.getTime();
 	}
 
 	public void handleEvent(AgentDepartureEvent event) {
-		this.travelTime -= event.time;
+		this.travelTime -= event.getTime();
 	}
 }

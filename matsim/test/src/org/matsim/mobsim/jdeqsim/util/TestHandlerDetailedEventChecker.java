@@ -51,17 +51,17 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 		for (LinkedList<PersonEvent> list : events.values()) {
 			lastTimeStamp = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < list.size(); i++) {
-				if (lastTimeStamp > list.get(i).time) {
+				if (lastTimeStamp > list.get(i).getTime()) {
 					for (int j = 0; j < list.size(); j++) {
 						System.out.println(list.get(j).toString());
 					}
 					System.out.println(lastTimeStamp);
-					System.out.println(list.get(i).time);
+					System.out.println(list.get(i).getTime());
 					fail("Messages are not arriving in a consistent manner.");
 				}
 
-				assertTrue(lastTimeStamp <= list.get(i).time);
-				lastTimeStamp = list.get(i).time;
+				assertTrue(lastTimeStamp <= list.get(i).getTime());
+				lastTimeStamp = list.get(i).getTime();
 			}
 		}
 

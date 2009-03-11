@@ -22,9 +22,9 @@ public class ComparableEvent implements Comparable {
 		// for events with same time stamp: leave < arrival < departure < enter
 		public int compareTo(Object obj) {
 			ComparableEvent otherEvent= (ComparableEvent) obj;
-			if (basicEvent.time<otherEvent.getBasicEvent().time){
+			if (basicEvent.getTime()<otherEvent.getBasicEvent().getTime()){
 				return -1;
-			} else if (basicEvent.time>otherEvent.getBasicEvent().time){
+			} else if (basicEvent.getTime()>otherEvent.getBasicEvent().getTime()){
 				return 1;
 			}
 			// for equal time: use the following order

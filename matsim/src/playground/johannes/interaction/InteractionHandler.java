@@ -54,14 +54,14 @@ public class InteractionHandler implements ActStartEventHandler,
 	}
 	
 	public void handleEvent(ActStartEvent event) {
-		Facility f = event.act.getFacility();
+		Facility f = event.getAct().getFacility();
 		PhysicalFacility pf = facilities.get(f);
 		if(pf == null) {
 			pf = new PhysicalFacility();
 			facilities.put(f, pf);
 		}
 		
-		pf.enterPerson(event.agent, event.time);
+		pf.enterPerson(event.getAgent(), event.getTime());
 	}
 
 	public void reset(int iteration) {
@@ -71,13 +71,13 @@ public class InteractionHandler implements ActStartEventHandler,
 	}
 
 	public void handleEvent(ActEndEvent event) {
-		Facility f = event.act.getFacility();
+		Facility f = event.getAct().getFacility();
 		PhysicalFacility pf = facilities.get(f);
 		
 		if(pf == null)
 			throw new RuntimeException("Tried to remove a visitor from a non-existing physical facility!");
 		else {
-			pf.leavePerson(event.agent, event.time);
+			pf.leavePerson(event.getAgent(), event.getTime());
 		}
 
 	}

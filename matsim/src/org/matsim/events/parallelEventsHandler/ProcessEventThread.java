@@ -66,9 +66,8 @@ public class ProcessEventThread implements Runnable {
 			if (nextEvent != null) {
 				if (nextEvent instanceof LastEventOfIteration) {
 					break;
-				} else {
-					events.processEvent(nextEvent);
 				}
+				events.processEvent(nextEvent);
 			}
 		}
 		// inform main thread, that processing finished

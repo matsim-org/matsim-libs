@@ -59,8 +59,8 @@ public class AveTraSpeCal extends LinkAveCalA {
 		try {
 			LinkEnterEvent event = rebuildEventLinkEnter(enter);
 			computeInside(event.link.getLength()
-					/ (leaveTime - enter.time), event.linkId,
-					(long)(enter.time / 900));
+					/ (leaveTime - enter.getTime()), event.linkId,
+					(long)(enter.getTime() / 900));
 		} catch (NullPointerException e) {
 //			System.err.println(e);
 		}

@@ -64,12 +64,12 @@ public class MakeTimeWindowsFromEvents {
 				if(j==0){
 //					startTime=startEvents.get(startEvents.size()-1).time-86400.;
 //30.12					startTime=0;
-					startTime=(startEvents.get(startEvents.size()-1).time+86400.)%86400.;
-					endTime=endEvents.get(j).time;
+					startTime=(startEvents.get(startEvents.size()-1).getTime()+86400.)%86400.;
+					endTime=endEvents.get(j).getTime();
 				}
 				else if(j < endEvents.size()){
-					startTime=startEvents.get(j-1).time;
-					endTime=endEvents.get(j).time;
+					startTime=startEvents.get(j-1).getTime();
+					endTime=endEvents.get(j).getTime();
 				}
 //30.12				else if(j==endEvents.size()){
 //30.12					startTime=startEvents.get(j-1).time;

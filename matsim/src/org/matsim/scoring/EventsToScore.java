@@ -73,27 +73,27 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		getScoringFunctionForAgent(event.agentId).startLeg(event.time, event.leg);
+		getScoringFunctionForAgent(event.agentId).startLeg(event.getTime(), event.getLeg());
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		getScoringFunctionForAgent(event.agentId).endLeg(event.time);
+		getScoringFunctionForAgent(event.agentId).endLeg(event.getTime());
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		getScoringFunctionForAgent(event.agentId).agentStuck(event.time);
+		getScoringFunctionForAgent(event.agentId).agentStuck(event.getTime());
 	}
 
 	public void handleEvent(final AgentMoneyEvent event) {
-		getScoringFunctionForAgent(event.agentId).addMoney(event.amount);
+		getScoringFunctionForAgent(event.agentId).addMoney(event.getAmount());
 	}
 
 	public void handleEvent(ActStartEvent event) {
-		getScoringFunctionForAgent(event.agentId).startActivity(event.time, event.act);
+		getScoringFunctionForAgent(event.agentId).startActivity(event.getTime(), event.getAct());
 	}
 
 	public void handleEvent(ActEndEvent event) {
-		getScoringFunctionForAgent(event.agentId).endActivity(event.time);
+		getScoringFunctionForAgent(event.agentId).endActivity(event.getTime());
 	}
 
 	/**

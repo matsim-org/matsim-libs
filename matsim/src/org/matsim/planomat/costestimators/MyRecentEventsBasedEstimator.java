@@ -105,7 +105,7 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 
 		DepartureEvent depEvent = new DepartureEvent(new IdImpl(event.agentId));
 
-		this.departureEventsTimes.put(depEvent, event.time);
+		this.departureEventsTimes.put(depEvent, event.getTime());
 		this.departureEventsLinkIDs.put(depEvent, new IdImpl(event.linkId));
 	}
 
@@ -118,7 +118,7 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 		Double departureTime = this.departureEventsTimes.remove(removeMe);
 		Id departureLinkId = this.departureEventsLinkIDs.remove(removeMe);
 
-		Double travelTime = event.time - departureTime;
+		Double travelTime = event.getTime() - departureTime;
 
 		LegTravelTimeEntry newLtte = new LegTravelTimeEntry(agentId, departureLinkId, new IdImpl(event.linkId), "car");
 		this.legTravelTimeEstimations.put(newLtte, travelTime);

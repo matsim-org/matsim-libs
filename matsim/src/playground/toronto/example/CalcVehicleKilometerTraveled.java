@@ -35,7 +35,7 @@ public class CalcVehicleKilometerTraveled implements LinkEnterEventHandler {
 	private double[] travelDistanceSum = new double[NUM_OF_HOURS];
 
 	public void handleEvent(final LinkEnterEvent event) {
-		int hour = (int) event.time / 3600;
+		int hour = (int) event.getTime() / 3600;
 		this.travelDistanceSum[hour] += event.link.getLength(); // this assumes link.length is specified in meters!
 	}
 

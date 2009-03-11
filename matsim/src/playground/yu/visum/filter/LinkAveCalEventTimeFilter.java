@@ -22,7 +22,7 @@ public class LinkAveCalEventTimeFilter extends EventFilterA {
 	public boolean judge(BasicEvent event) {
 		if ((event.getClass() == (LinkEnterEvent.class))
 				|| (event.getClass() == (LinkLeaveEvent.class))) {
-			return judgeTime(event.time);
+			return judgeTime(event.getTime());
 		}
 		return isResult();
 	}

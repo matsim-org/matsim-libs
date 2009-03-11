@@ -79,7 +79,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	}
 
 	public void handleEvent(final AgentWait2LinkEvent event) {
-		Link link = event.link;
+		Link link = event.getLink();
 		if (link == null) {
 			link = this.network.getLink(new IdImpl(event.linkId));
 		}
@@ -168,7 +168,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 				return;
 			}
 			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(),
-					event.time);
+					event.getTime());
 			if (cost != null) {
 				double newToll = link.getLength() * cost.amount;
 				AgentInfo info = CalcPaidToll.this.agents.get(event.agentId);
@@ -185,7 +185,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 * one of the tolled link, the constant toll amount has to be paid once. */
 	class AreaTollBehaviour implements TollBehaviourI {
 		public void handleEvent(final PersonEvent event, final Link link) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(), event.time);
+			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(), event.getTime());
 			if (cost != null) {
 				AgentInfo info = CalcPaidToll.this.agents.get(event.agentId);
 				if (info == null) {
@@ -203,7 +203,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 */
 	class CordonTollBehaviour implements TollBehaviourI {
 		public void handleEvent(final PersonEvent event, final Link link) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(), event.time);
+			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(), event.getTime());
 			if (cost != null) {
 				// this is a link inside the toll area.
 				AgentInfo info = CalcPaidToll.this.agents.get(event.agentId);

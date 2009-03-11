@@ -121,7 +121,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 			}
 		}
 		ai.currentLink = event.linkId;
-		ai.enterTime = event.time;
+		ai.enterTime = event.getTime();
 		ai.id = event.agentId;
 		info.agentsOnLink++;
 	}
@@ -131,7 +131,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 	public void handleEvent(final AgentDepartureEvent event) {
 		LinkInfo info = getLinkInfo(event.linkId);
 		AgentInfo ai = getAgentInfo(event.agentId);
-		ai.enterTime = event.time;
+		ai.enterTime = event.getTime();
 		ai.id = event.agentId;
 		ai.currentLink = event.linkId;
 		info.agentsOnLink++;
@@ -143,7 +143,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 		info.agentsOnLink--;
 		AgentInfo ai = getAgentInfo(event.agentId);
 
-		if ((event.time - ai.enterTime) <= info.t_free){
+		if ((event.getTime() - ai.enterTime) <= info.t_free){
 //			info.lastFSSlice  = getTimeSlotIndex(event.time);
 			ai.stucked = false;	
 			

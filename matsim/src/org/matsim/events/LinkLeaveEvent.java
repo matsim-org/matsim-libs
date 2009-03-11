@@ -20,7 +20,6 @@
 
 package org.matsim.events;
 
-import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 
@@ -28,8 +27,8 @@ public class LinkLeaveEvent extends LinkEvent {
 
 	public static final String EVENT_TYPE = "left link";
 
-	public LinkLeaveEvent(final double time, final Person agent, final Link link, final Leg leg) {
-		super(time, agent, link, leg);
+	public LinkLeaveEvent(final double time, final Person agent, final Link link) {
+		super(time, agent, link);
 	}
 
 	public LinkLeaveEvent(final double time, final String agentId, final String linkId) {

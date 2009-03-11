@@ -240,10 +240,10 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			if (event.link != this.link) {
 				return;
 			}
-			if (event.agent == this.person1) {
-				this.person1enterTime = event.time;
-			} else if (event.agent == this.person2) {
-				this.person2enterTime = event.time;
+			if (event.getAgent() == this.person1) {
+				this.person1enterTime = event.getTime();
+			} else if (event.getAgent() == this.person2) {
+				this.person2enterTime = event.getTime();
 			}
 		}
 
@@ -251,10 +251,10 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			if (event.link != this.link) {
 				return;
 			}
-			if (event.agent == this.person1) {
-				this.person1leaveTime = event.time;
-			} else if (event.agent == this.person2) {
-				this.person2leaveTime = event.time;
+			if (event.getAgent() == this.person1) {
+				this.person1leaveTime = event.getTime();
+			} else if (event.getAgent() == this.person2) {
+				this.person2leaveTime = event.getTime();
 			}
 		}
 

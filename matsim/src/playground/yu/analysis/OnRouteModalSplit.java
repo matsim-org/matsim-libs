@@ -145,13 +145,13 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 
 	private void internHandleEvent(AgentEvent ae, int[] allCount,
 			int[] carCount, int[] ptCount, int[] wlkCount, int[] otherCount) {
-		int binIdx = getBinIndex(ae.time);
+		int binIdx = getBinIndex(ae.getTime());
 		allCount[binIdx]++;
 
-		if (ae.agent == null) {
-			ae.agent = this.plans.getPerson(new IdImpl(ae.agentId));
+		if (ae.getAgent() == null) {
+			ae.setAgent(this.plans.getPerson(new IdImpl(ae.agentId)));
 		}
-		Plan selectedPlan = ae.agent.getSelectedPlan();
+		Plan selectedPlan = ae.getAgent().getSelectedPlan();
 
 		if (otherCount != null)
 			if (Integer.parseInt(ae.agentId) > 1000000000)

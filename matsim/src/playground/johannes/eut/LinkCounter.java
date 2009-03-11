@@ -71,9 +71,9 @@ public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener
 	}
 	public void handleEvent(LinkEnterEvent event) {
 		if(firstEvent == 0)
-			firstEvent = (int) event.time;
+			firstEvent = (int) event.getTime();
 		
-		lastEvent = (int)event.time;
+		lastEvent = (int)event.getTime();
 		if(event.link.getId().toString().equals("1100")) {
 			events.add(event);
 			count++;
@@ -91,7 +91,7 @@ public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener
 		int bincount = (lastEvent-firstEvent)/binsize;
 		int[] bins = new int[bincount];
 		for(LinkEnterEvent e : events) {
-			int idx = ((int)e.time - firstEvent)/binsize;
+			int idx = ((int)e.getTime() - firstEvent)/binsize;
 			bins[idx]++;
 		}
 		

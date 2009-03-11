@@ -162,20 +162,20 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 		if (event.linkId.equalsIgnoreCase("2")) {
 			
 			if (this.beginningOfLink2 == null){				
-				this.beginningOfLink2 = new MeasurePoint(event.time + TravelTimeTestOneWay.timeToWaitBeforeMeasure);
+				this.beginningOfLink2 = new MeasurePoint(event.getTime() + TravelTimeTestOneWay.timeToWaitBeforeMeasure);
 			}
 			
 			this.beginningOfLink2.numberOfVehPassed_++;
 			
-			if( this.beginningOfLink2.timeToStartMeasurement <= event.time){				
+			if( this.beginningOfLink2.timeToStartMeasurement <= event.getTime()){				
 
 				if (this.beginningOfLink2.firstVehPassTime_s == -1){
-					this.beginningOfLink2.firstVehPassTime_s = event.time;
+					this.beginningOfLink2.firstVehPassTime_s = event.getTime();
 				}
 				
-				if (event.time < this.beginningOfLink2.timeToStartMeasurement + this.beginningOfLink2.timeToMeasure_s){
+				if (event.getTime() < this.beginningOfLink2.timeToStartMeasurement + this.beginningOfLink2.timeToMeasure_s){
 					this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_++;
-					this.beginningOfLink2.lastVehPassTime_s = event.time;
+					this.beginningOfLink2.lastVehPassTime_s = event.getTime();
 				}		
 			}
 		}		

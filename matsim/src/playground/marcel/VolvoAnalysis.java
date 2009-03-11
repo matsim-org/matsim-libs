@@ -101,7 +101,7 @@ public class VolvoAnalysis implements LinkEnterEventHandler,
 
 	public void handleEvent(LinkEnterEvent event) {
 		Link link = event.link;
-		int hour = getTimestep(event.time);
+		int hour = getTimestep(event.getTime());
 		if (link == null) {
 			link = this.network.getLink(event.linkId);
 		}
@@ -115,12 +115,12 @@ public class VolvoAnalysis implements LinkEnterEventHandler,
 			this.distRest[hour] += link.getLength();
 		}
 
-		this.depTimes.put(event.agentId, Double.valueOf(event.time));
+		this.depTimes.put(event.agentId, Double.valueOf(event.getTime()));
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
 		Double depTime = this.depTimes.put(event.agentId, Double.valueOf(-1.0));
-		int hour = getTimestep(event.time);
+		int hour = getTimestep(event.getTime());
 		if (depTime == null)
 			return;
 		if (depTime.doubleValue() == -1.0)
@@ -131,42 +131,42 @@ public class VolvoAnalysis implements LinkEnterEventHandler,
 			link = this.network.getLink(event.linkId);
 		}
 		if (this.hundekopfLinkIds.contains(link.getId())) {
-			this.timeHundekopf[hour] += (event.time - depTime.doubleValue());
+			this.timeHundekopf[hour] += (event.getTime() - depTime.doubleValue());
 		}
 		else if (this.gemarkungLinkIds.contains(link.getId())) {
-			this.timeGemarkung[hour] += (event.time - depTime.doubleValue());
+			this.timeGemarkung[hour] += (event.getTime() - depTime.doubleValue());
 		}
 		else {
-			this.timeRest[hour] += (event.time - depTime.doubleValue());
+			this.timeRest[hour] += (event.getTime() - depTime.doubleValue());
 		}
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
 		Double depTime = this.depTimes.put(event.agentId, Double.valueOf(-1.0));
-		int hour = getTimestep(event.time);
+		int hour = getTimestep(event.getTime());
 		if (depTime == null)
 			return;
 		if (depTime.doubleValue() == -1.0)
 			return;
 
-		Link link = event.link;
+		Link link = event.getLink();
 		if (link == null) {
 			link = this.network.getLink(event.linkId);
 		}
 		if (this.hundekopfLinkIds.contains(link.getId())) {
-			this.timeHundekopf[hour] += (event.time - depTime.doubleValue());
+			this.timeHundekopf[hour] += (event.getTime() - depTime.doubleValue());
 		}
 		else if (this.gemarkungLinkIds.contains(link.getId())) {
-			this.timeGemarkung[hour] += (event.time - depTime.doubleValue());
+			this.timeGemarkung[hour] += (event.getTime() - depTime.doubleValue());
 		}
 		else {
-			this.timeRest[hour] += (event.time - depTime.doubleValue());
+			this.timeRest[hour] += (event.getTime() - depTime.doubleValue());
 		}
 	}
 
 	public void handleEvent(AgentDepartureEvent event) {
-		Link link = event.link;
-		int hour = getTimestep(event.time);
+		Link link = event.getLink();
+		int hour = getTimestep(event.getTime());
 		if (link == null) {
 			link = this.network.getLink(event.linkId);
 		}
