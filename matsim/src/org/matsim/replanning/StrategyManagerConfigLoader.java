@@ -28,6 +28,7 @@ import org.matsim.config.Config;
 import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicScenario;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.locationchoice.LocationChoice;
 import org.matsim.network.NetworkLayer;
@@ -176,10 +177,23 @@ public class StrategyManagerConfigLoader {
 				}
 				else {
 					try {
-						Class[] args = {Controler.class};
 						Class<? extends PlanStrategy> klas = (Class<? extends PlanStrategy>) Class.forName(classname);
-						Constructor<? extends PlanStrategy> c = klas.getConstructor(args);
+						Class[] args = new Class[1];
+						args[0] = BasicScenario.class;
+						Constructor<? extends PlanStrategy> c = null;
+						try{
+							c = klas.getConstructor(args);
+						} catch(NoSuchMethodException e){
+							log.warn("Cannot find Constructor in PlanStrategy " + classname + " with single argument of type BasicScenario. " +
+									"This is not fatal, trying to find other constructor, however a constructor expecting BasicScenario as " +
+									"single argument is recommented!" );
+						}
+						if (c == null){
+							args[0] = Controler.class;
+							c = klas.getConstructor(args);
+						}
 						strategy = c.newInstance(controler);
+						log.info("Loaded PlanStrategy from class " + classname);
 					} catch (ClassNotFoundException e) {
 						e.printStackTrace();
 					} catch (InstantiationException e) {
