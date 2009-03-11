@@ -63,14 +63,18 @@ public class AnalysisTest {
 				.println(" arg 3: name incl. path to plans file (.xml[.gz])(optional)");
 		System.out
 				.println(" arg 4: name of scenario (optional, for Zurich required)");
+		System.out
+				.println(" arg 5: snapshot-period:  Specify how often a snapshot should be taken when reading the events, in seconds.");
+		System.out.println(" arg 5: runId");
 		System.out.println("----------------");
 	}
 
 	private static void runIntern(final String[] args, final String scenario) {
 		final String netFilename = args[0];
 		final String eventsFilename = args[1];
-		String eventsOutputFilename=args[1].replaceFirst("events", "events4mvi");
-		final String outputpath = args[2]+args[args.length-1]+".";
+		String eventsOutputFilename = args[1].replaceFirst("events",
+				"events4mvi");
+		final String outputpath = args[2] + args[args.length - 1] + ".";
 		String plansFilename = null;
 		if (args.length >= 4) {
 			if (args[3].endsWith("xml") || args[3].endsWith("xml.gz"))
@@ -185,9 +189,10 @@ public class AnalysisTest {
 		} catch (Exception e) {
 			System.err.println(e);
 		}
-		
-		new OTFEvent2MVI(new QueueNetwork(network), eventsOutputFilename, outputpath
-				+ "vis.mvi", Integer.parseInt(args[args.length - 2])).convert();
+
+		new OTFEvent2MVI(new QueueNetwork(network), eventsOutputFilename,
+				outputpath + "vis.mvi", Integer.parseInt(args[args.length - 2]))
+				.convert();
 
 		System.out.println("done.");
 	}
