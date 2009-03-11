@@ -142,7 +142,13 @@ public class PathSizeLogitSelector implements PlanSelector {
 
 			}
 			double PSi = Math.pow(tmp/planLength.get(plan.hashCode()), this.beta);
-			double weight = Math.exp(this.tau * (plan.getScoreAsPrimitiveType() - wc.maxScore))*PSi;
+			double weight;
+			if (Double.isInfinite(wc.maxScore)) {
+				// likely that wc.maxScore == -Infinity, and thus plan.getScoreAsPrimitiveType() also == -Infinity, handle it like any other case where getScore() == maxScore
+				weight = PSi;
+			} else {
+				weight = Math.exp(this.tau * (plan.getScoreAsPrimitiveType() - wc.maxScore))*PSi;
+			}
 			if (weight <= 0.0) weight = 0;
 			wc.weights[idx] = weight;
 			sumweight += weight;
