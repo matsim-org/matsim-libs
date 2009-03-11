@@ -45,19 +45,17 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
+import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
+
 /**
  * Test class for {@link PlanAnalyzeTourModeChoiceSet}.
  * 
- * Contains illustrative examples for analysis of feasible mode chains as sketched in
- * 
- * Miller, E. J., M. J. Roorda and J. A. Carrasco (2005) A tour-based model of travel mode choice,
- * Transportation, 32 (4) 399–422, pp. 404 and 405.
- * 
+ * Contains illustrative examples for analysis of feasible mode chains. See documentation <a href=http://matsim.org/node/267">here</a>.
  * @author meisterk
  *
  */
 public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
-	
+
 	private static final String CONFIGFILE = "test/scenarios/equil/config.xml";
 	private static Logger log = Logger.getLogger(PlanAnalyzeTourModeChoiceSetTest.class);
 
@@ -66,33 +64,43 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		super.loadConfig(PlanAnalyzeTourModeChoiceSetTest.CONFIGFILE);
 	}
 
-	public void testNetworkBased() {
-		
-		log.info("Reading network xml file...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		log.info("Reading network xml file...done.");
-
-		Gbl.getConfig().planomat().setTripStructureAnalysisLayer("link");
-		this.runDemo((Layer) network);
-		
-	}
-	
 	public void testFacilitiesBased() {
 
+		// load data
 		log.info("Reading facilities xml file...");
 		FacilitiesImpl facilities = new FacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
 		log.info("Reading facilities xml file...done.");
 
-		this.runDemo((Layer) facilities);
-		
+		// config
+		MeisterkConfigGroup meisterk = new MeisterkConfigGroup();
+
+		// run
+		this.runDemo((Layer) facilities, meisterk);
+
 	}
-	
-	protected void runDemo(Layer layer) {
-		
+
+	public void testNetworkBased() {
+
+		// load data
+		log.info("Reading network xml file...");
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		log.info("Reading network xml file...done.");
+
+		// config
+		MeisterkConfigGroup meisterk = new MeisterkConfigGroup();
+		Gbl.getConfig().planomat().setTripStructureAnalysisLayer("link");
+
+		// run
+		this.runDemo((Layer) network, meisterk);
+
+	}
+
+	protected void runDemo(Layer layer, MeisterkConfigGroup meisterk) {
+
 		HashMap<String, ArrayList<BasicLeg.Mode[]>> testCases = new HashMap<String, ArrayList<BasicLeg.Mode[]>>();
-		
+
 		////////////////////////////////////////////////////////////////
 		//
 		// 1 2 1
@@ -298,7 +306,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			}
 			expectedTourModeOptions.add(combination);
 		}		
-		
+
 		variableLegs = 4;
 		for (int ii = 0; ii < (int) Math.pow(2, variableLegs); ii++) {
 			BasicLeg.Mode[] combination = new BasicLeg.Mode[testedActChainLocations.split(" ").length - 1];
@@ -308,7 +316,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			}
 			expectedTourModeOptions.add(combination);
 		}
-		
+
 		variableLegs = 5;
 		for (int ii = 0; ii < (int) Math.pow(2, variableLegs); ii++) {
 			BasicLeg.Mode[] combination = new BasicLeg.Mode[testedActChainLocations.split(" ").length - 1];
@@ -359,7 +367,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		testCases.put(testedActChainLocations, expectedTourModeOptions);
 
-		PlanAnalyzeTourModeChoiceSet testee = new PlanAnalyzeTourModeChoiceSet();
+		PlanAnalyzeTourModeChoiceSet testee = new PlanAnalyzeTourModeChoiceSet(meisterk);
 		EnumSet<BasicLeg.Mode> possibleModes = EnumSet.of(BasicLeg.Mode.walk, BasicLeg.Mode.bike, BasicLeg.Mode.pt, BasicLeg.Mode.car);
 		testee.setModeSet(possibleModes);
 

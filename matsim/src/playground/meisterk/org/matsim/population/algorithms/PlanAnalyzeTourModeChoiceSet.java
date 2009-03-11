@@ -37,9 +37,25 @@ import org.matsim.world.Location;
 
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 
+/**
+ * Feasible mode chain analysis accoring to sectio 3.2 of 
+ * 
+ * Miller, E. J., M. J. Roorda and J. A. Carrasco (2005) A tour-based model of travel mode choice,
+ * Transportation, 32 (4) 399–422, pp. 404 and 405.
+ * 
+ * For more information, see documentation <a href=http://matsim.org/node/267">here</a>.
+ * 
+ * @author meisterk
+ *
+ */
 public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
-	private MeisterkConfigGroup meisterk = new MeisterkConfigGroup();
+	private MeisterkConfigGroup meisterk = null;
+	
+	public PlanAnalyzeTourModeChoiceSet(MeisterkConfigGroup meisterk) {
+		super();
+		this.meisterk = meisterk;
+	}
 
 	private EnumSet<BasicLeg.Mode> modeSet = null;
 

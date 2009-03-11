@@ -45,7 +45,7 @@ import org.matsim.world.Location;
 /**
  * Test class for {@link PlanAnalyzeSubtours}.
  * 
- * Contains illustrative examples for subtour analysis.
+ * Contains illustrative examples for subtour analysis. See documentation <a href="http://matsim.org/node/266">here</a>.
  * 
  * @author meisterk
  *

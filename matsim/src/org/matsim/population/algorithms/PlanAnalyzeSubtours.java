@@ -27,28 +27,10 @@ import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Act;
-import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Plan;
 
 /**
- * Analyses plans for subtours.
- *
- * A subtour is a sequence of activities whose first
- * and the last activity are at the same location.
- * The current implementation uses the {@link Facility} as location information,
- * thus activities at the same facility constitute a subtour.
- * <br><br>
- * Usage:
- * <br><br>
- * <code>
- * Plan plan = ...;<br>
- * <br>
- * PlanAnalyzeSubtours past = new PlanAnalyzeSubtours();<br>
- * testee.run(plan);<br>
- * <br>
- * int numSubtours = past.getNumSubtours();<br>
- * int[] subtourIndexation = past.getSubtourIndexation();<br>
- * </code>
+ * Analyses plans for subtours. See documentation <a href="http://matsim.org/node/266">here</a>.
  *
  * @see PlanAnalyzeSubtoursTest
  *
@@ -119,31 +101,8 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	}
 
 	/**
-	 * Use this method to get information which leg belongs to which subtour.
-	 * <br>
-	 * <br>
-	 * Example:<br>
-	 * <br>
-	 * Imagine an activity plan whose activities are located at {@link Facility}s with the following ids, in this order:<br>
-	 * <br>
-	 * 1 2 1 2 3 2 1<br>
-	 * <br>
-	 * Three subtours can be identified:<br>
-	 * <ul>
-	 * <li> One from the first activity at facility #1 to the second activity at facility #1.
-	 * <li> One from the second activity at facility #1 to the last activity at facility #1, excluding the activities/legs in between.
-	 * <li> One from the first activity at facility #2 to the last activity at facility #2.
-	 * </ul>
-	 * <br>
-	 * The returned result in this case is an array of size 6 containing the numbers:<br>
-	 * <br>
-	 * 0 0 2 1 1 2<br>
-	 * <br>
-	 * The subtour analysis algorithm first identifies subtours lying within the plan.
-	 * This is why the "outer" subtour in the second part of the plan has the higher index than its "inner" part.<br>
-	 * <br>
-	 * For more illustrative examples, see the code of the test class {@link PlanAnalyzeSubtoursTest}.<br>
-	 * <br>
+	 * Use this method to get information which leg belongs to which subtour. See documentation <a href="http://matsim.org/node/264">here</a>.
+	 * 
 	 * @return an array with subtour indices [int] of each leg of the {@link Plan} that was analyzed most recently
 	 */
 	public int[] getSubtourIndexation() {
@@ -151,28 +110,8 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	}
 
 	/**
-	 * Use this method to retrieve the number of subtours of an activity plan.
-	 * <br>
-	 * <br>
-	 * Example:<br>
-	 * <br>
-	 * Imagine an activity plan whose activities are located at the following facility, in this order:<br>
-	 * <br>
-	 * 1 2 1 2 3 2 1<br>
-	 * <br>
-	 * Three subtours can be identified:<br>
-	 * <ul>
-	 * <li> One from the first activity at facility #1 to the second activity at facility #1.
-	 * <li> One from the second activity at facility #1 to the last activity at facility #1, excluding the activities/legs in between.
-	 * <li> One from the first activity at facility #2 to the last activity at facility #2.
-	 * </ul>
-	 * <br>
-	 * The returned result in this case is:<br>
-	 * <br>
-	 * 3<br>
-	 * <br>
-	 * For more illustrative examples, see the code of the test class {@link PlanAnalyzeSubtoursTest}.<br>
-	 * <br>
+	 * Use this method to retrieve the number of subtours of an activity plan. See documentation <a href="http://matsim.org/node/264">here</a>.
+	 * 
 	 * @return the number of subtours in the {@link Plan} that was analyzed most recently
 	 */
 	public int getNumSubtours() {

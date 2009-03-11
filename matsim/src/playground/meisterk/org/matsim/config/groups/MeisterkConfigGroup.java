@@ -118,4 +118,8 @@ public class MeisterkConfigGroup extends Module {
 		return cachedChainBasedModes;
 	}
 	
+	public void setChainBasedModes(String chainBasedModes) {
+		MeisterkConfigParameter.CHAIN_BASED_MODES.setActualValue(chainBasedModes);
+	}
+	
 }
