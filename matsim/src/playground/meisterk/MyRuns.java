@@ -27,6 +27,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+import org.matsim.config.Config;
+import org.matsim.controler.ScenarioData;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
@@ -38,9 +41,12 @@ import org.matsim.population.ActUtilityParameters;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activities;
 import org.matsim.utils.misc.Time;
+
+import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 
 public class MyRuns {
 
@@ -64,18 +70,22 @@ public class MyRuns {
 	protected static double distanceCost = Double.NaN;
 	protected static double abortedPlanScore = Double.NaN;
 	protected static double learningRate = Double.NaN;
+	
+	private static Logger logger = Logger.getLogger(MyRuns.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public static void run() throws Exception {
+	public static void run(Config config) throws Exception {
 
 //		MyRuns.writeGUESSFile();
 //		MyRuns.conversionSpeedTest();
 //		MyRuns.convertPlansV0ToPlansV4();
 //		MyRuns.produceSTRC2007KML();
 
+		MyRuns.setPlansToSameDepTime(config);
+		
 		System.out.println();
 
 	}
@@ -86,35 +96,29 @@ public class MyRuns {
 
 	public static void main(final String[] args) throws Exception {
 
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
 //		Gbl.createWorld();
 //		Gbl.createFacilities();
 
-//		run();
-
-		String emptyString = "car";
-
-		String[] bla = emptyString.split(",");
-		System.out.println(bla.length);
+		run(config);
 
 	}
 
-	public static NetworkLayer initWorldNetwork() {
+	public static void setPlansToSameDepTime(Config config) {
+		
+		ScenarioData scenario = new ScenarioData(config);
+		Population population = scenario.getPopulation();
 
-		NetworkLayer network = null;
-
-		System.out.println("  creating network layer... ");
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-		System.out.println("  done");
-
-		System.out.println("  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		System.out.println("  done.");
-
-		return network;
+		PersonSetFirstActEndTime psfaet = new PersonSetFirstActEndTime(24.0 * 3600);
+		psfaet.run(population);
+		
+		logger.info("Writing plans file...");
+		PopulationWriter plans_writer = new PopulationWriter(population);
+		plans_writer.write();
+		logger.info("Writing plans file...DONE.");
+		
 	}
-
-	// Gbl.getConfig().plans().getInputFile()
+	
 	public static Population initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos) {
 
 		Population population = null;
@@ -162,7 +166,10 @@ public class MyRuns {
 
 		// initialize scenario with events from a given events file
 		// - network
-		final NetworkLayer network = MyRuns.initWorldNetwork();
+		logger.info("Reading network xml file...");
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		logger.info("Reading network xml file...done.");
 		// - population
 		PersonAlgorithm pa = new PersonAnalyseTimesByActivityType(TIME_BIN_SIZE);
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
