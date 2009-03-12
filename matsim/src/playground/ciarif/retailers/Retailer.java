@@ -29,7 +29,9 @@ public class Retailer {
 	}
 	
 	public final boolean addStrategy (Controler controler, String strategyName) {
-			
+		System.out.println("Strategy to be added= " + strategyName);	
+		System.out.println("Actual Strategy = " + this.strategy);
+		System.out.println("Strategy = " + CatchmentAreaRetailerStrategy.NAME);
 		if (strategyName.equals(RandomRetailerStrategy.NAME)) {
 			this.strategy = new RandomRetailerStrategy(controler.getNetwork());
 			return true;
@@ -46,7 +48,7 @@ public class Retailer {
 			this.strategy = new CatchmentAreaRetailerStrategy (controler);
 			return true;
 		}
-		else { return false; }
+		else { throw new RuntimeException("The strategy has been not added!"); }
 	}
 	
 	public final Facility getFacility(final Id facId) {
@@ -58,8 +60,6 @@ public class Retailer {
 	}
 
 	public final Map<Id,Facility> runStrategy() {
-		System.out.println("Strategy = " + strategy);
-		System.out.println("Facilities = " + facilities);
 		strategy.moveFacilities(this.facilities);
 		return this.facilities;
 	}

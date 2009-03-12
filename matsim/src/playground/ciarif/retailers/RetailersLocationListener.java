@@ -94,7 +94,6 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		this.facilityIdFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
 		System.out.println("facility file = " + this.facilityIdFile);
 		if (this.facilityIdFile == null) { //Francesco: TODO decide if throw an exception or permit a way to create retailers without an input file
-			System.out.println("facility file = " + facilityIdFile);
 		}
 	
 		else {
@@ -106,7 +105,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 				String curr_line = br.readLine();
 				while ((curr_line = br.readLine()) != null) {
 					String[] entries = curr_line.split("\t", -1);
-					// header: r_id  f_id  strat
+					// header: r_id  f_id  strategy
 					// index:     0     1      2
 					Id rId = new IdImpl(entries[0]);
 					if (this.retailers.getRetailers().containsKey(rId)) { // retailer exists already
@@ -115,8 +114,8 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 						this.retailers.getRetailers().get(rId).addFacility(f);
 					}
 					else { // retailer does not exists yet
-						System.out.println("The new retailer " + rId + " has been added");
 						Retailer r = new Retailer(rId, null);
+						System.out.println("The retailer " + rId + " has been added");
 						r.addStrategy(controler, entries[2]);
 						Id fId = new IdImpl (entries[1]);
 						Facility f = controler.getFacilities().getFacilities().get(fId);
@@ -154,41 +153,41 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	}
 	
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-		Controler controler = event.getControler();
-		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
-		
-		// works, but it is not nicely programmed. shouldn't be a global container, should be
-		// controlled by the controler (or actually added to the population)
-		Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
-		
-		controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
-		
-		for (Retailer r : this.retailers.getRetailers().values()) {
-			Map<Id,Facility> facs = r.runStrategy();
-			movedFacilities.putAll(facs);
-		}
-		
-		int iter = controler.getIteration();
-		this.rs.write(this.retailers);
-		
-		for (Person p : controler.getPopulation().getPersons().values()) {
-			pst.run(p,iter);
-			for (Plan plan : p.getPlans()) {
-				
-				boolean routeIt = false;
-				Iterator<?> actIter = plan.getIteratorAct();
-				while (actIter.hasNext()) {
-					Activity act = (Activity)actIter.next();
-					if (movedFacilities.containsKey(act.getFacilityId())) {
-						act.setLink(act.getFacility().getLink());
-						routeIt = true;
-					}
-				}
-				if (routeIt) {
-					pcrl.run(plan);
-				}
-			}
-		}
+//		Controler controler = event.getControler();
+//		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
+//		
+//		// works, but it is not nicely programmed. shouldn't be a global container, should be
+//		// controlled by the controler (or actually added to the population)
+//		Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
+//		
+//		controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
+//		
+//		for (Retailer r : this.retailers.getRetailers().values()) {
+//			Map<Id,Facility> facs = r.runStrategy();
+//			movedFacilities.putAll(facs);
+//		}
+//		
+//		int iter = controler.getIteration();
+//		this.rs.write(this.retailers);
+//		
+//		for (Person p : controler.getPopulation().getPersons().values()) {
+//			pst.run(p,iter);
+//			for (Plan plan : p.getPlans()) {
+//				
+//				boolean routeIt = false;
+//				Iterator<?> actIter = plan.getIteratorAct();
+//				while (actIter.hasNext()) {
+//					Activity act = (Activity)actIter.next();
+//					if (movedFacilities.containsKey(act.getFacilityId())) {
+//						act.setLink(act.getFacility().getLink());
+//						routeIt = true;
+//					}
+//				}
+//				if (routeIt) {
+//					pcrl.run(plan);
+//				}
+//			}
+//		}
 	}	
 	
 	private final QuadTree<Person> createPersonQuadTree(Controler controler) {
