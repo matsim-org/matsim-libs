@@ -28,7 +28,6 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for org.matsim.basic.v01");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(BasicPlanTest.class);
 		suite.addTestSuite(BasicHouseholdsReaderV1Test.class);
 		suite.addTestSuite(VehicleReaderWriterV1Test.class);
 		//$JUnit-END$
