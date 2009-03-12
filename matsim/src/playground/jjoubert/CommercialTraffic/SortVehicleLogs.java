@@ -21,7 +21,7 @@ import java.util.Scanner;
 
 public class SortVehicleLogs {
 	// String value that must be set
-	final static String PROVINCE = "All";
+	final static String PROVINCE = "SouthAfrica";
 	// Mac
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
