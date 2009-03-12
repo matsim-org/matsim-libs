@@ -10,7 +10,13 @@ xml:lang="en">
 <xs:include schemaLocation="http://www.matsim.org/files/dtd/households_v1.0.xsd" />
 
 <xs:annotation>
+  <xs:appinfo>
+    <deprecate date="2009-03-12" />
+  </xs:appinfo>
   <xs:documentation>
+    THIS SCHEMA IS DEPRECATED! DO NOT USE ANYMORE!!!
+  
+  
     This xml schema contains xml definitions for population information within the MATSim framework.
     This population schema is considered as stable file-format. Changes in this schema
     imply major changes in the code. All enumeration types needed by the data format are
@@ -37,6 +43,11 @@ xml:lang="en">
 </xs:annotation>
 
 <xs:element name="population">
+  <xs:annotation>
+    <xs:appinfo>
+      <deprecate date="2009-03-12" />
+    </xs:appinfo>
+  </xs:annotation>
   <xs:complexType>
     <xs:sequence>
       <xs:element name="person" type="personType" minOccurs="1" maxOccurs="unbounded" />
@@ -46,7 +57,7 @@ xml:lang="en">
   </xs:complexType>
 </xs:element>
 
-<xs:complexType name="personType">
+<xs:complexType name="personType" 
   <xs:complexContent>
     <xs:extension base="matsimObjectType">
      <xs:sequence>
