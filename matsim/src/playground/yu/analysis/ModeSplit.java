@@ -5,6 +5,7 @@ package playground.yu.analysis;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -25,14 +26,16 @@ import playground.yu.utils.io.SimpleWriter;
 public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm {
 	private int carUser = 0, ptUser = 0, walker = 0, zrhCarUser = 0,
 			zrhPtUser = 0, zrhWalker = 0;
-	private Coord center;
+	private Coord center = null;
 
 	public static boolean isInRange(Coord coord, Coord center, double radius) {
 		return coord.calcDistance(center) < radius;
 	}
 
 	public ModeSplit(NetworkLayer network) {
-		center = network.getNode("2531").getCoord();
+		Node centerNode = network.getNode("2531");
+		if (centerNode != null)
+			center = centerNode.getCoord();
 	}
 
 	@Override
@@ -44,16 +47,19 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 		Coord homeLoc = plan.getFirstActivity().getCoord();
 		if (PlanModeJudger.useCar(plan)) {
 			carUser++;
-			if (isInRange(homeLoc, center, 30000.0))
-				zrhCarUser++;
+			if (center != null)
+				if (isInRange(homeLoc, center, 30000.0))
+					zrhCarUser++;
 		} else if (PlanModeJudger.usePt(plan)) {
 			ptUser++;
-			if (isInRange(homeLoc, center, 30000.0))
-				zrhPtUser++;
+			if (center != null)
+				if (isInRange(homeLoc, center, 30000.0))
+					zrhPtUser++;
 		} else if (PlanModeJudger.useWalk(plan)) {
 			walker++;
-			if (isInRange(homeLoc, center, 30000.0))
-				zrhWalker++;
+			if (center != null)
+				if (isInRange(homeLoc, center, 30000.0))
+					zrhWalker++;
 		}
 	}
 
@@ -67,14 +73,18 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 				+ "\n");
 		sb.append("walk\t" + walker + "\t" + ((double) walker / sum * 100.0)
 				+ "\n");
-		sum = zrhCarUser + zrhPtUser + zrhWalker;
-		sb.append("(zrh30km)mode\tnumber\tfraction[%]\n");
-		sb.append("car\t" + zrhCarUser + "\t" + (double) zrhCarUser / sum
-				* 100.0 + "\n");
-		sb.append("pt\t" + zrhPtUser + "\t" + (double) zrhPtUser / sum * 100.0
-				+ "\n");
-		sb.append("walk\t" + zrhWalker + "\t" + (double) zrhWalker / sum
-				* 100.0 + "\n");
+
+		if (center != null) {
+			sum = zrhCarUser + zrhPtUser + zrhWalker;
+			sb.append("(center30km)mode\tnumber\tfraction[%]\n");
+			sb.append("car\t" + zrhCarUser + "\t" + (double) zrhCarUser / sum
+					* 100.0 + "\n");
+			sb.append("pt\t" + zrhPtUser + "\t" + (double) zrhPtUser / sum
+					* 100.0 + "\n");
+			sb.append("walk\t" + zrhWalker + "\t" + (double) zrhWalker / sum
+					* 100.0 + "\n");
+		}
+
 		return sb.toString();
 	}
 
@@ -82,14 +92,16 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 		SimpleWriter sw = new SimpleWriter(outputPath + "modalSplit.txt");
 		sw.write(toString());
 		sw.close();
-		PieChart chart = new PieChart("ModalSplit Zurich");
+		PieChart chart = new PieChart("ModalSplit -- agents");
 		chart.addSeries(new String[] { "car", "pt", "walk" }, new double[] {
 				carUser, ptUser, walker });
 		chart.saveAsPng(outputPath + "modalSplit.png", 800, 600);
-		PieChart chart2 = new PieChart("ModalSplit Zurich Center(30km)");
-		chart2.addSeries(new String[] { "car", "pt", "walk" }, new double[] {
-				zrhCarUser, zrhPtUser, zrhWalker });
-		chart2.saveAsPng(outputPath + "modalSplit30km.png", 800, 600);
+		if (center != null) {
+			PieChart chart2 = new PieChart("ModalSplit Center(30km) -- agents");
+			chart2.addSeries(new String[] { "car", "pt", "walk" },
+					new double[] { zrhCarUser, zrhPtUser, zrhWalker });
+			chart2.saveAsPng(outputPath + "modalSplit30km.png", 800, 600);
+		}
 	}
 
 	/**

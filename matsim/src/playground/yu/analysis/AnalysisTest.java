@@ -72,7 +72,7 @@ public class AnalysisTest {
 		final String eventsFilename = args[1];
 		String eventsOutputFilename = args[1].replaceFirst("events",
 				"events4mvi");
-		final String outputpath = args[2] + args[args.length - 1] + ".";
+		final String outputPath = args[2] + args[args.length - 1] + ".";
 		String plansFilename = null;
 		if (args.length >= 4) {
 			if (args[3].endsWith("xml") || args[3].endsWith("xml.gz"))
@@ -88,23 +88,24 @@ public class AnalysisTest {
 		CalcAverageTripLength catl = null;
 		DailyDistance dd = null;
 		DailyEnRouteTime dert = null;
+		ModeSplit ms = null;
 
 		if (plansFilename != null) {
 			Population plans = new PopulationImpl();
 
 			catl = new CalcAverageTripLength();
-			plans.addAlgorithm(catl);
-
 			dd = new DailyDistance();
-			plans.addAlgorithm(dd);
-
 			dert = new DailyEnRouteTime();
-			plans.addAlgorithm(dert);
+			ms = new ModeSplit(network);
 
 			PopulationReader plansReader = new MatsimPopulationReader(plans,
 					network);
 			plansReader.readFile(plansFilename);
-			plans.runAlgorithms();
+
+			catl.run(plans);
+			dd.run(plans);
+			dert.run(plans);
+			ms.run(plans);
 
 			orms = new OnRouteModalSplit(scenario, plans);
 			ttms = new TravelTimeModalSplit(plans);
@@ -136,21 +137,21 @@ public class AnalysisTest {
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
 		if (orms != null) {
-			orms.write(outputpath + "onRoute.txt.gz");
-			orms.writeCharts(outputpath + "onRoute.png");
+			orms.write(outputPath + "onRoute.txt.gz");
+			orms.writeCharts(outputPath + "onRoute.png");
 		}
 		if (ttms != null) {
-			ttms.write(outputpath + "traveltimes.txt.gz");
-			ttms.writeCharts(outputpath + "traveltimes");
+			ttms.write(outputPath + "traveltimes.txt.gz");
+			ttms.writeCharts(outputPath + "traveltimes");
 		}
-		clas.write(outputpath + "avgSpeed.txt.gz");
-		clas.writeChart(outputpath + "avgSpeedCityArea.png");
-		ld.write(outputpath + "legDistances.txt.gz");
-		ld.writeCharts(outputpath + "legDistances");
+		clas.write(outputPath + "avgSpeed.txt.gz");
+		clas.writeChart(outputPath + "avgSpeedCityArea.png");
+		ld.write(outputPath + "legDistances.txt.gz");
+		ld.writeCharts(outputPath + "legDistances");
 
-		SimpleWriter sw = new SimpleWriter(outputpath + "output.txt");
+		SimpleWriter sw = new SimpleWriter(outputPath + "output.txt");
 		sw.write("netfile:\t" + netFilename + "\neventsFile:\t"
-				+ eventsFilename + "\noutputpath:\t" + outputpath + "\n");
+				+ eventsFilename + "\noutputpath:\t" + outputPath + "\n");
 		if (catl != null)
 			sw.write("avg. Trip length:\t" + catl.getAverageTripLength()
 					+ " [m]\n");
@@ -160,8 +161,9 @@ public class AnalysisTest {
 				+ cas.getNetAvgSpeed() + " [km/h]\n");
 		sw.close();
 
-		dd.write(outputpath);
-		dert.write(outputpath);
+		dd.write(outputPath);
+		dert.write(outputPath);
+		ms.write(outputPath);
 
 		SimpleReader sr = new SimpleReader(eventsFilename);
 		SimpleWriter sw2 = new SimpleWriter(eventsOutputFilename);
@@ -177,15 +179,11 @@ public class AnalysisTest {
 				time = Double.parseDouble(line.split("\t")[0]);
 			}
 		}
-		try {
-			sr.close();
-			sw2.close();
-		} catch (Exception e) {
-			System.err.println(e);
-		}
+		sr.close();
+		sw2.close();
 
 		new OTFEvent2MVI(new QueueNetwork(network), eventsOutputFilename,
-				outputpath + "vis.mvi", Integer.parseInt(args[args.length - 2]))
+				outputPath + "vis.mvi", Integer.parseInt(args[args.length - 2]))
 				.convert();
 
 		System.out.println("done.");

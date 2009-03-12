@@ -30,8 +30,12 @@ public class SimpleReader implements Closeable {
 		}
 	}
 
-	public void close() throws IOException {
-		reader.close();
+	public void close() {
+		try {
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public String readLine() {
