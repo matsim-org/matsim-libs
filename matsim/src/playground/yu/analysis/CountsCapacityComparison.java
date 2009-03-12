@@ -9,6 +9,7 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -20,6 +21,10 @@ import playground.yu.utils.io.SimpleWriter;
  * 
  */
 public class CountsCapacityComparison {
+	public static boolean isInRange(final Link link,
+			Coord distanceFilterCenter, double filterRadius) {
+		return link.getCoord().calcDistance(distanceFilterCenter) < filterRadius;
+	}
 
 	/**
 	 * compare link capacity with counts-value, in order to check problematical
@@ -46,70 +51,90 @@ public class CountsCapacityComparison {
 		SimpleWriter sw = new SimpleWriter(outputFilename);
 		sw.writeln("linkId\tx\ty\tCapacity [veh/h]\tmax Value of Counts");
 
-		double capPeriod = ((double) network.getCapacityPeriod()) / 3600.0;
+		Coord center = network.getNode("2531").getCoord();
+		double capPeriod = ((double) network.getCapacityPeriod()) / 3600.0 * 0.97;
+		int n_countStations = 0;
+
 		for (Id linkId : counts.getCounts().keySet()) {
+
 			Link link = network.getLink(linkId);
 			if (link != null) {
-				double capacity = link.getCapacity(0) / capPeriod;
-				double maxCountsValue = counts.getCount(linkId).getMaxVolume()
-						.getValue();
-				if (capacity <= maxCountsValue) {
-					sw.writeln(linkId.toString() + "\t"
-							+ link.getCoord().getX() + "\t"
-							+ link.getCoord().getY() + "\t" + capacity + "\t"
-							+ maxCountsValue);
-					// TODO what about the upward and downward links??
-					// upward
-					int smallUpwardLinks = 1;
-					while (smallUpwardLinks == 1) {
-						sw.writeln("upward");
-						double capSum = 0.0;
-						smallUpwardLinks = 0;
-						for (Link inLink : link.getFromNode().getInLinks()
-								.values()) {
-							capSum += inLink.getCapacity(0) / capPeriod;
-							smallUpwardLinks++;
-						}
-						if (capSum <= maxCountsValue) {
-							for (Link inLink : link.getFromNode().getInLinks()
-									.values()) {
-								sw.writeln(inLink.getId().toString() + "\t"
-										+ inLink.getCoord().getX() + "\t"
-										+ inLink.getCoord().getY() + "\t"
-										+ inLink.getCapacity(0) / capPeriod);
+				if (isInRange(link, center, 30000.0)) {
+					n_countStations++;
+					double capacity = link.getCapacity(0) / capPeriod;
+					double maxCountsValue = counts.getCount(linkId)
+							.getMaxVolume().getValue();
+					if (capacity <= maxCountsValue) {
+						sw.writeln(linkId.toString() + "\t"
+								+ link.getCoord().getX() + "\t"
+								+ link.getCoord().getY() + "\t" + capacity
+								+ "\t" + maxCountsValue);
+						// TODO what about the upward and downward links??
+						// upward
+						Link upLink = link;
+						int smallUpwardLinks = 1;
+						while (smallUpwardLinks == 1) {
+							// sw.writeln("upward");
+							double capSum = 0.0;
+							smallUpwardLinks = 0;
+							for (Link inLink : upLink.getFromNode()
+									.getInLinks().values()) {
+								capSum += inLink.getCapacity(0) / capPeriod;
+								smallUpwardLinks++;
 							}
-						}
-						link = link.getFromNode().getInLinks().values()
-								.iterator().next();
-					}
-					// downward
-					int smallDownwardLinks = 1;
-					while (smallDownwardLinks == 1) {
-						sw.writeln("downward");
-						double capSum = 0.0;
-						smallDownwardLinks = 0;
-						for (Link outLink : link.getToNode().getOutLinks()
-								.values()) {
-							capSum += outLink.getCapacity(0) / capPeriod;
-							smallDownwardLinks++;
-						}
-						if (capSum <= maxCountsValue) {
-							for (Link outLink : link.getToNode().getOutLinks()
-									.values()) {
-								sw.writeln(outLink.getId().toString() + "\t"
-										+ outLink.getCoord().getX() + "\t"
-										+ outLink.getCoord().getY() + "\t"
-										+ outLink.getCapacity(0) / capPeriod);
+							if (capSum <= maxCountsValue) {
+								for (Link inLink : upLink.getFromNode()
+										.getInLinks().values()) {
+									sw
+											.writeln(inLink.getId().toString()
+													+ "\t"
+													+ inLink.getCoord().getX()
+													+ "\t"
+													+ inLink.getCoord().getY()
+													+ "\t"
+													+ inLink.getCapacity(0)
+													/ capPeriod);
+								}
 							}
+							upLink = upLink.getFromNode().getInLinks().values()
+									.iterator().next();
 						}
-						link = link.getToNode().getOutLinks().values()
-								.iterator().next();
-					}
+						// downward
+						Link downLink = link;
+						int smallDownwardLinks = 1;
+						while (smallDownwardLinks == 1) {
+							// sw.writeln("downward");
+							// System.out.println("downLink Id:"
+							// + downLink.getId().toString());
+							double capSum = 0.0;
+							smallDownwardLinks = 0;
+							for (Link outLink : downLink.getToNode()
+									.getOutLinks().values()) {
+								capSum += outLink.getCapacity(0) / capPeriod;
+								smallDownwardLinks++;
+							}
+							if (capSum <= maxCountsValue) {
+								for (Link outLink : downLink.getToNode()
+										.getOutLinks().values()) {
+									sw.writeln(outLink.getId().toString()
+											+ "\t" + outLink.getCoord().getX()
+											+ "\t" + outLink.getCoord().getY()
+											+ "\t" + outLink.getCapacity(0)
+											/ capPeriod);
+								}
+							}
+							downLink = downLink.getToNode().getOutLinks()
+									.values().iterator().next();
+							// System.out.println("(new) downLink Id:"
+							// + downLink.getId().toString());
+						}
 
-					sw.flush();
+						sw.flush();
+					}
 				}
 			}
 		}
 		sw.close();
+		System.out.println("n_countStations=" + n_countStations);
 	}
 }
