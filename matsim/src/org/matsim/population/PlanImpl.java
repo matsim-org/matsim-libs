@@ -305,18 +305,6 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 		return null;
 	}
 
-	/**
-	 * Returns the leg following the specified act. <b>Important Note: </b> This method (together with
-	 * {@link #getNextActivity(Leg)}) has a very bad performance if it is used to iterate over all Acts and
-	 * Legs of a plan. In that case, it is advised to use one of the special iterators.
-	 *
-	 * @param act
-	 * @return The Leg following <tt>act</tt> in the plan, null if <tt>act</tt> is the last Act in the plan.
-	 *
-	 * @see #getIterator()
-	 * @see #getIteratorAct()
-	 * @see #getIteratorLeg()
-	 */
 	public Leg getNextLeg(final Activity act) {
 		int index = this.getActLegIndex(act);
 		if ((index < this.actsLegs.size() - 1) && (index != -1)) {
@@ -325,18 +313,6 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 		return null;
 	}
 
-	/**
-	 * Returns the activity following the specified leg. <b>Important Note: </b> This method (together with
-	 * {@link #getNextLeg(Activity)}) has a very bad performance if it is used to iterate over all Acts and Legs of
-	 * a plan. In that case, it is advised to use one of the special iterators.
-	 *
-	 * @param leg
-	 * @return The Act following <tt>leg</tt> in the plan.
-	 *
-	 * @see #getIterator()
-	 * @see #getIteratorAct()
-	 * @see #getIteratorLeg()
-	 */
 	public Activity getNextActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {
