@@ -30,6 +30,7 @@ import org.jgap.impl.IntegerGene;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
+import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
@@ -77,7 +78,7 @@ public class PlanomatTest extends MatsimTestCase {
 		super.loadConfig(this.getClassInputDirectory() + "config.xml");
 
 		log.info("Reading facilities xml file...");
-		this.facilities = (Facilities)Gbl.createWorld().createLayer(Facilities.LAYER_TYPE,null);
+		FacilitiesImpl facilities = new FacilitiesImpl();
 		new MatsimFacilitiesReader(this.facilities).readFile(Gbl.getConfig().facilities().getInputFile());
 		log.info("Reading facilities xml file...done.");
 
@@ -90,7 +91,6 @@ public class PlanomatTest extends MatsimTestCase {
 		this.population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		PopulationReader plansReader = new MatsimPopulationReader(this.population, this.network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		this.population.printPlansCount();
 		log.info("Reading plans xml file...done.");
 
 	}
