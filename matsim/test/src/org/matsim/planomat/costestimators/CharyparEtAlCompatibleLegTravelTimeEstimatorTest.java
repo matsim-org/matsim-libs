@@ -43,14 +43,12 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 
 	@Override
 	public void testGetLegTravelTimeEstimation() {
-//		DepartureDelayAverageCalculator tDepDelayCalc = super.getTDepDelayCalc();
-//		TravelTimeCalculator linkTravelTimeEstimator = super.getLinkTravelTimeEstimator();
 
 		testee = new CharyparEtAlCompatibleLegTravelTimeEstimator(
 				super.linkTravelTimeEstimator,
 				super.linkTravelCostEstimator,
 				super.tDepDelayCalc,
-				super.network);
+				super.scenario.getNetwork());
 
 		Events events = new Events();
 		events.addHandler(super.tDepDelayCalc);

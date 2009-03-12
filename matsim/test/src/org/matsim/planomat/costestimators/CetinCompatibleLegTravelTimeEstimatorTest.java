@@ -49,7 +49,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 				super.linkTravelTimeEstimator,
 				super.linkTravelCostEstimator,
 				super.tDepDelayCalc, 
-				super.network);
+				super.scenario.getNetwork());
 
 		Events events = new Events();
 		events.addHandler(tDepDelayCalc);

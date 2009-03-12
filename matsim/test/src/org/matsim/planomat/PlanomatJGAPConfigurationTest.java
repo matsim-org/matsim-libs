@@ -28,17 +28,10 @@ import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.WeightedRouletteSelector;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Facilities;
+import org.matsim.config.Config;
+import org.matsim.controler.ScenarioData;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.Population;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -46,36 +39,22 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(PlanomatJGAPConfigurationTest.class);
 
+	private ScenarioData scenario;
+	
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		super.loadConfig(this.getInputDirectory() + "config.xml");
+		Config config = super.loadConfig(this.getInputDirectory() + "config.xml");
+		this.scenario = new ScenarioData(config);
 	}
 
 	public void testPlanomatJGAPConfiguration() {
-
-		log.info("Reading facilities xml file...");
-		Facilities facilities = (Facilities)Gbl.createWorld().createLayer(Facilities.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
-		log.info("Reading facilities xml file...done.");
-
-		log.info("Reading network xml file...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		log.info("Reading network xml file...done.");
-
-		log.info("Reading plans xml file...");
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		population.printPlansCount();
-		log.info("Reading plans xml file...done.");
 
 		// init test Plan
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = population.getPerson(new IdImpl("100"));
+		Person testPerson = this.scenario.getPopulation().getPerson(new IdImpl("100"));
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
@@ -109,28 +88,11 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 
 	public void testPlanomatJGAPConfigurationCarPt() {
 
-		log.info("Reading facilities xml file...");
-		Facilities facilities = (Facilities)Gbl.createWorld().createLayer(Facilities.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
-		log.info("Reading facilities xml file...done.");
-
-		log.info("Reading network xml file...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		log.info("Reading network xml file...done.");
-
-		log.info("Reading plans xml file...");
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		population.printPlansCount();
-		log.info("Reading plans xml file...done.");
-
 		// init test Plan
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = population.getPerson(new IdImpl("100"));
+		Person testPerson = this.scenario.getPopulation().getPerson(new IdImpl("100"));
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
@@ -161,6 +123,12 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 			}
 		}
 
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		this.scenario = null;
 	}
 
 }
