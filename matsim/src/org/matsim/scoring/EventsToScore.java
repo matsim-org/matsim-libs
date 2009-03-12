@@ -107,8 +107,8 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 			sf.finish();
 			double score = sf.getScore();
 			Plan plan = this.population.getPerson(new IdImpl(agentId)).getSelectedPlan();
-			double oldScore = plan.getScoreAsPrimitiveType();
-			if (Double.isNaN(oldScore)) {
+			Double oldScore = plan.getScore();
+			if (oldScore == null) {
 				plan.setScore(score);
 			} else {
 				plan.setScore(this.learningRate * score + (1 - this.learningRate) * oldScore);
@@ -128,7 +128,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	 */
 	public double getAveragePlanPerformance() {
 		if (this.scoreSum == 0)
-			return Plan.UNDEF_SCORE;
+			return Double.NaN;
 		return (this.scoreSum / this.scoreCount);
 	}
 
@@ -140,10 +140,10 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	 *            The id of the agent the score is requested for.
 	 * @return The score of the specified agent.
 	 */
-	public double getAgentScore(final Id agentId) {
+	public Double getAgentScore(final Id agentId) {
 		ScoringFunction sf = this.agentScorers.get(agentId.toString());
 		if (sf == null)
-			return Plan.UNDEF_SCORE;
+			return null;
 		return sf.getScore();
 	}
 

@@ -67,24 +67,24 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Population population = runTollSimulation(tollFile, "distance");
 
 		compareScores(
-				referencePopulation.getPerson(id1).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id1).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id1).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id1).getPlans().get(0).getScore().doubleValue(),
 				300 * 0.00020);
 		compareScores(
-				referencePopulation.getPerson(id2).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id2).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id2).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id2).getPlans().get(0).getScore().doubleValue(),
 				300 * 0.00010);
 		compareScores(
-				referencePopulation.getPerson(id3).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id3).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id3).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id3).getPlans().get(0).getScore().doubleValue(),
 				300 * 0.00020);
 		compareScores(
-				referencePopulation.getPerson(id4).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id4).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id4).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id4).getPlans().get(0).getScore().doubleValue(),
 				100 * 0.00020 + 200 * 0.00010);
 		compareScores(
-				referencePopulation.getPerson(id5).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id5).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id5).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id5).getPlans().get(0).getScore().doubleValue(),
 				200 * 0.00020); // agent departs on a tolled link which must NOT be paid.
 	}
 
@@ -104,36 +104,36 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Population population = runTollSimulation(tollFile, "area");
 
 		compareScores(
-				referencePopulation.getPerson(id1).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id1).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id1).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id1).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id2).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id2).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id2).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id2).getPlans().get(0).getScore().doubleValue(),
 				0.00);
 		compareScores(
-				referencePopulation.getPerson(id3).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id3).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id3).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id3).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id4).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id4).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id4).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id4).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id5).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id5).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id5).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id5).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id7).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id7).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id7).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id7).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id8).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id8).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id8).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id8).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id10).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id10).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id10).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id10).getPlans().get(0).getScore().doubleValue(),
 				2.00); // drives out of the area, must still pay the toll
 	}
 
@@ -152,32 +152,32 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Population population = runTollSimulation(tollFile, "cordon");
 
 		compareScores(
-				referencePopulation.getPerson(id1).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id1).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id1).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id1).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id2).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id2).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id2).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id2).getPlans().get(0).getScore().doubleValue(),
 				1.00);
 		compareScores(
-				referencePopulation.getPerson(id3).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id3).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id3).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id3).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id4).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id4).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id4).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id4).getPlans().get(0).getScore().doubleValue(),
 				1.50);
 		compareScores(
-				referencePopulation.getPerson(id5).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id5).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id5).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id5).getPlans().get(0).getScore().doubleValue(),
 				1.00); // this agent only pays when entering in the second area, as it starts in the first where it should not be tolled.
 		compareScores(
-				referencePopulation.getPerson(id7).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id7).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id7).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id7).getPlans().get(0).getScore().doubleValue(),
 				0.00); // this agent only leaves the area and should thus never pay a toll
 		compareScores(
-				referencePopulation.getPerson(id8).getPlans().get(0).getScoreAsPrimitiveType(),
-				population.getPerson(id8).getPlans().get(0).getScoreAsPrimitiveType(),
+				referencePopulation.getPerson(id8).getPlans().get(0).getScore().doubleValue(),
+				population.getPerson(id8).getPlans().get(0).getScore().doubleValue(),
 				0.00); // this agent only travels within the area and should thus never pay a toll
 	}
 

@@ -39,8 +39,9 @@ public class BestPlanSelector implements PlanSelector {
 		Plan bestPlan = null;
 
 		for (Plan plan : person.getPlans()) {
-			if (plan.getScoreAsPrimitiveType() > maxScore) {
-				maxScore = plan.getScoreAsPrimitiveType();
+			Double score = plan.getScore();
+			if ((score != null) && (score.doubleValue() > maxScore)) {
+				maxScore = plan.getScore().doubleValue();
 				bestPlan = plan;
 			}
 		}

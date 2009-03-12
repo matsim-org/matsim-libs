@@ -55,8 +55,15 @@ public class ExpBetaPlanChanger implements PlanSelector {
 			return null;
 		}
 
-		double currentScore = currentPlan.getScoreAsPrimitiveType();
-		double otherScore = otherPlan.getScoreAsPrimitiveType();
+		if ((currentPlan.getScore() == null) || (otherPlan.getScore() == null)) {
+			/* With the previous behavior, Double.NaN was returned if no score was available.
+			 * This resulted in weight=NaN below as well, and then ultimately in returning
+			 * the currentPlan---what we're doing right now as well.
+			 */
+			return currentPlan;
+		}
+		double currentScore = currentPlan.getScore().doubleValue();
+		double otherScore = otherPlan.getScore().doubleValue();
 
 		if ( betaFlag ) {
 //			System.err.println( "ExpBetaPlanChanger: The following beta should be replaced by beta/2.  Not fatal.") ; // ask kai.  Jul08

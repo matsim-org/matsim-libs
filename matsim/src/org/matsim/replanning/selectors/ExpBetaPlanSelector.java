@@ -49,7 +49,9 @@ public class ExpBetaPlanSelector implements PlanSelector {
 		// - first find the max. score of all plans of this person
 		double maxScore = Double.NEGATIVE_INFINITY;
 		for (Plan plan : person.getPlans()) {
-			if (plan.getScoreAsPrimitiveType() > maxScore) maxScore = plan.getScoreAsPrimitiveType();
+			if ((plan.getScore() != null) && (plan.getScore().doubleValue() > maxScore)) {
+				maxScore = plan.getScore().doubleValue();
+			}
 		}
 
 		// - now calculate the weights
@@ -91,7 +93,10 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	 * @return the weight of the plan
 	 */
 	private double calcPlanWeight(final Plan plan, final double maxScore) {
-		double weight = Math.exp(this.beta * (plan.getScoreAsPrimitiveType() - maxScore));
+		if (plan.getScore() == null) {
+			return Double.NaN;
+		}
+		double weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		if (weight < MIN_WEIGHT) weight = MIN_WEIGHT;
 		return weight;
 	}

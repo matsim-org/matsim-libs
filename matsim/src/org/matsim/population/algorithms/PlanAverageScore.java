@@ -29,25 +29,11 @@ public class PlanAverageScore extends AbstractPersonAlgorithm implements PlanAlg
 
 	private double sumScores = 0.0;
 	private long cntScores = 0;
-	private double limit = Double.NEGATIVE_INFINITY;
 	
 	public PlanAverageScore() {
 		super();
 	}
 	
-	/**
-	 * Constructs a PlanAverageScorer when some plans with a score lower than 
-	 * limit are not used to calculate the average.
-	 * 
-	 * @param limit only scores equal or bigger than limit will be average
-	 */
-	public PlanAverageScore(double limit) {
-		super();
-		this.limit = limit;
-	}
-
-	// TODO PlanCalcScore should NOT inherit from AbstractPersonAlgorithm, because it is a PlanAlgorithm
-	// this functionality is only provided a.t.m. until the complete PlanAlgorithm-API is ready.
 	@Override
 	public void run(Person person) {
 		Iterator<Plan> iter = person.getPlans().iterator();
@@ -60,10 +46,10 @@ public class PlanAverageScore extends AbstractPersonAlgorithm implements PlanAlg
 	}
 	
 	public final void run(Plan plan) {
-		double score = plan.getScoreAsPrimitiveType();
+		Double score = plan.getScore();
 
-		if (!(Double.isInfinite(score) || Double.isNaN(score) || (score < limit))) {
-			sumScores += score;
+		if ((score != null) && (!score.isInfinite()) && (!score.isNaN())) {
+			sumScores += score.doubleValue();
 			cntScores++;
 		}
 	}

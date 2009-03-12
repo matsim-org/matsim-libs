@@ -194,8 +194,8 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 
 	public void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
 		out.write("\t\t<plan");
-		if (!Double.isNaN(plan.getScoreAsPrimitiveType()))
-			out.write(" score=\"" + plan.getScoreAsPrimitiveType() + "\"");
+		if (plan.getScore() != null)
+			out.write(" score=\"" + plan.getScore().toString() + "\"");
 		if (plan.isSelected())
 			out.write(" selected=\"" + "yes" + "\"");
 		else

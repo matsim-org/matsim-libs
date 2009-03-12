@@ -228,7 +228,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 
 	@Override
 	public final String toString() {
-		return "[score=" + this.getScoreAsPrimitiveType() + "]" +
+		return "[score=" + this.getScore().toString() + "]" +
 				"[selected=" + this.isSelected() + "]" +
 				"[nof_acts_legs=" + this.actsLegs.size() + "]";
 	}
@@ -237,7 +237,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	 * @param in a plan who's data will be loaded into this plan
 	 **/
 	public void copyPlan(final Plan in) {
-		setScore(in.getScoreAsPrimitiveType());
+		setScore(in.getScore());
 		this.setType(in.getType());
 		this.person = in.getPerson();
 		List<?> actl = in.getPlanElements();
@@ -370,20 +370,6 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 			return Plan.UNDEF_SCORE;
 		}
 		return getScore().doubleValue();
-	}
-
-	public boolean hasUndefinedScore() {
-		if (getScore() == null) {
-			return true;
-		}
-		if (Double.isNaN(getScore())) {
-			return true;
-		}
-		return false;
-	}
-
-	public void setScore(double score) {
-		super.setScore(score);
 	}
 	
 }

@@ -30,7 +30,6 @@ import java.io.IOException;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
@@ -70,34 +69,35 @@ public class ScoreTest extends AbstractPersonAlgorithm {
 		double sumScores = 0.0;
 		double cntScores = 0;
 		for (Plan plan : person.getPlans()) {
-			if (plan.hasUndefinedScore())
+			if (plan.getScore() == null) {
 				continue;
+			}
 			// worst plan
 			if (worstPlan == null)
 				worstPlan = plan;
-			else if (plan.getScoreAsPrimitiveType() < worstPlan.getScoreAsPrimitiveType())
+			else if (plan.getScore() < worstPlan.getScore())
 				worstPlan = plan;
 			// best plan
 			if (bestPlan == null)
 				bestPlan = plan;
-			else if (plan.getScoreAsPrimitiveType() > bestPlan.getScoreAsPrimitiveType())
+			else if (plan.getScore() > bestPlan.getScore())
 				bestPlan = plan;
 			// avg. score
-			sumScores += plan.getScoreAsPrimitiveType();
+			sumScores += plan.getScore();
 			cntScores++;
 			// executed plan?
 			if (plan.isSelected()) {
-				this.sumExecutedScores += plan.getScoreAsPrimitiveType();
+				this.sumExecutedScores += plan.getScore();
 				this.nofExecutedScores++;
 			}
 		}
 		if (worstPlan != null) {
 			this.nofScoreWorst++;
-			this.sumScoreWorst += worstPlan.getScoreAsPrimitiveType();
+			this.sumScoreWorst += worstPlan.getScore();
 		}
 		if (bestPlan != null) {
 			this.nofScoreBest++;
-			this.sumScoreBest += bestPlan.getScoreAsPrimitiveType();
+			this.sumScoreBest += bestPlan.getScore();
 		}
 		if (cntScores > 0) {
 			this.sumAvgScores += sumScores / cntScores;
@@ -145,7 +145,7 @@ public class ScoreTest extends AbstractPersonAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 
 		ScoreTest st = new ScoreTest(outputFilename);
 		population.addAlgorithm(st);

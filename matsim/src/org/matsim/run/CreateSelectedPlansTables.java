@@ -121,7 +121,7 @@ public class CreateSelectedPlansTables {
 
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfileAverages);
 			out.write(header);
-			out.newLine();
+			out.write('\n');
 
 			final int nr_selectedplans=this.plans0.getPersons().size();
 
@@ -137,7 +137,7 @@ public class CreateSelectedPlansTables {
 				out.write(this.sumLegTraveltime[i]/nr_selectedplans+"\t");
 				out.write(this.sumLegTraveldistance[i]/nr_selectedplans+"\t");
 				out.write(this.sumNrLegs[i]/nr_selectedplans+"\t");
-				out.newLine();
+				out.write('\n');
 				out.flush();
 			}
 			out.close();
@@ -161,7 +161,7 @@ public class CreateSelectedPlansTables {
 
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfileTable);
 			out.write(header);
-			out.newLine();
+			out.write('\n');
 
 			for (final Id person_id : this.plans0.getPersons().keySet()) {
 
@@ -186,7 +186,7 @@ public class CreateSelectedPlansTables {
 				}
 
 				// plan0 ----------------------------------------------
-				out.write(person.getSelectedPlan().getScoreAsPrimitiveType()+"\t");
+				out.write(person.getSelectedPlan().getScore()+"\t");
 				out.write(this.getTravelTime(person)+"\t");
 				this.sumPlanTraveltime[0]+=this.getTravelTime(person);
 
@@ -202,20 +202,19 @@ public class CreateSelectedPlansTables {
 				if (this.twoPlans) {
 
 					final Person person_comp=this.plans1.getPerson(person_id);
-					out.write(person_comp.getSelectedPlan().getScoreAsPrimitiveType()+"\t");
+					out.write(person_comp.getSelectedPlan().getScore()+"\t");
 					out.write(this.getTravelTime(person_comp)+"\t");
 					this.sumPlanTraveltime[1]+=this.getTravelTime(person_comp);
 
 					out.write(this.getTravelDist(person_comp)+"\t");
 					this.sumPlanTraveldistance[1]+=this.getTravelDist(person_comp);
 
-					// TODO [AH] using newline(). But still a tab is necessary (!?) Correct that later.
 					out.write(this.getNumberOfTrips(person_comp)+"\t");
 					this.sumNrLegs[1]+=this.getNumberOfTrips(person_comp);
 					this.sumLegTraveltime[1]+=(this.getTravelTime(person_comp)/this.getNumberOfTrips(person_comp));
 					this.sumLegTraveldistance[1]+=(this.getTravelDist(person_comp)/this.getNumberOfTrips(person_comp));
 				}
-				out.newLine();
+				out.write('\n');
 				out.flush();
 			}
 			out.close();

@@ -97,7 +97,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 		//the very first and the very last link of a path will be ignored - gl
 		for (Plan plan : plans) {
 
-			if (plan.getScoreAsPrimitiveType() > wc.maxScore) wc.maxScore = plan.getScoreAsPrimitiveType();
+			if (plan.getScore() > wc.maxScore) wc.maxScore = plan.getScore();
 
 			double pathSize = 0;
 			double currentEndTime = 0.0;
@@ -147,7 +147,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 				// likely that wc.maxScore == -Infinity, and thus plan.getScoreAsPrimitiveType() also == -Infinity, handle it like any other case where getScore() == maxScore
 				weight = PSi;
 			} else {
-				weight = Math.exp(this.tau * (plan.getScoreAsPrimitiveType() - wc.maxScore))*PSi;
+				weight = Math.exp(this.tau * (plan.getScore() - wc.maxScore))*PSi;
 			}
 			if (weight <= 0.0) weight = 0;
 			wc.weights[idx] = weight;

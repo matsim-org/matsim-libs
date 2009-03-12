@@ -2240,9 +2240,10 @@ public class MyRuns {
 
 	public static void someTest(final String[] args) {
 
-		Double UNDEF = null;
-		double score = UNDEF;
-
+//		Double UNDEF = null;
+//		double score = UNDEF;
+//		
+		System.out.println(System.getProperties().get("java.class.path"));
 	}
 
 	//////////////////////////////////////////////////////////////////////

@@ -301,7 +301,7 @@ public class Planomat implements PlanAlgorithm {
 		}
 
 		// invalidate score information
-		plan.setScore(Double.NaN);
+		plan.setScore(null);
 
 	}
 

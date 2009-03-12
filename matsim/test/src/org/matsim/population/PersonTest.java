@@ -215,21 +215,21 @@ public class PersonTest extends MatsimTestCase {
 
 		// now test if we all for plans without score are returned
 		Plan plan = person.getRandomUnscoredPlan();
-		assertTrue(plan.hasUndefinedScore());
+		assertNull(plan.getScore());
 		plan.setScore(1.0);
 		plan = person.getRandomUnscoredPlan();
-		assertTrue(plan.hasUndefinedScore());
+		assertNull(plan.getScore());
 		plan.setScore(2.0);
 		plan = person.getRandomUnscoredPlan();
-		assertTrue(plan.hasUndefinedScore());
+		assertNull(plan.getScore());
 		plan.setScore(3.0);
 		plan = person.getRandomUnscoredPlan();
-		assertTrue(plan.hasUndefinedScore());
+		assertNull(plan.getScore());
 		plan.setScore(4.0);
 		plan = person.getRandomUnscoredPlan();
 		assertNull(plan);
 		for (int i = 0; i < plans.length; i++) {
-			assertFalse(plans[i].hasUndefinedScore());
+			assertNotNull(plans[i].getScore());
 		}
 	}
 

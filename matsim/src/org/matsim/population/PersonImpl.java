@@ -119,7 +119,7 @@ public class PersonImpl implements Person{
 	public Plan getRandomUnscoredPlan() {
 		int cntUnscored = 0;
 		for (Plan plan : this.getPlans()) {
-			if (plan.hasUndefinedScore()) {
+			if (plan.getScore() == null) {
 				cntUnscored++;
 			}
 		}
@@ -128,7 +128,7 @@ public class PersonImpl implements Person{
 			int idxUnscored = MatsimRandom.random.nextInt(cntUnscored);
 			cntUnscored = 0;
 			for (Plan plan : this.getPlans()) {
-				if (plan.hasUndefinedScore()) {
+				if (plan.getScore() == null) {
 					if (cntUnscored == idxUnscored) {
 						return plan;
 					}
@@ -245,13 +245,13 @@ public class PersonImpl implements Person{
 			double worstScore = Double.POSITIVE_INFINITY;
 			for (Plan plan : this.getPlans()) {
 				if (typeCounts.get(plan.getType()).intValue() > 1) {
-					if (plan.hasUndefinedScore()) {
+					if (plan.getScore() == null) {
 						worst = plan;
 						// make sure no other score could be less than this
 						worstScore = Double.NEGATIVE_INFINITY;
-					} else if (plan.getScoreAsPrimitiveType() < worstScore) {
+					} else if (plan.getScore().doubleValue() < worstScore) {
 						worst = plan;
-						worstScore = plan.getScoreAsPrimitiveType();
+						worstScore = plan.getScore().doubleValue();
 					}
 				}
 			}

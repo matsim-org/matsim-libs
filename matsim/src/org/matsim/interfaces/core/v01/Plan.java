@@ -16,7 +16,7 @@ public interface Plan extends BasicPlan {
 	
 	/**
 	 * Constant describing the score of an unscored plan. <b>Do not use this constant in
-	 * comparisons</b>, but use {@link #hasUndefinedScore()}
+	 * comparisons</b>, but use <code>getScore() == null</code>
 	 * instead to test if a plan has an undefined score.
 	 */
 	@Deprecated
@@ -128,11 +128,9 @@ public interface Plan extends BasicPlan {
 	@Deprecated
 	public ActIterator getIteratorAct();
 
+	@Deprecated // use getScore()
 	public double getScoreAsPrimitiveType();
 
-	/** @return true if the score of this plan is not defined */
-	public boolean hasUndefinedScore();
-	
 	@Deprecated
 	public void setType(Plan.Type type);
 	@Deprecated

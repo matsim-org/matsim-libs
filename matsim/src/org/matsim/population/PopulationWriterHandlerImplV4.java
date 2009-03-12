@@ -269,8 +269,8 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 
 	public void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
 		out.write("\t\t<plan");
-		if (!plan.hasUndefinedScore())
-			out.write(" score=\"" + plan.getScoreAsPrimitiveType() + "\"");
+		if (plan.getScore() != null)
+			out.write(" score=\"" + plan.getScore().toString() + "\"");
 		if (plan.isSelected())
 			out.write(" selected=\"" + "yes" + "\"");
 		else

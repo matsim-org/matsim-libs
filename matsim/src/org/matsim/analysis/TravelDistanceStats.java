@@ -117,21 +117,33 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		for (Person person : this.population.getPersons().values()) {
 			Plan worstPlan = null;
 			Plan bestPlan = null;
+			double worstScore = Double.POSITIVE_INFINITY;
+			double bestScore = Double.NEGATIVE_INFINITY;
 			double sumLegTravelDistance = 0.0;
 			double cntLegTravelDistance = 0;
 			for (Plan plan : person.getPlans()) {
+				
+				if (plan.getScore() == null) {
+					continue;
+				}
+				double score = plan.getScore().doubleValue();
+				
 				// worst plan -----------------------------------------------------
 				if (worstPlan == null) {
 					worstPlan = plan;
-				} else if (plan.getScoreAsPrimitiveType() < worstPlan.getScoreAsPrimitiveType()) {
+					worstScore = score;
+				} else if (score < worstScore) {
 					worstPlan = plan;
+					worstScore = score;
 				}
 
 				// best plan -------------------------------------------------------
 				if (bestPlan == null) {
 					bestPlan = plan;
-				} else if (plan.getScoreAsPrimitiveType() > bestPlan.getScoreAsPrimitiveType()) {
+					bestScore = score;
+				} else if (score > bestScore) {
 					bestPlan = plan;
+					bestScore = score;
 				}
 
 				// avg. leg travel distance

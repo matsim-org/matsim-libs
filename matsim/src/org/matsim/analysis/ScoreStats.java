@@ -46,7 +46,7 @@ import org.matsim.utils.io.IOUtils;
  * <li>average of the score of the best plan of each agent</li>
  * <li>average of the average score of all plans of each agent</li>
  * </ul>
- * Plans with {@linkplain org.matsim.interfaces.core.v01.Plan#isUndefinedScore(double) undefined scores}
+ * Plans with undefined scores
  * are not included in the statistics. The calculated values are written to a file, each iteration on
  * a separate line.
  *
@@ -104,58 +104,65 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 		int nofScoreBest = 0;
 		int nofAvgScores = 0;
 		int nofExecutedScores = 0;
-		int nofExecutedIvPlans = 0;
-		int nofExecutedOevPlans = 0;
+//		int nofExecutedIvPlans = 0;
+//		int nofExecutedOevPlans = 0;
 
 		for (Person person : this.population.getPersons().values()) {
 			Plan worstPlan = null;
 			Plan bestPlan = null;
+			double worstScore = Double.POSITIVE_INFINITY;
+			double bestScore = Double.NEGATIVE_INFINITY;
 			double sumScores = 0.0;
 			double cntScores = 0;
 			for (Plan plan : person.getPlans()) {
 
-				if (plan.hasUndefinedScore()) {
+				if (plan.getScore() == null) {
 					continue;
 				}
+				double score = plan.getScore().doubleValue();
 
 				// worst plan
 				if (worstPlan == null) {
 					worstPlan = plan;
-				} else if (plan.getScoreAsPrimitiveType() < worstPlan.getScoreAsPrimitiveType()) {
+					worstScore = score;
+				} else if (score < worstScore) {
 					worstPlan = plan;
+					worstScore = score;
 				}
 
 				// best plan
 				if (bestPlan == null) {
 					bestPlan = plan;
-				} else if (plan.getScoreAsPrimitiveType() > bestPlan.getScoreAsPrimitiveType()) {
+					bestScore = score;
+				} else if (score > bestScore) {
 					bestPlan = plan;
+					bestScore = score;
 				}
 
 				// avg. score
-				sumScores += plan.getScoreAsPrimitiveType();
+				sumScores += score;
 				cntScores++;
 
 				// executed plan?
 				if (plan.isSelected()) {
-					sumExecutedScores += plan.getScoreAsPrimitiveType();
+					sumExecutedScores += score;
 					nofExecutedScores++;
-					if (plan.getType() == Plan.Type.CAR) {
-						nofExecutedIvPlans ++;
-					}
-					else if (plan.getType() == Plan.Type.PT) {
-						nofExecutedOevPlans++;
-					}
+//					if (plan.getType() == Plan.Type.CAR) {
+//						nofExecutedIvPlans ++;
+//					}
+//					else if (plan.getType() == Plan.Type.PT) {
+//						nofExecutedOevPlans++;
+//					}
 				}
 			}
 
 			if (worstPlan != null) {
 				nofScoreWorst++;
-				sumScoreWorst += worstPlan.getScoreAsPrimitiveType();
+				sumScoreWorst += worstScore;
 			}
 			if (bestPlan != null) {
 				nofScoreBest++;
-				sumScoreBest += bestPlan.getScoreAsPrimitiveType();
+				sumScoreBest += bestScore;
 			}
 			if (cntScores > 0) {
 				sumAvgScores += (sumScores / cntScores);
@@ -163,13 +170,11 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 			}
 		}
 		log.info("-- avg. score of the executed plan of each agent: " + (sumExecutedScores / nofExecutedScores));
-		log.info("-- number of executed plans: "  + nofExecutedScores);
-		log.info("-- number of executed iv plans: "  + nofExecutedIvPlans);
-		log.info("-- number of executed oev plans: "  + nofExecutedOevPlans);
-		log.info("-- modal split iv: "  + ((nofExecutedScores == 0) ? 0 : ((double)nofExecutedIvPlans / (double)nofExecutedScores * 100d)) +
-				" % oev: " + ((nofExecutedScores == 0) ? 0 : ((double)nofExecutedOevPlans / (double)nofExecutedScores * 100d)) + " %");
-
-
+//		log.info("-- number of executed plans: "  + nofExecutedScores);
+//		log.info("-- number of executed iv plans: "  + nofExecutedIvPlans);
+//		log.info("-- number of executed oev plans: "  + nofExecutedOevPlans);
+//		log.info("-- modal split iv: "  + ((nofExecutedScores == 0) ? 0 : ((double)nofExecutedIvPlans / (double)nofExecutedScores * 100d)) +
+//				" % oev: " + ((nofExecutedScores == 0) ? 0 : ((double)nofExecutedOevPlans / (double)nofExecutedScores * 100d)) + " %");
 		log.info("-- avg. score of the worst plan of each agent: " + (sumScoreWorst / nofScoreWorst));
 		log.info("-- avg. of the avg. plan score per agent: " + (sumAvgScores / nofAvgScores));
 		log.info("-- avg. score of the best plan of each agent: " + (sumScoreBest / nofScoreBest));
