@@ -2,8 +2,6 @@ package org.matsim.scoring;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.scoring.CharyparNagelScoringParameters;
-import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 
 
