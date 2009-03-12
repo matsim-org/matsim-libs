@@ -23,11 +23,11 @@ package playground.jhackney.scoring;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentMoneyEvent;
@@ -113,8 +113,8 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 
 			double score = sf.getScore();
 			Plan plan = this.population.getPerson(new IdImpl(agentId)).getSelectedPlan();
-			double oldScore = plan.getScoreAsPrimitiveType();
-			if (Double.isNaN(oldScore)) {
+			Double oldScore = plan.getScore();
+			if (oldScore == null) {
 				plan.setScore(score);
 			} else {
 				plan.setScore(this.learningRate * score + (1-this.learningRate) * oldScore);
@@ -146,37 +146,44 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 				String agentId = entry.getKey();
 				playground.jhackney.scoring.EventSocScoringFunction sf = entry.getValue();
 				Plan plan = this.population.getPerson(new IdImpl(agentId)).getSelectedPlan();
-				ActLegIterator actLegIter = plan.getIterator();
-				Activity act = (Activity) actLegIter.nextAct();
-
+				Iterator actLegIter = plan.getPlanElements().iterator();
+				Activity act = (Activity) actLegIter.next(); // assume first plan element is always an Activity
 
 				int actNumber=0;
 				int legNumber=-1;
 
-				while(actLegIter.hasNextLeg()){//alternates Act-Leg-Act-Leg and ends with Act
-
-					Leg leg = (Leg) actLegIter.nextLeg();
-					legNumber++;
-
-					try {
-						muout.write(agentId+"\t"+sf.getDulegt(leg));
-						uout.write(agentId+"\t"+sf.getDulegt(leg));
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					act = (Activity) actLegIter.nextAct();
-					actNumber++;
-
-					try {
-						muout.write("\t"+actNumber+"\t\""+act.getType()+"\"\t"+sf.getDudur(act)+"\t"+sf.getDued(act)+"\t"+sf.getDula(act)+"\t"+sf.getDuld(act)+"\t"+sf.getDus(act)+"\t"+sf.getDuw(act)+"\t"+sf.getDusoc(act));
-						uout.write("\t"+actNumber+"\t\""+act.getType()+"\"\t"+sf.getUdur(act)+"\t"+sf.getUed(act)+"\t"+sf.getUla(act)+"\t"+sf.getUld(act)+"\t"+sf.getUs(act)+"\t"+sf.getUw(act)+"\t"+sf.getUsoc(act));
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+				while(actLegIter.hasNext()){//alternates Act-Leg-Act-Leg and ends with Act
+					Object o = actLegIter.next();
+					if (o instanceof Leg) {
+						Leg leg = (Leg) o;
+						legNumber++;
+	
+						try {
+							muout.write(agentId+"\t"+sf.getDulegt(leg));
+							uout.write(agentId+"\t"+sf.getDulegt(leg));
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					} else if (o instanceof Activity) {
+						act = (Activity) o;
+						actNumber++;
+	
+						try {
+							muout.write("\t"+actNumber+"\t\""+act.getType()+"\"\t"+sf.getDudur(act)+"\t"+sf.getDued(act)+"\t"+sf.getDula(act)+"\t"+sf.getDuld(act)+"\t"+sf.getDus(act)+"\t"+sf.getDuw(act)+"\t"+sf.getDusoc(act));
+							uout.write("\t"+actNumber+"\t\""+act.getType()+"\"\t"+sf.getUdur(act)+"\t"+sf.getUed(act)+"\t"+sf.getUla(act)+"\t"+sf.getUld(act)+"\t"+sf.getUs(act)+"\t"+sf.getUw(act)+"\t"+sf.getUsoc(act));
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
+			}
+			try {
+				muout.close();
+				uout.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}

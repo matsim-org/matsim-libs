@@ -48,7 +48,6 @@ import net.opengis.kml._2.PointType;
 import net.opengis.kml._2.StyleType;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Activity;
@@ -328,32 +327,35 @@ public class EgoNetPlansMakeKML {
 		facilitiesFolder.setVisibility(false);
 		myKMLDocument.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(facilitiesFolder));
 
-		ActLegIterator actLegIter = myPlan.getIterator();
-		Activity act0 = (Activity) actLegIter.nextAct();
+		Iterator actLegIter = myPlan.getPlanElements().iterator();
+		Activity act0 = (Activity) actLegIter.next(); // assumes first plan element is always an Activity
 		makeActKML(myPerson, act0, agentFolder, agentLinkStyle);
-		while(actLegIter.hasNextLeg()){//alternates Act-Leg-Act-Leg and ends with Act
-
-			Leg leg = (Leg) actLegIter.nextLeg();
-
-			for (Link routeLink : ((CarRoute) leg.getRoute()).getLinks()) {
-				PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo);
-
-				boolean linkExists = false;
-				ListIterator<JAXBElement<? extends AbstractFeatureType>> li = agentFolder.getAbstractFeatureGroup().listIterator();
-				while (li.hasNext() && (linkExists == false)) {
-
-					JAXBElement<? extends AbstractFeatureType> abstractFeature = li.next();
-					if (abstractFeature.getName().equals(agentLinkL.getName())) {
-						linkExists = true;
+		while(actLegIter.hasNext()){//alternates Act-Leg-Act-Leg and ends with Act
+			Object o = actLegIter.next();
+			if (o instanceof Leg) {
+				Leg leg = (Leg) o;
+	
+				for (Link routeLink : ((CarRoute) leg.getRoute()).getLinks()) {
+					PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo);
+	
+					boolean linkExists = false;
+					ListIterator<JAXBElement<? extends AbstractFeatureType>> li = agentFolder.getAbstractFeatureGroup().listIterator();
+					while (li.hasNext() && (linkExists == false)) {
+	
+						JAXBElement<? extends AbstractFeatureType> abstractFeature = li.next();
+						if (abstractFeature.getName().equals(agentLinkL.getName())) {
+							linkExists = true;
+						}
+	
 					}
-
+					if (!linkExists) {
+						agentFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(agentLinkL));
+					}
 				}
-				if (!linkExists) {
-					agentFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(agentLinkL));
-				}
+			} else if (o instanceof Activity) {
+				Activity act = (Activity) o;
+				makeActKML(myPerson, act, agentFolder,agentLinkStyle);
 			}
-			Activity act = (Activity) actLegIter.nextAct();
-			makeActKML(myPerson, act, agentFolder,agentLinkStyle);
 		}
 
 

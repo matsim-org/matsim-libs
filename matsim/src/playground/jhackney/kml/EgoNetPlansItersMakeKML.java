@@ -47,8 +47,6 @@ import net.opengis.kml._2.TimeSpanType;
 import net.opengis.kml._2.TimeStampType;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.config.Config;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
@@ -399,74 +397,76 @@ public class EgoNetPlansItersMakeKML {
 			planFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(facilitiesFolder));
 		}
 
-		ActLegIterator actLegIter = myPlan.getIterator();
-		Activity act0 = (Activity) actLegIter.nextAct();
+		Iterator actLegIter = myPlan.getPlanElements().iterator();
+		Activity act0 = (Activity) actLegIter.next(); // assume first is always an Activity
 		makeActKML(alter, act0, 0, planFolder, agentLinkStyle, iter);
 		int actNumber=0;
-		while(actLegIter.hasNextLeg()){//alternates Act-Leg-Act-Leg and ends with Act
+		while(actLegIter.hasNext()) {
+			Object o = actLegIter.next();
+			if (o instanceof Leg) {
+				Leg leg = (Leg) o;
 
-			Leg leg = (Leg) actLegIter.nextLeg();
+				for (Link routeLink : ((CarRoute) leg.getRoute()).getLinks()) {
+					PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo, iter);
+					
+					featureExists = false;
+					featureIterator = planFolder.getAbstractFeatureGroup().listIterator();
+					while (featureIterator.hasNext() && !featureExists) {
+						AbstractFeatureType abstractFeature = featureIterator.next().getValue();
+						if (abstractFeature.getId().equals(agentLinkL.getId())) {
+							featureExists = true;
+						}
+					}
+					if (!featureExists) {
+						planFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(agentLinkL));
+					}
+				}
+			} else if (o instanceof Activity) {
+				Activity act = (Activity) o;
+				actNumber++;
+				makeActKML(alter, act,actNumber, planFolder,agentLinkStyle, iter);
+			}
+		}
 
-			for (Link routeLink : ((CarRoute) leg.getRoute()).getLinks()) {
-				PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo, iter);
-				
+		// Fill the facilities folder
+
+		for (Object o : myPlan.getPlanElements()) {
+			if (o instanceof Activity) {
+				Activity myAct = (Activity) o;
+	//			Activity myActivity =myPerson.getKnowledge().getMentalMap().getActivity(myAct).getFacility().toString();
+				String myActivity=myAct.getFacility().getActivityOption(myAct.getType()).toString();
+				//Above lines call code that results in a null pointer. Test
+				// michi's new change. Note the Act.setFacility() might not
+				// always be kept up-to-date by socialNetowrk code, check this. JH 02-07-2008
+				StyleType myStyle=facStyle.get(myAct.getType());
+				PlacemarkType aFacility = kmlObjectFactory.createPlacemarkType();
+				aFacility.setId(myAct.getType().substring(0, 1));
+				aFacility.setDescription(myActivity);
+				aFacility.setAddress("address");
+				aFacility.setStyleUrl(myStyle.getId());
+				aFacility.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
+				// Get the coordinates of the facility associated with the Act and transform
+				// to WGS84 for GoogleEarth
+				Coord geometryCoord = trafo.transform(myAct.getCoord());
+				PointType myPoint = kmlObjectFactory.createPointType();
+				myPoint.getCoordinates().add(Double.toString(geometryCoord.getX()) + "," + Double.toString(geometryCoord.getY()) + ",0.0");
+				aFacility.setAbstractGeometryGroup(kmlObjectFactory.createPoint(myPoint));
+				LookAtType lookAt = kmlObjectFactory.createLookAtType();
+				lookAt.setLongitude(geometryCoord.getX());
+				lookAt.setLatitude(geometryCoord.getY());
+				aFacility.setAbstractViewGroup(kmlObjectFactory.createLookAt(lookAt));
+	
 				featureExists = false;
-				featureIterator = planFolder.getAbstractFeatureGroup().listIterator();
+				featureIterator = facilitiesFolder.getAbstractFeatureGroup().listIterator();
 				while (featureIterator.hasNext() && !featureExists) {
 					AbstractFeatureType abstractFeature = featureIterator.next().getValue();
-					if (abstractFeature.getId().equals(agentLinkL.getId())) {
+					if (abstractFeature.getId().equals(aFacility.getId())) {
 						featureExists = true;
 					}
 				}
 				if (!featureExists) {
-					planFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(agentLinkL));
+					facilitiesFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(aFacility));
 				}
-			}
-			Activity act = (Activity) actLegIter.nextAct();
-			actNumber++;
-			makeActKML(alter, act,actNumber, planFolder,agentLinkStyle, iter);
-		}
-
-
-
-		// Fill the facilities folder
-
-		ActIterator aIter = myPlan.getIteratorAct();
-		while(aIter.hasNext()){
-			Activity myAct = (Activity) aIter.next();
-//			Activity myActivity =myPerson.getKnowledge().getMentalMap().getActivity(myAct).getFacility().toString();
-			String myActivity=myAct.getFacility().getActivityOption(myAct.getType()).toString();
-			//Above lines call code that results in a null pointer. Test
-			// michi's new change. Note the Act.setFacility() might not
-			// always be kept up-to-date by socialNetowrk code, check this. JH 02-07-2008
-			StyleType myStyle=facStyle.get(myAct.getType());
-			PlacemarkType aFacility = kmlObjectFactory.createPlacemarkType();
-			aFacility.setId(myAct.getType().substring(0, 1));
-			aFacility.setDescription(myActivity);
-			aFacility.setAddress("address");
-			aFacility.setStyleUrl(myStyle.getId());
-			aFacility.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
-			// Get the coordinates of the facility associated with the Act and transform
-			// to WGS84 for GoogleEarth
-			Coord geometryCoord = trafo.transform(myAct.getCoord());
-			PointType myPoint = kmlObjectFactory.createPointType();
-			myPoint.getCoordinates().add(Double.toString(geometryCoord.getX()) + "," + Double.toString(geometryCoord.getY()) + ",0.0");
-			aFacility.setAbstractGeometryGroup(kmlObjectFactory.createPoint(myPoint));
-			LookAtType lookAt = kmlObjectFactory.createLookAtType();
-			lookAt.setLongitude(geometryCoord.getX());
-			lookAt.setLatitude(geometryCoord.getY());
-			aFacility.setAbstractViewGroup(kmlObjectFactory.createLookAt(lookAt));
-
-			featureExists = false;
-			featureIterator = facilitiesFolder.getAbstractFeatureGroup().listIterator();
-			while (featureIterator.hasNext() && !featureExists) {
-				AbstractFeatureType abstractFeature = featureIterator.next().getValue();
-				if (abstractFeature.getId().equals(aFacility.getId())) {
-					featureExists = true;
-				}
-			}
-			if (!featureExists) {
-				facilitiesFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(aFacility));
 			}
 		}
 

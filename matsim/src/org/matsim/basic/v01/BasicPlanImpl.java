@@ -116,42 +116,6 @@ public class BasicPlanImpl implements BasicPlan {
 		}
 	}
 
-	/**
-	 * Iterator-like class, that steps through all Activities and Legs
-	 * You have to call nextLeg(), nextAct alternating, otherwise
-	 * an exception is thrown.
-	 */
-	public class ActLegIterator {
-		private int index = 0;
-
-		public boolean hasNextLeg() {
-			return BasicPlanImpl.this.actsLegs.size() > this.index+1;
-		}
-
-		public BasicLeg nextLeg() {
-			if (this.index % 2 == 0 ) throw new IndexOutOfBoundsException("Requested Leg on Act-Position");
-			BasicLeg leg = (BasicLeg)BasicPlanImpl.this.actsLegs.get(this.index);
-			this.index+=1;
-			return leg;
-		}
-
-		public BasicActivity nextAct() {
-			if (this.index % 2 != 0 ) throw new IndexOutOfBoundsException("Requested Act on Leg-Position");
-			BasicActivity act = (BasicActivity)BasicPlanImpl.this.actsLegs.get(this.index);
-			this.index+=1;
-			return act;
-		}
-
-		public void remove() {
-			// not supported?
-			throw new UnsupportedOperationException("Remove is not supported with this iterator");
-		}
-	}
-
-	public ActLegIterator getIterator() {
-		return new ActLegIterator();
-	}
-
 	public LegIterator getIteratorLeg () {
 		return new LegIterator();
 	}

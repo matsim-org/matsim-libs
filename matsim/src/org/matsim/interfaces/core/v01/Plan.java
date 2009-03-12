@@ -1,7 +1,6 @@
 package org.matsim.interfaces.core.v01;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicPlan;
@@ -85,42 +84,28 @@ public interface Plan extends BasicPlan {
 	/**
 	 * Returns the leg following the specified act. <b>Important Note: </b> This method (together with
 	 * {@link #getNextActivity(Leg)}) has a very bad performance if it is used to iterate over all Acts and
-	 * Legs of a plan. In that case, it is advised to use one of the special iterators.
+	 * Legs of a plan. In that case, it is advised to use a regular iterator over {@link #getPlanElements()}
+	 * together with <code>instanceof</code>.
 	 *
 	 * @param act
 	 * @return The Leg following <tt>act</tt> in the plan, null if <tt>act</tt> is the last Act in the plan.
-	 *
-	 * @see #getIterator()
-	 * @see #getIteratorAct()
-	 * @see #getIteratorLeg()
 	 */
 	public Leg getNextLeg(final Activity act);
 
 	/**
 	 * Returns the activity following the specified leg. <b>Important Note: </b> This method (together with
 	 * {@link #getNextLeg(Activity)}) has a very bad performance if it is used to iterate over all Acts and Legs of
-	 * a plan. In that case, it is advised to use one of the special iterators.
+	 * a plan. In that case, it is advised to use a regular iterator over {@link #getPlanElements()} 
+	 * together with <code>instanceof</code>.
 	 *
 	 * @param leg
 	 * @return The Act following <tt>leg</tt> in the plan.
-	 *
-	 * @see #getIterator()
-	 * @see #getIteratorAct()
-	 * @see #getIteratorLeg()
 	 */
 	public Activity getNextActivity(final Leg leg);
 
 	public Activity getFirstActivity();
 
 	public Activity getLastActivity();
-
-	
-	/**
-	 * Getter for the Iterator class defined above
-	 * @return A special iterator over acts and legs.
-	 */
-	@Deprecated
-	public ActLegIterator getIterator();
 
 	@Deprecated
 	public LegIterator getIteratorLeg();
