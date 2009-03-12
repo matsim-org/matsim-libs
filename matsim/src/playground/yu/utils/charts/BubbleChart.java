@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.yu.utils;
+package playground.yu.utils.charts;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;

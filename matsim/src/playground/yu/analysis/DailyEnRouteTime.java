@@ -3,8 +3,6 @@
  */
 package playground.yu.analysis;
 
-import java.io.IOException;
-
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
@@ -22,7 +20,7 @@ import org.matsim.utils.charts.BarChart;
 import org.matsim.utils.charts.XYLineChart;
 
 import playground.yu.analysis.DailyDistance.ActTypeStart;
-import playground.yu.utils.BubbleChart;
+import playground.yu.utils.charts.BubbleChart;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -405,12 +403,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		chart2.addSeries("pt", xs, yPtFracs);
 		chart2.addSeries("walk", xs, yWlkFracs);
 		chart2.saveAsPng(outputFilename + "legTimeModalSplit2.png", 800, 600);
-
-		try {
-			sw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		sw.close();
 	}
 
 	/**

@@ -3,8 +3,6 @@
  */
 package playground.yu.analysis;
 
-import java.io.IOException;
-
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
@@ -24,7 +22,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- *
+ * 
  */
 public class DailyDistanceModalSplit extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -158,61 +156,72 @@ public class DailyDistanceModalSplit extends AbstractPersonAlgorithm implements
 				+ this.withLicensePtDist);
 		sw.writeln("without license\t" + this.withoutLicenseCarDist + "\t"
 				+ this.withoutLicensePtDist);
-		sw.writeln("always has a car\t" + this.alwaysCarDist + "\t" + this.alwaysPtDist);
+		sw.writeln("always has a car\t" + this.alwaysCarDist + "\t"
+				+ this.alwaysPtDist);
 		sw.writeln("sometimes has a car\t" + this.sometimesCarDist + "\t"
 				+ this.sometimesPtDist);
-		sw.writeln("never has a car\t" + this.neverCarDist + "\t" + this.neverPtDist);
-		sw.writeln("employed\t" + this.sometimesCarDist + "\t" + this.sometimesPtDist);
+		sw.writeln("never has a car\t" + this.neverCarDist + "\t"
+				+ this.neverPtDist);
+		sw.writeln("employed\t" + this.sometimesCarDist + "\t"
+				+ this.sometimesPtDist);
 		sw.writeln("not employed\t" + this.notEmployedCarDist + "\t"
 				+ this.notEmployedPtDist);
 		sw.writeln("-----------------------------");
-		try {
-			sw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		sw.close();
 		XYScatterChart chart = new XYScatterChart(
 				"Modal split -- daily Distance", "pt fraction", "car fraction");
 		chart.addSeries("male", new double[] { this.malePtDist * 100.0
-				/ (this.maleCarDist + this.malePtDist) }, new double[] { this.maleCarDist
-				* 100.0 / (this.maleCarDist + this.malePtDist) });
+				/ (this.maleCarDist + this.malePtDist) },
+				new double[] { this.maleCarDist * 100.0
+						/ (this.maleCarDist + this.malePtDist) });
 		chart.addSeries("female", new double[] { this.femalePtDist * 100.0
 				/ (this.femaleCarDist + this.femalePtDist) },
 				new double[] { this.femaleCarDist * 100.0
 						/ (this.femaleCarDist + this.femalePtDist) });
 		chart.addSeries("age<30", new double[] { this.ageAPtDist * 100.0
-				/ (this.ageACarDist + this.ageAPtDist) }, new double[] { this.ageACarDist
-				* 100.0 / (this.ageACarDist + this.ageAPtDist) });
+				/ (this.ageACarDist + this.ageAPtDist) },
+				new double[] { this.ageACarDist * 100.0
+						/ (this.ageACarDist + this.ageAPtDist) });
 		chart.addSeries("30<=age<50", new double[] { this.ageBPtDist * 100.0
-				/ (this.ageBCarDist + this.ageBPtDist) }, new double[] { this.ageBCarDist
-				* 100.0 / (this.ageBCarDist + this.ageBPtDist) });
+				/ (this.ageBCarDist + this.ageBPtDist) },
+				new double[] { this.ageBCarDist * 100.0
+						/ (this.ageBCarDist + this.ageBPtDist) });
 		chart.addSeries("50<=age<70", new double[] { this.ageCPtDist * 100.0
-				/ (this.ageCCarDist + this.ageCPtDist) }, new double[] { this.ageCCarDist
-				* 100.0 / (this.ageCCarDist + this.ageCPtDist) });
+				/ (this.ageCCarDist + this.ageCPtDist) },
+				new double[] { this.ageCCarDist * 100.0
+						/ (this.ageCCarDist + this.ageCPtDist) });
 		chart.addSeries("age>70", new double[] { this.ageDPtDist * 100.0
-				/ (this.ageDCarDist + this.ageDPtDist) }, new double[] { this.ageDCarDist
-				* 100.0 / (this.ageDCarDist + this.ageDPtDist) });
+				/ (this.ageDCarDist + this.ageDPtDist) },
+				new double[] { this.ageDCarDist * 100.0
+						/ (this.ageDCarDist + this.ageDPtDist) });
 		chart.addSeries("with license", new double[] { this.withLicensePtDist
 				* 100.0 / (this.withLicenseCarDist + this.withLicensePtDist) },
 				new double[] { this.withLicenseCarDist * 100.0
 						/ (this.withLicenseCarDist + this.withLicensePtDist) });
-		chart.addSeries("without license", new double[] { this.withoutLicensePtDist
-				* 100.0 / (this.withoutLicenseCarDist + this.withoutLicensePtDist) },
-				new double[] { this.withoutLicenseCarDist * 100.0
-						/ (this.withoutLicenseCarDist + this.withoutLicensePtDist) });
-		chart.addSeries("always has a car", new double[] { this.alwaysPtDist * 100.0
-				/ (this.alwaysCarDist + this.alwaysPtDist) },
+		chart
+				.addSeries(
+						"without license",
+						new double[] { this.withoutLicensePtDist
+								* 100.0
+								/ (this.withoutLicenseCarDist + this.withoutLicensePtDist) },
+						new double[] { this.withoutLicenseCarDist
+								* 100.0
+								/ (this.withoutLicenseCarDist + this.withoutLicensePtDist) });
+		chart.addSeries("always has a car", new double[] { this.alwaysPtDist
+				* 100.0 / (this.alwaysCarDist + this.alwaysPtDist) },
 				new double[] { this.alwaysCarDist * 100.0
 						/ (this.alwaysCarDist + this.alwaysPtDist) });
-		chart.addSeries("sometimes has a car", new double[] { this.sometimesPtDist
-				* 100.0 / (this.sometimesCarDist + this.sometimesPtDist) },
+		chart.addSeries("sometimes has a car",
+				new double[] { this.sometimesPtDist * 100.0
+						/ (this.sometimesCarDist + this.sometimesPtDist) },
 				new double[] { this.sometimesCarDist * 100.0
 						/ (this.sometimesCarDist + this.sometimesPtDist) });
-		chart.addSeries("never has a car", new double[] { this.neverPtDist * 100.0
-				/ (this.neverCarDist + this.neverPtDist) }, new double[] { this.neverCarDist
-				* 100.0 / (this.neverCarDist + this.neverPtDist) });
-		chart.addSeries("employed", new double[] { this.isEmployedPtDist * 100.0
-				/ (this.isEmployedCarDist + this.isEmployedPtDist) },
+		chart.addSeries("never has a car", new double[] { this.neverPtDist
+				* 100.0 / (this.neverCarDist + this.neverPtDist) },
+				new double[] { this.neverCarDist * 100.0
+						/ (this.neverCarDist + this.neverPtDist) });
+		chart.addSeries("employed", new double[] { this.isEmployedPtDist
+				* 100.0 / (this.isEmployedCarDist + this.isEmployedPtDist) },
 				new double[] { this.isEmployedCarDist * 100.0
 						/ (this.isEmployedCarDist + this.isEmployedPtDist) });
 		chart.addSeries("not employed", new double[] { this.notEmployedPtDist

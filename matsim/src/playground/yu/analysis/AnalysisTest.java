@@ -23,8 +23,6 @@
  */
 package playground.yu.analysis;
 
-import java.io.IOException;
-
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
@@ -160,11 +158,7 @@ public class AnalysisTest {
 				+ " [Pkm]\n");
 		sw.write("avg. speed of the total network (car):\t"
 				+ cas.getNetAvgSpeed() + " [km/h]\n");
-		try {
-			sw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		sw.close();
 
 		dd.write(outputpath);
 		dert.write(outputpath);

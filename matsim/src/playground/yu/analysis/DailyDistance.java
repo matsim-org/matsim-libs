@@ -3,8 +3,6 @@
  */
 package playground.yu.analysis;
 
-import java.io.IOException;
-
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
@@ -21,7 +19,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.charts.BarChart;
 import org.matsim.utils.charts.XYLineChart;
 
-import playground.yu.utils.BubbleChart;
+import playground.yu.utils.charts.BubbleChart;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -413,12 +411,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		chart2.addSeries("walk", xs, yWlkFracs);
 		chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png", 800,
 				600);
-
-		try {
-			sw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		sw.close();
 	}
 
 	/**

@@ -48,11 +48,19 @@ public class SimpleWriter implements Closeable, Flushable {
 		write(s + "\n");
 	}
 
-	public void close() throws IOException {
-		writer.close();
+	public void close() {
+		try {
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public void flush() throws IOException {
-		writer.flush();
+	public void flush() {
+		try {
+			writer.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

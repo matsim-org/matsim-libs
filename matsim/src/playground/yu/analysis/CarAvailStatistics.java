@@ -3,8 +3,6 @@
  */
 package playground.yu.analysis;
 
-import java.io.IOException;
-
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
@@ -19,7 +17,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- *
+ * 
  */
 public class CarAvailStatistics extends AbstractPersonAlgorithm {
 	private double male_al, male_so, male_ne, female_al, female_so, female_ne;
@@ -154,33 +152,31 @@ public class CarAvailStatistics extends AbstractPersonAlgorithm {
 		sw.writeln("car_avail--always");
 		sw
 				.writeln("\tmale\tfemale\tage<30\t30<=age<50\t50<=age<70\tage>70\twith license\twithout license\tis employed\tnot employed");
-		sw.writeln("\t" + this.male_al + "\t" + this.female_al + "\t" + this.ageA_al + "\t"
-				+ this.ageB_al + "\t" + this.ageC_al + "\t" + this.ageD_al + "\t"
-				+ this.withLicense_al + "\t" + this.withoutLicense_al + "\t"
-				+ this.isEmployed_al + "\t" + this.notEmployed_al);
+		sw.writeln("\t" + this.male_al + "\t" + this.female_al + "\t"
+				+ this.ageA_al + "\t" + this.ageB_al + "\t" + this.ageC_al
+				+ "\t" + this.ageD_al + "\t" + this.withLicense_al + "\t"
+				+ this.withoutLicense_al + "\t" + this.isEmployed_al + "\t"
+				+ this.notEmployed_al);
 		sw.writeln("-----------------------------");
 		sw.writeln("car_avail--sometimes");
 		sw
 				.writeln("\tmale\tfemale\tage<30\t30<=age<50\t50<=age<70\tage>70\twith license\twithout license\tis employed\tnot employed");
-		sw.writeln("\t" + this.male_so + "\t" + this.female_so + "\t" + this.ageA_so + "\t"
-				+ this.ageB_so + "\t" + this.ageC_so + "\t" + this.ageD_so + "\t"
-				+ this.withLicense_so + "\t" + this.withoutLicense_so + "\t"
-				+ this.isEmployed_so + "\t" + this.notEmployed_so);
+		sw.writeln("\t" + this.male_so + "\t" + this.female_so + "\t"
+				+ this.ageA_so + "\t" + this.ageB_so + "\t" + this.ageC_so
+				+ "\t" + this.ageD_so + "\t" + this.withLicense_so + "\t"
+				+ this.withoutLicense_so + "\t" + this.isEmployed_so + "\t"
+				+ this.notEmployed_so);
 		sw.writeln("-----------------------------");
 		sw.writeln("car_avail--never");
 		sw
 				.writeln("\tmale\tfemale\tage<30\t30<=age<50\t50<=age<70\tage>70\twith license\twithout license\tis employed\tnot employed");
-		sw.writeln("\t" + this.male_ne + "\t" + this.female_ne + "\t" + this.ageA_ne + "\t"
-				+ this.ageB_ne + "\t" + this.ageC_ne + "\t" + this.ageD_ne + "\t"
-				+ this.withLicense_ne + "\t" + this.withoutLicense_ne + "\t"
-				+ this.isEmployed_ne + "\t" + this.notEmployed_ne);
+		sw.writeln("\t" + this.male_ne + "\t" + this.female_ne + "\t"
+				+ this.ageA_ne + "\t" + this.ageB_ne + "\t" + this.ageC_ne
+				+ "\t" + this.ageD_ne + "\t" + this.withLicense_ne + "\t"
+				+ this.withoutLicense_ne + "\t" + this.isEmployed_ne + "\t"
+				+ this.notEmployed_ne);
 		sw.writeln("-----------------------------");
-		// TODO fractions
-		try {
-			sw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		sw.close();
 		BarChart chart = new BarChart("Car Avail", "categories",
 				"Car Availability %", new String[] { "male", "female",
 						"age<30", "30<=age<50", "50<=age<70", "age>70",
@@ -190,73 +186,115 @@ public class CarAvailStatistics extends AbstractPersonAlgorithm {
 				.addSeries(
 						"always",
 						new double[] {
-								this.male_al / (this.male_al + this.male_ne + this.male_so) * 100.0,
-								this.female_al / (this.female_al + this.female_ne + this.female_so)
+								this.male_al
+										/ (this.male_al + this.male_ne + this.male_so)
 										* 100.0,
-								this.ageA_al / (this.ageA_al + this.ageA_ne + this.ageA_so) * 100.0,
-								this.ageB_al / (this.ageB_al + this.ageB_ne + this.ageB_so) * 100.0,
-								this.ageC_al / (this.ageC_al + this.ageC_ne + this.ageC_so) * 100.0,
-								this.ageD_al / (this.ageD_al + this.ageD_ne + this.ageD_so) * 100.0,
+								this.female_al
+										/ (this.female_al + this.female_ne + this.female_so)
+										* 100.0,
+								this.ageA_al
+										/ (this.ageA_al + this.ageA_ne + this.ageA_so)
+										* 100.0,
+								this.ageB_al
+										/ (this.ageB_al + this.ageB_ne + this.ageB_so)
+										* 100.0,
+								this.ageC_al
+										/ (this.ageC_al + this.ageC_ne + this.ageC_so)
+										* 100.0,
+								this.ageD_al
+										/ (this.ageD_al + this.ageD_ne + this.ageD_so)
+										* 100.0,
 								this.withLicense_al
-										/ (this.withLicense_al + this.withLicense_ne + this.withLicense_so)
+										/ (this.withLicense_al
+												+ this.withLicense_ne + this.withLicense_so)
 										* 100.0,
 								this.withoutLicense_al
 										/ (this.withoutLicense_al
 												+ this.withoutLicense_ne + this.withoutLicense_so)
 										* 100.0,
 								this.isEmployed_al
-										/ (this.isEmployed_al + this.isEmployed_ne + this.isEmployed_so)
+										/ (this.isEmployed_al
+												+ this.isEmployed_ne + this.isEmployed_so)
 										* 100.0,
 								this.notEmployed_al
-										/ (this.notEmployed_al + this.notEmployed_ne + this.notEmployed_so)
+										/ (this.notEmployed_al
+												+ this.notEmployed_ne + this.notEmployed_so)
 										* 100.0 });
 		chart
 				.addSeries(
 						"sometimes",
 						new double[] {
-								this.male_so / (this.male_al + this.male_ne + this.male_so) * 100.0,
-								this.female_so / (this.female_al + this.female_ne + this.female_so)
+								this.male_so
+										/ (this.male_al + this.male_ne + this.male_so)
 										* 100.0,
-								this.ageA_so / (this.ageA_al + this.ageA_ne + this.ageA_so) * 100.0,
-								this.ageB_so / (this.ageB_al + this.ageB_ne + this.ageB_so) * 100.0,
-								this.ageC_so / (this.ageC_al + this.ageC_ne + this.ageC_so) * 100.0,
-								this.ageD_so / (this.ageD_al + this.ageD_ne + this.ageD_so) * 100.0,
+								this.female_so
+										/ (this.female_al + this.female_ne + this.female_so)
+										* 100.0,
+								this.ageA_so
+										/ (this.ageA_al + this.ageA_ne + this.ageA_so)
+										* 100.0,
+								this.ageB_so
+										/ (this.ageB_al + this.ageB_ne + this.ageB_so)
+										* 100.0,
+								this.ageC_so
+										/ (this.ageC_al + this.ageC_ne + this.ageC_so)
+										* 100.0,
+								this.ageD_so
+										/ (this.ageD_al + this.ageD_ne + this.ageD_so)
+										* 100.0,
 								this.withLicense_so
-										/ (this.withLicense_al + this.withLicense_ne + this.withLicense_so)
+										/ (this.withLicense_al
+												+ this.withLicense_ne + this.withLicense_so)
 										* 100.0,
 								this.withoutLicense_so
 										/ (this.withoutLicense_al
 												+ this.withoutLicense_ne + this.withoutLicense_so)
 										* 100.0,
 								this.isEmployed_so
-										/ (this.isEmployed_al + this.isEmployed_ne + this.isEmployed_so)
+										/ (this.isEmployed_al
+												+ this.isEmployed_ne + this.isEmployed_so)
 										* 100.0,
 								this.notEmployed_so
-										/ (this.notEmployed_al + this.notEmployed_ne + this.notEmployed_so)
+										/ (this.notEmployed_al
+												+ this.notEmployed_ne + this.notEmployed_so)
 										* 100.0 });
 		chart
 				.addSeries(
 						"never",
 						new double[] {
-								this.male_ne / (this.male_al + this.male_ne + this.male_so) * 100.0,
-								this.female_ne / (this.female_al + this.female_ne + this.female_so)
+								this.male_ne
+										/ (this.male_al + this.male_ne + this.male_so)
 										* 100.0,
-								this.ageA_ne / (this.ageA_al + this.ageA_ne + this.ageA_so) * 100.0,
-								this.ageB_ne / (this.ageB_al + this.ageB_ne + this.ageB_so) * 100.0,
-								this.ageC_ne / (this.ageC_al + this.ageC_ne + this.ageC_so) * 100.0,
-								this.ageD_ne / (this.ageD_al + this.ageD_ne + this.ageD_so) * 100.0,
+								this.female_ne
+										/ (this.female_al + this.female_ne + this.female_so)
+										* 100.0,
+								this.ageA_ne
+										/ (this.ageA_al + this.ageA_ne + this.ageA_so)
+										* 100.0,
+								this.ageB_ne
+										/ (this.ageB_al + this.ageB_ne + this.ageB_so)
+										* 100.0,
+								this.ageC_ne
+										/ (this.ageC_al + this.ageC_ne + this.ageC_so)
+										* 100.0,
+								this.ageD_ne
+										/ (this.ageD_al + this.ageD_ne + this.ageD_so)
+										* 100.0,
 								this.withLicense_ne
-										/ (this.withLicense_al + this.withLicense_ne + this.withLicense_so)
+										/ (this.withLicense_al
+												+ this.withLicense_ne + this.withLicense_so)
 										* 100.0,
 								this.withoutLicense_ne
 										/ (this.withoutLicense_al
 												+ this.withoutLicense_ne + this.withoutLicense_so)
 										* 100.0,
 								this.isEmployed_ne
-										/ (this.isEmployed_al + this.isEmployed_ne + this.isEmployed_so)
+										/ (this.isEmployed_al
+												+ this.isEmployed_ne + this.isEmployed_so)
 										* 100.0,
 								this.notEmployed_ne
-										/ (this.notEmployed_al + this.notEmployed_ne + this.notEmployed_so)
+										/ (this.notEmployed_al
+												+ this.notEmployed_ne + this.notEmployed_so)
 										* 100.0 });
 		chart.addMatsimLogo();
 		chart.saveAsPng(outputFilename + ".png", 1200, 900);

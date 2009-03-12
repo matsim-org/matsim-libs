@@ -3,8 +3,6 @@
  */
 package playground.yu.analysis;
 
-import java.io.IOException;
-
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
@@ -23,9 +21,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * check, whether the departure time of leg is later than 24:00
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -53,22 +51,15 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 			if (legDepTime >= 86400.0) {
 				this.sw.writeln(this.personId + "\t" + legDepTime + "\t"
 						+ Time.writeTime(legDepTime) + "\t" + c);
-				try {
-					this.sw.flush();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+
+				this.sw.flush();
 			}
 			c++;
 		}
 	}
 
 	public void close() {
-		try {
-			this.sw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.sw.close();
 	}
 
 	/**

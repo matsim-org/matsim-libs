@@ -36,12 +36,6 @@ import org.matsim.utils.io.IOUtils;
  */
 public class TXTExtractor {
 
-	/**
-	 * 
-	 */
-	public TXTExtractor() {
-	}
-
 	private static void printUsage() {
 		System.out.println("----------------");
 		System.out.println("TXTExtractor:");

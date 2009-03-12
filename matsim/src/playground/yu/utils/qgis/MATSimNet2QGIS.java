@@ -180,6 +180,6 @@ public class MATSimNet2QGIS implements X2QGIS {
 		mn2q.readNetwork(netFilename);
 		mn2q.setCrs(ch1903);
 		mn2q
-				.writeShapeFile("../schweiz-ivtch-SVN/baseCase/network/polygon2correct.shp");
+				.writeShapeFile("../schweiz-ivtch-SVN/baseCase/network/ivtch-osm_mode.shp");
 	}
 }
