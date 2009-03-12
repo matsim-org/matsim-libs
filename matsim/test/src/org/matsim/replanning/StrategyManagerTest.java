@@ -208,7 +208,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 			manager.run(population, i);
 			Plan plan = person.getSelectedPlan();
 			assertTrue("plan has not undefined score in iteration " + i, plan.hasUndefinedScore());
-			plan.setScore(i);
+			plan.setScore(Double.valueOf(i));
 		}
 
 		/* There are no more unscored plans now, so in the next "iteration" our

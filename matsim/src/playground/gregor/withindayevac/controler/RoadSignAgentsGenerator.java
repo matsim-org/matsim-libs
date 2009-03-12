@@ -73,10 +73,10 @@ public class RoadSignAgentsGenerator {
 //				plan.setScore(-144.0);
 				p.addPlan(plan);
 				if (dest == shortest) {
-					plan.setScore(0);
+					plan.setScore(0.0);
 					p.setSelectedPlan(plan);
 				} else {
-					plan.setScore(-100000);
+					plan.setScore(-100000.0);
 				}
 			}
 			

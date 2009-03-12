@@ -92,7 +92,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p1.addAct(a);
 		p1.addLeg(leg);
 		p1.addAct(b);
-		p1.setScore(-10);
+		p1.setScore(-10.0);
 		person.addPlan(p1);
 
 		assertNotNull(selector.selectPlan(person));
@@ -115,7 +115,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p2.addAct(a);
 		p2.addLeg(leg);
 		p2.addAct(b);
-		p2.setScore(-10);
+		p2.setScore(-10.0);
 		person.addPlan(p2);
 
 		a = new org.matsim.population.ActImpl("h", l6);
@@ -136,12 +136,12 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p3.addAct(a);
 		p3.addLeg(leg);
 		p3.addAct(b);
-		p3.setScore(-10);
+		p3.setScore(-10.0);
 		person.addPlan(p3);
 		assertNotNull(selector.selectPlan(person));
 		
 		// ... and test with multiple plans where the sum of all scores stays negative
-		p3.setScore(15);
+		p3.setScore(15.0);
 		assertNotNull(selector.selectPlan(person));
 		
 		// test with only one plan, but with NEGATIVE_INFINITY...
@@ -196,7 +196,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p1.addAct(a);
 		p1.addLeg(leg);
 		p1.addAct(b);
-		p1.setScore(0);
+		p1.setScore(0.0);
 		person.addPlan(p1);
 		
 		assertNotNull(selector.selectPlan(person));
@@ -230,7 +230,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p1.addAct(a);
 		p1.addLeg(leg);
 		p1.addAct(b);
-		p1.setScore(-10);
+		p1.setScore(-10.0);
 		person.addPlan(p1);
 	
 		a = new org.matsim.population.ActImpl("h", l6);
@@ -250,7 +250,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p2.addAct(a);
 		p2.addLeg(leg);
 		p2.addAct(b);
-		p2.setScore(-10);
+		p2.setScore(-10.0);
 		person.addPlan(p2);
 		
 		a = new org.matsim.population.ActImpl("h", l6);
@@ -271,7 +271,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p3.addAct(a);
 		p3.addLeg(leg);
 		p3.addAct(b);
-		p3.setScore(-10);
+		p3.setScore(-10.0);
 		person.addPlan(p3);
 
 		PathSizeLogitSelector selector = new PathSizeLogitSelector();

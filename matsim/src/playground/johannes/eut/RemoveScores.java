@@ -40,7 +40,7 @@ public class RemoveScores implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		for(Person p : event.getControler().getPopulation().getPersons().values()) {
 			for(Plan plan : p.getPlans())
-				plan.setScore(0);
+				plan.setScore(0.0);
 		}
 	}
 

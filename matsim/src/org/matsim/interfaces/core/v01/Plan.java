@@ -130,9 +130,6 @@ public interface Plan extends BasicPlan {
 
 	public double getScoreAsPrimitiveType();
 
-	@Deprecated
-	public void setScore(final double score);
-
 	/** @return true if the score of this plan is not defined */
 	public boolean hasUndefinedScore();
 	

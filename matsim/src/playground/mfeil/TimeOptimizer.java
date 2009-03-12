@@ -20,19 +20,14 @@
 package playground.mfeil;
 
 import java.util.ArrayList;
-import org.matsim.population.algorithms.PlanAlgorithm;
+
 import org.apache.log4j.Logger;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.scoring.PlanScorer;
-import org.matsim.controler.Controler;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
-
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.io.File;
-import java.io.FileNotFoundException;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.scoring.PlanScorer;
 
 
 /**
@@ -85,7 +80,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 				move = this.cleanSchedule(this.minimumTime, basePlan);
 				if (move!=0.0){
 					// TODO Check whether allowed?
-					basePlan.setScore(-100000);	// Like this, PlanomatX will see that the solution is no proper solution
+					basePlan.setScore(-100000.0);	// Like this, PlanomatX will see that the solution is no proper solution
 					log.warn("No valid initial solution found for person "+basePlan.getPerson().getId()+"!");
 					return;
 				}

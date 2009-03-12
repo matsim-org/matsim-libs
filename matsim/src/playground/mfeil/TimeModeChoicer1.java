@@ -21,6 +21,7 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.matsim.interfaces.basic.v01.*;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
@@ -177,7 +178,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 					}
 					else {					
 						// TODO Check whether allowed?
-						basePlan.setScore(-100000);	// Like this, PlanomatX will see that the solution is no proper solution
+						basePlan.setScore(-100000.0);	// Like this, PlanomatX will see that the solution is no proper solution
 						log.warn("No valid initial solution found for person "+basePlan.getPerson().getId()+"!");
 						return;
 					}
