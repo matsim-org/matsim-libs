@@ -129,8 +129,6 @@ public interface Plan extends BasicPlan {
 	public ActIterator getIteratorAct();
 
 	public double getScoreAsPrimitiveType();
-	
-	public Double getScore();
 
 	@Deprecated
 	public void setScore(final double score);
