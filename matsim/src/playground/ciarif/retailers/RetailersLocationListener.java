@@ -86,7 +86,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		String popOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
 		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.pst = new PlansSummaryTable (popOutFile);
-		this.mtxf = new MakeATableFromXMLFacilities ("output/FacilityTable/facilities.txt");
+		this.mtxf = new MakeATableFromXMLFacilities ("output/zurich_10pc/facilities.txt");
 		this.mtxf.write(controler.getFacilities());
 		String retailersOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
 		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
