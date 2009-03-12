@@ -22,7 +22,7 @@ package playground.meisterk.org.matsim.population.algorithms;
 
 import java.util.List;
 
-import org.matsim.interfaces.core.v01.Act;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -49,7 +49,7 @@ public class PersonSetFirstActEndTime extends AbstractPersonAlgorithm implements
 
 	public void run(Plan plan) {
 
-		Act firstAct = plan.getFirstActivity();
+		Activity firstAct = plan.getFirstActivity();
 		firstAct.setEndTime(this.firstActEndTime);
 		Leg firstLeg = plan.getNextLeg(firstAct);
 		firstLeg.setDepartureTime(this.firstActEndTime);
