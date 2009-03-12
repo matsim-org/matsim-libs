@@ -23,6 +23,10 @@
  */
 package playground.yu.analysis;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
@@ -34,7 +38,9 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
+import org.xml.sax.SAXException;
 
 import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
@@ -62,8 +68,10 @@ public class AnalysisTest {
 		System.out
 				.println(" arg 4: name of scenario (optional, for Zurich required)");
 		System.out
-				.println(" arg 5: snapshot-period:  Specify how often a snapshot should be taken when reading the events, in seconds.");
-		System.out.println(" arg 5: runId");
+				.println(" arg 5: name incl. path to toll file (.xml)(optional)");
+		System.out
+				.println(" arg 6: snapshot-period:  Specify how often a snapshot should be taken when reading the events, in seconds.");
+		System.out.println(" arg 7: runId");
 		System.out.println("----------------");
 	}
 
@@ -96,7 +104,21 @@ public class AnalysisTest {
 			catl = new CalcAverageTripLength();
 			dd = new DailyDistance();
 			dert = new DailyEnRouteTime();
-			ms = new ModeSplit(network);
+			ms = new ModeSplit(null);
+			if (scenario.equals("Zurich")) {
+				RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
+						network);
+				try {
+					tollReader.parse(args[args.length - 3]);
+				} catch (SAXException e) {
+					e.printStackTrace();
+				} catch (ParserConfigurationException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				ms = new ModeSplit(tollReader.getScheme());
+			}
 
 			PopulationReader plansReader = new MatsimPopulationReader(plans,
 					network);

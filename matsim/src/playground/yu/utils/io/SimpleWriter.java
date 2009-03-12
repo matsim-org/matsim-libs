@@ -33,6 +33,18 @@ public class SimpleWriter implements Closeable, Flushable {
 		}
 	}
 
+	public SimpleWriter(String outputFilename, String contents2write) {
+		try {
+			writer = IOUtils.getBufferedWriter(outputFilename);
+			write(contents2write);
+			close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void write(String s) {
 		if (writer != null) {
 			try {

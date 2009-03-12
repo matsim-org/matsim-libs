@@ -100,7 +100,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 	public void setCrs(final String wkt) {
 		this.crs = MGC.getCRS(wkt);
 		this.n2g = new Network2PolygonGraph(this.network, this.crs);
-	}// TODO override
+	}// TODO override e.g. set(N2g)
 
 	/**
 	 * @param flowCapFactor
