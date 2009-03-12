@@ -82,8 +82,6 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	private BeelineDifferenceTracer tracer;
 	
 	protected LogitSelector selector;	
-	//TODO [gl] DEBUGGING STUFF
-	private final  boolean debug = true;
 	protected RouterNetStateWriter netStateWriter = null;
 
 	private int dumpCounter;
@@ -98,11 +96,8 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 
 		initSelector();
 		
-		//TODO [gl] DEBUGGING STUFF
-		if (this.debug){
-			this.netStateWriter = writer;
-			this.dumpCounter = 0;
-		}
+		this.netStateWriter = writer;
+		this.dumpCounter = 0;
 	
 }
 
@@ -115,8 +110,6 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 		double minCost = Double.MAX_VALUE;
 		
 		this.shadowID =  Integer.MIN_VALUE + 1;
-
-		final double arrivalTime = 0;
 
 		this.tracer = new BeelineDifferenceTracer(fromNode.getCoord(), toNode.getCoord());
 
@@ -146,16 +139,6 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 					return null;
 				}
 
-
-
-//				if (this.debug) {
-//					if (count++ >= this.slowDown){
-//						count = 0;
-//						doSnapshot();
-//					}					
-//				}
-
-
 				if (outNodeD.getId() == toNode.getId()){
 					toNodes.add(outNodeD);
 					foundRoute = true;
@@ -182,7 +165,6 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 
 	
 		this.selector.run(toNodes,getData(fromNode));
-		//TODO [gl] DEBUG
 		colorizePaths(toNodes,fromNode);
 		
 		return null; // just visualization, no need to return the route
@@ -332,9 +314,8 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 						if (temp.getCost() < shadowCost) {
 							log.info("there is already a similar shadow node with lower costs - giving up");
 							return;					
-						} else {
-							toDelete.add(temp);
 						}
+						toDelete.add(temp);
 					}
 				}
 		}
@@ -364,6 +345,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	 *            The accumulated cost at the time of the visit of n.
 	 * @param fromNodeData
 	 *            The NodeData from which we came visiting toNodeData.
+	 * @param trace
 	 */
 	private void visitNode(final NodeData toNodeData, final PriorityQueue<NodeData> pendingNodes, final double time, final double cost, final NodeData fromNodeData, final double trace) {
 		toNodeData.visit(fromNodeData, cost, time, getIterationID(), trace);
@@ -384,6 +366,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	 *            The accumulated cost at the time of the visit of n.
 	 * @param fromNodeData
 	 *            The NodeData from which we came visiting toNodeData.
+	 * @param trace
 	 */
 	private void revisitNode(final NodeData toNodeData, final PriorityQueue<NodeData> pendingNodes, final double time, final double cost, final NodeData fromNodeData, final double trace) {
 
@@ -419,6 +402,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	 *            The accumulated cost at the time of the visit of n.
 	 * @param fromNodeData
 	 *            The NodeData from which we came visiting toNodeData.
+	 * @param trace
 	 */
 	private void touchNode(final NodeData toNodeData, final PriorityQueue<NodeData> pendingNodes, final double time, final double cost, final NodeData fromNodeData, final double trace) {
 
@@ -428,9 +412,8 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 				if (temp.getCost() < cost) {
 					log.info("there is already a similar shadow node with lower costs - giving up");
 					return;					
-				} else {
-					toDelete.add(temp);
 				}
+				toDelete.add(temp);
 			}
 		}
 		for (final NodeData del : toDelete) {
