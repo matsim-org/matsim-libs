@@ -29,10 +29,10 @@ public class MarginalTravelCostCalculatorII implements TravelCost {
 	
 
 
-	private final SocialCostCalculatorNetwork sc;
+	private final SocialCostCalculator sc;
 	private final TravelTimeCalculator tc;
 
-	public MarginalTravelCostCalculatorII(final TravelTimeCalculator tc, final SocialCostCalculatorNetwork sc) {
+	public MarginalTravelCostCalculatorII(final TravelTimeCalculator tc, final SocialCostCalculator sc) {
 		this.tc = tc;
 		this.sc = sc;
 	}
