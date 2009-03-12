@@ -83,8 +83,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 
 				// act end event
 				assertTrue(list.get(index) instanceof ActEndEvent);
-				assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-						((ActEndEvent) list.get(index)).linkId));
+				assertEquals(act.getLinkId(), ((ActEndEvent) list.get(index)).getLinkId());
 				index++;
 
 				// each leg starts with departure on act link
@@ -131,8 +130,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 
 				// each leg ends with arrival on act link
 				assertTrue(list.get(index) instanceof ActStartEvent);
-				assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-						((ActStartEvent) list.get(index)).linkId));
+				assertEquals(act.getLinkId(), ((ActStartEvent) list.get(index)).getLinkId());
 				index++;
 			}
 		}

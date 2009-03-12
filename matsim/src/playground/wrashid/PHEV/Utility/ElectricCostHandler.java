@@ -189,7 +189,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// for some strange reason, the links, person are not set using the DES
 		// controller
 		if (controler == null) {
-			event.setLink(controler2.getNetwork().getLink(event.linkId));
+			event.setLink(controler2.getNetwork().getLink(event.getLinkId()));
 			event.setAgent(controler2.getPopulation().getPerson(new IdImpl(event.agentId)));
 		}
 
@@ -208,7 +208,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// for some strange reason, the links, person are not set using the DES
 		// controller
 		if (controler == null) {
-			event.setLink(controler2.getNetwork().getLink(event.linkId));
+			event.setLink(controler2.getNetwork().getLink(event.getLinkId()));
 			event.setAgent(controler2.getPopulation().getPerson(new IdImpl(event.agentId)));
 		}
 
@@ -243,13 +243,13 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		}
 
 		double costOfEnergy = 0.0; // in "util"/Euro
-		if (event.linkId.equalsIgnoreCase("100")) {
+		if (event.getLinkId().toString().equalsIgnoreCase("100")) {
 
 			// work1
 			costOfEnergy = energyCharged * costPerJuleAtWork;
 			// System.out.println(activityTime);
 			averageTimeSpentAtWork += activityTime;
-		} else if (event.linkId.equalsIgnoreCase("107")) {
+		} else if (event.getLinkId().toString().equalsIgnoreCase("107")) {
 			// work2
 			costOfEnergy = energyCharged * costPerJuleAtShop;
 			averageTimeSpentAtShop += activityTime;
@@ -267,7 +267,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		recordSOCOfVehicle(event, eventTime);
 
 		// update energy consumption
-		if (event.linkId.equalsIgnoreCase(selectedLink) && relevantIterationReached) {
+		if (event.getLinkId().toString().equalsIgnoreCase(selectedLink) && relevantIterationReached) {
 			for (int i = (int) Math.round(state.startTimeOfLastAct); i < (int) Math
 					.round(state.startTimeOfLastAct + energyCharged
 							/ chargingPower); i++) {
@@ -280,7 +280,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		if (chargingOutput != null && state.startTimeOfLastAct!=state.startTimeOfLastAct
 				+ energyCharged / chargingPower && relevantIterationReached) {
 			try {
-				chargingOutput.write(event.linkId + "\t" + event.agentId + "\t"
+				chargingOutput.write(event.getLinkId().toString() + "\t" + event.agentId + "\t"
 						+ state.startTimeOfLastAct + "\t" + (state.startTimeOfLastAct
 						+ (energyCharged) / chargingPower) + "\t" + (state.energyLevel - energyCharged) + "\t" + (state.energyLevel) + "\n");
 			} catch (IOException e) {

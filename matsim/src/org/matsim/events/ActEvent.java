@@ -22,6 +22,7 @@ package org.matsim.events;
 
 import java.util.Map;
 
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -31,7 +32,7 @@ abstract class ActEvent extends PersonEvent {
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_ACTTYPE = "actType";
 
-	public String linkId;
+	private Id linkId;
 	private String acttype;
 
 	private transient Link link;
@@ -41,11 +42,11 @@ abstract class ActEvent extends PersonEvent {
 		super(time, agent);
 		this.act = act;
 		this.link = link;
-		this.linkId = link.getId().toString();
+		this.linkId = link.getId();
 		this.acttype = act.getType();
 	}
 
-	ActEvent(final double time, final String agentId, final String linkId, final String acttype) {
+	ActEvent(final double time, final String agentId, final Id linkId, final String acttype) {
 		super(time, agentId);
 		this.linkId = linkId;
 		this.acttype = acttype == null ? "" : acttype;
@@ -55,13 +56,13 @@ abstract class ActEvent extends PersonEvent {
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 
-		attr.put(ATTRIBUTE_LINK, this.linkId);
+		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
 		attr.put(ATTRIBUTE_ACTTYPE, this.acttype);
 		return attr;
 	}
 
 	protected String asString() {
-		return getTimeString(this.getTime()) + this.agentId + "\t\t"+ this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concat later
+		return getTimeString(this.getTime()) + this.agentId + "\t\t"+ this.linkId.toString() + "\t0\t"; // FLAG + DESCRIPTION is missing here: concatenate later
 	}
 
 	public String getActType() {
@@ -77,6 +78,10 @@ abstract class ActEvent extends PersonEvent {
 		return link;
 	}
 
+	public Id getLinkId() {
+		return this.linkId;
+	}
+	
 	public Activity getAct() {
 		return act;
 	}

@@ -20,6 +20,7 @@
 
 package org.matsim.events;
 
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -32,7 +33,7 @@ public class ActStartEvent extends ActEvent {
 		super(time, agent, link, act);
 	}
 
-	public ActStartEvent(final double time, final String agentId, final String linkId, final String acttype) {
+	public ActStartEvent(final double time, final String agentId, final Id linkId, final String acttype) {
 		super(time, agentId, linkId, acttype);
 	}
 

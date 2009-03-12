@@ -1,11 +1,20 @@
 package playground.kai.usecases;
 
-import java.util.*;
-
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.*;
-import org.matsim.events.*;
-import org.matsim.interfaces.basic.v01.*;
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.events.ActEndEvent;
+import org.matsim.events.ActStartEvent;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.Events;
+import org.matsim.events.LinkEnterEvent;
+import org.matsim.events.LinkLeaveEvent;
+import org.matsim.interfaces.basic.v01.BasicLink;
+import org.matsim.interfaces.basic.v01.BasicNetwork;
+import org.matsim.interfaces.basic.v01.BasicNode;
+import org.matsim.interfaces.basic.v01.BasicPerson;
+import org.matsim.interfaces.basic.v01.BasicPopulation;
 
 @SuppressWarnings("unused")
 public class Mobsim {
@@ -19,7 +28,7 @@ public class Mobsim {
 			
 		// finally, we need to be able to generate events:
 		double time = 1. ;
-		ActEndEvent aee = new ActEndEvent(time,"agentId","linkId","actType" ) ;
+		ActEndEvent aee = new ActEndEvent(time,"agentId", new IdImpl("linkId"),"actType" ) ;
 		eve.processEvent( aee ) ;
 
 		int legNumber = 1 ;
@@ -33,7 +42,7 @@ public class Mobsim {
 
 		AgentArrivalEvent aae = new AgentArrivalEvent( time, "agentId", "linkId" ) ;
 
-		ActStartEvent ase = new ActStartEvent( time, "agentId", "linkId", "acttype" ) ;
+		ActStartEvent ase = new ActStartEvent( time, "agentId", new IdImpl("linkId"), "acttype" ) ;
 
 		// TODO: None of this is behind interfaces.  Needed if we want to accept "external" mobsims.  Do we want that?
 		// If so, we would need to be sure that we want to maintain the create methods.

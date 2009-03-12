@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.AgentArrivalEventHandler;
@@ -53,7 +54,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("expected activity-End-Event to be event #1", 1, this.eventCounter);
 			assertEquals(21610.0, event.getTime(), 0.0);
 			assertEquals("1", event.agentId);
-			assertEquals("2", event.linkId);
+			assertEquals(new IdImpl("2"), event.getLinkId());
 		}
 
 		public void handleEvent(final AgentDepartureEvent event) {
@@ -101,7 +102,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("expected activityStart-Event to be event #7", 7, this.eventCounter);
 			assertEquals(21670.0, event.getTime(), 0.0);
 			assertEquals("7", event.agentId);
-			assertEquals("8", event.linkId);
+			assertEquals(new IdImpl("8"), event.getLinkId());
 		}
 
 		public void handleEvent(final AgentStuckEvent event) {

@@ -83,16 +83,16 @@ public class EventsReaderTXTv1 {
 				break;
 			case 7:
 				if ("".equals(acttype) && desc != null) {
-					data = new ActStartEvent(time, agentId, linkId, desc.replace("actstart ", ""));
+					data = new ActStartEvent(time, agentId, new IdImpl(linkId), desc.replace("actstart ", ""));
 				} else {
-					data = new ActStartEvent(time, agentId, linkId, acttype);
+					data = new ActStartEvent(time, agentId, new IdImpl(linkId), acttype);
 				}
 				break;
 			case 8:
 				if ("".equals(acttype) && desc != null) {
-					data = new ActEndEvent(time, agentId, linkId, desc.replace("actend ", ""));
+					data = new ActEndEvent(time, agentId, new IdImpl(linkId), desc.replace("actend ", ""));
 				} else {
-					data = new ActEndEvent(time, agentId, linkId, acttype);
+					data = new ActEndEvent(time, agentId, new IdImpl(linkId), acttype);
 				}
 				break;
 			case 9:

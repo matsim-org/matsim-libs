@@ -22,8 +22,8 @@ package org.matsim.mobsim.jdeqsim;
 import java.util.ArrayList;
 
 import org.matsim.events.ActStartEvent;
-import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.BasicEvent;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
@@ -107,8 +107,7 @@ public class EndLegMessage extends EventMessage {
 			actStartEventTime = this.getMessageArrivalTime();
 		}
 
-		event = new ActStartEvent(actStartEventTime, vehicle.getOwnerPerson().getId().toString(), vehicle.getCurrentLink().getId()
-				.toString(), nextAct.getType());
+		event = new ActStartEvent(actStartEventTime, vehicle.getOwnerPerson(), vehicle.getCurrentLink(), nextAct);
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
 	}
