@@ -92,6 +92,11 @@ xml:lang="en">
 </xs:element>
 
 <xs:complexType name="actLocationType">
+  <xs:annotation>
+    <xs:appinfo>
+      <deprecate date="2009-03-13" />
+    </xs:appinfo>
+  </xs:annotation>
   <xs:sequence>
         <xs:element ref="facilityId" minOccurs="0" maxOccurs="1" />
         <xs:element ref="linkId" minOccurs="0" maxOccurs="1" />
@@ -100,6 +105,11 @@ xml:lang="en">
 
 
 <xs:element name="location">
+  <xs:annotation>
+    <xs:appinfo>
+      <deprecate date="2009-03-13" />
+    </xs:appinfo>
+  </xs:annotation>
   <xs:complexType>
     <xs:sequence>
       <xs:element ref="coordinate" minOccurs="0" maxOccurs="1"/>
