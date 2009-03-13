@@ -27,11 +27,13 @@ import java.util.List;
 
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.BasicLegImpl;
+import org.matsim.basic.v01.BasicPopulationImpl;
 import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPopulation;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Activity;
+//import org.matsim.interfaces.core.v01.Act;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
@@ -39,6 +41,8 @@ import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.ActImpl;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationImpl;
 
@@ -597,53 +601,84 @@ public class Flow {
 	
 	
 	@SuppressWarnings("unchecked")
-	public Population createPoulation(boolean emptylegs,String oldfile){
+	
+	/**
+	 * 
+	 */
+	public BasicPopulation createPoulation(boolean emptylegs,String oldfile){
+		//check whether oldfile exists
+		boolean org = (oldfile!=null);
+		HashMap<Node,Person> orgpersons = new  HashMap<Node,Person>();
+		
+		//read old network an find out the startnodes of persons if oldfile exists
+		if(org){
+			Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+			new MatsimPopulationReader(population,_network).readFile(oldfile);
+			_network.connect();
+			for(Person person : population.getPersons().values() ){
+				Node node =person.getPlans().get(0).getFirstActivity().getLink().getToNode();
+				orgpersons.put(node, person);
+			}
+		}
+		
 		//construct Population
-		Population result =
-			new PopulationImpl(PopulationImpl.NO_STREAMING);
+		BasicPopulation result =new BasicPopulationImpl();
 		int id =1;
 		for (TimeExpandedPath path : this._TimeExpandedPaths){
 			if(path.isforward()){
+				//units of flow on the Path
 				int nofpersons = path.getFlow();
+				// list of links in order of the path
 				List<Id> ids = new LinkedList<Id>();
 				for (PathEdge edge : path.getPathEdges()){
 					ids.add(edge.getEdge().getId());
 				}
 				
 				
-				if (!emptylegs) { // normal case, write the routes!
+				if (!emptylegs) { 
+					// normal case, write the routes!
 					BasicRouteImpl route;
-				
 					
-					route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
+					Node firstnode  = _network.getLink(ids.get(0)).getFromNode();
 					
-					if (ids.size() > 1) {
-						route.setLinkIds(ids.subList(1, ids.size()-1));
-					} else {
-						route.setLinkIds(null);
-					}
-					
-					BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.car);
-					//Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
-					leg.setRoute(route);
-					BasicActImpl home = new BasicActImpl("h");
-					//Act home = new org.matsim.population.ActImpl("h", path.getPathEdges().getFirst().getEdge());
-					home.setEndTime(0);
-					home.setCoord(path.getPathEdges().getFirst().getEdge().getFromNode().getCoord());
-					// no end time for now.
-					//home.setEndTime(path.getPathEdges().getFirst().getTime());
-					
-					BasicActImpl work = new BasicActImpl("w");
-					//Act work = new org.matsim.population.ActImpl("w", path.getPathEdges().getLast().getEdge());
-					work.setEndTime(0);
-					work.setCoord(path.getPathEdges().getLast().getEdge().getToNode().getCoord());
-					Link fromlink =path.getPathEdges().getFirst().getEdge();
-					Link tolink =path.getPathEdges().getLast().getEdge();
-					
-					home.setLinkId(fromlink.getId());
-					work.setLinkId(tolink.getId());
+					// for each unit of flow construct a Person
 					for (int i =1 ; i<= nofpersons;i++){
-						Id matsimid  = new IdImpl(id);
+						//add the first edge if olfile exists
+						if(org){
+							Person orgperson = orgpersons.get(firstnode);
+							Link firstlink = orgperson.getPlans().get(0).getFirstActivity().getLink();
+							
+						}
+						route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
+						
+						if (ids.size() > 1) {
+							route.setLinkIds(ids.subList(1, ids.size()-1));
+						} else {
+							route.setLinkIds(null);
+						}
+						
+						BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.car);
+						//Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
+						leg.setRoute(route);
+						BasicActImpl home = new BasicActImpl("h");
+						//Act home = new org.matsim.population.ActImpl("h", path.getPathEdges().getFirst().getEdge());
+						home.setEndTime(0);
+						home.setCoord(path.getPathEdges().getFirst().getEdge().getFromNode().getCoord());
+						// no end time for now.
+						//home.setEndTime(path.getPathEdges().getFirst().getTime());
+						
+						BasicActImpl work = new BasicActImpl("w");
+						//Act work = new org.matsim.population.ActImpl("w", path.getPathEdges().getLast().getEdge());
+						work.setEndTime(0);
+						work.setCoord(path.getPathEdges().getLast().getEdge().getToNode().getCoord());
+						Link fromlink =path.getPathEdges().getFirst().getEdge();
+						Link tolink =path.getPathEdges().getLast().getEdge();
+						
+						home.setLinkId(fromlink.getId());
+						work.setLinkId(tolink.getId());
+						
+						String stringid = "new"+String.valueOf(id);
+						Id matsimid  = new IdImpl(stringid);
 						Person p = new PersonImpl(matsimid);
 						Plan plan = new org.matsim.population.PlanImpl(p);
 						plan.addAct(home);
@@ -662,12 +697,12 @@ public class Flow {
 					Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 					leg.setRoute(route);
 					//BasicActImpl home = new BasicActImpl("h");
-					Activity home = new org.matsim.population.ActImpl("h", path.getPathEdges().getFirst().getEdge());
+					ActImpl home = new org.matsim.population.ActImpl("h", path.getPathEdges().getFirst().getEdge());
 					home.setEndTime(0);
 					home.setCoord(path.getPathEdges().getFirst().getEdge().getFromNode().getCoord());
 					home.setEndTime(path.getPathEdges().getFirst().getTime());
 					//BasicActImpl work = new BasicActImpl("w");
-					Activity work = new org.matsim.population.ActImpl("w", path.getPathEdges().getLast().getEdge());
+					ActImpl work = new org.matsim.population.ActImpl("w", path.getPathEdges().getLast().getEdge());
 					work.setEndTime(0);
 					work.setCoord(path.getPathEdges().getLast().getEdge().getToNode().getCoord());
 					Link fromlink =path.getPathEdges().getFirst().getEdge();
@@ -725,7 +760,6 @@ public class Flow {
 	/**
 	 * returns a String representation of a TimeExpandedPath
 	 */
-	@Override
 	public String toString(){
 		StringBuilder strb = new StringBuilder();
 		for(Link link : _flow.keySet()){

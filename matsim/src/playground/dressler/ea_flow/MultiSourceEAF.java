@@ -302,7 +302,7 @@ public class MultiSourceEAF {
 				}
 			}
 			if(outputplansfile!=null){
-				Population output = fluss.createPoulation(emptylegs,null);
+				Population output = (Population)fluss.createPoulation(emptylegs,null);
 				if (emptylegs) {
 					Config config = Gbl.createConfig(new String[] {});
 
