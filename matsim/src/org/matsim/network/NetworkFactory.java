@@ -61,11 +61,11 @@ public class NetworkFactory {
 		this.routeFactories.put(BasicLeg.Mode.car, new NodeCarRouteFactory());
 	}
 
-	protected Node createNode(final Id id, final Coord coord, final String type) {
+	public Node createNode(final Id id, final Coord coord, final String type) {
 		return new NodeImpl(id, coord, type);
 	}
 
-	protected Link createLink(final Id id, final Node from, final Node to,
+	public Link createLink(final Id id, final Node from, final Node to,
 			final NetworkLayer network, final double length, final double freespeedTT, final double capacity,
 			final double lanes) {
 		Link ret;
