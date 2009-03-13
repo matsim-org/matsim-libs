@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicAdaptiveSignalSystemControlInfoImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,42 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.basic.signalsystemsconfig;
 
-package org.matsim.signalsystems;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
-import org.matsim.utils.io.MatsimJaxbXmlWriter;
+import org.matsim.interfaces.basic.v01.Id;
 
 
 /**
- * Writes a light signal system definition to xml.
  * @author dgrether
+ *
  */
-public class MatsimSignalSystemConfigurationsWriter {
+public class BasicAdaptiveSignalSystemControlInfoImpl implements
+		BasicAdaptiveSignalSystemControlInfo {
+
+	private List<Id> signalGroupIds;
+	private String adaptiveControlerClass;
 	
-	private MatsimJaxbXmlWriter writerDelegate;
-	
-	/**
-	 * Use this constructor to write the default xml format.
-	 * @param basiclss
-	 */
-	public MatsimSignalSystemConfigurationsWriter(BasicSignalSystemConfigurations basiclss) {
-		this(new SignalSystemConfigurationsWriter11(basiclss));
+	public void addSignalGroupId(Id id) {
+		if (this.signalGroupIds == null){
+			this.signalGroupIds = new ArrayList<Id>();
+		}
+		this.signalGroupIds.add(id);
 	}
-	
-	/**
-	 * Customize the verion of the written xml by using this constructor with
-	 * the SignalSystemsWriter of your choice (there is no specific type SignalSystemsWriter)
-	 * @param basiclss
-	 * @param writer
-	 */
-	public MatsimSignalSystemConfigurationsWriter(MatsimJaxbXmlWriter writer){
-		this.writerDelegate = writer;
+
+	public String getAdaptiveControlerClass() {
+		return this.adaptiveControlerClass;
 	}
-	
-	
-	public void writeFile(String filename){
-		this.writerDelegate.writeFile(filename);
+
+	public List<Id> getSignalGroupIds() {
+		return this.signalGroupIds;
+	}
+
+	public void setAdaptiveControlerClass(String adaptiveControler) {
+		this.adaptiveControlerClass = adaptiveControler;
 	}
 
 }

@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicAdaptivePlanbasedSignalSystemControlInfoImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,42 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.basic.signalsystemsconfig;
 
-package org.matsim.signalsystems;
+import java.util.List;
 
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
-import org.matsim.utils.io.MatsimJaxbXmlWriter;
+import org.matsim.interfaces.basic.v01.Id;
 
 
-/**
- * Writes a light signal system definition to xml.
- * @author dgrether
- */
-public class MatsimSignalSystemConfigurationsWriter {
-	
-	private MatsimJaxbXmlWriter writerDelegate;
-	
-	/**
-	 * Use this constructor to write the default xml format.
-	 * @param basiclss
-	 */
-	public MatsimSignalSystemConfigurationsWriter(BasicSignalSystemConfigurations basiclss) {
-		this(new SignalSystemConfigurationsWriter11(basiclss));
-	}
-	
-	/**
-	 * Customize the verion of the written xml by using this constructor with
-	 * the SignalSystemsWriter of your choice (there is no specific type SignalSystemsWriter)
-	 * @param basiclss
-	 * @param writer
-	 */
-	public MatsimSignalSystemConfigurationsWriter(MatsimJaxbXmlWriter writer){
-		this.writerDelegate = writer;
-	}
-	
-	
-	public void writeFile(String filename){
-		this.writerDelegate.writeFile(filename);
+
+public class BasicAdaptivePlanbasedSignalSystemControlInfoImpl extends BasicPlanBasedSignalSystemControlInfoImpl implements
+BasicAdaptivePlanBasedSignalSystemControlInfo {
+
+	BasicAdaptiveSignalSystemControlInfo delegate;
+
+	BasicAdaptivePlanbasedSignalSystemControlInfoImpl(){
+		this.delegate = new BasicAdaptiveSignalSystemControlInfoImpl();
 	}
 
+	public void addSignalGroupId(Id id) {
+		delegate.addSignalGroupId(id);
+	}
+
+	public String getAdaptiveControlerClass() {
+		return delegate.getAdaptiveControlerClass();
+	}
+
+	public List<Id> getSignalGroupIds() {
+		return delegate.getSignalGroupIds();
+	}
+
+	public void setAdaptiveControlerClass(String adaptiveControler) {
+		delegate.setAdaptiveControlerClass(adaptiveControler);
+	}
+	
+	
+	
 }

@@ -19,6 +19,8 @@
 
 package org.matsim.signalsystems;
 
+import org.matsim.basic.signalsystemsconfig.BasicAdaptivePlanBasedSignalSystemControlInfo;
+import org.matsim.basic.signalsystemsconfig.BasicAdaptiveSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
@@ -34,7 +36,7 @@ import org.matsim.testcases.MatsimTestCase;
  * file formats.
  * @author dgrether
  */
-public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
+public class SignalSystemsConfigReaderTest extends MatsimTestCase {
 
   private static final String TESTXML  = "testSignalSystemConfigurations_v1.1.xml";
 
@@ -43,8 +45,10 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
   private Id id5 = new IdImpl("5");
   
   private Id id23 = new IdImpl("23");
+  private Id id24 = new IdImpl("24");
   
   private Id id42 = new IdImpl("42");
+  private Id id43 = new IdImpl("43");
 
   
   
@@ -72,7 +76,7 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
   }
 
 	private void checkContent(BasicSignalSystemConfigurations lssConfigs) {
-		assertEquals(2, lssConfigs.getSignalSystemConfigurations().size());
+		assertEquals(4, lssConfigs.getSignalSystemConfigurations().size());
 		//test first
 		BasicSignalSystemConfiguration lssConfiguration = lssConfigs.getSignalSystemConfigurations().get(id23);
 		assertNotNull(lssConfiguration);
@@ -115,6 +119,47 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
 		assertEquals(45.0, groupConfig.getDropping(), EPSILON);
 		assertNull(groupConfig.getInterimTimeRoughcast());
 		assertNull(groupConfig.getInterimTimeDropping());
+		
+		//test 3rd
+		lssConfiguration = lssConfigs.getSignalSystemConfigurations().get(id43);
+		assertNotNull(lssConfiguration);
+		assertEquals(id43, lssConfiguration.getSignalSystemId());
+		BasicAdaptiveSignalSystemControlInfo adaptiveControlInfo = (BasicAdaptiveSignalSystemControlInfo) lssConfiguration.getControlInfo();
+		assertNotNull(adaptiveControlInfo);
+		assertEquals("org.matism.nonexistingpackage.Nonexistingcontroler.class", adaptiveControlInfo.getAdaptiveControlerClass());
+		assertEquals(2, adaptiveControlInfo.getSignalGroupIds().size());
+		assertEquals(id23, adaptiveControlInfo.getSignalGroupIds().get(0));
+		assertEquals(id42, adaptiveControlInfo.getSignalGroupIds().get(1));
+		
+		
+		// test 4th
+		lssConfiguration = lssConfigs.getSignalSystemConfigurations().get(id24);
+		assertNotNull(lssConfiguration);
+		assertEquals(id24, lssConfiguration.getSignalSystemId());
+		BasicAdaptivePlanBasedSignalSystemControlInfo adaptivePbControlInfo = (BasicAdaptivePlanBasedSignalSystemControlInfo) lssConfiguration.getControlInfo();
+		assertNotNull(adaptivePbControlInfo);
+		assertEquals("org.matism.nonexistingpackage.Nonexistingcontroler.class", adaptiveControlInfo.getAdaptiveControlerClass());
+		assertEquals(2, adaptivePbControlInfo.getSignalGroupIds().size());
+		assertEquals(id23, adaptivePbControlInfo.getSignalGroupIds().get(0));
+		assertEquals(id42, adaptivePbControlInfo.getSignalGroupIds().get(1));
+		
+		plan =   adaptivePbControlInfo.getPlans().get(id5);
+		assertNotNull(plan);
+		assertEquals(id5, plan.getId());
+		assertEquals(0.0, plan.getStartTime(), EPSILON);
+		assertEquals(0.0, plan.getEndTime(), EPSILON);
+		assertEquals(Integer.valueOf(40), plan.getCirculationTime());
+		assertEquals(Integer.valueOf(3), plan.getSyncronizationOffset());
+		
+		assertEquals(1, plan.getGroupConfigs().size());
+		groupConfig = plan.getGroupConfigs().get(id23);
+		assertNotNull(groupConfig);
+		assertEquals(0.0, groupConfig.getRoughCast(), EPSILON);
+		assertEquals(45.0, groupConfig.getDropping(), EPSILON);
+		assertEquals(Integer.valueOf(2), groupConfig.getInterimTimeRoughcast());
+		assertEquals(Integer.valueOf(3), groupConfig.getInterimTimeDropping());
+		
+		
 	}  
 	
 }

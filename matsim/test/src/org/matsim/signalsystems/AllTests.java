@@ -32,7 +32,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for org.matsim.signalsystems");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(SignalSystemsReaderWriterTest.class);
-		suite.addTestSuite(LightSignalSystemsConfigReaderTest.class);
+		suite.addTestSuite(SignalSystemsConfigReaderTest.class);
 		suite.addTestSuite(CalculateAngleTest.class);
 		suite.addTestSuite(SignalSystemsOneAgentTest.class);
 		suite.addTestSuite(TravelTimeOneWayTest.class);

@@ -28,14 +28,19 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.basic.signalsystemsconfig.BasicAdaptivePlanBasedSignalSystemControlInfo;
+import org.matsim.basic.signalsystemsconfig.BasicAdaptiveSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsBuilder;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.jaxb.signalsystemsconfig11.XMLAdaptivePlanbasedSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLAdaptiveSignalSystemControlInfoType;
+import org.matsim.jaxb.signalsystemsconfig11.XMLIdRefType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLPlanbasedSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalGroupSettingsType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfig;
@@ -81,45 +86,77 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 				BasicSignalSystemConfiguration blssc = builder.createSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
 				
 				XMLSignalSystemControlInfoType xmlcit = xmlLssConfiguration.getSignalSystemControlInfo();
-				if (xmlcit instanceof XMLPlanbasedSignalSystemControlInfoType) {
-					XMLPlanbasedSignalSystemControlInfoType xmlpcit = (XMLPlanbasedSignalSystemControlInfoType) xmlcit;
-					
-					BasicPlanBasedSignalSystemControlInfo controlInfo = builder.createPlanBasedSignalSystemControlInfo();
-					
-					for (XMLSignalSystemPlanType xmlplan : xmlpcit.getSignalSystemPlan()) {
-						BasicSignalSystemPlan plan = builder.createSignalSystemPlan(new IdImpl(xmlplan.getId()));					
-						plan.setStartTime(getSeconds(xmlplan.getStart().getDaytime()));
-						plan.setEndTime(getSeconds(xmlplan.getStop().getDaytime()));
-						if (xmlplan.getCirculationTime() != null) {
-							plan.setCirculationTime(xmlplan.getCirculationTime().getSec());
-						}
-						if (xmlplan.getSyncronizationOffset() != null) {
-							plan.setSyncronizationOffset(xmlplan.getSyncronizationOffset().getSec());
-						}
-						for (XMLSignalGroupSettingsType xmlgroupconfig : xmlplan.getSignalGroupSettings()) {
-							BasicSignalGroupSettings groupConfig = builder.createSignalGroupSettings(new IdImpl(xmlgroupconfig.getRefId()));
-							groupConfig.setRoughCast(xmlgroupconfig.getRoughcast().getSec());
-							groupConfig.setDropping(xmlgroupconfig.getDropping().getSec());
-							if (xmlgroupconfig.getInterimTimeRoughcast() != null)
-								groupConfig.setInterimTimeRoughcast(xmlgroupconfig.getInterimTimeRoughcast().getSec());
-							if (xmlgroupconfig.getInterimTimeDropping() != null)
-								groupConfig.setInterimTimeDropping(xmlgroupconfig.getInterimTimeDropping().getSec());
-							
-							plan.addLightSignalGroupConfiguration(groupConfig);
-						}
-						controlInfo.addPlan(plan);
-						
-					}
-					blssc.setSignalSystemControlInfo(controlInfo);
-				}
-				else if (xmlcit instanceof XMLAdaptiveSignalSystemControlInfoType) {
-					//TODO implement adaptive control
-					throw new UnsupportedOperationException("has to be implemented!");
-				}
+				BasicSignalSystemControlInfo controlInfo;
+				controlInfo = convertXmlControlInfoToBasic(xmlcit);
+				blssc.setSignalSystemControlInfo(controlInfo);
 				
 				this.lssConfigurations.getSignalSystemConfigurations().put(blssc.getSignalSystemId(), blssc);
 			} // end outer for
 	}
+
+	private BasicSignalSystemControlInfo convertXmlControlInfoToBasic(
+			XMLSignalSystemControlInfoType xmlcit) {
+		BasicSignalSystemControlInfo controlInfo = null;
+		if (xmlcit instanceof XMLPlanbasedSignalSystemControlInfoType) {
+			XMLPlanbasedSignalSystemControlInfoType xmlpcit = (XMLPlanbasedSignalSystemControlInfoType) xmlcit;
+			
+			BasicPlanBasedSignalSystemControlInfo pcontrolInfo = builder.createPlanBasedSignalSystemControlInfo();
+			controlInfo = pcontrolInfo;
+			
+			for (XMLSignalSystemPlanType xmlplan : xmlpcit.getSignalSystemPlan()) {
+				pcontrolInfo.addPlan(convertXmlPlanToBasic(xmlplan));
+			}
+		}
+		else if (xmlcit instanceof XMLAdaptivePlanbasedSignalSystemControlInfoType){
+			XMLAdaptivePlanbasedSignalSystemControlInfoType sscit = (XMLAdaptivePlanbasedSignalSystemControlInfoType)xmlcit;
+			BasicAdaptivePlanBasedSignalSystemControlInfo aci = builder.createAdaptivePlanbasedSignalSystemControlInfo();
+			controlInfo = aci;
+			aci.setAdaptiveControlerClass(sscit.getAdaptiveControler());
+			for (XMLIdRefType idref : sscit.getSignalGroup()){
+				aci.addSignalGroupId(new IdImpl(idref.getRefId()));
+			}
+			for (XMLSignalSystemPlanType xmlplan : sscit.getSignalSystemPlan()) {
+				aci.addPlan(convertXmlPlanToBasic(xmlplan));
+			}
+		}
+		else if (xmlcit instanceof XMLAdaptiveSignalSystemControlInfoType) {
+			XMLAdaptiveSignalSystemControlInfoType sscit = (XMLAdaptiveSignalSystemControlInfoType)xmlcit;
+			BasicAdaptiveSignalSystemControlInfo aci = builder.createAdaptiveSignalSystemControlInfo();
+			controlInfo = aci;
+			aci.setAdaptiveControlerClass(sscit.getAdaptiveControler());
+			for (XMLIdRefType idref : sscit.getSignalGroup()){
+				aci.addSignalGroupId(new IdImpl(idref.getRefId()));
+			}
+		}
+		return controlInfo;
+
+	}
+	
+	private BasicSignalSystemPlan convertXmlPlanToBasic(XMLSignalSystemPlanType xmlplan){
+		BasicSignalSystemPlan plan = builder.createSignalSystemPlan(new IdImpl(xmlplan.getId()));					
+		plan.setStartTime(getSeconds(xmlplan.getStart().getDaytime()));
+		plan.setEndTime(getSeconds(xmlplan.getStop().getDaytime()));
+		if (xmlplan.getCirculationTime() != null) {
+			plan.setCirculationTime(xmlplan.getCirculationTime().getSec());
+		}
+		if (xmlplan.getSyncronizationOffset() != null) {
+			plan.setSyncronizationOffset(xmlplan.getSyncronizationOffset().getSec());
+		}
+		for (XMLSignalGroupSettingsType xmlgroupconfig : xmlplan.getSignalGroupSettings()) {
+			BasicSignalGroupSettings groupConfig = builder.createSignalGroupSettings(new IdImpl(xmlgroupconfig.getRefId()));
+			groupConfig.setRoughCast(xmlgroupconfig.getRoughcast().getSec());
+			groupConfig.setDropping(xmlgroupconfig.getDropping().getSec());
+			if (xmlgroupconfig.getInterimTimeRoughcast() != null)
+				groupConfig.setInterimTimeRoughcast(xmlgroupconfig.getInterimTimeRoughcast().getSec());
+			if (xmlgroupconfig.getInterimTimeDropping() != null)
+				groupConfig.setInterimTimeDropping(xmlgroupconfig.getInterimTimeDropping().getSec());
+			
+			plan.addLightSignalGroupConfiguration(groupConfig);
+		}		
+		return plan;
+	}
+	
+	
 
 	private double getSeconds(XMLGregorianCalendar daytime) {
 		double sec = daytime.getHour() * 3600.0;

@@ -46,4 +46,12 @@ public class BasicSignalSystemConfigurationsBuilder {
 		return new BasicSignalGroupSettingsImpl(refid);
 	}
 
+	public BasicAdaptiveSignalSystemControlInfo createAdaptiveSignalSystemControlInfo() {
+		return new BasicAdaptiveSignalSystemControlInfoImpl();
+	}
+
+	public BasicAdaptivePlanbasedSignalSystemControlInfoImpl createAdaptivePlanbasedSignalSystemControlInfo() {
+		return new BasicAdaptivePlanbasedSignalSystemControlInfoImpl();
+	}
+
 }
