@@ -113,7 +113,7 @@ the simulation -->
 				<xs:element name="signalSystemPlan" type="signalSystemPlanType" minOccurs="0" maxOccurs="unbounded">
 					<xs:annotation>
 						<xs:documentation>An adaptive control can use signal plans to control the system. How this
-						plans are used depends on the adaptive control strategy choosen.
+						plans are used depends on the adaptive control strategy chosen.
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
