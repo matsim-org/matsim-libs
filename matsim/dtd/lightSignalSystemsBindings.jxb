@@ -13,7 +13,7 @@
 
 
 <jxb:schemaBindings>
-  <jxb:package name="org.matsim.basic.xml.lightsignalsystems" />
+  <jxb:package name="org.matsim.jaxb.lightsignalsystems10" />
   <jxb:nameXmlTransform>
     <jxb:elementName prefix="XML" />
     <jxb:typeName prefix="XML"  />
