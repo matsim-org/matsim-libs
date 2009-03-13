@@ -24,20 +24,21 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
+import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.xml.sax.SAXException;
 
 public class OSM2MATSim {
 
 	public static void main(final String[] args) {
 
-		Gbl.startMeasurement();
-		OSMReader osmReader = new OSMReader();
+		NetworkLayer network = new NetworkLayer();
+		OsmNetworkReader osmReader = new OsmNetworkReader(network, new WGS84toCH1903LV03());
+		osmReader.setKeepPaths(false);
 		try {
-//			osmReader.parse("../mystudies/zueri.osm");
-			osmReader.parse("../mystudies/switzerland.osm");
+//			osmReader.parse("../mystudies/osmnet/switzerland-20090313.osm");
+			osmReader.parse("../mystudies/osmnet/zueri-20080410.osm");
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -45,10 +46,8 @@ public class OSM2MATSim {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		NetworkLayer network = osmReader.convert();
-//		new NetworkWriter(network, "../mystudies/zueri-net.xml").write();
-		new NetworkWriter(network, "../mystudies/swiss-net.xml").write();
-		Gbl.printElapsedTime();
+//		new NetworkWriter(network, "../mystudies/osmnet/switzerland-20090313.xml").write();
+		new NetworkWriter(network, "../mystudies/osmnet/zueri-20080410.xml").write();
 	}
 
 }

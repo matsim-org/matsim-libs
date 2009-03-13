@@ -28,19 +28,21 @@ import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
+import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.xml.sax.SAXException;
 
-import playground.marcel.osm2matsim.OSMReader;
+import playground.marcel.osm2matsim.OsmNetworkReader;
 
 public class OSM2MATSim {
 	private static final Logger log = Logger.getLogger(OSM2MATSim.class);
 
 	public static void main(final String[] args) {
 		
-		log.error( "This still doesn't have the coordinate transform problem fixed.  Look in OSMReader near line 226. kai, jan09" ) ; 
+		log.error( "This still doesn't have the coordinate transform problem fixed.  kai, jan09" ) ; 
 
 		Gbl.startMeasurement();
-		OSMReader osmReader = new OSMReader();
+		NetworkLayer network = new NetworkLayer();
+		OsmNetworkReader osmReader = new OsmNetworkReader(network, new WGS84toCH1903LV03()); // wrong coordinate system! that's for Switzerland
 		try {
 //			osmReader.parse("../mystudies/zueri.osm");
 			osmReader.parse("../shared-svn/studies/north-america/ca/vancouver/network/osm/map.osm");
@@ -51,7 +53,6 @@ public class OSM2MATSim {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		NetworkLayer network = osmReader.convert();
 //		new NetworkWriter(network, "../mystudies/zueri-net.xml").write();
 		new NetworkWriter(network, "../shared-svn/studies/north-america/ca/vancouver/network/net.xml").write();
 		Gbl.printElapsedTime();
