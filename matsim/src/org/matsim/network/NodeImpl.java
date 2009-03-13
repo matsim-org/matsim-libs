@@ -41,12 +41,6 @@ public class NodeImpl extends BasicNodeImpl implements Node {
 	private String type = null;
 	private String origid = null;
 
-	/* TODO [balmermi] The topo_type member should not be here, instead using a role or
-	 * inheritance would make more sense. topo_type is calculated by
-	 * org.matsim.network.algorithms.NetworkCalcTopoType */
-	@Deprecated
-	private int topoType = Integer.MIN_VALUE;
-
 	private final static Logger log = Logger.getLogger(Node.class);
 
 	//////////////////////////////////////////////////////////////////////
@@ -197,7 +191,6 @@ public class NodeImpl extends BasicNodeImpl implements Node {
 		return "[id=" + this.id + "]" +
 				"[coord=" + this.coord + "]" +
 				"[type=" + this.type + "]" +
-				"[topoType=" + this.topoType + "]" +
 				"[nof_inlinks=" + this.inlinks.size() + "]" +
 				"[nof_outlinks=" + this.outlinks.size() + "]";
 	}
