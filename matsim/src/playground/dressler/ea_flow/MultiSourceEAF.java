@@ -32,7 +32,6 @@ import java.util.HashMap;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicPopulation;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -41,7 +40,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriterV5;
+import org.matsim.population.PopulationWriter;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -303,7 +302,7 @@ public class MultiSourceEAF {
 				}
 			}
 			if(outputplansfile!=null){
-				BasicPopulation output = fluss.createPoulation(emptylegs,null);
+				Population output = fluss.createPoulation(emptylegs,null);
 				if (emptylegs) {
 					Config config = Gbl.createConfig(new String[] {});
 
@@ -320,10 +319,10 @@ public class MultiSourceEAF {
 						router.run(plan);
 					}
 				}
-				PopulationWriterV5 popwriter = new PopulationWriterV5(output);
+				PopulationWriter popwriter = new PopulationWriter(output, outputplansfile);
 
 				try {
-				  popwriter.writeFile(outputplansfile);
+				  popwriter.write();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

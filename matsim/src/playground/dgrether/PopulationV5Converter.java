@@ -22,8 +22,6 @@ package playground.dgrether;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.utils.io.MatsimXMLFormatConverter;
-
 
 /**
  * @author dgrether
@@ -46,7 +44,7 @@ public class PopulationV5Converter {
 //		String popv5 = "examples/equil/plans2v5.xml";
 		String popv5 = "test/input/org/matsim/integration/EquilTwoAgentsTest/plans2v5.xml";
 		
-		MatsimXMLFormatConverter.convertPopulationV4ToV5(popv4, popv5, net);
+//		MatsimXMLFormatConverter.convertPopulationV4ToV5(popv4, popv5, net);
 		
 	}
 

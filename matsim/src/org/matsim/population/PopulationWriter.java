@@ -97,6 +97,13 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 			writeStartPlans();
 		}
 	}
+	
+	
+	public PopulationWriter(final Population population, String filename) {
+		this(population, filename, "v4", 1.0);
+	}
+	
+	
 
 	/**
 	 * Just a helper method to instantiate the correct handler
@@ -272,6 +279,8 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 			}
 		}
 	}
+	
+	
 
 	/**
 	 * Writes all plans to the file. If plans-streaming is on, this will end the writing and close the file.

@@ -27,11 +27,9 @@ import java.util.List;
 
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.BasicLegImpl;
-import org.matsim.basic.v01.BasicPopulationImpl;
 import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.BasicPopulation;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
@@ -39,8 +37,10 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
+import org.matsim.population.PopulationImpl;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
@@ -597,10 +597,10 @@ public class Flow {
 	
 	
 	@SuppressWarnings("unchecked")
-	public BasicPopulation createPoulation(boolean emptylegs,String oldfile){
+	public Population createPoulation(boolean emptylegs,String oldfile){
 		//construct Population
-		BasicPopulation result =
-			new BasicPopulationImpl();
+		Population result =
+			new PopulationImpl(PopulationImpl.NO_STREAMING);
 		int id =1;
 		for (TimeExpandedPath path : this._TimeExpandedPaths){
 			if(path.isforward()){
@@ -725,6 +725,7 @@ public class Flow {
 	/**
 	 * returns a String representation of a TimeExpandedPath
 	 */
+	@Override
 	public String toString(){
 		StringBuilder strb = new StringBuilder();
 		for(Link link : _flow.keySet()){

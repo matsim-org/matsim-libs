@@ -33,7 +33,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriterV5;
+import org.matsim.population.PopulationWriter;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.world.World;
@@ -124,10 +124,10 @@ public class EmptyPlans {
 			router.run(plan);
 		}
 
-		PopulationWriterV5 popwriter = new PopulationWriterV5(population);
+		PopulationWriter popwriter = new PopulationWriter(population, outputplansfile);
 
 		try {
-			popwriter.writeFile(outputplansfile);
+			popwriter.write();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}								

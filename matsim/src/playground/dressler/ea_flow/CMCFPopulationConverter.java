@@ -31,21 +31,20 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.BasicLegImpl;
-import org.matsim.basic.v01.BasicPopulationImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.BasicPerson;
-import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkReaderMatsimV1;
 import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationWriterV5;
+import org.matsim.population.PopulationImpl;
+import org.matsim.population.PopulationWriter;
 import org.xml.sax.SAXException;
 /**
  * 
@@ -56,8 +55,8 @@ public class CMCFPopulationConverter {
 	
 
 	@SuppressWarnings("unchecked")
-	public static BasicPopulationImpl<BasicPerson<BasicPlan>> readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
-		BasicPopulationImpl result = new BasicPopulationImpl();
+	public static Population readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
+		Population result = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		SAXBuilder builder = new SAXBuilder();
 		Document cmcfdemands = builder.build(filename);
 		Element demandgraph = cmcfdemands.getRootElement();
@@ -125,7 +124,7 @@ public class CMCFPopulationConverter {
 	 * @param args
 	 */
 	public static void main(String[] args) { 
-		if(args.length<3 || args.length > 4){
+		if((args.length<3) || (args.length > 4)){
 			System.out.println("usage:1. c ore e for coordinates or edges in plans 2. argument network file 3. argument inputfile 4. argument outfile (optional)");
 			return;
 		}
@@ -144,9 +143,10 @@ public class CMCFPopulationConverter {
 			NetworkLayer network = new NetworkLayer();
 			NetworkReaderMatsimV1 netreader = new NetworkReaderMatsimV1(network);
 			netreader.parse(netfile);
-			BasicPopulationImpl<BasicPerson<BasicPlan>> population = readCMCFDemands(inputfile,network,coordinates); 
-			PopulationWriterV5 writer = new PopulationWriterV5( population);
-			writer.writeFile(outfile);
+			Population population = readCMCFDemands(inputfile,network,coordinates); 
+			PopulationWriter writer = new PopulationWriter(population, outfile);
+//			PopulationWriterV5 writer = new PopulationWriterV5( population);
+			writer.write();
 			System.out.println(inputfile+"conveted "+"output written in :"+outfile);
 		} catch (JDOMException e) {
 			e.printStackTrace();

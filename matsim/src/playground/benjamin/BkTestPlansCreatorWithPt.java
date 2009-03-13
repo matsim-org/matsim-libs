@@ -36,7 +36,6 @@ import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.BasicPopulation;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.population.PopulationWriterV5;
 
 
 /**
@@ -152,8 +151,8 @@ public class BkTestPlansCreatorWithPt {
 		String outfile = "../bkick/oneRouteNoModeTest/plans.xml";
 		BkTestPlansCreatorWithPt pc = new BkTestPlansCreatorWithPt();
 		BasicPopulation<BasicPerson<BasicPlan>> pop = pc.createPlans();
-		PopulationWriterV5 writer = new PopulationWriterV5(pop, null);
-		writer.writeFile(outfile);
+//		PopulationWriterV5 writer = new PopulationWriterV5(pop, null);
+//		writer.writeFile(outfile);
 		log.info("plans written");
 		//test if correct...
         pop = new BasicPopulationImpl();

@@ -10,6 +10,7 @@
         <defaultSyncronizationOffset seconds="0.0"/>
         <defaultInterimTime seconds="2.0"/>
     </signalSystemDefinition>
+    
     <signalGroupDefinition linkIdRef="23" id="23">
         <signalSystemDefinition refId="23"/>
         <lane refId="3"/>

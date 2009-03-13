@@ -168,7 +168,11 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 	public final Map<Id, Person> getPersons() {
 		return super.getPersons();
 	}
-
+	/**
+	 * @deprecated 
+	 * @see org.matsim.interfaces.core.v01.Population#isStreaming()
+	 */
+  @Deprecated
 	public final boolean isStreaming() {
 		return this.isStreaming;
 	}
