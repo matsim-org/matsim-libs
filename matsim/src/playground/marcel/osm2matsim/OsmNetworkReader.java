@@ -31,6 +31,7 @@ import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.counts.Count;
 import org.matsim.interfaces.basic.v01.Id;
@@ -59,17 +60,21 @@ import org.xml.sax.SAXException;
  * to process it.  For some countries, there are
  * <a href="http://wiki.openstreetmap.org/wiki/Planet.osm#Extracts" target="_blank">Extracts</a> available containing
  * only the data of a single country.</li>
+ * </ul>
  *
  * OpenStreetMap only contains limited information regarding traffic flow in the streets. The most valuable attribute
  * of OSM data is a <a href="http://wiki.openstreetmap.org/wiki/Map_Features#Highway" target="_blank">categorization</a>
  * of "ways". This reader allows to set {@link #setHighwayDefaults(String, double, double, double) defaults} how
  * those categories should be interpreted to create a network with suitable attributes for traffic simulation.
  * For the most common highway-types, some basic defaults are loaded automatically (see code), but they can be
- * overwritten if desired.
+ * overwritten if desired. If the optional attributes <code>lanes</code> and <code>oneway</code> are set in the
+ * osm data, they overwrite the default values.
  *
  * @author mrieser
  */
 public class OsmNetworkReader {
+
+	private final static Logger log = Logger.getLogger(OsmNetworkReader.class);
 
 	private final Map<String, OsmNode> nodes = new HashMap<String, OsmNode>();
 	private final Map<String, OsmWay> ways = new HashMap<String, OsmWay>();
@@ -116,17 +121,19 @@ public class OsmNetworkReader {
 		OsmXmlParser parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
 		parser.parse(osmFilename);
 		convert();
-		System.out.println("read osm nodes: " + parser.nodeCounter.getCounter());
-		System.out.println("read osm ways:  " + parser.wayCounter.getCounter());
-		System.out.println("created nodes:  " + this.network.getNodes().size());
-		System.out.println("created links:  " + this.network.getLinks().size());
+		log.info("= conversion statistics: ==========================");
+		log.info("osm: # nodes read:       " + parser.nodeCounter.getCounter());
+		log.info("osm: # ways read:        " + parser.wayCounter.getCounter());
+		log.info("MATSim: # nodes created: " + this.network.getNodes().size());
+		log.info("MATSim: # links created: " + this.network.getLinks().size());
 
 		if (this.unknownHighways.size() > 0) {
-			System.out.println("The following highway-types had no defaults set and were thus not converted:");
+			log.info("The following highway-types had no defaults set and were thus NOT converted:");
 			for (String highwayType : this.unknownHighways) {
-				System.out.println("- \"" + highwayType + "\"");
+				log.info("- \"" + highwayType + "\"");
 			}
 		}
+		log.info("= end of conversion statistics ====================");
 	}
 
 	/**
@@ -378,8 +385,8 @@ public class OsmNetworkReader {
 		private OsmWay currentWay = null;
 		private final Map<String, OsmNode> nodes;
 		private final Map<String, OsmWay> ways;
-		private final Counter nodeCounter = new Counter("node ");
-		private final Counter wayCounter = new Counter("way ");
+		/*package*/ final Counter nodeCounter = new Counter("node ");
+		/*package*/ final Counter wayCounter = new Counter("way ");
 		private final CoordinateTransformation transform;
 
 		public OsmXmlParser(final Map<String, OsmNode> nodes, final Map<String, OsmWay> ways, final CoordinateTransformation transform) {
