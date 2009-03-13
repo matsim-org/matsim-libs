@@ -15,6 +15,7 @@ import org.matsim.interfaces.basic.v01.BasicNetwork;
 import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPopulation;
+import org.matsim.interfaces.basic.v01.Id;
 
 @SuppressWarnings("unused")
 public class Mobsim {
@@ -27,22 +28,25 @@ public class Mobsim {
 		
 			
 		// finally, we need to be able to generate events:
+		Id agentId = new IdImpl("agentId");
+		Id linkId = new IdImpl("linkId");
 		double time = 1. ;
-		ActEndEvent aee = new ActEndEvent(time,"agentId", new IdImpl("linkId"),"actType" ) ;
+		ActEndEvent aee = new ActEndEvent(time, agentId, linkId, "actType" ) ;
 		eve.processEvent( aee ) ;
 
+		
 		int legNumber = 1 ;
-		AgentDepartureEvent ade = new AgentDepartureEvent( time, "agentId", "linkId" ) ;
+		AgentDepartureEvent ade = new AgentDepartureEvent( time, agentId, linkId ) ;
 
-		AgentWait2LinkEvent aw2le = new AgentWait2LinkEvent(time,"agentId","linkId") ;
+		AgentWait2LinkEvent aw2le = new AgentWait2LinkEvent(time,agentId,linkId) ;
 
-		LinkLeaveEvent lle = new LinkLeaveEvent( time, "agentId", "linkId" ) ;
+		LinkLeaveEvent lle = new LinkLeaveEvent( time, agentId, linkId ) ;
 
-		LinkEnterEvent lee = new LinkEnterEvent( time, "agentId", "linkId" ) ;
+		LinkEnterEvent lee = new LinkEnterEvent( time, agentId, linkId ) ;
 
-		AgentArrivalEvent aae = new AgentArrivalEvent( time, "agentId", "linkId" ) ;
+		AgentArrivalEvent aae = new AgentArrivalEvent( time, agentId, linkId ) ;
 
-		ActStartEvent ase = new ActStartEvent( time, "agentId", new IdImpl("linkId"), "acttype" ) ;
+		ActStartEvent ase = new ActStartEvent( time, agentId, linkId, "acttype" ) ;
 
 		// TODO: None of this is behind interfaces.  Needed if we want to accept "external" mobsims.  Do we want that?
 		// If so, we would need to be sure that we want to maintain the create methods.

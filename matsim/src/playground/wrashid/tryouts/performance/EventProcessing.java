@@ -2,29 +2,11 @@ package playground.wrashid.tryouts.performance;
 
 import java.util.LinkedList;
 
-import org.matsim.basic.v01.BasicNodeImpl;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.config.Config;
 import org.matsim.events.Events;
-import org.matsim.events.EventsReaderTXTv1;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.events.parallelEventsHandler.ParallelEvents;
-import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicNode;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.network.LinkImpl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-
-import playground.wrashid.PHEV.co2emissions.AllLinkHandler;
-import playground.wrashid.PHEV.co2emissions.AllLinkOneIntervalHandler;
-import playground.wrashid.PHEV.co2emissions.OneLinkHandler;
-
-import org.matsim.population.PersonImpl;
-import org.matsim.utils.geometry.CoordImpl;
 
 // this events processing relies on creating artifical events, intead of reading them
 public class EventProcessing {
@@ -44,7 +26,7 @@ public class EventProcessing {
 		events.addHandler(ep.new Handler1());
 
 		
-		LinkLeaveEvent linkLeaveEvent=new LinkLeaveEvent(0, "", "");
+		LinkLeaveEvent linkLeaveEvent=new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""));
 		
 		for (int i=0;i<1000000;i++){
 				events.processEvent(linkLeaveEvent);

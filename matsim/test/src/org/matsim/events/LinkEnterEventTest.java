@@ -20,6 +20,7 @@
 
 package org.matsim.events;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -28,10 +29,10 @@ import org.matsim.testcases.MatsimTestCase;
 public class LinkEnterEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		final LinkEnterEvent event1 = new LinkEnterEvent(6823.8, "agfe", "abcd");
+		final LinkEnterEvent event1 = new LinkEnterEvent(6823.8, new IdImpl("agfe"), new IdImpl("abcd"));
 		final LinkEnterEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
-		assertEquals(event1.agentId, event2.agentId);
-		assertEquals(event1.linkId, event2.linkId);
+		assertEquals(event1.getPersonId(), event2.getPersonId());
+		assertEquals(event1.getLinkId(), event2.getLinkId());
 	}
 }

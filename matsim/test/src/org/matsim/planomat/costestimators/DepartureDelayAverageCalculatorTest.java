@@ -25,6 +25,7 @@ import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
 import org.matsim.events.LinkLeaveEvent;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
@@ -33,8 +34,8 @@ import org.matsim.utils.geometry.CoordImpl;
 public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 
 	private NetworkLayer network = null;
-	private static final String LINK_ID = "1";
-	private static final String PERSON_ID = "1";
+	private static final Id LINK_ID = new IdImpl("1");
+	private static final Id PERSON_ID = new IdImpl("1");
 	private static final int TIME_BIN_SIZE = 900;
 
 	@Override
@@ -51,7 +52,7 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		double toY = 200.0;
 		Node fromNode = network.createNode(new IdImpl("1"), new CoordImpl(fromX, fromY));
 		Node toNode = network.createNode(new IdImpl("2"), new CoordImpl(toX, toY));
-		network.createLink(new IdImpl(LINK_ID), fromNode, toNode, 999.9, 50.0 / 3.6, 1000, 1);
+		network.createLink(LINK_ID, fromNode, toNode, 999.9, 50.0 / 3.6, 1000, 1);
 	}
 
 	@Override

@@ -31,9 +31,9 @@ import org.matsim.utils.misc.Time;
 
 public class EndLegMessage extends EventMessage {
 
-	public EndLegMessage(Scheduler scheduler, Vehicle vehicle) {
+	public EndLegMessage(final Scheduler scheduler, final Vehicle vehicle) {
 		super(scheduler, vehicle);
-		priority = SimulationParameters.PRIORITY_ARRIVAL_MESSAGE;
+		this.priority = SimulationParameters.PRIORITY_ARRIVAL_MESSAGE;
 	}
 
 	@Override
@@ -42,16 +42,16 @@ public class EndLegMessage extends EventMessage {
 		 * start next leg. assumption: actions and legs are alternating in plans
 		 * file
 		 */
-		vehicle.setLegIndex(vehicle.getLegIndex() + 2);
+		this.vehicle.setLegIndex(this.vehicle.getLegIndex() + 2);
 		// reset link index
-		vehicle.setLinkIndex(-1);
+		this.vehicle.setLinkIndex(-1);
 
-		Plan plan = vehicle.getOwnerPerson().getSelectedPlan();
+		Plan plan = this.vehicle.getOwnerPerson().getSelectedPlan();
 		ArrayList<Object> actsLegs = plan.getPlanElements();
-		if ((actsLegs.size() > vehicle.getLegIndex())) {
-			vehicle.setCurrentLeg((Leg) actsLegs.get(vehicle.getLegIndex()));
+		if ((actsLegs.size() > this.vehicle.getLegIndex())) {
+			this.vehicle.setCurrentLeg((Leg) actsLegs.get(this.vehicle.getLegIndex()));
 			// current act
-			Activity currentAct = (Activity) actsLegs.get(vehicle.getLegIndex() - 1);
+			Activity currentAct = (Activity) actsLegs.get(this.vehicle.getLegIndex() - 1);
 			// the leg the agent performs
 
 			// if only duration or end time of act is defined, take that
@@ -81,33 +81,33 @@ public class EndLegMessage extends EventMessage {
 			}
 
 			// update current link (we arrived at a new activity)
-			vehicle.setCurrentLink(currentAct.getLink());
+			this.vehicle.setCurrentLink(currentAct.getLink());
 
-			Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
+			Road road = Road.getRoad(this.vehicle.getCurrentLink().getId().toString());
 			// schedule a departure from the current link in future
-			vehicle.scheduleStartingLegMessage(departureTime, road);
+			this.vehicle.scheduleStartingLegMessage(departureTime, road);
 		}
 
 	}
 
+	@Override
 	public void processEvent() {
 		BasicEvent event = null;
 
 		// schedule AgentArrivalEvent
-		event = new AgentArrivalEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId().toString(), vehicle
-				.getCurrentLink().getId().toString());
+		event = new AgentArrivalEvent(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson(), this.vehicle.getCurrentLink(), this.vehicle.getCurrentLeg());
 
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
 		// schedule ActStartEvent
-		Activity nextAct = vehicle.getNextActivity();
+		Activity nextAct = this.vehicle.getNextActivity();
 		double actStartEventTime = nextAct.getStartTime();
 
 		if (this.getMessageArrivalTime() > actStartEventTime) {
 			actStartEventTime = this.getMessageArrivalTime();
 		}
 
-		event = new ActStartEvent(actStartEventTime, vehicle.getOwnerPerson(), vehicle.getCurrentLink(), nextAct);
+		event = new ActStartEvent(actStartEventTime, this.vehicle.getOwnerPerson(), this.vehicle.getCurrentLink(), nextAct);
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
 	}

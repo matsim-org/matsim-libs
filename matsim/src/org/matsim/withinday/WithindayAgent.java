@@ -212,7 +212,7 @@ public class WithindayAgent extends PersonAgent {
     	this.getPerson().exchangeSelectedPlan(newPlan, false);
     	this.exchangeCurrentLeg(newLeg);
   
-    	QueueSimulation.getEvents().processEvent(new AgentReplanEvent(SimulationTimer.getTime(), this.getPerson().getId().toString(), alternativeRoute));
+    	QueueSimulation.getEvents().processEvent(new AgentReplanEvent(SimulationTimer.getTime(), this.getPerson().getId(), alternativeRoute));
     }
 	}
 

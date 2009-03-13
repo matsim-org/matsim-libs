@@ -20,9 +20,11 @@
 
 package org.matsim.events;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.handler.BasicEventHandler;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 
 public class EventsHandlerHierarchyTest extends MatsimTestCase {
@@ -52,23 +54,24 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 
 	public final void testHandlerHierarchy() {
 		Events events = new Events();
-
+		Id dummy = new IdImpl("");
 		EventHandler cc = new B();
-		events.processEvent(new LinkLeaveEvent(0., "", ""));
+		events.processEvent(new LinkLeaveEvent(0., dummy, dummy));
 		assertEquals(this.eventHandled, 0);
 		events.addHandler(cc);
-		events.processEvent(new LinkLeaveEvent(0., "", ""));
+		events.processEvent(new LinkLeaveEvent(0., dummy, dummy));
 		assertEquals(this.eventHandled, 1);
 	}
 
 	public final void testHierarchicalReset() {
 		Events events = new Events();
+		Id dummy = new IdImpl("");
 		//first test if handleEvent is not called twice for A and for C
 		C cc = new C();
-		events.processEvent(new LinkLeaveEvent(0., "", ""));
+		events.processEvent(new LinkLeaveEvent(0., dummy, dummy));
 		assertEquals(this.eventHandled, 0);
 		events.addHandler(cc);
-		events.processEvent(new LinkLeaveEvent(0., "", ""));
+		events.processEvent(new LinkLeaveEvent(0., dummy, dummy));
 		assertEquals(this.eventHandled, 1);
 		//then test the reset
 		events.resetHandlers(0);

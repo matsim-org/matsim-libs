@@ -33,7 +33,7 @@ public class ActEndEvent extends ActEvent {
 		super(time, agent, link, act);
 	}
 
-	public ActEndEvent(final double time, final String agentId, final Id linkId, final String acttype) {
+	public ActEndEvent(final double time, final Id agentId, final Id linkId, final String acttype) {
 		super(time, agentId, linkId, acttype);
 	}
 

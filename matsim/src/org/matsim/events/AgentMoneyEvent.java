@@ -65,7 +65,7 @@ public final class AgentMoneyEvent extends PersonEvent {
 	 * @param amount
 	 */
 	public AgentMoneyEvent(final double time, final Id agentId, final double amount) {
-		super(time, agentId.toString());
+		super(time, agentId);
 		this.amount = amount;
 	}
 
@@ -83,11 +83,11 @@ public final class AgentMoneyEvent extends PersonEvent {
 
 	@Override
 	public String toString() {
-		return getTimeString(this.getTime()) + this.agentId + "\t\t\t0\t9\t" + EVENT_TYPE + "\t" + this.amount;
+		return getTimeString(this.getTime()) + this.getPersonId() + "\t\t\t0\t9\t" + EVENT_TYPE + "\t" + this.amount;
 	}
 
 	public double getAmount() {
-		return amount;
+		return this.amount;
 	}
 
 }

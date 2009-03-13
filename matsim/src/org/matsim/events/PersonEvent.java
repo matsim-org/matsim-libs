@@ -22,6 +22,7 @@ package org.matsim.events;
 
 import java.util.Map;
 
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Person;
 
 /**
@@ -31,34 +32,40 @@ public abstract class PersonEvent extends BasicEvent {
 
 	public static final String ATTRIBUTE_AGENT = "agent";
 
-	private Person agent;
+	private Person person;
 	public final String agentId;
+	private final Id personId;
 
 	public PersonEvent(final double time, final Person person) {
 		super(time);
-		this.agent = person;
+		this.person = person;
+		this.personId = person.getId();
 		this.agentId = person.getId().toString();
 	}
 
-	public PersonEvent(final double time, final String personId)	{
+	public PersonEvent(final double time, final Id personId)	{
 		super(time);
-		this.agentId = personId;
+		this.personId = personId;
+		this.agentId = personId.toString();
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_AGENT, this.agentId);
+		attr.put(ATTRIBUTE_AGENT, this.personId.toString());
 		return attr;
 	}
 
 	@Deprecated // should be set via Constructor...
-	public void setAgent(Person agent) {
-		this.agent = agent;
+	public void setAgent(final Person agent) {
+		this.person = agent;
 	}
 
-	public Person getAgent() {
-		return agent;
+	public Person getAgent() { // TODO [MR] rename to getPerson
+		return this.person;
 	}
 
+	public Id getPersonId() {
+		return this.personId;
+	}
 }

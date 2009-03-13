@@ -1,5 +1,6 @@
 package org.matsim.events.parallelEventsHandler;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkLeaveEventHandler;
@@ -36,7 +37,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 		events.addHandler(handler);
 		events.removeHandler(handler);
 
-		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, "", "");
+		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""));
 
 		for (int i = 0; i < 100; i++) {
 			events.processEvent(linkLeaveEvent);
@@ -57,7 +58,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 			events.addHandler(handlers[i]);
 		}
 
-		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, "", "");
+		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""));
 
 		for (int j = 0; j < numberOfIterations; j++) {
 

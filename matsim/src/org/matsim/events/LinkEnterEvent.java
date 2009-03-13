@@ -20,6 +20,7 @@
 
 package org.matsim.events;
 
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 
@@ -31,7 +32,7 @@ public class LinkEnterEvent extends LinkEvent {
 		super(time, agent, link);
 	}
 
-	public LinkEnterEvent(final double time, final String agentId, final String linkId) {
+	public LinkEnterEvent(final double time, final Id agentId, final Id linkId) {
 		super(time, agentId, linkId);
 	}
 

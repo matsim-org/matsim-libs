@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.io.IOUtils;
 
@@ -58,8 +59,8 @@ public class EventsReaderTXTv1 {
 
 	}
 
-	static public final void createEvent(final Events events, final double time, final String agentId, 
-			final String linkId, final int flag, final String desc, final String acttype) {
+	static public final void createEvent(final Events events, final double time, final Id agentId,
+			final Id linkId, final int flag, final String desc, final String acttype) {
 		BasicEvent data = null;
 
 		switch (flag) {
@@ -83,20 +84,20 @@ public class EventsReaderTXTv1 {
 				break;
 			case 7:
 				if ("".equals(acttype) && desc != null) {
-					data = new ActStartEvent(time, agentId, new IdImpl(linkId), desc.replace("actstart ", ""));
+					data = new ActStartEvent(time, agentId, linkId, desc.replace("actstart ", ""));
 				} else {
-					data = new ActStartEvent(time, agentId, new IdImpl(linkId), acttype);
+					data = new ActStartEvent(time, agentId, linkId, acttype);
 				}
 				break;
 			case 8:
 				if ("".equals(acttype) && desc != null) {
-					data = new ActEndEvent(time, agentId, new IdImpl(linkId), desc.replace("actend ", ""));
+					data = new ActEndEvent(time, agentId, linkId, desc.replace("actend ", ""));
 				} else {
-					data = new ActEndEvent(time, agentId, new IdImpl(linkId), acttype);
+					data = new ActEndEvent(time, agentId, linkId, acttype);
 				}
 				break;
 			case 9:
-				data = new AgentMoneyEvent(time, new IdImpl(agentId), Double.parseDouble(desc.replace("agentMoney\t", "")));
+				data = new AgentMoneyEvent(time, agentId, Double.parseDouble(desc.replace("agentMoney\t", "")));
 				break;
 			default:
 				throw new RuntimeException("Type of events with flag = " + flag + " is not known!");
@@ -110,11 +111,11 @@ public class EventsReaderTXTv1 {
 		String[] result = StringUtils.explode(line, '\t', 7);
 		if (result.length == 7) {
 			createEvent(this.events, Double.parseDouble(result[0]),	// time
-									result[1],		// vehID
-									result[3],		// linkID
-									//Integer.parseInt(result[4]),		// nodeID
-									Integer.parseInt(result[5]),		// flag
-									result[6], "");		// description
+					new IdImpl(result[1]),		// vehID
+					new IdImpl(result[3]),		// linkID
+					//Integer.parseInt(result[4]),		// nodeID
+					Integer.parseInt(result[5]),		// flag
+					result[6], "");		// description
 		}
 	}
 

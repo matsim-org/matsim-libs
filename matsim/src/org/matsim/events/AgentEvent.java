@@ -22,6 +22,7 @@ package org.matsim.events;
 
 import java.util.Map;
 
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -34,37 +35,44 @@ public abstract class AgentEvent extends PersonEvent {
 	private Link link;
 	private Leg leg;
 
-	public String linkId;
+	public final String linkId;
+	private final Id linkId_;
 
 	AgentEvent(final double time, final Person agent, final Link link, final Leg leg) {
 		super(time, agent);
 		this.link = link;
+		this.linkId_ = link.getId();
 		this.linkId = link.getId().toString();
 		this.leg = leg;
 	}
 
-	AgentEvent(final double time, final String agentId, final String linkId) {
+	AgentEvent(final double time, final Id agentId, final Id linkId) {
 		super(time, agentId);
-		this.linkId = linkId;
+		this.linkId = linkId.toString();
+		this.linkId_ = linkId;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_LINK, this.linkId);
+		attr.put(ATTRIBUTE_LINK, this.linkId_.toString());
 		return attr;
 	}
 
 	protected String asString() {
-		return getTimeString(this.getTime()) + this.agentId + "\t\t"+ this.linkId + "\t0\t"; // FLAG + DESCRIPTION is mising here: concat later
+		return getTimeString(this.getTime()) + this.getPersonId() + "\t\t"+ this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concatenate later
 	}
 
 	public Link getLink() {
-		return link;
+		return this.link;
 	}
 
 	public Leg getLeg() {
-		return leg;
+		return this.leg;
+	}
+	
+	public Id getLinkId() {
+		return this.linkId_;
 	}
 
 }

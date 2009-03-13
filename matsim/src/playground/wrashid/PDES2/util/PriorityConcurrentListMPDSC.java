@@ -2,13 +2,10 @@ package playground.wrashid.PDES2.util;
 
 import java.util.LinkedList;
 import java.util.PriorityQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.BasicEvent;
-import org.matsim.mobsim.jdeqsim.util.Timer;
-
-import playground.wrashid.deqsim.PDESStarter2;
 // optimized for multiple producer, single consumer
 // the producer decides, when the his inputBuffer should be emptied
 // the parameter maxInputPutListSize can be set large for allowing high cuncurrency, if
@@ -106,7 +103,7 @@ public class PriorityConcurrentListMPDSC {
 		int outEventCount=0;
 		int inEventCount=1000000;
 		for (int i=0;i<inEventCount;i++){
-			queue.add(new AgentArrivalEvent(1,"",""), 0);
+			queue.add(new AgentArrivalEvent(1,new IdImpl(""),new IdImpl("")), 0);
 		}
 		
 		BasicEvent be=queue.remove();

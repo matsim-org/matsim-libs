@@ -20,6 +20,7 @@
 
 package org.matsim.events;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -28,7 +29,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class AgentWait2LinkEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		final AgentWait2LinkEvent event1 = new AgentWait2LinkEvent(8463.7301, "483", "783");
+		final AgentWait2LinkEvent event1 = new AgentWait2LinkEvent(8463.7301, new IdImpl("483"), new IdImpl("783"));
 		final AgentWait2LinkEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
 		assertEquals(event1.agentId, event2.agentId);
