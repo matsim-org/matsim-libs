@@ -71,7 +71,7 @@ public class PtcheckControler2 extends Controler {
 
 		private OnRouteModalSplit orms = null;
 
-		private TravelTimeModalSplit ttms = null;
+		private LegTravelTimeModalSplit ttms = null;
 
 		private LegDistance ld = null;
 
@@ -183,7 +183,7 @@ public class PtcheckControler2 extends Controler {
 				// nl,
 						ps);
 				es.addHandler(orms);
-				ttms = new TravelTimeModalSplit(300, ps);
+				ttms = new LegTravelTimeModalSplit(300, ps);
 				es.addHandler(ttms);
 				ld = new LegDistance(300, nl);
 				es.addHandler(ld);

@@ -34,7 +34,7 @@ import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ShutdownListener;
 
 import playground.yu.analysis.PtCheck;
-import playground.yu.analysis.TravelTimeModalSplit;
+import playground.yu.analysis.LegTravelTimeModalSplit;
 
 /**
  * @author yu
@@ -45,7 +45,7 @@ public class TravelTimeRoadPricingControler extends Controler {
 	private static class TTRPlistener implements IterationEndsListener,
 			IterationStartsListener, ShutdownListener {
 		private final PtCheck pc;
-		private TravelTimeModalSplit ttms = null;
+		private LegTravelTimeModalSplit ttms = null;
 
 		public TTRPlistener(String ptCheckFilename) throws IOException {
 			pc = new PtCheck(ptCheckFilename);
@@ -82,7 +82,7 @@ public class TravelTimeRoadPricingControler extends Controler {
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			Controler c = event.getControler();
 			if (event.getIteration() == c.getLastIteration()) {
-				ttms = new TravelTimeModalSplit(3600, c.getPopulation());
+				ttms = new LegTravelTimeModalSplit(3600, c.getPopulation());
 				c.getEvents().addHandler(ttms);
 			}
 		}

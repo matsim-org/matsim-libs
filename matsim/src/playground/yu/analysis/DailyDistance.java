@@ -3,6 +3,10 @@
  */
 package playground.yu.analysis;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
@@ -16,10 +20,15 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.utils.charts.BarChart;
 import org.matsim.utils.charts.XYLineChart;
+import org.xml.sax.SAXException;
 
+import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.BubbleChart;
+import playground.yu.utils.charts.PieChart;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -46,6 +55,13 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 	private int count;
 
 	private Person person;
+
+	private RoadPricingScheme toll = null;
+
+	public DailyDistance(RoadPricingScheme toll) {
+		this();
+		this.toll = toll;
+	}
 
 	public enum ActTypeStart {
 		h, w, s, e, l, o
@@ -97,8 +113,14 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 	@Override
 	public void run(final Person person) {
 		this.person = person;
-		this.count++;
-		run(person.getSelectedPlan());
+		Plan plan = person.getSelectedPlan();
+		if (toll == null) {
+			this.count++;
+			run(plan);
+		} else if (TollTools.isInRange(plan.getFirstActivity().getLink(), toll)) {
+			this.count++;
+			run(plan);
+		}
 	}
 
 	public void run(final Plan plan) {
@@ -200,9 +222,10 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 						this.ptCounts5[Math.min(20, (int) dist / 5)]++;
 						this.ptCounts1[Math.min(100, (int) dist)]++;
 					} else if (bl.getMode().equals(Mode.walk)) {
-						dist = plan.getPreviousActivity(bl).getCoord()
-								.calcDistance(
-										plan.getNextActivity(bl).getCoord()) * 1.5 / 1000.0;
+						dist = plan.getPreviousActivity(bl).getLink()
+								.getCoord().calcDistance(
+										plan.getNextActivity(bl).getLink()
+												.getCoord()) * 1.5 / 1000.0;
 						this.wlkDist += dist;
 						wlkDayDist += dist;
 						switch (ats) {
@@ -246,27 +269,47 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 
 	public void write(final String outputFilename) {
 		double sum = this.carDist + this.ptDist + wlkDist + this.otherDist;
+
 		SimpleWriter sw = new SimpleWriter(outputFilename + "dailyDistance.txt");
-		sw.writeln("\tDaily Distance\t(exkl. through-traffic)");
-		sw.writeln("\tkm\t%");
-		sw.writeln("car\t" + this.carDist / (double) this.count + "\t"
-				+ this.carDist / sum * 100.0);
-		sw.writeln("pt\t" + this.ptDist / (double) this.count + "\t"
-				+ this.ptDist / sum * 100.0);
-		sw.writeln("walk\t" + this.wlkDist / (double) this.count + "\t"
-				+ this.wlkDist / sum * 100.0);
-		sw.writeln("through\t" + this.otherDist / (double) this.count + "\t"
-				+ this.otherDist / sum * 100.0);
+		sw.writeln("\tDaily Distance\t(exkl. through-traffic)\tn_agents\t"
+				+ count);
+		sw.writeln("mode\tavg.[km]\t%\tsum.[km]");
+
+		double avgCarDist = this.carDist / (double) this.count;
+		double avgPtDist = this.ptDist / (double) this.count;
+		double avgWlkDist = this.wlkDist / (double) this.count;
+		double avgOtherDist = this.otherDist / (double) this.count;
+
+		sw.writeln("car\t" + avgCarDist + "\t" + this.carDist / sum * 100.0
+				+ "\t" + carDist);
+		sw.writeln("pt\t" + avgPtDist + "\t" + this.ptDist / sum * 100.0 + "\t"
+				+ ptDist);
+		sw.writeln("walk\t" + avgWlkDist + "\t" + this.wlkDist / sum * 100.0
+				+ "\t" + wlkDist);
+		sw.writeln("through\t" + avgOtherDist + "\t" + this.otherDist / sum
+				* 100.0 + "\t" + otherDist);
+
+		PieChart pieChart = new PieChart("Avg. Daily Distance -- Modal Split");
+		pieChart
+				.addSeries(new String[] { "car", "pt", "wlk", "through" },
+						new double[] { avgCarDist, avgPtDist, avgWlkDist,
+								avgOtherDist });
+		pieChart.saveAsPng(outputFilename + "dailyDistanceModalSplitPie.png",
+				800, 600);
+
 		sw.writeln("--------------------------------------------");
-		sw.writeln("\tDaily Distance\t(inkl. through-traffic)");
-		sw.writeln("\tkm\t%");
-		sw.writeln("car\t" + (this.carDist + this.otherDist)
-				/ (double) this.count + "\t" + (this.carDist + this.otherDist)
-				/ sum * 100.0);
-		sw.writeln("pt\t" + this.ptDist / (double) this.count + "\t"
-				+ this.ptDist / sum * 100.0);
-		sw.writeln("walk\t" + this.wlkDist / (double) this.count + "\t"
-				+ this.wlkDist / sum * 100.0);
+		sw.writeln("\tDaily Distance\t(inkl. through-traffic)\tn_agents\t"
+				+ count);
+		sw.writeln("mode\tkm\t%\tsum.[km]");
+		sw.writeln("car\t" + (avgCarDist + avgOtherDist) + "\t"
+				+ (this.carDist + this.otherDist) / sum * 100.0 + "\t"
+				+ (carDist + otherDist));
+		sw.writeln("pt\t" + avgPtDist + "\t" + this.ptDist / sum * 100.0 + "\t"
+				+ ptDist);
+		sw.writeln("walk\t" + avgWlkDist + "\t" + this.wlkDist / sum * 100.0
+				+ "\t" + wlkDist);
+		sw.writeln("----------------------------------------------");
+
 		sw.writeln("--travel destination and modal split--daily distance--");
 		sw.writeln("\twork\teducation\tshopping\tleisure\thome\tother...");
 		sw.writeln("car\t" + this.carWorkDist + "\t" + this.carEducDist + "\t"
@@ -344,7 +387,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		chart.addSeries("total", x, yTotal);
 		chart.saveAsPng(outputFilename + "dailyDistance.png", 800, 600);
 
-		sw.writeln("");
+		sw
+				.writeln("-------------------------------------------------------------");
 		sw.writeln("--Modal split -- leg distance--");
 		sw
 				.writeln("leg Distance [km]\tcar legs no.\tpt legs no.\twalk legs no.\tcar fraction [%]\tpt fraction [%]\twalk fraction [%]");
@@ -421,8 +465,9 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		Gbl.startMeasurement();
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		final String plansFilename = "../matsimTests/walk-1Test/it.500/500.plans.xml.gz";
-		final String outputFilename = "../matsimTests/walk-1Test/it.500/";
+		final String plansFilename = "../runs_SVN/run684/it.1000/1000.plans.xml.gz";
+		String outputFilename = "../matsimTests/analysis/";
+		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
 
 		Gbl.createConfig(null);
 
@@ -430,15 +475,24 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		new MatsimNetworkReader(network).readFile(netFilename);
 
 		Population population = new PopulationImpl();
+		
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
+		try {
+			tollReader.parse(tollFilename);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		DailyDistance dd = new DailyDistance(null
+		// tollReader.getScheme()
+		);
 
-		DailyDistance dd = new DailyDistance();
-		population.addAlgorithm(dd);
-
-		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
-
+		dd.run(population);
 		dd.write(outputFilename);
 
 		System.out.println("--> Done!");

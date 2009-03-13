@@ -72,7 +72,7 @@ public class PtcheckControler extends Controler {
 		private CalcTrafficPerformance ctpf = null;
 		private RoadPricing rp = null;
 		private OnRouteModalSplit orms = null;
-		private TravelTimeModalSplit ttms = null;
+		private LegTravelTimeModalSplit ttms = null;
 		private LegDistance ld = null;
 		private CalcLinksAvgSpeed clas = null;
 
@@ -187,7 +187,7 @@ public class PtcheckControler extends Controler {
 				// nl,
 						ps);
 				es.addHandler(orms);
-				ttms = new TravelTimeModalSplit(ps);
+				ttms = new LegTravelTimeModalSplit(ps);
 				es.addHandler(ttms);
 				ld = new LegDistance(nl);
 				es.addHandler(ld);

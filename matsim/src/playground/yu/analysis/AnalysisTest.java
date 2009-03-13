@@ -39,6 +39,7 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
 import org.xml.sax.SAXException;
 
@@ -80,36 +81,42 @@ public class AnalysisTest {
 		final String eventsFilename = args[1];
 		String eventsOutputFilename = args[1].replaceFirst("events",
 				"events4mvi");
-		final String outputPath = args[2] + args[args.length - 1] + ".";
+		String outputBase = args[2] + args[args.length - 1] + "."
+				+ (scenario.equals("Kanton_Zurich") ? scenario : "");
 		String plansFilename = null;
 		if (args.length >= 4) {
 			if (args[3].endsWith("xml") || args[3].endsWith("xml.gz"))
 				plansFilename = args[3];
 		}
+		String tollFilename = (!scenario.equals("Kanton_Zurich")) ? null
+				: args[args.length - 3];
 
 		Gbl.createConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
+		RoadPricingScheme toll = null;
+		// EventsHandlers with parameter of Population:
 		OnRouteModalSplit orms = null;
-		TravelTimeModalSplit ttms = null;
+		LegTravelTimeModalSplit lttms = null;
+		// PersonAlgorithm
 		CalcAverageTripLength catl = null;
 		DailyDistance dd = null;
 		DailyEnRouteTime dert = null;
 		ModeSplit ms = null;
 
+		// only PersonAlgorithm begins.
 		if (plansFilename != null) {
 			Population plans = new PopulationImpl();
 
 			catl = new CalcAverageTripLength();
-			dd = new DailyDistance();
-			dert = new DailyEnRouteTime();
 			ms = new ModeSplit(null);
-			if (scenario.equals("Zurich")) {
+
+			if (scenario.equals("Kanton_Zurich")) {
 				RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
 						network);
 				try {
-					tollReader.parse(args[args.length - 3]);
+					tollReader.parse(tollFilename);
 				} catch (SAXException e) {
 					e.printStackTrace();
 				} catch (ParserConfigurationException e) {
@@ -117,8 +124,15 @@ public class AnalysisTest {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				ms = new ModeSplit(tollReader.getScheme());
+				toll = tollReader.getScheme();
 			}
+
+			ms = new ModeSplit(toll);
+			orms = new OnRouteModalSplit(scenario, plans, toll);
+			lttms = new LegTravelTimeModalSplit(plans, toll);
+			dd = new DailyDistance(toll);
+			dert = new DailyEnRouteTime(toll);
+			// TODO add some PersonAlgorithm and EventsHandler
 
 			PopulationReader plansReader = new MatsimPopulationReader(plans,
 					network);
@@ -128,14 +142,10 @@ public class AnalysisTest {
 			dd.run(plans);
 			dert.run(plans);
 			ms.run(plans);
-
-			orms = new OnRouteModalSplit(scenario, plans);
-			ttms = new TravelTimeModalSplit(plans);
-
 		}
-
+		// only PersonAlgorithm ends.
 		Events events = new Events();
-
+		// EventsHandlers:
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network);
 		CalcLinksAvgSpeed clas = null;
@@ -153,27 +163,28 @@ public class AnalysisTest {
 
 		if (orms != null)
 			events.addHandler(orms);
-		if (ttms != null)
-			events.addHandler(ttms);
+		if (lttms != null)
+			events.addHandler(lttms);
 
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
 		if (orms != null) {
-			orms.write(outputPath + "onRoute.txt.gz");
-			orms.writeCharts(outputPath + "onRoute.png");
-		}
-		if (ttms != null) {
-			ttms.write(outputPath + "traveltimes.txt.gz");
-			ttms.writeCharts(outputPath + "traveltimes");
-		}
-		clas.write(outputPath + "avgSpeed.txt.gz");
-		clas.writeChart(outputPath + "avgSpeedCityArea.png");
-		ld.write(outputPath + "legDistances.txt.gz");
-		ld.writeCharts(outputPath + "legDistances");
 
-		SimpleWriter sw = new SimpleWriter(outputPath + "output.txt");
+			orms.write(outputBase + "onRoute.txt");
+			orms.writeCharts(outputBase);
+		}
+		if (lttms != null) {
+			lttms.write(outputBase + "legtraveltimes.txt.gz");
+			lttms.writeCharts(outputBase + "legtraveltimes");
+		}
+		clas.write(outputBase + "avgSpeed.txt.gz");
+		clas.writeChart(outputBase + "avgSpeedCityArea.png");
+		ld.write(outputBase + "legDistances.txt.gz");
+		ld.writeCharts(outputBase + "legDistances");
+
+		SimpleWriter sw = new SimpleWriter(outputBase + "output.txt");
 		sw.write("netfile:\t" + netFilename + "\neventsFile:\t"
-				+ eventsFilename + "\noutputpath:\t" + outputPath + "\n");
+				+ eventsFilename + "\noutputpath:\t" + outputBase + "\n");
 		if (catl != null)
 			sw.write("avg. Trip length:\t" + catl.getAverageTripLength()
 					+ " [m]\n");
@@ -183,9 +194,9 @@ public class AnalysisTest {
 				+ cas.getNetAvgSpeed() + " [km/h]\n");
 		sw.close();
 
-		dd.write(outputPath);
-		dert.write(outputPath);
-		ms.write(outputPath);
+		dd.write(outputBase);
+		dert.write(outputBase);
+		ms.write(outputBase);
 
 		SimpleReader sr = new SimpleReader(eventsFilename);
 		SimpleWriter sw2 = new SimpleWriter(eventsOutputFilename);
@@ -205,7 +216,7 @@ public class AnalysisTest {
 		sw2.close();
 
 		new OTFEvent2MVI(new QueueNetwork(network), eventsOutputFilename,
-				outputPath + "vis.mvi", Integer.parseInt(args[args.length - 2]))
+				outputBase + "vis.mvi", Integer.parseInt(args[args.length - 2]))
 				.convert();
 
 		System.out.println("done.");
@@ -219,6 +230,10 @@ public class AnalysisTest {
 		runIntern(args, "Zurich");
 	}
 
+	public static void runKantonZurich(String[] args) {
+		runIntern(args, "Kanton_Zurich");
+	}
+
 	/**
 	 * @param args
 	 */
@@ -228,6 +243,9 @@ public class AnalysisTest {
 			System.exit(0);
 		} else if (args[3].equals("Zurich") || args[4].equals("Zurich")) {
 			runZurich(args);
+		} else if (args[3].equals("Kanton_Zurich")
+				|| args[4].equals("Kanton_Zurich")) {
+			runKantonZurich(args);
 		} else {
 			run(args);
 		}

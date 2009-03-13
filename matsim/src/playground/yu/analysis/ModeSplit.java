@@ -22,6 +22,7 @@ import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
+import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.PieChart;
 import playground.yu.utils.io.SimpleWriter;
 
@@ -33,10 +34,6 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 	private int carUser = 0, ptUser = 0, walker = 0, zrhCarUser = 0,
 			zrhPtUser = 0, zrhWalker = 0;
 	private RoadPricingScheme toll = null;
-
-	public static boolean isInRange(Link loc, RoadPricingScheme toll) {
-		return toll.getLinks().contains(loc);
-	}
 
 	public ModeSplit(RoadPricingScheme toll) {
 		this.toll = toll;
@@ -52,17 +49,17 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 		if (PlanModeJudger.useCar(plan)) {
 			carUser++;
 			if (toll != null)
-				if (isInRange(homeLoc, toll))
+				if (TollTools.isInRange(homeLoc, toll))
 					zrhCarUser++;
 		} else if (PlanModeJudger.usePt(plan)) {
 			ptUser++;
 			if (toll != null)
-				if (isInRange(homeLoc, toll))
+				if (TollTools.isInRange(homeLoc, toll))
 					zrhPtUser++;
 		} else if (PlanModeJudger.useWalk(plan)) {
 			walker++;
 			if (toll != null)
-				if (isInRange(homeLoc, toll))
+				if (TollTools.isInRange(homeLoc, toll))
 					zrhWalker++;
 		}
 	}

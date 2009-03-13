@@ -3,6 +3,10 @@
  */
 package playground.yu.analysis;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
@@ -16,11 +20,16 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.utils.charts.BarChart;
 import org.matsim.utils.charts.XYLineChart;
+import org.xml.sax.SAXException;
 
 import playground.yu.analysis.DailyDistance.ActTypeStart;
+import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.BubbleChart;
+import playground.yu.utils.charts.PieChart;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -43,6 +52,12 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 			throughWorkTime, throughEducTime, throughShopTime, throughLeisTime,
 			throughHomeTime, throughOtherTime;
 	private Person person;
+	private RoadPricingScheme toll = null;
+
+	public DailyEnRouteTime(RoadPricingScheme toll) {
+		this();
+		this.toll = toll;
+	}
 
 	public DailyEnRouteTime() {
 		this.count = 0;
@@ -90,8 +105,14 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 	@Override
 	public void run(final Person person) {
 		this.person = person;
-		this.count++;
-		run(person.getSelectedPlan());
+		Plan plan = person.getSelectedPlan();
+		if (toll == null) {
+			this.count++;
+			run(plan);
+		} else if (TollTools.isInRange(plan.getFirstActivity().getLink(), toll)) {
+			this.count++;
+			run(plan);
+		}
 	}
 
 	public void run(final Plan plan) {
@@ -238,27 +259,46 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 
 	public void write(final String outputFilename) {
 		double sum = this.carTime + this.ptTime + this.otherTime + wlkTime;
+
 		SimpleWriter sw = new SimpleWriter(outputFilename
 				+ "dailyEnRouteTime.txt");
-		sw.writeln("\tDaily En Route Time\t(exkl. through-traffic)");
-		sw.writeln("\tmin\t%");
-		sw.writeln("car\t" + this.carTime / this.count + "\t" + this.carTime
-				/ sum * 100.0);
-		sw.writeln("pt\t" + this.ptTime / this.count + "\t" + this.ptTime / sum
-				* 100.0);
-		sw.writeln("walk\t" + wlkTime / this.count + "\t" + wlkTime / sum
-				* 100.0);
-		sw.writeln("through\t" + this.otherTime / this.count + "\t"
-				+ this.otherTime / sum * 100.0);
+		sw.writeln("\tDaily En Route Time\t(exkl. through-traffic)\tn_agents\t"
+				+ count);
+		sw.writeln("\tavg.[min]\t%\tsum.[min]");
+
+		double avgCarTime = carTime / (double) this.count;
+		double avgPtTime = ptTime / (double) count;
+		double avgWlkTime = wlkTime / (double) count;
+		double avgOtherTime = otherTime / (double) count;
+
+		sw.writeln("car\t" + avgCarTime + "\t" + this.carTime / sum * 100.0
+				+ "\t" + carTime);
+		sw.writeln("pt\t" + avgPtTime + "\t" + this.ptTime / sum * 100.0 + "\t"
+				+ ptTime);
+		sw.writeln("walk\t" + avgWlkTime + "\t" + wlkTime / sum * 100.0 + "\t"
+				+ wlkTime);
+		sw.writeln("through\t" + avgOtherTime + "\t" + this.otherTime / sum
+				* 100.0 + "\t" + otherTime);
+
+		PieChart pieChart = new PieChart(
+				"Avg. Daily En Route Time -- Modal Split");
+		pieChart
+				.addSeries(new String[] { "car", "pt", "wlk", "through" },
+						new double[] { avgCarTime, avgPtTime, avgWlkTime,
+								avgOtherTime });
+		pieChart.saveAsPng(
+				outputFilename + "dailyEnRouteTimeModalSplitPie.png", 800, 600);
 		sw.writeln("--------------------------------------------");
-		sw.writeln("\tDaily En Route Time\t(inkl. through-traffic)");
+		sw.writeln("\tDaily En Route Time\t(inkl. through-traffic)\tn_agents\t"
+				+ count);
 		sw.writeln("\tmin\t%");
-		sw.writeln("car\t" + (this.carTime + this.otherTime) / this.count
-				+ "\t" + (this.carTime + this.otherTime) / sum * 100.0);
-		sw.writeln("pt\t" + this.ptTime / this.count + "\t" + this.ptTime / sum
-				* 100.0);
-		sw.writeln("walk\t" + wlkTime / this.count + "\t" + wlkTime / sum
-				* 100.0);
+		sw.writeln("car\t" + (avgCarTime + avgOtherTime) + "\t"
+				+ (this.carTime + this.otherTime) / sum * 100.0 + "\t"
+				+ (this.carTime + this.otherTime));
+		sw.writeln("pt\t" + avgPtTime + "\t" + this.ptTime / sum * 100.0 + "\t"
+				+ ptTime);
+		sw.writeln("walk\t" + avgWlkTime + "\t" + wlkTime / sum * 100.0 + "\t"
+				+ wlkTime);
 		sw
 				.writeln("--travel destination and modal split--daily on route time--");
 		sw.writeln("\twork\teducation\tshopping\tleisure\thome\tother...");
@@ -413,8 +453,9 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		Gbl.startMeasurement();
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		final String plansFilename = "../matsimTests/walk-1Test/it.500/500.plans.xml.gz";
-		final String outputFilename = "../matsimTests/walk-1Test/it.500/";
+		final String plansFilename = "../runs_SVN/run684/it.1000/1000.plans.xml.gz";
+		String outputFilename = "../matsimTests/analysis/";
+		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
 
 		Gbl.createConfig(null);
 
@@ -423,14 +464,23 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 
 		Population population = new PopulationImpl();
 
-		DailyEnRouteTime ert = new DailyEnRouteTime();
-		population.addAlgorithm(ert);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
+		try {
+			tollReader.parse(tollFilename);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		DailyEnRouteTime ert = new DailyEnRouteTime(tollReader.getScheme());
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
-
+		ert.run(population);
 		ert.write(outputFilename);
 
 		System.out.println("--> Done!");

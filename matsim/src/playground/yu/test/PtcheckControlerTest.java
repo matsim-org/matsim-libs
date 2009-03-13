@@ -47,7 +47,7 @@ import playground.yu.analysis.CalcTrafficPerformance;
 import playground.yu.analysis.LegDistance;
 import playground.yu.analysis.OnRouteModalSplit;
 import playground.yu.analysis.PtRate;
-import playground.yu.analysis.TravelTimeModalSplit;
+import playground.yu.analysis.LegTravelTimeModalSplit;
 
 /**
  * test of PtCheck and PtRate, outputs Public-Transit user fraction
@@ -72,7 +72,7 @@ public class PtcheckControlerTest extends Controler {
 		private CalcTrafficPerformance ctpf = null;
 		private RoadPricing rp = null;
 		private OnRouteModalSplit orms = null;
-		private TravelTimeModalSplit ttms = null;
+		private LegTravelTimeModalSplit ttms = null;
 		private LegDistance ld = null;
 		private CalcLinksAvgSpeed clas = null;
 
@@ -183,7 +183,7 @@ public class PtcheckControlerTest extends Controler {
 				// nl,
 						ps);
 				es.addHandler(this.orms);
-				this.ttms = new TravelTimeModalSplit(300, ps);
+				this.ttms = new LegTravelTimeModalSplit(300, ps);
 				es.addHandler(this.ttms);
 				this.ld = new LegDistance(300, nl);
 				es.addHandler(this.ld);
