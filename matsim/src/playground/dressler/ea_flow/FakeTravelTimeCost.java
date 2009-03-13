@@ -35,7 +35,7 @@ public class FakeTravelTimeCost implements TravelMinCost, TravelTime {
 	}
 	
 	public double getLinkTravelCost(Link link, double time) {
-		return Math.floor((link.getLength() / link.getFreespeed(0)));
+		return Math.round((link.getLength() / link.getFreespeed(0)));
 	}
 
 	public double getLinkTravelTime(Link link, double time) {
@@ -43,7 +43,7 @@ public class FakeTravelTimeCost implements TravelMinCost, TravelTime {
 	}
 
 	public double getLinkMinimumTravelCost(Link link) {
-		return (link.getLength() / link.getFreespeed(0));
+		return Math.round((link.getLength() / link.getFreespeed(0)));
 	}
 
 }
