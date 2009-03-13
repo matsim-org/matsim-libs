@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * 
+ * AdaptiveSignalSystemControler
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,14 +19,11 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.control;
 
-import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
-
-
 /**
+ * Just a marker interface for adaptive controlers.
  * @author dgrether
  *
  */
-public interface SignalSystemControler {
+public interface AdaptiveSignalSystemControler extends  SignalSystemControler {
 
-	public boolean givenSignalGroupIsGreen(BasicSignalGroupDefinition signalGroup);
 }

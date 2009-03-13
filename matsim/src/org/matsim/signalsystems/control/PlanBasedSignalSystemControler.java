@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems;
+package org.matsim.signalsystems.control;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
@@ -26,7 +26,6 @@ import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.mobsim.queuesim.SimulationTimer;
-import org.matsim.signalsystems.control.SignalSystemControler;
 
 
 /**
@@ -39,7 +38,7 @@ import org.matsim.signalsystems.control.SignalSystemControler;
  * @author aneumann
  *
  */
-public class PlanBasedSignalSystemControler extends SignalSystemControler {
+public class PlanBasedSignalSystemControler implements SignalSystemControler {
 	
 	private static final Logger log = Logger
 			.getLogger(PlanBasedSignalSystemControler.class);
@@ -70,7 +69,6 @@ public class PlanBasedSignalSystemControler extends SignalSystemControler {
 	 * TODO include time argument to avoid static call to SimulationTimer.getTime()
 	 * @see org.matsim.signalsystems.control.SignalSystemControler#givenSignalGroupIsGreen(org.matsim.basic.signalsystems.BasicSignalGroupDefinition)
 	 */
-	@Override
 	public boolean givenSignalGroupIsGreen(
 			BasicSignalGroupDefinition signalGroup) {
 		BasicSignalSystemPlan activePlan = this.plans.getPlans().values().iterator().next();

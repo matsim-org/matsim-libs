@@ -22,6 +22,8 @@ package org.matsim.mobsim.queuesim;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -36,6 +38,9 @@ import org.matsim.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
+import org.matsim.basic.signalsystemsconfig.BasicAdaptivePlanBasedSignalSystemControlInfo;
+import org.matsim.basic.signalsystemsconfig.BasicAdaptiveSignalSystemControlInfo;
+import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.config.Config;
@@ -50,7 +55,9 @@ import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkLayer;
-import org.matsim.signalsystems.PlanBasedSignalSystemControler;
+import org.matsim.signalsystems.control.AdaptivePlanBasedSignalSystemControler;
+import org.matsim.signalsystems.control.AdaptiveSignalSystemControler;
+import org.matsim.signalsystems.control.PlanBasedSignalSystemControler;
 import org.matsim.signalsystems.control.SignalSystemControler;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
@@ -196,27 +203,96 @@ public class QueueSimulation {
 	
 	private void initSignalSystemController(BasicSignalSystemConfigurations basicSignalSystemConfigurations) {
 		this.signalSystemControlerBySystemId = new TreeMap<Id, SignalSystemControler>();
-		for (BasicSignalSystemConfiguration config : basicSignalSystemConfigurations.getSignalSystemConfigurations().values()) {
-			//TODO consider adaptive controlers
-			//create the controler
-			PlanBasedSignalSystemControler controler = new PlanBasedSignalSystemControler(config);
-			this.signalSystemControlerBySystemId.put(config.getSignalSystemId(), controler);
-			
-			BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getSignalSystemId());
-			//TODO set other defaults of xml
-			controler.setDefaultCirculationTime(systemDef.getDefaultCirculationTime());
-
-			List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getSignalSystemId());
-			if ((groups == null) || groups.isEmpty()) {
-				String message = "SignalSystemControler for SignalSystem Id: " + config.getSignalSystemId() + "without any SignalGroups defined in SignalSystemConfiguration!";
-				log.warn(message);
+		for (BasicSignalSystemConfiguration config : 
+			basicSignalSystemConfigurations.getSignalSystemConfigurations().values()) {
+			SignalSystemControler systemControler = null;
+			if (this.signalSystemControlerBySystemId.containsKey(config.getSignalSystemId())){
+				throw new IllegalStateException("SignalSystemControler for SignalSystem with id: " + config.getSignalSystemId() +
+						" already exists. Cannot add second SignalSystemControler for same system. Check your" +
+						" signal system's configuration file.");
+			}
+			if (config.getControlInfo() instanceof BasicAdaptivePlanBasedSignalSystemControlInfo) {
+				AdaptiveSignalSystemControler c = createAdaptiveControler((BasicAdaptiveSignalSystemControlInfo)config);
+				if (!(c instanceof PlanBasedSignalSystemControler)){
+					throw new IllegalArgumentException("Class " + c.getClass().getName() + "is no PlanBasedSignalSystemControler instance. Check your configuration of the signal system control!");
+				}
+				AdaptivePlanBasedSignalSystemControler controler = (AdaptivePlanBasedSignalSystemControler) c;
+				this.initPlanbasedControler(controler, config);
+				systemControler = controler;
+			}
+			else if (config.getControlInfo() instanceof BasicAdaptiveSignalSystemControlInfo) {
+				AdaptiveSignalSystemControler controler = createAdaptiveControler((BasicAdaptiveSignalSystemControlInfo)config);
+				systemControler = controler;
+			}
+			else if (config.getControlInfo() instanceof BasicPlanBasedSignalSystemControlInfo){
+				PlanBasedSignalSystemControler controler = new PlanBasedSignalSystemControler(config);
+				this.initPlanbasedControler(controler, config);
+				systemControler = controler;
+			}
+			if (systemControler != null){
+				this.signalSystemControlerBySystemId.put(config.getSignalSystemId(), systemControler);
 			}
 			else {
-				for (BasicSignalGroupDefinition group : groups){
-					group.setResponsibleLSAControler(controler);
-				}
+				log.error("Could not initialize signal system controler for signal system with id: " + config.getSignalSystemId() + " " +
+						"Check stacktrace for details.");
 			}
 		}
+	}
+	
+	private AdaptiveSignalSystemControler createAdaptiveControler(
+			BasicAdaptiveSignalSystemControlInfo config) {
+		if (config.getAdaptiveControlerClass() == null){
+			throw new IllegalArgumentException("controler class must be given");
+		}
+		if (config.getAdaptiveControlerClass().startsWith("org.matsim")){
+			//when we have standardized code for adaptive control
+			//within org.matsim here is the point to create those controlers
+			throw new IllegalArgumentException("Loading classes by name within the org.matsim packages is not allowed!");
+		}
+		AdaptiveSignalSystemControler controler = null;
+		try {
+			Class<? extends AdaptiveSignalSystemControler> klas = (Class<? extends AdaptiveSignalSystemControler>) Class.forName(config.getAdaptiveControlerClass());
+			Class[] args = new Class[1];
+			args[0] = BasicAdaptiveSignalSystemControlInfo.class;
+			Constructor<? extends AdaptiveSignalSystemControler> c = klas.getConstructor(args);
+			controler = c.newInstance(config);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		if (controler == null){
+			throw new IllegalStateException("Cannot create AdaptiveSignalSystemControler for class name: " + config.getAdaptiveControlerClass());
+		}
+		return controler;
+	}
+
+	private void initPlanbasedControler(PlanBasedSignalSystemControler controler, BasicSignalSystemConfiguration config){
+		BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getSignalSystemId());
+		//TODO set other defaults of xml
+		controler.setDefaultCirculationTime(systemDef.getDefaultCirculationTime());
+
+		List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getSignalSystemId());
+		if ((groups == null) || groups.isEmpty()) {
+			String message = "SignalSystemControler for SignalSystem Id: " + config.getSignalSystemId() + "without any SignalGroups defined in SignalSystemConfiguration!";
+			log.warn(message);
+		}
+		else {
+			for (BasicSignalGroupDefinition group : groups){
+				group.setResponsibleLSAControler(controler);
+			}
+		}				
+		
 	}
 	
 	

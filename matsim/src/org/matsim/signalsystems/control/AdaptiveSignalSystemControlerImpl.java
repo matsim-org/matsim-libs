@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * 
+ * AdaptiveSignalSystemControler
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,14 +19,24 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.control;
 
-import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.basic.signalsystemsconfig.BasicAdaptiveSignalSystemControlInfo;
 
 
 /**
+ * Abstract shell for Adaptive Signal System Controlers. Must be extended when 
+ * implementing custom adaptive controlers.
  * @author dgrether
  *
  */
-public interface SignalSystemControler {
+public abstract class AdaptiveSignalSystemControlerImpl implements SignalSystemControler {
 
-	public boolean givenSignalGroupIsGreen(BasicSignalGroupDefinition signalGroup);
+	private BasicAdaptiveSignalSystemControlInfo controlInfo;
+
+	public AdaptiveSignalSystemControlerImpl(BasicAdaptiveSignalSystemControlInfo controlInfo) {
+		this.controlInfo = controlInfo;
+	}
+	
+	public BasicAdaptiveSignalSystemControlInfo getControlInfo(){
+		return this.controlInfo;
+	}
 }

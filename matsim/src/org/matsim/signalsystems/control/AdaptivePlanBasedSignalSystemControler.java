@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * 
+ * AdaptivePlanBasedSignalSystemControler
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,13 +20,22 @@
 package org.matsim.signalsystems.control;
 
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 
 
 /**
  * @author dgrether
  *
  */
-public interface SignalSystemControler {
+public abstract class AdaptivePlanBasedSignalSystemControler extends
+		PlanBasedSignalSystemControler implements AdaptiveSignalSystemControler {
 
-	public boolean givenSignalGroupIsGreen(BasicSignalGroupDefinition signalGroup);
+	public AdaptivePlanBasedSignalSystemControler(
+			BasicSignalSystemConfiguration config) {
+		super(config);
+	}
+
+	@Override
+	public abstract boolean givenSignalGroupIsGreen(BasicSignalGroupDefinition signalGroup);
+	
 }
