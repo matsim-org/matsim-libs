@@ -19,22 +19,13 @@
  * *********************************************************************** */
 package org.matsim.utils.io;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.matsim.basic.network.BasicLaneDefinitions;
 import org.matsim.basic.network.BasicLaneDefinitionsImpl;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.basic.signalsystems.BasicSignalSystemsImpl;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimLaneDefinitionsWriter;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriterV5;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
@@ -50,26 +41,6 @@ import org.matsim.signalsystems.MatsimSignalSystemsWriter;
 public class MatsimXMLFormatConverter {
 
 	
-	/**
-	 * Converts a population file in the v4 file format to a population file using the v5 format
-	 * @param popv4 path to the v4 file
-	 * @param popv5 path to that the v5 file is written
-	 * @param network path to the network needed to parse v4
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	public static void convertPopulationV4ToV5(final String popv4, final String popv5, final String network) throws FileNotFoundException, IOException{
-		NetworkLayer net = new NetworkLayer();
-		MatsimNetworkReader reader = new MatsimNetworkReader(net);
-		reader.readFile(network);
-
-		Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
-		MatsimPopulationReader popreader = new MatsimPopulationReader(pop, net);
-		popreader.readFile(popv4);
-
-		PopulationWriterV5 writer = new PopulationWriterV5(pop);
-		writer.writeFile(popv5);
-	}
 
 	
 	/**
