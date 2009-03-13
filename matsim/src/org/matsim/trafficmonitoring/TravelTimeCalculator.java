@@ -95,10 +95,6 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 		 */
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// Implementation of EventAlgorithmI
-	//////////////////////////////////////////////////////////////////////
-
 	public void handleEvent(final LinkEnterEvent event) {
 		EnterEvent e = new EnterEvent(event.linkId, event.getTime());
 		this.enterEvents.put(event.agentId, e);
