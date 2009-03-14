@@ -67,10 +67,10 @@ public class TransitScheduleReader extends MatsimXmlParser {
 		this.schedule = schedule;
 		this.network = network;
 		this.facilities = facilities;
+		this.setValidating(false);
 	}
 
 	public void readFile(final String fileName) throws SAXException, ParserConfigurationException, IOException {
-		this.setValidating(false);
 		this.parse(fileName);
 	}
 
