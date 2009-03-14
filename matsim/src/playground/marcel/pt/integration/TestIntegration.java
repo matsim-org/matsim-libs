@@ -20,14 +20,59 @@
 
 package playground.marcel.pt.integration;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.matsim.config.Config;
+import org.matsim.controler.ScenarioData;
+import org.matsim.events.Events;
+import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.core.v01.Facilities;
+import org.matsim.network.NetworkLayer;
+import org.xml.sax.SAXException;
+
+import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.TransitScheduleReader;
+
 
 public class TestIntegration {
 
-	public void testVehicles() {
+//	public void testVehicles() {
 //		
 //		Map<String, BasicVehicleType> vehicleTypes = new LinkedHashMap<String, BasicVehicleType>();
-//		Map<String, Vehicle> vehicles = new LinkedHashMap<String, Vehicle>();
+//		Map<Id, Vehicle> vehicles = new LinkedHashMap<Id, Vehicle>();
 //		VehicleBuilder vb = new VehicleBuilderImpl(vehicleTypes, vehicles);
+//		
+//	}
+//	
+	
+	
+	public static void main(final String[] args) {
+		final Config config = Gbl.createConfig(new String[] {"test/input/playground/marcel/pt/config.xml"});
+		final ScenarioData scenario = new ScenarioData(config);
+		final TransitSchedule schedule = new TransitSchedule();
+		final Events events = new Events();
+		NetworkLayer network = scenario.getNetwork();
+		Facilities facilities = scenario.getFacilities();
+//		FacilityNetworkMatching.loadMapping(facilities, network, world, "../thesis-data/examples/minibln/facilityMatching.txt");
+		System.out.println(network.getLinks().size());
+		System.out.println(facilities.getFacilities().size());
 		
+		try {
+			new TransitScheduleReader(schedule, network, facilities).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
+		
+			final TransitQueueSimulation sim = new TransitQueueSimulation(scenario.getNetwork(), scenario.getPopulation(), events);
+			sim.setTransitSchedule(schedule);
+			sim.run();
+
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
+	
 }

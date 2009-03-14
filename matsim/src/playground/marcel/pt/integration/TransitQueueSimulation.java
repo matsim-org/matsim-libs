@@ -50,20 +50,30 @@ public class TransitQueueSimulation extends QueueSimulation {
 		super.createAgents();
 		
 		if (this.schedule != null) {
-			for (TransitLine line : this.schedule.getTransitLines().values()) {
-				for (TransitRoute route : line.getRoutes().values()) {
-					for (Departure departure : route.getDepartures().values()) {
-						BusDriver driver = new BusDriver(route, departure);
-						Vehicle bus = new VehicleImpl(20, events);
-						driver.setVehicle(bus);
-						
-						
-						
-					}
-				}
-			}
+			TransitLine line1 = this.schedule.getTransitLines().values().iterator().next();
+			TransitRoute route = line1.getRoutes().values().iterator().next();
+			Departure departure = route.getDepartures().values().iterator().next();
+			BusDriver driver = new BusDriver(route, departure);
+			Vehicle bus = new VehicleImpl(20, events);
+			driver.setVehicle(bus);
+			bus.setDriver(driver);
+			addVehicleToLink(new TransitQueueVehicle(bus));
+			
+			
+//			for (TransitLine line : this.schedule.getTransitLines().values()) {
+//				for (TransitRoute route : line.getRoutes().values()) {
+//					for (Departure departure : route.getDepartures().values()) {
+//						BusDriver driver = new BusDriver(route, departure);
+//						Vehicle bus = new VehicleImpl(20, events);
+//						driver.setVehicle(bus);
+//						
+//						
+//						
+//					}
+//				}
+//			}
 		}
-		
+
 		
 //		
 //		if (this.plans == null) {

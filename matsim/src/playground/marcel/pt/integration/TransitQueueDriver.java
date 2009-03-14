@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitQueueVehicle.java
+ * TransitQueueDriver.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,21 +20,15 @@
 
 package playground.marcel.pt.integration;
 
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.mobsim.queuesim.QueueVehicle;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.mobsim.queuesim.PersonAgent;
 
-import playground.marcel.pt.interfaces.Vehicle;
+public class TransitQueueDriver extends PersonAgent {
 
-public class TransitQueueVehicle extends QueueVehicle {
-
-	private final Vehicle vehicle;
-	
-	public TransitQueueVehicle(Vehicle vehicle) {
-		this.vehicle = vehicle;
+	public TransitQueueDriver(Person p) {
+		super(p);
 	}
+
 	
-	public Link getCurrentLink() {
-		return this.vehicle.getDriver().chooseNextLink();
-	}
 	
 }
