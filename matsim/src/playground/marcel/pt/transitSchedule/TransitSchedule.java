@@ -40,10 +40,6 @@ public class TransitSchedule {
 		this.transitLines.put(id, line);
 	}
 
-	public TransitLine getTransitLine(final Id id) {
-		return this.transitLines.get(id);
-	}
-
 	public Map<Id, TransitLine> getTransitLines() {
 		return Collections.unmodifiableMap(this.transitLines);
 	}

@@ -62,7 +62,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 		assertEquals("wrong number of transit lines.", 1, schedule.getTransitLines().size());
 		assertEquals("wrong line id.", new IdImpl("T1"), schedule.getTransitLines().keySet().iterator().next());
 
-		TransitLine lineT1 = schedule.getTransitLine(new IdImpl("T1"));
+		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
 		assertNotNull("could not find line with id T1.", lineT1);
 
 		TransitRoute route1 = lineT1.getRoute(new IdImpl("1"));

@@ -61,7 +61,7 @@ public class CreateTimetableForStopTest extends MatsimTestCase {
 		TransitSchedule schedule = new TransitSchedule();
 		new TransitScheduleReader(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
-		TransitLine line = schedule.getTransitLine(new IdImpl("T1"));
+		TransitLine line = schedule.getTransitLines().get(new IdImpl("T1"));
 		CreateTimetableForStop timetable = new CreateTimetableForStop(line);
 		assertNotNull("could not get transit line.", line);
 

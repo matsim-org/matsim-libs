@@ -75,7 +75,7 @@ public class BusDriverTest extends MatsimTestCase {
 		TransitSchedule schedule = new TransitSchedule();
 		new TransitScheduleReader(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
-		TransitLine lineT1 = schedule.getTransitLine(new IdImpl("T1"));
+		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
 		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
 		assertNotNull("could not get transit line.", lineT1);
 
@@ -133,7 +133,7 @@ public class BusDriverTest extends MatsimTestCase {
 		TransitSchedule schedule = new TransitSchedule();
 		new TransitScheduleReader(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
-		TransitLine lineT1 = schedule.getTransitLine(new IdImpl("T1"));
+		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
 		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
 		assertNotNull("could not get transit line.", lineT1);
 
