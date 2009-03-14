@@ -19,7 +19,7 @@
 
 <!-- ====================================================================== -->
 
-	<links effectivecellsize="7.5" effectivelanewidth="NaN">
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="NaN">
 		<link id="1" from="1" to="3" length="1000.0" freespeed="10.0" capacity="3600.0" permlanes="1.0" oneway="1" />
 		<link id="2" from="2" to="3" length="1000.0" freespeed="10.0" capacity="3600.0" permlanes="1.0" oneway="1" />
 		<link id="3" from="3" to="4" length="1000.0" freespeed="10.0" capacity="3600.0" permlanes="1.0" oneway="1" />
