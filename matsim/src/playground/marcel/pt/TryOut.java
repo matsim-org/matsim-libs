@@ -26,8 +26,6 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.Events;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.algorithms.EventWriterXML;
 import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -145,8 +143,8 @@ public class TryOut {
 
 		// - bus crosses node 3
 		busDriver.leaveCurrentLink();//link1
-		new LinkLeaveEvent(7.27*3600, null/*bus*/, link1);
-		new LinkEnterEvent(7.27*3600, null/*bus*/, link3);
+//		new LinkLeaveEvent(7.27*3600, null/*bus*/, link1, null/*leg*/);
+//		new LinkEnterEvent(7.27*3600, null/*bus*/, link3, null/*leg*/);
 		busDriver.enterNextLink();//link3
 
 		// - bus arrives at stop2
@@ -214,6 +212,7 @@ public class TryOut {
 	private NetworkLayer createNetwork() {
 		final String filename = "../thesis-data/examples/tryout/network.xml";
 		NetworkLayer network = new NetworkLayer();
+		network.setCapacityPeriod(3600.0);
 
 //		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 1000));
 //		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(0, 0));
