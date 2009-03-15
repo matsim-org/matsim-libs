@@ -31,7 +31,7 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.mobsim.queuesim.PersonAgent;
+import org.matsim.mobsim.queuesim.DriverAgent;
 import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -65,7 +65,7 @@ public class LeaveLinkReplanner {
 	protected Activity prevAct;
 	protected Leg leg;
 	protected double time;
-	protected PersonAgent personAgent;
+	protected DriverAgent personAgent;
 	protected Person person;
 	protected Node node;
 	protected Plan plan;

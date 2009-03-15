@@ -36,7 +36,7 @@ import org.matsim.utils.misc.Time;
 /**
  * @author dgrether
  */
-public class PersonAgent {
+public class PersonAgent implements DriverAgent {
 
 	private static final Logger log = Logger.getLogger(PersonAgent.class);
 

@@ -34,7 +34,7 @@ public class QueueVehicle implements DrawableAgentI {
 	private double currentDepartureTime = 0;
 	private double lastMovedTime = 0;
 
-	private PersonAgent driver = null;
+	private DriverAgent driver = null;
 
 	private final Id id = new IdImpl(globalID++);
 
@@ -63,14 +63,14 @@ public class QueueVehicle implements DrawableAgentI {
 	/**
 	 * @return Returns the driver.
 	 */
-	public PersonAgent getDriver() {
+	public DriverAgent getDriver() {
 		return this.driver;
 	}
 
 	/**
 	 * @param driver The driver to set.
 	 */
-	public void setDriver(final PersonAgent driver) {
+	public void setDriver(final DriverAgent driver) {
 		this.driver = driver;
 	}
 
@@ -99,8 +99,7 @@ public class QueueVehicle implements DrawableAgentI {
 	@Override
 	public String toString() {
 		return "Vehicle Id " + getId() + ", driven by (personId) " + this.driver.getPerson().getId()
-				+ ", on link " + this.driver.getCurrentLink().getId() + ", routeindex: " + this.driver.getCurrentNodeIndex()
-				+ ", next activity#: " + this.driver.getNextActivity();
+				+ ", on link " + this.driver.getCurrentLink().getId();
 	}
 
 
