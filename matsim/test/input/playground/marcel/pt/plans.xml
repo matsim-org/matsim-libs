@@ -6,8 +6,9 @@
 	<plan type="pt">
 		<act type="h" link="2" end_time="06:55:00" />
 		<leg mode="car">
+			<route>3 4 5 6 7</route>
 		</leg>
-		<act type="w" link="8" dur="09:02:22" />
+		<act type="w" link="7" dur="09:02:22" />
 	</plan>
 </person>
 
