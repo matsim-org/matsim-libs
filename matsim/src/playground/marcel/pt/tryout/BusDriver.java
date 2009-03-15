@@ -27,6 +27,7 @@ import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
+import org.matsim.population.routes.LinkCarRoute;
 
 import playground.marcel.pt.interfaces.DriverAgent;
 import playground.marcel.pt.interfaces.PassengerAgent;
@@ -40,6 +41,7 @@ public class BusDriver implements DriverAgent {
 
 		private final List<Facility> stops;
 		private final List<Link> linkRoute;
+		private final CarRoute carRoute;
 		private final double departureTime;
 
 		private Vehicle vehicle = null;
@@ -48,10 +50,13 @@ public class BusDriver implements DriverAgent {
 		private Link currentLink = null;
 		private FacilityVisitors facilityVisitors = null;
 
+		@Deprecated
 		public BusDriver(final List<Facility> stops, final List<Link> linkRoute, final double departureTime) {
 			this.stops = stops;
 			this.linkRoute = linkRoute;
 			this.departureTime = departureTime;
+			this.carRoute = new LinkCarRoute(this.linkRoute.get(0), this.linkRoute.get(this.linkRoute.size() - 1));
+			carRoute.setLinks(this.linkRoute.get(0), this.linkRoute.subList(1, this.linkRoute.size() - 2), this.linkRoute.get(this.linkRoute.size() - 1));
 		}
 
 		public BusDriver(final TransitRoute route, final Departure departure) {
@@ -59,7 +64,7 @@ public class BusDriver implements DriverAgent {
 			for (TransitRouteStop stop : route.getStops()) {
 				this.stops.add(stop.getStopFacility());
 			}
-			CarRoute carRoute = (CarRoute) route.getRoute();
+			this.carRoute = (CarRoute) route.getRoute();
 			List<Link> links = carRoute.getLinks();
 			this.linkRoute = new ArrayList<Link>(2 + links.size());
 			this.linkRoute.add(carRoute.getStartLink());
@@ -122,4 +127,11 @@ public class BusDriver implements DriverAgent {
 			}
 		}
 
+		public double getDepartureTime() {
+			return this.departureTime;
+		}
+		
+		public CarRoute getCarRoute() {
+			return this.carRoute;
+		}
 }

@@ -23,6 +23,7 @@ package playground.marcel.pt.integration;
 import org.matsim.events.Events;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueSimulation;
+import org.matsim.mobsim.queuesim.Simulation;
 import org.matsim.network.NetworkLayer;
 
 import playground.marcel.pt.implementations.VehicleImpl;
@@ -50,28 +51,34 @@ public class TransitQueueSimulation extends QueueSimulation {
 		super.createAgents();
 		
 		if (this.schedule != null) {
-			TransitLine line1 = this.schedule.getTransitLines().values().iterator().next();
-			TransitRoute route = line1.getRoutes().values().iterator().next();
-			Departure departure = route.getDepartures().values().iterator().next();
-			BusDriver driver = new BusDriver(route, departure);
-			Vehicle bus = new VehicleImpl(20, events);
-			driver.setVehicle(bus);
-			bus.setDriver(driver);
-			addVehicleToLink(new TransitQueueVehicle(bus));
+//			TransitLine line1 = this.schedule.getTransitLines().values().iterator().next();
+//			TransitRoute route = line1.getRoutes().values().iterator().next();
+//			Departure departure = route.getDepartures().values().iterator().next();
+//			BusDriver driver = new BusDriver(route, departure);
+//			Vehicle bus = new VehicleImpl(20, events);
+//			driver.setVehicle(bus);
+//			bus.setDriver(driver);
+//			TransitQueueDriver qDriver = new TransitQueueDriver(driver);
+//			TransitQueueVehicle qVeh = new TransitQueueVehicle(bus, qDriver);
+//			qVeh.setDriver(qDriver);
+//			addVehicleToLink(qVeh);
+//			Simulation.incLiving();
 			
 			
-//			for (TransitLine line : this.schedule.getTransitLines().values()) {
-//				for (TransitRoute route : line.getRoutes().values()) {
-//					for (Departure departure : route.getDepartures().values()) {
-//						BusDriver driver = new BusDriver(route, departure);
-//						Vehicle bus = new VehicleImpl(20, events);
-//						driver.setVehicle(bus);
-//						
-//						
-//						
-//					}
-//				}
-//			}
+			for (TransitLine line : this.schedule.getTransitLines().values()) {
+				for (TransitRoute route : line.getRoutes().values()) {
+					for (Departure departure : route.getDepartures().values()) {
+						BusDriver driver = new BusDriver(route, departure);
+						Vehicle bus = new VehicleImpl(20, events);
+						driver.setVehicle(bus);
+						TransitQueueDriver qDriver = new TransitQueueDriver(driver);
+						TransitQueueVehicle qVeh = new TransitQueueVehicle(bus, qDriver);
+						qVeh.setDriver(qDriver);
+						addVehicleToLink(qVeh);
+						Simulation.incLiving();
+					}
+				}
+			}
 		}
 
 		
