@@ -57,10 +57,16 @@ public class PathSetGenerator {
 	private int nofPaths = 20; // default
 	private double variationFactor = 1.0; // default
 	private double depTime = Time.UNDEFINED_TIME; // not sure yet if there needs a depTime defined => setting default
+	private long timeout = 604800000; // default 1 week
 	
 	// this is not very nice...: keep the leastCostPath in mind (path on level zero) during the
 	// getPaths() method.
 	private Path leastCostPath = null;
+	
+	// this is also not very nice: to keep the sart time for calc one path set
+	private long startTimeMilliseconds = System.currentTimeMillis();
+	
+	private int routeCnt = 0;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -88,6 +94,11 @@ public class PathSetGenerator {
 		if (nofPaths < 1.0) { log.warn("variationFactor: "+variationFactor+" < 1.0 not allowed. Keeping previous variation factor: "+this.variationFactor); }
 		else { this.variationFactor = variationFactor; }
 	}
+	
+	public final void setTimeout(long timeout) {
+		if ((timeout < 1000) || (timeout > (604800000))) { log.warn("timeout: "+timeout+" must be between 1 sec (1000 msec) and 7 days (604'800'000 msec). Keeping previous timeout: "+this.variationFactor); }
+		else { this.timeout = timeout; }
+	}
 
 	public final boolean setODPair(Node fromNode, Node toNode) {
 		if (fromNode == null) { log.warn("Origin node must exist."); return false; }
@@ -103,10 +114,16 @@ public class PathSetGenerator {
 	}
 	
 	public final Tuple<Path,List<Path>> getPaths() {
+		
+		// set calculation start time
+		startTimeMilliseconds = System.currentTimeMillis();
+		log.debug(" measurement started at "+startTimeMilliseconds+" with timeout "+timeout+"...");
+		
 		// setup and run the recursion
 		List<Set<Link>> excludingLinkSets = new LinkedList<Set<Link>>();
 		excludingLinkSets.add(new HashSet<Link>());
 		Set<Path> paths = new HashSet<Path>();
+		routeCnt = 0;
 		generate(0,excludingLinkSets,paths);
 		
 		// remove the least cost path from the paths
@@ -151,7 +168,7 @@ public class PathSetGenerator {
 	}
 
 	private final void generate(int level, List<Set<Link>> excludingLinkSets, Set<Path> paths) {
-		log.info("start level "+level);
+		log.debug("start level "+level);
 		
 		// for EARLY ABORT: shuffle the excludingLinkSets
 		Collections.shuffle(excludingLinkSets,MatsimRandom.random);
@@ -167,6 +184,7 @@ public class PathSetGenerator {
 			// remove the links from the network, calculate the least cost path and put the links back where they were
 			for (Link l : linkSet) { removeLinkFromNetwork(l); }
 			Path path = router.calcLeastCostPath(origin,destination,depTime);
+			routeCnt++;
 			for (Link l : linkSet) { addLinkToNetwork(l); }
 			
 			// check if there is a path from O to D (if not, that part of the recursion tree does not have to be expanded)
@@ -175,7 +193,7 @@ public class PathSetGenerator {
 				// add path to the path set (if not yet exists)
 				if (!containsPath(paths,path)) {
 					paths.add(path);
-					log.info("  path added (nofPath="+paths.size()+"; nofRemainingSets="+(excludingLinkSets.size()-setCnt)+")");
+					log.debug("  path added (nofPath="+paths.size()+"; nofRemainingSets="+(excludingLinkSets.size()-setCnt)+")");
 				}
 				
 				// this is not very nice...: keep the leastCostPath in mind (path on level zero)
@@ -185,9 +203,19 @@ public class PathSetGenerator {
 				// need to go through the whole level anymore. Therefore,
 				// if the number of paths is already enough, stop the process right here
 				if (paths.size() >= (nofPaths*variationFactor)) {
-					log.info("  number of paths("+paths.size()+") >= nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
-					log.info("  ==> found enough paths from node "+origin.getId()+" to node "+destination.getId()+".");
-					log.info("end level "+level);
+					log.debug("  number of paths("+paths.size()+") >= nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
+					log.debug("  ==> found enough paths from node "+origin.getId()+" to node "+destination.getId()+".");
+					log.debug("end level "+level);
+					printSummary(origin, destination, System.currentTimeMillis()-startTimeMilliseconds, paths.size(), routeCnt, level, "OK");
+					return;
+				}
+				
+				// TIMEOUT ABORT
+				if (System.currentTimeMillis() > (startTimeMilliseconds+timeout)) {
+					log.debug("  number of paths("+paths.size()+") < nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
+					log.debug("  ==> calculation timeout ("+timeout+" msec) reached for from node "+origin.getId()+" to node "+destination.getId()+".");
+					log.debug("end level "+level);
+					printSummary(origin, destination, System.currentTimeMillis()-startTimeMilliseconds, paths.size(), routeCnt, level, "TIMEOUT");
 					return;
 				}
 				
@@ -206,17 +234,22 @@ public class PathSetGenerator {
 		
 		// nothing more to expand and therefore, no next tree level
 		if (newExcludingLinkSets.isEmpty()) {
-			log.info("  number of paths("+paths.size()+") < nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
-			log.info("  ==> there are no more paths from node "+origin.getId()+" to node "+destination.getId()+".");
-			log.info("end level "+level);
+			log.debug("  number of paths("+paths.size()+") < nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
+			log.debug("  ==> there are no more paths from node "+origin.getId()+" to node "+destination.getId()+".");
+			log.debug("end level "+level);
+			printSummary(origin, destination, System.currentTimeMillis()-startTimeMilliseconds, paths.size(), routeCnt, level, "NOMOREPATH");
 		}
 		// not enough paths found yet and therefore go into the next tree level
 		else {
-			log.info("  newExcludingLinkIdSets.size() = "+newExcludingLinkSets.size());
-			log.info("  paths.size()                  = "+paths.size());
-			log.info("end level "+level);
+			log.debug("  newExcludingLinkIdSets.size() = "+newExcludingLinkSets.size());
+			log.debug("  paths.size()                  = "+paths.size());
+			log.debug("end level "+level);
 			level++;
 			generate(level,newExcludingLinkSets,paths);
 		}
+	}
+	
+	private final void printSummary(Node o, Node d, long ctime, int pathCnt, int routeCnt, int level, String type) {
+		log.info("PATHSETSUMMARY: o = "+o.getId()+"; d = "+d.getId()+"; comptime = "+ctime+"; pathCnt = "+pathCnt+"; routesCalcCnt = "+routeCnt+"; level = "+level+"; type = "+type);
 	}
 }

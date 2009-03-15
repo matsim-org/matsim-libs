@@ -69,13 +69,13 @@ public class GeneratePathSets {
 			if ((origin == null) || (destination == null)) { throw new RuntimeException("line "+lineCnt+": O and/or D not found in the network"); }
 			ods.put(id,new Tuple<Node,Node>(origin,destination));
 			// progress report
-			if (lineCnt % 100000 == 0) { log.info("line "+lineCnt); }
+			if (lineCnt % 100000 == 0) { log.debug("line "+lineCnt); }
 			lineCnt++;
 		}
 		in.close();
 		fr.close();
-		log.info("# lines read: " + lineCnt);
-		log.info("# OD pairs: " + ods.size());
+		log.debug("# lines read: " + lineCnt);
+		log.debug("# OD pairs: " + ods.size());
 		return ods;
 	}
 	
@@ -90,11 +90,11 @@ public class GeneratePathSets {
 			Tuple<Node,Node> od = ods.get(id);
 			// generate paths
 			
-			log.info("----------------------------------------------------------------------");
-			log.info("generating path sets for segment id="+id+", O="+od.getFirst().getId()+" and D="+od.getSecond().getId()+"...");
+			log.debug("----------------------------------------------------------------------");
+			log.debug("generating path sets for segment id="+id+", O="+od.getFirst().getId()+" and D="+od.getSecond().getId()+"...");
 			if (gen.setODPair(od.getFirst(),od.getSecond())) {
 				Tuple<Path,List<Path>> paths = gen.getPaths();
-				log.info("done.");
+				log.debug("done.");
 				// write least cost path
 				out.write(id.toString()+"\t"+od.getFirst().getId()+"\t"+od.getSecond().getId());
 				for (Link l : paths.getFirst().links) { out.write("\t"+l.getId()); }
@@ -111,7 +111,7 @@ public class GeneratePathSets {
 				log.warn("triple id="+id+", O="+od.getFirst().getId()+" and D="+od.getSecond().getId()+" is omitted.");
 			}
 			Gbl.printMemoryUsage();
-			log.info("----------------------------------------------------------------------");
+			log.debug("----------------------------------------------------------------------");
 		}
 		
 		out.close();
@@ -123,10 +123,11 @@ public class GeneratePathSets {
 	//////////////////////////////////////////////////////////////////////
 	
 	public static void main(String[] args) throws IOException {
-		if (args.length != 5) {
-			log.error("Usage: GeneratePathSets nofPaths variantionFactor inputNetworkFile inputODFile outputPathSetFile");
+		if (args.length != 6) {
+			log.error("Usage: GeneratePathSets nofPaths variantionFactor timeout inputNetworkFile inputODFile outputPathSetFile");
 			log.error("       nofPaths:          the number of paths generated per od pair (int >= 0)");
 			log.error("       variantionFactor:  degree of variation in the generated path set (double >= 1.0)");
+			log.error("       timeout:           maximum calc time of one OD pair in milliseconds (1000 <= long <= 604800000) [1 sec..1 week]");
 			log.error("       inputNetworkFile:  matsim input XML network file (String)");
 			log.error("       inputODFile:       input id|origin|destination tab seperated table (String)");
 			log.error("       outputPathSetFile: output path set file (String)");
@@ -139,12 +140,14 @@ public class GeneratePathSets {
 		
 		int nofPaths = Integer.parseInt(args[0]);
 		double variantionFactor = Double.parseDouble(args[1]);
-		String inputNetworkFile = args[2];
-		String inputODFile = args[3];
-		String outputPathSetFile = args[4];
+		long timeout = Long.parseLong(args[2]);
+		String inputNetworkFile = args[3];
+		String inputODFile = args[4];
+		String outputPathSetFile = args[5];
 		
 		log.info("nofPaths:          "+nofPaths);
 		log.info("variantionFactor:  "+variantionFactor);
+		log.info("timeout:           "+timeout);
 		log.info("inputNetworkFile:  "+inputNetworkFile);
 		log.info("inputODFile:       "+inputODFile);
 		log.info("outputPathSetFile: "+outputPathSetFile);
@@ -157,6 +160,7 @@ public class GeneratePathSets {
 		PathSetGenerator gen = new PathSetGenerator(network);
 		gen.setPathSetSize(nofPaths);
 		gen.setVariationFactor(variantionFactor);
+		gen.setTimeout(timeout);
 		
 		Map<Id,Tuple<Node,Node>> ods = GeneratePathSets.parseODs(inputODFile,network);
 
