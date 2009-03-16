@@ -200,30 +200,31 @@ public class AnalysisTest {
 		dd.write(outputBase);
 		dert.write(outputBase);
 		ms.write(outputBase);
+		// otfvis
+		if (toll == null) {
+			SimpleReader sr = new SimpleReader(eventsFilename);
+			SimpleWriter sw2 = new SimpleWriter(eventsOutputFilename);
 
-		SimpleReader sr = new SimpleReader(eventsFilename);
-		SimpleWriter sw2 = new SimpleWriter(eventsOutputFilename);
-
-		String line = sr.readLine();
-		sw2.writeln(line);
-		// after filehead
-		double time = 0;
-		while (line != null && time < 108000.0) {
-			line = sr.readLine();
-			if (line != null) {
-				sw2.writeln(line);
-				time = Double.parseDouble(line.split("\t")[0]);
+			String line = sr.readLine();
+			sw2.writeln(line);
+			// after filehead
+			double time = 0;
+			while (line != null && time < 108000.0) {
+				line = sr.readLine();
+				if (line != null) {
+					sw2.writeln(line);
+					time = Double.parseDouble(line.split("\t")[0]);
+				}
 			}
+			sr.close();
+			sw2.close();
+
+			new OTFEvent2MVI(new QueueNetwork(network), eventsOutputFilename,
+					args[2] + "../" + args[args.length - 1] + "."
+							+ (scenario.equals("normal") ? "" : scenario + ".")
+							+ "vis.mvi", Integer
+							.parseInt(args[args.length - 2])).convert();
 		}
-		sr.close();
-		sw2.close();
-
-		new OTFEvent2MVI(new QueueNetwork(network), eventsOutputFilename,
-				args[2] + "../" + args[args.length - 1] + "."
-						+ (scenario.equals("normal") ? "" : scenario + ".")
-						+ "vis.mvi", Integer.parseInt(args[args.length - 2]))
-				.convert();
-
 		System.out.println("done.");
 	}
 
