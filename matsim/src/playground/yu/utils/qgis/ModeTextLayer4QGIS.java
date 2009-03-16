@@ -3,6 +3,10 @@
  */
 package playground.yu.utils.qgis;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Coord;
@@ -12,6 +16,9 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingScheme;
+import org.xml.sax.SAXException;
 
 import playground.yu.analysis.PlanModeJudger;
 
@@ -26,6 +33,11 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 	 */
 	public ModeTextLayer4QGIS(String textFilename) {
 		super(textFilename);
+		writer.writeln("mode");
+	}
+
+	public ModeTextLayer4QGIS(String textFilename, RoadPricingScheme toll) {
+		super(textFilename, toll);
 		writer.writeln("mode");
 	}
 
@@ -50,7 +62,8 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String plansFilename = "../runs_SVN/run684/it.1000/1000.plans.xml.gz";
-		final String textFilename = "../runs_SVN/run684/it.1000/1000.analysis/mode.txt";
+		final String textFilename = "../runs_SVN/run684/it.1000/1000.analysis/mode_Kanton.txt";
+		String tollFilename = "../schweiz-ivtch-SVN/baseCase/roadpricing/KantonZurich.xml";
 		// final String netFilename = "../matsimTests/scoringTest/network.xml";
 		// final String plansFilename =
 		// "../matsimTests/scoringTest/output/ITERS/it.100/100.plans.xml.gz";
@@ -64,7 +77,19 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 		Population population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		ModeTextLayer4QGIS mtl = new ModeTextLayer4QGIS(textFilename);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
+		try {
+			tollReader.parse(tollFilename);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		ModeTextLayer4QGIS mtl = new ModeTextLayer4QGIS(textFilename,
+				tollReader.getScheme());
 		mtl.run(population);
 		mtl.close();
 

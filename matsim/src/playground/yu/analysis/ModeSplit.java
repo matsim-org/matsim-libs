@@ -99,7 +99,7 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 		chart.saveAsPng(outputPath + "modalSplit.png", 800, 600);
 		if (toll != null) {
 			PieChart chart2 = new PieChart(
-					"ModalSplit Center(toll area) -- agents");
+					"ModalSplit Center (toll area) -- agents");
 			chart2.addSeries(new String[] { "car", "pt", "walk" },
 					new double[] { zrhCarUser, zrhPtUser, zrhWalker });
 			chart2.saveAsPng(outputPath + "modalSplitToll.png", 800, 600);

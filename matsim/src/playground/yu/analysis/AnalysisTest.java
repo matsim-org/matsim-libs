@@ -149,7 +149,7 @@ public class AnalysisTest {
 		Events events = new Events();
 		// EventsHandlers without parameter of "Population":
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network, toll);
-		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network);
+		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network,toll);
 		CalcLinksAvgSpeed clas = null;
 		if (scenario.equals("Zurich")) {
 			clas = new CalcLinksAvgSpeed(network, 682845.0, 247388.0, 2000.0);
