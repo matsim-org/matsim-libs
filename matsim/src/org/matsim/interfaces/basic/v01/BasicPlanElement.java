@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * BasicPlanElement.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,44 +20,6 @@
 
 package org.matsim.interfaces.basic.v01;
 
-import org.matsim.interfaces.core.v01.Coord;
-
-
-/**
- *
- * @author dgrether
- */
-public interface BasicActivity extends BasicPlanElement {
-
-	public double getEndTime();
-
-	public void setEndTime(final double seconds);
-
-	/**
-	 * Activity type is, until further notice, defined via the config file.
-	 * 
-	 * @return
-	 */
-	public String getType();
-
-	public void setType(final String type);
-
-	@Deprecated // not yet clear what will happen, may not survive
-	public Coord getCoord();
-
-	@Deprecated // not yet clear what will happen, may not survive
-	public void setCoord(Coord coordinates);
-
-	public double getStartTime();
-
-	public void setStartTime(double seconds);
-
-	public Id getLinkId();
-
-	public void setLinkId(final Id id);
-	
-	public Id getFacilityId();
-	
-	public void setFacilityId(final Id id);
+public interface BasicPlanElement {
 
 }

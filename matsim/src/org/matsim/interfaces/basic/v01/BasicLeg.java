@@ -24,7 +24,7 @@ package org.matsim.interfaces.basic.v01;
 /**
 * @author dgrether
 */
-public interface BasicLeg {
+public interface BasicLeg extends BasicPlanElement {
 
 	public enum Mode {miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, other, undefined}
 

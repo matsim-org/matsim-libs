@@ -22,12 +22,13 @@ package org.matsim.interfaces.basic.v01;
 
 import java.util.ArrayList;
 
+
 /**
 * @author dgrether
 */
 public interface BasicPlan {
 
-	public ArrayList<Object> getPlanElements(); // TODO [MR] change return type to List
+	public ArrayList<Object> getPlanElements(); // TODO [MR] change return type to List<BasicPlanElement>
 
 	public void addLeg(final BasicLeg leg);
 
