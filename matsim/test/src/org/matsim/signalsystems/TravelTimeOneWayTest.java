@@ -54,16 +54,6 @@ public class TravelTimeOneWayTest extends MatsimTestCase implements
 																									// starts with second 0 in
 																									// signalsystemplan
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
 	public void testTrafficLightIntersection2arms_w_TrafficLight_0_60() {
 		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
 		String laneDefinitions = this.getClassInputDirectory()
