@@ -20,7 +20,7 @@
 
 package org.matsim.population.algorithms;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.core.v01.Activity;
@@ -68,7 +68,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		for (Plan plan : person.getPlans()) {
 			boolean needsXY2Links = false;
 			boolean needsReRoute = false;
-			ArrayList<Object> actslegs = plan.getPlanElements();
+			List<Object> actslegs = plan.getPlanElements();
 			for (int i = 0; i < actslegs.size(); i++) {
 				if (i % 2 == 0) {
 					Activity act = (Activity)actslegs.get(i);

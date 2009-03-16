@@ -20,11 +20,12 @@
 
 package playground.ciarif.modechoice_old;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -109,7 +110,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 			 * 4			Other means */
 
 			Plan plan = person.getSelectedPlan();
-			ArrayList<Object> acts_legs = plan.getPlanElements();
+			List<Object> acts_legs = plan.getPlanElements();
 			if (index == 0) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
 					Leg leg = (Leg)acts_legs.get(i);
@@ -213,14 +214,12 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 		if (plan == null) {
 			return 0;
 		}
-		ArrayList<Object> acts_legs = plan.getPlanElements();
+		List<Object> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
-			double distX = (((Activity)acts_legs.get(i)).getCoord().getX() - ((Activity)acts_legs.get(i-2)).getCoord().getX());
-			// Position variation on the x axis
-			double distY = (((Activity)acts_legs.get(i)).getCoord().getY() - ((Activity)acts_legs.get(i-2)).getCoord().getY());
-			// Position variation on the y axis
-			dist = dist + Math.sqrt(Math.pow(distX, 2)+ Math.pow(distY, 2));
+			Coord coord1 = ((Activity)acts_legs.get(i)).getCoord();
+			Coord coord2 = ((Activity)acts_legs.get(i-2)).getCoord();
+			dist = dist + coord1.calcDistance(coord2);
 		}
 		return dist / 1000;
 	}
@@ -229,7 +228,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 
 		String main_type = "o";
 		Plan plan = person.getSelectedPlan();
-		ArrayList<Object> acts_legs = plan.getPlanElements();
+		List<Object> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
 			String type = ((Activity)acts_legs.get(i)).getType();
@@ -258,7 +257,7 @@ public int detectTourMainActivity2 (Person person){
 
 		int main_type = 2;
 		Plan plan = person.getSelectedPlan();
-		ArrayList<Object> acts_legs = plan.getPlanElements();
+		List<Object> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
 			String type = ((Activity)acts_legs.get(i)).getType();

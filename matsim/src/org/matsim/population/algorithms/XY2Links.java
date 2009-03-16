@@ -20,7 +20,7 @@
 
 package org.matsim.population.algorithms;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Link;
@@ -57,7 +57,7 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 	}
 
 	private void processPlan(final Plan plan) {
-		ArrayList<?> actslegs = plan.getPlanElements();
+		List<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			Activity act = (Activity)actslegs.get(j);
 			Link link = this.network.getNearestLink(act.getCoord());

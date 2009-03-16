@@ -1,6 +1,6 @@
 package playground.wrashid.PDES2;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
@@ -36,7 +36,7 @@ public class StartingLegMessage extends EventMessage {
 			road.roadEntryHandler.registerEnterRequestMessage(road, vehicle, messageArrivalTime);
 		} else {
 			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the
-			ArrayList<Object> actsLegs = plan.getPlanElements();
+			List<Object> actsLegs = plan.getPlanElements();
 			Link nextLink = ((Activity) actsLegs.get(vehicle.getLegIndex() + 1)).getLink();
 			Road road=Road.allRoads.get(nextLink.getId().toString());
 			//vehicle.setCurrentLink(nextLink); //perhaps this line of code is needed (it helped in the single cpu variant)

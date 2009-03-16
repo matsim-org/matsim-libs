@@ -20,7 +20,6 @@
 
 package org.matsim.planomat.costestimators;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -85,7 +84,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		// only plan of that person
 		this.testPlan = this.testPerson.getPlans().get(TEST_PLAN_NR);
 		// first leg
-		ArrayList<Object> actsLegs = this.testPlan.getPlanElements();
+		List<Object> actsLegs = this.testPlan.getPlanElements();
 		this.testLeg = (Leg) actsLegs.get(TEST_LEG_NR + 1);
 		// activities before and after leg
 		this.originAct = (Activity) actsLegs.get(TEST_LEG_NR);

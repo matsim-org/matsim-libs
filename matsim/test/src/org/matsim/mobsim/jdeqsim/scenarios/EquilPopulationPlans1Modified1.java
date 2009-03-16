@@ -1,6 +1,6 @@
 package org.matsim.mobsim.jdeqsim.scenarios;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.core.v01.Activity;
@@ -18,20 +18,16 @@ public class EquilPopulationPlans1Modified1 implements PopulationModifier{
 		return population;
 	} 
 	
-
 	public Population modifyPopulation(Population population) {
 		// modify population: a plan was needed, which contained some properties to be compared with C++
 		this.population=population;
 		Person p=population.getPerson(new IdImpl("1"));
 		Plan plan= p.getSelectedPlan();
-		ArrayList<Object> actsLegs =plan.getPlanElements();
+		List<Object> actsLegs = plan.getPlanElements();
 		((Activity)actsLegs.get(0)).setEndTime(360);
 		((Activity)actsLegs.get(2)).setEndTime(900); // this requires immediate departure after arrival
 		((Activity)actsLegs.get(4)).setEndTime(2000);
 		return population;
 	}
-	
-	
-	
-	
+
 }

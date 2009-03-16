@@ -21,6 +21,7 @@
 package org.matsim.population.algorithms;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.core.v01.Activity;
@@ -79,7 +80,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 	//////////////////////////////////////////////////////////////////////
 
 	public void handlePlan(final Plan plan) throws Exception {
-		ArrayList<?> actslegs = plan.getPlanElements();
+		List<?> actslegs = plan.getPlanElements();
 		Activity fromAct = (Activity)actslegs.get(0);
 
 		// loop over all <act>s

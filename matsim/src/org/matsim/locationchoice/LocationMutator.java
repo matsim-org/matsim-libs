@@ -20,7 +20,6 @@
 
 package org.matsim.locationchoice;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,6 +29,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.matsim.config.groups.LocationChoiceConfigGroup;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
@@ -53,7 +53,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
 	protected TreeMap<String, Facility []> facilities_of_type;
-	
+	protected final LocationChoiceConfigGroup config;
 			
 	private static final Logger log = Logger.getLogger(LocationMutator.class);
 	// ----------------------------------------------------------
@@ -61,6 +61,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	public LocationMutator(final NetworkLayer network, final Controler controler) {
 		this.quad_trees = new TreeMap<String, QuadTree<Facility>>();
 		this.facilities_of_type = new TreeMap<String, Facility []>();
+		this.config = Gbl.getConfig().locationchoice();
 		this.initLocal(network, controler);		
 	}
 	
@@ -165,7 +166,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	
 		List<Activity> primaryActivities = new Vector<Activity>();
 		
-		final ArrayList<?> actslegs = plan.getPlanElements();
+		final List actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);
 			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());

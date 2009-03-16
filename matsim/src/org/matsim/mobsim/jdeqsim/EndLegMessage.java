@@ -19,7 +19,7 @@
 
 package org.matsim.mobsim.jdeqsim;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentArrivalEvent;
@@ -47,7 +47,7 @@ public class EndLegMessage extends EventMessage {
 		this.vehicle.setLinkIndex(-1);
 
 		Plan plan = this.vehicle.getOwnerPerson().getSelectedPlan();
-		ArrayList<Object> actsLegs = plan.getPlanElements();
+		List<Object> actsLegs = plan.getPlanElements();
 		if ((actsLegs.size() > this.vehicle.getLegIndex())) {
 			this.vehicle.setCurrentLeg((Leg) actsLegs.get(this.vehicle.getLegIndex()));
 			// current act

@@ -1,8 +1,8 @@
 package org.matsim.mobsim.jdeqsim.util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
@@ -184,7 +184,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 		for (Person p : population.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			ExpectedNumberOfEvents expected = new ExpectedNumberOfEvents();
-			ArrayList<Object> actsLegs = plan.getPlanElements();
+			List<Object> actsLegs = plan.getPlanElements();
 			expected.expectedDepartureEvents += actsLegs.size() / 2;
 
 			LegIterator iter = plan.getIteratorLeg();

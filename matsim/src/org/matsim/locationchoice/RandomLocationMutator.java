@@ -20,10 +20,9 @@
 
 package org.matsim.locationchoice;
 
-import java.util.ArrayList;
 import java.util.List;
+
 import org.matsim.controler.Controler;
-import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facility;
@@ -48,17 +47,17 @@ public class RandomLocationMutator extends LocationMutator {
 	public void handlePlan(final Plan plan){
 		
 		List<Activity> movablePrimaryActivities = null; 
-		if (Gbl.getConfig().locationchoice().getFixByActType().equals("false")) {
+		if (this.config.getFixByActType().equals("false")) {
 			movablePrimaryActivities = defineMovablePrimaryActivities(plan);
 		}
 		
-		final ArrayList<?> actslegs = plan.getPlanElements();
+		final List<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);
 			
 			boolean isPrimary = false;
 			boolean movable = false;
-			if (Gbl.getConfig().locationchoice().getFixByActType().equals("false")) {	
+			if (this.config.getFixByActType().equals("false")) {	
 				isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
 				movable = movablePrimaryActivities.contains(act);
 			}

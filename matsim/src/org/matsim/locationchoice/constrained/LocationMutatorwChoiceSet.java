@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.controler.Controler;
-import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Activity;
@@ -37,8 +36,6 @@ import org.matsim.locationchoice.LocationMutator;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.PlansCalcRoute;
 
-
-
 public class LocationMutatorwChoiceSet extends LocationMutator {
 	
 //	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
@@ -49,9 +46,9 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	
 	public LocationMutatorwChoiceSet(final NetworkLayer network, Controler controler) {
 		super(network, controler);
-		this.recursionTravelSpeedChange = Double.parseDouble(Gbl.getConfig().locationchoice().getRecursionTravelSpeedChange());
-		this.maxRecursions = Integer.parseInt(Gbl.getConfig().locationchoice().getMaxRecursions());
-		this.recursionTravelSpeed = Double.parseDouble(Gbl.getConfig().locationchoice().getRecursionTravelSpeed());
+		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
+		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
+		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
 	}
 	
 	@Override
@@ -59,7 +56,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		List<SubChain> subChains = this.calcActChains(plan);
 		this.handleSubChains(plan, subChains);
 			
-		final ArrayList<?> actslegs = plan.getPlanElements();
+		final List<?> actslegs = plan.getPlanElements();
 		// loop over all <leg>s, remove route-information
 		// routing is done after location choice
 		for (int j = 1; j < actslegs.size(); j=j+2) {
@@ -161,7 +158,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		if (choiceSet.size()>1) {
 			//final Facility facility=(Facility)choiceSet.toArray()[
            	//		           MatsimRandom.random.nextInt(choiceSet.size())];
-			final Facility facility=(Facility)choiceSet.get(MatsimRandom.random.nextInt(choiceSet.size()));
+			final Facility facility = choiceSet.get(MatsimRandom.random.nextInt(choiceSet.size()));
 			
 			act.setFacility(facility);
        		act.setLink(this.network.getNearestLink(facility.getCoord()));
@@ -187,17 +184,17 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		
 		ManageSubchains manager = new ManageSubchains();	
 		List<Activity> movablePrimaryActivities = null; 
-		if (Gbl.getConfig().locationchoice().getFixByActType().equals("false")) {
+		if (this.config.getFixByActType().equals("false")) {
 			movablePrimaryActivities = defineMovablePrimaryActivities(plan);
 		}
 				
-		final ArrayList<?> actslegs = plan.getPlanElements();
+		final List<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);
 			
 			boolean isPrimary = false;
 			boolean movable = false;
-			if (Gbl.getConfig().locationchoice().getFixByActType().equals("false")) {	
+			if (this.config.getFixByActType().equals("false")) {	
 				isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
 				movable = movablePrimaryActivities.contains(act);
 			}
@@ -230,7 +227,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	public List<SubChain> calcActChainsHavingOneFlexibleActivityType(final Plan plan, String firstOfFlexibleActivityType) {
 		ManageSubchains manager = new ManageSubchains();	
 		
-		final ArrayList<?> actslegs = plan.getPlanElements();
+		final List<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);
 						

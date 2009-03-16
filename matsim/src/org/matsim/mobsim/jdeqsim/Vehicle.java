@@ -19,7 +19,6 @@
 
 package org.matsim.mobsim.jdeqsim;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -65,7 +64,7 @@ public class Vehicle extends SimUnit {
 		}
 
 		Plan plan = ownerPerson.getSelectedPlan();
-		ArrayList<Object> actsLegs = plan.getPlanElements();
+		List<Object> actsLegs = plan.getPlanElements();
 		// actsLegs(0) is the first activity, actsLegs(1) is the first leg
 		legIndex = 1;
 		setCurrentLeg((Leg) actsLegs.get(legIndex));
@@ -176,7 +175,7 @@ public class Vehicle extends SimUnit {
 	// note: does not affect the link index
 	public void moveToFirstLinkInNextLeg() {
 		Plan plan = getOwnerPerson().getSelectedPlan();
-		ArrayList<Object> actsLegs = plan.getPlanElements();
+		List<Object> actsLegs = plan.getPlanElements();
 		setCurrentLink(((Activity) actsLegs.get(getLegIndex() + 1)).getLink());
 	}
 
@@ -229,7 +228,7 @@ public class Vehicle extends SimUnit {
 		 */
 		if (this.getLinkIndex() == 0) {
 			Plan plan = ownerPerson.getSelectedPlan();
-			ArrayList<Object> actsLegs = plan.getPlanElements();
+			List<Object> actsLegs = plan.getPlanElements();
 			previousLink = ((Activity) actsLegs.get(legIndex - 1)).getLink();
 			previousRoad = Road.getRoad(previousLink.getId().toString());
 		} else if (this.getLinkIndex() >= 1) {

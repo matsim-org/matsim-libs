@@ -20,7 +20,6 @@
 
 package playground.wrashid.deqsim;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -142,7 +141,7 @@ public class JavaPDEQSim2 {
 
 			// TODO: we could make this more precise (e.g. take all act links or also path links)
 			Plan plan = person.getSelectedPlan();
-			ArrayList<Object> actsLegs = plan.getPlanElements();
+			List<Object> actsLegs = plan.getPlanElements();
 			// assumption, an action is followed by a let always
 			// and a plan starts with a action
 			Activity act=null;

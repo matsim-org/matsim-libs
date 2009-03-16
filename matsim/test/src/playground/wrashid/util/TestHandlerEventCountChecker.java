@@ -1,6 +1,6 @@
 package playground.wrashid.util;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.config.Config;
@@ -82,7 +82,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler  {
 		
 		for (Person p:population.getPersons().values()){
 			Plan plan= p.getSelectedPlan();
-			ArrayList<Object> actsLegs =plan.getPlanElements();
+			List<Object> actsLegs =plan.getPlanElements();
 			expectedDepartureEvents+=actsLegs.size() / 2 ;
 			
 			LegIterator iter=plan.getIteratorLeg();

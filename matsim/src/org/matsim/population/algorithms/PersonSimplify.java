@@ -20,7 +20,6 @@
 
 package org.matsim.population.algorithms;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.gbl.Gbl;
@@ -55,7 +54,7 @@ public class PersonSimplify extends AbstractPersonAlgorithm {
 			Plan plan = (Plan)plans.get(i);
 
 			// set the first and last activty to home
-			ArrayList acts_legs = plan.getPlanElements();
+			List acts_legs = plan.getPlanElements();
 			((Activity)acts_legs.get(0)).setType("h");
 			((Activity)acts_legs.get(acts_legs.size()-1)).setType("h");
 

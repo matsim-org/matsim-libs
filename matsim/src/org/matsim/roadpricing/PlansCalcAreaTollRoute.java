@@ -20,7 +20,7 @@
 
 package org.matsim.roadpricing;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.core.v01.Activity;
@@ -72,7 +72,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 
 		boolean agentPaysToll = false;
 
-		ArrayList<?> actslegs = plan.getPlanElements();
+		List<?> actslegs = plan.getPlanElements();
 		Activity fromAct = (Activity)actslegs.get(0);
 
 		final int TOLL_INDEX = 0;
