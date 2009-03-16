@@ -29,9 +29,8 @@ import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
-import org.matsim.interfaces.core.v01.Plan.Type;
 
-import playground.yu.newPlans.NewPlan;
+import playground.yu.newPlans.NewPopulation;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -41,7 +40,7 @@ import playground.yu.newPlans.NewPlan;
  * @author ychen
  *
  */
-public class NewAgentPtPlan extends NewPlan {
+public class NewAgentPtPlan extends NewPopulation {
 	/**
 	 * Constructor, writes file-head
 	 *
