@@ -66,20 +66,34 @@ import org.xml.sax.SAXException;
 
 public abstract class Gbl {
 	public final static String ONLYONCE=" This message given only once.";
-
+	
+	/**
+	 * @deprecated The Controler should hold the config instance without any
+	 * static reference to the object.
+	 */
+	@Deprecated
 	private static Config config = null;
+	/**
+	 * @deprecated The ScenarioData should hold the config instance without any
+	 * static reference to the object.
+	 */
+	@Deprecated
 	private static World world = null;
-
-	//////////////////////////////////////////////////////////////////////
-	// project global random number generator
-	//////////////////////////////////////////////////////////////////////
 
 	private static final Logger log = Logger.getLogger(Gbl.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// config creation
 	//////////////////////////////////////////////////////////////////////
-
+	/**
+	 * @deprecated The functionality of the method is in principle ok, except that 
+	 * the created config is held by a static field in this class.
+	 * This makes a lot of features of OO programming quite useless thus
+	 * this method will be refactored in the future. It will be replaced
+	 * by a createConfig method that does the same except writing the config to
+	 * static fields
+	 */
+	@Deprecated
 	public static final Config createConfig(final String[] args) {
 		if (Gbl.config != null) {
 			Gbl.errorMsg("config exists already! Cannot create a 2nd global config.");
@@ -111,11 +125,11 @@ public abstract class Gbl {
 
 		return Gbl.config;
 	}
-
+  @Deprecated
 	public static final Config getConfig() {
 		return Gbl.config;
 	}
-
+  @Deprecated
 	public static final void setConfig(final Config config) {
 		Gbl.config = config;
 	}
