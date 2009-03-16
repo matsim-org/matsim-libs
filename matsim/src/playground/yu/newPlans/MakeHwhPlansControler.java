@@ -31,9 +31,9 @@ import org.matsim.population.PopulationReader;
 
 /**
  * test of NewAgentPtPlan
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class MakeHwhPlansControler {
 
@@ -49,13 +49,12 @@ public class MakeHwhPlansControler {
 		Population population = new PopulationImpl();
 
 		HwhPlansMaker hpm = new HwhPlansMaker(network, config, population);
-		population.addAlgorithm(hpm);
 
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
 		plansReader.readFile(plansFilename);
 
-		population.runAlgorithms();
+		hpm.run(population);
 		hpm.writeEndPlans();
 	}
 }

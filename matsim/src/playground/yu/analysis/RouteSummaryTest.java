@@ -96,7 +96,8 @@ public class RouteSummaryTest {
 					if (routes.size() > 0) {
 						this.writer.write("odPair :\t" + odPair + "\n");
 						for (List<Id> linkIds : routes) {
-							Integer routeFlows = this.routeCounters.get(linkIds);
+							Integer routeFlows = this.routeCounters
+									.get(linkIds);
 							Integer num_of_num_of_routes = this.numRoutesDistribution
 									.get(routeFlows);
 							this.numRoutesDistribution
@@ -116,10 +117,14 @@ public class RouteSummaryTest {
 						this.writer.flush();
 					}
 				}
-				this.writer.write("number_of_routes\tnumber_of_number_of_routes\n");
+				this.writer
+						.write("number_of_routes\tnumber_of_number_of_routes\n");
 				for (Integer n_o_routes : this.numRoutesDistribution.keySet()) {
-					this.writer.write(n_o_routes + "\t"
-							+ this.numRoutesDistribution.get(n_o_routes) + "\n");
+					this.writer
+							.write(n_o_routes
+									+ "\t"
+									+ this.numRoutesDistribution
+											.get(n_o_routes) + "\n");
 				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -214,12 +219,11 @@ public class RouteSummaryTest {
 		Population population = new PopulationImpl();
 
 		RouteSummary rs = new RouteSummary(outFilename);
-		population.addAlgorithm(rs);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		rs.run(population);
 		rs.write();
 		rs.end();
 

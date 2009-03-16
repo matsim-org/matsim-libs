@@ -35,7 +35,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class PersonCounter extends AbstractPersonAlgorithm {
 	private int cnt, nullCnt;
@@ -75,11 +75,10 @@ public class PersonCounter extends AbstractPersonAlgorithm {
 
 		Population population = new PopulationImpl();
 		PersonCounter pc = new PersonCounter();
-		population.addAlgorithm(pc);
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
 		plansReader.readFile(plansFilename);
-		population.runAlgorithms();
+		pc.run(population);
 		System.out.println(pc.toString());
 	}
 }

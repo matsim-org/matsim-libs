@@ -47,7 +47,7 @@ import org.matsim.utils.io.IOUtils;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class Wait2Link_2Acts1LinkTest {
 	public static class AgentLinkPair {
@@ -95,8 +95,9 @@ public class Wait2Link_2Acts1LinkTest {
 								if (tmpLinkId.equals(nextTmpLinkId)) {
 									this.actLocCount++;
 									this.actsAtSameLink = true;
-									this.agentLinks.add(new AgentLinkPair(person
-											.getId().toString(), tmpLinkId));
+									this.agentLinks.add(new AgentLinkPair(
+											person.getId().toString(),
+											tmpLinkId));
 								}
 							tmpLinkId = nextTmpLinkId;
 						}
@@ -202,12 +203,11 @@ public class Wait2Link_2Acts1LinkTest {
 		Population population = new PopulationImpl();
 
 		SameActLoc sal = new SameActLoc();
-		population.addAlgorithm(sal);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		sal.run(population);
 
 		System.out.println("there is " + sal.getPersonCount() + " persons, "
 				+ sal.getActLocCount() + " 2Acts1Link-s!");

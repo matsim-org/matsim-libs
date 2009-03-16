@@ -32,16 +32,16 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
  * @author yu
  *
  */
-public abstract class NewPlan extends AbstractPersonAlgorithm {
+public abstract class NewPopulation extends AbstractPersonAlgorithm {
 	protected PopulationWriter pw;
 	protected NetworkLayer net;
 
-	public NewPlan(final Population plans) {
+	public NewPopulation(final Population plans) {
 		this.pw = new PopulationWriter(plans);
 		this.pw.writeStartPlans();
 	}
 
-	public NewPlan(final Population population, final String filename) {
+	public NewPopulation(final Population population, final String filename) {
 		this.pw = new PopulationWriter(population, filename, "v4");
 		this.pw.writeStartPlans();
 	}
@@ -50,7 +50,7 @@ public abstract class NewPlan extends AbstractPersonAlgorithm {
 	/**
 	 *
 	 */
-	public NewPlan(final NetworkLayer network, final Population plans) {
+	public NewPopulation(final NetworkLayer network, final Population plans) {
 		this(plans);
 		this.net = network;
 	}

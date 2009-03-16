@@ -49,7 +49,7 @@ import playground.yu.visum.writer.PrintStreamUDANET;
  * (EventFilterAlgorithm, EventFilterPersonSpecific, TraVolCal)] [to read events
  * file] [to run events algorithms] [to print additiv netFile of Visum...] [to
  * print attributsFile of link...]
- *
+ * 
  * @author ychen
  */
 public class EventFilterTestTraVol_personSpecific {
@@ -86,7 +86,6 @@ public class EventFilterTestTraVol_personSpecific {
 		PersonIDsExporter pide = new PersonIDsExporter();
 		PersonFilterAlgorithm pfa = new PersonFilterAlgorithm();
 		pfa.setNextFilter(pide);
-		plans.addAlgorithm(pfa);
 		System.out.println("  done.");
 
 		// events
@@ -101,7 +100,7 @@ public class EventFilterTestTraVol_personSpecific {
 		System.out.println("  done.");
 
 		System.out.println("  running plans algos ... ");
-		plans.runAlgorithms();
+		pfa.run(plans);
 		System.out.println("we have " + pfa.getCount()
 				+ " persons at last -- FilterAlgorithm");
 		System.out.println("we have " + pide.getCount()

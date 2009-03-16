@@ -24,19 +24,29 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.roadpricing.RoadPricingScheme;
+
+import playground.yu.utils.TollTools;
 
 /**
- * Calculates the traffic performance [Per.km] and works in current modell of MATSim only for private transport
- *
+ * Calculates the traffic performance [Per.km] and works in current modell of
+ * MATSim only for private transport
+ * 
  * @author ychen
- *
+ * 
  */
 public class CalcTrafficPerformance implements LinkEnterEventHandler {
 	private double lengthSum = 0;
 	private NetworkLayer network = null;
+	private RoadPricingScheme toll = null;
 
 	public CalcTrafficPerformance(final NetworkLayer network) {
 		this.network = network;
+	}
+
+	public CalcTrafficPerformance(NetworkLayer network, RoadPricingScheme toll) {
+		this(network);
+		this.toll = toll;
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
@@ -45,7 +55,10 @@ public class CalcTrafficPerformance implements LinkEnterEventHandler {
 			l = this.network.getLink(event.linkId);
 		}
 		if (l != null) {
-			this.lengthSum += l.getLength() / 1000.0;
+			if (toll == null)
+				this.lengthSum += l.getLength() / 1000.0;
+			else if (TollTools.isInRange(l, toll))
+				this.lengthSum += l.getLength() / 1000.0;
 		}
 	}
 

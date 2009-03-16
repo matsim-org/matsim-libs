@@ -33,20 +33,23 @@ import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.roadpricing.RoadPricingScheme;
+
+import playground.yu.utils.TollTools;
 
 /**
  * Calculates the average travel speed
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 		LinkLeaveEventHandler, AgentArrivalEventHandler {
 	/**
-	 * @param lengthSum -
-	 *            the sum of all the covered distance [km].
-	 * @param timeSum -
-	 *            the sum of all the drivingtime [h]
+	 * @param lengthSum
+	 *            - the sum of all the covered distance [km].
+	 * @param timeSum
+	 *            - the sum of all the drivingtime [h]
 	 */
 	private double lengthSum, timeSum;
 	protected NetworkLayer network = null;
@@ -54,6 +57,7 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 	 * enterTimes<String agentId, Double enteringtime>
 	 */
 	private TreeMap<String, Double> enterTimes = null;
+	private RoadPricingScheme toll = null;
 
 	// --------------------------CONSTRUCTOR------------------
 	/**
@@ -64,8 +68,23 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 		this.enterTimes = new TreeMap<String, Double>();
 	}
 
+	public CalcNetAvgSpeed(NetworkLayer network, RoadPricingScheme toll) {
+		this(network);
+		this.toll = toll;
+	}
+
 	public void handleEvent(LinkEnterEvent enter) {
-		this.enterTimes.put(enter.agentId, enter.getTime());
+		if (toll == null)
+			this.enterTimes.put(enter.agentId, enter.getTime());
+		else {
+			Link link = enter.link;
+			if (link == null)
+				link = network.getLink(enter.linkId);
+			if (link != null) {
+				if (TollTools.isInRange(link, toll))
+					this.enterTimes.put(enter.agentId, enter.getTime());
+			}
+		}
 	}
 
 	public void reset(int iteration) {

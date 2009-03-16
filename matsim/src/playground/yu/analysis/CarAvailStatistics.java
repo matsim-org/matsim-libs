@@ -318,12 +318,11 @@ public class CarAvailStatistics extends AbstractPersonAlgorithm {
 		Population population = new PopulationImpl();
 
 		CarAvailStatistics cas = new CarAvailStatistics();
-		population.addAlgorithm(cas);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		cas.run(population);
 
 		cas.write(outputFilename);
 

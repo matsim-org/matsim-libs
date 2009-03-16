@@ -31,7 +31,6 @@ import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.PersonAlgorithm;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
-import org.matsim.interfaces.core.v01.Plan.Type;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
@@ -46,7 +45,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @author ychen
  * 
  */
-public class NewPtWalkPlan extends NewPlan implements PersonAlgorithm,
+public class NewPtWalkPlan extends NewPopulation implements PersonAlgorithm,
 		PlanAlgorithm {
 	private Person person;
 	private List<Plan> copyPlans = new ArrayList<Plan>();
@@ -134,11 +133,10 @@ public class NewPtWalkPlan extends NewPlan implements PersonAlgorithm,
 		Population population = new PopulationImpl();
 
 		NewPtWalkPlan npwp = new NewPtWalkPlan(population, outputFilename);
-		population.addAlgorithm(npwp);
 
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		npwp.run(population);
 
 		npwp.writeEndPlans();
 

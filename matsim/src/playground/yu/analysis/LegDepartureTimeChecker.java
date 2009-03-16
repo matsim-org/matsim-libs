@@ -82,9 +82,8 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 		Population population = new PopulationImpl();
 		LegDepartureTimeChecker fldtc = new LegDepartureTimeChecker(
 				outputFilename);
-		population.addAlgorithm(fldtc);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
-		population.runAlgorithms();
+		fldtc.run(population);
 
 		fldtc.close();
 

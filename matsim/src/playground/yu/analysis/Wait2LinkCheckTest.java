@@ -41,7 +41,7 @@ import org.matsim.utils.io.IOUtils;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class Wait2LinkCheckTest {
 	public static class Wait2LinkCheck extends AbstractPersonAlgorithm {
@@ -114,12 +114,11 @@ public class Wait2LinkCheckTest {
 		Population population = new PopulationImpl();
 
 		Wait2LinkCheck alt = new Wait2LinkCheck(outFilename);
-		population.addAlgorithm(alt);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		alt.run(population);
 
 		alt.end();
 

@@ -34,9 +34,9 @@ import org.matsim.population.PopulationReader;
 /**
  * Controler to run MATSim in order to get compression ratio of the sparely new
  * network with sparely linkroute.
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class CompressRouteControler {
 
@@ -60,18 +60,18 @@ public class CompressRouteControler {
 		System.out.println("-->done.");
 
 		System.out.println("  setting up plans objects...");
-		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final Population plans = new PopulationImpl(
+				PopulationImpl.USE_STREAMING);
 		PopulationReader plansReader = new MatsimPopulationReader(plans,
 				network);
 		// compress routes
 		CompressRoute cr = new CompressRoute(ss.getSsLinks(), plans,
 				"./test/yu/output/linkrout_capacity.txt");
-		plans.addAlgorithm(cr);
 		System.out.println("  done.");
 
 		System.out.println("  reading and writing plans...");
 		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
+		cr.run(plans);
 		System.out.println("  done.");
 
 		System.out.println("-->begins to write result...");

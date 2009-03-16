@@ -29,6 +29,7 @@ import java.io.IOException;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -112,8 +113,9 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 				Plan sp = person.getSelectedPlan();
 				Activity fa = sp.getFirstActivity();
 				if (fa.getType().substring(0, 1).equals("h")) {
-					out.write(fa.getCoord().getX() + ";");
-					out.write(fa.getCoord().getY() + ";");
+					Coord coord = fa.getLink().getCoord();
+					out.write(coord.getX() + ";");
+					out.write(coord.getY() + ";");
 					out.write(fa.getLinkId() + ";");
 				} else {
 					// no home activity in the plan -> no home activity in the
@@ -121,8 +123,9 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 					out.write("-;-;-;");
 				}
 
-				out.write(PlanModeJudger.getMode(sp) + ";" + sp.getScoreAsPrimitiveType()
-						+ ";" + fa.getEndTime() + ";");
+				out.write(PlanModeJudger.getMode(sp) + ";"
+						+ sp.getScore().doubleValue() + ";" + fa.getEndTime()
+						+ ";");
 				out.write(getTravelTime(person) + ";");
 				out.write(getTravelDist(person) + ";");
 				out.write(getNumberOfTrips(person));

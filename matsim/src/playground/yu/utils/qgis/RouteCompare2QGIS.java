@@ -150,26 +150,24 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		Population populationA = new PopulationImpl();
 
 		RouteSummary rsA = new RouteSummary(outputDir + "/routeCompareA.txt.gz");
-		populationA.addAlgorithm(rsA);
 
 		System.out.println("-->reading plansfile: " + populationFilenameA);
 		new MatsimPopulationReader(populationA, network)
 				.readFile(populationFilenameA);
 
-		populationA.runAlgorithms();
+		rsA.run(populationA);
 		rsA.write();
 		rsA.end();
 		// ------------------------RouteSummaryB---------------------------------
 		Population populationB = new PopulationImpl();
 
 		RouteSummary rsB = new RouteSummary(outputDir + "/routeCompareB.txt.gz");
-		populationB.addAlgorithm(rsB);
 
 		System.out.println("-->reading plansfile: " + populationFilenameB);
 		new MatsimPopulationReader(populationB, network)
 				.readFile(populationFilenameB);
 
-		populationB.runAlgorithms();
+		rsB.run(populationB);
 		rsB.write();
 		rsB.end();
 		// ----------------------------------------------------------------------

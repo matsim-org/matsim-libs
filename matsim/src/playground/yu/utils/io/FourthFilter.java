@@ -22,10 +22,8 @@ package playground.yu.utils.io;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -106,7 +104,7 @@ public class FourthFilter extends MyFilter {
 										pls.add(currentPl);
 										ff.writeNewLine(currentLine);
 										compareSecoLines = false;
-									}								
+									}
 									referencePls.clear();
 									currentLine = null;
 									currentPl = null;
@@ -158,7 +156,7 @@ public class FourthFilter extends MyFilter {
 											compareSecoLines = false;
 										}
 									}
-								}							
+								}
 							}
 						} else if (currentPl != null) {
 							// if (currentPl.transfers > 0) {

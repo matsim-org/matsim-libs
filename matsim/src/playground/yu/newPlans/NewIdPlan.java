@@ -34,9 +34,9 @@ import org.matsim.population.PopulationImpl;
 
 /**
  * @author yu
- *
+ * 
  */
-public class NewIdPlan extends NewPlan {
+public class NewIdPlan extends NewPopulation {
 
 	/**
 	 * @param plans
@@ -63,10 +63,9 @@ public class NewIdPlan extends NewPlan {
 
 		Population plans = new PopulationImpl();
 		NewIdPlan nip = new NewIdPlan(plans);
-		plans.addAlgorithm(nip);
 		new MatsimPopulationReader(plans, network).readFile(config.plans()
 				.getInputFile());
-		plans.runAlgorithms();
+		nip.run(plans);
 		nip.writeEndPlans();
 	}
 }

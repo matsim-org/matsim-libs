@@ -33,7 +33,7 @@ import org.matsim.population.PopulationReader;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class PlanCheckControler {
 	public static void main(final String[] args) {
@@ -48,11 +48,10 @@ public class PlanCheckControler {
 
 		Population population = new PopulationImpl();
 		PlanChecker pc = new PlanChecker(planCheckFilename);
-		population.addAlgorithm(pc);
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
 		plansReader.readFile(plansFilename);
-		population.runAlgorithms();
+		pc.run(population);
 		pc.writeResult();
 	}
 }

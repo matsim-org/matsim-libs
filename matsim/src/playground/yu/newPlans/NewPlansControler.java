@@ -33,9 +33,9 @@ import org.matsim.population.PopulationReader;
 
 /**
  * test of NewAgentPtPlan
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class NewPlansControler {
 
@@ -50,11 +50,10 @@ public class NewPlansControler {
 
 		Population population = new PopulationImpl();
 		NewPtWalkPlan nap = new NewPtWalkPlan(population);
-		population.addAlgorithm(nap);
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
 		plansReader.readFile(plansFilename);
-		population.runAlgorithms();
+		nap.run(population);
 		nap.writeEndPlans();
 	}
 }

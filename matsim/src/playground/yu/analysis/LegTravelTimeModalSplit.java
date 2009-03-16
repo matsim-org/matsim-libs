@@ -132,13 +132,13 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		double arrTime = event.getTime();
 		String agentId = event.agentId;
 		if (toll == null)
-			internCompute(agentId, arrTime);
+			internalCompute(agentId, arrTime);
 		else if (TollTools.isInRange(plans.getPerson(new IdImpl(event.agentId))
 				.getSelectedPlan().getFirstActivity().getLink(), toll))
-			internCompute(agentId, arrTime);
+			internalCompute(agentId, arrTime);
 	}
 
-	private void internCompute(String agentId, double arrTime) {
+	private void internalCompute(String agentId, double arrTime) {
 		Double dptTime = this.tmpDptTimes.get(agentId);
 		if (dptTime != null) {
 			int binIdx = getBinIndex(arrTime);

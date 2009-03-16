@@ -33,7 +33,7 @@ import org.matsim.interfaces.core.v01.Population;
  * @author ychen
  * 
  */
-public class SelectedPlans extends NewPlan implements PersonAlgorithm {
+public class SelectedPlans extends NewPopulation implements PersonAlgorithm {
 	/**
 	 * Constructor, writes file-head
 	 * 

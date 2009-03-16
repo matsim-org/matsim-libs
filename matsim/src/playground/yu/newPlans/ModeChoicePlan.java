@@ -39,9 +39,9 @@ import playground.yu.analysis.PlanModeJudger;
 
 /**
  * @author yu
- *
+ * 
  */
-public class ModeChoicePlan extends NewPlan {
+public class ModeChoicePlan extends NewPopulation {
 	private boolean addNewPlan = false;
 
 	/**
@@ -119,10 +119,10 @@ public class ModeChoicePlan extends NewPlan {
 
 		Population population = new PopulationImpl();
 		ModeChoicePlan mcp = new ModeChoicePlan(population);
-		population.addAlgorithm(mcp);
+
 		new MatsimPopulationReader(population, network).readFile(config.plans()
 				.getInputFile());
-		population.runAlgorithms();
+		mcp.run(population);
 		mcp.writeEndPlans();
 	}
 

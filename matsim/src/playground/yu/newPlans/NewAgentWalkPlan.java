@@ -33,7 +33,6 @@ import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.PersonAlgorithm;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
-import org.matsim.interfaces.core.v01.Plan.Type;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
@@ -49,7 +48,7 @@ import playground.yu.analysis.PlanModeJudger;
  * @author ychen
  * 
  */
-public class NewAgentWalkPlan extends NewPlan implements PersonAlgorithm {
+public class NewAgentWalkPlan extends NewPopulation implements PersonAlgorithm {
 	/**
 	 * Constructor, writes file-head
 	 * 
@@ -113,8 +112,9 @@ public class NewAgentWalkPlan extends NewPlan implements PersonAlgorithm {
 	private boolean hasLongLegs(Plan plan) {
 		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
 			Leg leg = (Leg) li.next();
-			if (plan.getPreviousActivity(leg).getCoord().calcDistance(
-					plan.getNextActivity(leg).getCoord()) / 1000.0 > 3.0)
+			if (plan.getPreviousActivity(leg).getLink().getCoord()
+					.calcDistance(
+							plan.getNextActivity(leg).getLink().getCoord()) / 1000.0 > 3.0)
 				return true;
 		}
 		return false;
@@ -129,10 +129,9 @@ public class NewAgentWalkPlan extends NewPlan implements PersonAlgorithm {
 
 		Population population = new PopulationImpl();
 		NewAgentWalkPlan nawp = new NewAgentWalkPlan(population);
-		population.addAlgorithm(nawp);
 		new MatsimPopulationReader(population, network).readFile(config.plans()
 				.getInputFile());
-		population.runAlgorithms();
+		nawp.run(population);
 		nawp.writeEndPlans();
 	}
 }

@@ -41,7 +41,7 @@ import org.matsim.utils.io.IOUtils;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class SameActLocTest {
 	public static class SameActLoc extends AbstractPersonAlgorithm {
@@ -150,12 +150,11 @@ public class SameActLocTest {
 		Population population = new PopulationImpl();
 
 		SameActLoc alt = new SameActLoc(outFilename);
-		population.addAlgorithm(alt);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		alt.run(population);
 
 		alt.end();
 

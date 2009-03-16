@@ -38,7 +38,7 @@ import org.matsim.interfaces.core.v01.Population;
  * @author ychen
  * 
  */
-public class NewAgentPtPlan2 extends NewPlan {
+public class NewAgentPtPlan2 extends NewPopulation {
 	private List<Plan> copyPlans = new ArrayList<Plan>();
 	private List<BasicLeg.Mode> copyPlansModes = new ArrayList<BasicLeg.Mode>();
 

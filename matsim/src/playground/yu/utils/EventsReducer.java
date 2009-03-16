@@ -16,10 +16,10 @@ public class EventsReducer {
 	 */
 	public static void main(String[] args) {
 		final String eventsFilename = "../matsimTests/scoringTest/output/ITERS/it.100/100.events.txt.gz";
-		String outputEventsFilename = "../matsimTests/scoringTest/output/ITERS/it.100/100.events4mvi.txt.gz";
 
 		SimpleReader sr = new SimpleReader(eventsFilename);
-		SimpleWriter sw = new SimpleWriter(eventsFilename.replaceFirst("events", "events4mvi"));
+		SimpleWriter sw = new SimpleWriter(eventsFilename.replaceFirst(
+				"events", "events4mvi"));
 
 		String line = sr.readLine();
 		sw.writeln(line);

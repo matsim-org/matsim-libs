@@ -31,9 +31,9 @@ import org.matsim.population.PopulationReader;
 
 /**
  * test of DoublePtPlan
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class DoublePlanControler {
 
@@ -50,11 +50,10 @@ public class DoublePlanControler {
 
 		Population population = new PopulationImpl();
 		DoublePlan dp = new DoublePlan(population);
-		population.addAlgorithm(dp);
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
 		plansReader.readFile(config.plans().getInputFile());
-		population.runAlgorithms();
+		dp.run(population);
 		dp.writeEndPlans();
 	}
 

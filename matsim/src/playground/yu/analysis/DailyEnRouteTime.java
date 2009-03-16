@@ -385,35 +385,32 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 				"Modal split -- leg Duration", "pt fraction [%]",
 				"car fraction [%]");
 		for (int i = 0; i < 20; i++) {
-			double ptFraction = this.ptCounts10[i]
-					/ (this.ptCounts10[i] + this.carCounts10[i] + wlkCounts10[i])
-					* 100.0;
-			double wlkFraction = this.wlkCounts10[i]
-					/ (this.ptCounts10[i] + this.carCounts10[i] + wlkCounts10[i])
-					* 100.0;
-			double carFraction = this.carCounts10[i]
-					/ (this.ptCounts10[i] + this.carCounts10[i] + wlkCounts10[i])
-					* 100.0;
-			bubbleChart.addSeries(i * 10 + "-" + (i + 1) * 10 + " min",
-					new double[][] { new double[] { ptFraction },
-							new double[] { carFraction },
-							new double[] { (i + 0.5) / 2.5 } });
+			double sumCounts10 = this.ptCounts10[i] + this.carCounts10[i]
+					+ wlkCounts10[i];
+			double ptFraction = this.ptCounts10[i] / sumCounts10 * 100.0;
+			double wlkFraction = this.wlkCounts10[i] / sumCounts10 * 100.0;
+			double carFraction = this.carCounts10[i] / sumCounts10 * 100.0;
+			if (sumCounts10 > 0)
+				bubbleChart.addSeries(i * 10 + "-" + (i + 1) * 10 + " min",
+						new double[][] { new double[] { ptFraction },
+								new double[] { carFraction },
+								new double[] { (i + 0.5) / 2.5 } });
+			System.out.println("bubbleChart add series: ptFrac:\t" + ptFraction
+					+ "\tcarFrac:\t" + carFraction + "\tradius:\t"
+					+ ((i + 0.5) / 2.5));
 			sw.writeln((i * 10) + "+\t" + this.carCounts10[i] + "\t"
 					+ this.ptCounts10[i] + "\t" + this.wlkCounts10[i] + "\t"
 					+ carFraction + "\t" + ptFraction + "\t" + wlkFraction);
 		}
-		double ptFraction = this.ptCounts10[20]
-				/ (this.ptCounts10[20] + this.carCounts10[20] + wlkCounts10[20])
-				* 100.0;
-		double wlkFraction = this.wlkCounts10[20]
-				/ (this.ptCounts10[20] + this.carCounts10[20] + wlkCounts10[20])
-				* 100.0;
-		double carFraction = this.carCounts10[20]
-				/ (this.ptCounts10[20] + this.carCounts10[20] + wlkCounts10[20])
-				* 100.0;
-		bubbleChart.addSeries("200+ min", new double[][] {
-				new double[] { ptFraction }, new double[] { carFraction },
-				new double[] { 8.2 } });
+		double sumCounts10 = this.ptCounts10[20] + this.carCounts10[20]
+				+ wlkCounts10[20];
+		double ptFraction = this.ptCounts10[20] / sumCounts10 * 100.0;
+		double wlkFraction = this.wlkCounts10[20] / sumCounts10 * 100.0;
+		double carFraction = this.carCounts10[20] / sumCounts10 * 100.0;
+		if (sumCounts10 > 0)
+			bubbleChart.addSeries("200+ min", new double[][] {
+					new double[] { ptFraction }, new double[] { carFraction },
+					new double[] { 8.2 } });
 		sw.writeln(200 + "+\t" + this.carCounts10[20] + "\t"
 				+ this.ptCounts10[20] + "\t" + this.wlkCounts10[20] + "\t"
 				+ carFraction + "\t" + ptFraction + "\t" + wlkFraction);

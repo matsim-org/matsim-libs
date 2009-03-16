@@ -24,7 +24,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- *
+ * 
  */
 public class ActOrderChecker extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -75,17 +75,15 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 
 		Population populationA = new PopulationImpl();
 		ActOrderChecker aocA = new ActOrderChecker();
-		populationA.addAlgorithm(aocA);
 		new MatsimPopulationReader(populationA, network)
 				.readFile(plansFilenameA);
-		populationA.runAlgorithms();
+		aocA.run(populationA);
 
 		Population populationB = new PopulationImpl();
 		ActOrderChecker aocB = new ActOrderChecker();
-		populationB.addAlgorithm(aocB);
 		new MatsimPopulationReader(populationB, network)
 				.readFile(plansFilenameB);
-		populationB.runAlgorithms();
+		aocB.run(populationB);
 
 		SimpleWriter writer = new SimpleWriter(outputFilename);
 		if (writer != null) {

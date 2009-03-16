@@ -47,10 +47,9 @@ public class PtCheckTest {
 		try {
 			PtCheck2 pc = new PtCheck2(ptcheckFilename);
 
-			population.addAlgorithm(pc);
 			new MatsimPopulationReader(population, network)
 					.readFile(plansFilename);
-			population.runAlgorithms();
+			pc.run(population);
 
 			pc.write(100);
 			pc.writeEnd();

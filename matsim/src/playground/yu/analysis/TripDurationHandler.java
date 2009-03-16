@@ -45,7 +45,7 @@ import org.matsim.utils.io.IOUtils;
 
 /**
  * @author yu
- *
+ * 
  */
 public class TripDurationHandler implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
@@ -86,13 +86,9 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 			this.arrCount++;
 			this.tmpDptTimes.remove(agentId);
 
-			if (event.getAgent() == null) {
-				// rebuild event
-				event.setAgent(this.plans.getPerson(new IdImpl(event.agentId)));
-			}
-
 			// Type planType = event.agent.getSelectedPlan().getType();d
-			Plan selectedPlan = event.getAgent().getSelectedPlan();
+			Plan selectedPlan = plans.getPerson(new IdImpl(event.agentId))
+					.getSelectedPlan();
 			if (
 			// planType != null && Plan.Type.UNDEFINED != planType
 			!PlanModeJudger.useUndefined(selectedPlan)) {
@@ -127,14 +123,16 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 
 	@Override
 	public String toString() {
-		return "\ttrips\tcar trips\tpt trips\tother trips\nnumber\t" + this.arrCount
-				+ "\t" + this.carArrCount + "\t" + this.ptArrCount + "\t" + this.otherArrCount
+		return "\ttrips\tcar trips\tpt trips\tother trips\nnumber\t"
+				+ this.arrCount + "\t" + this.carArrCount + "\t"
+				+ this.ptArrCount + "\t" + this.otherArrCount
 				+ "\nTripDuration (sum, s)\t" + this.travelTimes + "\t"
 				+ this.carTravelTimes + "\t" + this.ptTravelTimes + "\t"
 				+ this.otherTravelTimes + "\nTripDuration (avg., s)\t"
-				+ this.travelTimes / this.arrCount + "\t" + this.carTravelTimes / this.carArrCount
-				+ "\t" + this.ptTravelTimes / this.ptArrCount + "\t" + this.otherTravelTimes
-				/ this.otherArrCount;
+				+ this.travelTimes / this.arrCount + "\t"
+				+ this.carTravelTimes / this.carArrCount + "\t"
+				+ this.ptTravelTimes / this.ptArrCount + "\t"
+				+ this.otherTravelTimes / this.otherArrCount;
 	}
 
 	/**

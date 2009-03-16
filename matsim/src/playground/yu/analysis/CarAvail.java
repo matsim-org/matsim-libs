@@ -40,7 +40,7 @@ import org.matsim.utils.io.IOUtils;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class CarAvail extends AbstractPersonAlgorithm {
 	private int never_hasCar, always_hasCar, sometimes_hasCar,
@@ -67,11 +67,12 @@ public class CarAvail extends AbstractPersonAlgorithm {
 			BufferedWriter writer = IOUtils.getBufferedWriter(outputFilename);
 			writer.write("\tpersons\tcar-plans\tpt-plans\nnever\t"
 					+ this.never_hasCar + "\t" + this.never_but_car_plan + "\t"
-					+ this.never_but_pt_plan + "\nalways\t" + this.always_hasCar + "\t"
-					+ this.always_but_car_plan + "\t" + this.always_but_pt_plan
-					+ "\nsometimes\t" + this.sometimes_hasCar + "\t"
-					+ this.sometimes_but_car_plan + "\t" + this.sometimes_but_pt_plan
-					+ "\n");
+					+ this.never_but_pt_plan + "\nalways\t"
+					+ this.always_hasCar + "\t" + this.always_but_car_plan
+					+ "\t" + this.always_but_pt_plan + "\nsometimes\t"
+					+ this.sometimes_hasCar + "\t"
+					+ this.sometimes_but_car_plan + "\t"
+					+ this.sometimes_but_pt_plan + "\n");
 			writer.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -137,12 +138,11 @@ public class CarAvail extends AbstractPersonAlgorithm {
 		Population population = new PopulationImpl();
 
 		CarAvail ca = new CarAvail();
-		population.addAlgorithm(ca);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		ca.run(population);
 
 		ca.write(outputFilename);
 

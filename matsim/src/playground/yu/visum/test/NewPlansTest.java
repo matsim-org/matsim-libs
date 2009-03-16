@@ -124,7 +124,6 @@ public class NewPlansTest {
 		NewPlansWriter npw = new NewPlansWriter(plans);
 		pfa.setNextFilter(prf);
 		prf.setNextFilter(npw);
-		plans.addAlgorithm(pfa);
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
@@ -134,7 +133,7 @@ public class NewPlansTest {
 		System.out.println("  done.");
 
 		System.out.println("  running plans algos ... ");
-		plans.runAlgorithms();
+		pfa.run(plans);
 		npw.writeEndPlans();
 		// //////////////////////////////////////////////////////////////////////////////////////////////////
 

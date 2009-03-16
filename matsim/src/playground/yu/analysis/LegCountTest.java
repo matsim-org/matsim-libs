@@ -40,7 +40,7 @@ import org.matsim.utils.io.IOUtils;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class LegCountTest {
 	public static class LegCount extends AbstractPersonAlgorithm {
@@ -64,13 +64,23 @@ public class LegCountTest {
 
 		public void end() {
 			try {
-				this.writer.write("------------------------------------\ncarUser:\t"
-						+ this.carUserCount + ";\tcarLegs:\t" + this.carLegCount + ";\t"
-						+ (double) this.carLegCount / (double) this.carUserCount
-						+ "\tLegs pro carUser." + "\nptUser:\t" + this.ptUserCount
-						+ ";\tptLegs:\t" + this.ptLegCount + ";\t"
-						+ (double) this.ptLegCount / (double) this.ptUserCount
-						+ "\tLegs pro ptUser.");
+				this.writer
+						.write("------------------------------------\ncarUser:\t"
+								+ this.carUserCount
+								+ ";\tcarLegs:\t"
+								+ this.carLegCount
+								+ ";\t"
+								+ (double) this.carLegCount
+								/ (double) this.carUserCount
+								+ "\tLegs pro carUser."
+								+ "\nptUser:\t"
+								+ this.ptUserCount
+								+ ";\tptLegs:\t"
+								+ this.ptLegCount
+								+ ";\t"
+								+ (double) this.ptLegCount
+								/ (double) this.ptUserCount
+								+ "\tLegs pro ptUser.");
 				this.writer.flush();
 				this.writer.close();
 			} catch (IOException e) {
@@ -135,13 +145,11 @@ public class LegCountTest {
 		Population population = new PopulationImpl();
 
 		LegCount lc = new LegCount(outFilename);
-		population.addAlgorithm(lc);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
-
+		lc.run(population);
 		lc.end();
 
 		System.out.println("--> Done!");

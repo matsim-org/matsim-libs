@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentStuckEvent;
@@ -36,10 +37,15 @@ import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
+import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
+
+import playground.yu.utils.TollTools;
 
 /**
  * @author ychen
@@ -51,12 +57,13 @@ public class LegDistance implements LinkEnterEventHandler,
 	private int binSize;
 	private double[] legDistances;
 	private int[] legCount;
-
+	private RoadPricingScheme toll = null;
+	private Population ppl = null;
 	/**
-	 * @param arg0 -
-	 *            String agentId;
-	 * @param arg1 -
-	 *            AgentLeg agentLeg, some information about a Leg;
+	 * @param arg0
+	 *            - String agentId;
+	 * @param arg1
+	 *            - AgentLeg agentLeg, some information about a Leg;
 	 */
 	private HashMap<String, Double> distances = new HashMap<String, Double>();
 
@@ -78,12 +85,12 @@ public class LegDistance implements LinkEnterEventHandler,
 	}
 
 	/**
-	 * @param binSize -
-	 *            the size of bin
-	 * @param nofBins -
-	 *            number of bins
-	 * @param network -
-	 *            the network, in which the simulation is located.
+	 * @param binSize
+	 *            - the size of bin
+	 * @param nofBins
+	 *            - number of bins
+	 * @param network
+	 *            - the network, in which the simulation is located.
 	 */
 	public LegDistance(final int binSize, final int nofBins,
 			NetworkLayer network) {
@@ -101,6 +108,13 @@ public class LegDistance implements LinkEnterEventHandler,
 		this(300, network);
 	}
 
+	public LegDistance(NetworkLayer network, RoadPricingScheme toll,
+			Population ppl) {
+		this(network);
+		this.toll = toll;
+		this.ppl = ppl;
+	}
+
 	public void handleEvent(LinkEnterEvent event) {
 		String linkId = event.linkId;
 		Link l = this.network.getLink(linkId);
@@ -115,7 +129,15 @@ public class LegDistance implements LinkEnterEventHandler,
 			System.err.println("link with ID: \"" + linkId
 					+ "\" doesn't exist in this network!");
 		}
-		this.distances.put(agentId, distance);
+		if (toll == null)
+			this.distances.put(agentId, distance);
+		else {
+			Person ps = ppl.getPerson(new IdImpl(agentId));
+			if (TollTools.isInRange(ps.getSelectedPlan().getFirstActivity()
+					.getLink(), toll)) {
+				this.distances.put(agentId, distance);
+			}
+		}
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
@@ -177,7 +199,8 @@ public class LegDistance implements LinkEnterEventHandler,
 		}
 		XYLineChart legDistanceSumChart = new XYLineChart("car-legDistances",
 				"time", "sum of legDistances (car) [m]");
-		legDistanceSumChart.addSeries("sum of legDistances of all agents (car)", xs,
+		legDistanceSumChart.addSeries(
+				"sum of legDistances of all agents (car)", xs,
 				this.legDistances);
 		legDistanceSumChart.saveAsPng(filename + "Sum.png", 1024, 768);
 		for (int i = 0; i < xsLength - 1; i++) {
@@ -185,8 +208,10 @@ public class LegDistance implements LinkEnterEventHandler,
 					: this.legDistances[i] / this.legCount[i];
 		}
 		XYLineChart avgLegDistanceChart = new XYLineChart(
-				"average car-LegDistance", "time", "average legDistances (car) [m]");
-		avgLegDistanceChart.addSeries("average legDistance of all agents (car)", xs,
+				"average car-LegDistance", "time",
+				"average legDistances (car) [m]");
+		avgLegDistanceChart.addSeries(
+				"average legDistance of all agents (car)", xs,
 				this.legDistances);
 		avgLegDistanceChart.saveAsPng(filename + "Avg.png", 1024, 768);
 	}

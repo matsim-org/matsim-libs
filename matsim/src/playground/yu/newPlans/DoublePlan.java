@@ -31,7 +31,7 @@ import org.matsim.interfaces.core.v01.Population;
  * @author ychen
  * 
  */
-public class DoublePlan extends NewPlan {
+public class DoublePlan extends NewPopulation {
 	private int newPersonId;
 
 	/**

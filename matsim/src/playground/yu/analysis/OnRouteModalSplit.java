@@ -144,21 +144,21 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 	/* Implementation of eventhandler-Interfaces */
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		internHandleEvent(event, this.dep, this.carDep, this.ptDep, wlkDep,
+		internalHandleEvent(event, this.dep, this.carDep, this.ptDep, wlkDep,
 				this.otherDep);
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		internHandleEvent(event, this.arr, this.carArr, this.ptArr, wlkArr,
+		internalHandleEvent(event, this.arr, this.carArr, this.ptArr, wlkArr,
 				this.otherArr);
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		internHandleEvent(event, this.stuck, this.carStuck, null, null,
+		internalHandleEvent(event, this.stuck, this.carStuck, null, null,
 				this.otherStuck);
 	}
 
-	private void internHandleEvent(AgentEvent ae, double[] allCount,
+	private void internalHandleEvent(AgentEvent ae, double[] allCount,
 			double[] carCount, double[] ptCount, double[] wlkCount,
 			double[] otherCount) {
 		int binIdx = getBinIndex(ae.getTime());
@@ -167,17 +167,17 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 		if (toll != null) {
 			if (TollTools.isInRange(selectedPlan.getFirstActivity().getLink(),
 					toll)) {
-				internCompute(binIdx, ae, selectedPlan, allCount, carCount,
+				internalCompute(binIdx, ae, selectedPlan, allCount, carCount,
 						ptCount, wlkCount, otherCount);
 			}
 		} else {
-			internCompute(binIdx, ae, selectedPlan, allCount, carCount,
+			internalCompute(binIdx, ae, selectedPlan, allCount, carCount,
 					ptCount, wlkCount, otherCount);
 		}
 
 	}
 
-	private void internCompute(int binIdx, AgentEvent ae, Plan plan,
+	private void internalCompute(int binIdx, AgentEvent ae, Plan plan,
 			double[] allCount, double[] carCount, double[] ptCount,
 			double[] wlkCount, double[] otherCount) {
 		allCount[binIdx]++;

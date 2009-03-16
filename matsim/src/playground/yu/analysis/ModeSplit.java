@@ -102,7 +102,7 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 					"ModalSplit Center(toll area) -- agents");
 			chart2.addSeries(new String[] { "car", "pt", "walk" },
 					new double[] { zrhCarUser, zrhPtUser, zrhWalker });
-			chart2.saveAsPng(outputPath + "modalSplit30km.png", 800, 600);
+			chart2.saveAsPng(outputPath + "modalSplitToll.png", 800, 600);
 		}
 	}
 

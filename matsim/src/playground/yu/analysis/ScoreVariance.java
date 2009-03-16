@@ -43,7 +43,7 @@ import org.matsim.utils.io.IOUtils;
 
 /**
  * @author yu
- *
+ * 
  */
 public class ScoreVariance extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -85,12 +85,11 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements
 		Population population = new PopulationImpl();
 
 		ScoreVariance sv = new ScoreVariance(outputFilename);
-		population.addAlgorithm(sv);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		sv.run(population);
 		sv.writeVariance();
 
 		System.out.println("--> Done!");
@@ -99,7 +98,7 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements
 	}
 
 	public void run(final Plan plan) {
-		this.scores.add(plan.getScoreAsPrimitiveType());
+		this.scores.add(plan.getScore());
 	}
 
 	public void writeVariance() {
@@ -121,8 +120,8 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements
 			scoreArray[i] = this.scores.get(i);
 		double var = getVariance(scoreArray);
 		try {
-			this.writer.write(this.outputFilename + "\ncount = " + scoreArray.length
-					+ "\navg. = " + getAverage(scoreArray)
+			this.writer.write(this.outputFilename + "\ncount = "
+					+ scoreArray.length + "\navg. = " + getAverage(scoreArray)
 					+ "\nScoreVariance = " + var + "\nStandard deviation = "
 					+ getStandardDeviation(var));
 			this.writer.close();

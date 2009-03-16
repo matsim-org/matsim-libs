@@ -174,13 +174,12 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 		Population population = new PopulationImpl();
 
 		RouteSummary rs = new RouteSummary(outputDir + "/routeCompare.txt.gz");
-		population.addAlgorithm(rs);
 
 		System.out.println("-->reading plansfile: " + populationFilename);
 		new MatsimPopulationReader(population, network)
 				.readFile(populationFilename);
 
-		population.runAlgorithms();
+		rs.run(population);
 		rs.write();
 		rs.end();
 

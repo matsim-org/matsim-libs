@@ -19,9 +19,6 @@
 package playground.yu.test;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import net.opengis.kml._2.BoundaryType;
 import net.opengis.kml._2.DocumentType;
@@ -39,7 +36,6 @@ import org.matsim.config.Config;
 import org.matsim.config.MatsimConfigReader;
 import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.KmlNetworkWriter;
@@ -376,31 +372,6 @@ public class TollSchemeGenerator {
 				+ "Network.shp");
 		new ShapeFilePolygonWriter().writePolygon(coords, usedGisOut
 				+ "MoutArea.shp");
-	}
-
-	private NetworkLayer applyCapacityFilter(NetworkLayer network,
-			double lowerBound, double upperBound) {
-		Set<Link> linksToRemove = new HashSet<Link>();
-		for (Link l : network.getLinks().values()) {
-			if ((lowerBound > l
-					.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME))
-					|| (upperBound < l
-							.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME))) {
-				linksToRemove.add(l);
-			}
-		}
-		for (Link l : linksToRemove) {
-			network.removeLink(l);
-		}
-		return network;
-	}
-
-	private NetworkLayer applyLinkIdFilter(NetworkLayer tollNetwork,
-			List<Id> linkIdsToFilter) {
-		for (Id i : linkIdsToFilter) {
-			tollNetwork.removeLink(tollNetwork.getLink(i));
-		}
-		return tollNetwork;
 	}
 
 	private NetworkLayer createTollScheme(Config config) {

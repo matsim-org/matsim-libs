@@ -23,7 +23,7 @@ import org.matsim.utils.io.IOUtils;
 
 /**
  * @author yu
- *
+ * 
  */
 public class ActTimeEstimator extends AbstractPersonAlgorithm {
 	private static class ActTimeCounter {
@@ -138,12 +138,11 @@ public class ActTimeEstimator extends AbstractPersonAlgorithm {
 		Population population = new PopulationImpl();
 
 		ActTimeEstimator ade = new ActTimeEstimator();
-		population.addAlgorithm(ade);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		ade.run(population);
 
 		ade.write(outputFilename);
 

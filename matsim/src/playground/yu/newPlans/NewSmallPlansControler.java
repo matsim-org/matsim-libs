@@ -30,9 +30,9 @@ import org.matsim.population.PopulationReader;
 
 /**
  * test of NewAgentPtPlan
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class NewSmallPlansControler {
 
@@ -50,11 +50,11 @@ public class NewSmallPlansControler {
 		new MatsimNetworkReader(network).readFile(netFilename);
 		Population population = new PopulationImpl();
 		NewSmallPlan nsp = new NewSmallPlan(population);
-		population.addAlgorithm(nsp);
+
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
 		plansReader.readFile(plansFilename);
-		population.runAlgorithms();
+		nsp.run(population);
 		nsp.writeEndPlans();
 	}
 }

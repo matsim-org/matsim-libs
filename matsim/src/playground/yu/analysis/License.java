@@ -35,9 +35,9 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 /**
  * checks, how many people have license for driving car and can choose from car
  * or pt
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class License extends AbstractPersonAlgorithm {
 	private int hasLicenseCount;
@@ -79,12 +79,11 @@ public class License extends AbstractPersonAlgorithm {
 		Population population = new PopulationImpl();
 
 		License l = new License();
-		population.addAlgorithm(l);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		l.run(population);
 
 		System.out.println("--> Done!\n-->There is " + l.getHasLicenseCount()
 				+ " legal drivers!");

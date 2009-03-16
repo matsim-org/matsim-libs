@@ -41,7 +41,7 @@ import playground.yu.analysis.PlanModeJudger;
  * @author ychen
  * 
  */
-public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithm {
+public class NewAgentPtPlan3 extends NewPopulation implements PersonAlgorithm {
 
 	private final List<Plan> copyPlans = new ArrayList<Plan>();
 

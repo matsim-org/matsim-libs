@@ -82,7 +82,7 @@ public class AnalysisTest {
 		String eventsOutputFilename = args[1].replaceFirst("events",
 				"events4mvi");
 		String outputBase = args[2] + args[args.length - 1] + "."
-				+ (scenario.equals("Kanton_Zurich") ? scenario : "");
+				+ (scenario.equals("normal") ? "" : scenario + ".");
 		String plansFilename = null;
 		if (args.length >= 4) {
 			if (args[3].endsWith("xml") || args[3].endsWith("xml.gz"))
@@ -95,8 +95,24 @@ public class AnalysisTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
+		// toll
 		RoadPricingScheme toll = null;
-		// EventsHandlers with parameter of Population:
+		if (scenario.equals("Kanton_Zurich")) {
+			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
+					network);
+			try {
+				tollReader.parse(tollFilename);
+			} catch (SAXException e) {
+				e.printStackTrace();
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			toll = tollReader.getScheme();
+		}
+
+		// EventsHandlers with parameter of "Population":
 		OnRouteModalSplit orms = null;
 		LegTravelTimeModalSplit lttms = null;
 		// PersonAlgorithm
@@ -104,34 +120,18 @@ public class AnalysisTest {
 		DailyDistance dd = null;
 		DailyEnRouteTime dert = null;
 		ModeSplit ms = null;
-
+		LegDistance ld = null;
 		// only PersonAlgorithm begins.
 		if (plansFilename != null) {
 			Population plans = new PopulationImpl();
 
 			catl = new CalcAverageTripLength();
-			ms = new ModeSplit(null);
-
-			if (scenario.equals("Kanton_Zurich")) {
-				RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
-						network);
-				try {
-					tollReader.parse(tollFilename);
-				} catch (SAXException e) {
-					e.printStackTrace();
-				} catch (ParserConfigurationException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				toll = tollReader.getScheme();
-			}
-
 			ms = new ModeSplit(toll);
 			orms = new OnRouteModalSplit(scenario, plans, toll);
 			lttms = new LegTravelTimeModalSplit(plans, toll);
 			dd = new DailyDistance(toll);
 			dert = new DailyEnRouteTime(toll);
+			ld = new LegDistance(network, toll, plans);
 			// TODO add some PersonAlgorithm and EventsHandler
 
 			PopulationReader plansReader = new MatsimPopulationReader(plans,
@@ -142,19 +142,22 @@ public class AnalysisTest {
 			dd.run(plans);
 			dert.run(plans);
 			ms.run(plans);
+		} else {
+			ld = new LegDistance(network);
 		}
 		// only PersonAlgorithm ends.
 		Events events = new Events();
-		// EventsHandlers:
-		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network);
+		// EventsHandlers without parameter of "Population":
+		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network, toll);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network);
 		CalcLinksAvgSpeed clas = null;
-		if (!scenario.equals("Zurich")) {
-			clas = new CalcLinksAvgSpeed(network);
-		} else if (scenario.equals("Zurich")) {
+		if (scenario.equals("Zurich")) {
 			clas = new CalcLinksAvgSpeed(network, 682845.0, 247388.0, 2000.0);
+		} else if (scenario.equals("Kanton_Zurich")) {
+			clas = new CalcLinksAvgSpeed(network, toll);
+		} else {
+			clas = new CalcLinksAvgSpeed(network);
 		}
-		LegDistance ld = new LegDistance(network);
 
 		events.addHandler(ctpf);
 		events.addHandler(cas);
@@ -216,7 +219,9 @@ public class AnalysisTest {
 		sw2.close();
 
 		new OTFEvent2MVI(new QueueNetwork(network), eventsOutputFilename,
-				outputBase + "vis.mvi", Integer.parseInt(args[args.length - 2]))
+				args[2] + "../" + args[args.length - 1] + "."
+						+ (scenario.equals("normal") ? "" : scenario + ".")
+						+ "vis.mvi", Integer.parseInt(args[args.length - 2]))
 				.convert();
 
 		System.out.println("done.");

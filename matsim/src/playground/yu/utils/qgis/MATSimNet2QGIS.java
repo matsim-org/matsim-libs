@@ -155,10 +155,9 @@ public class MATSimNet2QGIS implements X2QGIS {
 	public void readPlans(final String plansFilename,
 			final AbstractPersonAlgorithm pa) {
 		Population population = new PopulationImpl();
-		population.addAlgorithm(pa);
 		new MatsimPopulationReader(population, this.network)
 				.readFile(plansFilename);
-		population.runAlgorithms();
+		pa.run(population);
 	}
 
 	public CoordinateReferenceSystem getCrs() {

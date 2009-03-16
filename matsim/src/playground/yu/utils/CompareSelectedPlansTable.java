@@ -8,6 +8,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
@@ -105,26 +106,23 @@ public class CompareSelectedPlansTable {
 
 				if (person.getSelectedPlan().getFirstActivity().getType()
 						.substring(0, 1).equals("h")) {
-					out.write(person.getSelectedPlan().getFirstActivity()
-							.getCoord().getX()
-							+ ";");
-					out.write(person.getSelectedPlan().getFirstActivity()
-							.getCoord().getY()
-							+ ";");
-					out.write(person.getSelectedPlan().getFirstActivity()
-							.getLinkId()
-							+ ";");
+					Activity act = person.getSelectedPlan().getFirstActivity();
+					Coord crd = act.getLink().getCoord();
+					out.write(crd.getX() + ";");
+					out.write(crd.getY() + ";");
+					out.write(act.getLinkId() + ";");
 				} else {
 					// no home activity in the plan -> no home activity in the
 					// knowledge
 					out.write("-;-;-;");
 				}
 
-				double s0 = person.getSelectedPlan().getScoreAsPrimitiveType();
+				double s0 = person.getSelectedPlan().getScore().doubleValue();
 				out.write(s0 + ";");
 				score0s[i] = s0;
 				Person person_comp = this.plans1.getPerson(person_id);
-				double s1 = person_comp.getSelectedPlan().getScoreAsPrimitiveType();
+				double s1 = person_comp.getSelectedPlan().getScore()
+						.doubleValue();
 				out.write(s1 + ";");
 				score1s[i] = s1;
 

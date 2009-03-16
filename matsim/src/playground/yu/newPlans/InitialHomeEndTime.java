@@ -16,9 +16,9 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author yu
- *
+ * 
  */
-public class InitialHomeEndTime extends NewPlan implements PlanAlgorithm {
+public class InitialHomeEndTime extends NewPopulation implements PlanAlgorithm {
 
 	/**
 	 * @param population
@@ -55,13 +55,11 @@ public class InitialHomeEndTime extends NewPlan implements PlanAlgorithm {
 		InitialHomeEndTime ihet = new InitialHomeEndTime(population,
 				outputPlansFilename);
 
-		population.addAlgorithm(ihet);
-
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
 		plansReader.readFile(plansFilename);
 
-		population.runAlgorithms();
+		ihet.run(population);
 
 		ihet.writeEndPlans();
 	}

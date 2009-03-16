@@ -397,35 +397,29 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				"Modal split -- leg distance", "pt fraction [%]",
 				"car fraction [%]");
 		for (int i = 0; i < 20; i++) {
-			double ptFraction = this.ptCounts5[i]
-					/ (this.ptCounts5[i] + this.carCounts5[i] + wlkCounts5[i])
-					* 100.0;
-			double wlkFraction = this.wlkCounts5[i]
-					/ (this.ptCounts5[i] + this.carCounts5[i] + wlkCounts5[i])
-					* 100.0;
-			double carFraction = this.carCounts5[i]
-					/ (this.ptCounts5[i] + this.carCounts5[i] + wlkCounts5[i])
-					* 100.0;
-			bubbleChart.addSeries(i * 5 + "-" + (i + 1) * 5 + " km",
-					new double[][] { new double[] { ptFraction },
-							new double[] { carFraction },
-							new double[] { (i + 0.5) / 5.0 } });
+			double sumCounts5 = this.ptCounts5[i] + this.carCounts5[i]
+					+ wlkCounts5[i];
+			double ptFraction = this.ptCounts5[i] / sumCounts5 * 100.0;
+			double wlkFraction = this.wlkCounts5[i] / sumCounts5 * 100.0;
+			double carFraction = this.carCounts5[i] / sumCounts5 * 100.0;
+			if (sumCounts5 > 0)
+				bubbleChart.addSeries(i * 5 + "-" + (i + 1) * 5 + " km",
+						new double[][] { new double[] { ptFraction },
+								new double[] { carFraction },
+								new double[] { (i + 0.5) / 5.0 } });
 			sw.writeln((i * 5) + "+\t" + this.carCounts5[i] + "\t"
 					+ this.ptCounts5[i] + "\t" + this.wlkCounts5[i] + "\t"
 					+ carFraction + "\t" + ptFraction + "\t" + wlkFraction);
 		}
-		double ptFraction = this.ptCounts5[20]
-				/ (this.ptCounts5[20] + this.carCounts5[20] + wlkCounts5[20])
-				* 100.0;
-		double wlkFraction = this.wlkCounts5[20]
-				/ (this.ptCounts5[20] + this.carCounts5[20] + wlkCounts5[20])
-				* 100.0;
-		double carFraction = this.carCounts5[20]
-				/ (this.ptCounts5[20] + this.carCounts5[20] + wlkCounts5[20])
-				* 100.0;
-		bubbleChart.addSeries("100+ km", new double[][] {
-				new double[] { ptFraction }, new double[] { carFraction },
-				new double[] { 4.1 } });
+		double sumCounts5 = this.ptCounts5[20] + this.carCounts5[20]
+				+ wlkCounts5[20];
+		double ptFraction = this.ptCounts5[20] / sumCounts5 * 100.0;
+		double wlkFraction = this.wlkCounts5[20] / sumCounts5 * 100.0;
+		double carFraction = this.carCounts5[20] / sumCounts5 * 100.0;
+		if (sumCounts5 > 0)
+			bubbleChart.addSeries("100+ km", new double[][] {
+					new double[] { ptFraction }, new double[] { carFraction },
+					new double[] { 4.1 } });
 		sw.writeln(100 + "+\t" + this.carCounts5[20] + "\t"
 				+ this.ptCounts5[20] + "\t" + this.wlkCounts5[20] + "\t"
 				+ carFraction + "\t" + ptFraction + "\t" + wlkFraction);
@@ -475,7 +469,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		new MatsimNetworkReader(network).readFile(netFilename);
 
 		Population population = new PopulationImpl();
-		
+
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
 		try {
 			tollReader.parse(tollFilename);
@@ -486,9 +480,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		DailyDistance dd = new DailyDistance(null
-		// tollReader.getScheme()
-		);
+		DailyDistance dd = new DailyDistance(tollReader.getScheme());
 
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
@@ -499,5 +491,4 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		Gbl.printElapsedTime();
 		System.exit(0);
 	}
-
 }

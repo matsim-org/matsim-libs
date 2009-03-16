@@ -40,9 +40,9 @@ import org.matsim.population.PopulationImpl;
 
 /**
  * @author yu
- *
+ * 
  */
-public class AvoidOldNodes extends NewPlan {
+public class AvoidOldNodes extends NewPopulation {
 	private boolean nullRoute = false;
 	private final Set<String> nodeIds;
 
@@ -105,10 +105,9 @@ public class AvoidOldNodes extends NewPlan {
 		for (int i = 3000022; i <= 3000025; i++) {
 			aon.addLink(Integer.toString(i));
 		}
-		population.addAlgorithm(aon);
 		new MatsimPopulationReader(population, network).readFile(config.plans()
 				.getInputFile());
-		population.runAlgorithms();
+		aon.run(population);
 		aon.writeEndPlans();
 	}
 

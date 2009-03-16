@@ -40,7 +40,7 @@ import org.matsim.utils.io.IOUtils;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class LegCountTest2 {
 	public static class LegCount extends AbstractPersonAlgorithm {
@@ -66,28 +66,37 @@ public class LegCountTest2 {
 
 		public void end() {
 			try {
-				this.writer.write("------------------------------------\ncarUser:\t"
-						+ this.carUserCount
-						+ ";\tcarLegs:\t"
-						+ this.carLegCount
-						+ ";\t"
-						+ (double) this.carLegCount / (double) this.carUserCount
-						+ "\tLegs pro carUser;\tlicensedCarUser:\t"
-						+ this.licensedCarUserCount
-						+ ";\tlicensedCarLegs:\t"
-						+ this.licensedCarLegCount
-						+ ";\t"
-						+ (double) this.licensedCarLegCount
-								/ (double) this.licensedCarUserCount
-						+ "\tLegs pro licensedCarUser;\n" + "\nptUser:\t"
-						+ this.ptUserCount + ";\tptLegs:\t" + this.ptLegCount + ";\t"
-						+ (double) this.ptLegCount / (double) this.ptUserCount
-						+ "\tLegs pro ptUser;\tlicensedPtUser:\t"
-						+ this.licensedPtUserCount + ";\tlicensedPtLegs:\t"
-						+ this.licensedPtLegCount + ";\t"
-						+ (double) this.licensedPtLegCount
-						/ (double) this.licensedPtUserCount
-						+ "\tLegs pro licensedPtUser.");
+				this.writer
+						.write("------------------------------------\ncarUser:\t"
+								+ this.carUserCount
+								+ ";\tcarLegs:\t"
+								+ this.carLegCount
+								+ ";\t"
+								+ (double) this.carLegCount
+										/ (double) this.carUserCount
+								+ "\tLegs pro carUser;\tlicensedCarUser:\t"
+								+ this.licensedCarUserCount
+								+ ";\tlicensedCarLegs:\t"
+								+ this.licensedCarLegCount
+								+ ";\t"
+								+ (double) this.licensedCarLegCount
+										/ (double) this.licensedCarUserCount
+								+ "\tLegs pro licensedCarUser;\n"
+								+ "\nptUser:\t"
+								+ this.ptUserCount
+								+ ";\tptLegs:\t"
+								+ this.ptLegCount
+								+ ";\t"
+								+ (double) this.ptLegCount
+										/ (double) this.ptUserCount
+								+ "\tLegs pro ptUser;\tlicensedPtUser:\t"
+								+ this.licensedPtUserCount
+								+ ";\tlicensedPtLegs:\t"
+								+ this.licensedPtLegCount
+								+ ";\t"
+								+ (double) this.licensedPtLegCount
+								/ (double) this.licensedPtUserCount
+								+ "\tLegs pro licensedPtUser.");
 				this.writer.flush();
 				this.writer.close();
 			} catch (IOException e) {
@@ -161,12 +170,11 @@ public class LegCountTest2 {
 		Population population = new PopulationImpl();
 
 		LegCount lc = new LegCount(outFilename);
-		population.addAlgorithm(lc);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		lc.run(population);
 
 		lc.end();
 

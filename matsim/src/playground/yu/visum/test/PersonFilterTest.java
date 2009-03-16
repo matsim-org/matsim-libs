@@ -46,7 +46,6 @@ public class PersonFilterTest {
 		idf.setNextFilter(atf);
 		atf.setNextFilter(dtf);
 		dtf.setNextFilter(pid);
-		plans.addAlgorithm(pfa);
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
@@ -56,7 +55,7 @@ public class PersonFilterTest {
 		System.out.println("  done.");
 
 		System.out.println("  running plans algos ... ");
-		plans.runAlgorithms();
+		pfa.run(plans);
 		System.out.println("we have " + pfa.getCount()
 				+ "persons at last -- FilterAlgorithm");
 		System.out.println("we have " + idf.getCount()

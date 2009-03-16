@@ -40,17 +40,17 @@ import playground.yu.analysis.PlanModeJudger;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- *
+ * 
  * @author ychen
- *
+ * 
  */
-public class NewAgentCarPlan extends NewPlan implements PlanAlgorithm {
+public class NewAgentCarPlan extends NewPopulation implements PlanAlgorithm {
 	private Person person = null;
 	private final List<Plan> plans = new ArrayList<Plan>();
 
 	/**
 	 * Constructor, writes file-head
-	 *
+	 * 
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
@@ -86,11 +86,10 @@ public class NewAgentCarPlan extends NewPlan implements PlanAlgorithm {
 		Population population = new PopulationImpl();
 		NewAgentCarPlan nac = new NewAgentCarPlan(population,
 				outputPlansFilename);
-		population.addAlgorithm(nac);
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
 		plansReader.readFile(plansFilename);
-		population.runAlgorithms();
+		nac.run(population);
 		nac.writeEndPlans();
 	}
 

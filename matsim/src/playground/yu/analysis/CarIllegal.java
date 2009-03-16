@@ -35,7 +35,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class CarIllegal extends AbstractPersonAlgorithm {
 	private int count = 0;
@@ -91,12 +91,11 @@ public class CarIllegal extends AbstractPersonAlgorithm {
 		Population population = new PopulationImpl();
 
 		CarIllegal cl = new CarIllegal();
-		population.addAlgorithm(cl);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		cl.run(population);
 
 		System.out.println("--> Done!\n-->There is " + cl.getCount()
 				+ " illeagel drivers!");

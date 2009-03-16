@@ -117,7 +117,8 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	public CalcLinksAvgSpeed(final NetworkLayer network,
 			final RoadPricingScheme toll) {
 		this(network);
-		interestLinks = new HashSet<Link>(toll.getLinks());
+		if (toll != null)
+			interestLinks = new HashSet<Link>(toll.getLinks());
 	}
 
 	public static class SpeedCounter {
