@@ -28,6 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for playground.meisterk.org.matsim.population.algorithms");
 
+		suite.addTestSuite(PersonAddTypicalDurationsToDesiresTest.class);
 		suite.addTestSuite(PlanAnalyzeTourModeChoiceSetTest.class);
 
 		return suite;

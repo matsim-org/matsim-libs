@@ -40,9 +40,9 @@ public class PersonAddTypicalDurationsToDesires extends AbstractPersonAlgorithm 
 		HashMap<String, Integer> numOfOccurrences = new HashMap<String, Integer>();
 		
 		Plan selectedPlan = person.getSelectedPlan();
-		Activity firstActivity = selectedPlan.getFirstActivity();
+		Activity lastActivity = selectedPlan.getLastActivity();
 		for (Object o : selectedPlan.getPlanElements()) {
-			if ((o instanceof Activity) && !(((Activity) o).equals(firstActivity))) {
+			if ((o instanceof Activity) && !(((Activity) o).equals(lastActivity))) {
 				actType = ((Activity) o).getType();
 				if (numOfOccurrences.containsKey(actType)) {
 					numOfOccurrences.put(actType, numOfOccurrences.get(actType) + 1);

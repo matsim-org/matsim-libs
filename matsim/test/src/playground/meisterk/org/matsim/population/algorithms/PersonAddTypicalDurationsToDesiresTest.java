@@ -41,16 +41,17 @@ public class PersonAddTypicalDurationsToDesiresTest extends MatsimTestCase {
 	private static final String CONFIGFILE = "test/scenarios/equil/config.xml";
 	private static Logger log = Logger.getLogger(PlanAnalyzeTourModeChoiceSetTest.class);
 	
+	private final String HOME = "home";
+	private final String FROBNICATE = "frobnicate";
+	private final String REFROBNICATE = "refrobnicate";
+	
+	
 	protected void setUp() throws Exception {
 		super.setUp();
 		super.loadConfig(PersonAddTypicalDurationsToDesiresTest.CONFIGFILE);
 	}
 
 	public void testRunPerson() {
-
-		final String HOME = "home";
-		final String FROBNICATE = "frobnicate";
-		final String REFROBNICATE = "refrobnicate";
 		
 		// load data
 		log.info("Reading network xml file...");
@@ -72,6 +73,8 @@ public class PersonAddTypicalDurationsToDesiresTest extends MatsimTestCase {
 		plan.addLeg(new LegImpl(BasicLeg.Mode.undefined));
 		plan.addAct(new ActImpl(REFROBNICATE, network.getLink("1")));
 		plan.addLeg(new LegImpl(BasicLeg.Mode.undefined));
+		plan.addAct(new ActImpl(HOME, network.getLink("1")));
+		plan.addLeg(new LegImpl(BasicLeg.Mode.undefined));
 		plan.addAct(new ActImpl(REFROBNICATE, network.getLink("1")));
 		plan.addLeg(new LegImpl(BasicLeg.Mode.undefined));
 		plan.addAct(new ActImpl(REFROBNICATE, network.getLink("1")));
@@ -90,7 +93,14 @@ public class PersonAddTypicalDurationsToDesiresTest extends MatsimTestCase {
 		assertEquals(6, expectedDesires.getActivityDurations().size());
 		assertEquals(2.0 * 3600, expectedDesires.getActivityDuration(FROBNICATE + PersonAddTypicalDurationsToDesires.APPENDIX));
 		assertEquals((4.0 / 3) * 3600, expectedDesires.getActivityDuration(REFROBNICATE + PersonAddTypicalDurationsToDesires.APPENDIX));
-		assertEquals(16.0 * 3600, expectedDesires.getActivityDuration(HOME  + PersonAddTypicalDurationsToDesires.APPENDIX));
+		// TODO do we want home to be split into equal parts, too?
+		// "home" is a special type of activity, it implicitly has two meanings
+		// - anchor of the daily activity plan ("sleep")
+		// - intermediate activity
+		// a solution is to have two home-type activity types
+		// - something like "home-anchor" with a long minimal typical duration, say 9 hours
+		// - other "home", which share the rest of home-activity budget
+		assertEquals(8.0 * 3600, expectedDesires.getActivityDuration(HOME  + PersonAddTypicalDurationsToDesires.APPENDIX));
 	}
 
 }
