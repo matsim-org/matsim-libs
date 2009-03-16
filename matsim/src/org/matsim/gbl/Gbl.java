@@ -34,29 +34,6 @@ import org.matsim.matrices.Matrices;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
-/* some ideas about this class... [MR, dec06]
- * Currently, there are the following methods:
- * - createConfig(String[] args);
- * - getConfig();
- * - createWorld();
- * - getWorld();
- * - createFacilities();
- * - createMatrices();
- * - reset();
- *
- * The problem: It is not clear, who is responsible to create the globals.
- * e.g.: Before, with World.getSingleton(), the world was created if needed (it
- * was a singleton after all, so there should not have been a special create-
- * Singleton() imho). Anyway, a clearer thing would be:
- * - init(String[] args);
- * - reset();
- * - getConfig();
- * - getWorld();
- * - getFacilities();
- * - getMatrices();
- * In that case, init() has to be called exactly once, and that init-method
- * takes care of creating config, world, facilities etc.
- */
 /* The usage of Gbl.getConfig() all throughout the code makes it very hard
  * to debug. We would thus prefer if Gbl.getConfig() could be removed in
  * the longer term and the config-object, or single params from the config,
@@ -85,15 +62,6 @@ public abstract class Gbl {
 	//////////////////////////////////////////////////////////////////////
 	// config creation
 	//////////////////////////////////////////////////////////////////////
-	/**
-	 * @deprecated The functionality of the method is in principle ok, except that 
-	 * the created config is held by a static field in this class.
-	 * This makes a lot of features of OO programming quite useless thus
-	 * this method will be refactored in the future. It will be replaced
-	 * by a createConfig method that does the same except writing the config to
-	 * static fields
-	 */
-	@Deprecated
 	public static final Config createConfig(final String[] args) {
 		if (Gbl.config != null) {
 			Gbl.errorMsg("config exists already! Cannot create a 2nd global config.");
@@ -125,10 +93,18 @@ public abstract class Gbl {
 
 		return Gbl.config;
 	}
+
+	/**
+	 * Having config as a static member makes a lot of features of OO programming
+	 * quite useless. Thus this method will be removed in the future. If the 
+	 * config is used somewhere in the code, the config (or the needed
+	 * parameters) need to be passed explicitly.
+	 */
   @Deprecated
 	public static final Config getConfig() {
 		return Gbl.config;
 	}
+
   @Deprecated
 	public static final void setConfig(final Config config) {
 		Gbl.config = config;
