@@ -32,6 +32,7 @@ import java.util.HashMap;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicPopulation;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -77,15 +78,15 @@ public class MultiSourceEAF {
 	 * @throws IOException if file reading fails
 	 */
 	private static HashMap<Node,Integer> readDemands(final NetworkLayer network, final String filename) throws IOException{
-			BufferedReader in = new BufferedReader(new FileReader(filename));
-			HashMap<Node,Integer> demands = new HashMap<Node,Integer>();
-			String inline = null;
-			while ((inline = in.readLine()) != null) {
-				String[] line = inline.split(";");
-				Node node = network.getNode(line[0].trim());
-				int d = Integer.valueOf(line[1].trim());
-				demands.put(node, d);
-			}
+		BufferedReader in = new BufferedReader(new FileReader(filename));
+		HashMap<Node,Integer> demands = new HashMap<Node,Integer>();
+		String inline = null;
+		while ((inline = in.readLine()) != null) {
+			String[] line = inline.split(";");
+			Node node = network.getNode(line[0].trim());
+			int d = Integer.valueOf(line[1].trim());
+			demands.put(node, d);
+		}
 		return demands;
 	}
 
@@ -130,14 +131,14 @@ public class MultiSourceEAF {
 	 */
 	public static void main(final String[] args) {
 
-			//set debuging modes
-			MultiSourceEAF.debug(true);
-			BellmanFordVertexIntervalls.debug(0);
-			VertexIntervalls.debug(false);
-			//VertexIntervall.debug(false);
-			EdgeIntervalls.debug(false);
-			//EdgeIntervall.debug(false);
-			Flow.debug(0);
+		//set debuging modes
+		MultiSourceEAF.debug(true);
+		BellmanFordVertexIntervalls.debug(0);
+		VertexIntervalls.debug(false);
+		//VertexIntervall.debug(false);
+		EdgeIntervalls.debug(false);
+		//EdgeIntervall.debug(false);
+		Flow.debug(0);
 
 
 		if(_debug){
@@ -146,20 +147,21 @@ public class MultiSourceEAF {
 
 		String networkfile = null;
 		//networkfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_100p_flow_2s_cap.xml";
+		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618_10p_5s.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
 		//networkfile = "./examples/meine_EA/swissold_network_5s.xml";
 		networkfile = "./examples/meine_EA/siouxfalls_network_5s_euclid.xml";
-		
-		
+
+
 		//networkfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
 
 
-		String plansfile = null;
+		String plansfile = null;		
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
 		//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans_simple.xml";
 		//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
-		
-		
+		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
+
 
 
 
@@ -170,10 +172,10 @@ public class MultiSourceEAF {
 		//outputplansfile = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans_10p_5s.xml";
 		//outputplansfile = "./examples/meine_EA/swissold_plans_5s_demands_100.xml";
 		//outputplansfile = "./examples/meine_EA/padang_plans_100p_flow_2s.xml";
-		outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_euclid_demands_100_empty.xml";
-		
+		//outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_euclid_demands_100_empty.xml";
+
 		//outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_demand_100_emptylegs.xml";
-		//outputplansfile = "./examples/meine_EA/padang_plans_100p_flow_10s_test.xml";
+		outputplansfile = "/homes/combi/dressler/stuff/testplans.xml";
 
 		int uniformDemands = 100;
 
@@ -181,7 +183,7 @@ public class MultiSourceEAF {
 		int timeHorizon = 200000;
 		int rounds = 100000;
 		String sinkid = "supersink";
-		boolean emptylegs = true;		
+		//boolean emptylegs = false; // really bad! use EmptyPlans.class instead 		
 
 		//read network
 		NetworkLayer network = new NetworkLayer();
@@ -205,11 +207,11 @@ public class MultiSourceEAF {
 			demands = new HashMap<Node, Integer>();
 			for (Node node : network.getNodes().values()) {
 				if (!node.getId().equals(sink.getId())) {
-				  demands.put(node, Math.max(uniformDemands,0));
+					demands.put(node, Math.max(uniformDemands,0));
 				}
 			}
 		}
-		
+
 		int totaldemands = 0;
 		for (int i : demands.values()) {
 			totaldemands += i;
@@ -226,10 +228,10 @@ public class MultiSourceEAF {
 		if(_debug){
 			System.out.println("reading input done");
 		}
-		
-		
+
+
 		String tempstr = null;
-		
+
 		if(!demands.isEmpty() && (sink != null)) {
 			TimeExpandedPath result = null;
 			FakeTravelTimeCost travelcost = new FakeTravelTimeCost();
@@ -247,43 +249,43 @@ public class MultiSourceEAF {
 
 			//main loop for calculations
 			if(vertexAlgo){
-			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
+				BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
 
-			int i;
-			int gain = 0;
-			for (i=0; i<rounds; i++){
-				timer1 = System.currentTimeMillis();
-				result = routingAlgo.doCalculations();
-				timer2 = System.currentTimeMillis();
-				timeMBF += timer2 - timer1;
-				if (result==null){
-					break;
-				}
-				if(_debug){
-					tempstr = "found path " + result;
-					//System.out.println("found path: " +  result);
-				}
-				fluss.augment(result);
-				timer3 = System.currentTimeMillis();
-				gain += fluss.cleanUp();
-				
-				timeAugment += timer3 - timer2;
-				if (_debug) {
-					if (i % 100 == 0) {
-					  System.out.println("Iteration " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
-					  System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
-					  System.out.println("last " + tempstr);
+				int i;
+				int gain = 0;
+				for (i=0; i<rounds; i++){
+					timer1 = System.currentTimeMillis();
+					result = routingAlgo.doCalculations();
+					timer2 = System.currentTimeMillis();
+					timeMBF += timer2 - timer1;
+					if (result==null){
+						break;
+					}
+					if(_debug){
+						tempstr = "found path " + result;
+						//System.out.println("found path: " +  result);
+					}
+					fluss.augment(result);
+					timer3 = System.currentTimeMillis();
+					gain += fluss.cleanUp();
+
+					timeAugment += timer3 - timer2;
+					if (_debug) {
+						if (i % 100 == 0) {
+							System.out.println("Iteration " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+							System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
+							System.out.println("last " + tempstr);
+						}
 					}
 				}
+				if (_debug) {
+					long timeStop = System.currentTimeMillis();
+					System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");				  
+					System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
+					System.out.println("last " + tempstr);
+				}
 			}
-			if (_debug) {
-				  long timeStop = System.currentTimeMillis();
-				  System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");				  
-				  System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
-				  System.out.println("last " + tempstr);
-			}
-			}
-			else{
+			else{ // use the other algo
 				FakeTravelTimeCost length = new FakeTravelTimeCost();
 				fluss = new Flow(network, length, demands, sink, timeHorizon);
 				TravelCost travelCost = length;
@@ -297,28 +299,29 @@ public class MultiSourceEAF {
 				System.out.println("unsatisfied demands:");
 				for (Node node : demands.keySet()){
 					if (demands.get(node) > 0) {
-					  System.out.println("node:" + node.getId().toString()+ " demand:" + demands.get(node));
+						System.out.println("node:" + node.getId().toString()+ " demand:" + demands.get(node));
 					}
 				}
 			}
 			if(outputplansfile!=null){
-				Population output = (Population)fluss.createPoulation(emptylegs,null);
-				if (emptylegs) {
-					Config config = Gbl.createConfig(new String[] {});
-
-					World world = Gbl.getWorld();
-					world.setNetworkLayer(network);
-					world.complete();
-
-					CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
-					PlansCalcRoute router = new PlansCalcRoute(network, new FakeTravelTimeCost(), new FakeTravelTimeCost());
-					//PlansCalcRoute router = new PlansCalcRouteDijkstra(network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), new FakeTravelTimeCost());
-					for (Object O_person : output.getPersons().values()) {
-						Person person = (Person) O_person;
-						Plan plan = person.getPlans().get(0);
-						router.run(plan);
-					}
-				}
+				Population output = fluss.createPoulation(null);
+				// TODO remove emptylegs from Flow.java ... not needed anymore
+//				if (emptylegs) {
+//					Config config = Gbl.createConfig(new String[] {});
+//
+//					World world = Gbl.getWorld();
+//					world.setNetworkLayer(network);
+//					world.complete();
+//
+//					CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
+//					PlansCalcRoute router = new PlansCalcRoute(network, new FakeTravelTimeCost(), new FakeTravelTimeCost());
+//					//PlansCalcRoute router = new PlansCalcRouteDijkstra(network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), new FakeTravelTimeCost());
+//					for (Object O_person : output.getPersons().values()) {
+//						Person person = (Person) O_person;
+//						Plan plan = person.getPlans().get(0);
+//						router.run(plan);
+//					}
+//				}
 				PopulationWriter popwriter = new PopulationWriter(output, outputplansfile);
 
 				try {
