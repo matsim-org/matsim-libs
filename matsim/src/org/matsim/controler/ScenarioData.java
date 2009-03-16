@@ -95,7 +95,7 @@ public class ScenarioData implements BasicScenario {
 	 * @param config
 	 */
 	public ScenarioData(final Config config) {
-		this(config, null);
+		this(config, (NetworkFactory)null);
 	}
 
 	public ScenarioData(final Config config, final NetworkFactory factory) {
@@ -123,6 +123,11 @@ public class ScenarioData implements BasicScenario {
 		this.facilitiesFileName = facilitiesFileName;
 		this.populationFileName = populationFileName;
 		this.networkFactory = new NetworkFactory();
+	}
+
+	public ScenarioData(Config config, NetworkLayer network) {
+		this(config, network.getFactory());
+		this.network = network;
 	}
 
 	public World getWorld() throws RuntimeException {
@@ -219,7 +224,7 @@ public class ScenarioData implements BasicScenario {
 	}
 	
 	public BasicLaneDefinitions getLaneDefinitions(){
-		if (this.laneDefinitions == null){
+		if ((this.laneDefinitions == null) && (this.config.network().getLaneDefinitionsFile() != null)){
 			this.laneDefinitions = new BasicLaneDefinitionsImpl();
 			MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(this.laneDefinitions);
 			reader.readFile(this.config.network().getLaneDefinitionsFile());
@@ -231,19 +236,21 @@ public class ScenarioData implements BasicScenario {
 		if ((this.config == null) || (this.config.signalSystems() == null)){
 			throw new IllegalStateException("SignalSystems can only be loaded if set in config");
 		}
-		//we try to parse the deprecated format
-		if ((this.signalSystems == null) && (this.laneDefinitions == null)) {
-			this.laneDefinitions = new BasicLaneDefinitionsImpl();
-			this.signalSystems = new BasicSignalSystemsImpl();
-			MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(this.laneDefinitions, this.signalSystems);
-			log.info("loading signalsystems from " + this.config.signalSystems().getSignalSystemFile());
-			reader.readFile(this.config.signalSystems().getSignalSystemFile());
-		}
-		else if (this.signalSystems == null){
-			this.signalSystems = new BasicSignalSystemsImpl();
-			MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(this.signalSystems);
-			log.info("loading signalsystems from " + this.config.signalSystems().getSignalSystemFile());
-			reader.readFile(this.config.signalSystems().getSignalSystemFile());
+		if (this.config.signalSystems().getSignalSystemFile() != null){
+			//we try to parse the deprecated format
+			if ((this.signalSystems == null) && (this.laneDefinitions == null)) {
+				this.laneDefinitions = new BasicLaneDefinitionsImpl();
+				this.signalSystems = new BasicSignalSystemsImpl();
+				MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(this.laneDefinitions, this.signalSystems);
+				log.info("loading signalsystems from " + this.config.signalSystems().getSignalSystemFile());
+				reader.readFile(this.config.signalSystems().getSignalSystemFile());
+			}
+			else if (this.signalSystems == null){
+				this.signalSystems = new BasicSignalSystemsImpl();
+				MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(this.signalSystems);
+				log.info("loading signalsystems from " + this.config.signalSystems().getSignalSystemFile());
+				reader.readFile(this.config.signalSystems().getSignalSystemFile());
+			}
 		}
 		return this.signalSystems;
 	}
@@ -252,11 +259,13 @@ public class ScenarioData implements BasicScenario {
 		if ((this.config == null) || (this.config.signalSystems() == null)){
 			throw new IllegalStateException("SignalSystems can only be loaded if set in config");
 		}
-		if (this.signalSystemConfigurations == null){
-			this.signalSystemConfigurations = new BasicSignalSystemConfigurationsImpl();
-			MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(this.signalSystemConfigurations);
-			log.info("loading signalsystemsconfiguration from " + this.config.signalSystems().getSignalSystemConfigFile());
-			reader.readFile(this.config.signalSystems().getSignalSystemConfigFile());
+		if (this.config.signalSystems().getSignalSystemConfigFile() != null){
+			if (this.signalSystemConfigurations == null){
+				this.signalSystemConfigurations = new BasicSignalSystemConfigurationsImpl();
+				MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(this.signalSystemConfigurations);
+				log.info("loading signalsystemsconfiguration from " + this.config.signalSystems().getSignalSystemConfigFile());
+				reader.readFile(this.config.signalSystems().getSignalSystemConfigFile());
+			}
 		}
 		return this.signalSystemConfigurations;
 	}

@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.ConsoleAppender;
@@ -77,6 +79,7 @@ import org.matsim.mobsim.external.ExternalMobsim;
 import org.matsim.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
+import org.matsim.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
@@ -188,6 +191,8 @@ public class Controler {
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
+	private List<QueueSimulationListener> queueSimulationListener  = new ArrayList<QueueSimulationListener>();
+	
 	private final Thread shutdownHook = new Thread() {
 		@Override
 		public void run() {
@@ -255,6 +260,13 @@ public class Controler {
 	 *  
 	 *  Kai, feb'08</p>
 	 * 
+	 * <p>
+	 * Using this constructor will disable the creation of the scenario data instance used 
+	 * to load consistent scenarios. Lanes and SingalSystems won't be initialized automatically even
+	 * if set in config! Take care that this is done by yourself.
+	 * 
+	 * dg, march 09<p>
+	 * 
 	 * @param config
 	 * @param network
 	 * @param population
@@ -263,6 +275,12 @@ public class Controler {
 		this(null, null, config);
 		this.network = network;
 		this.population = population;
+		//FIXME dg march 09: this warning should not be needed if there wouldn't be a
+		//world without any humanthinkable concept
+		log.warn("Using this constructor will disable the creation of the scenario data instance used for" +
+				"to ensure consistent scenarios. Lanes and SingalSystems won't be initialized automatically even" +
+				"if set in config! " +
+				"Take care that this is done by yourself.");
 	}
 
 	private Controler(final String configFileName, final String dtdFileName, final Config config) {
@@ -705,6 +723,13 @@ public class Controler {
 				sim.run();
 			} else {
 				QueueSimulation sim = new QueueSimulation(this.network, this.population, this.events);
+				sim.addQueueSimulationListeners(this.getQueueSimulationListener());
+				if ((this.scenarioData != null) && (this.scenarioData.getLaneDefinitions() != null)){
+					sim.setLaneDefinitions(this.scenarioData.getLaneDefinitions());
+				}
+				if ((this.scenarioData != null) && (this.scenarioData.getSignalSystems() != null) && (this.scenarioData.getSignalSystemsConfiguration() != null)){
+					sim.setSignalSystems(this.scenarioData.getSignalSystems(), this.scenarioData.getSignalSystemsConfiguration());
+				}
 				sim.run();
 			}
 		} else {
@@ -1165,6 +1190,11 @@ public class Controler {
 			controler.run();
 		}
 		System.exit(0);
+	}
+
+	
+	public List<QueueSimulationListener> getQueueSimulationListener() {
+		return queueSimulationListener;
 	}
 
 }

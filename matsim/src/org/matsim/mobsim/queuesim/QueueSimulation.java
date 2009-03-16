@@ -53,6 +53,8 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.mobsim.queuesim.listener.QueueSimListenerManager;
+import org.matsim.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkLayer;
 import org.matsim.signalsystems.control.AdaptivePlanBasedSignalSystemControler;
@@ -130,6 +132,8 @@ public class QueueSimulation {
 
 	private BasicLaneDefinitions laneDefintions;
 
+	private QueueSimListenerManager listenerManager;
+
 	/**
 	 * Initialize the QueueSimulation without signal systems
 	 * @param network
@@ -137,6 +141,7 @@ public class QueueSimulation {
 	 * @param events
 	 */
 	public QueueSimulation(final NetworkLayer network, final Population plans, final Events events) {
+		listenerManager = new QueueSimListenerManager(this);
 		Simulation.reset();
 		this.config = Gbl.getConfig();
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
@@ -146,6 +151,19 @@ public class QueueSimulation {
 		this.network = new QueueNetwork(network);
 		this.networkLayer = network;
 		this.agentFactory = new AgentFactory();
+	}
+	
+	/**
+	 * Adds all QueueSimulation listener instances in the List given as parameters as
+	 * listeners to this QueueSimulation instance.
+	 * @param listeners
+	 */
+	public void addQueueSimulationListeners(List<QueueSimulationListener> listeners){
+		if (listeners != null){
+			for (QueueSimulationListener l : listeners){
+				this.listenerManager.addQueueSimulationListener(l);
+			}
+		}
 	}
 	
 	/**
@@ -298,6 +316,7 @@ public class QueueSimulation {
 	
 	public final void run() {
 		prepareSim();
+		this.listenerManager.fireQueueSimulationInitializedEvent();
 		//do iterations
 		boolean cont = true;
 		while (cont) {
@@ -309,7 +328,10 @@ public class QueueSimulation {
 				SimulationTimer.incTime();
 			}
 		}
+		this.listenerManager.fireQueueSimulationBeforeClenupEvent();
 		cleanupSim();
+		//delete reference to clear memory 
+		this.listenerManager = null;
 	}
 
 	protected void createAgents() {
@@ -611,6 +633,16 @@ public class QueueSimulation {
 
 	public void setAgentFactory(final AgentFactory fac) {
 		this.agentFactory = fac;
+	}
+
+	
+	public SortedMap<Id, SignalSystemControler> getSignalSystemControlerBySystemId() {
+		return signalSystemControlerBySystemId;
+	}
+
+	
+	public SortedMap<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions() {
+		return signalSystemDefinitions;
 	}
 
 }
