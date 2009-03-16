@@ -27,21 +27,16 @@ import java.util.List;
 
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.BasicLegImpl;
-import org.matsim.basic.v01.BasicPopulationImpl;
 import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.BasicPopulation;
 import org.matsim.interfaces.basic.v01.Id;
-//import org.matsim.interfaces.core.v01.Act;
-import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.ActImpl;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationImpl;
@@ -605,7 +600,7 @@ public class Flow {
 	/**
 	 * 
 	 */
-	public BasicPopulation createPoulation(boolean emptylegs,String oldfile){
+	public Population createPoulation(String oldfile){
 		//check whether oldfile exists
 		boolean org = (oldfile!=null);
 		HashMap<Node,Person> orgpersons = new  HashMap<Node,Person>();
@@ -622,7 +617,7 @@ public class Flow {
 		}
 		
 		//construct Population
-		BasicPopulation result =new BasicPopulationImpl();
+		Population result =new PopulationImpl();
 		int id =1;
 		for (TimeExpandedPath path : this._TimeExpandedPaths){
 			if(path.isforward()){
@@ -635,7 +630,7 @@ public class Flow {
 				}
 				
 				
-				if (!emptylegs) { 
+				//if (!emptylegs) { 
 					// normal case, write the routes!
 					BasicRouteImpl route;
 					
@@ -689,7 +684,7 @@ public class Flow {
 						id++;
 					}
 					
-				} else { // LEAVE THE ROUTES EMPTY! (sadly, this needs different types ...)
+				/*}  else { // LEAVE THE ROUTES EMPTY! (sadly, this needs different types ...)
 					BasicRouteImpl route;				
 					route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
 					
@@ -722,12 +717,13 @@ public class Flow {
 						id++;
 					}
 										
-				}
+				}*/
 				
 			
 				
 			}else{
-				;//TODO unwind residual edges
+				// TODO this should not happen! just output an error?
+				// residual edges
 			}
 			
 			
