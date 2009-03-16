@@ -40,8 +40,7 @@ public class DepartureAtFacilityEvent extends VehicleEvent {
 		return EVENT_TYPE;
 	}
 
-	@Override
-	public String toString() {
+	public String getTextRepresentation() {
 		return "[DepartureAtFacilityEvent: ]";
 	}
 

@@ -111,42 +111,42 @@ public class EventWriterTXT implements ActEndEventHandler, ActStartEventHandler,
 	}
 
 	public void handleEvent(ActEndEvent event) {
-		writeLine(event.toString());
+		writeLine(event.getTextRepresentation());
 	}
 
 	public void handleEvent(ActStartEvent event) {
-		writeLine(event.toString());
+		writeLine(event.getTextRepresentation());
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
-		writeLine(event.toString());
+		writeLine(event.getTextRepresentation());
 	}
 
 	public void handleEvent(AgentDepartureEvent event) {
-		writeLine(event.toString());
+		writeLine(event.getTextRepresentation());
 	}
 
 	public void handleEvent(AgentReplanEvent event) {
-		writeLine(event.toString());
+		writeLine(event.getTextRepresentation());
 	}
 	
 	public void handleEvent(AgentStuckEvent event) {
-		writeLine(event.toString());
+		writeLine(event.getTextRepresentation());
 	}
 
 	public void handleEvent(AgentMoneyEvent event) {
-		writeLine(event.toString());		
+		writeLine(event.getTextRepresentation());		
 	}
 
 	public void handleEvent(AgentWait2LinkEvent event) {
-		writeLine(event.toString());
+		writeLine(event.getTextRepresentation());
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		writeLine(event.toString());
+		writeLine(event.getTextRepresentation());
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		writeLine(event.toString());
+		writeLine(event.getTextRepresentation());
 	}
 }

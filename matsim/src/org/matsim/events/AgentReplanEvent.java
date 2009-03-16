@@ -41,11 +41,7 @@ public class AgentReplanEvent extends PersonEvent {
 		return EVENT_TYPE;
 	}
 
-	/**
-	 * @see org.matsim.events.BasicEvent#toString()
-	 */
-	@Override
-	public String toString() {
+	public String getTextRepresentation() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(Double.valueOf(this.getTime()));
 		builder.append(' ');

@@ -50,8 +50,7 @@ public abstract class BasicEvent {
 	 * The string <em>must</em> follow the following format:
 	 * <pre>time-stamp \t agentId \t legNumber \t linkId \t nodeId \t flag \t description</pre>
 	 */
-	@Override
-	public abstract String toString();
+	public abstract String getTextRepresentation();
 
 	/** @return a unique, descriptive name for this event type, used to identify event types in files. */
 	abstract public String getEventType();

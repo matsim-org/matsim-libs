@@ -42,8 +42,7 @@ public class AgentDepartureEvent extends AgentEvent {
 		return EVENT_TYPE;
 	}
 
-	@Override
-	public String toString() {
+	public String getTextRepresentation() {
 		return asString() + "6\t" + EVENT_TYPE;
 	}
 

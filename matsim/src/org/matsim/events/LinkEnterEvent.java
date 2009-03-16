@@ -41,8 +41,7 @@ public class LinkEnterEvent extends LinkEvent {
 		return EVENT_TYPE;
 	}
 
-	@Override
-	public String toString() {
+	public String getTextRepresentation() {
 		return asString() + "5\t" + EVENT_TYPE;
 	}
 

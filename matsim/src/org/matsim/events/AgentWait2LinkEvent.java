@@ -42,8 +42,7 @@ public class AgentWait2LinkEvent extends AgentEvent {
 		return EVENT_TYPE;
 	}
 
-	@Override
-	public String toString() {
+	public String getTextRepresentation() {
 		return asString() + "4\t" + EVENT_TYPE;
 	}
 

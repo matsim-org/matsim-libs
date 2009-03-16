@@ -42,8 +42,7 @@ public class AgentStuckEvent extends AgentEvent {
 		return EVENT_TYPE;
 	}
 
-	@Override
-	public String toString() {
+	public String getTextRepresentation() {
 		return asString() + "3\t" + EVENT_TYPE;
 	}
 

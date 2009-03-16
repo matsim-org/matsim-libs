@@ -33,8 +33,7 @@ public class LastEventOfIteration extends BasicEvent {
 		return null;
 	}
 
-	@Override
-	public String toString() {
+	public String getTextRepresentation() {
 		return "";
 	}
 

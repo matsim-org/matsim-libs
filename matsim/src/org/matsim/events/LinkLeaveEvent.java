@@ -41,8 +41,7 @@ public class LinkLeaveEvent extends LinkEvent {
 		return EVENT_TYPE;
 	}
 
-	@Override
-	public String toString() {
+	public String getTextRepresentation() {
 		return asString() + "2\t" + EVENT_TYPE;
 	}
 

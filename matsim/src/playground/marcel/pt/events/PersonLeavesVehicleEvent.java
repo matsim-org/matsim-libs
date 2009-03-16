@@ -53,8 +53,7 @@ public class PersonLeavesVehicleEvent extends PersonEvent {
 		return this.vehicle;
 	}
 
-	@Override
-	public String toString() {
+	public String getTextRepresentation() {
 		return "[" + EVENT_TYPE + ": agent: " + this.agentId + "; vehicle: " + this.vehicle.getId() + "]";
 	}
 
