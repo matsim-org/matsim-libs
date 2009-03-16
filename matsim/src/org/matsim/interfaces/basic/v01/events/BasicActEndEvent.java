@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AgentDepartureEvent.java
+ * BasicActEndEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,33 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.events;
+package org.matsim.interfaces.basic.v01.events;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Person;
-
-public class AgentDepartureEvent extends AgentEvent implements BasicAgentDepartureEvent {
-
-	public static final String EVENT_TYPE = "departure";
-
-	public AgentDepartureEvent(final double time, final Person agent, final Link link, final Leg leg) {
-		super(time, agent, link, leg);
-	}
-
-	public AgentDepartureEvent(final double time, final Id agentId, final Id linkId) {
-		super(time, agentId, linkId);
-	}
-
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-
-	public String getTextRepresentation() {
-		return asString() + "6\t" + EVENT_TYPE;
-	}
+public interface BasicActEndEvent extends BasicActEvent {
 
 }

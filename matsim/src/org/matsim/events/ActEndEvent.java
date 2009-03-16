@@ -21,11 +21,12 @@
 package org.matsim.events;
 
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.events.BasicActEndEvent;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 
-public class ActEndEvent extends ActEvent {
+public class ActEndEvent extends ActEvent implements BasicActEndEvent {
 
 	public static final String EVENT_TYPE = "actend";
 

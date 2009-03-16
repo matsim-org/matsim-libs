@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.matsim.utils.misc.Time;
 
-public abstract class BasicEvent {
+public abstract class BasicEvent implements org.matsim.interfaces.basic.v01.events.BasicEvent {
 
 	public final static String ATTRIBUTE_TYPE = "type";
 

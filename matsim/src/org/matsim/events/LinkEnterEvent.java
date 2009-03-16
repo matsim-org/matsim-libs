@@ -21,10 +21,11 @@
 package org.matsim.events;
 
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 
-public class LinkEnterEvent extends LinkEvent {
+public class LinkEnterEvent extends LinkEvent implements BasicLinkEnterEvent {
 
 	public static final String EVENT_TYPE = "entered link";
 

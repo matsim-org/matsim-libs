@@ -23,6 +23,7 @@ package org.matsim.events;
 import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.events.BasicAgentMoneyEvent;
 import org.matsim.interfaces.core.v01.Person;
 
 /**
@@ -33,7 +34,7 @@ import org.matsim.interfaces.core.v01.Person;
  *
  * @author mrieser
  */
-public final class AgentMoneyEvent extends PersonEvent {
+public final class AgentMoneyEvent extends PersonEvent implements BasicAgentMoneyEvent {
 
 	public static final String ATTRIBUTE_AMOUNT = "amount";
 

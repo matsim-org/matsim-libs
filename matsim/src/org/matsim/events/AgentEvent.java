@@ -23,11 +23,12 @@ package org.matsim.events;
 import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.events.BasicAgentEvent;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 
-public abstract class AgentEvent extends PersonEvent {
+public abstract class AgentEvent extends PersonEvent implements BasicAgentEvent {
 
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_LEG = "leg";

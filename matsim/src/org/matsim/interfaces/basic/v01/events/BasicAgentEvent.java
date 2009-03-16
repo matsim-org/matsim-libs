@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonEvent.java
+ * BasicAgentEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,55 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.events;
-
-import java.util.Map;
+package org.matsim.interfaces.basic.v01.events;
 
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.events.BasicPersonEvent;
-import org.matsim.interfaces.core.v01.Person;
 
-/**
- * @author mrieser
- */
-public abstract class PersonEvent extends BasicEvent implements BasicPersonEvent {
+public interface BasicAgentEvent extends BasicPersonEvent {
 
-	public static final String ATTRIBUTE_AGENT = "agent";
+	public Id getLinkId();
 
-	private Person person;
-	public final String agentId;
-	private final Id personId;
-
-	public PersonEvent(final double time, final Person person) {
-		super(time);
-		this.person = person;
-		this.personId = person.getId();
-		this.agentId = person.getId().toString();
-	}
-
-	public PersonEvent(final double time, final Id personId)	{
-		super(time);
-		this.personId = personId;
-		this.agentId = personId.toString();
-	}
-
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_AGENT, this.personId.toString());
-		return attr;
-	}
-
-	@Deprecated // should be set via Constructor...
-	public void setAgent(final Person agent) {
-		this.person = agent;
-	}
-
-	public Person getAgent() { // TODO [MR] rename to getPerson
-		return this.person;
-	}
-
-	public Id getPersonId() {
-		return this.personId;
-	}
 }

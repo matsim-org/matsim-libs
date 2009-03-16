@@ -21,11 +21,12 @@
 package org.matsim.events;
 
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.events.BasicAgentArrivalEvent;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 
-public class AgentArrivalEvent extends AgentEvent {
+public class AgentArrivalEvent extends AgentEvent implements BasicAgentArrivalEvent {
 
 	public static final String EVENT_TYPE = "arrival";
 

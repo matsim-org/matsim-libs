@@ -21,10 +21,11 @@
 package org.matsim.events;
 
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 
-public class LinkLeaveEvent extends LinkEvent {
+public class LinkLeaveEvent extends LinkEvent implements BasicLinkLeaveEvent {
 
 	public static final String EVENT_TYPE = "left link";
 
