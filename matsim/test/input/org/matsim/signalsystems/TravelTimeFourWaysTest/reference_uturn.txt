@@ -1,0 +1,37 @@
+T_GBL	VEH_ID	LEG_NR	LINK_ID	FROM_NODE_ID	EVENT_FLAG	DESCRIPTION
+11255	4		20	0	8	actend h
+11255	4		20	0	6	departure
+11255	3		20	0	8	actend h
+11255	3		20	0	6	departure
+11255	2		20	0	8	actend h
+11255	2		20	0	6	departure
+11255	1		20	0	8	actend h
+11255	1		20	0	6	departure
+11255	4		20	0	4	wait2link
+11256	4		20	0	2	left link
+11256	4		2	0	5	entered link
+11256	3		20	0	4	wait2link
+11257	3		20	0	2	left link
+11257	3		2	0	5	entered link
+11257	2		20	0	4	wait2link
+11258	2		20	0	2	left link
+11258	2		2	0	5	entered link
+11258	1		20	0	4	wait2link
+11259	1		20	0	2	left link
+11259	1		2	0	5	entered link
+11286	2		2	0	2	left link
+11286	2		7	0	5	entered link
+11286	1		2	0	2	left link
+11286	1		9	0	5	entered link
+11307	2		7	0	0	arrival
+11307	2		7	0	7	actstart h
+11307	1		9	0	0	arrival
+11307	1		9	0	7	actstart h
+11308	4		2	0	2	left link
+11308	4		3	0	5	entered link
+11310	3		2	0	2	left link
+11310	3		5	0	5	entered link
+11329	4		3	0	0	arrival
+11329	4		3	0	7	actstart h
+11331	3		5	0	0	arrival
+11331	3		5	0	7	actstart h
