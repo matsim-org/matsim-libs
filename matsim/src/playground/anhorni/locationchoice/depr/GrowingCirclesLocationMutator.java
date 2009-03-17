@@ -25,13 +25,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
@@ -279,7 +279,7 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		Coord home_coord = null;
 		Coord prim_coord = null;
 		final Plan plan = person.getSelectedPlan();
-		Iterator<BasicActImpl> act_it = plan.getIteratorAct();
+		Iterator<BasicActivityImpl> act_it = plan.getIteratorAct();
 		while (act_it.hasNext()) {
 			final Activity act = (Activity)act_it.next();
 			if (act.getType().startsWith(H)) {

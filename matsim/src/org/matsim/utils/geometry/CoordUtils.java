@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CoordI.java
+ * CoordUtils.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.basic.v01;
+package org.matsim.utils.geometry;
 
-/**
- * In MATSim, generally Cartesian Coordinates are used, with x increasing
- * to the right, and y increasing to the top:
- * 
- *     ^
- *   y |
- *     |     x
- *   (0/0) ---->
- */
-public interface BasicCoord {
+import org.matsim.interfaces.basic.v01.Coord;
 
-	public void setX(final double x); 
+public abstract class CoordUtils {
 
-	public void setY(final double y);
-
-	public void setXY(final double x, final double y);
-
-	public double getX();
-
-	public double getY();
+	public static double calcDistance(Coord coord, Coord other) {
+		//depending on the coordinate system that is used, determining the
+		//distance based on the euclidean distance will lead to wrong results.
+		//however, if the distance is not to large (<1km) this will be a usable distance estimation.
+		//Another comfortable way to calculate correct distances would be, to use the distance functions
+		//provided by geotools lib. May be we need to discuss what part of GIS functionality we should implement
+		//by our own and for what part we could use an existing GIS like geotools. We need to discuss this in terms
+		//of code robustness, performance and so on ... [gl]
+		double xDiff = other.getX()-coord.getX();
+		double yDiff = other.getY()-coord.getY();
+		return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
+	}
 
 }

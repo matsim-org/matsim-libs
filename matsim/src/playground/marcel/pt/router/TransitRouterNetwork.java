@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.collections.QuadTree;
 
 import playground.marcel.pt.transitSchedule.TransitLine;

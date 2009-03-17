@@ -1,11 +1,28 @@
 package playground.kai.usecases.basicmentalmodule;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.interfaces.basic.v01.* ;
-import org.matsim.interfaces.basic.v01.events.* ;
+import org.matsim.controler.Controler;
+import org.matsim.events.ActEndEvent;
+import org.matsim.events.ActStartEvent;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.LinkEnterEvent;
+import org.matsim.events.LinkLeaveEvent;
+import org.matsim.events.handler.ActEndEventHandler;
+import org.matsim.events.handler.ActStartEventHandler;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.interfaces.basic.v01.BasicScenario;
+import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.events.BasicActEndEvent;
 import org.matsim.interfaces.basic.v01.facilities.BasicFacilities;
 import org.matsim.interfaces.basic.v01.facilities.BasicFacility;
 import org.matsim.interfaces.basic.v01.network.BasicLink;
@@ -18,24 +35,8 @@ import org.matsim.interfaces.basic.v01.population.BasicPlan;
 import org.matsim.interfaces.basic.v01.population.BasicPopulation;
 import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.interfaces.basic.v01.population.BasicRoute;
-
-// TODO: add events handlers in basic
-import org.matsim.events.handler.*;
-
-//TODO: use basic versions of this 
-import org.matsim.events.* ;
-
-//TODO: mv Coord to basic
-import org.matsim.interfaces.core.v01.Coord;
-
-// TODO: ???
-import org.matsim.controler.Controler;
-
-// TODO: ????  BasicStrategyModule???
-import org.matsim.replanning.modules.StrategyModule;
-
-// TODO: ????
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.replanning.modules.StrategyModule;
 
 
 @SuppressWarnings("unused")
@@ -136,12 +137,12 @@ ActStartEventHandler
 			// (can't be used at this level, but useful anyways)
 			// FIXME: createAndAddPerson ????
 			
-			BasicPlan newPlan = pb.createPlan(person) ; // replace (??) the plan by a completely new plan
+			BasicPlan newPlan = pb.createPlan() ; // replace (??) the plan by a completely new plan
 			// FIXME: This creational method has the side effect of also adding the created Object.  In my view:
 			// - either createAndAddPlan
 			// - or createPlan w/o side effects
 			
-			person.addPlan(newPlan) ; // now the person has the plan twice.
+//			person.addPlan(newPlan) ; // now the person has the plan twice.
 			
 			BasicActivity act = null ;
 			
@@ -161,7 +162,7 @@ ActStartEventHandler
 			act.setType("home") ;
 			act.setStartTime(122.) ;
 			
-			BasicLeg leg = pb.createLeg(plan, BasicLeg.Mode.bike) ;
+			BasicLeg leg = pb.createLeg(BasicLeg.Mode.bike) ;
 			plan.addLeg( leg ) ;
 			
 			List<Id> routeIdList = new ArrayList<Id>() ;

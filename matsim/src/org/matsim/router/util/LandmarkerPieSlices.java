@@ -29,11 +29,12 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 
 class LandmarkerPieSlices {
 
@@ -234,7 +235,7 @@ class LandmarkerPieSlices {
 				if (angelDiff < minSectorSize * minAngelFactor) {
 					// Change landmark that is nearer to the center
 					int indexToChange = 0;
-					if (this.center.calcDistance(this.landmarks[preInd].getCoord()) < this.center.calcDistance(this.landmarks[i].getCoord())) {
+					if (CoordUtils.calcDistance(this.center, this.landmarks[preInd].getCoord()) < CoordUtils.calcDistance(this.center, this.landmarks[i].getCoord())) {
 						// Narrow the sector
 						sectorAngles[preInd][1] -= minSectorSize * minAngelFactor;
 						indexToChange = preInd;

@@ -25,7 +25,8 @@ package playground.johannes.socialnet;
 
 import gnu.trove.TDoubleDoubleHashMap;
 
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.utils.geometry.CoordUtils;
 
 import playground.johannes.statistics.WeightedStatistics;
 
@@ -48,7 +49,7 @@ public class SocialNetworkStatistics {
 			if(normalize) {
 				for(Ego<?> e2 : network.getVertices()) {
 					Coord c2 = e2.getCoord();
-					double d = c1.calcDistance(c2);
+					double d = CoordUtils.calcDistance(c1, c2);
 					double bin = Math.floor(d / normBinSize);
 					double count = hist.get(bin);
 					count++;
@@ -57,7 +58,7 @@ public class SocialNetworkStatistics {
 			}
 			
 			for(Ego<?> e2 : e.getNeighbours()) {
-				double d = e.getCoord().calcDistance(e2.getCoord());
+				double d = CoordUtils.calcDistance(e.getCoord(), e2.getCoord());
 				double w = 1;
 				if(normalize)
 					w = 1 / hist.get(Math.floor(d / normBinSize));

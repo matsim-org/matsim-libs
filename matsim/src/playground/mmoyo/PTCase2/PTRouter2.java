@@ -6,9 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
@@ -167,7 +167,7 @@ public class PTRouter2 {
 	}
 	
 	private Activity newPTAct(Coord coord, Link link, double startTime, double dur, double endTime){
-		Activity ptAct= new org.matsim.population.ActImpl("Wait PT Vehicle", coord);
+		Activity ptAct= new org.matsim.population.ActivityImpl("Wait PT Vehicle", coord);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
 		//ptAct.setDuration(dur);   deprecated

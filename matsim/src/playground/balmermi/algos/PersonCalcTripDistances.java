@@ -28,6 +28,7 @@ import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.utils.geometry.CoordUtils;
 
 public class PersonCalcTripDistances extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -67,7 +68,7 @@ public class PersonCalcTripDistances extends AbstractPersonAlgorithm implements 
 				leg.getRoute().setDistance(0.0);
 			}
 			else {
-				if (((CarRoute) leg.getRoute()).getNodes().isEmpty()) { leg.getRoute().setDistance(next.getCoord().calcDistance(prev.getCoord())); }
+				if (((CarRoute) leg.getRoute()).getNodes().isEmpty()) { leg.getRoute().setDistance(CoordUtils.calcDistance(next.getCoord(), prev.getCoord())); }
 				else {
 					double dist = prev.getLink().getLength();
 					for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {

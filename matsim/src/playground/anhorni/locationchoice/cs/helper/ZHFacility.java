@@ -1,7 +1,8 @@
 package playground.anhorni.locationchoice.cs.helper;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.utils.geometry.CoordUtils;
 
 public class ZHFacility  {
 	
@@ -47,7 +48,7 @@ public class ZHFacility  {
 	}
 	
 	public double getCrowFlyDistance(Coord other) {
-		return this.mappedPosition.calcDistance(other);
+		return CoordUtils.calcDistance(this.mappedPosition, other);
 	}
 
 	public Coord getExactPosition() {

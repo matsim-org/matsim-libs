@@ -41,6 +41,7 @@ import org.matsim.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.misc.Time;
 
 public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
@@ -272,7 +273,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	private double handleWalkLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		// make simple assumption about distance and walking speed
-		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
+		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		double speed = 3.0 / 3.6; // 3.0 km/h --> m/s
 		// create an empty route, but with realistic traveltime
 		CarRoute route = new NodeCarRoute(fromAct.getLink(), toAct.getLink());
@@ -287,7 +288,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	private double handleBikeLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		// make simple assumption about distance and cycling speed
-		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
+		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		double speed = 15.0 / 3.6; // 15.0 km/h --> m/s
 		// create an empty route, but with realistic traveltime
 		CarRoute route = new NodeCarRoute(fromAct.getLink(), toAct.getLink());
@@ -302,7 +303,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	private double handleUndefLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		// make simple assumption about distance and a dummy speed (50 km/h)
-		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
+		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		double speed = 50.0 / 3.6; // 50.0 km/h --> m/s
 		// create an empty route, but with realistic traveltime
 		CarRoute route = new NodeCarRoute(fromAct.getLink(), toAct.getLink());

@@ -21,9 +21,8 @@ package org.matsim.interfaces.basic.v01.population;
 
 import java.util.List;
 
-import org.matsim.basic.v01.BasicKnowledge;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.facilities.BasicActivityOption;
 import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
 
 /**
@@ -31,37 +30,24 @@ import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
  */
 public interface BasicPopulationBuilder {
 
-	BasicPerson createPerson(Id id) throws Exception;
+	public BasicPerson createPerson(Id id);
 
-	BasicPlan createPlan(BasicPerson currentPerson);
+	public BasicPlan createPlan();
 
-//	@Deprecated // to be clarified
-//	BasicActivity createAct(BasicPlan basicPlan, String currentActType, BasicLocation currentlocation);
+	public BasicActivity createActivityFromCoord(String actType, Coord coord);
 
-	/* we need something like createAct
-	 * Kai wants something like:
-	 * - takes either a coord, or a facility, or a link
-	 * when working with basic*, the methods should be something like
-	 * createActWithCoord(), createActWithFacility(), ... as Id is always the same.
-	 */
+	public BasicActivity createActivityFromFacilityId(String actType, Id facilityId);
+
+	public BasicActivity createActivityFromLinkId(String actType, Id linkId);
 	
-	BasicLeg createLeg(BasicPlan basicPlan, Mode legMode);
+	public BasicLeg createLeg(Mode legMode);
 
 	/**
 	 * Creates a new Route object
 	 * @param currentRouteLinkIds List of Ids including the start and the end Link Id of the route's links
 	 * @return a BasicRoute Object with the links set accordingly
+	 * @deprecated needs to be verified
 	 */
-	BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
-
-	BasicPlan createPlan(BasicPerson person, boolean selected);
-
-//	@Deprecated // to be clarified: this generates an activity opportunity, not an "act"!!!
-//	BasicActivityOption createActivity(String type, BasicLocation currentlocation);
-
-	@Deprecated // to be clarified
-	BasicKnowledge createKnowledge(List<BasicActivityOption> currentActivities);
-
-//	BasicAct createAct(BasicPlan plan, String string, Coord coord);
+	public BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds); // TODO [MR] check this
 
 }

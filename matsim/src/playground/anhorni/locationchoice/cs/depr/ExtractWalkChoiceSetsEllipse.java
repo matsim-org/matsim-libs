@@ -7,9 +7,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.utils.collections.QuadTree;
+import org.matsim.utils.geometry.CoordUtils;
 
 import playground.anhorni.locationchoice.cs.choicesetextractors.ChoiceSetExtractor;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
@@ -61,8 +62,8 @@ public class ExtractWalkChoiceSetsEllipse extends ChoiceSetExtractor {
 	
 	private boolean inEllipse(ZHFacility facility, ChoiceSet choiceSet) {
 		
-			double dist0 = choiceSet.getTrip().getBeforeShoppingAct().getCoord().calcDistance(facility.getMappedPosition());
-			double dist1 = choiceSet.getTrip().getAfterShoppingAct().getCoord().calcDistance(facility.getMappedPosition());
+			double dist0 = CoordUtils.calcDistance(choiceSet.getTrip().getBeforeShoppingAct().getCoord(), facility.getMappedPosition());
+			double dist1 = CoordUtils.calcDistance(choiceSet.getTrip().getAfterShoppingAct().getCoord(), facility.getMappedPosition());
 			
 			if (dist0 + dist1 <= choiceSet.getTravelTimeBudget() * this.walkingSpeed) return true;
 			else return false;

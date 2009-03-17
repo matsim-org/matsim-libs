@@ -33,8 +33,8 @@ import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.feature.Feature;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
@@ -42,6 +42,7 @@ import org.matsim.network.NetworkWriter;
 import org.matsim.network.algorithms.NetworkWriteAsTable;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
@@ -729,7 +730,7 @@ public class TeleatlasParser {
 			Tuple<Id,Id> turn = turns.get(i);
 			Link fromLink = network.getLink(turn.getFirst());
 			Link toLink = network.getLink(turn.getSecond());
-			Link l = network.createLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),toLink.getFromNode().getCoord().calcDistance(fromLink.getToNode().getCoord()),fromLink.getFreespeed(Time.UNDEFINED_TIME),fromLink.getCapacity(Time.UNDEFINED_TIME),fromLink.getNumberOfLanes(Time.UNDEFINED_TIME));
+			Link l = network.createLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()),fromLink.getFreespeed(Time.UNDEFINED_TIME),fromLink.getCapacity(Time.UNDEFINED_TIME),fromLink.getNumberOfLanes(Time.UNDEFINED_TIME));
 			newLinks.add(l);
 		}
 		return new Tuple<ArrayList<Node>, ArrayList<Link>>(newNodes,newLinks);

@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.listener.ShutdownListener;
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Node;

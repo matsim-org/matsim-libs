@@ -1,8 +1,9 @@
 package playground.anhorni.locationchoice.cs.helper;
 
 //import org.apache.log4j.Logger;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.utils.geometry.CoordUtils;
 
 import java.util.Iterator;
 import java.util.TreeMap;
@@ -24,7 +25,7 @@ public class ChoiceSet {
 	}
 	
 	public boolean isRoundTrip() {
-		if (this.trip.getBeforeShoppingAct().getCoord().calcDistance(this.trip.getAfterShoppingAct().getCoord()) < 0.01) {
+		if (CoordUtils.calcDistance(this.trip.getBeforeShoppingAct().getCoord(), this.trip.getAfterShoppingAct().getCoord()) < 0.01) {
 			return true;
 		}
 		else return false;
@@ -134,14 +135,13 @@ public class ChoiceSet {
 	}
 	
 	public double calculateCrowFlyDistanceMapped(Coord mappedCoords) {
-		return this.trip.getBeforeShoppingAct().getCoord().calcDistance(mappedCoords) +
-			this.trip.getAfterShoppingAct().getCoord().calcDistance(mappedCoords);
+		return CoordUtils.calcDistance(this.trip.getBeforeShoppingAct().getCoord(), mappedCoords) +
+			CoordUtils.calcDistance(this.trip.getAfterShoppingAct().getCoord(), mappedCoords);
 	}
 	
 	public double calculateCrowFlyDistanceExact(Coord exactCoords) {
-		return this.trip.getBeforeShoppingAct().getCoord().
-			calcDistance(exactCoords) +
-			this.trip.getAfterShoppingAct().getCoord().calcDistance(exactCoords);
+		return CoordUtils.calcDistance(this.trip.getBeforeShoppingAct().getCoord(), exactCoords) +
+			CoordUtils.calcDistance(this.trip.getAfterShoppingAct().getCoord(), exactCoords);
 	}
 
 	public Id getChosenFacilityId() {

@@ -24,8 +24,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
@@ -82,7 +83,7 @@ public abstract class WorldUtils {
 			double radius;
 			if (zoneMin == null || zoneMin.equals(aZone.getMax())) {
 				// the distance is center-to-center, only take 0.7 times the distance as radius
-				radius = 0.7*zoneCenter.calcDistance(center);
+				radius = 0.7*CoordUtils.calcDistance(zoneCenter, center);
 			} else {
 				// the other zone has an extent(min/max), so just use the full distance
 				radius = aZone.calcDistance(center);
@@ -144,7 +145,7 @@ public abstract class WorldUtils {
 
 		if ((lineDX == 0.0) && (lineDY == 0.0)) {
 			// the line segment is a point without dimension
-			return lineFrom.calcDistance(point);
+			return CoordUtils.calcDistance(lineFrom, point);
 		}
 
 		double u = ((point.getX() - lineFrom.getX())*lineDX + (point.getY() - lineFrom.getY())*lineDY) /
@@ -152,13 +153,13 @@ public abstract class WorldUtils {
 
 		if (u <= 0) {
 			// (x | y) is not on the line segment, but before lineFrom
-			return lineFrom.calcDistance(point);
+			return CoordUtils.calcDistance(lineFrom, point);
 		}
 		if (u >= 1) {
 			// (x | y) is not on the line segment, but after lineTo
-			return lineTo.calcDistance(point);
+			return CoordUtils.calcDistance(lineTo, point);
 		}
-		return new CoordImpl(lineFrom.getX() + u*lineDX, lineFrom.getY() + u*lineDY).calcDistance(point);
+		return CoordUtils.calcDistance(new CoordImpl(lineFrom.getX() + u*lineDX, lineFrom.getY() + u*lineDY), point);
 	}
 
 }

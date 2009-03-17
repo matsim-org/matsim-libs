@@ -31,9 +31,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.io.IOUtils;
@@ -120,7 +121,7 @@ public class PrimaryActivityDefinition {
 			}
 			actC.incCounter();
 			
-			writer.writeLine(new String[] {p.id, "" + c.getX(), "" + c.getY(), a.type.toString(), "" + c.calcDistance(a.location), "" + a.location.getX(), "" + a.location.getY()});
+			writer.writeLine(new String[] {p.id, "" + c.getX(), "" + c.getY(), a.type.toString(), "" + CoordUtils.calcDistance(c, a.location), "" + a.location.getX(), "" + a.location.getY()});
 //			System.out.println(a.type + ";" + c.calcDistance(a.location));
 		}
 		writer.finish();

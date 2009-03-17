@@ -34,6 +34,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.misc.Time;
 
 import playground.marcel.ptnetwork.tempelements.TempFZP;
@@ -1225,8 +1226,8 @@ public class PtInternalNetwork {
 							link.type="P";
 							link2.type="P";
 
-							link.length=pednode.getCoord().calcDistance(hp.getCoord());
-							link2.length=pednode.getCoord().calcDistance(hp.getCoord());
+							link.length=CoordUtils.calcDistance(pednode.getCoord(), hp.getCoord());
+							link2.length=CoordUtils.calcDistance(pednode.getCoord(), hp.getCoord());
 
 							link2.cost = INITIAL_CHANGE_COST;
 							// Zugangslinks zu Haltebereichen als extra Funktion
@@ -1267,7 +1268,7 @@ public class PtInternalNetwork {
 					l.setDepartures(link.departures);
 
 					if(l.getLength()<=0.0){
-						l.setLength(l.getFromNode().getCoord().calcDistance(l.getToNode().getCoord()));
+						l.setLength(CoordUtils.calcDistance(l.getFromNode().getCoord(), l.getToNode().getCoord()));
 					}
 				}
 			}

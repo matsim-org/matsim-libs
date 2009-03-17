@@ -4,7 +4,6 @@ import org.matsim.config.Config;
 import org.matsim.interfaces.basic.v01.facilities.BasicFacilities;
 import org.matsim.interfaces.basic.v01.network.BasicNetwork;
 import org.matsim.interfaces.basic.v01.population.BasicPopulation;
-import org.matsim.interfaces.core.v01.Coord;
 
 public interface BasicScenario {
 

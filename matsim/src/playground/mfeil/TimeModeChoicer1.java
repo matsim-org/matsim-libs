@@ -31,11 +31,12 @@ import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.population.ActImpl;
+import org.matsim.population.ActivityImpl;
 import org.matsim.population.LegImpl;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.population.routes.LinkCarRoute;
 import org.matsim.scoring.PlanScorer;
+import org.matsim.utils.geometry.CoordUtils;
 
 import playground.mfeil.config.TimeModeChoicerConfigGroup;
 
@@ -849,7 +850,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		ArrayList<BasicPlanElement> out = new ArrayList<BasicPlanElement>();
 		for (BasicPlanElement pe : in) {
 			if (pe instanceof Activity) {
-				out.add(new ActImpl ((Activity) pe));
+				out.add(new ActivityImpl ((Activity) pe));
 			} else if (pe instanceof Leg) {
 				Leg inl = ((Leg) pe);
 				Leg l = new LegImpl (inl.getMode());
@@ -1011,7 +1012,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		double distance = 0;
 		for (int k=0;k<((int)(actslegs.size()/2));k++){
 			if ((planAnalyzeSubtours.getSubtourIndexation()[k])==pos){
-				distance=distance+((Activity)(actslegs.get(k*2))).getCoord().calcDistance(((Activity)(actslegs.get(k*2+2))).getCoord());
+				distance=distance+CoordUtils.calcDistance(((Activity)(actslegs.get(k*2))).getCoord(), ((Activity)(actslegs.get(k*2+2))).getCoord());
 				if (distance>this.maxWalkingDistance) {
 					return 2;
 				}

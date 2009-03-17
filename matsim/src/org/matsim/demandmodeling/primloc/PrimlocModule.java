@@ -70,6 +70,7 @@ import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.Knowledge;
 import org.matsim.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
@@ -356,7 +357,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			// The method requires cii > 0 therefore we set
 			// cii = length of the diagonal of the bounding box of Zone #i
 			
-			core.cij.set(i, i, (zones[i].getMax().calcDistance(zones[i].getMin()))/2 );
+			core.cij.set(i, i, (CoordUtils.calcDistance(zones[i].getMax(), zones[i].getMin()))/2 );
 			
 			if( core.cij.get( i, i ) == 0.0 )
 				Gbl.errorMsg( new Exception("PrimLocChoice_core requires Cii>0 for intrazonal travel costs"));

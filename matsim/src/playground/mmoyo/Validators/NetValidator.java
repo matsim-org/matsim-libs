@@ -1,8 +1,10 @@
 package playground.mmoyo.Validators;
 
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.geometry.CoordUtils;
+
 import playground.mmoyo.PTCase2.PTTimeTable2;
 
 public class NetValidator {
@@ -49,7 +51,7 @@ public class NetValidator {
 		for (Link l : net.getLinks().values()){
 			Coord from = l.getFromNode().getCoord();
 			Coord to = l.getToNode().getCoord();
-			double distance= from.calcDistance(to);
+			double distance= CoordUtils.calcDistance(from, to);
 			if (l.getLength()!= distance ){
 				return false;
 			}

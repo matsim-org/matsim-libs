@@ -3,6 +3,7 @@ package playground.mmoyo.input;
 import java.util.Arrays;
 import java.util.List;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
@@ -39,7 +40,7 @@ public class PTLinkFactory {
 		Id id =  new IdImpl(intId);
 		Node fromNode = net.getNode(fromBasicNode.getId());
 		Node toNode = net.getNode(toBasicNode.getId());
-		double length = fromNode.getCoord().calcDistance(toNode.getCoord());
+		double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
 		double freespeed= 1;
 		double capacity = 1;
 		double numLanes = 1;

@@ -24,6 +24,7 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Node;
+import org.matsim.utils.geometry.CoordUtils;
 
 /**
  * Example implementation of a leg travel time estimation (the estimation of
@@ -59,7 +60,7 @@ public class BeeLine implements LegTravelTimeEstimator {
 		 * After all, it's just a bee-line estimation, and if that's from a node
 		 * or from another point nearby....    -marcel/12mar2008
 		 */
-		double distance = originFromNode.getCoord().calcDistance(destinationFromNode.getCoord());
+		double distance = CoordUtils.calcDistance(originFromNode.getCoord(), destinationFromNode.getCoord());
 		
 		return distance / SPEED;
 	}

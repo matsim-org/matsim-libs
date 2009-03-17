@@ -23,14 +23,15 @@ package playground.ciarif.modechoice_old;
 import java.util.List;
 
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.utils.geometry.CoordUtils;
 
 
 /**
@@ -220,7 +221,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 		for (int i=2; i<acts_legs.size(); i=i+2) {
 			Coord coord1 = ((Activity)acts_legs.get(i)).getCoord();
 			Coord coord2 = ((Activity)acts_legs.get(i-2)).getCoord();
-			dist = dist + coord1.calcDistance(coord2);
+			dist = dist + CoordUtils.calcDistance(coord1, coord2);
 		}
 		return dist / 1000;
 	}

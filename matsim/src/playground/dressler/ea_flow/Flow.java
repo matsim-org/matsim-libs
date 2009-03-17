@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.basic.v01.IdImpl;
@@ -655,14 +655,14 @@ public class Flow {
 						BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.car);
 						//Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 						leg.setRoute(route);
-						BasicActImpl home = new BasicActImpl("h");
+						BasicActivityImpl home = new BasicActivityImpl("h");
 						//Act home = new org.matsim.population.ActImpl("h", path.getPathEdges().getFirst().getEdge());
 						home.setEndTime(0);
 						home.setCoord(path.getPathEdges().getFirst().getEdge().getFromNode().getCoord());
 						// no end time for now.
 						//home.setEndTime(path.getPathEdges().getFirst().getTime());
 						
-						BasicActImpl work = new BasicActImpl("w");
+						BasicActivityImpl work = new BasicActivityImpl("w");
 						//Act work = new org.matsim.population.ActImpl("w", path.getPathEdges().getLast().getEdge());
 						work.setEndTime(0);
 						work.setCoord(path.getPathEdges().getLast().getEdge().getToNode().getCoord());

@@ -27,14 +27,15 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.utils.geometry.CoordUtils;
 
 public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -95,13 +96,13 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 		Coord prev = ((Activity)plan.getPlanElements().get(start)).getCoord();
 		for (int k=start+2; k<=i; k=k+2) {
 			Coord curr = ((Activity)plan.getPlanElements().get(k)).getCoord();
-			d = d + curr.calcDistance(prev);
+			d = d + CoordUtils.calcDistance(curr, prev);
 			prev = curr;
 		}
 		prev = ((Activity)plan.getPlanElements().get(j)).getCoord();
 		for (int k=j+2; k<=end; k=k+2) {
 			Coord curr = ((Activity)plan.getPlanElements().get(k)).getCoord();
-			d = d + curr.calcDistance(prev);
+			d = d + CoordUtils.calcDistance(curr, prev);
 			prev = curr;
 		}
 		d = d/1000.0;

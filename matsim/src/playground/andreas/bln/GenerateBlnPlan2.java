@@ -12,7 +12,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.population.ActImpl;
+import org.matsim.population.ActivityImpl;
 import org.matsim.population.LegImpl;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationImpl;
@@ -278,13 +278,13 @@ public class GenerateBlnPlan2 {
 				curPlan = curPerson.getSelectedPlan();
 			}
 			
-			ActImpl lastAct = null;
+			ActivityImpl lastAct = null;
 			
 			for (Iterator<String[]> iterator = curTripList.iterator(); iterator.hasNext();) {
 				String[] tripEntry = iterator.next();
 				
 				// Read Activity from survey
-				ActImpl newAct = new ActImpl(this.getActType(tripEntry), new CoordImpl(Double.parseDouble(tripEntry[11]), Double.parseDouble(tripEntry[12])));
+				ActivityImpl newAct = new ActivityImpl(this.getActType(tripEntry), new CoordImpl(Double.parseDouble(tripEntry[11]), Double.parseDouble(tripEntry[12])));
 		
 				Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMM);
 				

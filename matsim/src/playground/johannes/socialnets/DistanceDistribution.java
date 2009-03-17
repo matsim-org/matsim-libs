@@ -33,9 +33,10 @@ import java.util.HashSet;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.utils.geometry.CoordUtils;
 
 import playground.johannes.statistics.WeightedStatistics;
 
@@ -74,7 +75,7 @@ public class DistanceDistribution {
 			for(Person p2 : persons2) {
 				Coord c1 = p1.getSelectedPlan().getFirstActivity().getCoord();
 				Coord c2 = p2.getSelectedPlan().getFirstActivity().getCoord();
-				double d = c1.calcDistance(c2);
+				double d = CoordUtils.calcDistance(c1, c2);
 				double bin = Math.floor(d/binsize);
 				double val = hist.get(bin);
 				val++;

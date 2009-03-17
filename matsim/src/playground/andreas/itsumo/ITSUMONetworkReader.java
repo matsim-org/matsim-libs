@@ -29,6 +29,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -147,7 +148,7 @@ public class ITSUMONetworkReader {
 			} else if (lname.equals("streets")) {
 
 			} else if (lname.equals("laneset")) {
-				double length = ITSUMONetworkReader.this.network.getNode(this.lanesetFrom).getCoord().calcDistance(ITSUMONetworkReader.this.network.getNode(this.lanesetTo).getCoord());
+				double length = CoordUtils.calcDistance(ITSUMONetworkReader.this.network.getNode(this.lanesetFrom).getCoord(), ITSUMONetworkReader.this.network.getNode(this.lanesetTo).getCoord());
 				double capacity = 3600.0; // TODO calculate capacity from speed
 				ITSUMONetworkReader.this.network.createLink(new IdImpl(this.lanesetId), ITSUMONetworkReader.this.network.getNode(this.lanesetFrom), ITSUMONetworkReader.this.network.getNode(this.lanesetTo),
 						length, this.laneSpeed / this.lanesCount, capacity, this.lanesCount);

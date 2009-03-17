@@ -30,6 +30,7 @@ import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.utils.geometry.CoordUtils;
 
 public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -178,7 +179,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			else { Gbl.errorMsg("mode=" + trip_mode + " not known!"); }
 
 			// get col (trip dist)
-			double trip_dist = prev_act.getCoord().calcDistance(next_act.getCoord());
+			double trip_dist = CoordUtils.calcDistance(prev_act.getCoord(), next_act.getCoord());
 			int trip_col = -1;
 			if (trip_dist < 1000) { trip_col = 0; }
 			else if (trip_dist < 5000) { trip_col = 1; }

@@ -26,12 +26,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.ActivityOption;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.utils.geometry.CoordUtils;
 
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
@@ -143,7 +144,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		if (prim_acts.isEmpty()) { model.setDistanceHome2Work(0.0); }
 		else {
 			Coord p_coord = prim_acts.get(MatsimRandom.random.nextInt(prim_acts.size())).getFacility().getCoord();
-			model.setDistanceHome2Work(h_coord.calcDistance(p_coord));
+			model.setDistanceHome2Work(CoordUtils.calcDistance(h_coord, p_coord));
 		}
 
 		// fuelcost

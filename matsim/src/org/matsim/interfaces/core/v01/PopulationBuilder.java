@@ -21,9 +21,8 @@ package org.matsim.interfaces.core.v01;
 
 import java.util.List;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.population.BasicPerson;
-import org.matsim.interfaces.basic.v01.population.BasicPlan;
 import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
 
@@ -32,24 +31,24 @@ import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
  */
 public interface PopulationBuilder extends BasicPopulationBuilder {
 
-	Person createPerson(Id id) throws Exception;
+	Person createPerson(Id id);
 
-	Plan createPlan(BasicPerson currentPerson);
+	Plan createPlan();
 
-//	@Deprecated // to be clarified
-//	Activity createAct(BasicPlan basicPlan, String currentActType, BasicLocation currentlocation);
+	Activity createActivityFromCoord(String actType, Coord coord);
+	
+	Activity createActivityFromFacilityId(String actType, Id facilityId);
 
-	Leg createLeg(BasicPlan basicPlan, Mode legMode);
+	Activity createActivityFromLinkId(String actType, Id linkId);
+	
+	Leg createLeg(Mode legMode);
 
 	/**
 	 * Creates a new Route object
 	 * @param currentRouteLinkIds List of Ids including the start and the end Link Id of the route's links
 	 * @return a BasicRoute Object with the links set accordingly
+	 * @deprecated needs to be verified // TODO [MR] verify
 	 */
 	Route createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
-
-	Plan createPlan(BasicPerson person, boolean selected);
-
-//	BasicAct createAct(BasicPlan plan, String string, Coord coord);
 
 }

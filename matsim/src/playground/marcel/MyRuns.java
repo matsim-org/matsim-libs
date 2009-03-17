@@ -71,12 +71,14 @@ import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.GenerateRealPlans;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
+import org.matsim.interfaces.basic.v01.population.BasicPerson;
 import org.matsim.interfaces.basic.v01.population.BasicPlan;
+import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -131,6 +133,7 @@ import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
@@ -416,7 +419,7 @@ public class MyRuns {
 		for (Link link : network.getLinks().values()) {
 			final Node from = link.getFromNode();
 			final Node to = link.getToNode();
-			if ((from.getCoord().calcDistance(center) <= radius) || (to.getCoord().calcDistance(center) <= radius)) {
+			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
 				System.out.println("    link " + link.getId().toString());
 				areaOfInterest.put(link.getId(),link);
 			}
@@ -1264,7 +1267,7 @@ public class MyRuns {
 			for (Link link : network.getLinks().values()) {
 				final Node from = link.getFromNode();
 				final Node to = link.getToNode();
-				if ((from.getCoord().calcDistance(center) <= radius) || (to.getCoord().calcDistance(center) <= radius)) {
+				if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
 					areaOfInterest.put(link.getId(),link);
 				}
 			}
@@ -2251,12 +2254,21 @@ public class MyRuns {
 		
 		List<BasicPlan> basicList2 = (List<BasicPlan>) basicList;
 		
+		List genericList = basicList;
+		
 		List<? extends BasicPlan> basicList3 = basicList2;
 		
 		List<? extends Plan> list = (List) basicList;
 		
+		List<? extends Plan> list2 = genericList;
+		List<Plan> list3 = genericList;
+		
 //		basicList.add(new BasicPlanImpl()); // doesn't compile
 		basicList2.add(new BasicPlanImpl());
+		BasicPopulationBuilder pb = null;
+		BasicPerson person = null;
+//		person.getPlans().add(pb.createPlan(person));
+//		person.addPlan(..);
 		
 		basicList3.get(0);
 		
@@ -2267,6 +2279,11 @@ public class MyRuns {
 		for (Plan plan : list) {
 			plan.getFirstActivity();
 		}
+		
+		A a;
+		B b;
+//		List<A> l = b.getList1();
+//		l.add(a);
 		
 	}
 	

@@ -22,6 +22,7 @@ package org.matsim.socialnetworks.algorithms;
 
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.utils.geometry.CoordUtils;
 
 public class PlanEuclideanLength {
 
@@ -33,7 +34,7 @@ public class PlanEuclideanLength {
 			Activity toAct = (Activity) (plan.getPlanElements().get(i));
 
 			if (fromAct != null && toAct != null) {
-				double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
+				double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 				length += dist;
 			}
 			fromAct = toAct;

@@ -1,10 +1,11 @@
 package playground.anhorni.locationchoice.cs.helper;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 
 public class Line {
 	
@@ -81,7 +82,7 @@ public class Line {
 		this.tripHandler = new ReaderTripHandler();
 		this.tripHandler.constructTrip(entries, network, facilities, mzTrip, this.tripNr);
 		
-		if (this.getTrip().getBeforeShoppingAct().getCoord().calcDistance(this.homeCoordinates) < 0.01) {
+		if (CoordUtils.calcDistance(this.getTrip().getBeforeShoppingAct().getCoord(), this.homeCoordinates) < 0.01) {
 			this.start_is_home = 1;
 		}
 		else {

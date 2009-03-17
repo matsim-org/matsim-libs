@@ -32,7 +32,7 @@ import net.opengis.kml._2.ScreenOverlayType;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.KmlNetworkWriter;
@@ -48,6 +48,7 @@ import org.matsim.router.util.TravelTime;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.io.IOUtils;
@@ -154,7 +155,7 @@ public class NetworkDistance {
 
 				Path path = router.calcLeastCostPath(fromNode, toNode, 0);
 
-				double crowflyDistance = ct.transform(fromCoord).calcDistance(ct.transform(toCoord));
+				double crowflyDistance = CoordUtils.calcDistance(ct.transform(fromCoord), ct.transform(toCoord));
 
 				writer.write(parts[0] + "\t" + parts[1] + "\t" + crowflyDistance + "\t" + getPathDistance(path));
 

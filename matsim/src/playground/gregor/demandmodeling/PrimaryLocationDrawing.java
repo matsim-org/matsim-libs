@@ -33,9 +33,9 @@ import org.geotools.feature.Feature;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -52,6 +52,7 @@ import org.matsim.router.util.DijkstraFactory;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.io.IOUtils;
@@ -169,7 +170,7 @@ public class PrimaryLocationDrawing {
 			for (int i = 0; i < li ; i++) {
 				final Person pers = new PersonImpl(new IdImpl(this.id++));
 				final Plan plan = new org.matsim.population.PlanImpl(pers);
-				final Activity act = new org.matsim.population.ActImpl("h",link.getCoord(),link);
+				final Activity act = new org.matsim.population.ActivityImpl("h",link.getCoord(),link);
 				act.setEndTime(6*3600);
 				plan.addAct(act);
 				pers.addPlan(plan);
@@ -220,7 +221,7 @@ public class PrimaryLocationDrawing {
 						}
 					}
 
-					double distance = tmpZone.coord.calcDistance(pers.getRandomPlan().getFirstActivity().getCoord());
+					double distance = CoordUtils.calcDistance(tmpZone.coord, pers.getRandomPlan().getFirstActivity().getCoord());
 					double p = Math.exp(-BETA * distance);
 					if (p >= MatsimRandom.random.nextDouble()) {
 						primActZone = tmpZone;
@@ -240,7 +241,7 @@ public class PrimaryLocationDrawing {
 				leg.setArrivalTime(Time.UNDEFINED_TIME);
 				leg.setDepartureTime(Time.UNDEFINED_TIME);
 				leg.setTravelTime(Time.UNDEFINED_TIME);
-				Activity act = new org.matsim.population.ActImpl("w",link.getCoord(),link);
+				Activity act = new org.matsim.population.ActivityImpl("w",link.getCoord(),link);
 				pers.getSelectedPlan().addLeg(leg);
 				pers.getSelectedPlan().addAct(act);
 				try {
@@ -262,7 +263,7 @@ public class PrimaryLocationDrawing {
 	private Link getRandomLinkWithin(final Feature ft) {
 
 		Envelope e = ft.getBounds();
-		double maxShift = new CoordImpl(e.getMinX(),e.getMinY()).calcDistance(new CoordImpl(e.getMaxX(),e.getMaxY()));
+		double maxShift = CoordUtils.calcDistance(new CoordImpl(e.getMinX(),e.getMinY()), new CoordImpl(e.getMaxX(),e.getMaxY()));
 		Coordinate centroid = ft.getDefaultGeometry().getCentroid().getCoordinate();
 		int count = 0;
 		while (count < 100) {

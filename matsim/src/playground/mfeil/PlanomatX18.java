@@ -43,7 +43,7 @@ import org.matsim.locationchoice.constrained.SubChain;
 import org.matsim.planomat.Planomat;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.population.ActImpl;
+import org.matsim.population.ActivityImpl;
 import org.matsim.population.LegImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRoute;
@@ -506,7 +506,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					Activity act1 = (Activity)(actslegs.get(planRunningPos));
 					if (act0.getType()!=act1.getType()){
 							
-						Activity actHelp = new ActImpl ((Activity)(actslegs.get(planBasePos)));
+						Activity actHelp = new ActivityImpl ((Activity)(actslegs.get(planBasePos)));
 						
 						actslegs.set(planBasePos, actslegs.get(planRunningPos));
 						actslegs.set(planRunningPos, actHelp);
@@ -620,7 +620,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			((Activity)actslegs.get(0)).setDuration(12*3600);
 			((Activity)actslegs.get(0)).setEndTime(12*3600);
 			
-			Activity actHelp = new ActImpl ((Activity)(actslegs.get((0))));
+			Activity actHelp = new ActivityImpl ((Activity)(actslegs.get((0))));
 			actHelp.setDuration(12*3600);
 			actHelp.setEndTime(24*3600);
 			actHelp.setStartTime(12*3600);
@@ -879,7 +879,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		List<BasicPlanElement> actslegs = (List<BasicPlanElement>) basePlan.getPlanElements();
 		//Act actHelp = new Act ((Act)(actslegs.get((position*2)-2))); //changed the actHelp position to the act "behind" the gap because of conflict with location choice (would otherwise see it as primary activity)
-		Activity actHelp = new ActImpl ((Activity)(actslegs.get((position*2))));
+		Activity actHelp = new ActivityImpl ((Activity)(actslegs.get((position*2))));
 		actHelp.setDuration(0);
 		actHelp.setEndTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
 		actHelp.setStartTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());

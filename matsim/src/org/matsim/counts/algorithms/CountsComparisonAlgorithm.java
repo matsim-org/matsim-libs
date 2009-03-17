@@ -36,6 +36,7 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Network;
 import org.matsim.interfaces.core.v01.Node;
+import org.matsim.utils.geometry.CoordUtils;
 
 /**
  * This algorithm can be used to obtain a List of CountSimComparison objects from the
@@ -127,7 +128,7 @@ public class CountsComparisonAlgorithm {
 			log.warn("Cannot find requested link: " + linkid.toString());
 			return false;
 		}
-		double dist = l.getCoord().calcDistance(this.distanceFilterNode.getCoord());
+		double dist = CoordUtils.calcDistance(l.getCoord(), this.distanceFilterNode.getCoord());
 		return dist < this.distanceFilter.doubleValue();
 	}
 

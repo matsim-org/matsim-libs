@@ -22,11 +22,12 @@ package org.matsim.network;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLinkImpl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.network.BasicNode;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
+import org.matsim.utils.geometry.CoordUtils;
 
 public class LinkImpl extends BasicLinkImpl implements Link {
 
@@ -65,7 +66,7 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		this.freespeedTravelTime = length / freespeed;
 		this.flowCapacity = this.capacity / ((NetworkLayer)this.getLayer()).getCapacityPeriod();
 
-		this.euklideanDist = this.from.getCoord().calcDistance(this.to.getCoord());
+		this.euklideanDist = CoordUtils.calcDistance(this.from.getCoord(), this.to.getCoord());
 
 		// do some semantic checks
 		if (this.from.equals(this.to)) { log.warn("[from=to=" + this.to + " link is a loop]"); }

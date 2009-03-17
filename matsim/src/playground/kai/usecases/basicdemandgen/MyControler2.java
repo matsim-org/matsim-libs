@@ -41,7 +41,6 @@ import org.matsim.controler.Controler;
 import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.*;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.basic.v01.population.BasicPerson;
 import org.matsim.interfaces.basic.v01.population.BasicPlan;
 import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;

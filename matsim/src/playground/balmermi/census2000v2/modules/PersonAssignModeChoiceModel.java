@@ -28,16 +28,17 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.world.Zone;
 
 import playground.balmermi.census2000.data.Municipalities;
@@ -147,7 +148,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		for (int j=1; j<act_indices.size(); j++) {
 			Activity from_act = (Activity)p.getPlanElements().get(act_indices.get(j-1));
 			Activity to_act = (Activity)p.getPlanElements().get(act_indices.get(j));
-			dist += to_act.getFacility().getCoord().calcDistance(from_act.getFacility().getCoord());
+			dist += CoordUtils.calcDistance(to_act.getFacility().getCoord(), from_act.getFacility().getCoord());
 		}
 		return dist/1000.0;
 	}
@@ -257,7 +258,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			if (prim_acts.isEmpty()) { model.setDistanceHome2Work(0.0); }
 			else {
 				Coord p_coord = prim_acts.get(MatsimRandom.random.nextInt(prim_acts.size())).getFacility().getCoord();
-				model.setDistanceHome2Work(h_coord.calcDistance(p_coord)/1000.0);
+				model.setDistanceHome2Work(CoordUtils.calcDistance(h_coord, p_coord)/1000.0);
 			}
 			// tickets; // holds some kind of season tickets 
 			model.setTickets(person.getTravelcards());

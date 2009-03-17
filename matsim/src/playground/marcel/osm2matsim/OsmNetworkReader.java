@@ -34,11 +34,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.counts.Count;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Counter;
@@ -261,7 +262,7 @@ public class OsmNetworkReader {
 					for (int i = 1, n = way.nodes.size(); i < n; i++) {
 						OsmNode toNode = this.nodes.get(way.nodes.get(i));
 						if (toNode != lastToNode) {
-							length += lastToNode.coord.calcDistance(toNode.coord);
+							length += CoordUtils.calcDistance(lastToNode.coord, toNode.coord);
 							if (toNode.used) {
 								createLink(this.network, way, fromNode, toNode, length);
 								fromNode = toNode;

@@ -22,9 +22,10 @@ package org.matsim.world;
 
 import org.matsim.basic.v01.LocationType;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 
 /**
  * A geographical object in MATSim. It describes a zone as a rectangle.
@@ -105,7 +106,7 @@ public class Zone extends AbstractLocation {
 	 * </p>
 	 *
 	 * @param coord
-	 * @see org.matsim.world.AbstractLocation#calcDistance(org.matsim.interfaces.core.v01.Coord)
+	 * @see org.matsim.world.AbstractLocation#calcDistance(org.matsim.interfaces.basic.v01.Coord)
 	 * @return distance to that zone
 	 */
 	@Override
@@ -123,35 +124,35 @@ public class Zone extends AbstractLocation {
 		} else if ((x < minX) && (maxY < y)) {
 			// case 2
 			CoordImpl refPt = new CoordImpl(minX, maxY);
-			return refPt.calcDistance(coord);
+			return CoordUtils.calcDistance(refPt, coord);
 		} else if ((minX <= x) && (x <= maxX) && (maxY < y)) {
 			// case 3
 			CoordImpl refPt = new CoordImpl(x, maxY);
-			return refPt.calcDistance(coord);
+			return CoordUtils.calcDistance(refPt, coord);
 		} else if ((maxX < x) && (maxY < y)) {
 			// case 4
 			CoordImpl refPt = new CoordImpl(maxX, maxY);
-			return refPt.calcDistance(coord);
+			return CoordUtils.calcDistance(refPt, coord);
 		} else if ((x < minX) && (minY <= y) && (y <= maxY)) {
 			// case 5
 			CoordImpl refPt = new CoordImpl(minX, y);
-			return refPt.calcDistance(coord);
+			return CoordUtils.calcDistance(refPt, coord);
 		} else if ((maxX < x) && (minY <= y) && (y <= maxY)) {
 			// case 6
 			CoordImpl refPt = new CoordImpl(maxX, y);
-			return refPt.calcDistance(coord);
+			return CoordUtils.calcDistance(refPt, coord);
 		} else if ((x < minX) && (y < minY)) {
 			// case 7
 			CoordImpl refPt = new CoordImpl(minX, minY);
-			return refPt.calcDistance(coord);
+			return CoordUtils.calcDistance(refPt, coord);
 		} else if ((minX <= x) && (x <= maxX) && (y < minY)) {
 			// case 8
 			CoordImpl refPt = new CoordImpl(x, minY);
-			return refPt.calcDistance(coord);
+			return CoordUtils.calcDistance(refPt, coord);
 		} else if ((maxX < x) && (y < maxY)) {
 			// case 9
 			CoordImpl refPt = new CoordImpl(maxX, minY);
-			return refPt.calcDistance(coord);
+			return CoordUtils.calcDistance(refPt, coord);
 		} else {
 			Gbl.errorMsg("This should never happen!");
 			return Double.NaN;

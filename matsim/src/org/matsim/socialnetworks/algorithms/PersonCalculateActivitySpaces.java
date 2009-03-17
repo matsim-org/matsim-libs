@@ -22,12 +22,13 @@ package org.matsim.socialnetworks.algorithms;
 
 import java.util.ArrayList;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.socialnetworks.socialnet.EgoNet;
+import org.matsim.utils.geometry.CoordUtils;
 
 public class PersonCalculateActivitySpaces {
 
@@ -48,7 +49,7 @@ public class PersonCalculateActivitySpaces {
 			//Coord myAlterCoord = (Coord) pfc.personGetCoords(myAlter,"home").get(0);
 			myAct = (Activity) myAlter.getSelectedPlan().getPlanElements().get(0);
 			Coord myAlterCoord = myAct.getCoord();
-			aSd = aSd + egoHomeCoord.calcDistance(myAlterCoord);
+			aSd = aSd + CoordUtils.calcDistance(egoHomeCoord, myAlterCoord);
 		}
 		aSd = aSd / alters.size();
 		return aSd;
@@ -69,7 +70,7 @@ public class PersonCalculateActivitySpaces {
 			Activity act1 = (Activity) (plan.getPlanElements().get(i));
 
 			if (myAct != null && act1 != null) {
-				double dist = act1.getCoord().calcDistance(myAct.getCoord());
+				double dist = CoordUtils.calcDistance(act1.getCoord(), myAct.getCoord());
 				aSd += dist;
 				numAct++;
 			}

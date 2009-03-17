@@ -5,14 +5,14 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
@@ -26,6 +26,7 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.population.routes.LinkCarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
+import org.matsim.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.Validators.PathValidator;
@@ -77,14 +78,14 @@ public class PTActWriter {
 			int legNum=0;
 
 			Plan newPlan = new org.matsim.population.PlanImpl(person);
-			for (Iterator<BasicActImpl> iter= plan.getIteratorAct(); iter.hasNext();){
+			for (Iterator<BasicActivityImpl> iter= plan.getIteratorAct(); iter.hasNext();){
 				thisAct= (Activity)iter.next();
 
 				if (!first) {
 					Coord lastActCoord = lastAct.getCoord();
 		    		Coord actCoord = thisAct.getCoord();
 
-		    		double distanceToDestination = lastActCoord.calcDistance(actCoord);
+		    		double distanceToDestination = CoordUtils.calcDistance(lastActCoord, actCoord);
 		    		double distToWalk= distToWalk(person.getAge());
 		    		if (distanceToDestination<= distToWalk){
 		    			newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
@@ -206,7 +207,7 @@ public class PTActWriter {
 	}
 
 	private double coordDistance(final Coord coord1, final Coord coord2){
-		return coord1.calcDistance(coord2);
+		return CoordUtils.calcDistance(coord1, coord2);
 	}
 
 	private double walkTravelTime(final double distance){
@@ -318,7 +319,7 @@ public class PTActWriter {
 	}//insert
 
 	private Activity newPTAct(final String type, final Coord coord, final Link link, final double startTime, final double dur, final double endTime){
-		Activity ptAct= new org.matsim.population.ActImpl(type, coord);
+		Activity ptAct= new org.matsim.population.ActivityImpl(type, coord);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
 		//ptAct.setDuration(dur); Deprecated?

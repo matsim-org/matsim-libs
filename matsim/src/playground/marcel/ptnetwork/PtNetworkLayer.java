@@ -33,8 +33,8 @@ import java.util.TreeSet;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
@@ -42,6 +42,7 @@ import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.misc.Time;
 
 public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalculator{
@@ -89,7 +90,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		for (Iterator<Node> it = this.getNodes().values().iterator(); it.hasNext(); ) {
 			PtNode node = (PtNode)it.next();
 			if (PEDESTRIAN_TYPE.equals(node.getType())) {
-				double distance = node.getCoord().calcDistance(coord);
+				double distance = CoordUtils.calcDistance(node.getCoord(), coord);
 				if (distance < shortestDistance) {
 					shortestDistance = distance;
 					nearestNodes.clear();
@@ -203,7 +204,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 						}
 					}
 
-					Link l = this.createLink(new IdImpl(this.idCounter+1000000), getNode(nxt.getId()), getNode(act.getId()), act.getCoord().calcDistance(nxt.getCoord()), 50, 10000, 1);
+					Link l = this.createLink(new IdImpl(this.idCounter+1000000), getNode(nxt.getId()), getNode(act.getId()), CoordUtils.calcDistance(act.getCoord(), nxt.getCoord()), 50, 10000, 1);
 					l.setOrigId(Integer.toString((this.idCounter+1000000)));
 					l.setType("P");
 					this.idCounter++;
@@ -233,7 +234,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 						}
 					}
 
-					Link l = this.createLink(new IdImpl(this.idCounter+1000000), getNode(act.getId()), getNode(nxt.getId()), act.getCoord().calcDistance(nxt.getCoord()), 50, 10000, 1);
+					Link l = this.createLink(new IdImpl(this.idCounter+1000000), getNode(act.getId()), getNode(nxt.getId()), CoordUtils.calcDistance(act.getCoord(), nxt.getCoord()), 50, 10000, 1);
 					l.setOrigId(Integer.toString(this.idCounter+1000000));
 					l.setType("P");
 					this.idCounter++;
@@ -284,7 +285,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 
 		// start at departure nodes
 		for (PtNode actNode : depNodes) {
-			actNode.actTime = (int)(depTime + (actNode.getCoord().calcDistance(fromCoord) / PEDESTRIAN_SPEED));
+			actNode.actTime = (int)(depTime + (CoordUtils.calcDistance(actNode.getCoord(), fromCoord) / PEDESTRIAN_SPEED));
 			actNode.actCost = actNode.actTime;
 			actNode.shortestPath = null;
 			actNode.dijkstraCounter = this.dijkstraCounter;
@@ -360,13 +361,13 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		int minCost = Integer.MAX_VALUE;
 		PtNode arrNode = null;
 		for (PtNode node : reachedNodes) {
-			int cost = node.actCost + (int) (node.getCoord().calcDistance(toCoord) / PEDESTRIAN_SPEED);
+			int cost = node.actCost + (int) (CoordUtils.calcDistance(node.getCoord(), toCoord) / PEDESTRIAN_SPEED);
 			if (cost < minCost) {
 				minCost = cost;
 				arrNode = node;
 			}
 		}
-		int arrTime = (arrNode.actTime + (int) (arrNode.getCoord().calcDistance(toCoord) / PEDESTRIAN_SPEED));
+		int arrTime = (arrNode.actTime + (int) (CoordUtils.calcDistance(arrNode.getCoord(), toCoord) / PEDESTRIAN_SPEED));
 
 		// create path
 		ArrayList<Node> nodes = new ArrayList<Node>();
@@ -407,7 +408,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 			pending.clear();
 
 			for (PtNode node : depNodes) {
-				node.actTime = (depTime+(int)(node.getCoord().calcDistance(fromCoord)/PEDESTRIAN_SPEED));
+				node.actTime = (depTime+(int)(CoordUtils.calcDistance(node.getCoord(), fromCoord)/PEDESTRIAN_SPEED));
 				node.actCost = node.actTime;
 				pending.add(node);
 			}
@@ -446,7 +447,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 			int minCost = Integer.MAX_VALUE;
 			PtNode arrNode = null;
 			for (PtNode node : reachedNodes) {
-				int cost = node.actCost + (int)(node.getCoord().calcDistance(toCoord)/PEDESTRIAN_SPEED);
+				int cost = node.actCost + (int)(CoordUtils.calcDistance(node.getCoord(), toCoord)/PEDESTRIAN_SPEED);
 				if (cost < minCost) {
 					minCost = cost;
 					arrNode = node;
@@ -468,7 +469,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 				route = new NodeCarRoute();
 				route.setNodes(path);
 				route.setTravelTime(arrTime-depTime);
-				out.write(path.get(0).getId()+";"+arrNode.getId()+";"+path.get(0).getCoord().calcDistance(fromCoord)+";"+arrNode.getCoord().calcDistance(toCoord)+";"+path.size()+";"+touchedNodes+";"+pending.size()+";"+(arrTime-depTime)+";"+(int)((arrNode.actCost+(arrNode.getCoord().calcDistance(toCoord)/PEDESTRIAN_SPEED))-depTime)+";");
+				out.write(path.get(0).getId()+";"+arrNode.getId()+";"+CoordUtils.calcDistance(path.get(0).getCoord(), fromCoord)+";"+CoordUtils.calcDistance(arrNode.getCoord(), toCoord)+";"+path.size()+";"+touchedNodes+";"+pending.size()+";"+(arrTime-depTime)+";"+(int)((arrNode.actCost+(CoordUtils.calcDistance(arrNode.getCoord(), toCoord)/PEDESTRIAN_SPEED))-depTime)+";");
 			} else {
 				out.write(";;;;0;"+touchedNodes+";"+pending.size()+";"+arrTime+";;");
 			}

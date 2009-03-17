@@ -26,18 +26,19 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
@@ -93,7 +94,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 	private final void setUpModeChoice(final Plan plan, final PersonSubtour personSubtour) {	
 		// setting subtour parameters
 		if (plan == null) { Gbl.errorMsg("Person id=" + plan.getPerson().getId() + "does not have a selected plan."); }
-		Iterator<BasicActImpl> act_it = plan.getIteratorAct();
+		Iterator<BasicActivityImpl> act_it = plan.getIteratorAct();
 		Coord home_coord = null;
 		Coord work_coord = null;
 		act_it.hasNext();
@@ -106,7 +107,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		if ((home_coord == null) || (home_coord.equals(ZERO))) { Gbl.errorMsg("No home coord defined!"); }
 		if ((work_coord != null) && (work_coord.equals(ZERO))) { Gbl.errorMsg("Weird work coord defined!!!"); }
 		if (work_coord != null) { 
-			dist_h_w = work_coord.calcDistance(home_coord); 
+			dist_h_w = CoordUtils.calcDistance(work_coord, home_coord); 
 			dist_h_w = dist_h_w/1000.0;
 		}
 		//System.out.println("Work coord " + work_coord);

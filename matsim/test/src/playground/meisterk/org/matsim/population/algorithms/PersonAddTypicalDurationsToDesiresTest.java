@@ -29,7 +29,7 @@ import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.ActImpl;
+import org.matsim.population.ActivityImpl;
 import org.matsim.population.Desires;
 import org.matsim.population.LegImpl;
 import org.matsim.population.PersonImpl;
@@ -67,21 +67,21 @@ public class PersonAddTypicalDurationsToDesiresTest extends MatsimTestCase {
 		initialDesires.putActivityDuration(REFROBNICATE, 4.0 * 3600);
 		
 		Plan plan = person.createPlan(true);
-		plan.addAct(new ActImpl(HOME, network.getLink("1")));
+		plan.addAct(new ActivityImpl(HOME, network.getLink("1")));
 		plan.addLeg(new LegImpl(BasicLeg.Mode.undefined));
-		plan.addAct(new ActImpl(FROBNICATE, network.getLink("1")));
+		plan.addAct(new ActivityImpl(FROBNICATE, network.getLink("1")));
 		plan.addLeg(new LegImpl(BasicLeg.Mode.undefined));
-		plan.addAct(new ActImpl(REFROBNICATE, network.getLink("1")));
+		plan.addAct(new ActivityImpl(REFROBNICATE, network.getLink("1")));
 		plan.addLeg(new LegImpl(BasicLeg.Mode.undefined));
-		plan.addAct(new ActImpl(HOME, network.getLink("1")));
+		plan.addAct(new ActivityImpl(HOME, network.getLink("1")));
 		plan.addLeg(new LegImpl(BasicLeg.Mode.undefined));
-		plan.addAct(new ActImpl(REFROBNICATE, network.getLink("1")));
+		plan.addAct(new ActivityImpl(REFROBNICATE, network.getLink("1")));
 		plan.addLeg(new LegImpl(BasicLeg.Mode.undefined));
-		plan.addAct(new ActImpl(REFROBNICATE, network.getLink("1")));
+		plan.addAct(new ActivityImpl(REFROBNICATE, network.getLink("1")));
 		plan.addLeg(new LegImpl(BasicLeg.Mode.undefined));
-		plan.addAct(new ActImpl(FROBNICATE, network.getLink("1")));
+		plan.addAct(new ActivityImpl(FROBNICATE, network.getLink("1")));
 		plan.addLeg(new LegImpl(BasicLeg.Mode.undefined));
-		plan.addAct(new ActImpl(HOME, network.getLink("1")));
+		plan.addAct(new ActivityImpl(HOME, network.getLink("1")));
 
 		Population pop = new PopulationImpl();
 		pop.addPerson(person);

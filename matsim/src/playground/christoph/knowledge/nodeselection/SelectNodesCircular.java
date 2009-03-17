@@ -33,11 +33,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.geometry.CoordUtils;
 
 
 public class SelectNodesCircular extends BasicSelectNodesImpl{
@@ -110,7 +111,7 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 	
 				double dist;
 				
-				if(centerNode != null) dist = centerNode.getCoord().calcDistance(coord);
+				if(centerNode != null) dist = CoordUtils.calcDistance(centerNode.getCoord(), coord);
 				else dist = centerLink.calcDistance(coord);
 					
 				// within the distance?

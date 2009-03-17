@@ -21,9 +21,10 @@
 package org.matsim.utils;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -108,7 +109,7 @@ public class WorldUtilsTest extends MatsimTestCase {
 		Zone zone = layer.createZone("1", "4.5", "9", null, null, null, null, null, "center zone");
 		Zone zone2 = layer.createZone("2", "30", "15", "9", null, null, null, null, "another zone");
 		Coord center = zone.getCoord();
-		final double distance = center.calcDistance(zone2.getCoord());
+		final double distance = CoordUtils.calcDistance(center, zone2.getCoord());
 
 		for (int i = 0; i < 700; i++) {
 			Coord c = WorldUtils.getRandomCoordInZone(zone, layer);
@@ -124,7 +125,7 @@ public class WorldUtilsTest extends MatsimTestCase {
 			if (c.getY() > maxY) {
 				maxY = c.getY();
 			}
-			int areaIndex = (int) (c.calcDistance(center) / distance * 10);
+			int areaIndex = (int) (CoordUtils.calcDistance(c, center) / distance * 10);
 			areaCounters[areaIndex]++;
 		}
 		assertTrue("random coordinates are not spread enough. minX = " + minX, minX < (4.5 - distance/2.0));

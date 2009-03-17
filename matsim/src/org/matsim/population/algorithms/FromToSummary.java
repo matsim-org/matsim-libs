@@ -33,6 +33,7 @@ import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.utils.geometry.CoordUtils;
 
 /**
  * @author lnicolas
@@ -84,8 +85,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			out.append(": ");
 			out.append(count);
 			out.append(" (");
-			double dist = np.getFirst().getCoord().calcDistance(
-					np.getSecond().getCoord());
+			double dist = CoordUtils.calcDistance(np.getFirst().getCoord(), np.getSecond().getCoord());
 			avgDistance = (avgDistance * cnt + dist) / (cnt + 1);
 			cnt++;
 			Iterator<Map.Entry<Double, Integer>> sIt = occ.getStartTimeOccurrenceCnt().entrySet().iterator();

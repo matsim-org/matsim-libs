@@ -22,6 +22,7 @@ package org.matsim.interfaces.core.v01;
 
 import java.util.Map;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.facilities.BasicFacility;
 import org.matsim.network.NetworkLayer;
 import org.matsim.world.World;

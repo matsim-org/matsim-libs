@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.basic.v01.BasicPersonImpl;
 import org.matsim.basic.v01.BasicPlanImpl;
@@ -65,11 +65,11 @@ public class BkTestPlansCreatorWithPt {
 			BasicPlan plan = new BasicPlanImpl();
 			plan.setSelected(true);
 //			plan.setType(BasicPlan.Type.CAR); // TODO
-			p.addPlan(plan);
+//			p.addPlan(plan);
 			
 			//adding carPlan to person
 			
-			BasicActImpl act1 = new BasicActImpl("h");
+			BasicActivityImpl act1 = new BasicActivityImpl("h");
 			act1.setLinkId(id1);
 			act1.setEndTime(homeEndTime);
 			plan.addAct(act1);
@@ -83,7 +83,7 @@ public class BkTestPlansCreatorWithPt {
 			leg1Car.setRoute(routeCar);
 			plan.addLeg(leg1Car);
 			
-			BasicActImpl act2 = new BasicActImpl("w");
+			BasicActivityImpl act2 = new BasicActivityImpl("w");
 			act2.setLinkId(id4);
 			act2.setStartTime(7.0 * 3600.0);
 			act2.setEndTime(15.0 * 3600.0);
@@ -100,7 +100,7 @@ public class BkTestPlansCreatorWithPt {
 			leg2Car.setRoute(routeCar);
 			plan.addLeg(leg2Car);
 			
-			BasicActImpl act3 = new BasicActImpl("h");
+			BasicActivityImpl act3 = new BasicActivityImpl("h");
 			act3.setLinkId(id1);
 			plan.addAct(act3);
 			
@@ -109,7 +109,7 @@ public class BkTestPlansCreatorWithPt {
 			plan = new BasicPlanImpl();
 			//plan.setSelected(true);
 //			plan.setType(BasicPlan.Type.PT); // TODO
-			p.addPlan(plan);
+//			p.addPlan(plan);
 			
 			
 			plan.addAct(act1);

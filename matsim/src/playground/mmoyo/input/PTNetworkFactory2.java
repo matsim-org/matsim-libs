@@ -8,14 +8,15 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTCase2.PTTimeTable2;
 import playground.mmoyo.PTRouter.PTNode;
@@ -252,7 +253,7 @@ public class PTNetworkFactory2 {
 			throw new java.lang.NullPointerException("toNode does not exist in link:" + strIdLink); 
 
 		IdImpl idLink = new IdImpl(strIdLink);
-		double length = fromNode.getCoord().calcDistance(toNode.getCoord());
+		double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
 		
 		//For the time being these values are irrelevant in PTsimulation
 		double freespeed= 1;
@@ -276,7 +277,7 @@ public class PTNetworkFactory2 {
 				//System.out.println(nearNode.getId().toString());
 				if(!node.getCoord().equals(nearNode.getCoord())){
 					if (!areConected(node, nearNode)){
-						double distNodes= node.getCoord().calcDistance(nearNode.getCoord());
+						double distNodes= CoordUtils.calcDistance(node.getCoord(), nearNode.getCoord());
 						net.createLink(new org.matsim.basic.v01.IdImpl("DT" + ++x),node, nearNode, distNodes, 1.0, 1.0, 1.0, "0", "DetTransfer");  //DetTransfer
 						net.createLink(new org.matsim.basic.v01.IdImpl("DT" + ++x),nearNode, node, distNodes, 1.0, 1.0, 1.0, "0", "DetTransfer");  //DetTransfer
 						//System.out.println(areConected(node, nearNode));

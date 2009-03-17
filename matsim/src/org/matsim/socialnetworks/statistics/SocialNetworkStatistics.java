@@ -33,9 +33,9 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
@@ -44,6 +44,7 @@ import org.matsim.socialnetworks.algorithms.PersonCalculateActivitySpaces;
 import org.matsim.socialnetworks.algorithms.PlanEuclideanLength;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.world.Location;
 
 import cern.colt.list.DoubleArrayList;
@@ -306,7 +307,7 @@ public class SocialNetworkStatistics {
 		Person pTo = myEdge.getPersonTo();
 		Coord toCoord = ((Activity) pTo.getSelectedPlan().getPlanElements().get(0))
 		.getCoord();
-		dist = fromCoord.calcDistance(toCoord);
+		dist = CoordUtils.calcDistance(fromCoord, toCoord);
 		return dist;
 	}
 	private double getDyadDistance(Edge myEdge, Population plans) {
@@ -319,7 +320,7 @@ public class SocialNetworkStatistics {
 		Person pTo = plans.getPerson((Id) vTo.getUserDatum("personId"));
 		Coord toCoord = ((Activity) pTo.getSelectedPlan().getPlanElements().get(0))
 		.getCoord();
-		dist = fromCoord.calcDistance(toCoord);
+		dist = CoordUtils.calcDistance(fromCoord, toCoord);
 		return dist;
 	}
 

@@ -22,15 +22,16 @@ package playground.balmermi.census2000.modules;
 
 import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 
 import playground.balmermi.census2000.data.Persons;
 import playground.balmermi.census2000.models.ModelMobiliyTools;
@@ -69,7 +70,7 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 	@Override
 	public void run(Person person) {
 		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.valueOf(person.getId().toString()));
-		Iterator<BasicActImpl> act_it = person.getSelectedPlan().getIteratorAct();
+		Iterator<BasicActivityImpl> act_it = person.getSelectedPlan().getIteratorAct();
 		Coord home_coord = null;
 		Coord work_coord = null;
 		while (act_it.hasNext()) {
@@ -81,7 +82,7 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 		if ((home_coord == null) || (home_coord.equals(ZERO))) { Gbl.errorMsg("No home coord defined!"); }
 		if ((work_coord != null) && (work_coord.equals(ZERO))) { Gbl.errorMsg("Weird work coord defined!!!"); }
 		if (work_coord != null) {
-			distance = work_coord.calcDistance(home_coord);
+			distance = CoordUtils.calcDistance(work_coord, home_coord);
 		}
 
 		model.setAge(p.getAge());

@@ -31,6 +31,7 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 
 /**
  * this class is based on
@@ -56,8 +57,8 @@ public class NetworkLinksInCircle {
 		for (Link link : this.network.getLinks().values()) {
 			final Node from = link.getFromNode();
 			final Node to = link.getToNode();
-			if ((from.getCoord().calcDistance(center) <= radius)
-					|| (to.getCoord().calcDistance(center) <= radius)) {
+			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius)
+					|| (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
 				System.out.println("    link " + link.getId().toString());
 				this.areaOfInterest.add(link);
 			}

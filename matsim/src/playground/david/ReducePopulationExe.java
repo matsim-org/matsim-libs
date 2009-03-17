@@ -40,7 +40,7 @@ import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
-import org.matsim.population.ActImpl;
+import org.matsim.population.ActivityImpl;
 import org.matsim.population.LegImpl;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PlanImpl;
@@ -108,7 +108,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 				if (i % 2 == 0) {
 					// activity
 					Activity a = (Activity)actl.get(i);
-					ergPEs.add(new ActImpl(a));
+					ergPEs.add(new ActivityImpl(a));
 				} else {
 					// Leg
 					Leg l = (Leg) actl.get(i);

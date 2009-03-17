@@ -26,14 +26,15 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.LocationType;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.ActivityOption;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.world.AbstractLocation;
 import org.matsim.world.Location;
 import org.matsim.world.World;
@@ -65,7 +66,7 @@ public class FacilityImpl extends AbstractLocation implements Facility {
 
 	@Override
 	public double calcDistance(Coord coord) {
-		return this.center.calcDistance(coord);
+		return CoordUtils.calcDistance(this.center, coord);
 	}
 
 	//////////////////////////////////////////////////////////////////////

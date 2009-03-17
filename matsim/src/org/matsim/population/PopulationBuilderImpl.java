@@ -23,12 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.facilities.BasicActivityOption;
-import org.matsim.interfaces.basic.v01.population.BasicPerson;
-import org.matsim.interfaces.basic.v01.population.BasicPlan;
 import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
-import org.matsim.interfaces.core.v01.ActivityOption;
+import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Leg;
@@ -67,26 +65,35 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		this.scenario = scenario;
 		this.network = scenario.getNetwork();
 		this.population = scenario.getPopulation();
-		this.facilities = null;
-	}
-
-	public Leg createLeg(final BasicPlan basicPlan, final Mode legMode) {
-		return ((Plan)basicPlan).createLeg(legMode);
+		this.facilities = null; // TODO [MR]
 	}
 
 	public Person createPerson(final Id id) {
 		Person p = new PersonImpl(id);
-		this.population.addPerson(p);
 		return p;
 	}
-
-	public Plan createPlan(final BasicPerson person, final boolean selected) {
-		Person p = (Person) person;
-		return p.createPlan(false);
+	
+	public Plan createPlan() {
+		return new PlanImpl(null);
 	}
 
-	public Plan createPlan(final BasicPerson currentPerson) {
-		return createPlan(currentPerson, false);
+	public Activity createActivityFromCoord(String actType, Coord coord) {
+		ActivityImpl act = new ActivityImpl(actType, coord);
+		return act;
+	}
+
+	public Activity createActivityFromFacilityId(String actType, Id facilityId) {
+		ActivityImpl act = new ActivityImpl(actType, this.facilities.getFacilities().get(facilityId));
+		return act;
+	}
+
+	public Activity createActivityFromLinkId(String actType, Id linkId) {
+		ActivityImpl act = new ActivityImpl(actType, this.network.getLinks().get(linkId));
+		return act;
+	}
+	
+	public Leg createLeg(final Mode legMode) {
+		return new LegImpl(legMode);
 	}
 
 	public Route createRoute(final Id startLinkId, final Id endLinkId, final List<Id> currentRouteLinkIds) {
@@ -110,18 +117,6 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		}
 		route.setLinks(start, links, end);
 		return route;
-	}
-
-	public Knowledge createKnowledge(final List<BasicActivityOption> acts) {
-		Knowledge knowledge = null;
-		if ((acts != null) && !acts.isEmpty()) {
-			knowledge = new Knowledge();
-			for (BasicActivityOption a : acts) {
-				knowledge.addActivity((ActivityOption)a);
-			}
-			return knowledge;
-		}
-		throw new IllegalArgumentException("Knowledge must contain at least one Activity!");
 	}
 
 }

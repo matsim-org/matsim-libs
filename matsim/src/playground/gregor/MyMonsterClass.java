@@ -41,9 +41,9 @@ import org.matsim.evacuation.EvacuationAreaLink;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
@@ -64,6 +64,7 @@ import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.population.algorithms.PlansFilterActInArea;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
@@ -318,7 +319,7 @@ public class MyMonsterClass {
 			}
 
 
-			Activity nact = new org.matsim.population.ActImpl("w", act.getLink().getCoord(), act.getLink());
+			Activity nact = new org.matsim.population.ActivityImpl("w", act.getLink().getCoord(), act.getLink());
 			nact.setStartTime(0);
 			nact.setEndTime(39600);
 			nact.setDuration(39600);
@@ -565,8 +566,8 @@ int three=0;
 		for (Link link : network.getLinks().values()) {
 			Node from = link.getFromNode();
 			Node to = link.getToNode();
-			double fromDist = from.getCoord().calcDistance(center);
-			double toDist = to.getCoord().calcDistance(center);
+			double fromDist = CoordUtils.calcDistance(from.getCoord(), center);
+			double toDist = CoordUtils.calcDistance(to.getCoord(), center);
 			if (Math.min(fromDist, toDist) <= radius) areaOfInteresst.put(link.getId(),link);
 		}
 		System.out.println("done. ");
@@ -947,7 +948,7 @@ int three=0;
 		Node toNode = network.getNode(result[2]);
 
 //
-		double length = fromNode.getCoord().calcDistance(toNode.getCoord());
+		double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
 //		double freeFlowTime = (Double.parseDouble(result[5])/100)*3600; // free flow time is given in 0.01 hours ...
 //		double freeSpeed = length / freeFlowTime;
 		network.createLink(new IdImpl(result[0]), fromNode, toNode, length, 13.88, 2000 , 1, id, null);

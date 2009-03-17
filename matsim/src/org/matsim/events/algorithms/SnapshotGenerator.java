@@ -46,6 +46,7 @@ import org.matsim.interfaces.basic.v01.network.BasicLink;
 import org.matsim.interfaces.basic.v01.network.BasicNetwork;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Network;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
@@ -202,7 +203,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			this.parkingQueue = new ArrayList<EventAgent>();
 			this.waitingQueue = new ArrayList<EventAgent>();
 			this.buffer = new ArrayList<EventAgent>();
-			this.euklideanDist = link2.getFromNode().getCoord().calcDistance(link2.getToNode().getCoord());
+			this.euklideanDist = CoordUtils.calcDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord());
 			this.radioLengthToEuklideanDist = this.link.getLength() / this.euklideanDist;
 			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed(Time.UNDEFINED_TIME);
 			this.timeCap = this.link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * capCorrectionFactor;

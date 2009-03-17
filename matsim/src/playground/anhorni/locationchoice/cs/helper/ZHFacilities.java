@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.utils.geometry.CoordUtils;
 
 public class ZHFacilities {
 	
@@ -89,7 +90,7 @@ public class ZHFacilities {
 				ZHFacility facility = facilities_it.next();
 				
 				// distance in km
-				double distance = 0.001 * facility.getExactPosition().calcDistance(referenceFacility.getExactPosition());
+				double distance = 0.001 * CoordUtils.calcDistance(facility.getExactPosition(), referenceFacility.getExactPosition());
 				accessibility02 += Math.exp(0.2 * distance * (-1.0));
 				accessibility10 += Math.exp(1.0 * distance * (-1.0));
 				accessibility20 += Math.exp(2.0 * distance * (-1.0));	

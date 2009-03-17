@@ -29,8 +29,6 @@ import org.matsim.interfaces.basic.v01.Identifiable;
  */
 public interface BasicPerson<T extends BasicPlan> extends Identifiable {
 
-	public void addPlan(final T plan);
-
 	public List<T> getPlans();
 
 	public void setId(final Id id);

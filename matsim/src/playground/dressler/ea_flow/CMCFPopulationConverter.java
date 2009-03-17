@@ -29,12 +29,12 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
@@ -97,9 +97,9 @@ public class CMCFPopulationConverter {
 				 Id matsimid  = new IdImpl(id+"."+i);
 				 Person p = new PersonImpl(matsimid);
 				 Plan plan = new org.matsim.population.PlanImpl(p);
-				 BasicActImpl home = new BasicActImpl("home");
+				 BasicActivityImpl home = new BasicActivityImpl("home");
 				 home.setEndTime(0.);
-				 BasicActImpl work = new BasicActImpl("work");
+				 BasicActivityImpl work = new BasicActivityImpl("work");
 				 BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.walk);
 				 if (coordinates){
 					home.setCoord(coordfrom);

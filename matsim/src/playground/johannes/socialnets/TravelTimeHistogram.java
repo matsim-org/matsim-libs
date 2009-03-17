@@ -38,7 +38,7 @@ import java.util.Set;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
@@ -48,6 +48,7 @@ import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.utils.io.IOUtils;
 
@@ -177,7 +178,7 @@ public class TravelTimeHistogram {
 			for(Person p2 : population.getPersons().values()) {
 				Coord c1 = ego.homeloc;
 				Coord c2 = p2.getSelectedPlan().getFirstActivity().getCoord();
-				double d = c1.calcDistance(c2);
+				double d = CoordUtils.calcDistance(c1, c2);
 				double bin = Math.floor(d/binsize);
 				double val = hist.get(bin);
 				val++;
@@ -253,7 +254,7 @@ public class TravelTimeHistogram {
 //				double w = 1 / ((pEgo + pAlter) - (pEgo * pAlter));
 //				double w = 1 / (pEgo * pAlter);
 //				double w = 1 / pAlter;
-				double bin = Math.floor(coord.calcDistance(ego.homeloc)/1000.0);
+				double bin = Math.floor(CoordUtils.calcDistance(coord, ego.homeloc)/1000.0);
 				double w = 1/hist.get(bin);
 //				double w = 1/distDistr.get(bin);
 				if(Double.isInfinite(w)) {
@@ -265,7 +266,7 @@ public class TravelTimeHistogram {
 				r.distFastestPath = getPathLength(fastestRoute);
 				r.ttShortestPath = shortesRoute.travelTime;
 				r.distShortestPath = getPathLength(shortesRoute);
-				r.geodesicDistance = coord.calcDistance(ego.homeloc);
+				r.geodesicDistance = CoordUtils.calcDistance(coord, ego.homeloc);
 				if(r.geodesicDistance > 0 ) {
 				relations.add(r);
 				stats.add(r.ttFastesPath, w);
@@ -387,7 +388,7 @@ public class TravelTimeHistogram {
 	private static int getPersons(Coord ego, double radius, Population pop) {
 		int count = 0;
 		for(Person p : pop.getPersons().values()) {
-			double r = ego.calcDistance(p.getSelectedPlan().getFirstActivity().getCoord());
+			double r = CoordUtils.calcDistance(ego, p.getSelectedPlan().getFirstActivity().getCoord());
 			if(r <= radius)
 				count++;
 		}

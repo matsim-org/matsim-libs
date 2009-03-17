@@ -11,6 +11,7 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTRouter.*;
 
@@ -201,7 +202,7 @@ public class PTNetworkFactory {
 		Id id =  new IdImpl(intId);
 		Node fromNode = this.ptNetworkLayer.getNode(strIdFromNode); 
 		Node toNode = this.ptNetworkLayer.getNode(strToNode);
-		double length = fromNode.getCoord().calcDistance(toNode.getCoord());
+		double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
 		double freespeed= 1;
 		double capacity = 1;
 		double numLanes = 1;

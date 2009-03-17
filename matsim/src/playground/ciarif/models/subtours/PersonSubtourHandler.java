@@ -3,11 +3,12 @@ package playground.ciarif.models.subtours;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.utils.geometry.CoordUtils;
 
 public class PersonSubtourHandler {
 	
@@ -74,7 +75,7 @@ public class PersonSubtourHandler {
 					else if (type.equals(S)) {mainpurpose = 2;}
 				} 
 				Coord curr = ((Activity)plan.getPlanElements().get(subtour.get(k))).getCoord();
-				if (curr.getX()>0 && curr.getY()>0) {d = d + curr.calcDistance(prev);}
+				if (curr.getX()>0 && curr.getY()>0) {d = d + CoordUtils.calcDistance(curr, prev);}
 				prev = curr;
 				
 				// Getting the main mode at the sub-tour level
@@ -91,7 +92,7 @@ public class PersonSubtourHandler {
 			}
 			System.out.println("subtour mode = " + sub.getMode());
 			sub.setPurpose(mainpurpose);
-			if (prev.getX()>0 && prev.getY()>0) {d = d + start.calcDistance(prev);}// In the for-cycle the trip to home is not accounted
+			if (prev.getX()>0 && prev.getY()>0) {d = d + CoordUtils.calcDistance(start, prev);}// In the for-cycle the trip to home is not accounted
 			d = d/1000.0; // distance in the model is in Km
 			sub.setDistance(d);
 			

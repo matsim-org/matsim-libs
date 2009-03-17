@@ -34,6 +34,7 @@ import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -181,7 +182,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		Activity prev_act = (Activity)act_it.next();
 		while (act_it.hasNext()) {
 			Activity act = (Activity)act_it.next();
-			double curr_dist = act.getCoord().calcDistance(prev_act.getCoord());
+			double curr_dist = CoordUtils.calcDistance(act.getCoord(), prev_act.getCoord());
 			dist += curr_dist;
 			prev_act = act;
 		}
@@ -209,7 +210,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		Activity prev_act = (Activity)act_it.next();
 		while (act_it.hasNext()) {
 			Activity act = (Activity)act_it.next();
-			double dist = act.getCoord().calcDistance(prev_act.getCoord());
+			double dist = CoordUtils.calcDistance(act.getCoord(), prev_act.getCoord());
 			if (dist < 1000.0) { cnts[0]++; }
 			else if (dist < 5000.0) { cnts[1]++; }
 			else if (dist < 20000.0) { cnts[2]++; }

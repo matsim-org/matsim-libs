@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.utils.geometry.CoordUtils;
 
 /**
  * @author Matthias Feil
@@ -48,9 +49,9 @@ public class OptimizedAgents {
 			double tmpDistance=0;
 			if (this.list.get(i).getPerson().getKnowledge().getActivities(true).size()>1){
 				for (int k=0;k<this.list.get(i).getPerson().getKnowledge().getActivities(true).size()-1;k++){
-					tmpDistance+=this.list.get(i).getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCoord().calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCoord());
+					tmpDistance+=CoordUtils.calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCoord(), this.list.get(i).getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCoord());
 				}
-				tmpDistance+=this.list.get(i).getPerson().getKnowledge().getActivities(true).get(this.list.get(i).getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCoord().calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord());
+				tmpDistance+=CoordUtils.calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(this.list.get(i).getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCoord(), this.list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord());
 			}
 			this.distancesTestAgents.add(tmpDistance);
 		}
@@ -77,9 +78,9 @@ public class OptimizedAgents {
 		double tmpDistance=0;
 		if (plan.getPerson().getKnowledge().getActivities(true).size()>1){
 			for (int k=0;k<plan.getPerson().getKnowledge().getActivities(true).size()-1;k++){
-				tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCoord().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCoord());
+				tmpDistance+=CoordUtils.calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCoord(), plan.getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCoord());
 			}
-			tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(plan.getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCoord().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord());
+			tmpDistance+=CoordUtils.calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(plan.getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCoord(), plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord());
 		}
 		this.distancesTestAgents.add(tmpDistance);
 	}

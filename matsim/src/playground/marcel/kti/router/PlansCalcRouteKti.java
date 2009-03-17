@@ -22,10 +22,10 @@ package playground.marcel.kti.router;
 
 import java.util.List;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
@@ -36,6 +36,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
@@ -87,9 +88,9 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			throw new RuntimeException("No entry found for " + from.getId() + " --> " + to.getId());
 		}
 		final double timeInVehicle = traveltime.getValue() * 60.0;
-		final double beeLineWalkTime = fromAct.getCoord().calcDistance(toAct.getCoord()) / WALK_SPEED;
+		final double beeLineWalkTime = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord()) / WALK_SPEED;
 
-		final double walkDistance = fromAct.getCoord().calcDistance(fromStop) + toAct.getCoord().calcDistance(toStop);
+		final double walkDistance = CoordUtils.calcDistance(fromAct.getCoord(), fromStop) + CoordUtils.calcDistance(toAct.getCoord(), toStop);
 		final double walkTime = walkDistance / WALK_SPEED;
 //		System.out.println(from.getId() + " > " + to.getId() + ": " + timeInVehicle/60 + "min + " + (walkTime / 60) + "min (" + walkDistance + "m walk); beeLine: " + beeLineWalkTime/60 + "min walk");
 

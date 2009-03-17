@@ -31,9 +31,9 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
@@ -42,6 +42,7 @@ import org.matsim.socialnetworks.algorithms.FacilitiesFindScenarioMinMaxCoords;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.GeoStatistics;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 
@@ -133,7 +134,7 @@ public class PajekWriter {
 
 				Coord xy1 = ((Activity) printPerson1.getSelectedPlan().getPlanElements().get(0)).getCoord();
 				Coord xy2 = ((Activity) printPerson2.getSelectedPlan().getPlanElements().get(0)).getCoord();
-				double dist = xy1.calcDistance(xy2);
+				double dist = CoordUtils.calcDistance(xy1, xy2);
 
 				pjnet.write(" " + this.pajekIndex.get(printPerson1.getId()) + " "+ this.pajekIndex.get(printPerson2.getId())+" "+dist+" "+age+"\r\n");
 //				pjnet.write(" " + printPerson1.getId() + " "+ printPerson2.getId());

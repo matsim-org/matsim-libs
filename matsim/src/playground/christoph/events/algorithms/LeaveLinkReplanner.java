@@ -149,7 +149,7 @@ public class LeaveLinkReplanner {
 		// This would be the "correct" Type - but it is slower and is not necessary
 		//String type = this.plan.getPreviousActivity(leg).getType();
 		
-		Activity newFromAct = new org.matsim.population.ActImpl(type, this.personAgent.getCurrentLink().getToNode().getCoord(), this.personAgent.getCurrentLink());
+		Activity newFromAct = new org.matsim.population.ActivityImpl(type, this.personAgent.getCurrentLink().getToNode().getCoord(), this.personAgent.getCurrentLink());
 		newFromAct.setStartTime(time);
 		newFromAct.setEndTime(time);
 		newFromAct.setDuration(0);

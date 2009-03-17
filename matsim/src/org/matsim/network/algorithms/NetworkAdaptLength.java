@@ -20,9 +20,10 @@
 
 package org.matsim.network.algorithms;
 
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Network;
+import org.matsim.utils.geometry.CoordUtils;
 
 public class NetworkAdaptLength {
 
@@ -34,7 +35,7 @@ public class NetworkAdaptLength {
 			Coord tc   = l.getToNode().getCoord();
 			double length = l.getLength();
 
-			double dist = fc.calcDistance(tc);
+			double dist = CoordUtils.calcDistance(fc, tc);
 			if (dist > length) {
 				l.setLength(dist);
 				System.out.println("      link id=" + l.getId() + ": length=" + length + " set to eucledian dist=" + dist + ".");

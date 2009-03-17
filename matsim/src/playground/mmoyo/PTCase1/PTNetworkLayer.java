@@ -11,6 +11,7 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTRouter.PTLine;
 import playground.mmoyo.PTRouter.PTNode;
@@ -202,7 +203,7 @@ public class PTNetworkLayer extends NetworkLayer {
 		Id id = new IdImpl(String.valueOf(intId)); 
 		Node fromNode = this.getNode(from);
 		Node toNode = this.getNode(to);
-		double length = fromNode.getCoord().calcDistance(toNode.getCoord());
+		double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
 		double freespeed=   1;
 		double capacity =  1;
 		double numLanes=  1;

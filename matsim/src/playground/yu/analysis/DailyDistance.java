@@ -24,6 +24,7 @@ import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.utils.charts.BarChart;
 import org.matsim.utils.charts.XYLineChart;
+import org.matsim.utils.geometry.CoordUtils;
 import org.xml.sax.SAXException;
 
 import playground.yu.utils.TollTools;
@@ -222,10 +223,9 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 						this.ptCounts5[Math.min(20, (int) dist / 5)]++;
 						this.ptCounts1[Math.min(100, (int) dist)]++;
 					} else if (bl.getMode().equals(Mode.walk)) {
-						dist = plan.getPreviousActivity(bl).getLink()
-								.getCoord().calcDistance(
-										plan.getNextActivity(bl).getLink()
-												.getCoord()) * 1.5 / 1000.0;
+						dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl).getLink()
+								.getCoord(), plan.getNextActivity(bl).getLink()
+								.getCoord()) * 1.5 / 1000.0;
 						this.wlkDist += dist;
 						wlkDayDist += dist;
 						switch (ats) {

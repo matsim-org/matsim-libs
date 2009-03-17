@@ -20,9 +20,10 @@
 
 package org.matsim.facilities.algorithms;
 
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
+import org.matsim.utils.geometry.CoordUtils;
 
 public class FacilitiesCalcMinDist {
 
@@ -42,7 +43,7 @@ public class FacilitiesCalcMinDist {
 			for (Facility f2 : facilities.getFacilities().values()) {
 				if (!f2.equals(f)) {
 					Coord c2 = f2.getCoord();
-					double dist = c2.calcDistance(c);
+					double dist = CoordUtils.calcDistance(c2, c);
 					if (dist < min_dist) { min_dist = dist; }
 					if (dist == 0.0) {
 						System.out.println("      dist=0! fid=" + f.getId() + " <=> f2id=" + f2.getId());

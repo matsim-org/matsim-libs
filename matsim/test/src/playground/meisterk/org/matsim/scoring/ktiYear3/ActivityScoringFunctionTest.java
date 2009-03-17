@@ -24,14 +24,14 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.OpeningTimeImpl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.population.ActImpl;
+import org.matsim.population.ActivityImpl;
 import org.matsim.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
@@ -65,12 +65,12 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		Activity testActivity = null;
 		double[] openingInterval = null;
 		
-		testActivity = new ActImpl("work_sector2", facility);
+		testActivity = new ActivityImpl("work_sector2", facility);
 		openingInterval = testee.getOpeningInterval(testActivity);
 		assertEquals(Time.parseTime("11:00:00"), openingInterval[0]);
 		assertEquals(Time.parseTime("23:00:00"), openingInterval[1]);
 		
-		testActivity = new ActImpl("leisure", facility);
+		testActivity = new ActivityImpl("leisure", facility);
 		openingInterval = testee.getOpeningInterval(testActivity);
 		assertEquals(Time.parseTime("11:00:00"), openingInterval[0]);
 		assertEquals(Time.parseTime("23:00:00"), openingInterval[1]);

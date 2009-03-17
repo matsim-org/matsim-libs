@@ -26,9 +26,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Counter;
 
@@ -104,7 +105,7 @@ public class PadangSurvey2Biogeme {
 				
 				Coord homeCoord = new CoordImpl(parts[1], parts[2]);
 				Coord primActCoord = new CoordImpl(parts[5], parts[6]);
-				double distance = homeCoord.calcDistance(primActCoord);
+				double distance = CoordUtils.calcDistance(homeCoord, primActCoord);
 				if (distance > 30000) {
 					throw new RuntimeException("this should not happen!!");
 				}
@@ -130,7 +131,7 @@ public class PadangSurvey2Biogeme {
 							break;
 						}
 					}
-					double tmpDistance = homeCoord.calcDistance(tmpZone.coord);
+					double tmpDistance = CoordUtils.calcDistance(homeCoord, tmpZone.coord);
 					if ((tmpDistance < (0.7 * distance)) && (numShorterTrips < 3)) {
 						alternatives[numShorterTrips + numEqualTrips + numLongerTrips + numMissed] = tmpZone;
 						numShorterTrips++;
@@ -156,7 +157,7 @@ public class PadangSurvey2Biogeme {
 
 				biogemeWriter.write(id + "\t1\t" + distance);
 				for (Zone alternative : alternatives) {
-					biogemeWriter.write("\t" + homeCoord.calcDistance(alternative.coord));
+					biogemeWriter.write("\t" + CoordUtils.calcDistance(homeCoord, alternative.coord));
 				}
 				biogemeWriter.write('\n');
 

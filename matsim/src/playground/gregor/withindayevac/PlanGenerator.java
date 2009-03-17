@@ -121,7 +121,7 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 //		pers.removeWorstPlans(this.maxPlans-1);
 		Plan plan = new org.matsim.population.PlanImpl(pers);
 		Activity oldA = pers.getSelectedPlan().getFirstActivity();
-		Activity a = new org.matsim.population.ActImpl(oldA);
+		Activity a = new org.matsim.population.ActivityImpl(oldA);
 		a.setType("h");
 		Leg oldLeg = pers.getSelectedPlan().getNextLeg(oldA);
 		Leg l = new org.matsim.population.LegImpl(oldLeg.getMode());
@@ -130,7 +130,7 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 		l.setArrivalTime(oldLeg.getArrivalTime());
 		
 		Activity oldB = pers.getSelectedPlan().getNextActivity(oldLeg);
-		Activity b = new org.matsim.population.ActImpl(oldB);
+		Activity b = new org.matsim.population.ActivityImpl(oldB);
 		plan.addAct(a);
 		CarRoute route = new NodeCarRoute();
 		route.setNodes(nodes);

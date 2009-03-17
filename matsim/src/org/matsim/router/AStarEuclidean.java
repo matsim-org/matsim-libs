@@ -31,6 +31,7 @@ import org.matsim.interfaces.core.v01.Node;
 import org.matsim.router.util.PreProcessEuclidean;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.utils.geometry.CoordUtils;
 
 /**
  * Implements the <a href="http://en.wikipedia.org/wiki/A%2A">A* router algorithm</a>
@@ -210,7 +211,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * @return The travel cost when traveling between the two given nodes.
 	 */
 	double estimateRemainingTravelCost(Node fromNode, Node toNode) {
-		double dist = fromNode.getCoord().calcDistance(toNode.getCoord())
+		double dist = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord())
 				* getMinTravelCostPerLength();
 		return dist * this.overdoFactor;
 	}

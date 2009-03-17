@@ -40,6 +40,7 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonIdRecorder;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.misc.Time;
 
 public class PlanFilter {
@@ -81,7 +82,7 @@ public class PlanFilter {
 				for (Link link : network.getLinks().values()) {
 					final Node from = link.getFromNode();
 					final Node to = link.getToNode();
-					if ((from.getCoord().calcDistance(center) <= smallRadius) || (to.getCoord().calcDistance(center) <= smallRadius)) {
+					if ((CoordUtils.calcDistance(from.getCoord(), center) <= smallRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= smallRadius)) {
 						smallAOI.put(link.getId(),link);
 					}
 				}
@@ -90,7 +91,7 @@ public class PlanFilter {
 				for (Link link : network.getLinks().values()) {
 					final Node from = link.getFromNode();
 					final Node to = link.getToNode();
-					if ((from.getCoord().calcDistance(center) <= bigRadius) || (to.getCoord().calcDistance(center) <= bigRadius)) {
+					if ((CoordUtils.calcDistance(from.getCoord(), center) <= bigRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= bigRadius)) {
 						bigAOI.put(link.getId(),link);
 					}
 				}
@@ -144,7 +145,7 @@ public class PlanFilter {
 		for (Link link : network.getLinks().values()) {
 			final Node from = link.getFromNode();
 			final Node to = link.getToNode();
-			if ((from.getCoord().calcDistance(center) <= smallRadius) || (to.getCoord().calcDistance(center) <= smallRadius)) {
+			if ((CoordUtils.calcDistance(from.getCoord(), center) <= smallRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= smallRadius)) {
 				smallAOI.put(link.getId(),link);
 			}
 		}
@@ -156,7 +157,7 @@ public class PlanFilter {
 		for (Link link : network.getLinks().values()) {
 			final Node from = link.getFromNode();
 			final Node to = link.getToNode();
-			if ((from.getCoord().calcDistance(center) <= bigRadius) || (to.getCoord().calcDistance(center) <= bigRadius)) {
+			if ((CoordUtils.calcDistance(from.getCoord(), center) <= bigRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= bigRadius)) {
 				bigAOI.put(link.getId(),link);
 				Node fromNode = link.getFromNode();
 				if (!subnet.getNodes().containsKey(fromNode.getId())) {

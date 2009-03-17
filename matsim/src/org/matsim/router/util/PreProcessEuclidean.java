@@ -23,6 +23,7 @@ package org.matsim.router.util;
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Network;
+import org.matsim.utils.geometry.CoordUtils;
 
 /**
  * Pre-processes a given network, gathering information which can be used by a
@@ -73,7 +74,7 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 	private boolean checkLinkLengths(final Network network) {
 		for (Link link : network.getLinks().values()) {
 			double linkLength = link.getLength();
-			double eucDist = link.getFromNode().getCoord().calcDistance(link.getToNode().getCoord());
+			double eucDist = CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
 			if (linkLength < eucDist) {
 				if (log.isDebugEnabled()) {
 					log.debug("link " + link.getId() + " has length " + linkLength + " which is smaller than the euclidean distance " + eucDist);

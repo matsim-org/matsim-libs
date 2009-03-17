@@ -20,12 +20,12 @@
 
 package org.matsim.basic.v01;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.population.BasicActivity;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.utils.misc.Time;
 
-public class BasicActImpl implements BasicActivity {
+public class BasicActivityImpl implements BasicActivity {
 
 	private double endTime = Time.UNDEFINED_TIME;
 	private double startTime = Time.UNDEFINED_TIME;
@@ -35,7 +35,7 @@ public class BasicActImpl implements BasicActivity {
 	private Id linkId;
 	private Id facilityId;
 
-	public BasicActImpl(String type) {
+	public BasicActivityImpl(String type) {
 		this.type = type;
 	}
 	

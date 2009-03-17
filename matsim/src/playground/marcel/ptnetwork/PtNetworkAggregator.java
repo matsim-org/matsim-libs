@@ -27,6 +27,7 @@ import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.geometry.CoordUtils;
 
 /**
  * Aggregates a PtNetworkLayer from HaltePunkte to HalteBereiche. In the
@@ -78,7 +79,7 @@ public class PtNetworkAggregator {
 			if (link == null) {
 				link = this.network.createLink(ptLink.getId(),
 						this.network.getNode(fromHb.getId()), this.network.getNode(toHb.getId()),
-						fromHb.getCoord().calcDistance(toHb.getCoord()), 2, 1000, 1);
+						CoordUtils.calcDistance(fromHb.getCoord(), toHb.getCoord()), 2, 1000, 1);
 			}
 			this.linkMatching.put(ptLink.getId(), link.getId());
 		}

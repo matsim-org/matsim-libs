@@ -40,6 +40,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.utils.geometry.CoordUtils;
 
 public class RandomChangeLocShortestK implements PlanAlgorithm {
 
@@ -224,7 +225,7 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 			Activity act2 = (Activity)(plan.getPlanElements().get(i+2));
 
 			if (act2 != null && act1 != null) {
-				double dist = act1.getCoord().calcDistance(act2.getCoord());
+				double dist = CoordUtils.calcDistance(act1.getCoord(), act2.getCoord());
 				length += dist;
 			}
 		}

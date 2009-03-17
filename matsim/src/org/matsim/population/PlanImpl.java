@@ -25,11 +25,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -64,14 +64,14 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 
 	public final Activity createAct(final String type, final Coord coord) throws IllegalStateException {
 		verifyCreateAct(Time.UNDEFINED_TIME);
-		Activity a = new ActImpl(type, coord);
+		Activity a = new ActivityImpl(type, coord);
 		this.actsLegs.add(a);
 		return a;
 	}
 
 	public final Activity createAct(final String type, final Facility fac) throws IllegalStateException {
 		verifyCreateAct(Time.UNDEFINED_TIME);
-		Activity a = new ActImpl(type, fac);
+		Activity a = new ActivityImpl(type, fac);
 		this.actsLegs.add(a);
 		return a;
 	}
@@ -79,7 +79,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 
 	public final Activity createAct(final String type, final Link link) throws IllegalStateException {
 		verifyCreateAct(Time.UNDEFINED_TIME);
-		Activity a = new ActImpl(type, link);
+		Activity a = new ActivityImpl(type, link);
 		this.actsLegs.add(a);
 		return a;
 	}
@@ -246,7 +246,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 				if (i % 2 == 0) {
 					// activity
 					Activity a = (Activity)actl.get(i);
-					this.actsLegs.add(new ActImpl(a));
+					this.actsLegs.add(new ActivityImpl(a));
 				} else {
 					// Leg
 					Leg l = (Leg) actl.get(i);

@@ -10,7 +10,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.population.ActImpl;
+import org.matsim.population.ActivityImpl;
 import org.matsim.population.LegImpl;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationImpl;
@@ -128,7 +128,7 @@ public class GenerateBlnPlan {
 				
 //			}
 			
-			ActImpl lastAct = null;
+			ActivityImpl lastAct = null;
 			LegImpl lastLeg = null;
 			Id lastPersonId = null;
 			
@@ -159,7 +159,7 @@ public class GenerateBlnPlan {
 							actPlan = actPerson.getSelectedPlan();
 						}
 
-						ActImpl newAct = null;
+						ActivityImpl newAct = null;
 
 						// set every non home activity to work
 //						if (data[10].equalsIgnoreCase("WAHR")){
@@ -253,7 +253,7 @@ public class GenerateBlnPlan {
 							actType = "not defined";
 						}
 						
-						newAct = new ActImpl(actType, new CoordImpl(Double.parseDouble(data[11]), Double.parseDouble(data[12])));
+						newAct = new ActivityImpl(actType, new CoordImpl(Double.parseDouble(data[11]), Double.parseDouble(data[12])));
 				
 						numberOfTripsUsed++;
 

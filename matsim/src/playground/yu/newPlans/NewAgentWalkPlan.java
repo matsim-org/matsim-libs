@@ -37,6 +37,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
+import org.matsim.utils.geometry.CoordUtils;
 
 import playground.yu.analysis.PlanModeJudger;
 
@@ -112,9 +113,7 @@ public class NewAgentWalkPlan extends NewPopulation implements PersonAlgorithm {
 	private boolean hasLongLegs(Plan plan) {
 		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
 			Leg leg = (Leg) li.next();
-			if (plan.getPreviousActivity(leg).getLink().getCoord()
-					.calcDistance(
-							plan.getNextActivity(leg).getLink().getCoord()) / 1000.0 > 3.0)
+			if (CoordUtils.calcDistance(plan.getPreviousActivity(leg).getLink().getCoord(), plan.getNextActivity(leg).getLink().getCoord()) / 1000.0 > 3.0)
 				return true;
 		}
 		return false;

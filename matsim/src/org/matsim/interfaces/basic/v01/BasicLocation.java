@@ -19,7 +19,6 @@
 
 package org.matsim.interfaces.basic.v01;
 
-import org.matsim.interfaces.core.v01.Coord;
 
 /**
  * @author dgrether

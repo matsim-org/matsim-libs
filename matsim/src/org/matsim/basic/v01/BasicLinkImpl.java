@@ -20,12 +20,13 @@
 
 package org.matsim.basic.v01;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.network.BasicLink;
 import org.matsim.interfaces.basic.v01.network.BasicNode;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.world.AbstractLocation;
 
 public class BasicLinkImpl
@@ -59,7 +60,7 @@ implements BasicLink
 	// It would be better to implement the version in Link here and remove the one in Link.
 	@Override
 	public double calcDistance(final Coord coord) {
-		return this.center.calcDistance(coord);
+		return CoordUtils.calcDistance(this.center, coord);
 	}
 
 	public BasicNode getFromNode() {

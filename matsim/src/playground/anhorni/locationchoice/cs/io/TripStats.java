@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.io.IOUtils;
 
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
@@ -38,10 +39,8 @@ public class TripStats extends CSWriter{
 				double travelSpeed = 3.6 * travelDistance / travelTime;
 				double usedBudgetPercent = 100.0 * travelTime / choiceSet.getTravelTimeBudget();
 				
-				double crowFlyDistance = choiceSet.getTrip().getBeforeShoppingAct().getCoord().
-					calcDistance(choiceSet.getChosenFacility().getFacility().getExactPosition()) +
-					choiceSet.getTrip().getAfterShoppingAct().getCoord().
-					calcDistance(choiceSet.getChosenFacility().getFacility().getExactPosition());
+				double crowFlyDistance = CoordUtils.calcDistance(choiceSet.getTrip().getBeforeShoppingAct().getCoord(), choiceSet.getChosenFacility().getFacility().getExactPosition()) +
+					CoordUtils.calcDistance(choiceSet.getTrip().getAfterShoppingAct().getCoord(), choiceSet.getChosenFacility().getFacility().getExactPosition());
 				
 				String location = choiceSet.getId().toString();
 				

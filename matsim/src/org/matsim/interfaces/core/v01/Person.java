@@ -32,6 +32,8 @@ import org.matsim.utils.customize.Customizable;
  */
 public interface Person extends BasicPerson<Plan>, Customizable{
 	
+	public void addPlan(final Plan plan);
+	
 	public Plan createPlan(final boolean selected);
 	
 	public Plan getSelectedPlan();

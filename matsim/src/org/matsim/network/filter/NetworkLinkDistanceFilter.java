@@ -21,6 +21,7 @@ package org.matsim.network.filter;
 
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
+import org.matsim.utils.geometry.CoordUtils;
 
 /**
  * @author dgrether
@@ -48,7 +49,7 @@ public class NetworkLinkDistanceFilter implements NetworkLinkFilter {
 	 * distance specified by the distance filter from the center node of the filter.
 	 */	
 	public boolean judgeLink(Link l) {
-		double dist = l.getCoord().calcDistance(this.distanceFilterNode.getCoord());
+		double dist = CoordUtils.calcDistance(l.getCoord(), this.distanceFilterNode.getCoord());
 		return dist < this.distanceFilter;
 	}
 		

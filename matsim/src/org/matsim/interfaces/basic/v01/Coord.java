@@ -18,9 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.core.v01;
-
-import org.matsim.interfaces.basic.v01.BasicCoord;
+package org.matsim.interfaces.basic.v01;
 
 /**
  * In MATSim, generally Cartesian Coordinates are used, with x increasing
@@ -31,8 +29,16 @@ import org.matsim.interfaces.basic.v01.BasicCoord;
  *     |     x
  *   (0/0) ---->
  */
-public interface Coord extends BasicCoord {
+public interface Coord {
 
- 	public double calcDistance(final Coord other);
-	
+	public void setX(final double x); 
+
+	public void setY(final double y);
+
+	public void setXY(final double x, final double y);
+
+	public double getX();
+
+	public double getY();
+
 }

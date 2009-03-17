@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.basic.v01.BasicActivityImpl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
@@ -67,9 +67,9 @@ public class Wardrop {
 		{
 			Plan plan = person.getSelectedPlan();
 			
-			ArrayList<BasicActImpl> acts = new ArrayList<BasicActImpl>();
+			ArrayList<BasicActivityImpl> acts = new ArrayList<BasicActivityImpl>();
 			
-			Iterator<BasicActImpl> actIter = plan.getIteratorAct();
+			Iterator<BasicActivityImpl> actIter = plan.getIteratorAct();
 			while (actIter.hasNext())
 			{
 				acts.add(actIter.next());				
@@ -78,8 +78,8 @@ public class Wardrop {
 			// The last Act is only the end of a leg and not the beginning of a new one!
 			for(int i = 0; i < acts.size() - 1; i++)
 			{
-				BasicActImpl startAct = acts.get(i);
-				BasicActImpl endAct = acts.get(i + 1);
+				BasicActivityImpl startAct = acts.get(i);
+				BasicActivityImpl endAct = acts.get(i + 1);
 				
 				Coord startCoord = startAct.getCoord();
 				Coord endCoord = endAct.getCoord();

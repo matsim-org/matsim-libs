@@ -20,8 +20,9 @@
 
 package org.matsim.utils.vis.routervis.multipathrouter;
 
-import org.matsim.interfaces.core.v01.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.CoordUtils;
 
 /**
  * The BeelineDifferenceTracer calculates the deviance from the hypothetical OD connection for a given Coord.
@@ -52,7 +53,7 @@ public class BeelineDifferenceTracer {
 		this.orig = orig;
 		this.dest = dest;
 
-		this.distOD = this.orig.calcDistance(this.dest);
+		this.distOD = CoordUtils.calcDistance(this.orig, this.dest);
 		this.sqrDistOD = Math.pow(this.distOD,2);
 
 	}
@@ -84,7 +85,7 @@ public class BeelineDifferenceTracer {
 		double oldDiff = getDeviance(oldCoord);
 		oldDiff = oldDiff >= 0 ? oldDiff : 0;
 //
-		final double directionSign = this.orig.calcDistance(newCoord) > this.orig.calcDistance(oldCoord) ? 1 : -1;
+		final double directionSign = CoordUtils.calcDistance(this.orig, newCoord) > CoordUtils.calcDistance(this.orig, oldCoord) ? 1 : -1;
 
 
 
@@ -107,8 +108,8 @@ public class BeelineDifferenceTracer {
 
 	private double getDeviance(final Coord explored) {
 
-		final double distExplDest = explored.calcDistance(this.dest);
-		final double distOrigExpl = this.orig.calcDistance(explored);
+		final double distExplDest = CoordUtils.calcDistance(explored, this.dest);
+		final double distOrigExpl = CoordUtils.calcDistance(this.orig, explored);
 
 		final double cosAlpha = getCosine(distExplDest,distOrigExpl);
 

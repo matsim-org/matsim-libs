@@ -20,17 +20,17 @@
 
 package org.matsim.population;
 
-import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.BasicActivityImpl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.network.BasicLink;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
-public class ActImpl extends BasicActImpl implements Activity {
+public class ActivityImpl extends BasicActivityImpl implements Activity {
 
 	private BasicLink link = null;
 	private Facility facility = null;
@@ -39,27 +39,27 @@ public class ActImpl extends BasicActImpl implements Activity {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public ActImpl(final String type, final Link link) {
+	public ActivityImpl(final String type, final Link link) {
 		super(type.intern());
 		this.setLink(link);
 	}
 
-	public ActImpl(final String type, final Coord coord) {
+	public ActivityImpl(final String type, final Coord coord) {
 		super(type.intern());
 		this.setCoord(coord);
 	}
 
-	public ActImpl(final String type, final Facility fac) {
+	public ActivityImpl(final String type, final Facility fac) {
 		super(type.intern());
 		this.setFacility(fac);
 	}
 
-	public ActImpl(final String type, final Coord coord, final Link link) {
+	public ActivityImpl(final String type, final Coord coord, final Link link) {
 		this(type, link);
 		this.setCoord(coord);
 	}
 
-	public ActImpl(final Activity act) {
+	public ActivityImpl(final Activity act) {
 		super(act.getType());
 		// Act coord could be null according to first c'tor!
 		Coord c = act.getCoord() == null ? null : new CoordImpl(act.getCoord());

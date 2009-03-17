@@ -32,7 +32,7 @@ import org.matsim.utils.misc.Time;
 public class ActTest extends MatsimTestCase {
 
 	public void testCalculateDuration() {
-		Activity testee = new org.matsim.population.ActImpl("h", new CoordImpl(0, 0));
+		Activity testee = new org.matsim.population.ActivityImpl("h", new CoordImpl(0, 0));
 		testee.setStartTime(0.0);
 		testee.setDuration(0.0);
 		testee.setEndTime(0.0);

@@ -22,7 +22,7 @@ package playground.balmermi.census2000.modules;
 
 import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
@@ -32,6 +32,7 @@ import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.utils.geometry.CoordUtils;
 
 import playground.balmermi.census2000.data.Persons;
 import playground.balmermi.census2000.models.ModelModeChoice;
@@ -77,12 +78,12 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		// calc plan distance and main purpose
 		double plan_dist = 0.0;
 		int mainpurpose = 2; // 0 := w; 1 := e; 2 := s|l
-		Iterator<BasicActImpl> act_it = person.getSelectedPlan().getIteratorAct();
+		Iterator<BasicActivityImpl> act_it = person.getSelectedPlan().getIteratorAct();
 		act_it.hasNext(); // first act is always 'home'
 		Activity prev_act = (Activity)act_it.next();
 		while (act_it.hasNext()) {
 			Activity act = (Activity)act_it.next();
-			plan_dist += act.getCoord().calcDistance(prev_act.getCoord());
+			plan_dist += CoordUtils.calcDistance(act.getCoord(), prev_act.getCoord());
 			String type = act.getType();
 			if (mainpurpose == 1){
 				if (type == W) { mainpurpose = 0; break; }

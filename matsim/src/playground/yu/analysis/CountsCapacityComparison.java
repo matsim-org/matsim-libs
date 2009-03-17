@@ -8,11 +8,12 @@ import java.io.IOException;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.geometry.CoordUtils;
 
 import playground.yu.utils.io.SimpleWriter;
 
@@ -23,7 +24,7 @@ import playground.yu.utils.io.SimpleWriter;
 public class CountsCapacityComparison {
 	public static boolean isInRange(final Link link,
 			Coord distanceFilterCenter, double filterRadius) {
-		return link.getCoord().calcDistance(distanceFilterCenter) < filterRadius;
+		return CoordUtils.calcDistance(link.getCoord(), distanceFilterCenter) < filterRadius;
 	}
 
 	/**

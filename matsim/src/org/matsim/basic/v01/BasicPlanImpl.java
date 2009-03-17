@@ -79,16 +79,16 @@ public class BasicPlanImpl implements BasicPlan {
 	/**
 	 * Iterator that steps through all Activities ignoring the Legs
 	 */
-	public class ActIterator implements Iterator<BasicActImpl> {
+	public class ActIterator implements Iterator<BasicActivityImpl> {
 		private int index = 0;
 
 		public boolean hasNext() {
 			return BasicPlanImpl.this.actsLegs.size() > this.index;
 		}
 
-		public BasicActImpl next() {
+		public BasicActivityImpl next() {
 			this.index+=2;
-			return (BasicActImpl)BasicPlanImpl.this.actsLegs.get(this.index-2);
+			return (BasicActivityImpl)BasicPlanImpl.this.actsLegs.get(this.index-2);
 		}
 
 		public void remove() {
