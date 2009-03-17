@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * StrategyModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,50 +18,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.usecases.mentalmodule;
-/*
- * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
+package org.matsim.interfaces.core.v01;
+
+
+/**
+ * A module which modifies a single plan.
+ * 
+ * @author mrieser
  */
+public interface PlanStrategyModule {
 
-import org.matsim.controler.Controler;
-import org.matsim.events.Events;
-import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.PlanStrategyModule;
-import org.matsim.interfaces.core.v01.Population;
-import org.matsim.network.NetworkLayer;
-import org.matsim.replanning.PlanStrategy;
-import org.matsim.replanning.selectors.PlanSelector;
-import org.matsim.replanning.selectors.RandomPlanSelector;
-
-
-public class MyStrategy extends PlanStrategy {
+	/**
+	 * Initializes this module before handling plans. Modules using an external
+	 * routine could e.g. open a file here to write the plans out and pass them to
+	 * the external routines. Multi-threaded modules could initialize and start
+	 * their threads in this method.
+	 */
+	public void prepareReplanning();
 	
+	/**
+	 * Tells this module to handle the specified plan. It is not required that
+	 * the plan must immediately be handled, e.g. modules calling external 
+	 * routines could just collect the plans here and start the external routine
+	 * in {@link #finishReplanning()}, or multi-threaded modules could just add the
+	 * plan to a synchronized queue for the threads.
+	 *
+	 * @param plan
+	 * @see #finishReplanning()
+	 */
+	public void handlePlan(Plan plan);
 	
-
-	public MyStrategy(Controler controler) {
-		super(new RandomPlanSelector());
-		
-		MyModule mod = new MyModule( controler ) ;
-		
-		addStrategyModule(mod) ;
-		
-		Events events = controler.getEvents() ;
-		events.addHandler( mod ) ;
-		
-	}
-
-	public static void main(final String[] args) {
-
-		if ( args.length==0 ) {
-			Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
-		} else {
-			Gbl.createConfig(args) ;
-		}
-
-		final Controler controler = new Controler(Gbl.getConfig());
-		controler.setOverwriteFiles(true);
-		controler.run();
-
-	}
-
+	/**
+	 * Indicates that no additional plans will be handed to this module and waits
+	 * until this module has finished handling all plans. Modules calling external
+	 * routines can call those here, or multi-threaded modules can wait here until
+	 * all threads are finished with their work.
+	 * 
+	 * @see #handlePlan(Plan)
+	 */
+	public void finishReplanning();
 }

@@ -23,7 +23,7 @@ package playground.mfeil;
 import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.PlanStrategyModule;
+import org.matsim.interfaces.core.v01.PlanStrategyModule;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.replanning.PlanStrategy;

@@ -20,14 +20,15 @@
 
 package org.matsim.interfaces.basic.v01;
 
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.basic.v01.population.BasicPlan;
+
 
 /**
  * A module which modifies a single plan.
  * 
  * @author mrieser
  */
-public interface PlanStrategyModule {
+public interface BasicPlanStrategyModule {
 
 	/**
 	 * Initializes this module before handling plans. Modules using an external
@@ -47,7 +48,7 @@ public interface PlanStrategyModule {
 	 * @param plan
 	 * @see #finishReplanning()
 	 */
-	public void handlePlan(Plan plan);
+	public void handlePlan(BasicPlan plan);
 	
 	/**
 	 * Indicates that no additional plans will be handed to this module and waits

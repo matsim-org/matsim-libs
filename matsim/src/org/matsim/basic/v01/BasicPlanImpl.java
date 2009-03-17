@@ -27,6 +27,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.population.BasicActivity;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
+import org.matsim.interfaces.basic.v01.population.BasicPerson;
 import org.matsim.interfaces.basic.v01.population.BasicPlan;
 import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Plan;
@@ -41,11 +42,20 @@ public class BasicPlanImpl implements BasicPlan {
 	protected ArrayList<BasicPlanElement> actsLegs = new ArrayList<BasicPlanElement>();
 
 	private Double score = null;
+	protected BasicPerson person = null;
 
 	private Plan.Type type = null;
 
 	private boolean isSelected;
 
+	public BasicPlanImpl(final BasicPerson person) {
+		this.person = person;
+	}
+	
+	public BasicPerson getPerson() {
+		return this.person;
+	}
+	
 	public final Double getScore() {
 		return this.score;
 	}

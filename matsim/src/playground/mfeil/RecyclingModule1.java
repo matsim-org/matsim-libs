@@ -23,8 +23,8 @@ package playground.mfeil;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.PlanStrategyModule;
 import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.PlanStrategyModule;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import java.util.ArrayList;
 import java.util.Iterator;

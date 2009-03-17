@@ -21,9 +21,9 @@ import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.interfaces.basic.v01.BasicPlanStrategyModule;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.PlanStrategyModule;
 import org.matsim.interfaces.basic.v01.network.BasicLink;
 import org.matsim.interfaces.basic.v01.network.BasicNode;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
@@ -37,7 +37,7 @@ import org.matsim.network.NetworkLayer;
 
 @SuppressWarnings("unused")
 public class MyModule implements
-PlanStrategyModule,
+BasicPlanStrategyModule,
 ActEndEventHandler,
 AgentDepartureEventHandler,
 AgentWait2LinkEventHandler,
@@ -132,7 +132,7 @@ ActStartEventHandler
 		}
 	}
 	
-	public void handlePlan(Plan plan) {
+	public void handlePlan(BasicPlan plan) {
 		
 		PopulationBuilder pb = pop.getPopulationBuilder() ; 
 		

@@ -48,14 +48,12 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private Person person = null;
-
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
 	public PlanImpl(final Person person) {
-		this.person = person;
+		super(person);
 	}
 
 	public static Plan createPlan( final Person p) {
@@ -195,7 +193,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	}
 
 	public final Person getPerson() {
-		return this.person;
+		return (Person) this.person;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -211,7 +209,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	//////////////////////////////////////////////////////////////////////
 	@Override
 	public final boolean isSelected() {
-		return this.person.getSelectedPlan() == this;
+		return getPerson().getSelectedPlan() == this;
 	}
 
 

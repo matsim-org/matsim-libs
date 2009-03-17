@@ -23,9 +23,10 @@ package org.matsim.replanning;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.PlanStrategyModule;
+import org.matsim.interfaces.basic.v01.BasicPlanStrategyModule;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.PlanStrategyModule;
 import org.matsim.replanning.selectors.PlanSelector;
 
 /**
@@ -37,8 +38,8 @@ import org.matsim.replanning.selectors.PlanSelector;
 public class PlanStrategy {
 
 	private PlanSelector planSelector = null;
-	private PlanStrategyModule firstModule = null;
-	private final ArrayList<PlanStrategyModule> modules = new ArrayList<PlanStrategyModule>();
+	private Object firstModule = null;
+	private final ArrayList<Object> modules = new ArrayList<Object>();
 	private final ArrayList<Plan> plans = new ArrayList<Plan>();
 	private long counter = 0;
 	private final static Logger log = Logger.getLogger(PlanStrategy.class);
@@ -50,6 +51,19 @@ public class PlanStrategy {
 	 */
 	public PlanStrategy(final PlanSelector planSelector) {
 		this.planSelector = planSelector;
+	}
+
+	/**
+	 * Adds a strategy module to this strategy.
+	 *
+	 * @param module
+	 */
+	public void addStrategyModule(final BasicPlanStrategyModule module) {
+		if (this.firstModule == null) {
+			this.firstModule = module;
+		} else {
+			this.modules.add(module);
+		}
 	}
 
 	/**
@@ -95,7 +109,11 @@ public class PlanStrategy {
 			plan = person.copySelectedPlan();
 			this.plans.add(plan);
 			// start working on this plan already
-			this.firstModule.handlePlan(plan);
+			if (this.firstModule instanceof PlanStrategyModule) {
+				((BasicPlanStrategyModule) this.firstModule).handlePlan(plan);
+			} else if (this.firstModule instanceof BasicPlanStrategyModule) {
+				((BasicPlanStrategyModule) this.firstModule).handlePlan(plan);
+			}
 		}
 	}
 
@@ -105,7 +123,11 @@ public class PlanStrategy {
 	 */
 	public void init() {
 		if (this.firstModule != null) {
-			this.firstModule.prepareReplanning();
+			if (this.firstModule instanceof PlanStrategyModule) {
+				((BasicPlanStrategyModule) this.firstModule).prepareReplanning();
+			} else if (this.firstModule instanceof BasicPlanStrategyModule) {
+				((BasicPlanStrategyModule) this.firstModule).prepareReplanning();
+			}
 		}
 	}
 
@@ -118,14 +140,28 @@ public class PlanStrategy {
 	public void finish() {
 		if (this.firstModule != null) {
 			// finish the first module
-			this.firstModule.finishReplanning();
+			if (this.firstModule instanceof PlanStrategyModule) {
+				((BasicPlanStrategyModule) this.firstModule).finishReplanning();
+			} else if (this.firstModule instanceof BasicPlanStrategyModule) {
+				((BasicPlanStrategyModule) this.firstModule).finishReplanning();
+			}
 			// now work through the others
-			for (PlanStrategyModule module : this.modules) {
-				module.prepareReplanning();
-				for (Plan plan : this.plans) {
-					module.handlePlan(plan);
+			for (Object o : this.modules) {
+				if (o instanceof PlanStrategyModule) {
+					PlanStrategyModule module = (PlanStrategyModule) o;
+					module.prepareReplanning();
+					for (Plan plan : this.plans) {
+						module.handlePlan(plan);
+					}
+					module.finishReplanning();
+				} else if (o instanceof BasicPlanStrategyModule) {
+					BasicPlanStrategyModule module = (BasicPlanStrategyModule) o;
+					module.prepareReplanning();
+					for (Plan plan : this.plans) {
+						module.handlePlan(plan);
+					}
+					module.finishReplanning();					
 				}
-				module.finishReplanning();
 			}
 		}
 		this.plans.clear();
@@ -145,7 +181,7 @@ public class PlanStrategy {
 		if (this.firstModule != null) {
 			name.append('_');
 			name.append(this.firstModule.getClass().getSimpleName());
-			for (PlanStrategyModule module : this.modules) {
+			for (Object module : this.modules) {
 				name.append('_');
 				name.append(module.getClass().getSimpleName());
 			}

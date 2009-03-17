@@ -55,7 +55,6 @@ import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.analysis.StuckVehStats;
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
@@ -2264,7 +2263,7 @@ public class MyRuns {
 		List<Plan> list3 = genericList;
 		
 //		basicList.add(new BasicPlanImpl()); // doesn't compile
-		basicList2.add(new BasicPlanImpl());
+//		basicList2.add(new BasicPlanImpl());
 		BasicPopulationBuilder pb = null;
 		BasicPerson person = null;
 //		person.getPlans().add(pb.createPlan(person));

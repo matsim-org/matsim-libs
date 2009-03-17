@@ -42,4 +42,5 @@ public interface BasicPlan {
 	
 	public Double getScore();
 
+	public BasicPerson getPerson();
 }

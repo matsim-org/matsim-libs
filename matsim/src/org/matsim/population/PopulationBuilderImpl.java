@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.population.BasicPerson;
 import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
@@ -73,8 +74,11 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		return p;
 	}
 	
-	public Plan createPlan() {
-		return new PlanImpl(null);
+	public Plan createPlan(BasicPerson person) {
+		if (!(person instanceof Person)) {
+			throw new IllegalArgumentException("person must be of type Person.");
+		}
+		return new PlanImpl((Person) person);
 	}
 
 	public Activity createActivityFromCoord(String actType, Coord coord) {

@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.population.BasicPerson;
 import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
 
@@ -33,7 +34,7 @@ public interface PopulationBuilder extends BasicPopulationBuilder {
 
 	Person createPerson(Id id);
 
-	Plan createPlan();
+	Plan createPlan(BasicPerson person);
 
 	Activity createActivityFromCoord(String actType, Coord coord);
 	

@@ -62,7 +62,7 @@ public class BkTestPlansCreator {
 		
 		for (int i = 1; i <= 1000; i++) {
 			BasicPerson<BasicPlan> p = new BasicPersonImpl(new IdImpl(i));
-			BasicPlan plan = new BasicPlanImpl();
+			BasicPlan plan = new BasicPlanImpl(p);
 			plan.setSelected(true);
 //			p.addPlan(plan);
 			

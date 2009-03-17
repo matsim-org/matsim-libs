@@ -32,7 +32,7 @@ public interface BasicPopulationBuilder {
 
 	public BasicPerson createPerson(Id id);
 
-	public BasicPlan createPlan();
+	public BasicPlan createPlan(BasicPerson person);
 
 	public BasicActivity createActivityFromCoord(String actType, Coord coord);
 

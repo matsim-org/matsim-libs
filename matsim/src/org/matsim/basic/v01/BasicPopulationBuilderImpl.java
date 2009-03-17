@@ -48,8 +48,8 @@ public class BasicPopulationBuilderImpl implements BasicPopulationBuilder {
 		return new BasicPersonImpl(id);
 	}
 	
-	public BasicPlan createPlan() {
-		return new BasicPlanImpl();
+	public BasicPlan createPlan(BasicPerson person) {
+		return new BasicPlanImpl(person);
 	}
 	
 	public BasicActivity createActivityFromCoord(String actType, Coord coord) {
