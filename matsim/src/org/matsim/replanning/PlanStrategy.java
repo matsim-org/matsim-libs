@@ -110,7 +110,7 @@ public class PlanStrategy {
 			this.plans.add(plan);
 			// start working on this plan already
 			if (this.firstModule instanceof PlanStrategyModule) {
-				((BasicPlanStrategyModule) this.firstModule).handlePlan(plan);
+				((PlanStrategyModule) this.firstModule).handlePlan(plan);
 			} else if (this.firstModule instanceof BasicPlanStrategyModule) {
 				((BasicPlanStrategyModule) this.firstModule).handlePlan(plan);
 			}
@@ -124,7 +124,7 @@ public class PlanStrategy {
 	public void init() {
 		if (this.firstModule != null) {
 			if (this.firstModule instanceof PlanStrategyModule) {
-				((BasicPlanStrategyModule) this.firstModule).prepareReplanning();
+				((PlanStrategyModule) this.firstModule).prepareReplanning();
 			} else if (this.firstModule instanceof BasicPlanStrategyModule) {
 				((BasicPlanStrategyModule) this.firstModule).prepareReplanning();
 			}
@@ -141,7 +141,7 @@ public class PlanStrategy {
 		if (this.firstModule != null) {
 			// finish the first module
 			if (this.firstModule instanceof PlanStrategyModule) {
-				((BasicPlanStrategyModule) this.firstModule).finishReplanning();
+				((PlanStrategyModule) this.firstModule).finishReplanning();
 			} else if (this.firstModule instanceof BasicPlanStrategyModule) {
 				((BasicPlanStrategyModule) this.firstModule).finishReplanning();
 			}
