@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class AnalyseGAPDensity {
 	// String value that must be set
-	final static String PROVINCE = "WesternCape";
+	final static String PROVINCE = "Gauteng";
 	final static int GAP_ID_INDEX = 2;
 	// GAP_ID indices:
 	//    Gauteng: 1
@@ -271,7 +271,7 @@ public class AnalyseGAPDensity {
 				outputMajor.write( header );
 				outputMajor.newLine();
 				for(int j = 0; j < zoneList.size()-1; j++ ){
-					outputMajor.write( createStatsString( zoneList.get(j) ).get(0) );
+					outputMajor.write( createStatsString( zoneList.get(j) ).get(1) );
 					outputMajor.newLine();
 				}
 				outputMajor.write( createStatsString( zoneList.get( zoneList.size()-1 ) ).get(0) );
