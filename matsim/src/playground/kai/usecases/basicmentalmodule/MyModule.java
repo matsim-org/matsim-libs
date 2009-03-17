@@ -4,24 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.controler.Controler;
-import org.matsim.events.ActEndEvent;
-import org.matsim.events.ActStartEvent;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.ActEndEventHandler;
-import org.matsim.events.handler.ActStartEventHandler;
-import org.matsim.events.handler.AgentArrivalEventHandler;
-import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.events.handler.LinkLeaveEventHandler;
+
+import org.matsim.interfaces.basic.v01.BasicPlanStrategyModule;
 import org.matsim.interfaces.basic.v01.BasicScenario;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.events.BasicActEndEvent;
+import org.matsim.interfaces.basic.v01.events.handler.BasicActEndEventHandler;
 import org.matsim.interfaces.basic.v01.facilities.BasicFacilities;
 import org.matsim.interfaces.basic.v01.facilities.BasicFacility;
 import org.matsim.interfaces.basic.v01.network.BasicLink;
@@ -35,20 +24,12 @@ import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 import org.matsim.interfaces.basic.v01.population.BasicPopulation;
 import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.interfaces.basic.v01.population.BasicRoute;
-import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.PlanStrategyModule;
 
 
 @SuppressWarnings("unused")
 public class MyModule implements
-PlanStrategyModule,
-ActEndEventHandler,
-AgentDepartureEventHandler,
-AgentWait2LinkEventHandler,
-LinkLeaveEventHandler,
-LinkEnterEventHandler,
-AgentArrivalEventHandler,
-ActStartEventHandler
+BasicPlanStrategyModule,
+BasicActEndEventHandler
 {
 	private static final Logger log = Logger.getLogger(MyModule.class);
 	
@@ -57,16 +38,15 @@ ActStartEventHandler
 	BasicPopulation<BasicPerson<BasicPlan>> pop ;
 	BasicFacilities facs ; // TODO: nicht konsequenterweise BasicFacilities<BasicFacility> ??  Maybe low prio.
 	
-	public MyModule(Controler controler) {
+	public MyModule(BasicScenario sc) {
 		
-		sc = controler.getScenarioData() ; // TODO in controler
 		net = sc.getNetwork() ;
 		pop = sc.getPopulation() ;
 		facs = sc.getFacilities() ;
 		
 	}
 	
-	public void prepareReplanning() { // initReplanning() 
+	public void prepareReplanning() { 
 		
 		// go through network and copy to my personal network:
 		for ( BasicNode bn : net.getNodes().values() ) {
@@ -125,7 +105,7 @@ ActStartEventHandler
 		}
 	}
 	
-	public void handlePlan(Plan ppp) { // need handlePlan(BasicPlan) ??????
+	public void handlePlan(BasicPlan ppp) { // need handlePlan(BasicPlan) ??????
 		BasicPlan plan = ppp ;
 		
 		BasicPopulationBuilder pb = pop.getPopulationBuilder() ; 
@@ -136,10 +116,9 @@ ActStartEventHandler
 			BasicPerson<BasicPlan> person = pb.createPerson(id) ;
 			pop.getPersons().put(id,person);
 			
-			// (can't be used at this level, but useful anyways)
-			// FIXME: createAndAddPerson ????
+			BasicPlan newPlan = pb.createPlan(person) ; 
+			person.getPlans().add( newPlan ) ;
 			
-			BasicPlan newPlan = pb.createPlan(person) ; // replace (??) the plan by a completely new plan
 			// FIXME: This creational method has the side effect of also adding the created Object.  In my view:
 			// - either createAndAddPlan
 			// - or createPlan w/o side effects
@@ -181,32 +160,15 @@ ActStartEventHandler
 
 	}
 
-	public void handleEvent(ActEndEvent event) {
-		ActEndEvent ev = event ;
+	public void handleEvent(BasicActEndEvent event) {
+		BasicActEndEvent ev = event ;
 		ev.getActType();
 		ev.getLinkId();
 		ev.getPersonId();
 		ev.getTime();
 	}
 
-	public void handleEvent(AgentDepartureEvent event) {
-	}
-
-	public void handleEvent(AgentWait2LinkEvent event) {
-	}
-
-	public void handleEvent(LinkLeaveEvent event) {
-	}
-
-	public void handleEvent(LinkEnterEvent event) {
-	}
-
-	public void handleEvent(AgentArrivalEvent event) {
-	}
-
-	public void handleEvent(ActStartEvent event) {
-	}
-
+	
 	public void reset(int iteration) {
 	}
 

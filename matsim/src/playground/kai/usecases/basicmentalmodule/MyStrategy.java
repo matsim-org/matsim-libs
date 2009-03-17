@@ -24,39 +24,25 @@ package playground.kai.usecases.basicmentalmodule;
 
 import org.matsim.controler.Controler;
 import org.matsim.events.Events;
-import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicScenario;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 
 
 public class MyStrategy extends PlanStrategy {
 	
-	
-
 	public MyStrategy(Controler controler) {
 		super(new RandomPlanSelector());
 		
-		MyModule mod = new MyModule( controler ) ;
+		BasicScenario sc = controler.getScenarioData() ;
+		
+		MyModule mod = new MyModule( sc ) ;
 		
 		addStrategyModule(mod) ;
 		
 		Events events = controler.getEvents() ;
 		events.addHandler( mod ) ;
 		
-	}
-
-	public static void main(final String[] args) {
-
-		if ( args.length==0 ) {
-			Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
-		} else {
-			Gbl.createConfig(args) ;
-		}
-
-		final Controler controler = new Controler(Gbl.getConfig());
-		controler.setOverwriteFiles(true);
-		controler.run();
-
 	}
 
 }
