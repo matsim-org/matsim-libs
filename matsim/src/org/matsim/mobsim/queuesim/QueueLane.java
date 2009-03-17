@@ -421,13 +421,8 @@ public class QueueLane implements Comparable<QueueLane> {
 				continue;
 			}
 
-			/*
-			 * using the following line instead should, I think, be an easy way to
-			 * make the mobsim stochastic. not tested. kai
-			 */
-			// if ( Gbl.random.nextDouble() < this.buffercap_accumulate ) {
-			// is there still room left in the buffer, or is it overcrowded from the
-			// last time steps?
+			/* is there still room left in the buffer, or is it overcrowded from the
+			 * last time steps? */
 			if (!hasBufferSpace()) {
 				return;
 			}
@@ -437,7 +432,7 @@ public class QueueLane implements Comparable<QueueLane> {
 		} // end while
 	}
 	
-	/*package*/ boolean isActive() {
+	private boolean isActive() {
 		/*
 		 * Leave Lane active as long as there are vehicles on the link (ignore
 		 * buffer because the buffer gets emptied by nodes and not links) and leave
@@ -525,11 +520,10 @@ public class QueueLane implements Comparable<QueueLane> {
 	}
 	
 	/**
-	 * Adds a vehicle to the link, called by
-	 * {@link QueueNode#moveVehicleOverNode(QueueVehicle, double)}.
+	 * Adds a vehicle to the lane.
 	 *
 	 * @param veh
-	 *          the vehicle
+	 * @param now the current time
 	 */
 	/*package*/ void add(final QueueVehicle veh, double now) {
 //		activateLane();
