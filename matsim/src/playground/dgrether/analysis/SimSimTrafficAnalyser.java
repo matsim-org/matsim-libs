@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.counts.ComparisonErrorStatsCalculator;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
@@ -58,7 +58,7 @@ public class SimSimTrafficAnalyser {
 
 	
 	private void loadData(String networkFile, String linkAttributes1, String linkAttributes2) {
-		ScenarioData scenario = new ScenarioData(null, networkFile, null, null);	
+		ScenarioImpl scenario = new ScenarioImpl(null, networkFile, null, null);	
 		network = scenario.getNetwork();
 		
 		this.linkStats = new CalcLinkStats(this.network);

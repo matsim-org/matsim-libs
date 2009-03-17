@@ -29,7 +29,7 @@ import org.jgap.impl.MutationOperator;
 import org.jgap.impl.WeightedRouletteSelector;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
@@ -39,13 +39,13 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(PlanomatJGAPConfigurationTest.class);
 
-	private ScenarioData scenario;
+	private ScenarioImpl scenario;
 	
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		Config config = super.loadConfig(this.getInputDirectory() + "config.xml");
-		this.scenario = new ScenarioData(config);
+		this.scenario = new ScenarioImpl(config);
 	}
 
 	public void testPlanomatJGAPConfiguration() {

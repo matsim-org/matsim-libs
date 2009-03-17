@@ -24,7 +24,7 @@ import java.util.HashMap;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.Events;
@@ -48,7 +48,7 @@ public class TRBAnalysis implements AgentDepartureEventHandler, AgentArrivalEven
 
 	public TRBAnalysis(final String[] args) {
 		this.config = Gbl.createConfig(args);
-		final ScenarioData data = new ScenarioData(config);
+		final ScenarioImpl data = new ScenarioImpl(config);
 		this.population = data.getPopulation();
 	}
 

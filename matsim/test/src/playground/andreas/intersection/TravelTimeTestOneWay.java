@@ -12,7 +12,7 @@ import java.io.OutputStreamWriter;
 import java.util.TreeMap;
 
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
@@ -52,7 +52,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 		String newLSADef = "./test/input/playground/andreas/intersection/oneways/lsa.xml";
 		String newLSADefCfg = "./test/input/playground/andreas/intersection/oneways/lsa_config.xml";
 		
-		ScenarioData data = new ScenarioData(conf);
+		ScenarioImpl data = new ScenarioImpl(conf);
 		Events events = new Events();
 		events.addHandler(this);
 		
@@ -134,7 +134,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 		String newLSADef = "./test/input/playground/andreas/intersection/oneways/lsa.xml";
 		String newLSADefCfg = "./test/input/playground/andreas/intersection/oneways/lsa_config.xml";
 		
-		ScenarioData data = new ScenarioData(conf);
+		ScenarioImpl data = new ScenarioImpl(conf);
 		Events events = new Events();
 		events.addHandler(this);
 		

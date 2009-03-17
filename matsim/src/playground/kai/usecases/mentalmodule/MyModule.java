@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentArrivalEvent;
@@ -49,7 +49,7 @@ ActStartEventHandler
 {
 	private static final Logger log = Logger.getLogger(MyModule.class);
 	
-	ScenarioData sc ;
+	ScenarioImpl sc ;
 	NetworkLayer net ;
 	Population pop ;
 	

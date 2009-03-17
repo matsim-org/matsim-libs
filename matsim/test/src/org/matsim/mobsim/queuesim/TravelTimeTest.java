@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
@@ -54,7 +54,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 
 		conf.plans().setInputFile(popFileName);
 
-		ScenarioData data = new ScenarioData(conf);
+		ScenarioImpl data = new ScenarioImpl(conf);
 		Events events = new Events();
 		events.addHandler(this);
 
@@ -76,7 +76,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 
 		conf.plans().setInputFile(popFileName);
 
-		ScenarioData data = new ScenarioData(conf);
+		ScenarioImpl data = new ScenarioImpl(conf);
 		Events events = new Events();
 		events.addHandler(this);
 

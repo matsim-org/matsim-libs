@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentArrivalEvent;
@@ -164,7 +164,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler  {
 		}
 		this.printEvent=printEvent;
 
-		ScenarioData data = new ScenarioData(config);
+		ScenarioImpl data = new ScenarioImpl(config);
 		NetworkLayer network = data.getNetwork();
 		Population population = data.getPopulation();
 		if (populationModifier != null) {

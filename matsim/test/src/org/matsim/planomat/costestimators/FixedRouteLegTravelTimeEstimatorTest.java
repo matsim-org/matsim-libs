@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEventImpl;
 import org.matsim.events.Events;
@@ -48,7 +48,7 @@ import org.matsim.utils.misc.Time;
 
 public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
-	protected ScenarioData scenario = null;
+	protected ScenarioImpl scenario = null;
 	
 	protected static final Id TEST_PERSON_ID = new IdImpl("1");
 	private static final int TEST_PLAN_NR = 0;
@@ -77,7 +77,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		Config config = super.loadConfig(CONFIGFILE);
 
-		this.scenario = new ScenarioData(config);
+		this.scenario = new ScenarioImpl(config);
 		
 		// the estimator is tested on the central route alternative through equil-net
 		// first person

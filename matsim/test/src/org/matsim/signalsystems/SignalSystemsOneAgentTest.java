@@ -30,7 +30,7 @@ import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
@@ -79,7 +79,7 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 		conf.plans().setInputFile(plansFile);
-		ScenarioData data = new ScenarioData(conf);
+		ScenarioImpl data = new ScenarioImpl(conf);
 		BasicLaneDefinitions lanedefs = data.getLaneDefinitions();
 		BasicSignalSystems signalSystems = data.getSignalSystems();
 

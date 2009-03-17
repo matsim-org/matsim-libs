@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
@@ -71,7 +71,7 @@ public class ScenarioCut {
 	public static void run() {
 		
 		System.out.println("read scenario data... " + (new Date()));
-		ScenarioData sd = new ScenarioData(Gbl.getConfig());
+		ScenarioImpl sd = new ScenarioImpl(Gbl.getConfig());
 		Facilities facilities = sd.getFacilities();
 		NetworkLayer network = sd.getNetwork();
 		Population population = sd.getPopulation();

@@ -34,7 +34,7 @@ import net.opengis.kml._2.ScreenOverlayType;
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.config.MatsimConfigReader;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
@@ -306,7 +306,7 @@ public class TollSchemeGenerator {
 	private Config config;
 	private NetworkLayer network;
 	private Coord[] usedCoords;
-	private ScenarioData scenario;
+	private ScenarioImpl scenario;
 
 	// TODO change used data here:
 	private String usedConf = SCHWEIZCHCONF;
@@ -375,7 +375,7 @@ public class TollSchemeGenerator {
 	}
 
 	private NetworkLayer createTollScheme(Config config) {
-		this.scenario = new ScenarioData(config);
+		this.scenario = new ScenarioImpl(config);
 		this.network = this.scenario.getNetwork();
 
 		NetworkLayer net = filterNetwork(this.network, false);

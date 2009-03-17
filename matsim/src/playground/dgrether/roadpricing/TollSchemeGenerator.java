@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.MatsimConfigReader;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
@@ -148,7 +148,7 @@ public class TollSchemeGenerator {
 
 	private Coord[] usedCoords;
 
-	private ScenarioData scenario;
+	private ScenarioImpl scenario;
 
 	// TODO change used data here:
 	// private String usedConf = EQUILCONFIG;
@@ -244,7 +244,7 @@ public class TollSchemeGenerator {
 	}
 
 	private NetworkLayer createTollScheme(Config config) {
-		this.scenario = new ScenarioData(config);
+		this.scenario = new ScenarioImpl(config);
 		this.network = this.scenario.getNetwork();
 
 		NetworkLayer net = filterNetwork(this.network, false);

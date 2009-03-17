@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
@@ -53,7 +53,7 @@ public class DistanceDistribution {
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		Config config = Gbl.createConfig(new String[]{args[0]});
-		ScenarioData data = new ScenarioData(config);
+		ScenarioImpl data = new ScenarioImpl(config);
 		Population population = data.getPopulation();
 		
 		Collection<Person> persons2 = new HashSet<Person>();

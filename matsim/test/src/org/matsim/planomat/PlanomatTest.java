@@ -29,7 +29,7 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
@@ -62,7 +62,7 @@ public class PlanomatTest extends MatsimTestCase {
 	
 	private static final Logger log = Logger.getLogger(PlanomatTest.class);
 
-	private ScenarioData scenario;
+	private ScenarioImpl scenario;
 	
 	@Override
 	protected void setUp() throws Exception {
@@ -71,7 +71,7 @@ public class PlanomatTest extends MatsimTestCase {
 		if (this.getName().equals("testRunDefaultManyModes")) {
 			Gbl.getConfig().plans().setInputFile(this.getInputDirectory() + "input_plans.xml.gz");
 		}
-		this.scenario = new ScenarioData(config);
+		this.scenario = new ScenarioImpl(config);
 	}
 
 	public void testRunDefault() {

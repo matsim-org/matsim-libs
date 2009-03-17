@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import org.matsim.config.Config;
 import org.matsim.config.MatsimConfigReader;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Population;
@@ -52,7 +52,7 @@ public class PDESStarter3 {
 		}
 		
 		// prepare data
-		ScenarioData data = new ScenarioData(config);
+		ScenarioImpl data = new ScenarioImpl(config);
 		NetworkLayer network = data.getNetwork();
 		Population population = data.getPopulation();
 		Events events = new Events();

@@ -169,7 +169,7 @@ public class Controler {
 	private String externalMobsim = null;
 
 	public final IterationStopWatch stopwatch = new IterationStopWatch();
-	private ScenarioData scenarioData = null;
+	private ScenarioImpl scenarioData = null;
 	private RoadPricing roadPricing = null;
 	private ScoreStats scoreStats = null;
 	private TravelDistanceStats travelDistanceStats = null;
@@ -561,7 +561,7 @@ public class Controler {
 	 */
 	protected void loadData() {
 		if (this.network == null) {
-			this.scenarioData = new ScenarioData(this.config, this.networkFactory);
+			this.scenarioData = new ScenarioImpl(this.config, this.networkFactory);
 			this.network = loadNetwork();
 			this.population = loadPopulation();
 		}
@@ -980,7 +980,7 @@ public class Controler {
 	 * This is here for testing purposes only.  Kai, mar08
 	 */
 	@Deprecated
-	public final ScenarioData getScenarioData() {
+	public final ScenarioImpl getScenarioData() {
 		return this.scenarioData ;
 	}
 

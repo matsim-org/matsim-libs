@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.core.v01.Person;
@@ -47,7 +47,7 @@ public class SimplifyPersons {
 	public static void main(String[] args) {
 		Config config = Gbl.createConfig(new String[]{args[0]});
 		
-		ScenarioData data = new ScenarioData(config);
+		ScenarioImpl data = new ScenarioImpl(config);
 
 		double centerX = 683000;
 		double centerY = 247000;

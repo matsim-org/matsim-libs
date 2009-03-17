@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import org.matsim.config.Config;
 import org.matsim.config.MatsimConfigReader;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Population;
@@ -137,7 +137,7 @@ public class OTFVis {
 		} else {
 			new MatsimConfigReader(config).readFile(args[0]);
 		}
-		ScenarioData data = new ScenarioData(config);
+		ScenarioImpl data = new ScenarioImpl(config);
 		Events events = new Events();
 
 		Population pop;

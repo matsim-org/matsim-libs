@@ -62,13 +62,13 @@ import org.xml.sax.SAXException;
  *
  * @author mrieser
  */
-public class ScenarioData implements Scenario {
+public class ScenarioImpl implements Scenario {
 	private final String worldFileName;
 	private final String networkFileName;
 	private final String facilitiesFileName;
 	private final String populationFileName;
 	private boolean isTimeVariantNetwork = false;
-	private String changEventsInputFile;
+	private String networkChangeEventsInputFile;
 
 	private boolean worldLoaded = false;
 	private boolean networkLoaded = false;
@@ -86,7 +86,7 @@ public class ScenarioData implements Scenario {
 	private final NetworkFactory networkFactory;
 	private Config config;
 
-	private static final Logger log = Logger.getLogger(ScenarioData.class);
+	private static final Logger log = Logger.getLogger(ScenarioImpl.class);
 
 	/**
 	 * Loads the data from the locations specified in the configuration.
@@ -94,15 +94,15 @@ public class ScenarioData implements Scenario {
 	 *
 	 * @param config
 	 */
-	public ScenarioData(final Config config) {
+	public ScenarioImpl(final Config config) {
 		this(config, (NetworkFactory)null);
 	}
 
-	public ScenarioData(final Config config, final NetworkFactory factory) {
+	public ScenarioImpl(final Config config, final NetworkFactory factory) {
 		this.worldFileName = config.world().getInputFile();
 		this.networkFileName = config.network().getInputFile();
 		this.isTimeVariantNetwork = config.network().isTimeVariantNetwork();
-		this.changEventsInputFile = config.network().getChangeEventsInputFile();
+		this.networkChangeEventsInputFile = config.network().getChangeEventsInputFile();
 		this.facilitiesFileName = config.facilities().getInputFile();
 		this.populationFileName = config.plans().getInputFile();
 		this.config = config;
@@ -116,7 +116,7 @@ public class ScenarioData implements Scenario {
 		}
 	}
 
-	public ScenarioData(final String worldFileName, final String networkFileName,
+	public ScenarioImpl(final String worldFileName, final String networkFileName,
 			final String facilitiesFileName, final String populationFileName) {
 		this.worldFileName = worldFileName;
 		this.networkFileName = networkFileName;
@@ -125,7 +125,7 @@ public class ScenarioData implements Scenario {
 		this.networkFactory = new NetworkFactory();
 	}
 
-	public ScenarioData(Config config, NetworkLayer network) {
+	public ScenarioImpl(Config config, NetworkLayer network) {
 		this(config, network.getFactory());
 		this.network = network;
 	}
@@ -162,11 +162,11 @@ public class ScenarioData implements Scenario {
 			this.world.setNetworkLayer(this.network);
 			this.world.complete();
 
-			if ((this.changEventsInputFile != null) && this.isTimeVariantNetwork){
-				log.info("loading network change events from " + this.changEventsInputFile);
+			if ((this.networkChangeEventsInputFile != null) && this.isTimeVariantNetwork){
+				log.info("loading network change events from " + this.networkChangeEventsInputFile);
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(this.network);
 				try {
-					parser.parse(this.changEventsInputFile);
+					parser.parse(this.networkChangeEventsInputFile);
 				} catch (SAXException e) {
 					e.printStackTrace();
 				} catch (ParserConfigurationException e) {

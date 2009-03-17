@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.gis;
 
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.network.NetworkLayer;
 
 
@@ -40,7 +40,7 @@ public class ShapeFileNetworkWriter {
 	
 	
 	public void writeNetwork(String network, String outfile) {
-		ScenarioData scenario = new ScenarioData(null, network, null, null);	
+		ScenarioImpl scenario = new ScenarioImpl(null, network, null, null);	
 		NetworkLayer net = scenario.getNetwork();
 		writeNetwork(net, outfile);
 	}

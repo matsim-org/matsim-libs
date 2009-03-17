@@ -58,7 +58,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
@@ -278,7 +278,7 @@ public class MyRuns {
 		Gbl.printSystemInfo();
 
 		final Config config = Gbl.createConfig(new String[] {"../mystudies/navteq-config.xml"}); // overwrite args
-		final ScenarioData data = new ScenarioData(config);
+		final ScenarioImpl data = new ScenarioImpl(config);
 
 		log.info("reading world, facilities and network ... ");
 		data.getWorld();
@@ -2226,7 +2226,7 @@ public class MyRuns {
 		QVDiagramm qvds[] = new QVDiagramm[links.length];
 
 		Config config = Gbl.createConfig(args);
-		ScenarioData data = new ScenarioData(config);
+		ScenarioImpl data = new ScenarioImpl(config);
 
 		Events events = new Events();
 		NetworkLayer network = data.getNetwork();

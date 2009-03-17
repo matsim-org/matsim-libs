@@ -8,7 +8,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentArrivalEvent;
@@ -163,7 +163,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 		}
 		this.printEvent = printEvent;
 
-		ScenarioData data = new ScenarioData(config);
+		ScenarioImpl data = new ScenarioImpl(config);
 		NetworkLayer network = data.getNetwork();
 		Population population = data.getPopulation();
 		if (populationModifier != null) {

@@ -25,7 +25,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterXML;
 import org.matsim.gbl.Gbl;
@@ -50,7 +50,7 @@ public class TestIntegration {
 
 	public static void main(final String[] args) {
 		final Config config = Gbl.createConfig(new String[] {"test/input/playground/marcel/pt/config.xml"});
-		final ScenarioData scenario = new ScenarioData(config);
+		final ScenarioImpl scenario = new ScenarioImpl(config);
 		final TransitSchedule schedule = new TransitSchedule();
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");

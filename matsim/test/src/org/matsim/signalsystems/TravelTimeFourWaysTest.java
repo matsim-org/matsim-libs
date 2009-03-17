@@ -21,7 +21,7 @@
 package org.matsim.signalsystems;
 
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.mobsim.queuesim.QueueSimulation;
@@ -45,7 +45,7 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		conf.network().setLaneDefinitionsFile(laneDefinitions);
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
-		ScenarioData data = new ScenarioData(conf);
+		ScenarioImpl data = new ScenarioImpl(conf);
 
 		Events events = new Events();
 		String tempout = this.getOutputDirectory() + "events.txt.gz";
@@ -71,7 +71,7 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 		conf.plans().setInputFile(this.getClassInputDirectory() + "plans_uturn.xml.gz");
-		ScenarioData data = new ScenarioData(conf);
+		ScenarioImpl data = new ScenarioImpl(conf);
 		Events events = new Events();
 		String tempout = this.getOutputDirectory() + "events.txt";
 		EventWriterTXT eWriter = new EventWriterTXT(tempout);

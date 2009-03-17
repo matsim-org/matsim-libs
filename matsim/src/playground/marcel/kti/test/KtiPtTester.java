@@ -24,7 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
@@ -44,13 +44,13 @@ public class KtiPtTester {
 
 	final private Config config;
 	final private World world;
-	final private ScenarioData data;
+	final private ScenarioImpl data;
 	private Matrix ptTravelTimes = null;
 
 	public KtiPtTester(final String[] args) {
 		this.config = Gbl.createConfig(args);
 		this.world = Gbl.createWorld();
-		this.data = new ScenarioData(this.config);
+		this.data = new ScenarioImpl(this.config);
 	}
 
 	public void readPtTimeMatrix(final String filename) {

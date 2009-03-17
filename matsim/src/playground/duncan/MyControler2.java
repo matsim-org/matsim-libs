@@ -32,7 +32,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
@@ -142,7 +142,7 @@ public class MyControler2 {
 		} else {
 			Gbl.createConfig(args) ;
 		}
-		ScenarioData scenarioData = new ScenarioData( Gbl.getConfig() ) ;
+		ScenarioImpl scenarioData = new ScenarioImpl( Gbl.getConfig() ) ;
 
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.

@@ -29,7 +29,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
@@ -106,7 +106,7 @@ public class MyRuns {
 
 	public static void setPlansToSameDepTime(Config config) {
 		
-		ScenarioData scenario = new ScenarioData(config);
+		ScenarioImpl scenario = new ScenarioImpl(config);
 		Population population = scenario.getPopulation();
 
 		PersonSetFirstActEndTime psfaet = new PersonSetFirstActEndTime(24.0 * 3600);

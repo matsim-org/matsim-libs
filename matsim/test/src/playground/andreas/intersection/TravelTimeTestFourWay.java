@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentArrivalEvent;
@@ -53,7 +53,7 @@ public class TravelTimeTestFourWay extends MatsimTestCase implements	LinkLeaveEv
 		String newLSADef = "test/input/playground/andreas/intersection/fourways/lsa.xml";
 		String newLSADefCfg = "test/input/playground/andreas/intersection/fourways/lsa_config.xml";
 		
-		ScenarioData data = new ScenarioData(conf);
+		ScenarioImpl data = new ScenarioImpl(conf);
 		Events events = new Events();
 		events.addHandler(this);
 		
@@ -86,7 +86,7 @@ public class TravelTimeTestFourWay extends MatsimTestCase implements	LinkLeaveEv
 		String newLSADef = "test/input/playground/andreas/intersection/fourways/lsa.xml";
 		String newLSADefCfg = "test/input/playground/andreas/intersection/fourways/lsa_config.xml";
 		
-		ScenarioData data = new ScenarioData(conf);
+		ScenarioImpl data = new ScenarioImpl(conf);
 		Events events = new Events();
 		events.addHandler(this);
 		

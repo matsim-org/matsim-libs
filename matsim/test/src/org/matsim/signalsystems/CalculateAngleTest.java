@@ -1,7 +1,7 @@
 package org.matsim.signalsystems;
 
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.signalsystems.CalculateAngle;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -14,7 +14,7 @@ public class CalculateAngleTest extends MatsimTestCase {
     
 	public void testCalculateAngle() {
 		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
-		ScenarioData data = new ScenarioData(conf);
+		ScenarioImpl data = new ScenarioImpl(conf);
 		
 		assertEquals("Has to be 'null', since there is no other way back but Link 11.",
 				null, CalculateAngle.getLeftLane(data.getNetwork().getLink("1")));

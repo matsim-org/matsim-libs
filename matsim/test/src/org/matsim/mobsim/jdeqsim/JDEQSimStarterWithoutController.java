@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import org.matsim.config.Config;
 import org.matsim.config.MatsimConfigReader;
-import org.matsim.controler.ScenarioData;
+import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.Events;
 import org.matsim.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.gbl.Gbl;
@@ -55,7 +55,7 @@ public class JDEQSimStarterWithoutController {
 		}
 		
 		// prepare data
-		ScenarioData data = new ScenarioData(config);
+		ScenarioImpl data = new ScenarioImpl(config);
 		NetworkLayer network = data.getNetwork();
 		Population population = data.getPopulation();
 		// TODO: remove this after integration into core.
