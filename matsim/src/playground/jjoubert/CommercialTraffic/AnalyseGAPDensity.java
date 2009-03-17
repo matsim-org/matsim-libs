@@ -40,9 +40,9 @@ public class AnalyseGAPDensity {
 	//    WesternCape: 2
 	
 	// Mac
-	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-//	final static String ROOT = "/home/jjoubert/";
+	final static String ROOT = "/home/jjoubert/";
 	// Derived string values
 	final static String GAP_SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "GAP_UTM35S.shp";
 	final static String SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
