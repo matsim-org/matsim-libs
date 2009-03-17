@@ -32,9 +32,13 @@ public abstract class LinkEvent extends PersonEvent implements BasicLinkEvent {
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_LEG = "leg";
 
+	/**
+	 * @deprecated please use {@link #getLinkId()}
+	 */
+	@Deprecated
 	public final String linkId;
 	private final Id linkId_;
-	public transient Link link;
+	public transient Link link; // TODO [MR] refactor: encapsulate
 
 	LinkEvent(final double time, final Person agent, final Link link) {
 		super(time, agent);

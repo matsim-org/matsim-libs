@@ -36,6 +36,10 @@ public abstract class AgentEvent extends PersonEvent implements BasicAgentEvent 
 	private Link link;
 	private Leg leg;
 
+	/**
+	 * @deprecated please use {@link #getLinkId()}
+	 */
+	@Deprecated
 	public final String linkId;
 	private final Id linkId_;
 
