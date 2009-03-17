@@ -22,14 +22,9 @@ package org.matsim.interfaces.basic.v01;
 import java.util.List;
 
 /**
- *
-* @author dgrether
-*
-*/
+ * @author dgrether
+ */
 public interface BasicPerson<T extends BasicPlan> extends Identifiable {
-
-//	TODO [kai]: Would make more sense to be to have something like "getAttributes" and "getPlans".  Current version seems a bit
-//	over-specified to me.  kai, feb09
 
 	public void addPlan(final T plan);
 

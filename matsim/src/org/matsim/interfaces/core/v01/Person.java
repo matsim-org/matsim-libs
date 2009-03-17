@@ -108,7 +108,10 @@ public interface Person extends BasicPerson<Plan>, Customizable{
 	public Household getHousehold();
 
 	
-	
+//TODO [kai]: Would make more sense to be to have something like "getAttributes" and "getPlans".  Current version seems a bit
+//over-specified to me.  kai, feb09
+
+
 	public String getSex();
 
 	public int getAge();
