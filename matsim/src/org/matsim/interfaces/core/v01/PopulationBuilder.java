@@ -21,11 +21,11 @@ package org.matsim.interfaces.core.v01;
 
 import java.util.List;
 
-import org.matsim.interfaces.basic.v01.BasicPerson;
-import org.matsim.interfaces.basic.v01.BasicPlan;
-import org.matsim.interfaces.basic.v01.BasicPopulationBuilder;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
+import org.matsim.interfaces.basic.v01.population.BasicPerson;
+import org.matsim.interfaces.basic.v01.population.BasicPlan;
+import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
 
 /**
  * @author dgrether

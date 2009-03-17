@@ -21,7 +21,7 @@
 package org.matsim.population;
 
 import org.matsim.basic.v01.BasicLegImpl;
-import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Route;

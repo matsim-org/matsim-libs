@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilitiesI.java
+ * BasicAct.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,13 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.interfaces.basic.v01;
+package org.matsim.interfaces.basic.v01.population;
 
 import java.util.Map;
 
-public interface BasicFacilities {
+import org.matsim.interfaces.basic.v01.Id;
 
-	public Map<Id, ? extends BasicFacility> getFacilities();
+/**
+* @author dgrether
+*/
+public interface BasicPopulation<T extends BasicPerson> {
+	// Bin inzwischen der Meinung, dass wir es bei "population" lassen sollten, und dafuer "households" 
+	// noch einhaengen sollten.  kai, feb09
 
+	public String getName();
+	
+	public void setName(String name);
+	
+	public void addPerson(T person);
+
+	/** @deprecated please use getPersons().get(personId) instead. */
+	@Deprecated
+	public T getPerson(Id personId);
+
+	public Map<Id, T> getPersons();
+	
+	public BasicPopulationBuilder getPopulationBuilder();
+	
+	// TODO:
+
+//	public Map<Id,?> getHouseholds() ;
+//  public void addHousehold( ?? ) ;
+	
 }

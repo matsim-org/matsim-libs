@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
+import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;

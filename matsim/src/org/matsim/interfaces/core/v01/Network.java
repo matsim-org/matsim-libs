@@ -22,8 +22,8 @@ package org.matsim.interfaces.core.v01;
 
 import java.util.Collection;
 
-import org.matsim.interfaces.basic.v01.BasicNetwork;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.network.BasicNetwork;
 import org.matsim.network.NetworkFactory;
 
 // FIXME [MR] still imports NetworkFactory from outside interface

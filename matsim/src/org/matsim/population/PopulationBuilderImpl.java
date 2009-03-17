@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.BasicActivityOption;
-import org.matsim.interfaces.basic.v01.BasicPerson;
-import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
+import org.matsim.interfaces.basic.v01.facilities.BasicActivityOption;
+import org.matsim.interfaces.basic.v01.population.BasicPerson;
+import org.matsim.interfaces.basic.v01.population.BasicPlan;
+import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Facilities;

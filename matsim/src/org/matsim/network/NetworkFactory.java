@@ -25,9 +25,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.network.BasicNode;
+import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
@@ -99,7 +99,7 @@ public class NetworkFactory {
 	 * @return a new Route for the specified mode
 	 * @throws IllegalArgumentException if no {@link RouteFactory} is registered that creates routes for the specified mode.
 	 *
-	 * @see #setRouteFactory(org.matsim.interfaces.basic.v01.BasicLeg.Mode, RouteFactory)
+	 * @see #setRouteFactory(org.matsim.interfaces.basic.v01.population.BasicLeg.Mode, RouteFactory)
 	 */
 	public Route createRoute(final BasicLeg.Mode mode, final Link startLink, final Link endLink) {
 		final RouteFactory factory = this.routeFactories.get(mode);

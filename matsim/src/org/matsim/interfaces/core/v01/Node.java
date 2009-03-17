@@ -22,8 +22,8 @@ package org.matsim.interfaces.core.v01;
 
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.network.BasicNode;
 
 public interface Node extends BasicNode, Comparable<Node> {
 

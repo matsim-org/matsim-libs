@@ -24,9 +24,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicLink;
-import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.network.BasicLink;
+import org.matsim.interfaces.basic.v01.network.BasicNode;
 import org.matsim.interfaces.core.v01.Coord;
 
 public class BasicNodeImpl implements BasicNode {

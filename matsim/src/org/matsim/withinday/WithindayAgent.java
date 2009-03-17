@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.events.AgentReplanEvent;
-import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;

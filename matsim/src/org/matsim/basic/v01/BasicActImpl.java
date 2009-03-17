@@ -20,8 +20,8 @@
 
 package org.matsim.basic.v01;
 
-import org.matsim.interfaces.basic.v01.BasicActivity;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.population.BasicActivity;
 import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.utils.misc.Time;
 
@@ -95,7 +95,7 @@ public class BasicActImpl implements BasicActivity {
 
 
 	/**
-	 * @see org.matsim.basic.v01.BasicActivity#getDuration()
+	 * @see org.matsim.interfaces.basic.v01.population.BasicActivity#getDuration()
 	 */
 	@Deprecated // nov08, dg
 	public double getDuration() {
@@ -103,7 +103,7 @@ public class BasicActImpl implements BasicActivity {
 	}
 
 	/**
-	 * @see org.matsim.basic.v01.BasicActivity#setDuration(double)
+	 * @see org.matsim.interfaces.basic.v01.population.BasicActivity#setDuration(double)
 	 */
 	@Deprecated // nov08, dg
 	public void setDuration(final double dur) {

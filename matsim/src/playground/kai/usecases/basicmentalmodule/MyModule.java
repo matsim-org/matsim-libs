@@ -6,6 +6,18 @@ import org.apache.log4j.Logger;
 
 import org.matsim.interfaces.basic.v01.* ;
 import org.matsim.interfaces.basic.v01.events.* ;
+import org.matsim.interfaces.basic.v01.facilities.BasicFacilities;
+import org.matsim.interfaces.basic.v01.facilities.BasicFacility;
+import org.matsim.interfaces.basic.v01.network.BasicLink;
+import org.matsim.interfaces.basic.v01.network.BasicNetwork;
+import org.matsim.interfaces.basic.v01.network.BasicNode;
+import org.matsim.interfaces.basic.v01.population.BasicActivity;
+import org.matsim.interfaces.basic.v01.population.BasicLeg;
+import org.matsim.interfaces.basic.v01.population.BasicPerson;
+import org.matsim.interfaces.basic.v01.population.BasicPlan;
+import org.matsim.interfaces.basic.v01.population.BasicPopulation;
+import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.interfaces.basic.v01.population.BasicRoute;
 
 // TODO: add events handlers in basic
 import org.matsim.events.handler.*;

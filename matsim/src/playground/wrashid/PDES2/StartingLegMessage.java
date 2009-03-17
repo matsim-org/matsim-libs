@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
-import org.matsim.interfaces.basic.v01.BasicLeg;
-import org.matsim.interfaces.basic.v01.BasicPlanElement;
+import org.matsim.interfaces.basic.v01.population.BasicLeg;
+import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Plan;

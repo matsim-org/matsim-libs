@@ -21,7 +21,7 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.testcases.MatsimTestCase;

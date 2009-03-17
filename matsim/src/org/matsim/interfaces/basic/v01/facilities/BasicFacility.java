@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,34 +16,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.interfaces.basic.v01;
+
+package org.matsim.interfaces.basic.v01.facilities;
 
 import java.util.Map;
 
-/**
-* @author dgrether
-*/
-public interface BasicPopulation<T extends BasicPerson> {
-	// Bin inzwischen der Meinung, dass wir es bei "population" lassen sollten, und dafuer "households" 
-	// noch einhaengen sollten.  kai, feb09
+import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.world.Location;
 
-	public String getName();
-	
-	public void setName(String name);
-	
-	public void addPerson(T person);
+public interface BasicFacility extends Location {
 
-	/** @deprecated please use getPersons().get(personId) instead. */
-	@Deprecated
-	public T getPerson(Id personId);
+	public Map<String, ? extends BasicActivityOption> getActivityOptions();
 
-	public Map<Id, T> getPersons();
-	
-	public BasicPopulationBuilder getPopulationBuilder();
-	
-	// TODO:
+	public BasicActivityOption getActivityOption(final String type);
 
-//	public Map<Id,?> getHouseholds() ;
-//  public void addHousehold( ?? ) ;
-	
+	public Id getLinkId();
+
 }

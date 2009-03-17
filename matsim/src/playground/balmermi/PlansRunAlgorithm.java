@@ -24,7 +24,7 @@ import java.util.Date;
 
 import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;

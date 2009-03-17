@@ -21,8 +21,8 @@ package org.matsim.interfaces.core.v01;
 
 import java.util.TreeSet;
 
-import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.population.BasicPerson;
 import org.matsim.population.Desires;
 import org.matsim.population.Knowledge;
 import org.matsim.utils.customize.Customizable;

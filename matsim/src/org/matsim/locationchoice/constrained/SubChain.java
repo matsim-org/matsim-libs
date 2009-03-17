@@ -23,7 +23,7 @@ package org.matsim.locationchoice.constrained;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
+import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Coord;
 

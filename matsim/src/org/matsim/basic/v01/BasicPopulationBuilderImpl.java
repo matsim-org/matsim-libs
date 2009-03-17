@@ -22,16 +22,16 @@ package org.matsim.basic.v01;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.interfaces.basic.v01.BasicActivityOption;
-import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicLocation;
-import org.matsim.interfaces.basic.v01.BasicPerson;
-import org.matsim.interfaces.basic.v01.BasicPlan;
-import org.matsim.interfaces.basic.v01.BasicPopulation;
-import org.matsim.interfaces.basic.v01.BasicPopulationBuilder;
-import org.matsim.interfaces.basic.v01.BasicRoute;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
+import org.matsim.interfaces.basic.v01.facilities.BasicActivityOption;
+import org.matsim.interfaces.basic.v01.population.BasicLeg;
+import org.matsim.interfaces.basic.v01.population.BasicPerson;
+import org.matsim.interfaces.basic.v01.population.BasicPlan;
+import org.matsim.interfaces.basic.v01.population.BasicPopulation;
+import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.interfaces.basic.v01.population.BasicRoute;
+import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
 
 /**
  * @author dgrether

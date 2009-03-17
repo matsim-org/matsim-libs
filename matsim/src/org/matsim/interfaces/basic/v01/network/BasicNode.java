@@ -18,9 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.basic.v01;
+package org.matsim.interfaces.basic.v01.network;
 
 import java.util.Map;
+
+import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.interfaces.basic.v01.Id;
 
 
 /**

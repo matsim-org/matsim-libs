@@ -18,8 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.basic.v01;
+package org.matsim.interfaces.basic.v01.network;
 
+import org.matsim.interfaces.basic.v01.Identifiable;
 import org.matsim.interfaces.core.v01.Network;
 import org.matsim.utils.misc.Time;
 

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicNode;
+import org.matsim.interfaces.basic.v01.network.BasicNode;
 import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;

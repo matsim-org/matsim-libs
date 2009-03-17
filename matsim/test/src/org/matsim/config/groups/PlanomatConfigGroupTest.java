@@ -23,7 +23,7 @@ package org.matsim.config.groups;
 import java.util.Arrays;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PlanomatConfigGroupTest extends MatsimTestCase {

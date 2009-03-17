@@ -25,8 +25,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.interfaces.basic.v01.BasicActivityOption;
 import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.interfaces.basic.v01.facilities.BasicActivityOption;
 
 /**
  * @author dgrether

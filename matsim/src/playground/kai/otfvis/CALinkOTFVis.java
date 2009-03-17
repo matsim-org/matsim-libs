@@ -17,7 +17,7 @@ import javax.swing.JSplitPane;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.BasicNode;
+import org.matsim.interfaces.basic.v01.network.BasicNode;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.mobsim.queuesim.QueueLink;

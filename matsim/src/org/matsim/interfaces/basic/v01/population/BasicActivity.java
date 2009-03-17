@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,32 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.basic.v01;
+package org.matsim.interfaces.basic.v01.population;
 
-import java.util.List;
+import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Coord;
 
 
 /**
-* @author dgrether
-*/
-public interface BasicRoute {
+ *
+ * @author dgrether
+ */
+public interface BasicActivity extends BasicPlanElement {
 
-	public double getDistance();
+	public double getEndTime();
 
-	public void setDistance(final double distance);
+	public void setEndTime(final double seconds);
 
-	public double getTravelTime();
+	/**
+	 * Activity type is, until further notice, defined via the config file.
+	 * 
+	 * @return
+	 */
+	public String getType();
 
-	public void setTravelTime(final double travelTime);
+	public void setType(final String type);
 
-	public List<Id> getLinkIds();
+	@Deprecated // not yet clear what will happen, may not survive
+	public Coord getCoord();
 
-//	public void setStartLinkId(final Id linkId);
+	@Deprecated // not yet clear what will happen, may not survive
+	public void setCoord(Coord coordinates);
 
-	public Id getStartLinkId();
+	public double getStartTime();
 
-//	public void setEndLinkId(final Id linkId);
+	public void setStartTime(double seconds);
 
-	public Id getEndLinkId();
+	public Id getLinkId();
+
+	public void setLinkId(final Id id);
+	
+	public Id getFacilityId();
+	
+	public void setFacilityId(final Id id);
 
 }

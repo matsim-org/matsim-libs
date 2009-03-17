@@ -1,7 +1,7 @@
 package org.matsim.interfaces.core.v01;
 
-import org.matsim.interfaces.basic.v01.BasicActivity;
-import org.matsim.interfaces.basic.v01.BasicLink;
+import org.matsim.interfaces.basic.v01.network.BasicLink;
+import org.matsim.interfaces.basic.v01.population.BasicActivity;
 
 public interface Activity extends BasicActivity {
 

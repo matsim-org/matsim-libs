@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * BasicNetI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,46 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.basic.v01;
+package org.matsim.interfaces.basic.v01.network;
 
-import org.matsim.interfaces.core.v01.Coord;
+import java.util.Map;
+
+import org.matsim.interfaces.basic.v01.Id;
 
 
 /**
- *
- * @author dgrether
+ * A topological network representation.
  */
-public interface BasicActivity extends BasicPlanElement {
+public interface BasicNetwork<N extends BasicNode, L extends BasicLink> {
 
-	public double getEndTime();
+    /**
+     * Returns a set of this network's nodes. This set might be empty, but it
+     * must not be <code>null</code>.
+     *
+     * @return a set of this network's nodes
+     */
+    public Map<Id, N> getNodes();
 
-	public void setEndTime(final double seconds);
-
-	/**
-	 * Activity type is, until further notice, defined via the config file.
-	 * 
-	 * @return
-	 */
-	public String getType();
-
-	public void setType(final String type);
-
-	@Deprecated // not yet clear what will happen, may not survive
-	public Coord getCoord();
-
-	@Deprecated // not yet clear what will happen, may not survive
-	public void setCoord(Coord coordinates);
-
-	public double getStartTime();
-
-	public void setStartTime(double seconds);
-
-	public Id getLinkId();
-
-	public void setLinkId(final Id id);
-	
-	public Id getFacilityId();
-	
-	public void setFacilityId(final Id id);
+    /**
+     * Returns a set of this network's links. This set might be empty, but it
+     * must not be <code>null</code>.
+     *
+     * @return a set of this network's links
+     */
+    public Map<Id, L> getLinks();
 
 }

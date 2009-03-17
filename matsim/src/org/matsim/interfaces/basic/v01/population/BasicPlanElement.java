@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * BasicPlanElement.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,19 +17,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.interfaces.basic.v01;
 
-import java.util.List;
+package org.matsim.interfaces.basic.v01.population;
 
-/**
- * @author dgrether
- */
-public interface BasicPerson<T extends BasicPlan> extends Identifiable {
-
-	public void addPlan(final T plan);
-
-	public List<T> getPlans();
-
-	public void setId(final Id id);
+public interface BasicPlanElement {
 
 }

@@ -17,12 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.basic.v01;
+package org.matsim.interfaces.basic.v01.population;
 
 import java.util.List;
 
 import org.matsim.basic.v01.BasicKnowledge;
-import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
+import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.facilities.BasicActivityOption;
+import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
 
 /**
  * @author dgrether

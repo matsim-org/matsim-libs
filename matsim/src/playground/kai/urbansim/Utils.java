@@ -13,7 +13,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
+import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Plan;

@@ -22,8 +22,8 @@ package org.matsim.mobsim.queuesim;
 
 import java.util.Collection;
 
-import org.matsim.interfaces.basic.v01.BasicLink;
-import org.matsim.interfaces.basic.v01.BasicNetwork;
+import org.matsim.interfaces.basic.v01.network.BasicLink;
+import org.matsim.interfaces.basic.v01.network.BasicNetwork;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.VisConfig;
 

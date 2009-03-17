@@ -7,7 +7,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
-import org.matsim.interfaces.basic.v01.BasicNode;
+import org.matsim.interfaces.basic.v01.network.BasicNode;
 
 public class PTLinkFactory {
 	NetworkLayer net;

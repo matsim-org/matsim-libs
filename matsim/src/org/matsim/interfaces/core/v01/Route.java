@@ -20,7 +20,7 @@
 
 package org.matsim.interfaces.core.v01;
 
-import org.matsim.interfaces.basic.v01.BasicRoute;
+import org.matsim.interfaces.basic.v01.population.BasicRoute;
 
 /**
  * Defines the minimum amount of information a route in MATSim must provide.

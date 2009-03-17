@@ -23,9 +23,9 @@ package org.matsim.utils.vis.netvis.visNet;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.interfaces.basic.v01.BasicLink;
-import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.network.BasicLink;
+import org.matsim.interfaces.basic.v01.network.BasicNode;
 import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.utils.vis.netvis.drawableNet.DrawableNodeI;
 

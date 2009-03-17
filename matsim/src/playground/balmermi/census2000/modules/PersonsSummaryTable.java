@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.interfaces.basic.v01.BasicActivity;
+import org.matsim.interfaces.basic.v01.population.BasicActivity;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;

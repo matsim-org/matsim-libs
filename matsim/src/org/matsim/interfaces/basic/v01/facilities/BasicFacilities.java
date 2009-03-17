@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * FacilitiesI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,26 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.basic.v01;
+package org.matsim.interfaces.basic.v01.facilities;
 
-import java.util.SortedSet;
+import java.util.Map;
 
-import org.matsim.basic.v01.BasicOpeningTime;
-import org.matsim.basic.v01.BasicOpeningTime.DayType;
+import org.matsim.interfaces.basic.v01.Id;
 
-/**
- * @author dgrether
- */
-public interface BasicActivityOption {
-	
-	public Double getCapacity();
-	
-	public void setCapacity(Double cap);
+public interface BasicFacilities {
 
-	public void addOpeningTime(BasicOpeningTime openingTime);
-
-	public SortedSet<BasicOpeningTime> getOpeningTimes(DayType day);
-	
-	public String getType();
+	public Map<Id, ? extends BasicFacility> getFacilities();
 
 }

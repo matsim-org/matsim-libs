@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicNetI.java
+ * BasicAct.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.interfaces.basic.v01.population;
 
-package org.matsim.interfaces.basic.v01;
+import java.util.List;
 
-import java.util.Map;
-
+import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.Identifiable;
 
 /**
- * A topological network representation.
+ * @author dgrether
  */
-public interface BasicNetwork<N extends BasicNode, L extends BasicLink> {
+public interface BasicPerson<T extends BasicPlan> extends Identifiable {
 
-    /**
-     * Returns a set of this network's nodes. This set might be empty, but it
-     * must not be <code>null</code>.
-     *
-     * @return a set of this network's nodes
-     */
-    public Map<Id, N> getNodes();
+	public void addPlan(final T plan);
 
-    /**
-     * Returns a set of this network's links. This set might be empty, but it
-     * must not be <code>null</code>.
-     *
-     * @return a set of this network's links
-     */
-    public Map<Id, L> getLinks();
+	public List<T> getPlans();
+
+	public void setId(final Id id);
 
 }

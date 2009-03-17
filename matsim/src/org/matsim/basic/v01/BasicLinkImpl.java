@@ -20,9 +20,9 @@
 
 package org.matsim.basic.v01;
 
-import org.matsim.interfaces.basic.v01.BasicLink;
-import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.network.BasicLink;
+import org.matsim.interfaces.basic.v01.network.BasicNode;
 import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;

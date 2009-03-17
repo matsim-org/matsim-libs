@@ -29,7 +29,7 @@ import org.matsim.controler.Controler;
 import org.matsim.controler.events.ScoringEvent;
 import org.matsim.controler.listener.ScoringListener;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
+import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;

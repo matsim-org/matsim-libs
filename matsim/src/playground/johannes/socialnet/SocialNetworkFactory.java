@@ -25,9 +25,9 @@ package playground.johannes.socialnet;
 
 import java.util.Iterator;
 
-import org.matsim.interfaces.basic.v01.BasicPerson;
-import org.matsim.interfaces.basic.v01.BasicPlan;
-import org.matsim.interfaces.basic.v01.BasicPopulation;
+import org.matsim.interfaces.basic.v01.population.BasicPerson;
+import org.matsim.interfaces.basic.v01.population.BasicPlan;
+import org.matsim.interfaces.basic.v01.population.BasicPopulation;
 
 import playground.johannes.graph.generators.GraphFactory;
 

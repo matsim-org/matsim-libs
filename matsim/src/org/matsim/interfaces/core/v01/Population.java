@@ -22,8 +22,8 @@ package org.matsim.interfaces.core.v01;
 
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.BasicPopulation;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.population.BasicPopulation;
 
 /**
  * Root class of the population description (previously also called "plans file")

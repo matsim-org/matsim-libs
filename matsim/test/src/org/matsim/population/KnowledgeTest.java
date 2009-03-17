@@ -27,7 +27,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.FacilitiesImpl;
-import org.matsim.interfaces.basic.v01.BasicActivityOption;
+import org.matsim.interfaces.basic.v01.facilities.BasicActivityOption;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.testcases.MatsimTestCase;

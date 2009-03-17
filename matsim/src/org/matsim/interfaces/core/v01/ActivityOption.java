@@ -25,7 +25,7 @@ import java.util.SortedSet;
 
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.interfaces.basic.v01.BasicActivityOption;
+import org.matsim.interfaces.basic.v01.facilities.BasicActivityOption;
 
 public interface ActivityOption extends BasicActivityOption {
 

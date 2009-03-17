@@ -23,7 +23,7 @@ package playground.mfeil.config;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.config.Module;
-import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.population.BasicLeg;
 
 public class TimeModeChoicerConfigGroup extends Module {
 	
