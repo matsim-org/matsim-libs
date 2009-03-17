@@ -34,6 +34,8 @@ public interface BasicPopulation<T extends BasicPerson> {
 	
 	public void addPerson(T person);
 
+	/** @deprecated please use getPersons().get(personId) instead. */
+	@Deprecated
 	public T getPerson(Id personId);
 
 	public Map<Id, T> getPersons();
