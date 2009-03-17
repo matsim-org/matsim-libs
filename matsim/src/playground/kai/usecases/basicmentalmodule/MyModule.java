@@ -1,42 +1,28 @@
 package playground.kai.usecases.basicmentalmodule;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
+
+import org.matsim.interfaces.basic.v01.*;
+import org.matsim.interfaces.basic.v01.facilities.*;
+import org.matsim.interfaces.basic.v01.network.*;
+import org.matsim.interfaces.basic.v01.population.*;
+
+// TODO: add events handlers in basic. ok for today
+import org.matsim.events.handler.*;
+
+//TODO: use basic versions of this. ok for today
+import org.matsim.events.* ;
+
+// TODO: ???
 import org.matsim.controler.Controler;
-import org.matsim.events.ActEndEvent;
-import org.matsim.events.ActStartEvent;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.ActEndEventHandler;
-import org.matsim.events.handler.ActStartEventHandler;
-import org.matsim.events.handler.AgentArrivalEventHandler;
-import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.interfaces.basic.v01.BasicScenario;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.events.BasicActEndEvent;
-import org.matsim.interfaces.basic.v01.facilities.BasicFacilities;
-import org.matsim.interfaces.basic.v01.facilities.BasicFacility;
-import org.matsim.interfaces.basic.v01.network.BasicLink;
-import org.matsim.interfaces.basic.v01.network.BasicNetwork;
-import org.matsim.interfaces.basic.v01.network.BasicNode;
-import org.matsim.interfaces.basic.v01.population.BasicActivity;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.basic.v01.population.BasicPerson;
-import org.matsim.interfaces.basic.v01.population.BasicPlan;
-import org.matsim.interfaces.basic.v01.population.BasicPopulation;
-import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
-import org.matsim.interfaces.basic.v01.population.BasicRoute;
-import org.matsim.interfaces.core.v01.Plan;
+
+// TODO: ????  BasicStrategyModule???
 import org.matsim.replanning.modules.StrategyModule;
+
+// TODO: ????
+import org.matsim.interfaces.core.v01.Plan;
 
 
 @SuppressWarnings("unused")
@@ -90,14 +76,14 @@ ActStartEventHandler
 		}
 		
 		// go through population and copy to my personal population:
-		for ( BasicPerson<BasicPlan> person : pop.getPersons().values() ) {
+		for ( BasicPerson person : pop.getPersons().values() ) {
 			
 			Id id = person.getId();
 			
 			List<BasicPlan> plans = person.getPlans() ;
 			
 			for ( BasicPlan plan : plans ) {
-				for ( Object oo : plan.getPlanElements() ) {
+				for ( BasicPlanElement oo : plan.getPlanElements() ) {
 					if ( oo instanceof BasicActivity ) {
 						BasicActivity act = (BasicActivity) oo ;
 						act.getCoord() ; // deprecated ????
@@ -134,6 +120,8 @@ ActStartEventHandler
 			Id id = sc.createId("1") ; 
 
 			BasicPerson<BasicPlan> person = pb.createPerson(id) ;
+			pop.getPersons().put(id,person);
+			
 			// (can't be used at this level, but useful anyways)
 			// FIXME: createAndAddPerson ????
 			
@@ -169,7 +157,6 @@ ActStartEventHandler
 			routeIdList.add(id) ; routeIdList.add(id) ;
 
 			BasicRoute route = pb.createRoute(id, id, routeIdList ) ;
-			// FIXME: createRouteFromLinkIds ???
 			
 			leg.setRoute(route) ;
 			
@@ -181,7 +168,7 @@ ActStartEventHandler
 	}
 
 	public void handleEvent(ActEndEvent event) {
-		BasicActEndEvent ev = event ;
+		ActEndEvent ev = event ;
 		ev.getActType();
 		ev.getLinkId();
 		ev.getPersonId();
