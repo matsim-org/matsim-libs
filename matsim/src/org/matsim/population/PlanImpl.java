@@ -349,10 +349,6 @@ public class PlanImpl implements Plan {
 		return delegate.containsActivity(activityType);
 	}
 
-	public boolean equals(Object obj) {
-		return delegate.equals(obj);
-	}
-
 	public ActIterator getIteratorAct() {
 		return delegate.getIteratorAct();
 	}
@@ -367,10 +363,6 @@ public class PlanImpl implements Plan {
 
 	public Type getType() {
 		return delegate.getType();
-	}
-
-	public int hashCode() {
-		return delegate.hashCode();
 	}
 
 	public void setScore(Double score) {
