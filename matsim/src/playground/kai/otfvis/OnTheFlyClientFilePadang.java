@@ -65,7 +65,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	@Override
 	public OTFDrawer getLeftDrawerComponent(final JFrame frame) throws RemoteException {
 		 ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(2);
-		final OTFClientQuad clientQ = this.hostControl.createNewView(null, null, connect1);
+		final OTFClientQuad clientQ = this.hostControl.createNewView(null, connect1);
 
 		final OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);
 
@@ -104,7 +104,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	
 	@Override
 	public OTFDrawer getRightDrawerComponent(final JFrame frame) throws RemoteException {
-		final OTFClientQuad clientQ2 = this.hostControl.createNewView(null, null, connect1);
+		final OTFClientQuad clientQ2 = this.hostControl.createNewView(null, connect1);
 
 		final OTFDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
 //		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");

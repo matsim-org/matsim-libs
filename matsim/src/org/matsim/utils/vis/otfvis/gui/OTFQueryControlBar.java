@@ -43,6 +43,7 @@ import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQueryHandler;
@@ -81,14 +82,12 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	private final OTFHostControlBar handler;
 //	private final  String queryType = "Agent";
 	private JTextField text;
-	private transient final OTFVisConfig cfg;
 	private final List<OTFQuery> queryItems = new ArrayList<OTFQuery>();
 
 	
 	public OTFQueryControlBar(String name, OTFHostControlBar handler, final OTFVisConfig config) {
 		super(name);
 		this.handler = handler;
-		this.cfg = config;
 		{
 			JLabel jLabel3 = new JLabel();
 			add(jLabel3);
@@ -98,7 +97,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		{
 			ComboBoxModel leftMFuncModel =	new DefaultComboBoxModel(queries);
 			leftMFuncModel.setSelectedItem(queries[0]);
-			this.cfg.setQueryType(queries[0].clazz.getCanonicalName());
+			config.setQueryType(queries[0].clazz.getCanonicalName());
 			JComboBox queryType = new JComboBox();
 			add(queryType);
 			queryType.setActionCommand("type_changed");
@@ -132,7 +131,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		    
 			JCheckBox SynchBox = new JCheckBox("multiple select");
 			SynchBox.setMnemonic(KeyEvent.VK_M);
-			SynchBox.setSelected(cfg.isMultipleSelect());
+			SynchBox.setSelected(config.isMultipleSelect());
 			SynchBox.addItemListener(this);
 			add(SynchBox);
 
@@ -140,6 +139,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	}
 
 	public void actionPerformed(ActionEvent e) {
+		OTFVisConfig cfg = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 		String command = e.getActionCommand();
 		if("id_changed".equals(command)) {
 			String id = ((JTextField)e.getSource()).getText();
@@ -150,8 +150,8 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		} else if ("type_changed".equals(command)) {
 			JComboBox cb = (JComboBox)e.getSource();
 	        QueryEntry queryType = (QueryEntry)cb.getSelectedItem();
-	        this.cfg.setQueryType(queryType.clazz.getCanonicalName());
-	        this.cfg.setQueryType(queryType.clazz.getCanonicalName());
+	        cfg.setQueryType(queryType.clazz.getCanonicalName());
+	        cfg.setQueryType(queryType.clazz.getCanonicalName());
 	        removeQueries();
 	        cb.setToolTipText(queryType.toolTip);
 		} else if ("clear".equals(command)) {
@@ -161,9 +161,10 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	}
 
 	public void itemStateChanged(ItemEvent e) {
+		OTFVisConfig conf = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
 		if (source.getText().equals("multiple select")) {
-			cfg.setMultipleSelect(e.getStateChange() != ItemEvent.DESELECTED);
+			conf.setMultipleSelect(e.getStateChange() != ItemEvent.DESELECTED);
 		}
 	}
 
@@ -181,8 +182,9 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	}
 	
 	public void handleIdQuery(Collection<String> list, String queryName) {
+		OTFVisConfig conf = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 
-		if (!this.cfg.isMultipleSelect()) {
+		if (!conf.isMultipleSelect()) {
 			removeQueries();
 		}
 		
@@ -230,7 +232,9 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 			removeQueries();
 			handler.redrawHandlers();
 		} else {
-			String queryName = this.cfg.getQueryType();
+			OTFVisConfig conf = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+
+			String queryName = conf.getQueryType();
 			OTFQuery query = createQuery(queryName);
 			
 			if (query.getType() == OTFQuery.Type.AGENT) {

@@ -29,6 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.utils.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.gui.PreferencesDialog;
@@ -63,7 +64,8 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 				SynchBox.setVisible(true);
 				//SynchBox.setMaximumSize(new Dimension(250,60));
 				panel.add(SynchBox);
-
+			}
+			if((host.isLiveHost())||((cfg.getFileVersion()>=1) &&(cfg.getFileMinorVersion()>=4))) {
 				SynchBox = new JCheckBox("show link Ids");
 //				SynchBox.setMnemonic(KeyEvent.VK_M);
 				SynchBox.setSelected(cfg.drawLinkIds());
@@ -104,6 +106,7 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 	}
 
 	public void itemStateChanged(ItemEvent e) {
+		this.cfg = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis"));
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
 		if (source.getText().equals("show parked vehicles")) {
 			cfg.setShowParking(e.getStateChange() != ItemEvent.DESELECTED);
@@ -111,7 +114,7 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 			if (host != null) {
 				host.doQuery(new QueryToggleShowParking());
 				host.clearCaches();
-				host.invalidateHandlers();
+				host.redrawHandlers();
 			}
 		} else if (source.getText().equals("show link Ids")) {
 			// toggle draw link Ids

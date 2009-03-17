@@ -279,6 +279,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	private final List<OTFGLDrawable> overlayItems = new ArrayList<OTFGLDrawable>();
 	//private final List<OTFGLDrawable> otherItems = new ArrayList<OTFGLDrawable>();
 
+
 	//private final SimpleBackgroundDrawer background = null;
 
 	private static List<OTFGLDrawable> newItems = new ArrayList<OTFGLDrawable>();
@@ -544,14 +545,15 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			Map<CoordImpl, Boolean> xymap = new HashMap<CoordImpl, Boolean>(); // Why is here a Map used, and not a Set?
 			// Query linkIds
 			Rect rect = mouseMan.getBounds();
-			Rectangle2D.Double dest = new Rectangle2D.Double(rect.minX + clientQ.offsetEast, rect.minY + clientQ.offsetNorth, rect.maxX - rect.minX, rect.maxY - rect.minY);
-			QueryLinkId linkIdQuery = (QueryLinkId)clientQ.doQuery(new QueryLinkId(dest));
+			Rectangle2D.Double dest = new Rectangle2D.Double(rect.minX , rect.minY , rect.maxX - rect.minX, rect.maxY - rect.minY);
+			CollectDrawLinkId linkIdQuery = new CollectDrawLinkId(dest);
+			linkIdQuery.prepare(clientQ);
 			double xRaster = test.getWidth(), yRaster = test.getHeight();
 
 			for( CoordImpl coord : linkIdQuery.linkIds.keySet()) {
 				// draw linkId
-				float east = (float)coord.getX() -(float)getQuad().offsetEast;
-				float north = (float)coord.getY() - (float)getQuad().offsetNorth;
+				float east = (float)coord.getX() ;
+				float north = (float)coord.getY() ;
 
 				float textX = (float) (((int)(east / xRaster) +1)*xRaster);
 				float textY = north -(float)(north % yRaster) +80;
@@ -587,7 +589,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	BufferedImage current;
 	synchronized public void display(GLAutoDrawable drawable) {
 		//		Gbl.startMeasurement();
-
+		// update config
+		this.config = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis"));
 
 		this.gl = drawable.getGL();
 
@@ -609,7 +612,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 		if(queryHandler != null) queryHandler.drawQueries(this);
 
-		if(((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).drawLinkIds()) displayLinkIds();
+		if(this.config.drawLinkIds()) displayLinkIds();
 
 		this.gl.glDisable(GL.GL_BLEND);
 

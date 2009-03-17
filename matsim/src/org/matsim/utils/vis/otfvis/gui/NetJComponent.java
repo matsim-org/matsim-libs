@@ -393,6 +393,11 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			//display.setColor(Color.BLUE);
 			//display.draw(poly);
 		}
+
+		public void setId(char[] idBuffer) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 	
 	

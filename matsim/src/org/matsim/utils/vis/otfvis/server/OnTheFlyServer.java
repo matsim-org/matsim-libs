@@ -41,6 +41,7 @@ import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.collections.QuadTree.Rect;
+import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.utils.vis.otfvis.data.OTFDataWriter;
 import org.matsim.utils.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
@@ -281,7 +282,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		quads.put(id, new QuadStorage(id, quad, null, null));
 	}
 	
-	public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers) throws RemoteException {
+	public OTFServerQuad getQuad(String id, OTFConnectionManager connect) throws RemoteException {
 
 		if (quads.containsKey(id)) return quads.get(id).quad;
 
@@ -290,7 +291,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 		OTFDataWriter.setServer(this);
 
-		quad.fillQuadTree(writers);
+		quad.fillQuadTree(connect);
 		return quad;
 	}
 

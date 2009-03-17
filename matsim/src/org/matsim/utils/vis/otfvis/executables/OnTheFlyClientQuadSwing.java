@@ -52,12 +52,6 @@ public class OnTheFlyClientQuadSwing{
 	public static void main(String[] args) {
 		// FIXME hard-coded filenames
 		String arg0 = "file:../OnTheFlyVis-test/test/OTFQuadfileNoParking10p_wip.mvi";
-		OTFDefaultNetWriterFactoryImpl factory = null;
-
-		if (args != null && args.length == 1) {
-			arg0 = args[0];
-			factory = new OTFDefaultNetWriterFactoryImpl();
-		}
 
 		connect2.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect2.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
@@ -85,7 +79,7 @@ public class OnTheFlyClientQuadSwing{
 			PreferencesDialog.buildMenu(frame, visconf, hostControl, null);
 
 
-			OTFClientQuad clientQ2 = hostControl.createNewView(null, factory, connect2);
+			OTFClientQuad clientQ2 = hostControl.createNewView(null, connect2);
 			OTFDrawer drawer2 = new NetJComponent(frame, clientQ2);
 			pane.setRightComponent(drawer2.getComponent());
 			hostControl.addHandler("test2", drawer2);

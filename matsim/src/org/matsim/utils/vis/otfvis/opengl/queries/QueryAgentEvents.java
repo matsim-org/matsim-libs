@@ -76,7 +76,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 		
 	}
 
-	private final float[] vertex = null;
+	//private final float[] vertex = null;
 	private transient FloatBuffer vert;
 	private transient List<InfoText> texts = null;
 	private transient InfoText agentText = null;
@@ -89,14 +89,14 @@ public class QueryAgentEvents extends QueryAgentPlan {
 		if(handler == null) {
 			handler = new MyEventsHandler(agentId);
 			events.addHandler(handler);
+			Person person = plans.getPerson(new IdImpl(this.agentId));
+			if (person == null) return;
+
+			Plan plan = person.getSelectedPlan();
+
+			buildRoute(plan);
 		}
 		
-		Person person = plans.getPerson(new IdImpl(this.agentId));
-		if (person == null) return;
-
-		Plan plan = person.getSelectedPlan();
-
-		buildRoute(plan);
 	}
 
 	public void draw(OTFDrawer drawer) {

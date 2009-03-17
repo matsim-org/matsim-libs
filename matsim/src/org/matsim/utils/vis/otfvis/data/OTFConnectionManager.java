@@ -20,6 +20,7 @@
 
 package org.matsim.utils.vis.otfvis.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -34,12 +35,21 @@ import org.matsim.utils.vis.otfvis.interfaces.OTFDataReader;
 
 
 
-public class OTFConnectionManager implements Cloneable {
+public class OTFConnectionManager implements Cloneable, Serializable {
 
-	private final Logger log = Logger.getLogger(OTFConnectionManager.class);
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6481835753628883014L;
+	
+	transient private final Logger log = Logger.getLogger(OTFConnectionManager.class);
 	private boolean isValidated = false;
 
-	public static class Entry {
+	public static class Entry implements Serializable{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -2260651735789627280L;
 		Class from, to;
 
 		public Entry(Class from, Class to) {
@@ -120,6 +130,15 @@ public class OTFConnectionManager implements Cloneable {
 		return classList;
 	}
 
+	public Class getFirstEntry(Class srcClass) {
+		if (!isValidated) validate();
+		
+		for(Entry entry : connections) {
+			if (entry.from.equals(srcClass)) return entry.to;
+		}
+		return Object.class;
+	}
+
 	public Collection<OTFData.Receiver> getReceivers(Class srcClass, SceneGraph graph) {
 		Collection<Class> classList = getEntries(srcClass);
 		List<OTFData.Receiver> receiverList = new LinkedList<OTFData.Receiver>();
@@ -193,6 +212,14 @@ public class OTFConnectionManager implements Cloneable {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+		}
+	}
+
+	public void updateEntries(OTFConnectionManager connect2) {
+		Iterator<Entry> iter = connect2.connections.iterator();
+		while(iter.hasNext()) {
+			Entry entry = iter.next();
+			this.add(entry);
 		}
 	}
 }

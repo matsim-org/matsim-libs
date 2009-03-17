@@ -24,12 +24,19 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.matsim.mobsim.queuesim.QueueLink;
+import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFDataWriter;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
+import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler.ReaderV1_1;
+import org.matsim.utils.vis.otfvis.interfaces.OTFDataReader;
 
 
 public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
+	static {
+		OTFDataReader.setPreviousVersion(OTFLinkLanesAgentsNoParkingHandler.class.getCanonicalName() + "V1.3", ReaderV1_3.class);
+	}
 	
+
 	static public class Writer extends  OTFLinkAgentsHandler.Writer {
 		/**
 		 * 
@@ -37,6 +44,9 @@ public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 		private static final long serialVersionUID = 6541770536927233851L;
 
 		public void writeConstData(ByteBuffer out) throws IOException {
+			String id = this.src.getLink().getId().toString();
+			out.putInt(id.length());
+			for (int i=0; i<id.length(); i++) out.putChar(id.charAt(i));
 			out.putFloat((float)(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad.offsetEast)); //subtract minEasting/Northing somehow!
 			out.putFloat((float)(this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad.offsetNorth));
 			out.putFloat((float)(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad.offsetEast)); //subtract minEasting/Northing somehow!
@@ -52,6 +62,22 @@ public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 	}
 	
 	public void readConstData(ByteBuffer in) throws IOException {
+		int length = in.getInt();
+		char[] idBuffer = new char[length];
+		for(int i=0;i<length;i++) idBuffer[i] = in.getChar();
+
 		this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());
+		this.quadReceiver.setId(idBuffer);
+	}
+	/***
+	 * PREVIOUS VERSION of the reader
+	 * 
+	 * @author dstrippgen
+	 */
+	public static final class ReaderV1_3 extends OTFLinkAgentsHandler {
+		@Override
+		public void readConstData(ByteBuffer in) throws IOException {
+			this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());
+		}
 	}
 }

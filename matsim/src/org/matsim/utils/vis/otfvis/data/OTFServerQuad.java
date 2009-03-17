@@ -138,24 +138,39 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 		offsetNorth = this.minNorthing;
 	}
 
-	public void fillQuadTree(OTFNetWriterFactory writers) {
+	public void fillQuadTree(final OTFConnectionManager connect) {
 		final double easting = this.maxEasting - this.minEasting;
 		final double northing = this.maxNorthing - this.minNorthing;
 		// set top node
 		setTopNode(0, 0, easting, northing);
+		// Get the writer Factories from connect
+		OTFWriterFactory<QueueLink> linkWriterFac = null;
+		OTFWriterFactory<QueueNode> nodeWriterFac = null;
+		Class lFac =  connect.getFirstEntry(QueueLink.class);
+		Class nFac =  connect.getFirstEntry(QueueNode.class);
+		try {
+			if(lFac != Object.class) linkWriterFac = (OTFWriterFactory<QueueLink>)lFac.newInstance();
+			if(nFac != Object.class) nodeWriterFac = (OTFWriterFactory<QueueNode>)nFac.newInstance();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 //		System.out.println("server bounds: " +  " coords 0,0-" + easting + "," + northing );
 
-    	for (QueueNode node : this.net.getNodes().values()) {
-    		OTFDataWriter<QueueNode> writer = writers.getNodeWriter();
+    	if(nodeWriterFac != null) for (QueueNode node : this.net.getNodes().values()) {
+    		OTFDataWriter<QueueNode> writer = nodeWriterFac.getWriter();
     		if (writer != null) writer.setSrc(node);
     		put(node.getNode().getCoord().getX() - this.minEasting, node.getNode().getCoord().getY() - this.minNorthing, writer);
     	}
 //		System.out.print("server links/nodes count: " + (net.getLinks().values().size()+net.getNodes().values().size()) );
 
-    	for (QueueLink link : this.net.getLinks().values()) {
+    	if(linkWriterFac != null) for (QueueLink link : this.net.getLinks().values()) {
     		double middleEast = (link.getLink().getToNode().getCoord().getX() + link.getLink().getFromNode().getCoord().getX())*0.5 - this.minEasting;
     		double middleNorth = (link.getLink().getToNode().getCoord().getY() + link.getLink().getFromNode().getCoord().getY())*0.5 - this.minNorthing;
-    		OTFDataWriter<QueueLink> writer = writers.getLinkWriter();
+    		OTFDataWriter<QueueLink> writer = linkWriterFac.getWriter();
     		// null means take the default handler
     		if (writer != null) writer.setSrc(link);
     		put(middleEast, middleNorth, writer);

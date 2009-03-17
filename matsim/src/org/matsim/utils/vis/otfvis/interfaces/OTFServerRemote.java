@@ -25,14 +25,14 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.vis.otfvis.data.OTFNetWriterFactory;
+import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 
 public interface OTFServerRemote extends Remote {
 	public enum TimePreference{EARLIER, LATER};
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException;
 	
-	public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers) throws RemoteException;
+	public OTFServerQuad getQuad(String id, OTFConnectionManager connect) throws RemoteException;
 	public byte[] getQuadConstStateBuffer(String id) throws RemoteException;
 	public byte[] getQuadDynStateBuffer(String id, QuadTree.Rect bounds) throws RemoteException;
 

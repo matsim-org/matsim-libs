@@ -47,6 +47,7 @@ import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+import org.matsim.utils.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
 import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.utils.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
@@ -121,15 +122,13 @@ public class OnTheFlyClientQuad extends Thread {
 			OTFHostControlBar hostControl = new OTFHostControlBar(url);
 			hostControl.frame = frame;
 			frame.getContentPane().add(hostControl, BorderLayout.NORTH);
-			PreferencesDialog.buildMenu(frame, visconf, hostControl, null);
+			String netName= Gbl.getConfig().network().getInputFile();
+			OTFFileSettingsSaver saver = new OTFFileSettingsSaver(netName);
+			saver.readDefaultSettings();
+			
+			PreferencesDialog.buildMenu(frame, visconf, hostControl, saver);
 
-			OTFDefaultNetWriterFactoryImpl factory = new OTFDefaultNetWriterFactoryImpl();
-			if (connect.getEntries(QueueLink.class).isEmpty())	factory.setLinkWriterFac(new OTFLinkLanesAgentsNoParkingHandler.Writer());
-			else {
-				Class linkhandler = connect.getEntries(QueueLink.class).iterator().next();
-				factory.setLinkWriterFac((OTFWriterFactory<QueueLink>)linkhandler.newInstance());
-			}
-			OTFClientQuad clientQ = hostControl.createNewView(id1, factory, connect);
+			OTFClientQuad clientQ = hostControl.createNewView(id1, connect);
 
 			OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);
 
@@ -164,10 +163,6 @@ public class OnTheFlyClientQuad extends Thread {
 		catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (NotBoundException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
 

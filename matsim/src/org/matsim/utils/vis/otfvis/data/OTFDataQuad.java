@@ -26,6 +26,7 @@ public interface OTFDataQuad extends OTFData{
 		public void setQuad(float startX, float startY, float endX, float endY);
 		public void setQuad(float startX, float startY, float endX, float endY, int nrLanes);
 		public void setColor(float coloridx);
+		public void setId(char[] idBuffer);
 	}
 
 }

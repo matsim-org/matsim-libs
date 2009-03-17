@@ -42,14 +42,19 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
+import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.utils.vis.otfvis.data.OTFDefaultNetWriterFactoryImpl;
 import org.matsim.utils.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.utils.vis.otfvis.handler.OTFDefaultNodeHandler;
+import org.matsim.utils.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.SnapshotWriter;
@@ -62,7 +67,7 @@ public class OTFQuadFileHandler {
 	// the version number should be increased to imply a compatibility break
 	public static final int VERSION = 1;
 	// minor version increase does not break compatibility
-	public static final int MINORVERSION = 3;
+	public static final int MINORVERSION = 4;
 
 	public static class Writer implements SimStateWriterI, SnapshotWriter {
 		protected final QueueNetwork net;
@@ -119,11 +124,18 @@ public class OTFQuadFileHandler {
 			onAdditionalQuadData();
 
 			Gbl.startMeasurement();
-			this.quad.fillQuadTree(new OTFDefaultNetWriterFactoryImpl());
+			OTFConnectionManager connect = new OTFConnectionManager();
+			connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+			connect.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
+			this.quad.fillQuadTree(connect);
 			System.out.print("fill writer Quad on Server: ");
 			Gbl.printElapsedTime();
 			Gbl.startMeasurement();
 			new ObjectOutputStream(this.zos).writeObject(this.quad);
+			this.zos.closeEntry();
+			// this is new, write connect into the mvi as well
+			this.zos.putNextEntry(new ZipEntry("connect.bin"));
+			new ObjectOutputStream(this.zos).writeObject(connect);
 			this.zos.closeEntry();
 		}
 
@@ -265,7 +277,7 @@ public class OTFQuadFileHandler {
 			ZipEntry entry = this.zipFile.getEntry("step." + time_string + ".bin");
 			byte [] buffer = new byte [(int)this.timesteps.get(time_s).longValue()]; //DS TODO Might be bigger than int??
 
-			this.inFile = new DataInputStream(new BufferedInputStream(this.zipFile.getInputStream(entry)));
+			this.inFile = new DataInputStream(new BufferedInputStream(this.zipFile.getInputStream(entry),1000000));
 			readStateBuffer(buffer);
 
 			return buffer;
@@ -343,6 +355,26 @@ public class OTFQuadFileHandler {
 			}
 		}
 
+		private void readConnect(OTFConnectionManager connect) {
+			try {
+				ZipEntry connectEntry = this.zipFile.getEntry("connect.bin");
+				// maybe no connect given.. no Problem
+				if(connectEntry == null) return;
+				
+				BufferedInputStream is =  new BufferedInputStream(this.zipFile.getInputStream(connectEntry));
+				try {
+					OTFConnectionManager connect2 = (OTFConnectionManager) new OTFObjectInputStream(is).readObject();
+					connect.updateEntries(connect2);
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
 		public int getLocalTime() throws RemoteException {
 			return (int)this.nextTime;
 		}
@@ -377,8 +409,8 @@ public class OTFQuadFileHandler {
 			return false;
 		}
 
-		public OTFServerQuad getQuad(final String id, final OTFNetWriterFactory writers) throws RemoteException {
-			if (writers != null) throw new RemoteException("writers need to be NULL, when reading from file");
+		public OTFServerQuad getQuad(final String id, final OTFConnectionManager connect) throws RemoteException {
+			//if (connect != null) throw new RemoteException("writers need to be NULL, when reading from file");
 			if (this.id == null) readQuad();
 			if ((id != null) && !id.equals(this.id)) throw new RemoteException("id does not match, set id to NULL will match ALL!");
 

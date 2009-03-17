@@ -298,6 +298,10 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 	}
 
+	synchronized public void invalidateAll(final SceneGraph result) {
+		invalidate(null, result);
+	}
+	
 	@Override
 	public double getMinEasting() {
 		return this.minEasting;

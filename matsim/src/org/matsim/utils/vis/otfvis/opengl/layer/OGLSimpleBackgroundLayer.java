@@ -23,11 +23,15 @@ package org.matsim.utils.vis.otfvis.opengl.layer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFData.Receiver;
 import org.matsim.utils.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
+import org.matsim.utils.vis.otfvis.opengl.drawer.OTFOGLDrawer.AgentDrawer;
+
+import com.sun.opengl.util.texture.Texture;
 
 
 public class OGLSimpleBackgroundLayer extends DefaultSceneLayer {

@@ -29,15 +29,20 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.io.IOUtils;
+import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.utils.vis.otfvis.data.OTFDefaultNetWriterFactoryImpl;
 import org.matsim.utils.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.handler.OTFAgentsListHandler;
+import org.matsim.utils.vis.otfvis.handler.OTFDefaultNodeHandler;
+import org.matsim.utils.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.world.World;
@@ -71,8 +76,12 @@ public class OTFTVehServer implements OTFServerRemote {
 		world.complete();
 		QueueNetwork qnet = new QueueNetwork(net);
 
+		OTFConnectionManager connect = new OTFConnectionManager();
+		connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		connect.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
+
 		this.quad = new OTFServerQuad(qnet);
-		this.quad.fillQuadTree(new OTFDefaultNetWriterFactoryImpl());
+		this.quad.fillQuadTree(connect);
 		this.quad.addAdditionalElement(this.writer);
 
 //		this.times = buildTimesList(); // Does not work very smoothly, therefore we leave it out until there is demand for this
@@ -231,7 +240,7 @@ public class OTFTVehServer implements OTFServerRemote {
 	}
 
 
-	public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers)
+	public OTFServerQuad getQuad(String id, OTFConnectionManager connect)
 			throws RemoteException {
 		return this.quad;
 	}

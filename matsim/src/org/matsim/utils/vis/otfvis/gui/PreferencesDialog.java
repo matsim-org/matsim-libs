@@ -46,6 +46,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.utils.vis.otfvis.interfaces.OTFSettingsSaver;
 import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientFileQuad;
 import org.matsim.utils.vis.otfvis.opengl.gui.PreferencesDialog2;
@@ -54,12 +55,14 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 	public static Class preDialogClass = PreferencesDialog2.class;
 
-	protected transient final OTFVisConfig cfg;
+	protected transient OTFVisConfig cfg;
 	private JComboBox rightMFunc;
 	private JComboBox middleMFunc;
 	private JComboBox leftMFunc;
 	protected OTFHostControlBar host = null;
 	private JSlider agentSizeSlider = null;
+
+	private JSlider linkWidthSlider;
 
 	// private JSlider linkWidthSlider = null;
 
@@ -188,36 +191,39 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			getContentPane().add(this.agentSizeSlider);
 		}
 
-		// Link Width
-		// {
-		// JLabel label = new JLabel();
-		// getContentPane().add(label);
-		// label.setText("LinkWidth:");
-		// label.setBounds(10, 195, 80, 31);
-		// this.linkWidthSlider = new JSlider();
-		// BoundedRangeModel model2 = new DefaultBoundedRangeModel(30,0,0,100);
-		// this.linkWidthSlider.setModel(model2);
-		// this.linkWidthSlider.setLabelTable(this.linkWidthSlider.
-		// createStandardLabels(20, 0));
-		// this.linkWidthSlider.setPaintLabels(true);
-		// this.linkWidthSlider.setBounds(90, 190, 153, 45);
-		// this.linkWidthSlider.addChangeListener(this);
-		// getContentPane().add(label);
-		// getContentPane().add(this.linkWidthSlider);
-		// }
+		 //Link Width
+		 {
+		 JLabel label = new JLabel();
+		 getContentPane().add(label);
+		 label.setText("LinkWidth:");
+		 label.setBounds(10, 195, 80, 31);
+		 this.linkWidthSlider = new JSlider();
+		 BoundedRangeModel model2 = new DefaultBoundedRangeModel(30,0,0,100);
+		 this.linkWidthSlider.setModel(model2);
+		 this.linkWidthSlider.setLabelTable(this.linkWidthSlider.
+		 createStandardLabels(20, 0));
+		 this.linkWidthSlider.setPaintLabels(true);
+		 this.linkWidthSlider.setBounds(90, 190, 153, 45);
+		 this.linkWidthSlider.addChangeListener(this);
+		 getContentPane().add(label);
+		 getContentPane().add(this.linkWidthSlider);
+		 }
 
 	}
 
 	public void stateChanged(final ChangeEvent e) {
+		this.cfg = (OTFVisConfig)Gbl.getConfig().getModule("otfvis");
 		if (e.getSource() == this.agentSizeSlider) {
 			this.cfg.setAgentSize(this.agentSizeSlider.getValue());
 			if (this.host != null)
 				this.host.invalidateHandlers();
 			System.out.println("val: " + this.agentSizeSlider.getValue());
-			// } else if (e.getSource() == this.linkWidthSlider) {
-			// this.cfg.setLinkWidth(this.linkWidthSlider.getValue());
-			// if (this.host != null) this.host.invalidateHandlers();
-			// System.out.println("val: "+ this.linkWidthSlider.getValue());
+			 } else if (e.getSource() == this.linkWidthSlider) {
+			 this.cfg.setLinkWidth(this.linkWidthSlider.getValue());
+			 if (this.host != null){
+				host.redrawHandlers();
+			 }
+			 //System.out.println("val: "+ this.linkWidthSlider.getValue());
 		}
 	}
 
@@ -286,11 +292,11 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			e.printStackTrace();
 		}
 
-		buildMenu(frame, preferencesDialog, save);
+		preferencesDialog.buildMenu(frame, preferencesDialog, save);
 		return preferencesDialog;
 	}
 
-	public static void buildMenu(final JFrame frame, final PreferencesDialog preferencesDialog, final OTFSettingsSaver save) {
+	public void buildMenu(final JFrame frame, final PreferencesDialog preferencesDialog, final OTFSettingsSaver save) {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
@@ -305,10 +311,10 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			}
 		};
 		fileMenu.add(prefAction);
-		if (save != null) {
+		if (!preferencesDialog.host.isLiveHost()) {
 			Action saveAction = new AbstractAction() {
 				{
-					putValue(Action.NAME, "Save Settings");
+					putValue(Action.NAME, "Save Settings to mvi");
 					putValue(Action.MNEMONIC_KEY, 1);
 				}
 
@@ -318,6 +324,35 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			};
 			fileMenu.add(saveAction);
 		}
+		Action saveAsAction = new AbstractAction() {
+			{
+				putValue(Action.NAME, "Save Settings as...");
+				putValue(Action.MNEMONIC_KEY, 1);
+			}
+
+			public void actionPerformed(final ActionEvent e) {
+				save.saveSettingsAs();
+			}
+		};
+		fileMenu.add(saveAsAction);
+
+		Action openAction = new AbstractAction() {
+			{
+				putValue(Action.NAME, "Open Settings...");
+				putValue(Action.MNEMONIC_KEY, 1);
+			}
+
+			public void actionPerformed(final ActionEvent e) {
+				save.readSettings();
+				if (frame != null) {
+					frame.getContentPane().invalidate();
+					OTFVisConfig conf = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+					PreferencesDialog.buildMenu(frame, conf, host, save);
+				}
+			}
+		};
+		fileMenu.add(openAction);
+
 		Action exitAction = new AbstractAction("Quit") {
 			public void actionPerformed(ActionEvent e) {
 				OnTheFlyClientFileQuad.endProgram(0);
@@ -326,6 +361,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		fileMenu.add(exitAction);
 
 		frame.setJMenuBar(menuBar);
+		SwingUtilities.updateComponentTreeUI(frame);
 	}
 
 	public void actionPerformed(final ActionEvent e) {

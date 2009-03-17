@@ -39,6 +39,11 @@ public class OTFDefaultLinkHandler extends OTFDataReader implements OTFDataQuad.
 
 	protected OTFDataQuad.Receiver quadReceiver = null;
 
+	public OTFDataQuad.Receiver getQuadReceiver() {
+		return quadReceiver;
+	}
+
+
 	static public class Writer extends  OTFDataWriter<QueueLink> implements OTFWriterFactory<QueueLink> {
 
 		private static final long serialVersionUID = 2827811927720044709L;

@@ -200,7 +200,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		return new OTFTVehServer(netname,vehname);
 	}
 
-	public OTFClientQuad createNewView(String id, OTFNetWriterFactory factory, OTFConnectionManager connect) throws RemoteException {
+	public OTFClientQuad createNewView(String id, OTFConnectionManager connect) throws RemoteException {
 		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 
 		if(config.getFileVersion() < OTFQuadFileHandler.VERSION || config.getFileMinorVersion() < OTFQuadFileHandler.MINORVERSION) {
@@ -209,7 +209,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 
 		System.out.println("Getting Quad");
-		OTFServerQuad servQ = host.getQuad(id, factory);
+		OTFServerQuad servQ = host.getQuad(id, connect);
 		System.out.println("Converting Quad");
 		OTFClientQuad clientQ = servQ.convertToClient(id, host, connect);
 		System.out.println("Creating receivers");

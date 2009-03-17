@@ -71,7 +71,7 @@ public class QueryAgentPlan implements OTFQuery {
 	}
 
 	protected String agentId;
-	private float[] vertex = null;
+	protected float[] vertex = null;
 	private byte[] colors = null;
 	private transient FloatBuffer vert;
 	private Object [] acts;

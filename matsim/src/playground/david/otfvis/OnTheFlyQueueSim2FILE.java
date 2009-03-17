@@ -130,13 +130,13 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 
 		Events events = new Events();
 
-		config.simulation().setStartTime(Time.parseTime("00:00:00"));
-		config.simulation().setEndTime(Time.parseTime("12:02:00"));
+		config.simulation().setStartTime(Time.parseTime("05:00:00"));
+		config.simulation().setEndTime(Time.parseTime("18:02:00"));
 		config.network().setInputFile(netFileName);
 
 		config.simulation().setSnapshotFormat("otfvis");
-		config.simulation().setSnapshotPeriod(10);
-		config.simulation().setSnapshotFile("./output/otfvis1p");
+		config.simulation().setSnapshotPeriod(5*60);
+		config.simulation().setSnapshotFile("./output/otfvis2_1p");
 
 
 		OnTheFlyQueueSim2FILE sim = new OnTheFlyQueueSim2FILE(net, population, events);

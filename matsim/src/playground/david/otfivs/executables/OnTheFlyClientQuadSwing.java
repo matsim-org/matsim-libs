@@ -32,7 +32,7 @@ public class OnTheFlyClientQuadSwing extends OnTheFlyClientFileQuad{
 
 	@Override
 	public OTFDrawer getLeftDrawerComponent(JFrame frame) throws RemoteException {
-		OTFClientQuad clientQ = hostControl.createNewView(null, null, connect1);
+		OTFClientQuad clientQ = hostControl.createNewView(null, connect1);
 
 		OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);
 		return drawer;
@@ -40,7 +40,7 @@ public class OnTheFlyClientQuadSwing extends OnTheFlyClientFileQuad{
 
 	@Override
 	public OTFDrawer getRightDrawerComponent(JFrame frame) throws RemoteException {
-		OTFClientQuad clientQ2 = hostControl.createNewView(null, null, connect2);
+		OTFClientQuad clientQ2 = hostControl.createNewView(null, connect2);
 
 		OTFDrawer drawer2 = new NetJComponent(frame, clientQ2);
 

@@ -203,6 +203,22 @@ public class Config {
 		this.modules.put(name, module);
 	}
 
+	/**
+	 * Removes the specified module / config-group with the specified name from the configuration.
+	 * Does nothing if this module was not existing.
+	 * 
+	 * @param name
+	 * @param module
+	 * 
+	 */
+	public final void removeModule(final String name) {
+		if (this.modules.containsKey(name)) {
+			this.modules.remove(name);
+			log.warn("Module \"" + name + "\" is removed manually from config");
+
+		}
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////

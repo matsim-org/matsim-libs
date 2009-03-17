@@ -379,7 +379,7 @@ class OTFServerQUADCA extends OTFServerQuad {
 	}
 
 	@Override
-	public void fillQuadTree(OTFNetWriterFactory writers) {
+	public void fillQuadTree(OTFConnectionManager connect) {
 		OTFLinkAgentsHandler.Writer writer = new OTFLinkAgentsHandler.Writer();
 		writer.setSrc(link);
 		put(CALink.LINKLEN/2, 500, writer);
@@ -398,9 +398,9 @@ class CALiveServer implements OTFLiveServerRemote{
 		return time;
 	}
 
-	public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers) throws RemoteException {
+	public OTFServerQuad getQuad(String id, OTFConnectionManager connect) throws RemoteException {
 		quad = new OTFServerQUADCA(0,0,CALink.LINKLEN , 1000);
-		quad.fillQuadTree(writers);
+		quad.fillQuadTree(connect);
 		return quad;
 	}
 
@@ -556,7 +556,7 @@ public class CALinkOTFVis extends Thread {
 			connectR.add(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
 
 
-			OTFClientQuad clientQ2 = hostControl.createNewView(null, null, connectR);
+			OTFClientQuad clientQ2 = hostControl.createNewView(null, connectR);
 			clientQ2.setCachingAllowed(false);
 
 			OTFDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
