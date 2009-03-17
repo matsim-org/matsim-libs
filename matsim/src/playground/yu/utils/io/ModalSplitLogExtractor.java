@@ -15,18 +15,32 @@ import org.matsim.utils.charts.XYLineChart;
 public class ModalSplitLogExtractor {
 	private List<Double> carFracs = new ArrayList<Double>();
 	private List<Double> ptFracs = new ArrayList<Double>();
-	private List<Double> walkFracs = new ArrayList<Double>();
+	private List<Double> wlkFracs = new ArrayList<Double>();
+	private int maxIter;
 
-	public void addCar(String carFrac) {
-		carFracs.add(Double.valueOf(carFrac));
+	public int getMaxIter() {
+		return maxIter;
 	}
 
-	public void addPt(String ptFrac) {
-		ptFracs.add(Double.valueOf(ptFrac));
+	public ModalSplitLogExtractor(int n) {
+		maxIter = n;
+		for (int i = 0; i < n; i++) {
+			carFracs.add(i, Double.valueOf(0));
+			ptFracs.add(i, Double.valueOf(0));
+			wlkFracs.add(i, Double.valueOf(0));
+		}
 	}
 
-	public void addWalk(String walkFrac) {
-		walkFracs.add(Double.valueOf(walkFrac));
+	public void addCar(int idx, String carFrac) {
+		carFracs.set(idx, Double.valueOf(carFrac));
+	}
+
+	public void addPt(int idx, String ptFrac) {
+		ptFracs.set(idx, Double.valueOf(ptFrac));
+	}
+
+	public void addWalk(int idx, String walkFrac) {
+		wlkFracs.set(idx, Double.valueOf(walkFrac));
 	}
 
 	private static String extractFrac(String line) {
@@ -35,46 +49,67 @@ public class ModalSplitLogExtractor {
 		return frac.substring(0, frac.length() - 1);
 	}
 
-	private int getModeFracsLength() {
-		return Math.min(Math.min(carFracs.size(), ptFracs.size()), walkFracs
-				.size());
+	/**
+	 * @param line
+	 *            , which must contains "ITERATION " and " BEGINS"
+	 * @return ITERATION-No.
+	 */
+	private static int getCount(String line) {
+		String[] words = line.split(" ");
+		return Integer.parseInt(words[words.length - 2]);
 	}
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String logFilename = "../runs_SVN/run684/logfile.log";
-		String chartFilename = "../runs_SVN/run684/legModeChart.png";
-		String outputFilename = "../runs_SVN/run684/legMode.txt";
+	private static void readLog(String logFilename, ModalSplitLogExtractor msle) {
 		SimpleReader sr = new SimpleReader(logFilename);
 		String line = sr.readLine();
-		ModalSplitLogExtractor msle = new ModalSplitLogExtractor();
-		int carCount = 0, ptCount = 0, walkCount = 0;
+		int count = -1;
 		while (line != null) {
 			line = sr.readLine();
-			if (line != null)
-				if (line.contains("car legs")) {
-					carCount++;
-					msle.addCar(extractFrac(line));
+			if (line != null) {
+				if (line.contains("ITERATION ") && line.contains(" BEGINS")) {
+					count = getCount(line);
+				} else if (line.contains("car legs")) {
+					if (count > -1)
+						msle.addCar(count, extractFrac(line));
 				} else if (line.contains("pt legs")) {
-					ptCount++;
-					msle.addPt(extractFrac(line));
+					if (count > -1)
+						msle.addPt(count, extractFrac(line));
 				} else if (line.contains("walk legs")) {
-					walkCount++;
-					msle.addWalk(extractFrac(line));
+					if (count > -1)
+						msle.addWalk(count, extractFrac(line));
+				} else if (line.contains("ITERATION ")
+						&& line.contains(" ENDS")) {
+					count = -1;
 				}
+			}
 		}
-		int n = msle.getModeFracsLength();
-		double xs[] = new double[n];
-		double carFracs[] = new double[n];
-		double ptFracs[] = new double[n];
-		double wlkFracs[] = new double[n];
-		for (int i = 0; i < n; i++) {
+		sr.close();
+	}
+
+	private static void writeMode(String chartFilename, String outputFilename,
+			ModalSplitLogExtractor msle) {
+		int maxIter = msle.getMaxIter();
+		double xs[] = new double[maxIter];
+		double carFracs[] = new double[maxIter];
+		double ptFracs[] = new double[maxIter];
+		double wlkFracs[] = new double[maxIter];
+
+		for (int i = 0; i < maxIter; i++) {
 			xs[i] = i;
-			carFracs[i] = msle.carFracs.get(i);
-			ptFracs[i] = msle.ptFracs.get(i);
-			wlkFracs[i] = msle.walkFracs.get(i);
+			Double carFrac = (i < msle.carFracs.size()) ? msle.carFracs.get(i)
+					: null;
+			if (carFrac != null)
+				carFracs[i] = carFrac;
+
+			Double ptFrac = (i < msle.ptFracs.size()) ? msle.ptFracs.get(i)
+					: null;
+			if (ptFrac != null)
+				ptFracs[i] = ptFrac;
+			Double wlkFrac = (i < msle.wlkFracs.size()) ? msle.wlkFracs.get(i)
+					: null;
+			if (wlkFrac != null)
+				wlkFracs[i] = wlkFrac;
+
 		}
 
 		XYLineChart chart = new XYLineChart("Mode Choice", "iteration",
@@ -86,9 +121,27 @@ public class ModalSplitLogExtractor {
 
 		SimpleWriter sw = new SimpleWriter(outputFilename);
 		sw.writeln("iteration\tcar [%]\tpt [%]\twalk [%]");
-		for (int i = 0; i < n; i++) {
+		System.out.println("n=" + maxIter);
+		for (int i = 0; i < maxIter; i++) {
 			sw.writeln(i + "\t" + carFracs[i] + "\t" + ptFracs[i] + "\t"
 					+ wlkFracs[i]);
+			sw.flush();
 		}
+		sw.close();
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		String logFilename = "../runs_SVN/run711/logfile.log";
+		String chartFilename = "../runs_SVN/run711/legModeChart.png";
+		String outputFilename = "../runs_SVN/run711/legMode.txt";
+		int maxIter = 1001;
+		ModalSplitLogExtractor msle = new ModalSplitLogExtractor(maxIter);
+		// reading
+		readLog(logFilename, msle);
+		// writing
+		writeMode(chartFilename, outputFilename, msle);
 	}
 }
