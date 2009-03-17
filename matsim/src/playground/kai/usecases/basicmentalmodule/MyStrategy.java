@@ -25,11 +25,7 @@ package playground.kai.usecases.basicmentalmodule;
 import org.matsim.controler.Controler;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Population;
-import org.matsim.network.NetworkLayer;
 import org.matsim.replanning.PlanStrategy;
-import org.matsim.replanning.modules.StrategyModule;
-import org.matsim.replanning.selectors.PlanSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 
 
