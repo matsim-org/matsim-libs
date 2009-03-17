@@ -3,10 +3,10 @@ package org.matsim.socialnetworks.io;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Person;
@@ -51,7 +51,7 @@ public class ActivityActWriter {
 
 			for (int i=0;i<myPersonPlans.size();i++){
 				Plan myPlan = myPersonPlans.get(i);
-				ArrayList<Object> actsLegs=myPlan.getPlanElements();
+				List<? extends BasicPlanElement> actsLegs=myPlan.getPlanElements();
 
 				for (int j=0;j<actsLegs.size()+1;j=j+2){
 					Activity myAct= (Activity) actsLegs.get(j);

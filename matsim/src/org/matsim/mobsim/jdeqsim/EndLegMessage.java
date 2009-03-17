@@ -24,6 +24,7 @@ import java.util.List;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.BasicEvent;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
@@ -47,7 +48,7 @@ public class EndLegMessage extends EventMessage {
 		this.vehicle.setLinkIndex(-1);
 
 		Plan plan = this.vehicle.getOwnerPerson().getSelectedPlan();
-		List<Object> actsLegs = plan.getPlanElements();
+		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 		if ((actsLegs.size() > this.vehicle.getLegIndex())) {
 			this.vehicle.setCurrentLeg((Leg) actsLegs.get(this.vehicle.getLegIndex()));
 			// current act

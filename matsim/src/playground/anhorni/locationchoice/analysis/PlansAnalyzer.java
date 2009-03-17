@@ -22,12 +22,13 @@ package playground.anhorni.locationchoice.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Person;
@@ -124,7 +125,7 @@ public class PlansAnalyzer {
 
 				Plan selectedPlan = person.getSelectedPlan();
 
-				final ArrayList<?> actslegs = selectedPlan.getPlanElements();
+				final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 				for (int j = 0; j < actslegs.size(); j=j+2) {
 					final Activity act = (Activity)actslegs.get(j);
 					if (act.getType().startsWith(type)) {
@@ -167,7 +168,7 @@ public class PlansAnalyzer {
 			boolean personSet = false;
 
 			Plan selectedPlan = person.getSelectedPlan();
-			final ArrayList<?> actslegs = selectedPlan.getPlanElements();
+			List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 
 
 			for (int j = 0; j < actslegs.size(); j=j+2) {
@@ -213,7 +214,7 @@ public class PlansAnalyzer {
 				Person person = person_iter.next();
 				counter.incCounter();
 				Plan selectedPlan = person.getSelectedPlan();
-				final ArrayList<?> actslegs = selectedPlan.getPlanElements();
+				final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 
 				int countSL = 0;
 				for (int j = 0; j < actslegs.size(); j=j+2) {

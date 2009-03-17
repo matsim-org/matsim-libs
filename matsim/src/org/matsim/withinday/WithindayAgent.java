@@ -187,7 +187,7 @@ public class WithindayAgent extends PersonAgent {
     newRoute.setNodes(oldRoute.getStartLink(), newRouteConcatedList, oldRoute.getEndLink());
     //put the new route in the leg and the leg in the plan
     newLeg.setRoute(newRoute);
-    newPlan.getPlanElements().add(currentLegIndex, newLeg);
+    ((List) newPlan.getPlanElements()).add(currentLegIndex, newLeg);
     //score plans and select best
     double currentScore = this.planScorer.getScore(oldPlan);
     double newScore = this.planScorer.getScore(newPlan);

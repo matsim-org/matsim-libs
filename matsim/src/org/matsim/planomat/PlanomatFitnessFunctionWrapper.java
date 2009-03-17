@@ -27,6 +27,7 @@ import org.jgap.IChromosome;
 import org.jgap.impl.IntegerGene;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
@@ -74,11 +75,11 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
 		double now = 0.0;
 
-		List<Object> actslegs = this.plan.getPlanElements();
+		List<? extends BasicPlanElement> actslegs = this.plan.getPlanElements();
 		int numActs = actslegs.size() / 2;
 
 		int legCounter = 0;
-		for (Object o : actslegs) {
+		for (BasicPlanElement o : actslegs) {
 
 			if (o instanceof Leg) {
 

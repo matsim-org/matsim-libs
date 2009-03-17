@@ -32,6 +32,7 @@ import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Leg;
@@ -369,7 +370,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		/* Update the plan with the final solution*/ 		
 		java.util.Collections.sort(tabuList);
-		ArrayList<Object> al = plan.getPlanElements();
+		List<BasicPlanElement> al = (List<BasicPlanElement>) plan.getPlanElements();
 		
 		
 		// TODO must be removed before putting into core!
@@ -490,7 +491,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	
 	public int[] changeOrder (PlanomatXPlan basePlan, int [] positions, ArrayList<ActivityOption> primActs){
 	
-		ArrayList<Object> actslegs = basePlan.getPlanElements();
+		List<BasicPlanElement> actslegs = (List<BasicPlanElement>) basePlan.getPlanElements();
 		
 		if (actslegs.size()<=5){	//If true the plan has not enough activities to change their order. Do nothing.		
 			return (new int[]{1,0,0});
@@ -614,7 +615,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		if (position[0]==-1) return (new int[]{1,0,0});
 		if (basePlan.getPlanElements().size()==1){
 			
-			ArrayList<Object> actslegs = basePlan.getPlanElements();
+			List<BasicPlanElement> actslegs = (List<BasicPlanElement>) basePlan.getPlanElements();
 			
 			((Activity)actslegs.get(0)).setDuration(12*3600);
 			((Activity)actslegs.get(0)).setEndTime(12*3600);
@@ -876,7 +877,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	/* Inserts an activity of random type at the given position with the given type of act (but checks whether type is allowed)*/
 	private void insertAct (int position, int [] actToBeAdded, PlanomatXPlan basePlan, ArrayList<ActivityOption> actTypes){
 		
-		ArrayList<Object> actslegs = basePlan.getPlanElements();
+		List<BasicPlanElement> actslegs = (List<BasicPlanElement>) basePlan.getPlanElements();
 		//Act actHelp = new Act ((Act)(actslegs.get((position*2)-2))); //changed the actHelp position to the act "behind" the gap because of conflict with location choice (would otherwise see it as primary activity)
 		Activity actHelp = new ActImpl ((Activity)(actslegs.get((position*2))));
 		actHelp.setDuration(0);
@@ -908,7 +909,8 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	
 	/* Removes the activity at the given position*/
 	private void removeAct (int position, Plan basePlan){
-		ArrayList<Object> actslegs = basePlan.getPlanElements();
+		// why writing everything yourself, if it's already here? see basePlan.removeAct(position);
+		List<? extends BasicPlanElement> actslegs = basePlan.getPlanElements();
 		actslegs.remove(position*2);
 		actslegs.remove(position*2);
 	}
@@ -1008,7 +1010,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			}
 		}
 		if (bestScore!=-1){
-			ArrayList<Object> al = plan.getPlanElements();
+			List<BasicPlanElement> al = (List<BasicPlanElement>) plan.getPlanElements();
 			for (int i = 0; i<al.size();i++){
 				al.remove(i);
 				al.add(i, LCset[bestScore].getPlanElements().get(i));	

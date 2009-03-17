@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -85,7 +86,7 @@ public class QueueTransitDriver implements DriverAgent {
 	
 	// *** The methods below are currently not used... ***
 	
-	public List<Object> getActsLegs() {
+	public List<? extends BasicPlanElement> getActsLegs() {
 		return null;
 	}
 	

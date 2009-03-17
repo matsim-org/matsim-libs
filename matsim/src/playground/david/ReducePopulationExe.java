@@ -47,7 +47,6 @@ import org.matsim.population.PlanImpl;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.world.World;
 
 class EventHH implements LinkEnterEventHandler {
@@ -102,13 +101,14 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 	}
 	Plan copyPlanToPT(final Plan in) {
 		Plan erg = new PlanImpl(in.getPerson());
+		List ergPEs = erg.getPlanElements();
 		List<?> actl = in.getPlanElements();
 		for (int i= 0; i< actl.size() ; i++) {
 			try {
 				if (i % 2 == 0) {
 					// activity
 					Activity a = (Activity)actl.get(i);
-					erg.getPlanElements().add(new ActImpl(a));
+					ergPEs.add(new ActImpl(a));
 				} else {
 					// Leg
 					Leg l = (Leg) actl.get(i);
@@ -116,7 +116,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 					l2.setDepartureTime(l.getDepartureTime());
 					l2.setTravelTime(l.getTravelTime());
 					l2.setArrivalTime(l.getArrivalTime());
-					erg.getPlanElements().add(l2);
+					ergPEs.add(l2);
 				}
 			} catch (Exception e) {
 				// copying a plan is fairly basic. if an exception occurs here, something

@@ -21,6 +21,7 @@ import org.matsim.events.PersonEvent;
 import org.matsim.events.handler.PersonEventHandler;
 import org.matsim.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
@@ -184,7 +185,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 		for (Person p : population.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			ExpectedNumberOfEvents expected = new ExpectedNumberOfEvents();
-			List<Object> actsLegs = plan.getPlanElements();
+			List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 			expected.expectedDepartureEvents += actsLegs.size() / 2;
 
 			LegIterator iter = plan.getIteratorLeg();

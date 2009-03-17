@@ -2,6 +2,7 @@ package playground.wrashid.PDES2;
 
 import java.util.List;
 
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
@@ -62,7 +63,7 @@ public class Vehicle extends SimUnit {
 
 		Plan plan = ownerPerson.getSelectedPlan(); // that's the plan the
 		// person will execute
-		List<Object> actsLegs = plan.getPlanElements();
+		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 		// the assumption here
 		setCurrentLeg((Leg) actsLegs.get(legIndex));
 		// the leg the agent performs
@@ -185,7 +186,7 @@ public class Vehicle extends SimUnit {
 		Link previousLink=null;
 		if (this.getLinkIndex()==0){
 			Plan plan = ownerPerson.getSelectedPlan(); 
-			List<Object> actsLegs = plan.getPlanElements();
+			List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 			previousLink = ((Activity) actsLegs.get(legIndex - 1)).getLink();
 			//System.out.println("AscheduleLeavePreviousRoadMessage:"+previousLink.getId().toString());
 			previousRoad=Road.allRoads.get(previousLink.getId().toString());

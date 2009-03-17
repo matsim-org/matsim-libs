@@ -22,11 +22,13 @@ package org.matsim.basic.v01;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.BasicActivity;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicPlan;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Plan;
 
 /**
@@ -36,7 +38,7 @@ public class BasicPlanImpl implements BasicPlan {
 
 	private final static Logger log = Logger.getLogger(BasicPlanImpl.class);
 
-	protected ArrayList<Object> actsLegs = new ArrayList<Object>();
+	protected ArrayList<BasicPlanElement> actsLegs = new ArrayList<BasicPlanElement>();
 
 	private Double score = null;
 
@@ -70,7 +72,7 @@ public class BasicPlanImpl implements BasicPlan {
 		this.type = type;
 	}
 
-	public ArrayList<Object> getPlanElements() {
+	public List<? extends BasicPlanElement> getPlanElements() {
 		return this.actsLegs;
 	}
 

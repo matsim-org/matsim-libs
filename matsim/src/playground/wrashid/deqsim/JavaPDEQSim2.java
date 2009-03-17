@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
@@ -141,7 +142,7 @@ public class JavaPDEQSim2 {
 
 			// TODO: we could make this more precise (e.g. take all act links or also path links)
 			Plan plan = person.getSelectedPlan();
-			List<Object> actsLegs = plan.getPlanElements();
+			List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 			// assumption, an action is followed by a let always
 			// and a plan starts with a action
 			Activity act=null;

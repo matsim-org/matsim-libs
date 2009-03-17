@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
@@ -117,7 +118,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 	}
 
 	public void run(Plan plan) {
-		List<Object> actsLegs = plan.getPlanElements();
+		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 		for (int j=0; j<actsLegs.size(); j=j+2) {
 			this.actCnt++;
 			Activity act = (Activity)actsLegs.get(j);

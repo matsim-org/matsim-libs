@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.events.Events;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
@@ -53,14 +54,14 @@ public class JavaDEQSim {
 		
 		for (Person person : this.population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan(); // that's the plan the person will execute
-			List<Object> actsLegs = plan.getPlanElements();
-			for (int i = 0; i < actsLegs.size(); i++) {
-				if (i % 0 == 0) {
-					Activity act = (Activity)actsLegs.get(i);
+			List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
+			for (BasicPlanElement pe : actsLegs) {
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
 					// the activity the agent performs
 					double departureTime = act.getEndTime(); // the time the agent departs at this activity
-				} else {
-					Leg leg = (Leg)actsLegs.get(i);
+				} else if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
 					// the leg the agent performs
 					if (BasicLeg.Mode.car.equals(leg.getMode())) { // we only simulate car traffic
 						List<Link> route = ((CarRoute) leg.getRoute()).getLinks(); // these are the links the agent will drive along one after the other.

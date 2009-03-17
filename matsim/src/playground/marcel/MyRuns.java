@@ -55,6 +55,7 @@ import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.analysis.StuckVehStats;
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
@@ -71,6 +72,7 @@ import org.matsim.events.algorithms.GenerateRealPlans;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
@@ -2243,7 +2245,39 @@ public class MyRuns {
 //		Double UNDEF = null;
 //		double score = UNDEF;
 //		
-		System.out.println(System.getProperties().get("java.class.path"));
+//		System.out.println(System.getProperties().get("java.class.path"));
+		
+		List<? extends BasicPlan> basicList = new ArrayList<BasicPlan>();
+		
+		List<BasicPlan> basicList2 = (List<BasicPlan>) basicList;
+		
+		List<? extends BasicPlan> basicList3 = basicList2;
+		
+		List<? extends Plan> list = (List) basicList;
+		
+//		basicList.add(new BasicPlanImpl()); // doesn't compile
+		basicList2.add(new BasicPlanImpl());
+		
+		basicList3.get(0);
+		
+		for (BasicPlan plan : basicList) {
+			plan.getScore();
+		}
+		
+		for (Plan plan : list) {
+			plan.getFirstActivity();
+		}
+		
+	}
+	
+	public static interface A {
+		public List<A> getList1();
+		public List<? extends A> getList2();
+	}
+	
+	public static interface B extends A {
+//		public List<B> getList1(); // doesn't compile
+		public  List<? extends B> getList2();
 	}
 
 	//////////////////////////////////////////////////////////////////////

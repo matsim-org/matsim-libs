@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Coord;
 import org.matsim.interfaces.core.v01.Leg;
@@ -110,7 +111,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 			 * 4			Other means */
 
 			Plan plan = person.getSelectedPlan();
-			List<Object> acts_legs = plan.getPlanElements();
+			List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 			if (index == 0) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
 					Leg leg = (Leg)acts_legs.get(i);
@@ -214,7 +215,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 		if (plan == null) {
 			return 0;
 		}
-		List<Object> acts_legs = plan.getPlanElements();
+		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
 			Coord coord1 = ((Activity)acts_legs.get(i)).getCoord();
@@ -228,7 +229,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 
 		String main_type = "o";
 		Plan plan = person.getSelectedPlan();
-		List<Object> acts_legs = plan.getPlanElements();
+		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
 			String type = ((Activity)acts_legs.get(i)).getType();
@@ -257,7 +258,7 @@ public int detectTourMainActivity2 (Person person){
 
 		int main_type = 2;
 		Plan plan = person.getSelectedPlan();
-		List<Object> acts_legs = plan.getPlanElements();
+		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
 			String type = ((Activity)acts_legs.get(i)).getType();

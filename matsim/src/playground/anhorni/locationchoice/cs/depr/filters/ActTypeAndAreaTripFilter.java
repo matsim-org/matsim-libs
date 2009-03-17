@@ -1,14 +1,14 @@
 package playground.anhorni.locationchoice.cs.depr.filters;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
 
-import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.Trip;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -37,7 +37,7 @@ public class ActTypeAndAreaTripFilter extends TripFilter {
 	}
 	protected boolean filterPlan(final Plan plan, String mode) {
 		boolean choiceSetAdded = false;		
-		final ArrayList<?> actslegs = plan.getPlanElements();
+		final List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
 		Activity previousAct = (Activity)actslegs.get(0);
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			Activity act = (Activity)actslegs.get(j);

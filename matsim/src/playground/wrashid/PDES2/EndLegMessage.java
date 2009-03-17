@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.BasicEvent;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
@@ -31,7 +32,7 @@ public class EndLegMessage extends EventMessage {
 		
 			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the
 														// person will execute
-			List<Object> actsLegs = plan.getPlanElements();
+			List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 		if ((actsLegs.size()>vehicle.getLegIndex())){	
 			vehicle.setCurrentLeg((Leg) actsLegs.get(vehicle.getLegIndex()));
 			// the leg the agent performs

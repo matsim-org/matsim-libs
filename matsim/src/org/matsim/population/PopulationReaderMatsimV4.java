@@ -21,6 +21,7 @@
 package org.matsim.population;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -162,7 +163,9 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			this.currfacility = null;
 			this.curractivity = null;
 		} else if (PLAN.equals(name)) {
-			this.currplan.getPlanElements().trimToSize();
+			if (this.currplan.getPlanElements() instanceof ArrayList) {
+				((ArrayList) this.currplan.getPlanElements()).trimToSize();
+			}
 			this.currplan = null;
 		} else if (ACT.equals(name)) {
 			this.prevAct = this.curract;

@@ -19,9 +19,12 @@
  * *********************************************************************** */
 package playground.mfeil;
 
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.population.*;
 import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.population.PlanImpl;
 
 
 /**
@@ -49,8 +52,8 @@ public class PlanomatXPlan extends PlanImpl implements Comparable<PlanomatXPlan>
 		else return -1;
 	}
 	
-	public void setActsLegs (ArrayList<Object> actslegs){
-		this.actsLegs = actslegs;
+	public void setActsLegs (List<? extends BasicPlanElement> actslegs){
+		this.actsLegs = (ArrayList<BasicPlanElement>) actslegs;
 	}
 	/*
 	public void copyTimes (ArrayList<Object> in){

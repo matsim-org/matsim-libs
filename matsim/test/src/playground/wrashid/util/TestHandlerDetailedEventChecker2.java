@@ -7,6 +7,7 @@ import java.util.List;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.events.PersonEvent;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
@@ -65,16 +66,16 @@ public class TestHandlerDetailedEventChecker2 extends TestHandlerDetailedEventCh
 		for (Person p : population.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			ExpectedNumberOfEvents expected = new ExpectedNumberOfEvents();
-			List<Object> actsLegs = plan.getPlanElements();
+			List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 			expected.expectedDepartureEvents += actsLegs.size() / 2;
 
-			LegIterator iter = plan.getIteratorLeg();
-			while (iter.hasNext()) {
-				Leg leg = (Leg) iter.next();
-				// at the moment only cars are simulated on the road
-				if (leg.getMode().equals(BasicLeg.Mode.car)) {
-					expected.expectedLinkEnterEvents += ((CarRoute) leg
-							.getRoute()).getLinks().size() + 1;
+			for (BasicPlanElement pe : actsLegs) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					// at the moment only cars are simulated on the road
+					if (leg.getMode().equals(BasicLeg.Mode.car)) {
+						expected.expectedLinkEnterEvents += ((CarRoute) leg.getRoute()).getLinks().size() + 1;
+					}
 				}
 			}
 

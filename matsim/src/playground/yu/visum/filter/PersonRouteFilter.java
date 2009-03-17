@@ -2,6 +2,7 @@ package playground.yu.visum.filter;
 
 import java.util.List;
 
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
@@ -56,9 +57,9 @@ public class PersonRouteFilter extends PersonFilterA {
 		List<Plan> plans = person.getPlans();
 		for (Plan plan : plans) {
 			if (plan.isSelected()) {
-				List<Object> acts_Legs = plan.getPlanElements();
+				List<? extends BasicPlanElement> acts_Legs = plan.getPlanElements();
 				boolean even = false;
-				for (Object obj : acts_Legs) {
+				for (BasicPlanElement obj : acts_Legs) {
 					if (even) {
 						Leg leg = (Leg) obj;
 						CarRoute route = (CarRoute) leg.getRoute();

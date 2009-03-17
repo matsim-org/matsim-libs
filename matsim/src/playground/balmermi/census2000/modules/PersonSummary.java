@@ -20,9 +20,10 @@
 
 package playground.balmermi.census2000.modules;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
@@ -157,7 +158,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			av_act_per_plan = av_act_per_plan / plan_cnt;
 		}
 
-		ArrayList<Object> acts_legs = person.getSelectedPlan().getPlanElements();
+		List<? extends BasicPlanElement> acts_legs = person.getSelectedPlan().getPlanElements();
 		double plan_dist = 0.0;
 		int plan_row = -1; // plan mode defined as last mode
 		                   // (it's just a trick, since the mode is the same for a plan) (just temporary)

@@ -5,6 +5,7 @@ import java.util.List;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Plan;
@@ -36,7 +37,7 @@ public class StartingLegMessage extends EventMessage {
 			road.roadEntryHandler.registerEnterRequestMessage(road, vehicle, messageArrivalTime);
 		} else {
 			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the
-			List<Object> actsLegs = plan.getPlanElements();
+			List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 			Link nextLink = ((Activity) actsLegs.get(vehicle.getLegIndex() + 1)).getLink();
 			Road road=Road.allRoads.get(nextLink.getId().toString());
 			//vehicle.setCurrentLink(nextLink); //perhaps this line of code is needed (it helped in the single cpu variant)

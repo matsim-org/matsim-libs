@@ -24,6 +24,7 @@ import org.matsim.events.handler.EventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.events.parallelEventsHandler.ParallelEvents;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
@@ -82,7 +83,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler  {
 		
 		for (Person p:population.getPersons().values()){
 			Plan plan= p.getSelectedPlan();
-			List<Object> actsLegs =plan.getPlanElements();
+			List<? extends BasicPlanElement> actsLegs =plan.getPlanElements();
 			expectedDepartureEvents+=actsLegs.size() / 2 ;
 			
 			LegIterator iter=plan.getIteratorLeg();

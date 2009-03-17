@@ -32,6 +32,7 @@ import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
@@ -84,7 +85,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		// only plan of that person
 		this.testPlan = this.testPerson.getPlans().get(TEST_PLAN_NR);
 		// first leg
-		List<Object> actsLegs = this.testPlan.getPlanElements();
+		List<? extends BasicPlanElement> actsLegs = this.testPlan.getPlanElements();
 		this.testLeg = (Leg) actsLegs.get(TEST_LEG_NR + 1);
 		// activities before and after leg
 		this.originAct = (Activity) actsLegs.get(TEST_LEG_NR);

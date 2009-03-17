@@ -2,11 +2,13 @@ package playground.anhorni.locationchoice.preprocess;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Coord;
@@ -100,7 +102,7 @@ public class LocationModifier extends Modifier {
 	private void exchangeFacilities(final String type, ArrayList<Facility>  exchange_facilities,
 			final Plan plan) {
 
-			final ArrayList<?> actslegs = plan.getPlanElements();
+			final List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
 				final Activity act = (Activity)actslegs.get(j);
 				if (act.getType().startsWith(type)) {

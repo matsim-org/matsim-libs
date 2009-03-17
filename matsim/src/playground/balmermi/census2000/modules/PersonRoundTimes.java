@@ -20,11 +20,12 @@
 
 package playground.balmermi.census2000.modules;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeSet;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
@@ -61,7 +62,7 @@ public class PersonRoundTimes extends AbstractPersonAlgorithm implements PlanAlg
 
 	@Override
 	public void run(Person person) {
-		ArrayList<Object> acts_legs = person.getSelectedPlan().getPlanElements();
+		List<? extends BasicPlanElement> acts_legs = person.getSelectedPlan().getPlanElements();
 
 		// getting durations
 		double[] durs = new double[(acts_legs.size()-1)/2];

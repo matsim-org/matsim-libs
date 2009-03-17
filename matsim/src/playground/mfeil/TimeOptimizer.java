@@ -20,8 +20,10 @@
 package playground.mfeil;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Plan;
@@ -111,10 +113,10 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		}
 		int [][] moves 									= new int [neighbourhood_size][2];
 		int [] position									= new int [2];
-		ArrayList<?> [] initialNeighbourhood 			= new ArrayList [neighbourhood_size];
-		ArrayList<?> [] neighbourhood 					= new ArrayList [java.lang.Math.min(NEIGHBOURHOOD_SIZE, neighbourhood_size)];
+		List<? extends BasicPlanElement> [] initialNeighbourhood 			= new ArrayList [neighbourhood_size];
+		List<? extends BasicPlanElement> [] neighbourhood 					= new ArrayList [java.lang.Math.min(NEIGHBOURHOOD_SIZE, neighbourhood_size)];
 		double []score					 				= new double [neighbourhood_size];
-		ArrayList<?> bestSolution						= new ArrayList<Object>();
+		List<? extends BasicPlanElement> bestSolution						= new ArrayList<BasicPlanElement>();
 		int pointer;
 		int currentIteration							= 1;
 		int lastImprovement 							= 0;
@@ -158,7 +160,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		pointer = this.findBestSolution (initialNeighbourhood, score, moves, position);
 		
 		if (score[pointer]>bestScore){
-			bestSolution = this.copyActsLegs((ArrayList<?>)initialNeighbourhood[pointer]);
+			bestSolution = this.copyActsLegs(initialNeighbourhood[pointer]);
 			bestScore=score[pointer];
 			lastImprovement = 0;
 		}
@@ -166,7 +168,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 			lastImprovement++;
 		}
 		for (int i = 0;i<neighbourhood.length; i++){
-			neighbourhood[i] = this.copyActsLegs((ArrayList<?>)initialNeighbourhood[pointer]);
+			neighbourhood[i] = this.copyActsLegs(initialNeighbourhood[pointer]);
 		}
 		
 		
@@ -184,7 +186,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 			}
 		
 			if (score[pointer]>bestScore){
-				bestSolution = this.copyActsLegs((ArrayList<?>)neighbourhood[pointer]);
+				bestSolution = this.copyActsLegs(neighbourhood[pointer]);
 				bestScore=score[pointer];
 				lastImprovement = 0;
 			}
@@ -195,7 +197,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 			
 			if (this.MAX_ITERATIONS!=currentIteration){			
 				for (int i = 0;i<neighbourhood.length; i++){
-					neighbourhood[i] = this.copyActsLegs((ArrayList<?>)neighbourhood[pointer]);
+					neighbourhood[i] = this.copyActsLegs(neighbourhood[pointer]);
 				}
 			}
 		}
@@ -203,7 +205,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		
 		/* Update the plan with the final solution */ 		
 	//	stream.println("Selected solution\t"+bestScore);
-		ArrayList<Object> al = basePlan.getPlanElements();
+		List<? extends BasicPlanElement> al = basePlan.getPlanElements();
 		basePlan.setScore(bestScore);
 		
 		double time;
@@ -234,7 +236,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	// Neighbourhood definition 
 	//////////////////////////////////////////////////////////////////////
 	
-	private void createInitialNeighbourhood (PlanomatXPlan plan, ArrayList<?> [] neighbourhood, double[]score, int [][] moves) {
+	private void createInitialNeighbourhood (PlanomatXPlan plan, List<? extends BasicPlanElement> [] neighbourhood, double[]score, int [][] moves) {
 		
 		int pos = 0;
 		for (int outer=0;outer<neighbourhood[0].size()-2;outer+=2){
@@ -255,7 +257,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	}
 	
 	
-	private void createNeighbourhood (PlanomatXPlan plan, ArrayList<?> [] neighbourhood, double[]score, int[][] moves, int[]position) {
+	private void createNeighbourhood (PlanomatXPlan plan, List<? extends BasicPlanElement> [] neighbourhood, double[]score, int[][] moves, int[]position) {
 		
 		int pos = 0;
 		int fieldLength = neighbourhood.length/3;
@@ -345,7 +347,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	
 	
 	
-	private double increaseTime(PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner){
+	private double increaseTime(PlanomatXPlan plan, List<? extends BasicPlanElement> actslegs, int outer, int inner){
 		
 		if ((((Activity)(actslegs.get(inner))).getDuration()>=(this.OFFSET+this.minimumTime))	||	
 				(outer==0	&&	inner==actslegs.size()-1)	||
@@ -358,7 +360,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	
 	
 	
-	private double decreaseTime(PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner){
+	private double decreaseTime(PlanomatXPlan plan, List<? extends BasicPlanElement> actslegs, int outer, int inner){
 		boolean checkFinalAct = false;
 		double time = OFFSET+this.minimumTime;
 		if (outer==0 && inner==actslegs.size()-1) time = OFFSET+1;
@@ -376,7 +378,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	}
 	
 	
-	private double swapDurations (PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner){
+	private double swapDurations (PlanomatXPlan plan, List<? extends BasicPlanElement> actslegs, int outer, int inner){
 		
 		double swaptime= java.lang.Math.max(((Activity)(actslegs.get(inner))).getDuration(), this.minimumTime)-((Activity)(actslegs.get(outer))).getDuration();
 		if (outer==0 	&&	swaptime<0) return this.setTimes(plan, actslegs, swaptime, outer, inner, outer, actslegs.size()-1); // check that first/last act does not turn below minimum time
@@ -438,7 +440,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 
 	
 	@SuppressWarnings("unchecked")
-	private double setTimes (PlanomatXPlan plan, ArrayList<?> actslegs, double offset, int outer, int inner, int start, int stop){		
+	private double setTimes (PlanomatXPlan plan, List<? extends BasicPlanElement> actslegs, double offset, int outer, int inner, int start, int stop){		
 		double travelTime;
 		double now = ((Leg)(actslegs.get(start+1))).getDepartureTime();
 		int position = 0;	// indicates whether time setting has reached parameter "stop"
@@ -540,7 +542,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		
 		
 		/* Scoring */
-		plan.setActsLegs((ArrayList<Object>)actslegs);
+		plan.setActsLegs(actslegs);
 		return scorer.getScore(plan);
 	}
 }

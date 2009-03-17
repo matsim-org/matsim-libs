@@ -26,6 +26,7 @@ import java.util.List;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Plan;
@@ -59,7 +60,7 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = Gbl.getConfig().planomat().getTripStructureAnalysisLayer();
 
 		Id locationId = null;
-		List<Object> actsLegs = plan.getPlanElements();
+		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 		for (int ii=0; ii < actsLegs.size(); ii++) {
 			if (actsLegs.get(ii) instanceof Activity) {
 				if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {

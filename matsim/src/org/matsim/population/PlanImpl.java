@@ -20,13 +20,13 @@
 
 package org.matsim.population;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Coord;
@@ -190,7 +190,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final ArrayList<Object> getPlanElements() {
+	public final List<? extends BasicPlanElement> getPlanElements() {
 		return this.actsLegs;
 	}
 

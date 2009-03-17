@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
@@ -69,7 +70,7 @@ public class PersonAgent implements DriverAgent {
 	 * Convenience method delegating to person's selected plan
 	 * @return list of {@link Activity}s and {@link Leg}s of this agent's plan
 	 */
-	public List<Object> getActsLegs() {
+	public List<? extends BasicPlanElement> getActsLegs() {
 		return this.person.getSelectedPlan().getPlanElements();
 	}
 

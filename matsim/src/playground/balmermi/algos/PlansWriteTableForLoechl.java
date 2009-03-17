@@ -23,9 +23,10 @@ package playground.balmermi.algos;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
@@ -116,7 +117,7 @@ public class PlansWriteTableForLoechl extends AbstractPersonAlgorithm implements
 
 	public void handlePlan(Plan plan) throws Exception {
 		try {
-			ArrayList actslegs = plan.getPlanElements();
+			List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
 
 			for (int i=0; i<actslegs.size()-2; i=i+2) {
 				Activity from_act = (Activity)actslegs.get(i);

@@ -21,6 +21,7 @@
 package org.matsim.population;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -37,8 +38,8 @@ import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.NetworkUtils;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
@@ -113,7 +114,9 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 			this.currperson = null;
 		}
 		else if (PLAN.equals(name)) {
-			this.currplan.getPlanElements().trimToSize();
+			if (this.currplan.getPlanElements() instanceof ArrayList) {
+				((ArrayList) this.currplan.getPlanElements()).trimToSize();
+			}
 			this.currplan = null;
 		}
 		else if (LEG.equals(name)) {

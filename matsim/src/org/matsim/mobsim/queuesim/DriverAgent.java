@@ -22,6 +22,7 @@ package org.matsim.mobsim.queuesim;
 
 import java.util.List;
 
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
@@ -59,5 +60,5 @@ public interface DriverAgent {
 	
 	public int getNextActivity();
 
-	public List<Object> getActsLegs();
+	public List<? extends BasicPlanElement> getActsLegs();
 }

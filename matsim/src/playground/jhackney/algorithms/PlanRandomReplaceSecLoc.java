@@ -40,12 +40,11 @@ package playground.jhackney.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Leg;
@@ -58,7 +57,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
-import org.matsim.utils.geometry.CoordImpl;
 
 
 public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
@@ -178,7 +176,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 
 			if(changed == true){
 				//		 loop over all <leg>s, remove route-information
-				ArrayList<?> bestactslegs = newPlan.getPlanElements();
+				List<? extends BasicPlanElement> bestactslegs = newPlan.getPlanElements();
 //				ArrayList<?> bestactslegs = plan.getActsLegs();
 				for (int j = 1; j < bestactslegs.size(); j=j+2) {
 					Leg leg = (Leg)bestactslegs.get(j);

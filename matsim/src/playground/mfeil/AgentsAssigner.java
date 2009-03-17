@@ -23,10 +23,12 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facility;
@@ -140,7 +142,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected void writePlan (Plan in, Plan out){
 		Plan bestPlan = new org.matsim.population.PlanImpl (in.getPerson());
 		bestPlan.copyPlan(in);
-		ArrayList<Object> al = out.getPlanElements();
+		List<BasicPlanElement> al = (List<BasicPlanElement>) out.getPlanElements();
 		
 		// NEW NEW NEW NEW NEW NEW NEW
 		ArrayList<ActivityOption> primActs = new ArrayList<ActivityOption>(out.getPerson().getKnowledge().getActivities(true));
