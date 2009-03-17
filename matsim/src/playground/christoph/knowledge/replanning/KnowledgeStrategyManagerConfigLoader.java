@@ -31,6 +31,7 @@ import org.matsim.config.Config;
 import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.PlanStrategyModule;
 import org.matsim.network.NetworkLayer;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
@@ -40,7 +41,6 @@ import org.matsim.replanning.modules.PlanomatModule;
 import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.replanning.modules.ReRouteLandmarks;
-import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.modules.TimeAllocationMutator;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.ExpBetaPlanChanger;
@@ -125,12 +125,12 @@ public class KnowledgeStrategyManagerConfigLoader extends StrategyManagerConfigL
 				strategy.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter));
 			} else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule planomatStrategyModule = new PlanomatModule(controler.getNetwork(), controler.getEvents(), controler.getTravelTimeCalculator(), controler.getTravelCostCalculator(), controler.getScoringFunctionFactory());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler.getNetwork(), controler.getEvents(), controler.getTravelTimeCalculator(), controler.getTravelCostCalculator(), controler.getScoringFunctionFactory());
 				strategy.addStrategyModule(planomatStrategyModule);
 //				setDecayingModuleProbability(manager, strategy, 100, rate); // FIXME [KM] Why "100" and not controler.firstIteration as in "PlanomatReRoute"
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule planomatStrategyModule = new PlanomatModule(controler.getNetwork(), controler.getEvents(), controler.getTravelTimeCalculator(), controler.getTravelCostCalculator(), controler.getScoringFunctionFactory());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler.getNetwork(), controler.getEvents(), controler.getTravelTimeCalculator(), controler.getTravelCostCalculator(), controler.getScoringFunctionFactory());
 				strategy.addStrategyModule(planomatStrategyModule);
 				strategy.addStrategyModule(new ReRoute(controler));
 				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);
@@ -148,7 +148,7 @@ public class KnowledgeStrategyManagerConfigLoader extends StrategyManagerConfigL
 			} else if (classname.equals("SNSecLoc")){
 //				System.out.println(" #### Choosing social network replanning algorithm");
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule socialNetStrategyModule= new RandomFacilitySwitcherK(network, travelCostCalc, travelTimeCalc);
+				PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherK(network, travelCostCalc, travelTimeCalc);
 //				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherSM(network, travelCostCalc, travelTimeCalc);
 				strategy.addStrategyModule(socialNetStrategyModule);
 			} /*else if (classname.equals("LocationChoice")) {

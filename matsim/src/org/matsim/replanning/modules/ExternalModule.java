@@ -31,6 +31,7 @@ import org.matsim.config.MatsimConfigReader;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.PlanStrategyModule;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
@@ -59,7 +60,7 @@ import org.matsim.utils.misc.ExeRunner;
  * @author dstrippgen
  * @author mrieser
  */
-public class ExternalModule implements StrategyModule {
+public class ExternalModule implements PlanStrategyModule {
 
 	private static final String SCENARIO = "scenario";
 	private static final String SCENARIO_INPUT_PLANS_FILENAME = "inputPlansFilename";
@@ -87,7 +88,7 @@ public class ExternalModule implements StrategyModule {
 		this.outFileRoot = Controler.getTempPath() + "/";
 	}
 
-	public void init() {
+	public void prepareReplanning() {
 		this.persons.clear();
 		this.plansWriter = getPlansWriterHandler();
 		this.plansWriter.writeStartPlans();
@@ -139,7 +140,7 @@ public class ExternalModule implements StrategyModule {
 		}
 	}
 
-	public void finish() {
+	public void finishReplanning() {
 		this.plansWriter.writeEndPlans();
 		if (this.persons.size() == 0) {
 			return;

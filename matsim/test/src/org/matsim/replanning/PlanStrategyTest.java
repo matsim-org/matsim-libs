@@ -20,8 +20,8 @@
 
 package org.matsim.replanning;
 
+import org.matsim.interfaces.basic.v01.PlanStrategyModule;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -44,19 +44,19 @@ public class PlanStrategyTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	private static class DummyStrategyModule implements StrategyModule {
+	private static class DummyStrategyModule implements PlanStrategyModule {
 
 		/*package*/ DummyStrategyModule() {
 			// empty constructor with default visibility for a private inner class
 		}
 
-		public void finish() {
+		public void finishReplanning() {
 		}
 
 		public void handlePlan(final Plan plan) {
 		}
 
-		public void init() {
+		public void prepareReplanning() {
 		}
 
 	}

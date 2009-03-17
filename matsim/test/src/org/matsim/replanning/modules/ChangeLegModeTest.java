@@ -55,7 +55,7 @@ public class ChangeLegModeTest extends MatsimTestCase {
 	}
 
 	private void runTest(final ChangeLegMode module, final BasicLeg.Mode[] possibleModes) {
-		module.init();
+		module.prepareReplanning();
 
 		Plan plan = new org.matsim.population.PlanImpl(null);
 		plan.createAct("home", new CoordImpl(0, 0));

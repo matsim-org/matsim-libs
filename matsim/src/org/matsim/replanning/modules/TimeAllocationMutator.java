@@ -23,12 +23,13 @@ package org.matsim.replanning.modules;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.PlanStrategyModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 
 /**
  * Wraps the {@link org.matsim.population.algorithms.PlanMutateTimeAllocation}-
- * PlanAlgorithm into a {@link StrategyModule} so it can be used for plans
+ * PlanAlgorithm into a {@link PlanStrategyModule} so it can be used for plans
  * replanning. Supports multiple threads.
  *
  * @author mrieser

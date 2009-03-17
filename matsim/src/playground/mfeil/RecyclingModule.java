@@ -22,13 +22,13 @@ package playground.mfeil;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.PlanStrategyModule;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.controler.Controler;
-import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
@@ -54,7 +54,7 @@ import java.util.LinkedList;
  */
 
 
-public class RecyclingModule implements StrategyModule {
+public class RecyclingModule implements PlanStrategyModule {
 	
 	protected  ArrayList<Plan> []				list;
 	protected final MultithreadedModuleA 		schedulingModule;
@@ -118,13 +118,13 @@ public class RecyclingModule implements StrategyModule {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void init() {
+	public void prepareReplanning() {
 		
 		this.list = new ArrayList[2];
 		for (int i=0;i<2;i++){
 			list[i] = new ArrayList<Plan>();
 		}
-		this.schedulingModule.init();
+		this.schedulingModule.prepareReplanning();
 	}
 
 	public void handlePlan(final Plan plan) {	
@@ -132,10 +132,10 @@ public class RecyclingModule implements StrategyModule {
 		this.list[1].add(plan);
 	}
 
-	public void finish(){
+	public void finishReplanning(){
 		
 		for (int i=0;i<list[0].size();i++) schedulingModule.handlePlan(list[0].get(i));
-		schedulingModule.finish();
+		schedulingModule.finishReplanning();
 		
 		for (int i=0;i<list[0].size();i++){
 			assignment.print(list[0].get(i).getPerson().getId()+"\t"+list[0].get(i).getScoreAsPrimitiveType()+"\t");
@@ -147,11 +147,11 @@ public class RecyclingModule implements StrategyModule {
 		assignment.println();
 		
 		this.agents = new OptimizedAgents (this.list[0]);		
-		this.assignmentModule.init();		
+		this.assignmentModule.prepareReplanning();		
 		for (int i=0;i<list[1].size();i++){
 			this.assignmentModule.handlePlan(this.list[1].get(i));
 		}		
-		this.assignmentModule.finish();
+		this.assignmentModule.finishReplanning();
 		
 		for (int i=0;i<Statistics.list.size();i++){
 			for (int j=0;j<Statistics.list.get(i).size();j++){

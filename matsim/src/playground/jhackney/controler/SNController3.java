@@ -5,11 +5,11 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
+import org.matsim.interfaces.basic.v01.PlanStrategyModule;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.ReRouteLandmarks;
-import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.replanning.selectors.KeepSelected;
 import org.matsim.replanning.selectors.RandomPlanSelector;
@@ -49,7 +49,7 @@ public class SNController3 extends Controler {
 
 		// Adjust activity start times by social network and time windows
 		PlanStrategy strategy1 = new PlanStrategy(new KeepSelected());// only facilities visited in last iteration are in time window hastable
-		StrategyModule socialNetStrategyModule= new SNCoordinateArrivalTimes(this);
+		PlanStrategyModule socialNetStrategyModule= new SNCoordinateArrivalTimes(this);
 		strategy1.addStrategyModule(socialNetStrategyModule);
 		manager.addStrategy(strategy1, 0.15);
 		this.log.info("  added strategy SNCoordinateArrivalTimes with probability 0.15");

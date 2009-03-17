@@ -852,13 +852,13 @@ public class MyRuns {
 		PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		preProcessRoutingData.run(network);
 		final ReRouteLandmarks reroute = new ReRouteLandmarks(network, new TravelTimeDistanceCostCalculator(ttime), ttime, preProcessRoutingData);
-		reroute.init();
+		reroute.prepareReplanning();
 		for (final Person person : population.getPersons().values()) {
 			for (final Plan plan : person.getPlans()) {
 				reroute.handlePlan(plan);
 			}
 		}
-		reroute.finish();
+		reroute.finishReplanning();
 		System.out.println("  done.");
 		Gbl.printElapsedTime();
 

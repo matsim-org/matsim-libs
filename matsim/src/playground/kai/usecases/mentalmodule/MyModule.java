@@ -23,6 +23,7 @@ import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.PlanStrategyModule;
 import org.matsim.interfaces.basic.v01.network.BasicLink;
 import org.matsim.interfaces.basic.v01.network.BasicNode;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
@@ -33,11 +34,10 @@ import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.interfaces.core.v01.PopulationBuilder;
 import org.matsim.network.NetworkLayer;
-import org.matsim.replanning.modules.StrategyModule;
 
 @SuppressWarnings("unused")
 public class MyModule implements
-StrategyModule,
+PlanStrategyModule,
 ActEndEventHandler,
 AgentDepartureEventHandler,
 AgentWait2LinkEventHandler,
@@ -61,7 +61,7 @@ ActStartEventHandler
 		
 	}
 	
-	public void init() { // initReplanning() 
+	public void prepareReplanning() { // initReplanning() 
 		
 		// go through network and copy to my personal network:
 		for ( BasicNode bn : net.getNodes().values() ) {
@@ -209,7 +209,7 @@ ActStartEventHandler
 	public void reset(int iteration) {
 	}
 
-	public void finish() {		
+	public void finishReplanning() {		
 	}
 
 }

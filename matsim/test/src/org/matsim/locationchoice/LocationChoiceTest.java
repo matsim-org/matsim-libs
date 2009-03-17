@@ -73,8 +73,8 @@ public class LocationChoiceTest  extends MatsimTestCase {
 		//this.initialize();
 		locationchoice.getPlanAlgoInstance();
 		assertEquals(false, locationchoice.getPlanAlgoInstances().isEmpty());
-		locationchoice.init();
-		locationchoice.finish();
+		locationchoice.prepareReplanning();
+		locationchoice.finishReplanning();
 		assertEquals(true , locationchoice.getPlanAlgoInstances().isEmpty());
 	}
 	

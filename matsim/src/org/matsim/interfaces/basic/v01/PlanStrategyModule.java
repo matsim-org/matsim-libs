@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.replanning.modules;
+package org.matsim.interfaces.basic.v01;
 
 import org.matsim.interfaces.core.v01.Plan;
 
@@ -27,7 +27,7 @@ import org.matsim.interfaces.core.v01.Plan;
  * 
  * @author mrieser
  */
-public interface StrategyModule {
+public interface PlanStrategyModule {
 
 	/**
 	 * Initializes this module before handling plans. Modules using an external
@@ -35,17 +35,17 @@ public interface StrategyModule {
 	 * the external routines. Multi-threaded modules could initialize and start
 	 * their threads in this method.
 	 */
-	public void init();
+	public void prepareReplanning();
 	
 	/**
 	 * Tells this module to handle the specified plan. It is not required that
 	 * the plan must immediately be handled, e.g. modules calling external 
 	 * routines could just collect the plans here and start the external routine
-	 * in {@link #finish()}, or multi-threaded modules could just add the
+	 * in {@link #finishReplanning()}, or multi-threaded modules could just add the
 	 * plan to a synchronized queue for the threads.
 	 *
 	 * @param plan
-	 * @see #finish()
+	 * @see #finishReplanning()
 	 */
 	public void handlePlan(Plan plan);
 	
@@ -57,5 +57,5 @@ public interface StrategyModule {
 	 * 
 	 * @see #handlePlan(Plan)
 	 */
-	public void finish();
+	public void finishReplanning();
 }

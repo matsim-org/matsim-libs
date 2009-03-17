@@ -23,9 +23,9 @@ package playground.mfeil;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.PlanStrategyModule;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.replanning.modules.MultithreadedModuleA;
-import org.matsim.replanning.modules.StrategyModule;
 import java.util.ArrayList;
 import java.util.Iterator;
 import org.matsim.controler.Controler;
@@ -37,7 +37,7 @@ import org.matsim.controler.Controler;
  */
 
 
-public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
+public class RecyclingModule1 extends RecyclingModule implements PlanStrategyModule{
 		
 	private final int iterations, noOfAgents, noOfSoftCoefficients;
 	private final DistanceCoefficients coefficients;
@@ -73,7 +73,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 	
 	
 
-	public void finish(){
+	public void finishReplanning(){
 		
 		Statistics.noSexAssignment=false;
 		Statistics.noCarAvailAssignment=false;
@@ -87,7 +87,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			schedulingModule.handlePlan(list[1].get(pos));
 			list[1].remove(pos);
 		}
-		schedulingModule.finish();
+		schedulingModule.finishReplanning();
 		
 		/* Fill Optimized Agents object */
 		agents = new OptimizedAgents (list[0]);
@@ -114,7 +114,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		assignment.println();
 		
 		/* Assign remaining agents */
-		assignmentModule.init();
+		assignmentModule.prepareReplanning();
 		if (this.list1Pointer.size()>0){
 			int pointer = 0;
 			for (int i=0;i<list[1].size();i++){
@@ -129,11 +129,11 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 				assignmentModule.handlePlan(list[1].get(i));
 			}
 		}
-		assignmentModule.finish();
+		assignmentModule.finishReplanning();
 		
 		/* Individually optimize all agents that couldn't be assigned */ 
 		if (this.nonassignedAgents.size()>0){
-			schedulingModule.init();
+			schedulingModule.prepareReplanning();
 			Iterator<String> naa = this.nonassignedAgents.iterator();
 			while (naa.hasNext()) {
 				String st = naa.next();
@@ -144,7 +144,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 					}
 				}
 			}
-			schedulingModule.finish();
+			schedulingModule.finishReplanning();
 		}
 		
 		/* Print statistics of assignment */
@@ -213,7 +213,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		/* Iteration 0 */
 		score [0]= this.calculate();		// calculate score for initial vector
 		
-		this.schedulingModule.init();
+		this.schedulingModule.prepareReplanning();
 		Iterator<String> naa = this.nonassignedAgents.iterator();
 		while (naa.hasNext()) {
 			String st = naa.next();
@@ -226,7 +226,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 				}
 			}
 		}
-		schedulingModule.finish();	
+		schedulingModule.finishReplanning();	
 		java.util.Collections.sort(this.list1Pointer);
 		for (int x=list1Pointer.size()-1;x>=0;x--){
 			this.list[0].add(this.list[1].get(list1Pointer.get(x)));
@@ -338,11 +338,11 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 	
 	private double calculate (){
 		double score = 0;
-		this.assignmentModule.init();
+		this.assignmentModule.prepareReplanning();
 		for (int j=0;j<java.lang.Math.min(this.noOfAgents, list[1].size());j++){
 			assignmentModule.handlePlan(list[1].get(j));
 		}
-		assignmentModule.finish();
+		assignmentModule.finishReplanning();
 		for (int j=0;j<java.lang.Math.min(this.noOfAgents, list[1].size());j++){
 			score += this.list[1].get(j).getScoreAsPrimitiveType(); 
 		}

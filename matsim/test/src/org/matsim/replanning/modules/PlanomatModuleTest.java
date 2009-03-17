@@ -95,14 +95,14 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		
 		PlanomatModule testee = new PlanomatModule(this.network, emptyEvents, tTravelEstimator, travelCostEstimator, scoringFunctionFactory);
 		
-		testee.init();
+		testee.prepareReplanning();
 		for (Person person : this.population.getPersons().values()) {
 
 			Plan plan = person.getPlans().get(TEST_PLAN_NR);
 			testee.handlePlan(plan);
 			
 		}
-		testee.finish();
+		testee.finishReplanning();
 		
 		System.out.println("Writing plans file...");
 		PopulationWriter plans_writer = new PopulationWriter(this.population, this.getOutputDirectory() + "output_plans.xml.gz", "v4");

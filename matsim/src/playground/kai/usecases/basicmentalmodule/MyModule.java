@@ -19,7 +19,6 @@ import org.matsim.events.* ;
 import org.matsim.controler.Controler;
 
 // TODO: ????  BasicStrategyModule???
-import org.matsim.replanning.modules.StrategyModule;
 
 // TODO: ????
 import org.matsim.interfaces.core.v01.Plan;
@@ -27,7 +26,7 @@ import org.matsim.interfaces.core.v01.Plan;
 
 @SuppressWarnings("unused")
 public class MyModule implements
-StrategyModule,
+PlanStrategyModule,
 ActEndEventHandler,
 AgentDepartureEventHandler,
 AgentWait2LinkEventHandler,
@@ -52,7 +51,7 @@ ActStartEventHandler
 		
 	}
 	
-	public void init() { // initReplanning() 
+	public void prepareReplanning() { // initReplanning() 
 		
 		// go through network and copy to my personal network:
 		for ( BasicNode bn : net.getNodes().values() ) {
@@ -196,7 +195,7 @@ ActStartEventHandler
 	public void reset(int iteration) {
 	}
 
-	public void finish() {		
+	public void finishReplanning() {		
 	}
 
 }

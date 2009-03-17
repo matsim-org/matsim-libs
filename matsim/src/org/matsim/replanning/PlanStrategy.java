@@ -23,9 +23,9 @@ package org.matsim.replanning;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.basic.v01.PlanStrategyModule;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.selectors.PlanSelector;
 
 /**
@@ -37,8 +37,8 @@ import org.matsim.replanning.selectors.PlanSelector;
 public class PlanStrategy {
 
 	private PlanSelector planSelector = null;
-	private StrategyModule firstModule = null;
-	private final ArrayList<StrategyModule> modules = new ArrayList<StrategyModule>();
+	private PlanStrategyModule firstModule = null;
+	private final ArrayList<PlanStrategyModule> modules = new ArrayList<PlanStrategyModule>();
 	private final ArrayList<Plan> plans = new ArrayList<Plan>();
 	private long counter = 0;
 	private final static Logger log = Logger.getLogger(PlanStrategy.class);
@@ -57,7 +57,7 @@ public class PlanStrategy {
 	 *
 	 * @param module
 	 */
-	public void addStrategyModule(final StrategyModule module) {
+	public void addStrategyModule(final PlanStrategyModule module) {
 		if (this.firstModule == null) {
 			this.firstModule = module;
 		} else {
@@ -105,7 +105,7 @@ public class PlanStrategy {
 	 */
 	public void init() {
 		if (this.firstModule != null) {
-			this.firstModule.init();
+			this.firstModule.prepareReplanning();
 		}
 	}
 
@@ -118,14 +118,14 @@ public class PlanStrategy {
 	public void finish() {
 		if (this.firstModule != null) {
 			// finish the first module
-			this.firstModule.finish();
+			this.firstModule.finishReplanning();
 			// now work through the others
-			for (StrategyModule module : this.modules) {
-				module.init();
+			for (PlanStrategyModule module : this.modules) {
+				module.prepareReplanning();
 				for (Plan plan : this.plans) {
 					module.handlePlan(plan);
 				}
-				module.finish();
+				module.finishReplanning();
 			}
 		}
 		this.plans.clear();
@@ -134,7 +134,7 @@ public class PlanStrategy {
 	}
 
 	/** Returns a descriptive name for this strategy, based on the class names on the used
-	 * {@link PlanSelector plan selector} and {@link StrategyModule strategy modules}.
+	 * {@link PlanSelector plan selector} and {@link PlanStrategyModule strategy modules}.
 	 *
 	 * @return An automatically generated name for this strategy.
 	 */
@@ -145,7 +145,7 @@ public class PlanStrategy {
 		if (this.firstModule != null) {
 			name.append('_');
 			name.append(this.firstModule.getClass().getSimpleName());
-			for (StrategyModule module : this.modules) {
+			for (PlanStrategyModule module : this.modules) {
 				name.append('_');
 				name.append(module.getClass().getSimpleName());
 			}

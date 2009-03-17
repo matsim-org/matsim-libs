@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.PlanStrategyModule;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -44,7 +45,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author mrieser
  */
-abstract public class MultithreadedModuleA implements StrategyModule {
+abstract public class MultithreadedModuleA implements PlanStrategyModule {
 	private final int numOfThreads;
 
 	private PlanAlgoThread[] algothreads = null;
@@ -67,7 +68,7 @@ abstract public class MultithreadedModuleA implements StrategyModule {
 		this.numOfThreads = numOfThreads;
 	}
 
-	public void init() {
+	public void prepareReplanning() {
 		if (this.numOfThreads == 0) {
 			// it seems, no threads are desired :(
 			this.directAlgo = getPlanAlgoInstance();
@@ -85,7 +86,7 @@ abstract public class MultithreadedModuleA implements StrategyModule {
 		}
 	}
 
-	public void finish() {
+	public void finishReplanning() {
 		if (this.directAlgo == null) {
 			// only try to start threads if we did not directly work on all the plans
 			log.info("[" + this.name + "] starting threads, handling " + this.counter + " plans");

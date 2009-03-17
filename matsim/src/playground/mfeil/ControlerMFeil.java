@@ -23,13 +23,13 @@ package playground.mfeil;
 import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.PlanStrategyModule;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.PlanomatModule;
 import org.matsim.replanning.modules.ReRoute;
-import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.scoring.ScoringFunctionFactory;
@@ -65,7 +65,7 @@ public class ControlerMFeil extends Controler {
 			
 			if (classname.equals("PlanomatX")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule planomatXStrategyModule = new PlanomatX12Initialiser(this);
+				PlanStrategyModule planomatXStrategyModule = new PlanomatX12Initialiser(this);
 				strategy.addStrategyModule(planomatXStrategyModule);
 			}
 			else if  (classname.equals("ReRoute") || classname.equals("threaded.ReRoute")) {
@@ -77,7 +77,7 @@ public class ControlerMFeil extends Controler {
 			}
 			else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule planomatStrategyModule = new PlanomatModule(this.getNetwork(), this.getEvents(), this.getTravelTimeCalculator(), this.getTravelCostCalculator(), this.getScoringFunctionFactory());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(this.getNetwork(), this.getEvents(), this.getTravelTimeCalculator(), this.getTravelCostCalculator(), this.getScoringFunctionFactory());
 				strategy.addStrategyModule(planomatStrategyModule);
 			}
 			else if (classname.equals("TimeOptimizer")) {
@@ -90,12 +90,12 @@ public class ControlerMFeil extends Controler {
 						super.getTravelCostCalculator(), 
 						tDepDelayCalc, 
 						super.network);
-				StrategyModule timeOptStrategyModule = new TimeOptInitialiser(this, legTravelTimeEstimator, this.scoringFunctionFactory);
+				PlanStrategyModule timeOptStrategyModule = new TimeOptInitialiser(this, legTravelTimeEstimator, this.scoringFunctionFactory);
 				strategy.addStrategyModule(timeOptStrategyModule);
 			}
 			else if (classname.equals("Clustering")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule module = new RecyclingModule1(this);
+				PlanStrategyModule module = new RecyclingModule1(this);
 				strategy.addStrategyModule(module);
 			}
 		
