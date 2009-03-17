@@ -221,55 +221,6 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		return openInterval;
 	}
 
-	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
-		double tmpScore = 0.0;
-		double travelTime = arrivalTime - departureTime; // traveltime in seconds
-
-		/* we only as for the route when we have to calculate a distance cost,
-		 * because route.getDist() may calculate the distance if not yet
-		 * available, which is quite an expensive operation
-		 */
-		double dist = 0.0; // distance in meters
-
-
-		if (BasicLeg.Mode.car.equals(leg.getMode())) {
-			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
-				Route route = leg.getRoute();
-				dist = route.getDistance();
-				/* TODO the route-distance does not contain the length of the first or
-				 * last link of the route, because the route doesn't know those. Should
-				 * be fixed somehow, but how? MR, jan07
-				 */
-				/* TODO in the case of within-day replanning, we cannot be sure that the
-				 * distance in the leg is the actual distance driven by the agent.
-				 */
-			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
-		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
-			if (this.params.marginalUtilityOfDistancePt != 0.0){
-				dist = leg.getRoute().getDistance();
-			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT + this.params.marginalUtilityOfDistancePt * dist;
-		} else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
-			if (this.params.marginalUtilityOfDistanceWalk != 0.0){
-				dist = leg.getRoute().getDistance();
-			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk + this.params.marginalUtilityOfDistanceWalk * dist;
-		} else {
-			if (this.params.marginalUtilityOfDistanceCar != 0.0){
-				dist = leg.getRoute().getDistance();
-			}
-			// use the same values as for "car"
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
-		}
-
-		return tmpScore;
-	}
-
-	private double getStuckPenalty() {
-		return this.params.abortedPlanScore;
-	}
-
 	protected void handleAct(final double time) {
 		Activity act = (Activity)this.plan.getPlanElements().get(this.index);
 		if (this.index == 0) {
