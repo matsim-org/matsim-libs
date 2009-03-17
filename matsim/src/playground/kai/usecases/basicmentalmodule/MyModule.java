@@ -20,7 +20,6 @@ import org.matsim.interfaces.basic.v01.population.BasicActivity;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.basic.v01.population.BasicPerson;
 import org.matsim.interfaces.basic.v01.population.BasicPlan;
-import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 import org.matsim.interfaces.basic.v01.population.BasicPopulation;
 import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.interfaces.basic.v01.population.BasicRoute;
@@ -77,7 +76,7 @@ BasicActEndEventHandler
 			List<BasicPlan> plans = person.getPlans() ;
 			
 			for ( BasicPlan plan : plans ) {
-				for ( BasicPlanElement oo : plan.getPlanElements() ) {
+				for ( Object oo : plan.getPlanElements() ) {
 					if ( oo instanceof BasicActivity ) {
 						BasicActivity act = (BasicActivity) oo ;
 						act.getCoord() ; // deprecated ????
@@ -168,7 +167,7 @@ BasicActEndEventHandler
 		ev.getTime();
 	}
 
-	
+
 	public void reset(int iteration) {
 	}
 

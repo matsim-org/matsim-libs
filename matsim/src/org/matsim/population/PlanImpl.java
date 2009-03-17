@@ -24,10 +24,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.basic.v01.population.BasicActivity;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Facility;
@@ -35,11 +37,14 @@ import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.PlanElement;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.utils.misc.Time;
 
-public class PlanImpl extends BasicPlanImpl implements Plan {
+public class PlanImpl implements Plan {
 
+	private final BasicPlanImpl delegate;
+	
 	private final static Logger log = Logger.getLogger(PlanImpl.class);
 
 	private final static String ACT_ERROR = "The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.";
@@ -53,7 +58,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	//////////////////////////////////////////////////////////////////////
 
 	public PlanImpl(final Person person) {
-		super(person);
+		this.delegate = new BasicPlanImpl(person);
 	}
 
 	public static Plan createPlan( final Person p) {
@@ -63,14 +68,14 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	public final Activity createAct(final String type, final Coord coord) throws IllegalStateException {
 		verifyCreateAct(Time.UNDEFINED_TIME);
 		Activity a = new ActivityImpl(type, coord);
-		this.actsLegs.add(a);
+		getPlanElements().add(a);
 		return a;
 	}
 
 	public final Activity createAct(final String type, final Facility fac) throws IllegalStateException {
 		verifyCreateAct(Time.UNDEFINED_TIME);
 		Activity a = new ActivityImpl(type, fac);
-		this.actsLegs.add(a);
+		getPlanElements().add(a);
 		return a;
 	}
 
@@ -78,7 +83,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	public final Activity createAct(final String type, final Link link) throws IllegalStateException {
 		verifyCreateAct(Time.UNDEFINED_TIME);
 		Activity a = new ActivityImpl(type, link);
-		this.actsLegs.add(a);
+		getPlanElements().add(a);
 		return a;
 	}
 
@@ -90,22 +95,22 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 		verifyCreateLeg();
 		Leg leg = new LegImpl(mode);
 		// Override leg number with an appropriate value
-		this.actsLegs.add(leg);
+		getPlanElements().add(leg);
 		return leg;
 	}
 
 	private final void verifyCreateLeg() throws IllegalStateException {
-		if (this.actsLegs.size() % 2 == 0) {
+		if (getPlanElements().size() % 2 == 0) {
 			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create a 'leg'.");
 		}
 	}
 
 	private static long noEndTimeCnt = 0 ;
 	private final void verifyCreateAct(final double endTime) throws IllegalStateException {
-		if (this.actsLegs.size() % 2 != 0) {
+		if (getPlanElements().size() % 2 != 0) {
 			throw new IllegalStateException(ACT_ERROR);
 		}
-		if ((this.actsLegs.size() == 0) && (endTime == Time.UNDEFINED_TIME)) {
+		if ((getPlanElements().size() == 0) && (endTime == Time.UNDEFINED_TIME)) {
 			if ( noEndTimeCnt < 1 ) {
 				noEndTimeCnt++ ;
 			log.warn( "First 'act' has no end time.  Some people think that the first 'act' should have an end time.  This is, however, not true, since someone can stay at the first act all day.  Future occurences of this warning will be suppressed." ) ;
@@ -129,33 +134,33 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	 * @param index
 	 */
 	public final void removeAct(final int index) {
-		if ((index % 2 != 0) || (index < 0) || (index > this.actsLegs.size()-1)) {
+		if ((index % 2 != 0) || (index < 0) || (index > getPlanElements().size()-1)) {
 			log.warn(this + "[index=" + index +" is wrong. nothing removed]");
 		}
-		else if (this.actsLegs.size() == 1) {
+		else if (getPlanElements().size() == 1) {
 			log.warn(this + "[index=" + index +" only one act. nothing removed]");
 		}
 		else {
 			if (index == 0) {
 				// remove first act and first leg
-				this.actsLegs.remove(index+1); // following leg
-				this.actsLegs.remove(index); // act
+				getPlanElements().remove(index+1); // following leg
+				getPlanElements().remove(index); // act
 			}
-			else if (index == this.actsLegs.size()-1) {
+			else if (index == getPlanElements().size()-1) {
 				// remove last act and last leg
-				this.actsLegs.remove(index); // act
-				this.actsLegs.remove(index-1); // previous leg
+				getPlanElements().remove(index); // act
+				getPlanElements().remove(index-1); // previous leg
 			}
 			else {
 				// remove an in-between act
-				Leg prev_leg = (Leg)this.actsLegs.get(index-1); // prev leg;
+				Leg prev_leg = (Leg)getPlanElements().get(index-1); // prev leg;
 				prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
 				prev_leg.setTravelTime(Time.UNDEFINED_TIME);
 				prev_leg.setArrivalTime(Time.UNDEFINED_TIME);
 				prev_leg.setRoute(null);
 
-				this.actsLegs.remove(index+1); // following leg
-				this.actsLegs.remove(index); // act
+				getPlanElements().remove(index+1); // following leg
+				getPlanElements().remove(index); // act
 			}
 		}
 	}
@@ -167,20 +172,20 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	 * @param index
 	 */
 	public final void removeLeg(final int index) {
-		if ((index % 2 == 0) || (index < 1) || (index >= this.actsLegs.size()-1)) {
+		if ((index % 2 == 0) || (index < 1) || (index >= getPlanElements().size()-1)) {
 			log.warn(this + "[index=" + index +" is wrong. nothing removed]");
 		}
 		else {
-			if (index != this.actsLegs.size()-2) {
+			if (index != getPlanElements().size()-2) {
 				// not the last leg
-				Leg next_leg = (Leg)this.actsLegs.get(index+2);
+				Leg next_leg = (Leg)getPlanElements().get(index+2);
 				next_leg.setDepartureTime(Time.UNDEFINED_TIME);
 				next_leg.setTravelTime(Time.UNDEFINED_TIME);
 				next_leg.setArrivalTime(Time.UNDEFINED_TIME);
 				next_leg.setRoute(null);
 			}
-			this.actsLegs.remove(index+1); // following act
-			this.actsLegs.remove(index); // leg
+			getPlanElements().remove(index+1); // following act
+			getPlanElements().remove(index); // leg
 		}
 	}
 
@@ -188,47 +193,33 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final List<? extends BasicPlanElement> getPlanElements() {
-		return this.actsLegs;
+	@SuppressWarnings("unchecked")
+	public final List<PlanElement> getPlanElements() {
+		return (List<PlanElement>) this.delegate.getPlanElements();
 	}
 
 	public final Person getPerson() {
-		return (Person) this.person;
+		return (Person) this.delegate.getPerson();
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
 
 	public void setPerson(final Person person) {
-		this.person = person;
+		this.delegate.setPerson(person);// FIXME [MR]
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// query methods
-	//////////////////////////////////////////////////////////////////////
-	@Override
 	public final boolean isSelected() {
 		return getPerson().getSelectedPlan() == this;
 	}
 
-
-	@Override
 	public void setSelected(final boolean selected) {
 		this.getPerson().setSelectedPlan(this);
-		super.setSelected(selected);
+		this.delegate.setSelected(selected);
 	}
-
-
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	public final String toString() {
 		return "[score=" + this.getScore().toString() + "]" +
 				"[selected=" + this.isSelected() + "]" +
-				"[nof_acts_legs=" + this.actsLegs.size() + "]";
+				"[nof_acts_legs=" + getPlanElements().size() + "]";
 	}
 
 	/** loads a copy of an existing plan
@@ -237,14 +228,14 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	public void copyPlan(final Plan in) {
 		setScore(in.getScore());
 		this.setType(in.getType());
-		this.person = in.getPerson();
+		setPerson(in.getPerson());
 		List<?> actl = in.getPlanElements();
 		for (int i= 0; i< actl.size() ; i++) {
 			try {
 				if (i % 2 == 0) {
 					// activity
 					Activity a = (Activity)actl.get(i);
-					this.actsLegs.add(new ActivityImpl(a));
+					getPlanElements().add(new ActivityImpl(a));
 				} else {
 					// Leg
 					Leg l = (Leg) actl.get(i);
@@ -274,23 +265,23 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	 * @throws IllegalArgumentException If the leg and act cannot be inserted at the specified position without retaining the correct order of legs and acts.
 	 */
 	public void insertLegAct(final int pos, final Leg leg, final Activity act) throws IllegalArgumentException {
-		if (pos < this.actsLegs.size()) {
-			Object o = this.actsLegs.get(pos);
+		if (pos < getPlanElements().size()) {
+			Object o = getPlanElements().get(pos);
 			if (!(o instanceof Leg)) {
 				throw new IllegalArgumentException("Position to insert leg and act is not valid (act instead of leg at position).");
 			}
-		} else if (pos > this.actsLegs.size()) {
+		} else if (pos > getPlanElements().size()) {
 			throw new IllegalArgumentException("Position to insert leg and act is not valid.");
 		}
 
-		this.actsLegs.add(pos, act);
-		this.actsLegs.add(pos, leg);
+		getPlanElements().add(pos, act);
+		getPlanElements().add(pos, leg);
 	}
 
 	public Leg getPreviousLeg(final Activity act) {
 		int index = this.getActLegIndex(act);
 		if (index != -1) {
-			return (Leg) this.actsLegs.get(index-1);
+			return (Leg) getPlanElements().get(index-1);
 		}
 		return null;
 	}
@@ -298,15 +289,15 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	public Activity getPreviousActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {
-			return (Activity) this.actsLegs.get(index-1);
+			return (Activity) getPlanElements().get(index-1);
 		}
 		return null;
 	}
 
 	public Leg getNextLeg(final Activity act) {
 		int index = this.getActLegIndex(act);
-		if ((index < this.actsLegs.size() - 1) && (index != -1)) {
-			return (Leg) this.actsLegs.get(index+1);
+		if ((index < getPlanElements().size() - 1) && (index != -1)) {
+			return (Leg) getPlanElements().get(index+1);
 		}
 		return null;
 	}
@@ -314,15 +305,15 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	public Activity getNextActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {
-			return (Activity) this.actsLegs.get(index+1);
+			return (Activity) getPlanElements().get(index+1);
 		}
 		return null;
 	}
 
 	private int getActLegIndex(final Object o) {
 		if ((o instanceof Leg) || (o instanceof Activity)) {
-			for (int i = 0; i < this.actsLegs.size(); i++) {
-				if (this.actsLegs.get(i).equals(o)) {
+			for (int i = 0; i < getPlanElements().size(); i++) {
+				if (getPlanElements().get(i).equals(o)) {
 					return i;
 				}
 			}
@@ -332,11 +323,11 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 	}
 
 	public Activity getFirstActivity() {
-		return (Activity) this.actsLegs.get(0);
+		return (Activity) getPlanElements().get(0);
 	}
 
 	public Activity getLastActivity() {
-		return (Activity) this.actsLegs.get(this.actsLegs.size() - 1);
+		return (Activity) getPlanElements().get(getPlanElements().size() - 1);
 	}
 
 	public final double getScoreAsPrimitiveType() {
@@ -344,6 +335,50 @@ public class PlanImpl extends BasicPlanImpl implements Plan {
 			return Plan.UNDEF_SCORE;
 		}
 		return getScore().doubleValue();
+	}
+
+	public void addAct(BasicActivity act) {
+		delegate.addAct(act);
+	}
+
+	public void addLeg(BasicLeg leg) {
+		delegate.addLeg(leg);
+	}
+
+	public boolean containsActivity(String activityType) {
+		return delegate.containsActivity(activityType);
+	}
+
+	public boolean equals(Object obj) {
+		return delegate.equals(obj);
+	}
+
+	public ActIterator getIteratorAct() {
+		return delegate.getIteratorAct();
+	}
+
+	public LegIterator getIteratorLeg() {
+		return delegate.getIteratorLeg();
+	}
+
+	public final Double getScore() {
+		return delegate.getScore();
+	}
+
+	public Type getType() {
+		return delegate.getType();
+	}
+
+	public int hashCode() {
+		return delegate.hashCode();
+	}
+
+	public void setScore(Double score) {
+		delegate.setScore(score);
+	}
+
+	public void setType(Type type) {
+		delegate.setType(type);
 	}
 	
 }

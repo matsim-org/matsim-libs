@@ -42,7 +42,7 @@ public class BasicPlanImpl implements BasicPlan {
 	protected ArrayList<BasicPlanElement> actsLegs = new ArrayList<BasicPlanElement>();
 
 	private Double score = null;
-	protected BasicPerson person = null;
+	private BasicPerson person = null;
 
 	private Plan.Type type = null;
 
@@ -54,6 +54,10 @@ public class BasicPlanImpl implements BasicPlan {
 	
 	public BasicPerson getPerson() {
 		return this.person;
+	}
+	
+	public void setPerson(final BasicPerson person) {
+		this.person = person;
 	}
 	
 	public final Double getScore() {

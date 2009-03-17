@@ -3,7 +3,7 @@ package org.matsim.interfaces.core.v01;
 import org.matsim.interfaces.basic.v01.network.BasicLink;
 import org.matsim.interfaces.basic.v01.population.BasicActivity;
 
-public interface Activity extends BasicActivity {
+public interface Activity extends BasicActivity, PlanElement {
 
 	public void setFacility(final Facility facility);
 

@@ -6,7 +6,7 @@ import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.basic.v01.population.BasicPlan;
 
-public interface Plan extends BasicPlan {
+public interface Plan extends BasicPlan<PlanElement> {
 
 	/**
 	 * @deprecated use Leg.Mode instead

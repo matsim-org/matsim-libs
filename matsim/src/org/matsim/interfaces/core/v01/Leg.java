@@ -22,7 +22,7 @@ package org.matsim.interfaces.core.v01;
 
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 
-public interface Leg extends BasicLeg {
+public interface Leg extends BasicLeg, PlanElement {
 
 	public Route getRoute();
 

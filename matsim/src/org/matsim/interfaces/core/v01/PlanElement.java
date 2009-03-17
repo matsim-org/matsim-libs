@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * PlanElement.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,29 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.basic.v01.population;
+package org.matsim.interfaces.core.v01;
 
-import java.util.List;
+import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 
+public interface PlanElement extends BasicPlanElement {
 
-/**
-* @author dgrether
-*/
-public interface BasicPlan<P extends BasicPlanElement> {
-
-	public List<P> getPlanElements();
-
-	public void addLeg(final BasicLeg leg);
-
-	public void addAct(final BasicActivity act);
-
-	public boolean isSelected();
-	
-	public void setSelected(boolean selected);
-
-	public void setScore(Double score);
-	
-	public Double getScore();
-
-	public BasicPerson getPerson();
 }

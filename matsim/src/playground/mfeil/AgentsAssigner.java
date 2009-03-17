@@ -28,11 +28,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.PlanElement;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -142,7 +142,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected void writePlan (Plan in, Plan out){
 		Plan bestPlan = new org.matsim.population.PlanImpl (in.getPerson());
 		bestPlan.copyPlan(in);
-		List<BasicPlanElement> al = (List<BasicPlanElement>) out.getPlanElements();
+		List<PlanElement> al = (List<PlanElement>) out.getPlanElements();
 		
 		// NEW NEW NEW NEW NEW NEW NEW
 		ArrayList<ActivityOption> primActs = new ArrayList<ActivityOption>(out.getPerson().getKnowledge().getActivities(true));

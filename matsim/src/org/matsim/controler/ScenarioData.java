@@ -35,11 +35,11 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicScenario;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.interfaces.core.v01.Scenario;
 import org.matsim.network.MatsimLaneDefinitionsReader;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkChangeEventsParser;
@@ -62,7 +62,7 @@ import org.xml.sax.SAXException;
  *
  * @author mrieser
  */
-public class ScenarioData implements BasicScenario {
+public class ScenarioData implements Scenario {
 	private final String worldFileName;
 	private final String networkFileName;
 	private final String facilitiesFileName;

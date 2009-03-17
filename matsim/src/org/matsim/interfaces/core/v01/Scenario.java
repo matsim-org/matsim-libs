@@ -6,8 +6,7 @@ public interface Scenario extends BasicScenario {
 
 	public Network getNetwork() ;
 
-//	@Deprecated
-//	public BasicFacilities getFacilities() ;
+	public Facilities getFacilities() ;
 
 	public Population getPopulation() ;
 
