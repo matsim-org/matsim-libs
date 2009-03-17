@@ -23,9 +23,9 @@ package org.matsim.events.parallelEventsHandler;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import org.matsim.events.BasicEventImpl;
 import org.matsim.events.Events;
 import org.matsim.events.handler.EventHandler;
+import org.matsim.interfaces.basic.v01.events.BasicEvent;
 
 /**
  * 
@@ -82,7 +82,8 @@ public class ParallelEvents extends Events {
 		init(numberOfThreads);
 	}
 	
-	public void processEvent(final BasicEventImpl event) {
+	@Override
+	public void processEvent(final BasicEvent event) {
 		for (int i = 0; i < eventsProcessThread.length; i++) {
 			eventsProcessThread[i].processEvent(event);
 		}
