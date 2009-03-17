@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * RiskCostControlerTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,22 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor;
+package playground.gregor.risk;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.CRCChecksum;
 
-public class AllTests {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.gregor");
-		//$JUnit-BEGIN$
-		suite.addTest(playground.gregor.risk.AllTests.suite());
-		suite.addTest(playground.gregor.systemopt.AllTests.suite());
-		suite.addTest(playground.gregor.withindayevac.AllTests.suite());
-		//$JUnit-END$
-		return suite;
+public class RiskCostControlerTest extends MatsimTestCase{
+	
+	public void testSimpleChecksum() {
+		
+		String config = getInputDirectory() + "config.xml";
+		String ref = getInputDirectory() + "events.txt.gz";
+		String compare = getOutputDirectory() + "ITERS/it.10/10.events.txt.gz";
+		new RiskCostControler(new String [] {config}).run();
+		assertEquals("different events-files.", CRCChecksum.getCRCFromFile(ref),	CRCChecksum.getCRCFromFile(compare));
 	}
-
-
 }

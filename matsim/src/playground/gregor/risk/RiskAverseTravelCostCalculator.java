@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * RiskAversTravelCost.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,22 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor;
+package playground.gregor.risk;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.router.util.TravelCost;
+import org.matsim.trafficmonitoring.TravelTimeCalculator;
 
-public class AllTests {
+public class RiskAverseTravelCostCalculator implements TravelCost {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.gregor");
-		//$JUnit-BEGIN$
-		suite.addTest(playground.gregor.risk.AllTests.suite());
-		suite.addTest(playground.gregor.systemopt.AllTests.suite());
-		suite.addTest(playground.gregor.withindayevac.AllTests.suite());
-		//$JUnit-END$
-		return suite;
+	private final TravelTimeCalculator tc;
+	private final RiskCostCalculator rc;
+
+	public RiskAverseTravelCostCalculator(final TravelTimeCalculator tc, final RiskCostCalculator rc) {
+		this.tc = tc;
+		this.rc = rc;
 	}
-
+	
+	public double getLinkTravelCost(final Link link, final double time) {
+		return this.tc.getLinkTravelTime(link, time) + this.rc.getLinkRisk(link,time);
+	}
 
 }
