@@ -32,11 +32,17 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class AnalyseGAPDensity {
 	// String value that must be set
-	final static String PROVINCE = "SouthAfrica";
+	final static String PROVINCE = "KZN";
+	final static int GAP_ID_INDEX = 2;
+	// GAP_ID indices:
+	//    Gauteng: 1
+	//    KZN: 2
+	//    WesternCape: 2
+	
 	// Mac
-//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-	final static String ROOT = "/home/jjoubert/";
+//	final static String ROOT = "/home/jjoubert/";
 	// Derived string values
 	final static String GAP_SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "GAP_UTM35S.shp";
 	final static String SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
@@ -83,7 +89,7 @@ public class AnalyseGAPDensity {
 			for (int i = 0; i < objectArray.size(); i++) {
 				Object thisZone = objectArray.get(i);
 				// For GAP files, field [1] contains the GAP_ID
-				String name = String.valueOf( ((Feature) thisZone).getAttribute( 1 ) ); 
+				String name = String.valueOf( ((Feature) thisZone).getAttribute( GAP_ID_INDEX ) ); 
 				Geometry shape = ((Feature) thisZone).getDefaultGeometry();
 				if( shape instanceof MultiPolygon ){
 					mp = (MultiPolygon)shape;
