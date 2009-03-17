@@ -13,7 +13,7 @@ import java.util.TreeSet;
 public class QueryWithinAndThroughTraffic {
 
 	// String value that must be set
-	final static String PROVINCE = "Gauteng";
+	final static String PROVINCE = "WesternCape";
 	final static double THRESHOLD = 0.9;
 	// Mac
 	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
@@ -30,6 +30,9 @@ public class QueryWithinAndThroughTraffic {
 	final static String MAJOR_WITHIN_OUT = OUT_FOLDER + PROVINCE + "MajorWithin.txt";
 	final static String MINOR_THROUGH_OUT = OUT_FOLDER + PROVINCE + "MinorThrough.txt";
 	final static String MAJOR_THROUGH_OUT = OUT_FOLDER + PROVINCE + "MajorThrough.txt";
+	final static String WITHIN_VEHICLE_OUT = OUT_FOLDER + PROVINCE + "WithinVehicleStats.txt";
+	final static String THOUGH_VEHICLE_OUT = OUT_FOLDER + PROVINCE + "ThroughVehicleStats.txt";
+	
 	
 	static TreeSet<Integer> withinTree;
 
@@ -60,6 +63,9 @@ public class QueryWithinAndThroughTraffic {
 		
 		// Analyse major activities
 		splitInputFile( "major", MAJOR_IN, MAJOR_WITHIN_OUT, MAJOR_THROUGH_OUT );
+		
+		// Split vehicle stats file accordingly
+		splitVehicleStatsFile();
 	}
 
 	private static void buildTreeSet() {
@@ -134,5 +140,46 @@ public class QueryWithinAndThroughTraffic {
 		long end = System.currentTimeMillis();
 		System.out.printf("Done, in %d millisec\n", end-start);
 	}
+	
+	private static void splitVehicleStatsFile() {
+		System.out.print("Splitting vehicle statistics file... ");
+
+		Scanner input;
+		try {
+			input = new Scanner(new BufferedReader(new FileReader(new File( VEHICLE ) ) ) );
+			String header = input.nextLine();
+			BufferedWriter withinVehicle = new BufferedWriter(new FileWriter(new File( WITHIN_VEHICLE_OUT ) ) );
+			BufferedWriter throughVehicle = new BufferedWriter(new FileWriter(new File( THOUGH_VEHICLE_OUT ) ) );
+
+			try{
+				withinVehicle.write( header );
+				withinVehicle.newLine();
+				throughVehicle.write( header );
+				throughVehicle.newLine();
+
+				while(input.hasNextLine() ){
+					String line = input.nextLine();
+					String [] lineSplit = line.split( "," );
+					if( withinTree.contains( Integer.parseInt( lineSplit[0] ) ) ){
+						withinVehicle.write( line );
+						withinVehicle.newLine();
+					} else{
+						throughVehicle.write( line );
+						throughVehicle.newLine();
+					}
+				}
+			} finally{
+				withinVehicle.close();
+				throughVehicle.close();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.printf("Done. \n\n");
+	}
+
+
 
 }
