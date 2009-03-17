@@ -42,7 +42,7 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.implementations.VehicleImpl;
+import playground.marcel.pt.implementations.TransitDriver;
 import playground.marcel.pt.interfaces.Vehicle;
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
@@ -53,7 +53,7 @@ import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
 import playground.marcel.pt.transitSchedule.modules.CreateTimetableForStop;
 import playground.marcel.pt.utils.FacilityVisitors;
 
-public class BusDriverTest extends MatsimTestCase {
+public class TransitDriverTest extends MatsimTestCase {
 
 	public static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
 	public static final String INPUT_TEST_FILE_NETWORK = "network.xml";
@@ -84,7 +84,7 @@ public class BusDriverTest extends MatsimTestCase {
 
 		Events events = new Events();
 
-		BusDriver driver = new BusDriver(route1, departures.values().iterator().next());
+		TransitDriver driver = new TransitDriver(route1, departures.values().iterator().next());
 		Vehicle bus = new VehicleImpl(20, events);
 		driver.setVehicle(bus);
 
@@ -142,7 +142,7 @@ public class BusDriverTest extends MatsimTestCase {
 
 		Events events = new Events();
 
-		BusDriver driver = new BusDriver(route1, departures.values().iterator().next());
+		TransitDriver driver = new TransitDriver(route1, departures.values().iterator().next());
 		Vehicle bus = new VehicleImpl(20, events);
 		driver.setVehicle(bus);
 

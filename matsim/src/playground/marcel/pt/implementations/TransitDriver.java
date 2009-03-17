@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.tryout;
+package playground.marcel.pt.implementations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +27,7 @@ import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
-import org.matsim.population.routes.LinkCarRoute;
 
-import playground.marcel.pt.interfaces.DriverAgent;
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.interfaces.Vehicle;
 import playground.marcel.pt.transitSchedule.Departure;
@@ -37,7 +35,7 @@ import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
 import playground.marcel.pt.utils.FacilityVisitors;
 
-public class BusDriver implements DriverAgent {
+public class TransitDriver {
 
 		private final List<Facility> stops;
 		private final List<Link> linkRoute;
@@ -50,16 +48,7 @@ public class BusDriver implements DriverAgent {
 		private Link currentLink = null;
 		private FacilityVisitors facilityVisitors = null;
 
-		@Deprecated
-		public BusDriver(final List<Facility> stops, final List<Link> linkRoute, final double departureTime) {
-			this.stops = stops;
-			this.linkRoute = linkRoute;
-			this.departureTime = departureTime;
-			this.carRoute = new LinkCarRoute(this.linkRoute.get(0), this.linkRoute.get(this.linkRoute.size() - 1));
-			carRoute.setLinks(this.linkRoute.get(0), this.linkRoute.subList(1, this.linkRoute.size() - 2), this.linkRoute.get(this.linkRoute.size() - 1));
-		}
-
-		public BusDriver(final TransitRoute route, final Departure departure) {
+		public TransitDriver(final TransitRoute route, final Departure departure) {
 			this.stops = new ArrayList<Facility>(route.getStops().size());
 			for (TransitRouteStop stop : route.getStops()) {
 				this.stops.add(stop.getStopFacility());

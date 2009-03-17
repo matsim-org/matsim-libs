@@ -28,9 +28,9 @@ import playground.marcel.pt.interfaces.Vehicle;
 public class TransitQueueVehicle extends QueueVehicle {
 
 	private final Vehicle vehicle;
-	private final TransitQueueDriver driver;
+	private final QueueTransitDriver driver;
 	
-	public TransitQueueVehicle(Vehicle vehicle, TransitQueueDriver driver) {
+	public TransitQueueVehicle(Vehicle vehicle, QueueTransitDriver driver) {
 		this.vehicle = vehicle;
 		this.driver = driver;
 		super.setDepartureTime_s(driver.getDepartureTime());

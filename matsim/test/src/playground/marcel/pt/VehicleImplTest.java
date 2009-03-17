@@ -23,9 +23,9 @@ package playground.marcel.pt;
 import org.matsim.events.Events;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.marcel.pt.implementations.VehicleImpl;
 import playground.marcel.pt.interfaces.Vehicle;
 import playground.marcel.pt.mocks.MockPassengerAgent;
+import playground.marcel.pt.tryout.VehicleImpl;
 
 public class VehicleImplTest extends MatsimTestCase {
 

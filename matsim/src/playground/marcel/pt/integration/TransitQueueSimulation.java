@@ -26,13 +26,13 @@ import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.Simulation;
 import org.matsim.network.NetworkLayer;
 
-import playground.marcel.pt.implementations.VehicleImpl;
+import playground.marcel.pt.implementations.TransitDriver;
 import playground.marcel.pt.interfaces.Vehicle;
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.marcel.pt.tryout.BusDriver;
+import playground.marcel.pt.tryout.VehicleImpl;
 
 public class TransitQueueSimulation extends QueueSimulation {
 	
@@ -51,27 +51,14 @@ public class TransitQueueSimulation extends QueueSimulation {
 		super.createAgents();
 		
 		if (this.schedule != null) {
-//			TransitLine line1 = this.schedule.getTransitLines().values().iterator().next();
-//			TransitRoute route = line1.getRoutes().values().iterator().next();
-//			Departure departure = route.getDepartures().values().iterator().next();
-//			BusDriver driver = new BusDriver(route, departure);
-//			Vehicle bus = new VehicleImpl(20, events);
-//			driver.setVehicle(bus);
-//			bus.setDriver(driver);
-//			TransitQueueDriver qDriver = new TransitQueueDriver(driver);
-//			TransitQueueVehicle qVeh = new TransitQueueVehicle(bus, qDriver);
-//			qVeh.setDriver(qDriver);
-//			addVehicleToLink(qVeh);
-//			Simulation.incLiving();
-			
-			
+
 			for (TransitLine line : this.schedule.getTransitLines().values()) {
 				for (TransitRoute route : line.getRoutes().values()) {
 					for (Departure departure : route.getDepartures().values()) {
-						BusDriver driver = new BusDriver(route, departure);
+						TransitDriver driver = new TransitDriver(route, departure);
 						Vehicle bus = new VehicleImpl(20, events);
 						driver.setVehicle(bus);
-						TransitQueueDriver qDriver = new TransitQueueDriver(driver);
+						QueueTransitDriver qDriver = new QueueTransitDriver(driver);
 						TransitQueueVehicle qVeh = new TransitQueueVehicle(bus, qDriver);
 						qVeh.setDriver(qDriver);
 						addVehicleToLink(qVeh);
@@ -80,31 +67,6 @@ public class TransitQueueSimulation extends QueueSimulation {
 				}
 			}
 		}
-
-		
-//		
-//		if (this.plans == null) {
-//			throw new RuntimeException("No valid Population found (plans == null)");
-//		}
-//		for (Person p : this.plans.getPersons().values()) {
-//			PersonAgent agent = this.agentFactory.createPersonAgent(p);
-//
-//			QueueVehicle veh;
-//			try {
-//				veh = this.vehiclePrototype.newInstance();
-//				//not needed in new agent class
-//				veh.setDriver(agent);
-//				agent.setVehicle(veh);
-//
-//				if (agent.initialize()) {
-//					addVehicleToLink(veh);
-//				}
-//			} catch (InstantiationException e) {
-//				e.printStackTrace();
-//			} catch (IllegalAccessException e) {
-//				e.printStackTrace();
-//			}
-//		}
 		
 	}
 	

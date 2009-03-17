@@ -28,7 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
-		suite.addTestSuite(BusDriverTest.class);
+		suite.addTestSuite(TransitDriverTest.class);
 
 		return suite;
 	}
