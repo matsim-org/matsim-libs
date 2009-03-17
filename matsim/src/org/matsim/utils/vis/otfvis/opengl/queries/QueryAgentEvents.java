@@ -30,7 +30,7 @@ import java.util.List;
 import javax.media.opengl.GL;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.events.Events;
 import org.matsim.events.PersonEvent;
 import org.matsim.events.handler.PersonEventHandler;
@@ -171,7 +171,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 			}
 
 			int offset = 0;
-			for(BasicEvent event : MyEventsHandler.events) {
+			for(BasicEventImpl event : MyEventsHandler.events) {
 				this.texts.add(InfoText.showTextPermanent(event.toString(),(float)pos.x + 150, (float)pos.y + 150 + 80*offset++,-0.0005f));
 			}
 			MyEventsHandler.events.clear();

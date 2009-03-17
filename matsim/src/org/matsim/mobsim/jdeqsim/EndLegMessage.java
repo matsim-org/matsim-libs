@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
@@ -93,7 +93,7 @@ public class EndLegMessage extends EventMessage {
 
 	@Override
 	public void processEvent() {
-		BasicEvent event = null;
+		BasicEventImpl event = null;
 
 		// schedule AgentArrivalEvent
 		event = new AgentArrivalEvent(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson(), this.vehicle.getCurrentLink(), this.vehicle.getCurrentLeg());

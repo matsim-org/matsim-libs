@@ -22,7 +22,7 @@ package org.matsim.planomat.costestimators;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.events.Events;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.interfaces.basic.v01.Id;
@@ -74,7 +74,7 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		AgentDepartureEvent depEvent = new AgentDepartureEvent(6.01 * 3600, PERSON_ID, LINK_ID);
 		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(6.02 * 3600, PERSON_ID, LINK_ID);
 
-		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
+		for (BasicEventImpl event : new BasicEventImpl[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
 		}
 
@@ -85,7 +85,7 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		depEvent = new AgentDepartureEvent(6.02 * 3600, PERSON_ID, LINK_ID);
 		leaveEvent = new LinkLeaveEvent(6.04 * 3600, PERSON_ID, LINK_ID);
 
-		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
+		for (BasicEventImpl event : new BasicEventImpl[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
 		}
 

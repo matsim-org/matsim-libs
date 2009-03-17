@@ -2,20 +2,20 @@ package playground.wrashid.PDES2.util;
 
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 
 import playground.wrashid.PDES2.Message;
 
 public class ComparableEvent implements Comparable {
-		private BasicEvent basicEvent;
+		private BasicEventImpl basicEvent;
 
-		public ComparableEvent(BasicEvent be){
+		public ComparableEvent(BasicEventImpl be){
 			this.basicEvent = be;
 		}
 		
-		public BasicEvent getBasicEvent(){
+		public BasicEventImpl getBasicEvent(){
 			return basicEvent;
 		}
 

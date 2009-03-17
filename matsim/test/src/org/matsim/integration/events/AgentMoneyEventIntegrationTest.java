@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentMoneyEvent;
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.algorithms.EventWriterTXT;
@@ -123,13 +123,13 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 	}
 
 	private static class EventCollector implements BasicEventHandler {
-		final public List<BasicEvent> events = new ArrayList<BasicEvent>();
+		final public List<BasicEventImpl> events = new ArrayList<BasicEventImpl>();
 
 		public EventCollector() {
 			// empty, but public constructor for private class
 		}
 
-		public void handleEvent(BasicEvent event) {
+		public void handleEvent(BasicEventImpl event) {
 			this.events.add(event);
 		}
 

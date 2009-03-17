@@ -1,7 +1,7 @@
 package playground.wrashid.PDES2;
 
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.LinkLeaveEvent;
 
@@ -43,7 +43,7 @@ public class LeaveRoadMessage extends EventMessage {
 	@Override
 	public void logEvent() {
 		Road road=(Road)this.receivingUnit;
-		BasicEvent event=null;
+		BasicEventImpl event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.LEAVE_LINK)){
 			

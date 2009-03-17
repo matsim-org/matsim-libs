@@ -21,11 +21,10 @@
 package playground.gregor.systemopt;
 
 import org.matsim.controler.listener.ControlerListener;
-import org.matsim.events.handler.EventHandler;
 import org.matsim.interfaces.core.v01.Link;
 
 
-public interface SocialCostCalculator extends EventHandler, ControlerListener {
+public interface SocialCostCalculator extends ControlerListener {
 
 		
 	public double getSocialCost(final Link link, final double time);

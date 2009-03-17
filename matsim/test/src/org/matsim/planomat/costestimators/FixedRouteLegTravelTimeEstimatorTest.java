@@ -27,7 +27,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
@@ -148,7 +148,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		AgentDepartureEvent depEvent = new AgentDepartureEvent(6.03 * 3600, TEST_PERSON_ID, this.originAct.getLinkId());
 		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(6.04 * 3600, TEST_PERSON_ID, this.originAct.getLinkId());
 
-		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
+		for (BasicEventImpl event : new BasicEventImpl[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
 		}
 
@@ -160,7 +160,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		depEvent = new AgentDepartureEvent(6.02 * 3600, TEST_PERSON_ID, linkId);
 		leaveEvent = new LinkLeaveEvent(6.04 * 3600, TEST_PERSON_ID, linkId);
 
-		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
+		for (BasicEventImpl event : new BasicEventImpl[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
 		}
 
@@ -197,7 +197,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		log.info(route.toString());
 
 		// generate some travel times
-		BasicEvent event = null;
+		BasicEventImpl event = null;
 
 		List<Link> links = route.getLinks();
 		System.out.println(links.size());
@@ -270,7 +270,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		LinkEnterEvent enterEvent = new LinkEnterEvent(Time.parseTime("06:05:00"), TEST_PERSON_ID, linkId);
 		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(Time.parseTime("06:06:48"), TEST_PERSON_ID, linkId);
 
-		for (BasicEvent event : new BasicEvent[]{enterEvent, leaveEvent}) {
+		for (BasicEventImpl event : new BasicEventImpl[]{enterEvent, leaveEvent}) {
 			events.processEvent(event);
 		}
 

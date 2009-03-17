@@ -48,7 +48,7 @@ public abstract class XmlEventsTester extends TestCase {
 	 * @param event the event to test
 	 * @return the read-in event
 	 */
-	public static <T extends BasicEvent> T testWriteReadXml(final String eventsFile, final T event) {
+	public static <T extends BasicEventImpl> T testWriteReadXml(final String eventsFile, final T event) {
 		EventWriterXML writer = new EventWriterXML(eventsFile);
 		writer.handleEvent(event);
 		writer.closeFile();
@@ -60,7 +60,7 @@ public abstract class XmlEventsTester extends TestCase {
 		new MatsimEventsReader(events).readFile(eventsFile);
 
 		assertEquals("there must be 1 event.", 1, collector.events.size());
-		BasicEvent readEvent = collector.events.iterator().next();
+		BasicEventImpl readEvent = collector.events.iterator().next();
 		assertEquals("event has wrong class.", event.getClass(), readEvent.getClass());
 
 		Map<String, String> writtenAttributes = event.getAttributes();
@@ -79,9 +79,9 @@ public abstract class XmlEventsTester extends TestCase {
 	 * @author mrieser
 	 */
 	/*package*/ static class EventsCollector implements BasicEventHandler {
-		/*package*/ final Collection<BasicEvent> events = new LinkedList<BasicEvent>();
+		/*package*/ final Collection<BasicEventImpl> events = new LinkedList<BasicEventImpl>();
 
-		public void handleEvent(final BasicEvent event) {
+		public void handleEvent(final BasicEventImpl event) {
 			this.events.add(event);
 		}
 

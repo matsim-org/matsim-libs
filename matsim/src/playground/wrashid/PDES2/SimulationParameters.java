@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.events.Events;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.mobsim.jdeqsim.util.testable.PopulationModifier;
@@ -36,7 +36,7 @@ public class SimulationParameters {
 	public static final String END_LEG = "end leg";
 	public static final String ENTER_LINK = "enter link";
 	public static final String LEAVE_LINK = "leave link";
-	public static BasicEvent temp_be = null;
+	public static BasicEventImpl temp_be = null;
 
 	public static final boolean debugMode = false;
 	public static final double maxAbsLinkAverage = 0.01; // how far can the
@@ -94,11 +94,11 @@ public class SimulationParameters {
 	// JavaPDEQSim2.maxEventsPerBucket may occur
 	public static int numberOfZoneBuckets = 5000;
 
-	public static void processEvent(BasicEvent event) {
+	public static void processEvent(BasicEventImpl event) {
 		SimulationParameters.events.processEvent(event);
 	}
 
-	public static void bufferEvent(BasicEvent event) {
+	public static void bufferEvent(BasicEventImpl event) {
 		// if (temp_be==null){
 		// temp_be=event;
 		// } else {
@@ -114,7 +114,7 @@ public class SimulationParameters {
 		// if (test_timer % 100000==0){System.out.println(test_timer);}
 	}
 
-	synchronized private static void bufferEvent(BasicEvent event, int producerId) {
+	synchronized private static void bufferEvent(BasicEventImpl event, int producerId) {
 		
 		if (event instanceof AgentDepartureEvent
 				|| event instanceof AgentArrivalEvent) {
@@ -126,7 +126,7 @@ public class SimulationParameters {
 	}
 
 	public static void processEventBuffer() {
-		BasicEvent be = eventBuffer.remove();
+		BasicEventImpl be = eventBuffer.remove();
 		while (be != null) {
 			if (be instanceof AgentDepartureEvent
 					|| be instanceof AgentArrivalEvent) {

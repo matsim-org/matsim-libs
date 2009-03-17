@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.events.PersonEvent;
 import org.matsim.interfaces.basic.v01.Id;
 
@@ -59,7 +59,7 @@ public class EventFilterPersonSpecific extends EventFilterA {
 	 *         the agent- ID.
 	 */
 	@Override
-	public boolean judge(BasicEvent event) {
+	public boolean judge(BasicEventImpl event) {
 		if (event instanceof PersonEvent) {
 			return this.personIds.contains(new IdImpl(((PersonEvent) event).agentId));
 		}

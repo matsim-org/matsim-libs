@@ -23,7 +23,7 @@ package org.matsim.planomat.costestimators;
 import java.util.List;
 
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
@@ -85,7 +85,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 				originAct.getLink().getId());
 		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(departureTime + depDelay, testPerson.getId(), originAct.getLink().getId());
 
-		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
+		for (BasicEventImpl event : new BasicEventImpl[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
 		}
 
@@ -110,7 +110,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 				new String[]{"06:16:00", "06:21:00", "06:26:00"}
 		};
 
-		BasicEvent event = null;
+		BasicEventImpl event = null;
 		for (int eventTimesCnt = 0; eventTimesCnt < eventTimes.length; eventTimesCnt++) {
 			for (int linkCnt = 0; linkCnt < links.size(); linkCnt++) {
 				event = new LinkEnterEvent(

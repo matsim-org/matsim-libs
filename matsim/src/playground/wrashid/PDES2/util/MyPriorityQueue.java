@@ -2,7 +2,7 @@ package playground.wrashid.PDES2.util;
 
 import java.util.PriorityQueue;
 
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 
 import playground.wrashid.PDES2.Message;
 

@@ -1,6 +1,6 @@
 package playground.yu.visum.filter;
 
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 
 /**
  * @author ychen
@@ -34,14 +34,14 @@ public abstract class EventFilterA extends Filter implements EventFilterI {
 	 *
 	 * @see org.matsim.demandmodeling.filters.filter.EventFilterI#judge(org.matsim.demandmodeling.events.BasicEvent)
 	 */
-	public abstract boolean judge(BasicEvent event);
+	public abstract boolean judge(BasicEventImpl event);
 
 	/*
 	 * (non-Javadoc)
 	 *
 	 * @see org.matsim.demandmodeling.filters.filter.EventFilterI#handleEvent(org.matsim.demandmodeling.events.BasicEvent)
 	 */
-	public void handleEvent(BasicEvent event) {
+	public void handleEvent(BasicEventImpl event) {
 		if (judge(event)) {
 			count();
 			this.nextFilter.handleEvent(event);

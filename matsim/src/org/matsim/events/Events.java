@@ -42,6 +42,7 @@ import org.matsim.events.handler.EventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.events.handler.PersonEventHandler;
+import org.matsim.interfaces.basic.v01.events.BasicEvent;
 
 /**
  * EventHandling
@@ -276,8 +277,8 @@ public class Events {
 		} else if (klass == AgentReplanEvent.class) {
 			((AgentReplanEventHandler)handler).handleEvent((AgentReplanEvent)ev);
 			return true;
-		} else if (klass == BasicEvent.class) {
-			((BasicEventHandler)handler).handleEvent(ev);
+		} else if (klass == org.matsim.events.BasicEventImpl.class) {
+			((BasicEventHandler)handler).handleEvent((org.matsim.events.BasicEventImpl) ev);
 			return true;
 		} else if (klass == PersonEvent.class) {
 			((PersonEventHandler)handler).handleEvent((PersonEvent)ev);

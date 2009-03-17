@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.interfaces.core.v01.Population;
@@ -112,10 +112,10 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.matsim.events.handler.BasicEventHandlerI#handleEvent(
-	 *      org.matsim.events.BasicEvent)
+	 *      org.matsim.events.BasicEventImpl)
 	 */
 	@Override
-	public void handleEvent(BasicEvent event) {
+	public void handleEvent(BasicEventImpl event) {
 		if (event instanceof LinkEnterEvent) { // event.getClass().equals(LinkEnterEvent.class))
 												// {
 			this.enters.put(((LinkEnterEvent) event).agentId, (LinkEnterEvent) event);

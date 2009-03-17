@@ -29,7 +29,7 @@ import org.matsim.interfaces.core.v01.Person;
 /**
  * @author mrieser
  */
-public abstract class PersonEvent extends BasicEvent implements BasicPersonEvent {
+public abstract class PersonEvent extends BasicEventImpl implements BasicPersonEvent {
 
 	public static final String ATTRIBUTE_AGENT = "agent"; // TODO [MR] test if this can be easily changed to "person"
 

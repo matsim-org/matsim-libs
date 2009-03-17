@@ -20,8 +20,8 @@
 
 package org.matsim.events.handler;
 
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 
 public interface BasicEventHandler extends EventHandler {
-	public void handleEvent (BasicEvent event);
+	public void handleEvent (BasicEventImpl event);
 }

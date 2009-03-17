@@ -21,11 +21,12 @@ package playground.dgrether.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
 import org.matsim.events.PersonEvent;
+import org.matsim.interfaces.basic.v01.events.BasicEvent;
 
 import playground.dgrether.events.filters.EventFilter;
+
 
 
 /**

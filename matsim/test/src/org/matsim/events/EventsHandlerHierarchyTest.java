@@ -34,7 +34,7 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 
 	class A implements BasicEventHandler, LinkLeaveEventHandler {
 
-		public void handleEvent(final BasicEvent event) {
+		public void handleEvent(final BasicEventImpl event) {
 			System.out.println("Event handled");
 			EventsHandlerHierarchyTest.this.eventHandled++;
 		}

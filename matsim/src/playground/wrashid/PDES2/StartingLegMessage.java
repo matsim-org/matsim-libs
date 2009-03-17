@@ -3,7 +3,7 @@ package playground.wrashid.PDES2;
 import java.util.List;
 
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
@@ -46,7 +46,7 @@ public class StartingLegMessage extends EventMessage {
 	}
 	
 	public void logEvent() {
-		BasicEvent event=null;
+		BasicEventImpl event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.START_LEG)){
 			//event=new AgentDepartureEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getCurrentLink().getId().toString(),vehicle.getLegIndex()-1);

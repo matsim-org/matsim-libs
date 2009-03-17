@@ -1,6 +1,6 @@
 package playground.wrashid.PDES2;
 
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.events.LinkEnterEvent;
 
 public class EnterRoadMessage extends EventMessage {
@@ -32,7 +32,7 @@ public class EnterRoadMessage extends EventMessage {
 	}
 
 	public void logEvent() {
-		BasicEvent event=null;
+		BasicEventImpl event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.ENTER_LINK)){
 			//System.out.println(vehicle.getCurrentLink());

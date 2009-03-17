@@ -1,6 +1,6 @@
 package playground.wrashid.PDES2;
 
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.events.AgentDepartureEvent;
 
 public abstract class EventMessage extends SelfhandleMessage {

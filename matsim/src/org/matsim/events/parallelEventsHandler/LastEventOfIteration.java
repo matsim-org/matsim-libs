@@ -20,9 +20,9 @@
 
 package org.matsim.events.parallelEventsHandler;
 
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 
-public class LastEventOfIteration extends BasicEvent {
+public class LastEventOfIteration extends BasicEventImpl {
 
 	public LastEventOfIteration(final double time) {
 		super(time);

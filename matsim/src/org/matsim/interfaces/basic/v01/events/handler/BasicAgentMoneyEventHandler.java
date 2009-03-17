@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VehicleEvent.java
+ * AgentMoneyEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,29 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.events;
+package org.matsim.interfaces.basic.v01.events.handler;
 
-import java.util.Map;
+import org.matsim.events.handler.EventHandler;
+import org.matsim.interfaces.basic.v01.events.BasicAgentMoneyEvent;
 
-import org.matsim.events.BasicEventImpl;
-
-import playground.marcel.pt.interfaces.Vehicle;
-
-public abstract class VehicleEvent extends BasicEventImpl {
-
-	public Vehicle vehicle;
-
-	public VehicleEvent(final double time, final Vehicle vehicle) {
-		super(time);
-		this.vehicle = vehicle;
-	}
-
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put("type", getEventType());
-		attr.put("vehicle", "unknown");// TODO [MR] Vehicles should have an Id on their own...
-		return attr;
-	}
-
+public interface BasicAgentMoneyEventHandler extends EventHandler {
+	public void handleEvent (BasicAgentMoneyEvent event);
 }

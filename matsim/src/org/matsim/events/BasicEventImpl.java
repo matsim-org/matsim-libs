@@ -23,9 +23,10 @@ package org.matsim.events;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.matsim.interfaces.basic.v01.events.BasicEvent;
 import org.matsim.utils.misc.Time;
 
-public abstract class BasicEvent implements org.matsim.interfaces.basic.v01.events.BasicEvent {
+public abstract class BasicEventImpl implements BasicEvent {
 
 	public final static String ATTRIBUTE_TYPE = "type";
 
@@ -34,7 +35,7 @@ public abstract class BasicEvent implements org.matsim.interfaces.basic.v01.even
 	private static String timeString = null;
 	private static double timeCache = Time.UNDEFINED_TIME;
 
-	public BasicEvent(final double time) {
+	public BasicEventImpl(final double time) {
 		this.time = time;
 	}
 

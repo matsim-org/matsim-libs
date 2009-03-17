@@ -5,7 +5,7 @@ import java.util.PriorityQueue;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 // optimized for multiple producer, single consumer
 // the producer decides, when the his inputBuffer should be emptied
 // the parameter maxInputPutListSize can be set large for allowing high cuncurrency, if
@@ -25,14 +25,14 @@ public class PriorityConcurrentListMPDSC {
 	LinkedList<ComparableEvent> outputWorkingBuffer=new LinkedList<ComparableEvent>();
 	
 	// producerId 0>=
-	public void add(BasicEvent element,int producerId){
+	public void add(BasicEventImpl element,int producerId){
 			synchronized (inputBuffer[producerId]){
 				inputBuffer[producerId].add(new ComparableEvent(element));
 			}
 	}
 	
 	// returns null, if empty, else the first element
-	public BasicEvent remove(){
+	public BasicEventImpl remove(){
 		if (outputQueue.size()>=minOutputBufferLength){
 			synchronized (outcounter){
 				outcounter++;
@@ -106,7 +106,7 @@ public class PriorityConcurrentListMPDSC {
 			queue.add(new AgentArrivalEvent(1,new IdImpl(""),new IdImpl("")), 0);
 		}
 		
-		BasicEvent be=queue.remove();
+		BasicEventImpl be=queue.remove();
 		outEventCount++;
 		//System.out.println(queue.remove());
 		

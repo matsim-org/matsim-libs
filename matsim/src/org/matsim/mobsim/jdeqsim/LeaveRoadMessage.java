@@ -19,7 +19,7 @@
 
 package org.matsim.mobsim.jdeqsim;
 
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.events.LinkLeaveEvent;
 
 public class LeaveRoadMessage extends EventMessage {
@@ -38,7 +38,7 @@ public class LeaveRoadMessage extends EventMessage {
 	@Override
 	public void processEvent() {
 		Road road = (Road) this.getReceivingUnit();
-		BasicEvent event = null;
+		BasicEventImpl event = null;
 
 		event = new LinkLeaveEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson(), road.getLink());
 

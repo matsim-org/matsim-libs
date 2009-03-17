@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.events.BasicEvent;
+import org.matsim.events.BasicEventImpl;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
@@ -31,7 +31,7 @@ public class TraVolCal extends FinalEventFilterA {
 
 	// --------------------------OVERRIDE METHODS------------------------
 	@Override
-	public void handleEvent(final BasicEvent enter) {
+	public void handleEvent(final BasicEventImpl enter) {
 		if (enter instanceof LinkEnterEvent) {
 			count();
 			long hour = (long) (enter.getTime() / 3600);
