@@ -40,15 +40,17 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
 import org.matsim.controler.ScenarioImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.*;
+import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.population.BasicActivity;
+import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.basic.v01.population.BasicPerson;
 import org.matsim.interfaces.basic.v01.population.BasicPlan;
+import org.matsim.interfaces.basic.v01.population.BasicPopulation;
 import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
-import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkCleaner;
-import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.utils.geometry.CoordImpl;
@@ -59,11 +61,11 @@ import org.matsim.utils.gis.ShapeFileReader;
 public class MyControler2 {
 	private static final Logger log = Logger.getLogger(MyControler2.class);
 
-	private static Population createPlansFromShp(final FeatureSource n) {
+	private static BasicPopulation createPlansFromShp(final FeatureSource n) {
 		List<Coord> workPlaces = new ArrayList<Coord>() ;
 
 //		BasicPopulation<? extends BasicPerson<? extends BasicPlan>> population = new PopulationImpl(PopulationImpl.NO_STREAMING) ;
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING) ;
+		BasicPopulation population = new PopulationImpl(PopulationImpl.NO_STREAMING) ;
 		// FIXME: select specific implementation here.  Makes sense, but is it what we want?  (Could also be empty population
 		// taken from controler.)
 		// TODO: The generics approach, as of now, is awful.
@@ -102,17 +104,18 @@ public class MyControler2 {
 			for ( int ii=0 ; ii<nPersons ; ii++ ) {
 				Id id = new IdImpl( popCnt ) ; popCnt++ ;
 
-				BasicPerson newPerson;
+				BasicPerson person = null;
 				try {
-					newPerson = pb.createPerson(id); // already added (I think)
+					person = pb.createPerson(id); 
 				} catch (Exception e) {
 					e.printStackTrace();
 				} 
-//				population.add( newPerson ) ; // FIXME: ???
-
-//				BasicPlan plan = pb.createPlan(newPerson) ; // FIXME
-//				plan.setSelected(true) ; // FIXME ??
-//				playground.kai.urbansim.Utils.makeHomePlan(plan, coord) ; // FIXME once createAct methods are there
+				population.getPersons().put( id, person ) ;
+				
+				BasicPlan plan = pb.createPlan(person) ;
+				plan.setSelected(true) ; // will also work without
+				BasicActivity act = pb.createActivityFromCoord("home",coord) ;
+				plan.getPlanElements().add(act) ;
 			}
 
 			// store workplace coordinates in temporary data structure
@@ -121,14 +124,19 @@ public class MyControler2 {
 			}
 		}
 
-		for ( BasicPerson pp : population.getPersons().values() ) {
-//			BasicPlan plan = pp.getSelectedPlan(); // FIXME: ouch
-			BasicPlan plan = null ;
+		for ( Object oo : population.getPersons().values() ) {
+			BasicPerson pp = (BasicPerson) oo ;
+			BasicPlan plan = (BasicPlan) pp.getPlans().get(0) ;
+			
 			int idx = (int)( Math.random()*workPlaces.size() ) ; // TODO: replace by matsim rnd generator
 			Coord workCoord = workPlaces.get( idx ) ;
 //			workPlaces.remove( idx ) ;
 			// (with replacement.  W/o replacement, make sure that there are enough workplaces!)
 //			playground.kai.urbansim.Utils.completePlanToHwh(plan, workCoord) ; // FIXME once createAct methods are there
+			
+			BasicLeg leg = pb.createLeg(BasicLeg.Mode.bike) ;
+			plan.getPlanElements().add(leg) ;
+			
 		}
 
 		return population ;
@@ -138,7 +146,7 @@ public class MyControler2 {
 
 		final String shpFile = "/Users/nagel/shared-svn/studies/north-america/ca/vancouver/facilities/shp/landuse.shp";
 
-		Population plans=null ;
+		BasicPopulation plans=null ;
 		try {
 			plans = createPlansFromShp( ShapeFileReader.readDataFile(shpFile) );
 		} catch (IOException e) {
@@ -146,7 +154,7 @@ public class MyControler2 {
 		}
 
 		// write the population for debugging purposes
-		PopulationWriter popWriter = new PopulationWriter(plans,"pop.xml.gz","v4",1) ;
+		PopulationWriter popWriter = new PopulationWriter( (Population) plans,"pop.xml.gz","v4",1) ;
 		popWriter.write();
 
 		log.info("### DONE with demand generation from urbansim ###") ;
@@ -168,7 +176,7 @@ public class MyControler2 {
 		log.info("... finished cleaning network.") ; log.info("") ;
 
 		// start the control(l)er with the network and plans as defined above
-		Controler controler = new Controler(Gbl.getConfig(),network,plans) ;
+		Controler controler = new Controler(Gbl.getConfig(),network,(Population) plans) ;
 
 		// this means existing files will be over-written.  Be careful!
 		controler.setOverwriteFiles(true);
