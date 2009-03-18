@@ -59,11 +59,14 @@ public class ZHFacilitiesReader {
 				double yCH = Double.parseDouble(entries[5].trim());
 				double hrs_week = Double.parseDouble(entries[6].trim());
 				
+				String name = entries[6].trim();
+				
 				Coord exactPosition = new CoordImpl(xCH, yCH);
 				Link closestLink = network.getNearestLink(exactPosition);
 				
 				facilities.addFacilityByLink(closestLink.getId(), new ZHFacility(
 									new IdImpl(shopID),
+									name,
 									closestLink.getCoord(),
 									exactPosition, 
 									closestLink.getId(),

@@ -10,6 +10,7 @@ public class ZHFacility  {
 	private Coord mappedPosition = null;	
 	private Coord exactPosition = null;
 	private Id linkId;
+	private String name;
 	
 	private Id retailerID = null;
 	private int size_descr;
@@ -21,10 +22,11 @@ public class ZHFacility  {
 	private double accessibility20;
 	
 
-	public ZHFacility(Id id, Coord mappedPosition, Coord exactPosition,
+	public ZHFacility(Id id, String name, Coord mappedPosition, Coord exactPosition,
 			Id linkId, Id retID, int size_descr, double halt, double hrs_week) {
 		super();
 		this.id = id;
+		this.name = name;
 		this.mappedPosition = mappedPosition;
 		this.exactPosition = exactPosition;
 		this.linkId = linkId;
@@ -42,6 +44,14 @@ public class ZHFacility  {
 		this.id = id;
 	}
 
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	public void setCenter(Coord mappedPosition) {
 		this.mappedPosition = mappedPosition;
