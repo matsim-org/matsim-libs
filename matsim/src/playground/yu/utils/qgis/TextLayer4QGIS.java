@@ -23,6 +23,12 @@ public abstract class TextLayer4QGIS extends AbstractPersonAlgorithm implements
 	protected SimpleWriter writer;
 	private RoadPricingScheme toll = null;
 
+	/**
+	 * dummy constructor, please don't use it.
+	 */
+	public TextLayer4QGIS() {
+	}
+
 	public TextLayer4QGIS(String textFilename) {
 		writer = new SimpleWriter(textFilename);
 		writer.write("x\ty\t");

@@ -27,6 +27,12 @@ import playground.yu.analysis.PlanModeJudger;
  * 
  */
 public class ModeTextLayer4QGIS extends TextLayer4QGIS {
+	/**
+	 *dummy constructor, please don't use it.
+	 */
+	public ModeTextLayer4QGIS() {
+
+	}
 
 	/**
 	 * @param textFilename

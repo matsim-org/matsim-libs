@@ -37,7 +37,6 @@ import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -132,9 +131,8 @@ public class LegDistance implements LinkEnterEventHandler,
 		if (toll == null)
 			this.distances.put(agentId, distance);
 		else {
-			Person ps = ppl.getPerson(new IdImpl(agentId));
-			if (TollTools.isInRange(ps.getSelectedPlan().getFirstActivity()
-					.getLink(), toll)) {
+			if (TollTools.isInRange(ppl.getPerson(new IdImpl(agentId))
+					.getSelectedPlan().getFirstActivity().getLink(), toll)) {
 				this.distances.put(agentId, distance);
 			}
 		}
