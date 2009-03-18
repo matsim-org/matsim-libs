@@ -2279,6 +2279,10 @@ public class MyRuns {
 			plan.getFirstActivity();
 		}
 		
+		for (BasicPlan plan : basicList3) {
+			plan.getPerson();
+		}
+		
 		A a;
 		B b;
 //		List<A> l = b.getList1();
