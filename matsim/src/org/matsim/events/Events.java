@@ -229,6 +229,7 @@ public class Events {
 		}
 
 		ArrayList<HandlerInfo> info = new ArrayList<HandlerInfo>();
+		// first search in class-hierarchy
 		while (klass != Object.class) {
 			HandlerData dat = findHandler(klass);
 			if (dat != null) {
@@ -237,6 +238,15 @@ public class Events {
 				}
 			}
 			klass = klass.getSuperclass();
+		}
+		// now search in implemented interfaces
+		for (Class<?> intfc : eventClass.getInterfaces()) {
+			HandlerData dat = findHandler(intfc);
+			if (dat != null) {
+				for(EventHandler handler: dat.handlerList) {
+					info.add(new HandlerInfo(intfc, handler, dat.method));
+				}
+			}
 		}
 
 		cache = info.toArray(new HandlerInfo[info.size()]);

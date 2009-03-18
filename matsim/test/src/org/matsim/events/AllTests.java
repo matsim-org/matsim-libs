@@ -37,6 +37,7 @@ public class AllTests {
 		suite.addTestSuite(AgentStuckEventTest.class);
 		suite.addTestSuite(AgentMoneyEventTest.class);
 		suite.addTestSuite(AgentWait2LinkEventTest.class);
+		suite.addTestSuite(BasicEventsHandlerTest.class);
 		suite.addTestSuite(LinkEnterEventTest.class);
 		suite.addTestSuite(LinkLeaveEventTest.class);
 		suite.addTestSuite(EventsHandlerHierarchyTest.class);
