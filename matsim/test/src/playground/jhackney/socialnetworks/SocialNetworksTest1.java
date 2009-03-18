@@ -22,10 +22,10 @@ public class SocialNetworksTest1 extends MatsimTestCase{
 		String socNetFile = getOutputDirectory() + "socialnets/stats/edge.txt";
 
 		final Controler controler = new Controler(new String[] {config});
-		controler.addControlerListener(new SNControllerListener2()); // had to comment this line out because SNControllerListener2 is in the playground, but this class is in core
+		controler.addControlerListener(new SNControllerListener2());
 		controler.setOverwriteFiles(true);
 		controler.run();
-
+	
 		long checksum1 = 0;
 		long checksum2 = 0;
 
