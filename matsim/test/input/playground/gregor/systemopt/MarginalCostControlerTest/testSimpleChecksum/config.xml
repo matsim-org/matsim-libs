@@ -1,35 +1,30 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY INPUTBASE    "./test/input/playground/gregor/systemopt/MarginalCostControlerTest/testSimpleChecksum">
+		<!ENTITY INPUTBASE    "./test/input/playground/gregor/data">
 		<!ENTITY OUTPUTBASE   "./test/output/playground/gregor/systemopt/MarginalCostControlerTest/testSimpleChecksum">
 	]
 >
 <config>
 
-<!-- ====================================================================== -->
-
-	<module name="global">
-		<param name="coordinateSystem" value="GK4" />
-	</module>	
 
 <!-- ====================================================================== -->
 
 	<module name="simulation">
 
-		<param name="evacuationTime" value = "09:00:00" /> <!-- make sure that the specific snapshot plans file exists -->
-         	<param name="endTime" value="12:00:00" />
-
-		<param name="flowCapacityFactor"	value="0.01" />
-		<param name="storageCapacityFactor"	value="0.01" />
-		<param name="stuckTime" value="60" />		
+		<param name="endTime" value="15:00:00" />
+		<param name="flowCapacityFactor"	value="0.1" />
+		<param name="storageCapacityFactor"	value="0.1" />
+		<param name="stuckTime" value="60" />
+		<param name = "moveWaitFirst" value = "true" />
+		
 	</module>
 
 <!-- ====================================================================== -->
 
 	<!-- Params for EvacuationQSimControler -->
 	<module name="evacuation">
-		<param name="inputEvacuationAreaLinksFile" value = "&INPUTBASE;/evacuationarea.xml.gz"/> 
+		<param name="inputEvacuationAreaLinksFile" value = "&INPUTBASE;/evacuationArea.xml"/> 
 	</module>
 
 <!-- ====================================================================== -->
@@ -39,13 +34,14 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 		<param name="travelTimeCalculator" value="TravelTimeCalculatorHashMap" />
+		<param name = "travelTimeAggregator" value = "experimental_LastMile" />
 		<param name="travelTimeBinSize" value="60" />
 	</module>	
 	
 <!-- ====================================================================== -->	
 
 	<module name="plans">
-		<param name="inputPlansFile" value="&INPUTBASE;/positionInfoPlansFile09-00-00.xml.gz" /><!-- the intial plans  -->
+		<param name="inputPlansFile" value="&INPUTBASE;/population.xml" /><!-- the intial plans  -->
 		
 		<param name="outputPlansFile" value="&OUTPUTBASE;/evacuationplans.xml" />		
 		<param name="outputVersion" value="v4" />		
@@ -56,7 +52,9 @@
 <!-- ====================================================================== -->	
 	
 	<module name="network">
-		<param name="inputNetworkFile" value="./test/scenarios/berlin/network.xml.gz" />
+		<param name="inputNetworkFile" value="&INPUTBASE;/network.xml" />
+		<param name="timeVariantNetwork" value="true" />
+		<param name="inputChangeEventsFile" value="&INPUTBASE;/changeEvents.xml" />
 		<param name="outputVersion" value="v1" />
 	</module>
 	

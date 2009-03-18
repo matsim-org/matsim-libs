@@ -7,11 +7,6 @@
 >
 <config>
 
-<!-- ====================================================================== -->
-
-	<module name="global">
-		<param name="coordinateSystem" value="GK4" />
-	</module>	
 
 <!-- ====================================================================== -->
 
@@ -19,7 +14,8 @@
 		<param name="endTime" value="15:00:00" />
 		<param name="flowCapacityFactor"	value="0.1" />
 		<param name="storageCapacityFactor"	value="0.1" />
-		<param name="stuckTime" value="60" />		
+		<param name="stuckTime" value="60" />
+		<param name = "moveWaitFirst" value = "true" />	
 	</module>
 
 <!-- ====================================================================== -->
