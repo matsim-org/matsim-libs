@@ -20,10 +20,16 @@
 
 package playground.yu.newPlans;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.PersonAlgorithm;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.PopulationImpl;
+import org.matsim.population.PopulationReader;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -50,5 +56,21 @@ public class SelectedPlans extends NewPopulation implements PersonAlgorithm {
 		person.getPlans().clear();
 		person.addPlan(selectedPlan);
 		pw.writePerson(person);
+	}
+	public static void main(final String[] args) {
+		final String netFilename = "../data/schweiz/input/ch.xml";
+		final String plansFilename = "../data/schweiz/input/459.100.plans.xml.gz";
+		Gbl.createConfig(new String[] { "../data/schweiz/selectedPlans.xml" });
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFilename);
+
+		Population population = new PopulationImpl();
+		SelectedPlans sp = new SelectedPlans(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
+		plansReader.readFile(plansFilename);
+		sp.run(population);
+		sp.writeEndPlans();
 	}
 }

@@ -20,9 +20,15 @@
 
 package playground.yu.newPlans;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.PersonAlgorithm;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.PopulationImpl;
+import org.matsim.population.PopulationReader;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -49,5 +55,25 @@ public class NewSmallPlan extends NewPopulation implements PersonAlgorithm {
 		pw.writePerson(person);
 		// }
 	}
+	public static void main(final String[] args) {
+		// final String netFilename = "./test/yu/ivtch/input/network.xml";
+		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+		final String plansFilename = "../schweiz-ivtch-SVN/baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
 
+		Gbl.createConfig(new String[] {
+		// "./test/yu/ivtch/config_for_10pctZuerich_car_pt_smallPlansl.xml"
+				// "../data/ivtch/make10pctPlans.xml"
+				"input/make10pctPlans.xml" });
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFilename);
+		Population population = new PopulationImpl();
+		NewSmallPlan nsp = new NewSmallPlan(population);
+
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
+		plansReader.readFile(plansFilename);
+		nsp.run(population);
+		nsp.writeEndPlans();
+	}
 }

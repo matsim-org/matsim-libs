@@ -21,8 +21,15 @@
 package playground.yu.newPlans;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.config.Config;
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.PopulationImpl;
+import org.matsim.population.PopulationReader;
 
 /**
  * increases the amount of Agents in a new MATSim plansfile, by copying the old
@@ -58,5 +65,21 @@ public class DoublePlan extends NewPopulation {
 			person.setId(new IdImpl(newPersonId));
 			pw.writePerson(person);
 		}
+	}
+	public static void main(final String[] args) {
+		Config config = Gbl
+				.createConfig(new String[] { "./test/yu/newPlans/newPlans.xml" });
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(config.network()
+				.getInputFile());
+
+		Population population = new PopulationImpl();
+		DoublePlan dp = new DoublePlan(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
+		plansReader.readFile(config.plans().getInputFile());
+		dp.run(population);
+		dp.writeEndPlans();
 	}
 }

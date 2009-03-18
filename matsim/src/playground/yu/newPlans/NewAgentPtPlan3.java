@@ -23,6 +23,7 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
@@ -30,6 +31,11 @@ import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.PersonAlgorithm;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.PopulationImpl;
+import org.matsim.population.PopulationReader;
 
 import playground.yu.analysis.PlanModeJudger;
 
@@ -117,5 +123,25 @@ public class NewAgentPtPlan3 extends NewPopulation implements PersonAlgorithm {
 		}
 
 		pw.writePerson(person);
+	}
+	public static void main(final String[] args) {
+		final String netFilename = "../data/ivtch/input/network.xml";
+		final String plansFilename = "../data/ivtch/input/10pctZrhPlans.xml.gz";
+		Gbl
+				.createConfig(new String[] { "../data/ivtch/newAllPlansWithLicense.xml" });
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFilename);
+
+		Population population = new PopulationImpl();
+		NewAgentPtPlan3 nap3 = new NewAgentPtPlan3(population);
+
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
+		plansReader.readFile(plansFilename);
+
+		nap3.run(population);
+
+		nap3.writeEndPlans();
 	}
 }

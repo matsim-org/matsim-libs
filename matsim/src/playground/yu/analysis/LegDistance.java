@@ -32,12 +32,16 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentStuckEvent;
+import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
+import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.utils.charts.XYLineChart;
@@ -212,5 +216,43 @@ public class LegDistance implements LinkEnterEventHandler,
 				"average legDistance of all agents (car)", xs,
 				this.legDistances);
 		avgLegDistanceChart.saveAsPng(filename + "Avg.png", 1024, 768);
+	}
+	public static void main(final String[] args) {
+		final String netFilename = "../schweiz-ivtch/network/ivtch.xml";
+		final String eventsFilename = "../runs/run265/100.events.txt.gz";
+		final String chartFilename = "./output/run265legDistance";
+		final String outFilename = "./output/run265legDistance.txt.gz";
+
+		// final String netFilename = "./test/yu/test/input/equil_net.xml";
+		// final String eventsFilename =
+		// "./test/yu/test/input/3k.100.events.txt.gz";
+		// final String chartFilename = "./test/yu/test/output/3kChart.png";
+		// final String outFilename = "./test/yu/test/output/3klegDist.txt.gz";
+
+		Gbl.startMeasurement();
+		Gbl.createConfig(null);
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFilename);
+
+		// Plans population = new Plans();
+		// System.out.println("-->reading plansfile: " + plansFilename);
+		// new MatsimPopulationReader(population).readFile(plansFilename);
+		// world.setPopulation(population);
+
+		Events events = new Events();
+
+		LegDistance legDist = new LegDistance(300, network);
+		events.addHandler(legDist);
+
+		System.out.println("-->reading evetsfile: " + eventsFilename);
+		new MatsimEventsReader(events).readFile(eventsFilename);
+
+		legDist.write(outFilename);
+		legDist.writeCharts(chartFilename);
+
+		System.out.println("--> Done!");
+		Gbl.printElapsedTime();
+		System.exit(0);
 	}
 }

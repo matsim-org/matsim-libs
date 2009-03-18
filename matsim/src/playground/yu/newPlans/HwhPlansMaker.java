@@ -26,9 +26,14 @@ package playground.yu.newPlans;
 import java.util.Set;
 
 import org.matsim.config.Config;
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.PopulationImpl;
+import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PlanSimplifyForDebug;
 
@@ -75,5 +80,24 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 			pw.writePerson(person);
 		}
 	}
+	public static void main(final String[] args) {
+		final String netFilename = "./test/yu/ivtch/input/network.xml";
+		final String plansFilename = "./test/yu/ivtch/input/allPlansZuerich.xml.gz";
+		Config config = Gbl
+				.createConfig(new String[] { "./test/yu/ivtch/config_for_make_hwhPlans.xml" });
 
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFilename);
+
+		Population population = new PopulationImpl();
+
+		HwhPlansMaker hpm = new HwhPlansMaker(network, config, population);
+
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
+		plansReader.readFile(plansFilename);
+
+		hpm.run(population);
+		hpm.writeEndPlans();
+	}
 }

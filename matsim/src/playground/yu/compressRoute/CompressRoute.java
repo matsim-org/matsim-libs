@@ -30,12 +30,19 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
+import org.matsim.config.Config;
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.PopulationImpl;
+import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
@@ -162,5 +169,39 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 		this.out.writeBytes("old links : " + this.oldLinksNr + ";\nnew links : "
 				+ this.newLinksNr + ";");
 		this.out.close();
+	}
+	public static void main(final String[] args) throws IOException {
+		Config config = Gbl.createConfig(args);
+
+		System.out.println("  reading the network...");
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(config.network()
+				.getInputFile());
+		System.out.println("  done.");
+
+		// analyse Netzwerk, make TreeMap<String ssLinkId, String linkId>
+		System.out.println("-->analysiing network");
+		SubsequentCapacity ss = new SubsequentCapacity(network);
+		ss.compute();
+		System.out.println("-->done.");
+
+		System.out.println("  setting up plans objects...");
+		final Population plans = new PopulationImpl(
+				PopulationImpl.USE_STREAMING);
+		PopulationReader plansReader = new MatsimPopulationReader(plans,
+				network);
+		// compress routes
+		CompressRoute cr = new CompressRoute(ss.getSsLinks(), plans,
+				"./test/yu/output/linkrout_capacity.txt");
+		System.out.println("  done.");
+
+		System.out.println("  reading and writing plans...");
+		plansReader.readFile(config.plans().getInputFile());
+		cr.run(plans);
+		System.out.println("  done.");
+
+		System.out.println("-->begins to write result...");
+		cr.writeEnd();
+		System.out.println("-->done");
 	}
 }

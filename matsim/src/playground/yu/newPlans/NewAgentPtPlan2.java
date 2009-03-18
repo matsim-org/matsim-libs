@@ -23,12 +23,18 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.PopulationImpl;
+import org.matsim.population.PopulationReader;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -129,4 +135,24 @@ public class NewAgentPtPlan2 extends NewPopulation {
 	// return Plan.Type.UNDEFINED;
 	// }
 	// }
+	public static void main(final String[] args) {
+		final String netFilename = "../data/ivtch/input/network.xml";
+		final String plansFilename = "../data/ivtch/newPlans/all10pctZrh_plans.xml.gz";
+		Gbl
+				.createConfig(new String[] { "../data/ivtch/cfgNewPlansCarPtLicense.xml" });
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFilename);
+
+		Population population = new PopulationImpl();
+		NewAgentPtPlan2 nap = new NewAgentPtPlan2(population);
+
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
+		plansReader.readFile(plansFilename);
+
+		nap.run(population);
+
+		nap.writeEndPlans();
+	}
 }

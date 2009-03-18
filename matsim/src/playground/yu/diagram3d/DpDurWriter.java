@@ -28,10 +28,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.matsim.config.Config;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.Events;
+import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -159,5 +163,19 @@ public class DpDurWriter implements AgentDepartureEventHandler, AgentArrivalEven
 			}
 			al.set(dur / 300, al.get(dur / 300).intValue() + 1);
 		}
+	}
+	public static void main(String[] args) {
+		Config config = Gbl.createConfig(args);
+		DpDurWriter ddw = new DpDurWriter("DpDurMatrix.txt");
+		
+		Events events = new Events();
+		events.addHandler(ddw);// TODO ...
+
+		System.out.println("@reading the eventsfile (TXTv1) ...");
+		new MatsimEventsReader(events).readFile(config.events().getInputFile());//One can also use readFile("..../...txt") hier
+		System.out.println("@done.");
+
+		ddw.writeMatrix();
+		ddw.closeFile();
 	}
 }

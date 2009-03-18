@@ -32,10 +32,17 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.Population;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.PopulationImpl;
+import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 import playground.yu.analysis.PlanModeJudger;
@@ -144,5 +151,22 @@ public class PlanChecker extends AbstractPersonAlgorithm {
 			e.printStackTrace();
 		}
 	}
+	public static void main(final String[] args) {
+		final String netFilename = "./test/yu/schweiz/input/ch.xml";
+		final String plansFilename = "./test/yu/schweiz/input/100ITERs_pt-6t-6output_plans.xml";
+		final String planCheckFilename = "./test/yu/schweiz/output/planCheck.txt";
+		Gbl
+				.createConfig(new String[] { "./test/yu/schweiz/multipleIterations_.xml" });
 
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFilename);
+
+		Population population = new PopulationImpl();
+		PlanChecker pc = new PlanChecker(planCheckFilename);
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
+		plansReader.readFile(plansFilename);
+		pc.run(population);
+		pc.writeResult();
+	}
 }
