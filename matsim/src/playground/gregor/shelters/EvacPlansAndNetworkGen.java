@@ -25,7 +25,6 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.evacuation.EvacuationPlansGeneratorAndNetworkTrimmer;
 import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
@@ -43,6 +42,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.world.algorithms.WorldConnectLocations;
+
+import playground.gregor.sims.evacbase.EvacuationPlansGeneratorAndNetworkTrimmer;
 
 public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTrimmer {
 	private final String shelters = "../inputs/padang/network_v20080618/shelters.shp";

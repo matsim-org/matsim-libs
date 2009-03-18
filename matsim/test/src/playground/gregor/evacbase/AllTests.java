@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.evacuation;
+package playground.gregor.evacbase;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -26,11 +26,12 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.evacuation");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(EvacuationQSimTest.class);
-		//$JUnit-END$
+		TestSuite suite = new TestSuite("Tests for playground.gregor.evacbase");
+
+		suite.addTestSuite(EvacuationQSimControlerTest.class);
+
 		return suite;
 	}
+
 
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EvacuationQSimTest.java
+ * EvacuationQSimControlerTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,39 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.evacuation;
+package playground.gregor.evacbase;
 
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 
-public class EvacuationQSimTest extends MatsimTestCase {
+import playground.gregor.sims.evacbase.EvacuationQSimControler;
 
-	public final void testEvacuationQSim(){
-		String config = getInputDirectory() + "/config.xml";
-		String referenceNetFile = getInputDirectory() + "/evacuation_net.xml";
-		String referenceEventsFile = getInputDirectory() + "/events.txt.gz";
-		String referencePlansFile = getInputDirectory() + "/plans.xml.gz";
-
-		String netFile = getOutputDirectory() + "/evacuation_net.xml";
-		String eventsFile = getOutputDirectory() + "/ITERS/it.10/10.events.txt.gz";
-		String plansFile = getOutputDirectory() + "/output_plans.xml.gz";
-
-		EvacuationQSimControler controler = new EvacuationQSimControler(new String[] {config});
-		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(10);
-		controler.run();
-
-		long checksum1 = CRCChecksum.getCRCFromFile(referenceNetFile);
-		long checksum2 = CRCChecksum.getCRCFromFile(netFile);
-		assertEquals("different network files", checksum1, checksum2);
-
-		checksum1 = CRCChecksum.getCRCFromFile(referenceEventsFile);
-		checksum2 = CRCChecksum.getCRCFromFile(eventsFile);
-		assertEquals("different events files", checksum1, checksum2);
-
-		checksum1 = CRCChecksum.getCRCFromFile(referencePlansFile);
-		checksum2 = CRCChecksum.getCRCFromFile(plansFile);
-		assertEquals("different plans files", checksum1, checksum2);
+public class EvacuationQSimControlerTest extends MatsimTestCase {
+public void testSimpleChecksum() {
+		
+		String config = getInputDirectory() + "config.xml";
+		String ref = getInputDirectory() + "events.txt.gz";
+		String compare = getOutputDirectory() + "ITERS/it.10/10.events.txt.gz";
+		new EvacuationQSimControler(new String [] {config}).run();
+		assertEquals("different events-files.", CRCChecksum.getCRCFromFile(ref),	CRCChecksum.getCRCFromFile(compare));
 	}
-
 }

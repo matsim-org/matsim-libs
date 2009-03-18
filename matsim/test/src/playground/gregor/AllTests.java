@@ -28,6 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for playground.gregor");
 		//$JUnit-BEGIN$
+		suite.addTest(playground.gregor.evacbase.AllTests.suite());
 		suite.addTest(playground.gregor.risk.AllTests.suite());
 		suite.addTest(playground.gregor.systemopt.AllTests.suite());
 		suite.addTest(playground.gregor.withindayevac.AllTests.suite());

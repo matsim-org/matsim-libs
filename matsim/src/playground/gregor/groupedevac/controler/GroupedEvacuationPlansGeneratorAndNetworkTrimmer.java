@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.evacuation.EvacuationPlansGeneratorAndNetworkTrimmer;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
@@ -41,6 +40,8 @@ import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.geometry.CoordImpl;
+
+import playground.gregor.sims.evacbase.EvacuationPlansGeneratorAndNetworkTrimmer;
 
 public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends EvacuationPlansGeneratorAndNetworkTrimmer {
 

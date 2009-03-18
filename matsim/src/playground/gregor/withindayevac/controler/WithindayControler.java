@@ -27,9 +27,9 @@ import org.matsim.controler.Controler;
 import org.matsim.controler.corelisteners.PlansDumping;
 import org.matsim.controler.corelisteners.PlansReplanning;
 import org.matsim.controler.corelisteners.PlansScoring;
-import org.matsim.evacuation.EvacuationQSimControler;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 
+import playground.gregor.sims.evacbase.EvacuationQSimControler;
 import playground.gregor.withindayevac.PlanGenerator;
 import playground.gregor.withindayevac.mobsim.WithindayQueueSimulation;
 

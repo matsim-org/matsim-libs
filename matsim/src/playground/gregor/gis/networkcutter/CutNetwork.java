@@ -30,9 +30,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.config.Config;
-import org.matsim.evacuation.EvacuationAreaFileReader;
-import org.matsim.evacuation.EvacuationAreaFileWriter;
-import org.matsim.evacuation.EvacuationAreaLink;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
@@ -55,6 +52,10 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
+
+import playground.gregor.sims.evacbase.EvacuationAreaFileReader;
+import playground.gregor.sims.evacbase.EvacuationAreaFileWriter;
+import playground.gregor.sims.evacbase.EvacuationAreaLink;
 
 public class CutNetwork {
 

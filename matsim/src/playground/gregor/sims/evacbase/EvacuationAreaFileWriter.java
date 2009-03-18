@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * EvacuationAreaFileWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,43 +18,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.evacTest;
-/*
- * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
+package playground.gregor.sims.evacbase;
+
+import java.io.IOException;
+import java.util.HashMap;
+
+import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.utils.misc.Time;
+import org.matsim.writer.MatsimXmlWriter;
+
+/**
+ *@author glaemmel
  */
+public class EvacuationAreaFileWriter extends MatsimXmlWriter {
 
-import org.matsim.gbl.Gbl;
-import org.matsim.utils.vis.netvis.NetVis;
+	private final HashMap<Id, EvacuationAreaLink> links;
 
-import playground.gregor.sims.evacbase.EvacuationQSimControler;
-
-
-public class MyControler1 extends EvacuationQSimControler {
-
-	public MyControler1(final String[] args) {
-		super(args) ;
+	public EvacuationAreaFileWriter(final HashMap<Id, EvacuationAreaLink> links) {
+		this.links = links;
 	}
 
-	public static void main(final String[] args) {
+	public void writeFile(final String filename) throws IOException {
+		openFile(filename);
+		writeXmlHead();
+		writeDoctype("evacuationarea", DEFAULT_DTD_LOCATION + "evacuationarea_v1.dtd");
+		write();
+		close();
+	}
 
-		if ( args.length==0 ) {
-//			Gbl.createConfig(new String[] {"../studies/schweiz/6-9SepFmaZurichOnly_rad=26000m-hwh/config-10pct.xml"});
-//			Gbl.createConfig(new String[] {"./examples/roundabout/config.xml"});
-//			Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
-			Gbl.createConfig(new String[] {"../padang/dlr-network/pconfig.xml"});
-		} else {
-			Gbl.createConfig(args) ;
+	private void write() throws IOException {
+		this.writer.write("<evacuationarea>" + NL);
+		writeBody("\t");
+		this.writer.write("</evacuationarea>" + NL);
+	}
+
+	private void writeBody(String indent) throws IOException {
+		for (EvacuationAreaLink link : this.links.values()) {
+			this.writer.write(indent +"<link id=\"" + link.getId() + "\" deadline=\""
+					+ Time.writeTime(link.getDeadline()) + "\" />\n");
 		}
-
-		final MyControler1 controler = new MyControler1(args);
-		controler.setOverwriteFiles(true) ;
-
-		controler.run();
-
-		// Visualize
-		String[] visargs = {"./output/ITERS/it.0/Snapshot"};
-		NetVis.main(visargs);
-
 	}
 
 }

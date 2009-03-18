@@ -21,10 +21,11 @@
 package playground.gregor.sims.socialcost;
 
 import org.matsim.controler.Controler;
-import org.matsim.evacuation.EvacuationQSimControler;
 import org.matsim.trafficmonitoring.PessimisticTravelTimeAggregator;
 import org.matsim.trafficmonitoring.TravelTimeAggregatorFactory;
 import org.matsim.trafficmonitoring.TravelTimeDataHashMap;
+
+import playground.gregor.sims.evacbase.EvacuationQSimControler;
 
 public class MarginalCostControler extends EvacuationQSimControler{
 

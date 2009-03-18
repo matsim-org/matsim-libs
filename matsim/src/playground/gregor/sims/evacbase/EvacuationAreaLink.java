@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * EvacuationAreaLink.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,43 +18,54 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.evacTest;
-/*
- * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
+package playground.gregor.sims.evacbase;
+
+import org.matsim.basic.v01.IdImpl;
+
+/**
+ * Simple evacuation link description, according to the evacuation area xml file.
+ *
+ * @author glaemmel
  */
+public class EvacuationAreaLink implements Comparable<EvacuationAreaLink> {
+	private IdImpl id;
+	private double deadline;
 
-import org.matsim.gbl.Gbl;
-import org.matsim.utils.vis.netvis.NetVis;
-
-import playground.gregor.sims.evacbase.EvacuationQSimControler;
-
-
-public class MyControler1 extends EvacuationQSimControler {
-
-	public MyControler1(final String[] args) {
-		super(args) ;
+	public EvacuationAreaLink(IdImpl id, double deadline){
+		this.id = id;
+		this.deadline = deadline;
+	}
+	public EvacuationAreaLink(String id, double deadline){
+		this.id = new IdImpl(id);
+		this.deadline = deadline;
 	}
 
-	public static void main(final String[] args) {
+	public IdImpl getId() { return this.id; }
 
-		if ( args.length==0 ) {
-//			Gbl.createConfig(new String[] {"../studies/schweiz/6-9SepFmaZurichOnly_rad=26000m-hwh/config-10pct.xml"});
-//			Gbl.createConfig(new String[] {"./examples/roundabout/config.xml"});
-//			Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
-			Gbl.createConfig(new String[] {"../padang/dlr-network/pconfig.xml"});
-		} else {
-			Gbl.createConfig(args) ;
+	public double getDeadline() { return this.deadline; }
+
+	public void setId(IdImpl id) { this.id = id; }
+
+	public void setDeadline(double deadline) { this.deadline = deadline; }
+
+	//compare operator for sorting the EvacuationAreaLinks according to their deadline
+	public int compareTo(EvacuationAreaLink o) {
+		if (this.deadline < o.getDeadline()) return -1;
+		if (this.deadline > o.getDeadline()) return 1;
+		return 0;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof EvacuationAreaLink) {
+			return compareTo((EvacuationAreaLink)o) == 0;
 		}
+		return false;
+	}
 
-		final MyControler1 controler = new MyControler1(args);
-		controler.setOverwriteFiles(true) ;
-
-		controler.run();
-
-		// Visualize
-		String[] visargs = {"./output/ITERS/it.0/Snapshot"};
-		NetVis.main(visargs);
-
+	@Override
+	public int hashCode() {
+		return this.id.hashCode();
 	}
 
 }
