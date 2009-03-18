@@ -20,17 +20,21 @@
 
 package playground.meisterk.org.matsim.scoring.ktiYear3;
 
+import java.util.TreeMap;
+
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.population.ActivityImpl;
 import org.matsim.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -60,7 +64,8 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		Person dummyPerson = new PersonImpl(new IdImpl("999"));
 		Plan dummyPlan = dummyPerson.createPlan(true);
-		ActivityScoringFunction testee = new ActivityScoringFunction(dummyPlan, null);
+		TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
+		ActivityScoringFunction testee = new ActivityScoringFunction(dummyPlan, null, facilityPenalties);
 
 		Activity testActivity = null;
 		double[] openingInterval = null;

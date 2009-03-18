@@ -20,16 +20,34 @@
 
 package playground.meisterk.org.matsim.scoring.ktiYear3;
 
+import java.util.TreeMap;
+
+import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionAccumulator;
-import org.matsim.scoring.ScoringFunctionFactory;
+import org.matsim.scoring.charyparNagel.AgentStuckScoringFunction;
+import org.matsim.scoring.charyparNagel.MoneyScoringFunction;
 
-public class KTIYear3ScoringFunctionFactory implements ScoringFunctionFactory {
+public class KTIYear3ScoringFunctionFactory extends org.matsim.scoring.charyparNagel.CharyparNagelScoringFunctionFactory {
+
+	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
+
+	public KTIYear3ScoringFunctionFactory(CharyparNagelScoringConfigGroup config, final TreeMap<Id, FacilityPenalty> facilityPenalties) {
+		super(config);
+		this.facilityPenalties = facilityPenalties;
+	}
 
 	public ScoringFunction getNewScoringFunction(Plan plan) {
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		
+		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, super.getParams(), this.facilityPenalties));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.scoring.charyparNagel.LegScoringFunction(plan, super.getParams()));
+		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(super.getParams()));
+		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(super.getParams()));
 		
 		return scoringFunctionAccumulator;
 		

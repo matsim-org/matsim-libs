@@ -20,12 +20,12 @@
 
 package org.matsim.scoring.charyparNagel;
 
+import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.CharyparNagelScoringParameters;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionAccumulator;
 import org.matsim.scoring.ScoringFunctionFactory;
-import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 
 public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
@@ -55,5 +55,9 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
 
 		return scoringFunctionAccumulator;
+	}
+
+	public CharyparNagelScoringParameters getParams() {
+		return params;
 	}
 }
