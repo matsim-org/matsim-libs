@@ -20,36 +20,33 @@
 
 package playground.gregor.risk;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentMoneyEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.geometry.transformations.TransformationFactory;
 
 public class RiskCostCalculator implements LinkEnterEventHandler {
 
 	private final static double BASE_TIME = 3600 * 3;
 	private final static double MAX_COST = 3600*30; //strict down hill;
 
-	//TODO which one is better?
 	private final Map<Link,Double> linkRiskCost = new HashMap<Link, Double>();
-	private final Map<String,Double> linkRiskCostII = new HashMap<String, Double>(); 
+	private boolean chargeEqualRiskLinks = false;
 
 
-	public RiskCostCalculator(final NetworkLayer network) {
+	public RiskCostCalculator(final NetworkLayer network, final boolean chargeEqualRiskLinks) {
+		this.chargeEqualRiskLinks = chargeEqualRiskLinks;
 		init(network);
 	}
 
@@ -60,7 +57,7 @@ public class RiskCostCalculator implements LinkEnterEventHandler {
 		}
 		Map<Node,Double> nodeMapping = getNodeMapping(c);
 		generateLinkMapping(nodeMapping);
-		new NodeCostShapeCreator(this.linkRiskCost,MGC.getCRS(TransformationFactory.WGS84_UTM47S));
+//		new NodeCostShapeCreator(this.linkRiskCost,MGC.getCRS(TransformationFactory.WGS84_UTM47S));
 //		throw new RuntimeException("");
 	}
 
@@ -72,12 +69,17 @@ public class RiskCostCalculator implements LinkEnterEventHandler {
 			for (Link l : n.getOutLinks().values()) {
 				Node tmp = l.getToNode();
 				Double nTmp = nodeMapping.get(tmp);
-				if (nTmp == null || nTmp <= cost) {
-					continue;
+				if (this.chargeEqualRiskLinks) {
+					if (nTmp == null || nTmp < cost) {
+						continue;
+					}					
+				} else {
+					if (nTmp == null || nTmp <= cost) {
+						continue;
+					}
 				}
-				//TODO which one is better?
-				this.linkRiskCost.put(l, cost);
-				this.linkRiskCostII.put(l.getId().toString(), cost);
+
+				this.linkRiskCost.put(l, nTmp);
 			}
 			
 		}
@@ -115,6 +117,18 @@ public class RiskCostCalculator implements LinkEnterEventHandler {
 
 			}
 		}
+		
+		Collection<Node> keys = new ArrayList<Node>(nodeMapping.keySet()); 
+		for (Node n : keys) {
+			for (Link l : n.getInLinks().values()) {
+				Node from = l.getFromNode();
+				if (!nodeMapping.containsKey(from)) {
+					nodeMapping.put(from, 0.);
+				}
+			}
+		}
+		
+		
 		return nodeMapping;
 	}
 
@@ -127,16 +141,16 @@ public class RiskCostCalculator implements LinkEnterEventHandler {
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
-		Double cost = this.linkRiskCostII.get(event.linkId);
+		Double cost = this.linkRiskCost.get(event.link);
 		if (cost == null) {
 			return;
 		}
-		Id id = new IdImpl(event.agentId);
-		AgentMoneyEvent e = new AgentMoneyEvent(event.getTime(),id,cost/-600);
+		AgentMoneyEvent e = new AgentMoneyEvent(event.getTime(),event.getPersonId(),cost/-600);
 		QueueSimulation.getEvents().processEvent(e);		
 		
 	}
 
+	
 	public void reset(final int iteration) {
 		// TODO Auto-generated method stub
 		

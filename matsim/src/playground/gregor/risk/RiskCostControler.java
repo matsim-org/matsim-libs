@@ -41,6 +41,7 @@ public class RiskCostControler extends Controler {
 	private final static Logger log = Logger.getLogger(RiskCostControler.class);
 	
 	private final HashMap<Id, EvacuationAreaLink> evacuationAreaLinks = new HashMap<Id, EvacuationAreaLink>();
+
 	
 	public RiskCostControler(final String[] args) {
 		super(args);
@@ -54,7 +55,7 @@ public class RiskCostControler extends Controler {
 //		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 //		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
 //		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
-		RiskCostCalculator rc = new RiskCostCalculator(this.network);
+		RiskCostCalculator rc = new RiskCostCalculator(this.network, false);
 		this.events.addHandler(rc);
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 		if (this.travelTimeCalculator == null) {
@@ -98,6 +99,7 @@ public class RiskCostControler extends Controler {
 		this.strategyManager = loadStrategyManager();
 //		this.addControlerListener(sc);
 	}
+	
 	
 	public static void main(final String [] args) {
 		final Controler controler = new RiskCostControler(args);
