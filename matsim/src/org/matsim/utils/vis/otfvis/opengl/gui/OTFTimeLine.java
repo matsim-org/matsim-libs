@@ -68,7 +68,7 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		}
 
 		@Override
-		public void paint(Graphics g) {
+		synchronized public void paint(Graphics g) {
 			super.paint(g);
 			Rectangle bounds = g.getClipBounds();
 			bounds.grow(-32, 0);
@@ -108,6 +108,8 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		}else if(e.getActionCommand().equals("setLoopEnd")){
 			hostControl.setLoopBounds(-1, time);
 			replaceLabel("]", time);
+		}else if(e.getActionCommand().equals("cancelcaching")){
+			setCachedTime(-1);
 		}
 		// insert new label
 	}
@@ -193,9 +195,31 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		}
 	}
 
-	public void setCachedTime(int time) {
-		if(time == -1) cachedTime.clear();
-		else {
+	private JButton cancelCaching = null;
+	public boolean isCancelCaching = false;
+	synchronized public void setCachedTime(int time) {
+		if(time == -1){
+			cachedTime.clear();
+			if(cancelCaching != null) {
+				isCancelCaching = true;
+				remove(cancelCaching);
+				this.doLayout();
+				invalidate();
+				setVisible(true);
+				cancelCaching = null;
+			}
+		} else {
+			if(cancelCaching == null) {
+				cancelCaching = new JButton();
+				cancelCaching.setText("Cancel");
+				cancelCaching.setActionCommand("cancelcaching");
+				cancelCaching.addActionListener(this);
+				cancelCaching.setToolTipText("Cancel the preloading of timesteps");
+
+				add(cancelCaching);
+				validate();
+				this.setVisible(true);
+			}
 			synchronized (cachedTime) {
 				cachedTime.add(time);
 				times.repaint();

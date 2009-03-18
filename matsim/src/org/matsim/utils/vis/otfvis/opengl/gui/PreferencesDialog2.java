@@ -52,7 +52,7 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 			JPanel panel = new JPanel(null);
 			getContentPane().add(panel);
 			panel.setBorder(BorderFactory.createTitledBorder("Switches"));
-			panel.setBounds(240, 130, 220, 140);
+			panel.setBounds(250, 130, 220, 160);
 
 			JCheckBox SynchBox; 
 			if(host.isLiveHost()) {
@@ -102,6 +102,14 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 			//SynchBox.setVisible(true);
 			//SynchBox.setMaximumSize(new Dimension(250,60));
 			panel.add(SynchBox);
+			SynchBox = new JCheckBox("allow caching");
+//			SynchBox.setMnemonic(KeyEvent.VK_M);
+			SynchBox.setSelected(cfg.isCachingAllowed());
+			SynchBox.addItemListener(this);
+			SynchBox.setBounds(10, 120, 200, 31);
+			//SynchBox.setVisible(true);
+			//SynchBox.setMaximumSize(new Dimension(250,60));
+			panel.add(SynchBox);
 		}
 	}
 
@@ -128,6 +136,9 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 		} else if (source.getText().equals("show time GL")) {
 			// toggle draw time in GL
 			cfg.setDrawTime(!cfg.drawTime());
+		} else if (source.getText().equals("allow caching")) {
+			// toggle caching allowed
+			cfg.setCachingAllowed(!cfg.isCachingAllowed());
 		}
 	}
 	public static void main(final String[] args) {

@@ -29,8 +29,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
+import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.gui.PoolFactory;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
@@ -276,7 +278,9 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 
 
 		result.finish();
-		if (isCachingAllowed()) this.cachedTimes.put(time, result);
+		OTFVisConfig cfg = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis"));
+
+		if (cfg.isCachingAllowed()) this.cachedTimes.put(time, result);
 		return result;
 	}
 
@@ -335,17 +339,4 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		return result;
 	}
 
-	/**
-	 * @return the chachingAllowed
-	 */
-	public static boolean isCachingAllowed() {
-		return cachingAllowed;
-	}
-
-	/**
-	 * @param cachingAllowed the chachingAllowed to set
-	 */
-	public static void setCachingAllowed(final boolean cachingAllowed) {
-		OTFClientQuad.cachingAllowed = cachingAllowed;
-	}
 }

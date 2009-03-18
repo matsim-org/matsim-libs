@@ -90,7 +90,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public transient Events events;
 
 	protected OnTheFlyServer(String ReadableName, QueueNetwork network, Population population, Events events) throws RemoteException {
-		super(4019, new SslRMIClientSocketFactory(),	new SslRMIServerSocketFactory());
+		super(0, new SslRMIClientSocketFactory(),	new SslRMIServerSocketFactory());
 		this.userReadableName = ReadableName;
 		this.network = network;
 		this.out = new ByteArrayOutputStream(20000000);
@@ -100,7 +100,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	protected OnTheFlyServer(String ReadableName, QueueNetwork network, Population population, Events events, boolean noSSL) throws RemoteException {
-		super(4019);
+		super(0);
 		this.userReadableName = ReadableName;
 		this.network = network;
 		this.out = new ByteArrayOutputStream(20000000);
@@ -129,9 +129,16 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			}
 		} else {
 			try {
-				registry = LocateRegistry.createRegistry(4019);
+				registry = LocateRegistry.getRegistry(4019);
+				// THIS Line is important, as this checks, if registry is REALLY connected "late binding"
+				/*String[] liste =*/ registry.list();
 			} catch (RemoteException e) {
-				e.printStackTrace();
+				try {
+					registry = LocateRegistry.createRegistry(4019);
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		}
 		// Register with RMI to be seen from client
@@ -143,11 +150,9 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 				result  = new OnTheFlyServer(ReadableName, network, population, events, true);
 			}
 
-			// Bind this object instance to the name "HelloServer"
-			registry.bind("DSOTFServer_" + ReadableName, result);
+			// Bind this object instance to the name ReadableName
+			registry.bind(ReadableName, result);
 
-			// THIS Line is important, as this checks, if registry is REALLY connected "late binding"
-			/*String[] liste =*/ registry.list();
 			System.out.println("OTFServer bound in registry");
 		} catch (Exception e) {
 			System.out.println("OTFServer err: " + e.getMessage());

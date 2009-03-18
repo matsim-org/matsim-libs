@@ -140,7 +140,14 @@ public class OTFVisConfig extends Module {
 	private boolean drawOverlays = true;
 	private boolean renderImages = false;
 	private boolean modified = false;
+	private boolean cachingAllowed = true;
 
+	public boolean isCachingAllowed() {
+		return cachingAllowed;
+	}
+	public void setCachingAllowed(boolean cachingAllowed) {
+		this.cachingAllowed = cachingAllowed;
+	}
 	/**
 	 * @return the modified
 	 */

@@ -59,7 +59,6 @@ import org.matsim.utils.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.SnapshotWriter;
 
-
 public class OTFQuadFileHandler {
 
 	private static final int BUFFERSIZE = 100000000;
@@ -82,7 +81,8 @@ public class OTFQuadFileHandler {
 
 		private final ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
 
-		public Writer(final double intervall_s, final QueueNetwork network, final String fileName) {
+		public Writer(final double intervall_s, final QueueNetwork network,
+				final String fileName) {
 			this.net = network;
 			this.interval_s = intervall_s;
 			this.fileName = fileName;
@@ -106,7 +106,7 @@ public class OTFQuadFileHandler {
 			this.outFile.writeInt(MINORVERSION);
 
 			this.outFile.writeDouble(this.interval_s);
-			//outFile.writeUTF("fromFile");
+			// outFile.writeUTF("fromFile");
 			this.zos.closeEntry();
 		}
 
@@ -125,7 +125,8 @@ public class OTFQuadFileHandler {
 
 			Gbl.startMeasurement();
 			OTFConnectionManager connect = new OTFConnectionManager();
-			connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+			connect.add(QueueLink.class,
+					OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 			connect.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
 			this.quad.fillQuadTree(connect);
 			System.out.print("fill writer Quad on Server: ");
@@ -166,11 +167,12 @@ public class OTFQuadFileHandler {
 		}
 
 		public void open() {
-			//open zip file
+			// open zip file
 			this.isOpen = true;
 
 			try {
-				this.zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(this.fileName),BUFFERSIZE));
+				this.zos = new ZipOutputStream(new BufferedOutputStream(
+						new FileOutputStream(this.fileName), BUFFERSIZE));
 			} catch (FileNotFoundException e1) {
 				e1.printStackTrace();
 			}
@@ -180,7 +182,8 @@ public class OTFQuadFileHandler {
 				writeInfos();
 				writeQuad();
 				writeConstData();
-				System.out.print("write to file  Quad on Server: "); Gbl.printElapsedTime();
+				System.out.print("write to file  Quad on Server: ");
+				Gbl.printElapsedTime();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -200,9 +203,10 @@ public class OTFQuadFileHandler {
 		}
 
 		public void beginSnapshot(final double time) {
-			if (!this.isOpen) open();
+			if (!this.isOpen)
+				open();
 			try {
-				dump((int)time);
+				dump((int) time);
 			} catch (IOException e) {
 
 				e.printStackTrace();
@@ -227,7 +231,8 @@ public class OTFQuadFileHandler {
 			openAndReadInfo();
 		}
 
-		private ZipFile zipFile = null;
+		// private ZipFile zipFile = null;
+		private File sourceZipFile = null;
 
 		private DataInputStream inFile;
 
@@ -235,32 +240,33 @@ public class OTFQuadFileHandler {
 		private final String id = null;
 		private byte[] actBuffer = null;
 
-		//public ByteArrayOutputStream out = null;
+		// public ByteArrayOutputStream out = null;
 		protected double intervall_s = -1, nextTime = -1;
 
 		TreeMap<Double, Long> timesteps = new TreeMap<Double, Long>();
 
-		private void scanZIPFile() {
+		private void scanZIPFile(ZipFile zipFile) {
 			this.nextTime = -1;
 			// Create an enumeration of the entries in the zip file
-			Enumeration<? extends ZipEntry> zipFileEntries = this.zipFile.entries();
+			Enumeration<? extends ZipEntry> zipFileEntries = zipFile.entries();
 			System.out.println("Scanning timesteps:");
 
 			Gbl.startMeasurement();
 
 			// Process each entry
-			while (zipFileEntries.hasMoreElements())
-			{
+			while (zipFileEntries.hasMoreElements()) {
 				// grab a zip file entry
 				ZipEntry entry = zipFileEntries.nextElement();
 
 				String currentEntry = entry.getName();
-				if(currentEntry.contains("step")) {
-					String [] spliti = StringUtils.explode(currentEntry, '.', 10);
+				if (currentEntry.contains("step")) {
+					String[] spliti = StringUtils
+							.explode(currentEntry, '.', 10);
 
 					double time_s = Double.parseDouble(spliti[1]);
-					if (this.nextTime == -1) this.nextTime = time_s;
-					this.timesteps.put(time_s,  entry.getSize());
+					if (this.nextTime == -1)
+						this.nextTime = time_s;
+					this.timesteps.put(time_s, entry.getSize());
 					System.out.print(time_s);
 					System.out.print(", ");
 				}
@@ -273,12 +279,16 @@ public class OTFQuadFileHandler {
 		}
 
 		private byte[] readTimeStep(final double time_s) throws IOException {
-			int time_string = (int)time_s;
-			ZipEntry entry = this.zipFile.getEntry("step." + time_string + ".bin");
-			byte [] buffer = new byte [(int)this.timesteps.get(time_s).longValue()]; //DS TODO Might be bigger than int??
+			int time_string = (int) time_s;
+			ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+			ZipEntry entry = zipFile.getEntry("step." + time_string + ".bin");
+			byte[] buffer = new byte[(int) this.timesteps.get(time_s)
+					.longValue()]; // DS TODO Might be bigger than int??
 
-			this.inFile = new DataInputStream(new BufferedInputStream(this.zipFile.getInputStream(entry),1000000));
+			this.inFile = new DataInputStream(new BufferedInputStream(zipFile
+					.getInputStream(entry), 1000000));
 			readStateBuffer(buffer);
+			zipFile.close();
 
 			return buffer;
 		}
@@ -286,52 +296,58 @@ public class OTFQuadFileHandler {
 		private void openAndReadInfo() {
 			// open file
 			try {
-				File sourceZipFile = new File(this.fileName);
+				sourceZipFile = new File(this.fileName);
 				// Open Zip file for reading
-				this.zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
-				ZipEntry infoEntry = this.zipFile.getEntry("info.bin");
-				this.inFile = new DataInputStream(this.zipFile.getInputStream(infoEntry));
+				ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+				ZipEntry infoEntry = zipFile.getEntry("info.bin");
+				this.inFile = new DataInputStream(zipFile.getInputStream(infoEntry));
 				int version = this.inFile.readInt();
 				int minorversion = this.inFile.readInt();
 				this.intervall_s = this.inFile.readDouble();
-				OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+				OTFVisConfig config = (OTFVisConfig) Gbl.getConfig().getModule(
+						OTFVisConfig.GROUP_NAME);
 
 				config.setFileVersion(version);
 				config.setFileMinorVersion(minorversion);
 
-				scanZIPFile();
-
+				scanZIPFile(zipFile);
+				zipFile.close();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
 		}
 
-		public void closeFile() {
-			try {
-				this.zipFile.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+//		public void closeFile() {
+//			try {
+//				this.zipFile.close();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//
+//		}
 
-		}
-		/*package*/ static class OTFObjectInputStream extends ObjectInputStream {
-			public OTFObjectInputStream(final InputStream in) throws IOException {
+		/* package */static class OTFObjectInputStream extends
+				ObjectInputStream {
+			public OTFObjectInputStream(final InputStream in)
+					throws IOException {
 				super(in);
 			}
 
 			@Override
 			protected Class resolveClass(final ObjectStreamClass desc)
-			throws IOException, ClassNotFoundException {
+					throws IOException, ClassNotFoundException {
 				String name = desc.getName();
-				System.out.println("try to resolve "+ name);
+				System.out.println("try to resolve " + name);
 				//
-				if(name.equals("playground.david.vis.data.OTFServerQuad")) return OTFServerQuad.class;
-				else if (name.startsWith("playground.david.vis")){
-					name = name.replaceFirst("playground.david.vis", "org.matsim.utils.vis.otfvis");
+				if (name.equals("playground.david.vis.data.OTFServerQuad"))
+					return OTFServerQuad.class;
+				else if (name.startsWith("playground.david.vis")) {
+					name = name.replaceFirst("playground.david.vis",
+							"org.matsim.utils.vis.otfvis");
 					return Class.forName(name);
-				}
-				else if (name.startsWith("org.matsim.utils.vis.otfivs")){
-					name = name.replaceFirst("org.matsim.utils.vis.otfivs", "org.matsim.utils.vis.otfvis");
+				} else if (name.startsWith("org.matsim.utils.vis.otfivs")) {
+					name = name.replaceFirst("org.matsim.utils.vis.otfivs",
+							"org.matsim.utils.vis.otfvis");
 					return Class.forName(name);
 				}
 				return super.resolveClass(desc);
@@ -341,13 +357,17 @@ public class OTFQuadFileHandler {
 		private void readQuad() {
 			try {
 				// we do not cache anymore ...readZIPFile();
-				ZipEntry quadEntry = this.zipFile.getEntry("quad.bin");
-				BufferedInputStream is =  new BufferedInputStream(this.zipFile.getInputStream(quadEntry));
+				ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+				ZipEntry quadEntry = zipFile.getEntry("quad.bin");
+				BufferedInputStream is = new BufferedInputStream(zipFile
+						.getInputStream(quadEntry));
 				try {
-					this.quad = (OTFServerQuad) new OTFObjectInputStream(is).readObject();
+					this.quad = (OTFServerQuad) new OTFObjectInputStream(is)
+							.readObject();
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}
+				zipFile.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -357,17 +377,21 @@ public class OTFQuadFileHandler {
 
 		private void readConnect(OTFConnectionManager connect) {
 			try {
-				ZipEntry connectEntry = this.zipFile.getEntry("connect.bin");
+				ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+				ZipEntry connectEntry = zipFile.getEntry("connect.bin");
 				// maybe no connect given.. no Problem
-				if(connectEntry == null) return;
-				
-				BufferedInputStream is =  new BufferedInputStream(this.zipFile.getInputStream(connectEntry));
-				try {
-					OTFConnectionManager connect2 = (OTFConnectionManager) new OTFObjectInputStream(is).readObject();
-					connect.updateEntries(connect2);
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
+				if (connectEntry != null) {
+					BufferedInputStream is = new BufferedInputStream(zipFile
+							.getInputStream(connectEntry));
+					try {
+						OTFConnectionManager connect2 = (OTFConnectionManager) new OTFObjectInputStream(
+								is).readObject();
+						connect.updateEntries(connect2);
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
 				}
+				zipFile.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -376,28 +400,29 @@ public class OTFQuadFileHandler {
 		}
 
 		public int getLocalTime() throws RemoteException {
-			return (int)this.nextTime;
+			return (int) this.nextTime;
 		}
 
 		public void readStateBuffer(final byte[] result) {
-			int size =  0;
+			int size = 0;
 
 			try {
 				double timenextTime = this.inFile.readDouble();
 				size = this.inFile.readInt();
 
-
 				int offset = 0;
 				int remain = size;
 				int read = 0;
-				while ((remain > 0) && (read != -1)){
-					read = this.inFile.read(result,offset,remain);
+				while ((remain > 0) && (read != -1)) {
+					read = this.inFile.read(result, offset, remain);
 					remain -= read;
-					offset +=read;
+					offset += read;
 				}
 
 				if (offset != size) {
-					throw new IOException("READ SIZE did not fit! File corrupted! in second " + timenextTime);
+					throw new IOException(
+							"READ SIZE did not fit! File corrupted! in second "
+									+ timenextTime);
 				}
 
 			} catch (IOException e) {
@@ -409,32 +434,45 @@ public class OTFQuadFileHandler {
 			return false;
 		}
 
-		public OTFServerQuad getQuad(final String id, final OTFConnectionManager connect) throws RemoteException {
-			//if (connect != null) throw new RemoteException("writers need to be NULL, when reading from file");
-			if (this.id == null) readQuad();
-			if ((id != null) && !id.equals(this.id)) throw new RemoteException("id does not match, set id to NULL will match ALL!");
+		public OTFServerQuad getQuad(final String id,
+				final OTFConnectionManager connect) throws RemoteException {
+			// if (connect != null) throw new
+			// RemoteException("writers need to be NULL, when reading from file"
+			// );
+			if (this.id == null)
+				readQuad();
+			if ((id != null) && !id.equals(this.id))
+				throw new RemoteException(
+						"id does not match, set id to NULL will match ALL!");
 
 			return this.quad;
 		}
 
-		public byte[] getQuadConstStateBuffer(final String id) throws RemoteException {
-			ZipEntry entry = this.zipFile.getEntry("const.bin");
-			byte [] buffer = new byte[(int) entry.getSize()];
-
+		public byte[] getQuadConstStateBuffer(final String id)
+				throws RemoteException {
+			byte[] buffer = null;
 			try {
-				this.inFile = new DataInputStream(this.zipFile.getInputStream(entry));
+				ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+				ZipEntry entry = zipFile.getEntry("const.bin");
+				buffer = new byte[(int) entry.getSize()];
+
+				this.inFile = new DataInputStream(zipFile
+						.getInputStream(entry));
 				readStateBuffer(buffer);
 				this.inFile.close();
+				zipFile.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			return buffer;
 		}
 
-		public byte[] getQuadDynStateBuffer(final String id, final Rect bounds)	throws RemoteException {
-			// DS TODO bounds is ignored, maybe throw exception if bounds != null??
+		public byte[] getQuadDynStateBuffer(final String id, final Rect bounds)
+				throws RemoteException {
+			// DS TODO bounds is ignored, maybe throw exception if bounds !=
+			// null??
 			if (this.actBuffer == null)
-					this.actBuffer = getStateBuffer();
+				this.actBuffer = getStateBuffer();
 			return this.actBuffer;
 		}
 
@@ -445,33 +483,36 @@ public class OTFQuadFileHandler {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-//			double time = 0;
-//			Iterator<Double> it =  this.timesteps.keySet().iterator();
-//			while(it.hasNext() && (time <= this.nextTime)) time = it.next();
-//			if (time == this.nextTime) {
-//				time = this.timesteps.firstKey();
-//			}
-//			this.nextTime = time;
+			// double time = 0;
+			// Iterator<Double> it = this.timesteps.keySet().iterator();
+			// while(it.hasNext() && (time <= this.nextTime)) time = it.next();
+			// if (time == this.nextTime) {
+			// time = this.timesteps.firstKey();
+			// }
+			// this.nextTime = time;
 			return buffer;
 		}
 
-		public boolean requestNewTime(final int time, final TimePreference searchDirection) throws RemoteException {
+		public boolean requestNewTime(final int time,
+				final TimePreference searchDirection) throws RemoteException {
 			double lastTime = -1;
 			double foundTime = -1;
-			for(Double timestep : this.timesteps.keySet()) {
-				if (searchDirection == TimePreference.EARLIER){
-					if(timestep >= time) {
-						// take next lesser time than requested, if not exacty the same
+			for (Double timestep : this.timesteps.keySet()) {
+				if (searchDirection == TimePreference.EARLIER) {
+					if (timestep >= time) {
+						// take next lesser time than requested, if not exacty
+						// the same
 						foundTime = lastTime;
 						break;
 					}
-				} else if(timestep >= time) {
-					foundTime = timestep; //the exact time or one biggers
+				} else if (timestep >= time) {
+					foundTime = timestep; // the exact time or one biggers
 					break;
 				}
 				lastTime = timestep;
 			}
-			if (foundTime == -1) return false;
+			if (foundTime == -1)
+				return false;
 
 			this.nextTime = foundTime;
 			this.actBuffer = null;

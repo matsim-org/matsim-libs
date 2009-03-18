@@ -21,6 +21,7 @@
 package org.matsim.utils.vis.otfvis.opengl;
 
 import java.rmi.RemoteException;
+import java.util.UUID;
 
 import org.matsim.config.Config;
 import org.matsim.events.Events;
@@ -46,13 +47,15 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 
 	@Override
 	protected void prepareSim() {
-		this.myOTFServer = OnTheFlyServer.createInstance("AName1", this.network, this.plans, events, false);
+		UUID idOne = UUID.randomUUID();
+
+		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.network, this.plans, events, false);
 
 		super.prepareSim();
 
 		// FOR TESTING ONLY!
 		PreferencesDialog.preDialogClass = PreferencesDialog2.class;
-		OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019");
+		OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString());
 		client.start();
 		try {
 			this.myOTFServer.pause();

@@ -89,7 +89,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	protected void initGUI() {
 		getContentPane().setLayout(null);
 		this.setResizable(false);
-		setSize(470, 300);
+		setSize(480, 330);
 
 		// Mouse Buttons
 		{
@@ -146,7 +146,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			JPanel panel = new JPanel(null);
 			getContentPane().add(panel);
 			panel.setBorder(BorderFactory.createTitledBorder("Colors"));
-			panel.setBounds(240, 10, 220, 120);
+			panel.setBounds(250, 10, 220, 120);
 
 			{
 				JButton jButton = new JButton("Set Background...");

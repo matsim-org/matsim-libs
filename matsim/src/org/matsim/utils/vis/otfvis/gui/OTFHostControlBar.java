@@ -131,15 +131,19 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		String connection = this.address.substring(this.address.indexOf(':')+1, this.address.length());
 		if (type.equals("rmi")) {
 			int port = 4019;
+			String name = null;
 			String [] connparse = connection.split(":");
 			if (connparse.length > 1 ) port = Integer.parseInt(connparse[1]);
-			this.host = openRMI(connparse[0], port);
+			if (connparse.length > 2 ) name = connparse[2];
+			this.host = openRMI(connparse[0], port, name);
 
 		} else if (type.equals("ssl")) {
 			int port = 4019;
+			String name = null;
 			String [] connparse = connection.split(":");
 			if (connparse.length > 1 ) port = Integer.parseInt(connparse[1]);
-			this.host = openSSL(connparse[0], port);
+			if (connparse.length > 2 ) name = connparse[2];
+			this.host = openSSL(connparse[0], port, name);
 
 		} else if (type.equals("file")) {
 			this.host = openFile(connection);
@@ -153,7 +157,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		if (host != null) liveHost = host.isLive();
 	}
 
-	private OTFServerRemote openSSL(String hostname, int port) throws InterruptedException, RemoteException, NotBoundException {
+	private OTFServerRemote openSSL(String hostname, int port, String servername) throws InterruptedException, RemoteException, NotBoundException {
 		System.setProperty("javax.net.ssl.keyStore", "input/keystore");
 		System.setProperty("javax.net.ssl.keyStorePassword", "vspVSP");
 		System.setProperty("javax.net.ssl.trustStore", "input/truststore");
@@ -162,9 +166,11 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		Thread.sleep(1000);
 		Registry registry = LocateRegistry.getRegistry(hostname, port, new SslRMIClientSocketFactory());
 
+		if(servername == null) servername = "OTFServer_"; // take any
+		
 		String[] liste = registry.list();
 		for (String name : liste) {
-			if (name.indexOf("DSOTFServer_") != -1){
+			if (name.indexOf(servername) != -1){
 				this.host = (OTFServerRemote)registry.lookup(name);
 				((OTFLiveServerRemote)host).pause();
 			}
@@ -172,13 +178,15 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		return host;
 	}
 
-	private OTFServerRemote openRMI(String hostname, int port) throws InterruptedException, RemoteException, NotBoundException {
+	private OTFServerRemote openRMI(String hostname, int port, String servername) throws InterruptedException, RemoteException, NotBoundException {
 		Thread.sleep(1000);
 		Registry registry = LocateRegistry.getRegistry(hostname, port);
 
+		if(servername == null) servername = "OTFServer_"; // take any
+		
 		String[] liste = registry.list();
 		for (String name : liste) {
-			if (name.indexOf("DSOTFServer_") != -1){
+			if (name.indexOf(servername) != -1){
 				this.host = (OTFServerRemote)registry.lookup(name);
 				((OTFLiveServerRemote)host).pause();
 			}
@@ -236,7 +244,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			try {
 				int	time = host.getLocalTime();
 
-				while (hasNext) {
+				while (hasNext && !(timeLine.isCancelCaching)) {
 					synchronized(blockReading) {
 						// remember time the block had before caching next step
 						int	origtime = host.getLocalTime();
@@ -255,7 +263,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				e.printStackTrace();
 			}
 			
-			((OTFQuadFileHandler.Reader)host).closeFile();
+//			((OTFQuadFileHandler.Reader)host).closeFile();
 		}
 		@Override
 		public void run() {
@@ -695,7 +703,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	public void finishedInitialisition() {
-		if(!isLiveHost()) {
+		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+		if(!isLiveHost() && config.isCachingAllowed()) {
 			new PreloadHelper().start();
 		}
 	}

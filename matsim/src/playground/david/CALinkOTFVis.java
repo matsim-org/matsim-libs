@@ -137,7 +137,7 @@ class CALink extends QueueLink {
 			throw new UnsupportedOperationException("Method not implemented in draft class");		}
 
 		public double getDisplayableTimeCapValue() {
-			throw new UnsupportedOperationException("Method not implemented in draft class");
+			return 1;
 		}
 
 		public Collection<AgentOnLink> getDrawableCollection() {
@@ -497,7 +497,7 @@ public class CALinkOTFVis extends Thread {
 
 
 			OTFClientQuad clientQ2 = hostControl.createNewView(null,connectR);
-			clientQ2.setCachingAllowed(false);
+			visconf.setCachingAllowed(false);
 			
 			OTFDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
 			pane.setRightComponent(drawer2.getComponent());

@@ -192,7 +192,7 @@ implements MouseWheelListener{
 			if (button == 1 || button == 4) {
 				int deltax = Math.abs(start.x - e.getX());
 				int deltay = Math.abs(start.y - e.getY());
-				double ratio = Math.max((double)deltax/viewport[2], (double)deltay/viewport[3]);
+				double ratio =( (start.y - e.getY()) > 0 ? 1:0) + Math.max((double)deltax/viewport[2], (double)deltay/viewport[3]);
 				//System.out.println(ratio);
 				Point3f newPos = new Point3f((float)currentRect.getCenterX(),(float)currentRect.getCenterY(),(float)(cameraStart.getZ()*ratio));
 				if (button == 1) {
@@ -321,7 +321,7 @@ implements MouseWheelListener{
 		GLU glu = new GLU();
 		gl.glMatrixMode(GL_PROJECTION);
 		gl.glLoadIdentity();
-		glu.gluPerspective(45.0, aspectRatio, 1.0, cameraStart.getZ()*1.1);
+		glu.gluPerspective(45.0, aspectRatio, 1.0, cameraStart.getZ()*2);
 
 		gl.glMatrixMode(GL_MODELVIEW);
 		gl.glLoadIdentity();
