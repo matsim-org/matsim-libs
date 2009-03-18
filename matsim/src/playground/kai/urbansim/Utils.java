@@ -14,6 +14,8 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.population.BasicPlan;
+import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Plan;
@@ -133,6 +135,12 @@ public class Utils {
 	public static void makeHomePlan( Plan plan, Coord homeCoord ) {
 		plan.createAct(ACT_HOME, homeCoord) ;
 	}
+
+	public static void makeHomePlan( BasicPopulationBuilder pb, BasicPlan plan, Coord homeCoord ) {
+		log.fatal("currently not implemented; exiting ...");
+		System.exit(-1) ;
+	}
+	
 	/**
 	 * Helper method to complete a plan with *wh in a consistent way.  Assuming that the first activity is the home activity.
 	 * 
