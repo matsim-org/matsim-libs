@@ -37,7 +37,7 @@ import org.matsim.utils.CRCChecksum;
 import org.matsim.utils.geometry.CoordImpl;
 
 
-public class RiskCostControlerTest extends MatsimTestCase{
+public class RiskCostControllerTest extends MatsimTestCase{
 	
 
 	
@@ -175,7 +175,7 @@ public class RiskCostControlerTest extends MatsimTestCase{
 		String config = getInputDirectory() + "config.xml";
 		String ref = getInputDirectory() + "events.txt.gz";
 		String compare = getOutputDirectory() + "ITERS/it.10/10.events.txt.gz";
-		new RiskCostControler(new String [] {config}).run();
+		new RiskCostController(new String [] {config}).run();
 		assertEquals("different events-files.", CRCChecksum.getCRCFromFile(ref),	CRCChecksum.getCRCFromFile(compare));
 	}
 }

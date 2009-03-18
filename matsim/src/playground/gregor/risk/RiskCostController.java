@@ -35,15 +35,15 @@ import org.matsim.network.NetworkWriter;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorBuilder;
 import org.xml.sax.SAXException;
 
-public class RiskCostControler extends Controler {
+public class RiskCostController extends Controler {
 
 	
-	private final static Logger log = Logger.getLogger(RiskCostControler.class);
+	private final static Logger log = Logger.getLogger(RiskCostController.class);
 	
 	private final HashMap<Id, EvacuationAreaLink> evacuationAreaLinks = new HashMap<Id, EvacuationAreaLink>();
 
 	
-	public RiskCostControler(final String[] args) {
+	public RiskCostController(final String[] args) {
 		super(args);
 	}
 
@@ -102,7 +102,7 @@ public class RiskCostControler extends Controler {
 	
 	
 	public static void main(final String [] args) {
-		final Controler controler = new RiskCostControler(args);
+		final Controler controler = new RiskCostController(args);
 		controler.run();
 		System.exit(0);
 	}
