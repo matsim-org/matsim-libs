@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.risk;
+package playground.gregor.sims.riskaversion;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.systemopt;
+package playground.gregor.sims.socialcost;
 
 import org.matsim.controler.listener.ControlerListener;
 import org.matsim.events.handler.EventHandler;

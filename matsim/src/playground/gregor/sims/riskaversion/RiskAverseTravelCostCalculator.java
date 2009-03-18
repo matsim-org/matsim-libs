@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MarginalTravelCostCalculatorII.java
+ * RiskAversTravelCost.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,31 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.systemopt;
+package playground.gregor.sims.riskaversion;
 
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.router.util.TravelCost;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 
-public class MarginalTravelCostCalculatorII implements TravelCost {
+public class RiskAverseTravelCostCalculator implements TravelCost {
 
-	
-
-
-	private final SocialCostCalculator sc;
 	private final TravelTimeCalculator tc;
+	private final RiskCostCalculator rc;
 
-	public MarginalTravelCostCalculatorII(final TravelTimeCalculator tc, final SocialCostCalculator sc) {
+	public RiskAverseTravelCostCalculator(final TravelTimeCalculator tc, final RiskCostCalculator rc) {
 		this.tc = tc;
-		this.sc = sc;
+		this.rc = rc;
 	}
 	
-
 	public double getLinkTravelCost(final Link link, final double time) {
-		double t = this.tc.getLinkTravelTime(link, time);
-		double s = this.sc.getSocialCost(link, time);
-		return t + s;
+		return this.tc.getLinkTravelTime(link, time) + this.rc.getLinkRisk(link,time);
 	}
-	
 
 }

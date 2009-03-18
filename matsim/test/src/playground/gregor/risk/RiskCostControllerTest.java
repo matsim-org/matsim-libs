@@ -36,6 +36,9 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.utils.geometry.CoordImpl;
 
+import playground.gregor.sims.riskaversion.RiskCostCalculator;
+import playground.gregor.sims.riskaversion.RiskCostController;
+
 
 public class RiskCostControllerTest extends MatsimTestCase{
 	

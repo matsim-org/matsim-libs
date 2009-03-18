@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RiskAversTravelCost.java
+ * MarginalCostControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,24 +18,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.risk;
+package playground.gregor.sims.socialcost;
 
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.router.util.TravelCost;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.controler.Controler;
+import org.matsim.evacuation.EvacuationQSimControler;
+import org.matsim.trafficmonitoring.PessimisticTravelTimeAggregator;
+import org.matsim.trafficmonitoring.TravelTimeAggregatorFactory;
+import org.matsim.trafficmonitoring.TravelTimeDataHashMap;
 
-public class RiskAverseTravelCostCalculator implements TravelCost {
+public class MarginalCostControler extends EvacuationQSimControler{
 
-	private final TravelTimeCalculator tc;
-	private final RiskCostCalculator rc;
 
-	public RiskAverseTravelCostCalculator(final TravelTimeCalculator tc, final RiskCostCalculator rc) {
-		this.tc = tc;
-		this.rc = rc;
-	}
-	
-	public double getLinkTravelCost(final Link link, final double time) {
-		return this.tc.getLinkTravelTime(link, time) + this.rc.getLinkRisk(link,time);
+
+	public MarginalCostControler(final String[] args) {
+		super(args);
 	}
 
+	@Override
+	protected void setup() {
+		super.setup();
+		
+		
+		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
+		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
+		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
+		SocialCostCalculator sc = new SocialCostCalculatorSingleLink(this.network,this.config.controler().getTraveltimeBinSize());
+		
+		this.events.addHandler(sc);
+		this.travelCostCalculator = new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc);
+		this.strategyManager = loadStrategyManager();
+		this.addControlerListener(sc);
+	}
+
+	public static void main(final String[] args) {
+		final Controler controler = new MarginalCostControler(args);
+		controler.run();
+		System.exit(0);
+	}
 }

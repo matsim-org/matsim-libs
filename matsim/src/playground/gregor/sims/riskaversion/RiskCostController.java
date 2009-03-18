@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.risk;
+package playground.gregor.sims.riskaversion;
 
 import java.io.IOException;
 import java.util.HashMap;

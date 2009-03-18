@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.systemopt;
+package playground.gregor.sims.socialcost;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +43,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.utils.misc.IntegerCache;
 import org.matsim.utils.misc.Time;
 
-public class SocialCostCalculatorNetworkIII implements SocialCostCalculator, IterationStartsListener,  AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
+public class SocialCostCalculatorNetworkII implements SocialCostCalculator, IterationStartsListener,  AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
 
 	private final int travelTimeBinSize;
 	private final int numSlots;
@@ -57,20 +57,21 @@ public class SocialCostCalculatorNetworkIII implements SocialCostCalculator, Ite
 	private final HashMap<String,HashMap<Integer,LinkCongestionInfo>> linkCongestion = new HashMap<String, HashMap<Integer,LinkCongestionInfo>>();
 	
 	private final static int MSA_OFFSET = 20;
+	private final static double CONGESTION_RATION_THRESHOLD = 0.9;
 	
 	static double oldCoef = 0;
 	static double newCoef = 1;
 	static int iteration = 0;
 	
-	public SocialCostCalculatorNetworkIII(final NetworkLayer network) {
+	public SocialCostCalculatorNetworkII(final NetworkLayer network) {
 		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
 	}
 
-	public SocialCostCalculatorNetworkIII(final NetworkLayer network, final int timeslice) {
+	public SocialCostCalculatorNetworkII(final NetworkLayer network, final int timeslice) {
 		this(network, timeslice, 30*3600); // default: 30 hours at most
 	}
 
-	public SocialCostCalculatorNetworkIII(final NetworkLayer network, final int timeslice,	final int maxTime) {
+	public SocialCostCalculatorNetworkII(final NetworkLayer network, final int timeslice,	final int maxTime) {
 		this.travelTimeBinSize = timeslice;
 		this.numSlots = (maxTime / this.travelTimeBinSize) + 1;
 		this.network = network;
@@ -249,20 +250,11 @@ public class SocialCostCalculatorNetworkIII implements SocialCostCalculator, Ite
 			
 			for (Entry<String,Integer> e : tmp.entrySet()) {
 				double p = (double) e.getValue() / n;
-				int con = 0;
-				int notCon = 0;
-				int sum = 0;
-				for (int j = i; j <= uB; j++) {
-					if (isLinkCongested(j, e.getKey())) {
-						con++;
-					} else {
-						notCon++;
-					}
-					sum++;
+				if (isLinkCongested(i, e.getKey())) {
+					cost += (1.0 - p) * baseCost * p;
+				} else {
+					cost += baseCost * p;
 				}
-				double c = ((double)con/sum);
-				double nc = ((double)notCon/sum);
-				cost += c * (1.0 - p) * baseCost * p + nc * baseCost * p; 
 				
 			}
 			
@@ -325,7 +317,7 @@ public class SocialCostCalculatorNetworkIII implements SocialCostCalculator, Ite
 //		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 //		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 //		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
-
+		
 		// first guess at storageCapacity:
 		double storageCapacity = (link.getLength() * link.getNumberOfLanes(Time.UNDEFINED_TIME))
 				/ ((NetworkLayer) link.getLayer()).getEffectiveCellSize() * storageCapFactor;

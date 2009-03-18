@@ -24,6 +24,8 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 
+import playground.gregor.sims.socialcost.MarginalCostControler;
+
 public class MarginalCostControlerTest extends MatsimTestCase {
 	public void testSimpleChecksum() {
 		

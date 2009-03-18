@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.systemopt;
+package playground.gregor.sims.socialcost;
 
 import java.util.ArrayList;
 import java.util.HashMap;

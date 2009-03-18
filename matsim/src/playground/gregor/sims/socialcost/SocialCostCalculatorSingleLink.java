@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.systemopt;
+package playground.gregor.sims.socialcost;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -134,7 +134,9 @@ public class SocialCostCalculatorSingleLink implements SocialCostCalculator, Ite
 			this.socCosts.put(linkId, sc);
 		}
 
-		int lB = Math.max(info.lastFSSlice ,getTimeSlotIndex(info.agentsLeftLink.peek().enterTime));
+		int lB = info.lastFSSlice + 1; 
+			
+			//Math.max(info.lastFSSlice ,getTimeSlotIndex(info.agentsLeftLink.peek().enterTime));
 		int uB = getTimeSlotIndex(eventTime) - 1;
 
 
