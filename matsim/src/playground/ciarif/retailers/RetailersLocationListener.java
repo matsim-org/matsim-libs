@@ -29,7 +29,6 @@ package playground.ciarif.retailers;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -41,13 +40,10 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.BeforeMobsimListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.ActivityOption;
 import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.router.PlansCalcRoute;
@@ -63,17 +59,14 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	public final static String CONFIG_POP_SUM_TABLE = "populationSummaryTable";
 	public final static String CONFIG_RET_SUM_TABLE = "retailersSummaryTable";
 	public final static String CONFIG_RETAILERS = "retailers";
-	public final static String CONFIG_LINKS = "links";
 	private Retailers retailers;
-	private TreeMap<Id,Link> links;
 	private RetailersSummaryWriter rs = null;
 	private PlansSummaryTable pst = null;
-	private MakeATableFromXMLFacilities mtxf = null; 
+	//private MakeATableFromXMLFacilities mtxf = null; 
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
-	private String linkIdFile = null;
 	
 	public RetailersLocationListener() {
 	}
@@ -86,8 +79,8 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		String popOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
 		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.pst = new PlansSummaryTable (popOutFile);
-		this.mtxf = new MakeATableFromXMLFacilities ("output/zurich_10pc/facilities.txt");
-		this.mtxf.write(controler.getFacilities());
+		//this.mtxf = new MakeATableFromXMLFacilities ("output/zurich_10pc/facilities.txt");
+		//this.mtxf.write(controler.getFacilities());
 		String retailersOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
 		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.rs = new RetailersSummaryWriter (retailersOutFile);
@@ -128,66 +121,45 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 				Gbl.errorMsg(e);
 			}
 		} 
-		this.linkIdFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_LINKS);
-		if (this.linkIdFile != null) { 
-			
-			try {
-				//this.links = new ArrayList();
-				System.out.println("link file " + this.linkIdFile);
-				FileReader fr = new FileReader(this.linkIdFile);
-				BufferedReader br = new BufferedReader(fr);
-				// Skip header
-				String curr_line = br.readLine();
-				while ((curr_line = br.readLine()) != null) {
-					String[] entries = curr_line.split("\t", -1);
-					// header: l_id  max_fac
-					// index:   0       1   
-				}
-			} 
-			catch (IOException e) {
-				Gbl.errorMsg(e);
-			}
-		}
-		else {//Francesco: if no file stating which links are allowed is defined, any link is allowed.
-		}
+		
 	}
 	
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-//		Controler controler = event.getControler();
-//		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
-//		
-//		// works, but it is not nicely programmed. shouldn't be a global container, should be
-//		// controlled by the controler (or actually added to the population)
-//		Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
-//		
-//		controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
-//		
-//		for (Retailer r : this.retailers.getRetailers().values()) {
-//			Map<Id,Facility> facs = r.runStrategy();
-//			movedFacilities.putAll(facs);
-//		}
-//		
-//		int iter = controler.getIteration();
-//		this.rs.write(this.retailers);
-//		
-//		for (Person p : controler.getPopulation().getPersons().values()) {
-//			pst.run(p,iter);
-//			for (Plan plan : p.getPlans()) {
-//				
-//				boolean routeIt = false;
-//				Iterator<?> actIter = plan.getIteratorAct();
-//				while (actIter.hasNext()) {
-//					Activity act = (Activity)actIter.next();
-//					if (movedFacilities.containsKey(act.getFacilityId())) {
-//						act.setLink(act.getFacility().getLink());
-//						routeIt = true;
-//					}
-//				}
-//				if (routeIt) {
-//					pcrl.run(plan);
-//				}
-//			}
-//		}
+		Controler controler = event.getControler();
+		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
+		
+		// works, but it is not nicely programmed. shouldn't be a global container, should be
+		// controlled by the controler (or actually added to the population)
+		Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
+		
+		controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
+		
+		for (Retailer r : this.retailers.getRetailers().values()) {
+			Map<Id,Facility> facs = r.runStrategy();
+			movedFacilities.putAll(facs);
+		}
+		
+		int iter = controler.getIteration();
+		this.rs.write(this.retailers);
+		
+		for (Person p : controler.getPopulation().getPersons().values()) {
+			pst.run(p,iter);
+			for (Plan plan : p.getPlans()) {
+				
+				boolean routeIt = false;
+				Iterator<?> actIter = plan.getIteratorAct();
+				while (actIter.hasNext()) {
+					Activity act = (Activity)actIter.next();
+					if (movedFacilities.containsKey(act.getFacilityId())) {
+						act.setLink(act.getFacility().getLink());
+						routeIt = true;
+					}
+				}
+				if (routeIt) {
+					pcrl.run(plan);
+				}
+			}
+		}
 	}	
 	
 	private final QuadTree<Person> createPersonQuadTree(Controler controler) {

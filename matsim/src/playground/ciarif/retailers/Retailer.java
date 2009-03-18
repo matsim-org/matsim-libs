@@ -31,7 +31,6 @@ public class Retailer {
 	public final boolean addStrategy (Controler controler, String strategyName) {
 		System.out.println("Strategy to be added= " + strategyName);	
 		System.out.println("Actual Strategy = " + this.strategy);
-		System.out.println("Strategy = " + CatchmentAreaRetailerStrategy.NAME);
 		if (strategyName.equals(RandomRetailerStrategy.NAME)) {
 			this.strategy = new RandomRetailerStrategy(controler.getNetwork());
 			return true;

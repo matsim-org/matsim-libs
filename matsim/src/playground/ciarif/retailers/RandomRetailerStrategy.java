@@ -10,8 +10,8 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 
 public class RandomRetailerStrategy implements RetailerStrategy {
-	private final ArrayList<Link> links;
 	
+	private final ArrayList<Link> links;
 	public static final String NAME = "RandomRetailerStrategy";
 	
 	public RandomRetailerStrategy (NetworkLayer network) {

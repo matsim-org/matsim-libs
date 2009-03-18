@@ -27,5 +27,7 @@ public class RetailersControler {
     	Controler controler = new Controler(args);
     	controler.addControlerListener(new RetailersLocationListener());
     	controler.run();
+    	
+    	
     }
 }

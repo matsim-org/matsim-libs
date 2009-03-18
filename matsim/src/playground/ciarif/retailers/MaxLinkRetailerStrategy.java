@@ -28,7 +28,6 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId().toString());
 			double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(link.getId().toString());
-			System.out.println ("currentlink_volumes = " + currentlink_volumes);
 			double currentlink_volume =0;
 			double newlink_volume =0;
 			for (int j=0; j<currentlink_volumes.length;j=j+1) {
