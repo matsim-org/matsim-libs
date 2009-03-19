@@ -78,7 +78,7 @@ public class CreateShops {
 		while (facilities_it.hasNext()) {
 			ZHFacilityComposed facility = facilities_it.next();
 		
-			String key = facility.getPLZ()+ facility.getStreet();
+			String key = facility.getDesc()+facility.getPLZ()+ facility.getStreet();
 			facilitiesMap.put(key, facility);
 		}
 		return facilitiesMap;

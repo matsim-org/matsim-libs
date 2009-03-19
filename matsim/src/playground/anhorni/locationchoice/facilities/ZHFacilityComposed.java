@@ -17,7 +17,7 @@ public class ZHFacilityComposed {
 	private String sizeCategory = "-1";
 	private double size = -1;
 	private String shopType = "-1";
-	private double hrsWeek = -1;
+	private String desc = "-1";
 	private int parkingLots = -1;
 	private double parkingCostsPerHour = -1;
 	
@@ -31,7 +31,7 @@ public class ZHFacilityComposed {
 	
 	
 	public ZHFacilityComposed(String id, String retailerCategory, String name, String street, String hnr,
-			String plz, String city, double x, double y, String shopType) {
+			String plz, String city, double x, double y, String shopType, String desc) {
 		super();
 		this.id = id;
 		this.retailerCategory = retailerCategory;
@@ -43,6 +43,7 @@ public class ZHFacilityComposed {
 		this.x = x;
 		this.y = y;
 		this.shopType = shopType;
+		this.desc = desc;
 	}
 	
 	
@@ -148,12 +149,6 @@ public class ZHFacilityComposed {
 		return hrs;
 	}
 
-
-	public void setHrsWeek(double hrsWeek) {
-		this.hrsWeek = hrsWeek;
-	}
-
-
 	public int getParkingLots() {
 		return parkingLots;
 	}
@@ -181,5 +176,15 @@ public class ZHFacilityComposed {
 
 	public void setOpentimes(double[][] opentimes) {
 		this.opentimes = opentimes;
+	}
+
+
+	public String getDesc() {
+		return desc;
+	}
+
+
+	public void setDesc(String desc) {
+		this.desc = desc;
 	}
 }

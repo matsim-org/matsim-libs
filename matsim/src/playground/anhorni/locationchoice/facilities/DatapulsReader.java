@@ -71,7 +71,7 @@ public class DatapulsReader {
 				double y = Double.parseDouble(ys);
 				String desc = entries[11].trim();
 				
-				ZHFacilityComposed zhfacility = new ZHFacilityComposed(id, retailerCategory, name, street, HNR, PLZ, city, x, y, desc);
+				ZHFacilityComposed zhfacility = new ZHFacilityComposed(id, retailerCategory, name, street, HNR, PLZ, city, x, y, "-1", desc);
 				if (retailerCategory.equals("8") || retailerCategory.equals("9")) {
 					boolean set = false;
 					for (int i = 0; i < types2add.length; i++) {
@@ -87,9 +87,6 @@ public class DatapulsReader {
 				else {
 					zhfacilities.add(zhfacility);
 				}
-								
-				
-			
 			}
 		} catch (IOException e) {
 				Gbl.errorMsg(e);

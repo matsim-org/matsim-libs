@@ -25,7 +25,7 @@ public class ShopsWriter {
 		try {
 			
 			String header ="id\tx\ty\tRetailer_category\tName\tZIP\tCity\tStreet\tHNR\tSize_category\tSize\t" +
-					"Shop_type\tHrs_week\tParking_lots\tParking_costs_perhour";
+					"Shop_type\tDesc\tHrs_week\tParking_lots\tParking_costs_perhour";
 			
 			header +=	"MON_start\tMON_break_start\tMON_break_end\tMON_end\t" +
 						"TUE_start\tTUE_break_start\tTUE_break_end\tTUE_end\t" +
@@ -52,6 +52,8 @@ public class ShopsWriter {
 				shops.write(facility.getSizeCategory() +"\t");
 				shops.write(facility.getSize() +"\t");
 				shops.write(facility.getShopType() +"\t");
+				shops.write(facility.getDesc() +"\t");
+				
 				int whours = (int)(facility.getHrsWeek()) / 3600;
 				int wremainder = (int)facility.getHrsWeek() % 3600;
 				int wminutes = (int)wremainder / 60;

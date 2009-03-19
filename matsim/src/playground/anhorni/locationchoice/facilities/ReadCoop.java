@@ -37,10 +37,8 @@ public class ReadCoop {
 				}
 				else {
 					street = streetAndNumber.toUpperCase();
-					
 				}
-			
-				String key = PLZ + street.trim();
+				String key = entries[7].trim()+ PLZ + street.trim();
 				if (zhfacilities.get(key) != null && zhfacilities.get(key).getRetailerCategory().equals("Coop")) {
 					zhfacilities.get(key).setShopType(entries[5].trim());
 					log.info(key + " attribute added");
