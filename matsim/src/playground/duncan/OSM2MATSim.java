@@ -29,9 +29,9 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
+import org.matsim.utils.io.OsmNetworkReader;
 import org.xml.sax.SAXException;
 
-import playground.marcel.osm2matsim.OsmNetworkReader;
 
 public class OSM2MATSim {
 	private static final Logger log = Logger.getLogger(OSM2MATSim.class);

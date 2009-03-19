@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.osm2matsim;
+package org.matsim.utils.io;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,7 +41,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.geometry.CoordinateTransformation;
-import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Counter;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -320,6 +319,15 @@ public class OsmNetworkReader {
 				oneway = false;
 			} else if ("no".equals(onewayTag)) {
 				oneway = false; // may be used to overwrite defaults
+			}
+		}
+		
+		if (way.tags.containsKey("maxspeed")) {
+			Double maxspeed = Double.valueOf(way.tags.get("maxspeed"));
+			if (maxspeed < freespeed) {
+				// freespeed doesn't always mean it's the maximum speed allowed.
+				// thus only correct freespeed if maxspeed is lower than freespeed.
+				freespeed = maxspeed;
 			}
 		}
 
