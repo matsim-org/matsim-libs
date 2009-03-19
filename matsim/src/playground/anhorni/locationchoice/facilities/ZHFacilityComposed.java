@@ -73,7 +73,7 @@ public class ZHFacilityComposed {
 		this.street = street;
 	}
 	public String getHNR() {
-		return HNR;
+	 return this.HNR;		
 	}
 	public void setHNR(String hnr) {
 		HNR = hnr;
@@ -139,7 +139,13 @@ public class ZHFacilityComposed {
 
 
 	public double getHrsWeek() {
-		return hrsWeek;
+		double hrs = 0.0;
+		for (int i = 0; i < 7; i++) {
+			for (int j = 0; j < 4; j = j + 2) {
+				hrs += opentimes[i][j + 1] - opentimes[i][j];
+			}
+		}
+		return hrs;
 	}
 
 

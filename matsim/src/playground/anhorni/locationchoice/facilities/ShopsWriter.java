@@ -52,7 +52,11 @@ public class ShopsWriter {
 				shops.write(facility.getSizeCategory() +"\t");
 				shops.write(facility.getSize() +"\t");
 				shops.write(facility.getShopType() +"\t");
-				shops.write(facility.getHrsWeek() +"\t");
+				int whours = (int)(facility.getHrsWeek()) / 3600;
+				int wremainder = (int)facility.getHrsWeek() % 3600;
+				int wminutes = (int)wremainder / 60;
+				shops.write((whours < 10 ? "0" : "") + whours + ":" + (wminutes < 10 ? "0" : "") + wminutes +"\t");
+				
 				shops.write(facility.getParkingLots() +"\t");
 				shops.write(facility.getParkingCostsPerHour() +"\t");
 				
