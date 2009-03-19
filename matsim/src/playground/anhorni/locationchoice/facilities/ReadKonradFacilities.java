@@ -30,7 +30,7 @@ public class ReadKonradFacilities {
 		
 			String [] entries = facility.getId().toString().trim().split("_", -1);
 			String retailerCategory = entries[0].trim();
-			String desc = entries[1].trim();
+			String shopType = entries[1].trim();
 			String PLZ = entries[4].trim();
 			String city = entries[5].trim();
 			String streetAndNumber = entries[6].trim();
@@ -56,7 +56,7 @@ public class ReadKonradFacilities {
 			
 			ZHFacilityComposed zhfacility = new ZHFacilityComposed(
 				"0", retailerCategory, "no name", street.trim(), HNR, PLZ, city, 
-				facility.getCoord().getX(), facility.getCoord().getY(), desc);
+				facility.getCoord().getX(), facility.getCoord().getY(), shopType);
 			
 			double opentimes[][] = {{-1,-1,-1,-1}, 
 					{-1,-1,-1,-1},
@@ -83,7 +83,9 @@ public class ReadKonradFacilities {
 						opentimes[i][3] = set.first().getEndTime();
 					}
 				}
+				i++;
 			}
+			zhfacility.setOpentimes(opentimes);
 			zhfacilities.add(zhfacility);
 		}
 		return zhfacilities;

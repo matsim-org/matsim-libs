@@ -9,7 +9,6 @@ public class ZHFacilityComposed {
 	private double y = -1;
 	private String retailerCategory ="-1";
 	private String name = "-1";
-	private String desc = "-1";
 	
 	private String PLZ = "-1";
 	private String city = "-1";
@@ -32,7 +31,7 @@ public class ZHFacilityComposed {
 	
 	
 	public ZHFacilityComposed(String id, String retailerCategory, String name, String street, String hnr,
-			String plz, String city, double x, double y, String desc) {
+			String plz, String city, double x, double y, String shopType) {
 		super();
 		this.id = id;
 		this.retailerCategory = retailerCategory;
@@ -43,7 +42,7 @@ public class ZHFacilityComposed {
 		this.city = city;
 		this.x = x;
 		this.y = y;
-		this.desc = desc;
+		this.shopType = shopType;
 	}
 	
 	
@@ -103,13 +102,7 @@ public class ZHFacilityComposed {
 	public void setY(double y) {
 		this.y = y;
 	}
-	public String getDesc() {
-		return desc;
-	}
-	public void setDesc(String desc) {
-		this.desc = desc;
-	}
-	
+
 	public CoordImpl getCoords() {
 		return new CoordImpl(this.x,this.y);
 	}

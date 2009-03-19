@@ -54,13 +54,11 @@ public class CreateShops {
 		writer.writeNelsonFacilities(zhfacilities);
 		writer.writeDatapulsFacilities(datapulsFacilities);
 		writer.finish();
-		
+		*/
 		
 		
 		log.info("write shops dataset");
 		ShopsWriter shopsWriter = new ShopsWriter();
-		shopsWriter.write(datapulsFacilities);
-		*/
-		
+		shopsWriter.write(konradFacilities);		
 	}
 }

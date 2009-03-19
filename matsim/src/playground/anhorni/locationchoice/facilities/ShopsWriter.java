@@ -24,7 +24,7 @@ public class ShopsWriter {
 	public void write(List<ZHFacilityComposed> zhfacilities)  {
 		try {
 			
-			String header ="id\tx\ty\tRetailer_category\tName\tDesc\tZIP\tCity\tStreet\tHNR\tSize_category\tSize\t" +
+			String header ="id\tx\ty\tRetailer_category\tName\tZIP\tCity\tStreet\tHNR\tSize_category\tSize\t" +
 					"Shop_type\tHrs_week\tParking_lots\tParking_costs_perhour";
 			
 			header +=	"MON_start\tMON_break_start\tMON_break_end\tMON_end\t" +
@@ -45,7 +45,6 @@ public class ShopsWriter {
 				shops.write(facility.getCoords().getY() +"\t");
 				shops.write(facility.getRetailerCategory() +"\t");
 				shops.write(facility.getName() +"\t");
-				shops.write(facility.getDesc() +"\t");
 				shops.write(facility.getPLZ() +"\t");
 				shops.write(facility.getCity() +"\t");
 				shops.write(facility.getStreet() +"\t");
@@ -59,7 +58,17 @@ public class ShopsWriter {
 				
 				for (int i = 0; i < 7; i++) {
 					for (int j = 0; j < 4; j++) {
-						shops.write(facility.getOpentimes()[i][j] +"\t");
+						
+						if (facility.getOpentimes()[i][j] > 0.0) {
+							int hours = (int)(facility.getOpentimes()[i][j]) / 3600;
+							int remainder = (int)facility.getOpentimes()[i][j] % 3600;
+							int minutes = (int)remainder / 60;
+							
+							shops.write((hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes +"\t");
+						}
+						else {
+							shops.write(facility.getOpentimes()[i][j] +"\t");
+						}	                           
 					}
 				}
 				
