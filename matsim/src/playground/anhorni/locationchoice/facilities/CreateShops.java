@@ -31,6 +31,7 @@ public class CreateShops {
 		datapulsFacilities = filter.filterFacilities(datapulsFacilities);
 		GroceryFilter groceryFilter = new GroceryFilter();
 		datapulsFacilities = groceryFilter.filterFacilities(datapulsFacilities);
+		log.info("Number of datapuls facilities: " + datapulsFacilities.size());
 		
 		log.info("complete datapuls shops");
 		
@@ -44,7 +45,7 @@ public class CreateShops {
 		
 		log.info("compare facilities ...");
 		CompareFacilities comparator = new CompareFacilities();
-		comparator.compareCoordinates(konradFacilities, datapulsFacilities);
+		comparator.compare(konradFacilities, datapulsFacilities);
 		
 		/*
 		log.info("creating shp file ...");
