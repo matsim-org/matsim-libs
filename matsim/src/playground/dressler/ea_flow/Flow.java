@@ -21,13 +21,11 @@
 package playground.dressler.ea_flow;
 
 //java imports
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicActivityImpl;
-import org.matsim.basic.v01.BasicLegImpl;
-import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
@@ -37,9 +35,12 @@ import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.ActivityImpl;
+import org.matsim.population.LegImpl;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationImpl;
+import org.matsim.population.routes.LinkCarRoute;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
@@ -639,7 +640,7 @@ public class Flow {
 				
 				//if (!emptylegs) { 
 					// normal case, write the routes!
-					BasicRouteImpl route;
+					LinkCarRoute route;
 					
 					Node firstnode  = _network.getLink(ids.get(0)).getFromNode();
 					
@@ -648,7 +649,7 @@ public class Flow {
 						//add the first edge if olfile exists
 						String stringid = null;
 						Person orgperson = null;
-						if(org && ( orgpersons.get(firstnode))!=null ){
+						if(org && (( orgpersons.get(firstnode))!=null) ){
 							LinkedList<Person> list = orgpersons.get(firstnode);
 							orgperson = list.getFirst();
 							list.remove(0);
@@ -662,33 +663,43 @@ public class Flow {
 							stringid = "new"+String.valueOf(id);
 							id++;
 						}
-						route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
+
+//						route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
+						Link startLink = _network.getLink(ids.get(0));
+						Link endLink = _network.getLink(ids.get(ids.size()-1));
+						route = new LinkCarRoute(startLink, endLink);
 						
+						List<Link> routeLinks = null;
 						if (ids.size() > 1) {
-							route.setLinkIds(ids.subList(1, ids.size()-1));
-						} else {
-							route.setLinkIds(null);
-						}
+							routeLinks = new ArrayList<Link>();
+//							route.setLinkIds(ids.subList(1, ids.size()-1));
+							for (Id iid : ids.subList(1, ids.size()-1)){
+								routeLinks.add(_network.getLink(iid));
+							}
+						} 
+						route.setLinks(startLink, routeLinks, endLink);
+
 						
-						BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.car);
+						LegImpl leg = new LegImpl(BasicLeg.Mode.car);
 						//Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 						leg.setRoute(route);
-						BasicActivityImpl home = new BasicActivityImpl("h");
+						Link fromlink =_network.getLink(ids.getFirst());
+						ActivityImpl home = new ActivityImpl("h", fromlink);
+//						home.setLinkId(fromlink.getId());
+						Link tolink =_network.getLink(ids.getLast());
+						ActivityImpl work = new ActivityImpl("w", tolink);
+//						work.setLinkId(tolink.getId());
+						
+
 						//Act home = new org.matsim.population.ActImpl("h", path.getPathEdges().getFirst().getEdge());
 						home.setEndTime(0);
 						//home.setCoord(_network.getLink(ids.getFirst()).getFromNode().getCoord());	
 						// no end time for now.
 						//home.setEndTime(path.getPathEdges().getFirst().getTime());
 						
-						BasicActivityImpl work = new BasicActivityImpl("w");
 						//Act work = new org.matsim.population.ActImpl("w", path.getPathEdges().getLast().getEdge());
 						work.setEndTime(0);
 						//work.setCoord(_network.getLink(ids.getLast()).getToNode().getCoord());
-						Link fromlink =_network.getLink(ids.getFirst());
-						Link tolink =_network.getLink(ids.getLast());
-						
-						home.setLinkId(fromlink.getId());
-						work.setLinkId(tolink.getId());
 						
 						
 						Id matsimid  = new IdImpl(stringid);
@@ -774,6 +785,7 @@ public class Flow {
 	/**
 	 * returns a String representation of a TimeExpandedPath
 	 */
+	@Override
 	public String toString(){
 		StringBuilder strb = new StringBuilder();
 		for(Link link : _flow.keySet()){
