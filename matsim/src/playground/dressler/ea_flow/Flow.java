@@ -657,7 +657,9 @@ public class Flow {
 								orgpersons.remove(firstnode);
 							}
 							Link firstlink = orgperson.getPlans().get(0).getFirstActivity().getLink();
+							if(i==1){
 							ids.add(0,firstlink.getId());
+							}
 							stringid = orgperson.getId().toString();
 						}else{
 							stringid = "new"+String.valueOf(id);
