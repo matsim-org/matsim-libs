@@ -10,9 +10,8 @@ public class CompareFacilities {
 	
 	private final static Logger log = Logger.getLogger(CompareFacilities.class);
 	
-	public TreeMap<String, ZHFacilityComposed> compare(List<ZHFacilityComposed> konradFacilities, List<ZHFacilityComposed> datapulsFacilities) {
+	public TreeMap<String, ZHFacilityComposed> compare(List<ZHFacilityComposed> konradFacilities, TreeMap<String, ZHFacilityComposed> datapulsFacilitiesMap) {
 		
-		TreeMap<String, ZHFacilityComposed> datapulsFacilitiesMap = createTree(datapulsFacilities);
 		List<String> keys2Remove = new Vector<String>();
 		
 		int coordinatesNotMatched = 0;
@@ -21,7 +20,8 @@ public class CompareFacilities {
 		Iterator<ZHFacilityComposed> facilities_it = konradFacilities.iterator();
 		while (facilities_it.hasNext()) {
 			ZHFacilityComposed konradFacility = facilities_it.next();
-			ZHFacilityComposed datapulsFacility = datapulsFacilitiesMap.get(konradFacility.getPLZ() + konradFacility.getStreet());
+			String key = konradFacility.getPLZ() + konradFacility.getStreet();
+			ZHFacilityComposed datapulsFacility = datapulsFacilitiesMap.get(key);
 			
 			if (datapulsFacility != null) {
 				if (konradFacility.getCoords().calcDistance(datapulsFacility.getCoords()) > 100.0) {
@@ -37,7 +37,7 @@ public class CompareFacilities {
 				keys2Remove.add(datapulsFacility.getPLZ()+ datapulsFacility.getStreet());			
 			}
 			else {
-				log.info(konradFacility.getRetailerCategory() + " " +  konradFacility.getStreet() + " is not in datapuls data set");
+				log.info(key + " is not in datapuls data set");
 				recordNotPresent++;
 			}
 		}
@@ -50,17 +50,6 @@ public class CompareFacilities {
 		return datapulsFacilitiesMap;
 	}
 	
-	private TreeMap<String, ZHFacilityComposed>  createTree(List<ZHFacilityComposed> datapulsFacilities) {
-		TreeMap<String, ZHFacilityComposed> datapulsFacilitiesMap = new TreeMap<String, ZHFacilityComposed>();
-		Iterator<ZHFacilityComposed> facilities_it = datapulsFacilities.iterator();
-		while (facilities_it.hasNext()) {
-			ZHFacilityComposed facility = facilities_it.next();
-		
-			String key = facility.getPLZ()+ facility.getStreet();
-			datapulsFacilitiesMap.put(key, facility);
-		}
-		return datapulsFacilitiesMap;
-	}
 	
 	private void printAdditionalDatapulsFacilities(TreeMap<String, ZHFacilityComposed> datapulsFacilitiesMap) {
 		

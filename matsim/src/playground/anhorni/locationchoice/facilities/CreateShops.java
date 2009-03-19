@@ -48,12 +48,14 @@ public class CreateShops {
 		ReadCoop readCoop = new ReadCoop();
 		readCoop.completeWithCoop("input/facilities/coop-zh.csv", konradFacilitiesMap);
 		
+		/*
 		konradFacilities.clear();
 		konradFacilities.addAll(konradFacilitiesMap.values());
+		*/
 		
 		log.info("compare facilities ...");
 		CompareFacilities comparator = new CompareFacilities();
-		comparator.compare(konradFacilities, datapulsFacilities);
+		comparator.compare(konradFacilities, createTreeReduced(datapulsFacilities));
 		
 		
 		
@@ -78,7 +80,18 @@ public class CreateShops {
 		while (facilities_it.hasNext()) {
 			ZHFacilityComposed facility = facilities_it.next();
 		
-			String key = facility.getDesc()+facility.getPLZ()+ facility.getStreet();
+			String key = facility.getDesc()+ facility.getPLZ()+ facility.getStreet();
+			facilitiesMap.put(key, facility);
+		}
+		return facilitiesMap;
+	}
+	
+	private static TreeMap<String, ZHFacilityComposed>  createTreeReduced(List<ZHFacilityComposed> facilities) {
+		TreeMap<String, ZHFacilityComposed> facilitiesMap = new TreeMap<String, ZHFacilityComposed>();
+		Iterator<ZHFacilityComposed> facilities_it = facilities.iterator();
+		while (facilities_it.hasNext()) {
+			ZHFacilityComposed facility = facilities_it.next();		
+			String key = facility.getPLZ()+ facility.getStreet();
 			facilitiesMap.put(key, facility);
 		}
 		return facilitiesMap;
