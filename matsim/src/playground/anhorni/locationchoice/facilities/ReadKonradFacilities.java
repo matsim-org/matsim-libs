@@ -4,12 +4,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Facility;
 
 public class ReadKonradFacilities {
+	
+	private final static Logger log = Logger.getLogger(ReadKonradFacilities.class);
 	
 	public List<ZHFacilityComposed> readFacilities(String file) {
 		
@@ -28,23 +32,28 @@ public class ReadKonradFacilities {
 			String PLZ = entries[4].trim();
 			String city = entries[5].trim();
 			String streetAndNumber = entries[6].trim();
-			
+					
 			String [] addressParts = streetAndNumber.split(" ", -1);
 			
 			String HNR = "-1";
-			String lastElement = addressParts[addressParts.length];
+			String lastElement = addressParts[addressParts.length -1];
+			
+			log.info(lastElement);
 			
 			String street = "";
-			if (lastElement.matches("\\d{1-5}"))  {
+			if (lastElement.matches("\\d{1,7}"))  {
 				HNR = lastElement;
-				street = streetAndNumber.substring(0, addressParts.length -1).toLowerCase();
+				for (int i = 0; i < addressParts.length-1; i++) {
+					street +=  addressParts[i].charAt(0) + 
+						addressParts[i].substring(1, addressParts[i].length()).toLowerCase() + " ";
+				}
 			}
 			else {
 				street = streetAndNumber;
 			}
 			
 			ZHFacilityComposed zhfacility = new ZHFacilityComposed(
-				"0", retailerCategory, "no name", street, HNR, PLZ, city, 
+				"0", retailerCategory, "no name", street.trim(), HNR, PLZ, city, 
 				facility.getCoord().getX(), facility.getCoord().getY(), desc);
 			
 			zhfacilities.add(zhfacility);
