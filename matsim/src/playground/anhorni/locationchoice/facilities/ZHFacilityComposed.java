@@ -1,6 +1,5 @@
 package playground.anhorni.locationchoice.facilities;
 
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
 public class ZHFacilityComposed {
@@ -111,7 +110,7 @@ public class ZHFacilityComposed {
 		this.desc = desc;
 	}
 	
-	public Coord getCoords() {
+	public CoordImpl getCoords() {
 		return new CoordImpl(this.x,this.y);
 	}
 
