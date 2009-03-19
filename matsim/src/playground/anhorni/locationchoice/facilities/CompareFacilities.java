@@ -4,15 +4,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
-
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicOpeningTime.DayType;
 
 public class CompareFacilities {
 	
 	private final static Logger log = Logger.getLogger(CompareFacilities.class);
 	
-	public void compare(List<ZHFacilityComposed> konradFacilities, List<ZHFacilityComposed> datapulsFacilities) {
+	public TreeMap<String, ZHFacilityComposed> compare(List<ZHFacilityComposed> konradFacilities, List<ZHFacilityComposed> datapulsFacilities) {
 		
 		TreeMap<String, ZHFacilityComposed> datapulsFacilitiesMap = createTree(datapulsFacilities);
 		List<String> keys2Remove = new Vector<String>();
@@ -49,7 +47,7 @@ public class CompareFacilities {
 		log.info("Number of not matched coordinates: " + coordinatesNotMatched);
 		log.info("Number of not in datapuls dataset: " + recordNotPresent + "\n --------------------------");	
 		printAdditionalDatapulsFacilities(datapulsFacilitiesMap);
-			
+		return datapulsFacilitiesMap;
 	}
 	
 	private TreeMap<String, ZHFacilityComposed>  createTree(List<ZHFacilityComposed> datapulsFacilities) {

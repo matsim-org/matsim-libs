@@ -1,6 +1,9 @@
 package playground.anhorni.locationchoice.facilities;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.TreeMap;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
@@ -32,10 +35,7 @@ public class CreateShops {
 		GroceryFilter groceryFilter = new GroceryFilter();
 		datapulsFacilities = groceryFilter.filterFacilities(datapulsFacilities);
 		log.info("Number of datapuls facilities: " + datapulsFacilities.size());
-		
-		log.info("complete datapuls shops");
-		
-		
+			
 		log.info("create Konrad facilities");
 		ReadKonradFacilities konradReader = new ReadKonradFacilities();
 		List<ZHFacilityComposed> konradFacilities = konradReader.readFacilities("input/facilities/facilities_shopsOf2005.xml");
@@ -43,9 +43,19 @@ public class CreateShops {
 		log.info("filter Konrad facilities");
 		konradFacilities = filter.filterFacilities(konradFacilities);
 		
+		log.info("complete Konrad shops");
+		TreeMap<String, ZHFacilityComposed> konradFacilitiesMap = createTree(konradFacilities);
+		ReadCoop readCoop = new ReadCoop();
+		readCoop.completeWithCoop("input/facilities/coop-zh.csv", konradFacilitiesMap);
+		
+		konradFacilities.clear();
+		konradFacilities.addAll(konradFacilitiesMap.values());
+		
 		log.info("compare facilities ...");
 		CompareFacilities comparator = new CompareFacilities();
 		comparator.compare(konradFacilities, datapulsFacilities);
+		
+		
 		
 		/*
 		log.info("creating shp file ...");
@@ -61,4 +71,17 @@ public class CreateShops {
 		ShopsWriter shopsWriter = new ShopsWriter();
 		shopsWriter.write(konradFacilities);		
 	}
+	
+	private static TreeMap<String, ZHFacilityComposed>  createTree(List<ZHFacilityComposed> facilities) {
+		TreeMap<String, ZHFacilityComposed> datapulsFacilitiesMap = new TreeMap<String, ZHFacilityComposed>();
+		Iterator<ZHFacilityComposed> facilities_it = facilities.iterator();
+		while (facilities_it.hasNext()) {
+			ZHFacilityComposed facility = facilities_it.next();
+		
+			String key = facility.getPLZ()+ facility.getStreet();
+			datapulsFacilitiesMap.put(key, facility);
+		}
+		return datapulsFacilitiesMap;
+	}
+	
 }
