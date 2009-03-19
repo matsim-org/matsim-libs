@@ -43,7 +43,7 @@ public class ReadKonradFacilities {
 			String street = "";
 			if (lastElement.matches("\\d{1,7}") || lastElement.contains("-") || lastElement.contains("/") ||
 					lastElement.endsWith("a") || lastElement.endsWith("A") || lastElement.contains("+") || 
-					lastElement.endsWith("c") || lastElement.endsWith("c"))  {
+					lastElement.endsWith("c") || lastElement.endsWith("b"))  {
 				HNR = lastElement;
 				for (int i = 0; i < addressParts.length-1; i++) {
 					street +=  addressParts[i].toUpperCase() + " ";

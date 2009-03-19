@@ -73,15 +73,14 @@ public class CreateShops {
 	}
 	
 	private static TreeMap<String, ZHFacilityComposed>  createTree(List<ZHFacilityComposed> facilities) {
-		TreeMap<String, ZHFacilityComposed> datapulsFacilitiesMap = new TreeMap<String, ZHFacilityComposed>();
+		TreeMap<String, ZHFacilityComposed> facilitiesMap = new TreeMap<String, ZHFacilityComposed>();
 		Iterator<ZHFacilityComposed> facilities_it = facilities.iterator();
 		while (facilities_it.hasNext()) {
 			ZHFacilityComposed facility = facilities_it.next();
 		
 			String key = facility.getPLZ()+ facility.getStreet();
-			datapulsFacilitiesMap.put(key, facility);
+			facilitiesMap.put(key, facility);
 		}
-		return datapulsFacilitiesMap;
+		return facilitiesMap;
 	}
-	
 }
