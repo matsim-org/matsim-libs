@@ -32,6 +32,18 @@ public class CreateShops {
 		GroceryFilter groceryFilter = new GroceryFilter();
 		datapulsFacilities = groceryFilter.filterFacilities(datapulsFacilities);
 		
+		log.info("complete datapuls shops");
+		
+		
+		log.info("create Konrad facilities");
+		ReadKonradFacilities konradReader = new ReadKonradFacilities();
+		List<ZHFacilityComposed> konradFacilities = konradReader.readFacilities("input/facilities_shopsOf2005.xml");
+		
+		log.info("compare facilities ...");
+		CompareFacilities comparator = new CompareFacilities();
+		comparator.compareCoordinates(konradFacilities, datapulsFacilities);
+		
+		
 		log.info("creating shp file ...");
 		SHPWriter writer = new SHPWriter();
 		writer.write(hectares);
@@ -39,7 +51,7 @@ public class CreateShops {
 		writer.writeDatapulsFacilities(datapulsFacilities);
 		writer.finish();
 		
-		log.info("complete datapuls shops");
+		
 		
 		log.info("write shops dataset");
 		ShopsWriter shopsWriter = new ShopsWriter();

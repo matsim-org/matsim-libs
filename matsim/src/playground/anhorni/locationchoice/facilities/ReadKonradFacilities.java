@@ -34,18 +34,20 @@ public class ReadKonradFacilities {
 			String HNR = "-1";
 			String lastElement = addressParts[addressParts.length];
 			
+			String street = "";
 			if (lastElement.matches("\\d{1-5}"))  {
 				HNR = lastElement;
+				street = streetAndNumber.substring(0, addressParts.length -1).toLowerCase();
 			}
-			String street = null;
+			else {
+				street = streetAndNumber;
+			}
 			
-			
-		
-		
-		
 			ZHFacilityComposed zhfacility = new ZHFacilityComposed(
 				"0", retailerCategory, "no name", street, HNR, PLZ, city, 
 				facility.getCoord().getX(), facility.getCoord().getY(), desc);
+			
+			zhfacilities.add(zhfacility);
 		}
 		
 		
