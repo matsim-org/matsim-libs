@@ -150,7 +150,7 @@ public class MultiSourceEAF {
 		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618_10p_5s.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
 		//networkfile = "./examples/meine_EA/swissold_network_5s.xml";
-		networkfile = "./examples/meine_EA/siouxfalls_network_5s_euclid.xml";
+		networkfile = "/homes/combi/Projects/ADVEST/testcases/siouxfalls_network_5s_euclid.xml";
 
 
 		//networkfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
@@ -158,7 +158,7 @@ public class MultiSourceEAF {
 
 		String plansfile = null;		
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
-		//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans_simple.xml";
+		plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans_simple.xml";
 		//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
 
@@ -175,8 +175,9 @@ public class MultiSourceEAF {
 		//outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_euclid_demands_100_empty.xml";
 
 		//outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_demand_100_emptylegs.xml";
-		outputplansfile = "/homes/combi/dressler/stuff/testplans.xml";
-
+		//outputplansfile = "/homes/combi/dressler/stuff/testplans.xml";
+		outputplansfile = "/homes/combi/schneide/fricke/testplans.xml";
+		
 		int uniformDemands = 100;
 
 		//set parameters

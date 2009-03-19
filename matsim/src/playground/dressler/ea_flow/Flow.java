@@ -624,7 +624,7 @@ public class Flow {
 		}
 		
 		//construct Population
-		Population result =new PopulationImpl();
+		Population result =new PopulationImpl(PopulationImpl.NO_STREAMING);
 		int id =1;
 		for (TimeExpandedPath path : this._TimeExpandedPaths){
 			if(path.isforward()){
