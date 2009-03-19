@@ -23,7 +23,7 @@ public class CompareFacilities {
 			ZHFacilityComposed datapulsFacility = datapulsFacilitiesMap.get(konradFacility.getPLZ() + konradFacility.getStreet());
 			
 			if (datapulsFacility != null) {
-				if (konradFacility.getCoords().calcDistance(datapulsFacility.getCoords()) > 10.0) {
+				if (konradFacility.getCoords().calcDistance(datapulsFacility.getCoords()) > 100.0) {
 					log.info(konradFacility.getRetailerCategory() + " " +  konradFacility.getStreet() + 
 							" X: " + konradFacility.getCoords().getX() +" Y: " + konradFacility.getCoords().getY() +
 							datapulsFacility.getRetailerCategory() + " " +  datapulsFacility.getStreet() + 

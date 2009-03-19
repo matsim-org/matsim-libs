@@ -49,7 +49,12 @@ public class DatapulsReader {
 				String retailerCategory = entries[1].trim();
 				String id = entries[3].trim();
 				String name = entries[4].trim();
-				String street = entries[5].trim();
+				String streetItem = entries[5].trim();
+				
+				String street = "-1";
+				if (streetItem.length() > 1) {
+					street = streetItem.toUpperCase();
+				}
 				String HNR = entries[6].trim();
 				String PLZ = entries[7].trim();
 				String city = entries[8].trim();
