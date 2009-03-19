@@ -603,7 +603,7 @@ public class Flow {
 	public Population createPoulation(String oldfile){
 		//check whether oldfile exists
 		boolean org = (oldfile!=null);
-		HashMap<Node,Person> orgpersons = new  HashMap<Node,Person>();
+		HashMap<Node,LinkedList<Person>> orgpersons = new  HashMap<Node,LinkedList<Person>>();
 		
 		//read old network an find out the startnodes of persons if oldfile exists
 		if(org){
@@ -612,7 +612,14 @@ public class Flow {
 			_network.connect();
 			for(Person person : population.getPersons().values() ){
 				Node node =person.getPlans().get(0).getFirstActivity().getLink().getToNode();
-				orgpersons.put(node, person);
+				if(orgpersons.get(node)==null){
+					LinkedList<Person> list = new LinkedList<Person>();
+					list.add(person);
+					orgpersons.put(node, list);
+				}else{
+					LinkedList<Person> list = orgpersons.get(node);
+					list.add(person);
+				}
 			}
 		}
 		
@@ -624,7 +631,7 @@ public class Flow {
 				//units of flow on the Path
 				int nofpersons = path.getFlow();
 				// list of links in order of the path
-				List<Id> ids = new LinkedList<Id>();
+				LinkedList<Id> ids = new LinkedList<Id>();
 				for (PathEdge edge : path.getPathEdges()){
 					ids.add(edge.getEdge().getId());
 				}
@@ -639,10 +646,21 @@ public class Flow {
 					// for each unit of flow construct a Person
 					for (int i =1 ; i<= nofpersons;i++){
 						//add the first edge if olfile exists
-						if(org){
-							Person orgperson = orgpersons.get(firstnode);
+						String stringid = null;
+						Person orgperson = null;
+						if(org && ( orgpersons.get(firstnode))!=null ){
+							LinkedList<Person> list = orgpersons.get(firstnode);
+							orgperson = list.getFirst();
+							list.remove(0);
+							if(list.isEmpty()){
+								orgpersons.remove(firstnode);
+							}
 							Link firstlink = orgperson.getPlans().get(0).getFirstActivity().getLink();
-							
+							ids.add(0,firstlink.getId());
+							stringid = orgperson.getId().toString();
+						}else{
+							stringid = "new"+String.valueOf(id);
+							id++;
 						}
 						route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
 						
@@ -658,21 +676,21 @@ public class Flow {
 						BasicActivityImpl home = new BasicActivityImpl("h");
 						//Act home = new org.matsim.population.ActImpl("h", path.getPathEdges().getFirst().getEdge());
 						home.setEndTime(0);
-						home.setCoord(path.getPathEdges().getFirst().getEdge().getFromNode().getCoord());
+						//home.setCoord(_network.getLink(ids.getFirst()).getFromNode().getCoord());	
 						// no end time for now.
 						//home.setEndTime(path.getPathEdges().getFirst().getTime());
 						
 						BasicActivityImpl work = new BasicActivityImpl("w");
 						//Act work = new org.matsim.population.ActImpl("w", path.getPathEdges().getLast().getEdge());
 						work.setEndTime(0);
-						work.setCoord(path.getPathEdges().getLast().getEdge().getToNode().getCoord());
-						Link fromlink =path.getPathEdges().getFirst().getEdge();
-						Link tolink =path.getPathEdges().getLast().getEdge();
+						//work.setCoord(_network.getLink(ids.getLast()).getToNode().getCoord());
+						Link fromlink =_network.getLink(ids.getFirst());
+						Link tolink =_network.getLink(ids.getLast());
 						
 						home.setLinkId(fromlink.getId());
 						work.setLinkId(tolink.getId());
 						
-						String stringid = "new"+String.valueOf(id);
+						
 						Id matsimid  = new IdImpl(stringid);
 						Person p = new PersonImpl(matsimid);
 						Plan plan = new org.matsim.population.PlanImpl(p);
