@@ -612,7 +612,10 @@ public class Flow {
 			new MatsimPopulationReader(population,_network).readFile(oldfile);
 			_network.connect();
 			for(Person person : population.getPersons().values() ){
-				Node node =person.getPlans().get(0).getFirstActivity().getLink().getToNode();
+				Link link = person.getPlans().get(0).getFirstActivity().getLink();
+				if (link == null) continue; // happens with plans that don't match the network.
+				
+				Node node = link.getToNode();
 				if(orgpersons.get(node)==null){
 					LinkedList<Person> list = new LinkedList<Person>();
 					list.add(person);
