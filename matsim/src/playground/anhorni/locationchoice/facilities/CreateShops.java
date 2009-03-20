@@ -16,7 +16,7 @@ public class CreateShops {
 		
 		log.info("reading BZ ...");
 		BZReader reader = new BZReader();
-		List<Hectare> hectares = reader.readBZ("input/facilities/BZ01_UNT_P_DSVIEW.TXT", true);
+		List<Hectare> hectares = reader.readBZGrocery("input/facilities/BZ01_UNT_P_DSVIEW.TXT");
 				
 		log.info("filtering BZ ...");
 		ZHFilter filter = new ZHFilter("input/cs/gem.shp");
