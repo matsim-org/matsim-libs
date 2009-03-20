@@ -1,30 +1,40 @@
 package playground.ciarif.retailers;
 
+import java.util.ArrayList;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.controler.Controler;
+import org.matsim.facilities.FacilityImpl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.network.BasicLink;
 import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 
 public class MaxLinkRetailerStrategy implements RetailerStrategy {
 	
+	private final static Logger log = Logger.getLogger(MaxLinkRetailerStrategy.class);
 	public static final String NAME = "maxLinkRetailerStrategy";
 	
 	private Controler controler;
+
+	private Object[] links;
 	// TODO balmermi: do the same speed optimization here
 
-	public MaxLinkRetailerStrategy(Controler controler) {
+	public MaxLinkRetailerStrategy(Controler controler, Object [] links) {
 		this.controler = controler;
+		this.links = links;
 	}
-
+	
+	
 	public void moveFacilities(Map<Id, Facility> facilities) {
 		
 		for (Facility f : facilities.values()) {
-			Object[] links = controler.getNetwork().getLinks().values().toArray();
-			int rd = MatsimRandom.random.nextInt(links.length);
-			Link link = (Link)links[rd];
+			//Object[] links = controler.getNetwork().getLinks().values().toArray();
+			int rd = MatsimRandom.random.nextInt(this.links.length);
+			BasicLinkImpl link = (BasicLinkImpl)this.links[rd];
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId().toString());
 			double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(link.getId().toString());
@@ -38,11 +48,15 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 				newlink_volume = newlink_volume + newlink_volumes[j];
 				
 			}
-			System.out.println ("currentlink_volume = " + currentlink_volume);
-			System.out.println ("newlink_volume = " + newlink_volume);
+			log.info("facility = " + f.getId());
+			log.info ("currentlink = " + f.getLink().getId());
+			log.info ("currentlink = " + f.getLinkId());
+			log.info ("current link coord= " + f.getLink().getCoord());
+			log.info ("currentlink_volume = " + currentlink_volume);
+			log.info ("newlink_volume = " + newlink_volume);
 			if (newlink_volume >= currentlink_volume) {
-				System.out.println ("newlink = " + link);
-				System.out.println ("facility = " + f.getId());
+				log.info ("newlink Id= " + link.getId());
+				log.info ("newlink coord= " + link.getCoord());
 				Utils.moveFacility(f,link);
 			}
 		}

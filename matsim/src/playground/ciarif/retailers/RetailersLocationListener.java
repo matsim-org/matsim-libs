@@ -29,6 +29,7 @@ package playground.ciarif.retailers;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -44,6 +45,7 @@ import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Facility;
+import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.router.PlansCalcRoute;
@@ -62,11 +64,12 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	private Retailers retailers;
 	private RetailersSummaryWriter rs = null;
 	private PlansSummaryTable pst = null;
-	//private MakeATableFromXMLFacilities mtxf = null; 
+	private LinksRetailerReader lrr = null;
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
+	private Object[] links = null;
 	
 	public RetailersLocationListener() {
 	}
@@ -79,16 +82,14 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		String popOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
 		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.pst = new PlansSummaryTable (popOutFile);
-		//this.mtxf = new MakeATableFromXMLFacilities ("output/zurich_10pc/facilities.txt");
-		//this.mtxf.write(controler.getFacilities());
+		this.lrr = new LinksRetailerReader (controler);
+		this.links = lrr.ReadLinks(); 
 		String retailersOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
 		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.rs = new RetailersSummaryWriter (retailersOutFile);
 		this.facilityIdFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
-		System.out.println("facility file = " + this.facilityIdFile);
-		if (this.facilityIdFile == null) { //Francesco: TODO decide if throw an exception or permit a way to create retailers without an input file
+		if (this.facilityIdFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RETAILERS+" in module = "+CONFIG_GROUP+" not defined!");
 		}
-	
 		else {
 			try {
 				this.retailers = new Retailers();
@@ -108,8 +109,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 					}
 					else { // retailer does not exists yet
 						Retailer r = new Retailer(rId, null);
-						System.out.println("The retailer " + rId + " has been added");
-						r.addStrategy(controler, entries[2]);
+						r.addStrategy(controler, entries[2], this.links);
 						Id fId = new IdImpl (entries[1]);
 						Facility f = controler.getFacilities().getFacilities().get(fId);
 						r.addFacility(f);
@@ -135,11 +135,14 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 		
 		for (Retailer r : this.retailers.getRetailers().values()) {
+			//System.out.println("The retailer " + r.getId() + "is using the strategy '" + r.);
 			Map<Id,Facility> facs = r.runStrategy();
 			movedFacilities.putAll(facs);
+			System.out.println("moved facilities =" + facs);
 		}
 		
 		int iter = controler.getIteration();
+		System.out.println("retailers : " + this.retailers);
 		this.rs.write(this.retailers);
 		
 		for (Person p : controler.getPopulation().getPersons().values()) {

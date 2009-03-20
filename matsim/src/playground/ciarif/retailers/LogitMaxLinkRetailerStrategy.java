@@ -20,7 +20,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	private Controler controler;
 	private int alternatives;	
 	
-	public LogitMaxLinkRetailerStrategy (Controler controler) {
+	public LogitMaxLinkRetailerStrategy (Controler controler, Object[] links) {
 		this.controler = controler;
 		String logitAlternatives = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_N_ALTERNATIVES);
 		int alternatives = Integer.parseInt(logitAlternatives);

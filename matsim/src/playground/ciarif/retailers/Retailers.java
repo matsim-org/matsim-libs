@@ -1,20 +1,12 @@
 package playground.ciarif.retailers;
 
 import java.util.*;
-import java.lang.Object;
-import java.math.*;
-
-
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.*;
-import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
 
 public class Retailers {
 	
 	private final Map<Id,Retailer> retailers = new LinkedHashMap<Id, Retailer>();
-
-	private final ArrayList<RetailersAlgorithm> algorithms = new ArrayList<RetailersAlgorithm>();
+	//private final ArrayList<RetailersAlgorithm> algorithms = new ArrayList<RetailersAlgorithm>();
 	
 	public final boolean addRetailer(final Retailer retailer) {
 		if (retailer == null) { return false; }

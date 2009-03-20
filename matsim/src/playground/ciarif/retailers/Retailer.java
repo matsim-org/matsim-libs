@@ -1,11 +1,13 @@
 package playground.ciarif.retailers;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.controler.Controler;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Facility;
+import org.matsim.interfaces.core.v01.Link;
 
 public class Retailer {
 	private final Id id;
@@ -28,23 +30,22 @@ public class Retailer {
 		return true;
 	}
 	
-	public final boolean addStrategy (Controler controler, String strategyName) {
-		System.out.println("Strategy to be added= " + strategyName);	
-		System.out.println("Actual Strategy = " + this.strategy);
+	public final boolean addStrategy (Controler controler, String strategyName, Object [] links) {
+		
 		if (strategyName.equals(RandomRetailerStrategy.NAME)) {
-			this.strategy = new RandomRetailerStrategy(controler.getNetwork());
+			this.strategy = new RandomRetailerStrategy(controler.getNetwork(), links);
 			return true;
 		}
 		else if (strategyName.equals(MaxLinkRetailerStrategy.NAME)) {
-			this.strategy = new MaxLinkRetailerStrategy (controler);
+			this.strategy = new MaxLinkRetailerStrategy (controler, links);
 			return true;
 		}
 		else if (strategyName.equals(LogitMaxLinkRetailerStrategy.NAME)) {
-			this.strategy = new LogitMaxLinkRetailerStrategy (controler);
+			this.strategy = new LogitMaxLinkRetailerStrategy (controler, links);
 			return true;
 		}
 		else if (strategyName.equals(CatchmentAreaRetailerStrategy.NAME)) {
-			this.strategy = new CatchmentAreaRetailerStrategy (controler);
+			this.strategy = new CatchmentAreaRetailerStrategy (controler, links);
 			return true;
 		}
 		else { throw new RuntimeException("The strategy has been not added!"); }
