@@ -15,21 +15,24 @@ public class BZReader {
 	}
 	
 	/*
-	B015211A = 408;
-	B015211B = 409;
-	B015211C = 410;	
-	B015211D = 411;	
-	B015211E = 412;	
-	B015212A = 413;
+	B015211A = 408;	Verbrauchermärkte (> 2500 m2) 
+	B015211B = 409; Grosse Supermärkte (1000-2499 m2)
+	B015211C = 410;	Kleine Supermärkte (400-999 m2)
+	B015211D = 411;	Grosse Geschäfte (100-399 m2)
 	
-	B015221A = 415;
-	B015222A = 416;	
-	B015223A = 417;	
-	B015224A = 418;	
-	B015225A = 419;	
+	B015211E = 412;	Kleine Geschäfte (< 100 m2)
+	B015212A = 413; Warenhäuser
 	
-	B015227A = 421;
-	B015227B = 422;
+	*
+	B015221A = 415; Detailhandel mit Obst und Gemüse
+	B015222A = 416; Detailhandel mit Fleisch und Fleischwaren	
+	B015223A = 417; Detailhandel mit Fisch und Meeresfrüchten	
+	B015224A = 418; Detailhandel mit Brot, Back- und Süsswaren	
+	B015225A = 419;	Detailhandel mit Getränken
+	*
+	B015227A = 421; Detailhandel mit Milcherzeugnissen und Eiern	
+	B015227B = 422; Sonstiger Fachdetailhandel mit Nahrungsmitteln, Getränken und Tabak a.n.g. (in Verkaufsräumen)
+
 	*/
 	
 		
