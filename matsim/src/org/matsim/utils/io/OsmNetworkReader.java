@@ -278,24 +278,19 @@ public class OsmNetworkReader {
 	private void createLink(final NetworkLayer network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length) {
 		String highway = way.tags.get("highway");
 
-		double freespeed = 13.3;
-		double laneCapacity = 600;
-		double nofLanes = 1;
-		boolean oneway = false;
-		boolean onewayReverse = false;
-		String origId = Long.toString(way.id);
-
 		// load defaults
 		OsmHighwayDefaults defaults = this.highwayDefaults.get(highway);
-		if (defaults != null) {
-			nofLanes = defaults.lanes;
-			laneCapacity = defaults.laneCapacity;
-			freespeed = defaults.freespeed;
-			oneway = defaults.oneway;
-		} else {
+		if (defaults == null) {
 			this.unknownHighways.add(highway);
 			return;
 		}
+
+		String origId = Long.toString(way.id);
+		double nofLanes = defaults.lanes;
+		double laneCapacity = defaults.laneCapacity;
+		double freespeed = defaults.freespeed;
+		boolean oneway = defaults.oneway;
+		boolean onewayReverse = false;
 
 		// check if there are tags that overwrite defaults
 		// - check tag "junction"
