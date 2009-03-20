@@ -16,15 +16,15 @@ public class CreateShops {
 		
 		log.info("reading BZ ...");
 		BZReader reader = new BZReader();
-		//List<Hectare> hectares = reader.readBZ("input/facilities/BZ01_UNT_P_DSVIEW.TXT");
+		List<Hectare> hectares = reader.readBZ("input/facilities/BZ01_UNT_P_DSVIEW.TXT", true);
 				
 		log.info("filtering BZ ...");
 		ZHFilter filter = new ZHFilter("input/cs/gem.shp");
-		//hectares = filter.filterHectares(hectares);
+		hectares = filter.filterHectares(hectares);
 		
 		log.info("reading Nelson facilities");
 		ZHFacilitiesReader facilitiesReader = new ZHFacilitiesReader();
-		//List<ZHFacility> zhfacilities = facilitiesReader.readFile("input/facilities/zhFacilities3.dat");
+		List<ZHFacility> zhfacilities = facilitiesReader.readFile("input/facilities/zhFacilities3.dat");
 		
 		log.info("reading datapuls facilities");
 		DatapulsReader datapulsreader = new DatapulsReader();

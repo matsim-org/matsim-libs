@@ -33,7 +33,7 @@ public class BZReader {
 	*/
 	
 		
-	public List<Hectare> readBZ(String file) {
+	public List<Hectare> readBZ(String file, boolean special) {
 		
 		List<Hectare> hectares = new Vector<Hectare>();
 		
@@ -50,7 +50,7 @@ public class BZReader {
 				Hectare hectare = new Hectare(new CoordImpl(x,y));
 				
 				for (int i = 3; i < entries.length; i++) {					
-					if (i >= 408 && i <= 422 && i != 414 && i != 420 && Double.parseDouble(entries[i].trim()) > 0.0) {
+					if (special && i >= 408 && i <= 422 && i != 414 && i != 420 && Double.parseDouble(entries[i].trim()) > 0.0) {
 						hectare.addShop(i);
 					}
 				}
