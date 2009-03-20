@@ -97,7 +97,7 @@ public class CompareSelectedPlansTable {
 
 				// method person.toString() not appropriate
 				out.write(person_id.toString() + ";");
-				Person person = this.plans0.getPerson(person_id);
+				Person person = this.plans0.getPersons().get(person_id);
 				out.write(person.getSex() + ";");
 				out.write(person.getAge() + ";");
 				out.write(person.getLicense() + ";");
@@ -107,7 +107,7 @@ public class CompareSelectedPlansTable {
 				if (person.getSelectedPlan().getFirstActivity().getType()
 						.substring(0, 1).equals("h")) {
 					Activity act = person.getSelectedPlan().getFirstActivity();
-					Coord crd = act.getLink().getCoord();
+					Coord crd = act.getCoord();
 					out.write(crd.getX() + ";");
 					out.write(crd.getY() + ";");
 					out.write(act.getLinkId() + ";");
@@ -120,7 +120,7 @@ public class CompareSelectedPlansTable {
 				double s0 = person.getSelectedPlan().getScore().doubleValue();
 				out.write(s0 + ";");
 				score0s[i] = s0;
-				Person person_comp = this.plans1.getPerson(person_id);
+				Person person_comp = this.plans1.getPersons().get(person_id);
 				double s1 = person_comp.getSelectedPlan().getScore()
 						.doubleValue();
 				out.write(s1 + ";");

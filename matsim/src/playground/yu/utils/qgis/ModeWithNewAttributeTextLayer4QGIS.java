@@ -40,7 +40,7 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 	public void run(Plan plan) {
 		count++;
 		Activity act = plan.getFirstActivity();
-		Coord homeLoc = act.getLink().getCoord();
+		Coord homeLoc = act.getCoord();
 		double endTime = act.getEndTime();
 		double travelTime = plan.getNextLeg(act).getTravelTime();
 		this.travelTime += travelTime;

@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentStuckEvent;
@@ -80,7 +79,7 @@ public class LegDistance implements LinkEnterEventHandler,
 
 	protected void handleEventIntern(AgentEvent ae) {
 		int binIdx = getBinIndex(ae.getTime());
-		Double distance = this.distances.remove(ae.agentId);
+		Double distance = this.distances.remove(ae.getPersonId().toString());
 		if (distance != null) {
 			this.legDistances[binIdx] += distance;
 			this.legCount[binIdx]++;
@@ -119,9 +118,9 @@ public class LegDistance implements LinkEnterEventHandler,
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		String linkId = event.linkId;
+		String linkId = event.getLinkId().toString();
 		Link l = this.network.getLink(linkId);
-		String agentId = event.agentId;
+		String agentId = event.getPersonId().toString();
 		Double distance = this.distances.get(agentId);
 		if (distance == null) {
 			distance = new Double(0.0);
@@ -135,7 +134,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		if (toll == null)
 			this.distances.put(agentId, distance);
 		else {
-			if (TollTools.isInRange(ppl.getPerson(new IdImpl(agentId))
+			if (TollTools.isInRange(ppl.getPersons().get(event.getPersonId())
 					.getSelectedPlan().getFirstActivity().getLink(), toll)) {
 				this.distances.put(agentId, distance);
 			}
@@ -217,6 +216,7 @@ public class LegDistance implements LinkEnterEventHandler,
 				this.legDistances);
 		avgLegDistanceChart.saveAsPng(filename + "Avg.png", 1024, 768);
 	}
+
 	public static void main(final String[] args) {
 		final String netFilename = "../schweiz-ivtch/network/ivtch.xml";
 		final String eventsFilename = "../runs/run265/100.events.txt.gz";

@@ -26,7 +26,6 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentEvent;
@@ -162,7 +161,7 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 			double[] carCount, double[] ptCount, double[] wlkCount,
 			double[] otherCount) {
 		int binIdx = getBinIndex(ae.getTime());
-		Plan selectedPlan = plans.getPerson(new IdImpl(ae.agentId))
+		Plan selectedPlan = plans.getPersons().get(ae.getPersonId())
 				.getSelectedPlan();
 		if (toll != null) {
 			if (TollTools.isInRange(selectedPlan.getFirstActivity().getLink(),
@@ -182,7 +181,7 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 			double[] wlkCount, double[] otherCount) {
 		allCount[binIdx]++;
 		if (otherCount != null)
-			if (Integer.parseInt(ae.agentId) > 1000000000)
+			if (Integer.parseInt(ae.getPersonId().toString()) > 1000000000)
 				otherCount[binIdx]++;
 			else {
 				if (PlanModeJudger.useCar(plan))

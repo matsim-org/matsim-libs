@@ -103,7 +103,7 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 
 				// method person.toString() not appropriate
 				out.write(person_id.toString() + ";");
-				Person person = this.plans.getPerson(person_id);
+				Person person = this.plans.getPersons().get(person_id);
 				out.write(person.getSex() + ";");
 				out.write(person.getAge() + ";");
 				out.write(person.getLicense() + ";");
@@ -113,7 +113,7 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 				Plan sp = person.getSelectedPlan();
 				Activity fa = sp.getFirstActivity();
 				if (fa.getType().substring(0, 1).equals("h")) {
-					Coord coord = fa.getLink().getCoord();
+					Coord coord = fa.getCoord();
 					out.write(coord.getX() + ";");
 					out.write(coord.getY() + ";");
 					out.write(fa.getLinkId() + ";");

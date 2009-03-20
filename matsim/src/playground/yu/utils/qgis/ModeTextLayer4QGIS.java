@@ -48,7 +48,7 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 	}
 
 	public void run(Plan plan) {
-		Coord homeLoc = plan.getFirstActivity().getLink().getCoord();
+		Coord homeLoc = plan.getFirstActivity().getCoord();
 		String mode = "";
 		if (PlanModeJudger.useCar(plan)) {
 			mode = Mode.car.name();

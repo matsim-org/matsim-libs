@@ -117,11 +117,11 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 	public void handleEvent(final AgentDepartureEvent event) {
 		if (toll != null) {
 			// only inhabitant from Kanton
-			if (TollTools.isInRange(plans.getPerson(new IdImpl(event.agentId))
+			if (TollTools.isInRange(plans.getPersons().get(event.getPersonId())
 					.getSelectedPlan().getFirstActivity().getLink(), toll))
-				this.tmpDptTimes.put(event.agentId, event.getTime());
+				this.tmpDptTimes.put(event.getPersonId().toString(), event.getTime());
 		} else
-			this.tmpDptTimes.put(event.agentId, event.getTime());
+			this.tmpDptTimes.put(event.getPersonId().toString(), event.getTime());
 	}
 
 	public void reset(final int iteration) {
@@ -130,10 +130,10 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 
 	public void handleEvent(final AgentArrivalEvent event) {
 		double arrTime = event.getTime();
-		String agentId = event.agentId;
+		String agentId = event.getPersonId().toString();
 		if (toll == null)
 			internalCompute(agentId, arrTime);
-		else if (TollTools.isInRange(plans.getPerson(new IdImpl(event.agentId))
+		else if (TollTools.isInRange(plans.getPersons().get(event.getPersonId())
 				.getSelectedPlan().getFirstActivity().getLink(), toll))
 			internalCompute(agentId, arrTime);
 	}
@@ -147,7 +147,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 			this.arrCount[binIdx]++;
 			this.tmpDptTimes.remove(agentId);
 
-			Plan selectedplan = plans.getPerson(new IdImpl(agentId))
+			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
 					.getSelectedPlan();
 			if (Integer.parseInt(agentId) < 1000000000) {
 				if (PlanModeJudger.useCar(selectedplan)) {

@@ -147,7 +147,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 			else
 				ats = ActTypeStart.o;
 			double dist = bl.getRoute().getDistance() / 1000.0;
-			if (bl.getDepartureTime() < 86400) {
+			// if (bl.getDepartureTime() < 86400)
+			{
 				if (Long.parseLong(this.person.getId().toString()) > 1000000000) {
 					this.otherDist += dist;
 					otherDayDist += dist;
@@ -223,9 +224,9 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 						this.ptCounts5[Math.min(20, (int) dist / 5)]++;
 						this.ptCounts1[Math.min(100, (int) dist)]++;
 					} else if (bl.getMode().equals(Mode.walk)) {
-						dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl).getLink()
-								.getCoord(), plan.getNextActivity(bl).getLink()
-								.getCoord()) * 1.5 / 1000.0;
+						dist = CoordUtils.calcDistance(plan
+								.getPreviousActivity(bl).getLink().getCoord(),
+								plan.getNextActivity(bl).getLink().getCoord()) * 1.5 / 1000.0;
 						this.wlkDist += dist;
 						wlkDayDist += dist;
 						switch (ats) {
@@ -459,8 +460,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		Gbl.startMeasurement();
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		final String plansFilename = "../runs_SVN/run684/it.1000/1000.plans.xml.gz";
-		String outputFilename = "../matsimTests/analysis/";
+		final String plansFilename = "../runs-svn/run684/it.1000/1000.plans.xml.gz";
+		String outputFilename = "../matsimTests/run684/dailyDistance/";
 		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
 
 		Gbl.createConfig(null);
