@@ -2,7 +2,7 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
 		<!ENTITY INPUTBASE    "./test/input/playground/gregor/data">
-		<!ENTITY OUTPUTBASE   "./test/output/playground/gregor/evacbase/EvacuationQSimControlerTest/testSimpleChecksum">
+		<!ENTITY OUTPUTBASE   "./test/output/playground/gregor/evacbase/EvacuationAreaFileReaderWriterTest/testSimpleChecksum">
 	]
 >
 <config>
@@ -24,7 +24,7 @@
 
 	<!-- Params for EvacuationQSimControler -->
 	<module name="evacuation">
-		<param name="inputEvacuationAreaLinksFile" value = "&INPUTBASE;/evacuationArea.xml"/> 
+		<param name="inputEvacuationAreaLinksFile" value = "&INPUTBASE;/evacuationArea.xml"/>
 	</module>
 
 <!-- ====================================================================== -->

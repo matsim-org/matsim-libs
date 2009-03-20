@@ -23,6 +23,7 @@ package playground.gregor.sims.evacbase;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
@@ -66,7 +67,7 @@ public class EvacuationPlansGeneratorAndNetworkTrimmer {
 	private final static String saveBX = "662433";
 	private final static String saveBY = "9898853";
 	
-	private HashMap<Id, EvacuationAreaLink> evacuationAreaLinks = new HashMap<Id, EvacuationAreaLink>();
+	private Map<Id, EvacuationAreaLink> evacuationAreaLinks = new HashMap<Id, EvacuationAreaLink>();
 	private final HashSet<Node> saveNodes = new HashSet<Node>();
 	private final HashSet<Node> redundantNodes = new HashSet<Node>();
 
@@ -79,7 +80,7 @@ public class EvacuationPlansGeneratorAndNetworkTrimmer {
 	 * @param plans
 	 * @param network
 	 */
-	public void createEvacuationPlans(final Population plans, final NetworkLayer network) {
+	private void createEvacuationPlans(final Population plans, final NetworkLayer network) {
 		PlansCalcRoute router;
 		if (this.tc != null) {
 			router = new PlansCalcRoute(network, this.tc, new FreespeedTravelTimeCost());
@@ -176,8 +177,8 @@ public class EvacuationPlansGeneratorAndNetworkTrimmer {
 	}
 
 
-	public void generatePlans(final Population plans, final NetworkLayer network, final HashMap<Id, EvacuationAreaLink> evacuationAreaLinks) {
-		this.evacuationAreaLinks = evacuationAreaLinks;
+	public void generatePlans(final Population plans, final NetworkLayer network, final Map<Id, EvacuationAreaLink> el1) {
+		this.evacuationAreaLinks = el1;
 		log.info("generating evacuation plans ...");
 		log.info(" * classifing nodes");
 		classifyNodes(network);

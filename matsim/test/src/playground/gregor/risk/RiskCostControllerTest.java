@@ -60,7 +60,7 @@ public class RiskCostControllerTest extends MatsimTestCase{
 		Link l1 = net.createLink(new IdImpl(1), n1, n2, 10., 5., 8., 5.4321);
 		Link l2 = net.createLink(new IdImpl(2), n2, n3, 10., 5., 8., 5.4321);
 		Link l3 = net.createLink(new IdImpl(3), n3, n4, 10., 5., 8., 5.4321);
-		Link l4 = net.createLink(new IdImpl(4), n4, n0, 10., 5., 8., 5.4321);
+		Link l4 = net.createLink(new IdImpl(4), n4, n0, 2.5, 5., 8., 5.4321);
 		
 		List<NetworkChangeEvent> nc = new ArrayList<NetworkChangeEvent>();
 		
@@ -100,10 +100,10 @@ public class RiskCostControllerTest extends MatsimTestCase{
 		
 		RiskCostCalculator rcc = new RiskCostCalculator(net,false);
 		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l0, 0.));
-		assertEquals("Risk cost:" , 107400. , rcc.getLinkRisk(l1, 0.));
+		assertEquals("Risk cost:" , 107400. * 10., rcc.getLinkRisk(l1, 0.));
 		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l2, 0.));
 		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l3, 0.));
-		assertEquals("Risk cost:" , 106800. , rcc.getLinkRisk(l4, 0.));
+		assertEquals("Risk cost:" , 106800. * 2.5, rcc.getLinkRisk(l4, 0.));
 		
 	}
 	
@@ -119,12 +119,12 @@ public class RiskCostControllerTest extends MatsimTestCase{
 		Node n4 = net.createNode(new IdImpl(4), new CoordImpl(.75,.75));
 		Node n5 = net.createNode(new IdImpl(5), new CoordImpl(.25,.25));
 		
-		Link l0 = net.createLink(new IdImpl(0), n0, n1, 10., 5., 8., 5.4321);
-		Link l1 = net.createLink(new IdImpl(1), n1, n2, 10., 5., 8., 5.4321);
-		Link l2 = net.createLink(new IdImpl(2), n2, n3, 10., 5., 8., 5.4321);
+		Link l0 = net.createLink(new IdImpl(0), n0, n1, 2.5, 5., 8., 5.4321);
+		Link l1 = net.createLink(new IdImpl(1), n1, n2, 3.5, 5., 8., 5.4321);
+		Link l2 = net.createLink(new IdImpl(2), n2, n3, 4.5, 5., 8., 5.4321);
 		Link l3 = net.createLink(new IdImpl(3), n3, n4, 10., 5., 8., 5.4321);
 		Link l4 = net.createLink(new IdImpl(4), n4, n5, 10., 5., 8., 5.4321);
-		Link l5 = net.createLink(new IdImpl(5), n5, n0, 10., 5., 8., 5.4321);
+		Link l5 = net.createLink(new IdImpl(5), n5, n0, 5.5, 5., 8., 5.4321);
 		
 		List<NetworkChangeEvent> nc = new ArrayList<NetworkChangeEvent>();
 		
@@ -164,12 +164,12 @@ public class RiskCostControllerTest extends MatsimTestCase{
 		
 		RiskCostCalculator rcc = new RiskCostCalculator(net,true);
 		
-		assertEquals("Risk cost:" , 106800. , rcc.getLinkRisk(l0, 0.));
-		assertEquals("Risk cost:" , 107400. , rcc.getLinkRisk(l1, 0.));
-		assertEquals("Risk cost:" , 107400. , rcc.getLinkRisk(l2, 0.));
+		assertEquals("Risk cost:" , 106800. * 2.5, rcc.getLinkRisk(l0, 0.));
+		assertEquals("Risk cost:" , 107400. * 3.5, rcc.getLinkRisk(l1, 0.));
+		assertEquals("Risk cost:" , 107400. * 4.5, rcc.getLinkRisk(l2, 0.));
 		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l3, 0.));
 		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l4, 0.));
-		assertEquals("Risk cost:" , 106800. , rcc.getLinkRisk(l5, 0.));
+		assertEquals("Risk cost:" , 106800. * 5.5, rcc.getLinkRisk(l5, 0.));
 		
 	}
 	

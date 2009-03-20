@@ -48,7 +48,6 @@ import playground.gregor.sims.evacbase.EvacuationPlansGeneratorAndNetworkTrimmer
 public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTrimmer {
 	private final String shelters = "../inputs/padang/network_v20080618/shelters.shp";
 	Logger log = Logger.getLogger(EvacPlansAndNetworkGen.class);
-	@Override
 	public void createEvacuationPlans(final Population plans, final NetworkLayer network) {
 		
 		

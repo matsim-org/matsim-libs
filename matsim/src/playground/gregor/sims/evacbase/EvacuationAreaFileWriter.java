@@ -21,7 +21,7 @@
 package playground.gregor.sims.evacbase;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.misc.Time;
@@ -32,10 +32,10 @@ import org.matsim.writer.MatsimXmlWriter;
  */
 public class EvacuationAreaFileWriter extends MatsimXmlWriter {
 
-	private final HashMap<Id, EvacuationAreaLink> links;
+	private final Map<Id, EvacuationAreaLink> links;
 
-	public EvacuationAreaFileWriter(final HashMap<Id, EvacuationAreaLink> links) {
-		this.links = links;
+	public EvacuationAreaFileWriter(final Map<Id, EvacuationAreaLink> el) {
+		this.links = el;
 	}
 
 	public void writeFile(final String filename) throws IOException {

@@ -79,7 +79,7 @@ public class RiskCostCalculator implements LinkEnterEventHandler {
 					}
 				}
 
-				this.linkRiskCost.put(l, nTmp);
+				this.linkRiskCost.put(l, nTmp * l.getLength());
 			}
 			
 		}
