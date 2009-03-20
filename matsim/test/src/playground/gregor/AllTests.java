@@ -31,7 +31,6 @@ public class AllTests {
 		suite.addTest(playground.gregor.evacbase.AllTests.suite());
 		suite.addTest(playground.gregor.risk.AllTests.suite());
 		suite.addTest(playground.gregor.systemopt.AllTests.suite());
-		suite.addTest(playground.gregor.withindayevac.AllTests.suite());
 		//$JUnit-END$
 		return suite;
 	}
