@@ -25,6 +25,7 @@ public abstract class Utils {
 			Gbl.getWorld().removeMapping(f, oldL);
 		}
 		Gbl.getWorld().addMapping(f, link);
+	
 	}
 	
 	// BAD CODE STYLE but keep that anyway for the moment
