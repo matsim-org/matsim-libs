@@ -19,13 +19,13 @@ public abstract class Utils {
 //		System.out.println("length = " + length);
 		Coord coord = new CoordImpl(link.getCoord().getX()+vector[0]*EPSILON,link.getCoord().getY()+vector[1]*EPSILON);
 		f.moveTo(coord);
-		
-		Link oldL = f.getLink();
-		if (oldL != null) {
-			Gbl.getWorld().removeMapping(f, oldL);
-		}
-		Gbl.getWorld().addMapping(f, link);
-	
+//		
+//		Link oldL = f.getLink();
+//		if (oldL != null) {
+//			Gbl.getWorld().removeMapping(f, oldL);
+//		}
+//		Gbl.getWorld().addMapping(f, link);
+//	
 	}
 	
 	// BAD CODE STYLE but keep that anyway for the moment
