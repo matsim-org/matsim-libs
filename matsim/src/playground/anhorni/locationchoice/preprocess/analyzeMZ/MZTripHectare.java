@@ -8,6 +8,11 @@ public class MZTripHectare {
 	MZTrip mzTrip;
 	Hectare hectare;
 	
+	public MZTripHectare(MZTrip mzTrip, Hectare hectare) {
+		this.mzTrip = mzTrip;
+		this.hectare = hectare;
+	}
+	
 	public MZTrip getMzTrip() {
 		return mzTrip;
 	}
