@@ -48,7 +48,9 @@ public class MZReader {
 				String purpose = entries[45].trim();
 				mzTrip.setPurpose(purpose);
 				
-				mzTrips.add(mzTrip);
+				if (coord.getX() > 1000 && coord.getY() > 1000) {
+					mzTrips.add(mzTrip);
+				}
 			}
 		} catch (IOException e) {
 				Gbl.errorMsg(e);
