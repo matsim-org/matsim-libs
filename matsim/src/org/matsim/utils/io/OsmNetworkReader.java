@@ -84,7 +84,7 @@ public class OsmNetworkReader {
 	private final NetworkLayer network;
 	/*package*/ final CoordinateTransformation transform;
 	private boolean keepPaths = false;
-
+	
 	/**
 	 * Creates a new Reader to convert OSM data into a MATSim network.
 	 *
@@ -92,23 +92,73 @@ public class OsmNetworkReader {
 	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
 	 */
 	public OsmNetworkReader(final NetworkLayer network, final CoordinateTransformation transformation) {
-		this.network = network;
-		this.transform = transformation;
-
-		this.setHighwayDefaults("motorway",      2, 120.0/3.6, 2000, true);
-		this.setHighwayDefaults("motorway_link", 1,  80.0/3.6, 1500, true);
-		this.setHighwayDefaults("trunk",         1,  80.0/3.6, 2000);
-		this.setHighwayDefaults("trunk_link",    1,  50.0/3.6, 1500);
-		this.setHighwayDefaults("primary",       1,  80.0/3.6, 1500);
-		this.setHighwayDefaults("primary_link",  1,  60.0/3.6, 1500);
-		this.setHighwayDefaults("secondary",     1,  60.0/3.6, 1000);
-		this.setHighwayDefaults("tertiary",      1,  45.0/3.6,  600);
-		this.setHighwayDefaults("minor",         1,  45.0/3.6,  600);
-		this.setHighwayDefaults("unclassified",  1,  45.0/3.6,  600);
-		this.setHighwayDefaults("residential",   1,  30.0/3.6,  600);
-		this.setHighwayDefaults("living_street", 1,  15.0/3.6,  300);
+		this(network, transformation, -1);
 	}
 
+	/**
+	 * Creates a new Reader to convert OSM data into a MATSim network.
+	 *
+	 * @param network An empty network where the converted OSM data will be stored.
+	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
+	 * @param parseLvl Hierarchy level indicating, which roads to convert. Level specified:
+	 * <ul style="list-style-type:none">
+	 * <li>1 - Only motorways and its links / onramps</li>
+	 * <li>2 - Lvl 1 + trunk road and its links</li>
+	 * <li>3 - Lvl 2 + primary roads and its links</li>
+	 * <li>4 - Lvl 3 + secondary roads</li>
+	 * <li>5 - Lvl 4 + tertiary roads</li>
+	 * <li>6 - Lvl 5 + roads defined as living streets, minor, residential or unclassified.</li></ul>
+	 */
+	@SuppressWarnings("fallthrough")
+	public OsmNetworkReader(final NetworkLayer network, final CoordinateTransformation transformation, int parseLvl) {
+		this.network = network;
+		this.transform = transformation;
+		
+		switch (parseLvl) {
+
+		case 6:
+			this.setHighwayDefaults("minor", 1, 45.0 / 3.6, 600); // mostly nothing
+			this.setHighwayDefaults("unclassified", 1, 45.0 / 3.6, 600);
+			this.setHighwayDefaults("residential", 1, 30.0 / 3.6, 600);
+			this.setHighwayDefaults("living_street", 1, 15.0 / 3.6, 300);
+
+		case 5:
+			this.setHighwayDefaults("tertiary", 1, 45.0 / 3.6, 600); // ca wip
+
+		case 4:
+			this.setHighwayDefaults("secondary", 1, 60.0 / 3.6, 1000);
+
+		case 3:
+			this.setHighwayDefaults("primary", 1, 80.0 / 3.6, 1500);
+			this.setHighwayDefaults("primary_link", 1, 60.0 / 3.6, 1500);
+
+		case 2:
+			this.setHighwayDefaults("trunk", 1, 80.0 / 3.6, 2000);
+			this.setHighwayDefaults("trunk_link", 1, 50.0 / 3.6, 1500);
+
+		case 1:
+			this.setHighwayDefaults("motorway", 2, 120.0 / 3.6, 2000, true);
+			this.setHighwayDefaults("motorway_link", 1, 80.0 / 3.6, 1500, true);
+			break;
+
+		default:
+			log.info("Parse level not specified or unknown. Falling back to default values.");
+			this.setHighwayDefaults("motorway",      2, 120.0/3.6, 2000, true);
+			this.setHighwayDefaults("motorway_link", 1,  80.0/3.6, 1500, true);
+			this.setHighwayDefaults("trunk",         1,  80.0/3.6, 2000);
+			this.setHighwayDefaults("trunk_link",    1,  50.0/3.6, 1500);
+			this.setHighwayDefaults("primary",       1,  80.0/3.6, 1500);
+			this.setHighwayDefaults("primary_link",  1,  60.0/3.6, 1500);
+			this.setHighwayDefaults("secondary",     1,  60.0/3.6, 1000);
+			this.setHighwayDefaults("tertiary",      1,  45.0/3.6,  600);
+			this.setHighwayDefaults("minor",         1,  45.0/3.6,  600);
+			this.setHighwayDefaults("unclassified",  1,  45.0/3.6,  600);
+			this.setHighwayDefaults("residential",   1,  30.0/3.6,  600);
+			this.setHighwayDefaults("living_street", 1,  15.0/3.6,  300);
+			break;
+		}		
+	}
+	
 	/**
 	 * Parses the given osm file and creates a MATSim network from the data.
 	 *
