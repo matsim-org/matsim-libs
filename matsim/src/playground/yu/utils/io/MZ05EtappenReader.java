@@ -4,22 +4,32 @@
 package playground.yu.utils.io;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
+
+import playground.yu.utils.CollectionSum;
 
 /**
  * @author yu
  * 
  */
 public class MZ05EtappenReader implements TabularFileHandler {
-
 	private SimpleWriter sw = null;
+
 	private String tmpPersonId = null, tmpPersonKantonZurichId = null;
+
 	private double e_dist_obj = 0.0, e_dist_obj_KantonZurich = 0.0;
+
 	private int eCnt = 0, eCnt_KantonZurich = 0, personCnt = 0,
 			personKantonZurichCnt = 0;
+
+	private Set<Double> tmpEtappenDists = new HashSet<Double>();
+
+	private boolean changePerson = false, belongs2KantonZurich = false;
 
 	/**
 	 * 
@@ -29,35 +39,67 @@ public class MZ05EtappenReader implements TabularFileHandler {
 		sw.writeln("linearDistance\tlinearDistance [m]\tlinearDistance [km]");
 	}
 
+	private void reset(String personId) {
+		if (!changePerson) {
+			append();
+		}
+		changePerson = false;
+		tmpPersonId = personId;
+		tmpEtappenDists.clear();
+	}
+
+	private void resetKantonZurich(String personId) {
+		belongs2KantonZurich = true;
+		tmpPersonKantonZurichId = personId;
+	}
+
+	private void append() {
+		personCnt++;
+		eCnt += tmpEtappenDists.size();
+		e_dist_obj += CollectionSum.getSum(tmpEtappenDists);
+		if (belongs2KantonZurich) {
+			personKantonZurichCnt++;
+			eCnt_KantonZurich += tmpEtappenDists.size();
+			e_dist_obj_KantonZurich += CollectionSum.getSum(tmpEtappenDists);
+		}
+	}
+
 	public void startRow(String[] row) {
 		String personId = row[0] + row[1];
 		if (tmpPersonId == null) {
-			tmpPersonId = personId;
-			personCnt++;
+			reset(personId);
 		} else if (!tmpPersonId.equals(personId)) {
-			tmpPersonId = personId;
-			personCnt++;
+			reset(personId);
+		} else {
+			if (changePerson)
+				return;
 		}
 
 		String e_dist_obj = row[37];
 		if (e_dist_obj != null) {
 			double tmpEtappeDist = Double.parseDouble(e_dist_obj);
-			if (tmpEtappeDist > 0) {
-				eCnt++;
-				this.e_dist_obj += tmpEtappeDist;
-				if (row[14] != null)
+			if (tmpEtappeDist >= 0) {
+				tmpEtappenDists.add(new Double(tmpEtappeDist));
+				if (row[14] != null) {
 					if (row[14].equals("1")) {
 						if (tmpPersonKantonZurichId == null) {
-							tmpPersonKantonZurichId = personId;
-							personKantonZurichCnt++;
+							resetKantonZurich(personId);
 						} else if (!tmpPersonKantonZurichId.equals(personId)) {
-							tmpPersonKantonZurichId = personId;
-							personKantonZurichCnt++;
+							resetKantonZurich(personId);
 						}
-						eCnt_KantonZurich++;
-						e_dist_obj_KantonZurich += tmpEtappeDist;
+					} else {
+						belongs2KantonZurich = false;
 					}
+				} else {
+					belongs2KantonZurich = false;
+				}
+			} else {
+				changePerson = true;
+				return;
 			}
+		} else {
+			changePerson = true;
+			return;
 		}
 	}
 
