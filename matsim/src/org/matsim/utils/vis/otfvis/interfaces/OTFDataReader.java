@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFData;
+import org.matsim.utils.vis.otfvis.data.OTFDataWriter;
 
 
 public abstract class  OTFDataReader {
@@ -41,6 +42,14 @@ public abstract class  OTFDataReader {
 	}
 	public static String getVersionString(int major, int minor) {
 		return "V" + major + "." + minor;
+	}
+	
+	private OTFDataWriter src;
+	public void setSrc(OTFDataWriter src) {
+		this.src = src;
+	}
+	public OTFDataWriter getSrc() {
+		return this.src;
 	}
 	public abstract void readConstData(ByteBuffer in) throws IOException;
 	public abstract void readDynData(ByteBuffer in, SceneGraph graph) throws IOException;

@@ -30,7 +30,7 @@ public interface OTFQueryHandler {
 	public OTFQuery handleQuery(OTFQuery query);
 	public void updateQueries();
 	public void drawQueries(OTFDrawer drawer);
-	public void handleClick(Double point, int mouseButton);
-	public void handleClick(Rectangle2D.Double origRect, int button);
+	public void handleClick(String id, Double point, int mouseButton);
+	public void handleClick(String id, Rectangle2D.Double origRect, int button);
 
 }

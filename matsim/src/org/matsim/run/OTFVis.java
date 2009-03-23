@@ -145,7 +145,7 @@ public class OTFVis {
 			pop = data.getPopulation();
 		} catch (RuntimeException e) {
 			// if this population can not be found start showing network with empty population
-			System.out.println("OTFVis: Population not found: Starting empty network");
+			System.out.println("OTFVis: Population file not found or corrupted! Starting empty network");
 			pop = new PopulationImpl();
 		}
 

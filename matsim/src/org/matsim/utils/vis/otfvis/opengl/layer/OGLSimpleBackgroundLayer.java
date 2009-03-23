@@ -41,7 +41,7 @@ public class OGLSimpleBackgroundLayer extends DefaultSceneLayer {
 	private final static List<AbstractBackgroundDrawer> items = new ArrayList<AbstractBackgroundDrawer>();
 
 	@Override
-	public void init(final SceneGraph graph) {
+	public void init(final SceneGraph graph, boolean initConstData) {
 		if (graph.getDrawer() != null) {
 			final OTFClientQuad quad = graph.getDrawer().getQuad();
 

@@ -33,7 +33,7 @@ public abstract class DefaultSceneLayer implements SceneLayer {
 	public void finish() {
 	}
 
-	public void init(SceneGraph graph) {
+	public void init(SceneGraph graph, boolean initConstData) {
 	}
 
 	public Object newInstance(Class clazz) throws InstantiationException, IllegalAccessException {

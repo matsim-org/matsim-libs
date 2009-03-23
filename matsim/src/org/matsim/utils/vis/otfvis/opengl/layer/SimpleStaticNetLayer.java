@@ -141,7 +141,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	@Override
 	public void addItem(Receiver item) {
 		// only add items in initial run
-		if (netDisplList == -1) items.add((OTFDrawable)item);
+		if (netDisplList < 0) items.add((OTFDrawable)item);
 	}
 
 	public void drawNetList(List<OTFDrawable> items){
@@ -157,15 +157,16 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 		List<OTFDrawable> it = items;
 		
 		float cellWidthAct_m = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
+		
 		if (netDisplListMap.containsKey(myDrawer) && (cellWidth_m != cellWidthAct_m)){
 			int displList = netDisplListMap.get(myDrawer);
 			gl.glDeleteLists(displList, 1);
-			it = itemsListMap.get(myDrawer);
-			cellWidth_m = cellWidthAct_m;
+			if(itemsListMap.containsKey(myDrawer))it = itemsListMap.get(myDrawer);
 			netDisplList = -2;
 		}
 		
 		if (netDisplList < 0) {
+			cellWidth_m = cellWidthAct_m;
 			netDisplList = gl.glGenLists(1);
 			gl.glNewList(netDisplList, GL.GL_COMPILE);
 			drawNetList(it);
@@ -205,13 +206,17 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	}
 
 	@Override
-	public void init(SceneGraph graph) {
-		cellWidth_m = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
-		
+	public void init(SceneGraph graph, boolean initConstData) {
 		myDrawer = (OGLProvider)graph.getDrawer();
 		
-		if (netDisplListMap.containsKey(myDrawer)){
+		if (netDisplListMap.containsKey(myDrawer) && netDisplList != -2){
 			netDisplList = netDisplListMap.get(myDrawer);
+
+			if(initConstData) {
+				itemsListMap.remove(myDrawer);
+				items.clear();
+				netDisplList = -2;
+			}
 		}
 	}
 

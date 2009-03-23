@@ -23,7 +23,7 @@ package org.matsim.utils.vis.otfvis.caching;
 import org.matsim.utils.vis.otfvis.data.OTFData;
 
 public interface SceneLayer {
-	public void init(SceneGraph graph);
+	public void init(SceneGraph graph, boolean initConstData);
 	public void finish();
 	public void addItem(OTFData.Receiver item);
 	public void draw();

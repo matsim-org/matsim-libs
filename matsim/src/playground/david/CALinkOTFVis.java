@@ -29,6 +29,7 @@ import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.utils.vis.otfvis.data.OTFDataWriter;
 import org.matsim.utils.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFHostControlBar;
@@ -390,6 +391,12 @@ class CALiveServer implements OTFLiveServerRemote{
 
 	public OTFQuery answerQuery(OTFQuery query) throws RemoteException {
 		return null;
+	}
+
+	public boolean replace(String id, double x, double y, int index, Class clazz)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
 

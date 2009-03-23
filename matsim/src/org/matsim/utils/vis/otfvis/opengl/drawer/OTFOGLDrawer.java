@@ -774,8 +774,21 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		config.addZoom(new ZoomEntry(image,zoomstore, name));
 
 	}
+	
+	void doChangeDrawer(final Point2D.Double point){
+		if(!clientQ.doChangeDrawer(point, this)) return;
+		try {
+			//actGraph = this.clientQ.getSceneGraph(this.now, mouseMan.getBounds(), this);
+			invalidate(-1);
+			redraw();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 
-	public void handleClick(Point2D.Double point, int mouseButton, MouseEvent e) {
+	public void handleClick(final Point2D.Double point, int mouseButton, MouseEvent e) {
 		if(mouseButton == 4 ){
 			JPopupMenu popmen = new JPopupMenu(); 
 			JMenuItem menu1 = new JMenuItem( "Zoom"); 
@@ -812,16 +825,22 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 					}
 				} 
 			} ); 
+			popmen.addSeparator();
+			popmen.add( new AbstractAction("ChangeDrawers...") { 
+				public void actionPerformed( ActionEvent e ) {
+					doChangeDrawer(point);
+				} 
+			} ); 
 			popmen.show(this.getComponent(),e.getX(), e.getY());
 			return;
 		}
 		Point2D.Double origPoint = new Point2D.Double(point.x + this.clientQ.offsetEast, point.y + this.clientQ.offsetNorth);
-		if(queryHandler != null) queryHandler.handleClick(origPoint, mouseButton);
+		if(queryHandler != null) queryHandler.handleClick(clientQ.getId(),origPoint, mouseButton);
 	}
 
 	public void handleClick(Rectangle currentRect, int button) {
 		Rectangle2D.Double origRect = new Rectangle2D.Double(currentRect.x + this.clientQ.offsetEast, currentRect.y + this.clientQ.offsetNorth, currentRect.width, currentRect.height);
-		if(queryHandler != null) queryHandler.handleClick(origRect, button);
+		if(queryHandler != null) queryHandler.handleClick(clientQ.getId(),origRect, button);
 	}
 
 	/***

@@ -30,6 +30,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,6 +46,7 @@ import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.utils.vis.otfvis.data.OTFDataWriter;
 import org.matsim.utils.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
+import org.matsim.utils.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.utils.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
 
@@ -348,7 +350,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		return updateQuad.buffer;
 	}
 
-	public OTFQuery answerQuery(org.matsim.utils.vis.otfvis.interfaces.OTFQuery query) throws RemoteException {
+	public OTFQuery answerQuery(OTFQuery query) throws RemoteException {
 		if (status == PAUSE) {
 			OTFServerQuad quad = quads.values().iterator().next().quad;
 			query.query(network, pop, events, quad);
@@ -370,5 +372,31 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public Collection<Double> getTimeSteps() throws RemoteException {
 		// There are no timesteps implemented here right now, so we return null instead
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean replace(String id, double x, double y, int index, Class clazz)
+			throws RemoteException {
+		OTFServerQuad quad = quads.get(id).quad;
+		if(quad != null) {
+			List<OTFDataWriter> writer = quad.getLeafValues(x,y);
+			OTFDataWriter w = writer.get(index);
+			OTFDataWriter wnew;
+			try {
+				wnew = (OTFDataWriter) clazz.newInstance();
+				wnew.setSrc(w.getSrc());
+				writer.remove(index);
+				writer.add(index, wnew);
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return true;
+		}
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

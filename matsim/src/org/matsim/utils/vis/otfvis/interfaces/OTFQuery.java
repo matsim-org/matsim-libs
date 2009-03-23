@@ -28,7 +28,7 @@ import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 
 public interface OTFQuery extends Serializable{
-	public enum Type {AGENT,LINK,OTHER};
+	public enum Type {AGENT,LINK,OTHER, CLIENT};
 	public void setId(String id);
 	// while this returns true, the query is send to the server EVERY Tick
 	public boolean isAlive();

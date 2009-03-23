@@ -25,6 +25,7 @@ import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * An implementation of a QuadTree to store geometric point data. The expected
@@ -114,6 +115,12 @@ public class QuadTree<T> implements Serializable {
 		return false;
 	}
 
+	public List<T> getLeafValues(final double x, final double y) {
+		Leaf<T> leaf =  this.top.getLeaf(x, y);
+		if(leaf != null) return leaf.values;
+		return null;
+	}
+	
 	/** Clear the QuadTree. */
 	public void clear() {
 		this.top.clear();
@@ -563,6 +570,12 @@ public class QuadTree<T> implements Serializable {
 			return false;
 		}
 
+		public Leaf<T> getLeaf(final double x, final double y) {
+			if (this.hasChilds) return getChild(x, y).getLeaf(x, y);
+			if (this.leaf != null && this.leaf.x == x && this.leaf.y == y) return this.leaf;
+			return null;
+		}
+
 		public void clear() {
 			// we could as well just set everything to null and let the
 			// garbage collection do its job.
@@ -774,7 +787,7 @@ public class QuadTree<T> implements Serializable {
 
 	}
 
-	public abstract static class Executor<T> {
-		abstract public void execute(double x, double y, T object);
+	public interface Executor<T> {
+		public void execute(double x, double y, T object);
 	}
 }

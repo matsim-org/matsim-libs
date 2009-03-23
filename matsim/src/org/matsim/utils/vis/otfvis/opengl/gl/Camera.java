@@ -39,10 +39,14 @@ public class Camera {
     public Camera() {
         location = new Point3f();
         target = new Point3f();
-        targetOffset = new Point3f();
+        targetOffset = new Point3f(000,000,0);
     }
     
-    public void setup(GL gl, GLU glu) {
+    public Point3f getTargetOffset() {
+		return targetOffset;
+	}
+
+	public void setup(GL gl, GLU glu) {
         glu.gluLookAt(location.getX(), location.getY(), location.getZ(),
                       target.getX() + targetOffset.getX(), target.getY() + targetOffset.getY(), target.getZ() + targetOffset.getZ(),
                       0.0f, 1.0f, 0.0f);

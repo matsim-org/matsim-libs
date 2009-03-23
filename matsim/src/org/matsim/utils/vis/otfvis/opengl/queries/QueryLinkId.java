@@ -74,7 +74,7 @@ public class QueryLinkId implements OTFQuery {
 	public void draw(OTFDrawer drawer) {
 	}
 
-	class AddIdStringExecutor extends Executor<OTFDataWriter> {
+	class AddIdStringExecutor implements Executor<OTFDataWriter> {
 		private final boolean nearestOnly;
 		private double minDist = Double.POSITIVE_INFINITY;
 		private static final double epsilon = 0.0001;
@@ -85,7 +85,6 @@ public class QueryLinkId implements OTFQuery {
 			cellWidth = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
 		}
 		
-		@Override
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			Object src = writer.getSrc();
 			if(src instanceof QueueLink) {

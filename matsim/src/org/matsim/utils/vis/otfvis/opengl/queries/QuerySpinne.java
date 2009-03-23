@@ -21,14 +21,22 @@
 package org.matsim.utils.vis.otfvis.opengl.queries;
 
 import java.awt.Color;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.media.opengl.GL;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
@@ -42,17 +50,20 @@ import org.matsim.interfaces.core.v01.Node;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
+import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
+import org.matsim.utils.vis.otfvis.interfaces.OTFQueryOptions;
 import org.matsim.utils.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.utils.vis.otfvis.opengl.gl.InfoText;
 
 import com.sun.opengl.util.BufferUtil;
 
-public class QuerySpinne implements OTFQuery {
+public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 
 	private static final long serialVersionUID = -749787121253826794L;
 	protected Id linkId;
@@ -60,14 +71,51 @@ public class QuerySpinne implements OTFQuery {
 	private float[] vertex = null;
 	private int[] count = null;
 	private boolean calcOffset = true;
+	private static boolean tripOnly = false;
+	private static boolean nowOnly = false;
 	private transient FloatBuffer vert;
 //	private transient FloatBuffer cnt;
 	private transient ByteBuffer colors =  null;
 
+	public void itemStateChanged(ItemEvent e) {
+		JCheckBox source = (JCheckBox)e.getItemSelectable();
+		if (source.getText().equals("trip only")) {
+			tripOnly = !tripOnly;
+		} else if (source.getText().equals("only vehicles on the link now")) {
+			nowOnly = ! nowOnly;
+		}	
+		
+	}
+	public JComponent getOptionsGUI(JComponent mother) {
+		JPanel com = new JPanel();
+		com.setSize(500, 60);
+		JCheckBox SynchBox = new JCheckBox("trip only");
+		SynchBox.setMnemonic(KeyEvent.VK_M);
+		SynchBox.setSelected(false);
+		SynchBox.addItemListener(this);
+		com.add(SynchBox);
+		SynchBox = new JCheckBox("only vehicles on the link now");
+		SynchBox.setMnemonic(KeyEvent.VK_V);
+		SynchBox.setSelected(false);
+		SynchBox.addItemListener(this);
+		com.add(SynchBox);
+
+		return com;
+	}
+	
 	private void addLink(Link driven) {
 		Integer count = this.drivenLinks.get(driven);
 		if (count == null) this.drivenLinks.put(driven, 1);
 		else  this.drivenLinks.put(driven, count + 1);
+	}
+
+	protected List<Plan> getPersonsNOW(Population plans, QueueNetwork net) {
+		List<Plan> actPersons = new ArrayList<Plan>();
+		QueueLink link = net.getLinks().get(linkId);
+		Collection<QueueVehicle> vehs = link.getAllVehicles();
+		for( QueueVehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
+		
+		return actPersons;
 	}
 
 	protected List<Plan> getPersons(Population plans, QueueNetwork net) {
@@ -101,14 +149,42 @@ public class QuerySpinne implements OTFQuery {
 		return actPersons;
 	}
 	
-	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
-		this.drivenLinks = new HashMap<Link,Integer> ();
-//		QueueLink link = net.getQueueLink(this.linkId);
-//		String start = link.getLink().getFromNode().getId().toString();
-//		String end = link.getLink().getToNode().getId().toString();
-		
-		List<Plan> actPersons = getPersons(plans, net);
+	protected void collectLinksFromTrip(List<Plan> actPersons) {
+		boolean addthis = false;
+		for (Plan plan : actPersons) {
+			List actslegs = plan.getPlanElements();
+			for (int i= 0; i< actslegs.size(); i++) {
+				if( i%2 == 0) {
+					// handle act
+					Activity act = (Activity)plan.getPlanElements().get(i);
+					Id id2 = act.getLink().getId();
+					if(id2.equals(this.linkId)) {
+						// only if act is ON the link add +1 to linkcounter
+						addLink(act.getLink());
+						addthis = true;
+					}
+				} else {
+					// handle leg
+					Leg leg = (Leg)actslegs.get(i);
+					List<Link> links = new ArrayList<Link>();
+					for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
+						links.add(link);
+						Id id2 = link.getId();
+						if(id2.equals(this.linkId) ) {
+							// only if this specific trip includes link, add all!
+							addthis = true;
+						}
+					}
+					if(addthis) for (Link link : links) addLink(link);
+					addthis = false;
+				}
 
+			}
+
+		}
+	}
+
+	protected void collectLinks(List<Plan> actPersons) {
 		for (Plan plan : actPersons) {
 			List actslegs = plan.getPlanElements();
 			for (int i= 0; i< actslegs.size(); i++) {
@@ -127,6 +203,19 @@ public class QuerySpinne implements OTFQuery {
 			}
 
 		}
+	}
+	
+	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
+		this.drivenLinks = new HashMap<Link,Integer> ();
+//		QueueLink link = net.getQueueLink(this.linkId);
+//		String start = link.getLink().getFromNode().getId().toString();
+//		String end = link.getLink().getToNode().getId().toString();
+		
+		List<Plan> actPersons = nowOnly ? getPersonsNOW(plans, net) : getPersons(plans, net);
+
+		if(tripOnly) collectLinksFromTrip(actPersons);
+		else collectLinks(actPersons);
+		
 		if(this.drivenLinks.size() == 0) return;
 
 		// convert this to drawable info
@@ -225,6 +314,7 @@ public class QuerySpinne implements OTFQuery {
 	public void setId(String id) {
 		this.linkId = new IdImpl(id);
 	}
+
 
 
 }

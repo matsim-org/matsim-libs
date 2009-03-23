@@ -45,7 +45,7 @@ public class SimpleSceneLayer extends DefaultSceneLayer {
 	}
 
 	@Override
-	public void init(SceneGraph graph) {
+	public void init(SceneGraph graph, boolean initConstData) {
 	}
 
 	public int getDrawOrder() {

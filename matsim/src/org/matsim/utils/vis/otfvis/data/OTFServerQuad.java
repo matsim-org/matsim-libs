@@ -40,7 +40,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 
 	private final List<OTFDataWriter> additionalElements= new LinkedList<OTFDataWriter>();
 
-	class ConvertToClientExecutor extends Executor<OTFDataWriter> {
+	class ConvertToClientExecutor implements Executor<OTFDataWriter> {
 		final OTFConnectionManager connect;
 		final OTFClientQuad client;
 
@@ -49,13 +49,13 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 			this.client = client;
 		}
 		@SuppressWarnings("unchecked")
-		@Override
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			Collection<Class> readerClasses = this.connect.getEntries(writer.getClass());
 			for (Class readerClass : readerClasses) {
 				try {
-					Object reader = readerClass.newInstance();
-					this.client.put(x, y, (OTFDataReader)reader);
+					OTFDataReader reader = (OTFDataReader)readerClass.newInstance();
+					reader.setSrc(writer);
+					this.client.put(x, y, reader);
 				} catch (Exception e) {
 					e.printStackTrace();
 					throw new RuntimeException();
@@ -65,7 +65,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 	}
 
 
-	class WriteDataExecutor extends Executor<OTFDataWriter> {
+	class WriteDataExecutor implements Executor<OTFDataWriter> {
 		final ByteBuffer out;
 		boolean writeConst;
 
@@ -73,7 +73,6 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 			this.out = out;
 			this.writeConst = writeConst;
 		}
-		@Override
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			try {
 				if (this.writeConst) writer.writeConstData(this.out);
@@ -268,5 +267,4 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 	public double getMinNorthing() {
 		return this.minNorthing;
 	}
-
 }

@@ -28,6 +28,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -97,6 +98,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private String address;
 	protected OTFServerRemote host = null;
 	private final Map <String,OTFDrawer> handlers = new HashMap<String,OTFDrawer>();
+	private final Map <String,OTFClientQuad> quads = new HashMap<String,OTFClientQuad>();
 
 	private ImageIcon playIcon = null;
 	private ImageIcon pauseIcon = null;
@@ -223,7 +225,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		System.out.println("Creating receivers");
 		clientQ.createReceiver(connect);
 		readConstData(clientQ);
-		
+		this.quads.put(id, clientQ);
 		return clientQ;
 	}
 
@@ -692,14 +694,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	public OTFQuery doQuery(OTFQuery query) {
 		OTFQuery result = null;
-		try {
-			if(host.isLive()) {
-				result = ((OTFLiveServerRemote)host).answerQuery(query);
-			}
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		return result;
+		OTFClientQuad quad = this.quads.values().iterator().next();
+		return quad.doQuery(query);
 	}
 
 	public void finishedInitialisition() {

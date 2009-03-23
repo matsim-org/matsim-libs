@@ -78,7 +78,7 @@ public class SceneGraph {
 
 		// do initialising action if necessary
 		for (SceneLayer layer : layers.values()) {
-			layer.init(this);
+			layer.init(this, time == -1 ? true : false);
 			drawingLayers.add(layer);
 		}
 		

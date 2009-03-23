@@ -321,7 +321,7 @@ implements MouseWheelListener{
 		GLU glu = new GLU();
 		gl.glMatrixMode(GL_PROJECTION);
 		gl.glLoadIdentity();
-		glu.gluPerspective(45.0, aspectRatio, 1.0, cameraStart.getZ()*2);
+		glu.gluPerspective(45.0, aspectRatio, 1.0, Math.max(1, cameraStart.getZ()*2));
 
 		gl.glMatrixMode(GL_MODELVIEW);
 		gl.glLoadIdentity();
@@ -371,8 +371,8 @@ implements MouseWheelListener{
 		//		glu.gluUnProject( winX, winY, winZ, DoubleBuffer.wrap(modelview), DoubleBuffer.wrap(projection), IntBuffer.wrap(viewport), DoubleBuffer.wrap(obj_pos));
 		glu.gluUnProject( winX, winY, w_pos[2], modelview,0, projection,0, viewport,0, obj_pos,0);
 
-		posX = (float)obj_pos[0];
-		posY = (float)obj_pos[1];
+		posX = (float)obj_pos[0] - camera.getTargetOffset().x;
+		posY = (float)obj_pos[1] - camera.getTargetOffset().y;
 		//posZ = (float)obj_pos[2];
 		// maintain z-pos == zoom level
 		return new Point3f(posX, posY, cameraStart.getZ());

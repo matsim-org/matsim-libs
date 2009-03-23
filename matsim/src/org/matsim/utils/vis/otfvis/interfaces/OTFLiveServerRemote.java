@@ -22,10 +22,14 @@ package org.matsim.utils.vis.otfvis.interfaces;
 
 import java.rmi.RemoteException;
 
+import org.matsim.utils.vis.otfvis.data.OTFDataWriter;
+
 public interface OTFLiveServerRemote extends OTFServerRemote {
 	public void pause() throws RemoteException;
 	public void play() throws RemoteException;
 	
-	public OTFQuery answerQuery(org.matsim.utils.vis.otfvis.interfaces.OTFQuery query) throws RemoteException;
+	public boolean replace(String id, double x, double y, int index, Class clazz) throws RemoteException;
+	
+	public OTFQuery answerQuery(OTFQuery query) throws RemoteException;
 	
 }
