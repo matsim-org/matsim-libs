@@ -74,7 +74,7 @@ public class BasicActivityImpl implements BasicActivity {
 
 	@Override
 	public int hashCode() {
-		return this.type.hashCode() ^ this.linkId.toString().hashCode(); // XOR of two hashes
+		return this.type.hashCode() ^ this.getLinkId().toString().hashCode(); // XOR of two hashes
 	}
 
 	public void setFacilityId(Id locationId) {
@@ -93,18 +93,11 @@ public class BasicActivityImpl implements BasicActivity {
 		return this.facilityId;
 	}
 
-
-	/**
-	 * @see org.matsim.interfaces.basic.v01.population.BasicActivity#getDuration()
-	 */
 	@Deprecated // nov08, dg
 	public double getDuration() {
 		return this.dur;
 	}
 
-	/**
-	 * @see org.matsim.interfaces.basic.v01.population.BasicActivity#setDuration(double)
-	 */
 	@Deprecated // nov08, dg
 	public void setDuration(final double dur) {
 		this.dur = dur;
