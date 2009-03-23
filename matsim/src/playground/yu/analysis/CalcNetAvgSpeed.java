@@ -94,7 +94,7 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 	}
 
 	public void handleEvent(LinkLeaveEvent leave) {
-		Double enterTime = this.enterTimes.get(leave.agentId);
+		Double enterTime = this.enterTimes.remove(leave.agentId);
 		if (enterTime != null) {
 			Link l = leave.link;
 			if (l == null) {

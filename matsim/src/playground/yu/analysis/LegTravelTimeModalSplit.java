@@ -119,9 +119,11 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 			// only inhabitant from Kanton
 			if (TollTools.isInRange(plans.getPersons().get(event.getPersonId())
 					.getSelectedPlan().getFirstActivity().getLink(), toll))
-				this.tmpDptTimes.put(event.getPersonId().toString(), event.getTime());
+				this.tmpDptTimes.put(event.getPersonId().toString(), event
+						.getTime());
 		} else
-			this.tmpDptTimes.put(event.getPersonId().toString(), event.getTime());
+			this.tmpDptTimes.put(event.getPersonId().toString(), event
+					.getTime());
 	}
 
 	public void reset(final int iteration) {
@@ -133,19 +135,19 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		String agentId = event.getPersonId().toString();
 		if (toll == null)
 			internalCompute(agentId, arrTime);
-		else if (TollTools.isInRange(plans.getPersons().get(event.getPersonId())
-				.getSelectedPlan().getFirstActivity().getLink(), toll))
+		else if (TollTools.isInRange(plans.getPersons()
+				.get(event.getPersonId()).getSelectedPlan().getFirstActivity()
+				.getLink(), toll))
 			internalCompute(agentId, arrTime);
 	}
 
 	private void internalCompute(String agentId, double arrTime) {
-		Double dptTime = this.tmpDptTimes.get(agentId);
+		Double dptTime = this.tmpDptTimes.remove(agentId);
 		if (dptTime != null) {
 			int binIdx = getBinIndex(arrTime);
 			double travelTime = arrTime - dptTime;
 			this.travelTimes[binIdx] += travelTime;
 			this.arrCount[binIdx]++;
-			this.tmpDptTimes.remove(agentId);
 
 			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
 					.getSelectedPlan();

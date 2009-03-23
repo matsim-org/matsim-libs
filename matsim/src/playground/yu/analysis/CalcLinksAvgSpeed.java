@@ -137,9 +137,10 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		 * @param nofBins
 		 *            - number of bins.
 		 */
-		public SpeedCounter(final int nofBins, final double[] freeSpeeds) {
-			lengthSum = new double[nofBins];
-			timeSum = new double[nofBins];
+		public SpeedCounter(final double[] freeSpeeds) {
+			int length = freeSpeeds.length;
+			lengthSum = new double[length];
+			timeSum = new double[length];
 			this.freeSpeeds = freeSpeeds;
 		}
 
@@ -192,7 +193,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 			for (int i = 0; i < nofBins - 1; i++)
 				freeSpeeds[i] = network.getLink(linkId).getFreespeed(
 						i * 86400.0 / nofBins);
-			sc = new SpeedCounter(nofBins, freeSpeeds);
+			sc = new SpeedCounter(freeSpeeds);
 		}
 		sc.setTmpEnterTime(enter.agentId, enter.getTime());
 		speedCounters.put(linkId, sc);

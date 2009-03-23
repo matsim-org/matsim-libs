@@ -37,7 +37,6 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationReader;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
@@ -123,25 +122,24 @@ public class AnalysisTest {
 		LegDistance ld = null;
 		// only PersonAlgorithm begins.
 		if (plansFilename != null) {
-			Population plans = new PopulationImpl();
+			Population population = new PopulationImpl();
 
 			catl = new CalcAverageTripLength();
 			ms = new ModeSplit(toll);
-			orms = new OnRouteModalSplit(scenario, plans, toll);
-			lttms = new LegTravelTimeModalSplit(plans, toll);
+			orms = new OnRouteModalSplit(scenario, population, toll);
+			lttms = new LegTravelTimeModalSplit(population, toll);
 			dd = new DailyDistance(toll);
 			dert = new DailyEnRouteTime(toll);
-			ld = new LegDistance(network, toll, plans);
-			// TODO add some PersonAlgorithm and EventsHandler
+			ld = new LegDistance(network, toll, population);
+			// in future, add some PersonAlgorithm and EventsHandler
 
-			PopulationReader plansReader = new MatsimPopulationReader(plans,
-					network);
-			plansReader.readFile(plansFilename);
+			new MatsimPopulationReader(population, network)
+					.readFile(plansFilename);
 
-			catl.run(plans);
-			dd.run(plans);
-			dert.run(plans);
-			ms.run(plans);
+			catl.run(population);
+			dd.run(population);
+			dert.run(population);
+			ms.run(population);
 		} else {
 			ld = new LegDistance(network);
 		}
@@ -149,7 +147,7 @@ public class AnalysisTest {
 		Events events = new Events();
 		// EventsHandlers without parameter of "Population":
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network, toll);
-		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network,toll);
+		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network, toll);
 		CalcLinksAvgSpeed clas = null;
 		if (scenario.equals("Zurich")) {
 			clas = new CalcLinksAvgSpeed(network, 682845.0, 247388.0, 2000.0);
