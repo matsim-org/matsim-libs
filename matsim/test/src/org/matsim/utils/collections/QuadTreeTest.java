@@ -110,6 +110,12 @@ public class QuadTreeTest extends MatsimTestCase {
 		assertTrue(values.contains("15.0, 15.0"));
 		assertTrue(values.contains("15.0, 15.0 B"));
 
+		// test "distance" get with exact coordinate and distance=0
+		values = qt.get(15.0, 15.0, 0.0);
+		assertEquals(2, values.size());
+		assertTrue(values.contains("15.0, 15.0"));
+		assertTrue(values.contains("15.0, 15.0 B"));
+
 		// test "distance" get with not exact coordinate
 		values = qt.get(9.0, 9.0, 10.0);
 		assertEquals(3, values.size());
