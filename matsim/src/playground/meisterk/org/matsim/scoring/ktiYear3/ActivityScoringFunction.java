@@ -22,79 +22,95 @@ package playground.meisterk.org.matsim.scoring.ktiYear3;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.regex.Pattern;
 
-import org.matsim.basic.v01.BasicOpeningTime;
-import org.matsim.basic.v01.BasicOpeningTime.DayType;
-import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.interfaces.core.v01.PlanElement;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.population.ActUtilityParameters;
 import org.matsim.scoring.CharyparNagelScoringParameters;
-import org.matsim.utils.misc.Time;
 
-import playground.meisterk.org.matsim.population.algorithms.PersonAddTypicalDurationsToDesires;
 
 public class ActivityScoringFunction extends
-		org.matsim.scoring.charyparNagel.ActivityScoringFunction {
+org.matsim.scoring.charyparNagel.ActivityScoringFunction {
 
+	public static final int DEFAULT_PRIORITY = 1;
+	
 	private List<ScoringPenalty> penalty = null;
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
+	private TreeMap<String, Double> activityDurations = null;
+	private TreeMap<String, Double> zeroUtilityDurations = null;
 
-	public ActivityScoringFunction(Plan plan,
-			CharyparNagelScoringParameters params,
-			final TreeMap<Id, FacilityPenalty> facilityPenalties) {
+	public ActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		super(plan, params);
 		this.penalty = new Vector<ScoringPenalty>();
 		this.facilityPenalties = facilityPenalties;
+		this.activityDurations = new TreeMap<String, Double>();
 	}
 
 	@Override
-	public void finish() {
-		super.finish();
+	protected double calcActScore(double arrivalTime, double departureTime,
+			Activity act) {
 
-		// reduce score by penalty from capacity restraints
-		Iterator<ScoringPenalty> pen_it = this.penalty.iterator();
-		while (pen_it.hasNext()) {
-			ScoringPenalty penalty = pen_it.next();
-			this.score -= penalty.getPenalty();
+		// copied from super class, but:
+		// - calculate duration by activity type, save it, but not process for scoring
+		// - process all other scoring elements except performing (done in finishPerformingActivities)
+		// - (TODO) with this, process facility opening times. find a way use opening times 1:1, not ignoring lunch breaks
+
+		ActUtilityParameters actParams = this.params.utilParams.get(act.getType());
+		if (actParams == null) {
+			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
-		this.penalty.clear();
 
-	}
-
-	@Override
-	protected double calcActScore(final double arrivalTime,
-			final double departureTime, final Activity act) {
-
-		ActUtilityParameters params = this.params.utilParams.get(act.getType());
-		if (params == null) {
-			throw new IllegalArgumentException("acttype \"" + act.getType()
-					+ "\" is not known in utility parameters.");
-		}
 		double tmpScore = 0.0;
+
+		/* Calculate the times the agent actually performs the
+		 * activity.  The facility must be open for the agent to
+		 * perform the activity.  If it's closed, but the agent is
+		 * there, the agent must wait instead of performing the
+		 * activity (until it opens).
+		 *
+		 *                                             Interval during which
+		 * Relationship between times:                 activity is performed:
+		 *
+		 *      O________C A~~D  ( 0 <= C <= A <= D )   D...D (not performed)
+		 * A~~D O________C       ( A <= D <= O <= C )   D...D (not performed)
+		 *      O__A+++++C~~D    ( O <= A <= C <= D )   A...C
+		 *      O__A++D__C       ( O <= A <= D <= C )   A...D
+		 *   A~~O++++++++C~~D    ( A <= O <= C <= D )   O...C
+		 *   A~~O+++++D__C       ( A <= O <= D <= C )   O...D
+		 *
+		 * Legend:
+		 *  A = arrivalTime    (when agent gets to the facility)
+		 *  D = departureTime  (when agent leaves the facility)
+		 *  O = openingTime    (when facility opens)
+		 *  C = closingTime    (when facility closes)
+		 *  + = agent performs activity
+		 *  ~ = agent waits (agent at facility, but not performing activity)
+		 *  _ = facility open, but agent not there
+		 *
+		 * assume O <= C
+		 * assume A <= D
+		 */
 
 		double[] openingInterval = this.getOpeningInterval(act);
 		double openingTime = openingInterval[0];
 		double closingTime = openingInterval[1];
+
 		double activityStart = arrivalTime;
 		double activityEnd = departureTime;
 
-		if ((openingTime >= 0) && (arrivalTime < openingTime)) {
+		if ((openingTime >=  0) && (arrivalTime < openingTime)) {
 			activityStart = openingTime;
 		}
 		if ((closingTime >= 0) && (closingTime < departureTime)) {
 			activityEnd = closingTime;
 		}
-		if ((openingTime >= 0)
-				&& (closingTime >= 0)
+		if ((openingTime >= 0) && (closingTime >= 0)
 				&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
 			// agent could not perform action
 			activityStart = departureTime;
@@ -102,150 +118,113 @@ public class ActivityScoringFunction extends
 		}
 		double duration = activityEnd - activityStart;
 
-		// utility of performing an action, duration is >= 1, thus log is no
-		// problem ----------------
-		// get typical duration from desires, rather than from config act params
-		double typicalDuration = this.person.getDesires().getActivityDuration(
-				act.getType() + PersonAddTypicalDurationsToDesires.APPENDIX);
-		// double typicalDuration = params.getTypicalDuration();
-
-		if (duration > 0) {
-			double utilPerf = this.params.marginalUtilityOfPerforming
-					* typicalDuration
-					* Math.log((duration / 3600.0)
-							/ params.getZeroUtilityDuration());
-
-			double utilWait = this.params.marginalUtilityOfWaiting * duration;
-			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
-
-			/*
-			 * Penalty due to facility load:
-			 * -------------------------------------------- Store the temporary
-			 * score to reduce it in finish() proportionally to score and dep.
-			 * on facility load. TODO: maybe checking if activity is movable for
-			 * this person (discussion)
-			 */
-			if (!act.getType().startsWith("h")) {
-				this.penalty.add(new ScoringPenalty(activityStart, activityEnd,
-						this.facilityPenalties.get(act.getFacility().getId()),
-						tmpScore));
-			}
-			// ---------------------------------------------------------------------------
-
-		} else {
-			tmpScore += 2 * this.params.marginalUtilityOfLateArrival
-					* Math.abs(duration);
+		// - calculate duration by activity type, save it, but do not process it in activity performing
+		double oldDuration = 0.0;
+		if (this.activityDurations.containsKey(act.getType())) {
+			oldDuration = this.activityDurations.get(act.getType());
 		}
+		this.activityDurations.put(act.getType(), oldDuration + duration);
 
-		// DISUTILITIES:
-		// ==============================================================================
 		// disutility if too early
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
-			tmpScore += this.params.marginalUtilityOfWaiting
-					* (activityStart - arrivalTime);
+			tmpScore += this.params.marginalUtilityOfWaiting * (activityStart - arrivalTime);
 		}
 
 		// disutility if too late
-		double latestStartTime = params.getLatestStartTime();
+
+		double latestStartTime = actParams.getLatestStartTime();
 		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
-			tmpScore += this.params.marginalUtilityOfLateArrival
-					* (activityStart - latestStartTime);
+			tmpScore += this.params.marginalUtilityOfLateArrival * (activityStart - latestStartTime);
 		}
 
+		// - process all other scoring elements except performing (done in finishPerformingActivities)
+//		double typicalDuration = actParams.getTypicalDuration();
+
+//		if (duration > 0) {
+//		double utilPerf = this.params.marginalUtilityOfPerforming * typicalDuration
+//		* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration());
+//		double utilWait = this.params.marginalUtilityOfWaiting * duration;
+//		tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
+//		} else {
+//		tmpScore += 2*this.params.marginalUtilityOfLateArrival*Math.abs(duration);
+//		}
+
 		// disutility if stopping too early
-		double earliestEndTime = params.getEarliestEndTime();
+		double earliestEndTime = actParams.getEarliestEndTime();
 		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
-			tmpScore += this.params.marginalUtilityOfEarlyDeparture
-					* (earliestEndTime - activityEnd);
+			tmpScore += this.params.marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
 		}
 
 		// disutility if going to away to late
 		if (activityEnd < departureTime) {
-			tmpScore += this.params.marginalUtilityOfWaiting
-					* (departureTime - activityEnd);
+			tmpScore += this.params.marginalUtilityOfWaiting * (departureTime - activityEnd);
 		}
 
 		// disutility if duration was too short
-		double minimalDuration = params.getMinimalDuration();
+		double minimalDuration = actParams.getMinimalDuration();
 		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
-			tmpScore += this.params.marginalUtilityOfEarlyDeparture
-					* (minimalDuration - duration);
+			tmpScore += this.params.marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 		}
+
 		return tmpScore;
 	}
 
-	/*
-	 * Copied from org.matsim.scoring.CharyparNagelOpenTimesScoringFunction.
-	 * Modifications: - matching of activity types - code a little bit more
-	 * structured
-	 * 
-	 * (non-Javadoc)
-	 * 
-	 * @see org.matsim.scoring.charyparNagel.ActivityScoringFunction#getOpeningInterval(org.matsim.interfaces.core.v01.Activity)
-	 */
 	@Override
-	protected double[] getOpeningInterval(Activity act) {
-		//  openInterval has two values
-		// openInterval[0] will be the opening time
-		// openInterval[1] will be the closing time
-		double[] openInterval = new double[] { Time.UNDEFINED_TIME,
-				Time.UNDEFINED_TIME };
+	public void finish() {
+		super.finish();
+		this.finishPerformingActivities();
+		this.finishFacilityPenalties();
+	}
 
-		boolean foundAct = false;
-
-		Facility facility = act.getFacility();
-		Iterator<String> activityOptions = facility.getActivityOptions()
-				.keySet().iterator();
-		String facilityActType = null;
-		Set<BasicOpeningTime> opentimes = null;
-
-		while (activityOptions.hasNext() && !foundAct) {
-			facilityActType = activityOptions.next();
-			// first, look if an exact match of the activity type exists
-			if (act.getType().equals(facilityActType)) {
-				foundAct = true;
-			}
-			// second, look if a similar type exists
-			else if (Pattern.matches(".*" + act.getType() + ".*",
-					facilityActType)) {
-				foundAct = true;
-			}
+	protected void finishFacilityPenalties() {
+		// copied from LocationChoiceScoringFunction
+		// reduce score by penalty from capacity restraints
+		Iterator<ScoringPenalty> pen_it = this.penalty.iterator();
+		while (pen_it.hasNext()){
+			ScoringPenalty penalty = pen_it.next();
+			this.score -= penalty.getPenalty();
 		}
+		this.penalty.clear();
+	}
 
-		if (foundAct) {
-			// choose appropriate opentime:
-			// either wed or wkday
-			// use wednesday opening times if available
-			opentimes = facility.getActivityOption(facilityActType)
-					.getOpeningTimes(DayType.wed);
-			// if not, use wkday opening times
-			if (opentimes == null) {
-				opentimes = facility.getActivityOption(facilityActType)
-						.getOpeningTimes(DayType.wkday);
-			}
-			// if none is given, use undefined opentimes
-			if (opentimes != null) {
-				// ignoring multiple opening intervals on one day with the
-				// following procedure, that is:
-				// use the earliest available opening time and the latest
-				// available closing time
-				openInterval[0] = Double.MAX_VALUE;
-				openInterval[1] = Double.MIN_VALUE;
-
-				for (BasicOpeningTime opentime : opentimes) {
-					openInterval[0] = Math.min(openInterval[0], opentime
-							.getStartTime());
-					openInterval[1] = Math.max(openInterval[1], opentime
-							.getEndTime());
+	protected void finishPerformingActivities() {
+		
+		double zeroUtilityDuration;
+		double typicalDuration;
+		double duration;
+		
+		// initialize zero utility durations here for better code readability, because we only need them here
+		Activity act;
+		if (this.zeroUtilityDurations == null) {
+			this.zeroUtilityDurations = new TreeMap<String, Double>();
+			for (PlanElement planElement : this.plan.getPlanElements()) {
+				if (planElement instanceof Activity) {
+					act = (Activity) planElement;
+					// - get typical duration from desires rather than from config
+					typicalDuration = this.person.getDesires().getActivityDuration(act.getType());
+					zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0) / ActivityScoringFunction.DEFAULT_PRIORITY);
+					this.zeroUtilityDurations.put(act.getType(), zeroUtilityDuration);
 				}
 			}
-		} else {
-			Gbl.errorMsg("Facility does not contain the activity option \""
-					+ act.getType() + "\" or a similar one.");
 		}
-
-		return openInterval;
+		
+		// process collected activity durations by activity type
+		for (String actType : this.activityDurations.keySet()) {
+			// - get typical duration from desires rather than from config
+			typicalDuration = this.person.getDesires().getActivityDuration(actType);
+			duration = this.activityDurations.get(actType);
+			if (duration > 0) {
+				double utilPerf = this.params.marginalUtilityOfPerforming * typicalDuration
+				* Math.log((duration / 3600.0) / this.zeroUtilityDurations.get(actType));
+				double utilWait = this.params.marginalUtilityOfWaiting * duration;
+				this.score += Math.max(0, Math.max(utilPerf, utilWait));
+			} else {
+				this.score += 2*this.params.marginalUtilityOfLateArrival*Math.abs(duration);
+			}
+		}
+		this.activityDurations.clear();
+		
 	}
 
 }

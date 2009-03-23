@@ -28,8 +28,6 @@ import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionAccumulator;
-import org.matsim.scoring.charyparNagel.AgentStuckScoringFunction;
-import org.matsim.scoring.charyparNagel.MoneyScoringFunction;
 
 public class KTIYear3ScoringFunctionFactory extends org.matsim.scoring.charyparNagel.CharyparNagelScoringFunctionFactory {
 
@@ -46,8 +44,8 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.scoring.charyparN
 		
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, super.getParams(), this.facilityPenalties));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.scoring.charyparNagel.LegScoringFunction(plan, super.getParams()));
-		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(super.getParams()));
-		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(super.getParams()));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.scoring.charyparNagel.MoneyScoringFunction(super.getParams()));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.scoring.charyparNagel.AgentStuckScoringFunction(super.getParams()));
 		
 		return scoringFunctionAccumulator;
 		

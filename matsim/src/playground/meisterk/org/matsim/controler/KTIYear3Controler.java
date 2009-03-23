@@ -22,10 +22,8 @@ package playground.meisterk.org.matsim.controler;
 
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
-import org.matsim.controler.listener.StartupListener;
 import org.matsim.gbl.Gbl;
-
-import playground.meisterk.org.matsim.controler.listener.KTIYear3StartupListener;
+import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 
 public class KTIYear3Controler {
 
@@ -37,8 +35,11 @@ public class KTIYear3Controler {
 		Config config = Gbl.createConfig(args);
 		Controler controler = new Controler(config);
 		
-		StartupListener sl = new KTIYear3StartupListener(controler);
-		controler.addControlerListener(sl);
+		// the scoring function processes facility loads independent of whether a location choice module is used or not
+		controler.addControlerListener(new FacilitiesLoadCalculator(controler.getFacilityPenalties()));
+		controler.setScoringFunctionFactory(new playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory(
+				Gbl.getConfig().charyparNagelScoring(), 
+				controler.getFacilityPenalties()));
 		
 		controler.run();
 
