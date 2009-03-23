@@ -29,6 +29,7 @@ public class GenerateBlnPlan2 {
 
 	private static final Logger log = Logger.getLogger(TabReader.class);
 	private static final int spreadingTime = 900; // 15min
+	private static final boolean setAllLegsToCar = true;
 	
 	// statistics
 	private int[] actTypes = new int[14];
@@ -44,23 +45,36 @@ public class GenerateBlnPlan2 {
 			GenerateBlnPlan2 myBlnPlanGenerator = new GenerateBlnPlan2();
 
 			HashMap<Id, PersonImpl> personMap;
-			personMap = myBlnPlanGenerator.generatePersons("Z:/PERSONEN.csv");
+			// Create a person for everyone in file and store them in a map
+			personMap = myBlnPlanGenerator.generatePersons("Z:/population/input/PERSONEN.csv");
 
-			HashMap<Id, ArrayList<String[]>> tripMap = myBlnPlanGenerator.readTrips("Z:/WEGE.csv");
+			// Same here, but trips
+			HashMap<Id, ArrayList<String[]>> tripMap = myBlnPlanGenerator.readTrips("Z:/population/input/WEGE.csv");
 
+			// Print statistics for raw data
 			myBlnPlanGenerator.countPersonsPlans(personMap, tripMap);
+			// If a person has only one trip, delete that trip 
 			tripMap = myBlnPlanGenerator.filterPersonsWithOneTrip(tripMap);
 
+
+			// Some trips have invalid coordinates. Most of them are situated outside the survey area and weren't localized
+			// But some weren't localized because of faulty survey data, e.x. misspelling, spaces in Name, or a different federal state
+			// Those could be reconstructed by defining a common entry point to the survey area
+			tripMap = myBlnPlanGenerator.filterTripsWithoutCoordButEntryInCoordMap(tripMap, "z:/population/input/zero_coordinates_trips.csv");
 //			tripMap = myBlnPlanGenerator.filterTripsWithoutCoord(tripMap);
-			tripMap = myBlnPlanGenerator.filterTripsWithoutCoordButEntryInCoordMap(tripMap, "z:/resultat_20090306.csv");
+			// Again statistics
 			tripMap = myBlnPlanGenerator.filterPersonsWithOneTrip(tripMap);
 
+			// Add trips to persons and create a plan
 			myBlnPlanGenerator.addPlansToPersons(personMap, tripMap);
 
+			// Remove all persons without a plan
 			personMap = myBlnPlanGenerator.removePersonsWithoutPlan(personMap, tripMap);
 
-			myBlnPlanGenerator.writePopulationToFile(personMap.values(), "z:/raw_plans_out.xml");
+			// Write output to file
+			myBlnPlanGenerator.writePopulationToFile(personMap.values(), "z:/population/output/plans_out.xml");
 
+			// Print additional statistics
 			myBlnPlanGenerator.printStatistic();
 
 		} catch (IOException e) {
@@ -165,8 +179,8 @@ public class GenerateBlnPlan2 {
 			}
 		}
 		
-		log.info("Found " + numberOfPersonsWithoutTrip + " persons without trip and " +
-				numberOfTripsWithoutPerson + " trips without a person in raw data.");		
+		log.info(numberOfPersonsWithoutTrip + " persons have no trip");
+		log.info(numberOfTripsWithoutPerson + " trips have no correspnding person in raw data.");		
 	}
 	
 	private HashMap<Id,ArrayList<String[]>> filterPersonsWithOneTrip(HashMap<Id,ArrayList<String[]>> unfilteredTripData){
@@ -215,7 +229,7 @@ public class GenerateBlnPlan2 {
 		
 		log.info("Start reading file " + filename);
 		ArrayList<String[]> unsortedCoordMapData = TabReader.readFile(filename);
-		log.info("...finished reading " + unsortedCoordMapData.size() + " entries in coordMap file.");
+		log.info("...finished reading " + unsortedCoordMapData.size() + " entries in " + filename + " file.");
 		
 		HashMap<Id, ArrayList<String[]>> sortedCoordMapData = new HashMap<Id, ArrayList<String[]>>();
 		for (String[] coordMapEntry : unsortedCoordMapData) {
@@ -266,6 +280,7 @@ public class GenerateBlnPlan2 {
 
 	private void addPlansToPersons(HashMap<Id,PersonImpl> personList, HashMap<Id,ArrayList<String[]>> tripData) {
 		
+		log.info("Adding Plans to Person, spreading time is " + GenerateBlnPlan2.spreadingTime + "s");
 		for (Id personId : tripData.keySet()) {
 			
 			ArrayList<String[]> curTripList = tripData.get(personId);
@@ -432,75 +447,93 @@ public class GenerateBlnPlan2 {
 	private LegImpl createLeg(String[] tripData){
 
 		LegImpl leg = null;
-
-		switch (Integer.parseInt(tripData[48])) {
-		case 0:
-			// "keine Angabe"
-			leg = new LegImpl(BasicLeg.Mode.undefined);
-			this.modalSplit[0]++;
-			break;
-		case 1:
-			// "Fuss"
-			leg = new LegImpl(BasicLeg.Mode.walk);
-			this.modalSplit[1]++;
-			break;
-		case 2:
-			// "Rad"
-			leg = new LegImpl(BasicLeg.Mode.bike);
-			this.modalSplit[2]++;
-			break;
-		case 3:
-			// "MIV" TODO [an] BasicLeg.Mode.miv cannot be handled by PersonPrepareForSim.1
+		
+		if(GenerateBlnPlan2.setAllLegsToCar == true){
+			
 			leg = new LegImpl(BasicLeg.Mode.car);
 			this.modalSplit[3]++;
-			break;
-		case 4:
-			// "OEV"
-			leg = new LegImpl(BasicLeg.Mode.pt);
-			this.modalSplit[4]++;
-			break;
-		case 5:
-			// "Rad/OEV"
-			leg = new LegImpl(BasicLeg.Mode.pt);
-			this.modalSplit[5]++;
-			break;
-		case 6:
-			// "IV/OEV"
-			leg = new LegImpl(BasicLeg.Mode.pt);
-			this.modalSplit[6]++;
-			break;
-		case 7:
-			// "sonstiges"
-			leg = new LegImpl(BasicLeg.Mode.undefined);
-			this.modalSplit[7]++;
-			break;
-		default:
-			log.error("transport mode not defined");
-			leg = new LegImpl(BasicLeg.Mode.walk);
-			this.modalSplit[8]++;
-		}
+			
+		} else {		
 
-		// Read travel trip time from survey (min) 
-		if (!tripData[50].equalsIgnoreCase("")){
-			leg.setTravelTime(Double.parseDouble(tripData[50]) * 60);
-		} else {
-//			log.info("empty String");
+			switch (Integer.parseInt(tripData[48])) {
+			case 0:
+				// "keine Angabe"
+				leg = new LegImpl(BasicLeg.Mode.undefined);
+				this.modalSplit[0]++;
+				break;
+			case 1:
+				// "Fuss"
+				leg = new LegImpl(BasicLeg.Mode.walk);
+				this.modalSplit[1]++;
+				break;
+			case 2:
+				// "Rad"
+				leg = new LegImpl(BasicLeg.Mode.bike);
+				this.modalSplit[2]++;
+				break;
+			case 3:
+				// "MIV" TODO [an] BasicLeg.Mode.miv cannot be handled by PersonPrepareForSim.1
+				leg = new LegImpl(BasicLeg.Mode.car);
+				this.modalSplit[3]++;
+				break;
+			case 4:
+				// "OEV"
+				leg = new LegImpl(BasicLeg.Mode.pt);
+				this.modalSplit[4]++;
+				break;
+			case 5:
+				// "Rad/OEV"
+				leg = new LegImpl(BasicLeg.Mode.pt);
+				this.modalSplit[5]++;
+				break;
+			case 6:
+				// "IV/OEV"
+				leg = new LegImpl(BasicLeg.Mode.pt);
+				this.modalSplit[6]++;
+				break;
+			case 7:
+				// "sonstiges"
+				leg = new LegImpl(BasicLeg.Mode.undefined);
+				this.modalSplit[7]++;
+				break;
+			default:
+				log.error("transport mode not defined");
+				leg = new LegImpl(BasicLeg.Mode.walk);
+				this.modalSplit[8]++;
+			}
+
+			// Read travel trip time from survey (min) 
+			if (!tripData[50].equalsIgnoreCase("")){
+				leg.setTravelTime(Double.parseDouble(tripData[50]) * 60);
+			} else {
+				//			log.info("empty String");
+			}
+
 		}
 		return leg;
 	}
 
 	private void printStatistic() {
-		log.info("\nActivity Split:\n" + (this.actTypes[0] + this.actTypes[8]) + " home | " 
+		int totalNumActs = 0;
+		for (int i = 0; i < this.actTypes.length; i++) {
+			totalNumActs = totalNumActs + this.actTypes[i];
+		}
+		log.info("Number of Acts: " + totalNumActs + "\nActivity Split:" + (this.actTypes[0] + this.actTypes[8]) + " home | " 
 				+ this.actTypes[1] + " work | " + this.actTypes[2] + " education | " 
 				+ this.actTypes[3] + " business | " + (this.actTypes[4] + this.actTypes[5]) + " shopping | " 
 				+ (this.actTypes[6] + this.actTypes[7]) + " leisure | "
 				+ this.actTypes[9] + " see a doctor | " + this.actTypes[10] + " holiday | "
 				+ (this.actTypes[11] + this.actTypes[12] + this.actTypes[13]) + " other, multiple or not defined");
-		log.info("\nModal Split: " + this.modalSplit[3] + " car | " 
+		
+		int totalNumLegs = 0;
+		for (int i = 0; i < this.modalSplit.length; i++) {
+			totalNumLegs = totalNumLegs + this.modalSplit[i];
+		}
+		log.info("Number of Legs: " + totalNumLegs + "\nModal Split: " + this.modalSplit[3] + " car | " 
 				+ (this.modalSplit[4] + this.modalSplit[5] + this.modalSplit[6]) + " public transport | "
 				+ this.modalSplit[2] +	" bike | " + this.modalSplit[1] + " walk | " 
 				+ (this.modalSplit[0] + this.modalSplit[7]) + " not definied | " 
-				+ this.modalSplit[8] + " no data");		
+				+ this.modalSplit[8] + " no data");
 	}
 
 }
