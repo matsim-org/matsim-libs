@@ -20,6 +20,12 @@
 
 package playground.meisterk.org.matsim.scoring.ktiYear3;
 
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.config.Config;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.population.PersonImpl;
+import org.matsim.scoring.ScoringFunction;
 import org.matsim.testcases.MatsimTestCase;
 
 public class ActivityScoringFunctionTest extends MatsimTestCase {
@@ -28,4 +34,17 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		super.setUp();
 	}
 
+	public void testGetTimePerforming() {
+
+		Config config = super.loadConfig(this.getInputDirectory() + "config.xml");
+
+		KTIYear3ScoringFunctionFactory factory = new KTIYear3ScoringFunctionFactory(config.charyparNagelScoring(), null);
+		
+		Person person = new PersonImpl(new IdImpl("123"));
+		Plan plan = person.createPlan(true);
+		
+		ScoringFunction ktiYear3ScoringFunction = factory.getNewScoringFunction(plan);
+		
+	}
+	
 }

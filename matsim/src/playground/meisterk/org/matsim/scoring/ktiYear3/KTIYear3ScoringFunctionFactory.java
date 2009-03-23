@@ -33,6 +33,8 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.scoring.charyparN
 
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 
+	private ActivityScoringFunction activities = null;
+	
 	public KTIYear3ScoringFunctionFactory(CharyparNagelScoringConfigGroup config, final TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		super(config);
 		this.facilityPenalties = facilityPenalties;
@@ -42,13 +44,18 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.scoring.charyparN
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
-		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, super.getParams(), this.facilityPenalties));
+		this.activities = new ActivityScoringFunction(plan, super.getParams(), this.facilityPenalties);
+		scoringFunctionAccumulator.addScoringFunction(this.activities);
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.scoring.charyparNagel.LegScoringFunction(plan, super.getParams()));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.scoring.charyparNagel.MoneyScoringFunction(super.getParams()));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.scoring.charyparNagel.AgentStuckScoringFunction(super.getParams()));
 		
 		return scoringFunctionAccumulator;
 		
+	}
+
+	public ActivityScoringFunction getActivities() {
+		return activities;
 	}
 
 }
