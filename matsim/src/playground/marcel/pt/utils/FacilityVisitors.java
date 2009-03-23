@@ -65,9 +65,12 @@ public class FacilityVisitors implements ActEndEventHandler, ActStartEventHandle
 	public void handleEvent(final ActEndEvent event) {
 		Facility facility = event.getAct().getFacility();
 		if (facility != null) {
-			List<Person> persons = this.facilities.get(facility).get(event.getAct().getType());
-			if (persons != null) {
-				persons.remove(event.getAgent());
+			Map<String, List<Person>> actTypes = this.facilities.get(facility);
+			if (actTypes != null) {
+				List<Person> persons = this.facilities.get(facility).get(event.getAct().getType());
+				if (persons != null) {
+					persons.remove(event.getAgent());
+				}
 			}
 		}
 	}

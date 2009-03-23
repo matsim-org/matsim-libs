@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonAgent.java
+ * TransitAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,36 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.tryout;
+package playground.marcel.pt.integration;
 
 import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Person;
+import org.matsim.mobsim.queuesim.PersonAgent;
 
-import playground.marcel.pt.interfaces.DriverAgent;
 import playground.marcel.pt.interfaces.PassengerAgent;
 
-public class PersonAgent implements DriverAgent, PassengerAgent {
+public class TransitAgent extends PersonAgent implements PassengerAgent {
 
-	public Link chooseNextLink() {
-		// TODO [MR] Auto-generated method stub
-		return null;
+	private boolean isFirstQuery = true;
+	
+	public TransitAgent(Person p) {
+		super(p);
 	}
 
-	public void enterNextLink() {
-		// TODO [MR] Auto-generated method stub
-	}
-
-	public void leaveCurrentLink() {
-		// TODO [MR] Auto-generated method stub
-	}
-
-	public boolean arriveAtStop(final Facility stop) {
-		// TODO [MR] Auto-generated method stub
-		return false;
+	public boolean arriveAtStop(Facility stop) {
+		return this.getDestinationLink() == stop.getLink(); // TODO [MR] not yet perfect...
 	}
 
 	public boolean ptLineAvailable() {
-		// TODO [MR] Auto-generated method stub
+		if (this.isFirstQuery) {
+			this.isFirstQuery = false;
+			this.leaveActivity(7*3600);
+			return true;
+		}
 		return false;
 	}
 

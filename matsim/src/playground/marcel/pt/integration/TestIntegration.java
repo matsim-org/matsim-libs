@@ -31,6 +31,7 @@ import org.matsim.events.algorithms.EventWriterXML;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.network.NetworkLayer;
+import org.matsim.run.OTFVis;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.transitSchedule.TransitSchedule;
@@ -38,15 +39,6 @@ import playground.marcel.pt.transitSchedule.TransitScheduleReader;
 
 
 public class TestIntegration {
-
-//	public void testVehicles() {
-//		
-//		Map<String, BasicVehicleType> vehicleTypes = new LinkedHashMap<String, BasicVehicleType>();
-//		Map<Id, Vehicle> vehicles = new LinkedHashMap<Id, Vehicle>();
-//		VehicleBuilder vb = new VehicleBuilderImpl(vehicleTypes, vehicles);
-//		
-//	}
-//	
 
 	public static void main(final String[] args) {
 		final Config config = Gbl.createConfig(new String[] {"test/input/playground/marcel/pt/config.xml"});
@@ -57,7 +49,7 @@ public class TestIntegration {
 		events.addHandler(writer);
 		NetworkLayer network = scenario.getNetwork();
 		Facilities facilities = scenario.getFacilities();
-//		FacilityNetworkMatching.loadMapping(facilities, network, world, "../thesis-data/examples/minibln/facilityMatching.txt");
+//		FacilityNetworkMatching.loadMapping(facilities, network, scenario.getWorld(), "../thesis-data/examples/minibln/facilityMatching.txt");
 //		System.out.println(network.getLinks().size());
 //		System.out.println(facilities.getFacilities().size());
 		
@@ -67,6 +59,7 @@ public class TestIntegration {
 			final TransitQueueSimulation sim = new TransitQueueSimulation(scenario.getNetwork(), scenario.getPopulation(), events);
 			sim.setTransitSchedule(schedule);
 			sim.run();
+			OTFVis.playMVI(new String[] {"./otfvis.mvi"});
 
 		} catch (SAXException e) {
 			e.printStackTrace();

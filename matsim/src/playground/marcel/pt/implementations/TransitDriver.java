@@ -28,6 +28,8 @@ import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 
+import playground.marcel.pt.integration.TransitConstants;
+import playground.marcel.pt.integration.TransitQueueSimulation;
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.interfaces.Vehicle;
 import playground.marcel.pt.transitSchedule.Departure;
@@ -47,8 +49,9 @@ public class TransitDriver {
 		private int nextLinkIndex = 0;
 		private Link currentLink = null;
 		private FacilityVisitors facilityVisitors = null;
+		private final TransitQueueSimulation sim;
 
-		public TransitDriver(final TransitRoute route, final Departure departure) {
+		public TransitDriver(final TransitRoute route, final Departure departure, final TransitQueueSimulation sim) {
 			this.stops = new ArrayList<Facility>(route.getStops().size());
 			for (TransitRouteStop stop : route.getStops()) {
 				this.stops.add(stop.getStopFacility());
@@ -60,6 +63,7 @@ public class TransitDriver {
 			this.linkRoute.addAll(links);
 			this.linkRoute.add(carRoute.getEndLink());
 			this.departureTime = departure.getDepartureTime();
+			this.sim = sim;
 		}
 
 		public void setFacilityVisitorObserver(final FacilityVisitors fv) {
@@ -86,6 +90,7 @@ public class TransitDriver {
 			this.nextLinkIndex++;
 			// let's see if we have a stop at that link
 			for (Facility stop : this.stops) {
+				Link link = stop.getLink();
 				if (stop.getLink() == this.currentLink) {
 					handleStop(stop);
 				}
@@ -102,14 +107,16 @@ public class TransitDriver {
 			}
 			for (PassengerAgent passenger : passengersLeaving) {
 				this.vehicle.removePassenger(passenger);
-				// TODO [MR] add person to facility
+				System.out.println("passenger exit: ");
 			}
 
 			if (this.facilityVisitors != null) {
-				List<Person> people = this.facilityVisitors.getVisitors(stop, "pt_interaction");
+				Person[] people = this.facilityVisitors.getVisitors(stop, TransitConstants.INTERACTION_ACTIVITY_TYPE).toArray(new Person[0]);
 				for (Person person : people) {
-					if (((PassengerAgent) person).ptLineAvailable()) {
-						this.vehicle.addPassenger((PassengerAgent) person);
+					PassengerAgent passenger = (PassengerAgent) sim.getAgent(person);
+					if (passenger.ptLineAvailable()) {
+						this.vehicle.addPassenger(passenger);
+						System.out.println("passenger enter: ");
 						// TODO [MR] remove person from facility
 					}
 				}
