@@ -76,7 +76,6 @@ import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.basic.v01.population.BasicPerson;
 import org.matsim.interfaces.basic.v01.population.BasicPlan;
 import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
-import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Leg;
@@ -118,7 +117,6 @@ import org.matsim.population.algorithms.PlansFilterArea;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterPersonHasPlans;
 import org.matsim.population.algorithms.XY2Links;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -127,7 +125,6 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.AStarLandmarksFactory;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
@@ -147,9 +144,6 @@ import org.matsim.world.Location;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;
-
-import playground.marcel.ptnetwork.PtNetworkLayer;
-import playground.marcel.ptnetwork.PtNode;
 
 public class MyRuns {
 
@@ -870,146 +864,6 @@ public class MyRuns {
 		System.out.println();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// calcRoutePt -- Public Transport
-	//////////////////////////////////////////////////////////////////////
-
-	public static void calcRoutePt(final String[] args) {
-
-		System.out.println("RUN: calcRoutePt");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		final PtNetworkLayer ptNetwork = new PtNetworkLayer();
-		ptNetwork.buildfromBERTA(config.getParam("network", "inputBvgDataDir"),
-				config.getParam("network", "inputBvgDataCoords"), true,
-				config.getParam("network", "inputSBahnNet"));
-		ptNetwork.handleDeadEnds(ptNetwork.getDeadEnds());
-
-
-//		PtInternalNetwork intNetwork = new PtInternalNetwork();
-//		intNetwork.buildInternalNetwork(Gbl.getConfig().getParam("network", "inputBvgDataDir"));
-//		intNetwork.readCoordFileByCoord(Gbl.getConfig().getParam("network", "inputBvgDataCoords"));
-//		intNetwork.createHbs();
-//		intNetwork.writeToNetworkLayer(ptNetwork);
-
-//		intNetwork.writeToVISUM("testnet.net");
-//		PtInternalNetwork int2 = new PtInternalNetwork();
-//		int2.parseVISUMNetwork("testnet.net");
-//		int2.writeToNetworkLayer(ptNetwork);
-
-		System.out.println("  done.");
-
-		final String filename = config.findParam("network", "outputPtNetworkFile");
-		if (filename != null) {
-			System.out.println("  writing network xml file to " + filename + "... ");
-			final NetworkWriter network_writer = new NetworkWriter(ptNetwork, filename);
-			network_writer.write();
-			System.out.println("  done");
-		}
-
-		System.out.println("  reading plans...");
-		final Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans, null);
-		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
-		System.out.println("  done.");
-
-		System.out.println("  processing plans... at " + (new Date()));
-		int counter = 0;
-		int nextCount = 1;
-		final int radius = 250;
-		for (final Person person : plans.getPersons().values()) {
-			counter++;
-			if (counter == nextCount) {
-				nextCount *= 2;
-				System.out.println("plan # " + counter);
-			}
-			final Plan plan = person.getPlans().get(0);
-			Coord depCoord = ((Activity)plan.getPlanElements().get(0)).getCoord();
-			for (int i = 2, maxi = plan.getPlanElements().size(); i < maxi; i = i + 2) {
-				final Leg leg = ((Leg)plan.getPlanElements().get(i-1));
-				final Coord arrCoord = ((Activity)plan.getPlanElements().get(i)).getCoord();
-				final double depTime = leg.getDepartureTime();
-				try {
-					final Path path = ptNetwork.dijkstraGetCheapestRoute(depCoord, arrCoord, depTime, radius);
-					CarRoute route = new NodeCarRoute();
-					route.setNodes(path.nodes);
-					leg.setRoute(route);
-				} catch (final RuntimeException e) {
-					System.err.println("error while handling plan " + 0 + " of person " + person.getId());
-					e.printStackTrace();
-				}
-				depCoord = arrCoord;
-			}
-		}
-		System.out.println("  done. at " + (new Date()));
-
-		System.out.println("  writing plans...");
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		plansWriter.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: calcRoutePt finished.");
-		System.out.println();
-	}
-
-
-
-	//////////////////////////////////////////////////////////////////////
-	// testPt -- Public Transport
-	//////////////////////////////////////////////////////////////////////
-
-	public static void testPt(final String[] args) {
-
-		System.out.println("RUN: testPt");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		final PtNetworkLayer ptNetwork = new PtNetworkLayer();
-		ptNetwork.buildfromBERTA(config.getParam("network", "inputBvgDataDir"),
-				config.getParam("network", "inputBvgDataCoords"), true,
-				config.getParam("network", "inputSBahnNet"));
-//		ptNetwork.handleDeadEnds(ptNetwork.getDeadEnds());
-//		PtInternalNetwork intNetwork = new PtInternalNetwork();
-//		intNetwork.buildInternalNetwork(Gbl.getConfig().getParam("network", "inputBvgDataDir"));
-//		intNetwork.readCoordFileByCoord(Gbl.getConfig().getParam("network", "inputBvgDataCoords"));
-//		intNetwork.createHbs();
-//		intNetwork.writeToNetworkLayer(ptNetwork);
-
-//		intNetwork.writeToVISUM("testnet.net");
-//		PtInternalNetwork int2 = new PtInternalNetwork();
-//		int2.parseVISUMNetwork("testnet.net");
-//		int2.writeToNetworkLayer(ptNetwork);
-
-		System.out.println("  done.");
-		final String pedNodeType = "P";
-		for (final Iterator<? extends Node> iter = ptNetwork.getNodes().values().iterator(); iter.hasNext(); ) {
-			final PtNode node = (PtNode) iter.next();
-			if (pedNodeType.equals(node.getType())) {
-				if (node.getIncidentLinks().size() == 2) {
-					final PtNode node2 = (PtNode)node.getOutNodes().values().iterator().next();
-					if (node2.getIncidentLinks().size() == 3) {
-						System.out.println("HP " + node2.getId() + " (part of HB " + node.getId() + ") is a dead end.");
-					}
-				}
-			}
-		}
-
-		final String filename = config.findParam("network", "outputPtNetworkFile");
-		if (filename != null) {
-			System.out.println("  writing network xml file to " + filename + "... ");
-			final NetworkWriter network_writer = new NetworkWriter(ptNetwork, filename);
-			network_writer.write();
-			System.out.println("  done");
-		}
-
-		System.out.println("RUN: testPt finished.");
-		System.out.println();
-	}
-
 	static public void calcRealPlans(final String[] args) {
 
 		System.out.println("RUN: calcRealPlans");
@@ -1039,7 +893,6 @@ public class MyRuns {
 		System.out.println("RUN: calcRealPlans finished.");
 		System.out.println();
 	}
-
 
 	//////////////////////////////////////////////////////////////////////
 	// calcScoreFromEvents
@@ -2279,10 +2132,6 @@ public class MyRuns {
 			plan.getFirstActivity();
 		}
 		
-		for (BasicPlan plan : basicList3) {
-			plan.getPerson();
-		}
-		
 		A a;
 		B b;
 //		List<A> l = b.getList1();
@@ -2388,9 +2237,9 @@ public class MyRuns {
 //		readCounts(args);
 //		writeKml();
 //		createQVDiagramm(args);
-		someTest(args);
+//		someTest(args);
 
-//		Gbl.printSystemInfo();
+		Gbl.printSystemInfo();	
 
 		System.out.println("stop at " + (new Date()));
 		System.exit(0); // currently only used for calcRouteMT();
