@@ -87,7 +87,7 @@ public class BkTestPlansCreatorWithPt {
 			act2.setLinkId(id4);
 			act2.setStartTime(7.0 * 3600.0);
 			act2.setEndTime(15.0 * 3600.0);
-			act2.setDuration(8.0 * 3600.0);
+//			act2.setDuration(8.0 * 3600.0);
 			plan.addAct(act2);
 			
 			BasicLeg leg2Car = new BasicLegImpl(BasicLeg.Mode.car);

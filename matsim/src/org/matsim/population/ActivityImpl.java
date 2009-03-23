@@ -34,6 +34,7 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 
 	private BasicLink link = null;
 	private Facility facility = null;
+	private double dur = Time.UNDEFINED_TIME;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -69,7 +70,6 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 		this.setEndTime(act.getEndTime());
 		this.setDuration(act.getDuration());
 		this.setFacility(act.getFacility());
-//		this.setLinkId(this.link.getId());
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -82,9 +82,6 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 
 	public void setLink(final BasicLink link) {
 		this.link = link;
-//		if (link != null) {
-//			this.setLinkId(link.getId());
-//		}
 	}
 
 	@Override
@@ -93,8 +90,7 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 				"[coord=" + this.getCoord() + "]" +
 				"[link=" + this.link + "]" +
 				"[startTime=" + Time.writeTime(this.getStartTime()) + "]" +
-				"[endTime=" + Time.writeTime(this.getEndTime()) + "]" +
-				"[dur=" + Time.writeTime(this.getDuration()) + "]";
+				"[endTime=" + Time.writeTime(this.getEndTime()) + "]";
 	}
 
 
@@ -160,4 +156,14 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 		}
 	}
 
+	@Deprecated // nov08, dg
+	public double getDuration() {
+		return this.dur;
+	}
+
+	@Deprecated // nov08, dg
+	public void setDuration(final double dur) {
+		this.dur = dur;
+	}
+	
 }

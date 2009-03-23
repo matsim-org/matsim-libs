@@ -29,7 +29,6 @@ public class BasicActivityImpl implements BasicActivity {
 
 	private double endTime = Time.UNDEFINED_TIME;
 	private double startTime = Time.UNDEFINED_TIME;
-	private double dur = Time.UNDEFINED_TIME;
 	private String type;
 	private Coord coord = null;
 	private Id linkId;
@@ -91,16 +90,6 @@ public class BasicActivityImpl implements BasicActivity {
 
 	public Id getFacilityId() {
 		return this.facilityId;
-	}
-
-	@Deprecated // nov08, dg
-	public double getDuration() {
-		return this.dur;
-	}
-
-	@Deprecated // nov08, dg
-	public void setDuration(final double dur) {
-		this.dur = dur;
 	}
 	
 }
