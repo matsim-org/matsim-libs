@@ -316,11 +316,10 @@ public class QuadTreeTest extends MatsimTestCase {
 	 * An internal class to test the execute()-methods
 	 *
 	 */
-	static class TestExecutor extends QuadTree.Executor<String> {
+	static class TestExecutor implements QuadTree.Executor<String> {
 
 		public final Collection<Tuple<CoordImpl, String>> objects = new ArrayList<Tuple<CoordImpl, String>>();
 
-		@Override
 		public void execute(final double x, final double y, final String object) {
 			this.objects.add(new Tuple<CoordImpl, String>(new CoordImpl(x, y), object));
 		}
