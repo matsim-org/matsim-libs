@@ -1,17 +1,13 @@
 package playground.ciarif.retailers;
 
-import java.util.ArrayList;
-import java.util.Map;
 
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.controler.Controler;
-import org.matsim.facilities.FacilityImpl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.network.BasicLink;
 import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Link;
 
 public class MaxLinkRetailerStrategy implements RetailerStrategy {
 	
@@ -46,8 +42,8 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 			}
 			for (int j=0; j<newlink_volumes.length;j=j+1) {
 				newlink_volume = newlink_volume + newlink_volumes[j];
-				
 			}
+			
 			log.info("facility = " + f.getId());
 			log.info ("currentlink = " + f.getLink().getId());
 			log.info ("currentlink = " + f.getLinkId());

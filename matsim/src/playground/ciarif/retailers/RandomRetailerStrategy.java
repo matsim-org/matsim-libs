@@ -1,20 +1,16 @@
 package playground.ciarif.retailers;
 
-import java.util.ArrayList;
 import java.util.Map;
-
 import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 
 public class RandomRetailerStrategy implements RetailerStrategy {
 	
 	private final Object[] links;
-	public static final String NAME = "RandomRetailerStrategy";
-	
+	public static final String NAME = "randomRetailerStrategy";
 	public RandomRetailerStrategy (NetworkLayer network, Object[] links) {
 		this.links = links;
 	}

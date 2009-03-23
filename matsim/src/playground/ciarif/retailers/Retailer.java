@@ -32,19 +32,21 @@ public class Retailer {
 	
 	public final boolean addStrategy (Controler controler, String strategyName, Object [] links) {
 		
-		if (strategyName.equals(RandomRetailerStrategy.NAME)) {
+		System.out.println("strategy name == " + strategyName);		
+		
+		if (strategyName.contains(RandomRetailerStrategy.NAME)) {
 			this.strategy = new RandomRetailerStrategy(controler.getNetwork(), links);
 			return true;
 		}
-		else if (strategyName.equals(MaxLinkRetailerStrategy.NAME)) {
+		else if (strategyName.contains(MaxLinkRetailerStrategy.NAME)) {
 			this.strategy = new MaxLinkRetailerStrategy (controler, links);
 			return true;
 		}
-		else if (strategyName.equals(LogitMaxLinkRetailerStrategy.NAME)) {
+		else if (strategyName.contains(LogitMaxLinkRetailerStrategy.NAME)) {
 			this.strategy = new LogitMaxLinkRetailerStrategy (controler, links);
 			return true;
 		}
-		else if (strategyName.equals(CatchmentAreaRetailerStrategy.NAME)) {
+		else if (strategyName.contains(CatchmentAreaRetailerStrategy.NAME)) {
 			this.strategy = new CatchmentAreaRetailerStrategy (controler, links);
 			return true;
 		}

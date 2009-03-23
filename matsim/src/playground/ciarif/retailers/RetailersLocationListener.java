@@ -109,6 +109,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 					}
 					else { // retailer does not exists yet
 						Retailer r = new Retailer(rId, null);
+						System.out.println("The strategy " + entries[2] + " will be added to the retailer = " + rId);
 						r.addStrategy(controler, entries[2], this.links);
 						Id fId = new IdImpl (entries[1]);
 						Facility f = controler.getFacilities().getFacilities().get(fId);

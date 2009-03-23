@@ -4,7 +4,10 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.matsim.interfaces.basic.v01.network.BasicLink;
 import org.matsim.interfaces.core.v01.Facility;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.world.Location;
 
 public class RetailersSummaryWriter {
 //////////////////////////////////////////////////////////////////////
@@ -67,6 +70,8 @@ public class RetailersSummaryWriter {
 					out.write(f.getId()+"\t");
 					out.write(f.getCoord().getX()+ "\t");
 					out.write(f.getCoord().getY()+"\t");
+//					BasicLink l = (BasicLink)f.getDownMapping().values().iterator().next();
+//					out.write(l.getId()+"\t");
 					out.write(f.getLink().getId()+"\t");
 					out.write(iter +"\n");
 				}

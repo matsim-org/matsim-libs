@@ -2,7 +2,6 @@ package playground.ciarif.retailers;
 
 import java.util.ArrayList;
 import java.util.Map;
-
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
@@ -13,8 +12,7 @@ import org.matsim.interfaces.core.v01.Link;
 
 public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	
-	public static final String NAME = "LogitMaxLinkRetailerStrategy";
-
+	public static final String NAME = "logitMaxLinkRetailerStrategy";
 	public final static String CONFIG_GROUP = "Retailers";
 	public final static String CONFIG_N_ALTERNATIVES = "alternatives";
 	private Controler controler;
