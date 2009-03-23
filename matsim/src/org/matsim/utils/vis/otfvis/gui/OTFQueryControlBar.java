@@ -169,11 +169,12 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	        cfg.setQueryType(queryType.clazz.getCanonicalName());
 	        removeQueries();
 	        OTFQuery test = createQuery(queryType.clazz.getCanonicalName());
+			
+	        if(pane.getTabCount() > 1) pane.remove(1);
+
 			if(test instanceof OTFQueryOptions) {
 				JComponent settings = ((OTFQueryOptions)test).getOptionsGUI(pane);
 				pane.addTab("Options", settings);
-			} else {
-				if(pane.getTabCount() > 1) pane.remove(1);
 			}
 
 	        cb.setToolTipText(queryType.toolTip);
