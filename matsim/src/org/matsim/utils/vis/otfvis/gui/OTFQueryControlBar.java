@@ -21,7 +21,6 @@
 package org.matsim.utils.vis.otfvis.gui;
 
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -31,11 +30,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -50,7 +46,6 @@ import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.apache.tools.ant.taskdefs.optional.ejb.JbossDeploymentTool;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
@@ -81,7 +76,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		public Class clazz;
 	}
 
-	private QueryEntry[] queries = {
+	private final QueryEntry[] queries = {
 		new QueryEntry("agentPlan", "show the actual plan of an agent", QueryAgentPlan.class),
 		new QueryEntry("agentEvents", "show the actual events of an agent", QueryAgentEvents.class),
 		new QueryEntry("agentPTBus", "highlight all buses of a given line", QueryAgentPTBus.class),
@@ -93,7 +88,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	private final OTFHostControlBar handler;
 //	private final  String queryType = "Agent";
 	private JTextField text;
-	private JTabbedPane pane;
+	private final JTabbedPane pane;
 	private final List<OTFQuery> queryItems = new ArrayList<OTFQuery>();
 
 	
