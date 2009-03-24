@@ -115,7 +115,16 @@ public class QuadTree<T> implements Serializable {
 		return false;
 	}
 
-	public List<T> getLeafValues(final double x, final double y) {
+	/**
+	 * Get access to all values of this leaf
+	 *
+	 * @param x x-coordinate from which the specified values should be retrieves
+	 * @param y y-coordinate from which the specified values should be retrieves
+	 *
+	 * @return A list of T values, if this leaf has values,
+	 *         otherwise null.
+	 */
+	protected List<T> getLeafValues(final double x, final double y) {
 		Leaf<T> leaf =  this.top.getLeaf(x, y);
 		if(leaf != null) return leaf.values;
 		return null;

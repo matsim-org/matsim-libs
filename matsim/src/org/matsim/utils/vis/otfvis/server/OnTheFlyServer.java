@@ -379,21 +379,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			throws RemoteException {
 		OTFServerQuad quad = quads.get(id).quad;
 		if(quad != null) {
-			List<OTFDataWriter> writer = quad.getLeafValues(x,y);
-			OTFDataWriter w = writer.get(index);
-			OTFDataWriter wnew;
-			try {
-				wnew = (OTFDataWriter) clazz.newInstance();
-				wnew.setSrc(w.getSrc());
-				writer.remove(index);
-				writer.add(index, wnew);
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			quad.replace(x, y, index, clazz);
 			return true;
 		}
 		// TODO Auto-generated method stub

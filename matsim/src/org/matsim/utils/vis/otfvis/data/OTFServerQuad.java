@@ -32,6 +32,7 @@ import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDataReader;
+import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.interfaces.OTFServerRemote;
 
 
@@ -267,4 +268,24 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 	public double getMinNorthing() {
 		return this.minNorthing;
 	}
+	
+	public void replace(double x, double y, int index, Class clazz) {
+		List<OTFDataWriter> writer = getLeafValues(x,y);
+		OTFDataWriter w = writer.get(index);
+		OTFDataWriter wnew;
+		try {
+			wnew = (OTFDataWriter) clazz.newInstance();
+			wnew.setSrc(w.getSrc());
+			writer.remove(index);
+			writer.add(index, wnew);
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
 }
