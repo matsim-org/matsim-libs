@@ -3,9 +3,10 @@ package playground.anhorni.locationchoice.preprocess.analyzeMZ;
 import java.util.List;
 import java.util.Vector;
 import org.apache.log4j.Logger;
+
+import playground.anhorni.locationchoice.assemblefacilities.BZReader;
+import playground.anhorni.locationchoice.assemblefacilities.Hectare;
 import playground.anhorni.locationchoice.cs.helper.MZTrip;
-import playground.anhorni.locationchoice.facilities.BZReader;
-import playground.anhorni.locationchoice.facilities.Hectare;
 
 
 
