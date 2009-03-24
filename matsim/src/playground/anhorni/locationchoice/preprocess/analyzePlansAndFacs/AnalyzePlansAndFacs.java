@@ -31,19 +31,21 @@ public class AnalyzePlansAndFacs {
 		log.info("reading the facilities ...");
 		this.facilitiesAll =(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilitiesAll).readFile(facilitiesAllfilePath);
-		
-		this.facilitiesSL =(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new FacilitiesReaderMatsimV1(this.facilitiesSL).readFile(facilitiesSLfilePath);
-		
+			
 		log.info("reading the network ...");
 		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 		
-		log.info("analyze ...");
-		AnalyzeFacilities facilitiesAnalyzer = new AnalyzeFacilities();
-		facilitiesAnalyzer.run(this.facilitiesSL, network);		
-		
+		log.info("analyze plans ...");
 		AnalyzePlans plansAnalyzer = new AnalyzePlans();
 		plansAnalyzer.run(plansfilePath, this.facilitiesAll, this.network);
+		
+		Gbl.getWorld().getLayers().remove(Facilities.LAYER_TYPE);
+		this.facilitiesSL = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		new FacilitiesReaderMatsimV1(this.facilitiesSL).readFile(facilitiesSLfilePath);
+		
+		log.info("analyze facilities ...");
+		AnalyzeFacilities facilitiesAnalyzer = new AnalyzeFacilities();
+		facilitiesAnalyzer.run(this.facilitiesSL, network);				
 	}
 }
