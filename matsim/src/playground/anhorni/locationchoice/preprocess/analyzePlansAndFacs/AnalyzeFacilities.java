@@ -46,44 +46,67 @@ public class AnalyzeFacilities {
 
 	private void write(String outfile, NetworkLayer network) {
 
-		double[] capacityCountShop = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+		double[][] capacityCount = {{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+				{0.0}};
 		
-		String[] NOGA_SHOP = {
-				"B015211A",
-				"B015211B",
-				"B015211C",
-				"B015211D",
-				"B015211E",
-				"B015212A",
-				"B015221A",
-				"B015222A",
-				"B015223A",	
-				"B015224A",	
-				"B015225A",
-				"B015227A",
-				"B015227B"
+		String[] types = {"shop", "leisure"};
+		
+		String[][] NOGA = {
+				{
+								"B015211A",
+								"B015211B",
+								"B015211C",
+								"B015211D",
+								"B015211E",
+								"B015212A",
+								"B015221A",
+								"B015222A",
+								"B015223A",	
+								"B015224A",	
+								"B015225A",
+								"B015227A",
+								"B015227B"
+							},
+				{
+								"B015211A",
+								"B015211B",
+								"B015211C",
+								"B015211D",
+								"B015211E",
+								"B015212A",
+								"B015221A",
+								"B015222A",
+								"B015223A",	
+								"B015224A",	
+								"B015225A",
+								"B015227A",
+								"B015227B"	
+				}
 		};
 		
+	
 		try {
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 						
-			Iterator<Facility> facility_it = this.facilities.getFacilities("shop").values().iterator();
-			while (facility_it.hasNext()) {
-				Facility facility = facility_it.next();
-				
-				ActivityOption actOpt = facility.getActivityOption("shop");							
-				
-				String desc = "noch nichts"; // actOpt.getDesc();
-				for (int i = 0; i < 13; i++) {
-					if (desc.contains(NOGA_SHOP[i])) {
-						capacityCountShop[i] += actOpt.getCapacity();
+			for (int typeIndex = 0; typeIndex < 2; typeIndex++) {
+				Iterator<Facility> facility_it = this.facilities.getFacilities(types[typeIndex]).values().iterator();
+				while (facility_it.hasNext()) {
+					Facility facility = facility_it.next();
+					
+					ActivityOption actOpt = facility.getActivityOption(types[typeIndex]);							
+					
+					String desc = "noch nichts"; // actOpt.getDesc();
+					for (int i = 0; i < capacityCount[typeIndex].length; i++) {
+						if (desc.contains(NOGA[typeIndex][i])) {
+							capacityCount[typeIndex][i] += actOpt.getCapacity();
+						}
 					}
 				}
+				for (int i = 0; i < capacityCount[typeIndex].length; i++) {		
+					out.write(types[typeIndex] + ": total capacity for " + NOGA[typeIndex][i] + ": " + capacityCount[typeIndex][i] + "\n");
+				}
+				out.flush();
 			}
-			for (int i = 0; i < 13; i++) {		
-				out.write("SHOP : Total capacity for " + NOGA_SHOP[i] + ": " + capacityCountShop[i] + "\n");
-			}
-			out.flush();
 			out.close();
 		}
 		catch (final IOException e) {
