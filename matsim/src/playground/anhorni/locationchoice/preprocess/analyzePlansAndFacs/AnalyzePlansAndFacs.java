@@ -21,7 +21,7 @@ public class AnalyzePlansAndFacs {
 			log.info("Too few arguments!");
 			System.exit(0);
 		}
-		analyzer.run("input/networks/ivtch.xml", args[1], "input/facilities.xml.gz");
+		analyzer.run("input/networks/ivtch.xml", args[0], "input/facilities.xml.gz");
 		Gbl.printElapsedTime();
 	}
 	
