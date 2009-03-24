@@ -56,16 +56,16 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		super();
 	}
 
-	public void init() {
-
-		System.out.println("Reading shops Of 2005 xml file... ");
+	private void init() {
+		log.info("Reading shops Of 2005 xml file... ");
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(this.shopsOf2005);
 		facilities_reader.readFile(this.shopsOf2005Filename);
-		System.out.println("Reading shops Of 2005 xml file...done.");
-
+		log.info("Reading shops Of 2005 xml file...done.");
 	}
 
 	public void run(final Facility facility) {
+		
+		this.init();
 
 		DayType[] days = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri, DayType.sat, DayType.sun };
 		DayType[] weekDays = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri };
