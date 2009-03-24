@@ -139,7 +139,6 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 		
 		for (Retailer r : this.retailers.getRetailers().values()) {
-			//System.out.println("The retailer " + r.getId() + "is using the strategy '" + r.);
 			Map<Id,Facility> facs = r.runStrategy();
 			movedFacilities.putAll(facs);
 			System.out.println("moved facilities =" + facs);
@@ -158,6 +157,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 				while (actIter.hasNext()) {
 					
 					Activity act = (Activity)actIter.next();
+					log.info("Activity = " + act);
 					log.info("Activity's facility = " + act.getFacilityId() );
 					if (movedFacilities.containsKey(act.getFacilityId())) {
 						log.info("link = " + act.getFacility().getLink());

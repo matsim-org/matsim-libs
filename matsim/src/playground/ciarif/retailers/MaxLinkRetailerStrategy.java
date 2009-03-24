@@ -46,7 +46,6 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 			
 			log.info("facility = " + f.getId());
 			log.info ("currentlink = " + f.getLink().getId());
-			log.info ("currentlink = " + f.getLinkId());
 			log.info ("current link coord= " + f.getLink().getCoord());
 			log.info ("currentlink_volume = " + currentlink_volume);
 			log.info ("newlink_volume = " + newlink_volume);
