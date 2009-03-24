@@ -26,13 +26,9 @@ import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Facilities;
 
-
 /**
  * Generates the facilities file for all of Switzerland from the Swiss
  * National Enterprise Census of the year 2000 (published 2001).
- * 
- * @author meisterk
- *
  */
 public class FacilitiesProductionKTI {
 
@@ -87,11 +83,8 @@ public class FacilitiesProductionKTI {
 		);
 		
 		log.info("Adding and running facilities algorithms...");
-//		facilities.addAlgorithm(new FacilitiesAllActivitiesFTE(ktiYear));
-//		facilities.addAlgorithm(new FacilitiesOpentimesKTIYear1());
-//		facilities.addAlgorithm(new FacilitiesRandomizeHectareCoordinates());
 		new FacilitiesAllActivitiesFTE(ktiYear).run(facilities);
-//		new FacilitiesOpentimesKTIYear1().run(facilities);
+		new AddOpentimes().run(facilities);
 //		new FacilitiesRandomizeHectareCoordinates().run(facilities);
 		facilities.runAlgorithms();
 		log.info("Adding and running facilities algorithms...done.");
