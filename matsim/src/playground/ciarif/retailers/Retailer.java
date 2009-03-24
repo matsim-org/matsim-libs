@@ -32,8 +32,6 @@ public class Retailer {
 	
 	public final boolean addStrategy (Controler controler, String strategyName, Object [] links) {
 		
-		System.out.println("strategy name == " + strategyName);		
-		
 		if (strategyName.contains(RandomRetailerStrategy.NAME)) {
 			this.strategy = new RandomRetailerStrategy(controler.getNetwork(), links);
 			return true;
