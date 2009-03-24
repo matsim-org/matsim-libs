@@ -123,8 +123,8 @@ public class NetworkRounder {
 		//String inputfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_network_evac.xml";
 		//String inputfile = "./examples/meine_EA/siouxfalls_network.xml";
 		
-		String outputfile_forEAF;
-		String outputfile_forMatsim;
+		String outputfile_forEAF = null;
+		String outputfile_forMatsim = null;
 		//String outputfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
 		outputfile_forEAF  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618_10p_5s_EAF.xml";
 		outputfile_forMatsim  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618_10p_5s_MATSIM.xml";
@@ -155,7 +155,8 @@ public class NetworkRounder {
 		  writer.write();
 		}
 		if (outputfile_forMatsim != null) {
-			  NetworkLayer network = roundNetwork(inputfile,cap, flowCapacityFactor, lengthFactor, false);
+			  // Matsim needs the real transit time ("false") & capacity ("1.0d")
+			  NetworkLayer network = roundNetwork(inputfile,cap, 1.0d, lengthFactor, false);
 			  NetworkWriter writer = new NetworkWriter( network, outputfile_forMatsim);
 			  writer.write();
 		}
