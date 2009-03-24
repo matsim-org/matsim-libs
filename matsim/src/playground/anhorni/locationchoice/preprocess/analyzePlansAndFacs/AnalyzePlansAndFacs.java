@@ -17,21 +17,21 @@ public class AnalyzePlansAndFacs {
 
 		Gbl.startMeasurement();
 		final AnalyzePlansAndFacs analyzer = new AnalyzePlansAndFacs();
-		if (args.length < 3) {
+		if (args.length < 1) {
 			log.info("Too few arguments!");
 			System.exit(0);
 		}
-		analyzer.run(args[0], args[1], args[2]);
+		analyzer.run("input/networks/ivtch.xml", args[1], "input/facilities.xml.gz");
 		Gbl.printElapsedTime();
 	}
 	
 	public void run(String networkfilePath, String plansfilePath, String facilitiesfilePath) {
 		
-		log.info("  reading the facilities...");
+		log.info("reading the facilities...");
 		this.facilities=(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 		
-		log.info("  reading the network...");
+		log.info("reading the network...");
 		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 		
