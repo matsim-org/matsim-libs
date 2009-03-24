@@ -18,8 +18,13 @@ public class OSM2MATSim {
 
 		NetworkLayer network = new NetworkLayer();
 //		OsmNetworkReader osmReader = new OsmNetworkReader(network, new WGS84toCH1903LV03());
-		OsmNetworkReader osmReader = new OsmNetworkReader(network, TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4), -1);
+		OsmNetworkReader osmReader = new OsmNetworkReader(network,
+				TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
+						TransformationFactory.DHDN_GK4), 1);
 		osmReader.setKeepPaths(false);
+		
+		String inputFile = "z:/osm_net/20090316_berlinbrandenburg.fused.gz";
+		String outputFile = "z:/osm_net/bb_osm_wip";
 		
 		// Autobahn
 		osmReader.setHighwayDefaults("motorway",      2, 120.0/3.6, 2000, true);
@@ -37,17 +42,17 @@ public class OSM2MATSim {
 		osmReader.setHighwayDefaults("tertiary",      1,  45.0/3.6,  600); // ca wip
 		
 		// Nebenstrassen
-		osmReader.setHighwayDefaults("minor",         1,  45.0/3.6,  600); // nix
+//		osmReader.setHighwayDefaults("minor",         1,  45.0/3.6,  600); // nix
 		// Alles Mögliche, vor allem Nebenstrassen auf dem Land, meist keine 30er Zone 
-		osmReader.setHighwayDefaults("unclassified",  1,  45.0/3.6,  600);
+//		osmReader.setHighwayDefaults("unclassified",  1,  45.0/3.6,  600);
 		// Nebenstrassen, meist 30er Zone
-		osmReader.setHighwayDefaults("residential",   1,  30.0/3.6,  600);
+//		osmReader.setHighwayDefaults("residential",   1,  30.0/3.6,  600);
 		// Spielstrassen
-		osmReader.setHighwayDefaults("living_street", 1,  15.0/3.6,  300);
+//		osmReader.setHighwayDefaults("living_street", 1,  15.0/3.6,  300);
 		
 		
 		try {
-			osmReader.parse("z:/osm_net/20090316_berlinbrandenburg.fused.gz");
+			osmReader.parse(inputFile);
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -55,8 +60,8 @@ public class OSM2MATSim {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		new NetworkWriter(network, "z:/osm_net/test.xml").write();
-		new NetworkCleaner().run(new String[] {"z:/osm_net/test.xml", "z:/osm_net/test_cl.xml"});
+		new NetworkWriter(network, outputFile + ".xml.gz").write();
+		new NetworkCleaner().run(new String[] {outputFile + ".xml.gz", outputFile + "_cl.xml.gz"});
 
 	}
 
