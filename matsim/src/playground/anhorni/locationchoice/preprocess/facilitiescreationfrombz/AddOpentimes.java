@@ -49,14 +49,14 @@ import playground.anhorni.locationchoice.preprocess.facilitiescreationfrombz.Fac
 public class AddOpentimes extends AbstractFacilityAlgorithm {
 
 	private final FacilitiesImpl shopsOf2005 = new FacilitiesImpl("shopsOf2005", FacilitiesImpl.FACILITIES_NO_STREAMING);
-	private final String shopsOf2005Filename = "/input/facilities/facilities_shopsOf2005.xml";
+	private final String shopsOf2005Filename = "input/facilities/facilities_shopsOf2005.xml";
 	private static final Logger log = Logger.getLogger(AddOpentimes.class);
 
 	public AddOpentimes() {
 		super();
 	}
 
-	private void init() {
+	public void init() {
 		log.info("Reading shops Of 2005 xml file... ");
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(this.shopsOf2005);
 		facilities_reader.readFile(this.shopsOf2005Filename);
@@ -65,8 +65,6 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 
 	public void run(final Facility facility) {
 		
-		this.init();
-
 		DayType[] days = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri, DayType.sat, DayType.sun };
 		DayType[] weekDays = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri };
 		double startTime = -1.0;
