@@ -131,7 +131,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		
 		// works, but it is not nicely programmed. shouldn't be a global container, should be
 		// controlled by the controler (or actually added to the population)
-		Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
+//		Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
 		
 		controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 		
@@ -166,25 +166,25 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		}
 	}	
 	
-	private final QuadTree<Person> createPersonQuadTree(Controler controler) {
-		double minx = Double.POSITIVE_INFINITY;
-		double miny = Double.POSITIVE_INFINITY;
-		double maxx = Double.NEGATIVE_INFINITY;
-		double maxy = Double.NEGATIVE_INFINITY;
-		//ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
-		for (Facility f : controler.getFacilities().getFacilities().values()) {
-			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
-			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
-			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
-			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
-		}
-		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
-		
-		QuadTree<Person> personQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
-		for (Person p : controler.getPopulation().getPersons().values()) {
-			Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();
-			personQuadTree.put(c.getX(),c.getY(),p);
-		}
-		return personQuadTree;
-	}
+//	private final QuadTree<Person> createPersonQuadTree(Controler controler) {
+//		double minx = Double.POSITIVE_INFINITY;
+//		double miny = Double.POSITIVE_INFINITY;
+//		double maxx = Double.NEGATIVE_INFINITY;
+//		double maxy = Double.NEGATIVE_INFINITY;
+//		//ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
+//		for (Facility f : controler.getFacilities().getFacilities().values()) {
+//			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+//			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+//			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+//			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
+//		}
+//		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
+//		
+//		QuadTree<Person> personQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
+//		for (Person p : controler.getPopulation().getPersons().values()) {
+//			Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();
+//			personQuadTree.put(c.getX(),c.getY(),p);
+//		}
+//		return personQuadTree;
+//	}
 }
