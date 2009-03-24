@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.BeforeMobsimEvent;
@@ -57,10 +57,13 @@ import org.matsim.utils.collections.QuadTree;
 
 public class RetailersLocationListener implements StartupListener, BeforeMobsimListener {
 	
+	private final static Logger log = Logger.getLogger(MaxLinkRetailerStrategy.class);
+	
 	public final static String CONFIG_GROUP = "Retailers";
 	public final static String CONFIG_POP_SUM_TABLE = "populationSummaryTable";
 	public final static String CONFIG_RET_SUM_TABLE = "retailersSummaryTable";
 	public final static String CONFIG_RETAILERS = "retailers";
+	
 	private Retailers retailers;
 	private RetailersSummaryWriter rs = null;
 	private PlansSummaryTable pst = null;
@@ -153,7 +156,10 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 				boolean routeIt = false;
 				Iterator<?> actIter = plan.getIteratorAct();
 				while (actIter.hasNext()) {
+					
 					Activity act = (Activity)actIter.next();
+					log.info("Activity" + act );
+					log.info("moved facilities" + movedFacilities  );
 					if (movedFacilities.containsKey(act.getFacilityId())) {
 						act.setLink(act.getFacility().getLink());
 						routeIt = true;
