@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
@@ -41,11 +42,11 @@ import org.matsim.utils.io.IOUtils;
 
 public class AnalyzePlans {
 
-	private Population plans;
+	private Population plans = new PopulationImpl(false);
 	private NetworkLayer network;
 	private final static Logger log = Logger.getLogger(AnalyzePlans.class);
 	
-	public void run(final String networkPath, final String plansfilePath) {
+	public void run(final String networkPath, final String plansfilePath, Facilities facilities) {
 		this.init(networkPath);
 		this.readPlansFile(plansfilePath, this.plans);
 
