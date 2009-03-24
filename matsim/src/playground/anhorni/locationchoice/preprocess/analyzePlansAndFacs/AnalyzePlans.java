@@ -33,7 +33,6 @@ import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.interfaces.core.v01.Population;
-import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
@@ -49,7 +48,7 @@ public class AnalyzePlans {
 	public void run(final String plansfilePath, Facilities facilities, NetworkLayer network) {;
 		this.readPlansFile(plansfilePath, network);
 
-		write("./output/activitiessummary.txt");
+		write("./output/plan_activities_summary.txt");
 		System.out.println("finished");
 	}
 
@@ -89,8 +88,11 @@ public class AnalyzePlans {
 			}
 			out.write("Number of shopping activities: " + numberOfShoppingActs + "\n");
 			out.write("Total desired duration of shopping activities: " + totalDesiredShoppingDuration + "\n");
+			out.write("Avg. desired shopping duration: " + totalDesiredShoppingDuration / numberOfShoppingActs);
+			out.newLine();
 			out.write("Number of leisure activities: " + numberOfLeisureActs + "\n");
 			out.write("Total desired duration of leisure activities: " + totalDesiredLeisureDuration + "\n");
+			out.write("Avg. desired leisure duration: " + totalDesiredLeisureDuration / numberOfLeisureActs);
 			out.flush();
 			out.close();
 		}

@@ -46,11 +46,8 @@ public class AnalyzeFacilities {
 
 	private void write(String outfile, NetworkLayer network) {
 
-		double[][] capacityCount = {{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-				{0.0}};
 		
-		String[] types = {"shop", "leisure"};
-		
+		String[] types = {"shop", "leisure"};		
 		String[][] NOGA = {
 				{
 					"B015211A",
@@ -154,32 +151,70 @@ public class AnalyzeFacilities {
 					"B019253A",	
 					"B019261A",	
 					"B019262A",	
-					"B019262B"	
+					"B019262B",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null",
+					"null"
 				}
 		};
+		
+		double[][] capacityCount = new double[2][65];
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j <65; j++) {
+				capacityCount[i][j] = 0.0;
+			}
+		}
 		
 	
 		try {
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 						
 			for (int typeIndex = 0; typeIndex < 2; typeIndex++) {
-				Iterator<Facility> facility_it = this.facilities.getFacilities(types[typeIndex]).values().iterator();
+				Iterator< ? extends Facility> facility_it = this.facilities.getFacilities().values().iterator();
 				while (facility_it.hasNext()) {
 					Facility facility = facility_it.next();
 					
-					for (int i = 0; i < capacityCount[typeIndex].length; i++) {
+					for (int i = 0; i < capacityCount[typeIndex].length; i++) {						
 						if (facility.getActivityOption(NOGA[typeIndex][i]) != null) {
 							Iterator<ActivityOption> options_it = facility.getActivityOptions().values().iterator();
 							while (options_it.hasNext()) {
 								ActivityOption actOpt = options_it.next();
-								if (actOpt.getType().startsWith("shop")) {
+								if (actOpt.getType().startsWith(types[typeIndex])) {
 									capacityCount[typeIndex][i] += actOpt.getCapacity();
 								}
 							}
 						}
 					}
 				}
-				for (int i = 0; i < capacityCount[typeIndex].length; i++) {		
+				for (int i = 0; i < capacityCount[typeIndex].length; i++) {
+					if (NOGA[typeIndex][i].equals("null")) continue;
 					out.write(types[typeIndex] + ": total capacity for " + NOGA[typeIndex][i] + ": " + capacityCount[typeIndex][i] + "\n");
 				}
 				out.flush();
