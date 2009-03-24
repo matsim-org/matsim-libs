@@ -67,7 +67,6 @@ import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.algorithms.CalcODMatrices;
 import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.events.algorithms.GenerateRealPlans;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
@@ -864,36 +863,6 @@ public class MyRuns {
 		System.out.println();
 	}
 
-	static public void calcRealPlans(final String[] args) {
-
-		System.out.println("RUN: calcRealPlans");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  setting up events objects... ");
-		final Events events = new Events();
-		final GenerateRealPlans algo = new GenerateRealPlans();
-		events.addHandler(algo);
-		System.out.println("  done.\n");
-
-		System.out.println("  reading events file and (probably) running events algos");
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		System.out.println("  done.\n");
-
-		System.out.println("  writing plans...");
-		final PopulationWriter plansWriter = new PopulationWriter(algo.getPlans());
-		plansWriter.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: calcRealPlans finished.");
-		System.out.println();
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// calcScoreFromEvents
 	//////////////////////////////////////////////////////////////////////
@@ -1376,47 +1345,6 @@ public class MyRuns {
 		System.out.println("Average tolled trip length: " + catl.getAverageTripLength());
 
 		System.out.println("RUN: calcTolledTripLength finished.");
-		System.out.println();
-	}
-
-
-	//////////////////////////////////////////////////////////////////////
-	// generateRealPlans
-	//////////////////////////////////////////////////////////////////////
-
-	public static void generateRealPlans(final String[] args) {
-		System.out.println("RUN: generateRealPlans");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		// events
-		System.out.println("  creating events object... ");
-		final Events events = new Events();
-		System.out.println("  done.");
-
-		System.out.println("  adding events algorithms...");
-		final GenerateRealPlans generator = new GenerateRealPlans();
-		events.addHandler(generator);
-		System.out.println("  done");
-
-		System.out.println("  reading events file and generating real plans...");
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		generator.finish();
-		System.out.println("  done.");
-
-		System.out.println("  writing real plans...");
-		final String outfile = config.plans().getOutputFile();
-		final String outversion = config.plans().getOutputVersion();
-		final PopulationWriter plansWriter = new PopulationWriter(generator.getPlans(), outfile, outversion);
-		plansWriter.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: generateRealPlans finished.");
 		System.out.println();
 	}
 
