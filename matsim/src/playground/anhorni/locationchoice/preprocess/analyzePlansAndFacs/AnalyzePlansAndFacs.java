@@ -10,7 +10,8 @@ import org.matsim.network.NetworkLayer;
 public class AnalyzePlansAndFacs {
 
 	private final static Logger log = Logger.getLogger(AnalyzePlansAndFacs.class);
-	private Facilities facilities;
+	private Facilities facilitiesAll;
+	private Facilities facilitiesSL;
 	private NetworkLayer network;
 	
 	public static void main(final String[] args) {
@@ -21,15 +22,18 @@ public class AnalyzePlansAndFacs {
 			log.info("Too few arguments!");
 			System.exit(0);
 		}
-		analyzer.run("input/networks/ivtch.xml", args[0], "input/facilities.xml.gz");
+		analyzer.run("input/networks/ivtch.xml", args[0], "input/facilities.xml.gz", "input/facilities_KTIYear2.xml.gz");
 		Gbl.printElapsedTime();
 	}
 	
-	public void run(String networkfilePath, String plansfilePath, String facilitiesfilePath) {
+	public void run(String networkfilePath, String plansfilePath, String facilitiesAllfilePath, String facilitiesSLfilePath) {
 		
 		log.info("reading the facilities ...");
-		this.facilities=(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
+		this.facilitiesAll =(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		new FacilitiesReaderMatsimV1(this.facilitiesAll).readFile(facilitiesAllfilePath);
+		
+		this.facilitiesSL =(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		new FacilitiesReaderMatsimV1(this.facilitiesSL).readFile(facilitiesSLfilePath);
 		
 		log.info("reading the network ...");
 		this.network = new NetworkLayer();
@@ -37,9 +41,9 @@ public class AnalyzePlansAndFacs {
 		
 		log.info("analyze ...");
 		AnalyzeFacilities facilitiesAnalyzer = new AnalyzeFacilities();
-		facilitiesAnalyzer.run(facilities, network);		
+		facilitiesAnalyzer.run(this.facilitiesSL, network);		
 		
 		AnalyzePlans plansAnalyzer = new AnalyzePlans();
-		plansAnalyzer.run(plansfilePath, this.facilities, this.network);
+		plansAnalyzer.run(plansfilePath, this.facilitiesAll, this.network);
 	}
 }
