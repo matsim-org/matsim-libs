@@ -24,10 +24,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
+import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.Plan;
@@ -37,6 +39,21 @@ import org.matsim.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.scoring.CharyparNagelScoringParameters;
 
 
+/**
+ * This class implements the activity scoring as used in Year 3 of the KTI project.
+ * 
+ * It has the following features:
+ * 
+ * <ul>
+ * <li>use opening times from facilities, not from config. scoring function can process multiple opening time intervals per activity option</li>
+ * <li>use typical durations from agents' desires, not from config</li>
+ * <li>typical duration applies to the sum of all instances of an activity type, not to single instances (so agent finds out itself how much time to spend in which instance)</li>
+ * <li>use facility load penalties from LocationChoiceScoringFunction</li>
+ * </ul>
+ * 
+ * @author meisterk
+ *
+ */
 public class ActivityScoringFunction extends
 org.matsim.scoring.charyparNagel.ActivityScoringFunction {
 
@@ -46,28 +63,31 @@ org.matsim.scoring.charyparNagel.ActivityScoringFunction {
 	// TODO differentiate in any way?
 	public static final double MINIMUM_DURATION = 0.5 * 3600;
 
-	private List<ScoringPenalty> penalty = null;
+	private List<ScoringPenalty> penalty = new Vector<ScoringPenalty>();
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
-	private TreeMap<String, Double> timePerforming = null;
-	private double timeWaiting = 0.0;
-	private double timeTooShort = 0.0;
+//	private TreeMap<String, Double> durations = new TreeMap<String, Double>();
+	private TreeMap<String, Vector<Double>> activitiesStartsAndEnds = new TreeMap<String, Vector<Double>>();
+	private double timeWaiting;
+	private double timeTooShort;
 	private TreeMap<String, Double> zeroUtilityDurations = null;
 
+	private static final double INITIAL_TIME_WAITING = 0.0;
+	private static final double INITIAL_TIME_TOO_SHORT = 0.0;
+	private static final DayType DEFAULT_DAY = DayType.wed;
+	private static final SortedSet<BasicOpeningTime> DEFAULT_OPENING_TIME = new TreeSet<BasicOpeningTime>();
+	static {
+		BasicOpeningTime defaultOpeningTime = new OpeningTimeImpl(ActivityScoringFunction.DEFAULT_DAY, Double.MIN_VALUE, Double.MAX_VALUE);
+		ActivityScoringFunction.DEFAULT_OPENING_TIME.add(defaultOpeningTime);
+	}
+	
 	public ActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		super(plan, params);
-		this.penalty = new Vector<ScoringPenalty>();
 		this.facilityPenalties = facilityPenalties;
-		this.timePerforming = new TreeMap<String, Double>();
 	}
 
 	@Override
 	protected double calcActScore(double arrivalTime, double departureTime,
 			Activity act) {
-
-		// copied from super class, but:
-		// - calculate duration by activity type, save it, but not process for scoring
-		// - process all other scoring elements except performing (done in finishPerformingActivities)
-		// - with this, process facility opening times. find a way use opening times 1:1, not ignoring lunch breaks
 
 		double tmpScore = 0.0;
 
@@ -100,10 +120,14 @@ org.matsim.scoring.charyparNagel.ActivityScoringFunction {
 		 * assume A <= D
 		 */
 
-		SortedSet<BasicOpeningTime> openTimes = act.getFacility().getActivityOption(act.getType()).getOpeningTimes(DayType.wkday);
-		if (openTimes == null) {
-			openTimes = act.getFacility().getActivityOption(act.getType()).getOpeningTimes(DayType.wed);
+		SortedSet<BasicOpeningTime> openTimes = null;
+		// if no associated activity option exists, assume facility is always open
+		if (act.getFacility().getActivityOption(act.getType()) == null) {
+			openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
+		} else {
+			openTimes = act.getFacility().getActivityOption(act.getType()).getOpeningTimes(ActivityScoringFunction.DEFAULT_DAY);
 		}
+
 		for (BasicOpeningTime openTime : openTimes) {
 
 			double openingTime = openTime.getStartTime();
@@ -127,11 +151,20 @@ org.matsim.scoring.charyparNagel.ActivityScoringFunction {
 			double duration = activityEnd - activityStart;
 
 			// - calculate duration by activity type, save it, but do not process it in activity performing
-			double oldDuration = 0.0;
-			if (this.timePerforming.containsKey(act.getType())) {
-				oldDuration = this.timePerforming.get(act.getType());
+			Vector<Double> activityStartsAndEnds = null;
+			if (this.activitiesStartsAndEnds.containsKey(act.getType())) {
+				activityStartsAndEnds = new Vector<Double>();
+				this.activitiesStartsAndEnds.put(act.getType(), activityStartsAndEnds);
+			} else {
+				activityStartsAndEnds = this.activitiesStartsAndEnds.get(act.getType());
 			}
-			this.timePerforming.put(act.getType(), oldDuration + duration);
+			
+			
+//			double oldDuration = 0.0;
+//			if (this.durations.containsKey(act.getType())) {
+//				oldDuration = this.durations.get(act.getType());
+//			}
+//			this.durations.put(act.getType(), oldDuration + duration);
 
 			// disutility if too early
 			if (arrivalTime < activityStart) {
@@ -156,8 +189,11 @@ org.matsim.scoring.charyparNagel.ActivityScoringFunction {
 			 * TODO: maybe checking if activity is movable for this person (discussion)
 			 */
 			if (!act.getType().startsWith("h")) {
-				this.penalty.add(new ScoringPenalty(activityStart, activityEnd, 
-						this.facilityPenalties.get(act.getFacility().getId()), tmpScore));
+				this.penalty.add(new ScoringPenalty(
+						activityStart, 
+						activityEnd, 
+						this.facilityPenalties.get(act.getFacility().getId()), 
+						tmpScore));
 			}
 			//---------------------------------------------------------------------------
 
@@ -207,6 +243,7 @@ org.matsim.scoring.charyparNagel.ActivityScoringFunction {
 			ScoringPenalty penalty = pen_it.next();
 			this.score -= penalty.getPenalty();
 		}
+		this.penalty.clear();
 	}
 
 	protected void finishPerformingActivities() {
@@ -214,6 +251,7 @@ org.matsim.scoring.charyparNagel.ActivityScoringFunction {
 		double zeroUtilityDuration;
 		double typicalDuration;
 		double duration;
+		Vector<Double> activityStartsAndEnds = null;
 
 		// initialize zero utility durations here for better code readability, because we only need them here
 		Activity act;
@@ -231,10 +269,16 @@ org.matsim.scoring.charyparNagel.ActivityScoringFunction {
 		}
 
 		// process collected activity durations by activity type
-		for (String actType : this.timePerforming.keySet()) {
+		for (String actType : this.activitiesStartsAndEnds.keySet()) {
 			// - get typical duration from desires rather than from config
 			typicalDuration = this.person.getDesires().getActivityDuration(actType);
-			duration = this.timePerforming.get(actType);
+			activityStartsAndEnds = this.activitiesStartsAndEnds.get(actType);
+			duration = 0.0;
+			for (int ii = 0; ii < activityStartsAndEnds.size(); ii++) {
+				if (ii % 2 == 0) {
+					duration += activityStartsAndEnds.get(ii + 1) - activityStartsAndEnds.get(ii);
+				}
+			}
 			if (duration > 0) {
 				double utilPerf = this.params.marginalUtilityOfPerforming * typicalDuration
 				* Math.log((duration / 3600.0) / this.zeroUtilityDurations.get(actType));
@@ -243,24 +287,24 @@ org.matsim.scoring.charyparNagel.ActivityScoringFunction {
 			} else {
 				this.score += 2*this.params.marginalUtilityOfLateArrival*Math.abs(duration);
 			}
+			
 		}
-
+		
 		this.score += this.timeWaiting * this.params.marginalUtilityOfWaiting;
 		this.score += this.timeTooShort * this.params.marginalUtilityOfEarlyDeparture;
-		
+
+		this.activitiesStartsAndEnds.clear();
 	}
 
 	@Override
 	public void reset() {
 		super.reset();
-		this.penalty.clear();
-		this.timePerforming.clear();
-		this.timeWaiting = 0.0;
-		this.timeTooShort = 0.0;
+		this.timeWaiting = ActivityScoringFunction.INITIAL_TIME_WAITING;
+		this.timeTooShort = ActivityScoringFunction.INITIAL_TIME_TOO_SHORT;
 	}
 
-	public TreeMap<String, Double> getTimePerforming() {
-		return timePerforming;
+	public TreeMap<String, Vector<Double>> getActivitiesStartsAndEnds() {
+		return activitiesStartsAndEnds;
 	}
 
 	public double getTimeWaiting() {
