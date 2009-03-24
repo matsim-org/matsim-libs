@@ -4,11 +4,14 @@ import org.apache.log4j.Logger;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.core.v01.Facilities;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 
 public class AnalyzePlansAndFacs {
 
 	private final static Logger log = Logger.getLogger(AnalyzePlansAndFacs.class);
 	private Facilities facilities;
+	private NetworkLayer network;
 	
 	public static void main(final String[] args) {
 
@@ -24,13 +27,16 @@ public class AnalyzePlansAndFacs {
 	
 	public void run(String networkfilePath, String plansfilePath, String facilitiesfilePath) {
 		
+		log.info("  reading the facilities...");
 		this.facilities=(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
-		log.info("facilities reading done");
+		
+		log.info("  reading the network...");
+		this.network = new NetworkLayer();
+		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 		
 		
 		AnalyzePlans plansAnalyzer = new AnalyzePlans();
-		plansAnalyzer.run(networkfilePath, plansfilePath, this.facilities);
+		plansAnalyzer.run(plansfilePath, this.facilities, this.network);
 	}
-	
 }

@@ -43,29 +43,19 @@ import org.matsim.utils.io.IOUtils;
 public class AnalyzePlans {
 
 	private Population plans = new PopulationImpl(false);
-	private NetworkLayer network;
+	
 	private final static Logger log = Logger.getLogger(AnalyzePlans.class);
 	
-	public void run(final String networkPath, final String plansfilePath, Facilities facilities) {
-		this.init(networkPath);
-		this.readPlansFile(plansfilePath, this.plans);
+	public void run(final String plansfilePath, Facilities facilities, NetworkLayer network) {;
+		this.readPlansFile(plansfilePath, network);
 
 		write("./output/activitiessummary.txt");
 		System.out.println("finished");
 	}
 
-	
-	private void init(final String networkPath) {
-		this.plans = new PopulationImpl(false);
-
-		log.info("  reading the network...");
-		this.network = new NetworkLayer();
-		new MatsimNetworkReader(this.network).readFile(networkPath);
-	}
-
-	private void readPlansFile(final String plansfilePath, final Population plans) {
+	private void readPlansFile(final String plansfilePath, NetworkLayer network) {
 		log.info("  reading file " + plansfilePath);
-		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, this.network);
+		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, network);
 		plansReader.readFile(plansfilePath);
 	}
 
