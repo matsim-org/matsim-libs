@@ -27,14 +27,17 @@ public class AnalyzePlansAndFacs {
 	
 	public void run(String networkfilePath, String plansfilePath, String facilitiesfilePath) {
 		
-		log.info("reading the facilities...");
+		log.info("reading the facilities ...");
 		this.facilities=(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 		
-		log.info("reading the network...");
+		log.info("reading the network ...");
 		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 		
+		log.info("analyze ...");
+		AnalyzeFacilities facilitiesAnalyzer = new AnalyzeFacilities();
+		facilitiesAnalyzer.run(facilities, network);		
 		
 		AnalyzePlans plansAnalyzer = new AnalyzePlans();
 		plansAnalyzer.run(plansfilePath, this.facilities, this.network);
