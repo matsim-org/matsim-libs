@@ -83,7 +83,7 @@ import org.matsim.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
-import org.matsim.network.TimeVariantLinkImpl;
+import org.matsim.network.TimeVariantLinkFactory;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
@@ -508,8 +508,8 @@ public class Controler {
 		log.info("Complete config dump done.");
 
 		if (this.config.network().isTimeVariantNetwork()) {
-			log.info("setting TimeVariantLinkImpl as link prototype in NetworkFactory.");
-			this.networkFactory.setLinkPrototype(TimeVariantLinkImpl.class);
+			log.info("use TimeVariantLinks in NetworkFactory.");
+			this.networkFactory.setLinkFactory(new TimeVariantLinkFactory());
 		}
 	}
 

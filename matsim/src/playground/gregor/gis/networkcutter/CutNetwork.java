@@ -44,7 +44,7 @@ import org.matsim.network.NetworkChangeEventsWriter;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
-import org.matsim.network.TimeVariantLinkImpl;
+import org.matsim.network.TimeVariantLinkFactory;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
@@ -160,7 +160,7 @@ public class CutNetwork {
 		World w = Gbl.createWorld();
 		
 		NetworkFactory nf = new NetworkFactory();
-		nf.setLinkPrototype(TimeVariantLinkImpl.class);
+		nf.setLinkFactory(new TimeVariantLinkFactory());
 		NetworkLayer net = new NetworkLayer(nf);
 		new MatsimNetworkReader(net).readFile(c.network().getInputFile());
 		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(net);

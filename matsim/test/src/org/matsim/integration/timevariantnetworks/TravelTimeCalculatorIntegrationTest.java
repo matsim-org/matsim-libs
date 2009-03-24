@@ -26,13 +26,14 @@ import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.TimeVariantLinkFactory;
 import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.network.NetworkChangeEvent.ChangeType;
 import org.matsim.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.router.util.TravelTime;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.trafficmonitoring.TravelTimeAggregatorFactory;
+import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.trafficmonitoring.TravelTimeDataHashMap;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -43,7 +44,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 
 		// create a network
 		NetworkFactory nf = new NetworkFactory();
-		nf.setLinkPrototype(TimeVariantLinkImpl.class);
+		nf.setLinkFactory(new TimeVariantLinkFactory());
 		final NetworkLayer network = new NetworkLayer(nf);
 		network.setCapacityPeriod(3600.0);
 
@@ -77,7 +78,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 
 		// create a network
 		NetworkFactory nf = new NetworkFactory();
-		nf.setLinkPrototype(TimeVariantLinkImpl.class);
+		nf.setLinkFactory(new TimeVariantLinkFactory());
 		final NetworkLayer network = new NetworkLayer(nf);
 		network.setCapacityPeriod(3600.0);
 

@@ -45,7 +45,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkChangeEventsParser;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.TimeVariantLinkImpl;
+import org.matsim.network.TimeVariantLinkFactory;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
@@ -109,7 +109,7 @@ public class ScenarioImpl implements Scenario {
 		if (factory == null) {
 			this.networkFactory = new NetworkFactory();
 			if (this.isTimeVariantNetwork){
-				this.networkFactory.setLinkPrototype(TimeVariantLinkImpl.class);
+				this.networkFactory.setLinkFactory(new TimeVariantLinkFactory());
 			}
 		} else {
 			this.networkFactory = factory;

@@ -19,15 +19,11 @@
 
 package org.matsim.network;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.network.BasicNode;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
@@ -40,24 +36,12 @@ import org.matsim.population.routes.RouteFactory;
  */
 public class NetworkFactory {
 
-	private Constructor<? extends Link> prototypeContructor;
-
-	private static final Class[] PROTOTYPECONSTRUCTOR = { Id.class,
-			BasicNode.class, BasicNode.class, NetworkLayer.class, double.class,
-			double.class, double.class, double.class};
+	private LinkFactory linkFactory = null;
 
 	private final Map<BasicLeg.Mode, RouteFactory> routeFactories = new HashMap<BasicLeg.Mode, RouteFactory>();
 
 	public NetworkFactory() {
-		try {
-			this.prototypeContructor = LinkImpl.class
-					.getConstructor(PROTOTYPECONSTRUCTOR);
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
-
+		this.linkFactory = new LinkFactoryImpl();
 		this.routeFactories.put(BasicLeg.Mode.car, new NodeCarRouteFactory());
 	}
 
@@ -68,28 +52,7 @@ public class NetworkFactory {
 	public Link createLink(final Id id, final Node from, final Node to,
 			final NetworkLayer network, final double length, final double freespeedTT, final double capacity,
 			final double lanes) {
-		Link ret;
-		Exception ex;
-		try {
-			ret = this.prototypeContructor.newInstance(new Object[] { id,
-					from, to, network, length, freespeedTT, capacity, lanes });
-			return ret;
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-			ex = e;
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			ex = e;
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			ex = e;
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-			ex = e;
-		}
-		throw new RuntimeException(
-				"Cannot instantiate link from prototype, this should never happen, but never say never!",
-				ex);
+		return this.linkFactory.createLink(id, from, to, network, length, freespeedTT, capacity, lanes);
 	}
 
 	/**
@@ -132,28 +95,13 @@ public class NetworkFactory {
 			this.routeFactories.put(mode, factory);
 		}
 	}
-
-	public void setLinkPrototype(final Class<? extends Link> prototype) {
-		try {
-			Constructor<? extends Link> c = prototype.getConstructor(PROTOTYPECONSTRUCTOR);
-			if (null != c) {
-				this.prototypeContructor = c;
-			}
-			else {
-				throw new IllegalArgumentException(
-						"A prototype must have a public constructor with parameter types: "
-								+ Arrays.toString(PROTOTYPECONSTRUCTOR));
-			}
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
-
+	
+	public void setLinkFactory(final LinkFactory factory) {
+		this.linkFactory = factory;
 	}
 
 	public boolean isTimeVariant() {
-		return (this.prototypeContructor.getDeclaringClass() == TimeVariantLinkImpl.class);
+		return (this.linkFactory instanceof TimeVariantLinkFactory);
 	}
 
 }
