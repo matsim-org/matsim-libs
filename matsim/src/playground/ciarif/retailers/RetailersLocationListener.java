@@ -158,9 +158,10 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 				while (actIter.hasNext()) {
 					
 					Activity act = (Activity)actIter.next();
-					log.info("Activity" + act );
-					log.info("moved facilities" + movedFacilities  );
+					log.info("Activity's facility = " + act.getFacilityId() );
 					if (movedFacilities.containsKey(act.getFacilityId())) {
+						log.info("link = " + act.getFacility().getLink());
+						log.info("link class = " + act.getFacility().getLink().getClass());
 						act.setLink(act.getFacility().getLink());
 						routeIt = true;
 					}
