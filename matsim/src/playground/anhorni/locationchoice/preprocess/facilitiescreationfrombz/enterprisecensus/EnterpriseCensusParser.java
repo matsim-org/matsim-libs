@@ -31,7 +31,6 @@ public class EnterpriseCensusParser {
 
 	private String inputHectareAggregationFile = "input/facilities/BZ01_UNT.TXT";
 	private String presenceCodeFile = "input/facilities/BZ01_UNT_P_DSVIEW.TXT";
-	private String separator = ";";
 	private static Logger log = Logger.getLogger(EnterpriseCensusParser.class);
 
 	public EnterpriseCensusParser(EnterpriseCensus ec) {
@@ -50,6 +49,7 @@ public class EnterpriseCensusParser {
 		int skip = 1;
 
 		String filename = presenceCodeFile;
+		String separator = ";";
 		File file = new File(filename);
 
 		LineIterator it = null;
@@ -101,6 +101,7 @@ public class EnterpriseCensusParser {
 
 		log.info("Reading the hectare aggregation file...");
 
+		String separator = ",";
 		String filename = inputHectareAggregationFile;
 		File file = new File(filename);
 
