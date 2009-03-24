@@ -22,7 +22,6 @@ package org.matsim.facilities;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -114,13 +113,13 @@ public class ActivityOptionImpl implements ActivityOption {
 	// query methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final boolean containsOpentime(final BasicOpeningTime o) {
-		Set<BasicOpeningTime> o_set = this.getOpeningTimes(o.getDay());
-		if (o_set == null) {
-			return false;
-		}
-		return o_set.contains(o);
-	}
+//	public final boolean containsOpentime(final BasicOpeningTime o) {
+//		Set<BasicOpeningTime> o_set = this.getOpeningTimes(o.getDay());
+//		if (o_set == null) {
+//			return false;
+//		}
+//		return o_set.contains(o);
+//	}
 
 	//////////////////////////////////////////////////////////////////////
 	// set methods
