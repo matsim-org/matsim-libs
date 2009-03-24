@@ -34,6 +34,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for org.matsim.utils.io");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(org.matsim.utils.io.IOUtilsTest.class);
+		suite.addTestSuite(org.matsim.utils.io.MatsimFileTypeGuesserTest.class);
 		//$JUnit-END$
 		return suite;
 	}

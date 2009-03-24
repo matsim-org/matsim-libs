@@ -18,11 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel;
+package org.matsim.utils.io;
 
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.network.MatsimLaneDefinitionsReader;
+import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
+import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.io.MatsimFileTypeGuesser;
 
@@ -54,20 +57,11 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 		assertEquals("http://www.matsim.org/files/dtd/plans_v4.dtd", g.getSystemId());
 	}
 
-	public void testPlansV5Xsd() throws IOException {
-		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/basic/v01/testPopulation.xml");
-		assertNull(g.getPublicId());
-		assertEquals(MatsimFileTypeGuesser.FileType.Population, g.getGuessedFileType());
-		assertEquals("http://www.matsim.org/files/dtd/population_v5.0.xsd", g.getSystemId());
-		fail("needs better example file");
-	}
-
 	public void testCountsV1Xsd() throws IOException {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("examples/equil/counts100.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Counts, g.getGuessedFileType());
 		assertNull(g.getPublicId());
 		assertEquals("http://matsim.org/files/dtd/counts_v1.xsd", g.getSystemId());
-		fail("needs better example file");
 	}
 
 	public void testEventsV1Txt() throws IOException {
@@ -75,7 +69,6 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 		assertEquals(MatsimFileTypeGuesser.FileType.Events, g.getGuessedFileType());
 		assertNull(g.getPublicId());
 		assertNull(g.getSystemId());
-		fail("needs better example file");
 	}
 
 	public void testEventsV1Xml() throws IOException {
@@ -83,9 +76,34 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 		assertEquals(MatsimFileTypeGuesser.FileType.Events, g.getGuessedFileType());
 		assertNull(g.getPublicId());
 		assertNull(g.getSystemId());
-		fail("needs better example file");
 	}
 
+	public void testLaneDefinitionsV11XML() throws IOException {
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/signalsystems/testLaneDefinitions_v1.1.xml");
+		assertEquals(MatsimFileTypeGuesser.FileType.LaneDefinitions, g.getGuessedFileType());
+		assertNull(g.getPublicId());
+		assertNotNull(g.getSystemId());
+		assertEquals(MatsimLaneDefinitionsReader.SCHEMALOCATIONV11, g.getSystemId());
+	}
+
+	public void testSignalSystemsV11XML() throws IOException {
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/signalsystems/testSignalSystems_v1.1.xml");
+		assertEquals(MatsimFileTypeGuesser.FileType.SignalSystems, g.getGuessedFileType());
+		assertNull(g.getPublicId());
+		assertNotNull(g.getSystemId());
+		assertEquals(MatsimSignalSystemsReader.SIGNALSYSTEMS11, g.getSystemId());
+	}
+
+	public void testSignalSystemConfigurationsV11XML() throws IOException {
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/signalsystems/testSignalSystemConfigurations_v1.1.xml");
+		assertEquals(MatsimFileTypeGuesser.FileType.SignalSystemConfigs, g.getGuessedFileType());
+		assertNull(g.getPublicId());
+		assertNotNull(g.getSystemId());
+		assertEquals(MatsimSignalSystemConfigurationsReader.SIGNALSYSTEMSCONFIG11, g.getSystemId());
+	}
+
+	
+	
 	// TODO needs more test for Households, Transims-Veh, OTFVis, ...
 
 	public void testNotExistant() {

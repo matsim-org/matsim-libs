@@ -46,7 +46,7 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 	 * This enum only informs about the correct container, not about the version of the input file.
 	 */
 	public enum FileType {Config, Network, Facilities, Population, World, 
-		Counts, Events, Households, TransimsVehicle, OTFVis, SignalSystems, SignalSystemsConfig };
+		Counts, Events, Households, TransimsVehicle, OTFVis, SignalSystems, LaneDefinitions, SignalSystemConfigs };
 
 	public static final String SYSTEMIDNOTFOUNDMESSAGE = "System Id of xml document couldn't be detected. " +
 	"Make sure that you try to read a xml document with a valid header. " +
@@ -133,22 +133,23 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 			throw new IOException("SAXException: " + e.getMessage());
 		} catch (ParserConfigurationException e) {
 			throw new IOException("ParserConfigurationException: " + e.getMessage());
-		} catch (EntityException e) {
+		} catch (XMLTypeDetectionException e) {
 			this.xmlPublicId = e.publicId;
 			this.xmlSystemId = e.systemId;
 			log.debug("Detected public id: " + this.xmlPublicId);
 			log.debug("Detected system Id: " + this.xmlSystemId);
-		} catch (RootTagException e) {
 			if ("events".equals(e.rootTag)) {
 				this.fileType = FileType.Events;
 			} else if ("lightSignalSystems".equals(e.rootTag)){
 				this.fileType = FileType.SignalSystems;
 			}	else if ("lightSignalSystemConfiguration".equals(e.rootTag)){
-				this.fileType = FileType.SignalSystemsConfig;
+				this.fileType = FileType.SignalSystemConfigs;
 			} else if ("signalSystems".equals(e.rootTag)){
 				this.fileType = FileType.SignalSystems;
-			}	else if ("signalSystemConfiguration".equals(e.rootTag)){
-				this.fileType = FileType.SignalSystemsConfig;
+			}	else if ("signalSystemConfig".equals(e.rootTag)){
+				this.fileType = FileType.SignalSystemConfigs;
+			}	else if ("laneDefinitions".equals(e.rootTag)){
+				this.fileType = FileType.LaneDefinitions;
 			}	else {
 				log.warn("got unexpected rootTag: " + e.rootTag);
 			}
@@ -158,60 +159,59 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 
 	private final static class XmlHandler extends DefaultHandler {
 
+		private XMLTypeDetectionException exception;
+		
+		private boolean detectedFirstEntity = false;
+		
 		public XmlHandler() {
 			// public constructor for private inner class
 		}
 
 		@Override
 		public InputSource resolveEntity(final String publicId, final String systemId) {
-			throw new EntityException(publicId, systemId);
+			/**
+			 * As the xml schema of interest may be derived from other schema instances we
+			 * are only interested in the first entity resolved.
+			 */
+			if (! detectedFirstEntity){
+				this.exception  = new XMLTypeDetectionException(publicId, systemId);
+				this.detectedFirstEntity = true;
+			}
+			return null;
 		}
 
 		@Override
 		public void startElement(final String uri, final String localName, final String qName, final Attributes atts) throws SAXException {
 			String tag = (uri.length() == 0) ? qName : localName;
-			throw new RootTagException(tag);
+			if (this.exception == null) {
+				this.exception = new XMLTypeDetectionException(null, null);
+			}
+			this.exception.rootTag = tag;
+			throw this.exception;
 		}
 	}
-
+	
 	/**
-	 * Used to return the declared type encountered in the XML file and stop parsing the file.
+	 * Used to return the declared type encountered in the XML file, the root tag 
+	 * and to stop parsing the file
+	 * @author dgrether
 	 *
-	 * @author mrieser
 	 */
-	private final static class EntityException extends RuntimeException {
-		private static final long serialVersionUID = 1L;
+	private final static class XMLTypeDetectionException extends RuntimeException {
+
 		public final String publicId;
 		public final String systemId;
-
-		public EntityException(final String publicId, final String systemId) {
+		public String rootTag;
+		
+		public XMLTypeDetectionException(String publicId, String systemId){
 			this.publicId = publicId;
 			this.systemId = systemId;
-		}
+		}		
 
 		@Override
 		public synchronized Throwable fillInStackTrace() {
 			return this; // optimization, as we're never interested in that stack trace
 		}
+
 	}
-
-	/**
-	 * Used to return the first tag encountered in the XML file and stop parsing the file.
-	 *
-	 * @author mrieser
-	 */
-	private final static class RootTagException extends RuntimeException {
-		private static final long serialVersionUID = 1L;
-		public final String rootTag;
-
-		public RootTagException(final String rootTag) {
-			this.rootTag = rootTag;
-		}
-
-		@Override
-		public synchronized Throwable fillInStackTrace() {
-			return this; // optimization, as we're never interested in that stack trace
-		}
-	}
-
 }
