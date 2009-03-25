@@ -12,13 +12,13 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.population.ActivityImpl;
-import org.matsim.population.LegImpl;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * 

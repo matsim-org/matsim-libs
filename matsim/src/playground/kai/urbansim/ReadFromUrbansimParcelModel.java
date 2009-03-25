@@ -26,10 +26,10 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.world.Location;
 
 import playground.kai.urbansim.ids.ZoneId;

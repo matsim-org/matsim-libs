@@ -39,15 +39,15 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationWriterHandlerImplV4;
+import org.matsim.core.population.routes.NodeCarRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
-import org.matsim.population.PopulationWriterHandlerImplV4;
-import org.matsim.population.routes.NodeCarRoute;
 import org.xml.sax.SAXException;
 
 /**
@@ -135,7 +135,7 @@ public class RandomPlansGenerator {
 
 		for(int i=1; i <= numberOfAgents; i++){
 			Person person = (new PersonImpl(new IdImpl(i)));
-			Plan plan = new org.matsim.population.PlanImpl(person);
+			Plan plan = new org.matsim.core.population.PlanImpl(person);
 			person.addPlan(plan);
 
 			//create random home and work link

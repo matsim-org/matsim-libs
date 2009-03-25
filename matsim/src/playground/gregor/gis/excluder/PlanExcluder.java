@@ -34,11 +34,11 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
-import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;

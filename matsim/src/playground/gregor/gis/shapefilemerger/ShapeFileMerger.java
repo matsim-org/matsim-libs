@@ -36,8 +36,8 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
-import org.matsim.utils.gis.ShapeFileReader;
-import org.matsim.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 

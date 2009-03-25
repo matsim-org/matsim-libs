@@ -9,7 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.Flushable;
 import java.io.IOException;
 
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * a small and simple writer

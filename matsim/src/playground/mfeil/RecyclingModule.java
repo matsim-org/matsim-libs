@@ -33,8 +33,8 @@ import org.matsim.core.replanning.modules.MultithreadedModuleA;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.planomat.Planomat;
 
 import java.io.File;

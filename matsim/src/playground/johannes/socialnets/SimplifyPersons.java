@@ -33,7 +33,7 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.population.PopulationWriter;
+import org.matsim.core.population.PopulationWriter;
 
 /**
  * @author illenberger

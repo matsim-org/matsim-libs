@@ -24,8 +24,8 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.utils.misc.Time;
 
 /**
  * it's a modified copy of org.matsim.population.algorithms.PlanMutateTimeAllocation

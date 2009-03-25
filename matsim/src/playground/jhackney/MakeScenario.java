@@ -26,11 +26,11 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationReader;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.algorithms.PersonSetActToLinkWithNonNullFacility;

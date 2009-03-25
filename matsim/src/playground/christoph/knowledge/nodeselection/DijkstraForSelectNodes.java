@@ -38,7 +38,7 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 
 

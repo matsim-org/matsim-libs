@@ -25,8 +25,8 @@ import java.io.IOException;
 
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.utils.io.IOUtils;
 
 /**
  * outputs the amount of public transit user or its fraction into .txt-files

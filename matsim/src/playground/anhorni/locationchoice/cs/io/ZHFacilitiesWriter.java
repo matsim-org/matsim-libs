@@ -13,8 +13,9 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileWriter;
+
 import com.vividsolutions.jts.geom.Point;
 
 import playground.anhorni.locationchoice.cs.helper.ZHFacilities;

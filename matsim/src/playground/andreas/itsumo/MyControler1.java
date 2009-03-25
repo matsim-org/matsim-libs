@@ -38,13 +38,13 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.run.Events2Snapshot;
-import org.matsim.utils.NetworkUtils;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.vis.netvis.NetVis;
+import org.matsim.vis.netvis.NetVis;
 
 
 public class MyControler1 extends Controler {
@@ -121,7 +121,7 @@ public class MyControler1 extends Controler {
 			Person p = new PersonImpl(new IdImpl(i+1));
 
 			try {
-				Plan plan1 = new org.matsim.population.PlanImpl(p);
+				Plan plan1 = new org.matsim.core.population.PlanImpl(p);
 				Activity act1a = plan1.createAct("h", new CoordImpl(100., 100.));
 				act1a.setLink(link9);
 				act1a.setEndTime(0*60*60.);
@@ -134,7 +134,7 @@ public class MyControler1 extends Controler {
 				act1b.setStartTime(8*60*60);
 				p.addPlan(plan1);
 
-				Plan plan2 = new org.matsim.population.PlanImpl(p);
+				Plan plan2 = new org.matsim.core.population.PlanImpl(p);
 				Activity act2a = plan1.createAct("h", new CoordImpl(100., 100.));
 				act2a.setLink(link9);
 				act2a.setEndTime(0*60*60.);
@@ -325,7 +325,7 @@ public class MyControler1 extends Controler {
 
 	private void generatePerson(final int ii, final LinkImpl sourceLink, final LinkImpl destLink, final Population population){
 		Person p = new PersonImpl(new IdImpl(ii));
-		Plan plan = new org.matsim.population.PlanImpl(p);
+		Plan plan = new org.matsim.core.population.PlanImpl(p);
 		try {
 			Activity act1 = plan.createAct("h", new CoordImpl(100., 100.));
 			act1.setLink(sourceLink);

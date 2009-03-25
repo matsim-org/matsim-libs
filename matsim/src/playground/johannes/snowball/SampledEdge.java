@@ -23,7 +23,7 @@
  */
 package playground.johannes.snowball;
 
-import org.matsim.utils.collections.Tuple;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.graph.EdgeDecorator;
 import playground.johannes.graph.SparseEdge;

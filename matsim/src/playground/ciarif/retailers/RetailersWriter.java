@@ -5,8 +5,8 @@ import java.util.Iterator;
 
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.writer.Writer;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.Writer;
 
 public class RetailersWriter extends Writer {
 

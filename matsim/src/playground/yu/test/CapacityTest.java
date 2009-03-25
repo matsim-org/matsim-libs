@@ -28,7 +28,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 public class CapacityTest {
 
@@ -50,7 +50,7 @@ public class CapacityTest {
 						.write(link.getId()
 								+ "\t"
 								+ link
-										.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+										.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 								+ "\n");
 				out.flush();
 			}

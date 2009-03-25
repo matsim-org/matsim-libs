@@ -33,9 +33,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 public class PlansGeneratorControler extends Controler {
 
@@ -162,7 +162,7 @@ public class PlansGeneratorControler extends Controler {
 	/** Generates one Person a time */
 	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Population population) {
 		Person p = new PersonImpl(new IdImpl(String.valueOf(ii)));
-		Plan plan = new org.matsim.population.PlanImpl(p);
+		Plan plan = new org.matsim.core.population.PlanImpl(p);
 		try {
 			Activity act1 = plan.createAct("h", new CoordImpl(100., 100.));
 			act1.setLink(fromLink);

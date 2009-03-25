@@ -26,12 +26,12 @@ package playground.johannes.itsc08;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.NodeCarRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.withinday.routeprovider.RouteProvider;
 
 /**

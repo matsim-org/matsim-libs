@@ -33,8 +33,8 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -83,9 +83,9 @@ public class NewPtWalkPlan extends NewPopulation implements PersonAlgorithm,
 	@SuppressWarnings("unchecked")
 	public void run(Plan plan) {
 		plan.setType(Plan.Type.CAR);
-		Plan ptPlan = new org.matsim.population.PlanImpl(person);
+		Plan ptPlan = new org.matsim.core.population.PlanImpl(person);
 		ptPlan.setType(Plan.Type.PT);
-		Plan walkPlan = new org.matsim.population.PlanImpl(person);
+		Plan walkPlan = new org.matsim.core.population.PlanImpl(person);
 		walkPlan.setType(Plan.Type.WALK);
 		List actsLegs = plan.getPlanElements();
 		for (int i = 0; i < actsLegs.size(); i++) {
@@ -95,7 +95,7 @@ public class NewPtWalkPlan extends NewPopulation implements PersonAlgorithm,
 				walkPlan.addAct((Activity) o);
 			} else {
 				Leg leg = (Leg) o;
-				Leg ptLeg = new org.matsim.population.LegImpl(leg);
+				Leg ptLeg = new org.matsim.core.population.LegImpl(leg);
 				ptLeg.setMode(Mode.pt);
 				ptLeg.setRoute(null);
 				// -----------------------------------------------
@@ -104,7 +104,7 @@ public class NewPtWalkPlan extends NewPopulation implements PersonAlgorithm,
 				// -----------------------------------------------
 				ptPlan.addLeg(ptLeg);
 
-				Leg walkLeg = new org.matsim.population.LegImpl(leg);
+				Leg walkLeg = new org.matsim.core.population.LegImpl(leg);
 				walkLeg.setMode(Mode.walk);
 				walkLeg.setRoute(null);
 				walkPlan.addLeg(walkLeg);

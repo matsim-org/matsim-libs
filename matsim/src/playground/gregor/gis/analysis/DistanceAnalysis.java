@@ -52,16 +52,16 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationReader;
-import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.gis.ShapeFileReader;
-import org.matsim.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.world.World;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -235,9 +235,9 @@ public class DistanceAnalysis {
 
 			dist[0] +=  l1;
 			dist[2] += person.getSelectedPlan().getScoreAsPrimitiveType();
-			Plan plan = new org.matsim.population.PlanImpl(person);
+			Plan plan = new org.matsim.core.population.PlanImpl(person);
 			plan.addAct(person.getSelectedPlan().getFirstActivity());
-			Leg ll = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
+			Leg ll = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
 			ll.setArrivalTime(0.0);
 			ll.setDepartureTime(0.0);
 			ll.setTravelTime(0.0);

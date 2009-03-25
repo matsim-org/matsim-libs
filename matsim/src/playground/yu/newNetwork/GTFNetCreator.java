@@ -60,17 +60,17 @@ public class GTFNetCreator {
 								+ linkId
 								+ "\tcapacity:\t"
 								+ l
-										.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+										.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
 				System.out.println("greentimefraction:\t"
 						+ g.getAvgGtfs(linkId));
 				l.setCapacity(l
-						.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 						* g.getAvgGtfs(linkId));
 				System.out.println("#b-->linkId:\t"
 						+ linkId
 						+ "\tcapacity:\t"
 						+ network.getLink(linkId).getCapacity(
-								org.matsim.utils.misc.Time.UNDEFINED_TIME));
+								org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
 				System.out.println("-------------------------");
 			}
 		}

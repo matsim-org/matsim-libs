@@ -33,9 +33,9 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
 
 import playground.yu.analysis.PlanModeJudger;
 
@@ -74,13 +74,13 @@ public class NewAgentPtPlan3 extends NewPopulation implements PersonAlgorithm {
 
 			if (!legMode.equals(BasicLeg.Mode.car)) {
 				if (person.getLicense().equals("yes")) {
-					Plan copyPlan = new org.matsim.population.PlanImpl(person);
+					Plan copyPlan = new org.matsim.core.population.PlanImpl(person);
 					//copyPlan.setType(Plan.Type.CAR);//????????????????????????
 					// ??
 					copyPlans.add(copyPlan);
 				}
 			} else if (!legMode.equals(BasicLeg.Mode.pt)) {
-				Plan copyPlan = new org.matsim.population.PlanImpl(person);
+				Plan copyPlan = new org.matsim.core.population.PlanImpl(person);
 				// copyPlan.setType(Plan.Type.PT);//?????????????????????
 				copyPlans.add(copyPlan);
 			}
@@ -94,7 +94,7 @@ public class NewAgentPtPlan3 extends NewPopulation implements PersonAlgorithm {
 						copyPlan.addAct((Activity) o);
 					else {
 						Leg leg = (Leg) o;
-						Leg copyLeg = new org.matsim.population.LegImpl(leg);
+						Leg copyLeg = new org.matsim.core.population.LegImpl(leg);
 						copyLeg.setRoute(null);
 						copyLeg.setMode(
 						// copyPlan.getType().toString()

@@ -36,10 +36,10 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReader;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
-import org.matsim.population.PopulationWriterHandlerImplV4;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.xml.sax.SAXException;
 
 import playground.msieg.structure.HashPathFlow;

@@ -16,8 +16,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.cppdeqsim.DEQSimControler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
 
 import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractChoiceSetsRouting;
 import playground.anhorni.locationchoice.cs.depr.filters.ActTypeAndAreaTripFilter;

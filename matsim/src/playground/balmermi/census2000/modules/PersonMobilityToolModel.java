@@ -28,10 +28,10 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicActivityImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordUtils;
 
 import playground.balmermi.census2000.data.Persons;
 import playground.balmermi.census2000.models.ModelMobiliyTools;

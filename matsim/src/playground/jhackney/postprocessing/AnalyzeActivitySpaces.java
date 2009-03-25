@@ -30,6 +30,7 @@ import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
 import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
 import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
@@ -37,7 +38,6 @@ import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.scoring.TrackActsOverlap;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
-import org.matsim.utils.charts.XYScatterChart;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;

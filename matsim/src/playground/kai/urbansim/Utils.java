@@ -19,7 +19,7 @@ import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.kai.urbansim.ids.IdFactory;
 

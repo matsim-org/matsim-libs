@@ -6,8 +6,8 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.BasicLinkImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 public abstract class Utils {
 	private final static double EPSILON = 0.0001;

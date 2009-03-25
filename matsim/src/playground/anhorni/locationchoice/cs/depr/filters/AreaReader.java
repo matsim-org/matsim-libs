@@ -8,7 +8,8 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.ShapeFileReader;
+
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class AreaReader {

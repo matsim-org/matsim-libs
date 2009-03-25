@@ -25,10 +25,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordUtils;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 
 import playground.marcel.visum.VisumNetwork;
 import playground.marcel.visum.VisumNetwork.Stop;

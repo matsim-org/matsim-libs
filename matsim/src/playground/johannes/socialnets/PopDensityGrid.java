@@ -33,7 +33,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author illenberger

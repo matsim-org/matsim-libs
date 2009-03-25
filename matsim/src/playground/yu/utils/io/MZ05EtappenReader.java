@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
-import org.matsim.utils.io.tabularFileParser.TabularFileParser;
-import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 import playground.yu.utils.CollectionSum;
 

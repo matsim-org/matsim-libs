@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;

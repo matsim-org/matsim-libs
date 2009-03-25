@@ -23,8 +23,8 @@ import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.mobsim.queuesim.QueueVehicleDepartureTimeComparator;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 
 public class PseudoLink implements Comparable<PseudoLink> {
 

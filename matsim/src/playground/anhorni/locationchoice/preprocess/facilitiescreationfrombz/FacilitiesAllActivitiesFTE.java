@@ -32,7 +32,7 @@ import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.locationchoice.preprocess.facilitiescreationfrombz.enterprisecensus.EnterpriseCensus;
 import playground.anhorni.locationchoice.preprocess.facilitiescreationfrombz.enterprisecensus.EnterpriseCensusParser;

@@ -19,7 +19,7 @@
 package playground.dgrether.functions;
 
 import org.apache.log4j.Logger;
-import org.matsim.utils.charts.XYLineChart;
+import org.matsim.core.utils.charts.XYLineChart;
 
 
 /**

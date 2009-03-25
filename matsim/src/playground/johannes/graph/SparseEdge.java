@@ -23,7 +23,7 @@
  */
 package playground.johannes.graph;
 
-import org.matsim.utils.collections.Tuple;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
  * Representation of an undirected an unweighted edge.

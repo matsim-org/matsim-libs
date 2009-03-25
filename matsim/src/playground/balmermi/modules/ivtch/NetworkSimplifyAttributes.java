@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 public class NetworkSimplifyAttributes {
 

@@ -47,10 +47,10 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordUtils;
-import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.statistics.WeightedStatistics;
 

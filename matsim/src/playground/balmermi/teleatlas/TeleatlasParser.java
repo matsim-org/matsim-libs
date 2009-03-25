@@ -40,16 +40,16 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
-import org.matsim.utils.collections.Tuple;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordUtils;
-import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.ArgumentParser;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.Network2ESRIShape;
-import org.matsim.utils.misc.ArgumentParser;
-import org.matsim.utils.misc.Time;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

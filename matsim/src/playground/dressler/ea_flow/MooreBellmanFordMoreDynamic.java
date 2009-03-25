@@ -30,11 +30,11 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.NodeCarRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervall;
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;

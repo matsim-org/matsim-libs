@@ -26,7 +26,7 @@ package playground.johannes.socialnet.io;
 import java.io.IOException;
 import java.util.List;
 
-import org.matsim.utils.collections.Tuple;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.graph.Edge;
 import playground.johannes.graph.Graph;

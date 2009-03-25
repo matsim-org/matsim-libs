@@ -19,9 +19,9 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.misc.Counter;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Counter;
 
 public class LocationModifier extends Modifier {
 

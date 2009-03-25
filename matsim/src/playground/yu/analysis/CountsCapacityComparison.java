@@ -11,9 +11,9 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
-import org.matsim.utils.geometry.CoordUtils;
 
 import playground.yu.utils.io.SimpleWriter;
 

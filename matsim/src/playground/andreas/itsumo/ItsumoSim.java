@@ -36,7 +36,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 public class ItsumoSim extends ExternalMobsim {
 

@@ -31,7 +31,7 @@ import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 public class EventsWait2LinkTest {
 	public static class EventsWait2Link implements AgentWait2LinkEventHandler {

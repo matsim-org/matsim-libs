@@ -11,7 +11,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.QuadTree;
 
 public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 	public static final String NAME = "catchmentAreaRetailerStrategy";

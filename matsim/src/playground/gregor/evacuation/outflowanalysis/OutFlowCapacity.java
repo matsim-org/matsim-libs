@@ -74,7 +74,7 @@ public class OutFlowCapacity {
 			for (Link l2 : link.getToNode().getOutLinks().values()) {
 				if (l2.getId().toString().contains("el")) {
 					this.outFlowLinks.add(link);
-					this.outFlowCapcity += link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+					this.outFlowCapcity += link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 					break;
 				}
 				

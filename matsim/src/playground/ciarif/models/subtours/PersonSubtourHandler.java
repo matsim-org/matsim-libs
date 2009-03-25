@@ -8,7 +8,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class PersonSubtourHandler {
 	

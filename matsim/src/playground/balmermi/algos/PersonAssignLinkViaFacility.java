@@ -32,8 +32,8 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.utils.collections.QuadTree;
 
 
 public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {

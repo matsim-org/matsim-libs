@@ -27,8 +27,8 @@ import java.io.IOException;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 
 public class NetworkParseETNet {
 

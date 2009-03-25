@@ -32,7 +32,7 @@ import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.charts.XYScatterChart;
+import org.matsim.core.utils.charts.XYScatterChart;
 
 /**
  * Generates a "Q-V-Diagramm" (traffic flow versus speed) for one link, based

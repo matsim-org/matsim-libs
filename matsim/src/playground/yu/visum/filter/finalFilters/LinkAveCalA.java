@@ -12,7 +12,7 @@ import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 import playground.yu.visum.writer.UserDefAtt;
 

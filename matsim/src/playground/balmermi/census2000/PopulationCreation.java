@@ -26,11 +26,11 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.MatsimMatricesReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 

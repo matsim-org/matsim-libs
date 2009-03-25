@@ -30,11 +30,11 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationReader;
-import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.netvis.NetVis;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.vis.netvis.NetVis;
 import org.matsim.world.World;
 
 public class IteratePopSimTest {

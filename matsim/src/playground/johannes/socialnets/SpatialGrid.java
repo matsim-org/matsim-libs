@@ -28,8 +28,8 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.utils.io.MatsimXmlParser;
-import org.matsim.writer.MatsimXmlWriter;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.xml.sax.Attributes;
 
 /**

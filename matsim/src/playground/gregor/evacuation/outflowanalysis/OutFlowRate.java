@@ -28,7 +28,7 @@ import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 public class OutFlowRate implements AgentArrivalEventHandler {
 	

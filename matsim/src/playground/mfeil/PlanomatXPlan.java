@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Person;
-import org.matsim.population.PlanImpl;
+import org.matsim.core.population.PlanImpl;
 
 
 /**

@@ -38,7 +38,7 @@ import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.collections.Tuple;
+import org.matsim.core.utils.collections.Tuple;
 
 public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 

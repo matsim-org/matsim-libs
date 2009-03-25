@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 
 import playground.gregor.collections.gnuclasspath.TreeMap;
 

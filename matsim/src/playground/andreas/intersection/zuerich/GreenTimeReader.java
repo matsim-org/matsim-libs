@@ -11,9 +11,9 @@ import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
-import org.matsim.utils.io.tabularFileParser.TabularFileParser;
-import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 
 public class GreenTimeReader implements TabularFileHandler {

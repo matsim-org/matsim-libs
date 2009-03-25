@@ -140,7 +140,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	}	
 	
 	protected void writePlan (Plan in, Plan out){
-		Plan bestPlan = new org.matsim.population.PlanImpl (in.getPerson());
+		Plan bestPlan = new org.matsim.core.population.PlanImpl (in.getPerson());
 		bestPlan.copyPlan(in);
 		List<PlanElement> al = (List<PlanElement>) out.getPlanElements();
 		

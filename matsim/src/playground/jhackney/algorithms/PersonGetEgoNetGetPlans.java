@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
 
 public class PersonGetEgoNetGetPlans {
 

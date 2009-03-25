@@ -8,7 +8,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.mmoyo.Validators.NetValidator;
 import playground.mmoyo.Validators.PlanValidator;

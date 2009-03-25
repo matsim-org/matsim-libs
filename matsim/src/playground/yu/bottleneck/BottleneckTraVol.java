@@ -27,8 +27,8 @@ import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * this Class offers a possibility, the traffic volume on a link with id "15",

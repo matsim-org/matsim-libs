@@ -5,7 +5,7 @@ import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 public class LinkRetailersImpl extends LinkImpl  { //AbstractLocation implements BasicLink {
 

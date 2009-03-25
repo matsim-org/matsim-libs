@@ -7,8 +7,8 @@ import java.util.Iterator;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 
 
 class OnlineWriter {

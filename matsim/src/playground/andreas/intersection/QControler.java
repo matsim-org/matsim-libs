@@ -31,7 +31,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.run.Events2Snapshot;
-import org.matsim.utils.vis.netvis.NetVis;
+import org.matsim.vis.netvis.NetVis;
 
 import playground.andreas.intersection.dijkstra.NetworkWrapper;
 import playground.andreas.intersection.dijkstra.PlansCalcRouteDijkstra;

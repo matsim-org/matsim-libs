@@ -16,10 +16,10 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
-import org.matsim.utils.io.IOUtils;
 
 /**
  * quote from playground.balmermi.Scenario

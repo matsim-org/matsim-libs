@@ -27,7 +27,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 import playground.ou.scenario.FileOperate;
 

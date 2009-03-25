@@ -5,9 +5,9 @@ package playground.yu.utils.io;
 
 import java.io.IOException;
 
-import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
-import org.matsim.utils.io.tabularFileParser.TabularFileParser;
-import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 /**
  * @author yu

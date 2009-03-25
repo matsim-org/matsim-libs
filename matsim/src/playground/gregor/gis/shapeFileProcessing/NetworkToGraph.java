@@ -37,8 +37,8 @@ import org.geotools.referencing.CRS;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -97,7 +97,7 @@ public class NetworkToGraph {
 	}
 
 	private LinearRing getLinearRing(Link link) {
-		double minWidth = link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / GISToMatsimConverter.CAPACITY_COEF;
+		double minWidth = link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) / GISToMatsimConverter.CAPACITY_COEF;
 		minWidth = Math.min(minWidth,20);
 //		minWidth = 10;
 		Coordinate zero = new Coordinate(0,0);

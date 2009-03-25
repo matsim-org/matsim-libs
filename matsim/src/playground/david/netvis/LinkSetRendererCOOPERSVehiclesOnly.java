@@ -32,16 +32,16 @@ import java.awt.image.BufferedImage;
 import java.util.Iterator;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.vis.netvis.DisplayableLinkI;
-import org.matsim.utils.vis.netvis.DisplayableNetI;
-import org.matsim.utils.vis.netvis.VisConfig;
-import org.matsim.utils.vis.netvis.gui.ControlToolbar;
-import org.matsim.utils.vis.netvis.gui.NetJComponent;
-import org.matsim.utils.vis.netvis.renderers.RendererA;
-import org.matsim.utils.vis.netvis.renderers.ValueColorizer;
-import org.matsim.utils.vis.netvis.visNet.DisplayAgent;
-import org.matsim.utils.vis.netvis.visNet.DisplayLink;
-import org.matsim.utils.vis.netvis.visNet.DisplayNet;
+import org.matsim.vis.netvis.DisplayableLinkI;
+import org.matsim.vis.netvis.DisplayableNetI;
+import org.matsim.vis.netvis.VisConfig;
+import org.matsim.vis.netvis.gui.ControlToolbar;
+import org.matsim.vis.netvis.gui.NetJComponent;
+import org.matsim.vis.netvis.renderers.RendererA;
+import org.matsim.vis.netvis.renderers.ValueColorizer;
+import org.matsim.vis.netvis.visNet.DisplayAgent;
+import org.matsim.vis.netvis.visNet.DisplayLink;
+import org.matsim.vis.netvis.visNet.DisplayNet;
 
 
 public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> extends RendererA {
@@ -93,7 +93,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 	private void renderLink(DisplayableLinkI link, Graphics2D display, AffineTransform linkTransform) {
 
 		final int NodeWidth = 20;
-		final int lanes = link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+		final int lanes = link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 		final int cellLength_m = (int)Math.round(link.getLength_m());
 		final int cellWidth_m = (int)Math.round(laneWidth * lanes);
 		int cellStart_m = 0;
@@ -166,7 +166,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 	        double dy = link.getEndEasting() - link.getStartEasting();
 	        double dx = link.getEndNorthing() - link.getStartNorthing();
 	        double sqr = Math.sqrt(dx*dx +dy*dy);
-			final double cellWidth_m = laneWidth * link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+			final double cellWidth_m = laneWidth * link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 
 			dx = dx*cellWidth_m/sqr;
 	        dy = -dy*cellWidth_m/sqr;
@@ -261,7 +261,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 //					renderLink(link, display, linkTransform);
 //				}
 
-				final int lanes = link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+				final int lanes = link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 				/*
 				 * (2) RENDER VEHICLES
 				 *

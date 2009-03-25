@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;

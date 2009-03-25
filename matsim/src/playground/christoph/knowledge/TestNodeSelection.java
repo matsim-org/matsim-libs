@@ -28,7 +28,7 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;

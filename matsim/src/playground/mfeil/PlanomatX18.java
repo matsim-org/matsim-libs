@@ -38,6 +38,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
@@ -49,8 +51,6 @@ import org.matsim.locationchoice.constrained.SubChain;
 import org.matsim.planomat.Planomat;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.population.ActivityImpl;
-import org.matsim.population.LegImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.mfeil.config.PlanomatXConfigGroup;

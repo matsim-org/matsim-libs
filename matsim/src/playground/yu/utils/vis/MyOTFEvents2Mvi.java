@@ -7,7 +7,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
+import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 
 /**
  *quote from org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI of David

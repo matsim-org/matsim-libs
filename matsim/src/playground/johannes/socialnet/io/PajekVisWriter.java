@@ -29,8 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.utils.collections.Tuple;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.graph.Edge;
 import playground.johannes.graph.Vertex;

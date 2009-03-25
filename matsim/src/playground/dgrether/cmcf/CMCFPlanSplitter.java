@@ -26,8 +26,8 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.MatsimIo;
@@ -63,7 +63,7 @@ public class CMCFPlanSplitter {
 				idStringBuffer.append(Integer.toString(i));
 
 				Person pNew = new PersonImpl(new IdImpl(idStringBuffer.toString()));
-				Plan planNew = new org.matsim.population.PlanImpl(pNew);
+				Plan planNew = new org.matsim.core.population.PlanImpl(pNew);
 				Leg leg = (Leg) legIter.next();
 
 				planNew.addAct(pl.getPreviousActivity(leg));

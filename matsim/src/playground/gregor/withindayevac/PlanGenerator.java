@@ -47,7 +47,7 @@ import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeCarRoute;
 
 import playground.gregor.withindayevac.debug.DebugDecisionTree;
 import playground.gregor.withindayevac.debug.DebugFollowFastestAgent;
@@ -119,18 +119,18 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 //		nodes.add(this.network.getLink(strLinks.get(strLinks.size()-1)).getToNode());
 		
 //		pers.removeWorstPlans(this.maxPlans-1);
-		Plan plan = new org.matsim.population.PlanImpl(pers);
+		Plan plan = new org.matsim.core.population.PlanImpl(pers);
 		Activity oldA = pers.getSelectedPlan().getFirstActivity();
-		Activity a = new org.matsim.population.ActivityImpl(oldA);
+		Activity a = new org.matsim.core.population.ActivityImpl(oldA);
 		a.setType("h");
 		Leg oldLeg = pers.getSelectedPlan().getNextLeg(oldA);
-		Leg l = new org.matsim.population.LegImpl(oldLeg.getMode());
+		Leg l = new org.matsim.core.population.LegImpl(oldLeg.getMode());
 		l.setDepartureTime(oldLeg.getDepartureTime());
 		l.setTravelTime(oldLeg.getTravelTime());
 		l.setArrivalTime(oldLeg.getArrivalTime());
 		
 		Activity oldB = pers.getSelectedPlan().getNextActivity(oldLeg);
-		Activity b = new org.matsim.population.ActivityImpl(oldB);
+		Activity b = new org.matsim.core.population.ActivityImpl(oldB);
 		plan.addAct(a);
 		CarRoute route = new NodeCarRoute();
 		route.setNodes(nodes);

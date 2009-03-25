@@ -33,7 +33,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
-import org.matsim.utils.misc.ExeRunner;
+import org.matsim.core.utils.misc.ExeRunner;
 
 public class EctmSim extends ExternalMobsim {
 

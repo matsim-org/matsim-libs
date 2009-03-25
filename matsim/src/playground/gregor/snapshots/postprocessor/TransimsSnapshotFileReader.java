@@ -24,8 +24,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.utils.StringUtils;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.StringUtils;
 
 public class TransimsSnapshotFileReader {
 

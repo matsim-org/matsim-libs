@@ -24,8 +24,8 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;

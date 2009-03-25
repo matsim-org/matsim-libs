@@ -22,7 +22,7 @@ package playground.gregor.mviProd;
 
 import java.awt.Color;
 
-import org.matsim.utils.charts.XYLineChart;
+import org.matsim.core.utils.charts.XYLineChart;
 
 public class XYLineChartFixedRange extends XYLineChart {
 

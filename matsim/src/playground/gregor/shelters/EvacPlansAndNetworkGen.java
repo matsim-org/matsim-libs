@@ -88,12 +88,12 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 			fact.setFacility(f);
 			ActivityOption a = f.getActivityOption("h");
 			person.getKnowledge().addActivity(a, true);
-			Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
+			Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);
 			plan.addLeg(leg);
-			Activity act = new org.matsim.population.ActivityImpl("evacuated",fac);
+			Activity act = new org.matsim.core.population.ActivityImpl("evacuated",fac);
 			person.getKnowledge().addActivity(fac.getActivityOption("evacuated"),false);
 						
 			

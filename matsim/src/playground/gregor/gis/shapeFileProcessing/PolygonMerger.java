@@ -32,8 +32,8 @@ import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
-import org.matsim.utils.gis.ShapeFileReader;
-import org.matsim.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 
 
 import com.vividsolutions.jts.geom.Coordinate;

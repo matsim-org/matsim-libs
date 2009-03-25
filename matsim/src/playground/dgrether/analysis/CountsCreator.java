@@ -28,11 +28,11 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
-import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.utils.NetworkUtils;
 
 /**
  * @author dgrether

@@ -23,7 +23,7 @@ package playground.yalcin;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 
 /* Reads a file containing:
  *   code  |  personId  |  tripId  |  additional data gets ignored ... 

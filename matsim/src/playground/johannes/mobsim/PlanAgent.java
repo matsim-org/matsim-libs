@@ -30,7 +30,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * An implementation of {@link MobsimAgent} that uses a {@link Person} as

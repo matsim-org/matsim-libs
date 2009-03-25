@@ -32,8 +32,8 @@ import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.mobsim.queuesim.Simulation;
-import org.matsim.population.LegImpl;
-import org.matsim.population.PersonImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 
 import playground.marcel.pt.implementations.TransitDriver;
 

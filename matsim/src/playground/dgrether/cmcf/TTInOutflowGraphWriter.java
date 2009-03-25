@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.dgrether.cmcf;
 
-import org.matsim.utils.charts.XYLineChart;
+import org.matsim.core.utils.charts.XYLineChart;
 
 
 /**

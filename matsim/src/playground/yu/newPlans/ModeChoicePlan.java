@@ -32,8 +32,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.analysis.PlanModeJudger;
 
@@ -59,7 +59,7 @@ public class ModeChoicePlan extends NewPopulation {
 		person.addPlan(sp);
 
 		// Plan.Type t = sp.getType();
-		Plan cp = new org.matsim.population.PlanImpl(person);
+		Plan cp = new org.matsim.core.population.PlanImpl(person);
 		List actsLegs = sp.getPlanElements();
 
 		if (
@@ -72,7 +72,7 @@ public class ModeChoicePlan extends NewPopulation {
 				if (i % 2 == 0) {
 					cp.addAct((Activity) o);
 				} else {
-					Leg cl = new org.matsim.population.LegImpl((Leg) o);
+					Leg cl = new org.matsim.core.population.LegImpl((Leg) o);
 					cl.setMode(
 					// "pt"
 							BasicLeg.Mode.pt);
@@ -90,7 +90,7 @@ public class ModeChoicePlan extends NewPopulation {
 				if (i % 2 == 0) {
 					cp.addAct((Activity) o);
 				} else {
-					Leg cl = new org.matsim.population.LegImpl((Leg) o);
+					Leg cl = new org.matsim.core.population.LegImpl((Leg) o);
 					cl.setMode(
 					// "car"
 							BasicLeg.Mode.car);

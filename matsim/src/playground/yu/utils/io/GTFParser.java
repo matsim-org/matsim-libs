@@ -32,8 +32,8 @@ import java.util.TreeMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.utils.io.MatsimXmlParser;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 

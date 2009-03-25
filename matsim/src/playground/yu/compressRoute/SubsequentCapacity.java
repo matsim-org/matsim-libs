@@ -33,7 +33,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.writer.MatsimXmlWriter;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
 /**
  * (like Subsequent) calculates the "default next" linkId of a current link in
@@ -85,7 +85,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 						.put(
 								outLinkId,
 								outLink
-										.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+										.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
 				outLinksMap.put(outLinkId, outLink);
 				// TODO: can man delete outLinksMap?
 			}
@@ -97,7 +97,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 				double maxCap = Collections.max(capsValues);
 				double minCap = Collections.min(capsValues);
 				double lCap = l
-						.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 
 				if (lCap >= maxCap) {
 					// choose the max, when over 1 max, compare angles.

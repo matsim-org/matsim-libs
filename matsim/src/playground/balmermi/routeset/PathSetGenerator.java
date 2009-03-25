@@ -37,8 +37,8 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.utils.collections.Tuple;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
 
 public class PathSetGenerator {
 

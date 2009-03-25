@@ -13,8 +13,9 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
+
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.MZTrip;
 

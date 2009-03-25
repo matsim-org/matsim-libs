@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.misc.ArgumentParser;
+import org.matsim.core.utils.misc.ArgumentParser;
 
 public class LinkZoneMapping {
 	

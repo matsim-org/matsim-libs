@@ -6,8 +6,8 @@ import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.utils.charts.XYScatterChart;
 
 public class PlansPlotScoreDistance extends AbstractPersonAlgorithm implements PersonAlgorithm{
 	double[] dist=null;

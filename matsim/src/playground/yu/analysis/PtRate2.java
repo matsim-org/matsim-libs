@@ -33,7 +33,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.utils.charts.XYLineChart;
+import org.matsim.core.utils.charts.XYLineChart;
 
 /**
  * An implementing of ContorlerListener, in order to output some information

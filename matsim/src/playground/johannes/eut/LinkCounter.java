@@ -35,7 +35,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author illenberger

@@ -40,13 +40,13 @@ import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.charts.XYLineChart;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.utils.charts.XYLineChart;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.misc.Time;
 import org.xml.sax.SAXException;
 
 import playground.yu.utils.TollTools;

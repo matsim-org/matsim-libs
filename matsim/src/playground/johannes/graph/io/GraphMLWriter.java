@@ -29,8 +29,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.utils.collections.Tuple;
-import org.matsim.writer.MatsimXmlWriter;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
 import playground.johannes.graph.Edge;
 import playground.johannes.graph.Graph;

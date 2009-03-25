@@ -28,7 +28,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * @author illenberger

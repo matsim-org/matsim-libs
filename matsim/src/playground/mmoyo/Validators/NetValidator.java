@@ -3,7 +3,7 @@ package playground.mmoyo.Validators;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTCase2.PTTimeTable2;
 

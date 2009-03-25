@@ -5,7 +5,7 @@ package playground.yu.visum.filter;
 
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.BasicEventImpl;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * @author ychen

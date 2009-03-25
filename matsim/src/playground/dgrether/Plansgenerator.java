@@ -34,13 +34,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
-import org.matsim.population.PopulationWriterHandlerImplV4;
-import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.utils.NetworkUtils;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationWriterHandlerImplV4;
+import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
 
 
 /**
@@ -77,7 +77,7 @@ public class Plansgenerator {
 		final Coord workCoord = new CoordImpl(10000, 0);
 		for (int i = 1; i <= 100; i++) {
 			Person p = new PersonImpl(new IdImpl(i));
-			Plan plan = new org.matsim.population.PlanImpl(p);
+			Plan plan = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(plan);
 			//home
 			homeEndtime += 0.5 * 60;

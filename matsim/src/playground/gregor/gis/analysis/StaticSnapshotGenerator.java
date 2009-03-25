@@ -45,10 +45,10 @@ import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.gis.ShapeFileWriter;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.gregor.gis.convexer.Concaver;

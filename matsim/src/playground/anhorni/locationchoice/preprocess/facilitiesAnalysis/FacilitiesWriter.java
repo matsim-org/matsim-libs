@@ -16,8 +16,9 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileWriter;
+
 import com.vividsolutions.jts.geom.Point;
 
 public class FacilitiesWriter {

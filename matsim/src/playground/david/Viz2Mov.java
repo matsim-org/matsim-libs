@@ -20,7 +20,7 @@
 
 package playground.david;
 
-import org.matsim.utils.vis.netvis.NetVis;
+import org.matsim.vis.netvis.NetVis;
 
 public class Viz2Mov {
     public static void main(String[] args) {

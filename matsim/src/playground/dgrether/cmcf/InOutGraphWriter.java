@@ -21,7 +21,7 @@ package playground.dgrether.cmcf;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.utils.charts.XYLineChart;
+import org.matsim.core.utils.charts.XYLineChart;
 
 
 /**

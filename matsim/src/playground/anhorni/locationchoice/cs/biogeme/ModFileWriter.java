@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 
 public class ModFileWriter {

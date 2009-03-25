@@ -29,7 +29,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author illenberger

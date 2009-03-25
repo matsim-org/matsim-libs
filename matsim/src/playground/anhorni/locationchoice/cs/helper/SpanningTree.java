@@ -37,7 +37,7 @@ import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 public class SpanningTree {
 

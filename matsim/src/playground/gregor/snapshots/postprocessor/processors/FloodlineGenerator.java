@@ -26,9 +26,9 @@ import java.util.Collection;
 import java.util.PriorityQueue;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.utils.StringUtils;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.StringUtils;
 
 public class FloodlineGenerator {
 

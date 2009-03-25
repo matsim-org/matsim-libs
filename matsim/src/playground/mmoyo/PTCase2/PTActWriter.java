@@ -19,14 +19,14 @@ import org.matsim.core.basic.v01.BasicActivityImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.routes.LinkCarRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.population.LegImpl;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
-import org.matsim.population.routes.LinkCarRoute;
-import org.matsim.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.Validators.PathValidator;
@@ -78,7 +78,7 @@ public class PTActWriter {
 			Activity thisAct= null;
 			int legNum=0;
 
-			Plan newPlan = new org.matsim.population.PlanImpl(person);
+			Plan newPlan = new org.matsim.core.population.PlanImpl(person);
 			
 			for (Iterator<BasicActivityImpl> iter= plan.getIteratorAct(); iter.hasNext();){
 				thisAct= (Activity)iter.next();
@@ -318,7 +318,7 @@ public class PTActWriter {
 	}//insert
 
 	private Activity newPTAct(final String type, final Coord coord, final Link link, final double startTime, final double dur, final double endTime){
-		Activity ptAct= new org.matsim.population.ActivityImpl(type, coord);
+		Activity ptAct= new org.matsim.core.population.ActivityImpl(type, coord);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
 		//ptAct.setDuration(dur); Deprecated?

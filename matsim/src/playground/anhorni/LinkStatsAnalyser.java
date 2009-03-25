@@ -33,14 +33,14 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.transformations.TransformationFactory;
 
 /**
  * This class is able to produce a crapy kml file to compare the link volumes

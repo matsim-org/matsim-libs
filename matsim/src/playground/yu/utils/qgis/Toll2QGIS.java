@@ -14,9 +14,9 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
 
@@ -59,7 +59,7 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 				o[3] = link.getToNode().getId().toString();
 				o[4] = link.getLength();
 				o[5] = link
-						.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 						/ network.getCapacityPeriod() * 3600.0;
 				o[6] = (link.getType() != null) ? Integer.parseInt(link
 						.getType()) : 0;

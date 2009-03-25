@@ -36,33 +36,33 @@ public class OSMNetCreator {
 
 	private void resetCapacity(final Link link) {
 		if (link.getType().equals("80")) {
-			if (link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+			if (link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 					/ capperiod < 2000.0) {
 				System.out
 						.print("link "
 								+ link.getId().toString()
 								+ " capacity from "
 								+ link
-										.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+										.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 								/ capperiod + " to ");
 				link.setCapacity(2000.0 * capperiod);
 				System.out.println(link
-						.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 						/ capperiod);
 			}
 		} else if (link.getType().equals("81"))
-			if (link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+			if (link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 					/ capperiod > 600.0) {
 				System.out
 						.print("link "
 								+ link.getId().toString()
 								+ " capacity from "
 								+ link
-										.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+										.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 								/ capperiod + " to ");
 				link.setCapacity(600.0 * capperiod);
 				System.out.println(link
-						.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 						/ capperiod);
 			}
 	}
@@ -99,19 +99,19 @@ public class OSMNetCreator {
 			upgraded++;
 			Link l = network.getLink(linkId);
 			if (l != null)
-				if (l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+				if (l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 						/ osmNC.capperiod < 2000.0) {
 					System.out
 							.print("link "
 									+ l.getId().toString()
 									+ " capacity from "
 									+ l
-											.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+											.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 									/ osmNC.capperiod + " to ");
 					l.setCapacity(2000.0 * osmNC.capperiod);
 					System.out
 							.println(l
-									.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+									.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 									/ osmNC.capperiod);
 				}
 		}
@@ -123,19 +123,19 @@ public class OSMNetCreator {
 			degraded++;
 			Link l = network.getLink(linkId);
 			if (l != null)
-				if (l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+				if (l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 						/ osmNC.capperiod > 600.0) {
 					System.out
 							.print("link "
 									+ l.getId().toString()
 									+ " capacity from "
 									+ l
-											.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+											.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 									/ osmNC.capperiod + " to ");
 					l.setCapacity(600.0 * osmNC.capperiod);
 					System.out
 							.println(l
-									.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+									.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 									/ osmNC.capperiod);
 				}
 		}

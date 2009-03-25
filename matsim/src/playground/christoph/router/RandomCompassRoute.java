@@ -30,8 +30,8 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.routes.NodeCarRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.population.routes.NodeCarRoute;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;

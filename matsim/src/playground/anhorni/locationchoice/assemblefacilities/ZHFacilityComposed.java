@@ -1,6 +1,6 @@
 package playground.anhorni.locationchoice.assemblefacilities;
 
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ZHFacilityComposed {
 	

@@ -11,7 +11,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 	
@@ -35,10 +35,10 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 		NetworkLayer network = controler.getNetwork();
 		
 		Link link0 = network.getNearestLink(new CoordImpl(681753.6875, 251900.64844999998));
-		Activity fromAct = new org.matsim.population.ActivityImpl("home", link0);
+		Activity fromAct = new org.matsim.core.population.ActivityImpl("home", link0);
 		
 		Link link1 = network.getNearestLink(new CoordImpl(695278.8125, 257607.125));
-		Activity toAct = new org.matsim.population.ActivityImpl("shop", link1);
+		Activity toAct = new org.matsim.core.population.ActivityImpl("shop", link1);
 		fromAct.setEndTime(0.0);
 		
 		Leg leg = computeLeg(fromAct, toAct, controler);	
@@ -47,7 +47,7 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 	
 	
 	private Leg computeLeg(Activity fromAct, Activity toAct, Controler controler) {	
-		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);		
+		Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);		
 		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());	
 		return leg;

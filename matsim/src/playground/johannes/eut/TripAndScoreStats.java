@@ -44,7 +44,7 @@ import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author illenberger

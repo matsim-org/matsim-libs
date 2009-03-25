@@ -58,15 +58,15 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.ActivitySpaceEllipse;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformation;
-import org.matsim.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.MatsimKMLLogo;
+import org.matsim.vis.kml.KMZWriter;
+import org.matsim.vis.kml.MatsimKMLLogo;
 
 import playground.jhackney.algorithms.PersonCalcEgoSpace;
 

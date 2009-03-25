@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 public class Households {
 

@@ -13,9 +13,9 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.LinkCarRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.population.routes.LinkCarRoute;
 
 import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.input.PTNetworkFactory2;
@@ -134,7 +134,7 @@ public class PTRouter2 {
 					if (linkList.size()>0) {legRoute.setLinks(null, linkList, null);}
 					
 					//insert leg 
-					Leg leg = new org.matsim.population.LegImpl(Leg.Mode.pt);
+					Leg leg = new org.matsim.core.population.LegImpl(Leg.Mode.pt);
 					//routeTravelTime =routeTravelTime; // routeTravelTime =routeTravelTime*3600;  //Seconds
 					leg.setDepartureTime(accumulatedTime);
 					leg.setTravelTime(routeTravelTime);
@@ -167,7 +167,7 @@ public class PTRouter2 {
 	}
 	
 	private Activity newPTAct(Coord coord, Link link, double startTime, double dur, double endTime){
-		Activity ptAct= new org.matsim.population.ActivityImpl("Wait PT Vehicle", coord);
+		Activity ptAct= new org.matsim.core.population.ActivityImpl("Wait PT Vehicle", coord);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
 		//ptAct.setDuration(dur);   deprecated

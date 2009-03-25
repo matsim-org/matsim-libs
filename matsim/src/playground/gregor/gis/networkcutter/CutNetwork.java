@@ -46,10 +46,10 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
 

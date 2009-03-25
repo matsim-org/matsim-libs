@@ -10,7 +10,7 @@ import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.entity.StandardEntityCollection;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 
 import com.lowagie.text.PageSize;

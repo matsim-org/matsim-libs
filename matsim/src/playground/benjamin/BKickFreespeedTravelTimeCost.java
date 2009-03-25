@@ -22,7 +22,7 @@ package playground.benjamin;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 
 /**

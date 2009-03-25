@@ -15,7 +15,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.toronto.ttimematrix.SpanningTree;
 

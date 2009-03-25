@@ -31,11 +31,11 @@ import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.NodeCarRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 public class DistanceCalculator {
 	private final static Logger log = Logger.getLogger(DistanceCalculator.class);

@@ -18,9 +18,9 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.population.PersonImpl;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 

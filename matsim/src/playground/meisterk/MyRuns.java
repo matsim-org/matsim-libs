@@ -37,14 +37,14 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.ActUtilityParameters;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationReader;
-import org.matsim.population.PopulationWriter;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scoring.ActivityUtilityParameters;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activities;
-import org.matsim.utils.misc.Time;
 
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 
@@ -61,7 +61,7 @@ public class MyRuns {
 
 	public static final int TIME_BIN_SIZE = 300;
 
-	protected static final TreeMap<String, ActUtilityParameters> utilParams = new TreeMap<String, ActUtilityParameters>();
+	protected static final TreeMap<String, ActivityUtilityParameters> utilParams = new TreeMap<String, ActivityUtilityParameters>();
 	protected static double marginalUtilityOfWaiting = Double.NaN;
 	protected static double marginalUtilityOfLateArrival = Double.NaN;
 	protected static double marginalUtilityOfEarlyDeparture = Double.NaN;

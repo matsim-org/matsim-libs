@@ -2,7 +2,7 @@ package playground.yu.visum.filter.finalFilters;
 
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.population.PopulationWriter;
+import org.matsim.core.population.PopulationWriter;
 
 /**
  * Write a new plans-file(.xml), while reading an old plans-file(.xml). eine

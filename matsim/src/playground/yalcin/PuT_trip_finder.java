@@ -2,8 +2,8 @@ package playground.yalcin;
 
 import java.io.IOException;
 
-import org.matsim.utils.io.tabularFileParser.TabularFileParser;
-import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 public class PuT_trip_finder {
 

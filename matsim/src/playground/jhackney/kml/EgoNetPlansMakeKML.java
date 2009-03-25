@@ -59,11 +59,11 @@ import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformation;
-import org.matsim.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.kml.KMZWriter;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.vis.kml.KMZWriter;
 
 public class EgoNetPlansMakeKML {
 

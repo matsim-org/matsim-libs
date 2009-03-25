@@ -35,9 +35,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.utils.geometry.CoordUtils;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.yu.analysis.PlanModeJudger;
 
@@ -75,7 +75,7 @@ public class NewAgentWalkPlan extends NewPopulation implements PersonAlgorithm {
 					break;
 				// set plan type for car, pt, walk
 				if (PlanModeJudger.usePt(pl)) {
-					Plan walkPlan = new org.matsim.population.PlanImpl(person);
+					Plan walkPlan = new org.matsim.core.population.PlanImpl(person);
 					walkPlan.setType(Plan.Type.WALK);
 					List actsLegs = pl.getPlanElements();
 					for (int i = 0; i < actsLegs.size(); i++) {
@@ -87,7 +87,7 @@ public class NewAgentWalkPlan extends NewPopulation implements PersonAlgorithm {
 							// -----------------------------------------------
 							// WITHOUT routeSetting!
 							// -----------------------------------------------
-							Leg walkLeg = new org.matsim.population.LegImpl(
+							Leg walkLeg = new org.matsim.core.population.LegImpl(
 									Mode.walk);
 							walkLeg.setDepartureTime(leg.getDepartureTime());
 							walkLeg.setTravelTime(leg.getTravelTime());

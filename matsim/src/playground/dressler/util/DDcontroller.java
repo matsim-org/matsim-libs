@@ -35,11 +35,11 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.run.OTFVis;
-import org.matsim.utils.vis.netvis.NetVis;
-import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
+import org.matsim.vis.netvis.NetVis;
+import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 import org.matsim.world.World;
 
 

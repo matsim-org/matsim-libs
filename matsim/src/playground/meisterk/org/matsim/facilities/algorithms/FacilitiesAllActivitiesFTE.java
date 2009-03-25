@@ -33,7 +33,7 @@ import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensusParser;

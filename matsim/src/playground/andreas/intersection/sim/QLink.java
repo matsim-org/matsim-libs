@@ -22,9 +22,9 @@ import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.mobsim.queuesim.VisData;
 import org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.signalsystems.CalculateAngle;
-import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 
 
 public class QLink extends QueueLink {
@@ -48,7 +48,7 @@ public class QLink extends QueueLink {
 		this.originalLink = new PseudoLink(this, true, null);
 
 		// Configure it
-		if(! this.originalLink.recalculatePseudoLinkProperties(0., this.getLink().getLength(), this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME), this.getLink().getFreespeed(Time.UNDEFINED_TIME), this.getLink().getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME),this.effectiveCelleSize)) {
+		if(! this.originalLink.recalculatePseudoLinkProperties(0., this.getLink().getLength(), this.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), this.getLink().getFreespeed(Time.UNDEFINED_TIME), this.getLink().getFlowCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME),this.effectiveCelleSize)) {
 			if ( spaceCapWarningCount <=10 ) {
 				log.warn("Link " + this.getLink().getId() + " too small: enlarge spaceCap.  This is not fatal, but modifies the traffic flow dynamics.");
 				if ( spaceCapWarningCount == 10 ) {
@@ -132,7 +132,7 @@ public class QLink extends QueueLink {
 		}
 
 		boolean firstNodeLinkInitialized = false;
-		double averageSimulatedFlowCapacityPerLane_Veh_s = this.getSimulatedFlowCapacity() / this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+		double averageSimulatedFlowCapacityPerLane_Veh_s = this.getSimulatedFlowCapacity() / this.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 
 		for (BasicLane signalLane : laneToLink.getLanes()) {
 
@@ -150,7 +150,7 @@ public class QLink extends QueueLink {
 				}
 
 				newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, averageSimulatedFlowCapacityPerLane_Veh_s, this.effectiveCelleSize);
-				this.originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLink().getLength() - signalLane.getLength(), this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME), this.getLink().getFreespeed(Time.UNDEFINED_TIME), averageSimulatedFlowCapacityPerLane_Veh_s ,this.effectiveCelleSize);
+				this.originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLink().getLength() - signalLane.getLength(), this.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), this.getLink().getFreespeed(Time.UNDEFINED_TIME), averageSimulatedFlowCapacityPerLane_Veh_s ,this.effectiveCelleSize);
 				this.pseudoLinksList.add(newNodePseudoLink);
 				firstNodeLinkInitialized = true;
 

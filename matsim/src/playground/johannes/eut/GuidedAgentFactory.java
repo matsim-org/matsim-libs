@@ -40,7 +40,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.withinday.WithindayAgent;
 import org.matsim.withinday.WithindayAgentLogicFactory;
 import org.matsim.withinday.contentment.AgentContentment;

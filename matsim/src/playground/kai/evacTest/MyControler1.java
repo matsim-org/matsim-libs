@@ -23,7 +23,7 @@ package playground.kai.evacTest;
  */
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.vis.netvis.NetVis;
+import org.matsim.vis.netvis.NetVis;
 
 import playground.gregor.sims.evacbase.EvacuationQSimControler;
 

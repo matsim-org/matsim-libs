@@ -28,7 +28,7 @@ import java.util.Arrays;
 import gnu.trove.TDoubleDoubleHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.utils.collections.Tuple;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
  * @author illenberger

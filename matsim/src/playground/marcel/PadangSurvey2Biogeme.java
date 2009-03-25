@@ -27,11 +27,11 @@ import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.utils.StringUtils;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordUtils;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.misc.Counter;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
+import org.matsim.core.utils.misc.StringUtils;
 
 public class PadangSurvey2Biogeme {
 

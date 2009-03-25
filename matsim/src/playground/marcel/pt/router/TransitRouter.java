@@ -28,7 +28,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 import playground.marcel.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import playground.marcel.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;

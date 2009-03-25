@@ -46,13 +46,13 @@ import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordUtils;
-import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
-import org.matsim.utils.vis.netvis.DrawableAgentI;
-import org.matsim.utils.vis.netvis.VisConfig;
-import org.matsim.utils.vis.snapshots.writers.PositionInfo;
-import org.matsim.utils.vis.snapshots.writers.SnapshotWriter;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.vis.netvis.DisplayNetStateWriter;
+import org.matsim.vis.netvis.DrawableAgentI;
+import org.matsim.vis.netvis.VisConfig;
+import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.SnapshotWriter;
 
 public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
 		LinkLeaveEventHandler, AgentWait2LinkEventHandler, AgentStuckEventHandler {
@@ -218,10 +218,10 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 			this.euklideanDist = CoordUtils.calcDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord());
 			this.radioLengthToEuklideanDist = this.link.getLength() / this.euklideanDist;
 			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed(Time.UNDEFINED_TIME);
-			this.timeCap = this.link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * capCorrectionFactor;
+			this.timeCap = this.link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) * capCorrectionFactor;
 			this.inverseTimeCap = 1.0 / this.timeCap;
 			this.effectiveCellSize = effectiveCellSize;
-			this.spaceCap = (this.link.getLength() * this.link.getNumberOfLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME)) / this.effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
+			this.spaceCap = (this.link.getLength() * this.link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)) / this.effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
 		}
 
 		public void enter(final EventAgent agent) {
@@ -283,7 +283,7 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 			// put all cars in the buffer one after the other
 			for (final EventAgent agent : this.buffer) {
 
-				final int lane = 1 + (agent.intId % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+				final int lane = 1 + (agent.intId % this.link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
 
 				final int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
 				final double speed = (time > cmp) ? 0.0 : this.link.getFreespeed(time);
@@ -325,7 +325,7 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 				final int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
 				final double speed = (time > cmp) ? 0.0 : this.link.getFreespeed(time);
 				agent.speed = speed;
-				final int lane = 1 + (agent.intId % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+				final int lane = 1 + (agent.intId % this.link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
 				final GregorsPositionInfo position = new GregorsPositionInfo(agent.id,
 						this.link, distanceOnLink/* + NetworkLayer.CELL_LENGTH*/,
 						lane, speed, PositionInfo.VehicleState.Driving,null,lst);
@@ -337,7 +337,7 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 			/* Put the vehicles from the waiting list in positions.
 			 * Their actual position doesn't matter, so they are just placed
 			 * to the coordinates of the from node */
-			int lane = this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + 1; // place them next to the link
+			int lane = this.link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + 1; // place them next to the link
 			for (final EventAgent agent : this.waitingQueue) {
 				final GregorsPositionInfo position = new GregorsPositionInfo(agent.id,
 						this.link, this.effectiveCellSize, lane, 0.0, PositionInfo.VehicleState.Driving,null,lst);
@@ -347,7 +347,7 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 			/* put the vehicles from the parking list in positions
 			 * their actual position doesn't matter, so they are just placed
 			 * to the coordinates of the from node */
-			lane = this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + 2; // place them next to the link
+			lane = this.link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + 2; // place them next to the link
 			for (final EventAgent agent : this.parkingQueue) {
 				final GregorsPositionInfo position = new GregorsPositionInfo(agent.id,
 						this.link, this.effectiveCellSize, lane, 0.0, PositionInfo.VehicleState.Driving,null,lst);
@@ -365,7 +365,7 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 		 */
 		public void getVehiclePositionsEquil(final Collection<GregorsPositionInfo> positions, final double time) {
 			int cnt = this.buffer.size() + this.drivingQueue.size();
-			final int nLanes = this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+			final int nLanes = this.link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 			if (cnt > 0) {
 				final double cellSize = this.link.getLength() / cnt;
 				double distFromFromNode = this.link.getLength() - cellSize / 2.0;

@@ -27,8 +27,8 @@ import java.util.Collection;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
-import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

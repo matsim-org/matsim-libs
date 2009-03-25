@@ -29,9 +29,9 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationReader;
-import org.matsim.utils.vis.netvis.NetVis;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.vis.netvis.NetVis;
 import org.matsim.world.World;
 
 public class SimRunKreisverkehr {
@@ -62,14 +62,14 @@ public class SimRunKreisverkehr {
 		int cellcount2 = 0;
 		int count3 = 0;
 		for (Link link : network.getLinks().values()) {
-			double length = link.getLength()*link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+			double length = link.getLength()*link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 			cellcount += Math.ceil(length/7.5);
 			cellcount2 += link.getLength();
 		}
 		System.out.println("Summarized Cell count is " + cellcount +" on a net of length " + cellcount2/1000 +" km");
 		int buffercount = 0;
 		for (Link link : network.getLinks().values()) {
-			double cap = link.getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+			double cap = link.getFlowCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 			buffercount += Math.ceil(cap);
 		}
 		System.out.println("Summarized buffer count is " + buffercount);

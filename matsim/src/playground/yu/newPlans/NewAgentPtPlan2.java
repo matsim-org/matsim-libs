@@ -32,9 +32,9 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -71,12 +71,12 @@ public class NewAgentPtPlan2 extends NewPopulation {
 				// pl.setType(getPlanType(legMode));//????????????
 
 				if (!legMode.equals(BasicLeg.Mode.car)) {
-					Plan copyPlan = new org.matsim.population.PlanImpl(person);
+					Plan copyPlan = new org.matsim.core.population.PlanImpl(person);
 					// copyPlan.setType(Plan.Type.CAR);//????????????
 					this.copyPlans.add(copyPlan);
 					this.copyPlansModes.add(BasicLeg.Mode.car);
 				} else if (!legMode.equals(BasicLeg.Mode.pt)) {
-					Plan copyPlan = new org.matsim.population.PlanImpl(person);
+					Plan copyPlan = new org.matsim.core.population.PlanImpl(person);
 					// copyPlan.setType(Plan.Type.PT);//??????????????
 					this.copyPlans.add(copyPlan);
 					this.copyPlansModes.add(BasicLeg.Mode.pt);
@@ -94,7 +94,7 @@ public class NewAgentPtPlan2 extends NewPopulation {
 							copyPlan.addAct((Activity) o);
 						} else {
 							Leg leg = (Leg) o;
-							Leg copyLeg = new org.matsim.population.LegImpl(leg);
+							Leg copyLeg = new org.matsim.core.population.LegImpl(leg);
 							copyLeg.setRoute(null);
 							copyLeg.setMode(this.copyPlansModes.get(j));
 							// -----------------------------------------------

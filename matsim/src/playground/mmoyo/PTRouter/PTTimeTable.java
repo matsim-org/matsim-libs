@@ -6,7 +6,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 /** 
  * Data structure of departures for a node 

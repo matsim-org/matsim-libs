@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.matsim.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.QuadTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;

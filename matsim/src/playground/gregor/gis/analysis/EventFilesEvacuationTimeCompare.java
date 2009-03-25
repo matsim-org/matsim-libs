@@ -46,11 +46,11 @@ import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.collections.QuadTree.Rect;
-import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.QuadTree.Rect;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;

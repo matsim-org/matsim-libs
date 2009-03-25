@@ -32,12 +32,12 @@ import org.matsim.core.basic.signalsystems.BasicSignalSystemsImpl;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.core.network.MatsimLaneDefinitionsWriter;
+import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
 import org.matsim.signalsystems.SignalSystemConfigurationsWriter11;
-import org.matsim.utils.io.MatsimFileTypeGuesser;
 
 
 /**

@@ -32,9 +32,9 @@ import org.matsim.core.mobsim.jdeqsim.Road;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
 
 import playground.wrashid.PDES3.PScheduler;
 import playground.wrashid.PDES3.PVehicle;

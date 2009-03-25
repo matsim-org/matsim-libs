@@ -26,7 +26,7 @@ package playground.johannes.socialnet.mcmc;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.utils.collections.Tuple;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.graph.Vertex;
 import playground.johannes.graph.mcmc.AdjacencyMatrix;

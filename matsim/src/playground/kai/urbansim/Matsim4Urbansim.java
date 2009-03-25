@@ -11,8 +11,8 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
 
 /**
  * Class that is meant to interface with urbansim.  As of nov08, only working for the urbansim "parcel"

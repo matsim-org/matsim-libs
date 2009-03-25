@@ -16,8 +16,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;

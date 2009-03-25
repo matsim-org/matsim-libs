@@ -37,11 +37,11 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
-import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -103,8 +103,8 @@ public class StaticPopulationGenerator {
 				all += li;
 				for (int i = 0; i < li ; i++) {
 					final Person pers = new PersonImpl(new IdImpl(id++));
-					final Plan plan = new org.matsim.population.PlanImpl(pers);
-					final Activity act = new org.matsim.population.ActivityImpl("h",link.getCoord(),link);
+					final Plan plan = new org.matsim.core.population.PlanImpl(pers);
+					final Activity act = new org.matsim.core.population.ActivityImpl("h",link.getCoord(),link);
 					act.setStartTime(3 * 3600.0);
 					// (I still think it would make more sense to leave the starting time of the first activity undefined. kai)
 					act.setEndTime(3 *3600.0);

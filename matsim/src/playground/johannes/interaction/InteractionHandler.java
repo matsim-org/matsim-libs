@@ -40,7 +40,7 @@ import org.matsim.core.events.ActEndEvent;
 import org.matsim.core.events.ActStartEvent;
 import org.matsim.core.events.handler.ActEndEventHandler;
 import org.matsim.core.events.handler.ActStartEventHandler;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author illenberger

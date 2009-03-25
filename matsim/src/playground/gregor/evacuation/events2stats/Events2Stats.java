@@ -33,7 +33,7 @@ import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentMoneyEventHandler;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 public class Events2Stats implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentMoneyEventHandler {
 

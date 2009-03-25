@@ -64,7 +64,7 @@ public class NewAgentPtPlan extends NewPopulation {
 			for (Plan pl : person.getPlans()) {
 				// set plan type for car, pt, walk
 				pl.setType(Plan.Type.CAR);
-				Plan ptPlan = new org.matsim.population.PlanImpl(person);
+				Plan ptPlan = new org.matsim.core.population.PlanImpl(person);
 				ptPlan.setType(Plan.Type.PT);
 //				Plan walkPlan = new org.matsim.population.PlanImpl(person);
 //				walkPlan.setType(Type.WALK);
@@ -77,7 +77,7 @@ public class NewAgentPtPlan extends NewPopulation {
 //						walkPlan.addAct((Act) o);
 					} else {
 						Leg leg = (Leg) o;
-						Leg ptLeg = new org.matsim.population.LegImpl(leg);
+						Leg ptLeg = new org.matsim.core.population.LegImpl(leg);
 						ptLeg.setMode(Mode.pt);
 						ptLeg.setRoute(null);
 						// -----------------------------------------------
@@ -86,7 +86,7 @@ public class NewAgentPtPlan extends NewPopulation {
 						// automaticly!!
 						// -----------------------------------------------
 						ptPlan.addLeg(ptLeg);
-						Leg walkLeg = new org.matsim.population.LegImpl(leg);
+						Leg walkLeg = new org.matsim.core.population.LegImpl(leg);
 						walkLeg.setMode(Mode.walk);
 						walkLeg.setRoute(null);
 //						walkPlan.addLeg(walkLeg);

@@ -32,9 +32,9 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
-import org.matsim.utils.charts.XYLineChart;
 
 public class VolumefromEventsOfIters {
 

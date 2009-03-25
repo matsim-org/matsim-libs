@@ -30,7 +30,7 @@ import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayList;
 
-import org.matsim.utils.collections.Tuple;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.graph.Edge;
 import playground.johannes.graph.Graph;

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * @author Matthias Feil

@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.CarRoute;
-import org.matsim.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

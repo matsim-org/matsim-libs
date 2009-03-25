@@ -22,7 +22,7 @@ package playground.marcel.pt.tryout;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
 

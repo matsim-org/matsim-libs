@@ -37,9 +37,9 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.population.Knowledge;
-import org.matsim.utils.io.MatsimXmlParser;
-import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 

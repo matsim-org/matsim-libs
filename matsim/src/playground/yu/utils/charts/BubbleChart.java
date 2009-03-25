@@ -8,7 +8,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.DefaultXYZDataset;
 import org.jfree.data.xy.XYZDataset;
-import org.matsim.utils.charts.ChartUtil;
+import org.matsim.core.utils.charts.ChartUtil;
 
 /**
  * @author yu

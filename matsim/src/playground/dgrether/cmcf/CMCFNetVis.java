@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.dgrether.cmcf;
 
-import org.matsim.utils.vis.netvis.NetVis;
+import org.matsim.vis.netvis.NetVis;
 
 
 /**

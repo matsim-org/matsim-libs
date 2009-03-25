@@ -24,9 +24,10 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.cppdeqsim.EventsReaderDEQv1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonIdRecorder;
 import org.matsim.population.algorithms.PlanAverageScore;
 import org.matsim.population.filters.ActLinkFilter;
@@ -34,7 +35,6 @@ import org.matsim.population.filters.PersonFilter;
 import org.matsim.population.filters.PersonIdFilter;
 import org.matsim.population.filters.RouteLinkFilter;
 import org.matsim.population.filters.SelectedPlanFilter;
-import org.matsim.utils.misc.Time;
 
 import playground.meisterk.org.matsim.run.facilities.ShopsOf2005ToFacilities;
 

@@ -40,9 +40,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 public class PlansCreateFromMZ {
 
@@ -362,7 +362,7 @@ public class PlansCreateFromMZ {
 		for (Person p : plans.getPersons().values()) {
 			boolean has_changed = false;
 			Plan plan = p.getSelectedPlan();
-			Plan plan2 = new org.matsim.population.PlanImpl(p);
+			Plan plan2 = new org.matsim.core.population.PlanImpl(p);
 			plan2.setSelected(true);
 			plan2.setScore(plan.getScoreAsPrimitiveType());
 			plan2.addAct((Activity)plan.getPlanElements().get(0));

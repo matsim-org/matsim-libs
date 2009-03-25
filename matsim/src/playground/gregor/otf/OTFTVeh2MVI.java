@@ -28,12 +28,12 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.StringUtils;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.utils.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
-import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
-import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.StringUtils;
+import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
+import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
+import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.world.World;
 
 

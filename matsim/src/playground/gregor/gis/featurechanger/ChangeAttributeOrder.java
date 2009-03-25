@@ -28,8 +28,8 @@ import java.util.Iterator;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
-import org.matsim.utils.gis.ShapeFileReader;
-import org.matsim.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 
 
 

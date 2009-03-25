@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.population.PopulationWriter;
+import org.matsim.core.population.PopulationWriter;
 
 /**
  * @author illenberger

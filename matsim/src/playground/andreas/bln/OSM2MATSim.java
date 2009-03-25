@@ -6,10 +6,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
+import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.run.NetworkCleaner;
-import org.matsim.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
-import org.matsim.utils.io.OsmNetworkReader;
 import org.xml.sax.SAXException;
 
 public class OSM2MATSim {

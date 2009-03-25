@@ -33,10 +33,10 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordinateTransformation;
-import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.MatsimKmlStyleFactory;
-import org.matsim.utils.vis.kml.NetworkFeatureFactory;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.vis.kml.KMZWriter;
+import org.matsim.vis.kml.MatsimKmlStyleFactory;
+import org.matsim.vis.kml.NetworkFeatureFactory;
 
 
 /**

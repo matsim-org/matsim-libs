@@ -6,7 +6,7 @@ package playground.yu.utils.charts;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.general.DefaultPieDataset;
-import org.matsim.utils.charts.ChartUtil;
+import org.matsim.core.utils.charts.ChartUtil;
 
 /**
  * @author yu

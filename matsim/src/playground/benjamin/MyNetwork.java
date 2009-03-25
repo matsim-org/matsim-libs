@@ -1,6 +1,6 @@
 package playground.benjamin;
 
-import org.matsim.utils.vis.netvis.NetVis;
+import org.matsim.vis.netvis.NetVis;
 
 public class MyNetwork {
 

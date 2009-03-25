@@ -29,8 +29,8 @@ import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.utils.StringUtils;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.world.World;
 
 public class FacilityNetworkMatching {

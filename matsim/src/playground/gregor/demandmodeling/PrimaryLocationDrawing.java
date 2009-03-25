@@ -43,20 +43,20 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
-import org.matsim.utils.StringUtils;
-import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordUtils;
-import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.gis.ShapeFileReader;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.StringUtils;
+import org.matsim.core.utils.misc.Time;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -169,8 +169,8 @@ public class PrimaryLocationDrawing {
 			all += li;
 			for (int i = 0; i < li ; i++) {
 				final Person pers = new PersonImpl(new IdImpl(this.id++));
-				final Plan plan = new org.matsim.population.PlanImpl(pers);
-				final Activity act = new org.matsim.population.ActivityImpl("h",link.getCoord(),link);
+				final Plan plan = new org.matsim.core.population.PlanImpl(pers);
+				final Activity act = new org.matsim.core.population.ActivityImpl("h",link.getCoord(),link);
 				act.setEndTime(6*3600);
 				plan.addAct(act);
 				pers.addPlan(plan);
@@ -237,11 +237,11 @@ public class PrimaryLocationDrawing {
 
 				Link link = getRandomLinkWithin(ftW);
 //				Leg leg = new org.matsim.population.LegImpl(0,"car",Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME);
-				Leg leg = new org.matsim.population.LegImpl(Mode.car);
+				Leg leg = new org.matsim.core.population.LegImpl(Mode.car);
 				leg.setArrivalTime(Time.UNDEFINED_TIME);
 				leg.setDepartureTime(Time.UNDEFINED_TIME);
 				leg.setTravelTime(Time.UNDEFINED_TIME);
-				Activity act = new org.matsim.population.ActivityImpl("w",link.getCoord(),link);
+				Activity act = new org.matsim.core.population.ActivityImpl("w",link.getCoord(),link);
 				pers.getSelectedPlan().addLeg(leg);
 				pers.getSelectedPlan().addAct(act);
 				try {

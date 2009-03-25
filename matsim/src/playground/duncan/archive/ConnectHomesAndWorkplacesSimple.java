@@ -26,9 +26,9 @@ import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
 
 public class ConnectHomesAndWorkplacesSimple {
 

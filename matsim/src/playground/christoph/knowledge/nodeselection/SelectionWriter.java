@@ -30,9 +30,9 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.Writer;
 import org.matsim.population.Knowledge;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.writer.Writer;
 
 import playground.christoph.router.util.KnowledgeTools;
 

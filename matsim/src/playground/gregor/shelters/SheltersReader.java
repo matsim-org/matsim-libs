@@ -41,9 +41,9 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import com.vividsolutions.jts.geom.Geometry;

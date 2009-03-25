@@ -44,10 +44,10 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 

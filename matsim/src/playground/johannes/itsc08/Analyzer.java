@@ -57,7 +57,7 @@ import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.statistics.WeightedStatistics;
 

@@ -35,10 +35,10 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.utils.NetworkUtils;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.IdFactory;
@@ -180,7 +180,7 @@ public class CMCFScenarioGeneratorNoReroute {
 
 		for (int i = 1; i <= 7200; i++) {
 			Person p = new PersonImpl(new IdImpl(i));
-			Plan plan = new org.matsim.population.PlanImpl(p);
+			Plan plan = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(plan);
 			// home % 2
 			homeEndTime = homeEndTime + firstHomeEndTime + ((i - 1) % 2);

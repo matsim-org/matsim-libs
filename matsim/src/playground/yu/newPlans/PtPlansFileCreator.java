@@ -19,11 +19,11 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
-import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * @author yu
@@ -142,7 +142,7 @@ public class PtPlansFileCreator {
 
 		Person p = new PersonImpl(new IdImpl("245-" + this.personCount));
 		try {
-			Plan pl = new org.matsim.population.PlanImpl(p);
+			Plan pl = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(pl);
 			Link startLink = this.network.getLink(new IdImpl(startLinkId));
 			Activity a = pl.createAct("h", startLink);

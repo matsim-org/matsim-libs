@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class ZHFacilities {
 	

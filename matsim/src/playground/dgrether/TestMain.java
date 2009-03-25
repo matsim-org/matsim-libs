@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.dgrether;
 
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 
 /**

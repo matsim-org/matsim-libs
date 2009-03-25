@@ -111,7 +111,7 @@ public class Relation {
 					
 			for (Link l : node.getOutLinks().values()) {
 				if (this.totalOutLinkCapacity>0.0) {
-					this.outLinkVolumes.add(new MyLink(l.getId(), this.volume*l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)/this.totalOutLinkCapacity));					
+					this.outLinkVolumes.add(new MyLink(l.getId(), this.volume*l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/this.totalOutLinkCapacity));					
 				}
 				else {
 					this.outLinkVolumes.add(new MyLink(l.getId(), 0.0));
@@ -126,7 +126,7 @@ public class Relation {
 		
 			for (Link l : node.getInLinks().values()) {
 				if (this.totalInLinkCapacity>0.0) {
-					this.inLinkVolumes.add(new MyLink(l.getId(), this.volume*l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)/this.totalInLinkCapacity));
+					this.inLinkVolumes.add(new MyLink(l.getId(), this.volume*l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/this.totalInLinkCapacity));
 				}
 				else {
 					this.inLinkVolumes.add(new MyLink(l.getId(), 0.0));
@@ -145,7 +145,7 @@ public class Relation {
 			Node node=network.getNode(Integer.toString(n_i));
 			
 			for (Link l : node.getOutLinks().values()) {
-				this.totalOutLinkCapacity+=l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+				this.totalOutLinkCapacity+=l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 			}
 		}
 		
@@ -155,7 +155,7 @@ public class Relation {
 			Node node=network.getNode(Integer.toString(n_i));
 		
 			for (Link l : node.getInLinks().values()) {
-				this.totalInLinkCapacity+=l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+				this.totalInLinkCapacity+=l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 			}//for
 		}
 	}

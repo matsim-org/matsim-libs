@@ -30,7 +30,7 @@ import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 public class AnalyzeFacilities {
 

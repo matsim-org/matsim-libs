@@ -28,10 +28,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
-import org.matsim.utils.StringUtils;
-import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.StringUtils;
 
 public class SwissHaltestellen {
 

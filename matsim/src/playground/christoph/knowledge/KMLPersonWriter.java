@@ -48,13 +48,13 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.population.Knowledge;
-import org.matsim.utils.geometry.CoordinateTransformation;
-import org.matsim.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.MatsimKMLLogo;
-import org.matsim.utils.vis.kml.MatsimKmlStyleFactory;
-import org.matsim.utils.vis.kml.NetworkFeatureFactory;
+import org.matsim.vis.kml.KMZWriter;
+import org.matsim.vis.kml.MatsimKMLLogo;
+import org.matsim.vis.kml.MatsimKmlStyleFactory;
+import org.matsim.vis.kml.NetworkFeatureFactory;
 
 public class KMLPersonWriter {
 

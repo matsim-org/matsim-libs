@@ -31,10 +31,10 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.population.PersonImpl;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * 
@@ -56,14 +56,14 @@ public class GuideAgentsGenerator {
 			}
 			Id id = new IdImpl("guide" + count++);
 			Person p = new PersonImpl(id);
-			Plan plan  = new org.matsim.population.PlanImpl(p);
-			Activity actA = new org.matsim.population.ActivityImpl("h", new CoordImpl(12000.0, -12000.0), l);
+			Plan plan  = new org.matsim.core.population.PlanImpl(p);
+			Activity actA = new org.matsim.core.population.ActivityImpl("h", new CoordImpl(12000.0, -12000.0), l);
 			actA.setEndTime(3600 * 3);
-			Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
+			Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);
-			Activity actB = new org.matsim.population.ActivityImpl("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
+			Activity actB = new org.matsim.core.population.ActivityImpl("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
 			plan.addAct(actA);
 			plan.addLeg(leg);
 			plan.addAct(actB);

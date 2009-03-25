@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.utils.misc.Time;
-import org.matsim.writer.MatsimXmlWriter;
+import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.misc.Time;
 
 /**
  *@author glaemmel

@@ -46,14 +46,14 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformation;
-import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.MatsimKMLLogo;
+import org.matsim.vis.kml.KMZWriter;
+import org.matsim.vis.kml.MatsimKMLLogo;
 
 import playground.dgrether.analysis.gis.ShapeFileNetworkWriter;
 import playground.dgrether.analysis.gis.ShapeFilePolygonWriter;
@@ -224,7 +224,7 @@ public class TollSchemeGenerator {
 	private NetworkLayer applyCapacityFilter(NetworkLayer network, double lowerBound, double upperBound) {
 		Set<Link> linksToRemove = new HashSet<Link>();
 		for (Link l : network.getLinks().values()) {
-			if ((lowerBound > l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)) || (upperBound < l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME))) {
+			if ((lowerBound > l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)) || (upperBound < l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME))) {
 				linksToRemove.add(l);
 			}
 		}

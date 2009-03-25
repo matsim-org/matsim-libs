@@ -58,7 +58,7 @@ public class SaturationLevel2QGIS implements X2QGIS {
 									(double) ((v != null) ? v[i] : 0)
 											* 10.0
 											/ link
-													.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+													.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 											* (double) net.getCapacityPeriod()
 											/ 3600.0);
 				} else if (m == null) {
@@ -69,7 +69,7 @@ public class SaturationLevel2QGIS implements X2QGIS {
 									(double) ((v != null) ? v[i] : 0)
 											* 10.0
 											/ link
-													.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+													.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 											* (double) net.getCapacityPeriod()
 											/ 3600.0);
 					saturationLevels.add(i, m);

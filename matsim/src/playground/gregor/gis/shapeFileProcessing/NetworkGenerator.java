@@ -29,8 +29,8 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;

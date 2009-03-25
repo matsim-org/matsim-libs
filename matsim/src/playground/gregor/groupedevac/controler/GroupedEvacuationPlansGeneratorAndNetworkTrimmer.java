@@ -36,10 +36,10 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.NodeCarRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.sims.evacbase.EvacuationPlansGeneratorAndNetworkTrimmer;
 
@@ -95,20 +95,20 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 				Gbl.errorMsg("For each initial evacuation plan only one Act is allowed - and no Leg at all");
 			}
 
-			Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
+			Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);
 			plan.addLeg(leg);
 
-			Activity actB = new org.matsim.population.ActivityImpl("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
+			Activity actB = new org.matsim.core.population.ActivityImpl("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
 			plan.addAct(actB);
 
 			router.run(plan);
 			
 			Link el = getEvacLink(leg);
 			Leg eLeg = getELeg(leg);
-			Activity actEvac = new org.matsim.population.ActivityImpl("h",el);
+			Activity actEvac = new org.matsim.core.population.ActivityImpl("h",el);
 			
 			plan.removeAct(2);
 			plan.addLeg(eLeg);
@@ -119,7 +119,7 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 	private Leg getELeg(final Leg leg) {
 		List<Node> nodeRoute = ((CarRoute) leg.getRoute()).getNodes();
 		nodeRoute.remove(nodeRoute.size()-1);
-		Leg l = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
+		Leg l = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
 		CarRoute route = new NodeCarRoute();
 		route.setNodes(nodeRoute);
 		l.setRoute(route);

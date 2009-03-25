@@ -40,8 +40,8 @@ import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.misc.IntegerCache;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.IntegerCache;
+import org.matsim.core.utils.misc.Time;
 
 public class SocialCostCalculatorNetworkII implements SocialCostCalculator, IterationStartsListener,  AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
 

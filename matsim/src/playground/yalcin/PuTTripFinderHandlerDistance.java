@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 
 public class PuTTripFinderHandlerDistance implements TabularFileHandler {
 

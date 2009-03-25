@@ -29,7 +29,7 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeCarRoute;
 
 import playground.msieg.structure.Commodity;
 

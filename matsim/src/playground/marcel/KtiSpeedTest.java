@@ -34,13 +34,13 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.cppdeqsim.EventsReaderDEQv1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationReader;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 

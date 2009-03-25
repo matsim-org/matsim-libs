@@ -42,9 +42,9 @@ import org.matsim.core.basic.v01.BasicLegImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
 import org.xml.sax.SAXException;
 /**
  * 
@@ -96,7 +96,7 @@ public class CMCFPopulationConverter {
 			 for (int i = 1 ; i<= dem ;i++) {
 				 Id matsimid  = new IdImpl(id+"."+i);
 				 Person p = new PersonImpl(matsimid);
-				 Plan plan = new org.matsim.population.PlanImpl(p);
+				 Plan plan = new org.matsim.core.population.PlanImpl(p);
 				 BasicActivityImpl home = new BasicActivityImpl("home");
 				 home.setEndTime(0.);
 				 BasicActivityImpl work = new BasicActivityImpl("work");

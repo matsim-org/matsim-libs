@@ -29,7 +29,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.visum.filter.EventFilterAlgorithm;
 import playground.yu.visum.filter.finalFilters.TraVolCal;

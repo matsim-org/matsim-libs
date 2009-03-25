@@ -25,14 +25,14 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
-import org.matsim.utils.vis.netvis.DisplayableLinkI;
-import org.matsim.utils.vis.netvis.DrawableAgentI;
-import org.matsim.utils.vis.netvis.VisConfig;
-import org.matsim.utils.vis.netvis.gui.NetJComponent;
-import org.matsim.utils.vis.netvis.renderers.RendererA;
-import org.matsim.utils.vis.netvis.renderers.ValueColorizer;
-import org.matsim.utils.vis.netvis.visNet.DisplayLink;
-import org.matsim.utils.vis.netvis.visNet.DisplayNet;
+import org.matsim.vis.netvis.DisplayableLinkI;
+import org.matsim.vis.netvis.DrawableAgentI;
+import org.matsim.vis.netvis.VisConfig;
+import org.matsim.vis.netvis.gui.NetJComponent;
+import org.matsim.vis.netvis.renderers.RendererA;
+import org.matsim.vis.netvis.renderers.ValueColorizer;
+import org.matsim.vis.netvis.visNet.DisplayLink;
+import org.matsim.vis.netvis.visNet.DisplayNet;
 
 public class LinkSetRenderer extends RendererA {
 
@@ -96,7 +96,7 @@ public class LinkSetRenderer extends RendererA {
 			display.setTransform(linkTransform);
 
 			final int lanes = link
-					.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+					.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 			final int cellLength_m = (int) Math.round(link.getLength_m()
 					/ link.getDisplayValueCount());
 			final int cellWidth_m = (int) Math.round(laneWidth * lanes);

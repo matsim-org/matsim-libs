@@ -33,7 +33,7 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 public class CutTrips implements PersonAlgorithm {
 

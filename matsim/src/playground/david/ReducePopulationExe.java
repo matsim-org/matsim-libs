@@ -40,12 +40,12 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.population.ActivityImpl;
-import org.matsim.population.LegImpl;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PlanImpl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.World;
 

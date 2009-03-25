@@ -11,12 +11,12 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.misc.Time;
 
 import playground.mmoyo.input.PTTimeTableReader;
 import playground.mmoyo.input.PTLinesReader2;
 
 import playground.mmoyo.PTRouter.*;
-import org.matsim.utils.misc.Time;
 
 public class PTTimeTable2{
 	private PTLinesReader2 ptLinesReader = new PTLinesReader2();

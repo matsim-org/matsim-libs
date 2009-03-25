@@ -26,7 +26,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
 
 import playground.balmermi.census2000.data.Persons;
 

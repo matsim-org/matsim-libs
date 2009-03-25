@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.geometry.CoordUtils;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 

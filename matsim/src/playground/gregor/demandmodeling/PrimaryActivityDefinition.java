@@ -32,13 +32,13 @@ import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.utils.StringUtils;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordUtils;
-import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.gis.ShapeFileReader;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.misc.Counter;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
+import org.matsim.core.utils.misc.StringUtils;
 
 public class PrimaryActivityDefinition {
 

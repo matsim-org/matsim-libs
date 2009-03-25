@@ -35,12 +35,12 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.ActivityImpl;
-import org.matsim.population.LegImpl;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.routes.LinkCarRoute;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.routes.LinkCarRoute;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
@@ -709,7 +709,7 @@ public class Flow {
 						
 						Id matsimid  = new IdImpl(stringid);
 						Person p = new PersonImpl(matsimid);
-						Plan plan = new org.matsim.population.PlanImpl(p);
+						Plan plan = new org.matsim.core.population.PlanImpl(p);
 						plan.addAct(home);
 						plan.addLeg(leg);					
 						plan.addAct(work);

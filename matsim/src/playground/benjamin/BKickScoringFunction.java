@@ -30,10 +30,10 @@ import org.matsim.core.api.population.Route;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.CharyparNagelScoringFunction;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.population.ActUtilityParameters;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 
 /**
@@ -66,7 +66,7 @@ public class BKickScoringFunction implements ScoringFunction {
 	/* At the moment, the following values are all static's. But in the longer run,
 	 * they should be agent-specific or facility-specific values...
 	 */
-	protected static final TreeMap<String, ActUtilityParameters> utilParams = new TreeMap<String, ActUtilityParameters>();
+	protected static final TreeMap<String, ActivityUtilityParameters> utilParams = new TreeMap<String, ActivityUtilityParameters>();
 	protected static double marginalUtilityOfWaiting = Double.NaN;
 	protected static double marginalUtilityOfLateArrival = Double.NaN;
 	protected static double marginalUtilityOfEarlyDeparture = Double.NaN;
@@ -166,7 +166,7 @@ public class BKickScoringFunction implements ScoringFunction {
 
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
-		ActUtilityParameters params = utilParams.get(act.getType());
+		ActivityUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
@@ -270,7 +270,7 @@ public class BKickScoringFunction implements ScoringFunction {
 
 	protected double[] getOpeningInterval(final Activity act) {
 
-		ActUtilityParameters params = utilParams.get(act.getType());
+		ActivityUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
@@ -343,7 +343,7 @@ public class BKickScoringFunction implements ScoringFunction {
 			String type = params.getType();
 			double priority = params.getPriority();
 			double typDurationSecs = params.getTypicalDuration();
-			ActUtilityParameters actParams = new ActUtilityParameters(type, priority, typDurationSecs);
+			ActivityUtilityParameters actParams = new ActivityUtilityParameters(type, priority, typDurationSecs);
 			if (params.getMinimalDuration() >= 0) {
 				actParams.setMinimalDuration(params.getMinimalDuration());
 			}

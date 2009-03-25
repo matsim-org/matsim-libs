@@ -36,7 +36,7 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -123,7 +123,7 @@ public class Network2LinkGraph {
 			o[2] = link.getFromNode().getId().toString();
 			o[3] = link.getToNode().getId().toString();
 			o[4] = link.getLength();
-			o[5] = link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+			o[5] = link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 					/ network.getCapacityPeriod() * 3600.0;
 			o[6] = Integer.parseInt(link.getType());
 			o[7] = link.getFreespeed(0);

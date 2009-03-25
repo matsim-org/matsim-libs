@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.graph.GraphProjection;
 import playground.johannes.graph.VertexDecorator;

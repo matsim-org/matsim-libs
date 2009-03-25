@@ -34,14 +34,14 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.gis.ShapeFileReader;
-import org.matsim.utils.misc.ArgumentParser;
-import org.matsim.utils.vis.netvis.VisConfig;
-import org.matsim.utils.vis.snapshots.writers.KmlSnapshotWriter;
-import org.matsim.utils.vis.snapshots.writers.PlansFileSnapshotWriter;
-import org.matsim.utils.vis.snapshots.writers.SnapshotWriter;
-import org.matsim.utils.vis.snapshots.writers.TransimsSnapshotWriter;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.ArgumentParser;
+import org.matsim.vis.netvis.VisConfig;
+import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
+import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
+import org.matsim.vis.snapshots.writers.SnapshotWriter;
+import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 
 
 /**

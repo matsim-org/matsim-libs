@@ -43,7 +43,7 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  *@author glaemmel
@@ -117,13 +117,13 @@ public class EvacuationPlansGeneratorAndNetworkTrimmer {
 				throw new RuntimeException("For each initial evacuation plan only one Act is allowed - and no Leg at all");
 			}
 			
-			Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
+			Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);
 			plan.addLeg(leg);
 
-			plan.addAct(new org.matsim.population.ActivityImpl("h", saveCoord, saveLink));
+			plan.addAct(new org.matsim.core.population.ActivityImpl("h", saveCoord, saveLink));
 
 			router.run(plan);
 		}

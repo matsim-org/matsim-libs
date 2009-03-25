@@ -40,8 +40,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.roadpricing.CalcPaidToll;
-import org.matsim.utils.io.IOUtils;
 
 import playground.yu.analysis.CalcNetAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;

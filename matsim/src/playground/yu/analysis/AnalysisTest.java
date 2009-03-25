@@ -35,11 +35,11 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
+import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 import org.xml.sax.SAXException;
 
 import playground.yu.utils.io.SimpleReader;

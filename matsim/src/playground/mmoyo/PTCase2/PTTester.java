@@ -8,9 +8,9 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
 
 public class PTTester {
 	private final PTOb pt;

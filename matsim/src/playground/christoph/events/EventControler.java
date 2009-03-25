@@ -34,10 +34,10 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
+import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.utils.geometry.transformations.AtlantisToWGS84;
-import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
-import org.matsim.utils.geometry.transformations.GK4toWGS84;
 
 import playground.christoph.events.algorithms.ParallelInitialReplanner;
 import playground.christoph.events.algorithms.ParallelReplanner;

@@ -28,12 +28,12 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
-import org.matsim.population.PopulationWriter;
-import org.matsim.utils.misc.Counter;
 import org.matsim.visum.VisumMatrixReader;
 import org.matsim.world.World;
 

@@ -34,8 +34,8 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.population.routes.NodeCarRoute;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.routes.NodeCarRoute;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;
 
@@ -149,7 +149,7 @@ public class LeaveLinkReplanner {
 		// This would be the "correct" Type - but it is slower and is not necessary
 		//String type = this.plan.getPreviousActivity(leg).getType();
 		
-		Activity newFromAct = new org.matsim.population.ActivityImpl(type, this.personAgent.getCurrentLink().getToNode().getCoord(), this.personAgent.getCurrentLink());
+		Activity newFromAct = new org.matsim.core.population.ActivityImpl(type, this.personAgent.getCurrentLink().getToNode().getCoord(), this.personAgent.getCurrentLink());
 		newFromAct.setStartTime(time);
 		newFromAct.setEndTime(time);
 		newFromAct.setDuration(0);
@@ -178,7 +178,7 @@ public class LeaveLinkReplanner {
 		subRoute.setNodes(nodesRoute);
 
 		// put the new route in a new leg
-		Leg newLeg = new org.matsim.population.LegImpl(leg.getMode());
+		Leg newLeg = new org.matsim.core.population.LegImpl(leg.getMode());
 		newLeg.setDepartureTime(leg.getDepartureTime());
 		newLeg.setTravelTime(leg.getTravelTime());
 		newLeg.setArrivalTime(leg.getArrivalTime());
@@ -188,7 +188,7 @@ public class LeaveLinkReplanner {
 		Plan currentPlan = person.getSelectedPlan();
 		
 		// create new plan and select it
-		Plan newPlan = new org.matsim.population.PlanImpl(person);
+		Plan newPlan = new org.matsim.core.population.PlanImpl(person);
 		person.setSelectedPlan(newPlan);
 			
 		// here we are at the moment

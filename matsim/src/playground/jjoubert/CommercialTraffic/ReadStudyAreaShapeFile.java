@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPolygon;

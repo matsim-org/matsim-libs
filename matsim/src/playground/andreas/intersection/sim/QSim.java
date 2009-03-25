@@ -44,11 +44,11 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.matsim.utils.vis.otfvis.executables.OnTheFlyClientQuadSwing;
-import org.matsim.utils.vis.otfvis.gui.PreferencesDialog;
-import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientQuad;
-import org.matsim.utils.vis.otfvis.opengl.gui.PreferencesDialog2;
-import org.matsim.utils.vis.otfvis.server.OnTheFlyServer;
+import org.matsim.vis.otfvis.executables.OnTheFlyClientQuadSwing;
+import org.matsim.vis.otfvis.gui.PreferencesDialog;
+import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
+import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
+import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 import playground.andreas.intersection.tl.NewSignalSystemControlerImpl;
 

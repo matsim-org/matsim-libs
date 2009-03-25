@@ -31,13 +31,13 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.ActivitySpaceBean;
 import org.matsim.population.ActivitySpaceCassini;
 import org.matsim.population.ActivitySpaceEllipse;
 import org.matsim.population.ActivitySpaceSuperEllipse;
 import org.matsim.population.Knowledge;
-import org.matsim.utils.misc.Time;
 
 public class SelectionWriterHandlerImpl implements SelectionWriterHandler {
 

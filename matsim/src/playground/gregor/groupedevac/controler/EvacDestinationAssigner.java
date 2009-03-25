@@ -39,11 +39,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.NodeCarRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.population.routes.NodeCarRoute;
 
 public class EvacDestinationAssigner implements ScoringListener {
 
@@ -144,11 +144,11 @@ public class EvacDestinationAssigner implements ScoringListener {
 	private void modifyPlans(final Link dest, final ArrayList<Node> evacRoute, final Link origin, final ArrayList<Plan> plans) {
 		
 		for (Plan plan : plans) {
-			Leg leg = new org.matsim.population.LegImpl(Mode.car);
+			Leg leg = new org.matsim.core.population.LegImpl(Mode.car);
 			CarRoute route = new NodeCarRoute();
 			route.setNodes(evacRoute);
 			leg.setRoute(route);
-			Activity act = new org.matsim.population.ActivityImpl("h",dest);
+			Activity act = new org.matsim.core.population.ActivityImpl("h",dest);
 			try {
 				route.getLinks();
 			} catch (Exception e) {

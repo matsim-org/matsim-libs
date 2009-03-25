@@ -28,9 +28,9 @@ import java.util.Iterator;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-import org.matsim.utils.misc.Time;
 
 public class NetworkCalibrationWithCounts {
 
@@ -75,7 +75,7 @@ public class NetworkCalibrationWithCounts {
 //						int time = h*3600-1800;
 						int time_end = h*3600-1;
 //						System.out.println("lcap="+l.getCapacity()+";vol("+h+")="+c.getVolume(h));
-						double val = c.getVolume(h).getValue()/(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)/network.getCapacityPeriod()*3600);
+						double val = c.getVolume(h).getValue()/(l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/network.getCapacityPeriod()*3600);
 						if (val >= 1.0) { System.out.println("csid="+c.getCsId()+";locid="+c.getLocId()+": val="+val); }
 						if (val < 0.01) { val = 0.01; }
 						out.write("\t\t<gtf time=\""+Time.writeTime(time_start)+"\" val=\""+val+"\"/>\n");

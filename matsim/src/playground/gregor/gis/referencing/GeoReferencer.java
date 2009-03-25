@@ -29,11 +29,11 @@ import java.util.HashMap;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.gis.ShapeFileReader;
-import org.matsim.utils.gis.ShapeFileWriter;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.io.IOUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.gregor.gis.referencing.CRN.CaseNode;

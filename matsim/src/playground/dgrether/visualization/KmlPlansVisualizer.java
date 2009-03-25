@@ -34,13 +34,13 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
 import org.matsim.population.filters.RouteLinkFilter;
 import org.matsim.population.filters.SelectedPlanFilter;
-import org.matsim.utils.collections.Tuple;
-import org.matsim.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.MatsimKMLLogo;
+import org.matsim.vis.kml.KMZWriter;
+import org.matsim.vis.kml.MatsimKMLLogo;
 
 import playground.dgrether.analysis.ScenarioLoader;
 import playground.dgrether.matsimkml.KmlPlansWriter;

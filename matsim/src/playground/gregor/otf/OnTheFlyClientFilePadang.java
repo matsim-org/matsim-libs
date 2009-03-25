@@ -8,24 +8,24 @@ import javax.swing.JFrame;
 
 import org.geotools.data.FeatureSource;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.gis.ShapeFileReader;
-import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
-import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
-import org.matsim.utils.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.utils.vis.otfvis.handler.OTFDefaultNodeHandler;
-import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
-import org.matsim.utils.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
-import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientFileQuad;
-import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientQuad;
-import org.matsim.utils.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.utils.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
-import org.matsim.utils.vis.otfvis.opengl.drawer.SimpleBackgroundFeatureDrawer;
-import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer;
-import org.matsim.utils.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
-import org.matsim.utils.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.vis.otfvis.data.OTFClientQuad;
+import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
+import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
+import org.matsim.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
+import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
+import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundFeatureDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
+import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
 
 

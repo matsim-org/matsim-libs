@@ -34,9 +34,9 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
-import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 

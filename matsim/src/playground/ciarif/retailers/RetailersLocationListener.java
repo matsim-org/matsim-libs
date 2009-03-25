@@ -52,7 +52,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
-import org.matsim.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.QuadTree;
 
 
 public class RetailersLocationListener implements StartupListener, BeforeMobsimListener {

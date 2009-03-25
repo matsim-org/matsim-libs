@@ -40,7 +40,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import org.matsim.utils.collections.Tuple;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.statistics.WeightedStatistics;
 
@@ -228,7 +228,7 @@ public class GraphStatistics {
 	
 	/**
 	 * Calculates the degree correlation of graph <tt>g</tt>.<br>
-	 * See: M.ÊE.ÊJ. Newman. Assortative mixing in networks. Physical Review
+	 * See: M.ï¿½E.ï¿½J. Newman. Assortative mixing in networks. Physical Review
 	 * Letters, 89(20), 2002.
 	 * 
 	 * @param g
