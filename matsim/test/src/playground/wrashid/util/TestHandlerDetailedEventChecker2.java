@@ -7,7 +7,7 @@ import java.util.List;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -74,7 +74,7 @@ public class TestHandlerDetailedEventChecker2 extends TestHandlerDetailedEventCh
 					Leg leg = (Leg) pe;
 					// at the moment only cars are simulated on the road
 					if (leg.getMode().equals(BasicLeg.Mode.car)) {
-						expected.expectedLinkEnterEvents += ((CarRoute) leg.getRoute()).getLinks().size() + 1;
+						expected.expectedLinkEnterEvents += ((NetworkRoute) leg.getRoute()).getLinks().size() + 1;
 					}
 				}
 			}
@@ -104,7 +104,7 @@ public class TestHandlerDetailedEventChecker2 extends TestHandlerDetailedEventCh
 		LegIterator iter = plan.getIteratorLeg();
 		while (iter.hasNext()) {
 			Leg leg = (Leg) iter.next();
-			for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
+			for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 				System.out.print(link.getId()
 						+ "("
 						+ Road.allRoads.get(link.getId().toString())
@@ -118,7 +118,7 @@ public class TestHandlerDetailedEventChecker2 extends TestHandlerDetailedEventCh
 		LegIterator iter = plan.getIteratorLeg();
 		while (iter.hasNext()) {
 			Leg leg = (Leg) iter.next();
-			for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
+			for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 				System.out.print(link.getId()+ "-");
 			}
 			System.out.println();

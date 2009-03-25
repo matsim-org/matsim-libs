@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Plan;
 
 import playground.gregor.withindayevac.Beliefs;
@@ -45,7 +45,7 @@ public class FollowPlanAnalyzer implements Analyzer {
 	public FollowPlanAnalyzer(final Beliefs beliefs, final Plan plan, final InformationExchanger informationExchanger) {
 		this.beliefs = beliefs;
 		this.informationExchanger = informationExchanger;
-		List<Link> linklist = ((CarRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinks();
+		List<Link> linklist = ((NetworkRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinks();
 		this.links = linklist.toArray(new Link[linklist.size()]);
 		this.startLink = plan.getFirstActivity().getLink();
 		if (Double.isNaN(plan.getScore())){

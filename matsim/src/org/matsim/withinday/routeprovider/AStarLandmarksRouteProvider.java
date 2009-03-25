@@ -22,7 +22,7 @@ package org.matsim.withinday.routeprovider;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -58,15 +58,15 @@ public class AStarLandmarksRouteProvider extends AbstractRouteProvider {
 		super.setPriority(priority);
 	}
 
-	public CarRoute requestRoute(final Link departureLink, final Link destinationLink,
+	public NetworkRoute requestRoute(final Link departureLink, final Link destinationLink,
 			final double time) {
 		Path path = this.landmarksAStar.calcLeastCostPath(departureLink.getToNode(), destinationLink.getFromNode(), time);
-		CarRoute route = (CarRoute) ((NetworkLayer) departureLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, departureLink, destinationLink);
+		NetworkRoute route = (NetworkRoute) ((NetworkLayer) departureLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, departureLink, destinationLink);
 		route.setNodes(departureLink, path.nodes, destinationLink);
 		return route;
 	}
 
-	public boolean providesRoute(final Link currentLink, final CarRoute subRoute) {
+	public boolean providesRoute(final Link currentLink, final NetworkRoute subRoute) {
 		return true;
 	}
 }

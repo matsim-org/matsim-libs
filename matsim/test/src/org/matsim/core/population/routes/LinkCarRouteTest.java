@@ -25,10 +25,10 @@ import java.util.List;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.LinkCarRoute;
+import org.matsim.core.population.routes.LinkNetworkRoute;
 
 /**
  * @author mrieser
@@ -36,8 +36,8 @@ import org.matsim.core.population.routes.LinkCarRoute;
 public class LinkCarRouteTest extends AbstractCarRouteTest {
 
 	@Override
-	public CarRoute getCarRouteInstance(final Link fromLink, final Link toLink) {
-		return new LinkCarRoute(fromLink, toLink);
+	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink) {
+		return new LinkNetworkRoute(fromLink, toLink);
 	}
 
 	public void testGetNodes_subsequentLinks_setLinks() {
@@ -46,7 +46,7 @@ public class LinkCarRouteTest extends AbstractCarRouteTest {
 		Link link2 = network.getLink(new IdImpl("2"));
 		Node node2 = network.getNode(new IdImpl("2"));
 
-		CarRoute route = new LinkCarRoute(link1, link2);
+		NetworkRoute route = new LinkNetworkRoute(link1, link2);
 		route.setLinks(link1, null, link2);
 		assertEquals("number of links.", 0, route.getLinks().size());
 		assertEquals("number of nodes.", 1, route.getNodes().size());
@@ -61,7 +61,7 @@ public class LinkCarRouteTest extends AbstractCarRouteTest {
 		List<Node> nodes = new ArrayList<Node>();
 		nodes.add(node2);
 
-		CarRoute route = new LinkCarRoute(link1, link2);
+		NetworkRoute route = new LinkNetworkRoute(link1, link2);
 		route.setNodes(link1, nodes, link2);
 		assertEquals("number of links.", 0, route.getLinks().size());
 		assertEquals("number of nodes.", 1, route.getNodes().size());

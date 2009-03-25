@@ -32,7 +32,7 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicLegImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.LinkCarRoute;
+import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -57,7 +57,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	private final double					maxWalkingDistance;
 	private final String					modeChoice;
 	private final BasicLeg.Mode[]			possibleModes;
-	private List<LinkCarRoute> 				routes;
+	private List<LinkNetworkRoute> 				routes;
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
@@ -101,9 +101,9 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		
 		/* Memorize the initial car routes.
 		 * Do this in any case as the car routes are required in the setTimes() method. */
-		ArrayList <LinkCarRoute> routes = new ArrayList<LinkCarRoute>();
+		ArrayList <LinkNetworkRoute> routes = new ArrayList<LinkNetworkRoute>();
 		for (int i=1;i<basePlan.getPlanElements().size();i=i+2){
-			LinkCarRoute r = new LinkCarRoute(((Leg)(basePlan.getPlanElements().get(i))).getRoute().getStartLink(), ((Leg)(basePlan.getPlanElements().get(i))).getRoute().getEndLink());
+			LinkNetworkRoute r = new LinkNetworkRoute(((Leg)(basePlan.getPlanElements().get(i))).getRoute().getStartLink(), ((Leg)(basePlan.getPlanElements().get(i))).getRoute().getEndLink());
 		/*	List<Id> l = new ArrayList<Id>();
 			for (int j=0;j<((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().size();j++){
 				l.add(((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().get(j));

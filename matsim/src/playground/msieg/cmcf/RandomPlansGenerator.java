@@ -30,7 +30,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -43,7 +43,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandlerImplV4;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -161,7 +161,7 @@ public class RandomPlansGenerator {
 			//create leg to work
 			Leg leg = plan.createLeg(Mode.car);
 			leg.setDepartureTime(randTime);
-			CarRoute route = new NodeCarRoute(lHome, lWork);
+			NetworkRoute route = new NodeNetworkRoute(lHome, lWork);
 			route.setNodes(lHome, lPath.nodes, lWork);
 			leg.setRoute(route);
 

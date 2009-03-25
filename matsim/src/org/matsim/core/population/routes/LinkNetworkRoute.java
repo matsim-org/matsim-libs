@@ -28,21 +28,21 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 
 /**
- * Implementation of {@link CarRoute} which internally stores the route as a series of {@link Link}s.
+ * Implementation of {@link NetworkRoute} which internally stores the route as a series of {@link Link}s.
  *
  * @author mrieser
  */
-public class LinkCarRoute extends AbstractRoute implements CarRoute {
+public class LinkNetworkRoute extends AbstractRoute implements NetworkRoute {
 
 	private final ArrayList<Link> route = new ArrayList<Link>();
 	private double travelCost = Double.NaN;
 
-	public LinkCarRoute(Link startLink, Link endLink){
+	public LinkNetworkRoute(Link startLink, Link endLink){
 		super(startLink, endLink);
 	}
 	
@@ -101,7 +101,7 @@ public class LinkCarRoute extends AbstractRoute implements CarRoute {
 		return nodes;
 	}
 
-	public CarRoute getSubRoute(final Node fromNode, final Node toNode) {
+	public NetworkRoute getSubRoute(final Node fromNode, final Node toNode) {
 		Link fromLink = getStartLink();
 		Link toLink = getEndLink();
 		int fromIndex = -1;
@@ -161,7 +161,7 @@ public class LinkCarRoute extends AbstractRoute implements CarRoute {
 				throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
 			}
 		}
-		LinkCarRoute ret = new LinkCarRoute(fromLink, toLink);
+		LinkNetworkRoute ret = new LinkNetworkRoute(fromLink, toLink);
 		if (toIndex >= fromIndex) {
 			ret.setLinks(fromLink, this.route.subList(fromIndex, toIndex + 1), toLink);
 		} else {

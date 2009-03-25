@@ -10,7 +10,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -23,7 +23,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.LinkCarRoute;
+import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -328,7 +328,7 @@ public class PTActWriter {
 	}
 
 	private Leg newPTLeg(final int num, final Leg.Mode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
-		CarRoute legRoute = new LinkCarRoute(null, null); 
+		NetworkRoute legRoute = new LinkNetworkRoute(null, null); 
 		//CarRoute legRoute = new NodeCarRoute();  25 feb
 		
 		if (mode!=Leg.Mode.walk){

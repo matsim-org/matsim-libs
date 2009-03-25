@@ -23,7 +23,7 @@ package playground.gregor.gis.analysis;
 import java.util.List;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -60,7 +60,7 @@ public class GTH {
 		return this.geofac.createPolygon(lr,null);
 	}
 	
-	public Polygon getPolygonFromRoute(CarRoute r) {
+	public Polygon getPolygonFromRoute(NetworkRoute r) {
 		
 		List<Link> linkRoute = r.getLinks();
 		Coordinate [] edges = new Coordinate [linkRoute.size() * 4] ;

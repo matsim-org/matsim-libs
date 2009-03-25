@@ -9,7 +9,7 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -106,7 +106,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 							((LinkLeaveEvent) list.get(index)).linkId));
 					index++;
 
-					for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
+					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 						// enter link and leave each link on route
 						assertTrue(list.get(index) instanceof LinkEnterEvent);
 						assertTrue(link.getId().toString().equalsIgnoreCase(
@@ -193,7 +193,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 				Leg leg = (Leg) iter.next();
 				// at the moment only cars are simulated on the road
 				if (leg.getMode().equals(BasicLeg.Mode.car)) {
-					expected.expectedLinkEnterEvents += ((CarRoute) leg.getRoute()).getLinks().size() + 1;
+					expected.expectedLinkEnterEvents += ((NetworkRoute) leg.getRoute()).getLinks().size() + 1;
 				}
 			}
 

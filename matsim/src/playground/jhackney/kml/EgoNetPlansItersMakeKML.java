@@ -52,7 +52,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -406,7 +406,7 @@ public class EgoNetPlansItersMakeKML {
 			if (o instanceof Leg) {
 				Leg leg = (Leg) o;
 
-				for (Link routeLink : ((CarRoute) leg.getRoute()).getLinks()) {
+				for (Link routeLink : ((NetworkRoute) leg.getRoute()).getLinks()) {
 					PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo, iter);
 					
 					featureExists = false;

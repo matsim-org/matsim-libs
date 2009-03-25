@@ -26,7 +26,7 @@ import java.io.IOException;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -112,7 +112,7 @@ public class PersonLinkRoutesTable extends AbstractPersonAlgorithm implements Pl
 				out_routes.write(person.getId() + "\t\t" + l.getMode() + "\t");
 				out_types.write(person.getId() + "\t\t" + l.getMode() + "\t");
 				out_length.write(person.getId() + "\t\t" + l.getMode() + "\t");
-				for (Link link : ((CarRoute) l.getRoute()).getLinks()) {
+				for (Link link : ((NetworkRoute) l.getRoute()).getLinks()) {
 					out_routes.write(link.getId() + "\t");
 					out_types.write(link.getType() + "\t");
 					out_length.write(link.getLength() + "\t");

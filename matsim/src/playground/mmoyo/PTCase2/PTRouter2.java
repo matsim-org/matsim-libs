@@ -13,7 +13,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.LinkCarRoute;
+import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -128,7 +128,7 @@ public class PTRouter2 {
 					linkList.add(link);
 				}else{
 					//CarRoute legRoute = new NodeCarRoute();    25 feb
-					LinkCarRoute legRoute = new LinkCarRoute(null, null); 
+					LinkNetworkRoute legRoute = new LinkNetworkRoute(null, null); 
 					
 					legRoute.setTravelTime(routeTravelTime); //legRoute.setTravTime(routeTravelTime*3600);
 					if (linkList.size()>0) {legRoute.setLinks(null, linkList, null);}

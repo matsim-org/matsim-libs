@@ -33,7 +33,7 @@ import java.util.List;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -191,7 +191,7 @@ public class DEQSim extends ExternalMobsim {
 			// departuretime, double, 64bit
 			out.writeDouble(time);
 
-			CarRoute route = (CarRoute) leg.getRoute();
+			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			// in the binary format, we write the link-ids instead of the node-ids
 			List<Link> linkRoute = route.getLinks();
 

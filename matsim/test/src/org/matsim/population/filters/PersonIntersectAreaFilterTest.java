@@ -27,7 +27,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -75,7 +75,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 
 		plan.createAct("w", link5);
 
-		CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link0, link5);
+		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link0, link5);
 		leg.setRoute(route);
 
 		// prepare route

@@ -28,10 +28,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 
 /**
@@ -67,13 +67,13 @@ public class VDSSign {
 
 	private Link directionLink;
 
-	private CarRoute currentRoute;
+	private NetworkRoute currentRoute;
 
-	private List<CarRoute> currentRouteSet;
+	private List<NetworkRoute> currentRouteSet;
 
-	private CarRoute mainRoute;
+	private NetworkRoute mainRoute;
 
-	private CarRoute alternativeRoute;
+	private NetworkRoute alternativeRoute;
 
 	private double complianceRate;
 
@@ -87,7 +87,7 @@ public class VDSSign {
 		// completes the routes, i.e. calculates out and inlinks
 		this.mainRoute = completeRoute(this.controlInput.getMainRoute());
 		this.alternativeRoute = completeRoute(this.controlInput.getAlternativeRoute());
-		this.currentRouteSet = new ArrayList<CarRoute>(this.controlEvents);
+		this.currentRouteSet = new ArrayList<NetworkRoute>(this.controlEvents);
 		if (this.signOutput != null) {
 			try {
 				this.signOutput.init();
@@ -250,7 +250,7 @@ public class VDSSign {
 	 * Returns the guidance message as a <code>Route</code>
 	 * @return current route
 	 */
-	public CarRoute requestRoute() {
+	public NetworkRoute requestRoute() {
 		double time = SimulationTimer.getTime();
 		double trust = MatsimRandom.getRandom().nextDouble();
 		if (time > this.nextUpdate) {
@@ -280,8 +280,8 @@ public class VDSSign {
 		}
 	}
 
-	private CarRoute completeRoute(final CarRoute r) {
-		CarRoute ret = new NodeCarRoute();
+	private NetworkRoute completeRoute(final NetworkRoute r) {
+		NetworkRoute ret = new NodeNetworkRoute();
 		ArrayList<Node> rNodes = new ArrayList<Node>(r.getNodes());
 		if (!this.signLink.getToNode().equals(rNodes.get(0))) {
 			for (Node n : calculateInLinks(this.signLink, rNodes.get(0))) {

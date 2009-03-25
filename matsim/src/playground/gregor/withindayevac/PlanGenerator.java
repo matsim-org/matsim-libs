@@ -29,7 +29,7 @@ import java.util.Map.Entry;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -47,7 +47,7 @@ import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 
 import playground.gregor.withindayevac.debug.DebugDecisionTree;
 import playground.gregor.withindayevac.debug.DebugFollowFastestAgent;
@@ -81,7 +81,7 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 			Person pers = this.population.getPerson(new IdImpl(e.getKey()));
 			Plan plan = pers.getSelectedPlan();
 		
-			List<Link> links = ((CarRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinks();
+			List<Link> links = ((NetworkRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinks();
 			ArrayList<String> strLinks = e.getValue();
 			if (strLinks.size() < links.size()) {
 				if (addNewPlan(pers,strLinks)) count++;
@@ -132,7 +132,7 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 		Activity oldB = pers.getSelectedPlan().getNextActivity(oldLeg);
 		Activity b = new org.matsim.core.population.ActivityImpl(oldB);
 		plan.addAct(a);
-		CarRoute route = new NodeCarRoute();
+		NetworkRoute route = new NodeNetworkRoute();
 		route.setNodes(nodes);
 		route.getDistance();
 		l.setRoute(route);

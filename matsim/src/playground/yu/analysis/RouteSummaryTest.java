@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -161,7 +161,7 @@ public class RouteSummaryTest {
 							aOdRouteSet = new HashSet<List<Id>>();
 
 						List<Id> routeLinkIds = new LinkedList<Id>();
-						CarRoute r = (CarRoute) l.getRoute();
+						NetworkRoute r = (NetworkRoute) l.getRoute();
 						// boolean illegalRoute = false;
 
 						if (r.getNodes().size() > 0) {

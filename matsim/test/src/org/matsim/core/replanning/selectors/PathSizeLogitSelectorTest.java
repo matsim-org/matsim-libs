@@ -27,7 +27,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -35,7 +35,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -85,7 +85,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
 
-		CarRoute r = new NodeCarRoute(l6, l7);
+		NetworkRoute r = new NodeNetworkRoute(l6, l7);
 		ArrayList<Node> srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n3);
@@ -107,7 +107,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
 		Plan p2 = new org.matsim.core.population.PlanImpl(person);
-		r = new NodeCarRoute(l6, l7);
+		r = new NodeNetworkRoute(l6, l7);
 		srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n2);
@@ -127,7 +127,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
 		Plan p3 = new org.matsim.core.population.PlanImpl(person);
-		r = new NodeCarRoute(l6, l7);
+		r = new NodeNetworkRoute(l6, l7);
 		srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n2);
@@ -155,7 +155,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
-		r = new NodeCarRoute(l6, l7);
+		r = new NodeNetworkRoute(l6, l7);
 		srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n3);
@@ -189,7 +189,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
 		
-		CarRoute r = new NodeCarRoute(l6, l7);
+		NetworkRoute r = new NodeNetworkRoute(l6, l7);
 		ArrayList<Node> srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n3);
@@ -223,7 +223,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
-		CarRoute r = new NodeCarRoute(l6, l7);
+		NetworkRoute r = new NodeNetworkRoute(l6, l7);
 		ArrayList<Node> srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n3);
@@ -242,7 +242,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
 		Plan p2 = new org.matsim.core.population.PlanImpl(person);
-		r = new NodeCarRoute(l6, l7);
+		r = new NodeNetworkRoute(l6, l7);
 		srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n2);
@@ -262,7 +262,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
 		Plan p3 = new org.matsim.core.population.PlanImpl(person);
-		r = new NodeCarRoute(l6, l7);
+		r = new NodeNetworkRoute(l6, l7);
 		srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n2);

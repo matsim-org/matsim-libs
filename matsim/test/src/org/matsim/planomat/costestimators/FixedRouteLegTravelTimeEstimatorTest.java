@@ -28,7 +28,7 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -193,7 +193,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		events.addHandler(this.linkTravelTimeEstimator);
 		events.printEventHandlers();
 
-		CarRoute route = (CarRoute) this.testLeg.getRoute();
+		NetworkRoute route = (NetworkRoute) this.testLeg.getRoute();
 		log.info(route.toString());
 
 		// generate some travel times
@@ -260,7 +260,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				this.linkTravelCostEstimator,
 				this.tDepDelayCalc,
 				this.scenario.getNetwork());
-		Id linkId = ((CarRoute) this.testLeg.getRoute()).getLinks().get(0).getId();
+		Id linkId = ((NetworkRoute) this.testLeg.getRoute()).getLinks().get(0).getId();
 
 		Events events = new Events();
 		events.addHandler(this.linkTravelTimeEstimator);

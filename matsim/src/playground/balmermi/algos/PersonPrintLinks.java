@@ -23,7 +23,7 @@ package playground.balmermi.algos;
 import java.util.Iterator;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -56,7 +56,7 @@ public class PersonPrintLinks extends AbstractPersonAlgorithm {
 			Leg leg = (Leg)leg_it.next();
 			System.out.println("Person id=" + person.getId() + "; Leg nr=" + counter);
 			counter++;
-			CarRoute route = (CarRoute) leg.getRoute();
+			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			for (Link link : route.getLinks()) {
 				System.out.println(link.getOrigId());
 			}

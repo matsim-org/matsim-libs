@@ -27,7 +27,7 @@ import java.util.TreeMap;
 import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -124,7 +124,7 @@ public class ExternalModule implements PlanStrategyModule {
 					this.handler.startLeg(leg, this.writer);
 					// route
 					if (leg.getRoute() != null) {
-						CarRoute r = (CarRoute) leg.getRoute();
+						NetworkRoute r = (NetworkRoute) leg.getRoute();
 						this.handler.startRoute(r, this.writer);
 						this.handler.endRoute(this.writer);
 					}

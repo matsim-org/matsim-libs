@@ -26,7 +26,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 
 
-public interface CarRoute extends Route {
+public interface NetworkRoute extends Route {
 
 	/**
 	 * Never use String arguments as parameter except they contain a real String, i.e. 
@@ -68,6 +68,6 @@ public interface CarRoute extends Route {
 	 * @param toNode
 	 * @return A flat copy of the original Route
 	 */
-	public abstract CarRoute getSubRoute(final Node fromNode, final Node toNode);
+	public abstract NetworkRoute getSubRoute(final Node fromNode, final Node toNode);
 
 }

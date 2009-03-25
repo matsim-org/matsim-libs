@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
@@ -49,7 +49,7 @@ public class RouteLinkFilter extends AbstractPlanFilter {
 		LegIterator iter = plan.getIteratorLeg();
 		while (iter.hasNext()) {
 			Leg leg = (Leg)iter.next();
-			for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
+			for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 				if (this.linkIds.contains(link.getId())) {
 					return true;
 				}

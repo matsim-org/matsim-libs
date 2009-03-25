@@ -25,7 +25,7 @@ import java.util.Stack;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.NetworkLayer;
@@ -226,11 +226,11 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	public void endTag(final String name, String content, final Stack<String> context) {
 		content = content.trim();
 		if (name.equalsIgnoreCase(MAINROUTE)) {
-			CarRoute route = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+			NetworkRoute route = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
 			route.setNodes(this.currentRouteNodes);
 			this.controlInput.setMainRoute(route);
 		} else if (name.equalsIgnoreCase(ALTERNATIVEROUTE)) {
-			CarRoute route = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+			NetworkRoute route = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
 			route.setNodes(this.currentRouteNodes);
 			this.controlInput.setAlternativeRoute(route);
 		}

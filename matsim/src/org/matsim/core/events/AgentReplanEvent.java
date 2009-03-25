@@ -20,7 +20,7 @@
 package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 
 /**
  * @author dgrether
@@ -29,9 +29,9 @@ public class AgentReplanEvent extends PersonEvent {
 
 	public static final String EVENT_TYPE = "replan";
 
-	private final CarRoute replannedRoute;
+	private final NetworkRoute replannedRoute;
 
-	public AgentReplanEvent(final double time, final Id agentId, final CarRoute alternativeRoute) {
+	public AgentReplanEvent(final double time, final Id agentId, final NetworkRoute alternativeRoute) {
 		super(time, agentId);
 		this.replannedRoute = alternativeRoute;
 	}
@@ -50,7 +50,7 @@ public class AgentReplanEvent extends PersonEvent {
 		return builder.toString();
 	}
 
-	public CarRoute getReplannedRoute() {
+	public NetworkRoute getReplannedRoute() {
 		return this.replannedRoute;
 	}
 

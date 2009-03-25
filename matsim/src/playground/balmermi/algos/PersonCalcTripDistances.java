@@ -22,7 +22,7 @@ package playground.balmermi.algos;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -64,14 +64,14 @@ public class PersonCalcTripDistances extends AbstractPersonAlgorithm implements 
 			Activity next = (Activity)plan.getPlanElements().get(i+1);
 
 			if (prev.getLinkId().equals(next.getLinkId())) {
-				if (!((CarRoute) leg.getRoute()).getNodes().isEmpty()) { throw new RuntimeException("Person id=" + person.getId() + ": route should be empty!"); }
+				if (!((NetworkRoute) leg.getRoute()).getNodes().isEmpty()) { throw new RuntimeException("Person id=" + person.getId() + ": route should be empty!"); }
 				leg.getRoute().setDistance(0.0);
 			}
 			else {
-				if (((CarRoute) leg.getRoute()).getNodes().isEmpty()) { leg.getRoute().setDistance(CoordUtils.calcDistance(next.getCoord(), prev.getCoord())); }
+				if (((NetworkRoute) leg.getRoute()).getNodes().isEmpty()) { leg.getRoute().setDistance(CoordUtils.calcDistance(next.getCoord(), prev.getCoord())); }
 				else {
 					double dist = prev.getLink().getLength();
-					for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
+					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 						dist += link.getLength();
 					}
 					leg.getRoute().setDistance(dist);

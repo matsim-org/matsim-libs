@@ -26,7 +26,7 @@ import java.io.IOException;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -170,7 +170,7 @@ public interface PopulationWriterHandler extends WriterHandler {
 	// <route ... > ... </route>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startRoute(final CarRoute route, final BufferedWriter out) throws IOException;
+	public void startRoute(final NetworkRoute route, final BufferedWriter out) throws IOException;
 
 	public void endRoute(final BufferedWriter out) throws IOException;
 

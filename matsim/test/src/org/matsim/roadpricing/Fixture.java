@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -39,7 +39,7 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -179,7 +179,7 @@ public class Fixture {
 		person.addPlan(plan);
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
 		Leg leg = plan.createLeg(Mode.car);//"car", startTime, "00:01", null);
-		CarRoute route = new NodeCarRoute(homeLink, workLink);
+		NetworkRoute route = new NodeNetworkRoute(homeLink, workLink);
 		route.setNodes(homeLink, routeNodes, workLink);
 		leg.setRoute(route);
 		plan.createAct("w", workLink);//, null, "24:00", null, "yes");
@@ -212,7 +212,7 @@ public class Fixture {
 		return referencePopulation;
 	}
 
-	public static void compareRoutes(final String expectedRoute, final CarRoute realRoute) {
+	public static void compareRoutes(final String expectedRoute, final NetworkRoute realRoute) {
 		StringBuilder strBuilder = new StringBuilder();
 		for (Node node : realRoute.getNodes()) {
 			strBuilder.append(node.getId().toString());

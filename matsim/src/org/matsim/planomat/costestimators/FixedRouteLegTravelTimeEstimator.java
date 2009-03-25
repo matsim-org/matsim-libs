@@ -28,7 +28,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.router.PlansCalcRoute;
@@ -93,7 +93,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 
 	}
 
-	protected double processRouteTravelTime(final CarRoute route, final double start) {
+	protected double processRouteTravelTime(final NetworkRoute route, final double start) {
 
 		double now = start;
 

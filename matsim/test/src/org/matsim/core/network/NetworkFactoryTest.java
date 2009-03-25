@@ -26,7 +26,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.population.routes.AbstractRoute;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -42,7 +42,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 
 		// test default
 		Route carRoute = factory.createRoute(BasicLeg.Mode.car, null, null);
-		assertTrue(carRoute instanceof NodeCarRoute);
+		assertTrue(carRoute instanceof NodeNetworkRoute);
 
 		try {
 			Route route = factory.createRoute(BasicLeg.Mode.pt, null, null);

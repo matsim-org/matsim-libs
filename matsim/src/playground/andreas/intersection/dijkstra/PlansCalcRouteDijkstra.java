@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -73,7 +73,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			
 			realRouteNodeList.remove(realRouteNodeList.size() - 1);
 			
-			CarRoute wrappedRoute = new NodeCarRoute();
+			NetworkRoute wrappedRoute = new NodeNetworkRoute();
 			wrappedRoute.setNodes(realRouteNodeList);
 			wrappedRoute.setTravelTime(path.travelTime);
 			
@@ -81,7 +81,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			travTime = path.travelTime;
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			CarRoute route = new NodeCarRoute();
+			NetworkRoute route = new NodeNetworkRoute();
 			route.setTravelTime(0);
 			leg.setRoute(route);
 			travTime = 0;

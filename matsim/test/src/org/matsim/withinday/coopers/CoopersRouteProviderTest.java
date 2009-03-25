@@ -29,7 +29,7 @@ import junit.framework.TestCase;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -50,9 +50,9 @@ public class CoopersRouteProviderTest extends TestCase {
 
 	private NetworkLayer network;
 
-	private CarRoute route1;
+	private NetworkRoute route1;
 
-	private CarRoute route2;
+	private NetworkRoute route2;
 
 	@Override
 	protected void setUp() throws Exception {
@@ -93,14 +93,14 @@ public class CoopersRouteProviderTest extends TestCase {
 		EmptyControlInputImpl controlInput = new EmptyControlInputImpl();
 		controlInput.setNashTime(0);
 
-		this.route1 = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+		this.route1 = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
 		ArrayList<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("31"));
 		list.add(this.network.getNode("4"));
 		this.route1.setNodes(list);
 		controlInput.setMainRoute(this.route1);
-		this.route2 = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+		this.route2 = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
 		list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("32"));
@@ -124,11 +124,11 @@ public class CoopersRouteProviderTest extends TestCase {
 
 
 	/**
-	 * Test method for {@link org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider#providesRoute(org.matsim.core.api.network.Link, org.matsim.core.api.population.CarRoute)}.
+	 * Test method for {@link org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider#providesRoute(org.matsim.core.api.network.Link, org.matsim.core.api.population.NetworkRoute)}.
 	 */
 	public void testProvidesRoute() {
 	  //create route which is driven by the person in the real simulated world
-		CarRoute agentRoute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+		NetworkRoute agentRoute = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
 	  ArrayList<Node> nodes = new ArrayList<Node>();
 	  nodes.add(this.network.getNode("3"));
 	  nodes.add(this.network.getNode("32"));
@@ -167,7 +167,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	 */
 	public void testRequestRouteLinkLinkDouble() {
 	  //create route which is driven by the person in the real simulated world
-		CarRoute agentRoute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+		NetworkRoute agentRoute = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
 	  ArrayList<Node> agentRouteNodes = new ArrayList<Node>();
 	  agentRouteNodes.add(this.network.getNode("2"));
 	  agentRouteNodes.add(this.network.getNode("3"));
@@ -175,7 +175,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	  agentRouteNodes.add(this.network.getNode("4"));
 	  agentRoute.setNodes(agentRouteNodes);
 	  //create the route which should be returned by the provider
-	  CarRoute providerRoute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+	  NetworkRoute providerRoute = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
 	  ArrayList<Node> providerRouteNodes = new ArrayList<Node>();
 	  providerRouteNodes.add(this.network.getNode("2"));
 	  providerRouteNodes.add(this.network.getNode("3"));
@@ -188,7 +188,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	  //has to be called first
 	  provider.providesRoute(linkNo1, agentRoute);
 	  //check routing
-	  CarRoute r = provider.requestRoute(linkNo1, this.network.getLink("7"), SimulationTimer.getTime());
+	  NetworkRoute r = provider.requestRoute(linkNo1, this.network.getLink("7"), SimulationTimer.getTime());
 //	  System.out.println("Route is: " + LogRouteUtils.getNodeRoute(r));
 		for (int i = 0; i < r.getNodes().size(); i++) {
 			assertEquals(providerRouteNodes.get(i), r.getNodes().get(i));

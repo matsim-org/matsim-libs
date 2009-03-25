@@ -24,7 +24,7 @@
 package playground.johannes.eut;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -81,8 +81,8 @@ public class RemoveDuplicatePlans implements BeforeMobsimListener {
 				/*
 				 * Compare sequence of nodes.
 				 */
-				if (((CarRoute) leg2.getRoute()).getNodes().equals(
-						((CarRoute) leg1.getRoute()).getNodes())) {
+				if (((NetworkRoute) leg2.getRoute()).getNodes().equals(
+						((NetworkRoute) leg1.getRoute()).getNodes())) {
 					/*
 					 * Compare departure times.
 					 */

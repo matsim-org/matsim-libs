@@ -28,7 +28,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
@@ -90,7 +90,7 @@ public class CutTrips implements PersonAlgorithm {
 			}
 
 			// test links of route
-			for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
+			for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 				if (this.aoi.containsKey(link.getId())) {
 					if (firstInsideLink == null) {
 						firstInsideLink = link;
@@ -154,7 +154,7 @@ public class CutTrips implements PersonAlgorithm {
 			}
 			// find the time the agent is entering the AOI, and use that time as from-act endtime
 			Leg leg = (Leg) plan.getPlanElements().get(firstInsideLeg);
-			CarRoute route = (CarRoute) leg.getRoute();
+			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			double traveltime = 0.0;
 			for (Link link : route.getLinks()) {
 				traveltime += link.getFreespeedTravelTime(Time.UNDEFINED_TIME);
@@ -201,7 +201,7 @@ public class CutTrips implements PersonAlgorithm {
 			// adapt route of leg that leads out of the AOI
 			boolean removing = false;
 			Leg leg = (Leg) plan.getPlanElements().get(firstOutsideLeg);
-			CarRoute route = (CarRoute) leg.getRoute();
+			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			List<Node> nodes = route.getNodes();
 			Iterator<Node> iter = nodes.iterator();
 			while (iter.hasNext()) {

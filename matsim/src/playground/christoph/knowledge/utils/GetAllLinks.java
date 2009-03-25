@@ -39,7 +39,7 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -123,7 +123,7 @@ public class GetAllLinks {
 		{
 			Leg leg = (Leg)legIterator.next();
 
-			CarRoute route = (CarRoute) leg.getRoute();
+			NetworkRoute route = (NetworkRoute) leg.getRoute();
 
 			for (Link link : route.getLinks()) {
 				// Hinzufuegen, falls neues Element

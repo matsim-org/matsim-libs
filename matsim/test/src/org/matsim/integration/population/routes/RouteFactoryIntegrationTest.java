@@ -33,9 +33,9 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.population.routes.CompressedCarRoute;
-import org.matsim.core.population.routes.CompressedCarRouteFactory;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.CompressedNetworkRoute;
+import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -72,7 +72,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 				for (LegIterator iter = plan.getIteratorLeg(); iter.hasNext(); ) {
 					BasicLeg leg = iter.next();
 					BasicRoute route = leg.getRoute();
-					assertTrue(route instanceof NodeCarRoute); // that must be different from the class used below
+					assertTrue(route instanceof NodeNetworkRoute); // that must be different from the class used below
 				}
 			}
 		}
@@ -93,7 +93,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 				for (LegIterator iter = plan.getIteratorLeg(); iter.hasNext(); ) {
 					BasicLeg leg = iter.next();
 					BasicRoute route = leg.getRoute();
-					assertTrue("person: " + person.getId() + "; plan: " + planCounter, route instanceof CompressedCarRoute);
+					assertTrue("person: " + person.getId() + "; plan: " + planCounter, route instanceof CompressedNetworkRoute);
 				}
 			}
 		}
@@ -108,7 +108,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		@Override
 		protected Population loadPopulation() {
 			NetworkFactory factory = getNetworkFactory();
-			factory.setRouteFactory(BasicLeg.Mode.car, new CompressedCarRouteFactory(getNetwork()));
+			factory.setRouteFactory(BasicLeg.Mode.car, new CompressedNetworkRouteFactory(getNetwork()));
 			return super.loadPopulation();
 		}
 	}

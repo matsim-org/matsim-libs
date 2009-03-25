@@ -29,14 +29,14 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -117,17 +117,17 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 	}
 
 	private Leg getELeg(final Leg leg) {
-		List<Node> nodeRoute = ((CarRoute) leg.getRoute()).getNodes();
+		List<Node> nodeRoute = ((NetworkRoute) leg.getRoute()).getNodes();
 		nodeRoute.remove(nodeRoute.size()-1);
 		Leg l = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
-		CarRoute route = new NodeCarRoute();
+		NetworkRoute route = new NodeNetworkRoute();
 		route.setNodes(nodeRoute);
 		l.setRoute(route);
 		return l;
 	}
 
 	private Link getEvacLink(final Leg leg) {
-		List<Link> lr = ((CarRoute) leg.getRoute()).getLinks();
+		List<Link> lr = ((NetworkRoute) leg.getRoute()).getLinks();
 		
 		
 		return lr.get(lr.size()-1);

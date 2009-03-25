@@ -26,7 +26,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
@@ -244,7 +244,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 						this.handler.startLeg(leg, this.out);
 						// route
 						if (leg.getRoute() != null) {
-							CarRoute r = (CarRoute) leg.getRoute();
+							NetworkRoute r = (NetworkRoute) leg.getRoute();
 							this.handler.startRoute(r, this.out);
 							this.handler.endRoute(this.out);
 						}

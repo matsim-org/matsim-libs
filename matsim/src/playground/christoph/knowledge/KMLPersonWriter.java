@@ -39,7 +39,7 @@ import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
@@ -68,7 +68,7 @@ public class KMLPersonWriter {
 	protected ArrayList<Node> routeNodes;
 	protected NetworkLayer network;
 	protected Map<Id, Node> nodes;
-	protected CarRoute route;
+	protected NetworkRoute route;
 	
 	protected boolean writeKnownNodes = true;
 	protected boolean writeActivityLinks = true;
@@ -301,9 +301,9 @@ public class KMLPersonWriter {
 				{
 					BasicLeg leg = iterator.next();
 					
-					if (leg.getRoute() instanceof CarRoute)
+					if (leg.getRoute() instanceof NetworkRoute)
 					{
-						CarRoute route = (CarRoute)leg.getRoute();
+						NetworkRoute route = (NetworkRoute)leg.getRoute();
 						for(Node node : route.getNodes())
 						{
 							routeNodes.add(node);

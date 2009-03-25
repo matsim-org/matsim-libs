@@ -28,10 +28,10 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 
 /**
- * Implementation of {@link CarRoute} that tries to minimize the amount of
+ * Implementation of {@link NetworkRoute} that tries to minimize the amount of
  * data needed to be stored for each route. This will give some memory savings,
  * allowing for larger scenarios (=more agents), especially on detailed
  * networks, but is likely a bit slower due to the more complex access of the
@@ -39,7 +39,7 @@ import org.matsim.core.api.population.CarRoute;
  *
  * @author mrieser
  */
-public class CompressedCarRoute extends AbstractRoute implements CarRoute {
+public class CompressedNetworkRoute extends AbstractRoute implements NetworkRoute {
 
 	private final ArrayList<Link> route = new ArrayList<Link>(0);
 	private final Map<Link, Link> subsequentLinks;
@@ -47,7 +47,7 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 	/** number of links in uncompressed route */
 	private int uncompressedLength = 0;
 
-	public CompressedCarRoute(Link startLink, Link endLink, final Map<Link, Link> subsequentLinks) {
+	public CompressedNetworkRoute(Link startLink, Link endLink, final Map<Link, Link> subsequentLinks) {
 		super(startLink, endLink);
 		this.subsequentLinks = subsequentLinks;
 	}
@@ -128,7 +128,7 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 
 	}
 
-	public CarRoute getSubRoute(final Node fromNode, final Node toNode) {
+	public NetworkRoute getSubRoute(final Node fromNode, final Node toNode) {
 		Link newStartLink = null;
 		Link newEndLink = null;
 		List<Link> newLinks = new ArrayList<Link>(10);
@@ -160,7 +160,7 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 			}
 		}
 
-		CarRoute subRoute = new CompressedCarRoute(newStartLink, newEndLink, this.subsequentLinks);
+		NetworkRoute subRoute = new CompressedNetworkRoute(newStartLink, newEndLink, this.subsequentLinks);
 		subRoute.setLinks(newStartLink, newLinks, newEndLink);
 		return subRoute;
 	}

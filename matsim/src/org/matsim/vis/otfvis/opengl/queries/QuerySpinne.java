@@ -42,7 +42,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -136,7 +136,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 				} else {
 					// handle leg
 					Leg leg = (Leg)actslegs.get(i);
-					for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
+					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 						Id id2 = link.getId();
 						if(id2.equals(this.linkId) ) {
 							actPersons.add(plan);
@@ -167,7 +167,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 					// handle leg
 					Leg leg = (Leg)actslegs.get(i);
 					List<Link> links = new ArrayList<Link>();
-					for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
+					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 						links.add(link);
 						Id id2 = link.getId();
 						if(id2.equals(this.linkId) ) {
@@ -195,7 +195,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 				} else {
 					// handle leg
 					Leg leg = (Leg)actslegs.get(i);
-					for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
+					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 							addLink(link);
 					}
 				}

@@ -29,7 +29,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -38,7 +38,7 @@ import org.matsim.core.basic.v01.BasicPlanImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.misc.Time;
 
 public class PlanImpl implements Plan {
@@ -244,7 +244,7 @@ public class PlanImpl implements Plan {
 					l2.setTravelTime(l.getTravelTime());
 					l2.setArrivalTime(l.getArrivalTime());
 					if (l.getRoute() != null) {
-						CarRoute r = new NodeCarRoute((CarRoute) l.getRoute());
+						NetworkRoute r = new NodeNetworkRoute((NetworkRoute) l.getRoute());
 						l2.setRoute(r);
 					}
 				}

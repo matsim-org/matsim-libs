@@ -10,7 +10,7 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.core.events.AgentArrivalEvent;
@@ -342,7 +342,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 							this.realLink.getLink(), veh.getCurrentLeg()));
 			Leg actLeg = veh.getCurrentLeg();
 			if (actLeg.getRoute() != null) {
-				if (((CarRoute) actLeg.getRoute()).getNodes() != null){
+				if (((NetworkRoute) actLeg.getRoute()).getNodes() != null){
 					this.parkToLinkQueue.add(veh);
 				}
 			} else {

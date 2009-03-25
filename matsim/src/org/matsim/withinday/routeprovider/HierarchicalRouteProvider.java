@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.network.NetworkLayer;
 
 
@@ -52,9 +52,9 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 	}
 
 	@Override
-	public CarRoute requestRoute(Link departureLink, final Link destinationLink, final double time) {
-		CarRoute subRoute;
-		CarRoute returnRoute = (CarRoute) ((NetworkLayer) departureLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, departureLink, destinationLink);
+	public NetworkRoute requestRoute(Link departureLink, final Link destinationLink, final double time) {
+		NetworkRoute subRoute;
+		NetworkRoute returnRoute = (NetworkRoute) ((NetworkLayer) departureLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, departureLink, destinationLink);
 		ArrayList<Node> routeNodes = new ArrayList<Node>();
 		for (RouteProvider rp : this.providers) {
 			if (log.isTraceEnabled()) {
@@ -79,7 +79,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 		return null;
 	}
 
-	private boolean isCompleteRoute(final CarRoute subRoute, final Link destinationLink) {
+	private boolean isCompleteRoute(final NetworkRoute subRoute, final Link destinationLink) {
 		Node endNode = subRoute.getNodes().get(subRoute.getNodes().size() - 1);
 		if (endNode.getOutLinks().containsKey(destinationLink.getId())) {
 			return true;
@@ -103,9 +103,9 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 
 	/**
 	 * As this implementation is backed by a AStarRouter the class provides Routes from everywhere to everywhere
-	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.core.network.LinkImpl, org.matsim.core.api.population.CarRoute)
+	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.core.network.LinkImpl, org.matsim.core.api.population.NetworkRoute)
 	 */
-	public boolean providesRoute(final Link currentLink, final CarRoute subRoute) {
+	public boolean providesRoute(final Link currentLink, final NetworkRoute subRoute) {
 		return true;
 	}
 

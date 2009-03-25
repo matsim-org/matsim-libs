@@ -27,13 +27,13 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControler;
 
@@ -49,8 +49,8 @@ public class VDSSignTest extends TestCase {
 	private static final Logger log = Logger.getLogger(VDSSignTest.class);
 
 	private NetworkLayer network;
-	private CarRoute route2;
-	private CarRoute route1;
+	private NetworkRoute route2;
+	private NetworkRoute route1;
 	private EmptyControlInputImpl controlInput;
 
 	private int systemTime;
@@ -90,14 +90,14 @@ public class VDSSignTest extends TestCase {
 		this.controlInput = new EmptyControlInputImpl();
 		this.controlInput.setNashTime(0);
 
-		this.route1 = new NodeCarRoute();
+		this.route1 = new NodeNetworkRoute();
 		ArrayList<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("31"));
 		list.add(this.network.getNode("4"));
 		this.route1.setNodes(list);
 		this.controlInput.setMainRoute(this.route1);
-		this.route2 = new NodeCarRoute();
+		this.route2 = new NodeNetworkRoute();
 		list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("32"));
@@ -132,7 +132,7 @@ public class VDSSignTest extends TestCase {
 		log.debug("test's system time: " + this.systemTime);
 		this.controlInput.setNashTime(-1);
 		sign.calculateOutput(this.systemTime);
-		CarRoute r1 = sign.requestRoute();
+		NetworkRoute r1 = sign.requestRoute();
 //		log.debug("Route1 is: " + LogRouteUtils.getNodeRoute(r1));
 		assertNotSame("routes should not be equal to those of ControlInput", this.route1, r1);
 		//however with the setting the nodes should be the same:
@@ -143,7 +143,7 @@ public class VDSSignTest extends TestCase {
 		this.controlInput.setNashTime(1);
 		this.incrementSystemTime();
 		sign.calculateOutput(this.systemTime);
-		CarRoute r2 = sign.requestRoute();
+		NetworkRoute r2 = sign.requestRoute();
 //		log.debug("Route2 is: " + LogRouteUtils.getNodeRoute(r2));
 		assertNotSame("routes should not be equal to those of ControlInput", this.route2, r2);
 		//however with the setting the nodes should be the same:
@@ -162,14 +162,14 @@ public class VDSSignTest extends TestCase {
 		sign.simulationPrepared();
 		this.controlInput.setNashTime(-1);
 		sign.calculateOutput(this.systemTime);
-		CarRoute r1 = sign.requestRoute();
+		NetworkRoute r1 = sign.requestRoute();
 //		System.out.println("Route1 is: " + LogRouteUtils.getNodeRoute(r1));
 		assertNotSame("routes should not be equal to those of ControlInput", this.route1, r1);
 		//same for route 2
 		this.incrementSystemTime();
 		this.controlInput.setNashTime(1);
 		sign.calculateOutput(this.systemTime);
-		CarRoute r2 = sign.requestRoute();
+		NetworkRoute r2 = sign.requestRoute();
 //		System.out.println("Route2 is: " + LogRouteUtils.getNodeRoute(r2));
 		assertNotSame("routes should not be equal to those of ControlInput", this.route2, r2);
 		List<Node> rl1, rl2;
@@ -197,7 +197,7 @@ public class VDSSignTest extends TestCase {
 		//test control
 		this.controlInput.setNashTime(0);
 		sign.calculateOutput(this.systemTime);
-		CarRoute r = sign.requestRoute();
+		NetworkRoute r = sign.requestRoute();
 //		log.debug("Route is: " + LogRouteUtils.getNodeRoute(r));
 		assertNotSame("routes should not be equal to those of ControlInput", this.route1, r);
 		assertNull("with a nash time of 0 the sign should be switched off!", r);
@@ -253,7 +253,7 @@ public class VDSSignTest extends TestCase {
 		this.controlInput.setNashTime(-1);
 		for (int i = messageHoldTime; i < 3*messageHoldTime; i++) {
 			sign.calculateOutput(i);
-			CarRoute r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route1, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			for (int j = 0; j < r.getNodes().size(); j++) {
@@ -265,7 +265,7 @@ public class VDSSignTest extends TestCase {
 		this.controlInput.setNashTime(1);
 		for (int i = 3*messageHoldTime; i < 5*messageHoldTime; i++) {
 			sign.calculateOutput(i);
-			CarRoute r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route2, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			for (int j = 0; j < r.getNodes().size(); j++) {
@@ -291,7 +291,7 @@ public class VDSSignTest extends TestCase {
 //		log.debug("Route is: " + LogRouteUtils.getNodeRoute(r));
 		for (int i = 0; i < controlEvents * messageHoldTime; i++) {
 			sign.calculateOutput(i);
-			CarRoute r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route1, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			for (int j = 0; j < r.getNodes().size(); j++) {
@@ -305,7 +305,7 @@ public class VDSSignTest extends TestCase {
 		int stop = this.systemTime + controlEvents * messageHoldTime;
 		for (int i = start; i < stop; i++) {
 			sign.calculateOutput(i);
-			CarRoute r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route2, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			for (int j = 0; j < r.getNodes().size(); j++) {
@@ -334,7 +334,7 @@ public class VDSSignTest extends TestCase {
 		stop = this.systemTime + messageHoldTime;
 		for (int i = start; i < stop; i++) {
 			sign.calculateOutput(i);
-			CarRoute r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route2, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			for (int j = 0; j < r.getNodes().size(); j++) {
@@ -348,7 +348,7 @@ public class VDSSignTest extends TestCase {
 		stop = this.systemTime + 3 * messageHoldTime;
 		for (int i = start; i < stop; i++) {
 			sign.calculateOutput(i);
-			CarRoute r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route1, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			for (int j = 0; j < r.getNodes().size(); j++) {
@@ -364,7 +364,7 @@ public class VDSSignTest extends TestCase {
 		stop = this.systemTime + messageHoldTime;
 		for (int i = start; i < stop; i++) {
 			sign.calculateOutput(i);
-			CarRoute r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route1, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			for (int j = 0; j < r.getNodes().size(); j++) {
@@ -378,7 +378,7 @@ public class VDSSignTest extends TestCase {
 		stop = this.systemTime +  3 * messageHoldTime;
 		for (int i = start; i < stop; i++) {
 			sign.calculateOutput(i);
-			CarRoute r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route2, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			for (int j = 0; j < r.getNodes().size(); j++) {

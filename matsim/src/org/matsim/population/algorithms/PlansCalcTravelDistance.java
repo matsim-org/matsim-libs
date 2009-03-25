@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -95,7 +95,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 			ArrayList<Node> nodes = new ArrayList<Node>();
 			nodes.add(startnode);
 
-			CarRoute route = (CarRoute) leg.getRoute();
+			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			if (route == null) throw new Exception("route missing");
 			nodes.addAll(route.getNodes());
 

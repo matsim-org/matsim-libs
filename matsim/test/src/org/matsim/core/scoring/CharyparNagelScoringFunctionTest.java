@@ -25,7 +25,7 @@ import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -98,13 +98,13 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		try {
 			this.plan.createAct("h", link1);
 			Leg leg = this.plan.createLeg(Mode.car);
-			CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
+			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
 			leg.setRoute(route);
 			route.setDistance(25000.0);
 			route.setTravelTime(0.5*3600);
 			this.plan.createAct("w", link3);
 			leg = this.plan.createLeg(Mode.pt);
-			route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link3, link5);
+			route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link3, link5);
 			leg.setRoute(route);
 			route.setDistance(20000.0);
 			route.setTravelTime(0.25*3600);

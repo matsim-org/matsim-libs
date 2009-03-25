@@ -28,7 +28,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -120,7 +120,7 @@ public class WithindayAgent extends PersonAgent {
 				//as replanning is rerouting agents will only replan if they are on the road and not on the link of the next activity
 				if (isEnRoute()) {
 					//only reroute if the RouteProvider provides a route
-					CarRoute subRoute = ((CarRoute) this.getCurrentLeg().getRoute()).getSubRoute(currentToNode, currentDestinationNode);
+					NetworkRoute subRoute = ((NetworkRoute) this.getCurrentLeg().getRoute()).getSubRoute(currentToNode, currentDestinationNode);
 					if (this.desireGenerationFunction.providesRoute(currentLink, subRoute)) {
 						this.reroute();
 					}
@@ -148,7 +148,7 @@ public class WithindayAgent extends PersonAgent {
 		Link currentLink = this.getCurrentLink();
 		Activity nextAct = this.getPerson().getSelectedPlan().getNextActivity(this.getCurrentLeg());
 		Link destinationLink = nextAct.getLink();
-		CarRoute alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
+		NetworkRoute alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
 		Plan oldPlan = this.getPerson().getSelectedPlan();
 		Leg currentLeg = this.getCurrentLeg();
 		Route oldRoute = currentLeg.getRoute();
@@ -156,7 +156,7 @@ public class WithindayAgent extends PersonAgent {
 		//create Route of already passed Nodes
 		//TODO dg use Route.getSubroute method
 		Node lastPassedNode = currentLink.getFromNode();
-		List<Node> oldRouteNodes = ((CarRoute) currentLeg.getRoute()).getNodes();
+		List<Node> oldRouteNodes = ((NetworkRoute) currentLeg.getRoute()).getNodes();
 		int lastPassedNodeIndex = oldRouteNodes.indexOf(lastPassedNode);
 		//this in fact a bit sophisticated construction is needed because Route.setNode(..) doesn't use the List interface and
 		//is bound to a ArrayList instead
@@ -183,7 +183,7 @@ public class WithindayAgent extends PersonAgent {
     ArrayList<Node> newRouteConcatedList = new ArrayList<Node>(passedNodesList.size() + alternativeRoute.getNodes().size());
     newRouteConcatedList.addAll(passedNodesList);
     newRouteConcatedList.addAll(alternativeRoute.getNodes());
-    CarRoute newRoute = (CarRoute) ((NetworkLayer) currentLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, oldRoute.getStartLink(), oldRoute.getEndLink());
+    NetworkRoute newRoute = (NetworkRoute) ((NetworkLayer) currentLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, oldRoute.getStartLink(), oldRoute.getEndLink());
     newRoute.setNodes(oldRoute.getStartLink(), newRouteConcatedList, oldRoute.getEndLink());
     //put the new route in the leg and the leg in the plan
     newLeg.setRoute(newRoute);

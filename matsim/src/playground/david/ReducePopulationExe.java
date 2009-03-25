@@ -29,7 +29,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -90,7 +90,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 					Leg l = (Leg) actl.get(i);
 					if(l.getMode().equals(BasicLeg.Mode.car) && l.getRoute() != null){
 						
-						List<Link> ll = ((CarRoute) l.getRoute()).getLinks();
+						List<Link> ll = ((NetworkRoute) l.getRoute()).getLinks();
 						for(Link link : ll) {
 							usedlinkList.add(link);
 						}

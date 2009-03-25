@@ -27,7 +27,7 @@ import java.util.Date;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -135,7 +135,7 @@ public class ItsumoSim extends ExternalMobsim {
 							System.err.println ( " WARNING: Empty route.  Not sure if itsumo can deal with this.  Continuing anyway ... " ) ;
 							continue ;
 						}
-						CarRoute rr = (CarRoute) leg.getRoute();
+						NetworkRoute rr = (NetworkRoute) leg.getRoute();
 						for (Link link : rr.getLinks()) {
 							out.write("    <route>"); out.newLine();
 							out.write("     <laneset>" + link.getId() + "</laneset>"); out.newLine();

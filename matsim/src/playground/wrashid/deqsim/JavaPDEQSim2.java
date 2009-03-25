@@ -26,7 +26,7 @@ import java.util.List;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -155,7 +155,7 @@ public class JavaPDEQSim2 {
 					bucketCount[getZone(act.getLink().getFromNode().getCoord().getX(),bucketBoundries)]++;
 				} else {
 					leg = (Leg) actsLegs.get(i);
-					List<Link> links = ((CarRoute) leg.getRoute()).getLinks();
+					List<Link> links = ((NetworkRoute) leg.getRoute()).getLinks();
 
 
 

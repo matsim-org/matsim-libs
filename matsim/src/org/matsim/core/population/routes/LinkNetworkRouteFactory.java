@@ -27,10 +27,10 @@ import org.matsim.core.api.population.Route;
 /**
  * @author mrieser
  */
-public class LinkCarRouteFactory implements RouteFactory {
+public class LinkNetworkRouteFactory implements RouteFactory {
 
 	public Route createRoute(Link startLink, Link endLink) {
-		return new LinkCarRoute(startLink, endLink);
+		return new LinkNetworkRoute(startLink, endLink);
 	}
 
 }

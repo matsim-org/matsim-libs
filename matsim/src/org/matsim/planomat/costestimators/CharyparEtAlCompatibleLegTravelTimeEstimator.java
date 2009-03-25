@@ -23,7 +23,7 @@ package org.matsim.planomat.costestimators;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -64,7 +64,7 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimator extends FixedRouteLegT
 
 		now = this.processDeparture(actOrigin.getLink(), now);
 		now = this.processLink(actOrigin.getLink(), now);
-		now = this.processRouteTravelTime((CarRoute) legIntermediate.getRoute(), now);
+		now = this.processRouteTravelTime((NetworkRoute) legIntermediate.getRoute(), now);
 		
 		double legTravelTimeEstimation = now - departureTime;
 

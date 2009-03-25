@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.withinday.routeprovider.AStarLandmarksRouteProvider;
 import org.matsim.withinday.routeprovider.AbstractRouteProvider;
 import org.matsim.withinday.routeprovider.HierarchicalRouteProvider;
@@ -43,7 +43,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 
 //	private VDSSign currentSign;
 
-	private CarRoute currentRoute;
+	private NetworkRoute currentRoute;
 
 	private HierarchicalRouteProvider hierarchicalProvider;
 
@@ -56,9 +56,9 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 	/**
 	 *
 	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.core.api.network.Link,
-	 *      org.matsim.core.api.population.CarRoute)
+	 *      org.matsim.core.api.population.NetworkRoute)
 	 */
-	public boolean providesRoute(final Link currentLink, final CarRoute subRoute) {
+	public boolean providesRoute(final Link currentLink, final NetworkRoute subRoute) {
 		for (VDSSign s : this.signs) {
 			log.trace("signLink: " + s.getSignLink().getId() + " currentLInk: " + currentLink.getId());
 			if (s.getSignLink().equals(currentLink) && containsLink(subRoute, s.getDirectionLinks())) {
@@ -75,7 +75,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 
 	}
 
-	private boolean containsLink(final CarRoute subRoute, final Link directionLink) {
+	private boolean containsLink(final NetworkRoute subRoute, final Link directionLink) {
 		// this should be the natural way of testing if a route contains a link
 		for (Link l : subRoute.getLinks()) {
 			if (l.equals(directionLink)) {
@@ -96,12 +96,12 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 	}
 
 	@Override
-	public CarRoute requestRoute(final Link departureLink, final Link destinationLink, final double time) {
+	public NetworkRoute requestRoute(final Link departureLink, final Link destinationLink, final double time) {
 		if (this.currentRoute != null) {
 			CurrentSignRouteProvider current = new CurrentSignRouteProvider(
 					this.currentRoute);
 			this.hierarchicalProvider.addRouteProvider(current);
-			CarRoute ret = this.hierarchicalProvider.requestRoute(departureLink,
+			NetworkRoute ret = this.hierarchicalProvider.requestRoute(departureLink,
 					destinationLink, time);
 			this.hierarchicalProvider.removeRouteProvider(current);
 			return ret;
@@ -111,9 +111,9 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 
 	private static class CurrentSignRouteProvider implements RouteProvider {
 
-		private CarRoute route;
+		private NetworkRoute route;
 
-		CurrentSignRouteProvider(final CarRoute route) {
+		CurrentSignRouteProvider(final NetworkRoute route) {
 			this.route = route;
 		}
 
@@ -121,11 +121,11 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 			return 10;
 		}
 
-		public boolean providesRoute(final Link currentLink, final CarRoute subRoute) {
+		public boolean providesRoute(final Link currentLink, final NetworkRoute subRoute) {
 			return true;
 		}
 
-		public CarRoute requestRoute(final Link departureLink,
+		public NetworkRoute requestRoute(final Link departureLink,
 				final Link destinationLink, final double time) {
 			return this.route;
 		}

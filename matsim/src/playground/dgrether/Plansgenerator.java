@@ -24,7 +24,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -38,7 +38,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandlerImplV4;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 
@@ -86,7 +86,7 @@ public class Plansgenerator {
 			a.setEndTime(homeEndtime);
 			//leg to work
 			Leg leg = plan.createLeg(Mode.car);
-			CarRoute route = new NodeCarRoute(link1, link20);
+			NetworkRoute route = new NodeNetworkRoute(link1, link20);
 			route.setNodes(link1, NetworkUtils.getNodes(networkLayer, "2 4 5"), link20);
 			leg.setRoute(route);
 			//work
@@ -95,7 +95,7 @@ public class Plansgenerator {
 			a.setDuration(2.5 * 3600);
 			//leg to work
 			leg = plan.createLeg(Mode.car);
-			route = new NodeCarRoute(link20, link1);
+			route = new NodeNetworkRoute(link20, link1);
 			route.setNodes(link20, NetworkUtils.getNodes(networkLayer, "13 14 15 1"), link1);
 			leg.setRoute(route);
 			a = plan.createAct("h", homeCoord);

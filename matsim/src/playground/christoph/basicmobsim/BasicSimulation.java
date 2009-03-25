@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -154,7 +154,7 @@ public class BasicSimulation {
 			}	// while(!currentLink.equals(destinationLink))
 			
 			// gefahrene Route im aktuellen Leg des Agenten hinterlegen
-			((CarRoute) leg.getRoute()).setNodes(routeNodes);
+			((NetworkRoute) leg.getRoute()).setNodes(routeNodes);
 			//Route newRoute = new Route();
 			//newRoute.setRoute(routeNodes);
 			//leg.setRoute(newRoute);

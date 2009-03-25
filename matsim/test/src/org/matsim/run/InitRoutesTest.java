@@ -24,7 +24,7 @@ import java.io.File;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -97,7 +97,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
 		Plan plan2 = person2.getPlans().get(0);
 		Leg leg2 = (Leg) plan2.getPlanElements().get(1);
-		CarRoute route2 = (CarRoute) leg2.getRoute();
+		NetworkRoute route2 = (NetworkRoute) leg2.getRoute();
 		assertNotNull("no route assigned.", route2);
 		assertEquals("wrong route", 3, route2.getNodes().size());
 	}

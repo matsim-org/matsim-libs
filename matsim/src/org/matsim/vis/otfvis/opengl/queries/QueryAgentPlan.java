@@ -34,7 +34,7 @@ import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -94,7 +94,7 @@ public class QueryAgentPlan implements OTFQuery {
 				Leg leg = (Leg)o;
 
 				if (leg.getMode().equals(Mode.car)) {
-					List<Link> route = ((CarRoute) leg.getRoute()).getLinks();
+					List<Link> route = ((NetworkRoute) leg.getRoute()).getLinks();
 					count += route.size();
 					if(route.size() != 0) count++; //add last position if there is a path
 				}
@@ -140,7 +140,7 @@ public class QueryAgentPlan implements OTFQuery {
 
 				if (leg.getMode().equals(Mode.car)) {
 					Node last = null;
-					for (Link driven : ((CarRoute) leg.getRoute()).getLinks()) {
+					for (Link driven : ((NetworkRoute) leg.getRoute()).getLinks()) {
 						Node node = driven.getFromNode();
 						last = driven.getToNode();
 						setCoord(pos++, node.getCoord(), carColor);

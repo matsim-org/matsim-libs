@@ -27,7 +27,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.router.AStarLandmarks;
@@ -78,7 +78,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 		final int TOLL_INDEX = 0;
 		final int NOTOLL_INDEX = 1;
 		final int nofLegs = (actslegs.size() - 1) / 2;
-		CarRoute[][] routes = new CarRoute[2][nofLegs];
+		NetworkRoute[][] routes = new NetworkRoute[2][nofLegs];
 		double[][] depTimes = new double[2][nofLegs];
 		boolean[] isCarLeg = new boolean[nofLegs];
 
@@ -113,8 +113,8 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 				Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 				Node endNode = toLink.getFromNode(); // the target is the start of the link
 
-				CarRoute tollRoute = (CarRoute) ((Network) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, fromLink, toLink);
-				CarRoute noTollRoute = null;
+				NetworkRoute tollRoute = (NetworkRoute) ((Network) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, fromLink, toLink);
+				NetworkRoute noTollRoute = null;
 
 				// # start searching a route where agent may pay the toll
 				boolean tollRouteInsideTollArea = false;
@@ -145,7 +145,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 					 * will still be a route returned.
 					 */
 					Path path = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
-					noTollRoute = (CarRoute) ((Network) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, fromLink, toLink);
+					noTollRoute = (NetworkRoute) ((Network) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, fromLink, toLink);
 					noTollRoute.setNodes(fromLink, path.nodes, toLink);
 					noTollRoute.setTravelTime((int) path.travelTime);
 					noTollRoute.setTravelCost(path.travelCost);

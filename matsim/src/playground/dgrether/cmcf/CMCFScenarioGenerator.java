@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -37,7 +37,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.dgrether.DgPaths;
@@ -182,7 +182,7 @@ public class CMCFScenarioGenerator {
 			act1.setEndTime(homeEndTime);
 			//leg to home
 			Leg leg = plan.createLeg(BasicLeg.Mode.car);
-			CarRoute route = new NodeCarRoute(l1, l6);
+			NetworkRoute route = new NodeNetworkRoute(l1, l6);
 			if (isAlternativeRouteEnabled) {
 				route.setNodes(l1, NetworkUtils.getNodes(this.network, "2 3 4 5 6"), l6);
 			}

@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
@@ -133,7 +133,7 @@ public class PlanScore implements AgentContentment {
 		double totalDistance = 0;
 		double length = 0;
 
-		List<Link> route = ((CarRoute) leg.getRoute()).getLinks();
+		List<Link> route = ((NetworkRoute) leg.getRoute()).getLinks();
 		int posInRoute = 0;
 		//determine the actual position in the route
 		for (int j = 0; j < route.size(); j++) {

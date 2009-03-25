@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
@@ -56,7 +56,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 		events.addHandler(linkTravelTimeEstimator);
 		events.printEventHandlers();
 
-		CarRoute route = (CarRoute) testLeg.getRoute();
+		NetworkRoute route = (NetworkRoute) testLeg.getRoute();
 		List<Link> links = route.getLinks();
 
 		// let's test a route without events first

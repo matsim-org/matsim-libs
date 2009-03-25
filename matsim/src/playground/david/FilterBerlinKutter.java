@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -73,7 +73,7 @@ class FilterPersons extends AbstractPersonAlgorithm{
 				Leg leg = (Leg)plan.getPlanElements().get(jj);
 				// route
 				if (leg.getRoute() != null) {
-					List<Node> nodes = ((CarRoute) leg.getRoute()).getNodes();
+					List<Node> nodes = ((NetworkRoute) leg.getRoute()).getNodes();
 					int count = 0;
 					for (Node node : nodes) {
 						if (relevantFromNodes.contains(node)) count++;

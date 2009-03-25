@@ -27,7 +27,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -204,7 +204,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			Leg leg1 = plan1.createLeg(BasicLeg.Mode.car);
 			leg1.setDepartureTime(departureTime);
 			leg1.setTravelTime(10);
-			CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, depLink, destLink);
+			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, depLink, destLink);
 			route.setNodes(depLink, NetworkUtils.getNodes(network, "2 3"), destLink);
 			leg1.setRoute(route);
 			plan1.createAct("w", destLink);

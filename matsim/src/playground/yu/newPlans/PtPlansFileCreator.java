@@ -10,7 +10,7 @@ import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -22,7 +22,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -149,7 +149,7 @@ public class PtPlansFileCreator {
 			a.setEndTime(Time.parseTime(endTime));
 			Leg leg = pl.createLeg(Mode.car);
 			leg.setDepartureTime(Time.parseTime(endTime));
-			CarRoute route = new NodeCarRoute();
+			NetworkRoute route = new NodeNetworkRoute();
 			leg.setRoute(route);
 			Link endLink = this.network.getLink(new IdImpl(endLinkId));
 			pl.createAct("w", endLink);

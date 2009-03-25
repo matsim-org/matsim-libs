@@ -28,7 +28,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Route;
-import org.matsim.core.population.routes.NodeCarRouteFactory;
+import org.matsim.core.population.routes.NodeNetworkRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
 
 /**
@@ -42,7 +42,7 @@ public class NetworkFactory {
 
 	public NetworkFactory() {
 		this.linkFactory = new LinkFactoryImpl();
-		this.routeFactories.put(BasicLeg.Mode.car, new NodeCarRouteFactory());
+		this.routeFactories.put(BasicLeg.Mode.car, new NodeNetworkRouteFactory());
 	}
 
 	public Node createNode(final Id id, final Coord coord, final String type) {

@@ -31,7 +31,7 @@ import java.util.LinkedList;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -65,7 +65,7 @@ public class CalcRouteSets {
 		if (o.getId().equals(d.getId())) { return; }
 
 		System.out.println("  create route set...");
-		LinkedList<CarRoute> routes = gen.calcRouteSet(o,d,nof_routes,time,var_factor, localRoutes_factor);
+		LinkedList<NetworkRoute> routes = gen.calcRouteSet(o,d,nof_routes,time,var_factor, localRoutes_factor);
 		System.out.println("  done.");
 
 		System.out.println("  write route set file...");
@@ -123,10 +123,10 @@ public class CalcRouteSets {
 		}
 	}
 
-	public static void printRoutes(Node o, Node d, LinkedList<CarRoute> routes) {
-		Iterator<CarRoute> r_it = routes.iterator();
+	public static void printRoutes(Node o, Node d, LinkedList<NetworkRoute> routes) {
+		Iterator<NetworkRoute> r_it = routes.iterator();
 		while (r_it.hasNext()) {
-			CarRoute r = r_it.next();
+			NetworkRoute r = r_it.next();
 			for (Link l : r.getLinks()) {
 				System.out.print(l.getId() + "\t");
 			}
@@ -134,13 +134,13 @@ public class CalcRouteSets {
 		}
 	}
 
-	public static void writeRouteSetFile(Integer id, Node o, Node d, LinkedList<CarRoute> routes) {
+	public static void writeRouteSetFile(Integer id, Node o, Node d, LinkedList<NetworkRoute> routes) {
 		try {
 			out.flush();
 			boolean is_first = true;
-			Iterator<CarRoute> r_it = routes.iterator();
+			Iterator<NetworkRoute> r_it = routes.iterator();
 			while (r_it.hasNext()) {
-				CarRoute r = r_it.next();
+				NetworkRoute r = r_it.next();
 				out.write(id.toString());
 				out.write("\t" + o.getId());
 				out.write("\t" + d.getId());

@@ -31,7 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -119,7 +119,7 @@ public class PlanChecker extends AbstractPersonAlgorithm {
 			StringBuilder text = new StringBuilder("\t");
 			for (LegIterator it = pl.getIteratorLeg(); it.hasNext();) {
 				Leg l = (Leg) it.next();
-				CarRoute r = (CarRoute) l.getRoute();
+				NetworkRoute r = (NetworkRoute) l.getRoute();
 				text.append(r.getDistance() + "\t" + r.getTravelTime() + "\t");
 			}
 			try {

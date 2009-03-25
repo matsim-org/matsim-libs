@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkCarRouteFactory.java
+ * CompressedCarRouteFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,29 +20,33 @@
 
 package org.matsim.core.population.routes;
 
+import java.util.Map;
+
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Route;
+import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 
+public class CompressedNetworkRouteFactory implements RouteFactory {
 
-/**
- * Creates new instances of {@link NodeCarRoute}.
- * 
- * @author mrieser
- */
-public class NodeCarRouteFactory implements RouteFactory {
-
-
-	public Route createRoute(Link startLink, Link endLink) {
-		return new NodeCarRoute(startLink, endLink);
-	}
+	private final Map<Link, Link> subsequentLinks;
 
 	/**
-	 * Method only available for backward compatibility. Make use
-	 * of createRoute(Link, Link) method if possible.
+	 * Uses {@link SubsequentLinksAnalyzer} to get the map of subsequent links,
+	 * used to compress the route information stored.
+	 *
+	 * @param network
 	 */
-	@Deprecated
-	public Route createRoute() {
-		return new NodeCarRoute();
+	public CompressedNetworkRouteFactory(final Network network) {
+		this(new SubsequentLinksAnalyzer(network).getSubsequentLinks());
+	}
+
+	public CompressedNetworkRouteFactory(final Map<Link, Link> subsequentLinks) {
+		this.subsequentLinks = subsequentLinks;
+	}
+
+	public Route createRoute(Link startLink, Link endLink) {
+		return new CompressedNetworkRoute(startLink, endLink, this.subsequentLinks);
 	}
 
 }

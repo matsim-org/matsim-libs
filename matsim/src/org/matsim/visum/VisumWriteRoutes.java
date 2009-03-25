@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -71,7 +71,7 @@ public class VisumWriteRoutes extends AbstractPersonAlgorithm implements PlanAlg
 		for (int i = 1; i < plan.getPlanElements().size(); i += 2) {
 			Leg leg = (Leg)plan.getPlanElements().get(i);
 			StringBuilder visum = new StringBuilder();
-			List<Node> route = ((CarRoute) leg.getRoute()).getNodes();
+			List<Node> route = ((NetworkRoute) leg.getRoute()).getNodes();
 
 			if (route.size() > 0) {
 				ArrayList<Location> locs = this.tvzLayer.getNearestLocations(route.get(0).getCoord(), null);

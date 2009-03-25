@@ -39,7 +39,7 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -312,7 +312,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			events.remove(event.getAgent());
 			double triptime = event.getTime() - e.getTime();
 			traveltimes.put(event.getAgent(), triptime);
-			if (((CarRoute) ((Leg)event.getAgent().getSelectedPlan().getPlanElements().get(1)).getRoute()).getNodes().get(1).getId().toString().equals("3")) {
+			if (((NetworkRoute) ((Leg)event.getAgent().getSelectedPlan().getPlanElements().get(1)).getRoute()).getNodes().get(1).getId().toString().equals("3")) {
 				riskyTriptime += triptime;
 				if(controler.getIteration() % 2 == 0) { //FIXME: needs to be consistent with IncidentGenerator!!!
 					// bad day

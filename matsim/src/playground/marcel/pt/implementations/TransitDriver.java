@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 
 import playground.marcel.pt.integration.TransitConstants;
@@ -41,7 +41,7 @@ public class TransitDriver {
 
 		private final List<Facility> stops;
 		private final List<Link> linkRoute;
-		private final CarRoute carRoute;
+		private final NetworkRoute carRoute;
 		private final double departureTime;
 
 		private Vehicle vehicle = null;
@@ -56,7 +56,7 @@ public class TransitDriver {
 			for (TransitRouteStop stop : route.getStops()) {
 				this.stops.add(stop.getStopFacility());
 			}
-			this.carRoute = (CarRoute) route.getRoute();
+			this.carRoute = (NetworkRoute) route.getRoute();
 			List<Link> links = carRoute.getLinks();
 			this.linkRoute = new ArrayList<Link>(2 + links.size());
 			this.linkRoute.add(carRoute.getStartLink());
@@ -127,7 +127,7 @@ public class TransitDriver {
 			return this.departureTime;
 		}
 		
-		public CarRoute getCarRoute() {
+		public NetworkRoute getCarRoute() {
 			return this.carRoute;
 		}
 }

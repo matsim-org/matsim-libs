@@ -28,13 +28,13 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 
-public class NodeCarRoute extends AbstractRoute implements CarRoute {
+public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 
 	protected final ArrayList<Node> route = new ArrayList<Node>();
 
@@ -47,13 +47,13 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 	 * start and the end link of a Route correctly.
 	 */
 	@Deprecated
-	public NodeCarRoute(){}
+	public NodeNetworkRoute(){}
 	
-	public NodeCarRoute(Link startLink, Link endLink) {
+	public NodeNetworkRoute(Link startLink, Link endLink) {
 		super(startLink, endLink);
 	}
 
-	public NodeCarRoute(final CarRoute route) {
+	public NodeNetworkRoute(final NetworkRoute route) {
 		super(route.getStartLink(), route.getEndLink());
 		super.setDistance(route.getDistance());
 		super.setTravelTime(route.getTravelTime());
@@ -219,7 +219,7 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 	 * @return a route leading from <code>fromNode</code> to <code>toNode</code> along this route
 	 * @throws IllegalArgumentException if <code>fromNode</code> or <code>toNode</code> are not part of this route
 	 */
-	public CarRoute getSubRoute(final Node fromNode, final Node toNode) {
+	public NetworkRoute getSubRoute(final Node fromNode, final Node toNode) {
 		Link fromLink = getStartLink();
 		Link toLink = getEndLink();
 		int fromIndex = -1;
@@ -286,7 +286,7 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 				throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
 			}
 		}
-		NodeCarRoute ret = new NodeCarRoute();
+		NodeNetworkRoute ret = new NodeNetworkRoute();
 		ret.setNodes(fromLink, this.route.subList(fromIndex, toIndex + 1), toLink);
 		return ret;
 	}

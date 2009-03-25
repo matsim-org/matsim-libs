@@ -21,16 +21,16 @@
 package org.matsim.core.population.routes;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.CarRoute;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 
 /**
  * @author mrieser
  */
 public class NodeCarRouteTest extends AbstractCarRouteTest {
 
-	public CarRoute getCarRouteInstance(final Link fromLink, final Link toLink) {
-		return new NodeCarRoute(fromLink, toLink);
+	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink) {
+		return new NodeNetworkRoute(fromLink, toLink);
 	}
 	
 }

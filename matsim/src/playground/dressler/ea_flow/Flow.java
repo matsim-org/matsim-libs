@@ -40,7 +40,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.LinkCarRoute;
+import org.matsim.core.population.routes.LinkNetworkRoute;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
@@ -643,7 +643,7 @@ public class Flow {
 				
 				//if (!emptylegs) { 
 					// normal case, write the routes!
-					LinkCarRoute route;
+					LinkNetworkRoute route;
 					
 					Node firstnode  = _network.getLink(ids.get(0)).getFromNode();
 					
@@ -672,7 +672,7 @@ public class Flow {
 //						route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
 						Link startLink = _network.getLink(ids.get(0));
 						Link endLink = _network.getLink(ids.get(ids.size()-1));
-						route = new LinkCarRoute(startLink, endLink);
+						route = new LinkNetworkRoute(startLink, endLink);
 						
 						List<Link> routeLinks = null;
 						if (ids.size() > 1) {

@@ -65,7 +65,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -510,7 +510,7 @@ public class MyRuns {
 			for (final Plan plan : person.getPlans()) {
 				for (int i = 1, max = plan.getPlanElements().size(); i < max; i +=2) {
 					final Leg leg = (Leg)plan.getPlanElements().get(i);
-					final CarRoute route = (CarRoute) leg.getRoute();
+					final NetworkRoute route = (NetworkRoute) leg.getRoute();
 					final List<Node> nodes = route.getNodes();
 					final int fromNodeIdx = nodes.indexOf(fromNode);
 					final int toNodeIdx = nodes.indexOf(toNode);
@@ -1615,11 +1615,11 @@ public class MyRuns {
 							final List actslegs = plan.getPlanElements();
 							for (int i = 1, max = actslegs.size(); i < max; i+=2) {
 								final Leg leg = (Leg)actslegs.get(i);
-								run((CarRoute) leg.getRoute(), leg.getDepartureTime());
+								run((NetworkRoute) leg.getRoute(), leg.getDepartureTime());
 							}
 						}
 
-						public void run(final CarRoute route, final double time) {
+						public void run(final NetworkRoute route, final double time) {
 							if (route == null) return;
 
 							final int hour = (int)time / 3600;

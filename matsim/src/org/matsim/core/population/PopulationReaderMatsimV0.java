@@ -31,7 +31,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -69,7 +69,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	private Person currperson = null;
 	private Plan currplan = null;
 	private Leg currleg = null;
-	private CarRoute currroute = null;
+	private NetworkRoute currroute = null;
 
 	private Activity prevAct = null;
 	private String routeNodes = null;
@@ -200,7 +200,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute() {
-		this.currroute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, this.prevAct.getLink(), this.prevAct.getLink());
+		this.currroute = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, this.prevAct.getLink(), this.prevAct.getLink());
 		this.currleg.setRoute(this.currroute);
 	}
 

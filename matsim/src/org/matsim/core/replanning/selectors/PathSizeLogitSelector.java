@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -105,7 +105,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 			while (it.hasNext()){
 					Leg leg = ((Leg)it.next());
 					currentEndTime = leg.getDepartureTime();
-					CarRoute r = (CarRoute) leg.getRoute();
+					NetworkRoute r = (NetworkRoute) leg.getRoute();
 					pathSize += r.getDistance();
 					for (Link link : r.getLinks()){
 						ArrayList<Double> lit = linksInTime.get(link.getId());
@@ -128,7 +128,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 			while(it.hasNext()){
 				Leg leg = (Leg) it.next();
 				double currentTime = leg.getDepartureTime();
-				CarRoute route = (CarRoute) leg.getRoute();
+				NetworkRoute route = (NetworkRoute) leg.getRoute();
 				for (Link link : route.getLinks()){
 					double denominator = 0;
 					for (double dbl : linksInTime.get(link.getId())){

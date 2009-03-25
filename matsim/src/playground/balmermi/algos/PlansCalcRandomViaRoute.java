@@ -26,13 +26,13 @@ import java.util.List;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -213,7 +213,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		if (path2 != null) {
 			nodes.addAll(path2.nodes);
 		}
-		CarRoute route = new NodeCarRoute();
+		NetworkRoute route = new NodeNetworkRoute();
 		route.setStartLink(fromLink);
 		route.setEndLink(toLink);
 		route.setNodes(nodes);
@@ -241,7 +241,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		double speed = 3.0 / 3.6; // 3.0 km/h --> m/s
 //	 create an empty route, but with realistic traveltime
-		CarRoute route = new NodeCarRoute();
+		NetworkRoute route = new NodeNetworkRoute();
 		int travTime = (int)(dist / speed);
 		route.setTravelTime(travTime);
 		leg.setRoute(route);
@@ -256,7 +256,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		double speed = 15.0 / 3.6; // 15.0 km/h --> m/s
 //	 create an empty route, but with realistic traveltime
-		CarRoute route = new NodeCarRoute();
+		NetworkRoute route = new NodeNetworkRoute();
 		int travTime = (int)(dist / speed);
 		route.setTravelTime(travTime);
 		leg.setRoute(route);
@@ -271,7 +271,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		double speed = 50.0 / 3.6; // 50.0 km/h --> m/s
 //	 create an empty route, but with realistic traveltime
-		CarRoute route = new NodeCarRoute();
+		NetworkRoute route = new NodeNetworkRoute();
 		int travTime = (int)(dist / speed);
 		route.setTravelTime(travTime);
 		leg.setRoute(route);

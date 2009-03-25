@@ -20,7 +20,7 @@
 
 package org.matsim.withinday.trafficmanagement.controlinput;
 
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
@@ -46,7 +46,7 @@ public class ControlInputImpl1 extends AbstractControlInputImpl implements
 	public ControlInputImpl1() {}
 
 	@Override
-	public double getPredictedNashTime(CarRoute route) {
+	public double getPredictedNashTime(NetworkRoute route) {
 		if (route.equals(this.mainRoute)) {
 			return this.lastTimeMainRoute;
 		}

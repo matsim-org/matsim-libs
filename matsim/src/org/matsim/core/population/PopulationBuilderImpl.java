@@ -32,7 +32,7 @@ import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -40,7 +40,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.LinkCarRoute;
+import org.matsim.core.population.routes.LinkNetworkRoute;
 
 /**
  * @author dgrether
@@ -109,7 +109,7 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		if (end == null) {
 			throw new IllegalStateException("Cann't create Route with EndLink Id " + startLinkId + " because the Link cannot be found in the loaded Network.");
 		}
-		CarRoute route = new LinkCarRoute(start, end);
+		NetworkRoute route = new LinkNetworkRoute(start, end);
 		List<Link> links = new ArrayList<Link>();
 		Link link;
 		for (Id id : currentRouteLinkIds) {

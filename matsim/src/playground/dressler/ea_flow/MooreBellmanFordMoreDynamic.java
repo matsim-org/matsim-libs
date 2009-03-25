@@ -28,9 +28,9 @@ import java.util.Queue;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -238,7 +238,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
 	 *      org.matsim.core.api.network.Node, double)
 	 */
-	public CarRoute calcLeastCostPath(final Node fromNode, final Node toNode,
+	public NetworkRoute calcLeastCostPath(final Node fromNode, final Node toNode,
 			final double startTime, HashMap<Link, EdgeIntervalls> flow) {
 
 		this.flow = flow;
@@ -292,7 +292,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 				routeNodes.add(tmpNode);
 			}
 		}
-		CarRoute route = new NodeCarRoute();
+		NetworkRoute route = new NodeNetworkRoute();
 		route.setNodes(routeNodes);
 
 		return route;

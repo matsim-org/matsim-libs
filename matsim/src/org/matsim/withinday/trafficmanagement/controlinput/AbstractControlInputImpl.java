@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.LinkEnterEvent;
@@ -55,9 +55,9 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	private static final Logger log = Logger
 			.getLogger(AbstractControlInputImpl.class);
 
-	protected CarRoute mainRoute;
+	protected NetworkRoute mainRoute;
 
-	protected CarRoute alternativeRoute;
+	protected NetworkRoute alternativeRoute;
 
 	protected Map<String, Integer> numberOfAgents;
 
@@ -131,7 +131,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	}
 
-	public abstract double getPredictedNashTime(CarRoute route);
+	public abstract double getPredictedNashTime(NetworkRoute route);
 
 	public double getNashTime() {
 		try {
@@ -156,23 +156,23 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		this.writer.close();
 	}
 
-	public CarRoute getMainRoute() {
+	public NetworkRoute getMainRoute() {
 		return this.mainRoute;
 	}
 
-	public CarRoute getAlternativeRoute() {
+	public NetworkRoute getAlternativeRoute() {
 		return this.alternativeRoute;
 	}
 
-	public void setAlternativeRoute(final CarRoute route) {
+	public void setAlternativeRoute(final NetworkRoute route) {
 		this.alternativeRoute = route;
 	}
 
-	public void setMainRoute(final CarRoute route) {
+	public void setMainRoute(final NetworkRoute route) {
 		this.mainRoute = route;
 	}
 
-	public int getNumberOfVehiclesOnRoute(final CarRoute route) {
+	public int getNumberOfVehiclesOnRoute(final NetworkRoute route) {
 		int ret = 0;
 		for (Link link : route.getLinks()) {
 			ret += this.numberOfAgents.get(link.getId().toString());
@@ -329,7 +329,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		}
 	}
 
-	public double getFreeSpeedRouteTravelTime(final CarRoute route) {
+	public double getFreeSpeedRouteTravelTime(final NetworkRoute route) {
 		if (route == this.mainRoute)
 			return this.ttFreeSpeedMainRoute;
 		else if (route == this.alternativeRoute)
@@ -338,7 +338,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 			throw new IllegalArgumentException("This route object does not exist!");
 	}
 
-	public double getMeasuredRouteTravelTime(final CarRoute route) {
+	public double getMeasuredRouteTravelTime(final NetworkRoute route) {
 		if (route == this.mainRoute)
 			return this.lastTimeMainRoute;
 		else if (route == this.alternativeRoute)
@@ -347,7 +347,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 			throw new IllegalArgumentException("This route object does not exist!");
 	}
 
-	public Link getNaturalBottleNeck(final CarRoute r) {
+	public Link getNaturalBottleNeck(final NetworkRoute r) {
 		Link naturalBottleNeck;
 		if (r == this.mainRoute) {
 			naturalBottleNeck = this.mainRouteNaturalBottleNeck;
@@ -402,7 +402,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		}
 	}
 
-	protected double sumUpTTFreeSpeed(final Node node, final CarRoute route) {
+	protected double sumUpTTFreeSpeed(final Node node, final NetworkRoute route) {
 
 		double ttFS = 0;
 		for (Link l : route.getLinks()) {
@@ -451,14 +451,14 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	public void reset(final int iteration) {}
 	
-	protected List<Link> getOutlinks(final CarRoute route) {
+	protected List<Link> getOutlinks(final NetworkRoute route) {
 		if (route == this.mainRoute) {
 			return this.outLinksMainRoute;
 		}
 		return this.outLinksAlternativeRoute;
 	}
 
-	protected List<Link> getInlinks(final CarRoute route) {
+	protected List<Link> getInlinks(final NetworkRoute route) {
 		if (route == this.mainRoute) {
 			return this.inLinksMainRoute;
 		}

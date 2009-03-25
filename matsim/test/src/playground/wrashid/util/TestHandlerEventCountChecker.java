@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -89,7 +89,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler  {
 			LegIterator iter=plan.getIteratorLeg();
 			while (iter.hasNext()){
 				Leg leg=(Leg)iter.next();
-				expectedLinkEnterEvents+=((CarRoute) leg.getRoute()).getLinks().size()+1;
+				expectedLinkEnterEvents+=((NetworkRoute) leg.getRoute()).getLinks().size()+1;
 			}
 		}
 		

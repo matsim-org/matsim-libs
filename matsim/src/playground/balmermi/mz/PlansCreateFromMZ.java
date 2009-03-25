@@ -31,7 +31,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -41,7 +41,7 @@ import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class PlansCreateFromMZ {
@@ -223,7 +223,7 @@ public class PlansCreateFromMZ {
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
-					CarRoute route = new NodeCarRoute();
+					NetworkRoute route = new NodeNetworkRoute();
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
@@ -243,7 +243,7 @@ public class PlansCreateFromMZ {
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
-					CarRoute route = new NodeCarRoute(); 
+					NetworkRoute route = new NodeNetworkRoute(); 
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());

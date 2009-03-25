@@ -20,11 +20,11 @@
 
 package playground.christoph.router.util;
 
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 
 public class RouteChecker {
 
-	public static boolean checkRoute(CarRoute route)
+	public static boolean checkRoute(NetworkRoute route)
 	{
 		if (route.getLinks() != null) return true;
 		else return false;

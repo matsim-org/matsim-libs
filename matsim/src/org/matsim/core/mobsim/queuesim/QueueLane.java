@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.basic.network.BasicLane;
 import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
@@ -357,7 +357,7 @@ public class QueueLane implements Comparable<QueueLane> {
 			if (!leg.getMode().equals(BasicLeg.Mode.car)) {
 				QueueSimulation.handleUnknownLegMode(veh);
 			} else {
-				if (((CarRoute) leg.getRoute()).getNodes().size() != 0) {
+				if (((NetworkRoute) leg.getRoute()).getNodes().size() != 0) {
 					this.waitingList.add(veh);
 				} else {
 					// this is the case where (hopefully) the next act happens at the same location as this act

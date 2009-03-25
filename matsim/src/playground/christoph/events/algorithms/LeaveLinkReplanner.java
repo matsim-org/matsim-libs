@@ -27,14 +27,14 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
-import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -141,7 +141,7 @@ public class LeaveLinkReplanner {
 		 * Entries with a lower index have already been visited!
 		 */ 
 		int currentNodeIndex = this.personAgent.getCurrentNodeIndex();
-		CarRoute route = (CarRoute) this.leg.getRoute();
+		NetworkRoute route = (NetworkRoute) this.leg.getRoute();
 
 		
 		// create dummy data for the "new" activities
@@ -174,7 +174,7 @@ public class LeaveLinkReplanner {
 		}
 
 		// create new, shortend Route
-		CarRoute subRoute = new NodeCarRoute();
+		NetworkRoute subRoute = new NodeNetworkRoute();
 		subRoute.setNodes(nodesRoute);
 
 		// put the new route in a new leg
@@ -213,18 +213,18 @@ public class LeaveLinkReplanner {
 		replanner.run(newPlan);			
 		
 		// get new calculated Route
-		CarRoute newRoute = (CarRoute) newLeg.getRoute();
+		NetworkRoute newRoute = (NetworkRoute) newLeg.getRoute();
 			
 		// Merge already driven parts of the Route with the new routed parts.
 		nodeBuffer.addAll(newRoute.getNodes());
 		
-		CarRoute mergedRoute = new NodeCarRoute();
+		NetworkRoute mergedRoute = new NodeNetworkRoute();
 		mergedRoute.setNodes(nodeBuffer);
 				
 		// replace Route
 //		leg.setRoute(mergedRoute);
-		((CarRoute) leg.getRoute()).getNodes().clear();
-		((CarRoute) leg.getRoute()).getNodes().addAll(mergedRoute.getNodes());
+		((NetworkRoute) leg.getRoute()).getNodes().clear();
+		((NetworkRoute) leg.getRoute()).getNodes().addAll(mergedRoute.getNodes());
 		
 		// check new created Route
 //		checkRoute(mergedRoute);
@@ -239,7 +239,7 @@ public class LeaveLinkReplanner {
 	/*
 	 * Checks, whether a new created Route is valid or not.
 	 */
-	protected boolean checkRoute(CarRoute route)
+	protected boolean checkRoute(NetworkRoute route)
 	{
 		List<Node> nodes = route.getNodes();
 		

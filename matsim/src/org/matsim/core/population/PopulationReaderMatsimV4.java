@@ -35,7 +35,7 @@ import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -91,7 +91,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private Plan currplan = null;
 	private Activity curract = null;
 	private Leg currleg = null;
-	private CarRoute currroute = null;
+	private NetworkRoute currroute = null;
 	private String routeNodes = null;
 
 	private Activity prevAct = null;
@@ -367,7 +367,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currroute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, this.prevAct.getLink(), this.prevAct.getLink());
+		this.currroute = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, this.prevAct.getLink(), this.prevAct.getLink());
 		this.currleg.setRoute(this.currroute);
 		if (atts.getValue("dist") != null) {
 			this.currroute.setDistance(Double.parseDouble(atts.getValue("dist")));

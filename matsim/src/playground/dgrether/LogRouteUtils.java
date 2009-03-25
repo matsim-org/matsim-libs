@@ -23,7 +23,7 @@ package playground.dgrether;
 import java.util.ArrayList;
 
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 
 
 /**
@@ -32,7 +32,7 @@ import org.matsim.core.api.population.CarRoute;
  */
 public class LogRouteUtils {
 
-	public static String getNodeRoute(final CarRoute r) {
+	public static String getNodeRoute(final NetworkRoute r) {
 		StringBuffer buffer = new StringBuffer();
 		for (Node n : r.getNodes()) {
 			buffer.append(n.getId().toString());

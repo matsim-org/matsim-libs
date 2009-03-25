@@ -28,7 +28,7 @@ import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -90,7 +90,7 @@ public class ControlerTest extends MatsimTestCase {
 		Activity a1 = plan1.createAct("h", link1);
 		a1.setEndTime(7.0*3600);
 		Leg leg1 = plan1.createLeg(Mode.car);
-		CarRoute route1 = (CarRoute)network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
+		NetworkRoute route1 = (NetworkRoute)network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
 		leg1.setRoute(route1);
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		nodes.add(node2);
@@ -104,7 +104,7 @@ public class ControlerTest extends MatsimTestCase {
 		Activity a2 = plan2.createAct("h", link1);
 		a2.setEndTime(7.0*3600);
 		Leg leg2 = plan2.createLeg(Mode.car);
-		CarRoute route2 = (CarRoute)network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
+		NetworkRoute route2 = (NetworkRoute)network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
 		leg2.setRoute(route2);
 		route2.setNodes(link1, nodes, link3);
 		plan2.createAct("h", link3);

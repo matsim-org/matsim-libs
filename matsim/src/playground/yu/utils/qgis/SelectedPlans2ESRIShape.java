@@ -37,7 +37,7 @@ import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -165,7 +165,7 @@ public class SelectedPlans2ESRIShape extends
 		Double arrTime = leg.getArrivalTime();
 		Double dist = leg.getRoute().getDistance();
 
-		List<Link> links = ((CarRoute) leg.getRoute()).getLinks();
+		List<Link> links = ((NetworkRoute) leg.getRoute()).getLinks();
 		Coordinate[] coords = new Coordinate[links.size() + 1];
 		for (int i = 0; i < links.size(); i++) {
 			Coord c = links.get(i).getFromNode().getCoord();

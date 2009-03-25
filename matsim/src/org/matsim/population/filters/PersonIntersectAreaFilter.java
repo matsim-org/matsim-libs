@@ -27,7 +27,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
@@ -86,7 +86,7 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 						return true;
 					}
 				} else {
-					List<Link> links = ((CarRoute) leg.getRoute()).getLinks();
+					List<Link> links = ((NetworkRoute) leg.getRoute()).getLinks();
 					if (links.size() == 0) {
 						if (judgeByBeeline((Activity) plan.getPlanElements().get(i-1), (Activity) plan.getPlanElements().get(i+1))) {
 							return true;
