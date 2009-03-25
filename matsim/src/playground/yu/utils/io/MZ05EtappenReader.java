@@ -19,16 +19,11 @@ import playground.yu.utils.CollectionSum;
  */
 public class MZ05EtappenReader implements TabularFileHandler {
 	private SimpleWriter sw = null;
-
 	private String tmpPersonId = null, tmpPersonKantonZurichId = null;
-
 	private double e_dist_obj = 0.0, e_dist_obj_KantonZurich = 0.0;
-
 	private int eCnt = 0, eCnt_KantonZurich = 0, personCnt = 0,
 			personKantonZurichCnt = 0;
-
 	private Set<Double> tmpEtappenDists = new HashSet<Double>();
-
 	private boolean changePerson = false, belongs2KantonZurich = false;
 
 	/**
@@ -104,6 +99,9 @@ public class MZ05EtappenReader implements TabularFileHandler {
 	}
 
 	public void write() {
+		if (!changePerson) {
+			append();
+		}
 		double avgE_DIST_OBJ = e_dist_obj / (double) eCnt;
 		double avgE_DIST_OBJ_KantonZurich = e_dist_obj_KantonZurich
 				/ (double) eCnt_KantonZurich;
@@ -123,7 +121,7 @@ public class MZ05EtappenReader implements TabularFileHandler {
 	 */
 	public static void main(String[] args) {
 		String etappenFilename = "D:/fromNB04/Archieve/MikroZensus2005/4_DB_ASCII(Sep_TAB)/Etappen.dat";
-		String outputFilename = "../matsimTests/LinearDistance/MZ05linearDistanceEttappen.txt";
+		String outputFilename = "../matsimTests/LinearDistance/MZ05linearDistanceEttappen_2.txt";
 
 		TabularFileParserConfig tfpc = new TabularFileParserConfig();
 		tfpc.setCommentTags(new String[] { "HHNR" });

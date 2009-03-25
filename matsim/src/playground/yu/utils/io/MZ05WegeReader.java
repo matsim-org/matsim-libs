@@ -19,16 +19,11 @@ import playground.yu.utils.CollectionSum;
  */
 public class MZ05WegeReader implements TabularFileHandler {
 	private SimpleWriter sw = null;
-
 	private String tmpPersonId = null, tmpPersonKantonZurichId = null;
-
 	private int personCnt = 0, personKantonZurichCnt = 0, wCnt = 0,
 			wKantonZurichCnt = 0;
-
-	private double w_dist_obj2 = 0.0, w_dist_obj2KantonZurich = 0.0;
-
+	private double w_dist_obj1 = 0.0, w_dist_obj1KantonZurich = 0.0;
 	private Set<Double> tmpWegeDists = new HashSet<Double>();
-
 	private boolean changePerson = false, belongs2KantonZurich = false;
 
 	public MZ05WegeReader(String outputFilename) {
@@ -53,11 +48,11 @@ public class MZ05WegeReader implements TabularFileHandler {
 	private void append() {
 		personCnt++;
 		wCnt += tmpWegeDists.size();
-		w_dist_obj2 += CollectionSum.getSum(tmpWegeDists);
+		w_dist_obj1 += CollectionSum.getSum(tmpWegeDists);
 		if (belongs2KantonZurich) {
 			personKantonZurichCnt++;
 			wKantonZurichCnt += tmpWegeDists.size();
-			w_dist_obj2KantonZurich += CollectionSum.getSum(tmpWegeDists);
+			w_dist_obj1KantonZurich += CollectionSum.getSum(tmpWegeDists);
 		}
 	}
 
@@ -72,9 +67,9 @@ public class MZ05WegeReader implements TabularFileHandler {
 				return;
 		}
 
-		String w_dist_obj2 = row[48];
-		if (w_dist_obj2 != null) {
-			double tmpWegDist = Double.parseDouble(w_dist_obj2);
+		String w_dist_obj1 = row[42];
+		if (w_dist_obj1 != null) {
+			double tmpWegDist = Double.parseDouble(w_dist_obj1);
 			if (tmpWegDist >= 0) {
 				tmpWegeDists.add(new Double(tmpWegDist));
 				if (row[9] != null) {
@@ -101,14 +96,17 @@ public class MZ05WegeReader implements TabularFileHandler {
 	}
 
 	public void write() {
-		double avgW_dist_obj2 = w_dist_obj2 / (double) wCnt;
-		double avgW_dist_obj2KantonZurich = w_dist_obj2KantonZurich
+		if (!changePerson) {
+			append();
+		}
+		double avgW_dist_obj1 = w_dist_obj1 / (double) wCnt;
+		double avgW_dist_obj1KantonZurich = w_dist_obj1KantonZurich
 				/ (double) wKantonZurichCnt;
-		sw.writeln("avg. w_dist_obj2\t" + avgW_dist_obj2 * 1000.0 + "\t"
-				+ avgW_dist_obj2);
-		sw.writeln("avg. w_dist_obj2 (KantonZurich)\t"
-				+ avgW_dist_obj2KantonZurich * 1000.0 + "\t"
-				+ avgW_dist_obj2KantonZurich);
+		sw.writeln("avg. w_dist_obj1\t" + avgW_dist_obj1 * 1000.0 + "\t"
+				+ avgW_dist_obj1);
+		sw.writeln("avg. w_dist_obj1 (KantonZurich)\t"
+				+ avgW_dist_obj1KantonZurich * 1000.0 + "\t"
+				+ avgW_dist_obj1KantonZurich);
 		sw.writeln("\npersons :\t" + personCnt + "\tWege :\t" + wCnt);
 		sw.writeln("persons KantonZurich :\t" + personKantonZurichCnt
 				+ "\tWege KantonZurich :\t" + wKantonZurichCnt);
@@ -120,7 +118,7 @@ public class MZ05WegeReader implements TabularFileHandler {
 	 */
 	public static void main(String[] args) {
 		String wegeFilename = "D:/fromNB04/Archieve/MikroZensus2005/4_DB_ASCII(Sep_TAB)/Wege.dat";
-		String outputFilename = "../matsimTests/LinearDistance/MZ05linearDistanceWege.txt";
+		String outputFilename = "../matsimTests/LinearDistance/MZ05linearDistanceWege_2.txt";
 
 		TabularFileParserConfig tfpc = new TabularFileParserConfig();
 		tfpc.setCommentTags(new String[] { "HHNR" });
@@ -137,5 +135,4 @@ public class MZ05WegeReader implements TabularFileHandler {
 
 		mz05wr.write();
 	}
-
 }

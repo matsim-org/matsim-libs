@@ -39,16 +39,17 @@ import org.matsim.population.PopulationReader;
  * 
  */
 public class DoublePlan extends NewPopulation {
-	private int newPersonId;
+	// private String newPersonId;
+	private Person tmpPerson;
 
 	/**
 	 * Construcktor
 	 * 
-	 * @param plans -
-	 *            a Plans Object, which derives from MATSim plansfile
+	 * @param plans
+	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public DoublePlan(Population plans) {
-		super(plans);
+	public DoublePlan(Population plans, String filename) {
+		super(plans, filename);
 	}
 
 	/**
@@ -59,27 +60,41 @@ public class DoublePlan extends NewPopulation {
 	@Override
 	public void run(Person person) {
 		pw.writePerson(person);
-		// produce new Person with bigger Id
-		for (int i = 0; i < 17; i++) {
-			newPersonId = Integer.parseInt(person.getId().toString()) + 1000;
-			person.setId(new IdImpl(newPersonId));
-			pw.writePerson(person);
-		}
+		tmpPerson = person;
+		String oldId = person.getId().toString();
+		// produce new Person with new Id
+		createNewPerson(oldId + "A");
+		createNewPerson(oldId + "B");
+		createNewPerson(oldId + "C");
+		createNewPerson(oldId + "D");
 	}
+
+	private void createNewPerson(String newId) {
+		tmpPerson.setId(new IdImpl(newId));
+		pw.writePerson(tmpPerson);
+	}
+
 	public static void main(final String[] args) {
-		Config config = Gbl
-				.createConfig(new String[] { "./test/yu/newPlans/newPlans.xml" });
+		Gbl.startMeasurement();
+
+		String networkFilename = "../berlin data/v1/network.xml";
+		String plansFilename = "../berlin data/v2/bln_car_c.xml.gz";
+		String outputPlansFilename = "../berlin data/v2/bln_car_c_5x.xml.gz";
+
+		Config config = Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network()
-				.getInputFile());
+		new MatsimNetworkReader(network).readFile(networkFilename);
 
 		Population population = new PopulationImpl();
-		DoublePlan dp = new DoublePlan(population);
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
-		plansReader.readFile(config.plans().getInputFile());
+		plansReader.readFile(plansFilename);
+
+		DoublePlan dp = new DoublePlan(population, outputPlansFilename);
 		dp.run(population);
 		dp.writeEndPlans();
+
+		Gbl.printElapsedTime();
 	}
 }
