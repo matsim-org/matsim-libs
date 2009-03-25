@@ -25,7 +25,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 public class ActChains {
 

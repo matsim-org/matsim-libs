@@ -24,8 +24,8 @@ package playground.duncan.archive;
 
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
-import org.matsim.facilities.FacilitiesImpl;
-import org.matsim.facilities.MatsimFacilitiesReader;
+import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;

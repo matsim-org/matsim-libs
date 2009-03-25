@@ -25,13 +25,13 @@ import java.util.Iterator;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkCalcTopoType;
-import org.matsim.network.algorithms.NetworkCleaner;
-import org.matsim.network.algorithms.NetworkMergeDoubleLinks;
-import org.matsim.network.algorithms.NetworkSummary;
-import org.matsim.network.algorithms.NetworkWriteAsTable;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.algorithms.NetworkCalcTopoType;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks;
+import org.matsim.core.network.algorithms.NetworkSummary;
+import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 
 public class CleanNetwork {
 

@@ -3,9 +3,9 @@ package playground.wrashid.PDES2.util;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.BasicEventImpl;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.BasicEventImpl;
 // optimized for multiple producer, single consumer
 // the producer decides, when the his inputBuffer should be emptied
 // the parameter maxInputPutListSize can be set large for allowing high cuncurrency, if

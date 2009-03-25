@@ -31,9 +31,9 @@ import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.mobsim.queuesim.DriverAgent;
-import org.matsim.mobsim.queuesim.QueueNode;
-import org.matsim.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.core.mobsim.queuesim.QueueNode;
+import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.routes.NodeCarRoute;
 

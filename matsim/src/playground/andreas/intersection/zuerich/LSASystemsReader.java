@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
-import org.matsim.basic.signalsystems.BasicSignalSystemDefinitionImpl;
-import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition;
+import org.matsim.core.basic.signalsystems.BasicSignalSystemDefinitionImpl;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;

@@ -20,20 +20,20 @@
 
 package playground.mfeil;
 
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.replanning.PlanStrategyModule;
-import org.matsim.replanning.modules.MultithreadedModuleA;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.PreProcessLandmarks;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.modules.MultithreadedModuleA;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.scoring.PlanScorer;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.scoring.PlanScorer;
 import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.planomat.Planomat;
 
@@ -182,10 +182,10 @@ public class RecyclingModule implements PlanStrategyModule {
 			}
 		}
 		
-		int firstCentroid = (int)java.lang.Math.floor(MatsimRandom.random.nextDouble()*this.testAgentsNumber);
+		int firstCentroid = (int)java.lang.Math.floor(MatsimRandom.getRandom().nextDouble()*this.testAgentsNumber);
 		int secondCentroid;
 		do {
-			secondCentroid = (int)java.lang.Math.floor(MatsimRandom.random.nextDouble()*this.testAgentsNumber);
+			secondCentroid = (int)java.lang.Math.floor(MatsimRandom.getRandom().nextDouble()*this.testAgentsNumber);
 		} while (secondCentroid==firstCentroid);
 		
 		System.out.println("firstCentroid = "+firstCentroid+", secondCentroid = "+secondCentroid);

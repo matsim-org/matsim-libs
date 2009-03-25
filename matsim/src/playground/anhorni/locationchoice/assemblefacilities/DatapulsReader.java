@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 public class DatapulsReader {
 	
 	private final static Logger log = Logger.getLogger(DatapulsReader.class);
 	
-	String [] types2add = {"Carrefour", "Manor", "Jelmoli Zürich", "Globus", "Confiserie",
+	String [] types2add = {"Carrefour", "Manor", "Jelmoli Zï¿½rich", "Globus", "Confiserie",
 			"Jumbo Markt AG", "Discounthaus", "Maxi-Supermarkt" };
 	
 	

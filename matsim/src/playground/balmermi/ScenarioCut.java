@@ -37,11 +37,11 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkWriter;
-import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.population.PopulationWriter;
 import org.matsim.utils.geometry.CoordImpl;
 

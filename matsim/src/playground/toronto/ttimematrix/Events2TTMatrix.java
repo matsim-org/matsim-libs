@@ -27,14 +27,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.Events;
-import org.matsim.events.EventsReaderTXTv1;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 
 public class Events2TTMatrix {

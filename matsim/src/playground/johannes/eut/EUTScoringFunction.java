@@ -25,8 +25,8 @@ package playground.johannes.eut;
 
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.scoring.CharyparNagelScoringFunction;
-import org.matsim.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.CharyparNagelScoringFunction;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
 /**
  * @author illenberger

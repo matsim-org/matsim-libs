@@ -7,7 +7,7 @@ import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.misc.Counter;
 
 public class FacilitiesV3Modifier extends Modifier {

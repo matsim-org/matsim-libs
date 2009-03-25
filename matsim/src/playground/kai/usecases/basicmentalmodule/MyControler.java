@@ -1,7 +1,7 @@
 package playground.kai.usecases.basicmentalmodule;
 
-import org.matsim.controler.Controler;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 
 public class MyControler {
 

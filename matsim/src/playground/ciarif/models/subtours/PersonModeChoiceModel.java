@@ -28,13 +28,13 @@ import java.util.Vector;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.geometry.CoordImpl;
@@ -133,13 +133,13 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			// generating a random bike ownership (see STRC2007 paper Ciari for more details)
 //			boolean has_bike = true;
 			boolean has_bike = false;
-			if (MatsimRandom.random.nextDouble() < 0.56) { has_bike = true; }			
+			if (MatsimRandom.getRandom().nextDouble() < 0.56) { has_bike = true; }			
 
 			////////////////////////////////////////////////////////////////////////////////
 			// TODO [balmermi]: Check for antoher probability
 //			boolean ride_possible = true;
 			boolean ride_possible = false;
-			double rd2 = MatsimRandom.random.nextDouble ();
+			double rd2 = MatsimRandom.getRandom().nextDouble ();
 			if (plan.getPerson().hasLicense()) {}
 			else {
 				if (rd2 < 0.60) {ride_possible = true; System.out.println("random = " + rd2);} // should be substituted with car ownership 
@@ -151,7 +151,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			// TODO [balmermi]: Check for antoher probability
 			//boolean pt = true;			
 			boolean pt = false; // Should be substituted with actual access to pt;
-			double rd3 = MatsimRandom.random.nextDouble (); 
+			double rd3 = MatsimRandom.getRandom().nextDouble (); 
 			if (plan.getPerson().getCarAvail().equals("always")) {
 				if (rd3 < 0.45) {pt = true;}
 				System.out.println("pt = " + pt );
@@ -194,7 +194,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			
 			Layer muni_layer = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY);
 			ArrayList<Location> locs = muni_layer.getNearestLocations(sub.getStart_coord());
-			Location loc = locs.get(MatsimRandom.random.nextInt(locs.size()));
+			Location loc = locs.get(MatsimRandom.getRandom().nextInt(locs.size()));
 			Municipality m = municipalities.getMunicipality(new Integer(loc.getId().toString()));
 			int udeg = m.getRegType();
 			//System.out.println ("udeg");

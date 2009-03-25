@@ -23,10 +23,10 @@ package playground.yu.newNetwork;
 import java.util.Set;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkWriter;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkWriter;
 
 import playground.yu.analysis.NetworkLinkIdsInCircle;
 import playground.yu.utils.io.OSMPatchPaser;

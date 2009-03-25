@@ -23,14 +23,14 @@ package playground.wrashid.deqsim;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.config.Config;
-import org.matsim.config.MatsimConfigReader;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.Events;
-import org.matsim.events.parallelEventsHandler.ParallelEvents;
-import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.jdeqsim.JDEQSimulation;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
+import org.matsim.core.network.NetworkLayer;
 
 
 public class DEQSimStarter {

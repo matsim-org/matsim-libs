@@ -30,12 +30,12 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.LocationType;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkFactory;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.LocationType;
+import org.matsim.core.network.NetworkFactory;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 

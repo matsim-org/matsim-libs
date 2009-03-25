@@ -5,7 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
-import org.matsim.gbl.Gbl;
+
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.geometry.CoordImpl;
 
 
@@ -15,23 +16,23 @@ public class BZReader {
 	}
 	
 	/*
-	B015211A = 408;	Verbrauchermärkte (> 2500 m2) 
-	B015211B = 409; Grosse Supermärkte (1000-2499 m2)
-	B015211C = 410;	Kleine Supermärkte (400-999 m2)
-	B015211D = 411;	Grosse Geschäfte (100-399 m2)
+	B015211A = 408;	Verbrauchermï¿½rkte (> 2500 m2) 
+	B015211B = 409; Grosse Supermï¿½rkte (1000-2499 m2)
+	B015211C = 410;	Kleine Supermï¿½rkte (400-999 m2)
+	B015211D = 411;	Grosse Geschï¿½fte (100-399 m2)
 	
-	B015211E = 412;	Kleine Geschäfte (< 100 m2)
-	B015212A = 413; Warenhäuser
+	B015211E = 412;	Kleine Geschï¿½fte (< 100 m2)
+	B015212A = 413; Warenhï¿½user
 	
 	*
-	B015221A = 415; Detailhandel mit Obst und Gemüse
+	B015221A = 415; Detailhandel mit Obst und Gemï¿½se
 	B015222A = 416; Detailhandel mit Fleisch und Fleischwaren	
-	B015223A = 417; Detailhandel mit Fisch und Meeresfrüchten	
-	B015224A = 418; Detailhandel mit Brot, Back- und Süsswaren	
-	B015225A = 419;	Detailhandel mit Getränken
+	B015223A = 417; Detailhandel mit Fisch und Meeresfrï¿½chten	
+	B015224A = 418; Detailhandel mit Brot, Back- und Sï¿½sswaren	
+	B015225A = 419;	Detailhandel mit Getrï¿½nken
 	*
 	B015227A = 421; Detailhandel mit Milcherzeugnissen und Eiern	
-	B015227B = 422; Sonstiger Fachdetailhandel mit Nahrungsmitteln, Getränken und Tabak a.n.g. (in Verkaufsräumen)
+	B015227B = 422; Sonstiger Fachdetailhandel mit Nahrungsmitteln, Getrï¿½nken und Tabak a.n.g. (in Verkaufsrï¿½umen)
 
 	*/
 	

@@ -21,7 +21,7 @@
 package playground.jhackney;
 
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationReader;
 import org.matsim.world.algorithms.WorldConnectLocations;

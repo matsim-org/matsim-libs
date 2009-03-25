@@ -25,10 +25,10 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordImpl;
 

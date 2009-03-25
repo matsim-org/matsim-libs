@@ -18,9 +18,9 @@
  * *********************************************************************** */
 package playground.dgrether;
 
-import org.matsim.controler.Controler;
-import org.matsim.controler.events.StartupEvent;
-import org.matsim.controler.listener.StartupListener;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.run.OTFVis;
 
 

@@ -20,9 +20,9 @@
 
 package playground.balmermi;
 
-import org.matsim.facilities.FacilitiesImpl;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.gbl.Gbl;
 
 import playground.balmermi.algos.FacilityWriteTable;
 import playground.balmermi.census2000v2.data.CAtts;

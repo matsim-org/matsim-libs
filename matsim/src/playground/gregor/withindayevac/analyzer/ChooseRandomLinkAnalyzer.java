@@ -21,7 +21,7 @@
 package playground.gregor.withindayevac.analyzer;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
 
 import playground.gregor.withindayevac.Beliefs;
 
@@ -37,7 +37,7 @@ public class ChooseRandomLinkAnalyzer implements Analyzer {
 	
 	public NextLinkOption getAction(final double now) {
 		Link link = this.beliefs.getCurrentLink();
-		double selnum = link.getToNode().getOutLinks().size() * MatsimRandom.random.nextDouble();
+		double selnum = link.getToNode().getOutLinks().size() * MatsimRandom.getRandom().nextDouble();
 		double coef = this.coef;
 
 		for (Link l : link.getToNode().getOutLinks().values()) {

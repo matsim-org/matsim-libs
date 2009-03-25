@@ -33,10 +33,10 @@ import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
 // matsim imports
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 
 
 /**
@@ -194,7 +194,7 @@ import org.matsim.router.util.TravelTime;
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
 	 *      org.matsim.core.api.network.Node, double)
 	 */
 	 public Path calcLeastCostPath(LinkedList<Node> sources, Node sink, final double startTime) {
@@ -253,7 +253,7 @@ import org.matsim.router.util.TravelTime;
 	 *            ignored
 	 * @param flow
 	 *            Determines the flow on links.
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
 	 *      org.matsim.core.api.network.Node, double)
 	 */
 	public Path calcLeastCostPath(LinkedList<Node> sources, Node sink, final double startTime, Flow flow) {
@@ -273,7 +273,7 @@ import org.matsim.router.util.TravelTime;
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
 	 *      org.matsim.core.api.network.Node, double)
 	 */
 	 public ArrayList<Link> calcLeastCostLinkRoute(LinkedList<Node> sources, Node sink, final double startTime) {
@@ -321,7 +321,7 @@ import org.matsim.router.util.TravelTime;
 	 *            ignored
 	 * @param flow
 	 *            Determines the flow on links.
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
 	 *      org.matsim.core.api.network.Node, double)
 	 */
 	public ArrayList<Link> calcLeastCostLinkRoute(LinkedList<Node> sources, Node sink, final double startTime, Flow flow) {
@@ -340,7 +340,7 @@ import org.matsim.router.util.TravelTime;
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
 	 *      org.matsim.core.api.network.Node, double)
 	 */
 	public Flow calcLeastCostFlow(LinkedList<Node> sources, final Node sink, final double startTime) {
@@ -387,7 +387,7 @@ import org.matsim.router.util.TravelTime;
 	 *            ignored
 	 * @param flow
 	 *            Determines the flow on links.
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
 	 *      org.matsim.core.api.network.Node, double)
 	 */
 	public Flow calcLeastCostFlow(final double startTime, Flow flow) {

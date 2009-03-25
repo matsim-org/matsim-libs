@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.network.Node;
-import org.matsim.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.CoordImpl;
 
 import playground.mmoyo.Validators.NetValidator;

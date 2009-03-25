@@ -6,15 +6,15 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.controler.Controler;
-import org.matsim.controler.events.ShutdownEvent;
-import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.utils.io.IOUtils;
 
 import playground.toronto.ttimematrix.SpanningTree;

@@ -24,10 +24,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.mobsim.queuesim.QueueLink;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.QueueNode;
-import org.matsim.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.QueueNode;
+import org.matsim.core.mobsim.queuesim.QueueVehicle;
 
 public class MyQueueLink extends QueueLink {
 	

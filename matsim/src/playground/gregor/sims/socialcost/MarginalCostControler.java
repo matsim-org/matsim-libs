@@ -20,10 +20,10 @@
 
 package playground.gregor.sims.socialcost;
 
-import org.matsim.controler.Controler;
-import org.matsim.trafficmonitoring.PessimisticTravelTimeAggregator;
-import org.matsim.trafficmonitoring.TravelTimeAggregatorFactory;
-import org.matsim.trafficmonitoring.TravelTimeDataHashMap;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
+import org.matsim.core.trafficmonitoring.TravelTimeAggregatorFactory;
+import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
 
 import playground.gregor.sims.evacbase.EvacuationQSimControler;
 

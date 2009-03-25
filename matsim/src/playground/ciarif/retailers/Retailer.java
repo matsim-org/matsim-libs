@@ -5,9 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.controler.Controler;
 
 public class Retailer {
 	private final Id id;

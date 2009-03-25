@@ -22,7 +22,7 @@ package playground.balmermi.lsa;
 
 import java.util.HashMap;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 public class Intersection implements Comparable<Intersection>  {
 

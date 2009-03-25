@@ -20,11 +20,11 @@
 
 package playground.balmermi;
 
-import org.matsim.config.Config;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkSummary;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.algorithms.NetworkSummary;
 
 import playground.balmermi.algos.NetworkWriteVolumesAsTable;
 

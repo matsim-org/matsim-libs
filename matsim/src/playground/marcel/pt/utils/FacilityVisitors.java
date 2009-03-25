@@ -28,10 +28,10 @@ import java.util.Map;
 
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Person;
-import org.matsim.events.ActEndEvent;
-import org.matsim.events.ActStartEvent;
-import org.matsim.events.handler.ActEndEventHandler;
-import org.matsim.events.handler.ActStartEventHandler;
+import org.matsim.core.events.ActEndEvent;
+import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.handler.ActEndEventHandler;
+import org.matsim.core.events.handler.ActStartEventHandler;
 
 /**
  * Keeps track of all persons that are currently executing an activity at the facility.

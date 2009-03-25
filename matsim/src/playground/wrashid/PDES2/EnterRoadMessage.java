@@ -1,7 +1,7 @@
 package playground.wrashid.PDES2;
 
-import org.matsim.events.BasicEventImpl;
-import org.matsim.events.LinkEnterEvent;
+import org.matsim.core.events.BasicEventImpl;
+import org.matsim.core.events.LinkEnterEvent;
 
 public class EnterRoadMessage extends EventMessage {
 

@@ -6,8 +6,8 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.BasicEventImpl;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.BasicEventImpl;
 
 public class EndLegMessage extends EventMessage {
 

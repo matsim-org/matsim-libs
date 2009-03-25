@@ -32,14 +32,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.Knowledge;
 import org.matsim.population.PersonImpl;
 import org.matsim.utils.collections.QuadTree;
@@ -142,7 +142,7 @@ public class PlansCreateFromCensus2000 {
 						ActivityOption a = f.getActivityOption(act_type);
 						for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 					}
-					ActivityOption act = acts.get(MatsimRandom.random.nextInt(acts.size()));
+					ActivityOption act = acts.get(MatsimRandom.getRandom().nextInt(acts.size()));
 					if (act == null) { Gbl.errorMsg("That should not happen!"); }
 					return act;
 				}
@@ -163,7 +163,7 @@ public class PlansCreateFromCensus2000 {
 				ActivityOption a = f.getActivityOption(act_type);
 				for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 			}
-			ActivityOption act = acts.get(MatsimRandom.random.nextInt(acts.size()));
+			ActivityOption act = acts.get(MatsimRandom.getRandom().nextInt(acts.size()));
 			if (act == null) { Gbl.errorMsg("That should not happen!"); }
 			return act;
 		}
@@ -212,7 +212,7 @@ public class PlansCreateFromCensus2000 {
 			if (!acts.isEmpty()) {
 				List<ActivityOption> acts_weighted = new ArrayList<ActivityOption>();
 				for (ActivityOption a : acts) { for (int i=0; i<a.getCapacity(); i++) { acts_weighted.add(a); } }
-				ActivityOption act = acts_weighted.get(MatsimRandom.random.nextInt(acts_weighted.size()));
+				ActivityOption act = acts_weighted.get(MatsimRandom.getRandom().nextInt(acts_weighted.size()));
 				if (act == null) { Gbl.errorMsg("That should not happen!"); }
 				p.getKnowledge().addActivity(act, false); // set activity in given zone
 			}
@@ -234,7 +234,7 @@ public class PlansCreateFromCensus2000 {
 							ActivityOption a = f.getActivityOption(act_type);
 							for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 						}
-						ActivityOption act = acts.get(MatsimRandom.random.nextInt(acts.size()));
+						ActivityOption act = acts.get(MatsimRandom.getRandom().nextInt(acts.size()));
 						if (act == null) { Gbl.errorMsg("That should not happen!"); }
 						p.getKnowledge().addActivity(act, false); // set activity in expanded given zone
 					}
@@ -381,7 +381,7 @@ public class PlansCreateFromCensus2000 {
 			}
 		}
 		log.trace("        pid="+p.getId()+", jobnr="+job+", acts_weighted size="+acts_weighted.size());
-		ActivityOption act_choosen = acts_weighted.get(MatsimRandom.random.nextInt(acts_weighted.size()));
+		ActivityOption act_choosen = acts_weighted.get(MatsimRandom.getRandom().nextInt(acts_weighted.size()));
 		p.getKnowledge().addActivity(act_choosen, false);
 	}
 	

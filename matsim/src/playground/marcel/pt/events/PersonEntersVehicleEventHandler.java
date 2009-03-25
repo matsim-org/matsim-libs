@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.events;
 
-import org.matsim.events.handler.EventHandler;
+import org.matsim.core.events.handler.EventHandler;
 
 public interface PersonEntersVehicleEventHandler extends EventHandler {
 	public void handleEvent(PersonEntersVehicleEvent event);

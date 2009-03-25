@@ -21,9 +21,9 @@
 package playground.balmermi.census2000v2;
 
 import org.matsim.core.api.facilities.Facilities;
-import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.gbl.Gbl;
 
 import playground.balmermi.census2000v2.modules.FacilitiesReduceTypes;
 

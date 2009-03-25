@@ -23,7 +23,7 @@
  */
 package playground.johannes.snowball;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.xml.sax.Attributes;
 
 import playground.johannes.graph.AbstractSparseGraph;

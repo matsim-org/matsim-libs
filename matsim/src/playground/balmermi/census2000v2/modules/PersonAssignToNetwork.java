@@ -26,13 +26,13 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.AStarLandmarksFactory;
-import org.matsim.router.util.PreProcessLandmarks;
 
 public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements PlanAlgorithm {
 

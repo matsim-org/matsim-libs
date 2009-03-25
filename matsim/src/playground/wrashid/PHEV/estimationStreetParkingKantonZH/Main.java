@@ -9,10 +9,10 @@ import java.util.Random;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkReaderMatsimV1;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.world.Layer;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;

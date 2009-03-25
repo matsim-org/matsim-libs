@@ -25,9 +25,9 @@ package playground.johannes.interaction;
 
 import java.util.Random;
 
-import org.matsim.controler.events.IterationStartsEvent;
-import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 
 import playground.johannes.socialnet.Ego;
 import playground.johannes.socialnet.SocialNetwork;

@@ -1,10 +1,10 @@
 package playground.wrashid.PHEV.Triangle;
 
-import org.matsim.config.Config;
 import org.matsim.core.api.network.Link;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 
 public class PrintLinkCoordinates {
 

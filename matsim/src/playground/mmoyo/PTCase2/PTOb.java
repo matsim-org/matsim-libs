@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 
 import playground.mmoyo.input.PTNetworkFactory2;
 

@@ -20,17 +20,17 @@ package playground.dgrether.cmcf;
 
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.config.Config;
-import org.matsim.controler.Controler;
-import org.matsim.controler.events.IterationEndsEvent;
-import org.matsim.controler.events.StartupEvent;
-import org.matsim.controler.listener.IterationEndsListener;
-import org.matsim.controler.listener.StartupListener;
 import org.matsim.core.api.network.Link;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.trafficmonitoring.LinkSensorManager;
 import org.matsim.run.OTFVis;
-import org.matsim.trafficmonitoring.LinkSensorManager;
 
 import playground.dgrether.utils.MatsimIo;
 

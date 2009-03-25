@@ -32,23 +32,23 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicLeg.Mode;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.DijkstraFactory;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordImpl;
@@ -210,7 +210,7 @@ public class PrimaryLocationDrawing {
 				Zone primActZone = null;
 				while(true) {
 					// draw random zone based on numOpportunities
-					int r = MatsimRandom.random.nextInt(this.sumOpportunities);
+					int r = MatsimRandom.getRandom().nextInt(this.sumOpportunities);
 					int tmpSum = 0;
 					Zone tmpZone = null;
 					for (Zone zone : zones) {
@@ -223,7 +223,7 @@ public class PrimaryLocationDrawing {
 
 					double distance = CoordUtils.calcDistance(tmpZone.coord, pers.getRandomPlan().getFirstActivity().getCoord());
 					double p = Math.exp(-BETA * distance);
-					if (p >= MatsimRandom.random.nextDouble()) {
+					if (p >= MatsimRandom.getRandom().nextDouble()) {
 						primActZone = tmpZone;
 						break;
 					}
@@ -267,7 +267,7 @@ public class PrimaryLocationDrawing {
 		Coordinate centroid = ft.getDefaultGeometry().getCentroid().getCoordinate();
 		int count = 0;
 		while (count < 100) {
-			Coordinate rnd = new Coordinate(centroid.x + MatsimRandom.random.nextDouble() * maxShift, centroid.y + MatsimRandom.random.nextDouble() * maxShift);
+			Coordinate rnd = new Coordinate(centroid.x + MatsimRandom.getRandom().nextDouble() * maxShift, centroid.y + MatsimRandom.getRandom().nextDouble() * maxShift);
 			Point p = this.geofac.createPoint(rnd);
 			try {
 				if (!p.disjoint(ft.getDefaultGeometry())) {
@@ -280,7 +280,7 @@ public class PrimaryLocationDrawing {
 
 		}
 //		log.warn("somthing went wrong with the geotools - just taking the link next to the centroid");
-		Coord rnd = new CoordImpl(centroid.x + MatsimRandom.random.nextDouble() * maxShift, centroid.y + MatsimRandom.random.nextDouble() * maxShift);
+		Coord rnd = new CoordImpl(centroid.x + MatsimRandom.getRandom().nextDouble() * maxShift, centroid.y + MatsimRandom.getRandom().nextDouble() * maxShift);
 		return this.network.getNearestLink(rnd);
 
 	}

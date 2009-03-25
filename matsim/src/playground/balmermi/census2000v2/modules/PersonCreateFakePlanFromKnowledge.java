@@ -28,8 +28,8 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -101,7 +101,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 			else {
 				// home act end time = [6am-8am]
 				double start_time = 0.0;
-				double end_time = 6*3600 + (MatsimRandom.random.nextInt(2*3600));
+				double end_time = 6*3600 + (MatsimRandom.getRandom().nextInt(2*3600));
 				double sum_dur = end_time;
 				int leg_cnt = 0;
 				Activity act = p.createAct(home.getType(),home.getFacility().getCoord());
@@ -118,7 +118,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				if (work!=null) {
 					// work act dur = [7h-8h]
 					start_time = end_time;
-					end_time = end_time + 7*3600 + (MatsimRandom.random.nextInt(1*3600));
+					end_time = end_time + 7*3600 + (MatsimRandom.getRandom().nextInt(1*3600));
 					sum_dur = sum_dur + (end_time-start_time);
 					act = p.createAct(work.getType(),work.getFacility().getCoord());
 					act.setStartTime(start_time);
@@ -135,7 +135,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				if (educ!=null) {
 					// educ act dur = [4h-6h]
 					start_time = end_time;
-					end_time = end_time + 4*3600 + (MatsimRandom.random.nextInt(2*3600));
+					end_time = end_time + 4*3600 + (MatsimRandom.getRandom().nextInt(2*3600));
 					sum_dur = sum_dur + (end_time-start_time);
 					act = p.createAct(educ.getType(),educ.getFacility().getCoord());
 					act.setStartTime(start_time);

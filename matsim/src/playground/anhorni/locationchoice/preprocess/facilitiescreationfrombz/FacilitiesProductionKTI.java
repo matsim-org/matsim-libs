@@ -22,9 +22,9 @@ package playground.anhorni.locationchoice.preprocess.facilitiescreationfrombz;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.Facilities;
-import org.matsim.facilities.FacilitiesImpl;
-import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * Generates the facilities file for all of Switzerland from the Swiss

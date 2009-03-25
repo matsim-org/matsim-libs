@@ -25,11 +25,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.events.Events;
-import org.matsim.events.EventsReaderTXTv1;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.world.World;
 
 import playground.gregor.snapshots.postprocessor.processors.DestinationDependentColorizer;

@@ -22,16 +22,16 @@ package playground.mfeil;
 
 
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.scoring.PlanScorer;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.scoring.PlanScorer;
 import org.matsim.utils.geometry.CoordUtils;
-import org.matsim.router.util.PreProcessLandmarks;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

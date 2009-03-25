@@ -3,8 +3,8 @@ package playground.yu.visum.filter.finalFilters;
 import java.util.List;
 
 import org.matsim.core.api.population.Population;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
 
 import playground.yu.visum.writer.UserDefAtt;

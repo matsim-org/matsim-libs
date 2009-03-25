@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.writer.Writer;
 

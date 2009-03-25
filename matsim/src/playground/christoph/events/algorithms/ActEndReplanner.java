@@ -25,9 +25,9 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.events.ActEndEvent;
-import org.matsim.events.handler.ActEndEventHandler;
-import org.matsim.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.events.ActEndEvent;
+import org.matsim.core.events.handler.ActEndEventHandler;
+import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;

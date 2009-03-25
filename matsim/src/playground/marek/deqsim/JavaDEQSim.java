@@ -31,8 +31,8 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.Events;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.events.Events;
+import org.matsim.core.network.NetworkLayer;
 
 public class JavaDEQSim {
 

@@ -18,11 +18,11 @@
  * *********************************************************************** */
 package playground.andreas.intersection.dijkstra;
 
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.replanning.modules.MultithreadedModuleA;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.replanning.modules.MultithreadedModuleA;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
 
 /**
  * @author dgrether
@@ -44,7 +44,7 @@ public class ReRouteDijkstraTurningMoves extends MultithreadedModuleA {
 	}
 
 	/**
-	 * @see org.matsim.replanning.modules.MultithreadedModuleA#getPlanAlgoInstance()
+	 * @see org.matsim.core.replanning.modules.MultithreadedModuleA#getPlanAlgoInstance()
 	 */
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {

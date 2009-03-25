@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 
 /**
  * prints much imformation in a .att-file of VISUM.

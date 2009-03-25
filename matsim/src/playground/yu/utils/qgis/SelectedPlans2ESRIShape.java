@@ -36,16 +36,16 @@ import org.geotools.feature.SchemaException;
 import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.utils.geometry.geotools.MGC;
@@ -169,15 +169,15 @@ public class SelectedPlans2ESRIShape extends
 		Coordinate[] coords = new Coordinate[links.size() + 1];
 		for (int i = 0; i < links.size(); i++) {
 			Coord c = links.get(i).getFromNode().getCoord();
-			double rx = MatsimRandom.random.nextDouble() * this.legBlurFactor;
-			double ry = MatsimRandom.random.nextDouble() * this.legBlurFactor;
+			double rx = MatsimRandom.getRandom().nextDouble() * this.legBlurFactor;
+			double ry = MatsimRandom.getRandom().nextDouble() * this.legBlurFactor;
 			Coordinate cc = new Coordinate(c.getX() + rx, c.getY() + ry);
 			coords[i] = cc;
 		}
 
 		Coord c = links.get(links.size() - 1).getToNode().getCoord();
-		double rx = MatsimRandom.random.nextDouble() * this.legBlurFactor;
-		double ry = MatsimRandom.random.nextDouble() * this.legBlurFactor;
+		double rx = MatsimRandom.getRandom().nextDouble() * this.legBlurFactor;
+		double ry = MatsimRandom.getRandom().nextDouble() * this.legBlurFactor;
 		Coordinate cc = new Coordinate(c.getX() + rx, c.getY() + ry);
 		coords[links.size()] = cc;
 

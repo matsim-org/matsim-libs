@@ -18,9 +18,9 @@
  * *********************************************************************** */
 package playground.dgrether.cmcf;
 
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.Events;
-import org.matsim.events.MatsimEventsReader;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.MatsimEventsReader;
 
 import playground.dgrether.DgPaths;
 

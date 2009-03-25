@@ -27,7 +27,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
  * @author illenberger

@@ -23,7 +23,7 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.MatsimIo;

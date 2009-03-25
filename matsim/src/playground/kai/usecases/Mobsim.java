@@ -7,15 +7,15 @@ import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.ActEndEvent;
-import org.matsim.events.ActStartEvent;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.Events;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.ActEndEvent;
+import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentWait2LinkEvent;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
 
 @SuppressWarnings("unused")
 public class Mobsim {

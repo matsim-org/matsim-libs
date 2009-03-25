@@ -23,13 +23,13 @@ package playground.toronto.example;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.handler.AgentArrivalEventHandler;
-import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.events.handler.LinkEnterEventHandler;
+import org.matsim.core.network.NetworkLayer;
 
 /**
  * Calculates the average length of all trips started in a hour.

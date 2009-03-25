@@ -26,13 +26,13 @@ package playground.johannes.itsc08;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.controler.events.BeforeMobsimEvent;
-import org.matsim.controler.events.StartupEvent;
-import org.matsim.controler.listener.BeforeMobsimListener;
-import org.matsim.controler.listener.StartupListener;
-import org.matsim.network.NetworkChangeEvent;
-import org.matsim.network.NetworkChangeEvent.ChangeType;
-import org.matsim.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
 /**
  * @author illenberger

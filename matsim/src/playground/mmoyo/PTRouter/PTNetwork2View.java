@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkWriter;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkWriter;
 
 public class PTNetwork2View extends NetworkLayer {
 	private static final String NETWORKFILENAME="c://PTnetwork.xml";

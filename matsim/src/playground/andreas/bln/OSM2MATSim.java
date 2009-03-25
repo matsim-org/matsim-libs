@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkWriter;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.run.NetworkCleaner;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -43,7 +43,7 @@ public class OSM2MATSim {
 		
 		// Nebenstrassen
 //		osmReader.setHighwayDefaults("minor",         1,  45.0/3.6,  600); // nix
-		// Alles Mögliche, vor allem Nebenstrassen auf dem Land, meist keine 30er Zone 
+		// Alles Mï¿½gliche, vor allem Nebenstrassen auf dem Land, meist keine 30er Zone 
 //		osmReader.setHighwayDefaults("unclassified",  1,  45.0/3.6,  600);
 		// Nebenstrassen, meist 30er Zone
 //		osmReader.setHighwayDefaults("residential",   1,  30.0/3.6,  600);

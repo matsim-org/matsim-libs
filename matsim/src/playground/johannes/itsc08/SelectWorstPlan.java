@@ -25,7 +25,7 @@ package playground.johannes.itsc08;
 
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
  * @author illenberger

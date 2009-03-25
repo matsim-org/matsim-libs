@@ -20,12 +20,12 @@
 
 package playground.balmermi.census2000v2;
 
-import org.matsim.config.ConfigWriter;
 import org.matsim.core.api.facilities.Facilities;
-import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.facilities.algorithms.FacilitiesCombine;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.facilities.algorithms.FacilitiesCombine;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 

@@ -22,7 +22,7 @@ package playground.dressler.ea_flow;
 
 //matsim imports
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 
 //other imports
 import java.util.Hashtable;

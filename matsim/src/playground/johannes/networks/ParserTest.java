@@ -25,13 +25,13 @@ package playground.johannes.networks;
 
 import java.util.List;
 
-import org.matsim.config.Config;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkChangeEvent;
-import org.matsim.network.NetworkChangeEventsWriter;
-import org.matsim.network.NetworkChangeEventsParser;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEventsParser;
+import org.matsim.core.network.NetworkChangeEventsWriter;
+import org.matsim.core.network.NetworkLayer;
 
 /**
  * @author illenberger

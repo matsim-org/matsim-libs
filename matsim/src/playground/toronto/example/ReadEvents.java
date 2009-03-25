@@ -20,8 +20,8 @@
 
 package playground.toronto.example;
 
-import org.matsim.events.Events;
-import org.matsim.events.EventsReaderTXTv1;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsReaderTXTv1;
 
 
 public class ReadEvents {

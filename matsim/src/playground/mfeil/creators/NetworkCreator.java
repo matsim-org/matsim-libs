@@ -23,7 +23,8 @@ package playground.mfeil.creators;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import org.matsim.gbl.Gbl;
+
+import org.matsim.core.gbl.Gbl;
 
 public class NetworkCreator {
 

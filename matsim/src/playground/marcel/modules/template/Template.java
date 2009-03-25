@@ -20,23 +20,23 @@
 
 package playground.marcel.modules.template;
 
-import org.matsim.config.Module;
-import org.matsim.controler.Controler;
-import org.matsim.controler.events.StartupEvent;
-import org.matsim.controler.listener.StartupListener;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Plan;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.handler.AgentArrivalEventHandler;
-import org.matsim.replanning.PlanStrategy;
-import org.matsim.replanning.selectors.RandomPlanSelector;
-import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
-import org.matsim.scoring.ScoringFunction;
-import org.matsim.scoring.ScoringFunctionFactory;
+import org.matsim.core.config.Module;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.marcel.modules.MatsimModule;
 

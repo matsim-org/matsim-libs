@@ -20,7 +20,7 @@
 
 package playground.ciarif.models;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 public class ModelModeChoiceShop18Plus extends ModelModeChoice {
 

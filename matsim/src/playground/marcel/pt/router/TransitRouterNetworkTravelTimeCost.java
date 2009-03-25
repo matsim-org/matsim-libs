@@ -21,8 +21,8 @@
 package playground.marcel.pt.router;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 
 import playground.marcel.pt.router.TransitRouterNetworkWrapper.LinkWrapper;
 

@@ -25,14 +25,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.config.Config;
-import org.matsim.config.ConfigWriter;
-import org.matsim.config.MatsimConfigReader;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.Events;
-import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.external.ExternalMobsim;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.events.Events;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.utils.misc.ExeRunner;
 
 public class EctmSim extends ExternalMobsim {

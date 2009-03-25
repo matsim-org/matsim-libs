@@ -21,10 +21,10 @@
 package playground.christoph.knowledge.replanning.modules;
 
 import org.matsim.core.api.population.Plan;
-import org.matsim.network.NetworkLayer;
-import org.matsim.replanning.modules.ReRouteDijkstra;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.replanning.modules.ReRouteDijkstra;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.knowledge.OldKnowledgeTravelCost;
 

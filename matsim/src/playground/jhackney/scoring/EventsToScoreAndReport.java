@@ -28,21 +28,21 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.AgentMoneyEvent;
-import org.matsim.events.AgentStuckEvent;
-import org.matsim.events.handler.AgentArrivalEventHandler;
-import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.events.handler.AgentMoneyEventHandler;
-import org.matsim.events.handler.AgentStuckEventHandler;
-import org.matsim.gbl.Gbl;
-import org.matsim.scoring.ScoringFunction;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentMoneyEvent;
+import org.matsim.core.events.AgentStuckEvent;
+import org.matsim.core.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.events.handler.AgentMoneyEventHandler;
+import org.matsim.core.events.handler.AgentStuckEventHandler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.scoring.ScoringFunction;
 
 /**
  * Continuously calculates the score of the selected plans of a given population

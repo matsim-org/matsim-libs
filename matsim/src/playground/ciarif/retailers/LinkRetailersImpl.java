@@ -3,8 +3,8 @@ package playground.ciarif.retailers;
 
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.network.Link;
-import org.matsim.network.LinkImpl;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
 
 public class LinkRetailersImpl extends LinkImpl  { //AbstractLocation implements BasicLink {

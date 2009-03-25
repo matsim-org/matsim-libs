@@ -19,7 +19,7 @@
 
 package playground.ciarif.retailers;
 
-import org.matsim.controler.Controler;
+import org.matsim.core.controler.Controler;
 
 public class RetailersControler {
 	

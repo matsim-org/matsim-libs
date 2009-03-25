@@ -2,15 +2,15 @@ package playground.kai.urbansim;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.config.Config;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
-import org.matsim.facilities.FacilitiesImpl;
-import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 

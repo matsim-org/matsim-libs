@@ -20,8 +20,8 @@
 
 package playground.balmermi.census2000.models;
 
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 
 
 public class ModelMobiliyTools {
@@ -135,7 +135,7 @@ public class ModelMobiliyTools {
 		this.license = -1.0;
 		this.disthw = -1.0;
 		this.fuelcost = -1.0;
-		MatsimRandom.random.nextDouble();
+		MatsimRandom.getRandom().nextDouble();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -229,7 +229,7 @@ public class ModelMobiliyTools {
 		utils[4] = this.calcCARsometimesPTyesUtil();
 		utils[5] = this.calcCARalwaysPTyesUtil();
 		double [] probs = this.calcLogitProbability(utils);
-		double r = MatsimRandom.random.nextDouble();
+		double r = MatsimRandom.getRandom().nextDouble();
 		double prob_sum = 0.0;
 		for (int i=0; i<probs.length; i++) {
 			prob_sum += probs[i];

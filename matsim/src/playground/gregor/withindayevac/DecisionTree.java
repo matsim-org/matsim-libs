@@ -24,8 +24,8 @@ import java.util.ArrayList;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkLayer;
 
 import playground.gregor.withindayevac.analyzer.Analyzer;
 import playground.gregor.withindayevac.analyzer.ChooseRandomLinkAnalyzer;
@@ -90,7 +90,7 @@ public class DecisionTree {
 			weightSum += n.getNodeWeight();
 		}
 
-		double selNum = weightSum * MatsimRandom.random.nextDouble();
+		double selNum = weightSum * MatsimRandom.getRandom().nextDouble();
 		for (Node n : current.getChildren()) {
 			selNum -= n.getNodeWeight();
 			if (selNum <= 0) {
@@ -138,7 +138,7 @@ public class DecisionTree {
 //		FollowHerdAnalyzer fha = new FollowHerdAnalyzer(this.beliefs);
 		fha.setCoefficient(1);
 		followFastest.setAnalyzer(fha);
-		if (MatsimRandom.random.nextDouble() < 0.2) {
+		if (MatsimRandom.getRandom().nextDouble() < 0.2) {
 			internal.addChildNode(followPlan);	
 		} else {
 			internal.addChildNode(followFastest);	

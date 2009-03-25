@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.basic.v01.BasicPlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 

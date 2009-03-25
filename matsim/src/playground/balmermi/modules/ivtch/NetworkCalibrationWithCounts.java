@@ -27,9 +27,9 @@ import java.util.Iterator;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-import org.matsim.gbl.Gbl;
 import org.matsim.utils.misc.Time;
 
 public class NetworkCalibrationWithCounts {

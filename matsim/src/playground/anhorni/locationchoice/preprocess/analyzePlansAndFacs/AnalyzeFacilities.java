@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.io.IOUtils;
 
 public class AnalyzeFacilities {

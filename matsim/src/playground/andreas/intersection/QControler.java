@@ -23,13 +23,13 @@ package playground.andreas.intersection;
 import java.io.File;
 
 import org.apache.log4j.Logger;
-import org.matsim.config.Config;
-import org.matsim.controler.Controler;
-import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.vis.netvis.NetVis;
 

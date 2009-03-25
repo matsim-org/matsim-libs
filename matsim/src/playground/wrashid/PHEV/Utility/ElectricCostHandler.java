@@ -5,20 +5,20 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
-import org.matsim.events.ActEndEvent;
-import org.matsim.events.ActStartEvent;
-import org.matsim.events.AgentMoneyEvent;
-import org.matsim.events.Events;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.PersonEvent;
-import org.matsim.events.handler.ActEndEventHandler;
-import org.matsim.events.handler.ActStartEventHandler;
-import org.matsim.events.handler.AgentMoneyEventHandler;
-import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.ActEndEvent;
+import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.AgentMoneyEvent;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.PersonEvent;
+import org.matsim.core.events.handler.ActEndEventHandler;
+import org.matsim.core.events.handler.ActStartEventHandler;
+import org.matsim.core.events.handler.AgentMoneyEventHandler;
+import org.matsim.core.events.handler.LinkEnterEventHandler;
+import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
 //TODO: write tests for this class
 

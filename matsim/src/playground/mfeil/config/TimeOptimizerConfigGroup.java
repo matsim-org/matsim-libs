@@ -22,7 +22,7 @@ package playground.mfeil.config;
 
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
-import org.matsim.config.Module;
+import org.matsim.core.config.Module;
 
 public class TimeOptimizerConfigGroup extends Module {
 	

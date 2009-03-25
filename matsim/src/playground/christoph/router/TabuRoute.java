@@ -28,9 +28,9 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.CarRoute;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.router.util.LeastCostPathCalculator.Path;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -110,7 +110,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 			Link[] newLinks = TabuSelector.getLinks(linksArray, previousNode);
 			
 			// choose link
-			int nextLink = MatsimRandom.random.nextInt(newLinks.length);
+			int nextLink = MatsimRandom.getRandom().nextInt(newLinks.length);
 			
 			// make the chosen link to the new current link
 			if(newLinks[nextLink] instanceof Link)

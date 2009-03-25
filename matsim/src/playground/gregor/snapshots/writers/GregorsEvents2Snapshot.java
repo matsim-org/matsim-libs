@@ -28,12 +28,12 @@ import java.util.Iterator;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.matsim.config.Config;
-import org.matsim.events.Events;
-import org.matsim.events.MatsimEventsReader;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.config.Config;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.misc.ArgumentParser;

@@ -16,9 +16,9 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Counter;
@@ -108,7 +108,7 @@ public class LocationModifier extends Modifier {
 				if (act.getType().startsWith(type)) {
 
 					Facility facility=exchange_facilities.get(
-							MatsimRandom.random.nextInt(exchange_facilities.size()));
+							MatsimRandom.getRandom().nextInt(exchange_facilities.size()));
 
 					act.setFacility(facility);
 					act.setLink(facility.getLink());

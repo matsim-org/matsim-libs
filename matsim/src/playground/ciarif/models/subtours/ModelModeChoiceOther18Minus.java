@@ -1,6 +1,6 @@
 package playground.ciarif.models.subtours;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 public class ModelModeChoiceOther18Minus extends ModelModeChoice {
 	

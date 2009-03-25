@@ -2,10 +2,10 @@ package playground.anhorni.locationchoice.preprocess.analyzePlansAndFacs;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.Facilities;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 
 public class AnalyzePlansAndFacs {
 

@@ -23,13 +23,13 @@ package playground.balmermi.census2000.modules;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.geometry.CoordUtils;
@@ -103,7 +103,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 
 		// generating a random bike ownership (see STRC2007 paper Ciari for more details)
 		boolean has_bike = true;
-		if (MatsimRandom.random.nextDouble() < 0.44) { has_bike = false; }
+		if (MatsimRandom.getRandom().nextDouble() < 0.44) { has_bike = false; }
 
 		// setting parameters
 		model.setAge(p.getAge());

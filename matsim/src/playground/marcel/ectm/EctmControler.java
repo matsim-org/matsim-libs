@@ -20,7 +20,7 @@
 
 package playground.marcel.ectm;
 
-import org.matsim.controler.Controler;
+import org.matsim.core.controler.Controler;
 
 public class EctmControler extends Controler {
 

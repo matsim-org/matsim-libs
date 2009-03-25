@@ -7,9 +7,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.BasicEventImpl;
-import org.matsim.events.PersonEvent;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.BasicEventImpl;
+import org.matsim.core.events.PersonEvent;
 
 /**
  * A EventFilterPersonSpecific lets the events, whose agentId belong to the

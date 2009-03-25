@@ -5,8 +5,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.matsim.mobsim.jdeqsim.Message;
-import org.matsim.mobsim.jdeqsim.SimulationParameters;
+import org.matsim.core.mobsim.jdeqsim.Message;
+import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 
 import playground.wrashid.PDES2.SelfhandleMessage;
 

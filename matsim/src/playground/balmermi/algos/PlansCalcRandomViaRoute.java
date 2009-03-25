@@ -30,17 +30,17 @@ import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.router.Dijkstra;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
-import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.utils.misc.Time;
@@ -179,14 +179,14 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		double y = 0.5*(startNode.getCoord().getY() + endNode.getCoord().getY());
 		double dist = CoordUtils.calcDistance(endNode.getCoord(), startNode.getCoord());
 		if (dist < 1000.0) { dist = 1000.0; } 
-		x = x + (MatsimRandom.random.nextDouble()-0.5)*dist;
-		y = y + (MatsimRandom.random.nextDouble()-0.5)*dist;
+		x = x + (MatsimRandom.getRandom().nextDouble()-0.5)*dist;
+		y = y + (MatsimRandom.getRandom().nextDouble()-0.5)*dist;
 		CoordImpl coord = new CoordImpl(x,y);
 		Node viaNode = this.network.getNearestNode(coord);
 		while ((viaNode == startNode) || (viaNode == endNode)) {
 			dist = dist + 1000.0;
-			x = x + (MatsimRandom.random.nextDouble()-0.5)*dist;
-			y = y + (MatsimRandom.random.nextDouble()-0.5)*dist;
+			x = x + (MatsimRandom.getRandom().nextDouble()-0.5)*dist;
+			y = y + (MatsimRandom.getRandom().nextDouble()-0.5)*dist;
 			coord = new CoordImpl(x,y);
 			viaNode = this.network.getNearestNode(coord);
 		}

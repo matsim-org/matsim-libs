@@ -27,8 +27,8 @@ import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -104,10 +104,10 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 						ArrayList<ActivityOption> rest = new ArrayList<ActivityOption>(work_acts);
 						rest.remove(prev_work);
 						if (rest.isEmpty()) { work_act = prev_work; log.warn("TODO pid="+person.getId()+": assign another work act."); }
-						else { work_act = rest.get(MatsimRandom.random.nextInt(rest.size())); }
+						else { work_act = rest.get(MatsimRandom.getRandom().nextInt(rest.size())); }
 					}
 					else {
-						work_act = work_acts.get(MatsimRandom.random.nextInt(work_acts.size()));
+						work_act = work_acts.get(MatsimRandom.getRandom().nextInt(work_acts.size()));
 					}
 					act.setType(work_act.getType());
 					act.setFacility(work_act.getFacility());
@@ -123,10 +123,10 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 						ArrayList<ActivityOption> rest = new ArrayList<ActivityOption>(educ_acts);
 						rest.remove(prev_educ);
 						if (rest.isEmpty()) { educ_act = prev_educ; log.warn("TODO pid="+person.getId()+": assign another educ act."); }
-						else { educ_act = rest.get(MatsimRandom.random.nextInt(rest.size())); }
+						else { educ_act = rest.get(MatsimRandom.getRandom().nextInt(rest.size())); }
 					}
 					else {
-						educ_act = educ_acts.get(MatsimRandom.random.nextInt(educ_acts.size()));
+						educ_act = educ_acts.get(MatsimRandom.getRandom().nextInt(educ_acts.size()));
 					}
 					act.setType(educ_act.getType());
 					act.setFacility(educ_act.getFacility());

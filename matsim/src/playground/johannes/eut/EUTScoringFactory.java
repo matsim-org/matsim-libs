@@ -23,11 +23,11 @@
  */
 package playground.johannes.eut;
 
-import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.api.population.Plan;
-import org.matsim.scoring.CharyparNagelScoringParameters;
-import org.matsim.scoring.ScoringFunction;
-import org.matsim.scoring.ScoringFunctionFactory;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 /**
  * @author illenberger

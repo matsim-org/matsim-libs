@@ -25,7 +25,7 @@ package playground.johannes.itsc08;
 
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
-import org.matsim.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunction;
 
 /**
  * @author illenberger

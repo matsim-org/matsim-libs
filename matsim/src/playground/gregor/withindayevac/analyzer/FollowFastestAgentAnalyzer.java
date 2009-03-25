@@ -25,10 +25,10 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.MatsimRandom;
 
 import playground.gregor.withindayevac.Beliefs;
 import playground.gregor.withindayevac.communication.InformationEntity;
@@ -137,12 +137,12 @@ public class FollowFastestAgentAnalyzer implements Analyzer {
 	private NextLinkOption getNextLinkGreedy(final ArrayList<Link> indices,
 			final HashMap<Link, Counter> counts) {
 		
-		if(MatsimRandom.random.nextDouble() < EPSILON){
+		if(MatsimRandom.getRandom().nextDouble() < EPSILON){
 			//DEBUG
 			DebugFollowFastestAgent.incrGreedy();
 			
 			Node n = this.beliefs.getCurrentLink().getToNode();
-			double selNum = n.getOutLinks().size() * MatsimRandom.random.nextDouble();
+			double selNum = n.getOutLinks().size() * MatsimRandom.getRandom().nextDouble();
 			for (Link l : n.getOutLinks().values()) {
 				selNum--;
 				if (selNum <= 0) {
@@ -181,7 +181,7 @@ public class FollowFastestAgentAnalyzer implements Analyzer {
 			weightSum += c.value; 
 		}
 		
-		double selNum = weightSum * MatsimRandom.random.nextDouble();
+		double selNum = weightSum * MatsimRandom.getRandom().nextDouble();
 		for (final Link l : indices) {
 			Counter c = counts.get(l);
 			selNum -= c.value;

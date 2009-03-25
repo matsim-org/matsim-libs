@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package playground.mfeil;
 
-import org.matsim.controler.Controler;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.scoring.PlanScorer;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.scoring.PlanScorer;
-import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import java.util.LinkedList;
 

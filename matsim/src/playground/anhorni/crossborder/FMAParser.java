@@ -6,8 +6,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import org.matsim.network.NetworkLayer;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+
 import playground.anhorni.crossborder.verification.Verification;
 
 public class FMAParser extends Parser {

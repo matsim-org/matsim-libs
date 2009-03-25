@@ -23,14 +23,14 @@ package playground.marcel.kti;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.controler.Controler;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
 import org.matsim.visum.VisumMatrixReader;
 
 import playground.marcel.kti.router.PlansCalcRouteKti;

@@ -32,10 +32,10 @@ import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.facilities.OpeningTime;
-import org.matsim.facilities.FacilitiesImpl;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.facilities.OpeningTimeImpl;
-import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
+import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.world.Location;
 
 import playground.anhorni.locationchoice.preprocess.facilitiescreationfrombz.FacilitiesProductionKTI;

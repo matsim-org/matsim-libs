@@ -10,8 +10,8 @@ import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.gbl.Gbl;
 
 public class ReadKonradFacilities {
 	

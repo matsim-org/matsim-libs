@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.utils.collections.Tuple;
 
 public class MicroCensus {
@@ -55,7 +55,7 @@ public class MicroCensus {
 	public MicroCensus(Population pop) {
 		for (int i=0; i<groups.length; i++) { groups[i] = null; }
 		this.create(pop);
-		MatsimRandom.random.nextDouble();
+		MatsimRandom.getRandom().nextDouble();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -85,12 +85,12 @@ public class MicroCensus {
 		}
 		
 		private final Person getRandomPerson() {
-			int i = MatsimRandom.random.nextInt(list.size());
+			int i = MatsimRandom.getRandom().nextInt(list.size());
 			return list.get(i).getSecond();
 		}
 
 		private final Person getRandomWeightedPerson() {
-			double r = MatsimRandom.random.nextDouble();
+			double r = MatsimRandom.getRandom().nextDouble();
 			double weight_sum = 0.0;
 			for (int i=0; i<list.size(); i++) {
 				weight_sum += list.get(i).getFirst();

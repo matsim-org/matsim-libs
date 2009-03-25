@@ -15,18 +15,18 @@ import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.mobsim.queuesim.QueueLink;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.QueueNode;
-import org.matsim.mobsim.queuesim.VisData;
-import org.matsim.mobsim.queuesim.QueueLane.AgentOnLink;
-import org.matsim.network.LinkImpl;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.QueueNode;
+import org.matsim.core.mobsim.queuesim.VisData;
+import org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
@@ -105,7 +105,7 @@ class CALink extends QueueLink {
 	public CALink(Link l, QueueNetwork queueNetwork, QueueNode toNode) {
 		super(l, queueNetwork, toNode);
 		
-		double rnd = MatsimRandom.random.nextDouble() ;
+		double rnd = MatsimRandom.getRandom().nextDouble() ;
 		
 		for ( int lane=0 ; lane<LANECOUNT; lane++ ) {
 			MyCAVeh veh = new MyCAVeh(3) ;
@@ -113,13 +113,13 @@ class CALink extends QueueLink {
 			if ( lane==0 ) { veh.setSpeedOffset(0.1) ; }
 			cells[lane][0] = veh ;
 			for ( int len=1 ; len<LINKLEN ; len++ ) {
-				if ( MatsimRandom.random.nextDouble() < 0.05 ) {
-					if ( MatsimRandom.random.nextDouble() < 0.1 ) {
+				if ( MatsimRandom.getRandom().nextDouble() < 0.05 ) {
+					if ( MatsimRandom.getRandom().nextDouble() < 0.1 ) {
 						veh = new MyCAVeh(3) ;
 						veh.setTruck(true) ;
 						cells[lane][len] = veh ;
 					} else {
-						if ( MatsimRandom.random.nextDouble() < 0.5 ) {
+						if ( MatsimRandom.getRandom().nextDouble() < 0.5 ) {
 							cells[lane][len] = new MyCAVeh(5) ;
 						} else {
 							cells[lane][len] = new MyCAVeh(5) ;
@@ -259,9 +259,9 @@ class CALink extends QueueLink {
 					if ( speed > gap ) { speed = gap ; }
 
 					if ( origSpeed==0 ) {
-						if ( (speed >= 1) && (MatsimRandom.random.nextDouble() < 0.01) ) { speed -- ; }
+						if ( (speed >= 1) && (MatsimRandom.getRandom().nextDouble() < 0.01) ) { speed -- ; }
 					} else {
-						if ( (speed >= 1) && (MatsimRandom.random.nextDouble() < 0.05+0.05*lane-veh.getSpeedOffset()) ) { speed -- ; }
+						if ( (speed >= 1) && (MatsimRandom.getRandom().nextDouble() < 0.05+0.05*lane-veh.getSpeedOffset()) ) { speed -- ; }
 					}
 					veh.setSpeed(speed) ;
 				}

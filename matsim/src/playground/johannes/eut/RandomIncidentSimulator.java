@@ -29,15 +29,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.controler.Controler;
-import org.matsim.controler.events.IterationStartsEvent;
-import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.core.api.network.Link;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.NetworkChangeEvent;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkChangeEvent.ChangeType;
-import org.matsim.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
 /**
  * @author illenberger
@@ -101,8 +101,8 @@ public class RandomIncidentSimulator implements IterationStartsListener {
 
 			List<NetworkChangeEvent> events = new ArrayList<NetworkChangeEvent>(links.size() * 2);
 			for (Link link : this.links) {
-				MatsimRandom.random.nextDouble();
-				if ((MatsimRandom.random.nextDouble() < this.incidentProba)
+				MatsimRandom.getRandom().nextDouble();
+				if ((MatsimRandom.getRandom().nextDouble() < this.incidentProba)
 						&& (iteration >= this.startIteration)) {
 
 					NetworkChangeEvent e1 = new NetworkChangeEvent(0);

@@ -7,8 +7,8 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.BasicEventImpl;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.BasicEventImpl;
 
 public class StartingLegMessage extends EventMessage {
 

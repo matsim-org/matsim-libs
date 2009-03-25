@@ -20,9 +20,9 @@
 
 package playground.meisterk.org.matsim.controler;
 
-import org.matsim.config.Config;
-import org.matsim.controler.Controler;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 
 public class ParsimoniousControler {
 

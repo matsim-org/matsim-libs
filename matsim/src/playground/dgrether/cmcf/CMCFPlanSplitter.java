@@ -19,13 +19,13 @@
 package playground.dgrether.cmcf;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationImpl;
 

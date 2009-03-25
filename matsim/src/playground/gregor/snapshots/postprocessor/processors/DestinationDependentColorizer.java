@@ -22,8 +22,8 @@ package playground.gregor.snapshots.postprocessor.processors;
 
 import java.util.HashMap;
 
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
 
 public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveEventHandler {

@@ -27,11 +27,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.world.Location;
 

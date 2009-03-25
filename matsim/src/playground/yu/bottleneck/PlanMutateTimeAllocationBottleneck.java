@@ -23,7 +23,7 @@ package playground.yu.bottleneck;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.misc.Time;
 
@@ -114,13 +114,13 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithm {
 		double t = time;
 		if (t != Time.UNDEFINED_TIME) {
 			t = t
-					+ (int) ((MatsimRandom.random.nextDouble() * 2.0 - 1.0) * mutationRange);
+					+ (int) ((MatsimRandom.getRandom().nextDouble() * 2.0 - 1.0) * mutationRange);
 			if (t < 0)
 				t = 0;
 			if (t > 24 * 3600)
 				t = 24 * 3600;
 		} else {
-			t = MatsimRandom.random.nextInt(24 * 3600);
+			t = MatsimRandom.getRandom().nextInt(24 * 3600);
 		}
 		return t;
 	}

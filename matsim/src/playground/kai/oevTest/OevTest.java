@@ -20,8 +20,8 @@
 
 package playground.kai.oevTest;
 
-import org.matsim.controler.Controler;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * @author nagel

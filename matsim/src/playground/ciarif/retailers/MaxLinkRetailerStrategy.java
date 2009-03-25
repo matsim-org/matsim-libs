@@ -4,10 +4,10 @@ package playground.ciarif.retailers;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.BasicLinkImpl;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.basic.v01.BasicLinkImpl;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.MatsimRandom;
 
 public class MaxLinkRetailerStrategy implements RetailerStrategy {
 	
@@ -29,7 +29,7 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 		
 		for (Facility f : facilities.values()) {
 			//Object[] links = controler.getNetwork().getLinks().values().toArray();
-			int rd = MatsimRandom.random.nextInt(this.links.length);
+			int rd = MatsimRandom.getRandom().nextInt(this.links.length);
 			BasicLinkImpl link = (BasicLinkImpl)this.links[rd];
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId().toString());

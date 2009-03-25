@@ -26,12 +26,12 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 
 import playground.christoph.router.util.DeadEndRemover;
 

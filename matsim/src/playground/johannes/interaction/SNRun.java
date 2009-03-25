@@ -26,12 +26,12 @@ package playground.johannes.interaction;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.controler.Controler;
-import org.matsim.controler.events.IterationEndsEvent;
-import org.matsim.controler.events.StartupEvent;
-import org.matsim.controler.listener.IterationEndsListener;
-import org.matsim.controler.listener.StartupListener;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.StartupListener;
 
 import playground.johannes.graph.GraphStatistics;
 import playground.johannes.socialnet.SocialNetwork;

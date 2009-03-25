@@ -21,8 +21,8 @@
 package playground.gregor.sims.socialcost;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.router.util.TravelCost;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 public class MarginalTravelCostCalculatorII implements TravelCost {
 

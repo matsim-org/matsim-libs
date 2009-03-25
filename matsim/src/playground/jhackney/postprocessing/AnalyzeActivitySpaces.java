@@ -21,18 +21,18 @@ package playground.jhackney.postprocessing;
 
 import java.util.Iterator;
 
-import org.matsim.config.Config;
-import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.SocNetConfigGroup;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
 import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
 import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
-import org.matsim.router.PlansCalcRoute;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.scoring.TrackActsOverlap;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;

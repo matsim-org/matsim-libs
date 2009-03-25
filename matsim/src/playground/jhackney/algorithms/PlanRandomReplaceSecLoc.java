@@ -41,22 +41,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
 
 
 public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
@@ -102,7 +102,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 		boolean changed = false;
 
 //		Pick a type of facility to replace in this plan according to config settings
-		double rand = MatsimRandom.random.nextDouble();
+		double rand = MatsimRandom.getRandom().nextDouble();
 
 		if (rand < cum_p_factype[0]) {
 			factype = factypes[0];
@@ -133,7 +133,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 			person.getPlans().remove(newPlan);
 			return;
 		}else{
-			Activity newAct = (Activity)(actsOfFacType.get(MatsimRandom.random.nextInt(actsOfFacType.size())));
+			Activity newAct = (Activity)(actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
 
 //			Get agent's knowledge
 			Knowledge k = person.getKnowledge();
@@ -144,7 +144,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 
 			Facilities facs = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 //			Id facId=new Id(Gbl.random.nextInt(facs.getFacilities().size()));
-			int facId=MatsimRandom.random.nextInt(facs.getFacilities(factype).size());
+			int facId=MatsimRandom.getRandom().nextInt(facs.getFacilities(factype).size());
 			Facility f= (Facility) facs.getFacilities(factype).values().toArray()[facId];
 			
 //			Facility f = facs.getFacilities().get(new Id(Gbl.random.nextInt(facs.getFacilities().size())));

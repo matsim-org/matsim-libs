@@ -12,12 +12,12 @@ import java.util.List;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.Dijkstra;
-import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
-import org.matsim.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 /**
  * @author illenberger

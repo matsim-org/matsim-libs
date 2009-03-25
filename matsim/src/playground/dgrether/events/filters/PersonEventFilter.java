@@ -21,8 +21,8 @@ package playground.dgrether.events.filters;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.PersonEvent;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.PersonEvent;
 
 
 /**
@@ -39,7 +39,7 @@ public class PersonEventFilter implements EventFilter {
 
 
 	/**
-	 * @see playground.dgrether.events.filters.EventFilter#judge(org.matsim.events.PersonEvent)
+	 * @see playground.dgrether.events.filters.EventFilter#judge(org.matsim.core.events.PersonEvent)
 	 */
 	public boolean judge(PersonEvent event) {
 		return this.personIds.contains(new IdImpl(event.agentId));

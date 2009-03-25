@@ -8,10 +8,10 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.core.api.population.Population;
-import org.matsim.events.BasicEventImpl;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.events.BasicEventImpl;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
 
 import playground.yu.visum.writer.UserDefAtt;
@@ -112,7 +112,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.matsim.events.handler.BasicEventHandlerI#handleEvent(
-	 *      org.matsim.events.BasicEventImpl)
+	 *      org.matsim.core.events.BasicEventImpl)
 	 */
 	@Override
 	public void handleEvent(BasicEventImpl event) {

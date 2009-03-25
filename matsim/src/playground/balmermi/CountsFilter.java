@@ -28,8 +28,8 @@ import java.util.TreeSet;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.counts.Counts;
-import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordUtils;
 

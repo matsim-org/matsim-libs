@@ -20,19 +20,19 @@
 package playground.mfeil;
 
 
-import org.matsim.config.groups.StrategyConfigGroup;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.replanning.PlanStrategyModule;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.modules.PlanomatModule;
+import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.replanning.PlanStrategy;
-import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.modules.PlanomatModule;
-import org.matsim.replanning.modules.ReRoute;
-import org.matsim.replanning.selectors.BestPlanSelector;
-import org.matsim.replanning.selectors.RandomPlanSelector;
-import org.matsim.scoring.ScoringFunctionFactory;
 
 
 /**

@@ -31,7 +31,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.geometry.CoordUtils;
 
@@ -53,7 +53,7 @@ public class ModeAlgo extends AbstractPersonAlgorithm{
 	@Override
 	public void run(Person person) {
 		
-		double rd = MatsimRandom.random.nextDouble();
+		double rd = MatsimRandom.getRandom().nextDouble();
 		Plan plan = person.getSelectedPlan();
 		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 

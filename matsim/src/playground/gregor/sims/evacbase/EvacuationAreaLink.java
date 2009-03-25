@@ -20,7 +20,7 @@
 
 package playground.gregor.sims.evacbase;
 
-import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * Simple evacuation link description, according to the evacuation area xml file.

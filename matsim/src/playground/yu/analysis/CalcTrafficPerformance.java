@@ -21,9 +21,9 @@
 package playground.yu.analysis;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.handler.LinkEnterEventHandler;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.utils.TollTools;

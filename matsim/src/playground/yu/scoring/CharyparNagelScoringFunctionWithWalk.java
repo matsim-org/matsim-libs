@@ -6,8 +6,8 @@ package playground.yu.scoring;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.scoring.CharyparNagelScoringFunction;
-import org.matsim.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.CharyparNagelScoringFunction;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
 /**
  * change scoring function, because "walk"-mode will be implemented

@@ -22,8 +22,8 @@ package playground.toronto.mapping;
 
 import java.util.Iterator;
 
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.misc.ArgumentParser;
 
 public class LinkZoneMapping {

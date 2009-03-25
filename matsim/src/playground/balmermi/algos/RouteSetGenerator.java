@@ -27,16 +27,16 @@ import java.util.List;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.CarRoute;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.AStarLandmarks;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.router.AStarLandmarks;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelTime;
-import org.matsim.router.util.LeastCostPathCalculator.Path;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
 
 public class RouteSetGenerator {
 
@@ -198,11 +198,11 @@ public class RouteSetGenerator {
 		System.out.println("--- Randomly removing routes until " + k + " routes left... ---");
 		// Remove randomly some routes from the localRoutes until it contains k*(localRouteFactor) elements
 		while (k*localRoute_factor < localRoutes.size()) { 
-			localRoutes.remove(MatsimRandom.random.nextInt(localRoutes.size()));
+			localRoutes.remove(MatsimRandom.getRandom().nextInt(localRoutes.size()));
 		}
 		// Remove randomly some routes from the nonLocalRoutes until it contains k*(1-localRouteFactor)-1 elements
 		while (k*(1-localRoute_factor)-1 < nonLocalRoutes.size()) { 
-			nonLocalRoutes.remove(MatsimRandom.random.nextInt(nonLocalRoutes.size()));
+			nonLocalRoutes.remove(MatsimRandom.getRandom().nextInt(nonLocalRoutes.size()));
 		}
 		// add the least cost path at the beginning of the route
 		CarRoute route = new NodeCarRoute(path.links.get(0),path.links.get(path.links.size()-1));

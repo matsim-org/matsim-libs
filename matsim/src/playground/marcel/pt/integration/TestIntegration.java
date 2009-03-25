@@ -25,12 +25,12 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.config.Config;
 import org.matsim.core.api.facilities.Facilities;
-import org.matsim.events.Events;
-import org.matsim.events.algorithms.EventWriterXML;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.config.Config;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.run.OTFVis;
 import org.xml.sax.SAXException;
 

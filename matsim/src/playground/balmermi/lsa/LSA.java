@@ -23,7 +23,7 @@ package playground.balmermi.lsa;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 public class LSA implements Comparable<LSA> {
 

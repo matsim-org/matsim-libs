@@ -25,7 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;

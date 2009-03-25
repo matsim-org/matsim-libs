@@ -25,17 +25,17 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.config.Config;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.MatsimEventsReader;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.EventsToScore;
 import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
 import org.matsim.population.filters.RouteLinkFilter;
 import org.matsim.population.filters.SelectedPlanFilter;
-import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.scoring.EventsToScore;
 
 import playground.dgrether.events.FilteredEvents;
 import playground.dgrether.events.filters.PersonEventFilter;

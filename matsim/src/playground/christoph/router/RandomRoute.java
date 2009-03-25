@@ -29,7 +29,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.CarRoute;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.routes.NodeCarRoute;
 
 import playground.christoph.router.util.KnowledgeTools;
@@ -100,7 +100,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 			}
 			
 			// choose node
-			int nextLink = MatsimRandom.random.nextInt(linksArray.length);
+			int nextLink = MatsimRandom.getRandom().nextInt(linksArray.length);
 			
 			// make the chosen link to the new current link
 			if(linksArray[nextLink] instanceof Link)

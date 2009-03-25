@@ -20,26 +20,26 @@
 
 package playground.jhackney.replanning;
 
-import org.matsim.config.Config;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.modules.ExternalModule;
+import org.matsim.core.replanning.modules.ReRouteDijkstra;
+import org.matsim.core.replanning.modules.ReRouteLandmarks;
+import org.matsim.core.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.KeepSelected;
+import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.replanning.PlanStrategy;
-import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.modules.ExternalModule;
-import org.matsim.replanning.modules.ReRouteDijkstra;
-import org.matsim.replanning.modules.ReRouteLandmarks;
-import org.matsim.replanning.modules.TimeAllocationMutator;
-import org.matsim.replanning.selectors.BestPlanSelector;
-import org.matsim.replanning.selectors.ExpBetaPlanChanger;
-import org.matsim.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.replanning.selectors.KeepSelected;
-import org.matsim.replanning.selectors.PathSizeLogitSelector;
-import org.matsim.replanning.selectors.RandomPlanSelector;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers

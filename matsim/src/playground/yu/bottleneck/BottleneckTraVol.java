@@ -23,10 +23,10 @@ package playground.yu.bottleneck;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.handler.LinkEnterEventHandler;
+import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
 

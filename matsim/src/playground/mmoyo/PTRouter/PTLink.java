@@ -1,9 +1,9 @@
 package playground.mmoyo.PTRouter;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.LinkImpl;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 
 //Validate the need of this class
 public class PTLink extends LinkImpl {

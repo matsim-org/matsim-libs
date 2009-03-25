@@ -3,14 +3,14 @@ package playground.mmoyo.PTCase2;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
-import org.matsim.router.util.LeastCostPathCalculator.Path;
 
 public class PTTester {
 	private final PTOb pt;

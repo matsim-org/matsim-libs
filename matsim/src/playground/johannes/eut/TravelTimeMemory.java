@@ -7,8 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author illenberger

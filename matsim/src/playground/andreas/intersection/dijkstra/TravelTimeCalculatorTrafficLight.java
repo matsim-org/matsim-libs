@@ -3,11 +3,11 @@ package playground.andreas.intersection.dijkstra;
 import java.util.HashMap;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.network.NetworkLayer;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 

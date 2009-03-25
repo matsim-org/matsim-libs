@@ -4,7 +4,8 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+
 import playground.mmoyo.PTRouter.PTNode;
 
 /**

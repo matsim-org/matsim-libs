@@ -27,7 +27,7 @@ import java.util.Iterator;
 
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
+import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 
 public class FacilityWriteTable extends AbstractFacilityAlgorithm {
 

@@ -28,8 +28,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.geometry.CoordUtils;
@@ -143,7 +143,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W3));
 		if (prim_acts.isEmpty()) { model.setDistanceHome2Work(0.0); }
 		else {
-			Coord p_coord = prim_acts.get(MatsimRandom.random.nextInt(prim_acts.size())).getFacility().getCoord();
+			Coord p_coord = prim_acts.get(MatsimRandom.getRandom().nextInt(prim_acts.size())).getFacility().getCoord();
 			model.setDistanceHome2Work(CoordUtils.calcDistance(h_coord, p_coord));
 		}
 

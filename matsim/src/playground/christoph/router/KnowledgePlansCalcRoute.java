@@ -22,12 +22,12 @@ package playground.christoph.router;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Person;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.router.util.PersonLeastCostPathCalculator;
 

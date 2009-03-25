@@ -1,6 +1,6 @@
 package playground.wrashid.tryouts.starting;
 
-import org.matsim.mobsim.jdeqsim.util.CppEventFileParser;
+import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 
 public class PCppEventFileParser extends Thread {
 	Object lock;

@@ -8,7 +8,7 @@ import java.util.ConcurrentModificationException;
 import java.util.List;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 
 import playground.yu.visum.filter.finalFilters.FinalEventFilterA;
 

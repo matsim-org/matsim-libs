@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 
 
 public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
@@ -48,7 +48,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 			utils [0]= Math.log(currentlink_volume); //If the utility would be defined in a more complex way than it is now, a 
 			// calc_utility method might be called at this point
 			for (int i=1; i<alternatives;i++) {
-				int rd = MatsimRandom.random.nextInt(links.length);
+				int rd = MatsimRandom.getRandom().nextInt(links.length);
 				newLinks.add((Link)links[rd]);
 				double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(newLinks.get(i).getId().toString());
 				
@@ -59,7 +59,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 				}
 				utils [i]= Math.log(newlink_volume); // see above calc_utility
 			}
-			double r = MatsimRandom.random.nextDouble();
+			double r = MatsimRandom.getRandom().nextDouble();
 			double [] probs = calcLogitProbability(utils);
 			for (int k=0;k<probs.length;k++) {
 				if (r<=probs [k]) {

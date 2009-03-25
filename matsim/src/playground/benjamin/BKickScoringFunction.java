@@ -22,17 +22,17 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.scoring.CharyparNagelScoringFunction;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.population.ActUtilityParameters;
-import org.matsim.scoring.CharyparNagelScoringFunction;
-import org.matsim.scoring.ScoringFunction;
 import org.matsim.utils.misc.Time;
 
 

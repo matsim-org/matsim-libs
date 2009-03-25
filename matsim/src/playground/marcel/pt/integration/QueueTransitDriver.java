@@ -24,14 +24,14 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
-import org.matsim.mobsim.queuesim.DriverAgent;
-import org.matsim.mobsim.queuesim.QueueLink;
-import org.matsim.mobsim.queuesim.QueueVehicle;
-import org.matsim.mobsim.queuesim.Simulation;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.population.LegImpl;
 import org.matsim.population.PersonImpl;
 

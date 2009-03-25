@@ -20,8 +20,8 @@
 
 package playground.toronto.example;
 
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.handler.LinkEnterEventHandler;
 
 /**
  * Calculates the distance all vehicles travel per hour

@@ -32,8 +32,8 @@ import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.collections.QuadTree;
@@ -163,7 +163,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			sum_cap_acts.add(sum_cap);
 			acts.add(a);
 		}
-		int r = MatsimRandom.random.nextInt(sum_cap);
+		int r = MatsimRandom.getRandom().nextInt(sum_cap);
 		for (int i=0; i<sum_cap_acts.size(); i++) {
 			if (r < sum_cap_acts.get(i)) {
 				return acts.get(i);

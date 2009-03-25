@@ -25,10 +25,10 @@ import java.util.HashSet;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.Dijkstra;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import playground.gregor.withindayevac.Beliefs;
 import playground.gregor.withindayevac.Intentions;

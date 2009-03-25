@@ -23,10 +23,10 @@ package playground.anhorni.locationchoice.depr;
 
 
 import org.apache.log4j.Logger;
-import org.matsim.controler.Controler;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.constrained.SubChain;
-import org.matsim.network.NetworkLayer;
 
 
 public class LocationMutatorwChoiceSetIncremental extends LocationMutatorwChoiceSet {

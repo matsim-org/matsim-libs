@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.core.api.network.Link;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
 
 import playground.yu.utils.io.SimpleReader;
 

@@ -29,9 +29,9 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.api.population.Route;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.router.util.LeastCostPathCalculator.Path;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -136,21 +136,21 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 			// select next Link
 			if(nextLink != null)
 			{
-				double randomDouble = MatsimRandom.random.nextDouble();
+				double randomDouble = MatsimRandom.getRandom().nextDouble();
 				
 				/*
 				 * Select random number, if the random number is bigger than the compassProbabilty.
 				 * If that's not the case, nothing has to be done - the current nextLink is selected by
 				 * the Compass Algorithm.
 				 */
-				if (randomDouble > compassProbability) nextLink = linksArray[MatsimRandom.random.nextInt(linksArray.length)];
+				if (randomDouble > compassProbability) nextLink = linksArray[MatsimRandom.getRandom().nextInt(linksArray.length)];
 			}
 			
 			// Compass Algorithm didn't find a link -> only choose randomly
 			else
 			{
 				// choose Link
-				nextLink = linksArray[MatsimRandom.random.nextInt(linksArray.length)];
+				nextLink = linksArray[MatsimRandom.getRandom().nextInt(linksArray.length)];
 			}
 			//nextLink = links[i];
 			

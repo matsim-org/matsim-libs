@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package playground.benjamin;
 
-import org.matsim.config.Config;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanCalcType;
-import org.matsim.scoring.ScoringFunctionFactory;
 
 
 /**

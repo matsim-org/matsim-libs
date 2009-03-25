@@ -27,12 +27,12 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.utils.geometry.CoordImpl;
 
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;
@@ -185,7 +185,7 @@ public class FacilitiesAllActivitiesFTE {
 				Object[] tempFacilitiesIds = tempFacilities.keySet().toArray();
 				while (numSectorFTE > 0) {
 					// choose a random temp facility
-					tempFacilityId = (String) tempFacilitiesIds[MatsimRandom.random.nextInt(tempFacilitiesIds.length)];
+					tempFacilityId = (String) tempFacilitiesIds[MatsimRandom.getRandom().nextInt(tempFacilitiesIds.length)];
 					// determine the size range
 					sizeRange = Integer.parseInt(tempFacilityId.substring(tempFacilityId.length() - 1));
 					// put in fixed additional number of FTEs, but consider upper limit, and remaining numSectorFTEs

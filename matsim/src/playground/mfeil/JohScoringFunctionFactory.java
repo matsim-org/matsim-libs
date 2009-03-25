@@ -21,7 +21,7 @@
 package playground.mfeil;
 
 import org.matsim.core.api.population.Plan;
-import org.matsim.scoring.*;
+import org.matsim.core.scoring.*;
 
 /**
  * A factory to create {@link CharyparNagelScoringFunction}s.

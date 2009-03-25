@@ -35,7 +35,6 @@ import java.util.Iterator;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.config.Config;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -44,10 +43,11 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.Events;
-import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.queuesim.Simulation;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.config.Config;
+import org.matsim.core.events.Events;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.Simulation;
+import org.matsim.core.network.NetworkLayer;
 
 public class BasicSimulation {
 	

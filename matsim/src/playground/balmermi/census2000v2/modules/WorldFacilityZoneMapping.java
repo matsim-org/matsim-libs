@@ -24,9 +24,9 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.facilities.FacilitiesImpl;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.world.Location;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
@@ -100,7 +100,7 @@ public class WorldFacilityZoneMapping {
 					log.warn("      no zone for f_id="+f.getId()+". assigning nearest zone_id="+nearest_loc.getId()+" with dist(f->z)="+min_dist);
 				}
 				else {
-					Location z = locs.get(MatsimRandom.random.nextInt(locs.size()));
+					Location z = locs.get(MatsimRandom.getRandom().nextInt(locs.size()));
 					world.addMapping(z,f);
 				}
 			}

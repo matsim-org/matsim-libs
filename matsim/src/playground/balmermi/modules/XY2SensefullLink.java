@@ -23,13 +23,13 @@ package playground.balmermi.modules;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.config.Config;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkSummary;
-import org.matsim.network.algorithms.NetworkWriteAsTable;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.algorithms.NetworkSummary;
+import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 
 import playground.balmermi.Scenario;
 

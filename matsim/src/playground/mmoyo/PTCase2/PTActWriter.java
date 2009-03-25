@@ -7,9 +7,6 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.BasicActivityImpl;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.config.Config;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -18,14 +15,17 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.population.LegImpl;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.routes.LinkCarRoute;
-import org.matsim.router.Dijkstra;
-import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTRouter.PTNode;
@@ -43,7 +43,7 @@ public class PTActWriter {
 
 	public PTActWriter(final PTOb ptOb){
 		this.pt = ptOb;
-		Config config = new org.matsim.config.Config();
+		Config config = new org.matsim.core.config.Config();
 		config = Gbl.createConfig(new String[]{this.pt.getConfig(), "http://www.matsim.org/files/dtd/plans_v4.dtd"});
 		Gbl.setConfig(config);
 		//Gbl.getWorld().setNetworkLayer(pt.getPtNetworkLayer());

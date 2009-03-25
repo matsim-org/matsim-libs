@@ -25,13 +25,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.network.NetworkLayer;
 
 public class Wardrop {
 

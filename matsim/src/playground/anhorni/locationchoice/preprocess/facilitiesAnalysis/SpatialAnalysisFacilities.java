@@ -10,8 +10,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.gbl.Gbl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

@@ -1,13 +1,13 @@
 package playground.wrashid.PDES3;
 
 import org.matsim.core.api.population.Person;
-import org.matsim.mobsim.jdeqsim.DeadlockPreventionMessage;
-import org.matsim.mobsim.jdeqsim.Message;
-import org.matsim.mobsim.jdeqsim.MessageFactory;
-import org.matsim.mobsim.jdeqsim.Road;
-import org.matsim.mobsim.jdeqsim.Scheduler;
-import org.matsim.mobsim.jdeqsim.SimUnit;
-import org.matsim.mobsim.jdeqsim.Vehicle;
+import org.matsim.core.mobsim.jdeqsim.DeadlockPreventionMessage;
+import org.matsim.core.mobsim.jdeqsim.Message;
+import org.matsim.core.mobsim.jdeqsim.MessageFactory;
+import org.matsim.core.mobsim.jdeqsim.Road;
+import org.matsim.core.mobsim.jdeqsim.Scheduler;
+import org.matsim.core.mobsim.jdeqsim.SimUnit;
+import org.matsim.core.mobsim.jdeqsim.Vehicle;
 
 
 public class PVehicle extends Vehicle {

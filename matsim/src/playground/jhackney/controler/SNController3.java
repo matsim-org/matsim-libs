@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.replanning.PlanStrategyModule;
-import org.matsim.replanning.PlanStrategy;
-import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.modules.ReRouteLandmarks;
-import org.matsim.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.replanning.selectors.KeepSelected;
-import org.matsim.replanning.selectors.RandomPlanSelector;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.PreProcessLandmarks;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.modules.ReRouteLandmarks;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.KeepSelected;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 
 import playground.jhackney.replanning.SNCoordinateArrivalTimes;

@@ -5,16 +5,16 @@ import java.util.Comparator;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.events.AgentStuckEvent;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.mobsim.queuesim.QueueLink;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.QueueNode;
-import org.matsim.mobsim.queuesim.QueueSimulation;
-import org.matsim.mobsim.queuesim.Simulation;
-import org.matsim.mobsim.queuesim.SimulationTimer;
-import org.matsim.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.events.AgentStuckEvent;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.QueueNode;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.mobsim.queuesim.Simulation;
+import org.matsim.core.mobsim.queuesim.SimulationTimer;
 
 public class QNode extends QueueNode{
 
@@ -71,7 +71,7 @@ public class QNode extends QueueNode{
 			int auxCounter = 0;
 			// randomize based on capacity
 			while (auxCounter < inLinksCounter) {
-				double rndNum = MatsimRandom.random.nextDouble() * inLinksCapSum;
+				double rndNum = MatsimRandom.getRandom().nextDouble() * inLinksCapSum;
 				double selCap = 0.0;
 				for (int i = 0; i < inLinksCounter; i++) {
 					QLink link = this.tempLinks[i];

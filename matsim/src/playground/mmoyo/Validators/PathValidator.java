@@ -1,7 +1,7 @@
 package playground.mmoyo.Validators;
 
-import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 
 public class PathValidator {

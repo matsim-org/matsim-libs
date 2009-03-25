@@ -1,8 +1,8 @@
 package playground.yu.visum.filter;
 
-import org.matsim.events.BasicEventImpl;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
+import org.matsim.core.events.BasicEventImpl;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.utils.misc.Time;
 
 /**

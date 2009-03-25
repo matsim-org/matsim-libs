@@ -27,8 +27,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 
-import org.matsim.controler.events.ShutdownEvent;
-import org.matsim.controler.listener.ShutdownListener;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.ShutdownListener;
 
 /**
  * @author illenberger

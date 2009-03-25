@@ -26,21 +26,21 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.scoring.PlanScorer;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.util.AStarLandmarksFactory;
-import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.scoring.PlanScorer;
 
 
 /**

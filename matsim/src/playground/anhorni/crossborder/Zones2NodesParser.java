@@ -5,7 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import org.matsim.gbl.Gbl;
+
+import org.matsim.core.gbl.Gbl;
 
 public class Zones2NodesParser {
 	

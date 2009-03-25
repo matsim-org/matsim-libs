@@ -32,10 +32,10 @@ import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
-import org.matsim.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
-import org.matsim.scoring.CharyparNagelScoringParameters;
 
 
 /**
@@ -54,7 +54,7 @@ import org.matsim.scoring.CharyparNagelScoringParameters;
  *
  */
 public class ActivityScoringFunction extends
-org.matsim.scoring.charyparNagel.ActivityScoringFunction {
+org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	// TODO should be in person.desires
 	public static final int DEFAULT_PRIORITY = 1;

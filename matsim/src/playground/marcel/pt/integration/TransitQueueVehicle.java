@@ -21,7 +21,7 @@
 package playground.marcel.pt.integration;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.mobsim.queuesim.QueueVehicle;
 
 import playground.marcel.pt.interfaces.Vehicle;
 

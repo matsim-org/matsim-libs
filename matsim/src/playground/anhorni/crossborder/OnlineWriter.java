@@ -4,10 +4,11 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import org.matsim.gbl.Gbl;
+
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
-import org.matsim.network.NetworkLayer;
 
 
 class OnlineWriter {

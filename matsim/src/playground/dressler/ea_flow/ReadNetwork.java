@@ -25,8 +25,7 @@ package playground.dressler.ea_flow;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.*;
-//import org.matsim.utils.identifiers.IdI;
+import org.matsim.core.network.*;
 
 public class ReadNetwork {
 

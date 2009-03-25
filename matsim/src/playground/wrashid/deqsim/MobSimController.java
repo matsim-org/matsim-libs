@@ -20,8 +20,8 @@
 
 package playground.wrashid.deqsim;
 
-import org.matsim.controler.Controler;
-import org.matsim.mobsim.jdeqsim.util.Timer;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.jdeqsim.util.Timer;
 
 
 

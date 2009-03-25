@@ -12,10 +12,10 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.matsim.mobsim.jdeqsim.util.Timer;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.jdeqsim.util.Timer;
 
 
 public class Scheduler {

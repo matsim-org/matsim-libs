@@ -23,11 +23,11 @@ package playground.christoph.router;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.Dijkstra;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelCost;

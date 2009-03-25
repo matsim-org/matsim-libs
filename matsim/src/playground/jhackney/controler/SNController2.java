@@ -1,7 +1,7 @@
 package playground.jhackney.controler;
 
 import org.apache.log4j.Logger;
-import org.matsim.controler.Controler;
+import org.matsim.core.controler.Controler;
 
 public class SNController2 extends Controler {
 

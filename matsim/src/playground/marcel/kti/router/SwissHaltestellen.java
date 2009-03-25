@@ -26,8 +26,8 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.CalcBoundingBox;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.algorithms.CalcBoundingBox;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordImpl;

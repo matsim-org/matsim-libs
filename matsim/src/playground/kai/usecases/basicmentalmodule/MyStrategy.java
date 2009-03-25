@@ -23,10 +23,10 @@ package playground.kai.usecases.basicmentalmodule;
  */
 
 import org.matsim.api.basic.v01.BasicScenario;
-import org.matsim.controler.Controler;
-import org.matsim.events.Events;
-import org.matsim.replanning.PlanStrategy;
-import org.matsim.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.events.Events;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 
 public class MyStrategy extends PlanStrategy {

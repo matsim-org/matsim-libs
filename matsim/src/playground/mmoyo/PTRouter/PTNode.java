@@ -2,7 +2,7 @@ package playground.mmoyo.PTRouter;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.network.NodeImpl;
+import org.matsim.core.network.NodeImpl;
 
 /**
  * Node with necessary data for the PT simulation

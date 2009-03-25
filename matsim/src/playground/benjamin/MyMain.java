@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin;
 
-import org.matsim.controler.Controler;
+import org.matsim.core.controler.Controler;
 import org.matsim.run.OTFVis;
 
 public class MyMain {

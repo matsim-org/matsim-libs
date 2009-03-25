@@ -3,10 +3,10 @@ package playground.anhorni.locationchoice.cs.helper;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
 
 public class ReaderTripHandler {

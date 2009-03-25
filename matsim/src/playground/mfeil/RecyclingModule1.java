@@ -22,14 +22,14 @@ package playground.mfeil;
 
 
 import org.apache.log4j.Logger;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.replanning.modules.MultithreadedModuleA;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.controler.Controler;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.replanning.PlanStrategyModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.modules.MultithreadedModuleA;
 
 
 /**
@@ -83,7 +83,7 @@ public class RecyclingModule1 extends RecyclingModule implements PlanStrategyMod
 		
 		/* Individual optimization of agents */
 		for (int i=0;i<this.testAgentsNumber;i++) {
-			int pos = (int)(MatsimRandom.random.nextDouble()*this.list[1].size());
+			int pos = (int)(MatsimRandom.getRandom().nextDouble()*this.list[1].size());
 			list[0].add(list[1].get(pos));
 			schedulingModule.handlePlan(list[1].get(pos));
 			list[1].remove(pos);

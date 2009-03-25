@@ -6,7 +6,8 @@ import java.util.Iterator;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+
 import java.util.Collections;
 import java.util.Vector;
 import java.util.List;

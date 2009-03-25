@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.dgrether.tests;
 
-import org.matsim.controler.Controler;
+import org.matsim.core.controler.Controler;
 
 import tutorial.MyControlerListener;
 

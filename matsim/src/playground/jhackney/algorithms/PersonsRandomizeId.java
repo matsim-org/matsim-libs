@@ -3,10 +3,10 @@ package playground.jhackney.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.MatsimRandom;
 
 public class PersonsRandomizeId {
 
@@ -40,12 +40,12 @@ public class PersonsRandomizeId {
 
 	private ArrayList<Integer> makeNewIds(int numPers2, int minId, int maxId) {
 		// TODO Auto-generated method stub
-		int offset=MatsimRandom.random.nextInt(maxId);
+		int offset=MatsimRandom.getRandom().nextInt(maxId);
 		ArrayList<Integer> newIds=new ArrayList<Integer>();
 		for (int i = minId + offset; i<maxId+offset; i++){
 			newIds.add(i);
 		}
-		java.util.Collections.shuffle(newIds, MatsimRandom.random);
+		java.util.Collections.shuffle(newIds, MatsimRandom.getRandom());
 		return newIds;
 	}
 

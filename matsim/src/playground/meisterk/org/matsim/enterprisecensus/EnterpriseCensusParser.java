@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 public class EnterpriseCensusParser {
 

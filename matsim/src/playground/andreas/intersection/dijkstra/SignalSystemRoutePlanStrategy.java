@@ -18,9 +18,9 @@
  * *********************************************************************** */
 package playground.andreas.intersection.dijkstra;
 
-import org.matsim.controler.Controler;
-import org.matsim.replanning.PlanStrategy;
-import org.matsim.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 /**
  * @author dgrether

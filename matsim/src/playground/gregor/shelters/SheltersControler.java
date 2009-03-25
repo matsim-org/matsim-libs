@@ -27,8 +27,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.controler.Controler;
-import org.matsim.network.NetworkWriter;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkWriter;
 import org.xml.sax.SAXException;
 
 import playground.gregor.sims.evacbase.EvacuationAreaFileReader;

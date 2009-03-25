@@ -26,13 +26,13 @@ import java.io.File;
 import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.config.Config;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkWriterHandlerImplTLinks;
-import org.matsim.network.NetworkWriterHandlerImplTNodes;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkWriterHandlerImplTLinks;
+import org.matsim.core.network.NetworkWriterHandlerImplTNodes;
 
 public class CreateTransimsNetwork {
 

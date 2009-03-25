@@ -27,17 +27,17 @@ import java.util.Queue;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.mobsim.queuesim.DriverAgent;
-import org.matsim.mobsim.queuesim.QueueLink;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.QueueNetworkFactory;
-import org.matsim.mobsim.queuesim.QueueNode;
-import org.matsim.mobsim.queuesim.QueueVehicle;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.QueueNetworkFactory;
+import org.matsim.core.mobsim.queuesim.QueueNode;
+import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.network.NetworkLayer;
 
 import playground.christoph.events.algorithms.ParallelActEndReplanner;
 import playground.christoph.events.algorithms.ParallelLeaveLinkReplanner;

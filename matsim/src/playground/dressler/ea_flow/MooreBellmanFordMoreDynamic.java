@@ -29,11 +29,11 @@ import java.util.Queue;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.CarRoute;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervall;
@@ -166,7 +166,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
 	 *      org.matsim.core.api.network.Node, double)
 	 */
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode,
@@ -235,7 +235,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
 	 *      org.matsim.core.api.network.Node, double)
 	 */
 	public CarRoute calcLeastCostPath(final Node fromNode, final Node toNode,
@@ -309,7 +309,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
 	 *      org.matsim.core.api.network.Node, double)
 	 */
 	public ArrayList<Link> calcLeastCostLinkRoute(final Node fromNode,
@@ -359,7 +359,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
 	 *      org.matsim.core.api.network.Node, double)
 	 */
 	public ArrayList<Link> calcLeastCostLinkRoute(final Node fromNode,
@@ -406,7 +406,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
 	 *      org.matsim.core.api.network.Node, double)
 	 */
 	public HashMap<Link, EdgeIntervalls> calcLeastCostFlow(final Node fromNode,
@@ -478,7 +478,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
 	 *      org.matsim.core.api.network.Node, double)
 	 */
 	public HashMap<Link, EdgeIntervalls> calcLeastCostFlow(final Node fromNode,

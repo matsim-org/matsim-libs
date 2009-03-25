@@ -29,15 +29,20 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
-import org.matsim.facilities.ActivityOptionImpl;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.scoring.PlanScorer;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.constrained.ManageSubchains;
 import org.matsim.locationchoice.constrained.SubChain;
@@ -47,11 +52,6 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.ActivityImpl;
 import org.matsim.population.LegImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.util.AStarLandmarksFactory;
-import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.scoring.PlanScorer;
-import org.matsim.scoring.ScoringFunctionFactory;
 
 import playground.mfeil.config.PlanomatXConfigGroup;
 
@@ -468,11 +468,11 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			for (neighbourPos = (int) (NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos<(int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos++){
 				infoOnNeighbourhood[neighbourPos] = this.changeNumber(neighbourhood[neighbourPos], WEIGHT_INC_NUMBER, numberPositions, actsToBeAdded, actTypes, primActs);
 			}
-			int [] typePosition = {(int)(MatsimRandom.random.nextDouble()*((int)(neighbourhood[0].getPlanElements().size()/2)-1))+1,1};
+			int [] typePosition = {(int)(MatsimRandom.getRandom().nextDouble()*((int)(neighbourhood[0].getPlanElements().size()/2)-1))+1,1};
 			
 			int [] actsToBeChanged = new int [actsToBeAdded.length];
 			for (int i = 0; i<actsToBeChanged.length;i++){
-				actsToBeChanged[i] = (int)(MatsimRandom.random.nextDouble()* actTypes.size());
+				actsToBeChanged[i] = (int)(MatsimRandom.getRandom().nextDouble()* actTypes.size());
 			}
 			for (neighbourPos = (int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos<NEIGHBOURHOOD_SIZE; neighbourPos++){
 				infoOnNeighbourhood[neighbourPos] = this.changeType(neighbourhood[neighbourPos], typePosition, actsToBeChanged, actTypes, primActs);
@@ -530,7 +530,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	public int[] changeNumber (PlanomatXPlan basePlan, double weight, int [] positions, int [] actsToBeAdded, 
 			ArrayList<ActivityOption> actTypes, ArrayList<ActivityOption> primActs){
 				
-		if(MatsimRandom.random.nextDouble()>=weight){
+		if(MatsimRandom.getRandom().nextDouble()>=weight){
 			
 			/* Removing an activity, "cycling"*/
 			if (basePlan.getPlanElements().size()==5){
@@ -544,7 +544,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 				}
 			}
 			if(positions[1]==0){
-				positions[1] = (int)(MatsimRandom.random.nextDouble()*((int)(basePlan.getPlanElements().size()/2)-1))+1;
+				positions[1] = (int)(MatsimRandom.getRandom().nextDouble()*((int)(basePlan.getPlanElements().size()/2)-1))+1;
 			}
 			
 			if (basePlan.getPlanElements().size()>5){
@@ -589,7 +589,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 				if (positions[0]==0){
 					positions[0] = 1;
 					for (int i = 0; i < actsToBeAdded.length;i++){
-						actsToBeAdded[i] = (int)(MatsimRandom.random.nextDouble()* actTypes.size());
+						actsToBeAdded[i] = (int)(MatsimRandom.getRandom().nextDouble()* actTypes.size());
 					}
 					this.insertAct(positions[0], actsToBeAdded, basePlan, actTypes);
 					
@@ -638,7 +638,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		}
 		else {
 			if (position[0] == 1){
-				actsToBeAdded[1] = (int)(MatsimRandom.random.nextDouble()* actTypes.size());
+				actsToBeAdded[1] = (int)(MatsimRandom.getRandom().nextDouble()* actTypes.size());
 				this.removeAct(0, basePlan);
 				((Activity)basePlan.getPlanElements().get(0)).setDuration(24*3600);
 				((Activity)basePlan.getPlanElements().get(0)).setStartTime(0);

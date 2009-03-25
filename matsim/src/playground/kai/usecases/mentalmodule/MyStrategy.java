@@ -22,15 +22,15 @@ package playground.kai.usecases.mentalmodule;
  * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
  */
 
-import org.matsim.controler.Controler;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.api.replanning.PlanStrategyModule;
-import org.matsim.events.Events;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
-import org.matsim.replanning.PlanStrategy;
-import org.matsim.replanning.selectors.PlanSelector;
-import org.matsim.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.events.Events;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 
 public class MyStrategy extends PlanStrategy {

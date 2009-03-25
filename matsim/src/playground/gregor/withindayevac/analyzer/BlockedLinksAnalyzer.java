@@ -23,7 +23,7 @@ package playground.gregor.withindayevac.analyzer;
 import java.util.HashSet;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.network.TimeVariantLinkImpl;
+import org.matsim.core.network.TimeVariantLinkImpl;
 
 import playground.gregor.withindayevac.Beliefs;
 import playground.gregor.withindayevac.communication.InformationEntity;

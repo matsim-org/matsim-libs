@@ -27,16 +27,16 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.AStarLandmarks;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.AStarLandmarks;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.misc.Time;
 
@@ -131,7 +131,7 @@ public class PathSetGenerator {
 		paths.remove(leastCostPath);
 		// remove randomly as many paths until nofPath-1 are remaining
 		List<Path> tmpPaths = new LinkedList<Path>(paths);
-		while (tmpPaths.size() > (nofPaths-1)) { tmpPaths.remove(MatsimRandom.random.nextInt(tmpPaths.size())); }
+		while (tmpPaths.size() > (nofPaths-1)) { tmpPaths.remove(MatsimRandom.getRandom().nextInt(tmpPaths.size())); }
 		// create the result containing the least cost path and nofPath-1 other paths
 		Tuple<Path,List<Path>> tuple = new Tuple<Path,List<Path>>(leastCostPath,tmpPaths);
 		// reset the least cost path
@@ -171,7 +171,7 @@ public class PathSetGenerator {
 		log.debug("start level "+level);
 		
 		// for EARLY ABORT: shuffle the excludingLinkSets
-		Collections.shuffle(excludingLinkSets,MatsimRandom.random);
+		Collections.shuffle(excludingLinkSets,MatsimRandom.getRandom());
 
 		// the set of excluding link sets for the NEXT tree level
 		List<Set<Link>> newExcludingLinkSets = new LinkedList<Set<Link>>();

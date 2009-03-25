@@ -1,6 +1,6 @@
 package playground.yu.visum.filter;
 
-import org.matsim.events.BasicEventImpl;
+import org.matsim.core.events.BasicEventImpl;
 
 /**
  * @author ychen

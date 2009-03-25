@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordUtils;
@@ -105,7 +105,7 @@ public class PadangSurvey2Biogeme {
 				while ( (numShorterTrips + numEqualTrips + numLongerTrips + numMissed) < 9) {
 
 					// draw random zone based on numOpportunities
-					int r = MatsimRandom.random.nextInt(sumOpportunities);
+					int r = MatsimRandom.getRandom().nextInt(sumOpportunities);
 					int tmpSum = 0;
 					Zone tmpZone = null;
 					for (Zone zone : zones) {

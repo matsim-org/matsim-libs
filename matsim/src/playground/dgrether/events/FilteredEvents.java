@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
-import org.matsim.events.Events;
-import org.matsim.events.PersonEvent;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.PersonEvent;
 
 import playground.dgrether.events.filters.EventFilter;
 

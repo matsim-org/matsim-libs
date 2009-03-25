@@ -1,6 +1,6 @@
 package playground.david.otfivs.executables;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientQuad;
 
 

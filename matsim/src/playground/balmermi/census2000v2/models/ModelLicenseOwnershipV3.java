@@ -20,8 +20,8 @@
 
 package playground.balmermi.census2000v2.models;
 
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 
 
 public class ModelLicenseOwnershipV3 {
@@ -123,7 +123,7 @@ public class ModelLicenseOwnershipV3 {
 		utilities[0] = this.calcYesUtility();
 		utilities[1] = this.calcNoUtility();
 		double license_prob = this.calcLogitProbability(utilities[0],utilities);
-		double r = MatsimRandom.random.nextDouble();
+		double r = MatsimRandom.getRandom().nextDouble();
 		if (r < license_prob) { return true; }
 		else { return false; }
 	}

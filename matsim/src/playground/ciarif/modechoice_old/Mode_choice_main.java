@@ -20,16 +20,16 @@
 
 package playground.ciarif.modechoice_old;
 
-import org.matsim.config.ConfigWriter;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
-import org.matsim.facilities.FacilitiesImpl;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkWriter;
-import org.matsim.network.algorithms.NetworkCalcTopoType;
-import org.matsim.network.algorithms.NetworkSummary;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkCalcTopoType;
+import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonCreatePlanFromKnowledge;

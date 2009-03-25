@@ -24,11 +24,11 @@ import java.util.HashMap;
 
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.Events;
-import org.matsim.mobsim.queuesim.PersonAgent;
-import org.matsim.mobsim.queuesim.QueueSimulation;
-import org.matsim.mobsim.queuesim.Simulation;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.events.Events;
+import org.matsim.core.mobsim.queuesim.PersonAgent;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.queuesim.Simulation;
+import org.matsim.core.network.NetworkLayer;
 
 import playground.marcel.pt.implementations.TransitDriver;
 import playground.marcel.pt.interfaces.Vehicle;

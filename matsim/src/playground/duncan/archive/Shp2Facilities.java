@@ -10,12 +10,12 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.facilities.FacilitiesImpl;
-import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.gis.ShapeFileReader;
 

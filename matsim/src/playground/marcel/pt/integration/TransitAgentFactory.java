@@ -23,8 +23,8 @@ package playground.marcel.pt.integration;
 import java.util.Map;
 
 import org.matsim.core.api.population.Person;
-import org.matsim.mobsim.queuesim.AgentFactory;
-import org.matsim.mobsim.queuesim.PersonAgent;
+import org.matsim.core.mobsim.queuesim.AgentFactory;
+import org.matsim.core.mobsim.queuesim.PersonAgent;
 
 public class TransitAgentFactory extends AgentFactory {
 

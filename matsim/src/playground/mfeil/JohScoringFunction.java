@@ -29,7 +29,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.utils.misc.Time;
 
 /**

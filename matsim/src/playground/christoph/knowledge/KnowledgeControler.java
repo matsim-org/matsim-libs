@@ -28,11 +28,11 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.population.Person;
-import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.replanning.StrategyManager;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorBuilder;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
 
 import playground.christoph.knowledge.replanning.KnowledgeStrategyManagerConfigLoader;
 

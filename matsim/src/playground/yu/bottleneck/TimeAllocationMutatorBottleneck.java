@@ -20,8 +20,8 @@
 
 package playground.yu.bottleneck;
 
+import org.matsim.core.replanning.modules.MultithreadedModuleA;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.replanning.modules.MultithreadedModuleA;
 
 public class TimeAllocationMutatorBottleneck extends MultithreadedModuleA {
 	// -----------------------------MEMBER

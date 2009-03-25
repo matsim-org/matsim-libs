@@ -27,7 +27,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.misc.Time;
@@ -44,7 +44,7 @@ public class PersonVaryTimes extends AbstractPersonAlgorithm implements PlanAlgo
 
 	public PersonVaryTimes() {
 		System.out.println("    init " + this.getClass().getName() + " module...");
-		MatsimRandom.random.nextInt();
+		MatsimRandom.getRandom().nextInt();
 		System.out.println("    done.");
 	}
 
@@ -60,12 +60,12 @@ public class PersonVaryTimes extends AbstractPersonAlgorithm implements PlanAlgo
 	public void run(Person person) {
 		List<? extends BasicPlanElement> acts_legs = person.getSelectedPlan().getPlanElements();
 
-		double bias = MatsimRandom.random.nextInt(3600)-1800.0; // [-1800,1800[
+		double bias = MatsimRandom.getRandom().nextInt(3600)-1800.0; // [-1800,1800[
 
 		// draw a new random number until the new end time >= 0.0
 		double first_end_time = ((Activity)acts_legs.get(0)).getEndTime();
 		while (first_end_time+bias < 0.0) {
-			bias = MatsimRandom.random.nextInt(3600)-1800.0;
+			bias = MatsimRandom.getRandom().nextInt(3600)-1800.0;
 		}
 		
 		for (int i=0; i<acts_legs.size(); i++) {

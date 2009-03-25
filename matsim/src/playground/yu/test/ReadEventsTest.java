@@ -3,8 +3,8 @@
  */
 package playground.yu.test;
 
-import org.matsim.events.Events;
-import org.matsim.events.MatsimEventsReader;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.MatsimEventsReader;
 
 /**
  * @author yu

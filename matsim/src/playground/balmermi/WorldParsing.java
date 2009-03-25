@@ -20,8 +20,8 @@
 
 package playground.balmermi;
 
-import org.matsim.config.ConfigWriter;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;

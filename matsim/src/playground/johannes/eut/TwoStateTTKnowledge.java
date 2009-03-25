@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author illenberger

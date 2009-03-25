@@ -22,7 +22,7 @@ package playground.kai.evacTest;
  * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
  */
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.vis.netvis.NetVis;
 
 import playground.gregor.sims.evacbase.EvacuationQSimControler;

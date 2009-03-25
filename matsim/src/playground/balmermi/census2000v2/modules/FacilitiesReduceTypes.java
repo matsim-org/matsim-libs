@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 public class FacilitiesReduceTypes {
 

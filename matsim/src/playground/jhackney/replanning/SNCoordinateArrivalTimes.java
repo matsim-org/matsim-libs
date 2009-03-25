@@ -19,8 +19,8 @@ package playground.jhackney.replanning;
  *                                                                         *
  * *********************************************************************** */
 
+import org.matsim.core.replanning.modules.MultithreadedModuleA;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.replanning.modules.MultithreadedModuleA;
 /**
  * A sample of schedule coordination in a replanning StrategyModule. The departure
  * time for an act is adjusted according to when friends will be at the act.

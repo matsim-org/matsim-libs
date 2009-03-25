@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
 
 import playground.gregor.withindayevac.Beliefs;
 import playground.gregor.withindayevac.communication.InformationEntity;
@@ -84,7 +84,7 @@ public class FollowHerdAnalyzer implements Analyzer {
 			weightSum += c.value; 
 		}
 		
-		double selNum = weightSum * MatsimRandom.random.nextDouble();
+		double selNum = weightSum * MatsimRandom.getRandom().nextDouble();
 		for (final Link l : indices) {
 			Counter c = counts.get(l);
 			selNum -= c.value;

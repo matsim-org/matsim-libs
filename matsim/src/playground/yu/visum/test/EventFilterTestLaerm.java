@@ -22,13 +22,13 @@ package playground.yu.visum.test;
 
 import java.io.IOException;
 
-import org.matsim.config.Config;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.Events;
-import org.matsim.events.MatsimEventsReader;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.config.Config;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.population.PopulationImpl;
 
 import playground.yu.visum.filter.EventFilterAlgorithm;

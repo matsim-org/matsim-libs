@@ -22,10 +22,10 @@ package playground.marcel;
 
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.facilities.FacilitiesImpl;
-import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.world.World;
 
 import playground.marcel.pt.utils.FacilityNetworkMatching;

@@ -23,12 +23,12 @@ package playground.gregor.withindayevac;
 import java.util.Collection;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Person;
-import org.matsim.mobsim.queuesim.PersonAgent;
-import org.matsim.mobsim.queuesim.SimulationTimer;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.mobsim.queuesim.PersonAgent;
+import org.matsim.core.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.network.NetworkLayer;
 
 import playground.gregor.withindayevac.analyzer.NextLinkWithEstimatedTravelTimeOption;
 import playground.gregor.withindayevac.analyzer.Option;

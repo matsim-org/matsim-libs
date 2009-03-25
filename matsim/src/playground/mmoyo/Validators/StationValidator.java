@@ -5,7 +5,8 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+
 import playground.mmoyo.PTCase2.PTStationMap;
 
 public class StationValidator {

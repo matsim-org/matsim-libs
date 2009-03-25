@@ -20,7 +20,7 @@
 
 package playground.marcel.modules;
 
-import org.matsim.controler.Controler;
+import org.matsim.core.controler.Controler;
 
 public interface MatsimModule {
 

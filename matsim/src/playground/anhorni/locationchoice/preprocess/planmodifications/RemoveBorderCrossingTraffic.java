@@ -9,7 +9,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 
 public class RemoveBorderCrossingTraffic extends Modifier {
 

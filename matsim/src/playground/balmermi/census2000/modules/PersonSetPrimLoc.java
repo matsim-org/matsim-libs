@@ -25,14 +25,14 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -163,7 +163,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 				System.out.println("      Therefore added a neighbor zone id=" + zones.get(0).getId());
 			}
 
-			Zone z = zones.get(MatsimRandom.random.nextInt(zones.size()));
+			Zone z = zones.get(MatsimRandom.getRandom().nextInt(zones.size()));
 			if (f.getActivityOption(WORK) != null) {
 				ArrayList<Facility> facs = this.zone_work_fac_mapping.get(z.getId());
 				if (facs == null) { facs = new ArrayList<Facility>(); }
@@ -208,7 +208,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			int val = (int) from_loc_entries.get(i).getValue();
 			dist_sum[i] = dist_sum[i-1] + val;
 		}
-		int r = MatsimRandom.random.nextInt(dist_sum[n-1]);
+		int r = MatsimRandom.getRandom().nextInt(dist_sum[n-1]);
 		for (int i=0; i<n; i++) {
 			if (r < dist_sum[i]) {
 				return (Zone)from_loc_entries.get(i).getToLocation();
@@ -236,7 +236,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			}
 			dist_sum[i] = dist_sum[i-1] + val;
 		}
-		int r = MatsimRandom.random.nextInt(dist_sum[n-1]);
+		int r = MatsimRandom.getRandom().nextInt(dist_sum[n-1]);
 		for (int i=0; i<n; i++) {
 			if (r < dist_sum[i]) {
 				return facs.get(i);

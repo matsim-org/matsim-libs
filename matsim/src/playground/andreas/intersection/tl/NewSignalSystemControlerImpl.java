@@ -4,13 +4,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemControlInfo;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
-import org.matsim.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.core.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalGroupSettings;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemControlInfo;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan;
+import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.signalsystems.control.SignalSystemControler;
 
 import playground.andreas.intersection.QControler;

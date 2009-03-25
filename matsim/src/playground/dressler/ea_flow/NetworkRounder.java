@@ -22,7 +22,7 @@
 package playground.dressler.ea_flow;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.network.*;
+import org.matsim.core.network.*;
 
 /**
  * @author Manuel Schneider

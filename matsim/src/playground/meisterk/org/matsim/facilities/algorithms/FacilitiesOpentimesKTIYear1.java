@@ -32,7 +32,7 @@ import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.facilities.OpeningTime;
-import org.matsim.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTimeImpl;
 
 public class FacilitiesOpentimesKTIYear1 {
 

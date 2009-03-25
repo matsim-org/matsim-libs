@@ -26,16 +26,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.basic.v01.BasicLegImpl;
+import org.matsim.core.scoring.PlanScorer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.ActivityImpl;
 import org.matsim.population.LegImpl;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.population.routes.LinkCarRoute;
-import org.matsim.scoring.PlanScorer;
 import org.matsim.utils.geometry.CoordUtils;
 
 import playground.mfeil.config.TimeModeChoicerConfigGroup;

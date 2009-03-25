@@ -23,10 +23,10 @@ package playground.gregor.mviProd;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.Events;
-import org.matsim.events.EventsReaderTXTv1;
-import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.handler.AgentArrivalEventHandler;
 
 
 

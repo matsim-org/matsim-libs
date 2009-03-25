@@ -21,9 +21,9 @@
 package playground.balmermi;
 
 import org.matsim.analysis.LegHistogram;
-import org.matsim.events.Events;
-import org.matsim.events.MatsimEventsReader;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.gbl.Gbl;
 
 public class EventsHandling {
 

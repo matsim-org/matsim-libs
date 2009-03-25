@@ -27,8 +27,8 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.geometry.CoordImpl;
@@ -188,7 +188,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 		DISTR[7][13]=0;
 		DISTR[7][14]=0;
 		DISTR[7][15]=0;
-		MatsimRandom.random.nextDouble();
+		MatsimRandom.getRandom().nextDouble();
 		System.out.println("    done.");
 	}
 
@@ -198,7 +198,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 
 	private final void setChain(Person p, int bitcode) {
 		ArrayList<ArrayList<Integer>> chains = this.actchains.getChains(bitcode);
-		int index = MatsimRandom.random.nextInt(chains.size());
+		int index = MatsimRandom.getRandom().nextInt(chains.size());
 		ArrayList<Integer> chain = chains.get(index);
 		Plan plan =  p.createPlan(true);
 		int time_sum = 0;
@@ -261,7 +261,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 		else if (age < 66) { row = 4; }
 		else { row = 6; }
 		if (employed) { row++; }
-		double r = MatsimRandom.random.nextDouble();
+		double r = MatsimRandom.getRandom().nextDouble();
 		double dist_sum = 0.0;
 		for (int j=0; j<cols; j++) {
 			dist_sum += DISTR[row][j];

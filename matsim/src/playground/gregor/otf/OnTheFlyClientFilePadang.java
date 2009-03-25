@@ -7,7 +7,7 @@ import java.rmi.RemoteException;
 import javax.swing.JFrame;
 
 import org.geotools.data.FeatureSource;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;

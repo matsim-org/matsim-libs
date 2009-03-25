@@ -22,7 +22,7 @@ package playground.balmermi.similarities;
 
 import java.util.Date;
 
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 
 import playground.balmermi.Scenario;
 

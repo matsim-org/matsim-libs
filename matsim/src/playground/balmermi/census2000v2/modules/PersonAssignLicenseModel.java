@@ -25,8 +25,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -132,7 +132,7 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 		boolean hasLicense = false;
 		if (person.getAge() >= 18) {
 			hasLicense = model.calcLicenseOwnership();
-			if (!hasLicense && (MatsimRandom.random.nextDouble() < 0.4)) { hasLicense = true; }
+			if (!hasLicense && (MatsimRandom.getRandom().nextDouble() < 0.4)) { hasLicense = true; }
 		}
 		if (hasLicense) { person.setLicence(YES); } else { person.setLicence(NO); }
 	}

@@ -2,11 +2,11 @@ package playground.wrashid.tryouts.performance;
 
 import java.util.LinkedList;
 
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.Events;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.events.parallelEventsHandler.ParallelEvents;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 
 // this events processing relies on creating artifical events, intead of reading them
 public class EventProcessing {

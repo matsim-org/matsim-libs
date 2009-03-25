@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 public class NetworkAdaptCHNavtec {
 

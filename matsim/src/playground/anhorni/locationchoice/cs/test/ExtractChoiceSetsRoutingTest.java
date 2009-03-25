@@ -2,15 +2,15 @@ package playground.anhorni.locationchoice.cs.test;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.controler.Controler;
-import org.matsim.controler.events.AfterMobsimEvent;
-import org.matsim.controler.listener.AfterMobsimListener;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.PlansCalcRoute;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.utils.geometry.CoordImpl;
 
 public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {

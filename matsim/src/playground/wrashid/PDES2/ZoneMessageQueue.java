@@ -14,7 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Person;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 import playground.wrashid.PDES2.util.ConcurrentListMPDSC;
 import playground.wrashid.PDES2.util.ConcurrentListMPSC;

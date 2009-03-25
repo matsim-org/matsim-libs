@@ -23,8 +23,9 @@ package playground.mfeil.creators;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 
 public class PlansCreator {
 
@@ -51,8 +52,8 @@ public class PlansCreator {
 			 
 			 for (int i=1;i<networkSize;i++){
 				 for (int j=1;j<networkSize;j++){
-					 int locationIDShopping=(37+(int)(MatsimRandom.random.nextDouble()*(42-37)));
-					 int locationIDLeisure=(42+(int)(MatsimRandom.random.nextDouble()*(47-42)));
+					 int locationIDShopping=(37+(int)(MatsimRandom.getRandom().nextDouble()*(42-37)));
+					 int locationIDLeisure=(42+(int)(MatsimRandom.getRandom().nextDouble()*(47-42)));
 					 int shoppingX =0, shoppingY=0, leisureX=0, leisureY=0, linkIDShopping=0, linkIDLeisure = 0;
 					
 					 int[]IDs = getShoppingIDs (locationIDShopping);
@@ -64,10 +65,10 @@ public class PlansCreator {
 					 leisureX=IDs[1];
 					 leisureY=IDs[2];
 					 
-					 double ran = MatsimRandom.random.nextDouble();
+					 double ran = MatsimRandom.getRandom().nextDouble();
 					 
 					 
-					 out.write("\t<person id=\""+personID+"\" age=\""+((int)(MatsimRandom.random.nextDouble()*100))+"\">\n");
+					 out.write("\t<person id=\""+personID+"\" age=\""+((int)(MatsimRandom.getRandom().nextDouble()*100))+"\">\n");
 					 
 					 out.write("\t\t<knowledge>\n");
 					 out.write("\t\t\t<activity type=\"home\">\n");
@@ -117,8 +118,8 @@ public class PlansCreator {
 			 
 			 for (int i=1;i<networkSize;i++){
 				 for (int j=1;j<networkSize;j++){
-					 int locationIDShopping=(37+(int)(MatsimRandom.random.nextDouble()*(42-37)));
-					 int locationIDLeisure=(42+(int)(MatsimRandom.random.nextDouble()*(47-42)));
+					 int locationIDShopping=(37+(int)(MatsimRandom.getRandom().nextDouble()*(42-37)));
+					 int locationIDLeisure=(42+(int)(MatsimRandom.getRandom().nextDouble()*(47-42)));
 					 int shoppingX =0, shoppingY=0, leisureX=0, leisureY=0, linkIDShopping=0, linkIDLeisure = 0;
 						
 					 int[]IDs = getShoppingIDs (locationIDShopping);
@@ -130,10 +131,10 @@ public class PlansCreator {
 					 leisureX=IDs[1];
 					 leisureY=IDs[2];
 					 
-					 double ran = MatsimRandom.random.nextDouble();
+					 double ran = MatsimRandom.getRandom().nextDouble();
 					 
 					 
-					 out.write("\t<person id=\""+personID+"\" age=\""+((int)(MatsimRandom.random.nextDouble()*100))+"\">\n");
+					 out.write("\t<person id=\""+personID+"\" age=\""+((int)(MatsimRandom.getRandom().nextDouble()*100))+"\">\n");
 					 
 					 out.write("\t\t<knowledge>\n");
 					 out.write("\t\t\t<activity type=\"home\">\n");
@@ -183,8 +184,8 @@ public class PlansCreator {
 			 
 			 for (int i=1;i<networkSize;i++){
 				 for (int j=1;j<networkSize;j++){
-					 int locationIDShopping=(37+(int)(MatsimRandom.random.nextDouble()*(42-37)));
-					 int locationIDLeisure=(42+(int)(MatsimRandom.random.nextDouble()*(47-42)));
+					 int locationIDShopping=(37+(int)(MatsimRandom.getRandom().nextDouble()*(42-37)));
+					 int locationIDLeisure=(42+(int)(MatsimRandom.getRandom().nextDouble()*(47-42)));
 					 int shoppingX =0, shoppingY=0, leisureX=0, leisureY=0, linkIDShopping=0, linkIDLeisure = 0;
 						
 					 int[]IDs = getShoppingIDs (locationIDShopping);
@@ -196,9 +197,9 @@ public class PlansCreator {
 					 leisureX=IDs[1];
 					 leisureY=IDs[2];
 					 
-					 double ran = MatsimRandom.random.nextDouble();
+					 double ran = MatsimRandom.getRandom().nextDouble();
 					 
-					 out.write("\t<person id=\""+personID+"\" age=\""+((int)(MatsimRandom.random.nextDouble()*100))+"\">\n");
+					 out.write("\t<person id=\""+personID+"\" age=\""+((int)(MatsimRandom.getRandom().nextDouble()*100))+"\">\n");
 					 
 					 out.write("\t\t<knowledge>\n");
 					 out.write("\t\t\t<activity type=\"home\">\n");
@@ -249,8 +250,8 @@ public class PlansCreator {
 				
 			 for (int i=1;i<networkSize;i++){
 				 for (int j=1;j<networkSize;j++){
-					 int locationIDShopping=(37+(int)(MatsimRandom.random.nextDouble()*(42-37)));
-					 int locationIDLeisure=(42+(int)(MatsimRandom.random.nextDouble()*(47-42)));
+					 int locationIDShopping=(37+(int)(MatsimRandom.getRandom().nextDouble()*(42-37)));
+					 int locationIDLeisure=(42+(int)(MatsimRandom.getRandom().nextDouble()*(47-42)));
 					 int shoppingX =0, shoppingY=0, leisureX=0, leisureY=0, linkIDShopping=0, linkIDLeisure = 0;
 						
 					 int[]IDs = getShoppingIDs (locationIDShopping);
@@ -262,10 +263,10 @@ public class PlansCreator {
 					 leisureX=IDs[1];
 					 leisureY=IDs[2];
 					 
-					 double ran = MatsimRandom.random.nextDouble();
+					 double ran = MatsimRandom.getRandom().nextDouble();
 					 
 					 
-					 out.write("\t<person id=\""+personID+"\" age=\""+((int)(MatsimRandom.random.nextDouble()*100))+"\">\n");
+					 out.write("\t<person id=\""+personID+"\" age=\""+((int)(MatsimRandom.getRandom().nextDouble()*100))+"\">\n");
 					 
 					 out.write("\t\t<knowledge>\n");
 					 out.write("\t\t\t<activity type=\"home\">\n");

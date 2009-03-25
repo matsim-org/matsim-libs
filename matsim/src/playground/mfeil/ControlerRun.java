@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.mfeil;
 
-import org.matsim.controler.Controler;
+import org.matsim.core.controler.Controler;
 
 /**
  * @author Matthias Feil

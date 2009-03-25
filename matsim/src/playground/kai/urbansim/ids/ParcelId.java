@@ -3,7 +3,7 @@
  */
 package playground.kai.urbansim.ids;
 
-import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * See comment under IdFactory

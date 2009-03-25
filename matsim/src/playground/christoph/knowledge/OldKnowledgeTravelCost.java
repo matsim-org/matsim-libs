@@ -31,8 +31,8 @@ import java.util.ArrayList;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Person;
-import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.util.TravelTime;
 
 //public class KnowledgeTravelCost implements TravelCost{
 public class OldKnowledgeTravelCost extends TravelTimeDistanceCostCalculator {

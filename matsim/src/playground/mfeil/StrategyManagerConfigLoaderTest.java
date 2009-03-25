@@ -20,7 +20,7 @@
 package playground.mfeil;
 
 
-import org.matsim.controler.Controler;
+import org.matsim.core.controler.Controler;
 
 
 /**
@@ -30,7 +30,7 @@ import org.matsim.controler.Controler;
  */
 
 @Deprecated
-public class StrategyManagerConfigLoaderTest extends org.matsim.replanning.StrategyManagerConfigLoader {
+public class StrategyManagerConfigLoaderTest extends org.matsim.core.replanning.StrategyManagerConfigLoader {
 
 
 	/**

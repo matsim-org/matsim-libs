@@ -2,7 +2,7 @@ package playground.anhorni.locationchoice.preprocess.planmodifications;
 
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 
 public abstract class Modifier {
 

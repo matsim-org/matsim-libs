@@ -28,8 +28,8 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.Desires;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -148,9 +148,9 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		List<? extends BasicPlanElement> acts_legs = p.getPlanElements();
 
 		// draw a new random number until the new end time >= 0.0
-		double bias = MatsimRandom.random.nextInt(3600)-1800.0; // [-1800,1800[
+		double bias = MatsimRandom.getRandom().nextInt(3600)-1800.0; // [-1800,1800[
 		double first_end_time = ((Activity)acts_legs.get(0)).getEndTime();
-		while (first_end_time+bias < 0.0) { bias = MatsimRandom.random.nextInt(3600)-1800.0; }
+		while (first_end_time+bias < 0.0) { bias = MatsimRandom.getRandom().nextInt(3600)-1800.0; }
 		
 		for (int i=0; i<acts_legs.size(); i++) {
 			if (i % 2 == 0) {

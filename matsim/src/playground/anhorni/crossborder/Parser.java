@@ -1,7 +1,8 @@
 package playground.anhorni.crossborder;
 
 import java.util.ArrayList;
-import org.matsim.network.NetworkLayer;
+
+import org.matsim.core.network.NetworkLayer;
 
 abstract class Parser {
 	

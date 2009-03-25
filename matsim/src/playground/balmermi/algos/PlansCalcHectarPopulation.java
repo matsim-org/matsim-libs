@@ -31,7 +31,7 @@ import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PlansCalcHectarPopulation extends AbstractPersonAlgorithm implements PersonAlgorithm {

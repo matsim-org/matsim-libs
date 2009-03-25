@@ -9,13 +9,13 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkWriter;
-import org.matsim.network.NetworkFactory;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTCase2.PTTimeTable2;
@@ -345,8 +345,8 @@ public class PTNetworkFactory2 {
 				if(!node.getCoord().equals(nearNode.getCoord())){
 					if (!areConected(node, nearNode)){
 						double distNodes= CoordUtils.calcDistance(node.getCoord(), nearNode.getCoord());
-						net.createLink(new org.matsim.basic.v01.IdImpl("DT" + ++x),node, nearNode, distNodes, 1.0, 1.0, 1.0, "0", "DetTransfer");  //DetTransfer
-						net.createLink(new org.matsim.basic.v01.IdImpl("DT" + ++x),nearNode, node, distNodes, 1.0, 1.0, 1.0, "0", "DetTransfer");  //DetTransfer
+						net.createLink(new org.matsim.core.basic.v01.IdImpl("DT" + ++x),node, nearNode, distNodes, 1.0, 1.0, 1.0, "0", "DetTransfer");  //DetTransfer
+						net.createLink(new org.matsim.core.basic.v01.IdImpl("DT" + ++x),nearNode, node, distNodes, 1.0, 1.0, 1.0, "0", "DetTransfer");  //DetTransfer
 						//System.out.println(areConected(node, nearNode));
 					}//if !areConected
 				}//!node.getCoord()

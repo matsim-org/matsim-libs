@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.benjamin;
 
-import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.api.network.Link;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.misc.Time;
 
 
@@ -44,7 +44,7 @@ public class BKickFreespeedTravelTimeCost extends FreespeedTravelTimeCost {
 	}
 	
 	/**
-	 * @see org.matsim.router.util.TravelMinCost#getLinkMinimumTravelCost(org.matsim.core.api.network.Link)
+	 * @see org.matsim.core.router.util.TravelMinCost#getLinkMinimumTravelCost(org.matsim.core.api.network.Link)
 	 */
 	@Override
 	public double getLinkMinimumTravelCost(Link link) {
@@ -53,7 +53,7 @@ public class BKickFreespeedTravelTimeCost extends FreespeedTravelTimeCost {
 	}
 
 	/**
-	 * @see org.matsim.router.util.TravelCost#getLinkTravelCost(org.matsim.core.api.network.Link, double)
+	 * @see org.matsim.core.router.util.TravelCost#getLinkTravelCost(org.matsim.core.api.network.Link, double)
 	 */
 	@Override
 	public double getLinkTravelCost(Link link, double time) {

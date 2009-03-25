@@ -20,7 +20,7 @@
 
 package playground.balmermi.census2000.models;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 public class ModelModeChoiceEducation extends ModelModeChoice {
 

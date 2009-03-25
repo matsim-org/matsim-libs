@@ -25,9 +25,9 @@ import java.util.Collection;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
-import org.matsim.network.NetworkWriter;
-import org.matsim.router.Dijkstra;
-import org.matsim.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.misc.Time;
 
 import playground.marcel.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;

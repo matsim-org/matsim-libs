@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.controler.Controler;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.controler.Controler;
 
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.SpanningTree;

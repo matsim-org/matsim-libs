@@ -20,9 +20,9 @@
 
 package playground.balmermi.lsa;
 
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 
 import playground.balmermi.Scenario;
 

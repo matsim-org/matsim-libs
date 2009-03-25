@@ -20,7 +20,7 @@ package playground.dgrether.roadpricing;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 
 
 /**

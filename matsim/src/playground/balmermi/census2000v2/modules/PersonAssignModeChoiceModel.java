@@ -33,8 +33,8 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
@@ -100,7 +100,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	//////////////////////////////////////////////////////////////////////
 
 	private final boolean isRidePossible(Person person) {
-		double r = MatsimRandom.random.nextDouble();
+		double r = MatsimRandom.getRandom().nextDouble();
 		if (!person.hasLicense()) {
 			if (r < 0.54) { return true; }
 			else { return false; }
@@ -111,7 +111,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	//////////////////////////////////////////////////////////////////////
 
 	private final boolean isPtPossible(Person person) {
-		double r = MatsimRandom.random.nextDouble();
+		double r = MatsimRandom.getRandom().nextDouble();
 		if (person.getCarAvail().equals(ALWAYS)) {
 			if (r < 0.40) { return true; }
 			else  { return false; }
@@ -257,7 +257,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EOTHR));
 			if (prim_acts.isEmpty()) { model.setDistanceHome2Work(0.0); }
 			else {
-				Coord p_coord = prim_acts.get(MatsimRandom.random.nextInt(prim_acts.size())).getFacility().getCoord();
+				Coord p_coord = prim_acts.get(MatsimRandom.getRandom().nextInt(prim_acts.size())).getFacility().getCoord();
 				model.setDistanceHome2Work(CoordUtils.calcDistance(h_coord, p_coord)/1000.0);
 			}
 			// tickets; // holds some kind of season tickets 
@@ -269,7 +269,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			// male; // 0-[unlimited]
 			model.setMale(person.getSex());
 			// bike; // bike ownership
-			if (MatsimRandom.random.nextDouble() < 0.54) { model.setBike(true); } else { model.setBike(false); }
+			if (MatsimRandom.getRandom().nextDouble() < 0.54) { model.setBike(true); } else { model.setBike(false); }
 			// prev_mode; // 0= car; 1= Pt; 2= Car passenger; 3= Bike; 4= Walk; -1: subtour is starting from home;
 			int prev_mode = this.getPrevMode(act_indices.get(0),p);
 			model.setPrevMode(prev_mode);

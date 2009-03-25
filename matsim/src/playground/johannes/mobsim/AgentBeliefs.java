@@ -23,7 +23,7 @@
  */
 package playground.johannes.mobsim;
 
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author illenberger

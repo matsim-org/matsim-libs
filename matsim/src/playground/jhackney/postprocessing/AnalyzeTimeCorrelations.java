@@ -20,11 +20,11 @@ package playground.jhackney.postprocessing;
  *                                                                         *
  * *********************************************************************** */
 
-import org.matsim.config.Config;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.Events;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.config.Config;
+import org.matsim.core.events.Events;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;

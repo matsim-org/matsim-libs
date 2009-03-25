@@ -24,14 +24,14 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.collections.QuadTree;
@@ -211,7 +211,7 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 			dist_sum[i] = dist_sum[i-1] + val;
 		}
 
-		int r = MatsimRandom.random.nextInt(dist_sum[fs.size()-1]);
+		int r = MatsimRandom.getRandom().nextInt(dist_sum[fs.size()-1]);
 
 		i=-1;
 		f_it = fs.iterator();

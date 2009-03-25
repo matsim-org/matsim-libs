@@ -21,8 +21,8 @@
 package playground.jhackney.scoring;
 
 import org.matsim.core.api.population.Plan;
-import org.matsim.scoring.ScoringFunction;
-import org.matsim.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 /**
  * A factory to create {@link CharyparNagelReportingScoringFunction}s.

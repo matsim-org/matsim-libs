@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 import playground.johannes.graph.Graph;
 import playground.johannes.graph.Vertex;

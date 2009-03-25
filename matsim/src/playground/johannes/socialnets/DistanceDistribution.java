@@ -32,10 +32,10 @@ import java.util.HashSet;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.config.Config;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.geometry.CoordUtils;
 
 import playground.johannes.statistics.WeightedStatistics;

@@ -28,10 +28,10 @@ import java.io.Writer;
 import java.util.Arrays;
 
 
-import org.matsim.config.ConfigWriter;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 
 import playground.msieg.cmcf.BestFitTimeRouter;
 import playground.msieg.cmcf.CMCFDemandWriter;

@@ -1,10 +1,10 @@
 package playground.wrashid.PDES3;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.mobsim.jdeqsim.Road;
-import org.matsim.mobsim.jdeqsim.Scheduler;
-import org.matsim.mobsim.jdeqsim.SimulationParameters;
-import org.matsim.mobsim.jdeqsim.Vehicle;
+import org.matsim.core.mobsim.jdeqsim.Road;
+import org.matsim.core.mobsim.jdeqsim.Scheduler;
+import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
+import org.matsim.core.mobsim.jdeqsim.Vehicle;
 
 
 public class BorderRoad extends Road {

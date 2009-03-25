@@ -3,7 +3,7 @@ package playground.mmoyo.PTRouter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.IdImpl;
 
 /** 
  * Describes a Public Transport Network Line

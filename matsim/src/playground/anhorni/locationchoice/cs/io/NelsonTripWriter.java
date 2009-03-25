@@ -4,7 +4,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import org.matsim.gbl.Gbl;
+
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 

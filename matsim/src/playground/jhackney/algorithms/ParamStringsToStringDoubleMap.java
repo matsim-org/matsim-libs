@@ -2,7 +2,7 @@ package playground.jhackney.algorithms;
 
 import java.util.LinkedHashMap;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 public class ParamStringsToStringDoubleMap {
 	LinkedHashMap<String,Double> map= new LinkedHashMap<String, Double>();

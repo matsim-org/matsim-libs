@@ -27,9 +27,6 @@ import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicLeg.Mode;
-import org.matsim.controler.Controler;
-import org.matsim.controler.events.ScoringEvent;
-import org.matsim.controler.listener.ScoringListener;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -38,12 +35,15 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.util.DijkstraFactory;
-import org.matsim.router.util.TravelCost;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
 
 public class EvacDestinationAssigner implements ScoringListener {
 

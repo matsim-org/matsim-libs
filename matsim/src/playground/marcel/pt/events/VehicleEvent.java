@@ -22,7 +22,7 @@ package playground.marcel.pt.events;
 
 import java.util.Map;
 
-import org.matsim.events.BasicEventImpl;
+import org.matsim.core.events.BasicEventImpl;
 
 import playground.marcel.pt.interfaces.Vehicle;
 

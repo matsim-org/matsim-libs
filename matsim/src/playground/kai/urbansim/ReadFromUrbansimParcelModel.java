@@ -16,16 +16,16 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationImpl;
 import org.matsim.utils.geometry.CoordImpl;
@@ -159,7 +159,7 @@ public class ReadFromUrbansimParcelModel {
 				Id personId = new IdImpl( parts[idxFromKey.get("person_id")] ) ;
 				Person newPerson = new PersonImpl( personId ) ;
 
-				if ( !( flag || MatsimRandom.random.nextDouble() < samplingRate || (oldPop.getPerson( personId))!=null ) ) {
+				if ( !( flag || MatsimRandom.getRandom().nextDouble() < samplingRate || (oldPop.getPerson( personId))!=null ) ) {
 					continue ;
 				}
 				flag = false ;

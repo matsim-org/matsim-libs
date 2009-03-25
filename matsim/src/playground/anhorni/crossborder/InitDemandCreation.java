@@ -25,11 +25,11 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkAdaptLength;
-import org.matsim.network.algorithms.NetworkSummary;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.algorithms.NetworkAdaptLength;
+import org.matsim.core.network.algorithms.NetworkSummary;
 
 import playground.anhorni.crossborder.verification.Verification;
 
