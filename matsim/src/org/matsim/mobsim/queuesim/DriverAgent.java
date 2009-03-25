@@ -22,10 +22,10 @@ package org.matsim.mobsim.queuesim;
 
 import java.util.List;
 
-import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Person;
 
 public interface DriverAgent {
 

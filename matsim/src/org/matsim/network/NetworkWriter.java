@@ -22,10 +22,10 @@ package org.matsim.network;
 
 import java.io.IOException;
 
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.Node;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
-import org.matsim.interfaces.core.v01.Node;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.writer.Writer;
 

@@ -21,12 +21,12 @@
 package org.matsim.network;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.basic.v01.BasicLinkImpl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.network.BasicNode;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 import org.matsim.utils.geometry.CoordUtils;
 
 public class LinkImpl extends BasicLinkImpl implements Link {

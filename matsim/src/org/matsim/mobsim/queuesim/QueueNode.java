@@ -24,11 +24,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
 
 /**
  * Represents a node in the QueueSimulation.

@@ -19,10 +19,10 @@
 
 package org.matsim.mobsim.jdeqsim;
 
+import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEventImpl;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
 
 public class StartingLegMessage extends EventMessage {
 

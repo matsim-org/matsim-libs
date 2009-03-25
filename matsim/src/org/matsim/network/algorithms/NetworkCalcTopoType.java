@@ -23,9 +23,9 @@ package org.matsim.network.algorithms;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.Node;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Network;
-import org.matsim.interfaces.core.v01.Node;
 
 /** See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
  * for a description of node types. It's the graph matching paper. */

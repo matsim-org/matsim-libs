@@ -23,7 +23,7 @@ package org.matsim.network;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
 
 /**
  * Compares two links by their Id. A simple helper class so one is

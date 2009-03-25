@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
 
 /**
  * A container class for events that represent time-variant changes for link

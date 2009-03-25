@@ -27,12 +27,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.Node;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.world.Layer;
 

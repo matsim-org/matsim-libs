@@ -23,15 +23,15 @@ package org.matsim.mobsim.queuesim;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Person;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
-import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
-import org.matsim.interfaces.core.v01.Person;
 import org.matsim.utils.misc.Time;
 
 /**

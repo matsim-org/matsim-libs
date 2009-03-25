@@ -19,7 +19,7 @@
 
 package org.matsim.network.filter;
 
-import org.matsim.interfaces.basic.v01.network.BasicNode;
+import org.matsim.api.basic.v01.network.BasicNode;
 
 /**
  * Implement this interface to filter the nodes of a network

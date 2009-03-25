@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Network;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.Node;
 
 /**
  * Ensures that each link in the network can be reached by any other link. 

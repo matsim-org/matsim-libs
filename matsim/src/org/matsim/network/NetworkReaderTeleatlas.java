@@ -25,10 +25,10 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Node;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.gis.ShapeFileReader;
 

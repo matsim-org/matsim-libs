@@ -21,7 +21,7 @@ package org.matsim.mobsim.jdeqsim;
 
 import java.util.LinkedList;
 
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
 import org.matsim.utils.misc.Time;
 
 public class Road extends SimUnit {

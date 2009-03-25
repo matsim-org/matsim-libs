@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.network.BasicNetwork;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 import org.matsim.network.NetworkLayer;
 
 /**

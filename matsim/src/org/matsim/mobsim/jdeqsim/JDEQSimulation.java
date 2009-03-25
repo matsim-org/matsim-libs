@@ -24,11 +24,11 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.jdeqsim.util.Timer;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
