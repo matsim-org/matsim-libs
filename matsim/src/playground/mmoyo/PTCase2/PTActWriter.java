@@ -34,7 +34,6 @@ import playground.mmoyo.Validators.PathValidator;
 public class PTActWriter {
 	private final Population population;
 	private final PTOb pt;
-	//private PTNProximity ptnProximity;    //24 feb
 	private PTTravelCost ptTravelCost;
 	public PTTravelTime ptTravelTime;
 	private final Dijkstra dijkstra;
@@ -51,7 +50,6 @@ public class PTActWriter {
 		//Gbl.getWorld().complete();
 
 		this.ptTravelTime =new PTTravelTime(this.pt.getPtTimeTable());
-		//this.ptnProximity= new PTNProximity(this.pt.getPtNetworkLayer());   //24 feb
 		this.dijkstra = new Dijkstra(this.pt.getPtNetworkLayer(), this.ptTravelCost, this.ptTravelTime);
 		this.population = new PopulationImpl(false);
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(this.population,this.pt.getPtNetworkLayer() );
@@ -65,11 +63,14 @@ public class PTActWriter {
 		PathValidator ptPathValidator = new PathValidator ();
 		int valid=0;
 		int invalid=0;
-
+		int trips=0;
+		
 		for (Person person: this.population.getPersons().values()) {
-			//Person person = population.getPerson("3937204");
+			//Person person = population.getPersons().get(new IdImpl("3937204"));
+			
 			System.out.println(x + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
+			//plan.setScore(0.0);
 
 			boolean first =true;
 			boolean addPerson= true;
@@ -78,13 +79,15 @@ public class PTActWriter {
 			int legNum=0;
 
 			Plan newPlan = new org.matsim.population.PlanImpl(person);
+			
 			for (Iterator<BasicActivityImpl> iter= plan.getIteratorAct(); iter.hasNext();){
 				thisAct= (Activity)iter.next();
-
+				
 				if (!first) {
 					Coord lastActCoord = lastAct.getCoord();
 		    		Coord actCoord = thisAct.getCoord();
 
+					trips++;
 		    		double distanceToDestination = CoordUtils.calcDistance(lastActCoord, actCoord);
 		    		double distToWalk= distToWalk(person.getAge());
 		    		if (distanceToDestination<= distToWalk){
@@ -125,7 +128,7 @@ public class PTActWriter {
 					}//distanceToDestination<= distToWalk
 				}//if !First
 				
-		    	//Attention: this should be read from the city network not from pt network!!! 
+		    	//-->Attention: this should be read from the city network not from pt network!!! 
 		    	thisAct.setLink(this.pt.getPtNetworkLayer().getNearestLink(thisAct.getCoord()));
 
 		    	newPlan.addAct(thisAct);
@@ -146,7 +149,7 @@ public class PTActWriter {
 		Gbl.getConfig().plans().setOutputVersion("v4");
 		new PopulationWriter(newPopulation).write();
 		System.out.println("Done");
-
+		System.out.println("Trips:" + trips);
 		System.out.println("valid:" + valid +  " invalid:" + invalid);
 	}//createPTActs
 
@@ -176,10 +179,6 @@ public class PTActWriter {
 	}
 
 	public Path findRoute(final Coord coord1, final Coord coord2, final double time, final int distToWalk){
-		//23 feb
-		//PTNode[] NearStops1=  ptnProximity.getNearestBusStops(coord1, distToWalk, false);
-		//PTNode[] NearStops2= ptnProximity.getNearestBusStops(coord2, distToWalk, false);
-
 		Collection <Node> NearStops1 = this.pt.getPtNetworkLayer().getNearestNodes(coord1, distToWalk);
 		Collection <Node> NearStops2 = this.pt.getPtNetworkLayer().getNearestNodes(coord2, distToWalk);
 
@@ -263,7 +262,7 @@ public class PTActWriter {
 				if (lastLinkType.equals("Standard")){
 					arrTime= depTime+ legTravelTime;
 					legDistance= legDistance+ linkDistance;
-					//TODO: The legMode car is temporal only for visualization purposes
+					//-->: The legMode car is temporal only for visualization purposes
 					newPlan.addLeg(newPTLeg(legNum++, Leg.Mode.car, legRouteLinks, legDistance, depTime, legTravelTime, arrTime));
 					//newPlan.addAct(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
 					newPlan.addAct(newPTAct("Wait pt veh", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));

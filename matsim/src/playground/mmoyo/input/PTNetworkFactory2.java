@@ -31,6 +31,50 @@ public class PTNetworkFactory2 {
 	}
 	
 	public NetworkLayer createNetwork(String inFileName, PTTimeTable2 ptTimeTable, String OutFileName){
+		NetworkLayer ptNetworkLayer1 = readNetFile(inFileName);
+		readTimeTable(ptNetworkLayer1, ptTimeTable);
+		createTransferLinks(ptNetworkLayer1, ptTimeTable);
+		return ptNetworkLayer1;
+	}
+
+	
+	public NetworkLayer readNetwork(String inFileName, PTTimeTable2 ptTimeTable){
+		NetworkLayer ptNetworkLayer = readNetFile(inFileName);
+		readTimeTable(ptNetworkLayer, ptTimeTable);
+		return ptNetworkLayer;
+	}
+	
+	private NetworkLayer readNetFile(String inFileName){
+		NetworkFactory networkFactory = new NetworkFactory();
+	
+		NetworkLayer tempNet= new NetworkLayer(networkFactory);
+		NetworkLayer ptNetworkLayer= new NetworkLayer(networkFactory);
+		
+		//Create a temporal network with normal Nodes
+		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(tempNet);
+		matsimNetworkReader.readFile(inFileName);
+		
+		//Create the PTNetwork with PTNodes
+		//List<PTNode> ptNodeList = new ArrayList<PTNode>();
+		for (Node node: tempNet.getNodes().values()){
+			PTNode ptNode = new PTNode(new IdImpl(node.getId().toString()),node.getCoord(),node.getType());
+			ptNetworkLayer.getNodes().put(node.getId(),ptNode);
+		}
+	
+		//Add Links
+		for (Link l: tempNet.getLinks().values()){
+			createPTLink(ptNetworkLayer, l.getId().toString(), l.getFromNode().getId().toString(), l.getToNode().getId().toString(), l.getType());
+		}
+
+		tempNet= null;
+		networkFactory= null;
+		matsimNetworkReader= null;
+		return ptNetworkLayer;
+	}
+
+	/*
+	//This should be the new vrsion
+	public NetworkLayer createNetwork(String inFileName, PTTimeTable2 ptTimeTable, String OutFileName){
 		PTNetworkReader ptNetworkReader = new PTNetworkReader();
 		NetworkLayer ptNetworkLayer = ptNetworkReader.readNetFile(inFileName);
 		readTimeTable(ptNetworkLayer, ptTimeTable);
@@ -44,6 +88,9 @@ public class PTNetworkFactory2 {
 		readTimeTable(ptNetworkLayer, ptTimeTable);
 		return ptNetworkLayer;
 	}
+	*/
+	
+	
 	
 	
 	
@@ -152,12 +199,32 @@ public class PTNetworkFactory2 {
 	    				ArrayList<String> ch = new ArrayList<String>();
 	    				IntersectionMap.put(keyNode, ch);
 	    				IntersectionMap.get(keyNode).add(keyNode);
-	    				IntersectionMap.get(keyNode).add(strIdNode);
+	    				//IntersectionMap.get(keyNode).add(strIdNode);   //-> 25 march
 	    			}// if IntersectionMap
 	    			IntersectionMap.get(keyNode).add(strIdNode);
 				}//if Character
 			}//for interator String
 		}//for interator ptline
+		
+		
+		//Counting how many ptl's has every station:
+	
+		/*
+		//java.util.Iterator <String, ArrayList<String>> iter = IntersectionMap.entrySet().iterator();
+		while (iter.hasNext()) {
+			Map.Entry entry = (Map.Entry) iter.next();
+			System.out.println(entry.getKey() + " = " + entry.getValue());
+		}
+		iter = null;
+		
+		
+		for (ArrayList <String>chList : IntersectionMap.values()) {
+			System.out.println(chList.size());
+			System.out.println(chList.size());
+		}
+		*/
+		
+		
 		
 		// *Create Transfer Links
 		int maxLinkKey=0;

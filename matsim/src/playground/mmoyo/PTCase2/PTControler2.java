@@ -11,6 +11,7 @@ import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.CoordImpl;
 
 import playground.mmoyo.Validators.NetValidator;
+import playground.mmoyo.Validators.PlanValidator;
 import playground.mmoyo.input.PTNodeFactory;
 import playground.mmoyo.input.PTNodeReader;
 import playground.mmoyo.input.PTLinkFactory;
@@ -30,14 +31,22 @@ public class PTControler2 {
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, INPTNETFILE, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
 		
-		int option =8;
+		int option =-1;
 		
 		if (option>0){pt.readPTNet(ZURICHPTN);}
 		switch (option){
-			
+		
+			case -4:
+				String plansFile = path + "@All_plans .xml";
+				plansFile = path + "plans.xml";
+				
+				PlanValidator planValidator = new PlanValidator(); 
+				int num = planValidator.PlanCounter(pt.getPtNetworkLayer(), plansFile);
+				System.out.println(num);
+				
+				break;
 			case -3:
 				String filePath="C://Users/manuel/Desktop/TU/ZH_Files/bus/Basic_Bus_Network.xml";
-	    	
 				
 				PTNodeReader ptNodeReader = new PTNodeReader();
 	    		ptNodeReader.readFile (filePath);
@@ -73,11 +82,7 @@ public class PTControler2 {
 	    		System.out.println("created Links:" + finLinks);
 	    		
 	    		System.out.println(pt.getPtNetworkLayer().toString());
-	    		
-	    		//--<y despues de crear los nuevos nodos y links hay que volver a crear los transfers and detached links
-
-				
-				
+				//-->and after creating the new nodes ans links, we must create the transfers and detached again
 				
 		
 				break;
@@ -89,10 +94,11 @@ public class PTControler2 {
 				break;
 			case -1:
 				pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
+				long startTime = System.currentTimeMillis();
 				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300);
-	    		pt.getPtNetworkFactory().writeNet(pt.getPtNetworkLayer(), ZURICHPTN);
+				System.out.println("Duration of creation of detached transfers: " + (System.currentTimeMillis()-startTime));
+				pt.getPtNetworkFactory().writeNet(pt.getPtNetworkLayer(), ZURICHPTN);
 	    		pt.readPTNet(ZURICHPTN);
-   		
 	    		PTActWriter ptActWriter1 = new PTActWriter(pt);
 	    		ptActWriter1.writePTActsLegs();
 	    		
@@ -118,7 +124,7 @@ public class PTControler2 {
 	    		break;
 	    	
 	    	case 3:
-	    		long startTime = System.currentTimeMillis();
+	    		startTime = System.currentTimeMillis();
 	    		PTActWriter ptActWriter = new PTActWriter(pt);
 	    		ptActWriter.writePTActsLegs();
 	    		System.out.println("Duration: " + (System.currentTimeMillis()-startTime));	
@@ -155,8 +161,8 @@ public class PTControler2 {
 	    		Node nodeB=pt.getPtNetworkLayer().getNode("~8587652");
 	    		System.out.println(nodeA==null);
 	    		System.out.println(nodeB==null);
-	    		boolean unidos= pt.getPtNetworkFactory().areConected(nodeA, nodeB);
-	    		System.out.println(unidos);
+	    		boolean connected= pt.getPtNetworkFactory().areConected(nodeA, nodeB);
+	    		System.out.println(connected);
 	    		break;
 	    	case 8:
 	    		//Temporal only for the refactoring    	

@@ -8,7 +8,7 @@ import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Node;
 import playground.mmoyo.PTRouter.PTNode;
 
-//TODO: use iterators
+//--> iterate on collections
 
 /** 
  * Determines the optimal path of a passenger in a Public transport Network 
