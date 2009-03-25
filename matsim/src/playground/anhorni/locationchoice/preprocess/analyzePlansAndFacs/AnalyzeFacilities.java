@@ -282,7 +282,7 @@ public class AnalyzeFacilities {
 		};
 		
 		double groceryCapacity = 0.0;
-		double nongroceryCapacity = 0.0;
+		double totalCapacity = 0.0;
 					
 		try {
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
@@ -290,10 +290,18 @@ public class AnalyzeFacilities {
 			Iterator< ? extends Facility> facility_it = this.facilities.getFacilities().values().iterator();
 			while (facility_it.hasNext()) {
 				Facility facility = facility_it.next();
+				
+				Iterator<ActivityOption> options_it = facility.getActivityOptions().values().iterator();
+				while (options_it.hasNext()) {
+					ActivityOption actOpt = options_it.next();
+					if (actOpt.getType().startsWith("shop")) {
+						totalCapacity += actOpt.getCapacity();
+					}
+				}
 								
 				for (int i = 0; i < NOGA_Grocery.length; i++) {						
 					if (facility.getActivityOption(NOGA_Grocery[i]) != null) {
-						Iterator<ActivityOption> options_it = facility.getActivityOptions().values().iterator();
+						options_it = facility.getActivityOptions().values().iterator();
 						while (options_it.hasNext()) {
 							ActivityOption actOpt = options_it.next();
 							if (actOpt.getType().startsWith("shop")) {
@@ -301,18 +309,9 @@ public class AnalyzeFacilities {
 							}
 						}
 					}
-					else {
-						Iterator<ActivityOption> options_it = facility.getActivityOptions().values().iterator();
-						while (options_it.hasNext()) {
-							ActivityOption actOpt = options_it.next();
-							if (actOpt.getType().startsWith("shop")) {
-								nongroceryCapacity += actOpt.getCapacity();
-							}
-						}
-					}
 				}
 			}
-			out.write("Total grocery capacity: " + groceryCapacity + "\n" +  "Non grocery capacity: " + nongroceryCapacity + "\n");
+			out.write("Total grocery capacity: " + groceryCapacity + "\n" +  "Non grocery capacity: " + (totalCapacity - groceryCapacity) + "\n");
 			out.flush();
 			out.close();
 		}
