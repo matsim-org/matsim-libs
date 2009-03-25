@@ -33,7 +33,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.world.Layer;
 
 public class NetworkLayer extends Layer implements Network {

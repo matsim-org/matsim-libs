@@ -37,7 +37,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * A special router for complete plans that assigns the best routes to a plan

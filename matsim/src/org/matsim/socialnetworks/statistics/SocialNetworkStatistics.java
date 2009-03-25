@@ -40,11 +40,11 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.socialnetworks.algorithms.PersonCalculateActivitySpaces;
 import org.matsim.socialnetworks.algorithms.PlanEuclideanLength;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
-import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.world.Location;
 
 import cern.colt.list.DoubleArrayList;

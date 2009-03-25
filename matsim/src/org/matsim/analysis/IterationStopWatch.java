@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * This class provides a mechanism similar to a stop watch, allowing to measure the duration of operations and

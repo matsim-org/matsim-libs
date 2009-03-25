@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author dgrether

@@ -23,7 +23,7 @@ package org.matsim.core.events;
 import java.util.Stack;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
 public class EventsReaderXMLv1 extends MatsimXmlParser {

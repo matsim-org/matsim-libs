@@ -22,7 +22,7 @@ package org.matsim.counts;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.writer.WriterHandler;
+import org.matsim.core.utils.io.WriterHandler;
 
 interface CountsWriterHandler extends WriterHandler {
 	//////////////////////////////////////////////////////////////////////

@@ -23,7 +23,7 @@ package org.matsim.matrices;
 import java.util.Stack;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.world.World;
 import org.xml.sax.Attributes;
 

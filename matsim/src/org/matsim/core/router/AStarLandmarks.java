@@ -29,7 +29,7 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * Implements the A* router algorithm for a given NetworkLayer

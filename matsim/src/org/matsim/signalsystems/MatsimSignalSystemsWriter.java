@@ -21,7 +21,7 @@ package org.matsim.signalsystems;
 
 import org.matsim.core.basic.network.BasicLaneDefinitions;
 import org.matsim.core.basic.signalsystems.BasicSignalSystems;
-import org.matsim.utils.io.MatsimJaxbXmlWriter;
+import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 
 /**
  * Writes a light signal system definition to xml.

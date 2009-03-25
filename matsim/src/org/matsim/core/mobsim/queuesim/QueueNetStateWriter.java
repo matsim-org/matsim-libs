@@ -24,11 +24,11 @@ import java.util.Collection;
 
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
-import org.matsim.utils.vis.netvis.VisConfig;
+import org.matsim.vis.netvis.DisplayNetStateWriter;
+import org.matsim.vis.netvis.VisConfig;
 
 /**
- * Writes snapshots in the format used by {@link org.matsim.utils.vis.netvis.NetVis}
+ * Writes snapshots in the format used by {@link org.matsim.vis.netvis.NetVis}
  *
  * @author david
  */

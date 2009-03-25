@@ -31,7 +31,7 @@ public class NetworkCalcLanes {
 	public void run(Network network) {
 		double capDivider = network.getCapacityPeriod();
 		for (Link link : network.getLinks().values()) {
-			double capacity = link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+			double capacity = link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 			double cap1h = capacity * 3600.0 / capDivider;
 
 			int lanes;

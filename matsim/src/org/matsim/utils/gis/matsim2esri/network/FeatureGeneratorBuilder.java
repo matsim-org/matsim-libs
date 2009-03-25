@@ -25,7 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class FeatureGeneratorBuilder {

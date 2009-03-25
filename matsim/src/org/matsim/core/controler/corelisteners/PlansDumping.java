@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.population.PopulationWriter;
+import org.matsim.core.population.PopulationWriter;
 
 /**
  * {@link org.matsim.core.controler.listener.ControlerListener} that dumps the

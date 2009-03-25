@@ -23,7 +23,7 @@ package org.matsim.core.trafficmonitoring;
 import java.util.HashMap;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.utils.misc.IntegerCache;
+import org.matsim.core.utils.misc.IntegerCache;
 
 public class TravelTimeDataHashMap implements TravelTimeData {
 	private final HashMap<Integer,TimeStruct> travelTimes;

@@ -31,11 +31,13 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.utils.WorldUtils;
-import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
-import org.matsim.utils.io.tabularFileParser.TabularFileParser;
-import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.world.Layer;
+import org.matsim.world.WorldUtils;
 import org.matsim.world.Zone;
 
 public class PopulationReaderKutter implements PopulationReader {

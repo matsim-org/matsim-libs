@@ -26,8 +26,8 @@ import java.io.IOException;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 
 public class NetworkWriterHandlerImplTLinks {
 
@@ -92,7 +92,7 @@ public class NetworkWriterHandlerImplTLinks {
 		this.out.write(link.getFromNode().getId() + "\t");		// NODEA
 		this.out.write(link.getToNode().getId() + "\t");		// NODEB
 		this.out.write("0\t");						// PERMLANESA
-		this.out.write(link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\t");	// PERMLANESB
+		this.out.write(link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + "\t");	// PERMLANESB
 		this.out.write("0\t");						// LEFTPCKTSA
 		this.out.write("0\t");						// LEFTPCKTSB
 		this.out.write("0\t");						// RGHTPCKTSA
@@ -103,7 +103,7 @@ public class NetworkWriterHandlerImplTLinks {
 		this.out.write("0\t");						// SETBACKA
 		this.out.write("0\t");						// SETBACKB
 		this.out.write("0\t");						// CAPACITYA
-		this.out.write((int)link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\t");	// CAPACITYB
+		this.out.write((int)link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + "\t");	// CAPACITYB
 		this.out.write("0\t");						// SPEEDLMTA
 		this.out.write(link.getFreespeed(Time.UNDEFINED_TIME) + "\t");	// SPEEDLMTB
 		this.out.write("0\t");						// FREESPDA

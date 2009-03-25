@@ -40,10 +40,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationWriter;
-import org.matsim.population.PopulationWriterHandler;
-import org.matsim.utils.misc.ExeRunner;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationWriterHandler;
+import org.matsim.core.utils.misc.ExeRunner;
 
 public class ExternalMobsim {
 

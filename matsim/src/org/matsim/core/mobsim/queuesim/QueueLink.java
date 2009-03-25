@@ -34,8 +34,8 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.network.BasicLane;
 import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.signalsystems.CalculateAngle;
-import org.matsim.utils.misc.Time;
 
 /**
  * @author dstrippgen

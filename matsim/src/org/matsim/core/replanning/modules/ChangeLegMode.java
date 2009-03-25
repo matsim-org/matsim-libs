@@ -23,9 +23,9 @@ package org.matsim.core.replanning.modules;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.population.algorithms.ChooseRandomLegMode;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.utils.StringUtils;
 
 /**
  * Changes the transportation mode of all legs in a plan to a randomly chosen

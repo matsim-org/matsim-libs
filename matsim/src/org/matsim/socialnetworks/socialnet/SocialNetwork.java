@@ -33,8 +33,8 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.socialnetworks.io.MakeSocialNetworkFromFile;
-import org.matsim.utils.geometry.CoordUtils;
 /**
  * SocialNetwork is an object organizing the social ties between Persons. It serves two
  * purposes: to provide utilities for adding, removing, and changing

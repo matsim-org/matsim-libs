@@ -25,7 +25,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * Falsifies a network, so it can more legally be redistributed, by moving the nodes by a random amount

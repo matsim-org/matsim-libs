@@ -22,7 +22,7 @@ package org.matsim.api.basic.v01.network;
 
 import org.matsim.api.basic.v01.Identifiable;
 import org.matsim.core.api.network.Network;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * A topological representation of a network link.

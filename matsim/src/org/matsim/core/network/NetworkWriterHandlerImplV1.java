@@ -26,7 +26,7 @@ import java.io.IOException;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 
@@ -117,8 +117,8 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 		out.write(" to=\"" + link.getToNode().getId() + "\"");
 		out.write(" length=\"" + link.getLength() + "\"");
 		out.write(" freespeed=\"" + link.getFreespeed(Time.UNDEFINED_TIME) + "\"");
-		out.write(" capacity=\"" + link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\"");
-		out.write(" permlanes=\"" + link.getNumberOfLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\"");
+		out.write(" capacity=\"" + link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + "\"");
+		out.write(" permlanes=\"" + link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + "\"");
 		out.write(" oneway=\"" + "1" + "\"");
 		if (link.getOrigId() != null) {
 			out.write(" origid=\"" + link.getOrigId() + "\"");

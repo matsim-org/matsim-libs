@@ -24,12 +24,12 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.CharyparNagelScoringFunction;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
 import org.matsim.core.scoring.interfaces.BasicScoring;
-import org.matsim.population.ActUtilityParameters;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 
 public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
@@ -98,7 +98,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
-		ActUtilityParameters actParams = this.params.utilParams.get(act.getType());
+		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
@@ -202,7 +202,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 
 	protected double[] getOpeningInterval(final Activity act) {
 
-		ActUtilityParameters actParams = this.params.utilParams.get(act.getType());
+		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}

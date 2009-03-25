@@ -32,7 +32,7 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
-import org.matsim.utils.WorldUtils;
+import org.matsim.world.WorldUtils;
 
 /**
  * Filters all persons out whose routes do not lead at least once through

@@ -22,7 +22,7 @@ package org.matsim.core.basic.v01;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicRoute;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 public class BasicLegImpl implements BasicLeg {
 

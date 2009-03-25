@@ -24,7 +24,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
-import org.matsim.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * Example implementation of a leg travel time estimation (the estimation of

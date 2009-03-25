@@ -57,20 +57,20 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.signalsystems.control.AdaptivePlanBasedSignalSystemControler;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControler;
 import org.matsim.signalsystems.control.PlanBasedSignalSystemControler;
 import org.matsim.signalsystems.control.SignalSystemControler;
-import org.matsim.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.netvis.VisConfig;
-import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
-import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
-import org.matsim.utils.vis.snapshots.writers.KmlSnapshotWriter;
-import org.matsim.utils.vis.snapshots.writers.PlansFileSnapshotWriter;
-import org.matsim.utils.vis.snapshots.writers.PositionInfo;
-import org.matsim.utils.vis.snapshots.writers.SnapshotWriter;
-import org.matsim.utils.vis.snapshots.writers.TransimsSnapshotWriter;
+import org.matsim.vis.netvis.VisConfig;
+import org.matsim.vis.netvis.streaming.SimStateWriterI;
+import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
+import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
+import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
+import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.SnapshotWriter;
+import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 /**
  * @author dstrippgen
  * @author mrieser

@@ -22,7 +22,7 @@ package org.matsim.socialnetworks.algorithms;
 
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
-import org.matsim.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class PlanEuclideanLength {
 

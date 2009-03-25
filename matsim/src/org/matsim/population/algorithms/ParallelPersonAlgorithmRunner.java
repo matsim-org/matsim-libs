@@ -26,7 +26,7 @@ import java.util.List;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.misc.Counter;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * An abstract/static helper class for running {@link AbstractPersonAlgorithm}s in parallel using threads.

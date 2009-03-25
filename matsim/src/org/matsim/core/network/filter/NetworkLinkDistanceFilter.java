@@ -21,7 +21,7 @@ package org.matsim.core.network.filter;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * @author dgrether

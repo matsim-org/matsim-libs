@@ -31,10 +31,10 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
-import org.matsim.population.PersonImpl;
-import org.matsim.utils.WorldUtils;
+import org.matsim.world.WorldUtils;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 

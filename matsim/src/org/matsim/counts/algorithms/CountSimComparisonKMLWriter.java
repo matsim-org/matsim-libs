@@ -47,6 +47,9 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.MatsimResource;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.graphs.BiasErrorGraph;
 import org.matsim.counts.algorithms.graphs.BoxPlotErrorGraph;
@@ -55,12 +58,9 @@ import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24Graph;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraph;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformation;
-import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.MatsimKMLLogo;
-import org.matsim.utils.vis.kml.NetworkFeatureFactory;
+import org.matsim.vis.kml.KMZWriter;
+import org.matsim.vis.kml.MatsimKMLLogo;
+import org.matsim.vis.kml.NetworkFeatureFactory;
 
 /**
  * @author dgrether

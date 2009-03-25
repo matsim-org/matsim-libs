@@ -24,10 +24,9 @@ import java.util.TreeMap;
 
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.population.ActUtilityParameters;
 
 public class CharyparNagelScoringParameters {
-	public final TreeMap<String, ActUtilityParameters> utilParams = new TreeMap<String, ActUtilityParameters>();
+	public final TreeMap<String, ActivityUtilityParameters> utilParams = new TreeMap<String, ActivityUtilityParameters>();
 	public final double marginalUtilityOfWaiting;
 	public final double marginalUtilityOfLateArrival;
 	public final double marginalUtilityOfEarlyDeparture;
@@ -69,7 +68,7 @@ public class CharyparNagelScoringParameters {
 			String type = params.getType();
 			double priority = params.getPriority();
 			double typDurationSecs = params.getTypicalDuration();
-			ActUtilityParameters actParams = new ActUtilityParameters(type, priority, typDurationSecs);
+			ActivityUtilityParameters actParams = new ActivityUtilityParameters(type, priority, typDurationSecs);
 			if (params.getMinimalDuration() >= 0) {
 				actParams.setMinimalDuration(params.getMinimalDuration());
 			}

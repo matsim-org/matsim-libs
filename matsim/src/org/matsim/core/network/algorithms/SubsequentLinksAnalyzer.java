@@ -33,7 +33,7 @@ import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkIdComparator;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * Analyzes the network to find for each link the "logical subsequent link",

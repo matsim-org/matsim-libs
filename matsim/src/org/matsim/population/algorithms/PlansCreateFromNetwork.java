@@ -27,7 +27,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.algorithms.NetworkSummary;
-import org.matsim.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
 
 public class PlansCreateFromNetwork {
 

@@ -27,7 +27,7 @@ import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
 

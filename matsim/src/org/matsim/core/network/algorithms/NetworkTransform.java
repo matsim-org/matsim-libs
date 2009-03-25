@@ -25,7 +25,7 @@ import java.util.Iterator;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 public class NetworkTransform {
 

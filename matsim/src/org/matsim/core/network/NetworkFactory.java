@@ -28,8 +28,8 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Route;
-import org.matsim.population.routes.NodeCarRouteFactory;
-import org.matsim.population.routes.RouteFactory;
+import org.matsim.core.population.routes.NodeCarRouteFactory;
+import org.matsim.core.population.routes.RouteFactory;
 
 /**
  * @author dgrether

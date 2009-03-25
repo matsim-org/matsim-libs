@@ -31,13 +31,13 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.network.BasicLane;
 import org.matsim.core.basic.network.BasicLaneDefinitions;
 import org.matsim.core.basic.network.BasicLanesToLinkAssignment;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.lanedefinitions11.ObjectFactory;
 import org.matsim.jaxb.lanedefinitions11.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.io.MatsimJaxbXmlWriter;
 /**
  * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd
  * file format.
@@ -66,7 +66,7 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter {
 	}
 
 	/**
-	 * @see org.matsim.utils.io.MatsimJaxbXmlWriter#writeFile(java.lang.String)
+	 * @see org.matsim.core.utils.io.MatsimJaxbXmlWriter#writeFile(java.lang.String)
 	 */
 	@Override
 	public void writeFile(String filename) {

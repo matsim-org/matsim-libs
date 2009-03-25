@@ -41,7 +41,7 @@ import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /**

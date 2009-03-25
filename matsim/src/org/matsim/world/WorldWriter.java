@@ -25,8 +25,8 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.writer.Writer;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.Writer;
 
 public class WorldWriter extends Writer {
 

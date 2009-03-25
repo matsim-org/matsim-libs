@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 public class Desires {
 
@@ -69,7 +69,7 @@ public class Desires {
 		return true;
 	}
 	
-	protected final boolean putActivityDuration(final String act_type, final String duration) {
+	public final boolean putActivityDuration(final String act_type, final String duration) {
 		double dur = Time.parseTime(duration);
 		return this.putActivityDuration(act_type,dur);
 	}

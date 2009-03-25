@@ -25,8 +25,8 @@ import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.utils.StringUtils;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.StringUtils;
 
 public class EventsReaderTXTv1 {
 

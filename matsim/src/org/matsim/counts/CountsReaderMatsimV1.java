@@ -24,8 +24,8 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
 /**

@@ -38,6 +38,7 @@ import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemControlInfo;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.signalsystemsconfig11.XMLAdaptivePlanbasedSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLAdaptiveSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLIdRefType;
@@ -47,7 +48,6 @@ import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfig;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfigurationType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType;
-import org.matsim.utils.io.MatsimJaxbXmlParser;
 import org.xml.sax.SAXException;
 
 

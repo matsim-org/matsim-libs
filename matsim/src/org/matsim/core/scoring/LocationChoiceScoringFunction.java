@@ -30,7 +30,6 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
-import org.matsim.population.ActUtilityParameters;
 
 /* 
  * Scoring function factoring in capacity restraints
@@ -61,7 +60,7 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
-		ActUtilityParameters params = this.params.utilParams.get(act.getType());
+		ActivityUtilityParameters params = this.params.utilParams.get(act.getType());
 		if (params == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}

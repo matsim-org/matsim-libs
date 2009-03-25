@@ -28,7 +28,7 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.events.ActStartEvent;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.BasicEventImpl;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 public class EndLegMessage extends EventMessage {
 

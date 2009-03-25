@@ -43,9 +43,9 @@ import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.netvis.DrawableAgentI;
-import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.vis.netvis.DrawableAgentI;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
  * A QueueLane has no own active state and only offers isActive() for a 
@@ -161,8 +161,8 @@ public class QueueLane implements Comparable<QueueLane> {
 		 * moved capacity calculation to two methods, to be able to call it from
 		 * outside e.g. for reducing cap in case of an incident
 		 */
-		initFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
-		recalcCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+		initFlowCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
+		recalcCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 	}
 	
 	
@@ -798,7 +798,7 @@ public class QueueLane implements Comparable<QueueLane> {
 		public void getVehiclePositionsEquil(final Collection<PositionInfo> positions) {
 			double time = SimulationTimer.getTime();
 			int cnt = buffer.size() + vehQueue.size();
-			int nLanes = queueLink.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+			int nLanes = queueLink.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 			if (cnt > 0) {
 				double cellSize = queueLink.getLink().getLength() / cnt;
 				double distFromFromNode = queueLink.getLink().getLength() - cellSize / 2.0;
@@ -881,7 +881,7 @@ public class QueueLane implements Comparable<QueueLane> {
 			// put all cars in the buffer one after the other
 			for (QueueVehicle veh : buffer) {
 
-				int lane = 1 + (Integer.parseInt(veh.getId().toString()) % queueLink.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+				int lane = 1 + (Integer.parseInt(veh.getId().toString()) % queueLink.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
 
 				int cmp = (int) (veh.getDepartureTime_s() + inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp) ? 0.0 : queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
@@ -925,7 +925,7 @@ public class QueueLane implements Comparable<QueueLane> {
 				int cmp = (int) (veh.getDepartureTime_s()
 						+ inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp) ? 0.0 : queueLink.getLink().getFreespeed(now);
-				int lane = 1 + (Integer.parseInt(veh.getId().toString()) % queueLink.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+				int lane = 1 + (Integer.parseInt(veh.getId().toString()) % queueLink.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), queueLink.getLink(), distanceOnLink,
 						lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
@@ -937,7 +937,7 @@ public class QueueLane implements Comparable<QueueLane> {
 			 * position doesn't matter, so they are just placed to the coordinates of
 			 * the from node
 			 */
-			int lane = queueLink.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + 1; // place them next to the link
+			int lane = queueLink.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + 1; // place them next to the link
 			for (QueueVehicle veh : waitingList) {
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), queueLink.getLink(),
 						((NetworkLayer) queueLink.getLink().getLayer()).getEffectiveCellSize(), lane, 0.0,
@@ -950,7 +950,7 @@ public class QueueLane implements Comparable<QueueLane> {
 			 * doesn't matter, so they are just placed to the coordinates of the from
 			 * node
 			 */
-			lane = queueLink.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + 2; // place them next to the link
+			lane = queueLink.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + 2; // place them next to the link
 			for (QueueVehicle veh : parkingList) {
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), queueLink.getLink(),
 						((NetworkLayer) queueLink.getLink().getLayer()).getEffectiveCellSize(), lane, 0.0,

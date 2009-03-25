@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Population;
-import org.matsim.utils.misc.Counter;
+import org.matsim.core.utils.misc.Counter;
 
 public abstract class AbstractPersonAlgorithm implements PersonAlgorithm {
 

@@ -24,8 +24,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 
 public class NetworkSummary {
 

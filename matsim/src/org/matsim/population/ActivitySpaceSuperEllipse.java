@@ -68,7 +68,7 @@ public class ActivitySpaceSuperEllipse extends ActivitySpace {
 	}
 
 	@Override
-	protected void addParam(final String name, final String value) {
+	public void addParam(final String name, final String value) {
 		Double val = Double.valueOf(value);
 		this.addParam(name, val);
 	}

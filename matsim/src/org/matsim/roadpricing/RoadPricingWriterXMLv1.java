@@ -23,8 +23,8 @@ package org.matsim.roadpricing;
 import java.io.IOException;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.utils.misc.Time;
-import org.matsim.writer.MatsimXmlWriter;
+import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * Writes a {@link RoadPricingScheme} to a file according to <code>roadpricing_v1.dtd</code>.

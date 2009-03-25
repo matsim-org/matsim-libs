@@ -29,11 +29,11 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkTeleatlasAddManeuverRestrictions;
 import org.matsim.core.network.algorithms.NetworkTeleatlasAddSpeedRestrictions;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
+import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.Network2ESRIShape;
-import org.matsim.utils.misc.ArgumentParser;
 
 public class TeleAtlas2Network {
 

@@ -29,8 +29,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.BasicIncome.IncomePeriod;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -88,7 +88,7 @@ public class BasicHouseholdsReaderV1 extends MatsimXmlParser {
 	}
 	
 	/**
-	 * @see org.matsim.utils.io.MatsimXmlParser#endTag(java.lang.String, java.lang.String, java.util.Stack)
+	 * @see org.matsim.core.utils.io.MatsimXmlParser#endTag(java.lang.String, java.lang.String, java.util.Stack)
 	 */
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
@@ -120,7 +120,7 @@ public class BasicHouseholdsReaderV1 extends MatsimXmlParser {
 	}
 
 	/**
-	 * @see org.matsim.utils.io.MatsimXmlParser#startTag(java.lang.String, org.xml.sax.Attributes, java.util.Stack)
+	 * @see org.matsim.core.utils.io.MatsimXmlParser#startTag(java.lang.String, org.xml.sax.Attributes, java.util.Stack)
 	 */
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {

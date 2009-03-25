@@ -23,7 +23,7 @@ package org.matsim.core.router.util;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * Pre-processes a given network, gathering information which can be used by a

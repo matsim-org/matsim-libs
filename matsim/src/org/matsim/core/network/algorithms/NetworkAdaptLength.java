@@ -23,7 +23,7 @@ package org.matsim.core.network.algorithms;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class NetworkAdaptLength {
 

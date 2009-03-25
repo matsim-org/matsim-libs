@@ -32,7 +32,7 @@ import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEventHandler, AgentWait2LinkEventHandler {
 
@@ -137,7 +137,7 @@ public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEven
 		for (String linkId : stuckLinkTimes.keySet()) {
 			ArrayList<Double> times = stuckLinkTimes.get(linkId);
 			Link link = network.getLink(new IdImpl(linkId));
-			System.out.print(linkId + "\t" + link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\t" + link.getFreespeed(Time.UNDEFINED_TIME) + "\t" + link.getLength() + "\t" + times.size() + "\t");
+			System.out.print(linkId + "\t" + link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + "\t" + link.getFreespeed(Time.UNDEFINED_TIME) + "\t" + link.getLength() + "\t" + times.size() + "\t");
 			for (Double time : times) System.out.print(time + " ");
 			System.out.println();
 		}

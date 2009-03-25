@@ -34,6 +34,8 @@ import org.matsim.core.basic.signalsystemsconfig.BasicSignalGroupSettings;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.lightsignalsystemsconfig10.ObjectFactory;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalGroupConfigurationType;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfig;
@@ -44,8 +46,6 @@ import org.matsim.jaxb.lightsignalsystemsconfig10.XMLPlanbasedlightSignalSystemC
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalGroupConfigurationType.XMLInterimTimeDropping;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType.XMLStart;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType.XMLStop;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.io.MatsimJaxbXmlWriter;
 
 
 /**

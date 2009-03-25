@@ -26,8 +26,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
-import org.matsim.utils.io.MatsimFileTypeGuesser;
-import org.matsim.utils.io.MatsimJaxbXmlParser;
+import org.matsim.core.utils.io.MatsimFileTypeGuesser;
+import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.xml.sax.SAXException;
 
 

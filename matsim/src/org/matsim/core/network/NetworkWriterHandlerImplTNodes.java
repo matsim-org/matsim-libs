@@ -26,7 +26,7 @@ import java.io.IOException;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 public class NetworkWriterHandlerImplTNodes {
 

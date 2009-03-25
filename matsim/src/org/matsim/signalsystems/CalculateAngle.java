@@ -21,7 +21,7 @@ package org.matsim.signalsystems;
 import java.util.TreeMap;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * Class containing some static helpers to calculate the 

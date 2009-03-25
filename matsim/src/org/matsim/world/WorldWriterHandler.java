@@ -23,7 +23,7 @@ package org.matsim.world;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.writer.WriterHandler;
+import org.matsim.core.utils.io.WriterHandler;
 
 interface WorldWriterHandler extends WriterHandler {
 

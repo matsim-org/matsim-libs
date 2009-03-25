@@ -44,7 +44,7 @@ import org.matsim.core.config.Module;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * Calls David Charypar's DEQSim after writing out all the relevant plans, and reading in

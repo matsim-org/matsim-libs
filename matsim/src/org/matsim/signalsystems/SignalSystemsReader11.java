@@ -33,11 +33,11 @@ import org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.core.basic.signalsystems.BasicSignalSystems;
 import org.matsim.core.basic.signalsystems.BasicSignalSystemsBuilder;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.signalsystems11.XMLIdRefType;
 import org.matsim.jaxb.signalsystems11.XMLSignalGroupDefinitionType;
 import org.matsim.jaxb.signalsystems11.XMLSignalSystemDefinitionType;
 import org.matsim.jaxb.signalsystems11.XMLSignalSystems;
-import org.matsim.utils.io.MatsimJaxbXmlParser;
 import org.xml.sax.SAXException;
 
 /**

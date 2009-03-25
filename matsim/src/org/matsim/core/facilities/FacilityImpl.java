@@ -34,7 +34,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.LocationType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.world.AbstractLocation;
 import org.matsim.world.Location;
 import org.matsim.world.World;

@@ -25,7 +25,7 @@ import java.util.Iterator;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.utils.misc.ArgumentParser;
+import org.matsim.core.utils.misc.ArgumentParser;
 
 /**
  * Reads a network from file and "cleans" it to ensure the network is suited for simulation. Currently,

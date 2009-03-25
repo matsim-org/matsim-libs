@@ -33,12 +33,12 @@ import org.matsim.core.basic.network.BasicLaneDefinitions;
 import org.matsim.core.basic.network.BasicLaneDefinitionsBuilder;
 import org.matsim.core.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.lanedefinitions11.ObjectFactory;
 import org.matsim.jaxb.lanedefinitions11.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
-import org.matsim.utils.io.MatsimJaxbXmlParser;
 import org.xml.sax.SAXException;
 
 
@@ -66,7 +66,7 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
 	}
 
 	/**
-	 * @see org.matsim.utils.io.MatsimJaxbXmlParser#readFile(java.lang.String)
+	 * @see org.matsim.core.utils.io.MatsimJaxbXmlParser#readFile(java.lang.String)
 	 */
 	@Override
 	public void readFile(String filename) throws JAXBException, SAXException,

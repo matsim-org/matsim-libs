@@ -27,8 +27,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.population.PopulationReader;
-import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 

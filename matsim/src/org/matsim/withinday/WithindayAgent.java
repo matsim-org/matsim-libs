@@ -38,10 +38,10 @@ import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.population.PlanImpl;
-import org.matsim.utils.collections.Tuple;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.withinday.beliefs.AgentBeliefs;
 import org.matsim.withinday.contentment.AgentContentment;
 import org.matsim.withinday.percepts.AgentPercepts;
@@ -178,7 +178,7 @@ public class WithindayAgent extends PersonAgent {
 		}
 		//remove the old leg in the plan and replace it with the new one
     Leg oldLeg = (Leg) newPlan.getPlanElements().remove(currentLegIndex);
-    Leg newLeg = new org.matsim.population.LegImpl(oldLeg);
+    Leg newLeg = new org.matsim.core.population.LegImpl(oldLeg);
     //concat the Route of already passed nodes with the new route
     ArrayList<Node> newRouteConcatedList = new ArrayList<Node>(passedNodesList.size() + alternativeRoute.getNodes().size());
     newRouteConcatedList.addAll(passedNodesList);

@@ -25,7 +25,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.WithindayAgent;
 
 public class AgentLinkcostPercpetion implements TravelTime {

@@ -37,7 +37,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
  * QueueNetwork is responsible for creating the QueueLinks/Nodes and for

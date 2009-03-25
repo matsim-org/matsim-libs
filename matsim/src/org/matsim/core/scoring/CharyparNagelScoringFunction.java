@@ -27,8 +27,7 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
-import org.matsim.population.ActUtilityParameters;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * This is the default scoring function for MATSim, referring to:
@@ -158,7 +157,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
-		ActUtilityParameters actParams = this.params.utilParams.get(act.getType());
+		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
@@ -262,7 +261,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 
 	protected double[] getOpeningInterval(final Activity act) {
 
-		ActUtilityParameters actParams = this.params.utilParams.get(act.getType());
+		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}

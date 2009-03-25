@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.utils.collections.Tuple;
-import org.matsim.writer.MatsimXmlWriter;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
 
 /**

@@ -21,7 +21,7 @@ package org.matsim.core.mobsim.queuesim;
 
 import java.util.Collection;
 
-import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 /**
  * Interface for methods to provide a visualizer with data.
  * @author dgrether

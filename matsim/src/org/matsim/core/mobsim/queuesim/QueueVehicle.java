@@ -24,7 +24,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.utils.vis.netvis.DrawableAgentI;
+import org.matsim.vis.netvis.DrawableAgentI;
 
 public class QueueVehicle implements DrawableAgentI {
 

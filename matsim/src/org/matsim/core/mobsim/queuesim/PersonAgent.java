@@ -32,7 +32,7 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.events.ActEndEvent;
 import org.matsim.core.events.ActStartEvent;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * @author dgrether

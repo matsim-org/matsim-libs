@@ -34,6 +34,8 @@ import org.matsim.core.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.core.basic.signalsystems.BasicSignalSystems;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.lightsignalsystems10.ObjectFactory;
 import org.matsim.jaxb.lightsignalsystems10.XMLIdRefType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLaneType;
@@ -42,8 +44,6 @@ import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalGroupDefinitionType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystemDefinitionType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystems;
 import org.matsim.jaxb.lightsignalsystems10.XMLMatsimTimeAttributeType;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.io.MatsimJaxbXmlWriter;
 
 
 /**

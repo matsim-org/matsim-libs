@@ -26,7 +26,7 @@ import java.io.IOException;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.writer.WriterHandler;
+import org.matsim.core.utils.io.WriterHandler;
 
 public interface NetworkWriterHandler extends WriterHandler {
 

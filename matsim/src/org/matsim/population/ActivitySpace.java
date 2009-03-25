@@ -41,7 +41,7 @@ public abstract class ActivitySpace {
 	//////////////////////////////////////////////////////////////////////
 
 	protected abstract void addParam(final String name, final Double value);
-	protected abstract void addParam(final String name, final String value);
+	public abstract void addParam(final String name, final String value);
 
 	public void addParams(final TreeMap<String,Double> params) {
 		Set<Map.Entry<String, Double>> entries = params.entrySet();

@@ -25,7 +25,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
 
 /**
  * @author laemmel

@@ -32,9 +32,9 @@ import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.io.MatsimXmlParser;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 

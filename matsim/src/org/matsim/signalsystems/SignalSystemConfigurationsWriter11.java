@@ -38,6 +38,8 @@ import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemControlInfo;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.signalsystemsconfig11.ObjectFactory;
 import org.matsim.jaxb.signalsystemsconfig11.XMLAdaptivePlanbasedSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLAdaptiveSignalSystemControlInfoType;
@@ -53,8 +55,6 @@ import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLCirculat
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLStart;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLStop;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLSyncronizationOffset;
-import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.io.MatsimJaxbXmlWriter;
 
 
 public class SignalSystemConfigurationsWriter11 extends MatsimJaxbXmlWriter{

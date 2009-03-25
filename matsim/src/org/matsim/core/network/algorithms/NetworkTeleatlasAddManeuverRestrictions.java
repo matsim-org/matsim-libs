@@ -36,8 +36,8 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderTeleatlas;
-import org.matsim.utils.collections.Tuple;
-import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
 /**
  * Adds maneuver restrictions to a MATSim {@link NetworkLayer network} created

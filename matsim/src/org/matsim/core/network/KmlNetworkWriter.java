@@ -33,10 +33,10 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.utils.geometry.CoordinateTransformation;
-import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.MatsimKmlStyleFactory;
-import org.matsim.utils.vis.kml.NetworkFeatureFactory;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.vis.kml.KMZWriter;
+import org.matsim.vis.kml.MatsimKmlStyleFactory;
+import org.matsim.vis.kml.NetworkFeatureFactory;
 
 /**
  * @author dgrether

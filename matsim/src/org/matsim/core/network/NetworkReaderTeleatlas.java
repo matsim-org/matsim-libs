@@ -29,8 +29,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.BasicLinkImpl;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

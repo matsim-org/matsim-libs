@@ -31,13 +31,13 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PopulationImpl;
-import org.matsim.utils.io.MatsimFileTypeGuesser;
-import org.matsim.utils.io.MatsimFileTypeGuesser.FileType;
-import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
-import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientFileQuad;
-import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientQuad;
-import org.matsim.utils.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.io.MatsimFileTypeGuesser;
+import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
+import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
+import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
+import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
+import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
 
 /**
  * A generic starter for the OnTheFly Visualizer that supports
