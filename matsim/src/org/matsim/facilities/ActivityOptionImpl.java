@@ -26,12 +26,12 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.matsim.basic.v01.BasicOpeningTime;
-import org.matsim.basic.v01.BasicOpeningTime.DayType;
+import org.matsim.api.basic.v01.BasicLocation;
+import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
+import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
+import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.BasicLocation;
-import org.matsim.interfaces.core.v01.ActivityOption;
-import org.matsim.interfaces.core.v01.Facility;
 
 public class ActivityOptionImpl implements ActivityOption {
 

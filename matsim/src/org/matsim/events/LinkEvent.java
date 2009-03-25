@@ -22,10 +22,10 @@ package org.matsim.events;
 
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.events.BasicLinkEvent;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicLinkEvent;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Person;
 
 public abstract class LinkEvent extends PersonEvent implements BasicLinkEvent {
 

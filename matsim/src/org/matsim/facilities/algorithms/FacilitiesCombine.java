@@ -24,11 +24,11 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicOpeningTime;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.ActivityOption;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
+import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
 
 public class FacilitiesCombine {
 

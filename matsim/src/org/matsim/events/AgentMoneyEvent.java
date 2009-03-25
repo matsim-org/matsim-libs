@@ -22,9 +22,9 @@ package org.matsim.events;
 
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.events.BasicAgentMoneyEvent;
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
+import org.matsim.core.api.population.Person;
 
 /**
  * This event specifies that an agent has gained (or paid) some money.

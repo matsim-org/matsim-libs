@@ -20,10 +20,10 @@
 
 package org.matsim.facilities.algorithms;
 
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
 
 public class FacilitiesRandomizeHectareCoordinates {
 

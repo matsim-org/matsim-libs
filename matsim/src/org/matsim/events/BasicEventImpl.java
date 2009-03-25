@@ -23,7 +23,7 @@ package org.matsim.events;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.events.BasicEvent;
+import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.utils.misc.Time;
 
 public abstract class BasicEventImpl implements BasicEvent {

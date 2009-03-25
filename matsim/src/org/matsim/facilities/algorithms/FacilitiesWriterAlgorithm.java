@@ -20,9 +20,9 @@
 
 package org.matsim.facilities.algorithms;
 
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
 
 /**
  * Use this facilities writer when streaming facilities.

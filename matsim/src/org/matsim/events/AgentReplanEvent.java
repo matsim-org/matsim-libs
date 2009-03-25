@@ -19,8 +19,8 @@
 
 package org.matsim.events;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.population.CarRoute;
 
 /**
  * @author dgrether

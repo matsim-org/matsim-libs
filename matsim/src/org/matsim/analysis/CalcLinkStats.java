@@ -26,10 +26,10 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.network.BasicLink;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.io.IOUtils;

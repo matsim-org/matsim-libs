@@ -20,9 +20,9 @@
 
 package org.matsim.facilities;
 
-import org.matsim.basic.v01.BasicOpeningTime;
+import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
+import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.OpeningTime;
 import org.matsim.utils.misc.Time;
 
 public class OpeningTimeImpl implements OpeningTime {

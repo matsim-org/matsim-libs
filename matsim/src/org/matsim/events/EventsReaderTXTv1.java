@@ -23,8 +23,8 @@ package org.matsim.events;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.io.IOUtils;
 
