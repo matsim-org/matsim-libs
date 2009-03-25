@@ -40,7 +40,8 @@ public class AnalyzeFacilities {
 	public void run(Facilities facilities, NetworkLayer network) {
 		this.facilities = facilities;
 
-		write("./output/facilities_activities_summary.txt", network);
+		this.write("./output/facilities_activities_summary.txt", network);
+		this.writeGroceryCapacity("./output/facilities_groceryshopping_activities_summary.txt", network);
 		log.info("finished");
 	}
 
@@ -204,7 +205,7 @@ public class AnalyzeFacilities {
 			final BufferedWriter outSummary = IOUtils.getBufferedWriter("output/facilities_summary.txt");
 			
 			outSummary.write("Total number of facilities: " + this.facilities.getFacilities().size() +"\n");
-			out.write("Type\t#activity facilities\tcapacity\tavg. capacity\tmin capacity\tmaxCapacity\n");
+			out.write("Type\t#activity facilities\tcapacity\tavg. capacity\tmin capacity\tmax capacity\n");
 					
 			for (int typeIndex = 0; typeIndex < 2; typeIndex++) {
 				
@@ -246,7 +247,7 @@ public class AnalyzeFacilities {
 							"\t" + capacityCount[typeIndex][i] / count[typeIndex][i] + 
 							"\t" + minCapacity[typeIndex][i] +"\t" + maxCapacity[typeIndex][i] + "\n");
 				}
-				out.write(types[typeIndex] + " " + totalCount + "\t" +  totalCapacity + "\t" + totalCapacity / totalCount + "\n");
+				out.write(types[typeIndex] + "\t" + totalCount + "\t" +  totalCapacity + "\t" + totalCapacity / totalCount + "\n");
 				out.flush();
 				if (typeIndex == 0) {
 					outSummary.write("Total number of activity facilities: " + numberOfActivityFacilities);
@@ -255,6 +256,65 @@ public class AnalyzeFacilities {
 			}
 			out.close();
 			outSummary.close();
+		}
+		catch (final IOException e) {
+			Gbl.errorMsg(e);
+		}
+	}
+	
+	
+	private void writeGroceryCapacity(String outfile, NetworkLayer network) {
+	
+		String[] NOGA_Grocery = {
+				"B015211A",
+				"B015211B",
+				"B015211C",
+				"B015211D",
+				"B015211E",
+				"B015212A",
+				"B015221A",
+				"B015222A",
+				"B015223A",	
+				"B015224A",	
+				"B015225A",
+				"B015227A",
+				"B015227B"
+		};
+		
+		double groceryCapacity = 0.0;
+		double nongroceryCapacity = 0.0;
+					
+		try {
+			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
+								
+			Iterator< ? extends Facility> facility_it = this.facilities.getFacilities().values().iterator();
+			while (facility_it.hasNext()) {
+				Facility facility = facility_it.next();
+								
+				for (int i = 0; i < NOGA_Grocery.length; i++) {						
+					if (facility.getActivityOption(NOGA_Grocery[i]) != null) {
+						Iterator<ActivityOption> options_it = facility.getActivityOptions().values().iterator();
+						while (options_it.hasNext()) {
+							ActivityOption actOpt = options_it.next();
+							if (actOpt.getType().startsWith("shop")) {
+								groceryCapacity += actOpt.getCapacity();
+							}
+						}
+					}
+					else {
+						Iterator<ActivityOption> options_it = facility.getActivityOptions().values().iterator();
+						while (options_it.hasNext()) {
+							ActivityOption actOpt = options_it.next();
+							if (actOpt.getType().startsWith("shop")) {
+								nongroceryCapacity += actOpt.getCapacity();
+							}
+						}
+					}
+				}
+			}
+			out.write("Total grocery capacity: " + groceryCapacity + "\n" +  "Non grocery capacity: " + nongroceryCapacity + "\n");
+			out.flush();
+			out.close();
 		}
 		catch (final IOException e) {
 			Gbl.errorMsg(e);
