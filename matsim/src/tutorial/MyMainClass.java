@@ -1,7 +1,7 @@
 package tutorial;
 
-import org.matsim.controler.Controler;
-import org.matsim.utils.vis.netvis.NetVis;
+import org.matsim.core.controler.Controler;
+import org.matsim.vis.netvis.NetVis;
 
 
 public class MyMainClass {

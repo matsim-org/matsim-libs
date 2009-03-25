@@ -20,20 +20,20 @@
 
 package tutorial;
 
-import org.matsim.config.Config;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.Events;
-import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.queuesim.QueueSimulation;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.PopulationImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.EventsToScore;
 import org.matsim.population.algorithms.PlanAverageScore;
-import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.scoring.EventsToScore;
-import org.matsim.utils.vis.netvis.NetVis;
+import org.matsim.vis.netvis.NetVis;
 
 
 public class MyControler4 {

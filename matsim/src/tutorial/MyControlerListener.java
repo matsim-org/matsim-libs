@@ -6,14 +6,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.controler.events.IterationEndsEvent;
-import org.matsim.controler.events.ShutdownEvent;
-import org.matsim.controler.events.StartupEvent;
-import org.matsim.controler.listener.IterationEndsListener;
-import org.matsim.controler.listener.ShutdownListener;
-import org.matsim.controler.listener.StartupListener;
-import org.matsim.utils.charts.XYLineChart;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.utils.charts.XYLineChart;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * This class collects the average travel time per agent measured by the
