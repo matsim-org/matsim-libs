@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 import Jama.Matrix;
 

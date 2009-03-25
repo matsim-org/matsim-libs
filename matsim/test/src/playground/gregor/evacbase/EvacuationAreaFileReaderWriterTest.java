@@ -9,8 +9,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.CRCChecksum;
 import org.xml.sax.SAXException;
 
 import playground.gregor.sims.evacbase.EvacuationAreaFileReader;

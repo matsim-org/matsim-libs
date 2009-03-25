@@ -29,8 +29,8 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.CRCChecksum;
 
 /**
  * Tests that the re-planning process of MATSim generates the same results every time, even when

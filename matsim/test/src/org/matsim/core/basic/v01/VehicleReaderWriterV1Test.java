@@ -31,9 +31,9 @@ import org.matsim.core.basic.v01.BasicVehicleReaderV1;
 import org.matsim.core.basic.v01.BasicVehicleType;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.VehicleWriterV1;
-import org.matsim.population.VehicleReaderV1;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleReaderV1;
 
 /**
  * @author dgrether

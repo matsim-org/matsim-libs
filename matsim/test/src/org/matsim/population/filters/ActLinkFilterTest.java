@@ -27,9 +27,9 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordImpl;
 
 public class ActLinkFilterTest extends MatsimTestCase {
 

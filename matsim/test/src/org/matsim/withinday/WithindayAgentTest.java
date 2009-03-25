@@ -42,7 +42,7 @@ import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.coopers.CoopersAgentLogicFactory;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
@@ -139,7 +139,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 
 	private WithindayAgent createAgent(final Link homeLink, final Link workLink) {
 		Person p = new PersonImpl(new IdImpl("1"));
-		this.plan = new org.matsim.population.PlanImpl(p);
+		this.plan = new org.matsim.core.population.PlanImpl(p);
 		p.addPlan(this.plan);
 		this.leg = null;
 		try {

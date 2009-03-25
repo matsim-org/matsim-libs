@@ -24,7 +24,7 @@ import java.util.TreeMap;
 
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PersonIdFilterTest extends MatsimTestCase {

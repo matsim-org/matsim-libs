@@ -13,11 +13,11 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.PopulationReaderMatsimV4;
-import org.matsim.population.PopulationWriter;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.CRCChecksum;
 import org.xml.sax.SAXException;
 
 import playground.gregor.sims.evacbase.EvacuationAreaFileReader;

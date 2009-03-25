@@ -28,8 +28,8 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.ChangeLegMode;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * @author mrieser
@@ -58,7 +58,7 @@ public class ChangeLegModeTest extends MatsimTestCase {
 	private void runTest(final ChangeLegMode module, final BasicLeg.Mode[] possibleModes) {
 		module.prepareReplanning();
 
-		Plan plan = new org.matsim.population.PlanImpl(null);
+		Plan plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createAct("home", new CoordImpl(0, 0));
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
 		plan.createAct("work", new CoordImpl(0, 0));

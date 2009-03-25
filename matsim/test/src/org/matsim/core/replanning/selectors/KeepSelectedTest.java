@@ -23,9 +23,9 @@ package org.matsim.core.replanning.selectors;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PlanSelector;
-import org.matsim.population.PersonImpl;
 
 /**
  * Test for {@link KeepSelected}

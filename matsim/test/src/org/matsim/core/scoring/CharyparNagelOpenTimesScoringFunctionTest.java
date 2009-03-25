@@ -32,12 +32,12 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunction;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.population.PersonImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.misc.Time;
 
 public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 

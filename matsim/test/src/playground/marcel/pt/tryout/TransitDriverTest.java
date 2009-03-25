@@ -38,7 +38,7 @@ import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;

@@ -28,8 +28,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.CRCChecksum;
 import org.xml.sax.SAXException;
 
 /**

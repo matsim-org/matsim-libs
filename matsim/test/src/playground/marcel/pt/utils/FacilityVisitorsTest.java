@@ -31,9 +31,9 @@ import org.matsim.core.events.ActEndEvent;
 import org.matsim.core.events.ActStartEvent;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordImpl;
 
 public class FacilityVisitorsTest extends MatsimTestCase {
 

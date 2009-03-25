@@ -28,11 +28,11 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.Events;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

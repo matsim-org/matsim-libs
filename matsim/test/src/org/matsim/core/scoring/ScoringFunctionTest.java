@@ -31,9 +31,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.CharyparNagelScoringFunction;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

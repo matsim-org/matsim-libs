@@ -23,8 +23,8 @@ package org.matsim.core.replanning;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.CRCChecksum;
 
 public class ReRoutingTest extends MatsimTestCase {
 

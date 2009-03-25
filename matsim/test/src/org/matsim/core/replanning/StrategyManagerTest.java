@@ -24,12 +24,12 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class StrategyManagerTest extends MatsimTestCase {

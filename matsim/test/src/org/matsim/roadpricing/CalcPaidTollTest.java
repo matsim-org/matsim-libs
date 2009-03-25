@@ -34,8 +34,8 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.EventsToScore;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.misc.Time;
 import org.xml.sax.SAXException;
 
 /**

@@ -29,12 +29,12 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
-import org.matsim.population.PersonImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.misc.Time;
 
 /**
  * Tests the functionality of {@link TimeAllocationMutator}, mainly that the

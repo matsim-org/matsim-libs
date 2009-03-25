@@ -40,13 +40,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.population.Desires;
-import org.matsim.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.misc.Time;
 
 public class ActivityScoringFunctionTest extends MatsimTestCase {
 

@@ -34,12 +34,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.CharyparNagelScoringFunction;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.population.ActUtilityParameters;
-import org.matsim.population.PersonImpl;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * Test the correct working of {@link CharyparNagelScoringFunction} according to the formulas in:
@@ -163,13 +162,13 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		double zeroUtilDurH = getZeroUtilDuration_h(16.0, 1.0);
 		double zeroUtilDurW2 = getZeroUtilDuration_h(8.0, 2.0);
 
-		ActUtilityParameters params = new ActUtilityParameters("w", 1.0, 8.0 * 3600);
+		ActivityUtilityParameters params = new ActivityUtilityParameters("w", 1.0, 8.0 * 3600);
 		assertEquals(zeroUtilDurW, params.getZeroUtilityDuration(), EPSILON);
 
-		params = new ActUtilityParameters("h", 1.0, 16.0 * 3600);
+		params = new ActivityUtilityParameters("h", 1.0, 16.0 * 3600);
 		assertEquals(zeroUtilDurH, params.getZeroUtilityDuration(), EPSILON);
 
-		params = new ActUtilityParameters("w2", 2.0, 8.0 * 3600); // test that the priority is respected as well
+		params = new ActivityUtilityParameters("w2", 2.0, 8.0 * 3600); // test that the priority is respected as well
 		assertEquals(zeroUtilDurW2, params.getZeroUtilityDuration(), EPSILON);
 	}
 

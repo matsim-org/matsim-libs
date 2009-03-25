@@ -27,9 +27,9 @@ import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.NodeCarRoute;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.NetworkUtils;
 
 /**
  * @author dgrether

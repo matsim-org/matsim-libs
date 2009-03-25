@@ -51,10 +51,10 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.MultithreadedModuleA;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.utils.charts.XYScatterChart;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.charts.XYScatterChart;
-import org.matsim.utils.misc.Time;
 
 /**
  * This TestCase should ensure the correct behavior of agents when different

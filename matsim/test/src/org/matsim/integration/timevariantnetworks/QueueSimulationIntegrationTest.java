@@ -45,12 +45,12 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.NetworkUtils;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.misc.Time;
 
 /**
  * Tests that the QueueSimulation takes a TimeVariant Network into account.

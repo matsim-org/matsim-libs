@@ -33,9 +33,9 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.population.routes.CompressedCarRoute;
-import org.matsim.population.routes.CompressedCarRouteFactory;
-import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.core.population.routes.CompressedCarRoute;
+import org.matsim.core.population.routes.CompressedCarRouteFactory;
+import org.matsim.core.population.routes.NodeCarRoute;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

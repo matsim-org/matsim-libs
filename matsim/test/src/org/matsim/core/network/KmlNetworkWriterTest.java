@@ -35,10 +35,10 @@ import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.transformations.AtlantisToWGS84;
-import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.MatsimKmlStyleFactory;
+import org.matsim.vis.kml.KMZWriter;
+import org.matsim.vis.kml.MatsimKmlStyleFactory;
 
 /**
  * @author mrieser

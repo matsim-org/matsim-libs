@@ -12,7 +12,7 @@ import org.matsim.core.mobsim.jdeqsim.Scheduler;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.mobsim.jdeqsim.StartingLegMessage;
 import org.matsim.core.mobsim.jdeqsim.Vehicle;
-import org.matsim.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class TestMessageFactory extends MatsimTestCase{

@@ -43,8 +43,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.misc.Time;
 
 public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 

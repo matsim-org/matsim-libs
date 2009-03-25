@@ -31,10 +31,10 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.misc.Time;
 
 /**
  * @author mrieser
@@ -54,7 +54,7 @@ public class LegHistogramTest extends MatsimTestCase {
 
 		Person person1 = new PersonImpl(new IdImpl(1));
 		Person person2 = new PersonImpl(new IdImpl(2));
-		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
+		Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);
 		leg.setArrivalTime(Time.UNDEFINED_TIME);
@@ -102,7 +102,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		Link link = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 1.0, 1);
 
 		Person person1 = new PersonImpl(new IdImpl(1));
-		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
+		Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);
 		leg.setArrivalTime(Time.UNDEFINED_TIME);
@@ -139,7 +139,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		Link link = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 1.0, 1);
 
 		Person person1 = new PersonImpl(new IdImpl(1));
-		Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
+		Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);
 		leg.setArrivalTime(Time.UNDEFINED_TIME);

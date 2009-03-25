@@ -2,8 +2,8 @@ package playground.jhackney.socialnetworks;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.CRCChecksum;
 
 import playground.jhackney.controler.SNControllerListener2;
 

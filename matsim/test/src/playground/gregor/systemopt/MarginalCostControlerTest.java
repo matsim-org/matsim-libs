@@ -21,8 +21,8 @@
 package playground.gregor.systemopt;
 
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.CRCChecksum;
 
 import playground.gregor.sims.socialcost.MarginalCostControler;
 

@@ -34,9 +34,9 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * @author dgrether

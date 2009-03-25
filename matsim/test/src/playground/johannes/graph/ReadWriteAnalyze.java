@@ -25,8 +25,8 @@ package playground.johannes.graph;
 
 import java.io.IOException;
 
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.CRCChecksum;
 
 import playground.johannes.graph.GraphStatistics.GraphDistance;
 import playground.johannes.graph.io.GraphMLWriter;

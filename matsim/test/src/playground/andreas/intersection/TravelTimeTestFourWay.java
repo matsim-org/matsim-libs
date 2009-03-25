@@ -22,9 +22,9 @@ import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.CRCChecksum;
-import org.matsim.utils.io.IOUtils;
 
 import playground.andreas.intersection.sim.QSim;
 

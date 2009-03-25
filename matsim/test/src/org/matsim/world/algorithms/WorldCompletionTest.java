@@ -29,10 +29,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.examples.TriangleScenario;
 import org.matsim.population.DesiresTest;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.CRCChecksum;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 

@@ -23,8 +23,12 @@ package org.matsim.population;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.CRCChecksum;
 
 public class DesiresTest extends MatsimTestCase {
 

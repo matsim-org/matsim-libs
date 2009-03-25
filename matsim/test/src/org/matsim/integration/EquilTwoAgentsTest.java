@@ -33,8 +33,8 @@ import org.matsim.core.events.handler.ActEndEventHandler;
 import org.matsim.core.events.handler.ActStartEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.scoring.EventsToScore;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.misc.Time;
 
 /**
  * This test uses the org.matsim.examples equil scenario with two agents

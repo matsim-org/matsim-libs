@@ -33,9 +33,9 @@ import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.CRCChecksum;
-import org.matsim.utils.geometry.CoordImpl;
 import org.xml.sax.SAXException;
 
 public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{

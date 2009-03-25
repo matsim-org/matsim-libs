@@ -37,7 +37,7 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
@@ -174,7 +174,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 			String facString  = entry.getKey();
 			log.info("Testing location sequence: " + facString);
 
-			Plan plan = new org.matsim.population.PlanImpl(person);
+			Plan plan = new org.matsim.core.population.PlanImpl(person);
 
 			String[] locationIdSequence = facString.split(" ");
 			for (int aa=0; aa < locationIdSequence.length; aa++) {

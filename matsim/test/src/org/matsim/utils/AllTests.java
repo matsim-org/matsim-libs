@@ -20,6 +20,9 @@
 
 package org.matsim.utils;
 
+import org.matsim.core.utils.misc.NetworkUtilsTest;
+import org.matsim.world.WorldUtilsTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -28,13 +31,13 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for org.matsim.utils");
 		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.utils.charts.AllTests.suite());
-		suite.addTest(org.matsim.utils.collections.AllTests.suite());
-		suite.addTest(org.matsim.utils.geometry.AllTests.suite());
+		suite.addTest(org.matsim.core.utils.charts.AllTests.suite());
+		suite.addTest(org.matsim.core.utils.collections.AllTests.suite());
+		suite.addTest(org.matsim.core.utils.geometry.AllTests.suite());
 		suite.addTest(org.matsim.utils.gis.AllTests.suite());
-		suite.addTest(org.matsim.utils.io.AllTests.suite());
-		suite.addTest(org.matsim.utils.misc.AllTests.suite());
-		suite.addTest(org.matsim.utils.vis.AllTests.suite());
+		suite.addTest(org.matsim.core.utils.io.AllTests.suite());
+		suite.addTest(org.matsim.core.utils.misc.AllTests.suite());
+		suite.addTest(org.matsim.vis.AllTests.suite());
 		suite.addTestSuite(NetworkUtilsTest.class);
 		suite.addTestSuite(WorldUtilsTest.class);
 		//$JUnit-END$

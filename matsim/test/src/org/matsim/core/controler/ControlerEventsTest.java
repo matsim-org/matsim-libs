@@ -31,8 +31,8 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.io.IOUtils;
 
 /**
  * @author dgrether

@@ -27,9 +27,9 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
-import org.matsim.population.PopulationWriter;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 

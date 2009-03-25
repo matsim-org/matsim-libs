@@ -37,14 +37,14 @@ import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.routes.NodeCarRoute;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.EventsToScore;
-import org.matsim.population.PersonImpl;
-import org.matsim.population.PopulationImpl;
-import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.utils.NetworkUtils;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.misc.Time;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * Some static methods to set up the road pricing scenarios in the test cases.
@@ -175,7 +175,7 @@ public class Fixture {
 
 	private static Person createPerson1(final int personId, final String startTime, final Link homeLink, final List<Node> routeNodes, final Link workLink) {
 		Person person = new PersonImpl(new IdImpl(personId));
-		Plan plan = new org.matsim.population.PlanImpl(person);
+		Plan plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
 		Leg leg = plan.createLeg(Mode.car);//"car", startTime, "00:01", null);
@@ -188,7 +188,7 @@ public class Fixture {
 
 	private static Person createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
 		Person person = new PersonImpl(new IdImpl(personId));
-		Plan plan = new org.matsim.population.PlanImpl(person);
+		Plan plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
 		plan.createLeg(Mode.car);

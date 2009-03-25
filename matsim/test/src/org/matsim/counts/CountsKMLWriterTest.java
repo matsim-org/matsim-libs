@@ -22,10 +22,10 @@ package org.matsim.counts;
 
 import java.io.File;
 
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.transformations.IdentityTransformation;
 
 /**
  * Tests if some graphs are created.

@@ -32,9 +32,9 @@ import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.TimeVariantLinkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.misc.Time;
 
 /**
  * @author mrieser
@@ -54,7 +54,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		final Link link1 = network.createLink(new IdImpl("1"), node1, node2, 1000, 1.667, 3600, 1);
 		final Link link3 = network.createLink(new IdImpl("3"), node3, node4, 1000, 1.667, 3600, 1);
 
-		final double [] queryDates = {org.matsim.utils.misc.Time.UNDEFINED_TIME, 0., 1., 2., 3., 4.};
+		final double [] queryDates = {org.matsim.core.utils.misc.Time.UNDEFINED_TIME, 0., 1., 2., 3., 4.};
 
 		// link1 change event absolute, undef. endtime
 		final double [] responsesLink1 = {1.667, 1.667, 10., 10., 10., 10.};
@@ -264,8 +264,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 
 		// test base values
-		assertEquals(3600.0, link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
-		assertEquals(1.0, link.getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+		assertEquals(3600.0, link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+		assertEquals(1.0, link.getFlowCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
 
 		// add an absolute change
 		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
@@ -274,8 +274,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		link.applyEvent(change);
 
 		// do the tests
-		assertEquals(3600.0, link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
-		assertEquals(1.0, link.getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+		assertEquals(3600.0, link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+		assertEquals(1.0, link.getFlowCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
 		assertEquals(2.0, link.getFlowCapacity(7*3600), EPSILON);
 
 		// test derived values
@@ -298,7 +298,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 
 		// test base values
-		assertEquals(1.0, link.getNumberOfLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+		assertEquals(1.0, link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
 
 		// add an absolute change
 		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
@@ -307,7 +307,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		link.applyEvent(change);
 
 		// do the tests
-		assertEquals(1.0, link.getNumberOfLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+		assertEquals(1.0, link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
 		assertEquals(2.0, link.getNumberOfLanes(7*3600), EPSILON);
 
 		// test derived values
