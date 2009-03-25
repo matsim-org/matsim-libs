@@ -227,6 +227,16 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		
 	}
 	
+	private static OTFOGLDrawer.FastColorizer colorizerBlue = new OTFOGLDrawer.FastColorizer(
+			new double[] { 0.0, 50.}, new Color[] {	Color.BLUE, Color.YELLOW});
+	
+	public class AgentPointDrawerBlue extends AgentPointDrawer {
+		
+		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
+				drawer.addAgent(id, startX, startY, colorizerBlue.getColor(0.1 + 0.9*color), true);
+		}
+	}
+
 	public class AgentPadangDrawer  extends AgentPointDrawer {
 		public final AgentArrayDrawer drawerWave = new AgentArrayDrawer(){
 			protected void setAgentSize(){gl.glPointSize(10);}
