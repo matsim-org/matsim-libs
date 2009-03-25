@@ -186,17 +186,24 @@ public class AnalyzeFacilities {
 		};
 		
 		double[][] capacityCount = new double[2][65];
+		int[][] count = new int[2][65];
+		
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j <65; j++) {
 				capacityCount[i][j] = 0.0;
+				count[i][j] = 0;
 			}
 		}
 		
 	
 		try {
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
-						
+			
 			for (int typeIndex = 0; typeIndex < 2; typeIndex++) {
+				
+				double totalCapacity = 0.0;
+				int totalCount = 0;
+				
 				Iterator< ? extends Facility> facility_it = this.facilities.getFacilities().values().iterator();
 				while (facility_it.hasNext()) {
 					Facility facility = facility_it.next();
@@ -208,6 +215,9 @@ public class AnalyzeFacilities {
 								ActivityOption actOpt = options_it.next();
 								if (actOpt.getType().startsWith(types[typeIndex])) {
 									capacityCount[typeIndex][i] += actOpt.getCapacity();
+									count[typeIndex][i] += 1;
+									totalCapacity += actOpt.getCapacity();
+									totalCount++;
 								}
 							}
 						}
@@ -215,8 +225,12 @@ public class AnalyzeFacilities {
 				}
 				for (int i = 0; i < capacityCount[typeIndex].length; i++) {
 					if (NOGA[typeIndex][i].equals("null")) continue;
-					out.write(types[typeIndex] + ": total capacity for " + NOGA[typeIndex][i] + ": " + capacityCount[typeIndex][i] + "\n");
+					out.write(types[typeIndex] + " total number of activity facilities " + NOGA[typeIndex][i] + ": " + count[typeIndex][i] +						
+							" ... total capacity for " + NOGA[typeIndex][i] + ": " + capacityCount[typeIndex][i] + "\n");
 				}
+				out.write(types[typeIndex] + " total number of activity facilities: " + totalCount + "\n");
+				out.write(types[typeIndex] + " total number of capacity: " + totalCapacity + "\n");
+				out.write(types[typeIndex] + " avg capacity: " + totalCapacity / totalCount + "\n");
 				out.flush();
 			}
 			out.close();

@@ -87,12 +87,12 @@ public class AnalyzePlans {
 				}
 			}
 			out.write("Number of shopping activities: " + numberOfShoppingActs + "\n");
-			out.write("Total desired duration of shopping activities: " + totalDesiredShoppingDuration + "\n");
-			out.write("Avg. desired shopping duration: " + totalDesiredShoppingDuration / numberOfShoppingActs);
+			out.write("Total desired duration of shopping activities: " + 1/3600.0 * totalDesiredShoppingDuration + " [h] \n");
+			out.write("Avg. desired shopping duration: " + 1/3600.0 * (totalDesiredShoppingDuration / numberOfShoppingActs) + " [h] \n");
 			out.newLine();
 			out.write("Number of leisure activities: " + numberOfLeisureActs + "\n");
-			out.write("Total desired duration of leisure activities: " + totalDesiredLeisureDuration + "\n");
-			out.write("Avg. desired leisure duration: " + totalDesiredLeisureDuration / numberOfLeisureActs);
+			out.write("Total desired duration of leisure activities: " + 1/3600.0 * totalDesiredLeisureDuration + " [h] \n");
+			out.write("Avg. desired leisure duration: " + 1/3600.0 * (totalDesiredLeisureDuration / numberOfLeisureActs) + " [h] \n");
 			out.flush();
 			out.close();
 		}
