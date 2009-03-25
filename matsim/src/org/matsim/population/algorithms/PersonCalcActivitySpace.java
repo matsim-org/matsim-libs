@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.Knowledge;
 import org.matsim.utils.optimization.BeanObjective;

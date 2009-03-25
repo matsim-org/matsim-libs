@@ -23,10 +23,10 @@ package org.matsim.withinday;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.network.NetworkLayer;
-import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.scoring.ScoringFunctionFactory;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.withinday.beliefs.AgentBeliefs;
 import org.matsim.withinday.beliefs.AgentBeliefsImpl;

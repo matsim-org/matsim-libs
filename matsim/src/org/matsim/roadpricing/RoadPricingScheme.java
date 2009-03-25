@@ -26,9 +26,9 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * A road pricing scheme (sometimes also called toll scheme) contains the type of the toll, a list of the

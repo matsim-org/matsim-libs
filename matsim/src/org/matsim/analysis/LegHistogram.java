@@ -39,12 +39,12 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.AgentStuckEvent;
-import org.matsim.events.handler.AgentArrivalEventHandler;
-import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentStuckEvent;
+import org.matsim.core.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.utils.misc.Time;
 
 /**

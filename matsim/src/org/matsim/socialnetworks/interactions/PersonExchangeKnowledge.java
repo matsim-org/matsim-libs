@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.Knowledge;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
@@ -58,7 +58,7 @@ public class PersonExchangeKnowledge {
 		//from Person 2's knowledge and add it to Person 1's
 		List<ActivityOption> act2List = k2.getActivities(facType);
 		if(act2List.size()>=1){
-			ActivityOption activity2=act2List.get(MatsimRandom.random.nextInt( act2List.size()));
+			ActivityOption activity2=act2List.get(MatsimRandom.getRandom().nextInt( act2List.size()));
 			k1.getMentalMap().addActivity(activity2);
 		}
 
@@ -66,7 +66,7 @@ public class PersonExchangeKnowledge {
 		if(p2.getKnowledge().getEgoNet().knows(p1)){
 			List<ActivityOption> act1List = k1.getActivities(facType);
 			if(act1List.size()>=1){
-				ActivityOption activity1=act1List.get(MatsimRandom.random.nextInt( act1List.size()));
+				ActivityOption activity1=act1List.get(MatsimRandom.getRandom().nextInt( act1List.size()));
 				k2.getMentalMap().addActivity(activity1);
 			}
 		}

@@ -5,8 +5,8 @@ import java.util.LinkedHashMap;
 
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
-import org.matsim.scoring.ScoringFunction;
-import org.matsim.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 
 

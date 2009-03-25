@@ -24,11 +24,11 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.BasicLocation;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.BasicHousehold;
-import org.matsim.basic.v01.HouseholdBuilder;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.basic.v01.BasicHousehold;
+import org.matsim.core.basic.v01.HouseholdBuilder;
 import org.matsim.households.Household;
 import org.matsim.vehicles.Vehicle;
 

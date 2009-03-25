@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.control;
 
-import org.matsim.basic.signalsystemsconfig.BasicAdaptiveSignalSystemControlInfo;
+import org.matsim.core.basic.signalsystemsconfig.BasicAdaptiveSignalSystemControlInfo;
 
 
 /**

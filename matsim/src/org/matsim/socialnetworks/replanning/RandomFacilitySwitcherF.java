@@ -21,11 +21,11 @@
 package org.matsim.socialnetworks.replanning;
 
 import org.matsim.core.api.facilities.Facilities;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.replanning.modules.MultithreadedModuleA;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.replanning.modules.MultithreadedModuleA;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
 /**
  * A sample location choice replanning StrategyModule. The facility
  * (the place an activity takes place) is exchanged randomly for another

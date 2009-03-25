@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.mobsim.queuesim.QueueLink;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.QueueVehicle;
 
 public class QuerySpinneNOW extends QuerySpinne {
 

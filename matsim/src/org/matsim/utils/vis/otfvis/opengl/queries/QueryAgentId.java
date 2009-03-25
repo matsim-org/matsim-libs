@@ -26,9 +26,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.core.api.population.Population;
-import org.matsim.events.Events;
-import org.matsim.mobsim.queuesim.QueueLink;
-import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.events.Events;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;

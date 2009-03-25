@@ -29,16 +29,16 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.BasicEventImpl;
-import org.matsim.events.Events;
-import org.matsim.events.PersonEvent;
-import org.matsim.events.handler.PersonEventHandler;
-import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.BasicEventImpl;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.PersonEvent;
+import org.matsim.core.events.handler.PersonEventHandler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;

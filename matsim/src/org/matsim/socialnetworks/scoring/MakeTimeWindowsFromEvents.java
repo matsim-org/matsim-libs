@@ -33,8 +33,8 @@ import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.events.ActEndEvent;
-import org.matsim.events.ActStartEvent;
+import org.matsim.core.events.ActEndEvent;
+import org.matsim.core.events.ActStartEvent;
 import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 

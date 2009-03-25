@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.vehicles;
 
-import org.matsim.basic.v01.BasicVehicle;
-import org.matsim.basic.v01.BasicVehicleType;
+import org.matsim.core.basic.v01.BasicVehicle;
+import org.matsim.core.basic.v01.BasicVehicleType;
 
 
 /**

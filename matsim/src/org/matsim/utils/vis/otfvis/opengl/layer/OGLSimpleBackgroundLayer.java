@@ -23,7 +23,7 @@ package org.matsim.utils.vis.otfvis.opengl.layer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.gbl.MatsimResource;
+import org.matsim.core.gbl.MatsimResource;
 import org.matsim.utils.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;

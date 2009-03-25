@@ -20,12 +20,12 @@
 package org.matsim.signalsystems.control;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
-import org.matsim.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.core.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalGroupSettings;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan;
+import org.matsim.core.mobsim.queuesim.SimulationTimer;
 
 
 /**
@@ -67,7 +67,7 @@ public class PlanBasedSignalSystemControler implements SignalSystemControler {
 	
 	/**
 	 * TODO include time argument to avoid static call to SimulationTimer.getTime()
-	 * @see org.matsim.signalsystems.control.SignalSystemControler#givenSignalGroupIsGreen(org.matsim.basic.signalsystems.BasicSignalGroupDefinition)
+	 * @see org.matsim.signalsystems.control.SignalSystemControler#givenSignalGroupIsGreen(org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition)
 	 */
 	public boolean givenSignalGroupIsGreen(
 			BasicSignalGroupDefinition signalGroup) {

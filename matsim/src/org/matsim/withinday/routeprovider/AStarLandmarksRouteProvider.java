@@ -23,11 +23,11 @@ package org.matsim.withinday.routeprovider;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.CarRoute;
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.AStarLandmarks;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.AStarLandmarks;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 /**
  *

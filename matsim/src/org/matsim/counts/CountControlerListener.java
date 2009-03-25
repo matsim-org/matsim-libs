@@ -22,12 +22,12 @@ package org.matsim.counts;
 
 import java.util.Locale;
 
-import org.matsim.config.Config;
-import org.matsim.controler.Controler;
-import org.matsim.controler.events.IterationEndsEvent;
-import org.matsim.controler.events.StartupEvent;
-import org.matsim.controler.listener.IterationEndsListener;
-import org.matsim.controler.listener.StartupListener;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;

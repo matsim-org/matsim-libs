@@ -28,7 +28,7 @@ import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.Knowledge;
 
 public class PlansDefineKnowledge {
@@ -61,12 +61,12 @@ public class PlansDefineKnowledge {
 		while (p_it.hasNext()) {
 			Person p = p_it.next();
 			Knowledge k = p.createKnowledge("created by " + this.getClass().getName());
-			int index = MatsimRandom.random.nextInt(home_acts.size());
+			int index = MatsimRandom.getRandom().nextInt(home_acts.size());
 			k.addActivity(home_acts.get(index),true);
-			index = MatsimRandom.random.nextInt(work_acts.size());
+			index = MatsimRandom.getRandom().nextInt(work_acts.size());
 			k.addActivity(work_acts.get(index),true);
 			for (int i=0; i<4; i++) {
-				index = MatsimRandom.random.nextInt(other_acts.size());
+				index = MatsimRandom.getRandom().nextInt(other_acts.size());
 				k.addActivity(other_acts.get(index),false);
 			}
 		}

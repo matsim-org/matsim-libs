@@ -57,16 +57,16 @@ import java.util.HashMap;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.config.Config;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.facilities.ActivityOptionImpl;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.config.Config;
+import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.Knowledge;
 import org.matsim.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -135,7 +135,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			
 			// Compute a random work zone using the trip matrix as a
 			// probability distribution, with home being conditional
-			double epsilon = MatsimRandom.random.nextDouble();
+			double epsilon = MatsimRandom.getRandom().nextDouble();
 			double cumul=0.0;
 			int workZoneID = 0;
 			while( (cumul < epsilon) && (workZoneID<core.numZ-1) ){

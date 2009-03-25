@@ -39,8 +39,8 @@ import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.entity.StandardEntityCollection;
+import org.matsim.core.gbl.MatsimResource;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
-import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.io.IOUtils;
 
 import com.lowagie.text.Document;

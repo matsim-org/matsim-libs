@@ -22,8 +22,8 @@ package org.matsim.world;
 
 import java.util.Stack;
 
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 

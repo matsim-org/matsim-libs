@@ -20,9 +20,9 @@
 
 package org.matsim.withinday.coopers;
 
-import org.matsim.config.Config;
-import org.matsim.controler.events.StartupEvent;
-import org.matsim.controler.listener.StartupListener;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.withinday.WithindayControler;
 /**

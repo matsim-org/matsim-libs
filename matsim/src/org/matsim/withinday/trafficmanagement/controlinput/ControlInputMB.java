@@ -29,14 +29,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.config.groups.SimulationConfigGroup;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.CarRoute;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.mobsim.queuesim.SimulationTimer;
-import org.matsim.network.NetworkChangeEvent;
+import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.utils.misc.Time;
 
 /**

@@ -3,7 +3,7 @@ package org.matsim.api.basic.v01;
 import org.matsim.api.basic.v01.facilities.BasicFacilities;
 import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.config.Config;
+import org.matsim.core.config.Config;
 
 public interface BasicScenario {
 

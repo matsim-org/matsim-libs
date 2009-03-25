@@ -51,8 +51,8 @@ import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimResource;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimResource;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;

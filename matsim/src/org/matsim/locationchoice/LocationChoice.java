@@ -25,14 +25,14 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.controler.Controler;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.replanning.modules.MultithreadedModuleA;
+import org.matsim.core.scoring.LocationChoiceScoringFunctionFactory;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
-import org.matsim.network.NetworkLayer;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.replanning.modules.MultithreadedModuleA;
-import org.matsim.scoring.LocationChoiceScoringFunctionFactory;
 
 
 

@@ -27,12 +27,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.BasicKnowledge;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Person;
-import org.matsim.facilities.ActivityOptionImpl;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.basic.v01.BasicKnowledge;
+import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.socialnetworks.mentalmap.MentalMap;
 import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.utils.customize.CustomizableImpl;

@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.BasicHouseholdImpl;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.basic.v01.BasicHouseholdImpl;
 import org.matsim.households.Household;
 import org.matsim.vehicles.Vehicle;
 

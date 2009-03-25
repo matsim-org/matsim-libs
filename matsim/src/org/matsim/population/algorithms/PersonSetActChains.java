@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.utils.geometry.CoordImpl;
 
 public class PersonSetActChains extends AbstractPersonAlgorithm {
@@ -159,7 +159,7 @@ public class PersonSetActChains extends AbstractPersonAlgorithm {
 			}
 		}
 
-		double rd = MatsimRandom.random.nextDouble();
+		double rd = MatsimRandom.getRandom().nextDouble();
 		int index;
 		for (index=0; index<probsum.length; index++) {
 			if (probsum[index] > rd) {

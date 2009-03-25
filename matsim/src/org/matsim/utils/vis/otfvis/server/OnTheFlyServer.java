@@ -38,8 +38,8 @@ import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
 
 import org.matsim.core.api.population.Population;
-import org.matsim.events.Events;
-import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.events.Events;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;

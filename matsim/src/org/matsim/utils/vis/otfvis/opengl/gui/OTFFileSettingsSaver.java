@@ -41,7 +41,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFSettingsSaver;
 

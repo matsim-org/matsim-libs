@@ -24,7 +24,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.matsim.core.api.network.Network;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 

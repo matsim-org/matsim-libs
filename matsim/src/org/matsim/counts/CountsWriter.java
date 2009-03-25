@@ -23,7 +23,7 @@ package org.matsim.counts;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.writer.Writer;
 

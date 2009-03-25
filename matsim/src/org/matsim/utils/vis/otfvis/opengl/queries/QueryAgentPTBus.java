@@ -27,7 +27,6 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -36,9 +35,10 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.Events;
-import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.Events;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;

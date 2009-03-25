@@ -23,8 +23,8 @@ package org.matsim.utils.vis.otfvis.handler;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.mobsim.queuesim.QueueLink;
-import org.matsim.trafficmonitoring.LinkTravelTimeCounter;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.trafficmonitoring.LinkTravelTimeCounter;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.otfvis.data.OTFDataWriter;
 

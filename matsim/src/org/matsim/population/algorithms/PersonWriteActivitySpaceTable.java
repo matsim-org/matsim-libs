@@ -29,7 +29,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Person;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.ActivitySpaceBean;
 import org.matsim.population.ActivitySpaceCassini;

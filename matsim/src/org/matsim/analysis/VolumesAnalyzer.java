@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.core.api.network.Network;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
 /**
  * Counts the number of vehicles leaving a link, aggregated into time bins of a specified size.

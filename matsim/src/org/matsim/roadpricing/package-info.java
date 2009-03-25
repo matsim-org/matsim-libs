@@ -1,7 +1,7 @@
 /**
  * This package provides functionality to simulate different road-pricing scenarios in MATSim.
  * It provides support for different toll schemes, namely distance tolls, cordon tolls and area tolls. The
- * MATSim {@link org.matsim.controler.Controler} has support for the roadpricing package built in, so it
+ * MATSim {@link org.matsim.core.controler.Controler} has support for the roadpricing package built in, so it
  * only needs to be activated with the corresponding config-settings (<a href="#controler">see below</a>).
  * The toll schemes are described in special XML files (<a href="#schemes">see below</a>). All supported toll
  * schemes can be limited upon a part of the network and can be time-dependent (that means that the amount
@@ -112,7 +112,7 @@
  *
  *
  * <h3><a name="controler">Use RoadPricing with the Controler</a></h3>
- * To simulate road pricing with the default MATSim {@link org.matsim.controler.Controler}, prepare the
+ * To simulate road pricing with the default MATSim {@link org.matsim.core.controler.Controler}, prepare the
  * road pricing XML file (more details and examples can be found with the description of each
  * <a href="#schemes">supported toll scheme</a>). Then add the following part to your configuration:
  * <pre>
@@ -127,12 +127,12 @@
  * carefully read the following remarks to correctly setup your road pricing scenario:
  * <ul>
  *   <li>When using a distance or cordon toll scheme, use {@link org.matsim.roadpricing.TollTravelCostCalculator}
- *    as {@link org.matsim.router.util.TravelCost}-object for routers.</li>
+ *    as {@link org.matsim.core.router.util.TravelCost}-object for routers.</li>
  *   <li>When using an area toll, make sure you use {@link org.matsim.roadpricing.PlansCalcAreaTollRoute} as
  *    routing algorithm, together with a non-toll TravelCost.</li>
  * </ul>
- * The {@link org.matsim.controler.Controler} takes care of all of these details, so you only have to care about
- * this if you're not using (or are using a modified version of) the {@link org.matsim.controler.Controler}.
+ * The {@link org.matsim.core.controler.Controler} takes care of all of these details, so you only have to care about
+ * this if you're not using (or are using a modified version of) the {@link org.matsim.core.controler.Controler}.
  *
  * <h3><a name="limitations">Limitations</a></h3>
  * Currently, the package has the following limitations:

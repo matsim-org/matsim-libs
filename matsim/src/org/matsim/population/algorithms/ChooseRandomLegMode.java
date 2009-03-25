@@ -23,9 +23,9 @@ package org.matsim.population.algorithms;
 import java.util.Random;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * Changes the transportation mode of all legs in a plan to a randomly chosen

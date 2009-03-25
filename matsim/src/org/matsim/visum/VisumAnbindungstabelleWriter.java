@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.world.Location;
 import org.matsim.world.ZoneLayer;
 

@@ -20,7 +20,7 @@
 
 package org.matsim.utils.vis.routervis;
 
-import org.matsim.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 
 
 /**

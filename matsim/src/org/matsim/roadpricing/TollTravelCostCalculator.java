@@ -21,8 +21,8 @@
 package org.matsim.roadpricing;
 
 import org.matsim.core.api.network.Link;
+import org.matsim.core.router.util.TravelCost;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
-import org.matsim.router.util.TravelCost;
 
 /**
  * Calculates the travel costs for links, including tolls. Currently supports distance, cordon and area tolls.

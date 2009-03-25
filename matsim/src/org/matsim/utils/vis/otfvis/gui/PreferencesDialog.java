@@ -46,7 +46,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.vis.otfvis.interfaces.OTFSettingsSaver;
 import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientFileQuad;
 import org.matsim.utils.vis.otfvis.opengl.gui.PreferencesDialog2;

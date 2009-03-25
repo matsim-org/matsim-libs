@@ -31,8 +31,8 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.log4j.Logger;
-import org.matsim.config.Config;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
 import org.xml.sax.Attributes;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;

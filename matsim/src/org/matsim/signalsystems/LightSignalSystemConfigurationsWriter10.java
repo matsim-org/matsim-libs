@@ -29,11 +29,11 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
+import org.matsim.core.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalGroupSettings;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.jaxb.lightsignalsystemsconfig10.ObjectFactory;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalGroupConfigurationType;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfig;

@@ -25,7 +25,7 @@ import java.util.List;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 public class PersonSimplify extends AbstractPersonAlgorithm {
 

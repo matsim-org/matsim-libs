@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.ActEndEvent;
-import org.matsim.events.ActStartEvent;
-import org.matsim.events.handler.ActEndEventHandler;
-import org.matsim.events.handler.ActStartEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.ActEndEvent;
+import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.handler.ActEndEventHandler;
+import org.matsim.core.events.handler.ActStartEventHandler;
 
 public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEventHandler {
 

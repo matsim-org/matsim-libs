@@ -24,11 +24,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class RouteLinkFilter extends AbstractPlanFilter {

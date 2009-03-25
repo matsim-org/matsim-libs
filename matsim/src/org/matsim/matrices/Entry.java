@@ -20,7 +20,7 @@
 
 package org.matsim.matrices;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.world.Location;
 
 public class Entry {

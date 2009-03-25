@@ -31,10 +31,10 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
-import org.matsim.scoring.ScoringFunction;
 
 /**
  * This class connects the JGAP FitnessFunction class with the MATSim ScoringFunction interface.

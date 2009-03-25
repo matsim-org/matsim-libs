@@ -29,7 +29,7 @@ import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.vis.netvis.DisplayableLinkI;
 import org.matsim.utils.vis.netvis.DisplayableNetI;
 

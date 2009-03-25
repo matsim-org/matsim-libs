@@ -24,9 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 
 
 /**
@@ -50,7 +50,7 @@ public class AgentBeliefsImpl implements AgentBeliefs {
 
 	/**
 	 *
-	 * @see org.matsim.router.util.TravelTime#getLinkTravelTime(org.matsim.network.LinkImpl, double)
+	 * @see org.matsim.core.router.util.TravelTime#getLinkTravelTime(org.matsim.core.network.LinkImpl, double)
 	 */
 	public double getLinkTravelTime(final Link link, final double time) {
 		double ttime = 0.0;
@@ -65,7 +65,7 @@ public class AgentBeliefsImpl implements AgentBeliefs {
 
 
 	/**
-	 * @see org.matsim.router.util.TravelCost#getLinkTravelCost(org.matsim.network.LinkImpl, double)
+	 * @see org.matsim.core.router.util.TravelCost#getLinkTravelCost(org.matsim.core.network.LinkImpl, double)
 	 */
 	public double getLinkTravelCost(final Link link, final double time) {
 		double tcost = 0.0;

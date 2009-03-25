@@ -29,7 +29,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * @author dgrether

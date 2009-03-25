@@ -20,7 +20,7 @@
 
 package org.matsim.utils.optimization;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * An implementation of a multidimensional point. The dimension can be freely 

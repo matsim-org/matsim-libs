@@ -26,7 +26,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * Objective Function based on a Bean Curve. The Bean Curve is defined as

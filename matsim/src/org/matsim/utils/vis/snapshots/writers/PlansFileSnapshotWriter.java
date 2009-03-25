@@ -24,7 +24,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PlanImpl;
 import org.matsim.population.PopulationImpl;

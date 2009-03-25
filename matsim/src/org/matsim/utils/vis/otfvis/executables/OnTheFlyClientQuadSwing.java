@@ -29,7 +29,7 @@ import java.rmi.RemoteException;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.utils.vis.otfvis.data.OTFDefaultNetWriterFactoryImpl;

@@ -23,7 +23,7 @@ package org.matsim.demandmodeling.primloc;
 import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
 
 import Jama.Matrix;
 
@@ -174,7 +174,7 @@ public class PrimlocCore {
 				errR = err;
 			}
 			if( (omuL==muL)&&(omuC==muC)&&(omuR==muR)){
-				muC = (muL+muR)/2+(MatsimRandom.random.nextDouble()-0.5)*(muR-muL)/10;
+				muC = (muL+muR)/2+(MatsimRandom.getRandom().nextDouble()-0.5)*(muR-muL)/10;
 			}
 			omuL = muL;
 			omuC = muC;

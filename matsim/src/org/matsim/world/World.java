@@ -28,10 +28,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.facilities.Facilities;
-import org.matsim.facilities.FacilitiesImpl;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 public class World {

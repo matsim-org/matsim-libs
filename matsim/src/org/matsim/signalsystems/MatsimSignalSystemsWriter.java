@@ -19,8 +19,8 @@
 
 package org.matsim.signalsystems;
 
-import org.matsim.basic.network.BasicLaneDefinitions;
-import org.matsim.basic.signalsystems.BasicSignalSystems;
+import org.matsim.core.basic.network.BasicLaneDefinitions;
+import org.matsim.core.basic.signalsystems.BasicSignalSystems;
 import org.matsim.utils.io.MatsimJaxbXmlWriter;
 
 /**

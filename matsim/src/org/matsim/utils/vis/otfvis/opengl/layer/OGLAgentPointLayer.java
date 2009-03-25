@@ -32,7 +32,7 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFDataSimpleAgent;

@@ -21,7 +21,7 @@
 package org.matsim.api.basic.v01.events.handler;
 
 import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
-import org.matsim.events.handler.EventHandler;
+import org.matsim.core.events.handler.EventHandler;
 
 public interface BasicAgentMoneyEventHandler extends EventHandler {
 	public void handleEvent (BasicAgentMoneyEvent event);

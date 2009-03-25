@@ -32,7 +32,7 @@ import org.jfree.chart.title.Title;
 import org.jfree.ui.HorizontalAlignment;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.VerticalAlignment;
-import org.matsim.gbl.MatsimResource;
+import org.matsim.core.gbl.MatsimResource;
 
 /**
  * An abstract class to simplify the creation of JFreeCharts.

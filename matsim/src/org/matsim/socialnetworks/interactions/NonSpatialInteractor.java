@@ -24,8 +24,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
@@ -66,7 +66,7 @@ public class NonSpatialInteractor{
 		final List<Object> list = (List<Object>) Arrays.asList( links );
 		
 		
-		java.util.Collections.shuffle(list, MatsimRandom.random);
+		java.util.Collections.shuffle(list, MatsimRandom.getRandom());
 		links=list.toArray();
 		
 		int numPicks = (int) (proportionOfLinksToActivate * links.length);
@@ -116,7 +116,7 @@ public class NonSpatialInteractor{
 
 		links = net.getLinks().toArray();
 		final List<Object> list = (List<Object>) Arrays.asList( links );
-		java.util.Collections.shuffle(list, MatsimRandom.random);
+		java.util.Collections.shuffle(list, MatsimRandom.getRandom());
 		links=list.toArray();
 		
 		

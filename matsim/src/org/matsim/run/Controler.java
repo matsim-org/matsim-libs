@@ -29,6 +29,6 @@ package org.matsim.run;
 public class Controler {
 
 	public  static void main(String[] args) {
-		org.matsim.controler.Controler.main(args);
+		org.matsim.core.controler.Controler.main(args);
 	}
 }

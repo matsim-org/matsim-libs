@@ -25,11 +25,11 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * Analyses plans for subtours. See documentation <a href="http://matsim.org/node/266">here</a>.

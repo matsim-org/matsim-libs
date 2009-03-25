@@ -27,10 +27,10 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.facilities.Facilities;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 
 /**
  * Basic collection of same geographical objects in MATSim.

@@ -39,7 +39,7 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.api.population.Route;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.population.routes.LinkCarRoute;
 
 /**

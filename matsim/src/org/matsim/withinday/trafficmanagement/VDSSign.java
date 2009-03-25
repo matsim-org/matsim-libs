@@ -29,8 +29,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.CarRoute;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 
@@ -222,12 +222,12 @@ public class VDSSign {
 				int zeros = 0;
 				//computing randomized sequence of binary guidance message
 				while ((ones + zeros) < this.controlEvents) {
-					if ((input > MatsimRandom.random.nextDouble()) && (ones < numberOfOnes)) {
+					if ((input > MatsimRandom.getRandom().nextDouble()) && (ones < numberOfOnes)) {
 						this.currentRouteSet.add((ones + zeros), this.mainRoute);
 						ones++;
 						log.trace("1, i.e. main route");
 					}
-					else if ((input < MatsimRandom.random.nextDouble()) && (zeros < numberOfZeros)) {
+					else if ((input < MatsimRandom.getRandom().nextDouble()) && (zeros < numberOfZeros)) {
 						this.currentRouteSet.add((ones + zeros), this.alternativeRoute);
 						zeros++;
 						log.trace("0, i.e. alternative route");
@@ -252,7 +252,7 @@ public class VDSSign {
 	 */
 	public CarRoute requestRoute() {
 		double time = SimulationTimer.getTime();
-		double trust = MatsimRandom.random.nextDouble();
+		double trust = MatsimRandom.getRandom().nextDouble();
 		if (time > this.nextUpdate) {
 			throw new RuntimeException(
 					"Current system time: "

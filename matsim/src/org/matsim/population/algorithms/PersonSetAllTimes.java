@@ -24,7 +24,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.utils.misc.Time;
 
 public class PersonSetAllTimes extends AbstractPersonAlgorithm {
@@ -57,7 +57,7 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 
 				if (j == 0) {
 					int endtime = EARLIEST_ENDTIME +
-												MatsimRandom.random.nextInt(LATEST_ENDTIME -
+												MatsimRandom.getRandom().nextInt(LATEST_ENDTIME -
 																					 EARLIEST_ENDTIME + 1);
 					act.setEndTime(endtime);
 					act.setStartTime(Time.UNDEFINED_TIME);

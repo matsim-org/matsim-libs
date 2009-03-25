@@ -31,9 +31,9 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Route;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * Abstract class for <code>LegTravelTimeEstimator</code>s

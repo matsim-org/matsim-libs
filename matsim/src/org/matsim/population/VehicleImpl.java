@@ -20,8 +20,8 @@
 package org.matsim.population;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.BasicVehicleImpl;
-import org.matsim.basic.v01.BasicVehicleType;
+import org.matsim.core.basic.v01.BasicVehicleImpl;
+import org.matsim.core.basic.v01.BasicVehicleType;
 import org.matsim.vehicles.Vehicle;
 
 

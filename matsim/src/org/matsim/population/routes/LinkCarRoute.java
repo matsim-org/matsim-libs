@@ -29,8 +29,8 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.CarRoute;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 
 /**
  * Implementation of {@link CarRoute} which internally stores the route as a series of {@link Link}s.

@@ -28,9 +28,9 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
-import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
-import org.matsim.basic.signalsystems.BasicSignalSystems;
+import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition;
+import org.matsim.core.basic.signalsystems.BasicSignalSystems;
 import org.matsim.jaxb.signalsystems11.ObjectFactory;
 import org.matsim.jaxb.signalsystems11.XMLIdRefType;
 import org.matsim.jaxb.signalsystems11.XMLMatsimTimeAttributeType;

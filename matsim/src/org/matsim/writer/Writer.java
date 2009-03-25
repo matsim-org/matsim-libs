@@ -23,7 +23,7 @@ package org.matsim.writer;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * Usage of this class discouraged. It will be deprecated soon. Please

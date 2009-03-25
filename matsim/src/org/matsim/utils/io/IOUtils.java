@@ -42,7 +42,7 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
-import org.matsim.controler.Controler;
+import org.matsim.core.controler.Controler;
 
 /** A class with some static utility functions for file-I/O. */
 public class IOUtils {

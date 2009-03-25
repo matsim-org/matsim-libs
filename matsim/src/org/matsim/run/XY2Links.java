@@ -22,10 +22,10 @@ package org.matsim.run;
 
 import java.util.Iterator;
 
-import org.matsim.config.Config;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;

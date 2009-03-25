@@ -23,7 +23,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 
-import org.matsim.controler.Controler;
+import org.matsim.core.controler.Controler;
 import org.matsim.utils.io.IOUtils;
 
 /**

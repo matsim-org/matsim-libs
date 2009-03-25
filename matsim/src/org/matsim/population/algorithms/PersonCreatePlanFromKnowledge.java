@@ -29,7 +29,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
 
 public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 
@@ -44,7 +44,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		ArrayList<ActivityOption> acts = person.getKnowledge().getActivities();
 
 		// first act end time = [7am.9am]
-		int time = 7*3600 + (MatsimRandom.random.nextInt(2*3600));
+		int time = 7*3600 + (MatsimRandom.getRandom().nextInt(2*3600));
 
 		// first act (= home)
 		Activity a = p.createAct("home", home_facility.getCoord());
@@ -58,12 +58,12 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		l.setTravelTime(0);
 		l.setArrivalTime(time);
 
-		int nof_acts = 1 + MatsimRandom.random.nextInt(3);
+		int nof_acts = 1 + MatsimRandom.getRandom().nextInt(3);
 		int dur = 12*3600/nof_acts;
 
 		// in between acts
 		for (int i=0; i<nof_acts; i++) {
-			int act_index = MatsimRandom.random.nextInt(acts.size());
+			int act_index = MatsimRandom.getRandom().nextInt(acts.size());
 			ActivityOption act = acts.get(act_index);
 			Facility f = act.getFacility();
 			a = p.createAct(act.getType(),f.getCoord());

@@ -21,7 +21,7 @@
 package org.matsim.api.basic.v01.events.handler;
 
 import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
-import org.matsim.events.handler.EventHandler;
+import org.matsim.core.events.handler.EventHandler;
 
 public interface BasicAgentWait2LinkEventHandler extends EventHandler {
 	public void handleEvent (BasicAgentWait2LinkEvent event);

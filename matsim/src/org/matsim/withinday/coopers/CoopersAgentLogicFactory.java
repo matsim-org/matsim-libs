@@ -23,8 +23,8 @@ package org.matsim.withinday.coopers;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.withinday.WithindayAgent;
 import org.matsim.withinday.WithindayAgentLogicFactory;

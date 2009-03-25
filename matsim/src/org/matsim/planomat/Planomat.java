@@ -37,13 +37,13 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
-import org.matsim.scoring.ScoringFunction;
-import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.misc.Time;
 
 /**

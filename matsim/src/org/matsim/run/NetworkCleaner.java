@@ -22,9 +22,9 @@ package org.matsim.run;
 
 import java.util.Iterator;
 
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkWriter;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.utils.misc.ArgumentParser;
 
 /**
@@ -63,7 +63,7 @@ public class NetworkCleaner {
 		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputNetworkFile);
 
-		new org.matsim.network.algorithms.NetworkCleaner().run(network);
+		new org.matsim.core.network.algorithms.NetworkCleaner().run(network);
 
 		final NetworkWriter network_writer = new NetworkWriter(network, outputNetworkFile);
 		network_writer.write();

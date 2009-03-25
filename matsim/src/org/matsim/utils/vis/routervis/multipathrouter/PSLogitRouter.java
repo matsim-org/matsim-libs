@@ -20,9 +20,9 @@
 
 package org.matsim.utils.vis.routervis.multipathrouter;
 
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.utils.vis.routervis.RouterNetStateWriter;
 
 public class PSLogitRouter extends MultiPathRouter {

@@ -22,13 +22,13 @@ package org.matsim.run;
 
 import java.util.Iterator;
 
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkReaderTeleatlas;
-import org.matsim.network.NetworkWriter;
-import org.matsim.network.algorithms.NetworkTeleatlasAddManeuverRestrictions;
-import org.matsim.network.algorithms.NetworkTeleatlasAddSpeedRestrictions;
-import org.matsim.network.algorithms.NetworkWriteAsTable;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkReaderTeleatlas;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkTeleatlasAddManeuverRestrictions;
+import org.matsim.core.network.algorithms.NetworkTeleatlasAddSpeedRestrictions;
+import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;

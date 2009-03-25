@@ -20,8 +20,8 @@
 
 package org.matsim.withinday.beliefs;
 
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 
 
 /**

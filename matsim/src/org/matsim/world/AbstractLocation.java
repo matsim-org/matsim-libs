@@ -27,7 +27,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * Basic geographical class in MATSim.

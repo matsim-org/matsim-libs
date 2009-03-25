@@ -23,11 +23,11 @@ package org.matsim.utils.vis.otfvis.executables;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.vis.otfvis.handler.OTFAgentsListHandler;

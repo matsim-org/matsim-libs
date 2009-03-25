@@ -27,10 +27,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;

@@ -20,7 +20,7 @@
 
 package org.matsim.population;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 
 public class ActivitySpaceBean extends ActivitySpace {
 

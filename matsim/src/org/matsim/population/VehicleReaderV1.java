@@ -22,8 +22,8 @@ package org.matsim.population;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.BasicVehicleReaderV1;
-import org.matsim.basic.v01.BasicVehicleType;
+import org.matsim.core.basic.v01.BasicVehicleReaderV1;
+import org.matsim.core.basic.v01.BasicVehicleType;
 import org.matsim.vehicles.Vehicle;
 
 

@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.control;
 
-import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 
 
 /**

@@ -25,7 +25,7 @@ import java.util.Map;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Route;
-import org.matsim.network.algorithms.SubsequentLinksAnalyzer;
+import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 
 public class CompressedCarRouteFactory implements RouteFactory {
 

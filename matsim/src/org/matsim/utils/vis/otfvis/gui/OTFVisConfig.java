@@ -30,7 +30,7 @@ import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 
-import org.matsim.config.Module;
+import org.matsim.core.config.Module;
 import org.matsim.utils.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 

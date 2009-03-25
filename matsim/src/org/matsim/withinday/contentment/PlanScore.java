@@ -28,9 +28,9 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.mobsim.queuesim.SimulationTimer;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.WithindayAgent;
 
 /**

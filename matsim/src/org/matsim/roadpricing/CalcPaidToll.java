@@ -23,16 +23,16 @@ package org.matsim.roadpricing;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.events.AgentMoneyEvent;
-import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.Events;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.PersonEvent;
-import org.matsim.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.AgentMoneyEvent;
+import org.matsim.core.events.AgentWait2LinkEvent;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.PersonEvent;
+import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
 /**

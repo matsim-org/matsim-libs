@@ -26,7 +26,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 
 /**
  * Performs several checks that persons are ready for a mobility simulation.

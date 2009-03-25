@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.BasicHousehold;
-import org.matsim.basic.v01.BasicIncome;
-import org.matsim.basic.v01.HouseholdsSchemaV1Names;
-import org.matsim.basic.v01.MatsimCommonWriter;
+import org.matsim.core.basic.v01.BasicHousehold;
+import org.matsim.core.basic.v01.BasicIncome;
+import org.matsim.core.basic.v01.HouseholdsSchemaV1Names;
+import org.matsim.core.basic.v01.MatsimCommonWriter;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.writer.MatsimXmlWriter;
 

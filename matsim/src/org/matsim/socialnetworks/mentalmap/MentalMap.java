@@ -31,7 +31,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
@@ -39,8 +38,9 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.Knowledge;
 import org.matsim.socialnetworks.algorithms.SortHashMapByValue;
 import org.matsim.socialnetworks.io.ActivityActReader;
@@ -98,7 +98,7 @@ public class MentalMap {
 				ActivityOption myActivity = null;
 				// If there is already knowledge in the initial plans file, use it
 				if(this.knowledge.getActivities(myAct.getType()).size()>0){
-					myActivity=this.knowledge.getActivities(myAct.getType()).get(MatsimRandom.random.nextInt(this.knowledge.getActivities(myAct.getType()).size()));
+					myActivity=this.knowledge.getActivities(myAct.getType()).get(MatsimRandom.getRandom().nextInt(this.knowledge.getActivities(myAct.getType()).size()));
 					myAct.setFacility(myActivity.getFacility());
 					//TODO JH add logic to label this activity primary or secondary
 					this.knowledge.addActivity(myActivity, false);
@@ -114,7 +114,7 @@ public class MentalMap {
 				// Assign a random activity (a facility) on the link to the act
 				// thus giving it in effect a street address
 				while(myActivity==null){
-					int k = MatsimRandom.random.nextInt(facs.length);
+					int k = MatsimRandom.getRandom().nextInt(facs.length);
 					Facility f = (Facility) facs[k];
 					myActivity = f.getActivityOption(myAct.getType());
 					if(myActivity!=null){

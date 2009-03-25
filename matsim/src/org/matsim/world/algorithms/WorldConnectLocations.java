@@ -30,7 +30,7 @@ import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;

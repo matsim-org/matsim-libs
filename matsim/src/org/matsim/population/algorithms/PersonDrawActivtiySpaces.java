@@ -28,7 +28,7 @@ import java.util.Iterator;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.ActivitySpaceBean;
 import org.matsim.population.ActivitySpaceCassini;

@@ -29,7 +29,7 @@ import net.opengis.kml._2.LinkType;
 import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.StyleType;
 
-import org.matsim.gbl.MatsimResource;
+import org.matsim.core.gbl.MatsimResource;
 
 /**
  * @author dgrether

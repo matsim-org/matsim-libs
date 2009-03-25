@@ -22,7 +22,7 @@ package org.matsim.matrices;
 
 import java.util.TreeMap;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.world.Layer;
 
 public class Matrices {

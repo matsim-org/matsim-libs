@@ -23,10 +23,10 @@ package org.matsim.population;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
+import org.matsim.core.basic.v01.BasicActivityImpl;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 

@@ -29,8 +29,8 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimResource;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimResource;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;

@@ -26,15 +26,15 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.locationchoice.LocationMutator;
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.PlansCalcRoute;
 
 public class LocationMutatorwChoiceSet extends LocationMutator {
 	
@@ -158,7 +158,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		if (choiceSet.size()>1) {
 			//final Facility facility=(Facility)choiceSet.toArray()[
            	//		           MatsimRandom.random.nextInt(choiceSet.size())];
-			final Facility facility = choiceSet.get(MatsimRandom.random.nextInt(choiceSet.size()));
+			final Facility facility = choiceSet.get(MatsimRandom.getRandom().nextInt(choiceSet.size()));
 			
 			act.setFacility(facility);
        		act.setLink(this.network.getNearestLink(facility.getCoord()));

@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package org.matsim.utils.io;
 
-import org.matsim.basic.network.BasicLaneDefinitions;
-import org.matsim.basic.network.BasicLaneDefinitionsImpl;
-import org.matsim.basic.signalsystems.BasicSignalSystems;
-import org.matsim.basic.signalsystems.BasicSignalSystemsImpl;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
-import org.matsim.network.MatsimLaneDefinitionsWriter;
+import org.matsim.core.basic.network.BasicLaneDefinitions;
+import org.matsim.core.basic.network.BasicLaneDefinitionsImpl;
+import org.matsim.core.basic.signalsystems.BasicSignalSystems;
+import org.matsim.core.basic.signalsystems.BasicSignalSystemsImpl;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
+import org.matsim.core.network.MatsimLaneDefinitionsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;

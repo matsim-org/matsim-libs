@@ -41,10 +41,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.queuesim.QueueLink;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.QueueNode;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;

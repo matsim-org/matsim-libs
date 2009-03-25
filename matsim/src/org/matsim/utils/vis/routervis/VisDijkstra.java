@@ -25,10 +25,10 @@ import java.util.PriorityQueue;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.Dijkstra;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author laemmel

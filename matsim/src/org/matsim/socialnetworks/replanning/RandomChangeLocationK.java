@@ -24,22 +24,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
 
 /**
  * Sample replanning strategy to change activity location:
@@ -92,7 +92,7 @@ public class RandomChangeLocationK  implements PlanAlgorithm{
 		boolean changed = false;
 
 //		Pick a type of facility to replace in this plan according to config settings
-		double rand = MatsimRandom.random.nextDouble();
+		double rand = MatsimRandom.getRandom().nextDouble();
 
 		if (rand < cum_p_factype[0]) {
 			factype = factypes[0];
@@ -123,7 +123,7 @@ public class RandomChangeLocationK  implements PlanAlgorithm{
 			person.getPlans().remove(newPlan);
 			return;
 		}else{
-			Activity newAct = (Activity)(actsOfFacType.get(MatsimRandom.random.nextInt(actsOfFacType.size())));
+			Activity newAct = (Activity)(actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
 
 //			Get agent's knowledge
 			Knowledge k = person.getKnowledge();
@@ -134,7 +134,7 @@ public class RandomChangeLocationK  implements PlanAlgorithm{
 
 			List<ActivityOption> actList = k.getActivities(factype);
 			if(actList.size()>0){
-				Facility fFromKnowledge = actList.get(MatsimRandom.random.nextInt( actList.size())).getFacility();
+				Facility fFromKnowledge = actList.get(MatsimRandom.getRandom().nextInt( actList.size())).getFacility();
 
 //				And replace the activity in the chain with it (only changes the facility)
 

@@ -23,15 +23,15 @@ package org.matsim.analysis;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.AgentStuckEvent;
-import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.events.handler.AgentStuckEventHandler;
-import org.matsim.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentStuckEvent;
+import org.matsim.core.events.AgentWait2LinkEvent;
+import org.matsim.core.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.events.handler.AgentStuckEventHandler;
+import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.utils.misc.Time;
 
 public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEventHandler, AgentWait2LinkEventHandler {

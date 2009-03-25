@@ -28,7 +28,7 @@ import net.opengis.kml._2.ScreenOverlayType;
 import net.opengis.kml._2.UnitsEnumType;
 import net.opengis.kml._2.Vec2Type;
 
-import org.matsim.gbl.MatsimResource;
+import org.matsim.core.gbl.MatsimResource;
 
 /**
  * A ScreenOverlay representing the MATSim logo

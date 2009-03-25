@@ -23,13 +23,13 @@ package org.matsim.planomat.costestimators;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
 /**
  * Computes average departure delay on a link in a given time slot.

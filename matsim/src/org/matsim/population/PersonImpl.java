@@ -29,10 +29,10 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.basic.v01.BasicPersonImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.basic.v01.BasicPersonImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.households.Household;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
@@ -112,7 +112,7 @@ public class PersonImpl implements Person{
 		if (this.delegate.getPlans().size() == 0) {
 			return null;
 		}
-		int index = (int)(MatsimRandom.random.nextDouble()*this.delegate.getPlans().size());
+		int index = (int)(MatsimRandom.getRandom().nextDouble()*this.delegate.getPlans().size());
 		return this.getPlans().get(index);
 	}
 
@@ -125,7 +125,7 @@ public class PersonImpl implements Person{
 		}
 		if (cntUnscored > 0) {
 			// select one of the unscored plans
-			int idxUnscored = MatsimRandom.random.nextInt(cntUnscored);
+			int idxUnscored = MatsimRandom.getRandom().nextInt(cntUnscored);
 			cntUnscored = 0;
 			for (Plan plan : this.getPlans()) {
 				if (plan.getScore() == null) {

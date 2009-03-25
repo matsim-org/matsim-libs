@@ -21,9 +21,9 @@
 package org.matsim.utils.vis.otfvis.executables;
 
 import org.matsim.core.api.population.Population;
-import org.matsim.events.Events;
-import org.matsim.mobsim.queuesim.QueueSimulation;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.events.Events;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.network.NetworkLayer;
 
 /* set to deprecated on 20081104. If you still have a reason to use this class
  * instead of org.matsim.run.OTFVis, then please tell me so. Otherwise I might

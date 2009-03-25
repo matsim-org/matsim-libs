@@ -23,8 +23,8 @@ package org.matsim.utils.vis.otfvis.executables;
 import java.io.File;
 import java.io.IOException;
 
-import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;

@@ -24,15 +24,15 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.handler.AgentArrivalEventHandler;
-import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
 

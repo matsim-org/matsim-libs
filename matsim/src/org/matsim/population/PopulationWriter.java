@@ -32,8 +32,8 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.writer.Writer;
 
@@ -49,7 +49,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 
 	/**
 	 * Creates a new PlansWriter to write out the specified plans to the file and with version
-	 * as specified in the {@linkplain org.matsim.config.groups.PlansConfigGroup configuration}.
+	 * as specified in the {@linkplain org.matsim.core.config.groups.PlansConfigGroup configuration}.
 	 * If plans-streaming is on, the file will already be opened and the file-header be written.
 	 * If plans-streaming is off, the file will not be created until {@link #write()} is called.
 	 *
@@ -146,7 +146,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 
 	public final void writePerson(final Person p) {
 		//	 write only the defined fraction
-		if (MatsimRandom.random.nextDouble() >= this.write_person_fraction) {
+		if (MatsimRandom.getRandom().nextDouble() >= this.write_person_fraction) {
 			return;
 		}
 		try {

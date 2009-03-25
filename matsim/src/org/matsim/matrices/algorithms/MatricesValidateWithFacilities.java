@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;

@@ -72,8 +72,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimResource;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimResource;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.geometry.CoordImpl;

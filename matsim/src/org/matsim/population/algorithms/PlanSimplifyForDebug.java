@@ -30,9 +30,9 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 
 /**
  * @author mrieser
@@ -147,7 +147,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 			return;
 
 		Activity act = (Activity) plan.getPlanElements().get(0);
-		int time = 6 * 3600 + (int) (MatsimRandom.random.nextDouble() * 3600 * 3);
+		int time = 6 * 3600 + (int) (MatsimRandom.getRandom().nextDouble() * 3600 * 3);
 		act.setStartTime(0);
 		act.setEndTime(time);
 		act.setDuration(time);

@@ -21,10 +21,10 @@
 package org.matsim.population;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Route;
+import org.matsim.core.basic.v01.BasicLegImpl;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.utils.misc.Time;
 

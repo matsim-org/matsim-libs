@@ -30,7 +30,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.CarRoute;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 
 
 /**
@@ -103,7 +103,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 
 	/**
 	 * As this implementation is backed by a AStarRouter the class provides Routes from everywhere to everywhere
-	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.network.LinkImpl, org.matsim.core.api.population.CarRoute)
+	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.core.network.LinkImpl, org.matsim.core.api.population.CarRoute)
 	 */
 	public boolean providesRoute(final Link currentLink, final CarRoute subRoute) {
 		return true;

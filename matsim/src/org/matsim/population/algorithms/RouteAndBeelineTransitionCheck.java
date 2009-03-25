@@ -25,16 +25,16 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.population.PlanImpl;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
 /**
  * Checks if the fastest route between two activities ("beeline route") crosses a specific area.

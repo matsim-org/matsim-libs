@@ -27,12 +27,12 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.config.groups.SocNetConfigGroup;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.socialnetworks.io.MakeSocialNetworkFromFile;
 import org.matsim.utils.geometry.CoordUtils;
 /**
@@ -153,14 +153,14 @@ public class SocialNetwork {
 		int i=0;
 		while(i<numLinks){
 //			for (int i = 0; i < numLinks; i++) {
-			Person person1 = personList[MatsimRandom.random.nextInt(personList.length)];
-			Person person2 = personList[MatsimRandom.random.nextInt(personList.length)];
+			Person person1 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
+			Person person2 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
 			Coord home1=((Activity)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
 			Coord home2=((Activity)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
 			double distance = CoordUtils.calcDistance(home1, home2);
 			double pdist=c*Math.pow((distance+rmin),-alpha);
 
-			if(MatsimRandom.random.nextDouble()<pdist){
+			if(MatsimRandom.getRandom().nextDouble()<pdist){
 				if(makeSocialContactNotify(person1, person2, 0, "random")==2){//new link made
 //					log.info("new link made dist "+distance+" "+pdist);
 					i++;
@@ -219,7 +219,7 @@ public class SocialNetwork {
 		//Define the core network of m0 nodes, chosen from personList
 		ArrayList<Person> core = new ArrayList<Person>();
 		for (int ii=0;ii<m0;ii++){
-			int pick=MatsimRandom.random.nextInt(population.size());
+			int pick=MatsimRandom.getRandom().nextInt(population.size());
 			core.add(population.get(pick));
 			population.remove(pick);
 		}
@@ -228,12 +228,12 @@ public class SocialNetwork {
 		E=this.getLinks().size();
 		int coreSize = core.size();
 		while(population.size()>0 && E< maxE){
-			Person pI=population.get(MatsimRandom.random.nextInt(population.size()));
+			Person pI=population.get(MatsimRandom.getRandom().nextInt(population.size()));
 			// Attachment probabilities are based on last iteration
 			boolean met=false;
 			int j=0;
 			while (j<Math.min(m,coreSize)){ // the new member links to this many old members. m < m0
-				int pick=MatsimRandom.random.nextInt(coreSize);//start at a random core member
+				int pick=MatsimRandom.getRandom().nextInt(coreSize);//start at a random core member
 				Person pJ = core.get(pick);
 				double pIJ= (pJ.getKnowledge().getEgoNet().getOutDegree()+A)/(2*E + coreSize*A);
 				if(coreSize==0){
@@ -241,7 +241,7 @@ public class SocialNetwork {
 				}
 
 
-				if (MatsimRandom.random.nextInt()<pIJ){
+				if (MatsimRandom.getRandom().nextInt()<pIJ){
 					if(makeSocialContactNotify(pI, pJ, 0, "Barabasi-Albert")==2){
 						met=true;
 						j++;
@@ -278,8 +278,8 @@ public class SocialNetwork {
 		int i=0;
 		while(i<numLinks){
 //		for (int i = 0; i < numLinks; i++) {
-			Person person1 = personList[MatsimRandom.random.nextInt(personList.length)];
-			Person person2 = personList[MatsimRandom.random.nextInt(personList.length)];
+			Person person1 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
+			Person person2 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
 			Coord home1=((Activity)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
 			Coord home2=((Activity)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
 			double distance = CoordUtils.calcDistance(home1, home2);
@@ -376,7 +376,7 @@ public class SocialNetwork {
 				newOpposingLink.incrementNumberOfTimesMet();
 			} else 
 //				They do not know each other, make new link subject to saturation effects	
-				if(MatsimRandom.random.nextDouble()<Math.exp(this.degree_saturation_rate * person1.getKnowledge().getEgoNet().getOutDegree())){
+				if(MatsimRandom.getRandom().nextDouble()<Math.exp(this.degree_saturation_rate * person1.getKnowledge().getEgoNet().getOutDegree())){
 					newLink = new SocialNetEdge(person1, person2);
 					addLink(newLink,iteration);
 					linksList.add(newLink);
@@ -434,7 +434,7 @@ public class SocialNetwork {
 				newOpposingLink.incrementNumberOfTimesMet();
 			} else 
 //				They do not know each other, make new link subject to saturation effects	
-				if(MatsimRandom.random.nextDouble()<Math.exp(this.degree_saturation_rate * person1.getKnowledge().getEgoNet().getOutDegree())){
+				if(MatsimRandom.getRandom().nextDouble()<Math.exp(this.degree_saturation_rate * person1.getKnowledge().getEgoNet().getOutDegree())){
 					newLink = new SocialNetEdge(person1, person2);
 					addLink(newLink,iteration, linkType);
 					linksList.add(newLink);
@@ -503,7 +503,7 @@ public class SocialNetwork {
 				status=1; // status=1 means existing link was renewed
 			} else 
 //				They do not know each other, make new link subject to saturation effects	
-				if(MatsimRandom.random.nextDouble()<Math.exp(this.degree_saturation_rate * person1.getKnowledge().getEgoNet().getOutDegree())){
+				if(MatsimRandom.getRandom().nextDouble()<Math.exp(this.degree_saturation_rate * person1.getKnowledge().getEgoNet().getOutDegree())){
 					newLink = new SocialNetEdge(person1, person2);
 					addLink(newLink,iteration, linkType);
 					linksList.add(newLink);
@@ -542,7 +542,7 @@ public class SocialNetwork {
 	 * <br><br>
 	 * The linkRemovalCondition determines the algorithm for removing the links,
 	 * using parameters set in the configuration file, see
-	 * {@link org.matsim.config.groups.SocNetConfigGroup.java}.
+	 * {@link org.matsim.core.config.groups.SocNetConfigGroup.java}.
 	 * <br><br>
 	 * Each algorithm uses the parameter remove_age (measured in iterations) as a threshold
 	 * under which no link is flagged and above which the algorithm begins processing links.
@@ -575,7 +575,7 @@ public class SocialNetwork {
 			Iterator<SocialNetEdge> it_link = this.getLinks().iterator();
 			while (it_link.hasNext()) {
 				SocialNetEdge myLink = it_link.next();
-				double randremove=MatsimRandom.random.nextDouble();
+				double randremove=MatsimRandom.getRandom().nextDouble();
 				if ((iteration - myLink.getTimeLastUsed()) >= remove_age && randremove<remove_p ) {
 					linksToRemove.add(myLink);
 				}
@@ -592,7 +592,7 @@ public class SocialNetwork {
 			Iterator<SocialNetEdge> it_link = this.getLinks().iterator();
 			while (it_link.hasNext()) {
 				SocialNetEdge myLink = it_link.next();
-				double randremove=MatsimRandom.random.nextDouble();
+				double randremove=MatsimRandom.getRandom().nextDouble();
 				int degree =myLink.getPersonFrom().getKnowledge().getEgoNet().getOutDegree();
 				if(degree > maxDeg){
 					Gbl.errorMsg(this.getClass()+" degree of person "+myLink.getPersonFrom().getId()+" = "+degree+" > maxDegree="+maxDeg);
@@ -610,7 +610,7 @@ public class SocialNetwork {
 			Iterator<SocialNetEdge> it_link = this.getLinks().iterator();
 			while (it_link.hasNext()) {
 				SocialNetEdge myLink = it_link.next();
-				double randremove=MatsimRandom.random.nextDouble();
+				double randremove=MatsimRandom.getRandom().nextDouble();
 				int age =iteration - myLink.getTimeLastUsed();
 				if(age > iteration){
 					Gbl.errorMsg(this.getClass()+" age of edge from "+myLink.getPersonFrom().getId()+" to "+ myLink.getPersonTo().getId()+" = "+age+" > iteration ="+iteration);
@@ -633,7 +633,7 @@ public class SocialNetwork {
 				int i=0;
 				while(i<nRemove){
 
-					int index = MatsimRandom.random.nextInt(this.getLinks().size());
+					int index = MatsimRandom.getRandom().nextInt(this.getLinks().size());
 //					SocialNetEdge edge = (SocialNetEdge) this.getLinks().get(index);
 					SocialNetEdge edge = (SocialNetEdge) linkarray[index];
 //					SocialNetEdge edge = (SocialNetEdge) this.getLinks().get(index);

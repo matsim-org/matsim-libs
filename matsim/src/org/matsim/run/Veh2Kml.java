@@ -24,8 +24,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.geometry.transformations.IdentityTransformation;
@@ -236,7 +236,7 @@ public class Veh2Kml {
 	}
 
 	private void addVehicle(final double time, final PositionInfo position) {
-		if (MatsimRandom.random.nextDouble() >= this.percentage) return;
+		if (MatsimRandom.getRandom().nextDouble() >= this.percentage) return;
 		this.cntPositions++;
 
 		if (time != this.lastTime) {
