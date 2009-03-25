@@ -187,11 +187,15 @@ public class AnalyzeFacilities {
 		
 		double[][] capacityCount = new double[2][65];
 		int[][] count = new int[2][65];
+		double[][] minCapacity = new double[2][65];
+		double[][] maxCapacity = new double[2][65];
 		
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j <65; j++) {
 				capacityCount[i][j] = 0.0;
 				count[i][j] = 0;
+				minCapacity[i][j] = 99999999999999999999.0;
+				maxCapacity[i][j] = 0.0;
 			}
 		}
 			
@@ -199,8 +203,8 @@ public class AnalyzeFacilities {
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			final BufferedWriter outSummary = IOUtils.getBufferedWriter("output/facilities_summary.txt");
 			
-			outSummary.write("Total number of facilities: " + this.facilities.getFacilities().size());
-			out.write("Type\t#activity facilities\tcapacity\tavg. capacity\n");
+			outSummary.write("Total number of facilities: " + this.facilities.getFacilities().size() +"\n");
+			out.write("Type\t#activity facilities\tcapacity\tavg. capacity\tmin capacity\tmaxCapacity\n");
 					
 			for (int typeIndex = 0; typeIndex < 2; typeIndex++) {
 				
@@ -224,6 +228,12 @@ public class AnalyzeFacilities {
 									count[typeIndex][i] += 1;
 									totalCapacity += actOpt.getCapacity();
 									totalCount++;
+									if (actOpt.getCapacity() > maxCapacity[typeIndex][i]) {
+										maxCapacity[typeIndex][i] = actOpt.getCapacity();
+									}
+									if (actOpt.getCapacity() < minCapacity[typeIndex][i]) {
+										minCapacity[typeIndex][i] = actOpt.getCapacity();
+									}
 								}
 							}
 						}
@@ -231,9 +241,10 @@ public class AnalyzeFacilities {
 				}
 				for (int i = 0; i < capacityCount[typeIndex].length; i++) {
 					if (NOGA[typeIndex][i].equals("null")) continue;
-					out.write(types[typeIndex] + " " + NOGA[typeIndex][i] + ": " + 
+					out.write(types[typeIndex] + " " + NOGA[typeIndex][i] + ": \t" + 
 							count[typeIndex][i] + "\t" + capacityCount[typeIndex][i] + 
-							"\t" + capacityCount[typeIndex][i] / count[typeIndex][i] + "\n");
+							"\t" + capacityCount[typeIndex][i] / count[typeIndex][i] + 
+							"\t" + minCapacity[typeIndex][i] +"\t" + maxCapacity[typeIndex][i] + "\n");
 				}
 				out.write(types[typeIndex] + " " + totalCount + "\t" +  totalCapacity + "\t" + totalCapacity / totalCount + "\n");
 				out.flush();
