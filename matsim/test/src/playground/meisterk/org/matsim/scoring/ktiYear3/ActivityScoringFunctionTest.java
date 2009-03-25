@@ -118,7 +118,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		route.setDistance(2000.0);
 		route.setTravelTime(Time.parseTime("00:05:00"));
 
-		act = plan.createAct("leisure", facility3);
+		act = plan.createAct("leisure", facility5);
 		act.setLink(link5);
 		leg = this.plan.createLeg(Mode.pt);
 		route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link5, link3);
@@ -171,7 +171,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		ScoringFunction sf = this.getScoringFunction();
 		
-		logger.info(sf.getScore());
+		logger.info("Overall score: " + sf.getScore());
 		
 	}
 
