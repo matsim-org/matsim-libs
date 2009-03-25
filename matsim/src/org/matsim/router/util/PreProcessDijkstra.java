@@ -26,9 +26,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Network;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.Node;
 
 /**
  * Pre-processes a given network, gathering information which

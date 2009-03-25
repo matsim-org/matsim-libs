@@ -23,6 +23,8 @@ package org.matsim.planomat.costestimators;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
@@ -30,8 +32,6 @@ import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 

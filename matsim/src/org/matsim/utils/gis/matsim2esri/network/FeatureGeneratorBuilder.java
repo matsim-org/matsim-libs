@@ -23,8 +23,8 @@ package org.matsim.utils.gis.matsim2esri.network;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import org.matsim.core.api.network.Network;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Network;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 

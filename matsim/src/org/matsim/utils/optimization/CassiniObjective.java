@@ -25,8 +25,8 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 
 /**
  * Objective Function based on a Cassini Oval. The Cassini Oval is defined as

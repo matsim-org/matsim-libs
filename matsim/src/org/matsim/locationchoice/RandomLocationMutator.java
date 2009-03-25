@@ -23,11 +23,11 @@ package org.matsim.locationchoice;
 import java.util.List;
 
 import org.matsim.controler.Controler;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Plan;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.NetworkLayer;
 
 

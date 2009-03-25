@@ -20,7 +20,7 @@
 
 package org.matsim.replanning.modules;
 
-import org.matsim.interfaces.core.v01.Network;
+import org.matsim.core.api.network.Network;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.AStarLandmarksFactory;

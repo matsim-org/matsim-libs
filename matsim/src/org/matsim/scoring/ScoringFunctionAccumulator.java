@@ -22,8 +22,8 @@ package org.matsim.scoring;
 
 import java.util.ArrayList;
 
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
 import org.matsim.scoring.interfaces.ActivityScoring;
 import org.matsim.scoring.interfaces.AgentStuckScoring;
 import org.matsim.scoring.interfaces.BasicScoring;

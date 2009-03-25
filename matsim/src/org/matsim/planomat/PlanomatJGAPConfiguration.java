@@ -31,8 +31,8 @@ import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
 import org.jgap.impl.WeightedRouletteSelector;
 import org.matsim.config.groups.PlanomatConfigGroup;
+import org.matsim.core.api.population.Plan;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 public class PlanomatJGAPConfiguration extends Configuration {

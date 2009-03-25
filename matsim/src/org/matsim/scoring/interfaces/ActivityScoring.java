@@ -20,7 +20,7 @@
 
 package org.matsim.scoring.interfaces;
 
-import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.core.api.population.Activity;
 
 public interface ActivityScoring {
 

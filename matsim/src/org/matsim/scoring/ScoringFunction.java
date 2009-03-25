@@ -20,9 +20,9 @@
 
 package org.matsim.scoring;
 
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
 import org.matsim.events.AgentMoneyEvent;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Leg;
 
 /**
  * A scoring function calculates the score for one plan of an agent.  The score

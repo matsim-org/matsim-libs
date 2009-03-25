@@ -27,13 +27,13 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.network.BasicLane;
 import org.matsim.basic.network.BasicLaneDefinitions;
 import org.matsim.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.jaxb.lightsignalsystems10.ObjectFactory;
 import org.matsim.jaxb.lightsignalsystems10.XMLIdRefType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLaneType;

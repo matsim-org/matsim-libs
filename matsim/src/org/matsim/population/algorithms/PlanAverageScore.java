@@ -22,8 +22,8 @@ package org.matsim.population.algorithms;
 
 import java.util.Iterator;
 
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 
 public class PlanAverageScore extends AbstractPersonAlgorithm implements PlanAlgorithm {
 

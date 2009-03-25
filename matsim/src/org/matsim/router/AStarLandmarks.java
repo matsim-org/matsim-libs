@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
-import org.matsim.interfaces.core.v01.Network;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.Node;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -174,7 +174,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	}
 
 	/**
-	 * @see org.matsim.router.Dijkstra#getPreProcessData(org.matsim.interfaces.core.v01.Node)
+	 * @see org.matsim.router.Dijkstra#getPreProcessData(org.matsim.core.api.network.Node)
 	 */
 	@Override
 	PreProcessLandmarks.LandmarksData getPreProcessData(Node n) {

@@ -23,8 +23,8 @@ package org.matsim.utils;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordUtils;
 import org.matsim.world.Layer;

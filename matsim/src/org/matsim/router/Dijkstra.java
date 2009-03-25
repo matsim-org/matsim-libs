@@ -28,10 +28,10 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.Node;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessDijkstra;
 import org.matsim.router.util.TravelCost;
@@ -182,8 +182,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            The time at which the route should start.
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.interfaces.core.v01.Node,
-	 *      org.matsim.interfaces.core.v01.Node, double)
+	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
+	 *      org.matsim.core.api.network.Node, double)
 	 */
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 

@@ -26,7 +26,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.network.BasicNetwork;
+import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.utils.vis.netvis.config.IndexationConfig;
 import org.matsim.utils.vis.netvis.config.TemporalConfig;
 

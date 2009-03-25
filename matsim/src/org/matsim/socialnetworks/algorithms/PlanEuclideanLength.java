@@ -20,8 +20,8 @@
 
 package org.matsim.socialnetworks.algorithms;
 
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Plan;
 import org.matsim.utils.geometry.CoordUtils;
 
 public class PlanEuclideanLength {

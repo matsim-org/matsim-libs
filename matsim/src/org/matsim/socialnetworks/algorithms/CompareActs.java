@@ -1,6 +1,6 @@
 package org.matsim.socialnetworks.algorithms;
 
-import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.core.api.population.Activity;
 
 public class CompareActs {
 

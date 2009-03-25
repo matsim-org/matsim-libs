@@ -23,10 +23,10 @@ package org.matsim.replanning;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.BasicPlanStrategyModule;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.PlanStrategyModule;
+import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.replanning.selectors.PlanSelector;
 
 /**

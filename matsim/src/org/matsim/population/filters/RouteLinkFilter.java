@@ -23,12 +23,12 @@ package org.matsim.population.filters;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class RouteLinkFilter extends AbstractPlanFilter {

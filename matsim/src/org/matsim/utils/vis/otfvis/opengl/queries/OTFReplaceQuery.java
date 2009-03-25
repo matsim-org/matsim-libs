@@ -20,8 +20,8 @@
 
 package org.matsim.utils.vis.otfvis.opengl.queries;
 
+import org.matsim.core.api.population.Population;
 import org.matsim.events.Events;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;

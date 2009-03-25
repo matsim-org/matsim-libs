@@ -21,12 +21,12 @@
 package org.matsim.scoring;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.Route;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.Route;
 import org.matsim.population.ActUtilityParameters;
 import org.matsim.utils.misc.Time;
 

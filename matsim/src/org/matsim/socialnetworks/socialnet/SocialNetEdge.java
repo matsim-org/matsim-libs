@@ -20,7 +20,7 @@
 
 package org.matsim.socialnetworks.socialnet;
 
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.core.api.population.Person;
 
 public class SocialNetEdge implements Comparable<SocialNetEdge>{
 

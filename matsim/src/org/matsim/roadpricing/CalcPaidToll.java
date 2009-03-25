@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.events.AgentMoneyEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.Events;
@@ -31,8 +33,6 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.PersonEvent;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
 /**

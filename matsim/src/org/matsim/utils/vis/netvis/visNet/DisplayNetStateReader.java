@@ -20,7 +20,7 @@
 
 package org.matsim.utils.vis.netvis.visNet;
 
-import org.matsim.interfaces.basic.v01.network.BasicNetwork;
+import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.utils.vis.netvis.streaming.StateI;
 import org.matsim.utils.vis.netvis.streaming.StreamReaderA;

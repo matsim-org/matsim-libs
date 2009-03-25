@@ -22,15 +22,15 @@ package org.matsim.population;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.basic.v01.BasicLocation;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.BasicHousehold;
 import org.matsim.basic.v01.HouseholdBuilder;
-import org.matsim.interfaces.basic.v01.BasicLocation;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Household;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Population;
-import org.matsim.interfaces.core.v01.Vehicle;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
+import org.matsim.households.Household;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dgrether

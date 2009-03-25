@@ -22,8 +22,8 @@ package org.matsim.router.util;
 
 import java.util.List;
 
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 
 public interface LeastCostPathCalculator {
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime);

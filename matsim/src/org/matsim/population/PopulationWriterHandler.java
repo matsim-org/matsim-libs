@@ -23,14 +23,14 @@ package org.matsim.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.ActivityOption;
-import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.OpeningTime;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.Population;
+import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.api.facilities.OpeningTime;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.Population;
 import org.matsim.writer.WriterHandler;
 
 public interface PopulationWriterHandler extends WriterHandler {

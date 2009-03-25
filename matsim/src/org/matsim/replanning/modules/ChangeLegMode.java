@@ -20,9 +20,9 @@
 
 package org.matsim.replanning.modules;
 
+import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.config.Config;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
 import org.matsim.population.algorithms.ChooseRandomLegMode;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.StringUtils;

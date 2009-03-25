@@ -20,10 +20,10 @@
 
 package org.matsim.planomat.costestimators;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Node;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
 import org.matsim.utils.geometry.CoordUtils;
 
 /**

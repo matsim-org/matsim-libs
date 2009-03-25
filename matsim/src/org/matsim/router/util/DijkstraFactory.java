@@ -20,7 +20,7 @@
 
 package org.matsim.router.util;
 
-import org.matsim.interfaces.core.v01.Network;
+import org.matsim.core.api.network.Network;
 import org.matsim.router.Dijkstra;
 
 public class DijkstraFactory implements LeastCostPathCalculatorFactory {

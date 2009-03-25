@@ -21,8 +21,8 @@
 package org.matsim.router.util;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.utils.geometry.CoordUtils;
 
 /**

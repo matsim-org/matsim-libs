@@ -22,7 +22,7 @@ package org.matsim.roadpricing;
 
 import java.io.IOException;
 
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
 import org.matsim.utils.misc.Time;
 import org.matsim.writer.MatsimXmlWriter;
 

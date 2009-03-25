@@ -27,18 +27,18 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.basic.v01.BasicPersonImpl;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.population.BasicPlan;
-import org.matsim.interfaces.core.v01.Household;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.households.Household;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
 /**
  * For comments see interface
- * @see org.matsim.interfaces.core.v01.Person
+ * @see org.matsim.core.api.population.Person
  * @author dgrether
  *
  */
@@ -65,7 +65,7 @@ public class PersonImpl implements Person{
 	}
 
 	/**
-	 * @see org.matsim.interfaces.core.v01.Person#getSelectedPlan()
+	 * @see org.matsim.core.api.population.Person#getSelectedPlan()
 	 */
 	public Plan getSelectedPlan() {
 		return this.selectedPlan;

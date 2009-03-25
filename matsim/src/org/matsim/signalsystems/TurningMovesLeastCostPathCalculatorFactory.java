@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems;
 
-import org.matsim.interfaces.core.v01.Network;
+import org.matsim.core.api.network.Network;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.router.util.TravelCost;
@@ -38,7 +38,7 @@ public class TurningMovesLeastCostPathCalculatorFactory implements
 	}
 	
 	/**
-	 * @see org.matsim.router.util.LeastCostPathCalculatorFactory#createPathCalculator(org.matsim.interfaces.core.v01.Network, org.matsim.router.util.TravelCost, org.matsim.router.util.TravelTime)
+	 * @see org.matsim.router.util.LeastCostPathCalculatorFactory#createPathCalculator(org.matsim.core.api.network.Network, org.matsim.router.util.TravelCost, org.matsim.router.util.TravelTime)
 	 */
 	public LeastCostPathCalculator createPathCalculator(Network network,
 			TravelCost travelCosts, TravelTime travelTimes) {

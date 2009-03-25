@@ -20,8 +20,8 @@
 
 package org.matsim.population.routes;
 
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Route;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Route;
 
 /**
  * Provides a simple factory method to create new Route-objects.

@@ -20,10 +20,10 @@
 
 package org.matsim.population.routes;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.BasicRouteImpl;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Route;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Route;
 
 /**
  * Default, abstract implementation of the {@link Route}-interface.

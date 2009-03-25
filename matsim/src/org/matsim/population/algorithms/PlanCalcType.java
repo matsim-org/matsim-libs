@@ -20,10 +20,10 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 
 public class PlanCalcType extends AbstractPersonAlgorithm implements PlanAlgorithm {
 

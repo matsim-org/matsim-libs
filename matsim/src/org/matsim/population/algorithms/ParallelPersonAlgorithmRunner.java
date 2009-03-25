@@ -23,9 +23,9 @@ package org.matsim.population.algorithms;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.utils.misc.Counter;
 
 /**

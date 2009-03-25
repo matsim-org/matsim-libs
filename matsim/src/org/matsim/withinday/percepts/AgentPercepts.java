@@ -20,7 +20,7 @@
 
 package org.matsim.withinday.percepts;
 
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Node;
 
 
 /**

@@ -1,7 +1,7 @@
 package org.matsim.socialnetworks.mentalmap;
 
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Person;
 
 public class TimeWindow {
 

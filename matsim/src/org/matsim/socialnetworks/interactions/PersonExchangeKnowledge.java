@@ -22,9 +22,9 @@ package org.matsim.socialnetworks.interactions;
 
 import java.util.List;
 
+import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.api.population.Person;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.ActivityOption;
-import org.matsim.interfaces.core.v01.Person;
 import org.matsim.population.Knowledge;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;

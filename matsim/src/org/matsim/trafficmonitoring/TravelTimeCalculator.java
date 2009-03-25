@@ -23,6 +23,8 @@ package org.matsim.trafficmonitoring;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.LinkEnterEvent;
@@ -31,8 +33,6 @@ import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
 import org.matsim.router.util.TravelTime;
 
 public class TravelTimeCalculator implements TravelTime, LinkEnterEventHandler, LinkLeaveEventHandler, 

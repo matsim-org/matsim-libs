@@ -21,9 +21,9 @@
 package org.matsim.replanning.modules;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.PlanStrategyModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 

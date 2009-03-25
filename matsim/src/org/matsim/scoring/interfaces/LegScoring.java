@@ -20,7 +20,7 @@
 
 package org.matsim.scoring.interfaces;
 
-import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.core.api.population.Leg;
 
 public interface LegScoring {
 	public abstract void startLeg(final double time, final Leg leg);

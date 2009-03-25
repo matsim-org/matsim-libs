@@ -23,9 +23,9 @@ package org.matsim.population.algorithms;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Population;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
 
 /**
  * This algorithm filters out all persons without plans, leaving only persons in the

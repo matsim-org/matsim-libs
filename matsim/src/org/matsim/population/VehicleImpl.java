@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package org.matsim.population;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.BasicVehicleImpl;
 import org.matsim.basic.v01.BasicVehicleType;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Vehicle;
+import org.matsim.vehicles.Vehicle;
 
 
 /**

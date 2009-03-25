@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Node;
 
 public abstract class LogitSelector {
 

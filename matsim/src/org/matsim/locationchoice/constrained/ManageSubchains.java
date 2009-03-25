@@ -23,8 +23,8 @@ package org.matsim.locationchoice.constrained;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
 
 public class ManageSubchains {
 

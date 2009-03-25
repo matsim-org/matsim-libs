@@ -20,10 +20,10 @@
 
 package org.matsim.replanning.selectors;
 
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
 
 /**
  * Selects one of the existing plans of the person based on the

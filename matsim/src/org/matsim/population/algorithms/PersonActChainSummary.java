@@ -23,10 +23,10 @@ package org.matsim.population.algorithms;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
 
 public class PersonActChainSummary extends AbstractPersonAlgorithm {
 

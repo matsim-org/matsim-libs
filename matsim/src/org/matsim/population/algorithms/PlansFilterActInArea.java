@@ -21,10 +21,10 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Network;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Population;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
 import org.matsim.population.PopulationImpl;
 
 /**

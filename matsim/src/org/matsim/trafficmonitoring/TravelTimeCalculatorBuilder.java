@@ -21,7 +21,7 @@ package org.matsim.trafficmonitoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.groups.ControlerConfigGroup;
-import org.matsim.interfaces.core.v01.Network;
+import org.matsim.core.api.network.Network;
 
 
 /**

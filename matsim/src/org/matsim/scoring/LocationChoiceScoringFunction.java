@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Plan;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.population.ActUtilityParameters;

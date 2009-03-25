@@ -20,7 +20,7 @@
 
 package org.matsim.scoring;
 
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.core.api.population.Plan;
 
 /**
  * The <code>ScoringFunctionFactory</code> creates new scoring functions.

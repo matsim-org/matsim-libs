@@ -20,11 +20,11 @@
 
 package org.matsim.withinday.trafficmanagement.controlinput;
 
+import org.matsim.core.api.population.CarRoute;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /**

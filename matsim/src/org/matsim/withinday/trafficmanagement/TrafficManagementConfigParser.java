@@ -22,12 +22,12 @@ package org.matsim.withinday.trafficmanagement;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.config.groups.SimulationConfigGroup;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
+import org.matsim.core.api.population.CarRoute;
 import org.matsim.events.Events;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImpl1;

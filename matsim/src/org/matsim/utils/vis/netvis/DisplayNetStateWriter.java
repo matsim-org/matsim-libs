@@ -22,9 +22,9 @@ package org.matsim.utils.vis.netvis;
 
 import java.util.Collection;
 
-import org.matsim.interfaces.basic.v01.network.BasicLink;
-import org.matsim.interfaces.basic.v01.network.BasicNetwork;
-import org.matsim.interfaces.basic.v01.network.BasicNode;
+import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.utils.vis.netvis.config.IndexationConfig;
 import org.matsim.utils.vis.netvis.drawableNet.DrawableLinkI;
 import org.matsim.utils.vis.netvis.drawableNet.DrawableNodeI;

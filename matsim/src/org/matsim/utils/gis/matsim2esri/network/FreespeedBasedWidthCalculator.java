@@ -20,8 +20,8 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.utils.misc.Time;
 
 public class FreespeedBasedWidthCalculator implements WidthCalculator {

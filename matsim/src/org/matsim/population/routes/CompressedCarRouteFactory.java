@@ -22,9 +22,9 @@ package org.matsim.population.routes;
 
 import java.util.Map;
 
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
-import org.matsim.interfaces.core.v01.Route;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.population.Route;
 import org.matsim.network.algorithms.SubsequentLinksAnalyzer;
 
 public class CompressedCarRouteFactory implements RouteFactory {
