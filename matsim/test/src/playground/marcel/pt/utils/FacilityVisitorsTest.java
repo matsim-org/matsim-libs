@@ -21,15 +21,15 @@
 package playground.marcel.pt.utils;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.facilities.FacilitiesImpl;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;

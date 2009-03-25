@@ -22,8 +22,8 @@ package org.matsim.router;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
+import org.matsim.core.api.population.Population;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;

@@ -22,7 +22,7 @@ package org.matsim.utils.vis.routervis;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Node;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;

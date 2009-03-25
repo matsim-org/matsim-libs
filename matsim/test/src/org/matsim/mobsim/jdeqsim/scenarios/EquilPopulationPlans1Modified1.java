@@ -2,12 +2,12 @@ package org.matsim.mobsim.jdeqsim.scenarios;
 
 import java.util.List;
 
+import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.Population;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.Population;
 import org.matsim.mobsim.jdeqsim.util.testable.PopulationModifier;
 
 

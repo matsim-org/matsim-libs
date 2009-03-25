@@ -25,17 +25,17 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Plan;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.Events;
 import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PopulationImpl;

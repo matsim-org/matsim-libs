@@ -24,10 +24,10 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.examples.TriangleScenario;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.DesiresTest;

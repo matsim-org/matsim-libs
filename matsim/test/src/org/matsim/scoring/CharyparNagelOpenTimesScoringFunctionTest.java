@@ -20,18 +20,18 @@
 
 package org.matsim.scoring;
 
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.config.Config;
+import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.OpeningTimeImpl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.ActivityOption;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;

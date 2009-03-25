@@ -22,12 +22,12 @@ package org.matsim.network;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.network.BasicLane;
 import org.matsim.basic.network.BasicLaneDefinitions;
 import org.matsim.basic.network.BasicLaneDefinitionsImpl;
 import org.matsim.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.signalsystems.SignalSystemsReaderWriterTest;
 import org.matsim.testcases.MatsimTestCase;
 

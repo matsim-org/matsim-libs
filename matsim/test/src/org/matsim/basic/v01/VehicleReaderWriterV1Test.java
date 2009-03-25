@@ -24,10 +24,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Vehicle;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.population.VehicleReaderV1;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dgrether

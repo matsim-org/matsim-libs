@@ -20,11 +20,11 @@
 
 package org.matsim.events;
 
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.interfaces.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;

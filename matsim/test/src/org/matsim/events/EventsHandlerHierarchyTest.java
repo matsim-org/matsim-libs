@@ -20,11 +20,11 @@
 
 package org.matsim.events;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.handler.BasicEventHandler;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 
 public class EventsHandlerHierarchyTest extends MatsimTestCase {

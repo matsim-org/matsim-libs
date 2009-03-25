@@ -20,8 +20,8 @@
 
 package org.matsim.utils;
 
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordUtils;

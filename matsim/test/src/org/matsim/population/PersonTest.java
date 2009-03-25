@@ -21,8 +21,8 @@
 package org.matsim.population;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -32,7 +32,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class PersonTest extends MatsimTestCase {
 
 	/**
-	 * Tests {@link org.matsim.interfaces.core.v01.Person#removeWorstPlans(int)} when all
+	 * Tests {@link org.matsim.core.api.population.Person#removeWorstPlans(int)} when all
 	 * plans have the type <code>null</code>.
 	 *
 	 * @author mrieser
@@ -77,7 +77,7 @@ public class PersonTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests {@link org.matsim.interfaces.core.v01.Person#removeWorstPlans(int)} when the
+	 * Tests {@link org.matsim.core.api.population.Person#removeWorstPlans(int)} when the
 	 * plans have different types set.
 	 *
 	 * @author mrieser
@@ -138,7 +138,7 @@ public class PersonTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that after a call to {@link org.matsim.interfaces.core.v01.Person#removeWorstPlans(int)}
+	 * Tests that after a call to {@link org.matsim.core.api.population.Person#removeWorstPlans(int)}
 	 * the person still has a selected plan, even when the previously selected plan was
 	 * the one with the worst score.
 	 *

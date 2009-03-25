@@ -21,8 +21,8 @@
 package org.matsim.network;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.NetworkChangeEvent.ChangeType;

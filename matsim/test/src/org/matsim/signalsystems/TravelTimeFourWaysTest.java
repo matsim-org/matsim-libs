@@ -20,8 +20,8 @@
 
 package org.matsim.signalsystems;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.mobsim.queuesim.QueueSimulation;

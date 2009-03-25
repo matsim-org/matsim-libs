@@ -20,6 +20,7 @@
 package org.matsim.integration;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
@@ -31,7 +32,6 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;

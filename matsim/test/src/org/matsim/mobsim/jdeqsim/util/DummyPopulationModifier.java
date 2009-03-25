@@ -1,6 +1,6 @@
 package org.matsim.mobsim.jdeqsim.util;
 
-import org.matsim.interfaces.core.v01.Population;
+import org.matsim.core.api.population.Population;
 import org.matsim.mobsim.jdeqsim.util.testable.PopulationModifier;
 
 

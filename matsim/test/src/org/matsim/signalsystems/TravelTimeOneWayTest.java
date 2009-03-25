@@ -22,6 +22,7 @@ package org.matsim.signalsystems;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.basic.network.BasicLaneDefinitions;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
@@ -31,7 +32,6 @@ import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;

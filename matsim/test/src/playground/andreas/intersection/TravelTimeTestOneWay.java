@@ -11,8 +11,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioImpl;
 import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;

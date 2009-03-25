@@ -21,11 +21,11 @@
 package org.matsim.facilities;
 
 import org.matsim.config.Config;
+import org.matsim.core.api.facilities.Facilities;
 import org.matsim.examples.TriangleScenario;
 import org.matsim.facilities.algorithms.FacilitiesCalcMinDist;
 import org.matsim.facilities.algorithms.FacilitiesCombine;
 import org.matsim.facilities.algorithms.FacilitiesSummary;
-import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.world.MatsimWorldReader;

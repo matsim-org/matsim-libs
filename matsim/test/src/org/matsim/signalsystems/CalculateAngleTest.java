@@ -1,7 +1,7 @@
 package org.matsim.signalsystems;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioImpl;
 import org.matsim.signalsystems.CalculateAngle;
 import org.matsim.testcases.MatsimTestCase;
 

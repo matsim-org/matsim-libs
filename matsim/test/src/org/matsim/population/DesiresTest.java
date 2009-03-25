@@ -22,7 +22,7 @@ package org.matsim.population;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.core.api.population.Person;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 

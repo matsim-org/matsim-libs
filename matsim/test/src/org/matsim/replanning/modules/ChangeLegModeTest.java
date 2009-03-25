@@ -23,10 +23,10 @@ package org.matsim.replanning.modules;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.config.Config;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 

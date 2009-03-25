@@ -22,11 +22,11 @@ package org.matsim.demandmodeling.primloc;
 
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.population.Population;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;

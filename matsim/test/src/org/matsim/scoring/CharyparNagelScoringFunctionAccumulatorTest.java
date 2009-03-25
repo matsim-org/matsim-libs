@@ -1,7 +1,7 @@
 package org.matsim.scoring;
 
+import org.matsim.core.api.population.Plan;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 
 

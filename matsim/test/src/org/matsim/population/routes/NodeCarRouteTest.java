@@ -20,8 +20,8 @@
 
 package org.matsim.population.routes;
 
-import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.CarRoute;
 
 /**
  * @author mrieser
