@@ -24,7 +24,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraph;
 import org.matsim.counts.algorithms.graphs.helper.OutputDelegate;
 import org.matsim.counts.algorithms.graphs.helper.Section;

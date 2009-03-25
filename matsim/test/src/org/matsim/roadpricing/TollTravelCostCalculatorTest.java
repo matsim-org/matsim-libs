@@ -21,22 +21,22 @@
 package org.matsim.roadpricing;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-import org.matsim.config.Config;
 import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.config.Config;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.router.util.TravelCost;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.AStarLandmarksFactory;
-import org.matsim.router.util.DijkstraFactory;
-import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCost;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

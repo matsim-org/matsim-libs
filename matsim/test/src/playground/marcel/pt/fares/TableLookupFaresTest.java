@@ -23,10 +23,10 @@ package playground.marcel.pt.fares;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.facilities.FacilitiesImpl;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.geometry.CoordImpl;

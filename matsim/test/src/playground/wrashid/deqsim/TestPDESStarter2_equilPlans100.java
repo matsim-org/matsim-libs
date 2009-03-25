@@ -3,18 +3,18 @@ package playground.wrashid.deqsim;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.PersonEvent;
-import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.jdeqsim.EventLog;
-import org.matsim.mobsim.jdeqsim.scenarios.EquilPopulationPlans1Modified1;
-import org.matsim.mobsim.jdeqsim.util.CppEventFileParser;
-import org.matsim.mobsim.jdeqsim.util.DEQSimEventFileComparator;
-import org.matsim.mobsim.jdeqsim.util.DEQSimEventFileTravelTimeComparator;
-import org.matsim.mobsim.jdeqsim.util.TestHandlerDetailedEventChecker;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.PersonEvent;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.jdeqsim.EventLog;
+import org.matsim.core.mobsim.jdeqsim.scenarios.EquilPopulationPlans1Modified1;
+import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
+import org.matsim.core.mobsim.jdeqsim.util.DEQSimEventFileComparator;
+import org.matsim.core.mobsim.jdeqsim.util.DEQSimEventFileTravelTimeComparator;
+import org.matsim.core.mobsim.jdeqsim.util.TestHandlerDetailedEventChecker;
 import org.matsim.testcases.MatsimTestCase;
 
 

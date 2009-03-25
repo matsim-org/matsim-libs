@@ -22,7 +22,7 @@ package org.matsim.demandmodeling;
 
 import java.io.IOException;
 
-import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.world.World;

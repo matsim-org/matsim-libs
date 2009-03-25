@@ -20,15 +20,15 @@
 
 package org.matsim.integration.replanning;
 
-import org.matsim.config.Config;
-import org.matsim.controler.Controler;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.replanning.PlanStrategy;
-import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.modules.ReRoute;
-import org.matsim.replanning.modules.TimeAllocationMutator;
-import org.matsim.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 

@@ -22,7 +22,7 @@ package org.matsim.counts;
 
 import java.util.Iterator;
 
-import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class CountTest extends MatsimTestCase {

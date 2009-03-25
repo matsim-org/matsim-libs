@@ -20,11 +20,11 @@
 package playground.benjamin;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.config.Config;
-import org.matsim.controler.events.StartupEvent;
-import org.matsim.controler.listener.StartupListener;
-import org.matsim.scoring.EventsToScore;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;
 
 

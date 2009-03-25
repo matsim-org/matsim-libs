@@ -21,10 +21,6 @@
 package org.matsim.integration.replanning;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.config.Config;
-import org.matsim.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.controler.Controler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -32,12 +28,16 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationImpl;
-import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.StrategyManagerConfigLoader;
-import org.matsim.router.util.DijkstraFactory;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 

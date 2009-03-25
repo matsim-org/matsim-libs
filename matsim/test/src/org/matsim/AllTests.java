@@ -44,25 +44,25 @@ public class AllTests {
 
 		// run unit tests
 		suite.addTest(org.matsim.analysis.AllTests.suite());
-		suite.addTest(org.matsim.basic.v01.AllTests.suite());
-		suite.addTest(org.matsim.config.AllTests.suite());
-		suite.addTest(org.matsim.controler.AllTests.suite());
+		suite.addTest(org.matsim.core.basic.v01.AllTests.suite());
+		suite.addTest(org.matsim.core.config.AllTests.suite());
+		suite.addTest(org.matsim.core.controler.AllTests.suite());
 		suite.addTest(org.matsim.counts.AllTests.suite());
 		suite.addTest(org.matsim.demandmodeling.AllTests.suite());
-		suite.addTest(org.matsim.events.AllTests.suite());
-		suite.addTest(org.matsim.facilities.AllTests.suite());
-		suite.addTest(org.matsim.gbl.AllTests.suite());
+		suite.addTest(org.matsim.core.events.AllTests.suite());
+		suite.addTest(org.matsim.core.facilities.AllTests.suite());
+		suite.addTest(org.matsim.core.gbl.AllTests.suite());
 		suite.addTest(org.matsim.signalsystems.AllTests.suite());
 		suite.addTest(org.matsim.locationchoice.AllTests.suite());
-		suite.addTest(org.matsim.mobsim.AllTests.suite());
-		suite.addTest(org.matsim.network.AllTests.suite());
+		suite.addTest(org.matsim.core.mobsim.AllTests.suite());
+		suite.addTest(org.matsim.core.network.AllTests.suite());
 		suite.addTest(org.matsim.planomat.AllTests.suite());
 		suite.addTest(org.matsim.population.AllTests.suite());
-		suite.addTest(org.matsim.replanning.AllTests.suite());
+		suite.addTest(org.matsim.core.replanning.AllTests.suite());
 		suite.addTest(org.matsim.roadpricing.AllTests.suite());
-		suite.addTest(org.matsim.router.AllTests.suite());
-		suite.addTest(org.matsim.scoring.AllTests.suite());
-		suite.addTest(org.matsim.trafficmonitoring.AllTests.suite());
+		suite.addTest(org.matsim.core.router.AllTests.suite());
+		suite.addTest(org.matsim.core.scoring.AllTests.suite());
+		suite.addTest(org.matsim.core.trafficmonitoring.AllTests.suite());
 		suite.addTest(org.matsim.utils.AllTests.suite());
 		suite.addTest(org.matsim.world.AllTests.suite());
 		suite.addTest(org.matsim.withinday.AllTests.suite());

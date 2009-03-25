@@ -20,17 +20,17 @@
 
 package playground.marcel.pt.utils;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.events.ActEndEvent;
-import org.matsim.events.ActStartEvent;
-import org.matsim.facilities.FacilitiesImpl;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.ActEndEvent;
+import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;

@@ -24,8 +24,8 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
-import org.matsim.config.Config;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
 
 public class MatsimTestCase extends TestCase {

@@ -23,7 +23,7 @@ package org.matsim.utils.io;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.network.MatsimLaneDefinitionsReader;
+import org.matsim.core.network.MatsimLaneDefinitionsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.testcases.MatsimTestCase;

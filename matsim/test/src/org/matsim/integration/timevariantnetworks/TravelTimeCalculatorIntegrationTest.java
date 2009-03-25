@@ -20,21 +20,21 @@
 
 package org.matsim.integration.timevariantnetworks;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkChangeEvent;
-import org.matsim.network.NetworkFactory;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.TimeVariantLinkFactory;
-import org.matsim.network.TimeVariantLinkImpl;
-import org.matsim.network.NetworkChangeEvent.ChangeType;
-import org.matsim.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.TimeVariantLinkFactory;
+import org.matsim.core.network.TimeVariantLinkImpl;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.TravelTimeAggregatorFactory;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.trafficmonitoring.TravelTimeAggregatorFactory;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.trafficmonitoring.TravelTimeDataHashMap;
 import org.matsim.utils.geometry.CoordImpl;
 
 public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {

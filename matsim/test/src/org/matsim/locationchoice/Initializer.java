@@ -1,7 +1,7 @@
 package org.matsim.locationchoice;
 
-import org.matsim.controler.Controler;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class Initializer {

@@ -23,13 +23,13 @@ package org.matsim.world.algorithms;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.config.Config;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.config.Config;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.examples.TriangleScenario;
-import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
 import org.matsim.population.DesiresTest;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;

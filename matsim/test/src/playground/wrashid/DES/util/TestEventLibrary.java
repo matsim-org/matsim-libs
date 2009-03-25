@@ -2,11 +2,11 @@ package playground.wrashid.DES.util;
 
 import java.util.LinkedList;
 
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.PersonEvent;
-import org.matsim.mobsim.jdeqsim.util.EventLibrary;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.PersonEvent;
+import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
 import org.matsim.testcases.MatsimTestCase;
 
 public class TestEventLibrary extends MatsimTestCase {

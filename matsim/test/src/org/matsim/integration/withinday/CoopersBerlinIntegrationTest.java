@@ -19,7 +19,7 @@
 
 package org.matsim.integration.withinday;
 
-import org.matsim.config.Config;
+import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.withinday.coopers.CoopersControler;

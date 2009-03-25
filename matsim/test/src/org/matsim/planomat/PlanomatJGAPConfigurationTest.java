@@ -28,10 +28,10 @@ import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.WeightedRouletteSelector;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.config.Config;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.testcases.MatsimTestCase;
 

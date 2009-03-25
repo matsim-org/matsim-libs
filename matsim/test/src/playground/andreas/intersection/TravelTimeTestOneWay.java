@@ -12,14 +12,14 @@ import java.io.OutputStreamWriter;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.config.Config;
-import org.matsim.events.Events;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.config.Config;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.handler.LinkEnterEventHandler;
+import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.andreas.intersection.sim.QSim;

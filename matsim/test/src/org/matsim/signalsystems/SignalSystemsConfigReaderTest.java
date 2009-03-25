@@ -20,15 +20,15 @@
 package org.matsim.signalsystems;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.signalsystemsconfig.BasicAdaptivePlanBasedSignalSystemControlInfo;
-import org.matsim.basic.signalsystemsconfig.BasicAdaptiveSignalSystemControlInfo;
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
-import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
-import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.basic.signalsystemsconfig.BasicAdaptivePlanBasedSignalSystemControlInfo;
+import org.matsim.core.basic.signalsystemsconfig.BasicAdaptiveSignalSystemControlInfo;
+import org.matsim.core.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalGroupSettings;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

@@ -2,9 +2,9 @@ package org.matsim.locationchoice;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import org.matsim.network.NetworkLayer;
-import org.matsim.controler.Controler;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.locationchoice.LocationChoice;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.testcases.MatsimTestCase;

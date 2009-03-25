@@ -1,9 +1,9 @@
 package playground.wrashid.DES;
 
-import org.matsim.mobsim.jdeqsim.TestEventLog;
-import org.matsim.mobsim.jdeqsim.TestMessageFactory;
-import org.matsim.mobsim.jdeqsim.TestMessageQueue;
-import org.matsim.mobsim.jdeqsim.TestScheduler;
+import org.matsim.core.mobsim.jdeqsim.TestEventLog;
+import org.matsim.core.mobsim.jdeqsim.TestMessageFactory;
+import org.matsim.core.mobsim.jdeqsim.TestMessageQueue;
+import org.matsim.core.mobsim.jdeqsim.TestScheduler;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;

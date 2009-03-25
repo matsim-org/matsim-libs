@@ -20,15 +20,15 @@
 
 package org.matsim.examples;
 
-import org.matsim.config.Config;
-import org.matsim.config.ConfigWriter;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
-import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkWriter;
 import org.matsim.population.PopulationWriter;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;

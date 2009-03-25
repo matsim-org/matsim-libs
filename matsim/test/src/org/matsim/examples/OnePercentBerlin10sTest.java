@@ -21,13 +21,13 @@
 package org.matsim.examples;
 
 import org.apache.log4j.Logger;
-import org.matsim.config.Config;
-import org.matsim.events.Events;
-import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.mobsim.queuesim.QueueSimulation;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.config.Config;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;

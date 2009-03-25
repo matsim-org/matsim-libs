@@ -26,12 +26,17 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.Events;
-import org.matsim.events.MatsimEventsReader;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.planomat.Planomat;
 import org.matsim.planomat.PlanomatTest;
 import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
@@ -41,12 +46,7 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
-import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.router.util.TravelCost;
-import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
 
 public class PlanomatPerformanceTest extends MatsimTestCase {
 

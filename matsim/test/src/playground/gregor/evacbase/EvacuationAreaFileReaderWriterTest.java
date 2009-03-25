@@ -7,8 +7,8 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.config.Config;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.xml.sax.SAXException;

@@ -1,6 +1,6 @@
 package org.matsim.locationchoice.facilityload;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.locationchoice.Initializer;
 import org.matsim.testcases.MatsimTestCase;
 

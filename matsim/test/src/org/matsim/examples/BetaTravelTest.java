@@ -26,32 +26,32 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.config.Config;
-import org.matsim.controler.Controler;
-import org.matsim.controler.events.IterationEndsEvent;
-import org.matsim.controler.events.IterationStartsEvent;
-import org.matsim.controler.events.StartupEvent;
-import org.matsim.controler.listener.IterationEndsListener;
-import org.matsim.controler.listener.IterationStartsListener;
-import org.matsim.controler.listener.StartupListener;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.AgentArrivalEventHandler;
-import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.events.handler.LinkEnterEventHandler;
+import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.modules.MultithreadedModuleA;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.replanning.PlanStrategy;
-import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.modules.MultithreadedModuleA;
-import org.matsim.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.charts.XYScatterChart;
 import org.matsim.utils.misc.Time;
@@ -448,11 +448,11 @@ public class BetaTravelTest extends MatsimTestCase {
 		private double mutateTime(final double time) {
 			double t = time;
 			if (t != Time.UNDEFINED_TIME) {
-				t = t + (int)((MatsimRandom.random.nextDouble() * 2.0 - 1.0) * this.mutationRange);
+				t = t + (int)((MatsimRandom.getRandom().nextDouble() * 2.0 - 1.0) * this.mutationRange);
 				if (t < 0) t = 0;
 				if (t > 24*3600) t = 24*3600;
 			} else {
-				t = MatsimRandom.random.nextInt(24*3600);
+				t = MatsimRandom.getRandom().nextInt(24*3600);
 			}
 			return t;
 		}

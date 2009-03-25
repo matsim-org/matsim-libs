@@ -22,10 +22,10 @@ package org.matsim.population;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicLeg.Mode;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 

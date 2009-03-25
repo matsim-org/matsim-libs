@@ -20,8 +20,8 @@
 
 package org.matsim.examples;
 
-import org.matsim.config.Config;
-import org.matsim.controler.Controler;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 

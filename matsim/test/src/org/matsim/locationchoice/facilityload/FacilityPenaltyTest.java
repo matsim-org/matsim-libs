@@ -2,7 +2,8 @@ package org.matsim.locationchoice.facilityload;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import org.matsim.gbl.Gbl;
+
+import org.matsim.core.gbl.Gbl;
 import org.matsim.locationchoice.Initializer;
 import org.matsim.testcases.MatsimTestCase;
 

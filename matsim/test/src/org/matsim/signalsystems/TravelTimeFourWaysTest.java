@@ -21,10 +21,10 @@
 package org.matsim.signalsystems;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.config.Config;
-import org.matsim.events.Events;
-import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.config.Config;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 

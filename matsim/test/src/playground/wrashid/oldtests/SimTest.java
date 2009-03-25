@@ -2,10 +2,10 @@ package playground.wrashid.oldtests;
 
 import java.util.ArrayList;
 
-import org.matsim.mobsim.jdeqsim.JDEQSimStarterWithoutController;
-import org.matsim.mobsim.jdeqsim.EventLog;
-import org.matsim.mobsim.jdeqsim.SimulationParameters;
-import org.matsim.mobsim.jdeqsim.util.CppEventFileParser;
+import org.matsim.core.mobsim.jdeqsim.EventLog;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimStarterWithoutController;
+import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
+import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 
 import junit.framework.TestCase;
 

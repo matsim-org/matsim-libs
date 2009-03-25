@@ -21,7 +21,7 @@
 package org.matsim.counts;
 
 import org.matsim.analysis.CalcLinkStats;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 import org.xml.sax.helpers.AttributesImpl;
 
 public class AttributeFactory {

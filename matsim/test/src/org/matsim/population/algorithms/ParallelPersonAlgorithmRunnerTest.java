@@ -23,9 +23,9 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;

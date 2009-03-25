@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.analysis.CalcLinkStats;
-import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
 
 public class CountsFixture {
 
@@ -41,7 +41,7 @@ public class CountsFixture {
 
 	public void setUp() {
 		String[] args = {"test/input/org/matsim/counts/config.xml"};
-		org.matsim.config.Config config = Gbl.createConfig(args);
+		org.matsim.core.config.Config config = Gbl.createConfig(args);
 
 		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);
 		counts_parser.readFile(config.counts().getCountsFileName());

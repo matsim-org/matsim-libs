@@ -21,13 +21,13 @@
 package org.matsim.utils.vis.routervis;
 
 import org.apache.log4j.Logger;
-import org.matsim.config.Config;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+import org.matsim.core.config.Config;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.utils.vis.routervis.multipathrouter.CLogitRouter;

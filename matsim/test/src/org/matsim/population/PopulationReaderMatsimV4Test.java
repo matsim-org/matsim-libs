@@ -24,14 +24,14 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.Route;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 

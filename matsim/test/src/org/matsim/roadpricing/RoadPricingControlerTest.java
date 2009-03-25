@@ -21,12 +21,12 @@
 package org.matsim.roadpricing;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.config.Config;
-import org.matsim.controler.Controler;
-import org.matsim.gbl.Gbl;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.util.TravelCost;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.router.util.TravelCost;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

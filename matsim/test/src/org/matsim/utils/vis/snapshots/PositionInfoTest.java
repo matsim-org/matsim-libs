@@ -20,10 +20,10 @@
 
 package org.matsim.utils.vis.snapshots;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.network.NetworkLayer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;

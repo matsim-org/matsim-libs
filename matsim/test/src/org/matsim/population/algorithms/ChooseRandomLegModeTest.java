@@ -23,7 +23,7 @@ package org.matsim.population.algorithms;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -33,7 +33,7 @@ import org.matsim.utils.geometry.CoordImpl;
 public class ChooseRandomLegModeTest extends MatsimTestCase {
 
 	public void testRandomChoice() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk}, MatsimRandom.random);
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk}, MatsimRandom.getRandom());
 		Plan plan = new org.matsim.population.PlanImpl(null);
 		plan.createAct("home", new CoordImpl(0, 0));
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
@@ -62,14 +62,14 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	}
 
 	public void testHandleEmptyPlan() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk}, MatsimRandom.random);
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk}, MatsimRandom.getRandom());
 		Plan plan = new org.matsim.population.PlanImpl(null);
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
 
 	public void testHandlePlanWithoutLeg() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk}, MatsimRandom.random);
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk}, MatsimRandom.getRandom());
 		Plan plan = new org.matsim.population.PlanImpl(null);
 		plan.createAct("home", new CoordImpl(0, 0));
 		algo.run(plan);
@@ -80,7 +80,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	 * Test that all the legs have the same, changed mode
 	 */
 	public void testMultipleLegs() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt}, MatsimRandom.random);
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt}, MatsimRandom.getRandom());
 		Plan plan = new org.matsim.population.PlanImpl(null);
 		plan.createAct("home", new CoordImpl(0, 0));
 		plan.createLeg(BasicLeg.Mode.car);

@@ -20,9 +20,9 @@
 
 package org.matsim.population;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

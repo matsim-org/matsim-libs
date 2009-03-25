@@ -6,18 +6,18 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.CarRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.events.PersonEvent;
-import org.matsim.mobsim.jdeqsim.util.DummyPopulationModifier;
-import org.matsim.mobsim.jdeqsim.util.TestHandlerDetailedEventChecker;
-import org.matsim.mobsim.jdeqsim.util.testable.PopulationModifier;
-import org.matsim.mobsim.jdeqsim.util.testable.TestHandler;
+import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.events.PersonEvent;
+import org.matsim.core.mobsim.jdeqsim.util.DummyPopulationModifier;
+import org.matsim.core.mobsim.jdeqsim.util.TestHandlerDetailedEventChecker;
+import org.matsim.core.mobsim.jdeqsim.util.testable.PopulationModifier;
+import org.matsim.core.mobsim.jdeqsim.util.testable.TestHandler;
 
 import playground.wrashid.PDES2.Road;
 import playground.wrashid.deqsim.PDESStarter2;

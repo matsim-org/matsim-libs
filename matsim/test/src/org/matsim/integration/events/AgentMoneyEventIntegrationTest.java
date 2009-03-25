@@ -23,14 +23,14 @@ package org.matsim.integration.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.AgentMoneyEvent;
-import org.matsim.events.BasicEventImpl;
-import org.matsim.events.Events;
-import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.events.algorithms.EventWriterXML;
-import org.matsim.events.handler.BasicEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.AgentMoneyEvent;
+import org.matsim.core.events.BasicEventImpl;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

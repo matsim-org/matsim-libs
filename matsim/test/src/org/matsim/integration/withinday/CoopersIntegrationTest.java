@@ -19,12 +19,12 @@
 
 package org.matsim.integration.withinday;
 
-import org.matsim.config.Config;
-import org.matsim.controler.events.StartupEvent;
-import org.matsim.controler.listener.StartupListener;
-import org.matsim.events.handler.EventHandler;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.trafficmonitoring.LinkSensorManager;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.trafficmonitoring.LinkSensorManager;
 import org.matsim.withinday.coopers.CoopersControler;
 
 

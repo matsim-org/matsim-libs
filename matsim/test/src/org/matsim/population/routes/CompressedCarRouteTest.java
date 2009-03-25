@@ -25,13 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.CarRoute;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.LinkIdComparator;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.SubsequentLinksAnalyzer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkIdComparator;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 
 
 /**

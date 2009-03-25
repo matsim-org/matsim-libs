@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.events;
 
-import org.matsim.events.XmlEventsTester;
+import org.matsim.core.events.XmlEventsTester;
 import org.matsim.testcases.MatsimTestCase;
 
 public class ArrivalAtFacilityEventTest extends MatsimTestCase {

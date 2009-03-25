@@ -22,8 +22,8 @@ package org.matsim.population.filters;
 
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 

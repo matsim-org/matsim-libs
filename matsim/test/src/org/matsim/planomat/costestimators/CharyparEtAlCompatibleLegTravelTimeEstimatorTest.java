@@ -24,11 +24,11 @@ import java.util.List;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.CarRoute;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.BasicEventImpl;
-import org.matsim.events.Events;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.BasicEventImpl;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.utils.misc.Time;
 
 public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTravelTimeEstimatorTest {

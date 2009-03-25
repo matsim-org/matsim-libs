@@ -20,10 +20,10 @@
 
 package org.matsim.integration.controler;
 
-import org.matsim.config.Config;
-import org.matsim.controler.Controler;
-import org.matsim.events.Events;
-import org.matsim.events.parallelEventsHandler.ParallelEvents;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -39,7 +39,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 		final Controler controler = new Controler(config);
 		controler.run();
 		Events events = controler.getEvents();
-		assertEquals(org.matsim.events.Events.class, events.getClass());
+		assertEquals(org.matsim.core.events.Events.class, events.getClass());
 	}
 
 	public void testLoadParallelWithConfig() {
@@ -49,7 +49,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 		final Controler controler = new Controler(config);
 		controler.run();
 		Events events = controler.getEvents();
-		assertEquals(org.matsim.events.parallelEventsHandler.ParallelEvents.class, events.getClass());
+		assertEquals(org.matsim.core.events.parallelEventsHandler.ParallelEvents.class, events.getClass());
 	}
 
 }
