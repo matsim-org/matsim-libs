@@ -72,7 +72,7 @@ public  class InfoText {
 	}
 	public void draw3D(GL gl) {
 
-		float size = this.size;
+		float size = this.size; // kai: this is where font for labels can be made smaller
 		//z -= 0.5*z;
 		float border=15.f;
 		// draw relative to camera aka do not resize
