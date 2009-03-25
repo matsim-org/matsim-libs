@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatsimModule.java
+ * MatsimModuleLoader.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,10 +20,36 @@
 
 package playground.marcel.modules;
 
-import org.matsim.controler.Controler;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
-public interface MatsimModule {
+import org.apache.log4j.Logger;
 
-	public void initModule(final Controler controler);
+public abstract class MatsimModuleLoader {
 	
+	private final static Logger log = Logger.getLogger(MatsimModuleLoader.class);
+	
+	public static MatsimModule loadModule(final String classname) {
+		try {
+			Class<? extends MatsimModule> klas = (Class<? extends MatsimModule>) Class.forName(classname);
+			Constructor<? extends MatsimModule> c = klas.getConstructor(new Class[0]);
+			MatsimModule module = c.newInstance();
+			log.info("Loaded MatsimModule: " + classname);
+			return module;
+		} catch(NoSuchMethodException e) {
+			log.warn("The module must have a default constructor." );
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 }

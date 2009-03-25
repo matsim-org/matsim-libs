@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatsimModule.java
+ * TryOut.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,8 +22,12 @@ package playground.marcel.modules;
 
 import org.matsim.controler.Controler;
 
-public interface MatsimModule {
-
-	public void initModule(final Controler controler);
+public class TryOut {
 	
+	public static void main(String[] args) {
+		Controler c = new Controler(new String[] {"examples/equil/config.xml"});
+		MatsimModule test = MatsimModuleLoader.loadModule("playground.marcel.modules.template.Template");
+		test.initModule(c);
+	}
+
 }

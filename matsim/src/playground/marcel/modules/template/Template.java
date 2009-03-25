@@ -42,8 +42,11 @@ import playground.marcel.modules.MatsimModule;
 
 public class Template implements MatsimModule {
 
-	public void init(final Controler c) {
-		
+	public void initModule(final Controler c) {
+		System.out.println("hello world.");
+	}
+	
+	public void initModule2(final Controler c) {
 		// possible things that could get loaded with a module:
 		
 		
