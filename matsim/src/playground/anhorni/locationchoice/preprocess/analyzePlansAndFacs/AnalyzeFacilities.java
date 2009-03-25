@@ -225,15 +225,15 @@ public class AnalyzeFacilities {
 							while (options_it.hasNext()) {
 								ActivityOption actOpt = options_it.next();
 								if (actOpt.getType().startsWith(types[typeIndex])) {
-									capacityCount[typeIndex][i] += actOpt.getCapacity();
+									capacityCount[typeIndex][i] += Math.max(actOpt.getCapacity(), 1.0);
 									count[typeIndex][i] += 1;
-									totalCapacity += actOpt.getCapacity();
+									totalCapacity += Math.max(actOpt.getCapacity(), 1.0);
 									totalCount++;
 									if (actOpt.getCapacity() > maxCapacity[typeIndex][i]) {
 										maxCapacity[typeIndex][i] = actOpt.getCapacity();
 									}
 									if (actOpt.getCapacity() < minCapacity[typeIndex][i]) {
-										minCapacity[typeIndex][i] = actOpt.getCapacity();
+										minCapacity[typeIndex][i] = Math.max(actOpt.getCapacity(), 1.0);
 									}
 								}
 							}
@@ -295,7 +295,7 @@ public class AnalyzeFacilities {
 				while (options_it.hasNext()) {
 					ActivityOption actOpt = options_it.next();
 					if (actOpt.getType().startsWith("shop")) {
-						totalCapacity += actOpt.getCapacity();
+						totalCapacity += Math.max(actOpt.getCapacity(), 1.0);
 					}
 				}
 								
@@ -305,7 +305,7 @@ public class AnalyzeFacilities {
 						while (options_it.hasNext()) {
 							ActivityOption actOpt = options_it.next();
 							if (actOpt.getType().startsWith("shop")) {
-								groceryCapacity += actOpt.getCapacity();
+								groceryCapacity += Math.max(actOpt.getCapacity(), 1.0);
 							}
 						}
 					}
