@@ -32,9 +32,9 @@ import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
  * and be visualized thereafter.<br />
  * Apart from implementing this interface, the query must be made known to 
  * the queries drop-down box in the class OTFQueryControlBar.
- * The execution of a query happenes in two parts. First the
+ * The execution of a query happens in two parts. First the
  * query() method is called on the server side, with all parameters set.
- * Data needs to be collected here. It needs to be stored in a way that allowes
+ * Data needs to be collected here. It needs to be stored in a way that allows
  * serialization.
  * The query object is then transported back to the client, where the draw() method
  * is called to visualize whatever data has been collected.
