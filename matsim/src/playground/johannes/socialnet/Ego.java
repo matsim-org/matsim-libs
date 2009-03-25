@@ -28,6 +28,7 @@ import java.util.List;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.population.BasicPerson;
 import org.matsim.interfaces.basic.v01.population.BasicPlan;
+import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 import org.matsim.interfaces.core.v01.Activity;
 
 import playground.johannes.graph.SparseVertex;
@@ -36,7 +37,7 @@ import playground.johannes.graph.SparseVertex;
  * @author illenberger
  *
  */
-public class Ego<P extends BasicPerson<BasicPlan>> extends SparseVertex {
+public class Ego<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> extends SparseVertex {
 
 	private P person;
 	

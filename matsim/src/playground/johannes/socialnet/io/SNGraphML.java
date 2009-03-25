@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialNetworkFactory.java
+ * SNGraphML.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,45 +21,22 @@
 /**
  * 
  */
-package playground.johannes.socialnet;
-
-import java.util.Iterator;
-
-import org.matsim.interfaces.basic.v01.population.BasicPerson;
-import org.matsim.interfaces.basic.v01.population.BasicPlan;
-import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
-import org.matsim.interfaces.basic.v01.population.BasicPopulation;
-
-import playground.johannes.graph.generators.GraphFactory;
+package playground.johannes.socialnet.io;
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetworkFactory<P extends BasicPerson<BasicPlan<BasicPlanElement>>> implements GraphFactory<SocialNetwork<P>, Ego<P>, SocialTie> {
+public interface SNGraphML {
 
-	private BasicPopulation<P> population;
+	public static final String CREATED_TAG = "created";
 	
-	private Iterator<P> popIterator;
+	public static final String USAGE_TAG = "usage";
 	
-	public SocialNetworkFactory(BasicPopulation<P> population) {
-		this.population = population;
-	}
+	public static final String PERSON_ID_TAG = "personid";
 	
-	public SocialTie addEdge(SocialNetwork<P> g, Ego<P> v1, Ego<P> v2) {
-		return g.addEdge(v1, v2);
-	}
-
-	public Ego<P> addVertex(SocialNetwork<P> g) {
-		if(popIterator.hasNext())
-			return g.addEgo(popIterator.next());
-		else
-			return null;
-	}
-
-	public SocialNetwork<P> createGraph() {
-		popIterator = population.getPersons().values().iterator();
-		return new SocialNetwork<P>();
-	}
-
+	public static final String COORD_X_TAG = "x";
+	
+	public static final String COORD_Y_TAG = "y";
+	
 }

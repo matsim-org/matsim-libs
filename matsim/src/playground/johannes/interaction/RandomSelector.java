@@ -46,6 +46,9 @@ public class RandomSelector implements InteractionSelector {
 	public Collection<Visitor> select(Visitor v, Collection<Visitor> choiceSet) {
 		List<Visitor> targets = new LinkedList<Visitor>();
 		
+		if(choiceSet.isEmpty())
+			return targets;
+		
 		if(maxInteractions == 1)
 			targets.add(selectSingleTarget(v, choiceSet));
 		else if(maxInteractions > 1)
@@ -56,7 +59,7 @@ public class RandomSelector implements InteractionSelector {
 	
 	private Visitor selectSingleTarget(Visitor v, Collection<Visitor> choiceSet) {
 		List<Visitor> visitors = new LinkedList<Visitor>(choiceSet);
-		return visitors.get((int)(random.nextDouble() * (visitors.size() - 1)));
+		return visitors.get(random.nextInt(choiceSet.size()));
 	}
 
 }

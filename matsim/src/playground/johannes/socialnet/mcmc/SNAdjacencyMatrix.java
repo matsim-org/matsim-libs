@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BefriendInteractor.java
+ * SNAdjacencyMatrix.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,14 +21,15 @@
 /**
  * 
  */
-package playground.johannes.interaction;
+package playground.johannes.socialnet.mcmc;
 
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.controler.events.IterationStartsEvent;
-import org.matsim.controler.listener.IterationStartsListener;
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.utils.collections.Tuple;
 
+import playground.johannes.graph.Vertex;
+import playground.johannes.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.socialnet.Ego;
 import playground.johannes.socialnet.SocialNetwork;
 import playground.johannes.socialnet.SocialTie;
@@ -37,43 +38,39 @@ import playground.johannes.socialnet.SocialTie;
  * @author illenberger
  *
  */
-public class BefriendInteractor implements Interactor, IterationStartsListener {
+public class SNAdjacencyMatrix extends AdjacencyMatrix {
 
-	private SocialNetwork<Person> socialnet;
+	private List<Ego<?>> egoList;
 	
-	private double tieProba;
-	
-	private Random random;
-	
-	private int currentIteration;
-	
-	public BefriendInteractor(SocialNetwork<Person> socialnet, double p, long randomSeed) {
-		this.socialnet = socialnet;
-		this.tieProba = p;
-		random = new Random(randomSeed);
-	}
-	
-	public void interact(Person p1, Person p2, double startTime, double endTime) {
-		Ego<Person> e1 = socialnet.getEgo(p1);
-		Ego<Person> e2 = socialnet.getEgo(p2);
-
-		SocialTie tie = socialnet.getEdge(e1, e2);
-		if(tie == null) {
-			/*
-			 * Create tie...
-			 */
-			if(random.nextDouble() <= tieProba)
-				tie = socialnet.addEdge(e1, e2);
-		} else {
-			/*
-			 * Reinforce tie...
-			 */
-			tie.use(currentIteration);
+	public SNAdjacencyMatrix(SocialNetwork<?> g) {
+		super();
+		egoList = new ArrayList<Ego<?>>(g.getVertices().size());
+//		TObjectIntHashMap<Vertex> vertexIndicies = new TObjectIntHashMap<Vertex>();
+		
+		int idx = 0;
+		for(Ego<?> v : g.getVertices()) {
+//			vertexIndicies.put(v, idx);
+			egoList.add(v);
+			addVertex();
+			idx++;
+		}
+		
+		for(SocialTie e : g.getEdges()) {
+			Tuple<? extends Vertex, ? extends Vertex> p = e.getVertices();
+			int i = egoList.indexOf(p.getFirst());
+//			if(vertexIndicies.contains(p.getFirst()))
+//				i = vertexIndicies.get(p.getFirst());
+//			if(egoList.contains(p.getFirst()))
+//				i = egoList.indexOf(p.getFirst());
+			int j = egoList.indexOf(p.getSecond());
+//			if(vertexIndicies.contains(p.getSecond()))
+//				j = vertexIndicies.get(p.getSecond());
+			
+			if(i > -1 && j > -1) {
+				addEdge(i, j);
+			} else {
+				throw new IllegalArgumentException(String.format("Indices i=%1$s, j=%2$s not allowed!", i, j));
+			}
 		}
 	}
-
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		currentIteration = event.getIteration();
-	}
-
 }

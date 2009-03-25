@@ -29,16 +29,18 @@ import java.util.Set;
 
 import org.matsim.interfaces.basic.v01.population.BasicPerson;
 import org.matsim.interfaces.basic.v01.population.BasicPlan;
+import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
 import org.matsim.interfaces.basic.v01.population.BasicPopulation;
 
 import playground.johannes.graph.AbstractSparseGraph;
+import playground.johannes.graph.SparseEdge;
 import playground.johannes.graph.SparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetwork<P extends BasicPerson<BasicPlan>> extends AbstractSparseGraph {
+public class SocialNetwork<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> extends AbstractSparseGraph {
 	
 	private Map<P, Ego<P>> personEgoMapping = new HashMap<P, Ego<P>>();
 	
@@ -78,6 +80,12 @@ public class SocialNetwork<P extends BasicPerson<BasicPlan>> extends AbstractSpa
 		return (Set<? extends Ego<P>>) super.getVertices();
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<? extends SocialTie> getEdges() {
+		return (Set<? extends SocialTie>) super.getEdges();
+	}
+
 	public Ego<P> getEgo(P p) {
 		return personEgoMapping.get(p);
 	}
