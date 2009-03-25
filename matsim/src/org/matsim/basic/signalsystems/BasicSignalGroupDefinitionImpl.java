@@ -22,8 +22,8 @@ package org.matsim.basic.signalsystems;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.signalsystems.control.SignalSystemControler;
 
 /**
@@ -52,7 +52,7 @@ public class BasicSignalGroupDefinitionImpl implements BasicSignalGroupDefinitio
 	}
 
 	/**
-	 * @see org.matsim.basic.signalsystems.BasicSignalGroupDefinition#addLaneId(org.matsim.interfaces.basic.v01.Id)
+	 * @see org.matsim.basic.signalsystems.BasicSignalGroupDefinition#addLaneId(org.matsim.api.basic.v01.Id)
 	 */
 	public void addLaneId(Id laneId) {
 		if (this.laneIds == null)
@@ -68,7 +68,7 @@ public class BasicSignalGroupDefinitionImpl implements BasicSignalGroupDefinitio
 	}
 
 	/**
-	 * @see org.matsim.basic.signalsystems.BasicSignalGroupDefinition#addToLinkId(org.matsim.interfaces.basic.v01.Id)
+	 * @see org.matsim.basic.signalsystems.BasicSignalGroupDefinition#addToLinkId(org.matsim.api.basic.v01.Id)
 	 */
 	public void addToLinkId(Id linkId) {
 		if (this.toLinkIds == null)

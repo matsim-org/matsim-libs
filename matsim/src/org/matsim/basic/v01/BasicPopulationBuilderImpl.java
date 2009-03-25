@@ -22,16 +22,16 @@ package org.matsim.basic.v01;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.population.BasicActivity;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.basic.v01.population.BasicPerson;
-import org.matsim.interfaces.basic.v01.population.BasicPlan;
-import org.matsim.interfaces.basic.v01.population.BasicPopulation;
-import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
-import org.matsim.interfaces.basic.v01.population.BasicRoute;
-import org.matsim.interfaces.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.population.BasicRoute;
+import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 
 /**
  * @author dgrether

@@ -20,8 +20,8 @@
 
 package org.matsim.basic.v01;
 
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.basic.v01.population.BasicRoute;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.utils.misc.Time;
 
 public class BasicLegImpl implements BasicLeg {

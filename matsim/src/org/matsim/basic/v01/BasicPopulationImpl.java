@@ -23,10 +23,10 @@ package org.matsim.basic.v01;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.population.BasicPerson;
-import org.matsim.interfaces.basic.v01.population.BasicPopulation;
-import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
 
 public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulation<T> {
 	

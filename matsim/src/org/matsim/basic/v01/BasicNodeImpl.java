@@ -23,11 +23,11 @@ package org.matsim.basic.v01;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.network.BasicLink;
-import org.matsim.interfaces.basic.v01.network.BasicNode;
 
 public class BasicNodeImpl implements BasicNode {
 	protected final Map<Id, BasicLink> inlinks  = new LinkedHashMap<Id, BasicLink>(4, 0.95f);

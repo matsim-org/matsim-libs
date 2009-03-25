@@ -21,8 +21,8 @@ package org.matsim.basic.v01;
 
 import java.util.List;
 
-import org.matsim.interfaces.basic.v01.BasicLocation;
-import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.api.basic.v01.BasicLocation;
+import org.matsim.api.basic.v01.Id;
 
 /**
  * @author dgrether

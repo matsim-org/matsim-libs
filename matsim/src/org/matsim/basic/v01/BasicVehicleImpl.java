@@ -1,6 +1,6 @@
 package org.matsim.basic.v01;
 
-import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.api.basic.v01.Id;
 
 
 public class BasicVehicleImpl implements BasicVehicle {

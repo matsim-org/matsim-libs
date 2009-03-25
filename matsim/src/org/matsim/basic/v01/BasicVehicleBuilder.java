@@ -21,8 +21,8 @@ package org.matsim.basic.v01;
 
 import java.util.Map;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.BasicEngineInformation.FuelType;
-import org.matsim.interfaces.basic.v01.Id;
 
 /**
  * @author dgrether

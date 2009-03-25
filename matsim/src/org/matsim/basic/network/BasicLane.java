@@ -20,7 +20,7 @@ package org.matsim.basic.network;
 
 import java.util.List;
 
-import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.api.basic.v01.Id;
 /**
  * 
  * @author dgrether

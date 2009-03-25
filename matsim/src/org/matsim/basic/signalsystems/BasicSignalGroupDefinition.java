@@ -20,8 +20,8 @@ package org.matsim.basic.signalsystems;
 
 import java.util.List;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.signalsystems.control.SignalSystemControler;
 /**
  * 
