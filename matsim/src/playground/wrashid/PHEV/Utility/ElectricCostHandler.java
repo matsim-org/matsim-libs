@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.network.Link;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentMoneyEvent;
@@ -18,7 +19,6 @@ import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.interfaces.core.v01.Link;
 
 //TODO: write tests for this class
 

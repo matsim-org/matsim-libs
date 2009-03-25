@@ -20,7 +20,7 @@
 
 package playground.christoph.router.util;
 
-import org.matsim.interfaces.core.v01.CarRoute;
+import org.matsim.core.api.population.CarRoute;
 
 public class RouteChecker {
 

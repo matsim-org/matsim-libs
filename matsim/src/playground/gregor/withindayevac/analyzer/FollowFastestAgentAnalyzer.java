@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.controler.Controler;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
 
 import playground.gregor.withindayevac.Beliefs;
 import playground.gregor.withindayevac.communication.InformationEntity;

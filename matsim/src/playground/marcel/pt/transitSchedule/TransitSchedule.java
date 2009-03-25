@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.api.basic.v01.Id;
 
 public class TransitSchedule {
 

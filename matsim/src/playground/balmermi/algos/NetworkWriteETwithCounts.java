@@ -24,13 +24,13 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.Node;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
-import org.matsim.interfaces.core.v01.Node;
 import org.matsim.utils.misc.Time;
 
 public class NetworkWriteETwithCounts {

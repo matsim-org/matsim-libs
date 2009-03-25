@@ -1,6 +1,6 @@
 package playground.wrashid.PDES3;
 
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.core.api.population.Person;
 import org.matsim.mobsim.jdeqsim.DeadlockPreventionMessage;
 import org.matsim.mobsim.jdeqsim.Message;
 import org.matsim.mobsim.jdeqsim.MessageFactory;

@@ -7,10 +7,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.network.Link;
+
 import playground.mmoyo.input.PTTimeTableReader;
 import playground.mmoyo.input.PTLinesReader2;
 

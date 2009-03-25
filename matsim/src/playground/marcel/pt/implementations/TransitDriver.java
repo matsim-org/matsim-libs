@@ -23,10 +23,10 @@ package playground.marcel.pt.implementations;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.Person;
 
 import playground.marcel.pt.integration.TransitConstants;
 import playground.marcel.pt.integration.TransitQueueSimulation;

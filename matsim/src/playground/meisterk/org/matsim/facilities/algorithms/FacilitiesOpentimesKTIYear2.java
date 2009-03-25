@@ -27,15 +27,15 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicOpeningTime;
-import org.matsim.basic.v01.BasicOpeningTime.DayType;
+import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
+import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
+import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
-import org.matsim.interfaces.core.v01.ActivityOption;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.OpeningTime;
 import org.matsim.world.Location;
 
 import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;

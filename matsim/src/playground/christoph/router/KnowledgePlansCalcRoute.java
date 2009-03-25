@@ -21,7 +21,7 @@
 package playground.christoph.router;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.core.api.population.Person;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.PlansCalcRoute;

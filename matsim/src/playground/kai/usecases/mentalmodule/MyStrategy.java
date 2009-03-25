@@ -23,10 +23,10 @@ package playground.kai.usecases.mentalmodule;
  */
 
 import org.matsim.controler.Controler;
+import org.matsim.core.api.population.Population;
+import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.PlanStrategyModule;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.selectors.PlanSelector;

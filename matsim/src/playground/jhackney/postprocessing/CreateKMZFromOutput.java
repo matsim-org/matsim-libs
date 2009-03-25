@@ -21,9 +21,9 @@ package playground.jhackney.postprocessing;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.world.algorithms.WorldConnectLocations;

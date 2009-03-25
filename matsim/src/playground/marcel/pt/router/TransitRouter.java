@@ -22,9 +22,9 @@ package playground.marcel.pt.router;
 
 import java.util.Collection;
 
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.network.Link;
 import org.matsim.network.NetworkWriter;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator.Path;

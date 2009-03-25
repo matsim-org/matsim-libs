@@ -1,8 +1,8 @@
 package playground.mmoyo.PTRouter;
 
 //import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Link;
 
 /** 
  * Gives information of departures in the complete PT network 

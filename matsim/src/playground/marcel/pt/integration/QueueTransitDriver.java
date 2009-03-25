@@ -22,12 +22,12 @@ package playground.marcel.pt.integration;
 
 import java.util.List;
 
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Person;
 import org.matsim.mobsim.queuesim.DriverAgent;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueVehicle;

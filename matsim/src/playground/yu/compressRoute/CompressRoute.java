@@ -31,13 +31,13 @@ import java.util.Stack;
 import java.util.TreeMap;
 
 import org.matsim.config.Config;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.Population;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
@@ -83,7 +83,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 	 * counts and writes the amount of "old" links and that of "new" filtered
 	 * links
 	 *
-	 * @see org.matsim.population.algorithms.AbstractPersonAlgorithm#run(org.matsim.interfaces.core.v01.Person)
+	 * @see org.matsim.population.algorithms.AbstractPersonAlgorithm#run(org.matsim.core.api.population.Person)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override

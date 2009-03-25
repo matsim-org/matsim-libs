@@ -28,10 +28,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.Population;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.Population;
 
 /**
  * A builder class that builds {@link PlanAgent} instances out of {@link Person}

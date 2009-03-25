@@ -22,12 +22,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.CarRoute;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;

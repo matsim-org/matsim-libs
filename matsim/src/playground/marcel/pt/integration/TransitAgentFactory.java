@@ -22,7 +22,7 @@ package playground.marcel.pt.integration;
 
 import java.util.Map;
 
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.core.api.population.Person;
 import org.matsim.mobsim.queuesim.AgentFactory;
 import org.matsim.mobsim.queuesim.PersonAgent;
 

@@ -25,10 +25,10 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.ActivityOption;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.io.IOUtils;
 

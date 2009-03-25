@@ -23,8 +23,8 @@
  */
 package playground.yu.newNetwork;
 
+import org.matsim.core.api.network.Link;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;

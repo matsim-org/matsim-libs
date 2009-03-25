@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.network.BasicLaneDefinitions;
 import org.matsim.basic.network.BasicLaneDefinitionsImpl;
 import org.matsim.basic.network.BasicLaneImpl;
@@ -18,7 +19,6 @@ import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
 

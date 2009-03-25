@@ -29,15 +29,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
-import org.matsim.interfaces.basic.v01.network.BasicLink;
-import org.matsim.interfaces.basic.v01.network.BasicNetwork;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.io.IOUtils;
 

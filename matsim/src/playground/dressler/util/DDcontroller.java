@@ -21,16 +21,16 @@
 package playground.dressler.util;
 
 import org.matsim.config.Config;
+import org.matsim.core.api.network.Node;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.Population;
+import org.matsim.core.api.population.Route;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Node;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.Population;
-import org.matsim.interfaces.core.v01.Route;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;

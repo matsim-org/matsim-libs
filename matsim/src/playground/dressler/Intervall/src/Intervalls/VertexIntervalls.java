@@ -26,7 +26,7 @@ package playground.dressler.Intervall.src.Intervalls;
 
 import java.util.ArrayList;
 
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
 
 /**
  * class representing the flow of an edge in a Time Expanded Network

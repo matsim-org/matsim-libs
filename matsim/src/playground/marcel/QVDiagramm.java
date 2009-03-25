@@ -24,13 +24,13 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.network.Link;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.charts.XYScatterChart;
 

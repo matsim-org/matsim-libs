@@ -26,10 +26,10 @@ package playground.johannes.eut;
 import org.apache.log4j.Logger;
 import org.matsim.controler.events.BeforeMobsimEvent;
 import org.matsim.controler.listener.BeforeMobsimListener;
-import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 
 /**
  * @author illenberger

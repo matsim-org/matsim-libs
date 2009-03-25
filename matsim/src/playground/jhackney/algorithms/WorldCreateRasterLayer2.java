@@ -21,11 +21,11 @@ package playground.jhackney.algorithms;
 
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.facilities.Facilities;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Facilities;
 import org.matsim.socialnetworks.algorithms.FacilitiesFindScenarioMinMaxCoords;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.World;

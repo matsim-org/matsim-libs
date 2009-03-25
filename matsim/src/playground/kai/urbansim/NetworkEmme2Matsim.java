@@ -8,9 +8,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Node;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.algorithms.NetworkCleaner;

@@ -3,7 +3,7 @@ package playground.anhorni.locationchoice.assemblefacilities;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.api.basic.v01.Coord;
 
 public class Hectare {
 	

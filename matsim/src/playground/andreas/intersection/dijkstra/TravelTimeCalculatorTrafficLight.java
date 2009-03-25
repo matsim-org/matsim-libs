@@ -2,10 +2,10 @@ package playground.andreas.intersection.dijkstra;
 
 import java.util.HashMap;
 
+import org.matsim.core.api.network.Link;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 

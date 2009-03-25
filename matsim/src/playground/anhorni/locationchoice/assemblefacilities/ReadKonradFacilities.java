@@ -6,12 +6,12 @@ import java.util.SortedSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicOpeningTime;
-import org.matsim.basic.v01.BasicOpeningTime.DayType;
+import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
+import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
 
 public class ReadKonradFacilities {
 	

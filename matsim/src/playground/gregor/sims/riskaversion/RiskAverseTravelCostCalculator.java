@@ -20,7 +20,7 @@
 
 package playground.gregor.sims.riskaversion;
 
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
 import org.matsim.router.util.TravelCost;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 

@@ -21,10 +21,10 @@
 package playground.ciarif.modechoice_old;
 
 import org.matsim.config.ConfigWriter;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.population.Population;
 import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;

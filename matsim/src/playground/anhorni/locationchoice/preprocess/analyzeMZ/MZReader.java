@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.geometry.CoordImpl;
 
 import playground.anhorni.locationchoice.cs.helper.MZTrip;

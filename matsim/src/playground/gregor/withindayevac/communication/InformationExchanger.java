@@ -23,8 +23,8 @@ package playground.gregor.withindayevac.communication;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Node;
 import org.matsim.network.NetworkLayer;
 
 public class InformationExchanger {

@@ -26,11 +26,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 import org.matsim.events.AgentMoneyEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkLayer;

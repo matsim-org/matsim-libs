@@ -23,9 +23,9 @@ package playground.christoph.knowledge;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Node;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;

@@ -28,6 +28,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Population;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentStuckEvent;
@@ -38,8 +40,6 @@ import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme;

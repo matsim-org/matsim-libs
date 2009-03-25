@@ -14,12 +14,12 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
+import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Plan;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.network.BasicNode;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;

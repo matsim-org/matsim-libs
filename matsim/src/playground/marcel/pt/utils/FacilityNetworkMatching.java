@@ -25,10 +25,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;

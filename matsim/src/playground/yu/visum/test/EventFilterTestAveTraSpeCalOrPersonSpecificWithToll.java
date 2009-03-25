@@ -23,10 +23,10 @@ package playground.yu.visum.test;
 import java.io.IOException;
 
 import org.matsim.config.Config;
+import org.matsim.core.api.population.Population;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;

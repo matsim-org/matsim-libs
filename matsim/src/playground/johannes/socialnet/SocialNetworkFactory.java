@@ -25,10 +25,10 @@ package playground.johannes.socialnet;
 
 import java.util.Iterator;
 
-import org.matsim.interfaces.basic.v01.population.BasicPerson;
-import org.matsim.interfaces.basic.v01.population.BasicPlan;
-import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
-import org.matsim.interfaces.basic.v01.population.BasicPopulation;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.basic.v01.population.BasicPopulation;
 
 import playground.johannes.graph.generators.GraphFactory;
 

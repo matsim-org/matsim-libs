@@ -26,12 +26,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.population.Person;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Person;
 
 /**
  * Keeps track of all persons that are currently executing an activity at the facility.

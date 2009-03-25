@@ -21,8 +21,8 @@ package playground.christoph.mobsim;
 
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Person;
 import org.matsim.mobsim.queuesim.PersonAgent;
 
 public class MyPersonAgent extends PersonAgent{

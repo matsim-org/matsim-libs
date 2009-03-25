@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.api.basic.v01.Id;
 
 public class CostValidator {
 	private Map<Id,List<double[]>> negativeValuesMap = new TreeMap<Id,List<double[]>>();

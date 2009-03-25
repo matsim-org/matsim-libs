@@ -27,10 +27,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.controler.Controler;
+import org.matsim.core.api.population.Person;
 import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Person;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorBuilder;
 

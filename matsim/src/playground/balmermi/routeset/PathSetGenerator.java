@@ -28,9 +28,9 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.AStarLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;

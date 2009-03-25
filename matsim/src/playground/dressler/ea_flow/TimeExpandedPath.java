@@ -27,8 +27,8 @@ import java.util.ListIterator;
 // other imports
 
 // matsim imports
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 
 import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
 

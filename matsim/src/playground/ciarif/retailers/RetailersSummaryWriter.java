@@ -4,9 +4,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.interfaces.basic.v01.network.BasicLink;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.network.Link;
 import org.matsim.world.Location;
 
 public class RetailersSummaryWriter {

@@ -21,10 +21,10 @@
 package playground.meisterk.org.matsim.run.facilities;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.facilities.Facilities;
 import org.matsim.facilities.FacilitiesImpl;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Facilities;
 
 import playground.meisterk.org.matsim.facilities.algorithms.FacilitiesAllActivitiesFTE;
 

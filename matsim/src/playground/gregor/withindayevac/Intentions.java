@@ -20,7 +20,7 @@
 
 package playground.gregor.withindayevac;
 
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Node;
 
 public class Intentions {
 	

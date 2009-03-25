@@ -3,8 +3,8 @@ package playground.yu.visum.filter.finalFilters;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.population.Person;
 
 import playground.yu.visum.filter.PersonFilterA;
 

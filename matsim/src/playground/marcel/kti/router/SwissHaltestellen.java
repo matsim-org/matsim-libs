@@ -25,7 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.CalcBoundingBox;
 import org.matsim.utils.StringUtils;

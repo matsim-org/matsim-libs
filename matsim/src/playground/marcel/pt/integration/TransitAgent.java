@@ -20,8 +20,8 @@
 
 package playground.marcel.pt.integration;
 
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.population.Person;
 import org.matsim.mobsim.queuesim.PersonAgent;
 
 import playground.marcel.pt.interfaces.PassengerAgent;

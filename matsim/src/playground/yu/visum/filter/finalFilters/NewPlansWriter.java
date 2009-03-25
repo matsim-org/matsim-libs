@@ -1,7 +1,7 @@
 package playground.yu.visum.filter.finalFilters;
 
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Population;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
 import org.matsim.population.PopulationWriter;
 
 /**

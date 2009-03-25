@@ -30,7 +30,7 @@ import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.mobsim.WithindayQueueSimulation;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;

@@ -20,8 +20,8 @@
 
 package playground.balmermi.mz;
 
+import org.matsim.core.api.population.Population;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.PopulationImpl;
 import org.matsim.population.PopulationWriter;
 

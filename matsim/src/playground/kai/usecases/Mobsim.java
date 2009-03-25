@@ -1,6 +1,12 @@
 package playground.kai.usecases;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
@@ -10,12 +16,6 @@ import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.network.BasicLink;
-import org.matsim.interfaces.basic.v01.network.BasicNetwork;
-import org.matsim.interfaces.basic.v01.network.BasicNode;
-import org.matsim.interfaces.basic.v01.population.BasicPerson;
-import org.matsim.interfaces.basic.v01.population.BasicPopulation;
 
 @SuppressWarnings("unused")
 public class Mobsim {

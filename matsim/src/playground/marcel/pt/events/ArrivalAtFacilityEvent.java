@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.events;
 
-import org.matsim.interfaces.core.v01.Facility;
+import org.matsim.core.api.facilities.Facility;
 
 import playground.marcel.pt.interfaces.Vehicle;
 

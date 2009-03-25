@@ -1,7 +1,7 @@
 package playground.mmoyo.PTRouter;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Node;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 

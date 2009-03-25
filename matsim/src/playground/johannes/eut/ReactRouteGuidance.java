@@ -23,8 +23,8 @@
  */
 package playground.johannes.eut;
 
-import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.CarRoute;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.Dijkstra;

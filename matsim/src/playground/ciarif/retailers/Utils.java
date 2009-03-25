@@ -1,11 +1,11 @@
 package playground.ciarif.retailers;
 
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.basic.v01.BasicLinkImpl;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Person;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Person;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordImpl;
 

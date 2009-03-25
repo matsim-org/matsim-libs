@@ -20,8 +20,8 @@
 
 package playground.gregor.withindayevac.analyzer;
 
+import org.matsim.core.api.network.Link;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Link;
 
 import playground.gregor.withindayevac.Beliefs;
 

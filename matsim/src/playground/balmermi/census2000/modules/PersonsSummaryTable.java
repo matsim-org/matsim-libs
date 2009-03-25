@@ -25,10 +25,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.basic.v01.BasicActivityImpl;
-import org.matsim.interfaces.basic.v01.population.BasicActivity;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 

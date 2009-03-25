@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Population;
 
 public class PersonsRandomizeId {
 

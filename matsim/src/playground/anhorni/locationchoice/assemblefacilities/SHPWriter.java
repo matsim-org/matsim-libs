@@ -15,9 +15,9 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileWriter;
 import org.matsim.utils.io.IOUtils;
@@ -46,21 +46,21 @@ public class SHPWriter {
 	
 	
 	private void init() {
-		mapBZ.put(408, "Verbrauchermärkte  (> 2500 m2)");
-		mapBZ.put(409, "Grosse Supermärkte (1000-2499 m2)");
-		mapBZ.put(410, "Kleine Supermärkte (400-999 m2)");
-		mapBZ.put(411, "Grosse Geschäfte (100-399 m2)");
-		mapBZ.put(412, "Kleine Geschäfte (< 100 m2)");
-		mapBZ.put(413, "Warenhäuser");
+		mapBZ.put(408, "Verbrauchermï¿½rkte  (> 2500 m2)");
+		mapBZ.put(409, "Grosse Supermï¿½rkte (1000-2499 m2)");
+		mapBZ.put(410, "Kleine Supermï¿½rkte (400-999 m2)");
+		mapBZ.put(411, "Grosse Geschï¿½fte (100-399 m2)");
+		mapBZ.put(412, "Kleine Geschï¿½fte (< 100 m2)");
+		mapBZ.put(413, "Warenhï¿½user");
 		
-		mapBZ.put(415, "Detailhandel mit Obst und Gemüse");
+		mapBZ.put(415, "Detailhandel mit Obst und Gemï¿½se");
 		mapBZ.put(416, "Detailhandel mit Fleisch und Fleischwaren");
-		mapBZ.put(417, "Detailhandel mit Fisch und Meeresfrüchten");
-		mapBZ.put(418, "Detailhandel mit Brot, Back- und Süsswaren");
-		mapBZ.put(419, "Detailhandel mit Getränken");
+		mapBZ.put(417, "Detailhandel mit Fisch und Meeresfrï¿½chten");
+		mapBZ.put(418, "Detailhandel mit Brot, Back- und Sï¿½sswaren");
+		mapBZ.put(419, "Detailhandel mit Getrï¿½nken");
 		
 		mapBZ.put(421, "Detailhandel mit Milcherzeugnissen und Eiern");
-		mapBZ.put(422, "Sonstiger Fachdetailhandel mit Nahrungsmitteln, Getränken und Tabak");	
+		mapBZ.put(422, "Sonstiger Fachdetailhandel mit Nahrungsmitteln, Getrï¿½nken und Tabak");	
 		
 		// ----------------------------------------
 		
@@ -71,9 +71,9 @@ public class SHPWriter {
 		mapMZ.put("5", "Pickpay");
 		mapMZ.put("6", "Primo");
 		mapMZ.put("7", "Volg");
-		mapMZ.put("8", "Warenhäuser");
+		mapMZ.put("8", "Warenhï¿½user");
 		mapMZ.put("9", "Supermarkt");
-		mapMZ.put("10", "Bäckerei");
+		mapMZ.put("10", "Bï¿½ckerei");
 		mapMZ.put("11", "Metzgerei");
 		mapMZ.put("12", "Grocery, fruits and vegetables");			
 	}

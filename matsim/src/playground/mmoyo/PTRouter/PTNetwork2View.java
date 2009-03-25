@@ -3,8 +3,8 @@ package playground.mmoyo.PTRouter;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 
@@ -56,7 +56,7 @@ public class PTNetwork2View extends NetworkLayer {
 	}
 	
 	public void printLinks() {
-		for (org.matsim.interfaces.core.v01.Link l : this.getLinks().values()) {
+		for (org.matsim.core.api.network.Link l : this.getLinks().values()) {
 			System.out.println("(" + l.getFromNode().getId().toString() + ")----" + l.getId().toString() + "--->(" + l.getToNode().getId().toString() + ")   " + "      (" + ((PTNode) l.getFromNode()).getIdFather().toString()+ ")----" + l.getId().toString() + "--->(" + ((PTNode) l.getToNode()).getIdFather().toString() + ")");
 		}
 	}

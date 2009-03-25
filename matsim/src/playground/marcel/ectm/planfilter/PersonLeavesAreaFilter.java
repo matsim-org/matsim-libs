@@ -23,14 +23,14 @@ package playground.marcel.ectm.planfilter;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.PersonAlgorithm;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.CarRoute;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.PersonAlgorithm;
+import org.matsim.core.api.population.Plan;
 import org.matsim.population.filters.AbstractPersonFilter;
 
 /**

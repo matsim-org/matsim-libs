@@ -22,9 +22,9 @@ package playground.kai.usecases.basicmentalmodule;
  * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
  */
 
+import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.controler.Controler;
 import org.matsim.events.Events;
-import org.matsim.interfaces.basic.v01.BasicScenario;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 

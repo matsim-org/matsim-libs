@@ -39,11 +39,11 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
+import org.matsim.core.api.population.Person;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.interfaces.core.v01.Person;
 import org.matsim.utils.io.IOUtils;
 
 /**

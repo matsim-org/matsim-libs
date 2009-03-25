@@ -23,7 +23,7 @@ package playground.christoph.mobsim;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;

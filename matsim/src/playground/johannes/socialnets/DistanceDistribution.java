@@ -30,12 +30,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioImpl;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.utils.geometry.CoordUtils;
 
 import playground.johannes.statistics.WeightedStatistics;

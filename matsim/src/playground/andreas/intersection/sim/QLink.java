@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.network.BasicLane;
 import org.matsim.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.core.api.network.Link;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;

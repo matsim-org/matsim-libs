@@ -12,9 +12,9 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Person;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Person;
 
 import playground.wrashid.PDES2.util.ConcurrentListMPDSC;
 import playground.wrashid.PDES2.util.ConcurrentListMPSC;

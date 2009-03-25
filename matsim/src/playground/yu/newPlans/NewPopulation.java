@@ -23,7 +23,7 @@
  */
 package playground.yu.newPlans;
 
-import org.matsim.interfaces.core.v01.Population;
+import org.matsim.core.api.population.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;

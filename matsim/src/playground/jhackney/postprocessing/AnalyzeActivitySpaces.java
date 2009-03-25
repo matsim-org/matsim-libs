@@ -23,11 +23,11 @@ import java.util.Iterator;
 
 import org.matsim.config.Config;
 import org.matsim.config.groups.SocNetConfigGroup;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.Population;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
 import org.matsim.population.algorithms.PersonDrawActivtiySpaces;

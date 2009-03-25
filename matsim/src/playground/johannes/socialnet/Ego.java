@@ -25,11 +25,11 @@ package playground.johannes.socialnet;
 
 import java.util.List;
 
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.population.BasicPerson;
-import org.matsim.interfaces.basic.v01.population.BasicPlan;
-import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
-import org.matsim.interfaces.core.v01.Activity;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.core.api.population.Activity;
 
 import playground.johannes.graph.SparseVertex;
 

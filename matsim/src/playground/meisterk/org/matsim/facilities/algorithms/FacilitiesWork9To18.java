@@ -23,12 +23,12 @@ package playground.meisterk.org.matsim.facilities.algorithms;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.BasicOpeningTime.DayType;
+import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.facilities.OpeningTimeImpl;
-import org.matsim.interfaces.core.v01.ActivityOption;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.geometry.CoordImpl;
 
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;

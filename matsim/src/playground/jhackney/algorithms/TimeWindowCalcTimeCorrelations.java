@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Vector;
 
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Facility;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.population.Activity;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 

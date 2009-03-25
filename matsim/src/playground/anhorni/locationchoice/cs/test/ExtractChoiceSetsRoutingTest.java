@@ -1,14 +1,14 @@
 package playground.anhorni.locationchoice.cs.test;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.listener.AfterMobsimListener;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.utils.geometry.CoordImpl;

@@ -40,10 +40,10 @@ import net.opengis.kml._2.StyleType;
 import net.opengis.kml._2.TimeSpanType;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicOpeningTime;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Facility;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.misc.Time;

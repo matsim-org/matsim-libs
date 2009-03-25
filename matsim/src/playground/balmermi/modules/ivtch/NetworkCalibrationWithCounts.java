@@ -25,11 +25,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
 import org.matsim.utils.misc.Time;
 
 public class NetworkCalibrationWithCounts {

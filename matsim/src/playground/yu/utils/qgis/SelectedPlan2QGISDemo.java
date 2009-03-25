@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.geotools.referencing.CRS;
 import org.jfree.util.Log;
+import org.matsim.core.api.population.Population;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;

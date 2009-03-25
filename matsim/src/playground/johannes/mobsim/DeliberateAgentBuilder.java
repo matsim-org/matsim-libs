@@ -26,7 +26,7 @@ package playground.johannes.mobsim;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.interfaces.core.v01.Population;
+import org.matsim.core.api.population.Population;
 
 /**
  * A builder class that builds {@link DeliberateAgent} instances by decorating

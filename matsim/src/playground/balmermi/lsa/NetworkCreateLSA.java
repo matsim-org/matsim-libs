@@ -30,10 +30,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.network.Link;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
 

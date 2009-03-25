@@ -2,11 +2,11 @@ package playground.mmoyo.input;
 
 import java.util.List;
 
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.network.BasicNode;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Node;
 import org.matsim.network.NetworkLayer;
 
 import playground.mmoyo.PTCase2.PTStationMap;

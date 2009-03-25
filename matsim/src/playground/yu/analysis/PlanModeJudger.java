@@ -5,9 +5,9 @@ package playground.yu.analysis;
 
 import java.util.Iterator;
 
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.basic.v01.population.BasicPlan;
-import org.matsim.interfaces.core.v01.Leg;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.core.api.population.Leg;
 
 /**
  * @author yu

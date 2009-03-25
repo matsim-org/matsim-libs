@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.core.api.population.Population;
 import org.matsim.events.BasicEventImpl;
 import org.matsim.events.LinkEnterEvent;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 
 import playground.yu.visum.writer.UserDefAtt;

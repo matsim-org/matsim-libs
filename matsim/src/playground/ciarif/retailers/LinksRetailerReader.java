@@ -6,12 +6,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
+import org.matsim.core.api.network.Link;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.network.BasicLink;
-import org.matsim.interfaces.core.v01.Link;
 
 public class LinksRetailerReader {
 	public final static String CONFIG_LINKS = "links";

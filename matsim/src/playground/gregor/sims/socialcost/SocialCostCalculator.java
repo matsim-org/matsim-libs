@@ -21,8 +21,8 @@
 package playground.gregor.sims.socialcost;
 
 import org.matsim.controler.listener.ControlerListener;
+import org.matsim.core.api.network.Link;
 import org.matsim.events.handler.EventHandler;
-import org.matsim.interfaces.core.v01.Link;
 
 
 public interface SocialCostCalculator extends ControlerListener, EventHandler {

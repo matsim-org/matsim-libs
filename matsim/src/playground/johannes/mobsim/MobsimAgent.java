@@ -20,9 +20,9 @@
 
 package playground.johannes.mobsim;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.core.api.network.Link;
 
 /**
  * @author illenberger

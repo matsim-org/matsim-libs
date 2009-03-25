@@ -20,8 +20,8 @@
 
 package playground.marcel.pt.tryout;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Facility;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.population.PersonImpl;
 
 import playground.marcel.pt.interfaces.PassengerAgent;

@@ -1,6 +1,6 @@
 package playground.wrashid.PDES2;
 
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
 
 public class ZoneBorderMessage extends SelfhandleMessage {
 

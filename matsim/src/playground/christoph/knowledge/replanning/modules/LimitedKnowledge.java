@@ -20,7 +20,7 @@
 
 package playground.christoph.knowledge.replanning.modules;
 
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.core.api.population.Plan;
 import org.matsim.network.NetworkLayer;
 import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.router.util.TravelCost;

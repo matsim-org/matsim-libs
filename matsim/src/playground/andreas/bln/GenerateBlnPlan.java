@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.population.Plan;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.ActivityImpl;
 import org.matsim.population.LegImpl;
 import org.matsim.population.PersonImpl;

@@ -1,6 +1,6 @@
 package playground.mmoyo.PTCase2;
 
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
 import org.matsim.router.util.TravelTime;
 import playground.mmoyo.Validators.CostValidator;
 

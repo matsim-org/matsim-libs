@@ -1,8 +1,8 @@
 package playground.anhorni.locationchoice.cs.helper;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordUtils;

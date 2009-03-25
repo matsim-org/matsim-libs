@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.controler.Controler;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.network.Link;
 
 public class Retailer {
 	private final Id id;

@@ -14,8 +14,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.matsim.mobsim.jdeqsim.util.Timer;
 
+import org.matsim.core.api.network.Link;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Link;
 
 
 public class Scheduler {

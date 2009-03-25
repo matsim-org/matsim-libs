@@ -23,12 +23,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
-import org.matsim.controler.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.network.Link;
 import org.matsim.counts.ComparisonErrorStatsCalculator;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 

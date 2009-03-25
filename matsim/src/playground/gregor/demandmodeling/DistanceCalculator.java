@@ -26,9 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.network.Node;
+import org.matsim.core.api.population.CarRoute;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.CarRoute;
-import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.NodeCarRoute;

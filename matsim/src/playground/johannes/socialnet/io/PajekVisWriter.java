@@ -83,7 +83,7 @@ public class PajekVisWriter {
 			int counter = 1;
 			for(Ego v : g.getVertices()) {
 				String id = v.getPerson().getId().toString();
-				org.matsim.interfaces.basic.v01.Coord c = v.getCoord();
+				org.matsim.api.basic.v01.Coord c = v.getCoord();
 				double x = c.getX();
 				double y = c.getY();
 				

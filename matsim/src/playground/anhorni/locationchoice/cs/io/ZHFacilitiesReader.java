@@ -4,10 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.network.Link;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordImpl;
 

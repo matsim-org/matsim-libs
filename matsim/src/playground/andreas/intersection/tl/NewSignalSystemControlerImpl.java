@@ -3,13 +3,13 @@ package playground.andreas.intersection.tl;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalGroupSettings;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemControlInfo;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.signalsystems.control.SignalSystemControler;
 

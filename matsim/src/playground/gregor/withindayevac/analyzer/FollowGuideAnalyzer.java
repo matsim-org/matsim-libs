@@ -24,8 +24,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Link;
 
 import playground.gregor.withindayevac.Beliefs;
 import playground.gregor.withindayevac.communication.FollowGuideMessage;

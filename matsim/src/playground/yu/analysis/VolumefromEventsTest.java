@@ -24,10 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.core.api.network.Link;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 

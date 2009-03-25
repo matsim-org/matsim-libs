@@ -3,11 +3,11 @@ package playground.ciarif.models.subtours;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Plan;
 import org.matsim.utils.geometry.CoordUtils;
 
 public class PersonSubtourHandler {

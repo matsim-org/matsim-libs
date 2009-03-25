@@ -23,10 +23,10 @@ package playground.balmermi.census2000v2.modules;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 

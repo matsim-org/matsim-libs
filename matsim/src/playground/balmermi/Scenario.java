@@ -22,14 +22,14 @@ package playground.balmermi;
 
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.population.Population;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.MatsimMatricesReader;

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.christoph.mobsim;
 
-import org.matsim.interfaces.core.v01.Person;
+import org.matsim.core.api.population.Person;
 import org.matsim.mobsim.queuesim.AgentFactory;
 import org.matsim.mobsim.queuesim.PersonAgent;
 

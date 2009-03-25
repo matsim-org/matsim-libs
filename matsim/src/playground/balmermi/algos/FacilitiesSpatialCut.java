@@ -23,10 +23,10 @@ package playground.balmermi.algos;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.utils.geometry.CoordImpl;
 
 public class FacilitiesSpatialCut {

@@ -23,10 +23,10 @@
  */
 package playground.johannes.socialnets;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.config.Config;
-import org.matsim.controler.ScenarioImpl;
+import org.matsim.core.api.population.Population;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.population.PopulationWriter;
 
 /**

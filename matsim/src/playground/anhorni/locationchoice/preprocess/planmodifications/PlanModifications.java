@@ -1,10 +1,10 @@
 package playground.anhorni.locationchoice.preprocess.planmodifications;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.population.Population;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;

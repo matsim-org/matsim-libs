@@ -27,8 +27,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Population;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
 
 public class PlansWriteCustomAttributes {
 

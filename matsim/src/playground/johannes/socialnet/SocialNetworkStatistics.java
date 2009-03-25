@@ -25,7 +25,7 @@ package playground.johannes.socialnet;
 
 import gnu.trove.TDoubleDoubleHashMap;
 
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.utils.geometry.CoordUtils;
 
 import playground.johannes.statistics.WeightedStatistics;

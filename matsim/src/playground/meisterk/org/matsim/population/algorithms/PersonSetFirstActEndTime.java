@@ -22,10 +22,10 @@ package playground.meisterk.org.matsim.population.algorithms;
 
 import java.util.List;
 
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 

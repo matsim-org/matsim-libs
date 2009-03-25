@@ -21,7 +21,7 @@
 package playground.dressler.ea_flow;
 
 //matsim imports
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Node;
 import org.matsim.network.NetworkLayer;
 
 //other imports

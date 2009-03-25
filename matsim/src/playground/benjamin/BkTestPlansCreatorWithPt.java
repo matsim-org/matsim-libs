@@ -24,6 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.basic.v01.BasicActivityImpl;
 import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.basic.v01.BasicPersonImpl;
@@ -31,11 +36,6 @@ import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.BasicPopulationImpl;
 import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.basic.v01.population.BasicPerson;
-import org.matsim.interfaces.basic.v01.population.BasicPlan;
-import org.matsim.interfaces.basic.v01.population.BasicPopulation;
 
 
 /**

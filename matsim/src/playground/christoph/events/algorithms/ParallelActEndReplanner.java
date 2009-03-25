@@ -24,8 +24,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.population.Activity;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.population.algorithms.PlanAlgorithm;
 

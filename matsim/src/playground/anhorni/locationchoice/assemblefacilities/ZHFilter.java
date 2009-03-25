@@ -4,7 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.api.basic.v01.Coord;
+
 import playground.anhorni.locationchoice.cs.depr.filters.AreaReader;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

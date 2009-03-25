@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.ActivityOption;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.geometry.CoordUtils;

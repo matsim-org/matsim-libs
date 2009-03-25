@@ -25,9 +25,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 
 public class NetworkWriteVolumesAsTable {
 

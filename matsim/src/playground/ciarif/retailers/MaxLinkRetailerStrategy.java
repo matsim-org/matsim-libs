@@ -3,11 +3,11 @@ package playground.ciarif.retailers;
 
 import java.util.Map;
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.controler.Controler;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Facility;
 
 public class MaxLinkRetailerStrategy implements RetailerStrategy {
 	

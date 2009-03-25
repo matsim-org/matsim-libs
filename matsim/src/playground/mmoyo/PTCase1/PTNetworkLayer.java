@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordUtils;
 
@@ -226,7 +226,7 @@ public class PTNetworkLayer extends NetworkLayer {
 
 	public void printLinks() {
 		//Displays a quick visualization of links with from- and to- nodes
-		for (org.matsim.interfaces.core.v01.Link l : this.getLinks().values()) {
+		for (org.matsim.core.api.network.Link l : this.getLinks().values()) {
 			System.out.print("\n(" );
 			System.out.print(l.getFromNode().getId().toString());
 			System.out.print( ")----" );

@@ -22,9 +22,9 @@ package playground.meisterk.org.matsim.scoring.ktiYear3;
 
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Plan;
+import org.matsim.core.api.population.Plan;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionAccumulator;

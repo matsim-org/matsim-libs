@@ -32,12 +32,12 @@ import net.opengis.kml._2.PolygonType;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.config.Config;
 import org.matsim.config.MatsimConfigReader;
-import org.matsim.controler.ScenarioImpl;
+import org.matsim.core.api.network.Link;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.KmlNetworkWriter;
 import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme;

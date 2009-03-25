@@ -22,8 +22,8 @@ package playground.marcel.pt.events;
 
 import java.util.Map;
 
+import org.matsim.core.api.population.Person;
 import org.matsim.events.PersonEvent;
-import org.matsim.interfaces.core.v01.Person;
 import org.matsim.mobsim.queuesim.QueueVehicle;
 
 public class PersonEntersVehicleEvent extends PersonEvent {

@@ -28,9 +28,9 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
+import org.matsim.core.api.population.Activity;
 import org.matsim.mobsim.queuesim.DriverAgent;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;

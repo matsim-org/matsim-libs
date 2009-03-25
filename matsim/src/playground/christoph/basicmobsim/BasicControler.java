@@ -24,9 +24,9 @@ package playground.christoph.basicmobsim;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.controler.Controler;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 
 import playground.christoph.events.algorithms.ActEndReplanner;

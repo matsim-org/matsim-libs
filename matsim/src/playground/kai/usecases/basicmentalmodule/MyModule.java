@@ -5,24 +5,24 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.interfaces.basic.v01.BasicPlanStrategyModule;
-import org.matsim.interfaces.basic.v01.BasicScenario;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.events.BasicActEndEvent;
-import org.matsim.interfaces.basic.v01.events.handler.BasicActEndEventHandler;
-import org.matsim.interfaces.basic.v01.facilities.BasicFacilities;
-import org.matsim.interfaces.basic.v01.facilities.BasicFacility;
-import org.matsim.interfaces.basic.v01.network.BasicLink;
-import org.matsim.interfaces.basic.v01.network.BasicNetwork;
-import org.matsim.interfaces.basic.v01.network.BasicNode;
-import org.matsim.interfaces.basic.v01.population.BasicActivity;
-import org.matsim.interfaces.basic.v01.population.BasicLeg;
-import org.matsim.interfaces.basic.v01.population.BasicPerson;
-import org.matsim.interfaces.basic.v01.population.BasicPlan;
-import org.matsim.interfaces.basic.v01.population.BasicPopulation;
-import org.matsim.interfaces.basic.v01.population.BasicPopulationBuilder;
-import org.matsim.interfaces.basic.v01.population.BasicRoute;
+import org.matsim.api.basic.v01.BasicScenario;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicActEndEvent;
+import org.matsim.api.basic.v01.events.handler.BasicActEndEventHandler;
+import org.matsim.api.basic.v01.facilities.BasicFacilities;
+import org.matsim.api.basic.v01.facilities.BasicFacility;
+import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.population.BasicRoute;
+import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
 
 
 @SuppressWarnings("unused")

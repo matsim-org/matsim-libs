@@ -22,12 +22,12 @@ package playground.balmermi.census2000.modules;
 
 import java.util.Iterator;
 
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.collections.QuadTree;

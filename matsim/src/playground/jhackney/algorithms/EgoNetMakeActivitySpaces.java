@@ -21,10 +21,10 @@
 package playground.jhackney.algorithms;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Person;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
 import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;

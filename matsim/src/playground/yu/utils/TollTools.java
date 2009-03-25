@@ -3,7 +3,7 @@
  */
 package playground.yu.utils;
 
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 /**

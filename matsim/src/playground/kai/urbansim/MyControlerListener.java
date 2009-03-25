@@ -5,13 +5,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.listener.ShutdownListener;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.network.Node;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.TravelTime;

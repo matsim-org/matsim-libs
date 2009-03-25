@@ -22,9 +22,9 @@ package playground.balmermi.modules.ivtch;
 
 import java.util.ArrayList;
 
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Network;
 import org.matsim.utils.misc.Time;
 
 public class NetworkSimplifyAttributes {

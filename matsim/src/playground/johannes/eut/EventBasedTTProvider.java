@@ -8,15 +8,15 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Map;
 
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.core.api.network.Link;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.network.BasicLink;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;

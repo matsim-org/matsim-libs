@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.gis;
 
-import org.matsim.controler.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.network.NetworkLayer;
 
 

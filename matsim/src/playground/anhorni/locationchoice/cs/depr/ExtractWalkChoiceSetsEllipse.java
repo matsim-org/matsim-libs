@@ -5,10 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Coord;
-import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordUtils;
 

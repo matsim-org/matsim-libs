@@ -20,7 +20,7 @@
 
 
 package playground.dressler.Intervall.src.Intervalls;
-import org.matsim.interfaces.core.v01.Link;
+import org.matsim.core.api.network.Link;
 
 import java.util.Collection;
 

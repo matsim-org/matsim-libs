@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationStartsEvent;
@@ -32,6 +33,8 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ScoringListener;
 import org.matsim.controler.listener.StartupListener;
+import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.Population;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentMoneyEvent;
@@ -43,9 +46,6 @@ import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 

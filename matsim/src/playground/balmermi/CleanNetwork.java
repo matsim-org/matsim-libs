@@ -23,9 +23,9 @@ package playground.balmermi;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkCalcTopoType;
 import org.matsim.network.algorithms.NetworkCleaner;

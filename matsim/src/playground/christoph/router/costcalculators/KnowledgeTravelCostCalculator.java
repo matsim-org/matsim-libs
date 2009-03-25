@@ -23,10 +23,10 @@ package playground.christoph.router.costcalculators;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
 import org.matsim.router.util.TravelTime;
 
 import playground.christoph.router.util.KnowledgeTools;

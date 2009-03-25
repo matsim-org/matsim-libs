@@ -2,12 +2,12 @@ package playground.wrashid.PDES2;
 
 import java.util.List;
 
+import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Plan;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.BasicEventImpl;
-import org.matsim.interfaces.basic.v01.population.BasicPlanElement;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Leg;
-import org.matsim.interfaces.core.v01.Plan;
 
 public class EndLegMessage extends EventMessage {
 

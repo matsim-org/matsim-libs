@@ -21,10 +21,10 @@
 package playground.zhang.test;
 
 import org.matsim.controler.Controler;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.network.Link;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.core.v01.Facilities;
-import org.matsim.interfaces.core.v01.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.utils.misc.Time;

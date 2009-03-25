@@ -29,9 +29,9 @@ import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.config.MatsimConfigReader;
 import org.matsim.controler.Controler;
+import org.matsim.core.api.population.Population;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.external.ExternalMobsim;
 import org.matsim.utils.misc.ExeRunner;
 

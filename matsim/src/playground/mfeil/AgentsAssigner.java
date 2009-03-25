@@ -27,12 +27,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
+import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.ActivityOption;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.PlanElement;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;

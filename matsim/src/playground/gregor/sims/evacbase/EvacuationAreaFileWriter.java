@@ -23,7 +23,7 @@ package playground.gregor.sims.evacbase;
 import java.io.IOException;
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.utils.misc.Time;
 import org.matsim.writer.MatsimXmlWriter;
 

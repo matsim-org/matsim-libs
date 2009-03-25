@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.config.Config;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkSummary;
 import org.matsim.network.algorithms.NetworkWriteAsTable;

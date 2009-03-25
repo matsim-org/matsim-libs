@@ -25,6 +25,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.basic.network.BasicLaneDefinitions;
 import org.matsim.basic.network.BasicLaneDefinitionsImpl;
 import org.matsim.basic.network.BasicLanesToLinkAssignment;
@@ -35,9 +36,8 @@ import org.matsim.basic.signalsystems.BasicSignalSystemsImpl;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
+import org.matsim.core.api.population.Population;
 import org.matsim.events.Events;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;

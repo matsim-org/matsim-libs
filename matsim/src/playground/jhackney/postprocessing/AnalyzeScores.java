@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.matsim.config.Config;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Population;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.core.v01.Activity;
-import org.matsim.interfaces.core.v01.Facility;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
