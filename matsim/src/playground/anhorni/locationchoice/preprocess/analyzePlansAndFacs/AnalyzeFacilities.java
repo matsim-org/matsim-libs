@@ -199,6 +199,9 @@ public class AnalyzeFacilities {
 		try {
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			
+			
+			out.write("Type\t#activity facilities\tcapacity\tavg. capacity\n");
+					
 			for (int typeIndex = 0; typeIndex < 2; typeIndex++) {
 				
 				double totalCapacity = 0.0;
@@ -225,12 +228,11 @@ public class AnalyzeFacilities {
 				}
 				for (int i = 0; i < capacityCount[typeIndex].length; i++) {
 					if (NOGA[typeIndex][i].equals("null")) continue;
-					out.write(types[typeIndex] + " total number of activity facilities " + NOGA[typeIndex][i] + ": " + count[typeIndex][i] +						
-							" ... total capacity for " + NOGA[typeIndex][i] + ": " + capacityCount[typeIndex][i] + "\n");
+					out.write(types[typeIndex] + " " + NOGA[typeIndex][i] + ": " + 
+							count[typeIndex][i] + "\t" + capacityCount[typeIndex][i] + 
+							"\t" + capacityCount[typeIndex][i] / count[typeIndex][i] + "\n");
 				}
-				out.write(types[typeIndex] + " total number of activity facilities: " + totalCount + "\n");
-				out.write(types[typeIndex] + " total number of capacity: " + totalCapacity + "\n");
-				out.write(types[typeIndex] + " avg capacity: " + totalCapacity / totalCount + "\n");
+				out.write(types[typeIndex] + " " + totalCount + "\t" +  totalCapacity + "\t" + totalCapacity / totalCount + "\n");
 				out.flush();
 			}
 			out.close();
