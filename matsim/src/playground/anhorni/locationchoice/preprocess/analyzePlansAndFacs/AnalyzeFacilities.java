@@ -41,7 +41,7 @@ public class AnalyzeFacilities {
 		this.facilities = facilities;
 
 		write("./output/facilities_activities_summary.txt", network);
-		System.out.println("finished");
+		log.info("finished");
 	}
 
 	private void write(String outfile, NetworkLayer network) {
@@ -194,22 +194,25 @@ public class AnalyzeFacilities {
 				count[i][j] = 0;
 			}
 		}
-		
-	
+			
 		try {
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
+			final BufferedWriter outSummary = IOUtils.getBufferedWriter("output/facilities_summary.txt");
 			
-			
+			outSummary.write("Total number of facilities: " + this.facilities.getFacilities().size());
 			out.write("Type\t#activity facilities\tcapacity\tavg. capacity\n");
 					
 			for (int typeIndex = 0; typeIndex < 2; typeIndex++) {
 				
+				int numberOfActivityFacilities = 0;
 				double totalCapacity = 0.0;
 				int totalCount = 0;
 				
 				Iterator< ? extends Facility> facility_it = this.facilities.getFacilities().values().iterator();
 				while (facility_it.hasNext()) {
 					Facility facility = facility_it.next();
+					
+					numberOfActivityFacilities += facility.getActivityOptions().size();
 					
 					for (int i = 0; i < capacityCount[typeIndex].length; i++) {						
 						if (facility.getActivityOption(NOGA[typeIndex][i]) != null) {
@@ -234,8 +237,13 @@ public class AnalyzeFacilities {
 				}
 				out.write(types[typeIndex] + " " + totalCount + "\t" +  totalCapacity + "\t" + totalCapacity / totalCount + "\n");
 				out.flush();
+				if (typeIndex == 0) {
+					outSummary.write("Total number of activity facilities: " + numberOfActivityFacilities);
+				}
+				outSummary.flush();
 			}
 			out.close();
+			outSummary.close();
 		}
 		catch (final IOException e) {
 			Gbl.errorMsg(e);
