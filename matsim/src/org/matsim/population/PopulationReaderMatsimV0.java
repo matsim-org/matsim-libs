@@ -30,13 +30,13 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.population.BasicLeg;
+import org.matsim.interfaces.basic.v01.population.BasicPopulation;
 import org.matsim.interfaces.core.v01.Activity;
 import org.matsim.interfaces.core.v01.CarRoute;
 import org.matsim.interfaces.core.v01.Leg;
 import org.matsim.interfaces.core.v01.Link;
 import org.matsim.interfaces.core.v01.Person;
 import org.matsim.interfaces.core.v01.Plan;
-import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.geometry.CoordImpl;
@@ -64,7 +64,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	private final static String LEG = "leg";
 	private final static String ROUTE = "route";
 
-	private final Population plans;
+	private final BasicPopulation plans;
 	private final NetworkLayer network;
 	private Person currperson = null;
 	private Plan currplan = null;
@@ -76,7 +76,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 
 	private static final Logger log = Logger.getLogger(PopulationReaderMatsimV0.class);
 
-	public PopulationReaderMatsimV0(final Population plans, final NetworkLayer network) {
+	public PopulationReaderMatsimV0(final BasicPopulation plans, final NetworkLayer network) {
 		this.plans = plans;
 		this.network = network;
 	}

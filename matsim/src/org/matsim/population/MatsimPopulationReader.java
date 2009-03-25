@@ -27,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.population.BasicPopulation;
 import org.matsim.interfaces.core.v01.Population;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.io.MatsimXmlParser;
@@ -46,7 +47,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	private final static String PLANS_V1 = "plans_v1.dtd";
 	private final static String PLANS_V4 = "plans_v4.dtd";
 	
-	private final Population plans;
+	private final BasicPopulation plans;
 	private final NetworkLayer network;
 	private MatsimXmlParser delegate = null;
 
@@ -60,7 +61,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	 * @deprecated use {@link #MatsimPopulationReader(Population, NetworkLayer)}
 	 */
 	@Deprecated
-	public MatsimPopulationReader(final Population plans) {
+	public MatsimPopulationReader(final BasicPopulation plans) {
 		this(plans, (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE));
 	}
 
@@ -70,7 +71,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	 * @param plans The data structure where to store the persons with their plans.
 	 * @param network The network the plans are linked to, e.g. for routes, locations, ...
 	 */
-	public MatsimPopulationReader(final Population plans, final NetworkLayer network) {
+	public MatsimPopulationReader(final BasicPopulation plans, final NetworkLayer network) {
 		this.plans = plans;
 		this.network = network;
 	}
