@@ -25,7 +25,7 @@ import java.util.Collection;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.network.NetworkFactory;
+import org.matsim.core.network.NetworkFactory;
 
 // FIXME [MR] still imports NetworkFactory from outside interface
 public interface Network extends BasicNetwork<Node, Link> {

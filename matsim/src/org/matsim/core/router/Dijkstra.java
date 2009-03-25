@@ -1,0 +1,526 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Dijkstra.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.core.router;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.Node;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.PreProcessDijkstra;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
+
+/**
+ * Implementation of <a
+ * href="http://en.wikipedia.org/wiki/Dijkstra%27s_algorithm">Dijkstra's
+ * shortest-path algorithm</a> on a time-dependent network with arbitrary
+ * non-negative cost functions (e.g. negative link cost are not allowed). So
+ * 'shortest' in our context actually means 'least-cost'.
+ *
+ * <p>
+ * For every router, there exists a class which computes some preprocessing data
+ * and is passed to the router class constructor in order to accelerate the
+ * routing procedure. The one used for Dijkstra is
+ * {@link org.matsim.core.router.util.PreProcessDijkstra}.
+ * </p>
+ * <br>
+ *
+ * <h2>Code example:</h2>
+ * <p>
+ * <code>PreProcessDijkstra preProcessData = new PreProcessDijkstra();<br>
+ * preProcessData.run(network);<br>
+ * TravelCost costFunction = ...<br>
+ * LeastCostPathCalculator routingAlgo = new Dijkstra(network, costFunction, preProcessData);<br>
+ * routingAlgo.calcLeastCostPath(fromNode, toNode, startTime);</code>
+ * </p>
+ * <p>
+ * If you don't want to preprocess the network, you can invoke Dijkstra as
+ * follows:
+ * </p>
+ * <p>
+ * <code> LeastCostPathCalculator routingAlgo = new Dijkstra(network, costFunction);</code>
+ * </p>
+ *
+ * @see org.matsim.core.router.util.PreProcessDijkstra
+ * @see org.matsim.core.router.AStarEuclidean
+ * @see org.matsim.core.router.AStarLandmarks
+ * @author lnicolas
+ * @author mrieser
+ */
+public class Dijkstra implements LeastCostPathCalculator {
+
+	private final static Logger log = Logger.getLogger(Dijkstra.class);
+
+	/**
+	 * The network on which we find routes.
+	 */
+	private final Network network;
+
+	/**
+	 * The cost calculator. Provides the cost for each link and time step.
+	 */
+	final TravelCost costFunction;
+
+	/**
+	 * The travel time calculator. Provides the travel time for each link and time step.
+	 */
+	final TravelTime timeFunction;
+
+	final private HashMap<Id, DijkstraNodeData> nodeData;
+
+	/**
+	 * Provides an unique id (loop number) for each routing request, so we don't
+	 * have to reset all nodes at the beginning of each re-routing but can use the
+	 * loop number instead.
+	 */
+	private int iterationID = Integer.MIN_VALUE + 1;
+
+	/**
+	 * Temporary field that is only used if dead ends are being pruned during
+	 * routing and is updated each time a new route has to be calculated.
+	 */
+	private Node deadEndEntryNode;
+
+	/**
+	 * Determines whether we should mark nodes in dead ends during a
+	 * pre-processing step so they won't be expanded during routing.
+	 */
+	private final boolean pruneDeadEnds;
+
+	/**
+	 * Comparator that defines how to order the nodes in the pending nodes queue
+	 * during routing.
+	 */
+	protected ComparatorDijkstraCost comparator;
+
+	private final PreProcessDijkstra preProcessData;
+
+	/**
+	 * Default constructor.
+	 *
+	 * @param network
+	 *            The network on which to route.
+	 * @param costFunction
+	 *            Determines the link cost defining the cheapest route.
+	 * @param timeFunction
+	 *            Determines the travel time on links.
+	 */
+	public Dijkstra(final Network network, final TravelCost costFunction, final TravelTime timeFunction) {
+		this(network, costFunction, timeFunction, null);
+	}
+
+	/**
+	 * Constructor.
+	 *
+	 * @param network
+	 *            The network on which to route.
+	 * @param costFunction
+	 *            Determines the link cost defining the cheapest route.
+	 * @param timeFunction
+	 *            Determines the travel time on each link.
+	 * @param preProcessData
+	 *            The pre processing data used during the routing phase.
+	 */
+	public Dijkstra(final Network network, final TravelCost costFunction, final TravelTime timeFunction,
+			final PreProcessDijkstra preProcessData) {
+
+		this.network = network;
+		this.costFunction = costFunction;
+		this.timeFunction = timeFunction;
+		this.preProcessData = preProcessData;
+
+		this.nodeData = new HashMap<Id, DijkstraNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
+		this.comparator = new ComparatorDijkstraCost(this.nodeData);
+
+		if (preProcessData != null) {
+			if (preProcessData.containsData() == false) {
+				this.pruneDeadEnds = false;
+				log.warn("The preprocessing data provided to router class Dijkstra contains no data! Please execute its run(...) method first!");
+				log.warn("Running without dead-end pruning.");
+			} else {
+				this.pruneDeadEnds = true;
+			}
+		} else {
+			this.pruneDeadEnds = false;
+		}
+	}
+
+	/**
+	 * Calculates the cheapest route from Node 'fromNode' to Node 'toNode' at
+	 * starting time 'startTime'.
+	 *
+	 * @param fromNode
+	 *            The Node at which the route should start.
+	 * @param toNode
+	 *            The Node at which the route should end.
+	 * @param startTime
+	 *            The time at which the route should start.
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
+	 *      org.matsim.core.api.network.Node, double)
+	 */
+	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+
+		double arrivalTime = 0;
+		boolean stillSearching = true;
+
+		augmentIterationID();
+
+		if (this.pruneDeadEnds == true) {
+			this.deadEndEntryNode = getPreProcessData(toNode).getDeadEndEntryNode();
+		}
+
+		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500, this.comparator);
+		initFromNode(fromNode, toNode, startTime, pendingNodes);
+
+		while (stillSearching) {
+			Node outNode = pendingNodes.poll();
+
+			if (outNode == null) {
+				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId());
+				return null;
+			}
+
+			if (outNode.getId() == toNode.getId()) {
+				stillSearching = false;
+				DijkstraNodeData outData = getData(outNode);
+				arrivalTime = outData.getTime();
+			} else {
+				relaxNode(outNode, toNode, pendingNodes);
+			}
+		}
+
+		// now construct the path
+		ArrayList<Node> nodes = new ArrayList<Node>();
+		ArrayList<Link> links = new ArrayList<Link>();
+
+		nodes.add(0, toNode);
+		Link tmpLink = getData(toNode).getPrevLink();
+		if (tmpLink != null) {
+			while (tmpLink.getFromNode().getId() != fromNode.getId()) {
+				links.add(0, tmpLink);
+				nodes.add(0, tmpLink.getFromNode());
+				tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
+			}
+			links.add(0, tmpLink);
+			nodes.add(0, tmpLink.getFromNode());
+		}
+
+		DijkstraNodeData toNodeData = getData(toNode);
+		Path path = new Path(nodes, links, arrivalTime - startTime, toNodeData.cost);
+
+		return path;
+	}
+
+	/**
+	 * Initializes the first node of a route.
+	 *
+	 * @param fromNode
+	 *            The Node to be initialized.
+	 * @param toNode
+	 *            The Node at which the route should end.
+	 * @param startTime
+	 *            The time we start routing.
+	 * @param pendingNodes
+	 *            The pending nodes so far.
+	 */
+	void initFromNode(final Node fromNode, final Node toNode, final double startTime,
+			final PriorityQueue<Node> pendingNodes) {
+		DijkstraNodeData data = getData(fromNode);
+		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
+	}
+
+	/**
+	 * Expands the given Node in the routing algorithm; may be overridden in
+	 * sub-classes.
+	 *
+	 * @param outNode
+	 *            The Node to be expanded.
+	 * @param toNode
+	 *            The target Node of the route.
+	 * @param pendingNodes
+	 *            The set of pending nodes so far.
+	 */
+	void relaxNode(final Node outNode, final Node toNode, final PriorityQueue<Node> pendingNodes) {
+
+		DijkstraNodeData outData = getData(outNode);
+		double currTime = outData.getTime();
+		double currCost = outData.getCost();
+		PreProcessDijkstra.DeadEndData ddOutData = null;
+		if (this.pruneDeadEnds) {
+			ddOutData = getPreProcessData(outNode);
+			for (Link l : outNode.getOutLinks().values()) {
+				Node n = l.getToNode();
+				PreProcessDijkstra.DeadEndData ddData = getPreProcessData(n);
+
+				/* IF the current node n is not in a dead end
+				 * OR it is in the same dead end as the fromNode
+				 * OR it is in the same dead end as the toNode
+				 * THEN we add the current node to the pending nodes */
+				if ((ddData.getDeadEndEntryNode() == null)
+						|| (ddOutData.getDeadEndEntryNode() != null)
+						|| ((this.deadEndEntryNode != null)
+								&& (this.deadEndEntryNode.getId() == ddData.getDeadEndEntryNode().getId()))) {
+					addToPendingNodes(l, n, pendingNodes, currTime, currCost, toNode);
+				}
+			}
+		} else { // this.pruneDeadEnds == false
+			for (Link l : outNode.getOutLinks().values()) {
+				addToPendingNodes(l, l.getToNode(), pendingNodes, currTime, currCost, toNode);
+			}
+		}
+	}
+
+	/**
+	 * Adds some parameters to the given Node then adds it to the set of pending
+	 * nodes.
+	 *
+	 * @param l
+	 *            The link from which we came to this Node.
+	 * @param n
+	 *            The Node to add to the pending nodes.
+	 * @param pendingNodes
+	 *            The set of pending nodes.
+	 * @param currTime
+	 *            The time at which we started to traverse l.
+	 * @param currCost
+	 *            The cost at the time we started to traverse l.
+	 * @param toNode
+	 *            The target Node of the route.
+	 * @return true if the node was added to the pending nodes, false otherwise
+	 * 		(e.g. when the same node already has an earlier visiting time).
+	 */
+	protected boolean addToPendingNodes(final Link l, final Node n,
+			final PriorityQueue<Node> pendingNodes, final double currTime,
+			final double currCost, final Node toNode) {
+		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
+		double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
+		DijkstraNodeData data = getData(n);
+		double nCost = data.getCost();
+		if (!data.isVisited(getIterationID())) {
+			visitNode(n, data, pendingNodes, currTime + travelTime, currCost
+					+ travelCost, l);
+			return true;
+		} else if (currCost + travelCost < nCost) {
+			revisitNode(n, data, pendingNodes, currTime + travelTime, currCost
+					+ travelCost, l);
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Changes the position of the given Node n in the pendingNodes queue and
+	 * updates its time and cost information.
+	 *
+	 * @param n
+	 *            The Node that is revisited.
+	 * @param data
+	 *            The data for n.
+	 * @param pendingNodes
+	 *            The nodes visited and not processed yet.
+	 * @param time
+	 *            The time of the visit of n.
+	 * @param cost
+	 *            The accumulated cost at the time of the visit of n.
+	 * @param outLink
+	 *            The link from which we came visiting n.
+	 */
+	void revisitNode(final Node n, final DijkstraNodeData data,
+			final PriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final Link outLink) {
+		pendingNodes.remove(n);
+
+		data.visit(outLink, cost, time, getIterationID());
+		pendingNodes.add(n);
+	}
+
+	/**
+	 * Inserts the given Node n into the pendingNodes queue and updates its time
+	 * and cost information.
+	 *
+	 * @param n
+	 *            The Node that is revisited.
+	 * @param data
+	 *            The data for n.
+	 * @param pendingNodes
+	 *            The nodes visited and not processed yet.
+	 * @param time
+	 *            The time of the visit of n.
+	 * @param cost
+	 *            The accumulated cost at the time of the visit of n.
+	 * @param outLink
+	 *            The node from which we came visiting n.
+	 */
+	void visitNode(final Node n, final DijkstraNodeData data,
+			final PriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final Link outLink) {
+		data.visit(outLink, cost, time, getIterationID());
+		pendingNodes.add(n);
+	}
+
+	/**
+	 * Augments the iterationID and checks whether the visited information in
+	 * the nodes in the nodes have to be reset.
+	 */
+	private void augmentIterationID() {
+		if (getIterationID() == Integer.MAX_VALUE) {
+			this.iterationID = Integer.MIN_VALUE + 1;
+		} else {
+			this.iterationID++;
+		}
+
+		checkToResetNetworkVisited();
+	}
+
+	/**
+	 * @return iterationID
+	 */
+	int getIterationID() {
+		return this.iterationID;
+	}
+
+	/**
+	 * Resets all nodes in the network as if they have not been visited yet if
+	 * the iterationID is equal to Integer.MIN_VALUE + 1.
+	 */
+	private void checkToResetNetworkVisited() {
+		// If the re-planning id passed the maximal possible value
+		// and has the same value as at the 'beginning', we reset all nodes of
+		// the network to avoid identifying a node falsely as visited for the
+		// current iteration
+		if (getIterationID() == Integer.MIN_VALUE + 1) {
+			resetNetworkVisited();
+		}
+	}
+
+	/**
+	 * Resets all nodes in the network as if they have not been visited yet.
+	 */
+	private void resetNetworkVisited() {
+		for (Node node : this.network.getNodes().values()) {
+			DijkstraNodeData data = getData(node);
+			data.resetVisited();
+		}
+	}
+
+	/**
+	 * Returns the data for the given node. Creates a new NodeData if none exists
+	 * yet.
+	 *
+	 * @param n
+	 *            The Node for which to return the data.
+	 * @return The data for the given Node
+	 */
+	protected DijkstraNodeData getData(final Node n) {
+		DijkstraNodeData r = this.nodeData.get(n.getId());
+		if (null == r) {
+			r = new DijkstraNodeData();
+			this.nodeData.put(n.getId(), r);
+		}
+		return r;
+	}
+
+	PreProcessDijkstra.DeadEndData getPreProcessData(final Node n) {
+		return this.preProcessData.getNodeData(n);
+	}
+
+	/**
+	 * A data structure to store temporarily information used
+	 * by the Dijkstra-algorithm.
+	 */
+	static class DijkstraNodeData {
+
+		private Link prev = null;
+
+		/*default */ double cost = 0;
+
+		private double time = 0;
+
+		private int iterationID = Integer.MIN_VALUE;
+
+		public void resetVisited() {
+			this.prev = null;
+			this.iterationID = Integer.MIN_VALUE;
+		}
+
+		public void visit(final Link comingFrom, final double cost, final double time,
+				final int iterID) {
+			this.prev = comingFrom;
+			this.cost = cost;
+			this.time = time;
+			this.iterationID = iterID;
+		}
+
+		public boolean isVisited(final int iterID) {
+			return (iterID == this.iterationID);
+		}
+
+		public double getCost() {
+			return this.cost;
+		}
+
+		public double getTime() {
+			return this.time;
+		}
+
+		public Link getPrevLink() {
+			return this.prev;
+		}
+	}
+
+	static class ComparatorDijkstraCost implements Comparator<Node>, Serializable {
+
+		private static final long serialVersionUID = 1L;
+
+		protected Map<Id, ? extends DijkstraNodeData> nodeData;
+
+		ComparatorDijkstraCost(final Map<Id, ? extends DijkstraNodeData> nodeData) {
+			this.nodeData = nodeData;
+		}
+
+		public int compare(final Node n1, final Node n2) {
+			double c1 = getCost(n1);
+			double c2 = getCost(n2);
+
+			return compare(n1, c1, n2, c2);
+		}
+
+		private int compare(final Node n1, final double c1, final Node n2, final double c2) {
+			if (c1 < c2) return -1;
+			if (c1 > c2) return +1;
+			return n1.compareTo(n2);
+		}
+
+		protected double getCost(final Node node) {
+			return this.nodeData.get(node.getId()).getCost();
+		}
+	}
+}
