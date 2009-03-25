@@ -367,28 +367,17 @@ public class OsmNetworkReader {
 			}
 		}
 		
-		if (way.tags.containsKey("maxspeed") && !way.tags.get("maxspeed").equalsIgnoreCase("default")) {
-			
-			for (int i = 0; i < way.tags.get("maxspeed").length(); i++) {
-
-	            // If we find a non-digit character we don't know what unit it has, so break.
-				// Maybe use Regex
-	            if (!Character.isDigit(way.tags.get("maxspeed").charAt(i)))
-	                break;
-	            
-	            // Only set new maxspeed, if we hadn't a break yet.
-	            if(i == way.tags.get("maxspeed").length() - 1) {
-	            	
-	            	double maxspeed = Double.parseDouble(way.tags.get("maxspeed"));
-	            	if (maxspeed < freespeed) {
-						// freespeed doesn't always mean it's the maximum speed allowed.
-						// thus only correct freespeed if maxspeed is lower than freespeed.
-						freespeed = maxspeed;
-					}
-	            }
-	        }
-			
-			
+		if (way.tags.containsKey("maxspeed")) {        
+			try {
+				double maxspeed = Double.parseDouble(way.tags.get("maxspeed"));
+				if (maxspeed < freespeed) {
+					// freespeed doesn't always mean it's the maximum speed allowed.
+					// thus only correct freespeed if maxspeed is lower than freespeed.
+					freespeed = maxspeed;
+				}
+			} catch (Exception e) {
+				// Nothing to do here, simply ignore it
+			}			
 		}
 
 		// check tag "lanes"
