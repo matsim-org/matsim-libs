@@ -42,6 +42,7 @@ import org.matsim.core.utils.io.IOUtils;
 public class AnalyzePlans {
 
 	private Population plans = new PopulationImpl(false);
+	String plansfilePath;
 	
 	private final static Logger log = Logger.getLogger(AnalyzePlans.class);
 	
@@ -54,6 +55,7 @@ public class AnalyzePlans {
 
 	private void readPlansFile(final String plansfilePath, NetworkLayer network) {
 		log.info("  reading file " + plansfilePath);
+		this.plansfilePath = plansfilePath;
 		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, network);
 		plansReader.readFile(plansfilePath);
 	}
@@ -73,26 +75,37 @@ public class AnalyzePlans {
 				Person person = person_it.next();
 				Plan selectedPlan = person.getSelectedPlan();
 				
+				int numberOfShoppingActsPerPerson = 0;
+				int numberOfLeisureActsPerPerson = 0;
+				double desiredShopPerPerson = 0.0;
+				double desiredLeisurePerPerson = 0.0;
+				
 				final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 				for (int j = 0; j < actslegs.size(); j=j+2) {
 					final Activity act = (Activity)actslegs.get(j);
 					if (act.getType().startsWith("shop")) {
 						numberOfShoppingActs++;
-						totalDesiredShoppingDuration += person.getDesires().getActivityDuration("shop");
+						desiredShopPerPerson += person.getDesires().getActivityDuration("shop");
+						numberOfShoppingActsPerPerson++;
 					}
 					else if (act.getType().startsWith("leisure")) {
 						numberOfLeisureActs++;
-						totalDesiredLeisureDuration += person.getDesires().getActivityDuration("leisure");
+						desiredLeisurePerPerson += person.getDesires().getActivityDuration("leisure");
+						numberOfLeisureActsPerPerson++;
 					}
 				}
+				totalDesiredShoppingDuration += (desiredShopPerPerson / numberOfShoppingActsPerPerson);
+				totalDesiredLeisureDuration += desiredLeisurePerPerson / numberOfLeisureActsPerPerson;
+				
 			}
-			out.write("Number of shopping activities: " + numberOfShoppingActs + "\n");
-			out.write("Total desired duration of shopping activities: " + 1/3600.0 * totalDesiredShoppingDuration + " [h] \n");
-			out.write("Avg. desired shopping duration: " + 1/3600.0 * (totalDesiredShoppingDuration / numberOfShoppingActs) + " [h] \n");
+			out.write("Plans file: " + this.plansfilePath);
+			out.write("Number of shopping activities: \t" + numberOfShoppingActs + "\n");
+			out.write("Total desired duration of shopping activities: \t" + 1/3600.0 * totalDesiredShoppingDuration + " [h] \n");
+			out.write("Avg. desired shopping duration: \t" + 1/3600.0 * (totalDesiredShoppingDuration / numberOfShoppingActs) + " [h] \n");
 			out.newLine();
-			out.write("Number of leisure activities: " + numberOfLeisureActs + "\n");
-			out.write("Total desired duration of leisure activities: " + 1/3600.0 * totalDesiredLeisureDuration + " [h] \n");
-			out.write("Avg. desired leisure duration: " + 1/3600.0 * (totalDesiredLeisureDuration / numberOfLeisureActs) + " [h] \n");
+			out.write("Number of leisure activities: \t" + numberOfLeisureActs + "\n");
+			out.write("Total desired duration of leisure activities: \t" + 1/3600.0 * totalDesiredLeisureDuration + " [h] \n");
+			out.write("Avg. desired leisure duration: \t" + 1/3600.0 * (totalDesiredLeisureDuration / numberOfLeisureActs) + " [h] \n");
 			out.flush();
 			out.close();
 		}
