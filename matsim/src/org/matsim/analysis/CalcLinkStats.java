@@ -30,6 +30,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
@@ -258,10 +259,10 @@ public class CalcLinkStats {
 			while (line != null) {
 				String[] parts = StringUtils.explode(line, '\t');
 				if (parts.length == 154) {
-					String linkId = parts[0];
+					Id linkId = new IdImpl(parts[0]);
 					LinkData data = this.linkData.get(linkId);
 					if (data == null) {
-						System.err.println("CalcLinkStats.readFile(); unknown link: " + linkId);
+						System.err.println("CalcLinkStats.readFile(); unknown link: " + linkId.toString());
 					} else {
 						int baseTTimes;
 						for (int i = 0; i < this.nofHours; i++) {
@@ -335,7 +336,12 @@ public class CalcLinkStats {
 		}
 	}
 
+	/** @deprecated use getAvgLinkVolumes(Id) */
 	public double[] getAvgLinkVolumes(final String linkId) {
+		return getAvgLinkVolumes(new IdImpl(linkId));
+	}
+	
+	public double[] getAvgLinkVolumes(final Id linkId) {
 		LinkData data = this.linkData.get(linkId);
 		if (data == null) {
 			return null;

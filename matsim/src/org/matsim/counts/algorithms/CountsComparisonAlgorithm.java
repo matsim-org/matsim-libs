@@ -93,7 +93,7 @@ public class CountsComparisonAlgorithm {
 			if (!isInRange(count.getLocId())) {
 				continue;
 			}
-			double[] volumes = this.linkStats.getAvgLinkVolumes(count.getLocId().toString());
+			double[] volumes = this.linkStats.getAvgLinkVolumes(count.getLocId());
 			if (volumes== null) {
 				log.warn("No volumes for link: " + count.getLocId().toString());
 				continue;
