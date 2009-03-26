@@ -98,7 +98,7 @@ public class AnalyzePlans {
 					totalDesiredShoppingDuration += (desiredShopPerPerson / numberOfShoppingActsPerPerson);
 				}
 				if (numberOfLeisureActsPerPerson > 0) {
-					totalDesiredLeisureDuration += desiredLeisurePerPerson / numberOfLeisureActsPerPerson;
+					totalDesiredLeisureDuration += (desiredLeisurePerPerson / numberOfLeisureActsPerPerson);
 				}				
 			}
 			out.write("Plans file: " + this.plansfilePath);
