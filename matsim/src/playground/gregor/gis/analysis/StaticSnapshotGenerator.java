@@ -127,8 +127,8 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 			this.oldTime = time;
 			doSnapshot();
 		}
-		String agentId = event.agentId;
-		Link link = this.network.getLink(event.linkId);
+		String agentId = event.getPersonId().toString();
+		Link link = this.network.getLink(event.getLinkId().toString());
 		this.agentsOnLink.put(agentId, link);
 		
 	}

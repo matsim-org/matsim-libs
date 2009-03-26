@@ -244,9 +244,9 @@ public class EventFilesEvacuationTimeCompare {
 		public void handleEvent(final AgentDepartureEvent event) {
 			AgentInfo ai = new AgentInfo();
 			ai.time = event.getTime();
-			Link link = EventFilesEvacuationTimeCompare.this.network.getLink(event.linkId);
+			Link link = EventFilesEvacuationTimeCompare.this.network.getLink(event.getLinkId().toString());
 			ai.c = new Coordinate(link.getCoord().getX(),link.getCoord().getY());
-			this.ttimes.put(event.agentId, ai);
+			this.ttimes.put(event.getPersonId().toString(), ai);
 			
 		}
 
@@ -256,14 +256,14 @@ public class EventFilesEvacuationTimeCompare {
 		}
 
 		public void handleEvent(final AgentArrivalEvent event) {
-			AgentInfo ai = this.ttimes.get(event.agentId);
+			AgentInfo ai = this.ttimes.get(event.getPersonId().toString());
 			ai.time = event.getTime() - ai.time;
 			this.ttimesTree.put(ai.c.x, ai.c.y, ai);
 			
 		}
 
 		public void handleEvent(final AgentStuckEvent event) {
-			this.ttimes.remove(event.agentId);
+			this.ttimes.remove(event.getPersonId().toString());
 			
 		}
 		

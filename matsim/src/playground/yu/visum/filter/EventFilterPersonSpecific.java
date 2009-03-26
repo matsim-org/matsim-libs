@@ -61,7 +61,7 @@ public class EventFilterPersonSpecific extends EventFilterA {
 	@Override
 	public boolean judge(BasicEventImpl event) {
 		if (event instanceof PersonEvent) {
-			return this.personIds.contains(new IdImpl(((PersonEvent) event).agentId));
+			return this.personIds.contains(new IdImpl(((PersonEvent) event).getPersonId().toString()));
 		}
 		return false;
 	}

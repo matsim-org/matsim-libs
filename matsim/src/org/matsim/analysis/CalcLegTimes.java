@@ -61,18 +61,18 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		this.agentDepartures.put(event.agentId, event.getTime());
-		Integer cnt = this.agentLegs.get(event.agentId);
+		this.agentDepartures.put(event.getPersonId().toString(), event.getTime());
+		Integer cnt = this.agentLegs.get(event.getPersonId().toString());
 		if (cnt == null) cnt = 0;
-		this.agentLegs.put(event.agentId, cnt+1);
+		this.agentLegs.put(event.getPersonId().toString(), cnt+1);
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		Double depTime = this.agentDepartures.remove(event.agentId);
-		Person agent = this.population.getPerson(new IdImpl(event.agentId));
+		Double depTime = this.agentDepartures.remove(event.getPersonId().toString());
+		Person agent = this.population.getPerson(new IdImpl(event.getPersonId().toString()));
 		if (depTime != null && agent != null) {
 			double travTime = event.getTime() - depTime;
-			int legNr = this.agentLegs.get(event.agentId);
+			int legNr = this.agentLegs.get(event.getPersonId().toString());
 			Plan plan = agent.getSelectedPlan();
 			int index = (legNr - 1) * 2;
 			String fromActType = ((Activity)plan.getPlanElements().get(index)).getType();

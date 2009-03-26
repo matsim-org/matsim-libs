@@ -59,8 +59,8 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 	}
 	
 	public void handleEvent(LinkLeaveEvent event) {
-		if(event.linkId.equals("2")) {
-			LinkEnterEvent enter = events.remove(event.getAgent());
+		if(event.getLinkId().toString().equals("2")) {
+			LinkEnterEvent enter = events.remove(event.getPerson());
 			double realTT = event.getTime() - enter.getTime();
 			try {
 				realTTWriter.write(String.valueOf(enter.getTime()));
@@ -82,7 +82,7 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		events.put(event.getAgent(), event);
+		events.put(event.getPerson(), event);
 		
 		double estimTT = linktt.getLinkTravelTime(link, event.getTime());
 		try {

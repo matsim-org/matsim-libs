@@ -126,8 +126,8 @@ public class EventModeActivityDurationAnalyser {
 		}
 
 		public void handleEvent(final ActEndEvent event) {
-			ActStartEvent startEvent = this.eventMap.get(new IdImpl(event.agentId));
-			Plan p = this.plans.getPerson(new IdImpl(event.agentId)).getSelectedPlan();
+			ActStartEvent startEvent = this.eventMap.get(new IdImpl(event.getPersonId().toString()));
+			Plan p = this.plans.getPerson(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
 			if (startEvent == null) { // must be the end of home_0
 				this.durTemp = event.getTime();
 			}
@@ -157,8 +157,8 @@ public class EventModeActivityDurationAnalyser {
 		}
 
 		public void handleEvent(final ActStartEvent event) {
-			this.eventMap.put(new IdImpl(event.agentId), event);
-			Plan p = this.plans.getPerson(new IdImpl(event.agentId)).getSelectedPlan();
+			this.eventMap.put(new IdImpl(event.getPersonId().toString()), event);
+			Plan p = this.plans.getPerson(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
 			if (event.getActType().equalsIgnoreCase("w")) {
 				if (p.getType().equals(Plan.Type.PT)) {
 					this.ptStartTimeMap.incrementValue(event.getTime());

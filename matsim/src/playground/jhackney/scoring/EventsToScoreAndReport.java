@@ -81,22 +81,22 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.agentId);
+		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.getPersonId().toString());
 		sf.startLeg(event.getTime(), event.getLeg());
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.agentId);
+		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.getPersonId().toString());
 		sf.endLeg(event.getTime());
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.agentId);
+		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.getPersonId().toString());
 		sf.agentStuck(event.getTime());
 	}
 
 	public void handleEvent(final AgentMoneyEvent event) {
-		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.agentId);
+		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.getPersonId().toString());
 		sf.addMoney(event.getAmount());
 	}
 

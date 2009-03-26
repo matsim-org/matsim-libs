@@ -114,7 +114,7 @@ public class SheltersReader {
 			
 			Facility fac = this.facilities.createFacility(new IdImpl("shelter" + count++), c);
 			ActivityOption act = fac.createActivityOption("evacuated");
-			act.setOpentimes(opentimes);
+			act.setOpeningTimes(opentimes);
 			act.setCapacity(storageCap);
 
 			

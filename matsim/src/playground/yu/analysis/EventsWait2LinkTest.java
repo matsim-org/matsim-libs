@@ -51,7 +51,7 @@ public class EventsWait2LinkTest {
 
 		public void handleEvent(final AgentWait2LinkEvent event) {
 			try {
-				writer.write(event.agentId + "\t" + event.linkId + "\n");
+				writer.write(event.getPersonId().toString() + "\t" + event.getLinkId().toString() + "\n");
 				writer.flush();
 			} catch (IOException e) {
 				e.printStackTrace();

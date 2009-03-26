@@ -205,11 +205,11 @@ public class NetworkClearanceAnalysis {
 		}
 		
 		public void handleEvent(final LinkEnterEvent event) {
-			if (event.linkId.contains("el")) {
+			if (event.getLinkId().toString().contains("el")) {
 				return;
 			}
 			
-			PolygonInfo pi = this.linkMapping.get(event.linkId);
+			PolygonInfo pi = this.linkMapping.get(event.getLinkId().toString());
 			pi.agents++;
 			if (pi.agents > 1) {
 				pi.clearanceTime = 0;
@@ -222,10 +222,10 @@ public class NetworkClearanceAnalysis {
 		}
 
 		public void handleEvent(final LinkLeaveEvent event) {
-			if (event.linkId.contains("el")) {
+			if (event.getLinkId().toString().contains("el")) {
 				return;
 			}
-			PolygonInfo pi = this.linkMapping.get(event.linkId);
+			PolygonInfo pi = this.linkMapping.get(event.getLinkId().toString());
 			pi.agents--;
 			if (pi.agents <= 1 && pi.clearanceTime == 0) {
 				pi.clearanceTime = event.getTime();

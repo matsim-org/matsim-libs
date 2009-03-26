@@ -58,7 +58,7 @@ public class FacilityVisitors implements ActEndEventHandler, ActStartEventHandle
 				persons = new LinkedList<Person>();
 				actTypes.put(event.getAct().getType(), persons);
 			}
-			persons.add(event.getAgent());
+			persons.add(event.getPerson());
 		}
 	}
 
@@ -69,7 +69,7 @@ public class FacilityVisitors implements ActEndEventHandler, ActStartEventHandle
 			if (actTypes != null) {
 				List<Person> persons = this.facilities.get(facility).get(event.getAct().getType());
 				if (persons != null) {
-					persons.remove(event.getAgent());
+					persons.remove(event.getPerson());
 				}
 			}
 		}

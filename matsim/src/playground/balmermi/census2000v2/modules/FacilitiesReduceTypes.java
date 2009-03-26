@@ -106,14 +106,14 @@ public class FacilitiesReduceTypes {
 				ActivityOption old_act = s_map.values().iterator().next();
 				ActivityOption new_act = f.createActivityOption("shop");
 				new_act.setCapacity(old_act.getCapacity());
-				new_act.setOpentimes(old_act.getOpentimes());
+				new_act.setOpeningTimes(old_act.getOpeningTimes());
 				f.getActivityOptions().remove(old_act.getType());
 			}
 			if (!l_map.isEmpty()) {
 				ActivityOption old_act = l_map.values().iterator().next();
 				ActivityOption new_act = f.createActivityOption("leisure");
 				new_act.setCapacity(old_act.getCapacity());
-				new_act.setOpentimes(old_act.getOpentimes());
+				new_act.setOpeningTimes(old_act.getOpeningTimes());
 				f.getActivityOptions().remove(old_act.getType());
 			}
 		}

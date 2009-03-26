@@ -74,7 +74,7 @@ public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener
 			firstEvent = (int) event.getTime();
 		
 		lastEvent = (int)event.getTime();
-		if(event.link.getId().toString().equals("1100")) {
+		if(event.getLink().getId().toString().equals("1100")) {
 			events.add(event);
 			count++;
 		}

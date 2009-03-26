@@ -152,17 +152,17 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		this.traces.remove(event.agentId);	
+		this.traces.remove(event.getPersonId().toString());	
 	}
 
 
 	public void handleEvent(final LinkEnterEvent event) {
-		ArrayList<String> links = this.traces.get(event.agentId);
+		ArrayList<String> links = this.traces.get(event.getPersonId().toString());
 		if (links == null) {
 			links = new ArrayList<String>();
-			this.traces.put(event.agentId, links);
+			this.traces.put(event.getPersonId().toString(), links);
 		}
-		links.add(event.linkId);
+		links.add(event.getLinkId().toString());
 	}
 
 }

@@ -32,40 +32,41 @@ public abstract class LinkEvent extends PersonEvent implements BasicLinkEvent {
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_LEG = "leg";
 
-	/**
-	 * @deprecated please use {@link #getLinkId()}
-	 */
-	@Deprecated
-	public final String linkId;
-	private final Id linkId_;
-	public transient Link link; // TODO [MR] refactor: encapsulate
+	private final Id linkId;
+	private transient Link link;
 
 	LinkEvent(final double time, final Person agent, final Link link) {
 		super(time, agent);
-		this.link = link;
-		this.linkId = link.getId().toString();
-		this.linkId_ = link.getId();
+		this.setLink(link);
+		this.linkId = link.getId();
 	}
 
 	LinkEvent(final double time, final Id agentId, final Id linkId) {
 		super(time, agentId);
-		this.linkId = linkId.toString();
-		this.linkId_ = linkId;
+		this.linkId = linkId;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_LINK, this.linkId_.toString());
+		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
 		return attr;
 	}
 
 	protected String asString() {
-		return getTimeString(this.getTime()) + this.getPersonId() + "\t\t" + this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concatenate later
+		return getTimeString(this.getTime()) + this.getPersonId() + "\t\t" + this.getLinkId().toString() + "\t0\t"; // FLAG + DESCRIPTION is missing here: concatenate later
 	}
 
 	public Id getLinkId() {
-		return this.linkId_;
+		return this.linkId;
+	}
+
+	public void setLink(Link link) {
+		this.link = link;
+	}
+
+	public Link getLink() {
+		return link;
 	}
 
 }

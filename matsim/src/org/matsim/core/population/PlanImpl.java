@@ -29,8 +29,8 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -48,14 +48,6 @@ public class PlanImpl implements Plan {
 	private final static Logger log = Logger.getLogger(PlanImpl.class);
 
 	private final static String ACT_ERROR = "The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.";
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
 
 	public PlanImpl(final Person person) {
 		this.delegate = new BasicPlanImpl(person);
@@ -203,7 +195,7 @@ public class PlanImpl implements Plan {
 	}
 
 	public void setPerson(final Person person) {
-		this.delegate.setPerson(person);// FIXME [MR]
+		this.delegate.setPerson(person);
 	}
 
 	public final boolean isSelected() {
@@ -330,6 +322,7 @@ public class PlanImpl implements Plan {
 		return (Activity) getPlanElements().get(getPlanElements().size() - 1);
 	}
 
+	@Deprecated // use getScore()
 	public final double getScoreAsPrimitiveType() {
 		if (getScore() == null) {
 			return Plan.UNDEF_SCORE;

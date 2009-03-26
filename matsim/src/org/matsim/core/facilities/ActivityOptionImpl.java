@@ -132,7 +132,7 @@ public class ActivityOptionImpl implements ActivityOption {
 		this.capacity = capacity;
 	}
 
-	public void setOpentimes(Map<DayType, SortedSet<BasicOpeningTime>> opentimes) {
+	public void setOpeningTimes(Map<DayType, SortedSet<BasicOpeningTime>> opentimes) {
 		this.opentimes = opentimes;
 	}
 
@@ -156,7 +156,7 @@ public class ActivityOptionImpl implements ActivityOption {
 		return this.capacity;
 	}
 
-	public final Map<DayType,SortedSet<BasicOpeningTime>> getOpentimes() {
+	public final Map<DayType,SortedSet<BasicOpeningTime>> getOpeningTimes() {
 		return this.opentimes;
 	}
 
@@ -173,7 +173,7 @@ public class ActivityOptionImpl implements ActivityOption {
 		return "[type=" + this.type + "]" +
 				"[capacity=" + this.capacity + "]" +
 				"[facility_id=" + this.facility.getId() + "]" +
-				"[nof_opentimes=" + this.getOpentimes().size() + "]";
+				"[nof_opentimes=" + this.getOpeningTimes().size() + "]";
 	}
 
 

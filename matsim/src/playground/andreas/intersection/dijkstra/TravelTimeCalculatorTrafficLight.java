@@ -64,20 +64,20 @@ public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 
-		if (event.link == null) {
-			event.link = this.network.getLink(event.linkId);
+		if (event.getLink() == null) {
+			event.setLink(this.network.getLink(event.getLinkId().toString()));
 		}
 		
-		EnterEvent newEvent = new EnterEvent(event.link, event.getTime());
+		EnterEvent newEvent = new EnterEvent(event.getLink(), event.getTime());
 		
-		if(this.enterEvents.containsKey(event.agentId)){
+		if(this.enterEvents.containsKey(event.getPersonId().toString())){
 			
-			EnterEvent oldEvent = this.enterEvents.remove(event.agentId);
+			EnterEvent oldEvent = this.enterEvents.remove(event.getPersonId().toString());
 			double timediff = newEvent.time - oldEvent.time;
 			getTravelTimeRole(oldEvent.link, newEvent.link).addTravelTime(newEvent.time, timediff);
 						
 		}				
-		this.enterEvents.put(event.agentId, newEvent);
+		this.enterEvents.put(event.getPersonId().toString(), newEvent);
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 		// remove EnterEvents from list when an agent arrives.
 		// otherwise, the activity duration would counted as travel time, when the
 		// agent departs again and leaves the link!
-		this.enterEvents.remove(event.agentId);
+		this.enterEvents.remove(event.getPersonId().toString());
 	}
 
 	private TravelTimeRole getTravelTimeRole(final Link fromLink, final Link toLink) {

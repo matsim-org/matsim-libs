@@ -48,7 +48,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler {
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
-		String linkid = event.linkId;
+		String linkid = event.getLinkId().toString();
 		int[] volumes = this.links.get(linkid);
 		if (volumes == null) {
 			volumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs

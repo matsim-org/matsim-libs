@@ -54,7 +54,7 @@ class EventHH implements LinkEnterEventHandler {
 	static Set<String> linkList = new HashSet<String>();
 
 	public void handleEvent(final LinkEnterEvent event) {
-		linkList.add(event.linkId);
+		linkList.add(event.getLinkId().toString());
 	}
 
 	public void reset(final int iteration) {

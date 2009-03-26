@@ -118,13 +118,13 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	public void handleEvent(BasicEventImpl event) {
 		if (event instanceof LinkEnterEvent) { // event.getClass().equals(LinkEnterEvent.class))
 												// {
-			this.enters.put(((LinkEnterEvent) event).agentId, (LinkEnterEvent) event);
+			this.enters.put(((LinkEnterEvent) event).getPersonId().toString(), (LinkEnterEvent) event);
 		} else if (event instanceof LinkLeaveEvent) { // event.getClass().equals(LinkLeaveEvent.class))
 														// {
-			String agentId = ((LinkLeaveEvent) event).agentId;
+			String agentId = ((LinkLeaveEvent) event).getPersonId().toString();
 			if (this.enters.containsKey(agentId))
-				if (this.enters.get(agentId).linkId
-						.equals(((LinkLeaveEvent) event).linkId)) {
+				if (this.enters.get(agentId).getLinkId().toString()
+						.equals(((LinkLeaveEvent) event).getLinkId().toString())) {
 					count();
 					count();
 					compute(this.enters.remove(agentId), event.getTime());

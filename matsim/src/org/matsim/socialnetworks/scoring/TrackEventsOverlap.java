@@ -66,7 +66,7 @@ public class TrackEventsOverlap implements ActStartEventHandler, ActEndEventHand
 			}
 		}
 		if(eventStartTime>0){// if a valid start event is found, make a timeWindow and add to Map
-			Person agent = event.getAgent();
+			Person agent = event.getPerson();
 
 			Facility facility = event.getAct().getFacility();
 			if(this.timeWindowMap.containsKey(facility)){
@@ -95,7 +95,7 @@ public class TrackEventsOverlap implements ActStartEventHandler, ActEndEventHand
 			}
 		}
 		if(eventEndTime>0){// if a valid end time is found, make a timeWindow and add to Map
-			Person agent = event.getAgent();
+			Person agent = event.getPerson();
 
 			Facility facility = event.getAct().getFacility();
 			if(this.timeWindowMap.containsKey(facility)){

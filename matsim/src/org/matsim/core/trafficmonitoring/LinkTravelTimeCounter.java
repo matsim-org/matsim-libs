@@ -55,7 +55,7 @@ AgentArrivalEventHandler {
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
-		this.enterEvents.put(event.agentId, Double.valueOf(event.getTime()));
+		this.enterEvents.put(event.getPersonId().toString(), Double.valueOf(event.getTime()));
 	}
 
 	public void reset(final int iteration) {
@@ -64,14 +64,14 @@ AgentArrivalEventHandler {
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
-		Double startTime = this.enterEvents.get(event.agentId);
+		Double startTime = this.enterEvents.get(event.getPersonId().toString());
 		if (startTime != null) {
-			this.travelTimes.put(event.linkId, event.getTime() - startTime.doubleValue());
+			this.travelTimes.put(event.getLinkId().toString(), event.getTime() - startTime.doubleValue());
 		}
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		this.enterEvents.remove(event.agentId);
+		this.enterEvents.remove(event.getPersonId().toString());
 	}
 
 	public Double getLastLinkTravelTime(final String linkId) {

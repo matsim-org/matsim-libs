@@ -69,21 +69,21 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 	// =====================================================================
 
 	public void handleEvent(LinkEnterEvent event) {
-		Key2d<String, String> key = new Key2d<String, String>(event.linkId,
-				event.agentId);
+		Key2d<String, String> key = new Key2d<String, String>(event.getLinkId().toString(),
+				event.getPersonId().toString());
 		this.enterEvents.put(key, event.getTime());
 
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		Key2d<String, String> key = new Key2d<String, String>(event.linkId,
-				event.agentId);
+		Key2d<String, String> key = new Key2d<String, String>(event.getLinkId().toString(),
+				event.getPersonId().toString());
 		Double t1 = this.enterEvents.remove(key);
 
 		if (t1 != null) {
 			double deltaT = event.getTime() - t1;
 			if (deltaT >= 0) {
-				this.ttimes.add(new TTElement(event.link, (int) event.getTime(),
+				this.ttimes.add(new TTElement(event.getLink(), (int) event.getTime(),
 						(int) deltaT));
 //				eventsAvailable = true;
 			}
@@ -94,8 +94,8 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 		/*
 		 * Arrival event does not count as travel time!
 		 */
-		Key2d<String, String> key = new Key2d<String, String>(event.linkId,
-				event.agentId);
+		Key2d<String, String> key = new Key2d<String, String>(event.getLinkId().toString(),
+				event.getPersonId().toString());
 		this.enterEvents.remove(key);
 	}
 

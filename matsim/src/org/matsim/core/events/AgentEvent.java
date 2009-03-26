@@ -36,36 +36,29 @@ public abstract class AgentEvent extends PersonEvent implements BasicAgentEvent 
 	private Link link;
 	private Leg leg;
 
-	/**
-	 * @deprecated please use {@link #getLinkId()}
-	 */
-	@Deprecated
-	public final String linkId;
-	private final Id linkId_;
+	private final Id linkId;
 
 	AgentEvent(final double time, final Person agent, final Link link, final Leg leg) {
 		super(time, agent);
 		this.link = link;
-		this.linkId_ = link.getId();
-		this.linkId = link.getId().toString();
+		this.linkId = link.getId();
 		this.leg = leg;
 	}
 
 	AgentEvent(final double time, final Id agentId, final Id linkId) {
 		super(time, agentId);
-		this.linkId = linkId.toString();
-		this.linkId_ = linkId;
+		this.linkId = linkId;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_LINK, this.linkId_.toString());
+		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
 		return attr;
 	}
 
 	protected String asString() {
-		return getTimeString(this.getTime()) + this.getPersonId() + "\t\t"+ this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concatenate later
+		return getTimeString(this.getTime()) + this.getPersonId() + "\t\t"+ this.getLinkId().toString() + "\t0\t"; // FLAG + DESCRIPTION is missing here: concatenate later
 	}
 
 	public Link getLink() {
@@ -77,7 +70,7 @@ public abstract class AgentEvent extends PersonEvent implements BasicAgentEvent 
 	}
 	
 	public Id getLinkId() {
-		return this.linkId_;
+		return this.linkId;
 	}
 
 }

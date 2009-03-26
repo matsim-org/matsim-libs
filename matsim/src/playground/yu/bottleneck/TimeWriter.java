@@ -62,8 +62,8 @@ public class TimeWriter implements AgentDepartureEventHandler,
 	 * (agentDepTimes).
 	 */
 	public void handleEvent(final AgentDepartureEvent event) {
-		if (!this.agentDepTimes.containsKey(event.agentId)) { // only store first departure
-			agentDepTimes.put(event.agentId, event.getTime());
+		if (!this.agentDepTimes.containsKey(event.getPersonId().toString())) { // only store first departure
+			agentDepTimes.put(event.getPersonId().toString(), event.getTime());
 		}
 	}
 
@@ -72,7 +72,7 @@ public class TimeWriter implements AgentDepartureEventHandler,
 	 * written in a .txt-file
 	 */
 	public void handleEvent(final AgentArrivalEvent event) {
-		String agentId = event.agentId;
+		String agentId = event.getPersonId().toString();
 		if (agentDepTimes.containsKey(agentId)) {
 			int depT = (int) agentDepTimes.remove(agentId).doubleValue();
 			depTimes.add((double) depT);

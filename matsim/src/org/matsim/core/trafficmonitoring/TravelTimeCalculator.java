@@ -96,16 +96,16 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
-		EnterEvent e = new EnterEvent(event.linkId, event.getTime());
-		this.enterEvents.put(event.agentId, e);
+		EnterEvent e = new EnterEvent(event.getLinkId().toString(), event.getTime());
+		this.enterEvents.put(event.getPersonId().toString(), e);
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
-		EnterEvent e = this.enterEvents.remove(event.agentId);
-		if ((e != null) && e.linkId.equals(event.linkId)) {
-			if (event.link == null) event.link = this.network.getLink(new IdImpl(event.linkId));
-			if (event.link != null) {
-				this.aggregator.addTravelTime(getTravelTimeData(event.link, true),e.time,event.getTime());
+		EnterEvent e = this.enterEvents.remove(event.getPersonId().toString());
+		if ((e != null) && e.linkId.equals(event.getLinkId().toString())) {
+			if (event.getLink() == null) event.setLink(this.network.getLink(new IdImpl(event.getLinkId().toString())));
+			if (event.getLink() != null) {
+				this.aggregator.addTravelTime(getTravelTimeData(event.getLink(), true),e.time,event.getTime());
 			}
 		}
 	}
@@ -114,15 +114,15 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 		// remove EnterEvents from list when an agent arrives.
 		// otherwise, the activity duration would counted as travel time, when the
 		// agent departs again and leaves the link!
-		this.enterEvents.remove(event.agentId);
+		this.enterEvents.remove(event.getPersonId().toString());
 	}
 
 	public void handleEvent(AgentStuckEvent event) {
-		EnterEvent e = this.enterEvents.remove(event.agentId);
-		if ((e != null) && e.linkId.equals(event.linkId)) {
+		EnterEvent e = this.enterEvents.remove(event.getPersonId().toString());
+		if ((e != null) && e.linkId.equals(event.getLinkId().toString())) {
 			Link link = event.getLink();
 			if (link == null) {
-				link = this.network.getLink(new IdImpl(event.linkId));
+				link = this.network.getLink(new IdImpl(event.getLinkId().toString()));
 			}
 			if (link != null) {
 				this.aggregator.addStuckEventTravelTime(getTravelTimeData(link, true),e.time,event.getTime());

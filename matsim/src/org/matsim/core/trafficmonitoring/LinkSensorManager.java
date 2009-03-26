@@ -79,10 +79,10 @@ public class LinkSensorManager implements LinkLeaveEventHandler {
 	 * @see org.matsim.core.events.handler.LinkLeaveEventHandler#handleEvent(org.matsim.core.events.LinkLeaveEvent)
 	 */
 	public void handleEvent(final LinkLeaveEvent event) {
-		if (this.linkCountMap.containsKey(event.linkId)) {
-			int i = this.linkCountMap.get(event.linkId).intValue();
+		if (this.linkCountMap.containsKey(event.getLinkId().toString())) {
+			int i = this.linkCountMap.get(event.getLinkId().toString()).intValue();
 			i++;
-			this.linkCountMap.put(event.linkId, Integer.valueOf(i));
+			this.linkCountMap.put(event.getLinkId().toString(), Integer.valueOf(i));
 		}
 
 	}

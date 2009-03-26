@@ -64,7 +64,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	}
 	
 	public void handleEvent(LinkEnterEvent event) {
-		Id id = new IdImpl(event.linkId);
+		Id id = new IdImpl(event.getLinkId().toString());
 		if (linkIdIn.equals(id)) {
 			Integer in = getInflowMap().get(event.getTime());
 			if (in == null) {
@@ -75,13 +75,13 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 				in = Integer.valueOf(in.intValue() + 1);
 			  getInflowMap().put(event.getTime(), in);
 			}
-			this.enterEvents.put(new IdImpl(event.agentId), event);
+			this.enterEvents.put(new IdImpl(event.getPersonId().toString()), event);
 		}
 	}
 
 
 	public void handleEvent(LinkLeaveEvent event) {
-		Id id = new IdImpl(event.linkId);
+		Id id = new IdImpl(event.getLinkId().toString());
 		if (linkIdOut.equals(id)) {
 			Integer out = getOutflowMap().get(event.getTime());
 			if (out == null) {
@@ -93,7 +93,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 				getOutflowMap().put(event.getTime(), out);
 			}
 			
-			LinkEnterEvent enterEvent = this.enterEvents.get(new IdImpl(event.agentId));
+			LinkEnterEvent enterEvent = this.enterEvents.get(new IdImpl(event.getPersonId().toString()));
 			double tt = event.getTime() - enterEvent.getTime();
 			Double ttravel = getTravelTimesMap().get(enterEvent.getTime());
 			if (ttravel == null) {

@@ -73,7 +73,7 @@ public class InteractionHandler implements ActStartEventHandler,
 //			facilities.put(f, pf);
 //		}
 		
-		pf.enterPerson(event.getAgent(), event.getTime());
+		pf.enterPerson(event.getPerson(), event.getTime());
 	}
 
 	public void reset(int iteration) {
@@ -90,7 +90,7 @@ public class InteractionHandler implements ActStartEventHandler,
 		if(pf == null)
 			 throw new RuntimeException("Tried to remove a visitor from a non-existing physical facility!");
 		else
-			pf.leavePerson(event.getAgent(), event.getTime());
+			pf.leavePerson(event.getPerson(), event.getTime());
 
 		}
 	}

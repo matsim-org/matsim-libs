@@ -68,7 +68,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 	 */
 	public void handleEvent(LinkEnterEvent event) {
 		// TODO save entertime into agentTimer
-		String agentId = event.agentId;
+		String agentId = event.getPersonId().toString();
 		if (!agentTimer.containsKey(agentId))
 			agentTimer.put(agentId, event.getTime());
 		else
@@ -84,7 +84,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 	 * (org.matsim.demandmodeling.events.EventLinkLeave)
 	 */
 	public void handleEvent(LinkLeaveEvent event) {
-		String agentId = event.agentId;
+		String agentId = event.getPersonId().toString();
 		if (agentTimer.containsKey(agentId)) {
 			for (int tbIdx = agentTimer.remove(agentId).intValue(); tbIdx <= event.getTime(); tbIdx++) {
 				Integer vol = netVols.get(tbIdx);

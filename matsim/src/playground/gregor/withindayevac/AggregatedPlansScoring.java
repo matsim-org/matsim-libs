@@ -195,32 +195,32 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		getScoringFunctionForAgent(event.agentId).startLeg(event.getTime(), event.getLeg());
+		getScoringFunctionForAgent(event.getPersonId().toString()).startLeg(event.getTime(), event.getLeg());
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		getScoringFunctionForAgent(event.agentId).endLeg(event.getTime());
+		getScoringFunctionForAgent(event.getPersonId().toString()).endLeg(event.getTime());
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		getScoringFunctionForAgent(event.agentId).agentStuck(event.getTime());
-		this.agentMappings.put(event.agentId, "stuckAndAbord");
+		getScoringFunctionForAgent(event.getPersonId().toString()).agentStuck(event.getTime());
+		this.agentMappings.put(event.getPersonId().toString(), "stuckAndAbord");
 	}
 
 	public void handleEvent(final AgentMoneyEvent event) {
-		getScoringFunctionForAgent(event.agentId).addMoney(event.getAmount());
+		getScoringFunctionForAgent(event.getPersonId().toString()).addMoney(event.getAmount());
 	}
 
 
 
 	public void handleEvent(final LinkEnterEvent event) {
-		final String linkId = event.linkId;
+		final String linkId = event.getLinkId().toString();
 		if (linkId.contains("el")) {
 			String mapping = this.egressMappings.get(linkId);
 			if (mapping == null) {
 				mapping = linkId;
 			}
-			this.agentMappings.put(event.agentId, mapping);
+			this.agentMappings.put(event.getPersonId().toString(), mapping);
 		}
 		
 		

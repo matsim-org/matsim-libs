@@ -103,15 +103,15 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 
 	public void handleEvent(final AgentDepartureEvent event) {
 
-		DepartureEvent depEvent = new DepartureEvent(new IdImpl(event.agentId));
+		DepartureEvent depEvent = new DepartureEvent(new IdImpl(event.getPersonId().toString()));
 
 		this.departureEventsTimes.put(depEvent, event.getTime());
-		this.departureEventsLinkIDs.put(depEvent, new IdImpl(event.linkId));
+		this.departureEventsLinkIDs.put(depEvent, new IdImpl(event.getLinkId().toString()));
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
 
-		IdImpl agentId = new IdImpl(event.agentId);
+		IdImpl agentId = new IdImpl(event.getPersonId().toString());
 
 		DepartureEvent removeMe = new DepartureEvent(agentId);
 
@@ -120,7 +120,7 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 
 		Double travelTime = event.getTime() - departureTime;
 
-		LegTravelTimeEntry newLtte = new LegTravelTimeEntry(agentId, departureLinkId, new IdImpl(event.linkId), "car");
+		LegTravelTimeEntry newLtte = new LegTravelTimeEntry(agentId, departureLinkId, new IdImpl(event.getLinkId().toString()), "car");
 		this.legTravelTimeEstimations.put(newLtte, travelTime);
 	}
 

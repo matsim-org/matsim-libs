@@ -165,7 +165,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase implements
 
 	public void handleEvent(LinkEnterEvent event) {
 		// log.info("link enter event id :" + event.linkId);
-		if (event.linkId.equalsIgnoreCase("2")) {
+		if (event.getLinkId().toString().equalsIgnoreCase("2")) {
 			if (this.beginningOfLink2 == null) {
 				this.beginningOfLink2 = new MeasurementPoint(event.getTime()
 						+ TravelTimeOneWayTest.timeToWaitBeforeMeasure);

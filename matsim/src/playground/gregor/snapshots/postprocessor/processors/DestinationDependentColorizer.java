@@ -68,14 +68,14 @@ public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveE
 //	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
-		if (event.linkId.contains("shelter")) {
-			this.destNodeMapping.put(event.agentId,event.linkId.replace("shelter", ""));
-		} else if (event.linkId.contains("rev_el")) {
-			this.destNodeMapping.put(event.agentId,event.linkId.replace("rev_el", ""));
-		} else if (event.linkId.contains("el")) {
-			this.destNodeMapping.put(event.agentId,event.linkId.replace("el", ""));
-		}  else if (event.linkId.contains("rev_")) {
-			this.destNodeMapping.put(event.agentId,event.linkId.replace("rev_", ""));
+		if (event.getLinkId().toString().contains("shelter")) {
+			this.destNodeMapping.put(event.getPersonId().toString(),event.getLinkId().toString().replace("shelter", ""));
+		} else if (event.getLinkId().toString().contains("rev_el")) {
+			this.destNodeMapping.put(event.getPersonId().toString(),event.getLinkId().toString().replace("rev_el", ""));
+		} else if (event.getLinkId().toString().contains("el")) {
+			this.destNodeMapping.put(event.getPersonId().toString(),event.getLinkId().toString().replace("el", ""));
+		}  else if (event.getLinkId().toString().contains("rev_")) {
+			this.destNodeMapping.put(event.getPersonId().toString(),event.getLinkId().toString().replace("rev_", ""));
 		}
 
 		

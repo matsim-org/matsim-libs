@@ -237,23 +237,23 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		}
 
 		public void handleEvent(final LinkEnterEvent event) {
-			if (event.link != this.link) {
+			if (event.getLink() != this.link) {
 				return;
 			}
-			if (event.getAgent() == this.person1) {
+			if (event.getPerson() == this.person1) {
 				this.person1enterTime = event.getTime();
-			} else if (event.getAgent() == this.person2) {
+			} else if (event.getPerson() == this.person2) {
 				this.person2enterTime = event.getTime();
 			}
 		}
 
 		public void handleEvent(final LinkLeaveEvent event) {
-			if (event.link != this.link) {
+			if (event.getLink() != this.link) {
 				return;
 			}
-			if (event.getAgent() == this.person1) {
+			if (event.getPerson() == this.person1) {
 				this.person1leaveTime = event.getTime();
-			} else if (event.getAgent() == this.person2) {
+			} else if (event.getPerson() == this.person2) {
 				this.person2leaveTime = event.getTime();
 			}
 		}

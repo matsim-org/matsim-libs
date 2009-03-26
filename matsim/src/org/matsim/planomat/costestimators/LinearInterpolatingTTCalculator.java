@@ -217,20 +217,20 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
-		EnterEvent e = new EnterEvent(event.linkId, event.agentId);
+		EnterEvent e = new EnterEvent(event.getLinkId().toString(), event.getPersonId().toString());
 		this.enterEvents.put(e, event.getTime());
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
-		EnterEvent e = new EnterEvent(event.linkId, event.agentId);
+		EnterEvent e = new EnterEvent(event.getLinkId().toString(), event.getPersonId().toString());
 		Double starttime = this.enterEvents.remove(e);
 		if (starttime != null) {
 			double timediff = event.getTime() - starttime.intValue();
 			if (timediff < 0) {
 				Gbl.errorMsg("");
 			}
-			Link link = event.link;
-			if (null == link) link = this.network.getLink(new IdImpl(event.linkId));
+			Link link = event.getLink();
+			if (null == link) link = this.network.getLink(new IdImpl(event.getLinkId().toString()));
 			if (null != link) {
 				getTravelTimeRole(link).addTravelTime(starttime.intValue(), timediff);
 			}
@@ -241,7 +241,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 		// remove EnterEvents from list when an agent arrives.
 		// otherwise, the activity duration would counted as travel time, when the
 		// agent departs again and leaves the link!
-		EnterEvent e = new EnterEvent(event.linkId, event.agentId);
+		EnterEvent e = new EnterEvent(event.getLinkId().toString(), event.getPersonId().toString());
 		this.enterEvents.remove(e);
 	}
 

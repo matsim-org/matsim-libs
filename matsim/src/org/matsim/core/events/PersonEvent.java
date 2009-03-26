@@ -31,40 +31,35 @@ import org.matsim.core.api.population.Person;
  */
 public abstract class PersonEvent extends BasicEventImpl implements BasicPersonEvent {
 
-	public static final String ATTRIBUTE_AGENT = "agent"; // TODO [MR] test if this can be easily changed to "person"
+	public static final String ATTRIBUTE_PERSON = "person";
 
 	private Person person;
-	/** @deprected please use {@link #getPersonId()} */
-	@Deprecated
-	public final String agentId;
 	private final Id personId;
 
 	public PersonEvent(final double time, final Person person) {
 		super(time);
 		this.person = person;
 		this.personId = person.getId();
-		this.agentId = person.getId().toString();
 	}
 
 	public PersonEvent(final double time, final Id personId)	{
 		super(time);
 		this.personId = personId;
-		this.agentId = personId.toString();
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_AGENT, this.personId.toString());
+		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
 		return attr;
 	}
 
 	@Deprecated // should be set via Constructor...
-	public void setAgent(final Person agent) {
+	public void setPerson(final Person agent) {
 		this.person = agent;
 	}
 
-	public Person getAgent() { // TODO [MR] rename to getPerson
+	public Person getPerson() {
 		return this.person;
 	}
 

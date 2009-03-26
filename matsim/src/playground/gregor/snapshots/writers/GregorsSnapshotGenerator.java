@@ -98,32 +98,32 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 
 	public void handleEvent(final AgentDepartureEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.linkId).departure(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId().toString()).departure(getEventAgent(event));
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.linkId).arrival(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId().toString()).arrival(getEventAgent(event));
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.linkId).enter(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId().toString()).enter(getEventAgent(event));
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.linkId).leave(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId().toString()).leave(getEventAgent(event));
 	}
 
 	public void handleEvent(final AgentWait2LinkEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.linkId).wait2link(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId().toString()).wait2link(getEventAgent(event));
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.linkId).stuck(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId().toString()).stuck(getEventAgent(event));
 	}
 
 	public void reset(final int iteration) {
@@ -136,10 +136,10 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 	}
 
 	private EventAgent getEventAgent(final PersonEvent event) {
-		EventAgent agent = this.eventAgents.get(event.agentId);
+		EventAgent agent = this.eventAgents.get(event.getPersonId().toString());
 		if (agent == null) {
-			agent = new EventAgent(event.agentId, event.getTime());
-			this.eventAgents.put(event.agentId, agent);
+			agent = new EventAgent(event.getPersonId().toString(), event.getTime());
+			this.eventAgents.put(event.getPersonId().toString(), agent);
 		}
 		agent.time = event.getTime();
 		return agent;

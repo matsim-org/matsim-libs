@@ -39,7 +39,7 @@ public class DailyLinkVolumeCalc implements LinkLeaveEventHandler {
 	// implementation of a LinkLeaveEventHandler method
 	// it fills up the TreeMap
 	public void handleEvent(LinkLeaveEvent event) {
-		Id id = new IdImpl(event.linkId);
+		Id id = new IdImpl(event.getLinkId().toString());
 		Integer cnt = counts.get(id);
 		if (cnt == null) {
 			counts.put(id,1);

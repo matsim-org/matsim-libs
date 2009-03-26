@@ -84,20 +84,20 @@ public class QVDiagramm implements LinkEnterEventHandler, LinkLeaveEventHandler,
 
 	public void handleEvent(final LinkEnterEvent event) {
 		// Store the enter time of this agent if it's on the link we're interested in.
-		if (this.linkId.equals(event.linkId)) {
-			this.agents.put(event.agentId, Double.valueOf(event.getTime()));
+		if (this.linkId.equals(event.getLinkId().toString())) {
+			this.agents.put(event.getPersonId().toString(), Double.valueOf(event.getTime()));
 		}
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
 		// delete the enter time, because the agent won't leave this link for a while now...
-		if (this.linkId.equals(event.linkId)) {
-			this.agents.remove(event.agentId);
+		if (this.linkId.equals(event.getLinkId().toString())) {
+			this.agents.remove(event.getPersonId().toString());
 		}
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
-		if (this.linkId.equals(event.linkId)) {
+		if (this.linkId.equals(event.getLinkId().toString())) {
 			if ((int)event.getTime() / this.binSize != this.timeBinIndex) {
 				// the event is from a new time bin, finish the old one.
 				this.updateGraphValues();
@@ -105,7 +105,7 @@ public class QVDiagramm implements LinkEnterEventHandler, LinkLeaveEventHandler,
 			}
 			// we have one more vehicle leaving this link
 			this.flowCount++;
-			Double enterTime = this.agents.remove(event.agentId);
+			Double enterTime = this.agents.remove(event.getPersonId().toString());
 			if (enterTime == null) return;
 			// we have the enter time of this vehicle, calculate its speed.
 			double traveltime = event.getTime() - enterTime.doubleValue();

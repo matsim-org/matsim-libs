@@ -40,13 +40,13 @@ public class VolumesCounter implements LinkEnterEventHandler {
 	private static Integer ONE = Integer.valueOf(1);
 	
 	public void handleEvent(LinkEnterEvent event) {
-		Integer volume = this.links.get(event.linkId);
+		Integer volume = this.links.get(event.getLinkId().toString());
 		if (volume == null) {
 			volume = ONE;
 		} else {
 			volume = Integer.valueOf(volume.intValue() + 1);
 		}
-		this.links.put(event.linkId, volume);
+		this.links.put(event.getLinkId().toString(), volume);
 	}
 
 	public void reset(int iteration) {

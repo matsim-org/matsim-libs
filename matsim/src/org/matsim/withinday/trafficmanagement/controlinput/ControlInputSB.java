@@ -272,18 +272,18 @@ public class ControlInputSB extends AbstractControlInputImpl {
 	public void handleEvent(final LinkEnterEvent event) {
 
 		// Must be done before super.handleEvent as that removes entries
-		if (this.ttMeasured.containsKey(event.linkId)) {
-			this.enterLinkEvents.put(event.agentId, event.getTime());
+		if (this.ttMeasured.containsKey(event.getLinkId().toString())) {
+			this.enterLinkEvents.put(event.getPersonId().toString(), event.getTime());
 		}
 
 		// handle flows on outLinks
-		if (this.outLinksMainRoute.contains(event.link)) {
-			int numbersPassed = this.numbersPassedOnInAndOutLinks.get(event.linkId) + 1;
-			this.numbersPassedOnInAndOutLinks.put(event.linkId, numbersPassed);
+		if (this.outLinksMainRoute.contains(event.getLink())) {
+			int numbersPassed = this.numbersPassedOnInAndOutLinks.get(event.getLinkId().toString()) + 1;
+			this.numbersPassedOnInAndOutLinks.put(event.getLinkId().toString(), numbersPassed);
 		}
-		else if (this.outLinksAlternativeRoute.contains(event.link)) {
-			int numbersPassed = this.numbersPassedOnInAndOutLinks.get(event.linkId) + 1;
-			this.numbersPassedOnInAndOutLinks.put(event.linkId, numbersPassed);
+		else if (this.outLinksAlternativeRoute.contains(event.getLink())) {
+			int numbersPassed = this.numbersPassedOnInAndOutLinks.get(event.getLinkId().toString()) + 1;
+			this.numbersPassedOnInAndOutLinks.put(event.getLinkId().toString(), numbersPassed);
 		}
 
 		super.handleEvent(event);
@@ -293,22 +293,22 @@ public class ControlInputSB extends AbstractControlInputImpl {
 	public void handleEvent(final LinkLeaveEvent event) {
 
 		// Must be done before super.handleEvent as that removes entries
-		if (this.ttMeasured.containsKey(event.linkId)
-				&& (this.enterLinkEvents.get(event.agentId) != null)) {
-			Double enterTime = this.enterLinkEvents.remove(event.agentId);
+		if (this.ttMeasured.containsKey(event.getLinkId().toString())
+				&& (this.enterLinkEvents.get(event.getPersonId().toString()) != null)) {
+			Double enterTime = this.enterLinkEvents.remove(event.getPersonId().toString());
 			Double travelTime = event.getTime() - enterTime;
-			this.ttMeasured.put(event.linkId, travelTime);
+			this.ttMeasured.put(event.getLinkId().toString(), travelTime);
 		}
 
 		// Stores [NUMBEROFFLOWEVENTS] last events and calculates flow for detection
 		// of capacity reduction
-		if (this.intraFlows.containsKey(event.linkId)) {
+		if (this.intraFlows.containsKey(event.getLinkId().toString())) {
 			updateFlow(NUMBEROFEVENTSDETECTION, event);
 		}
-		if (this.inLinksAlternativeRoute.contains(event.link)
-				|| this.outLinksAlternativeRoute.contains(event.link)
-				|| this.inLinksMainRoute.contains(event.link)
-				|| this.outLinksMainRoute.contains(event.link)) {
+		if (this.inLinksAlternativeRoute.contains(event.getLink())
+				|| this.outLinksAlternativeRoute.contains(event.getLink())
+				|| this.inLinksMainRoute.contains(event.getLink())
+				|| this.outLinksMainRoute.contains(event.getLink())) {
 			// updateFlow(NUMBEROFEVENTSINOUTFLOW, event);
 			updateFlow(this.UPDATETIMEINOUTFLOW, event);
 		}

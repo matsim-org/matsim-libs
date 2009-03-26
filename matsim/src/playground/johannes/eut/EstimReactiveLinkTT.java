@@ -76,19 +76,19 @@ public class EstimReactiveLinkTT implements
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		increaseCount(event.link, event.getAgent(), (int) event.getTime());
+		increaseCount(event.getLink(), event.getPerson(), (int) event.getTime());
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		decreaseCount(event.link, event.getAgent(), (int) event.getTime());
+		decreaseCount(event.getLink(), event.getPerson(), (int) event.getTime());
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
-		decreaseCount(event.getLink(), event.getAgent(), (int) event.getTime());
+		decreaseCount(event.getLink(), event.getPerson(), (int) event.getTime());
 	}
 
 	public void handleEvent(AgentWait2LinkEvent event) {
-		increaseCount(event.getLink(), event.getAgent(), (int) event.getTime());
+		increaseCount(event.getLink(), event.getPerson(), (int) event.getTime());
 	}
 
 	private void increaseCount(Link link, Person person, int time) {

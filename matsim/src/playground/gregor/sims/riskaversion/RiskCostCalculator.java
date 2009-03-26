@@ -141,7 +141,7 @@ public class RiskCostCalculator implements LinkEnterEventHandler {
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
-		Double cost = this.linkRiskCost.get(event.link);
+		Double cost = this.linkRiskCost.get(event.getLink());
 		if (cost == null) {
 			return;
 		}

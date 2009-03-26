@@ -54,7 +54,7 @@ public class BottleneckTraVol implements LinkEnterEventHandler, LinkLeaveEventHa
 	 * measures the amount of the agents on the link with bottleneck by every "entering"-Event
 	 */
 	public void handleEvent(final LinkEnterEvent event) {
-		if (event.linkId.equals("15")) {
+		if (event.getLinkId().toString().equals("15")) {
 			writeLine(Time.writeTime(event.getTime() - 1) + "\t" + cnt);
 			writeLine(Time.writeTime(event.getTime()) + "\t" + (++cnt));
 		}
@@ -63,7 +63,7 @@ public class BottleneckTraVol implements LinkEnterEventHandler, LinkLeaveEventHa
 	 * measures the amount of the agents on the link with bottleneck by every "leaving"-Event
 	 */
 	public void handleEvent(final LinkLeaveEvent event) {
-		if (event.linkId.equals("15")) {
+		if (event.getLinkId().toString().equals("15")) {
 			writeLine(Time.writeTime(event.getTime() - 1) + "\t" + cnt);
 			writeLine(Time.writeTime(event.getTime()) + "\t" + (--cnt));
 		}

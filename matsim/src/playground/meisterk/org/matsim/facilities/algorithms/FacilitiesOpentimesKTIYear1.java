@@ -53,7 +53,7 @@ public class FacilitiesOpentimesKTIYear1 {
 				String actType = a.getType();
 
 				// delete all existing open times info
-				Map<DayType, SortedSet<BasicOpeningTime>> o = a.getOpentimes();
+				Map<DayType, SortedSet<BasicOpeningTime>> o = a.getOpeningTimes();
 				o.clear();
 
 				if (openingTimes.containsKey(actType)) {

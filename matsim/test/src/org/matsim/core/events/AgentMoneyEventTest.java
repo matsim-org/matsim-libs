@@ -33,7 +33,7 @@ public class AgentMoneyEventTest extends MatsimTestCase {
 		final AgentMoneyEvent event1 = new AgentMoneyEvent(25560.23, new IdImpl("1"), 2.71828);
 		final AgentMoneyEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
-		assertEquals(event1.agentId, event2.agentId);
+		assertEquals(event1.getPersonId().toString(), event2.getPersonId().toString());
 		assertEquals(event1.getAmount(), event2.getAmount(), EPSILON);
 	}
 }

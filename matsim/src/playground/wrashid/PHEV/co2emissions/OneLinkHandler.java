@@ -29,7 +29,7 @@ public class OneLinkHandler implements LinkLeaveEventHandler {
 	}
 	
 	public void handleEvent(LinkLeaveEvent event) {
-		if (event.linkId.equals(link.getId().toString())){
+		if (event.getLinkId().toString().equals(link.getId().toString())){
 			long hour= Math.round(event.getTime()/interval);
 			if (!co2EmissionsEachHour.containsKey(hour)){
 				co2EmissionsEachHour.put(hour, 0.0);

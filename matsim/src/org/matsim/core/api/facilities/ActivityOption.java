@@ -32,11 +32,10 @@ public interface ActivityOption extends BasicActivityOption {
 	@Deprecated
 	public void setCapacity(final int capacity);
 
-	public void setOpentimes(Map<DayType, SortedSet<BasicOpeningTime>> opentimes);
+	public void setOpeningTimes(Map<DayType, SortedSet<BasicOpeningTime>> openingTimes);
 
 	public Facility getFacility();
 
-	public Map<DayType, SortedSet<BasicOpeningTime>> getOpentimes();
-	// FIXME [MR] Opentimes vs. Openingtimes, and sometimes they are maps and sometimes sets!!!!
+	public Map<DayType, SortedSet<BasicOpeningTime>> getOpeningTimes();
 	
 }

@@ -65,7 +65,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 		}
 
 		public void handleEvent(PersonEvent event) {
-			if(event.agentId.equals(this.agentId)){
+			if(event.getPersonId().toString().equals(this.agentId)){
 				events.add(event);
 			}
 			

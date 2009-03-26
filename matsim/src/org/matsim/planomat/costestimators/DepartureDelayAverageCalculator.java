@@ -137,20 +137,20 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	//////////////////////////////////////////////////////////////////////
 
 	public void handleEvent(AgentDepartureEvent event) {
-		DepartureEvent depEvent = new DepartureEvent(new IdImpl(event.agentId));
+		DepartureEvent depEvent = new DepartureEvent(new IdImpl(event.getPersonId().toString()));
 		this.departureEventsTimes.put(depEvent, event.getTime());
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		DepartureEvent removeMe = new DepartureEvent(new IdImpl(event.agentId));
+		DepartureEvent removeMe = new DepartureEvent(new IdImpl(event.getPersonId().toString()));
 		Double departureTime = departureEventsTimes.remove(removeMe);
 		if (departureTime != null) {
 			double departureDelay = event.getTime() - departureTime.intValue();
 			if (departureDelay < 0) {
 				throw new RuntimeException("departureDelay cannot be < 0.");
 			}
-			Link link = event.link;
-			if (null == link) link = this.network.getLink(new IdImpl(event.linkId));
+			Link link = event.getLink();
+			if (null == link) link = this.network.getLink(new IdImpl(event.getLinkId().toString()));
 			if (null != link) {
 				DepartureDelayData ddd = this.getDepartureDelayRole(link);
 				if (ddd == null) {

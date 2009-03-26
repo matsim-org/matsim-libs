@@ -259,11 +259,11 @@ public class EvacZonesAssigner implements AgentDepartureEventHandler{
 
 
 		public void handleEvent(final AgentDepartureEvent event) {
-			String id = event.agentId;
+			String id = event.getPersonId().toString();
 			if (id.contains("guide")) {
 				return;
 			}
-			String lID = event.linkId;
+			String lID = event.getLinkId().toString();
 			Link l = this.network.getLink(lID);
 			Point p = this.geofac.createPoint(MGC.coord2Coordinate(l.getCoord()));
 			if (this.tree.get(p.getX(), p.getY(), 1).size() <= 0) {

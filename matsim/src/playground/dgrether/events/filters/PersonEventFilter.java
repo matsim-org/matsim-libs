@@ -42,6 +42,6 @@ public class PersonEventFilter implements EventFilter {
 	 * @see playground.dgrether.events.filters.EventFilter#judge(org.matsim.core.events.PersonEvent)
 	 */
 	public boolean judge(PersonEvent event) {
-		return this.personIds.contains(new IdImpl(event.agentId));
+		return this.personIds.contains(new IdImpl(event.getPersonId().toString()));
 	}
 }

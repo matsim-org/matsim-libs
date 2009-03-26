@@ -109,16 +109,16 @@ public class SocialCostCalculatorNetworkII implements SocialCostCalculator, Iter
 	
 	public void handleEvent(final LinkEnterEvent event) {
 
-		LinkInfo info = getLinkInfo(event.linkId);
-		AgentInfo ai = getAgentInfo(event.agentId);
+		LinkInfo info = getLinkInfo(event.getLinkId().toString());
+		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
 		
 		if (ai.stucked) {
 			LinkInfo oldInfo = this.linkInfos.get(ai.currentLink);
 			AgentCongestionInfo aci = new AgentCongestionInfo();
-			aci.agentId = event.agentId;
+			aci.agentId = event.getPersonId().toString();
 			aci.timeSlot = getTimeSlotIndex(ai.enterTime);
 			oldInfo.agentsLeftLink.add(aci);
-			oldInfo.incrCongestionInfo(event.linkId, aci.timeSlot, info.congested);
+			oldInfo.incrCongestionInfo(event.getLinkId().toString(), aci.timeSlot, info.congested);
 			
 			
 //			if (info.congested) { //TODO this probably wrong because if this link gets uncongested in the samt ttbin than con counter overestimates the #veh
@@ -127,27 +127,27 @@ public class SocialCostCalculatorNetworkII implements SocialCostCalculator, Iter
 //				oldInfo.agentsLeftToUncongestedLink.add(aci);
 //			}
 		}
-		ai.currentLink = event.linkId;
+		ai.currentLink = event.getLinkId().toString();
 		ai.enterTime = event.getTime();
-		ai.id = event.agentId;
+		ai.id = event.getPersonId().toString();
 //		info.agentsOnLink++;
 	}
 	
 	
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		LinkInfo info = getLinkInfo(event.linkId);
-		AgentInfo ai = getAgentInfo(event.agentId);
+		LinkInfo info = getLinkInfo(event.getLinkId().toString());
+		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
 		ai.enterTime = event.getTime();
-		ai.id = event.agentId;
-		ai.currentLink = event.linkId;
+		ai.id = event.getPersonId().toString();
+		ai.currentLink = event.getLinkId().toString();
 //		info.agentsOnLink++;
 	}
 	
 	public void handleEvent(final LinkLeaveEvent event) {
 		
-		LinkInfo info = getLinkInfo(event.linkId);
-		AgentInfo ai = getAgentInfo(event.agentId);
+		LinkInfo info = getLinkInfo(event.getLinkId().toString());
+		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
 
 		if ((event.getTime() - ai.enterTime) <= info.t_free){
 			ai.stucked = false;	
@@ -159,11 +159,11 @@ public class SocialCostCalculatorNetworkII implements SocialCostCalculator, Iter
 				throw new RuntimeException("something went wrong!");
 			}
 			info.lastFSTime = ai.enterTime;
-			handleLinkCongestionInformation(event.linkId,false,getTimeSlotIndex(event.getTime()));
+			handleLinkCongestionInformation(event.getLinkId().toString(),false,getTimeSlotIndex(event.getTime()));
 		} else {
 			ai.stucked = true;
 			info.congested = true;// optimization
-			handleLinkCongestionInformation(event.linkId,true,getTimeSlotIndex(event.getTime()));
+			handleLinkCongestionInformation(event.getLinkId().toString(),true,getTimeSlotIndex(event.getTime()));
 		}
 				
 	}

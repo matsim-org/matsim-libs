@@ -102,7 +102,7 @@ public class CppEventFileParser {
 	 * Compares events produced by java and by C++ simulation
 	 */
 	public static boolean equals(final PersonEvent personEvent, final EventLog deqSimEvent) {
-		if (Integer.parseInt(personEvent.agentId) != deqSimEvent.getVehicleId()) {
+		if (Integer.parseInt(personEvent.getPersonId().toString()) != deqSimEvent.getVehicleId()) {
 			CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 			return false;
 		}
@@ -112,7 +112,7 @@ public class CppEventFileParser {
 		}
 
 		if (personEvent instanceof AgentDepartureEvent) {
-			if (Integer.parseInt(((AgentDepartureEvent) personEvent).linkId) != deqSimEvent.getLinkId()) {
+			if (Integer.parseInt(((AgentDepartureEvent) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
@@ -124,7 +124,7 @@ public class CppEventFileParser {
 		}
 
 		if (personEvent instanceof LinkEnterEvent) {
-			if (Integer.parseInt(((LinkEnterEvent) personEvent).linkId) != deqSimEvent.getLinkId()) {
+			if (Integer.parseInt(((LinkEnterEvent) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
@@ -136,7 +136,7 @@ public class CppEventFileParser {
 		}
 
 		if (personEvent instanceof LinkLeaveEvent) {
-			if (Integer.parseInt(((LinkLeaveEvent) personEvent).linkId) != deqSimEvent.getLinkId()) {
+			if (Integer.parseInt(((LinkLeaveEvent) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
@@ -148,7 +148,7 @@ public class CppEventFileParser {
 		}
 
 		if (personEvent instanceof AgentArrivalEvent) {
-			if (Integer.parseInt(((AgentArrivalEvent) personEvent).linkId) != deqSimEvent.getLinkId()) {
+			if (Integer.parseInt(((AgentArrivalEvent) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}

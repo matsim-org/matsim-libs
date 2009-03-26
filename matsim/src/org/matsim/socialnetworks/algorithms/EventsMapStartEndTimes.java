@@ -28,7 +28,7 @@ public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEvent
 	}
 
 	public void handleEvent(ActStartEvent event) {
-		Person person = plans.getPerson(new IdImpl(event.agentId));
+		Person person = plans.getPerson(new IdImpl(event.getPersonId().toString()));
 		ArrayList<ActStartEvent> startList;
 		if((startMap.get(person)==null)){
 			startList=new ArrayList<ActStartEvent>();
@@ -48,7 +48,7 @@ public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEvent
 	}
 
 	public void handleEvent(ActEndEvent event) {
-		Person person = plans.getPerson(new IdImpl(event.agentId));
+		Person person = plans.getPerson(new IdImpl(event.getPersonId().toString()));
 		ArrayList<ActEndEvent> endList;
 		if((endMap.get(person)== null)){
 			endList=new ArrayList<ActEndEvent>();

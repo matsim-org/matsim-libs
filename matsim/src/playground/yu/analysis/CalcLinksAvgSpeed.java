@@ -179,14 +179,14 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 	@Override
 	public void handleEvent(final AgentArrivalEvent arrival) {
-		SpeedCounter sc = speedCounters.get(arrival.linkId);
+		SpeedCounter sc = speedCounters.get(arrival.getLinkId().toString());
 		if (sc != null)
-			sc.removeTmpEnterTime(arrival.agentId);
+			sc.removeTmpEnterTime(arrival.getPersonId().toString());
 	}
 
 	@Override
 	public void handleEvent(final LinkEnterEvent enter) {
-		String linkId = enter.linkId;
+		String linkId = enter.getLinkId().toString();
 		SpeedCounter sc = speedCounters.get(linkId);
 		if (sc == null) {
 			double[] freeSpeeds = new double[nofBins];
@@ -195,7 +195,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 						i * 86400.0 / nofBins);
 			sc = new SpeedCounter(freeSpeeds);
 		}
-		sc.setTmpEnterTime(enter.agentId, enter.getTime());
+		sc.setTmpEnterTime(enter.getPersonId().toString(), enter.getTime());
 		speedCounters.put(linkId, sc);
 	}
 
@@ -203,12 +203,12 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	public void handleEvent(final LinkLeaveEvent leave) {
 		double time = leave.getTime();
 		int timeBin = getBinIdx(time);
-		String linkId = leave.linkId;
+		String linkId = leave.getLinkId().toString();
 		SpeedCounter sc = speedCounters.get(linkId);
 		if (sc != null) {
-			Double enterTime = sc.removeTmpEnterTime(leave.agentId);
+			Double enterTime = sc.removeTmpEnterTime(leave.getPersonId().toString());
 			if (enterTime != null) {
-				Link l = leave.link;
+				Link l = leave.getLink();
 				if (l == null)
 					l = network.getLink(linkId);
 				if (l != null) {

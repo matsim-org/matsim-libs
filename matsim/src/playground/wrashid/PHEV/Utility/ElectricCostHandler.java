@@ -101,7 +101,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 	}
 
 	private void initEnergyLevel(PersonEvent event) {
-		energyLevel.put(event.agentId, new EnergyApplicatonSpecificState(
+		energyLevel.put(event.getPersonId().toString(), new EnergyApplicatonSpecificState(
 				fullEnergyLevel));
 	}
 
@@ -109,8 +109,8 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// for some strange reason, the links, person are not set using the DES
 		// controller
 		if (controler == null) {
-			event.link = controler2.getNetwork().getLink(event.linkId);
-			event.setAgent(controler2.getPopulation().getPerson(new IdImpl(event.agentId)));
+			event.setLink(controler2.getNetwork().getLink(event.getLinkId().toString()));
+			event.setPerson(controler2.getPopulation().getPerson(new IdImpl(event.getPersonId().toString())));
 		}
 
 		// change properties of roads
@@ -120,24 +120,24 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// event.link.setFreespeed(7.5);
 		// }
 
-		if (event.agentId.equalsIgnoreCase(observedVehicleId)) {
+		if (event.getPersonId().toString().equalsIgnoreCase(observedVehicleId)) {
 			System.out.println();
 		}
 
 		// initialize the energyLevel at the beginning to full energy
-		if (!energyLevel.containsKey(event.agentId)) {
+		if (!energyLevel.containsKey(event.getPersonId().toString())) {
 			initEnergyLevel(event);
 		}
 
 		// updated consumed energy for link
-		EnergyApplicatonSpecificState state = energyLevel.get(event.agentId);
+		EnergyApplicatonSpecificState state = energyLevel.get(event.getPersonId().toString());
 		// System.out.print(state.energyLevel);
-		state.energyLevel -= getEnergyConsumption(event.link);
+		state.energyLevel -= getEnergyConsumption(event.getLink());
 		// System.out.print(" => " + state.energyLevel);
 
 		// if energy level is below zero: give huge penalty to agent
 		if (state.energyLevel <= 0) {
-			events.processEvent(new AgentMoneyEvent(event.getTime(), event.getAgent(),
+			events.processEvent(new AgentMoneyEvent(event.getTime(), event.getPerson(),
 					penaltyForRunningOutOfElectricEnergy));
 		}
 		recordSOCOfVehicle(event);
@@ -190,16 +190,16 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// controller
 		if (controler == null) {
 			event.setLink(controler2.getNetwork().getLink(event.getLinkId()));
-			event.setAgent(controler2.getPopulation().getPerson(new IdImpl(event.agentId)));
+			event.setPerson(controler2.getPopulation().getPerson(new IdImpl(event.getPersonId().toString())));
 		}
 
 		// initialize the energyLevel at the beginning to full energy
-		if (!energyLevel.containsKey(event.agentId)) {
+		if (!energyLevel.containsKey(event.getPersonId().toString())) {
 			initEnergyLevel(event);
 		}
 
 		// set start time of act
-		EnergyApplicatonSpecificState state = energyLevel.get(event.agentId);
+		EnergyApplicatonSpecificState state = energyLevel.get(event.getPersonId().toString());
 		state.startTimeOfLastAct = event.getTime();
 		recordSOCOfVehicle(event);
 	}
@@ -209,11 +209,11 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// controller
 		if (controler == null) {
 			event.setLink(controler2.getNetwork().getLink(event.getLinkId()));
-			event.setAgent(controler2.getPopulation().getPerson(new IdImpl(event.agentId)));
+			event.setPerson(controler2.getPopulation().getPerson(new IdImpl(event.getPersonId().toString())));
 		}
 
 		// initialize the energyLevel at the beginning to full energy
-		if (!energyLevel.containsKey(event.agentId)) {
+		if (!energyLevel.containsKey(event.getPersonId().toString())) {
 			initEnergyLevel(event);
 		}
 
@@ -221,7 +221,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// also put the cost
 		// for the charging into the bill (utility function) of the agent
 
-		EnergyApplicatonSpecificState state = energyLevel.get(event.agentId);
+		EnergyApplicatonSpecificState state = energyLevel.get(event.getPersonId().toString());
 
 		// assumption is, the agent starts immediately charging, until the
 		// energyLevel is full
@@ -256,7 +256,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 			// System.out.println("noooo:"+costOfEnergy);
 		}
 
-		events.processEvent(new AgentMoneyEvent(event.getTime(), event.getAgent(),
+		events.processEvent(new AgentMoneyEvent(event.getTime(), event.getPerson(),
 				costOfEnergy));
 
 		state.energyLevel += energyCharged;
@@ -280,7 +280,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		if (chargingOutput != null && state.startTimeOfLastAct!=state.startTimeOfLastAct
 				+ energyCharged / chargingPower && relevantIterationReached) {
 			try {
-				chargingOutput.write(event.getLinkId().toString() + "\t" + event.agentId + "\t"
+				chargingOutput.write(event.getLinkId().toString() + "\t" + event.getPersonId().toString() + "\t"
 						+ state.startTimeOfLastAct + "\t" + (state.startTimeOfLastAct
 						+ (energyCharged) / chargingPower) + "\t" + (state.energyLevel - energyCharged) + "\t" + (state.energyLevel) + "\n");
 			} catch (IOException e) {
@@ -311,7 +311,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 	}
 
 	private void recordSOCOfVehicle(PersonEvent event, double time) {
-		if (event.agentId.toString().equalsIgnoreCase(observedVehicleId) && relevantIterationReached) {
+		if (event.getPersonId().toString().toString().equalsIgnoreCase(observedVehicleId) && relevantIterationReached) {
 			recordedStateOfCharge.add(time,
 					energyLevel.get(observedVehicleId).energyLevel);
 		}
@@ -319,7 +319,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 
 	public void handleEvent(LinkEnterEvent event) {
 		// initialize the energyLevel at the beginning to full energy
-		if (!energyLevel.containsKey(event.agentId)) {
+		if (!energyLevel.containsKey(event.getPersonId().toString())) {
 			initEnergyLevel(event);
 		}
 		recordSOCOfVehicle(event);

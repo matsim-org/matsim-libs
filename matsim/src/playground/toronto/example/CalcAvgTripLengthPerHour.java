@@ -53,15 +53,15 @@ public class CalcAvgTripLengthPerHour implements AgentDepartureEventHandler, Age
 	}
 	
 	public void handleEvent(final AgentDepartureEvent event) {
-		this.travelStartPerAgent.put(event.agentId.intern(), event.getTime());
-		this.travelDistancePerAgent.put(event.agentId.intern(), 0.0);
+		this.travelStartPerAgent.put(event.getPersonId().toString().intern(), event.getTime());
+		this.travelDistancePerAgent.put(event.getPersonId().toString().intern(), 0.0);
 	}
 	
 	public void handleEvent(final AgentArrivalEvent event) {
-		Double distance = this.travelDistancePerAgent.remove(event.agentId.intern());
+		Double distance = this.travelDistancePerAgent.remove(event.getPersonId().toString().intern());
 		
 		if (distance > 0.0) {
-			Double startTime = this.travelStartPerAgent.get(event.agentId.intern());
+			Double startTime = this.travelStartPerAgent.get(event.getPersonId().toString().intern());
 			int hour = startTime.intValue() / 3600;
 			this.travelDistanceSum[hour] += distance;
 			this.travelDistanceCnt[hour]++;
@@ -69,12 +69,12 @@ public class CalcAvgTripLengthPerHour implements AgentDepartureEventHandler, Age
 	}
 	
 	public void handleEvent(final LinkEnterEvent event) {
-		Double distance = this.travelDistancePerAgent.get(event.agentId.intern());
-		if (event.link == null) {
-			event.link = this.network.getLink(event.linkId);
+		Double distance = this.travelDistancePerAgent.get(event.getPersonId().toString().intern());
+		if (event.getLink() == null) {
+			event.setLink(this.network.getLink(event.getLinkId().toString()));
 		}
-		distance = distance + event.link.getLength();
-		this.travelDistancePerAgent.put(event.agentId.intern(), distance);
+		distance = distance + event.getLink().getLength();
+		this.travelDistancePerAgent.put(event.getPersonId().toString().intern(), distance);
 	}
 
 	public void reset(final int iteration) {

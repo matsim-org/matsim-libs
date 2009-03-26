@@ -153,8 +153,8 @@ public class Wait2Link_2Acts1LinkTest {
 
 		public void handleEvent(final AgentWait2LinkEvent event) {
 			for (AgentLinkPair alp : this.agentLinksPairs)
-				if (alp.agentId.equals(event.agentId)
-						&& alp.linkId.equals(event.linkId)) {
+				if (alp.agentId.equals(event.getPersonId().toString())
+						&& alp.linkId.equals(event.getLinkId().toString())) {
 					try {
 						this.writer.write(alp.toString());
 					} catch (IOException e) {

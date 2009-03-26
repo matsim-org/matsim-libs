@@ -50,9 +50,9 @@ public class CalcTrafficPerformance implements LinkEnterEventHandler {
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		Link l = event.link;
+		Link l = event.getLink();
 		if (l == null) {
-			l = this.network.getLink(event.linkId);
+			l = this.network.getLink(event.getLinkId().toString());
 		}
 		if (l != null) {
 			if (toll == null)

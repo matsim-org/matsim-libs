@@ -434,7 +434,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		}
 
 		public void handleEvent(final LinkEnterEvent event) {
-			if (event.linkId.equals(this.linkId)) this.counter++;
+			if (event.getLinkId().toString().equals(this.linkId)) this.counter++;
 		}
 
 		public void reset(final int iteration) {

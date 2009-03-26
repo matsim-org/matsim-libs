@@ -69,7 +69,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 		// compare plan and events for each agent
 		// compare: type of events, linkId
 		for (LinkedList<PersonEvent> list : events.values()) {
-			Person p = population.getPersons().get(new IdImpl(list.get(0).agentId));
+			Person p = population.getPersons().get(new IdImpl(list.get(0).getPersonId().toString()));
 			// printEvents(list.get(0).agentId);
 			Plan plan = p.getSelectedPlan();
 			int index = 0;
@@ -90,7 +90,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 				// each leg starts with departure on act link
 				assertTrue(list.get(index) instanceof AgentDepartureEvent);
 				assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-						((AgentDepartureEvent) list.get(index)).linkId));
+						((AgentDepartureEvent) list.get(index)).getLinkId().toString()));
 				index++;
 
 				// each CAR leg must enter/leave act link
@@ -98,24 +98,24 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 					// the first LinkEnterEvent is a AgentWait2LinkEvent
 					assertTrue(list.get(index) instanceof AgentWait2LinkEvent);
 					assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-							((AgentWait2LinkEvent) list.get(index)).linkId));
+							((AgentWait2LinkEvent) list.get(index)).getLinkId().toString()));
 					index++;
 
 					assertTrue(list.get(index) instanceof LinkLeaveEvent);
 					assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-							((LinkLeaveEvent) list.get(index)).linkId));
+							((LinkLeaveEvent) list.get(index)).getLinkId().toString()));
 					index++;
 
 					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 						// enter link and leave each link on route
 						assertTrue(list.get(index) instanceof LinkEnterEvent);
 						assertTrue(link.getId().toString().equalsIgnoreCase(
-								((LinkEnterEvent) list.get(index)).linkId));
+								((LinkEnterEvent) list.get(index)).getLinkId().toString()));
 						index++;
 
 						assertTrue(list.get(index) instanceof LinkLeaveEvent);
 						assertTrue(link.getId().toString().equalsIgnoreCase(
-								((LinkLeaveEvent) list.get(index)).linkId));
+								((LinkLeaveEvent) list.get(index)).getLinkId().toString()));
 						index++;
 					}
 				}
@@ -126,7 +126,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 				// each leg ends with arrival on act link
 				assertTrue(list.get(index) instanceof AgentArrivalEvent);
 				assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-						((AgentArrivalEvent) list.get(index)).linkId));
+						((AgentArrivalEvent) list.get(index)).getLinkId().toString()));
 				index++;
 
 				// each leg ends with arrival on act link
@@ -139,10 +139,10 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 	}
 
 	public void handleEvent(PersonEvent event) {
-		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<PersonEvent>());
+		if (!events.containsKey(event.getPersonId().toString())) {
+			events.put(event.getPersonId().toString(), new LinkedList<PersonEvent>());
 		}
-		events.get(event.agentId).add(event);
+		events.get(event.getPersonId().toString()).add(event);
 		if (printEvent) {
 			System.out.println(event.toString());
 		}

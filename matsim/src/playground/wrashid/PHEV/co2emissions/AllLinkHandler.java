@@ -27,10 +27,10 @@ public class AllLinkHandler implements LinkLeaveEventHandler {
 	}
 	
 	public void handleEvent(LinkLeaveEvent event) {
-		if (!co2EmissionsWholeDay.containsKey(event.linkId)){
-			co2EmissionsWholeDay.put(event.linkId, 0.0);
+		if (!co2EmissionsWholeDay.containsKey(event.getLinkId().toString())){
+			co2EmissionsWholeDay.put(event.getLinkId().toString(), 0.0);
 		}
-		co2EmissionsWholeDay.put(event.linkId, co2EmissionsWholeDay.get(event.linkId)+ network.getLink(event.linkId).getLength()/1000*CO2EmissionsGrammPerkm);
+		co2EmissionsWholeDay.put(event.getLinkId().toString(), co2EmissionsWholeDay.get(event.getLinkId().toString())+ network.getLink(event.getLinkId().toString()).getLength()/1000*CO2EmissionsGrammPerkm);
 	}
 
 	public void reset(int iteration) {

@@ -42,7 +42,7 @@ public class TraVolCal extends FinalEventFilterA {
 			LinkEnterEvent ele = rebuildEventLinkEnter((LinkEnterEvent) enter);
 			String linkId = null;
 			try {
-				linkId = ele.linkId;
+				linkId = ele.getLinkId().toString();
 			} catch (NullPointerException npe) {
 				System.err.println(npe);
 			}

@@ -63,9 +63,9 @@ public class CalcODMatrices implements AgentArrivalEventHandler, AgentDepartureE
 		if ((time < this.minTime) || (time >= this.maxTime)) {
 			return;
 		}
-		Location fromLoc = getLocation(event.linkId);
+		Location fromLoc = getLocation(event.getLinkId().toString());
 		if (fromLoc != null) {
-			String agentId = event.agentId;
+			String agentId = event.getPersonId().toString();
 			this.agents.put(agentId, fromLoc);
 			this.agentstime.put(agentId, time);
 		}
@@ -76,13 +76,13 @@ public class CalcODMatrices implements AgentArrivalEventHandler, AgentDepartureE
 		if (time < this.minTime) {
 			return;
 		}
-		String agentId = event.agentId;
+		String agentId = event.getPersonId().toString();
 		Location fromLoc = this.agents.remove(agentId); // use remove instead of get to make sure one arrival event is not used for multiple departure events
 		if (fromLoc == null) {
 			// we have no information on where the agent started
 			return;
 		}
-		Location toLoc = getLocation(event.linkId);
+		Location toLoc = getLocation(event.getLinkId().toString());
 		if (toLoc != null) {
 			this.agents.remove(agentId);
 			Entry entry = this.matrix.getEntry(fromLoc, toLoc);

@@ -73,27 +73,27 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		getScoringFunctionForAgent(event.agentId).startLeg(event.getTime(), event.getLeg());
+		getScoringFunctionForAgent(event.getPersonId().toString()).startLeg(event.getTime(), event.getLeg());
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		getScoringFunctionForAgent(event.agentId).endLeg(event.getTime());
+		getScoringFunctionForAgent(event.getPersonId().toString()).endLeg(event.getTime());
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		getScoringFunctionForAgent(event.agentId).agentStuck(event.getTime());
+		getScoringFunctionForAgent(event.getPersonId().toString()).agentStuck(event.getTime());
 	}
 
 	public void handleEvent(final AgentMoneyEvent event) {
-		getScoringFunctionForAgent(event.agentId).addMoney(event.getAmount());
+		getScoringFunctionForAgent(event.getPersonId().toString()).addMoney(event.getAmount());
 	}
 
 	public void handleEvent(ActStartEvent event) {
-		getScoringFunctionForAgent(event.agentId).startActivity(event.getTime(), event.getAct());
+		getScoringFunctionForAgent(event.getPersonId().toString()).startActivity(event.getTime(), event.getAct());
 	}
 
 	public void handleEvent(ActEndEvent event) {
-		getScoringFunctionForAgent(event.agentId).endActivity(event.getTime());
+		getScoringFunctionForAgent(event.getPersonId().toString()).endActivity(event.getTime());
 	}
 
 	/**

@@ -51,12 +51,12 @@ public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEven
 	}
 	
 	public void handleEvent(AgentDepartureEvent event) {
-		depTimes.put(event.agentId, event.getTime());
+		depTimes.put(event.getPersonId().toString(), event.getTime());
 	}
 
 	public void handleEvent(AgentWait2LinkEvent event) {
-		wait2linkTimes.put(event.agentId, event.getTime());
-		Double depTime = depTimes.get(event.agentId);
+		wait2linkTimes.put(event.getPersonId().toString(), event.getTime());
+		Double depTime = depTimes.get(event.getPersonId().toString());
 		if (depTime != null) {
 			int slot = (int)((event.getTime() - depTime) / 60);
 			if (slot > 120) slot = 120;
@@ -65,25 +65,25 @@ public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEven
 	}
 
 	public void handleEvent(AgentStuckEvent event) {
-		ArrayList<Double> times = stuckLinkTimes.get(event.linkId);			
+		ArrayList<Double> times = stuckLinkTimes.get(event.getLinkId().toString());			
 		if (times == null) {
 			times = new ArrayList<Double>(50);
 		}
 		times.add(event.getTime());
-		stuckLinkTimes.put(event.linkId, times);
+		stuckLinkTimes.put(event.getLinkId().toString(), times);
 		
 		int timeslot = (int)(event.getTime() / 900);
 		if (timeslot > 24*4) timeslot = 24*4;
 		stuckTimes[timeslot]++;
 		
-		Double wait2linkTime = wait2linkTimes.remove(event.agentId);
+		Double wait2linkTime = wait2linkTimes.remove(event.getPersonId().toString());
 		if (wait2linkTime != null) {
 			int slot = (int)((event.getTime() - wait2linkTime) / 60);
 			if (slot > 120) slot = 120;
 			driveTimes[slot]++;
 		}
 		
-		Double depTime = depTimes.remove(event.agentId);
+		Double depTime = depTimes.remove(event.getPersonId().toString());
 		if (depTime != null) {
 			int slot = (int)((event.getTime() - depTime) / 60);
 			if (slot > 120) slot = 120;

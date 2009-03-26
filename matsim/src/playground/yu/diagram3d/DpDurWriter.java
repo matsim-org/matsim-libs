@@ -133,12 +133,12 @@ public class DpDurWriter implements AgentDepartureEventHandler, AgentArrivalEven
 	}
 
 	public void handleEvent(AgentDepartureEvent event) {
-		String agentId=event.agentId;
+		String agentId=event.getPersonId().toString();
 		agentDepTimes.put(agentId, (int) event.getTime());
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
-		String agentId=event.agentId;
+		String agentId=event.getPersonId().toString();
 		if (agentDepTimes.containsKey(agentId)) {
 			int depT = agentDepTimes.remove(agentId);
 			int depH = depT / 3600;

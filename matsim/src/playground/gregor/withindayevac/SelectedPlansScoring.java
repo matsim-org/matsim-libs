@@ -143,25 +143,25 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		getScoringFunctionForAgent(event.agentId).startLeg(event.getTime(), event.getLeg());
+		getScoringFunctionForAgent(event.getPersonId().toString()).startLeg(event.getTime(), event.getLeg());
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		getScoringFunctionForAgent(event.agentId).endLeg(event.getTime());
+		getScoringFunctionForAgent(event.getPersonId().toString()).endLeg(event.getTime());
 	}
 
 	public void handleEvent(final AgentMoneyEvent event) {
-		getScoringFunctionForAgent(event.agentId).addMoney(event.getAmount());
+		getScoringFunctionForAgent(event.getPersonId().toString()).addMoney(event.getAmount());
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		getScoringFunctionForAgent(event.agentId).agentStuck(event.getTime());
+		getScoringFunctionForAgent(event.getPersonId().toString()).agentStuck(event.getTime());
 		this.stuckPenalty += -144.0;
 	}
 	
 
 	public void handleEvent(final LinkEnterEvent event) {
-		final String linkId = event.linkId;
+		final String linkId = event.getLinkId().toString();
 		Link link = this.network.getLink(linkId);
 		Node node = link.getFromNode();
 		ArrayList<String> list = this.mappings.get(node.getId());
@@ -169,7 +169,7 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 			list = new ArrayList<String>();
 			this.mappings.put(node.getId(), list);
 		}
-		String agentId = event.agentId;
+		String agentId = event.getPersonId().toString();
 		list.add(agentId);
 	}
 	

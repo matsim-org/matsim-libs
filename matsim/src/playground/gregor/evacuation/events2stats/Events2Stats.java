@@ -63,7 +63,7 @@ public class Events2Stats implements AgentDepartureEventHandler, AgentArrivalEve
 	}
 	
 	public void handleEvent(final AgentDepartureEvent event) {
-		this.startTimes.put(event.agentId, event.getTime());
+		this.startTimes.put(event.getPersonId().toString(), event.getTime());
 		
 	}
 
@@ -73,7 +73,7 @@ public class Events2Stats implements AgentDepartureEventHandler, AgentArrivalEve
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		this.oaTime += event.getTime() - this.startTimes.get(event.agentId);
+		this.oaTime += event.getTime() - this.startTimes.get(event.getPersonId().toString());
 		this.numAgents++;
 	}
 	

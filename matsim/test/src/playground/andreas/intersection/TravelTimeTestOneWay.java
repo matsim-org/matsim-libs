@@ -159,7 +159,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 
 	public void handleEvent(LinkEnterEvent event) {
 		
-		if (event.linkId.equalsIgnoreCase("2")) {
+		if (event.getLinkId().toString().equalsIgnoreCase("2")) {
 			
 			if (this.beginningOfLink2 == null){				
 				this.beginningOfLink2 = new MeasurePoint(event.getTime() + TravelTimeTestOneWay.timeToWaitBeforeMeasure);

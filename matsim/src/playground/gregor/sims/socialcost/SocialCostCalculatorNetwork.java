@@ -106,8 +106,8 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 	
 	public void handleEvent(final LinkEnterEvent event) {
 
-		LinkInfo info = getLinkInfo(event.linkId);
-		AgentInfo ai = getAgentInfo(event.agentId);
+		LinkInfo info = getLinkInfo(event.getLinkId().toString());
+		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
 		
 		if (ai.stucked) {
 			LinkInfo oldInfo = this.linkInfos.get(ai.currentLink);
@@ -120,28 +120,28 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 				oldInfo.uncon++;
 			}
 		}
-		ai.currentLink = event.linkId;
+		ai.currentLink = event.getLinkId().toString();
 		ai.enterTime = event.getTime();
-		ai.id = event.agentId;
+		ai.id = event.getPersonId().toString();
 		info.agentsOnLink++;
 	}
 	
 	
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		LinkInfo info = getLinkInfo(event.linkId);
-		AgentInfo ai = getAgentInfo(event.agentId);
+		LinkInfo info = getLinkInfo(event.getLinkId().toString());
+		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
 		ai.enterTime = event.getTime();
-		ai.id = event.agentId;
-		ai.currentLink = event.linkId;
+		ai.id = event.getPersonId().toString();
+		ai.currentLink = event.getLinkId().toString();
 		info.agentsOnLink++;
 	}
 	
 	public void handleEvent(final LinkLeaveEvent event) {
 		
-		LinkInfo info = getLinkInfo(event.linkId);
+		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		info.agentsOnLink--;
-		AgentInfo ai = getAgentInfo(event.agentId);
+		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
 
 		if ((event.getTime() - ai.enterTime) <= info.t_free){
 //			info.lastFSSlice  = getTimeSlotIndex(event.time);

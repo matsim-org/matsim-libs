@@ -75,14 +75,14 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 
 	public void handleEvent(LinkEnterEvent enter) {
 		if (toll == null)
-			this.enterTimes.put(enter.agentId, enter.getTime());
+			this.enterTimes.put(enter.getPersonId().toString(), enter.getTime());
 		else {
-			Link link = enter.link;
+			Link link = enter.getLink();
 			if (link == null)
-				link = network.getLink(enter.linkId);
+				link = network.getLink(enter.getLinkId().toString());
 			if (link != null) {
 				if (TollTools.isInRange(link, toll))
-					this.enterTimes.put(enter.agentId, enter.getTime());
+					this.enterTimes.put(enter.getPersonId().toString(), enter.getTime());
 			}
 		}
 	}
@@ -94,11 +94,11 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 	}
 
 	public void handleEvent(LinkLeaveEvent leave) {
-		Double enterTime = this.enterTimes.remove(leave.agentId);
+		Double enterTime = this.enterTimes.remove(leave.getPersonId().toString());
 		if (enterTime != null) {
-			Link l = leave.link;
+			Link l = leave.getLink();
 			if (l == null) {
-				l = this.network.getLink(leave.linkId);
+				l = this.network.getLink(leave.getLinkId().toString());
 			}
 			if (l != null) {
 				this.lengthSum += l.getLength() / 1000.0;
@@ -112,7 +112,7 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 	}
 
 	public void handleEvent(AgentArrivalEvent arrival) {
-		String id = arrival.agentId;
+		String id = arrival.getPersonId().toString();
 		if (this.enterTimes.containsKey(id)) {
 			this.enterTimes.remove(id);
 		}

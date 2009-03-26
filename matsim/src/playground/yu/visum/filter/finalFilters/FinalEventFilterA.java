@@ -62,8 +62,8 @@ public abstract class FinalEventFilterA extends EventFilterA {
 	public LinkEnterEvent rebuildEventLinkEnter(LinkEnterEvent enter) {
 		// very important to rebuild LinkEventData Object: event, aim to get
 		// the id and the length of the right link
-		enter.setAgent(this.plans.getPerson(new IdImpl(enter.agentId)));
-		enter.link = network.getLink(enter.linkId);
+		enter.setPerson(this.plans.getPerson(new IdImpl(enter.getPersonId().toString())));
+		enter.setLink(network.getLink(enter.getLinkId().toString()));
 		return enter;
 	}
 

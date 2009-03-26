@@ -75,7 +75,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		List<Location> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
 		ActivityOption shopsOf2005ShopAct = ((Facility) closestShops.get(0)).getActivityOption(FacilitiesProductionKTI.ACT_TYPE_SHOP);
 		if (shopsOf2005ShopAct != null) {
-			closestShopOpentimes = shopsOf2005ShopAct.getOpentimes();
+			closestShopOpentimes = shopsOf2005ShopAct.getOpeningTimes();
 		} else {
 			log.info("shop activity object of closest shop facility is null.");
 		}
@@ -83,7 +83,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 
 		// remove all existing opentimes
 		for (ActivityOption a : activities.values()) {
-			a.setOpentimes(new TreeMap<DayType, SortedSet<BasicOpeningTime>>());
+			a.setOpeningTimes(new TreeMap<DayType, SortedSet<BasicOpeningTime>>());
 		}
 
 		// if only presence code and work are present
@@ -130,8 +130,8 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 				for (String activityType : activities.keySet()) {
 					if (
 							Pattern.matches(FacilitiesProductionKTI.ACT_TYPE_SHOP + ".*", activityType)) {
-						activities.get(activityType).setOpentimes(closestShopOpentimes);
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).setOpentimes(closestShopOpentimes);
+						activities.get(activityType).setOpeningTimes(closestShopOpentimes);
+						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).setOpeningTimes(closestShopOpentimes);
 					} else if (
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_KINDERGARTEN, activityType) ||
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_PRIMARY, activityType)) {

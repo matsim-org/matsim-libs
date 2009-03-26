@@ -239,27 +239,27 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	public void handleEvent(final LinkEnterEvent event) {
 		// count the agents on the route links
 
-		if (event.linkId.equals(this.firstLinkOnMainRoute)) {
-			this.enterEvents1.put(event.agentId, event.getTime());
+		if (event.getLinkId().toString().equals(this.firstLinkOnMainRoute)) {
+			this.enterEvents1.put(event.getPersonId().toString(), event.getTime());
 		}
-		else if (event.linkId.equals(this.firstLinkOnAlternativeRoute)) {
-			this.enterEvents2.put(event.agentId, event.getTime());
+		else if (event.getLinkId().toString().equals(this.firstLinkOnAlternativeRoute)) {
+			this.enterEvents2.put(event.getPersonId().toString(), event.getTime());
 		}
 
-		if (this.numberOfAgents.containsKey(event.linkId)) {
-			int number = this.numberOfAgents.get(event.linkId);
+		if (this.numberOfAgents.containsKey(event.getLinkId().toString())) {
+			int number = this.numberOfAgents.get(event.getLinkId().toString());
 			number++;
-			this.numberOfAgents.put(event.linkId, Integer.valueOf(number));
+			this.numberOfAgents.put(event.getLinkId().toString(), Integer.valueOf(number));
 		}
 
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
 		// decrease current #agents
-		if (this.numberOfAgents.containsKey(event.linkId)) {
-			int number = this.numberOfAgents.get(event.linkId);
+		if (this.numberOfAgents.containsKey(event.getLinkId().toString())) {
+			int number = this.numberOfAgents.get(event.getLinkId().toString());
 			number--;
-			this.numberOfAgents.put(event.linkId, Integer.valueOf(number));
+			this.numberOfAgents.put(event.getLinkId().toString(), Integer.valueOf(number));
 		}
 
 		// if someone leaves one of the last links of the two alternative routes,
@@ -267,8 +267,8 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		// - check if that vehicle entered at the beginning
 		// - if so, then derive latest measured nashtime input from that
 		boolean timeDifferenceHasChanged = false;
-		if (event.linkId.equals(this.lastLinkOnMainRoute)) {
-			Double t1 = this.enterEvents1.remove(event.agentId);
+		if (event.getLinkId().toString().equals(this.lastLinkOnMainRoute)) {
+			Double t1 = this.enterEvents1.remove(event.getPersonId().toString());
 			if (t1 != null) {
 				double deltaT = event.getTime() - t1;
 				this.ttMeasuredMainRoute.put(event.getTime(), deltaT);
@@ -282,8 +282,8 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 //				}
 			}
 		}
-		else if (event.linkId.equals(this.lastLinkOnAlternativeRoute)) {
-			Double t1 = this.enterEvents2.remove(event.agentId);
+		else if (event.getLinkId().toString().equals(this.lastLinkOnAlternativeRoute)) {
+			Double t1 = this.enterEvents2.remove(event.getPersonId().toString());
 			if (t1 != null) {
 				double deltaT = event.getTime() - t1;
 				this.ttMeasuredAlternativeRoute.put(event.getTime(), deltaT);
@@ -313,19 +313,19 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	public void handleEvent(final AgentDepartureEvent event) {
 		// increase number of agents on the route links
-		if (this.numberOfAgents.containsKey(event.linkId)) {
-			int number = this.numberOfAgents.get(event.linkId);
+		if (this.numberOfAgents.containsKey(event.getLinkId().toString())) {
+			int number = this.numberOfAgents.get(event.getLinkId().toString());
 			number++;
-			this.numberOfAgents.put(event.linkId, Integer.valueOf(number));
+			this.numberOfAgents.put(event.getLinkId().toString(), Integer.valueOf(number));
 		}
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
 		// decrease number of agents on the route links
-		if (this.numberOfAgents.containsKey(event.linkId)) {
-			int number = this.numberOfAgents.get(event.linkId);
+		if (this.numberOfAgents.containsKey(event.getLinkId().toString())) {
+			int number = this.numberOfAgents.get(event.getLinkId().toString());
 			number--;
-			this.numberOfAgents.put(event.linkId, Integer.valueOf(number));
+			this.numberOfAgents.put(event.getLinkId().toString(), Integer.valueOf(number));
 		}
 	}
 
@@ -361,7 +361,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	protected void updateFlow(final int flowResolution, final LinkLeaveEvent event) {
 
 		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
-				.get(event.linkId);
+				.get(event.getLinkId().toString());
 		if (list.size() == flowResolution) {
 			list.removeFirst();
 			list.addLast(event.getTime());
@@ -381,24 +381,24 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		// Flow = agents / seconds:
 		double flow = (list.size() - 1) / (list.getLast() - list.getFirst());
 
-		if (this.intraFlows.containsKey(event.linkId)) {
-			this.intraFlows.put(event.linkId, flow);
+		if (this.intraFlows.containsKey(event.getLinkId().toString())) {
+			this.intraFlows.put(event.getLinkId().toString(), flow);
 		}
-		if (this.inLinksMainRoute.contains(event.link)) {
+		if (this.inLinksMainRoute.contains(event.getLink())) {
 			double inFlow = flow;
-			this.extraFlowsMainRoute.put(event.linkId, inFlow);
+			this.extraFlowsMainRoute.put(event.getLinkId().toString(), inFlow);
 		}
-		if (this.outLinksMainRoute.contains(event.link)) {
+		if (this.outLinksMainRoute.contains(event.getLink())) {
 			double outFlow = -flow;
-			this.extraFlowsMainRoute.put(event.linkId, outFlow);
+			this.extraFlowsMainRoute.put(event.getLinkId().toString(), outFlow);
 		}
-		if (this.inLinksAlternativeRoute.contains(event.link)) {
+		if (this.inLinksAlternativeRoute.contains(event.getLink())) {
 			double inFlow = flow;
-			this.extraFlowsAlternativeRoute.put(event.linkId, inFlow);
+			this.extraFlowsAlternativeRoute.put(event.getLinkId().toString(), inFlow);
 		}
-		if (this.outLinksAlternativeRoute.contains(event.link)) {
+		if (this.outLinksAlternativeRoute.contains(event.getLink())) {
 			double outFlow = -flow;
-			this.extraFlowsAlternativeRoute.put(event.linkId, outFlow);
+			this.extraFlowsAlternativeRoute.put(event.getLinkId().toString(), outFlow);
 		}
 	}
 
@@ -417,7 +417,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	protected void updateFlow(final double flowUpdateTime, final LinkLeaveEvent event) {
 
 		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
-				.get(event.linkId);
+				.get(event.getLinkId().toString());
 		// Remove times older than flowUpdateTime
 			while (!list.isEmpty() && ((list.getFirst() + flowUpdateTime) < event.getTime())) {
 				list.removeFirst();
@@ -428,24 +428,24 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		// Flow = agents / seconds:
 		double flow = (list.size() - 1) / (list.getLast() - list.getFirst());
 
-		if (this.intraFlows.containsKey(event.linkId)) {
-			this.intraFlows.put(event.linkId, flow);
+		if (this.intraFlows.containsKey(event.getLinkId().toString())) {
+			this.intraFlows.put(event.getLinkId().toString(), flow);
 		}
-		if (this.inLinksMainRoute.contains(event.link)) {
+		if (this.inLinksMainRoute.contains(event.getLink())) {
 			double inFlow = flow;
-			this.extraFlowsMainRoute.put(event.linkId, inFlow);
+			this.extraFlowsMainRoute.put(event.getLinkId().toString(), inFlow);
 		}
-		if (this.outLinksMainRoute.contains(event.link)) {
+		if (this.outLinksMainRoute.contains(event.getLink())) {
 			double outFlow = -flow;
-			this.extraFlowsMainRoute.put(event.linkId, outFlow);
+			this.extraFlowsMainRoute.put(event.getLinkId().toString(), outFlow);
 		}
-		if (this.inLinksAlternativeRoute.contains(event.link)) {
+		if (this.inLinksAlternativeRoute.contains(event.getLink())) {
 			double inFlow = flow;
-			this.extraFlowsAlternativeRoute.put(event.linkId, inFlow);
+			this.extraFlowsAlternativeRoute.put(event.getLinkId().toString(), inFlow);
 		}
-		if (this.outLinksAlternativeRoute.contains(event.link)) {
+		if (this.outLinksAlternativeRoute.contains(event.getLink())) {
 			double outFlow = -flow;
-			this.extraFlowsAlternativeRoute.put(event.linkId, outFlow);
+			this.extraFlowsAlternativeRoute.put(event.getLinkId().toString(), outFlow);
 		}
 	}
 

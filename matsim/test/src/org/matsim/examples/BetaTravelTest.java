@@ -171,7 +171,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		}
 
 		public void handleEvent(final LinkEnterEvent event) {
-			if (event.linkId.equals(this.linkId)) {
+			if (event.getLinkId().toString().equals(this.linkId)) {
 				this.enterTimes.add(Double.valueOf(event.getTime()));
 				if (event.getTime() < this.firstCarEnter) this.firstCarEnter = event.getTime();
 				if (event.getTime() > this.lastCarEnter) this.lastCarEnter = event.getTime();
@@ -179,7 +179,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		}
 
 		public void handleEvent(final LinkLeaveEvent event) {
-			if (event.linkId.equals(this.linkId)) {
+			if (event.getLinkId().toString().equals(this.linkId)) {
 				this.leaveTimes.add(Double.valueOf(event.getTime()));
 				if (event.getTime() < this.firstCarLeave) this.firstCarLeave = event.getTime();
 				if (event.getTime() > this.lastCarLeave) this.lastCarLeave = event.getTime();
@@ -479,14 +479,14 @@ public class BetaTravelTest extends MatsimTestCase {
 		}
 
 		public void handleEvent(final AgentDepartureEvent event) {
-			if (!this.agentSeen.contains(event.agentId)) { // only store first departure
-				this.agentDepTimes.put(event.agentId, Double.valueOf(event.getTime()));
-				this.agentSeen.add(event.agentId);
+			if (!this.agentSeen.contains(event.getPersonId().toString())) { // only store first departure
+				this.agentDepTimes.put(event.getPersonId().toString(), Double.valueOf(event.getTime()));
+				this.agentSeen.add(event.getPersonId().toString());
 			}
 		}
 
 		public void handleEvent(final AgentArrivalEvent event) {
-			String agentId = event.agentId;
+			String agentId = event.getPersonId().toString();
 			Double depTime = this.agentDepTimes.remove(agentId);
 			if (depTime != null) {
 				this.depTimes[this.agentCounter] = depTime.doubleValue() / 3600.0;

@@ -102,7 +102,7 @@ public class FacilitiesWriter extends Writer {
 				this.handler.startActivity(a, this.out);
 				this.handler.startCapacity(a, this.out);
 				this.handler.endCapacity(this.out);
-				Iterator<SortedSet<BasicOpeningTime>> o_set_it = a.getOpentimes().values().iterator();
+				Iterator<SortedSet<BasicOpeningTime>> o_set_it = a.getOpeningTimes().values().iterator();
 				while (o_set_it.hasNext()) {
 					SortedSet<BasicOpeningTime> o_set = o_set_it.next();
 					Iterator<BasicOpeningTime> o_it = o_set.iterator();

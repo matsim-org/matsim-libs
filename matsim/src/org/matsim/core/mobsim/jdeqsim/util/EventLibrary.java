@@ -20,7 +20,7 @@ public class EventLibrary {
 		double startLegTime = 0;
 
 		for (int i = 0; i < events.size(); i++) {
-			if (Integer.parseInt(events.get(i).agentId) == agentId) {
+			if (Integer.parseInt(events.get(i).getPersonId().toString()) == agentId) {
 				if (events.get(i) instanceof AgentDepartureEvent) {
 					startLegTime = events.get(i).getTime();
 				} else if (events.get(i) instanceof AgentArrivalEvent) {
@@ -49,13 +49,13 @@ public class EventLibrary {
 					// the problem is, that some agent departure events are
 					// negative.
 					// this solves this problem
-					startingTime.put(currentEvent.agentId, 0.0);
+					startingTime.put(currentEvent.getPersonId().toString(), 0.0);
 				} else {
-					startingTime.put(currentEvent.agentId, currentEvent.getTime());
+					startingTime.put(currentEvent.getPersonId().toString(), currentEvent.getTime());
 				}
 			} else if (currentEvent instanceof AgentArrivalEvent) {
 				travelTime += currentEvent.getTime()
-						- startingTime.get(currentEvent.agentId);
+						- startingTime.get(currentEvent.getPersonId().toString());
 			}
 		}
 		return travelTime;
