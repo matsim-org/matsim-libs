@@ -24,21 +24,24 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -52,6 +55,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 	private Plan plan;
 	private Config config;
+	private Facilities facilities;
 	
 	/*package*/ static final Logger logger = Logger.getLogger(ActivityScoringFunctionTest.class);
 
@@ -74,10 +78,10 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		Person person = new PersonImpl(new IdImpl("123"));
 
 		// generate facilities
-		Facilities facilities = new FacilitiesImpl();
-		Facility facility1 = facilities.createFacility(new IdImpl("1"), new CoordImpl(0.0, 0.0));
-		Facility facility3 = facilities.createFacility(new IdImpl("3"), new CoordImpl(1000.0, 1000.0));
-		Facility facility5 = facilities.createFacility(new IdImpl("5"), new CoordImpl(1000.0, 1010.0));
+		this.facilities = new FacilitiesImpl();
+		Facility facility1 = this.facilities.createFacility(new IdImpl("1"), new CoordImpl(0.0, 0.0));
+		Facility facility3 = this.facilities.createFacility(new IdImpl("3"), new CoordImpl(1000.0, 1000.0));
+		Facility facility5 = this.facilities.createFacility(new IdImpl("5"), new CoordImpl(1000.0, 1010.0));
 		
 		// generate network
 		NetworkLayer network = new NetworkLayer();
@@ -140,46 +144,186 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 	}
 
-	private ScoringFunction getScoringFunction() {
+	public void testAlwaysOpen() {
+		
+		// []{end home, work_sector3, leisure, work_Sector3, start home, finish, reset}
+		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:10:00",  "00:10:00", "00:10:00", "00:10:00", "00:00:00"};
+		String[] expectedWaitingTimeSequence = new String[]{"00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00"};
+		TreeMap<String, String[]> expectedAccumulatedActivityDurations = new TreeMap<String, String[]>();
+		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "14:30:00", "14:30:00", null});
+		expectedAccumulatedActivityDurations.put("work_sector3", new String[]{null, "06:00:00", "06:00:00", "08:00:00", "08:00:00", "08:00:00", null});
+		expectedAccumulatedActivityDurations.put("leisure", new String[]{null, null, "00:20:00", "00:20:00", "00:20:00", "00:20:00", null});
+		this.runTest(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
+
+	}
+
+	public void testOpenLongEnough() {
+		
+		Facility facility = this.facilities.getFacilities().get(new IdImpl("3"));
+		ActivityOption actOpt = facility.createActivityOption("work_sector3");
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("18:00:00")));
+		
+		facility = this.facilities.getFacilities().get(new IdImpl("5"));
+		actOpt = facility.createActivityOption("leisure");
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("16:00:00")));
+
+		// []{end home, work_sector3, leisure, work_Sector3, start home, finish, reset}
+		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:10:00",  "00:10:00", "00:10:00", "00:10:00", "00:00:00"};
+		String[] expectedWaitingTimeSequence = new String[]{"00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00"};
+		TreeMap<String, String[]> expectedAccumulatedActivityDurations = new TreeMap<String, String[]>();
+		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "14:30:00", "14:30:00", null});
+		expectedAccumulatedActivityDurations.put("work_sector3", new String[]{null, "06:00:00", "06:00:00", "08:00:00", "08:00:00", "08:00:00", null});
+		expectedAccumulatedActivityDurations.put("leisure", new String[]{null, null, "00:20:00", "00:20:00", "00:20:00", "00:20:00", null});
+		this.runTest(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
+
+	}
+	
+	public void testWaiting() {
+	
+		Facility facility = this.facilities.getFacilities().get(new IdImpl("3"));
+		ActivityOption actOpt = facility.createActivityOption("work_sector3");
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("14:00:00")));
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("15:15:00"), Time.parseTime("20:00:00")));
+		
+		facility = this.facilities.getFacilities().get(new IdImpl("5"));
+		actOpt = facility.createActivityOption("leisure");
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
+
+		// []{end home, work_sector3, leisure, work_Sector3, start home, finish, reset}
+		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:30:00",  "00:30:00", "00:30:00", "00:30:00", "00:00:00"};
+		String[] expectedWaitingTimeSequence = new String[]{"00:00:00", "00:30:00", "00:50:00", "01:05:00", "01:05:00", "01:05:00", "00:00:00"};
+		TreeMap<String, String[]> expectedAccumulatedActivityDurations = new TreeMap<String, String[]>();
+		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "14:30:00", "14:30:00", null});
+		expectedAccumulatedActivityDurations.put("work_sector3", new String[]{null, "05:30:00", "05:30:00", "07:15:00", "07:15:00", "07:15:00", null});
+		expectedAccumulatedActivityDurations.put("leisure", new String[]{null, null, "00:00:00", "00:00:00", "00:00:00", "00:00:00", null});
+		this.runTest(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
+
+	}
+	
+	public void testOverlapping() {
+		
+		Facility facility = this.facilities.getFacilities().get(new IdImpl("3"));
+		ActivityOption actOpt = facility.createActivityOption("work_sector3");
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("10:00:00")));
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("10:30:00"), Time.parseTime("14:00:00")));
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("15:15:00"), Time.parseTime("20:00:00")));
+		
+		facility = this.facilities.getFacilities().get(new IdImpl("5"));
+		actOpt = facility.createActivityOption("leisure");
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
+
+		// []{end home, work_sector3, leisure, work_Sector3, start home, finish, reset}
+		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:30:00",  "00:30:00", "00:30:00", "00:30:00", "00:00:00"};
+		String[] expectedWaitingTimeSequence = new String[]{"00:00:00", "01:00:00", "01:20:00", "01:35:00", "01:35:00", "01:35:00", "00:00:00"};
+		TreeMap<String, String[]> expectedAccumulatedActivityDurations = new TreeMap<String, String[]>();
+		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "14:30:00", "14:30:00", null});
+		expectedAccumulatedActivityDurations.put("work_sector3", new String[]{null, "05:00:00", "05:00:00", "06:45:00", "06:45:00", "06:45:00", null});
+		expectedAccumulatedActivityDurations.put("leisure", new String[]{null, null, "00:00:00", "00:00:00", "00:00:00", "00:00:00", null});
+		this.runTest(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
+		
+	}
+	
+	protected void runTest(
+			String[] expectedTooShortDurationsSequence, 
+			String[] expectedWaitingTimeSequence, 
+			TreeMap<String, String[]> expectedAccumulatedActivityDurations) {
 		
 		TreeMap<Id, FacilityPenalty> emptyFacilityPenalties = new TreeMap<Id, FacilityPenalty>();
 		KTIYear3ScoringFunctionFactory factory = new KTIYear3ScoringFunctionFactory(config.charyparNagelScoring(), emptyFacilityPenalties);
 		ScoringFunction testee = factory.getNewScoringFunction(this.plan);
 
 		testee.endActivity(Time.parseTime("08:00:00"));
+		
+		assertEquals(0, factory.getActivities().getAccumulatedDurations().size());
+		assertEquals(expectedTooShortDurationsSequence[0], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[0], Time.writeTime(factory.getActivities().getAccumulatedWaitingTime()));
+		
 		testee.startLeg(Time.parseTime("08:00:00"), (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(Time.parseTime("08:30:00"));
 		testee.startActivity(Time.parseTime("08:30:00"), (Activity) this.plan.getPlanElements().get(2));
 		testee.endActivity(Time.parseTime("14:30:00"));
+
+		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
+			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
+				assertEquals(expectedAccumulatedActivityDurations.get(actType)[1], Time.writeTime(factory.getActivities().getAccumulatedDurations().get(actType)));
+			}
+		}
+		assertEquals(expectedTooShortDurationsSequence[1], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[1], Time.writeTime(factory.getActivities().getAccumulatedWaitingTime()));
+
 		testee.startLeg(Time.parseTime("14:30:00"), (Leg) this.plan.getPlanElements().get(3));
 		testee.endLeg(Time.parseTime("14:35:00"));
 		testee.startActivity(Time.parseTime("14:35:00"), (Activity) this.plan.getPlanElements().get(4));
 		testee.endActivity(Time.parseTime("14:55:00"));
+
+		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
+			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
+				assertEquals(expectedAccumulatedActivityDurations.get(actType)[2], Time.writeTime(factory.getActivities().getAccumulatedDurations().get(actType)));
+			}
+		}
+		assertEquals(expectedTooShortDurationsSequence[2], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[2], Time.writeTime(factory.getActivities().getAccumulatedWaitingTime()));
+		
 		testee.startLeg(Time.parseTime("14:55:00"), (Leg) this.plan.getPlanElements().get(5));
 		testee.endLeg(Time.parseTime("15:00:00"));
 		testee.startActivity(Time.parseTime("15:00:00"), (Activity) this.plan.getPlanElements().get(6));
 		testee.endActivity(Time.parseTime("17:00:00"));
+
+		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
+			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
+				assertEquals(expectedAccumulatedActivityDurations.get(actType)[3], Time.writeTime(factory.getActivities().getAccumulatedDurations().get(actType)));
+			}
+		}
+		assertEquals(expectedTooShortDurationsSequence[3], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[3], Time.writeTime(factory.getActivities().getAccumulatedWaitingTime()));
+
 		testee.startLeg(Time.parseTime("17:00:00"), (Leg) this.plan.getPlanElements().get(7));
 		testee.endLeg(Time.parseTime("17:30:00"));
 		testee.startActivity(Time.parseTime("17:30:00"), (Activity) this.plan.getPlanElements().get(8));
+
+		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
+			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
+				assertEquals(expectedAccumulatedActivityDurations.get(actType)[4], Time.writeTime(factory.getActivities().getAccumulatedDurations().get(actType)));
+			}
+		}
+		assertEquals(expectedTooShortDurationsSequence[4], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[4], Time.writeTime(factory.getActivities().getAccumulatedWaitingTime()));
+
 		testee.finish();
+
+		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
+			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
+				assertEquals(expectedAccumulatedActivityDurations.get(actType)[5], Time.writeTime(factory.getActivities().getAccumulatedDurations().get(actType)));
+			}
+		}
+		assertEquals(expectedTooShortDurationsSequence[5], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[5], Time.writeTime(factory.getActivities().getAccumulatedWaitingTime()));
+
+		testee.reset();
+
+		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
+			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
+				assertEquals(expectedAccumulatedActivityDurations.get(actType)[6], Time.writeTime(factory.getActivities().getAccumulatedDurations().get(actType)));
+			}
+		}
+		assertEquals(expectedTooShortDurationsSequence[6], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[6], Time.writeTime(factory.getActivities().getAccumulatedWaitingTime()));
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+		// check zero utility durations
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+		assertEquals(1.677557, factory.getActivities().getZeroUtilityDurations().get("work_sector3"), 1e-3);
+		assertEquals(8.564183, factory.getActivities().getZeroUtilityDurations().get("home"), 1e-3);
+		assertEquals(0.0, factory.getActivities().getZeroUtilityDurations().get("leisure"), 1e-3);
 		
-		return testee;
 	}
 	
-	public void testDefault() {
-
-		ScoringFunction sf = this.getScoringFunction();
-		
-		logger.info("Overall score: " + sf.getScore());
-		
-	}
-
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		this.plan = null;
 		this.config = null;
+		this.facilities = null;
 	}
 	
 }
