@@ -153,7 +153,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "14:30:00", "14:30:00", null});
 		expectedAccumulatedActivityDurations.put("work_sector3", new String[]{null, "06:00:00", "06:00:00", "08:00:00", "08:00:00", "08:00:00", null});
 		expectedAccumulatedActivityDurations.put("leisure", new String[]{null, null, "00:20:00", "00:20:00", "00:20:00", "00:20:00", null});
-		this.calcScore(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
+		this.runTest(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
 	}
 
 	public void testOpenLongEnough() {
@@ -173,7 +173,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "14:30:00", "14:30:00", null});
 		expectedAccumulatedActivityDurations.put("work_sector3", new String[]{null, "06:00:00", "06:00:00", "08:00:00", "08:00:00", "08:00:00", null});
 		expectedAccumulatedActivityDurations.put("leisure", new String[]{null, null, "00:20:00", "00:20:00", "00:20:00", "00:20:00", null});
-		this.calcScore(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
+		this.runTest(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
 
 	}
 	
@@ -195,7 +195,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "14:30:00", "14:30:00", null});
 		expectedAccumulatedActivityDurations.put("work_sector3", new String[]{null, "05:30:00", "05:30:00", "07:15:00", "07:15:00", "07:15:00", null});
 		expectedAccumulatedActivityDurations.put("leisure", new String[]{null, null, "00:00:00", "00:00:00", "00:00:00", "00:00:00", null});
-		this.calcScore(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
+		this.runTest(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
 
 	}
 	
@@ -218,11 +218,11 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "14:30:00", "14:30:00", null});
 		expectedAccumulatedActivityDurations.put("work_sector3", new String[]{null, "05:00:00", "05:00:00", "06:45:00", "06:45:00", "06:45:00", null});
 		expectedAccumulatedActivityDurations.put("leisure", new String[]{null, null, "00:00:00", "00:00:00", "00:00:00", "00:00:00", null});
-		this.calcScore(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
+		this.runTest(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
 		
 	}
 	
-	protected void calcScore(
+	protected void runTest(
 			String[] expectedTooShortDurationsSequence, 
 			String[] expectedWaitingTimeSequence, 
 			TreeMap<String, String[]> expectedAccumulatedActivityDurations) {

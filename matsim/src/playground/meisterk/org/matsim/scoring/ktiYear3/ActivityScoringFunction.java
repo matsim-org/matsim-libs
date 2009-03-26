@@ -149,7 +149,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			//---------------------------------------------------------------------------
 		}
 		
-		// accumulate waiting time, which is the time that copuld not be spent in activities due to closed facilities
+		// accumulate waiting time, which is the time that could not be performed in activities due to closed facilities
 		this.accumulatedWaitingTime += (departureTime - arrivalTime) - additionalDuration;
 
 		// disutility if duration was too short
