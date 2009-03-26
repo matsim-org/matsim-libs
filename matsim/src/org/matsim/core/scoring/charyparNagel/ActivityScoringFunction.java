@@ -250,6 +250,4 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		this.index+=2;
 	}
 
-
-
 }

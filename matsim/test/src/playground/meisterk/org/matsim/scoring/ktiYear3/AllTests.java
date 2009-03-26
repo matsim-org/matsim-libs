@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk;
+package playground.meisterk.org.matsim.scoring.ktiYear3;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -26,11 +26,9 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.meisterk");
+		TestSuite suite = new TestSuite("Tests for playground.meisterk.scoring.ktiYear3");
 		//$JUnit-BEGIN$
-		suite.addTest(playground.meisterk.org.matsim.config.groups.AllTests.suite());
-		suite.addTest(playground.meisterk.org.matsim.population.algorithms.AllTests.suite());
-		suite.addTest(playground.meisterk.org.matsim.scoring.ktiYear3.AllTests.suite());
+		suite.addTestSuite(playground.meisterk.org.matsim.scoring.ktiYear3.ActivityScoringFunctionTest.class);
 		//$JUnit-END$
 		return suite;
 	}
