@@ -94,9 +94,12 @@ public class AnalyzePlans {
 						numberOfLeisureActsPerPerson++;
 					}
 				}
-				totalDesiredShoppingDuration += (desiredShopPerPerson / numberOfShoppingActsPerPerson);
-				totalDesiredLeisureDuration += desiredLeisurePerPerson / numberOfLeisureActsPerPerson;
-				
+				if (numberOfShoppingActsPerPerson > 0) {
+					totalDesiredShoppingDuration += (desiredShopPerPerson / numberOfShoppingActsPerPerson);
+				}
+				if (numberOfLeisureActsPerPerson > 0) {
+					totalDesiredLeisureDuration += desiredLeisurePerPerson / numberOfLeisureActsPerPerson;
+				}				
 			}
 			out.write("Plans file: " + this.plansfilePath);
 			out.write("Number of shopping activities: \t" + numberOfShoppingActs + "\n");
