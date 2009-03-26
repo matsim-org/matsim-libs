@@ -24,7 +24,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.network.MatsimLaneDefinitionsReader;
-import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.testcases.MatsimTestCase;
@@ -72,7 +71,7 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 	}
 
 	public void testEventsV1Xml() throws IOException {
-		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/events/EventsReadersTest/events.xml");
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/core/events/EventsReadersTest/events.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Events, g.getGuessedFileType());
 		assertNull(g.getPublicId());
 		assertNull(g.getSystemId());

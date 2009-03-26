@@ -1,27 +1,26 @@
 package org.matsim.core.mobsim.jdeqsim;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.testcases.MatsimTestCase;
 
 public class ConfigParameterTest extends MatsimTestCase {
 
 	public void testParametersSetCorrectly() {
-		String args[] = new String[] { "test/input/org/matsim/mobsim/jdeqsim/config.xml" };
-		Controler controler = new Controler(args);
-		controler.setOverwriteFiles(true);
+		Config config = super.loadConfig(this.getPackageInputDirectory() + "config.xml");
+//		config.controler().setLastIteration(-1); // we don't really want to run the simulation
+		Controler controler = new Controler(config);
+		
 		controler.run();
-		/*
-		 * make sure, all simulation parameters are set properly from
-		 * config xml file
-		 */
+		/* make sure, all simulation parameters are set properly from
+		 * config xml file */
 
-		assertEquals(360.0, SimulationParameters.getSimulationEndTime());
-		assertEquals(2.0, SimulationParameters.getFlowCapacityFactor());
-		assertEquals(3.0, SimulationParameters.getStorageCapacityFactor());
-		assertEquals(3600.0, SimulationParameters.getMinimumInFlowCapacity());
-		assertEquals(10.0, SimulationParameters.getCarSize());
-		assertEquals(20.0, SimulationParameters.getGapTravelSpeed());
-		assertEquals(9000.0, SimulationParameters.getSqueezeTime());
+		assertEquals(360.0, SimulationParameters.getSimulationEndTime(), EPSILON);
+		assertEquals(2.0, SimulationParameters.getFlowCapacityFactor(), EPSILON);
+		assertEquals(3.0, SimulationParameters.getStorageCapacityFactor(), EPSILON);
+		assertEquals(3600.0, SimulationParameters.getMinimumInFlowCapacity(), EPSILON);
+		assertEquals(10.0, SimulationParameters.getCarSize(), EPSILON);
+		assertEquals(20.0, SimulationParameters.getGapTravelSpeed(), EPSILON);
+		assertEquals(9000.0, SimulationParameters.getSqueezeTime(), EPSILON);
 	}
 }

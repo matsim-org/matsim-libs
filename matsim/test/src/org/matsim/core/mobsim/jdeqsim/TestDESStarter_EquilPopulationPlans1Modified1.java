@@ -19,14 +19,14 @@ public class TestDESStarter_EquilPopulationPlans1Modified1 extends MatsimTestCas
 
 	public void test_EquilPopulationPlans1Modified1_DEQSimEventFileComparator() {
 		DEQSimEventFileComparator deqSimComparator = new DEQSimEventFileComparator(
-				"test/input/org/matsim/mobsim/jdeqsim/deq_events.txt");
+				getPackageInputDirectory() + "deq_events.txt");
 		deqSimComparator.startTestDES("test/scenarios/equil/config.xml", false,
 				"test/scenarios/equil/plans1.xml", new EquilPopulationPlans1Modified1());
 	}
 
 	public void test_EquilPopulationPlans1Modified1_DEQSimEventFileTravelTimeComparator() {
 		DEQSimEventFileTravelTimeComparator deqSimTravelTimeComparator = new DEQSimEventFileTravelTimeComparator(
-				"test/input/org/matsim/mobsim/jdeqsim/deq_events.txt", 1);
+				getPackageInputDirectory() + "deq_events.txt", 1);
 		deqSimTravelTimeComparator.startTestDES("test/scenarios/equil/config.xml", false,
 				"test/scenarios/equil/plans1.xml", new EquilPopulationPlans1Modified1());
 	}

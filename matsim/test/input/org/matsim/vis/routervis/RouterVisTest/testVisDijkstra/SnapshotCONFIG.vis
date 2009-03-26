@@ -7,12 +7,12 @@
 	Auto generated configuration file.
 
 	Used StreamWriter implementation: 
-	  org.matsim.utils.vis.routervis.RouterNetStateWriter
+	  org.matsim.vis.routervis.RouterNetStateWriter
 
 	 -->
 
     <module name="general">
-    	<param name="netfile" value="test/input/org/matsim/utils/vis/routervis/RouterVisTest/network.xml"/>
+    	<param name="netfile" value="test/input/org/matsim/vis/routervis/RouterVisTest/network.xml"/>
     </module>
 
     <module name="temporal">
