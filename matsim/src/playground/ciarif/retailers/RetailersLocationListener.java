@@ -29,7 +29,6 @@ package playground.ciarif.retailers;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -37,7 +36,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -47,6 +45,7 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -67,6 +66,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	private Retailers retailers;
 	private RetailersSummaryWriter rs = null;
 	private PlansSummaryTable pst = null;
+	private MakeATableFromXMLFacilities txf = null;
 	private LinksRetailerReader lrr = null;
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
@@ -87,6 +87,9 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		this.pst = new PlansSummaryTable (popOutFile);
 		this.lrr = new LinksRetailerReader (controler);
 		this.links = lrr.ReadLinks(); 
+		this.txf = new MakeATableFromXMLFacilities("output/facilities_table.txt");
+		FacilitiesImpl facs = (FacilitiesImpl) controler.getFacilities();
+		txf.write(facs);
 		String retailersOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
 		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.rs = new RetailersSummaryWriter (retailersOutFile);
@@ -130,45 +133,42 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
-		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
-		
-		// works, but it is not nicely programmed. shouldn't be a global container, should be
-		// controlled by the controler (or actually added to the population)
-//		Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
-		
-		controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
-		
-		for (Retailer r : this.retailers.getRetailers().values()) {
-			Map<Id,Facility> facs = r.runStrategy();
-			movedFacilities.putAll(facs);
-			System.out.println("moved facilities =" + facs);
-		}
-		
-		int iter = controler.getIteration();
-		System.out.println("retailers : " + this.retailers);
-		this.rs.write(this.retailers);
-		
-		for (Person p : controler.getPopulation().getPersons().values()) {
-			pst.run(p,iter);
-			for (Plan plan : p.getPlans()) {
-				
-				boolean routeIt = false;
-				Iterator<?> actIter = plan.getIteratorAct();
-				while (actIter.hasNext()) {
+		System.out.println("Veryfing if the retailers need to be relocated " + controler.getIteration()%5);
+		if (controler.getIteration()%10==0) {
+			Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
+			
+			// works, but it is not nicely programmed. shouldn't be a global container, should be
+			// controlled by the controler (or actually added to the population)
+			//Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
+			
+			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
+			
+			for (Retailer r : this.retailers.getRetailers().values()) {
+				Map<Id,Facility> facs = r.runStrategy();
+				movedFacilities.putAll(facs);
+				System.out.println("moved facilities =" + facs);
+			}
+			
+			int iter = controler.getIteration();
+			this.rs.write(this.retailers);
+			
+			for (Person p : controler.getPopulation().getPersons().values()) {
+				pst.run(p,iter);
+				for (Plan plan : p.getPlans()) {
 					
-					Activity act = (Activity)actIter.next();
-					log.info("Activity = " + act);
-					log.info("Activity's facility = " + act.getFacilityId());
-					log.info("Activity's facility = " + act.getFacility().getId());
-					if (movedFacilities.containsKey(act.getFacilityId())) {
-						log.info("link = " + act.getFacility().getLink());
-						log.info("link class = " + act.getFacility().getLink().getClass());
-						act.setLink(act.getFacility().getLink());
-						routeIt = true;
+					boolean routeIt = false;
+					Iterator<?> actIter = plan.getIteratorAct();
+					while (actIter.hasNext()) {
+						
+						Activity act = (Activity)actIter.next();
+						if (movedFacilities.containsKey(act.getFacilityId())) {
+							act.setLink(act.getFacility().getLink());
+							routeIt = true;
+						}
 					}
-				}
-				if (routeIt) {
-					pcrl.run(plan);
+					if (routeIt) {
+						pcrl.run(plan);
+					}
 				}
 			}
 		}
