@@ -21,7 +21,6 @@
 package org.matsim.vis.otfvis.data;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
@@ -39,15 +38,12 @@ import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PoolFactory;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
-import org.matsim.vis.otfvis.opengl.layer.ColoredStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
-import org.matsim.vis.otfvis.opengl.queries.OTFReplaceQuery;
 
 
 public class OTFClientQuad extends QuadTree<OTFDataReader> {
@@ -81,7 +77,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 	}
 
-	class ReadDataExecutor implements Executor<OTFDataReader> {
+	private static class ReadDataExecutor implements Executor<OTFDataReader> {
 		final ByteBuffer in;
 		boolean readConst;
 		SceneGraph graph;
@@ -105,7 +101,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 	}
 
-	class InvalidateExecutor implements Executor<OTFDataReader> {
+	private static class InvalidateExecutor implements Executor<OTFDataReader> {
 		private final SceneGraph result;
 		public InvalidateExecutor(final SceneGraph result) {
 			this.result = result;
@@ -116,7 +112,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 	}
 
-	public class ClassCountExecutor implements Executor<OTFDataReader> {
+	public static class ClassCountExecutor implements Executor<OTFDataReader> {
 		private final Class targetClass;
 		private int count = 0;
 
@@ -187,7 +183,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 //		Gbl.printElapsedTime();
 //		System.out.println("^from serv time -- v read in time");
 //		Gbl.startMeasurement();
-		this.execute(bound, this.new ReadDataExecutor(in, readConst, result));
+		this.execute(bound, new ReadDataExecutor(in, readConst, result));
 		if (readAdd) getAdditionalData(in, readConst, result);
 //		Gbl.printElapsedTime();
 		PoolFactory.resetAll();
@@ -305,7 +301,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 
 		//int colls =
-		this.execute(rect, this.new InvalidateExecutor(result));
+		this.execute(rect, new InvalidateExecutor(result));
 		for(OTFDataReader element : this.additionalElements) {
 			element.invalidate(result);
 		}
@@ -353,7 +349,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		return replace(drawer, point.x, point.y,OTFLinkAgentsHandler.class,OTFDefaultLinkHandler.class,OTFDefaultLinkHandler.Writer.class);
 	}
 	
-	class CollectExecutor implements Executor<OTFDataReader> {
+	private static class CollectExecutor implements Executor<OTFDataReader> {
 		private Class class_old;
 		class Item {
 			public double x;

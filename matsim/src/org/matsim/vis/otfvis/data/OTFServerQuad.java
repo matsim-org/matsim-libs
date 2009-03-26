@@ -32,7 +32,6 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 
 
@@ -41,7 +40,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 
 	private final List<OTFDataWriter> additionalElements= new LinkedList<OTFDataWriter>();
 
-	class ConvertToClientExecutor implements Executor<OTFDataWriter> {
+	private static class ConvertToClientExecutor implements Executor<OTFDataWriter> {
 		final OTFConnectionManager connect;
 		final OTFClientQuad client;
 
@@ -66,7 +65,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 	}
 
 
-	class WriteDataExecutor implements Executor<OTFDataWriter> {
+	private static class WriteDataExecutor implements Executor<OTFDataWriter> {
 		final ByteBuffer out;
 		boolean writeConst;
 
@@ -84,9 +83,6 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 		}
 	}
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 1L;
 	protected double minEasting;
 	protected double maxEasting;
@@ -189,7 +185,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 
 		//int colls = 
 		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
-				this.new ConvertToClientExecutor(connect,client));
+				new ConvertToClientExecutor(connect,client));
 //		System.out.print("server executor count: " +colls );
 
 		for(OTFDataWriter element : this.additionalElements) {
@@ -211,7 +207,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 	public void writeConstData(ByteBuffer out) {
 		//int colls = 
 		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
-				this.new WriteDataExecutor(out,true));
+				new WriteDataExecutor(out,true));
 
 		for(OTFDataWriter element : this.additionalElements) {
 			try {
@@ -224,7 +220,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 
 	public void writeDynData(QuadTree.Rect bounds, ByteBuffer out) {
 		//int colls = 
-		this.execute(bounds, this.new WriteDataExecutor(out,false));
+		this.execute(bounds, new WriteDataExecutor(out,false));
 		//System.out.print("# of Writes: " + colls + " -> ");
 
 		for(OTFDataWriter element : this.additionalElements) {
@@ -237,33 +233,21 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 	}
 
 	// Internally we hold the coordinates from 0,0 to max -min .. to optimize use of float in visualizer
-	/* (non-Javadoc)
-	 * @see org.matsim.utils.collections.QuadTree#getMaxEasting()
-	 */
 	@Override
 	public double getMaxEasting() {
 		return this.maxEasting;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.utils.collections.QuadTree#getMaxNorthing()
-	 */
 	@Override
 	public double getMaxNorthing() {
 		return this.maxNorthing;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.utils.collections.QuadTree#getMinEasting()
-	 */
 	@Override
 	public double getMinEasting() {
 		return this.minEasting;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.utils.collections.QuadTree#getMinNorthing()
-	 */
 	@Override
 	public double getMinNorthing() {
 		return this.minNorthing;

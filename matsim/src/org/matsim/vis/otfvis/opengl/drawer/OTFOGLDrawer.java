@@ -82,6 +82,7 @@ import org.matsim.vis.netvis.renderers.ValueColorizer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgent;
+import org.matsim.vis.otfvis.data.OTFClientQuad.ClassCountExecutor;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.OTFVisConfig.ZoomEntry;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
@@ -90,7 +91,6 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.vis.otfvis.opengl.gui.VisGUIMouseHandler;
-import org.matsim.vis.otfvis.opengl.queries.QueryLinkId;
 
 import com.sun.opengl.util.ImageUtil;
 import com.sun.opengl.util.Screenshot;
@@ -486,7 +486,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.canvas.setPreferredSize(new Dimension(300,300));
 		this.canvas.setMaximumSize(new Dimension(1024,1024));
 
-		OTFClientQuad.ClassCountExecutor counter = clientQ.new ClassCountExecutor(OTFDefaultLinkHandler.class);
+		OTFClientQuad.ClassCountExecutor counter = new ClassCountExecutor(OTFDefaultLinkHandler.class);
 		clientQ.execute(null, counter);
 		double linkcount = counter.getCount();
 
