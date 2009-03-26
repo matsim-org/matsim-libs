@@ -14,21 +14,23 @@ import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
+import org.matsim.vis.otfvis.opengl.layer.ColoredStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
 
-public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
+public class OTFVisDualView extends OnTheFlyClientFileQuad{
 	
 	private static final String BG_IMG_ROOT = "../vsp-cvs/studies/padang/imagery/sliced/";
 	
-	public OnTheFlyClientFilePadang(String filename2, OTFConnectionManager connect, boolean split) {
+	public OTFVisDualView(String filename2, OTFConnectionManager connect, boolean split) {
 		super(filename2, connect, split);
 		// TODO Auto-generated constructor stub
 	}
@@ -50,18 +52,6 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		client.run();
 	}
 
-	@Override
-	public OTFDrawer getLeftDrawerComponent(JFrame frame) throws RemoteException {
-		 ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(2);
-		OTFClientQuad clientQ = hostControl.createNewView(null, connect1);
-		//clientQ.setCachingAllowed(false);
-		
-		OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);
-
-
-		// DS TODO Repair painting of this colored net drawer.isActiveNet = true;
-		return drawer;
-	}
 
 	private void loadSlicedBackgroundLayer(int ux, int uy, int num_x, int num_y, int size, String dir) {
 		int x=ux;
@@ -85,8 +75,19 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	
 	
 	@Override
+	public OTFDrawer getLeftDrawerComponent(JFrame frame) throws RemoteException {
+		OTFClientQuad clientQ = hostControl.createNewView(null, connect1);
+		//clientQ.setCachingAllowed(false);
+		
+		OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);
+
+
+		// DS TODO Repair painting of this colored net drawer.isActiveNet = true;
+		return drawer;
+	}
+	@Override
 	public OTFDrawer getRightDrawerComponent(JFrame frame) throws RemoteException {
-		OTFClientQuad clientQ2 = hostControl.createNewView(null, connect1);
+		OTFClientQuad clientQ2 = hostControl.createNewView(null, connect2);
 		//clientQ2.setCachingAllowed(false);
 
 		OTFDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
@@ -109,22 +110,20 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 
 		connect1.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect1.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
-		connect1.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect1.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		connect1.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		connect1.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangTimeDrawer.class);
-		connect1.add(OGLAgentPointLayer.AgentPadangTimeDrawer.class, OGLAgentPointLayer.class);
+		connect1.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		connect1.add(OTFLinkLanesAgentsNoParkingHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		connect1.add(OTFLinkLanesAgentsNoParkingHandler.class, OGLAgentPointLayer.AgentPointDrawer.class);
+		connect1.add(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
 		connect1.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
 		
-		
+		connect2.remove(OTFLinkLanesAgentsNoParkingHandler.class);
 		connect2.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect2.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
-		connect2.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect2.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		connect2.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		connect2.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangRegionDrawer.class);
-		connect2.add(OGLAgentPointLayer.AgentPadangTimeDrawer.class, OGLAgentPointLayer.class);
-		connect2.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		connect2.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		connect2.add(OTFLinkLanesAgentsNoParkingHandler.class,  ColoredStaticNetLayer.QuadDrawer.class);
+		connect2.add(OTFLinkLanesAgentsNoParkingHandler.class, OGLAgentPointLayer.NoAgentDrawer.class);
+		connect2.add(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
+		connect2.add(ColoredStaticNetLayer.QuadDrawer.class, ColoredStaticNetLayer.class);
 //	
 		//main2(args);
 		
@@ -135,9 +134,9 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		conf.setLinkWidth(10);
 		Gbl.getConfig().addModule("otfvis", conf);
 		
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(10); 
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50));
-		OnTheFlyClientFileQuad client = new OnTheFlyClientFilePadang(filename, null, true);
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(10); 
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50));
+		OnTheFlyClientFileQuad client = new OTFVisDualView(filename, null, true);
 		
 //		new OnTheFlyClientFilePadang()
 		client.run();

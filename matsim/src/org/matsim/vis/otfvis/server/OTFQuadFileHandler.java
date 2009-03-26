@@ -326,7 +326,7 @@ public class OTFQuadFileHandler {
 //
 //		}
 
-		/* package */static class OTFObjectInputStream extends
+		public static class OTFObjectInputStream extends
 				ObjectInputStream {
 			public OTFObjectInputStream(final InputStream in)
 					throws IOException {
@@ -338,16 +338,24 @@ public class OTFQuadFileHandler {
 					throws IOException, ClassNotFoundException {
 				String name = desc.getName();
 				System.out.println("try to resolve " + name);
-				//
-				if (name.equals("playground.david.vis.data.OTFServerQuad"))
+				//org.matsim.core.utils.collections
+				if (name.equals("playground.david.vis.data.OTFServerQuad")) {
 					return OTFServerQuad.class;
-				else if (name.startsWith("playground.david.vis")) {
+				} else if (name.startsWith("org.matsim.utils.vis.otfvis")) {
+					name = name.replaceFirst("org.matsim.utils.vis.otfvis",
+							"org.matsim.vis.otfvis");
+					return Class.forName(name);
+				}else if (name.startsWith("playground.david.vis")) {
 					name = name.replaceFirst("playground.david.vis",
 							"org.matsim.utils.vis.otfvis");
 					return Class.forName(name);
 				} else if (name.startsWith("org.matsim.utils.vis.otfivs")) {
 					name = name.replaceFirst("org.matsim.utils.vis.otfivs",
-							"org.matsim.utils.vis.otfvis");
+							"org.matsim.vis.otfvis");
+					return Class.forName(name);
+				} else if (name.startsWith("org.matsim.utils.collections")) {
+					name = name.replaceFirst("org.matsim.utils.collections",
+							"org.matsim.core.utils.collections");
 					return Class.forName(name);
 				}
 				return super.resolveClass(desc);

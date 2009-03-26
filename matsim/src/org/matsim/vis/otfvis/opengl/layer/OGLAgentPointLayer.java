@@ -254,6 +254,17 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 	}
 
+	public static class NoAgentDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgent.Receiver  {
+		
+		public void setAgent(char[] id, float startX, float startY, int state, int user, float color){
+		}
+
+		public void onDraw(GL gl) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
+
 	public class AgentPadangRegionDrawer extends AgentPadangDrawer {
 		
 		@Override

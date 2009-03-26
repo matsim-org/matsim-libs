@@ -21,6 +21,7 @@
 package org.matsim.vis.otfvis.opengl.layer;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import java.nio.ByteBuffer;
 
 import javax.media.opengl.GL;
@@ -86,7 +87,7 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 
 	@Override
 	public void init(SceneGraph graph, boolean initConstData) {
-		//super.init(graph, initConstData);
+		super.init(graph, initConstData);
 		myDrawer = (OGLProvider)graph.getDrawer();
 
 		if (this.myDrawer != null){
@@ -128,6 +129,10 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 
 		@Override
 		public void onDraw(GL gl) {
+			final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, nrLanes*SimpleStaticNetLayer.cellWidth_m);
+			this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
+			this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
+
 			final double tx = ((this.texIdx % actLayer.linkTexWidth) + 0.5) / actLayer.linkTexWidth;
 			final double ty = ((this.texIdx / actLayer.linkTexWidth) + 0.5)/ actLayer.linkTexWidth;
 			//Draw quad

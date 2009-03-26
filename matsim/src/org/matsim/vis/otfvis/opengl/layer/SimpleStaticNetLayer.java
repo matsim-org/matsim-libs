@@ -136,7 +136,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	protected static final Map<OGLProvider, List<OTFDrawable>> itemsListMap = new HashMap<OGLProvider, List<OTFDrawable>>(); // not yet defined
 	
 	protected int netDisplList = -1;
-	private static float cellWidth_m = -1.f;
+	protected static float cellWidth_m = -1.f;
 
 	@Override
 	public void addItem(Receiver item) {

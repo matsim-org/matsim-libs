@@ -54,7 +54,7 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 		connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		connect.add(OTFAgentsListHandler.class,  AgentPointDrawer.class);
 
-		OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019", connect);
+		OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:AName1", connect);
 		client.start();
 		try {
 			this.myOTFServer.pause();
