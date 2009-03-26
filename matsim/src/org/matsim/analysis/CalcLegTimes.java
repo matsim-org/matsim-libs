@@ -24,11 +24,11 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
@@ -50,8 +50,8 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 	private static final int MAXINDEX = 12; // slots 0..11 are regular slots, slot 12 is anything above
 
 	private Population population = null;
-	private final TreeMap<String, Double> agentDepartures = new TreeMap<String, Double>();
-	private final TreeMap<String, Integer> agentLegs = new TreeMap<String, Integer>();
+	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
+	private final TreeMap<Id, Integer> agentLegs = new TreeMap<Id, Integer>();
 	private final TreeMap<String, int[]> legStats = new TreeMap<String, int[]>();
 	private double sumTripDurations = 0;
 	private int sumTrips = 0;
@@ -61,18 +61,18 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		this.agentDepartures.put(event.getPersonId().toString(), event.getTime());
-		Integer cnt = this.agentLegs.get(event.getPersonId().toString());
+		this.agentDepartures.put(event.getPersonId(), event.getTime());
+		Integer cnt = this.agentLegs.get(event.getPersonId());
 		if (cnt == null) cnt = 0;
-		this.agentLegs.put(event.getPersonId().toString(), cnt+1);
+		this.agentLegs.put(event.getPersonId(), cnt+1);
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		Double depTime = this.agentDepartures.remove(event.getPersonId().toString());
-		Person agent = this.population.getPerson(new IdImpl(event.getPersonId().toString()));
+		Double depTime = this.agentDepartures.remove(event.getPersonId());
+		Person agent = this.population.getPerson(event.getPersonId());
 		if (depTime != null && agent != null) {
 			double travTime = event.getTime() - depTime;
-			int legNr = this.agentLegs.get(event.getPersonId().toString());
+			int legNr = this.agentLegs.get(event.getPersonId());
 			Plan plan = agent.getSelectedPlan();
 			int index = (legNr - 1) * 2;
 			String fromActType = ((Activity)plan.getPlanElements().get(index)).getType();

@@ -26,10 +26,10 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
@@ -55,7 +55,7 @@ public class CalcLinkStats {
 	private double volScaleFactor = 1.0;
 	
 	private int count = 0;
-	private final Map<String, LinkData> linkData;
+	private final Map<Id, LinkData> linkData;
 	private final int nofHours;
 	private final Network network;
 
@@ -66,7 +66,7 @@ public class CalcLinkStats {
 
 	public CalcLinkStats(final Network network) {
 		this.network = network;
-		this.linkData = new TreeMap<String, LinkData>();//((int)(1.1*this.network.getLinks().size()), 0.95f);
+		this.linkData = new TreeMap<Id, LinkData>();
 		this.nofHours = 24;
 		reset();
 	}
@@ -79,9 +79,9 @@ public class CalcLinkStats {
 	public void addData(final VolumesAnalyzer analyzer, final TravelTime ttimes) {
 		this.count++;
 		// TODO verify analyzer and ttimes have hourly timeBin-Settings
-		for (String linkId : this.linkData.keySet()) {
-			Link link = this.network.getLinks().get(new IdImpl(linkId));
-			int[] volumes = analyzer.getVolumesForLink(linkId);
+		for (Id linkId : this.linkData.keySet()) {
+			Link link = this.network.getLinks().get(linkId);
+			int[] volumes = analyzer.getVolumesForLink(linkId.toString());
 			LinkData data = this.linkData.get(linkId);
 			int sum = 0; // daily (0-24) sum
 			if (volumes == null) {
@@ -137,9 +137,8 @@ public class CalcLinkStats {
 
 		// initialize our data-table
 		for (BasicLink link : this.network.getLinks().values()) {
-			String linkId = link.getId().toString();
 			LinkData data = new LinkData(new int[NOF_STATS][this.nofHours + 1], new double[NOF_STATS][this.nofHours]);
-			this.linkData.put(linkId, data);
+			this.linkData.put(link.getId(), data);
 		}
 
 	}
@@ -167,11 +166,11 @@ public class CalcLinkStats {
 			out.write("\n");
 
 			// write data
-			for (String linkId : this.linkData.keySet()) {
+			for (Id linkId : this.linkData.keySet()) {
 				LinkData data = this.linkData.get(linkId);
-				Link link = this.network.getLinks().get(new IdImpl(linkId));
+				Link link = this.network.getLinks().get(linkId);
 
-				out.write(linkId);
+				out.write(linkId.toString());
 				if (link.getOrigId() == null) {
 					out.write("\t");
 				} else {
