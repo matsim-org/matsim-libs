@@ -10,14 +10,15 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.BasicActivityImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -65,8 +66,9 @@ public class PTActWriter {
 		int invalid=0;
 		int trips=0;
 		
-		for (Person person: this.population.getPersons().values()) {
-			//Person person = population.getPersons().get(new IdImpl("3937204"));
+//		for (Person person: this.population.getPersons().values()) {
+		if ( true ) {
+			Person person = population.getPersons().get(new IdImpl("3937204"));
 			
 			System.out.println(x + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
@@ -151,6 +153,17 @@ public class PTActWriter {
 		System.out.println("Done");
 		System.out.println("Trips:" + trips);
 		System.out.println("valid:" + valid +  " invalid:" + invalid);
+		
+		// start the control(l)er with the network and plans as defined above
+		Controler controler = new Controler(Gbl.getConfig(),this.pt.getPtNetworkLayer(),(Population) newPopulation) ;
+
+		// this means existing files will be over-written.  Be careful!
+		controler.setOverwriteFiles(true);
+
+		// start the matsim iterations (configured by the config file)
+		controler.run();
+
+		
 	}//createPTActs
 
 	private void createWlinks(final Coord coord1, final Path path, final Coord coord2){
@@ -170,6 +183,7 @@ public class PTActWriter {
 	}
 
 	private int distToWalk(final int personAge){
+		// TODO [kn] Sehe das gerade. Ich bin wenig begeistert über solche ad-hoc Festlegungen von Verhaltensparametern. kai, mar09 
 		int distance=0;
 		if (personAge>=60)distance=300;
 		if ((personAge>=40) && (personAge<60))distance=400;
