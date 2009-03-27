@@ -38,9 +38,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.world.algorithms.WorldConnectLocations;
-import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldMappingInfo;
 
 /**
  * Prints statistics of facility load
@@ -73,14 +70,14 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 				this.facilityPenalties);
 		event.getControler().getEvents().addHandler(this.eventsToFacilityLoad);
 
-		// correctly initalize the world.
-		//TODO: Move this to the controler
-		controler.getWorld().complete();
-		new WorldCheck().run(controler.getWorld());
-		new WorldConnectLocations().run(controler.getWorld());
-		new WorldMappingInfo().run(controler.getWorld());
-		new WorldCheck().run(controler.getWorld());
-		log.info("world checking done.");
+//		// correctly initalize the world.
+//		//TODO: Move this to the controler
+//		controler.getWorld().complete();
+//		new WorldCheck().run(controler.getWorld());
+//		new WorldConnectLocations().run(controler.getWorld());
+//		new WorldMappingInfo().run(controler.getWorld());
+//		new WorldCheck().run(controler.getWorld());
+//		log.info("world checking done.");
 	}
 
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {	
