@@ -291,7 +291,7 @@ public class CalcLinkStats {
 				}
 				else if (parts.length == 153) {
 					String linkId = parts[0];
-					LinkData data = this.linkData.get(linkId);
+					LinkData data = this.linkData.get(new IdImpl(linkId));
 					if (data == null) {
 						System.err.println("CalcLinkStats.readFile(); unknown link: " + linkId);
 					} else {
