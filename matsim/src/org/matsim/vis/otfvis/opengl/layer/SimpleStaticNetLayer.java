@@ -177,7 +177,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 		}
 	}
 
-	Texture marktex = null;//
+	static Texture marktex = null;//
 
 	private void checkTexture(GL gl) {
 		if(marktex == null)marktex = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream("mark.png"));

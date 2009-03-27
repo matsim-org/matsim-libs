@@ -263,6 +263,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				if (timeLine != null) timeLine.setCachedTime(-1);
 			} catch (RemoteException e) {
 				e.printStackTrace();
+			} catch (OutOfMemoryError e) {
+				e.printStackTrace();
 			}
 			
 //			((OTFQuadFileHandler.Reader)host).closeFile();
