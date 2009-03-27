@@ -6331,4 +6331,3 @@ iter tlast tfirst dist egoid alterid purpose timesmet
 0 0 0 178.04493814764857 1 538 random 1
 0 0 0 253.17977802344325 1 161 random 1
 0 0 0 0.0 1 9 renew_home 5
-1 1 0 186.01075237738274 1008 939 renew_shop 4
