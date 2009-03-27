@@ -35,12 +35,12 @@ public class StackedBarChart extends ChartUtil {
 	 * @param values
 	 *            [][ck]
 	 */
-	private void addSeries(String[] columnKeys, double[][] values) {
-		for (int rowKey = 0; rowKey < values.length; rowKey++)
-			for (int columnKey = 0; columnKey < values[rowKey].length; columnKey++)
-				dataset.addValue(Double.valueOf(values[rowKey][columnKey]),
-						"rowKey" + String.valueOf(rowKey),
-						columnKeys[columnKey]);
+	private void addSeries(String[] rowKeys, String[] columnKeys,
+			double[][] values) {
+		for (int rowIdx = 0; rowIdx < values.length; rowIdx++)
+			for (int columnIdx = 0; columnIdx < values[rowIdx].length; columnIdx++)
+				dataset.addValue(Double.valueOf(values[rowIdx][columnIdx]),
+						rowKeys[rowIdx], columnKeys[columnIdx]);
 	}
 
 	public void addValue(double value, String rowKey, String columnKey) {
@@ -50,9 +50,14 @@ public class StackedBarChart extends ChartUtil {
 	public static void main(String[] args) {
 		StackedBarChart chart = new StackedBarChart("TITLE", "category",
 				"values");
-		chart.addSeries(new String[] { "A", "B", "C", "D" }, new double[][] {
-				{ 1, 1, 3, 1 }, { 0, 2, 2, 2 } });
-		chart.addValue(12, "rowKey12", "D");
+		chart.addSeries(new String[] { "rowIdxA", "rowIdxB", "rowIdxC" },
+				new String[] { "ctgrA", "ctgrB", "ctgrC", "ctgrD" },
+				new double[][] { { 1, 2, 3, 4 }, { 8, 7, 6, 5 },
+						{ 1.9, 2.9, 1.9, 2.9 } });
+		// chart.addValue(7.2, "rowKeySpecialA", "ctgrB");
+		// chart.addValue(2.5, "rowKeySpecialB", "ctgrD");
+		// chart.addValue(3.3, "rowIdxB", "ctgrSpecial");
+		// chart.addValue(6.1, "rowIdxC", "ctgrC");
 		chart.saveAsPng("output/StackedBarChartTest.png", 800, 600);
 	}
 }
