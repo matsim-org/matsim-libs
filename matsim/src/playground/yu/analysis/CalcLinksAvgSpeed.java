@@ -64,6 +64,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	private final int binSize, nofBins;
 	private final double[] speeds;
 	private final int[] speedsCount;
+	private RoadPricingScheme toll = null;
 
 	/**
 	 * @param network
@@ -117,6 +118,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	public CalcLinksAvgSpeed(final NetworkLayer network,
 			final RoadPricingScheme toll) {
 		this(network);
+		this.toll = toll;
 		if (toll != null)
 			interestLinks = new HashSet<Link>(toll.getLinks());
 	}
@@ -206,7 +208,8 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		String linkId = leave.getLinkId().toString();
 		SpeedCounter sc = speedCounters.get(linkId);
 		if (sc != null) {
-			Double enterTime = sc.removeTmpEnterTime(leave.getPersonId().toString());
+			Double enterTime = sc.removeTmpEnterTime(leave.getPersonId()
+					.toString());
 			if (enterTime != null) {
 				Link l = leave.getLink();
 				if (l == null)
@@ -284,8 +287,8 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		for (int i = 0; i < xsLength; i++)
 			if (speedsCount[i] > 0)
 				ySpeed[i] = speeds[i] / speedsCount[i];
-		XYLineChart avgSpeedChart = new XYLineChart(
-				"avg. speed (car) in cityarea", "time",
+		XYLineChart avgSpeedChart = new XYLineChart("avg. speed (car) in "
+				+ ((toll == null) ? "cityarea" : "toll range"), "time",
 				"avg. speed (car) [km/h]");
 		avgSpeedChart.addSeries("avg. speed of all agents (car)", xs, ySpeed);
 		avgSpeedChart.saveAsPng(chartFilename, 1024, 768);

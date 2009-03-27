@@ -342,8 +342,8 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 			xs[j] = ((double) j) * (double) this.binSize / 3600.0;
 		}
 		// enRoute chart
-		XYLineChart enRouteChart = new XYLineChart("Leg Histogramm", "time",
-				"agents en route from " + scenario);
+		XYLineChart enRouteChart = new XYLineChart("Leg Histogramm - En Route",
+				"time", "agents en route from " + scenario);
 		enRouteChart.addSeries("drivers", xs, carEnRoute);
 		enRouteChart.addSeries("public transit users", xs, ptEnRoute);
 		enRouteChart.addSeries("walkers", xs, wlkEnRoute);
@@ -352,8 +352,9 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 		enRouteChart.addSeries("all agents", xs, enRoute);
 		enRouteChart.saveAsPng(filename + "enRoute.png", 1024, 768);
 		// departures chart
-		XYLineChart departChart = new XYLineChart("Leg Histogramm", "time",
-				"departing agents from " + scenario);
+		XYLineChart departChart = new XYLineChart(
+				"Leg Histogramm - Departures", "time", "departing agents from "
+						+ scenario);
 		departChart.addSeries("drivers", xs, carDep);
 		departChart.addSeries("public transit users", xs, ptDep);
 		departChart.addSeries("walkers", xs, wlkDep);
@@ -362,8 +363,8 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 		departChart.addSeries("all agents", xs, dep);
 		departChart.saveAsPng(filename + "departures.png", 1024, 768);
 		// arrivals chart
-		XYLineChart arrChart = new XYLineChart("Leg Histogramm", "time",
-				"arriving agents from " + scenario);
+		XYLineChart arrChart = new XYLineChart("Leg Histogramm - Arrivals",
+				"time", "arriving agents from " + scenario);
 		arrChart.addSeries("drivers", xs, carArr);
 		arrChart.addSeries("public transit users", xs, ptArr);
 		arrChart.addSeries("walkers", xs, wlkArr);

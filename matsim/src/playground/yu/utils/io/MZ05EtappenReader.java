@@ -12,6 +12,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 import playground.yu.utils.CollectionSum;
+import playground.yu.utils.charts.PieChart;
 
 /**
  * @author yu
@@ -19,18 +20,24 @@ import playground.yu.utils.CollectionSum;
  */
 public class MZ05EtappenReader implements TabularFileHandler {
 	private SimpleWriter sw = null;
-	private String tmpPersonId = null, tmpPersonKantonZurichId = null;
-	private double e_dist_obj = 0.0, e_dist_obj_KantonZurich = 0.0;
+	private String tmpPersonId = null, tmpPersonKantonZurichId = null,
+			outputBase = null;
+	private double e_dist_obj = 0.0, e_dist_obj_KantonZurich = 0.0, eLV = 0.0,
+			eMIV = 0.0, eOeV = 0.0, eOthers = 0.0, eLV_KZ = 0.0, eMIV_KZ = 0.0,
+			eOeV_KZ = 0.0, eOthers_KZ = 0.0;
 	private int eCnt = 0, eCnt_KantonZurich = 0, personCnt = 0,
 			personKantonZurichCnt = 0;
 	private Set<Double> tmpEtappenDists = new HashSet<Double>();
+	private double tmpELV = 0.0, tmpEMIV = 0.0, tmpEOeV = 0.0,
+			tmpEOthers = 0.0;
 	private boolean changePerson = false, belongs2KantonZurich = false;
 
 	/**
 	 * 
 	 */
 	public MZ05EtappenReader(String outputFilename) {
-		sw = new SimpleWriter(outputFilename);
+		this.outputBase = outputFilename;
+		sw = new SimpleWriter(outputFilename + ".txt");
 		sw.writeln("linearDistance\tlinearDistance [m]\tlinearDistance [km]");
 	}
 
@@ -41,6 +48,10 @@ public class MZ05EtappenReader implements TabularFileHandler {
 		changePerson = false;
 		tmpPersonId = personId;
 		tmpEtappenDists.clear();
+		tmpELV = 0.0;
+		tmpEMIV = 0.0;
+		tmpEOeV = 0.0;
+		tmpEOthers = 0.0;
 	}
 
 	private void resetKantonZurich(String personId) {
@@ -52,10 +63,18 @@ public class MZ05EtappenReader implements TabularFileHandler {
 		personCnt++;
 		eCnt += tmpEtappenDists.size();
 		e_dist_obj += CollectionSum.getSum(tmpEtappenDists);
+		eLV += tmpELV;
+		eMIV += tmpEMIV;
+		eOeV += tmpEOeV;
+		eOthers += tmpEOthers;
 		if (belongs2KantonZurich) {
 			personKantonZurichCnt++;
 			eCnt_KantonZurich += tmpEtappenDists.size();
 			e_dist_obj_KantonZurich += CollectionSum.getSum(tmpEtappenDists);
+			eLV_KZ += tmpELV;
+			eMIV_KZ += tmpEMIV;
+			eOeV_KZ += tmpEOeV;
+			eOthers_KZ += tmpEOthers;
 		}
 	}
 
@@ -71,10 +90,20 @@ public class MZ05EtappenReader implements TabularFileHandler {
 		}
 
 		String e_dist_obj = row[37];
+		String F510 = row[6];
 		if (e_dist_obj != null) {
 			double tmpEtappeDist = Double.parseDouble(e_dist_obj);
 			if (tmpEtappeDist >= 0) {
 				tmpEtappenDists.add(new Double(tmpEtappeDist));
+				int mode = Integer.parseInt(F510);
+				if (mode >= 1 && mode <= 3)
+					tmpELV++;
+				else if (mode <= 8)
+					tmpEMIV++;
+				else if (mode <= 12)
+					tmpEOeV++;
+				else
+					tmpEOthers++;
 				if (row[14] != null) {
 					if (row[14].equals("1")) {
 						if (tmpPersonKantonZurichId == null) {
@@ -113,7 +142,26 @@ public class MZ05EtappenReader implements TabularFileHandler {
 		sw.writeln("\npersons :\t" + personCnt + "\tEttapen :\t" + eCnt);
 		sw.writeln("persons KantonZurich :\t" + personKantonZurichCnt
 				+ "\tEtappen KantonZurich :\t" + eCnt_KantonZurich);
+		sw.writeln("LV etappen (walk leg):\t" + eLV
+				+ "\tLV etappen Kanton Zurich (walk leg):\t" + eLV_KZ);
+		sw.writeln("MIV etappen (car leg):\t" + eMIV
+				+ "\tMIV etappen (car leg):\t" + eMIV_KZ);
+		sw.writeln("OeV etappen (pt leg):\t" + eOeV
+				+ "\tOeV etappen (pt leg):\t" + eOeV_KZ);
+		sw.writeln("Others etappen (others leg):\t" + eOthers
+				+ "\tOthers etappen (others leg):\t" + eOthers_KZ);
 		sw.close();
+		PieChart chart = new PieChart("ModalSplit -- Etappen");
+		chart.addSeries(new String[] { "car", "pt", "walk", "other" },
+				new double[] { eMIV, eOeV, eLV, eOthers });
+		chart.saveAsPng(outputBase + ".png", 800, 600);
+
+		PieChart chart2 = new PieChart(
+				"ModalSplit Center (toll area) -- Etappen");
+		chart2.addSeries(new String[] { "car", "pt", "walk", "other" },
+				new double[] { eMIV_KZ, eOeV_KZ, eLV_KZ, eOthers_KZ });
+		chart2.saveAsPng(outputBase + "_Toll.png", 800, 600);
+
 	}
 
 	/**
@@ -121,14 +169,14 @@ public class MZ05EtappenReader implements TabularFileHandler {
 	 */
 	public static void main(String[] args) {
 		String etappenFilename = "D:/fromNB04/Archieve/MikroZensus2005/4_DB_ASCII(Sep_TAB)/Etappen.dat";
-		String outputFilename = "../matsimTests/LinearDistance/MZ05linearDistanceEttappen_2.txt";
+		String outputBase = "../matsimTests/LinearDistance/MZ05linearDistanceEttappen_ModalSplit";
 
 		TabularFileParserConfig tfpc = new TabularFileParserConfig();
 		tfpc.setCommentTags(new String[] { "HHNR" });
 		tfpc.setDelimiterRegex("\t");
 		tfpc.setFileName(etappenFilename);
 
-		MZ05EtappenReader mz05er = new MZ05EtappenReader(outputFilename);
+		MZ05EtappenReader mz05er = new MZ05EtappenReader(outputBase);
 
 		try {
 			new TabularFileParser().parse(tfpc, mz05er);

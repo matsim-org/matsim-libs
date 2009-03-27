@@ -8,10 +8,6 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -25,16 +21,22 @@ import org.matsim.roadpricing.RoadPricingScheme;
  * 
  */
 public class MZComparisonData extends AbstractPersonAlgorithm implements
-		PlanAlgorithm, AgentDepartureEventHandler, AgentArrivalEventHandler {
+		PlanAlgorithm {
 	public static boolean isInRange(Link loc, RoadPricingScheme toll) {
 		return toll.getLinks().contains(loc);
 	}
 
-	private double carDist, ptDist, wlkDist, otherDist, count, carDist_toll,
-			ptDist_toll, wlkDist_toll, otherDist_toll, count_toll;
-
+	private double carDist, ptDist, wlkDist,
+			otherDist,
+			count,// counts all persons in population
+			carDist_toll, ptDist_toll, wlkDist_toll,
+			otherDist_toll,
+			count_toll,// counts all inhabitants in toll area
+			carTime, ptTime, wlkTime, otherTime, carTime_toll, ptTime_toll,
+			wlkTime_toll, otherTime_toll
+			// , linearDist, linearDist_toll
+			;
 	private RoadPricingScheme toll;
-
 	private boolean inTollRange;
 
 	public MZComparisonData(RoadPricingScheme toll) {
@@ -55,22 +57,50 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 	public void run(Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
-				double legDist = ((Leg) pe).getRoute().getDistance();
-				if (((Leg) pe).getMode().name().equals("car")) {
+				double legDist = ((Leg) pe).getRoute().getDistance();// leg
+				// distance
+				// [m]
+				String legMode = ((Leg) pe).getMode().name();
+				double legTime = ((Leg) pe).getTravelTime() / 60.0;// travel
+				// time
+				// [min]
+				double legLinearDist = CoordUtils.calcDistance(plan
+						.getPreviousActivity((Leg) pe).getCoord(), plan
+						.getNextActivity((Leg) pe).getCoord());// leg linear
+				// distance [m]
+				/*
+				 * linearDist += legLinearDist; if (inTollRange) linearDist_toll
+				 * += legLinearDist;
+				 */
+				if (legMode.equals("car")) {
 					carDist += legDist;
-					if (inTollRange)
+					carTime += legTime;
+					if (inTollRange) {
 						carDist_toll += legDist;
-				} else if (((Leg) pe).getMode().name().equals("pt")) {
+						carTime_toll += legTime;
+					}
+				} else if (legMode.equals("pt")) {
 					ptDist += legDist;
-					if (inTollRange)
+					ptTime += legTime;
+					if (inTollRange) {
 						ptDist_toll += legDist;
-				} else if (((Leg) pe).getMode().name().equals("walk")) {
-					legDist = CoordUtils.calcDistance(plan.getPreviousActivity(
-							(Leg) pe).getCoord(), plan
-							.getNextActivity((Leg) pe).getCoord()) * 1.5;
+						ptTime_toll += legTime;
+					}
+				} else if (legMode.equals("walk")) {
+					legDist = legLinearDist * 1.5;
 					wlkDist += legDist;
-					if (inTollRange)
+					wlkTime += legTime;
+					if (inTollRange) {
 						wlkDist_toll += legDist;
+						wlkTime_toll += legTime;
+					}
+				} else {
+					otherDist += legDist;
+					otherTime += legTime;
+					if (inTollRange) {
+						otherDist_toll += legDist;
+						otherTime_toll += legTime;
+					}
 				}
 			}
 		}
@@ -89,58 +119,82 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 		count_toll = 0;
 	}
 
-	public void handleEvent(AgentDepartureEvent event) {
-		// TODO Auto-generated method stub
-	}
-
-	public void handleEvent(AgentArrivalEvent event) {
-		// TODO Auto-generated method stub
-
-	}
-
-	// getter -- DailyDistance
-	public double getDailyDistance_car_m() {
+	// ---------------events handle-------------------------------
+	// getter -- Daily Distance
+	public double getAvgDailyDistance_car_m() {
 		return carDist / count;
 	}
 
-	public double getTollDailyDistance_car_m() {
+	public double getAvgTollDailyDistance_car_m() {
 		return carDist_toll / count_toll;
 	}
 
-	public double getDailyDistance_pt_m() {
+	public double getAvgDailyDistance_pt_m() {
 		return ptDist / count;
 	}
 
-	public double getTollDailyDistance_pt_m() {
+	public double getAvgTollDailyDistance_pt_m() {
 		return ptDist_toll / count_toll;
 	}
 
-	public double getDailyDistance_walk_m() {
+	public double getAvgDailyDistance_walk_m() {
 		return wlkDist / count;
 	}
 
-	public double getTollDailyDistance_walk_m() {
+	public double getAvgTollDailyDistance_walk_m() {
 		return wlkDist_toll / count_toll;
 	}
 
-	public double getDailyDistance_other_m() {
+	public double getAvgDailyDistance_other_m() {
 		return otherDist / count;
 	}
 
-	public double getTollDailyDistance_other_m() {
+	public double getAvgTollDailyDistance_other_m() {
 		return otherDist_toll / count_toll;
 	}
 
-	// getter -- DailyEnRouteTime
-	public double getDailyEnRouteTime_min() {
-		return 0.0;
+	// getter -- Daily En Route Time
+	public double getAvgDailyEnRouteTime_car_min() {
+		return carTime / count;
 	}
 
-	public double getLegLinearDistance_m() {
-		return 0.0;
+	public double getAvgTollDailyEnRouteTime_car_min() {
+		return carTime_toll / count_toll;
 	}
 
-	public double getWorkHomeLinearDistance_m() {
-		return 0.0;
+	public double getAvgDailyEnRouteTime_pt_min() {
+		return ptTime / count;
 	}
+
+	public double getAvgTollDailyEnRouteTime_pt_min() {
+		return ptTime_toll / count_toll;
+	}
+
+	public double getAvgDailyEnRouteTime_walk_min() {
+		return wlkTime / count;
+	}
+
+	public double getAvgTollDailyEnRouteTime_walk_min() {
+		return wlkTime_toll / count_toll;
+	}
+
+	public double getAvgDailyEnRouteTime_other_min() {
+		return otherTime / count;
+	}
+
+	public double getAvgTollDailyEnRouteTime_other_min() {
+		return otherTime_toll / count_toll;
+	}
+	/*
+	 * // getter -- Leg Linear Distance public double
+	 * getAvgLegLinearDistance_m() { return linearDist / count; }
+	 * 
+	 * public double getAvgTollLegLinearDistance_m() { return linearDist_toll /
+	 * count_toll; }
+	 * 
+	 * // getter -- Work Home Linear Distance public double
+	 * getAvgWorkHomeLinearDistance_m() { return 0.0; }
+	 * 
+	 * public double getAvgTollWorkHomeLinearDistance_m() { return 0.0; }
+	 */
 }

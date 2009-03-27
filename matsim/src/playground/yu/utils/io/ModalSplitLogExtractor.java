@@ -134,18 +134,18 @@ public class ModalSplitLogExtractor {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String filenameBase = "../runs-svn/run750/";
+		String filenameBase = "../runs-svn/run713/";
 		String logFilename = filenameBase + "logfile0.log";
 		String chartFilename = filenameBase + "legModeChart.png";
 		String outputFilename = filenameBase + "legMode.txt";
-		String logFilename2 = filenameBase + "logfile1.log";
-		String logFilename3 = filenameBase + "logfile2.log";
+		String logFilename2 = filenameBase + "logfile.log";
+		// String logFilename3 = filenameBase + "logfile2.log";
 		int maxIter = 1001;
 		ModalSplitLogExtractor msle = new ModalSplitLogExtractor(maxIter);
 		// reading
 		readLog(logFilename, msle);
 		readLog(logFilename2, msle);
-		readLog(logFilename3, msle);
+		// readLog(logFilename3, msle);
 		// writing
 		writeMode(chartFilename, outputFilename, msle);
 	}
