@@ -134,19 +134,18 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			double scoreImprovement = 
 				this.getPerformanceScore(act.getType(), accumulatedDuration + duration) - 
 				this.getPerformanceScore(act.getType(), accumulatedDuration);
-			/* Penalty due to facility load: --------------------------------------------
+
+			/* Penalty due to facility load:
 			 * Store the temporary score to reduce it in finish() proportionally 
 			 * to score and dep. on facility load.
-			 * TODO: maybe checking if activity is movable for this person (discussion)
 			 */
-			if (!act.getType().startsWith("h")) {
+			if (act.getType().startsWith("shop") || act.getType().startsWith("leisure")) {
 				this.penalty.add(new ScoringPenalty(
 						activityStart, 
 						activityEnd, 
 						this.facilityPenalties.get(act.getFacility().getId()), 
 						scoreImprovement));
 			}
-			//---------------------------------------------------------------------------
 		}
 		
 		// accumulate waiting time, which is the time that could not be performed in activities due to closed facilities
