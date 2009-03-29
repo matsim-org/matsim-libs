@@ -35,7 +35,7 @@ public class StackedBarChart extends ChartUtil {
 	 * @param values
 	 *            [][ck]
 	 */
-	private void addSeries(String[] rowKeys, String[] columnKeys,
+	public void addSeries(String[] rowKeys, String[] columnKeys,
 			double[][] values) {
 		for (int rowIdx = 0; rowIdx < values.length; rowIdx++)
 			for (int columnIdx = 0; columnIdx < values[rowIdx].length; columnIdx++)
