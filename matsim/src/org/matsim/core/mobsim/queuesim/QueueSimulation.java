@@ -88,12 +88,10 @@ public class QueueSimulation {
 	protected QueueNetwork network;
 	protected NetworkLayer networkLayer;
 
-	protected static Events events = null; // TODO [MR] instead of making this static and Links/Nodes using QueueSimulation.getEvents(), Gbl should hold a global events-object
+	protected static Events events = null;
 	protected  SimStateWriterI netStateWriter = null;
 
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
-
-	private Class<? extends QueueVehicle> vehiclePrototype = QueueVehicle.class;
 
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
 
@@ -342,25 +340,15 @@ public class QueueSimulation {
 			PersonAgent agent = this.agentFactory.createPersonAgent(p);
 
 			QueueVehicle veh;
-			try {
-				veh = this.vehiclePrototype.newInstance();
-				//not needed in new agent class
-				veh.setDriver(agent);
-				agent.setVehicle(veh);
+			veh = new QueueVehicle();
+			//not needed in new agent class
+			veh.setDriver(agent);
+			agent.setVehicle(veh);
 
-				if (agent.initialize()) {
-					addVehicleToLink(veh);
-				}
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
+			if (agent.initialize()) {
+				addVehicleToLink(veh);
 			}
 		}
-	}
-
-	protected void setVehiclePrototye(final Class<? extends QueueVehicle> proto) {
-		this.vehiclePrototype = proto;
 	}
 
 	//TODO remove this method when agent representation is completely implemented
