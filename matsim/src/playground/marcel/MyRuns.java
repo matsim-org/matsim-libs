@@ -65,8 +65,8 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -79,7 +79,6 @@ import org.matsim.core.events.algorithms.CalcODMatrices;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.cppdeqsim.EventsReaderDEQv1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -1817,15 +1816,15 @@ public class MyRuns {
 			e.printStackTrace();
 		}
 	}
-
-	public static void speedEventsDat(final String[] args) {
-		Gbl.createConfig(args);
-		Events events = new Events();
-		Gbl.startMeasurement();
-		new EventsReaderDEQv1(events).readFile("../mystudies/deqsimtest/10.deq_events.dat");
-		events.printEventsCount();
-		Gbl.printElapsedTime();
-	}
+//
+//	public static void speedEventsDat(final String[] args) {
+//		Gbl.createConfig(args);
+//		Events events = new Events();
+//		Gbl.startMeasurement();
+//		new EventsReaderDEQv1(events).readFile("../mystudies/deqsimtest/10.deq_events.dat");
+//		events.printEventsCount();
+//		Gbl.printElapsedTime();
+//	}
 
 
 	public static void readMatrices(final String[] args) {

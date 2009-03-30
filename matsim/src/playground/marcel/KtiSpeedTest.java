@@ -31,7 +31,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.cppdeqsim.EventsReaderDEQv1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -50,12 +49,12 @@ public class KtiSpeedTest {
 		new MatsimEventsReader(events).readFile(filename);
 		events.printEventsCount();
 	}
-
-	private static void readBinEvents(final String filename, final Events events) {
-		final EventsReaderDEQv1 eventsReader = new EventsReaderDEQv1(events);
-		eventsReader.readFile(filename);
-		events.printEventsCount();
-	}
+//
+//	private static void readBinEvents(final String filename, final Events events) {
+//		final EventsReaderDEQv1 eventsReader = new EventsReaderDEQv1(events);
+//		eventsReader.readFile(filename);
+//		events.printEventsCount();
+//	}
 
 	public static void calcRouteMTwithTimes(final String[] args) {
 
