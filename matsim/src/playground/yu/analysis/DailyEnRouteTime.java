@@ -26,7 +26,7 @@ import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
-import playground.yu.analysis.DailyDistance.ActTypeStart;
+import playground.yu.analysis.forZrh.Analysis4Zrh.ActTypeStartWith;
 import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.BubbleChart;
 import playground.yu.utils.charts.PieChart;
@@ -40,19 +40,28 @@ import playground.yu.utils.io.SimpleWriter;
  */
 public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
-	private int count;
-	private double carTime, ptTime, wlkTime, otherTime;
-	final double totalCounts[], carCounts[], ptCounts[], wlkCounts[],
-			otherCounts[], carCounts10[], ptCounts10[], wlkCounts10[],
-			carCounts2[], ptCounts2[], wlkCounts2[];
-	private double carWorkTime, carEducTime, carShopTime, carLeisTime,
-			carHomeTime, carOtherTime, ptWorkTime, ptEducTime, ptShopTime,
-			ptLeisTime, ptHomeTime, ptOtherTime, wlkWorkTime, wlkEducTime,
-			wlkShopTime, wlkLeisTime, wlkHomeTime, wlkOtherTime,
-			throughWorkTime, throughEducTime, throughShopTime, throughLeisTime,
-			throughHomeTime, throughOtherTime;
-	private Person person;
-	private RoadPricingScheme toll = null;
+	protected int count;
+
+	protected double carTime, ptTime, wlkTime, otherTime;
+
+	protected final double totalCounts[], carCounts[], ptCounts[], wlkCounts[],
+			otherCounts[];
+
+	protected final double wlkCounts2[], wlkCounts10[], ptCounts2[],
+			ptCounts10[], carCounts2[], carCounts10[];
+
+	protected double carWorkTime, carEducTime, carShopTime, carLeisTime,
+			carOtherTime, carHomeTime;
+
+	protected double ptWorkTime, ptEducTime, ptShopTime, ptLeisTime,
+			ptOtherTime, ptHomeTime;
+
+	protected double wlkWorkTime, wlkEducTime, wlkShopTime, wlkLeisTime,
+			wlkOtherTime, wlkHomeTime;
+
+	protected Person person;
+
+	protected RoadPricingScheme toll = null;
 
 	public DailyEnRouteTime(RoadPricingScheme toll) {
 		this();
@@ -94,12 +103,6 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		this.wlkLeisTime = 0.0;
 		this.wlkHomeTime = 0.0;
 		this.wlkOtherTime = 0.0;
-		this.throughWorkTime = 0.0;
-		this.throughEducTime = 0.0;
-		this.throughShopTime = 0.0;
-		this.throughLeisTime = 0.0;
-		this.throughHomeTime = 0.0;
-		this.throughOtherTime = 0.0;
 	}
 
 	@Override
@@ -123,126 +126,102 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		double otherDayTime = 0.0;
 		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
 			Leg bl = (Leg) li.next();
-			ActTypeStart ats = null;
+			ActTypeStartWith ats = null;
 			String tmpActType = plan.getNextActivity(bl).getType();
 			if (tmpActType.startsWith("h"))
-				ats = ActTypeStart.h;
+				ats = ActTypeStartWith.h;
 			else if (tmpActType.startsWith("w"))
-				ats = ActTypeStart.w;
+				ats = ActTypeStartWith.w;
 			else if (tmpActType.startsWith("e"))
-				ats = ActTypeStart.e;
+				ats = ActTypeStartWith.e;
 			else if (tmpActType.startsWith("s"))
-				ats = ActTypeStart.s;
+				ats = ActTypeStartWith.s;
 			else if (tmpActType.startsWith("l"))
-				ats = ActTypeStart.l;
+				ats = ActTypeStartWith.l;
 			else
-				ats = ActTypeStart.o;
+				ats = ActTypeStartWith.o;
 			double time = bl.getTravelTime() / 60.0;
 			if (time < 0)
 				time = 0;
 			if (bl.getDepartureTime() < 86400) {
 				dayTime += time;
-				if (Long.parseLong(this.person.getId().toString()) > 1000000000) {
-					this.otherTime += time;
-					otherDayTime += time;
+				if (bl.getMode().equals(Mode.car)) {
+					this.carTime += time;
+					carDayTime += time;
 					switch (ats) {
 					case h:
-						this.throughHomeTime += time;
+						this.carHomeTime += time;
 						break;
 					case w:
-						this.throughWorkTime += time;
+						this.carWorkTime += time;
 						break;
 					case e:
-						this.throughEducTime += time;
+						this.carEducTime += time;
 						break;
 					case s:
-						this.throughShopTime += time;
+						this.carShopTime += time;
 						break;
 					case l:
-						this.throughLeisTime += time;
+						this.carLeisTime += time;
 						break;
 					default:
-						this.throughOtherTime += time;
+						this.carOtherTime += time;
 						break;
 					}
-				} else {
-					if (bl.getMode().equals(Mode.car)) {
-						this.carTime += time;
-						carDayTime += time;
-						switch (ats) {
-						case h:
-							this.carHomeTime += time;
-							break;
-						case w:
-							this.carWorkTime += time;
-							break;
-						case e:
-							this.carEducTime += time;
-							break;
-						case s:
-							this.carShopTime += time;
-							break;
-						case l:
-							this.carLeisTime += time;
-							break;
-						default:
-							this.carOtherTime += time;
-							break;
-						}
-						this.carCounts10[Math.min(20, (int) time / 10)]++;
-						this.carCounts2[Math.min(100, (int) time / 2)]++;
-					} else if (bl.getMode().equals(Mode.pt)) {
-						this.ptTime += time;
-						ptDayTime += time;
-						switch (ats) {
-						case h:
-							this.ptHomeTime += time;
-							break;
-						case w:
-							this.ptWorkTime += time;
-							break;
-						case e:
-							this.ptEducTime += time;
-							break;
-						case s:
-							this.ptShopTime += time;
-							break;
-						case l:
-							this.ptLeisTime += time;
-							break;
-						default:
-							this.ptOtherTime += time;
-							break;
-						}
-						this.ptCounts10[Math.min(20, (int) time / 10)]++;
-						this.ptCounts2[Math.min(100, (int) time / 2)]++;
-					} else if (bl.getMode().equals(Mode.walk)) {
-						this.wlkTime += time;
-						wlkDayTime += time;
-						switch (ats) {
-						case h:
-							this.wlkHomeTime += time;
-							break;
-						case w:
-							this.wlkWorkTime += time;
-							break;
-						case e:
-							this.wlkEducTime += time;
-							break;
-						case s:
-							this.wlkShopTime += time;
-							break;
-						case l:
-							this.wlkLeisTime += time;
-							break;
-						default:
-							this.wlkOtherTime += time;
-							break;
-						}
-						this.wlkCounts10[Math.min(20, (int) time / 10)]++;
-						this.wlkCounts2[Math.min(100, (int) time / 2)]++;
+					this.carCounts10[Math.min(20, (int) time / 10)]++;
+					this.carCounts2[Math.min(100, (int) time / 2)]++;
+				} else if (bl.getMode().equals(Mode.pt)) {
+					this.ptTime += time;
+					ptDayTime += time;
+					switch (ats) {
+					case h:
+						this.ptHomeTime += time;
+						break;
+					case w:
+						this.ptWorkTime += time;
+						break;
+					case e:
+						this.ptEducTime += time;
+						break;
+					case s:
+						this.ptShopTime += time;
+						break;
+					case l:
+						this.ptLeisTime += time;
+						break;
+					default:
+						this.ptOtherTime += time;
+						break;
 					}
+					this.ptCounts10[Math.min(20, (int) time / 10)]++;
+					this.ptCounts2[Math.min(100, (int) time / 2)]++;
+				} else if (bl.getMode().equals(Mode.walk)) {
+					this.wlkTime += time;
+					wlkDayTime += time;
+					switch (ats) {
+					case h:
+						this.wlkHomeTime += time;
+						break;
+					case w:
+						this.wlkWorkTime += time;
+						break;
+					case e:
+						this.wlkEducTime += time;
+						break;
+					case s:
+						this.wlkShopTime += time;
+						break;
+					case l:
+						this.wlkLeisTime += time;
+						break;
+					default:
+						this.wlkOtherTime += time;
+						break;
+					}
+					this.wlkCounts10[Math.min(20, (int) time / 10)]++;
+					this.wlkCounts2[Math.min(100, (int) time / 2)]++;
 				}
+
 			}
 		}
 		for (int i = 0; i <= Math.min(100, (int) dayTime); i++)
@@ -311,23 +290,13 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		sw.writeln("walk\t" + this.wlkWorkTime + "\t" + this.wlkEducTime + "\t"
 				+ this.wlkShopTime + "\t" + this.wlkLeisTime + "\t"
 				+ this.wlkHomeTime + "\t" + this.wlkOtherTime);
-		sw.writeln("through\t" + this.throughWorkTime + "\t"
-				+ this.throughEducTime + "\t" + this.throughShopTime + "\t"
-				+ this.throughLeisTime + "\t" + this.throughHomeTime + "\t"
-				+ this.throughOtherTime);
-		sw
-				.writeln("total\t"
-						+ (this.carWorkTime + this.ptWorkTime + wlkWorkTime + this.throughWorkTime)
-						+ "\t"
-						+ (this.carEducTime + this.ptEducTime + wlkEducTime + this.throughEducTime)
-						+ "\t"
-						+ (this.carShopTime + this.ptShopTime + wlkShopTime + this.throughShopTime)
-						+ "\t"
-						+ (this.carLeisTime + this.ptLeisTime + wlkLeisTime + this.throughLeisTime)
-						+ "\t"
-						+ (this.carHomeTime + this.ptHomeTime + wlkHomeTime + this.throughHomeTime)
-						+ "\t"
-						+ (this.carOtherTime + this.ptOtherTime + wlkOtherTime + this.throughOtherTime));
+		sw.writeln("total\t"
+				+ (this.carWorkTime + this.ptWorkTime + wlkWorkTime) + "\t"
+				+ (this.carEducTime + this.ptEducTime + wlkEducTime) + "\t"
+				+ (this.carShopTime + this.ptShopTime + wlkShopTime) + "\t"
+				+ (this.carLeisTime + this.ptLeisTime + wlkLeisTime) + "\t"
+				+ (this.carHomeTime + this.ptHomeTime + wlkHomeTime) + "\t"
+				+ (this.carOtherTime + this.ptOtherTime + wlkOtherTime));
 
 		BarChart barChart = new BarChart(
 				"travel destination and modal split--daily En Route Time",
@@ -343,10 +312,6 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		barChart.addSeries("walk", new double[] { this.wlkWorkTime,
 				this.wlkEducTime, this.wlkShopTime, this.wlkLeisTime,
 				this.wlkHomeTime, this.wlkOtherTime });
-		barChart.addSeries("through", new double[] { this.throughWorkTime,
-				this.throughEducTime, this.throughShopTime,
-				this.throughLeisTime, this.throughHomeTime,
-				this.throughOtherTime });
 		barChart.addMatsimLogo();
 		barChart.saveAsPng(outputFilename
 				+ "dailyEnRouteTimeTravelDistination.png", 1200, 900);

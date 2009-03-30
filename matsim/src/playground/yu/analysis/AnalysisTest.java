@@ -42,6 +42,8 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 import org.xml.sax.SAXException;
 
+import playground.yu.analysis.forZrh.DailyDistance4Zrh;
+import playground.yu.analysis.forZrh.DailyEnRouteTime4Zrh;
 import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
 
@@ -116,8 +118,8 @@ public class AnalysisTest {
 		LegTravelTimeModalSplit lttms = null;
 		// PersonAlgorithm
 		CalcAverageTripLength catl = null;
-		DailyDistance dd = null;
-		DailyEnRouteTime dert = null;
+		DailyDistance4Zrh dd = null;
+		DailyEnRouteTime4Zrh dert = null;
 		ModeSplit ms = null;
 		LegDistance ld = null;
 		// only PersonAlgorithm begins.
@@ -128,8 +130,8 @@ public class AnalysisTest {
 			ms = new ModeSplit(toll);
 			orms = new OnRouteModalSplit(scenario, population, toll);
 			lttms = new LegTravelTimeModalSplit(population, toll);
-			dd = new DailyDistance(toll);
-			dert = new DailyEnRouteTime(toll);
+			dd = new DailyDistance4Zrh(toll);
+			dert = new DailyEnRouteTime4Zrh(toll);
 			ld = new LegDistance(network, toll, population);
 			// in future, add some PersonAlgorithm and EventsHandler
 
