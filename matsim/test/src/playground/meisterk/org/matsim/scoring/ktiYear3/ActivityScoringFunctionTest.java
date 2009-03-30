@@ -146,6 +146,10 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 	public void testAlwaysOpen() {
 		
+		Facility facility = this.facilities.getFacilities().get(new IdImpl("1"));
+		ActivityOption actOpt = facility.createActivityOption("home");
+		actOpt.setCapacity(1.0);
+
 		// []{end home, work_sector3, leisure, work_Sector3, start home, finish, reset}
 		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:10:00",  "00:10:00", "00:10:00", "00:10:00", "00:00:00"};
 		String[] expectedWaitingTimeSequence = new String[]{"00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00"};
@@ -158,8 +162,12 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 	public void testOpenLongEnough() {
 		
-		Facility facility = this.facilities.getFacilities().get(new IdImpl("3"));
-		ActivityOption actOpt = facility.createActivityOption("work_sector3");
+		Facility facility = this.facilities.getFacilities().get(new IdImpl("1"));
+		ActivityOption actOpt = facility.createActivityOption("home");
+		actOpt.setCapacity(1.0);
+		
+		facility = this.facilities.getFacilities().get(new IdImpl("3"));
+		actOpt = facility.createActivityOption("work_sector3");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("18:00:00")));
 		
 		facility = this.facilities.getFacilities().get(new IdImpl("5"));
@@ -179,8 +187,12 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 	
 	public void testWaiting() {
 	
-		Facility facility = this.facilities.getFacilities().get(new IdImpl("3"));
-		ActivityOption actOpt = facility.createActivityOption("work_sector3");
+		Facility facility = this.facilities.getFacilities().get(new IdImpl("1"));
+		ActivityOption actOpt = facility.createActivityOption("home");
+		actOpt.setCapacity(1.0);
+
+		facility = this.facilities.getFacilities().get(new IdImpl("3"));
+		actOpt = facility.createActivityOption("work_sector3");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("14:00:00")));
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("15:15:00"), Time.parseTime("20:00:00")));
 		
@@ -201,8 +213,12 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 	
 	public void testOverlapping() {
 		
-		Facility facility = this.facilities.getFacilities().get(new IdImpl("3"));
-		ActivityOption actOpt = facility.createActivityOption("work_sector3");
+		Facility facility = this.facilities.getFacilities().get(new IdImpl("1"));
+		ActivityOption actOpt = facility.createActivityOption("home");
+		actOpt.setCapacity(1.0);
+
+		facility = this.facilities.getFacilities().get(new IdImpl("3"));
+		actOpt = facility.createActivityOption("work_sector3");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("10:00:00")));
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("10:30:00"), Time.parseTime("14:00:00")));
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("15:15:00"), Time.parseTime("20:00:00")));

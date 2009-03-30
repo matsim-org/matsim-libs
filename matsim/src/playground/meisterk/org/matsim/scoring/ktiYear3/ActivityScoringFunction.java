@@ -32,6 +32,7 @@ import java.util.Vector;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.facilities.OpeningTimeImpl;
@@ -89,13 +90,18 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			Activity act) {
 
 		SortedSet<BasicOpeningTime> openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
-		// if no associated activity option exists, assume facility is always open
-		if (act.getFacility().getActivityOption(act.getType()) != null) {
+		// if no associated activity option exists, or if the activity option does not contain an <opentimes> element, 
+		// assume facility is always open
+		ActivityOption actOpt = act.getFacility().getActivityOption(act.getType());
+		if (actOpt != null) {
 			openTimes = act.getFacility().getActivityOption(act.getType()).getOpeningTimes(ActivityScoringFunction.DEFAULT_DAY);
+			if (openTimes == null) {
+				openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
+			}
 		}
 
 		// calculate effective activity duration bounded by opening times
-		double accumulatedDuration; // retrievs activity duration for this activity type up to now
+		double accumulatedDuration; // retrieves activity duration for this activity type up to now
 		double additionalDuration = 0.0; // accumulates performance intervals for this activity
 		double activityStart, activityEnd; // hold effective activity start and end due to facility opening times
 		double openingTime, closingTime; // hold time information of an opening time interval
