@@ -99,55 +99,57 @@ public class ActivityLocations {
 			minorLocations.newLine();
 			
 			for(int i = 0; i < vehicles.length; i++ ){
-				File thisFile = vehicles[i];
-				if(thisFile.isFile() && !(thisFile.getName().startsWith(".")) ){ // avoid .* file names on Mac
-					//TODO Remove next line when SA run is complete
-					if( !foundPoint ){
-						Vehicle thisVehicle = createNewVehicle(thisFile);
-						ArrayList<GPSPoint> log = readFileToArray(thisFile, mt);				
-						processVehicleActivities(thisVehicle, thisFile, log);
+				try{
+					File thisFile = vehicles[i];
+					if(thisFile.isFile() && !(thisFile.getName().startsWith(".")) ){ // avoid .* file names on Mac
+						//TODO Remove next line when SA run is complete
+						if( !foundPoint ){
+							Vehicle thisVehicle = createNewVehicle(thisFile);
+							ArrayList<GPSPoint> log = readFileToArray(thisFile, mt);				
+							processVehicleActivities(thisVehicle, thisFile, log);
 
-						if(thisVehicle.getChains().size() > 0){
-							// Write major locations to file
-							for(Activity majorActivity: thisVehicle.getHomeLocation() ){
-								majorLocations.write( locationString(majorActivity) );
-								majorLocations.newLine();
-								numberOfMajorActivities++;
-							}
-
-							// Write activity locations to file 
-							for(Chain thisChain: thisVehicle.getChains() ){
-								// Do NOT consider the major locations at the end-points of each chain
-								for(int j = 1; j < thisChain.getActivities().size() - 1; j++){ 
-									minorLocations.write( locationString(thisChain.getActivities().get(j) ) );
-									minorLocations.newLine();
-									numberOfMinorActivities++;
+							if(thisVehicle.getChains().size() > 0){
+								// Write major locations to file
+								for(Activity majorActivity: thisVehicle.getHomeLocation() ){
+									majorLocations.write( locationString(majorActivity) );
+									majorLocations.newLine();
+									numberOfMajorActivities++;
 								}
+
+								// Write activity locations to file 
+								for(Chain thisChain: thisVehicle.getChains() ){
+									// Do NOT consider the major locations at the end-points of each chain
+									for(int j = 1; j < thisChain.getActivities().size() - 1; j++){ 
+										minorLocations.write( locationString(thisChain.getActivities().get(j) ) );
+										minorLocations.newLine();
+										numberOfMinorActivities++;
+									}
+								}
+
+								// Write vehicle statistics	to file					
+								vehicleStats.write(	vehicleStatsString(thisVehicle) );
+								vehicleStats.newLine();
+
+								saveVehicleStringToFile(thisVehicle.getVehID(), convertVehicleToXML(thisVehicle) );
 							}
-
-							// Write vehicle statistics	to file					
-							vehicleStats.write(	vehicleStatsString(thisVehicle) );
-							vehicleStats.newLine();
-
-							saveVehicleStringToFile(thisVehicle.getVehID(), convertVehicleToXML(thisVehicle) );
+							numberOfVehicles++;				
+							dotsPrinted = pb.updateProgress(dotsPrinted, numberOfVehicles, totalVehicles);
+							//TODO The following 'else' bit must also come out... just to fix SA run
+							int theVehicle = Integer.parseInt( thisFile.getName().substring(0, thisFile.getName().length() - 4 ) );
+							if ( theVehicle == 128155 ) {
+								foundPoint = true;
+							}
+						} else{
+							numberOfVehicles++;				
+							dotsPrinted = pb.updateProgress(dotsPrinted, numberOfVehicles, totalVehicles);
 						}
-						numberOfVehicles++;				
-						dotsPrinted = pb.updateProgress(dotsPrinted, numberOfVehicles, totalVehicles);
-						//TODO The following 'else' bit must also come out... just to fix SA run
-					} else{
-						int theVehicle = Integer.parseInt( thisFile.getName().substring(0, thisFile.getName().length() - 4 ) );
-						if ( theVehicle == 128155 ) {
-							foundPoint = true;
-						}
-						numberOfVehicles++;				
-						dotsPrinted = pb.updateProgress(dotsPrinted, numberOfVehicles, totalVehicles);
 					}
-			
+				} finally{
+					vehicleStats.close();
+					majorLocations.close();
+					minorLocations.close();
 				}
 			}
-			vehicleStats.close();
-			majorLocations.close();
-			minorLocations.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
