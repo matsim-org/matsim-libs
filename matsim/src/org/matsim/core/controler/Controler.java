@@ -716,14 +716,15 @@ public class Controler {
 	 * =================================================================== */
 
 	protected void runMobSim() {
-		//FIXME dg feb 09: this null checks are not really safe
+		//dg feb 09: this null checks are not really safe
 		//consider the case that a user copies a config with some
 		//externalMobsim or JDEQSim information in it and isn't aware
 		//that those configs will be used instead of the "normal" queuesimulation
 		//configuration
+		/* well, that's the user's problem if he doesn't know what settings he starts his simulation with.  mr/mar09 */
 		if (this.externalMobsim == null) {
 			final String JDEQ_SIM="JDEQSim";
-			if (Gbl.getConfig().getModule(JDEQ_SIM)!=null){
+			if (this.config.getModule(JDEQ_SIM)!=null){
 				JDEQSimulation sim= new JDEQSimulation(this.network, this.population, this.events);
 				sim.run();
 			} else {
@@ -752,7 +753,6 @@ public class Controler {
 	 *
 	 * @param l
 	 */
-	@SuppressWarnings("unchecked")
 	protected final void addCoreControlerListener(final ControlerListener l) {
 		this.controlerListenerManager.addCoreControlerListener(l);
 	}
@@ -766,7 +766,6 @@ public class Controler {
 	 *
 	 * @param l
 	 */
-	@SuppressWarnings("unchecked")
 	public final void addControlerListener(final ControlerListener l) {
 		this.controlerListenerManager.addControlerListener(l);
 	}
@@ -776,7 +775,6 @@ public class Controler {
 	 *
 	 * @param l
 	 */
-	@SuppressWarnings("unchecked")
 	public final void removeControlerListener(final ControlerListener l) {
 		this.controlerListenerManager.removeControlerListener(l);
 	}
