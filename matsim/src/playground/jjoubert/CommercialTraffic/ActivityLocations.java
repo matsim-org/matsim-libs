@@ -102,7 +102,7 @@ public class ActivityLocations {
 				File thisFile = vehicles[i];
 				if(thisFile.isFile() && !(thisFile.getName().startsWith(".")) ){ // avoid .* file names on Mac
 					//TODO Remove next line when SA run is complete
-					if( foundPoint ){
+					if( !foundPoint ){
 						Vehicle thisVehicle = createNewVehicle(thisFile);
 						ArrayList<GPSPoint> log = readFileToArray(thisFile, mt);				
 						processVehicleActivities(thisVehicle, thisFile, log);
