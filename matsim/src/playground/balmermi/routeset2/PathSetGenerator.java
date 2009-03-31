@@ -152,35 +152,31 @@ public class PathSetGenerator {
 
 	private final void initStreetSegments() {
 		log.info("init street segments...");
-		int streetSegmentCnt = 0;
 		for (Link l : network.getLinks().values()) {
-//			log.info("  l="+l.getId());
+
 			// find the beginning of the "oneway path" or "twoway path"
 			Link currLink = l;
 			Node fromNode = currLink.getFromNode();
 			while ((fromNode.getIncidentNodes().size() == 2) &&
-					((fromNode.getOutLinks().size() == 1) && (fromNode.getInLinks().size() == 1)) ||
-					((fromNode.getOutLinks().size() == 2) && (fromNode.getInLinks().size() == 2))) {
+					(((fromNode.getOutLinks().size() == 1) && (fromNode.getInLinks().size() == 1)) ||
+					((fromNode.getOutLinks().size() == 2) && (fromNode.getInLinks().size() == 2)))) {
 				Iterator<? extends Link> linkIt = fromNode.getInLinks().values().iterator();
 				Link prevLink = linkIt.next();
 				if (prevLink.getFromNode().getId().equals(currLink.getToNode().getId())) { prevLink = linkIt.next(); }
 				currLink = prevLink;
 				fromNode = currLink.getFromNode();
 			}
-//			log.info("  => currLink="+currLink.getId());
-//			log.info("  => fromNode="+fromNode.getId());
 			
 			// create the street segment for the whole "one- or twoway path" (if not already exists)
 			StreetSegment s = l2sMapping.get(currLink.getId());
 			if (s == null) {
-				s = new StreetSegment(new IdImpl("s"+currLink.getId()),currLink.getFromNode(),currLink.getToNode(),network,currLink.getLength(),currLink.getFreespeed(Time.UNDEFINED_TIME),currLink.getCapacity(Time.UNDEFINED_TIME),currLink.getNumberOfLanes(Time.UNDEFINED_TIME));
-				streetSegmentCnt++;
+				s = new StreetSegment(new IdImpl("s"+currLink.getId()),currLink.getFromNode(),currLink.getToNode(),network,1,1,1,1);
 				s.links.add(currLink);
 				l2sMapping.put(currLink.getId(),s);
 				Node toNode = currLink.getToNode();
 				while ((toNode.getIncidentNodes().size() == 2) &&
-						((toNode.getOutLinks().size() == 1) && (toNode.getInLinks().size() == 1)) ||
-						((toNode.getOutLinks().size() == 2) && (toNode.getInLinks().size() == 2))) {
+						(((toNode.getOutLinks().size() == 1) && (toNode.getInLinks().size() == 1)) ||
+						((toNode.getOutLinks().size() == 2) && (toNode.getInLinks().size() == 2)))) {
 					Iterator<? extends Link> linkIt = toNode.getOutLinks().values().iterator();
 					Link nextLink = linkIt.next();
 					if (nextLink.getToNode().getId().equals(currLink.getFromNode().getId())) { nextLink = linkIt.next(); }
@@ -188,14 +184,18 @@ public class PathSetGenerator {
 					toNode = currLink.getToNode();
 					s.links.add(currLink);
 					l2sMapping.put(currLink.getId(),s);
+					s.setToNode(toNode);
 				}
-				log.info("  s="+s.getId()+":");
-				for (Link ll : s.links) { log.info("    l="+ll.getId()); }
 			}
-			
 		}
-		log.info("  Number of links:           "+network.getLinks().size());
-		log.info("  Number of street segments: "+streetSegmentCnt);
+//		log.info("  Number of links in the network:         "+network.getLinks().size());
+//		log.info("  Number of links in the mapping:         "+l2sMapping.size());
+//		log.info("  Number of street segments: "+streetSegmentCnt);
+//		Set<StreetSegment> segments = new HashSet<StreetSegment>(l2sMapping.values());
+//		log.info("  Number of street segments:              "+segments.size());
+//		int lcnt = 0;
+//		for (StreetSegment s : segments) { for (Link l : s.links) { lcnt++; } }
+//		log.info("  Number of links in the street segments: "+lcnt);
 		log.info("done.");
 	}
 	
@@ -289,6 +289,8 @@ public class PathSetGenerator {
 				for (Link l : path.links) {
 					Set<StreetSegment> newExcludingStreetSegmentSet = new HashSet<StreetSegment>(streetSegmentSet.size()+1);
 					newExcludingStreetSegmentSet.addAll(streetSegmentSet);
+					StreetSegment s = l2sMapping.get(l.getId());
+					if (s == null) { log.fatal("THIS MUST NOT HAPPEN (linkid="+l.getId()+")"); }
 					newExcludingStreetSegmentSet.add(l2sMapping.get(l.getId()));
 					if (!containsStreetSegmentIdSet(newExcludingStreetSegmentSets,newExcludingStreetSegmentSet)) {
 						newExcludingStreetSegmentSets.add(newExcludingStreetSegmentSet);
