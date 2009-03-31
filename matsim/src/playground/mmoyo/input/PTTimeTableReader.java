@@ -2,8 +2,6 @@ package playground.mmoyo.input;
 
 import java.io.IOException;
 import java.util.Stack;
-
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -22,8 +20,6 @@ public class PTTimeTableReader extends MatsimXmlParser {
 	private String strIdNode="";
 	private String strIdPTLine="";
 	
-	//private Map <IdImpl, Map<IdImpl,int[]>> nodeTimeTableMap = new TreeMap <IdImpl, Map<IdImpl,int[]>>();
-	IdImpl idNode = null;
 	private PTTimeTable ptTimeTable = new PTTimeTable();
 	
 	public PTTimeTableReader() {

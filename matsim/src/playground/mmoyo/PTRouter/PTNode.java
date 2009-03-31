@@ -12,21 +12,38 @@ import org.matsim.core.network.NodeImpl;
  * @param idPTLine the PT line that exclusively travels through the node
  */
 public class PTNode extends NodeImpl {
-	private Id idFather;
+	private Id idFather;   //--> this must be changed to "idStation"
 	private Id idPTLine;
-	private String stationName;
-	private Id IdFareStage;
-
+	private int indexInRoute; 
+	private int minutesAfterDeparture;
+	
 	public PTNode(final Id id, final Coord coord, final String type, final Id idFather, final Id idPTLine) {
 		super(id, coord, type);
 		this.idFather = idFather;
 		this.idPTLine = idPTLine;
 	}
 
+	public int getIndexInRoute() {
+		return indexInRoute;
+	}
+
+	public void setIndexInRoute(int indexInRoute) {
+		this.indexInRoute = indexInRoute;
+	}
+
+	public int getMinutesAfterDeparture() {
+		return minutesAfterDeparture;
+	}
+
+	public void setMinutesAfterDeparture(int minutesAfterDeparture) {
+		this.minutesAfterDeparture = minutesAfterDeparture;
+	}
+
 	public PTNode(final Id id, final Coord coord, final String type){
 		super(id, coord, type);
 	}
 
+	
 	public Id getIdFather() {
 		return this.idFather;
 	}
@@ -34,6 +51,7 @@ public class PTNode extends NodeImpl {
 	public void setIdFather(final Id idFather) {
 		this.idFather = idFather;
 	}
+	
 
 	public Id getIdPTLine() {
 		return this.idPTLine;
@@ -41,21 +59,5 @@ public class PTNode extends NodeImpl {
 
 	public void setIdPTLine(final Id idPTLine) {
 		this.idPTLine = idPTLine;
-	}
-
-	public String getStationName() {
-		return this.stationName;
-	}
-
-	public void setStationName(final String stationName) {
-		this.stationName = stationName;
-	}
-
-	public Id getIdFarestage() {
-		return this.IdFareStage;
-	}
-
-	public void setIdFarestage(final Id idFareStage) {
-		this.IdFareStage = idFareStage;
 	}
 }

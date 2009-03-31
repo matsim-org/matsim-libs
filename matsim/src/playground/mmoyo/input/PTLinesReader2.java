@@ -13,6 +13,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlParser;
 
 /** 
@@ -24,7 +25,7 @@ public class PTLinesReader2 extends MatsimXmlParser {
 	private final static String LINE = "ptLine";
 	private final static String NODE = "node";
 	private final static String DEPARTURES = "departures";
-	private IdImpl idPTLine;
+	private Id idPTLine;
 	private char type;
 	private String direction;
 	private List<String> route;

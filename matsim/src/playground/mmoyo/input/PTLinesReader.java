@@ -8,6 +8,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -23,7 +24,7 @@ public class PTLinesReader extends MatsimXmlParser {
 	private final static String LINE = "ptLine";
 	private final static String ROUTE = "route";
 
-	private IdImpl idPTLine;
+	private Id idPTLine;
 	private char type;
 	private StringBuffer bufferLineRoute = new StringBuffer();
 	

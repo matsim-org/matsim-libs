@@ -16,6 +16,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.input.PTNetworkFactory2;
@@ -32,60 +33,104 @@ import playground.mmoyo.input.PTNetworkFactory2;
  * @param time Milliseconds after the midnight in which the trip must begin
  */
 public class PTRouter2 {
-	private NetworkLayer ptNetworkLayer; 
-	///private PTNProximity ptnProximity;  //24 feb
+	private NetworkLayer net; 
 	private Dijkstra dijkstra;
-	private PTNetworkFactory2 ptNetworkFactory = new PTNetworkFactory2();
+	//private PTNetworkFactory2 ptNetworkFactory = new PTNetworkFactory2();
 	private PTTravelCost ptTravelCost;
 	public PTTravelTime ptTravelTime; //TODO: make private
+	public final double WALKING_SPEED = 0.836;
 	
 	/**
 	 * @param network
 	 */
 	public PTRouter2(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimetable) {
-		this.ptNetworkLayer = ptNetworkLayer;
-		///this.ptnProximity = new PTNProximity (ptNetworkLayer);  //24 feb
+		this.net = ptNetworkLayer;
 		this.ptTravelCost = new PTTravelCost(ptTimetable);
 		this.ptTravelTime =new PTTravelTime(ptTimetable);
 		this.dijkstra = new Dijkstra(ptNetworkLayer, ptTravelCost, ptTravelTime);	
 	}
 		
 	public Path findRoute(Coord coord1, Coord coord2, double time, double distToWalk){
-		//original code //24 feb
-		//PTNode[] NearStops1= ptnProximity.getNearestBusStops(coord1, distToWalk, false);
-		//PTNode[] NearStops2= ptnProximity.getNearestBusStops(coord2, distToWalk, false);
+		Collection <Node> NearStops1 = net.getNearestNodes(coord1, distToWalk);
+		Collection <Node> NearStops2 = net.getNearestNodes(coord2, distToWalk);
 		
-		Collection <Node> NearStops1 = ptNetworkLayer.getNearestNodes(coord1, distToWalk);
-		Collection <Node> NearStops2 = ptNetworkLayer.getNearestNodes(coord2, distToWalk);
-		
-		PTNode ptNode1=ptNetworkFactory.CreateWalkingNode(ptNetworkLayer, new IdImpl("W1"), coord1);
-		PTNode ptNode2=ptNetworkFactory.CreateWalkingNode(ptNetworkLayer, new IdImpl("W2"), coord2);
-		List <Id> walkingLinkList1 = ptNetworkFactory.CreateWalkingLinks(ptNetworkLayer, ptNode1, NearStops1, true);
-		List <Id> walkingLinkList2 = ptNetworkFactory.CreateWalkingLinks(ptNetworkLayer, ptNode2, NearStops2, false);
+		Node ptNode1= CreateWalkingNode(new IdImpl("W1"), coord1);
+		Node ptNode2=CreateWalkingNode(new IdImpl("W2"), coord2);
+
+		List <Link> walkingLinkList1 = CreateWalkingLinks(ptNode1, NearStops1, true);
+		List <Link> walkingLinkList2 = CreateWalkingLinks(ptNode2, NearStops2, false);
 
 		Path path = dijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 		
-		ptNetworkFactory.removeWalkingLinks(ptNetworkLayer, walkingLinkList1);
-		ptNetworkFactory.removeWalkingLinks(ptNetworkLayer, walkingLinkList2);
-		this.ptNetworkLayer.removeNode(this.ptNetworkLayer.getNode("W1"));
-		this.ptNetworkLayer.removeNode(this.ptNetworkLayer.getNode("W2"));
-		this.ptNetworkLayer.removeNode(ptNode1);
-		this.ptNetworkLayer.removeNode(ptNode2);
+		removeWalkingLinks(walkingLinkList1);
+		removeWalkingLinks(walkingLinkList2);
+		net.removeNode(ptNode1);
+		net.removeNode(ptNode2);
 
 		if (path!=null){
 			path.nodes.remove(ptNode1);
 			path.nodes.remove(ptNode2);
 		}
+		
 		return path;
 	}
 
+	public Node CreateWalkingNode(Id idNode, Coord coord) {
+		Node node = new PTNode(idNode, coord, "Walking");
+		//ptNode.setIdPTLine(new IdImpl("Walk"));
+		net.getNodes().put(idNode, node);
+		return node;
+	}
+	
+	public List <Link> CreateWalkingLinks(Node walkNode, Collection <Node> nearNodes, boolean to){
+		List<Link> NewWalkLinks = new ArrayList<Link>();
+		String idLink;
+		Node fromNode;
+		Node toNode;
+		
+		int x=0;
+		for (Node node : nearNodes){
+			if (to){
+				fromNode= walkNode;
+				toNode= node;
+				idLink= "WLO" + x++;
+			}else{
+				fromNode= node;
+				toNode=  walkNode;
+				idLink= "WLD" + x++;
+			}
+			Link link= createPTLink(idLink, fromNode, toNode, "Walking");
+			//-->30 märz check if this temporary stuff improves the performance
+			link.setFreespeed(link.getLength()* WALKING_SPEED);
+			NewWalkLinks.add(link);
+		}
+		return NewWalkLinks;
+	}
+
+	public Link createPTLink(String strIdLink, Node fromNode, Node toNode, String type){
+		Id idLink = new IdImpl(strIdLink);
+		double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
+		double freespeed= 1;
+		double capacity = 1;
+		double numLanes = 1;
+		String origId = "0";
+		return net.createLink(idLink, fromNode, toNode, length, freespeed, capacity, numLanes, origId, type);
+	}
+	
+	public void removeWalkingLinks(Collection<Link> WalkingLinkList){
+		for (Link link : WalkingLinkList){
+			net.removeLink(link);
+		}
+	}
+	
+	
 	public Path findRoute(Coord coord1, Coord coord2, double time){
 		//24 feb
 		//PTNode node1= ptnProximity.getNearestNode(coord1.getX(), coord1.getY());
 		//PTNode node2= ptnProximity.getNearestNode(coord2.getX(), coord2.getY());
 		
-		Node node1= ptNetworkLayer.getNearestNode(coord1);
-		Node node2= ptNetworkLayer.getNearestNode(coord2);
+		Node node1= net.getNearestNode(coord1);
+		Node node2= net.getNearestNode(coord2);
 		return findRoute(node1, node2,time);
 	}
 	

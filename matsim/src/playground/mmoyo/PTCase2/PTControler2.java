@@ -31,7 +31,7 @@ public class PTControler2 {
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, INPTNETFILE, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
 		
-		int option =-1;
+		int option =3;
 		
 		if (option>0){pt.readPTNet(ZURICHPTN);}
 		switch (option){
@@ -46,6 +46,8 @@ public class PTControler2 {
 				
 				break;
 			case -3:
+				//-> Create class to add new nodes/Ptlines 
+				
 				String filePath="C://Users/manuel/Desktop/TU/ZH_Files/bus/Basic_Bus_Network.xml";
 				
 				PTNodeReader ptNodeReader = new PTNodeReader();
@@ -124,12 +126,9 @@ public class PTControler2 {
 	    		break;
 	    	
 	    	case 3:
-	    		startTime = System.currentTimeMillis();
 	    		PTActWriter ptActWriter = new PTActWriter(pt);
 	    		ptActWriter.writePTActsLegs();
-	    		System.out.println("Duration: " + (System.currentTimeMillis()-startTime));	
-	    		
-	    		ptActWriter.ptTravelTime.costValidator.printNegativeVaues();
+	    		//ptActWriter.ptTravelTime.costValidator.printNegativeVaues();
 	    		//System.out.println(ptActWriter.ptTravelTime.costValidator==null);
 	    		break;
 	 
@@ -138,9 +137,7 @@ public class PTControler2 {
 	    		pttester.countRoutes();
 	    		break;
 	    	case 5:
-	    		//24 feb
-	    		//playground.mmoyo.PTRouter.PTNProximity ptnProximity = new playground.mmoyo.PTRouter.PTNProximity(pt.getPtNetworkLayer());  
-
+	
 	    		Coord coord6= new CoordImpl(708146,243607);
 	    		double distance= 4500;
 	    		Collection <Node> nearNodes = pt.getPtNetworkLayer().getNearestNodes(coord6, distance);
@@ -151,7 +148,6 @@ public class PTControler2 {
 	    		}
 	    		break;
 	    	case 6:
-	      		//--> implement better createTransferLinks2
 	    		//pt.getPtNetworkFactory().createTransferLinks2(pt.getPtNetworkLayer(),IntersecionMap );
 	    		pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 200);
 	    		pt.getPtNetworkFactory().writeNet(pt.getPtNetworkLayer(), ZURICHPTN);

@@ -76,18 +76,18 @@ public class PTNetworkFactory {
 		return idToNode;
 	}// AddToSub
 	
-	private void addWalkingNode(Id idImpl) {
+	private void addWalkingNode(Id id) {
 		//System.out.print(idImpl.toString() + " " + this.nodes.containsKey(idImpl) + " " );
 		
-		if (this.ptNetworkLayer.getNodes().containsKey(idImpl)) {
-			throw new IllegalArgumentException(this + "[id=" + idImpl + " already exists]");
+		if (this.ptNetworkLayer.getNodes().containsKey(id)) {
+			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
 		
-		Node n = this.cityNet.getNode(idImpl);
-		PTNode node = new PTNode(idImpl, n.getCoord(), n.getType());
-		node.setIdFather(idImpl);        //All ptnodes must have a father, including fathers (themselves)
+		Node n = this.cityNet.getNode(id);
+		PTNode node = new PTNode(id, n.getCoord(), n.getType());
+		node.setIdFather(id);        //All ptnodes must have a father, including fathers (themselves)
 		node.setIdPTLine(new IdImpl("Walk"));
-		this.ptNetworkLayer.getNodes().put(idImpl, node);
+		this.ptNetworkLayer.getNodes().put(id, node);
 		n= null;
 	}
 
@@ -97,7 +97,7 @@ public class PTNetworkFactory {
 		Id idFather = new IdImpl(original.getId().toString());
 
 		PTNode ptNode = new PTNode(id, original.getCoord(), original.getType(), idFather, IdPTLine);
-		//Id i = new IdImpl(id);
+
 		if (this.ptNetworkLayer.getNodes().containsKey(id)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}

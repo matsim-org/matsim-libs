@@ -9,7 +9,7 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 
-import playground.mmoyo.PTCase2.PTStationMap;
+import playground.mmoyo.PTCase2.PTStation;
 import playground.mmoyo.PTCase2.PTTimeTable2;
 import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.Validators.StationValidator;
@@ -17,7 +17,7 @@ import playground.mmoyo.Validators.StationValidator;
 public class PTNodeFactory {
 
 	NetworkLayer net;
-	PTStationMap ptStationMap;;
+	PTStation ptStation;;
 	StationValidator sValidator;
 
 	public PTNodeFactory(){
@@ -26,9 +26,9 @@ public class PTNodeFactory {
 			
 	public PTNodeFactory(NetworkLayer net, PTTimeTable2 ptTimeTable) {
 		this.net = net;
-		this.ptStationMap = new PTStationMap(ptTimeTable);
+		this.ptStation = new PTStation(ptTimeTable);
 		this.sValidator = new StationValidator(net);
-		this.sValidator.hasValidCoordinates(this.ptStationMap);
+		this.sValidator.hasValidCoordinates(this.ptStation);
 	}
 
 	public NetworkLayer TransformToPTNodes(NetworkLayer NetWithNodes, NetworkLayer NetWithPTNodes){
@@ -48,7 +48,7 @@ public class PTNodeFactory {
 		String strNode1 = "~" + strBaseId;
 		String strNode2 = "_" + strBaseId;
 		
-		List <Id> list = this.ptStationMap.getIntersecionMap().get(strBaseId);
+		List <Id> list = this.ptStation.getIntersecionMap().get(strBaseId);
 		if(list != null){
     		Id firstId= list.get(0);
     		Coord coord = net.getNode(firstId).getCoord();

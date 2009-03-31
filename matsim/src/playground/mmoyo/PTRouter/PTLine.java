@@ -2,8 +2,7 @@ package playground.mmoyo.PTRouter;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.basic.v01.Id;
 
 /** 
  * Describes a Public Transport Network Line
@@ -12,20 +11,20 @@ import org.matsim.core.basic.v01.IdImpl;
  * @param withDedicatedTracks Points out if the line has own rails or interacts with normal city traffic
  */
 public class PTLine {
-	private IdImpl id;
+	private Id id;
 	private PTLineType ptLineType;
 	private String direction;
 	private List<String> route = new ArrayList<String>();  //List of nodes
 	private List<Double> minute = new ArrayList<Double>();
 	private List<String> departures = new ArrayList<String>();
 
-	public PTLine(IdImpl id, char lineType, List<String> route) {
+	public PTLine(Id id, char lineType, List<String> route) {
 		this.id = id;
 		this.ptLineType = new PTLineType(lineType);
 		this.route = route;
 	}
 
-	public PTLine(IdImpl id, char lineType, String direction, List<String> route, List<Double> minute, List<String> departures) {
+	public PTLine(Id id, char lineType, String direction, List<String> route, List<Double> minute, List<String> departures) {
 		this.id = id;
 		this.ptLineType = new PTLineType(lineType);
 		this.route = route;
@@ -34,11 +33,11 @@ public class PTLine {
 		this.departures=departures;
 	}
 		
-	public IdImpl getId() {
+	public Id getId() {
 		return id;
 	}
 
-	public void setId(IdImpl id) {
+	public void setId(Id id) {
 		this.id = id;
 	}
 

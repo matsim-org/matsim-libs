@@ -33,7 +33,7 @@ public class PTNetworkLayer extends NetworkLayer {
 
 	// This map stores the children nodes of each father node, necessary to
 	// create the transfer between them
-	public Map<IdImpl, ArrayList<String>> childrenList = new TreeMap<IdImpl, ArrayList<String>>();
+	public Map<Id, ArrayList<String>> childrenList = new TreeMap<Id, ArrayList<String>>();
 
 	public PTNetworkLayer(final NetworkLayer cityNet) {
 		super();
@@ -43,8 +43,7 @@ public class PTNetworkLayer extends NetworkLayer {
 	public void createPTNetwork(final List<PTLine> ptLineList) {
 		// Read the route of every PTline and adds the corresponding links and
 		// nodes
-		for (Iterator<PTLine> iterPTLines = ptLineList.iterator(); iterPTLines.hasNext();) {
-			PTLine ptLine = iterPTLines.next();
+		for (PTLine ptLine : ptLineList) {
 			boolean firstLink = true;
 			String idFromNode = "";
 			for (Iterator<String> iter = ptLine.getRoute().iterator(); iter.hasNext();) {
@@ -56,7 +55,7 @@ public class PTNetworkLayer extends NetworkLayer {
 		createTransferlinks();
 	}
 
-	public String addToSubwayPTN(final Link l, String idFromNode, final boolean firstLink,final IdImpl IdPTLine) {
+	public String addToSubwayPTN(final Link l, String idFromNode, final boolean firstLink,final Id IdPTLine) {
 		// Create the "Metro underground paths" related to the city network
 
 		// Create FromNode
@@ -78,28 +77,28 @@ public class PTNetworkLayer extends NetworkLayer {
 		return idToNode;
 	}// AddToSub
 
-	private void addWalkingNode(final IdImpl idImpl) {
+	private void addWalkingNode(final Id id) {
 		//System.out.print(idImpl.toString() + " " + this.nodes.containsKey(idImpl) + " " );
 
-		if (this.getNodes().containsKey(idImpl)) {
-			throw new IllegalArgumentException(this + "[id=" + idImpl + " already exists]");
+		if (this.getNodes().containsKey(id)) {
+			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
 
-		Node n = this.cityNet.getNode(idImpl);
-		PTNode node = new PTNode(idImpl,	n.getCoord(), n.getType());
-		node.setIdFather(idImpl);        //All ptnodes must have a father, including fathers (themselves)
+		Node n = this.cityNet.getNode(id);
+		PTNode node = new PTNode(id,	n.getCoord(), n.getType());
+		node.setIdFather(id);        //All ptnodes must have a father, including fathers (themselves)
 		node.setIdPTLine(new IdImpl("Walk"));
-		this.getNodes().put(idImpl, node);
+		this.getNodes().put(id, node);
 		n= null;
 	}
 
-	private void addPTNode(final String id, final Node original, final IdImpl IdPTLine) {
+	private void addPTNode(final String strId, final Node original, final Id IdPTLine) {
 		// Creates a underground clone of a node with a different ID
-		IdImpl idImpl = new IdImpl(id);
-		IdImpl idFather = new IdImpl(original.getId().toString());
+		Id id = new IdImpl(strId);
+		Id idFather = new IdImpl(original.getId().toString());
 
-		PTNode ptNode = new PTNode(idImpl, original.getCoord(), original.getType(), idFather, IdPTLine);
-		Id i = new IdImpl(id);
+		PTNode ptNode = new PTNode(id, original.getCoord(), original.getType(), idFather, IdPTLine);
+		Id i = new IdImpl(strId);
 		if (this.getNodes().containsKey(i)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
@@ -110,9 +109,9 @@ public class PTNetworkLayer extends NetworkLayer {
 			ArrayList<String> ch = new ArrayList<String>();
 			this.childrenList.put(idFather, ch);
 		}
-		this.childrenList.get(idFather).add(id);
+		this.childrenList.get(idFather).add(strId);
 
-		idImpl = null;
+		id = null;
 		idFather = null;
 		ptNode = null;
 		i = null;
@@ -129,36 +128,25 @@ public class PTNetworkLayer extends NetworkLayer {
 	}
 
 	private void createTransferlinks() {
-		// (like stairs between lines in a subway station)
-		Iterator it = this.childrenList.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pairs = (Map.Entry) it.next();
-			List chList1 = (ArrayList) pairs.getValue();
-			List chList2 = (ArrayList) pairs.getValue();
+		for (List<String> chList : childrenList.values()){
+			List<String> chList1 = chList;
+			List<String> chList2 = chList;
 
 			if (chList1.size() > 1) {
-				String n1 = "";
-				String n2 = "";
-				for (Iterator<String> iter1 = chList1.iterator(); iter1.hasNext();) {
-					n1 = iter1.next();
-					// Create links between children nodes lines
-					for (Iterator<String> iter2 = chList2.iterator(); iter2.hasNext();) {
-						n2 = iter2.next();
+				for (String n1 : chList1) {
+					for (String n2 : chList2) {
 						if (n1 != n2) {
 							this.maxLinkKey++;
 							this.createLink(this.maxLinkKey, n1, n2,"Transfer");
 						}//if n1
 					}//for iter2
 				}// for iter1
-				n1= null;
-				n2= null;
 			}// if chlist
 		}// while
-		it = null;
 	}// CreateTransfer
 
 
-	public List<String> createWalkingLinks(final IdImpl idFromNode, final IdImpl idToNode ){
+	public List<String> createWalkingLinks(final Id idFromNode, final Id idToNode ){
 		//Adds temporary the origin and destination node and create new temporary links between
 		//between them  and its respective children to the routing process
 
@@ -191,7 +179,7 @@ public class PTNetworkLayer extends NetworkLayer {
 		}
 	}
 
-	public void removeWalkingNodes(final IdImpl node1, final IdImpl node2){
+	public void removeWalkingNodes(final Id node1, final Id node2){
 		//Removes temporal links at the end of the routing process
 		this.removeNode(this.getNode(node1));
 		this.removeNode(this.getNode(node2));

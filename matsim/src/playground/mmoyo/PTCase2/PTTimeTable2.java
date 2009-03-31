@@ -6,14 +6,11 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
-
-import playground.mmoyo.input.PTTimeTableReader;
 import playground.mmoyo.input.PTLinesReader2;
 
 import playground.mmoyo.PTRouter.*;

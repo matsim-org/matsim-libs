@@ -9,8 +9,6 @@ import org.matsim.core.api.network.Node;
 
 import playground.mmoyo.PTRouter.PTNode;
 
-//--> iterate on collections
-
 /** 
  * Determines the optimal path of a passenger in a Public transport Network 
  * according to the information of timetables

@@ -1,7 +1,5 @@
 package playground.mmoyo.PTRouter;
 
-import playground.mmoyo.PTRouter.PTLine;
-
 public class PTVehicle {
 	
 	private PTLine ptline;
