@@ -10,8 +10,8 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
@@ -214,7 +214,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 	private void moveStorageQueueToFlowQueue(final double now) {
 		QueueVehicle veh;
 		while ((veh = this.storageQueue.peek()) != null) {
-			if (Math.floor(veh.getDepartureTime_s()) > now) {
+			if (Math.floor(veh.getEarliestLinkExitTime()) > now) {
 				break;
 			}
 
@@ -315,26 +315,26 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		if (this.amIOriginalLink) {
 			// It's the original link,
 			// so we need to start with a 'clean' freeSpeedTravelTime
-			vehicle.setDepartureTime_s(SimulationTimer.getTime() + this.freeSpeedTravelTime);
+			vehicle.setEarliestLinkExitTime(SimulationTimer.getTime() + this.freeSpeedTravelTime);
 		} else {
 			// It's not the original link,
 			// so there is a fractional rest we add to this link's freeSpeedTravelTime
-			vehicle.setDepartureTime_s(SimulationTimer.getTime() + this.freeSpeedTravelTime
-					+ vehicle.getDepartureTime_s() - Math.floor(vehicle.getDepartureTime_s()));
+			vehicle.setEarliestLinkExitTime(SimulationTimer.getTime() + this.freeSpeedTravelTime
+					+ vehicle.getEarliestLinkExitTime() - Math.floor(vehicle.getEarliestLinkExitTime()));
 		}
 
 		if (this.meterFromLinkEnd == 0) {
 			// It's a nodePseudoLink,
 			// so we have to floor the freeLinkTravelTime in order the get the same
 			// results compared to the old mobSim
-			vehicle.setDepartureTime_s(Math.floor(vehicle.getDepartureTime_s()));
+			vehicle.setEarliestLinkExitTime(Math.floor(vehicle.getEarliestLinkExitTime()));
 		}
 	}
 
 	private void moveParkingQueueToParkToLinkQueue(final double now) {
 		QueueVehicle veh;
 		while ((veh = this.parkingQueue.peek()) != null) {
-			if (veh.getDepartureTime_s() > now) {
+			if (veh.getEarliestLinkExitTime() > now) {
 				break;
 			}
 			veh.getDriver().leaveActivity(now);
@@ -428,7 +428,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 
 			int lane = this.visualizerLane;
 
-			int cmp = (int) (veh.getDepartureTime_s() + (1.0 / this.realLink.getSimulatedFlowCapacity()) + 2.0);
+			int cmp = (int) (veh.getEarliestLinkExitTime() + (1.0 / this.realLink.getSimulatedFlowCapacity()) + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.realLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 
 			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.realLink.getLink(),
@@ -448,7 +448,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		 */
 		double lastDistance = Integer.MAX_VALUE;
 		for (QueueVehicle veh : this.storageQueue) {
-			double travelTime = now - (veh.getDepartureTime_s() - this.realLink.getLink().getFreespeedTravelTime(now));
+			double travelTime = now - (veh.getEarliestLinkExitTime() - this.realLink.getLink().getFreespeedTravelTime(now));
 			double distanceOnLink = (this.realLink.getLink().getFreespeedTravelTime(now) == 0.0 ? 0.0
 					: ((travelTime / this.realLink.getLink().getFreespeedTravelTime(now)) * (this.realLink.getLink().getLength() - this.meterFromLinkEnd)));
 			if (distanceOnLink > queueEnd) { // vehicle is already in queue
@@ -470,7 +470,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 				if (distanceOnLink < 0)
 					distanceOnLink = 0.0;
 			}
-			int cmp = (int) (veh.getDepartureTime_s() + (1.0 / this.realLink.getSimulatedFlowCapacity()) + 2.0);
+			int cmp = (int) (veh.getEarliestLinkExitTime() + (1.0 / this.realLink.getSimulatedFlowCapacity()) + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.realLink.getLink().getFreespeed(now);
 			int lane = this.visualizerLane;
 			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.realLink.getLink(),

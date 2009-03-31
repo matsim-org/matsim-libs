@@ -27,8 +27,8 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.events.ActEndEvent;
 import org.matsim.core.events.ActStartEvent;
@@ -44,6 +44,8 @@ public class PersonAgent implements DriverAgent {
 	private final Person person;
 	private QueueVehicle vehicle;
 	protected Link cachedNextLink = null;
+	
+	private double activityDepartureTime = Time.UNDEFINED_TIME;
 
 	private Link currentLink;
 	/**
@@ -83,11 +85,11 @@ public class PersonAgent implements DriverAgent {
 	}
 
 	public double getDepartureTime() {
-		return this.vehicle.getDepartureTime_s();
+		return this.activityDepartureTime;
 	}
 
 	public void setDepartureTime(final double seconds) {
-		this.vehicle.setDepartureTime_s(seconds);
+		this.activityDepartureTime = seconds;
 	}
 
 	public void setCurrentLink(final Link link) {

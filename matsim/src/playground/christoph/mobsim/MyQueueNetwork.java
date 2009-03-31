@@ -208,7 +208,7 @@ public class MyQueueNetwork extends QueueNetwork{
 				if(actEndReplanning) 
 				{
 					// if the current Activity has ended
-					if (vehicle.getDepartureTime_s() <= time) 
+					if (vehicle.getDriver().getDepartureTime() <= time)
 					{				
 						vehiclesToReplanActEnd.add(vehicle);
 						
@@ -278,7 +278,7 @@ public class MyQueueNetwork extends QueueNetwork{
 					if(actEndReplanning) 
 					{						
 						// if the current Activity has ended
-						if (vehicle.getDepartureTime_s() <= time) 
+						if (vehicle.getDriver().getDepartureTime() <= time)
 						{				
 							vehiclesToReplanActEnd.add(vehicle);
 							

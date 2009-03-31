@@ -326,7 +326,7 @@ public class QueueLink {
 	public void addParking(QueueVehicle vehicle) {
 		this.originalLane.addParking(vehicle);
 		this.getQueueNetwork().setLinkActivation(
-				vehicle.getDepartureTime_s(), this);
+				vehicle.getDriver().getDepartureTime(), this);
 	}
 
 	protected boolean moveLink(double now) {

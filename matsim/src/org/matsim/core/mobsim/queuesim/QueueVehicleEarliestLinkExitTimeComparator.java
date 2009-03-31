@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitQueueVehicle.java
+ * VehicleDepartureTimeComparator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.integration;
+package org.matsim.core.mobsim.queuesim;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import java.io.Serializable;
+import java.util.Comparator;
 
-import playground.marcel.pt.interfaces.Vehicle;
+/**
+ * @author dstrippgen
+ *
+ * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
+ * according to their departure time
+ */
+public class QueueVehicleEarliestLinkExitTimeComparator implements Comparator<QueueVehicle>,
+		Serializable {
 
-public class TransitQueueVehicle extends QueueVehicle {
+	private static final long serialVersionUID = 1L;
 
-	private final Vehicle vehicle;
-	private final QueueTransitDriver driver;
-	
-	public TransitQueueVehicle(Vehicle vehicle, QueueTransitDriver driver) {
-		super(driver.getPerson().getId());
-		this.vehicle = vehicle;
-		this.driver = driver;
-		super.setEarliestLinkExitTime(driver.getDepartureTime()); // TODO [MR] driver.setDepartureTime()
+	public int compare(final QueueVehicle veh1, final QueueVehicle veh2) {
+		if (veh1.getEarliestLinkExitTime() > veh2.getEarliestLinkExitTime()) {
+			return 1;
+		}
+		if (veh1.getEarliestLinkExitTime() < veh2.getEarliestLinkExitTime()) {
+			return -1;
+		}
+
+		// Both depart at the same time -> let the one with the larger id be first
+		return veh2.getId().compareTo(veh1.getId());
 	}
-	
-	public Link getCurrentLink() {
-		return this.driver.getCurrentLink(); //this.vehicle.getDriver().getCurrentLink();
-	}
-	
 }

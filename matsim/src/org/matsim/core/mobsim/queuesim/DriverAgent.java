@@ -38,6 +38,23 @@ public interface DriverAgent {
 	public Link getDestinationLink();
 
 	public void incCurrentNode();
+	
+	/**
+	 * The time the agent wants to depart fromo an Activity. If the agent is currrently driving,
+	 * the return value cannot be interpreted (e.g. it is not defined if it is the departure time
+	 * from the previous activity, or from the next one).
+	 * 
+	 * @return the time when the agent wants to depart from an activity.
+	 */
+	public double getDepartureTime();
+	
+	/**
+	 * Sets the time when the agent wants to leave the next (or current, if currently not driving)
+	 * Activity.
+	 * 
+	 * @param departureTime
+	 */
+	public void setDepartureTime(final double departureTime);
 
 	/**
 	 * Returns the next link the vehicle will drive along.

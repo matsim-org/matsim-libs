@@ -99,7 +99,7 @@ public class QueueSimulation {
 	 * Includes all vehicle that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
-	private static PriorityQueue<QueueVehicle> teleportationList = new PriorityQueue<QueueVehicle>(30, new QueueVehicleDepartureTimeComparator());
+	private static PriorityQueue<QueueVehicle> teleportationList = new PriorityQueue<QueueVehicle>(30, new QueueVehicleEarliestLinkExitTimeComparator());
 
 	private final Date starttime = new Date();
 
@@ -583,7 +583,7 @@ public class QueueSimulation {
 	}
 
 	protected static final void handleUnknownLegMode(final QueueVehicle veh) {
-		veh.setDepartureTime_s(SimulationTimer.getTime() + veh.getCurrentLeg().getTravelTime());
+		veh.setEarliestLinkExitTime(SimulationTimer.getTime() + veh.getCurrentLeg().getTravelTime());
 		veh.getDriver().setCurrentLink(veh.getDriver().getDestinationLink());
 		teleportationList.add(veh);
 	}
@@ -591,7 +591,7 @@ public class QueueSimulation {
 	private final void moveVehiclesWithUnknownLegMode(final double now) {
 	  	while (teleportationList.peek() != null ) {
 	  		QueueVehicle veh = teleportationList.peek();
-	  		if (veh.getDepartureTime_s() <= now) {
+	  		if (veh.getEarliestLinkExitTime() <= now) {
 	  			teleportationList.poll();
 
 				getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getPerson(),

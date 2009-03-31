@@ -28,8 +28,8 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
@@ -244,8 +244,8 @@ public class WithindayAgent extends PersonAgent {
 	 *         <tt>false</tt> otherwise.
 	 */
 	public boolean isEnRoute() {
-		if (this.getVehicle().getDepartureTime_s() > SimulationTimer.getTime()) {
-			//TODO remove if exception never thrown (dg oct2007)
+		if (this.getVehicle().getEarliestLinkExitTime() > SimulationTimer.getTime()) {
+			//TODO [dg] remove if exception never thrown (dg oct2007)
 			throw new RuntimeException("This should never happen in the new implementation!");
 		}
 		return true;

@@ -32,8 +32,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.network.BasicLane;
 import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.core.events.AgentArrivalEvent;
@@ -66,29 +66,29 @@ public class QueueLane implements Comparable<QueueLane> {
 	private static int spaceCapWarningCount = 0;
 
 	/**
-	 * parking list includes all vehicle that do not have yet reached their start
+	 * parking list includes all vehicles that do not have yet reached their start
 	 * time, but will start at this link at some time
 	 */
-	private final PriorityQueue<QueueVehicle> parkingList = new PriorityQueue<QueueVehicle>(
-			30, new QueueVehicleDepartureTimeComparator());
+	/*package*/ final PriorityQueue<QueueVehicle> parkingList = new PriorityQueue<QueueVehicle>(
+			10, new QueueVehicleDepartureTimeComparator());
 
 	/**
 	 * All vehicles from parkingList move to the waitingList as soon as their time
 	 * has come. They are then filled into the vehQueue, depending on free space
 	 * in the vehQueue
 	 */
-	private final Queue<QueueVehicle> waitingList = new LinkedList<QueueVehicle>();
+	/*package*/ final Queue<QueueVehicle> waitingList = new LinkedList<QueueVehicle>();
 
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
 	 */
-	private final Queue<QueueVehicle> vehQueue = new LinkedList<QueueVehicle>();
+	/*package*/ final Queue<QueueVehicle> vehQueue = new LinkedList<QueueVehicle>();
 
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
-	private final Queue<QueueVehicle> buffer = new LinkedList<QueueVehicle>();
+	/*package*/ final Queue<QueueVehicle> buffer = new LinkedList<QueueVehicle>();
 
 	private double storageCapacity;
 
@@ -97,7 +97,7 @@ public class QueueLane implements Comparable<QueueLane> {
 	 */
 	private double simulatedFlowCapacity; // previously called timeCap
 
-	private double inverseSimulatedFlowCapacity; // optimization, cache 1.0 / simulatedFlowCapacity
+	/*package*/ double inverseSimulatedFlowCapacity; // optimization, cache 1.0 / simulatedFlowCapacity
 
 	private int bufferStorageCapacity; // optimization, cache Math.ceil(simulatedFlowCap)
 
@@ -116,7 +116,7 @@ public class QueueLane implements Comparable<QueueLane> {
 	 */
 	private double buffercap_accumulate = 1.0;
 
-	private QueueLink queueLink;
+	/*package*/ QueueLink queueLink;
 	/**
 	 * This collection contains all Lanes downstream, if null it is the last lane 
 	 * within a QueueLink.
@@ -151,7 +151,7 @@ public class QueueLane implements Comparable<QueueLane> {
 
 	private boolean thisTimeStepGreen = true;
 
-	/* package */ QueueLane(QueueLink ql, boolean isOriginalLane) {
+	/*package*/ QueueLane(QueueLink ql, boolean isOriginalLane) {
 		this.queueLink = ql;
 		this.originalLane = isOriginalLane;
 		this.freespeedTravelTime = ql.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
@@ -289,7 +289,6 @@ public class QueueLane implements Comparable<QueueLane> {
 	
 	/**
 	 * updated the status of the QueueLane's signal system
-	 * @return
 	 */
 	protected void updateGreenState(){
 		if (this.signalGroups == null) {
@@ -335,7 +334,7 @@ public class QueueLane implements Comparable<QueueLane> {
 	private void moveParkToWait(final double now) {
 		QueueVehicle veh;
 		while ((veh = this.parkingList.peek()) != null) {
-			if (veh.getDepartureTime_s() > now) {
+			if (veh.getDriver().getDepartureTime() > now) {
 				return;
 			}
 
@@ -405,11 +404,11 @@ public class QueueLane implements Comparable<QueueLane> {
 		QueueVehicle veh;
 		while ((veh = this.vehQueue.peek()) != null) {
 			//we have an original QueueLink behaviour
-			if ((veh.getDepartureTime_s() > now) && this.originalLane && (this.meterFromLinkEnd == 0.0)){
+			if ((veh.getEarliestLinkExitTime() > now) && this.originalLane && (this.meterFromLinkEnd == 0.0)){
 				return;
 			}
 			//this is the aneumann PseudoLink behaviour
-			else if (Math.floor(veh.getDepartureTime_s()) > now){
+			else if (Math.floor(veh.getEarliestLinkExitTime()) > now){
 				return;
 			}
 						
@@ -538,15 +537,15 @@ public class QueueLane implements Comparable<QueueLane> {
 			// It's not the original lane,
 			// so there is a fractional rest we add to this link's freeSpeedTravelTime
 			departureTime = now + this.freespeedTravelTime
-			+ veh.getDepartureTime_s() - Math.floor(veh.getDepartureTime_s());
+			+ veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
 		}
-		veh.setDepartureTime_s(departureTime);
+		veh.setEarliestLinkExitTime(departureTime);
 		
 		if (this.meterFromLinkEnd == 0.0) {
 			// It's a QueueLane that is directly connected to a QueueNode,
 			// so we have to floor the freeLinkTravelTime in order the get the same
 			// results compared to the old mobSim
-			veh.setDepartureTime_s(Math.floor(veh.getDepartureTime_s()));
+			veh.setEarliestLinkExitTime(Math.floor(veh.getEarliestLinkExitTime()));
 		}
 
 	}
@@ -747,7 +746,7 @@ public class QueueLane implements Comparable<QueueLane> {
 			double now = SimulationTimer.getTime();
 			for (QueueVehicle veh : vehQueue) {
 				// Check if veh has reached destination
-				if (veh.getDepartureTime_s() <= now) {
+				if (veh.getEarliestLinkExitTime() <= now) {
 					count++;
 				}
 			}
@@ -807,7 +806,7 @@ public class QueueLane implements Comparable<QueueLane> {
 				// the cars in the buffer
 				for (QueueVehicle veh : buffer) {
 					int lane = 1 + Integer.parseInt(veh.getId().toString()) % nLanes;
-					int cmp = (int) (veh.getDepartureTime_s() + inverseSimulatedFlowCapacity + 2.0);
+					int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 					double speed = (time > cmp ? 0.0 : freespeed);
 					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), queueLink.getLink(),
 							distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
@@ -818,7 +817,7 @@ public class QueueLane implements Comparable<QueueLane> {
 				// the cars in the drivingQueue
 				for (QueueVehicle veh : vehQueue) {
 					int lane = 1 + Integer.parseInt(veh.getId().toString()) % nLanes;
-					int cmp = (int) (veh.getDepartureTime_s() + inverseSimulatedFlowCapacity + 2.0);
+					int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 					double speed = (time > cmp ? 0.0 : freespeed);
 					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), queueLink.getLink(),
 							distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
@@ -883,7 +882,7 @@ public class QueueLane implements Comparable<QueueLane> {
 
 				int lane = 1 + (Integer.parseInt(veh.getId().toString()) % queueLink.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
 
-				int cmp = (int) (veh.getDepartureTime_s() + inverseSimulatedFlowCapacity + 2.0);
+				int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp) ? 0.0 : queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), queueLink.getLink(), queueEnd,
@@ -901,7 +900,7 @@ public class QueueLane implements Comparable<QueueLane> {
 			 */
 			double lastDistance = Integer.MAX_VALUE;
 			for (QueueVehicle veh : vehQueue) {
-				double travelTime = now - (veh.getDepartureTime_s() - queueLink.getLink().getFreespeedTravelTime(now));
+				double travelTime = now - (veh.getEarliestLinkExitTime() - queueLink.getLink().getFreespeedTravelTime(now));
 				double distanceOnLink = (queueLink.getLink().getFreespeedTravelTime(now) == 0.0 ? 0.0
 						: ((travelTime / queueLink.getLink().getFreespeedTravelTime(now)) * queueLink.getLink().getLength()));
 				if (distanceOnLink > queueEnd) { // vehicle is already in queue
@@ -922,8 +921,7 @@ public class QueueLane implements Comparable<QueueLane> {
 					if (distanceOnLink < 0)
 						distanceOnLink = 0.0;
 				}
-				int cmp = (int) (veh.getDepartureTime_s()
-						+ inverseSimulatedFlowCapacity + 2.0);
+				int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp) ? 0.0 : queueLink.getLink().getFreespeed(now);
 				int lane = 1 + (Integer.parseInt(veh.getId().toString()) % queueLink.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), queueLink.getLink(), distanceOnLink,

@@ -80,6 +80,11 @@ public class QueueTransitDriver implements DriverAgent {
 		return this.driver.getDepartureTime();
 	}
 	
+	public void setDepartureTime(final double time) {
+		throw new UnsupportedOperationException();
+		// ignore this, the bus-driver has its own schedule
+	}
+	
 	public void reachActivity(double now, QueueLink currentQueueLink) {
 		Simulation.decLiving();
 	}

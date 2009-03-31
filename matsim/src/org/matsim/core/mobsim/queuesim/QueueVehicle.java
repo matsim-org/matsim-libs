@@ -28,8 +28,6 @@ import org.matsim.vis.netvis.DrawableAgentI;
 
 public class QueueVehicle implements Identifiable, DrawableAgentI {
 
-//	private final static Logger log = Logger.getLogger(Vehicle.class);
-
 	private double currentDepartureTime = 0;
 	private double lastMovedTime = 0;
 
@@ -41,12 +39,11 @@ public class QueueVehicle implements Identifiable, DrawableAgentI {
 		this.id = id;
 	}
 
-
-	public double getDepartureTime_s() {
+	public double getEarliestLinkExitTime() {
 		return this.currentDepartureTime;
 	}
 
-	public void setDepartureTime_s(final double time) {
+	public void setEarliestLinkExitTime(final double time) {
 		this.currentDepartureTime = time;
 	}
 
@@ -108,7 +105,7 @@ public class QueueVehicle implements Identifiable, DrawableAgentI {
 	public double getPosInLink_m() {
 
 		double dur = this.driver.getCurrentLink().getFreespeedTravelTime(SimulationTimer.getTime());
-		double mytime = getDepartureTime_s() - SimulationTimer.getTime();
+		double mytime = getEarliestLinkExitTime() - SimulationTimer.getTime();
 		if (mytime<0) {
 			mytime = 0.;
 		}

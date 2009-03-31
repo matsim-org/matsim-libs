@@ -48,7 +48,7 @@ public class QueryAgentActivityStatus implements OTFQuery {
 	double finished = 0;
 
 	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
-		Person person = plans.getPerson(this.agentId);
+		Person person = plans.getPersons().get(this.agentId);
 		if (person == null) return;
 
 		Plan plan = person.getSelectedPlan();
@@ -59,13 +59,13 @@ public class QueryAgentActivityStatus implements OTFQuery {
 		for (int i=0;i< plan.getPlanElements().size(); i+=2) {
 			Activity act = (Activity)plan.getPlanElements().get(i);
 			QueueLink link = net.getQueueLink(act.getLinkId());
-			Collection<QueueVehicle> vehs = link.getAllVehicles();
-			for (QueueVehicle info : vehs) {
-				if (info.getDriver().getPerson().getId().compareTo(this.agentId) == 0) {
+			Collection<QueueVehicle> allVehicles = link.getAllVehicles();
+			for (QueueVehicle veh : allVehicles) {
+				if (veh.getDriver().getPerson().getId().compareTo(this.agentId) == 0) {
 					// we found the little nutty, now lets reason about the length of 1st activity
-					double departure = info.getDepartureTime_s();
-					double diff =  departure - info.getLastMovedTime();
-					this.finished = (this.now - info.getLastMovedTime()) / diff;
+					double departure = veh.getDriver().getDepartureTime(); 
+					double diff =  departure - veh.getLastMovedTime();
+					this.finished = (this.now - veh.getLastMovedTime()) / diff;
 					this.activityNr = i/2;
 				}
 			}
