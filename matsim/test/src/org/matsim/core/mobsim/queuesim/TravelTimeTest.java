@@ -31,7 +31,6 @@ import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
