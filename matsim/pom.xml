@@ -246,6 +246,13 @@
       <scope>system</scope>
       <systemPath>${basedir}/libs/jaxb-2.1.7/lib/jsr173_1.0_api.jar</systemPath>
     </dependency>
+    <dependency>
+      <groupId>unidata.ucar.edu</groupId>
+      <artifactId>netcdfAll-4.0.jar</artifactId>
+      <version>4.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/libs/netcdfAll-4.0.jar</systemPath>
+    </dependency>
     <!--End of jaxb 2.1.7 system scope dependencies -->
     <dependency>
       <groupId>org.geotools</groupId>
