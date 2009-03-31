@@ -34,10 +34,6 @@ public class QueueVehicleDepartureTimeComparator implements Comparator<QueueVehi
 
 	private static final long serialVersionUID = 1L;
 
-	public QueueVehicleDepartureTimeComparator() {
-
-	}
-
 	public int compare(final QueueVehicle veh1, final QueueVehicle veh2) {
 		if (veh1.getDepartureTime_s() > veh2.getDepartureTime_s())
 			return 1;
@@ -45,13 +41,6 @@ public class QueueVehicleDepartureTimeComparator implements Comparator<QueueVehi
 			return -1;
 
 		// Both depart at the same time -> let the one with the larger id be first
-		int veh1id = Integer.parseInt(veh1.getId().toString());
-		int veh2id = Integer.parseInt(veh2.getId().toString());
-
-		if (veh1id < veh2id)
-			return 1;
-		if (veh1id > veh2id)
-			return -1;
-		return 0;
+		return veh2.getId().compareTo(veh1.getId());
 	}
 }
