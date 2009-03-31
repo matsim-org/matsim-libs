@@ -1,7 +1,6 @@
 package playground.jhackney.socialnetworks;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -24,6 +23,7 @@ public class SocialNetworksTest4 extends MatsimTestCase{
 		final Controler controler = new Controler(new String[] {config});
 		controler.addControlerListener(new SNControllerListener2()); // had to comment this line out because SNControllerListener2 is in the playground, but this class is in core
 		controler.setOverwriteFiles(true);
+		controler.setCreateGraphs(false);
 		controler.run();
 
 		long checksum1 = 0;
@@ -49,10 +49,4 @@ public class SocialNetworksTest4 extends MatsimTestCase{
 
 		System.out.println("\nTest Succeeded");
 	}
-	protected void tearDown() throws Exception {
-        super.tearDown();
-        Gbl.reset();
-        // 
-    }
-
 }
