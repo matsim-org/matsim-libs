@@ -23,6 +23,10 @@ package org.matsim.core.mobsim.cppdeqsim;
 
 import org.matsim.core.controler.Controler;
 
+/**
+ * @author mrieser
+ * @deprecated use JDEQSim instead of C++-DEQSim
+ */
 public class DEQSimControler extends Controler {
 
 	public DEQSimControler(final String[] args) {

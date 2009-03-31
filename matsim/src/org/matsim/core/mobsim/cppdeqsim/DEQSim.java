@@ -33,8 +33,8 @@ import java.util.List;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -54,6 +54,7 @@ import org.matsim.core.utils.misc.Time;
  * reduce the amount of data written to/read from disk to speed the file I/O up.
  *
  * @author mrieser
+ * @deprecated use JDEQSim instead of C++-DEQSim
  */
 public class DEQSim extends ExternalMobsim {
 
