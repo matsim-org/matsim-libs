@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.yu.analysis;
+package playground.yu.analysis.MZComparison;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;

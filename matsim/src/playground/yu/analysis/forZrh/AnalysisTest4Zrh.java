@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.yu.analysis;
+package playground.yu.analysis.forZrh;
 
 import java.io.IOException;
 
@@ -42,6 +42,11 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 import org.xml.sax.SAXException;
 
+import playground.yu.analysis.CalcLinksAvgSpeed;
+import playground.yu.analysis.CalcNetAvgSpeed;
+import playground.yu.analysis.CalcTrafficPerformance;
+import playground.yu.analysis.LegDistance;
+import playground.yu.analysis.ModeSplit;
 import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
 
@@ -49,7 +54,7 @@ import playground.yu.utils.io.SimpleWriter;
  * @author ychen
  * 
  */
-public class AnalysisTest {
+public class AnalysisTest4Zrh {
 	private static void printUsage() {
 		System.out.println();
 		System.out.println("AnalysisTest:");
@@ -112,12 +117,12 @@ public class AnalysisTest {
 		}
 
 		// EventsHandlers with parameter of "Population":
-		EnRouteModalSplit orms = null;
-		LegTravelTimeModalSplit lttms = null;
+		EnRouteModalSplit4Zrh orms = null;
+		LegTravelTimeModalSplit4Zrh lttms = null;
 		// PersonAlgorithm
 		CalcAverageTripLength catl = null;
-		DailyDistance dd = null;
-		DailyEnRouteTime dert = null;
+		DailyDistance4Zrh dd = null;
+		DailyEnRouteTime4Zrh dert = null;
 		ModeSplit ms = null;
 		LegDistance ld = null;
 		// only PersonAlgorithm begins.
@@ -126,10 +131,10 @@ public class AnalysisTest {
 
 			catl = new CalcAverageTripLength();
 			ms = new ModeSplit(toll);
-			orms = new EnRouteModalSplit(scenario, population, toll);
-			lttms = new LegTravelTimeModalSplit(population, toll);
-			dd = new DailyDistance(toll);
-			dert = new DailyEnRouteTime(toll);
+			orms = new EnRouteModalSplit4Zrh(scenario, population, toll);
+			lttms = new LegTravelTimeModalSplit4Zrh(population, toll);
+			dd = new DailyDistance4Zrh(toll);
+			dert = new DailyEnRouteTime4Zrh(toll);
 			ld = new LegDistance(network, toll, population);
 			// in future, add some PersonAlgorithm and EventsHandler
 

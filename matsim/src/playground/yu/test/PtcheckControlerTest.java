@@ -45,7 +45,7 @@ import playground.yu.analysis.CalcLinksAvgSpeed;
 import playground.yu.analysis.CalcNetAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
 import playground.yu.analysis.LegDistance;
-import playground.yu.analysis.OnRouteModalSplit;
+import playground.yu.analysis.EnRouteModalSplit;
 import playground.yu.analysis.PtRate;
 import playground.yu.analysis.LegTravelTimeModalSplit;
 
@@ -71,7 +71,7 @@ public class PtcheckControlerTest extends Controler {
 		private CalcNetAvgSpeed cas = null;
 		private CalcTrafficPerformance ctpf = null;
 		private RoadPricing rp = null;
-		private OnRouteModalSplit orms = null;
+		private EnRouteModalSplit orms = null;
 		private LegTravelTimeModalSplit ttms = null;
 		private LegDistance ld = null;
 		private CalcLinksAvgSpeed clas = null;
@@ -179,7 +179,7 @@ public class PtcheckControlerTest extends Controler {
 			NetworkLayer nl = c.getNetwork();
 			Population ps = c.getPopulation();
 			if (event.getIteration() == c.getLastIteration()) {
-				this.orms = new OnRouteModalSplit("Zurich", 300,
+				this.orms = new EnRouteModalSplit("Zurich", 300,
 				// nl,
 						ps);
 				es.addHandler(this.orms);

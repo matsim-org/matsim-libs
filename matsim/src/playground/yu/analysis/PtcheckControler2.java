@@ -69,7 +69,7 @@ public class PtcheckControler2 extends Controler {
 
 		private RoadPricing rp = null;
 
-		private OnRouteModalSplit orms = null;
+		private EnRouteModalSplit orms = null;
 
 		private LegTravelTimeModalSplit ttms = null;
 
@@ -179,7 +179,7 @@ public class PtcheckControler2 extends Controler {
 			NetworkLayer nl = c.getNetwork();
 			Population ps = c.getPopulation();
 			if (event.getIteration() == c.getLastIteration()) {
-				orms = new OnRouteModalSplit("normal", 300,
+				orms = new EnRouteModalSplit("normal", 300,
 				// nl,
 						ps);
 				es.addHandler(orms);

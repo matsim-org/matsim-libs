@@ -59,15 +59,20 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
 	// private final NetworkLayer network;
 
-	private final Population plans;
+	protected final Population plans;
 	private RoadPricingScheme toll = null;
 
-	private final int binSize;
+	protected final int binSize;
 
-	private final double[] travelTimes, carTravelTimes, ptTravelTimes,
-			wlkTravelTimes;
+	protected final double[] travelTimes;
+	protected final double[] carTravelTimes;
+	protected final double[] ptTravelTimes;
+	protected final double[] wlkTravelTimes;
 
-	private final int[] arrCount, carArrCount, ptArrCount, wlkArrCount;
+	protected final int[] arrCount;
+	protected final int[] carArrCount;
+	protected final int[] ptArrCount;
+	protected final int[] wlkArrCount;
 
 	/**
 	 * @param arg0
@@ -75,9 +80,9 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 	 * @param arg1
 	 *            - Double departure time
 	 */
-	private final HashMap<String, Double> tmpDptTimes = new HashMap<String, Double>();
-	private double[] otherTravelTimes;
-	private int[] otherArrCount;
+	protected final HashMap<String, Double> tmpDptTimes = new HashMap<String, Double>();
+	protected double[] otherTravelTimes;
+	protected int[] otherArrCount;
 
 	/**
 	 *
@@ -141,7 +146,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 			internalCompute(agentId, arrTime);
 	}
 
-	private void internalCompute(String agentId, double arrTime) {
+	protected void internalCompute(String agentId, double arrTime) {
 		Double dptTime = this.tmpDptTimes.remove(agentId);
 		if (dptTime != null) {
 			int binIdx = getBinIndex(arrTime);
@@ -151,17 +156,15 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 
 			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
 					.getSelectedPlan();
-			if (Integer.parseInt(agentId) < 1000000000) {
-				if (PlanModeJudger.useCar(selectedplan)) {
-					this.carTravelTimes[binIdx] += travelTime;
-					this.carArrCount[binIdx]++;
-				} else if (PlanModeJudger.usePt(selectedplan)) {
-					this.ptTravelTimes[binIdx] += travelTime;
-					this.ptArrCount[binIdx]++;
-				} else if (PlanModeJudger.useWalk(selectedplan)) {
-					wlkTravelTimes[binIdx] += travelTime;
-					wlkArrCount[binIdx]++;
-				}
+			if (PlanModeJudger.useCar(selectedplan)) {
+				this.carTravelTimes[binIdx] += travelTime;
+				this.carArrCount[binIdx]++;
+			} else if (PlanModeJudger.usePt(selectedplan)) {
+				this.ptTravelTimes[binIdx] += travelTime;
+				this.ptArrCount[binIdx]++;
+			} else if (PlanModeJudger.useWalk(selectedplan)) {
+				wlkTravelTimes[binIdx] += travelTime;
+				wlkArrCount[binIdx]++;
 			} else {
 				this.otherTravelTimes[binIdx] += travelTime;
 				this.otherArrCount[binIdx]++;
@@ -169,7 +172,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		}
 	}
 
-	private int getBinIndex(final double time) {
+	protected int getBinIndex(final double time) {
 		int bin = (int) (time / this.binSize);
 		if (bin >= this.travelTimes.length)
 			return this.travelTimes.length - 1;
@@ -259,9 +262,10 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 						+ "the number of all the walkers Trips: "
 						+ nWlkTrips
 						+ "\n"
-						+ "the sum of all the through-traffic traveltimes [s]: "
-						+ otherTtSum + "\n"
-						+ "the number of all the through-traffic Trips: "
+						+ "the sum of all the persons with other modes traveltimes [s]: "
+						+ otherTtSum
+						+ "\n"
+						+ "the number of all the persons with other modes Trips: "
 						+ nOtherTrips);
 		sw.close();
 	}

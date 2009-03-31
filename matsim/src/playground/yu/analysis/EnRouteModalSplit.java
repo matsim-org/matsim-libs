@@ -57,7 +57,7 @@ import playground.yu.utils.TollTools;
  *         Counts the number of vehicles departed, arrived or got stuck per time
  *         bin based on events.
  */
-public class OnRouteModalSplit implements AgentDepartureEventHandler,
+public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler, AgentStuckEventHandler {
 	private String scenario;
 	private int iteration = 0;
@@ -81,7 +81,7 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 	 * @param nofBins
 	 *            The number of time bins for this analysis.
 	 */
-	public OnRouteModalSplit(String scenario, final int binSize,
+	public EnRouteModalSplit(String scenario, final int binSize,
 			final int nofBins, Population plans) {
 		super();
 		this.scenario = scenario;
@@ -125,16 +125,16 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 	 * @param binSize
 	 *            The size of a time bin in seconds.
 	 */
-	public OnRouteModalSplit(String scenario, final int binSize,
+	public EnRouteModalSplit(String scenario, final int binSize,
 			Population plans) {
 		this(scenario, binSize, 30 * 3600 / binSize + 1, plans);
 	}
 
-	public OnRouteModalSplit(String scenario, Population plans) {
+	public EnRouteModalSplit(String scenario, Population plans) {
 		this(scenario, 300, plans);
 	}
 
-	public OnRouteModalSplit(String scenario, Population ppl,
+	public EnRouteModalSplit(String scenario, Population ppl,
 			RoadPricingScheme toll) {
 		this(scenario, ppl);
 		this.toll = toll;
@@ -176,33 +176,34 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 
 	}
 
-	private void internalCompute(int binIdx, AgentEvent ae, Plan plan,
+	protected void internalCompute(int binIdx, AgentEvent ae, Plan plan,
 			double[] allCount, double[] carCount, double[] ptCount,
 			double[] wlkCount, double[] otherCount) {
 		allCount[binIdx]++;
-		if (otherCount != null)
-			if (Integer.parseInt(ae.getPersonId().toString()) > 1000000000)
-				otherCount[binIdx]++;
-			else {
-				if (PlanModeJudger.useCar(plan))
-					carCount[binIdx]++;
-				else if (PlanModeJudger.usePt(plan)) {
-					if (ptCount != null)
-						ptCount[binIdx]++;
-				} else if (PlanModeJudger.useWalk(plan))
-					if (wlkCount != null)
-						wlkCount[binIdx]++;
-			}
-		else {
-			if (PlanModeJudger.useCar(plan))
-				carCount[binIdx]++;
-			else if (PlanModeJudger.usePt(plan)) {
-				if (ptCount != null)
-					ptCount[binIdx]++;
-			} else if (PlanModeJudger.useWalk(plan))
-				if (wlkCount != null)
-					wlkCount[binIdx]++;
-		}
+		// if (otherCount != null)
+		// // if (Integer.parseInt(ae.getPersonId().toString()) > 1000000000)
+		// // otherCount[binIdx]++;
+		// // else
+		// {
+		// if (PlanModeJudger.useCar(plan))
+		// carCount[binIdx]++;
+		// else if (PlanModeJudger.usePt(plan)) {
+		// if (ptCount != null)
+		// ptCount[binIdx]++;
+		// } else if (PlanModeJudger.useWalk(plan))
+		// if (wlkCount != null)
+		// wlkCount[binIdx]++;
+		// } else
+		// {
+		if (PlanModeJudger.useCar(plan))
+			carCount[binIdx]++;
+		else if (PlanModeJudger.usePt(plan)) {
+			if (ptCount != null)
+				ptCount[binIdx]++;
+		} else if (PlanModeJudger.useWalk(plan))
+			if (wlkCount != null)
+				wlkCount[binIdx]++;
+		// }
 	}
 
 	/* output methods */
@@ -401,7 +402,7 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 			e.printStackTrace();
 		}
 		Events events = new Events();
-		OnRouteModalSplit orms = new OnRouteModalSplit("Kanton_Zurich",
+		EnRouteModalSplit orms = new EnRouteModalSplit("Kanton_Zurich",
 				population
 		// ,tollReader.getScheme()
 		);

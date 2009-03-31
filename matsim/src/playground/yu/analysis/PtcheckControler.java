@@ -71,7 +71,7 @@ public class PtcheckControler extends Controler {
 		private CalcNetAvgSpeed cas = null;
 		private CalcTrafficPerformance ctpf = null;
 		private RoadPricing rp = null;
-		private OnRouteModalSplit orms = null;
+		private EnRouteModalSplit orms = null;
 		private LegTravelTimeModalSplit ttms = null;
 		private LegDistance ld = null;
 		private CalcLinksAvgSpeed clas = null;
@@ -183,7 +183,7 @@ public class PtcheckControler extends Controler {
 			NetworkLayer nl = c.getNetwork();
 			Population ps = c.getPopulation();
 			if (event.getIteration() == c.getLastIteration()) {
-				orms = new OnRouteModalSplit(scenario,
+				orms = new EnRouteModalSplit(scenario,
 				// nl,
 						ps);
 				es.addHandler(orms);
