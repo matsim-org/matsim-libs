@@ -31,9 +31,9 @@ public class ErgmTwoStars extends ErgmTerm {
 
 	public double evaluate(AdjacencyMatrix m, int i, int j, boolean y_ij) {
 		if(y_ij) {
-			return getTheta() * (m.countNeighbours(i) + m.countNeighbours(j) - 2);
+			return getTheta() * -(m.countNeighbours(i) + m.countNeighbours(j) - 2);
 		} else {
-			return getTheta() * (m.countNeighbours(i) + m.countNeighbours(j));
+			return getTheta() * -(m.countNeighbours(i) + m.countNeighbours(j));
 		}
 	}
 

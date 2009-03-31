@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ErgmTerm.java
+ * PajekScalarColorizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,25 +21,54 @@
 /**
  * 
  */
-package playground.johannes.graph.mcmc;
+package playground.johannes.graph.io;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+
+import playground.johannes.graph.Edge;
+import playground.johannes.graph.Graph;
+import playground.johannes.graph.GraphStatistics;
+import playground.johannes.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public abstract class ErgmTerm {
+public class PajekDegreeColorizer<V extends Vertex, E extends Edge> extends PajekColorizer<V, E> {
+	
+	private double k_min;
+	
+	private double k_max;
+	
+	private boolean logScale;
+	
+	public PajekDegreeColorizer(Graph g, boolean logScale) {
+		super();
+		setLogScale(logScale);
+		DescriptiveStatistics stats = GraphStatistics.getDegreeStatistics(g);
+		k_min = stats.getMin();
+		k_max = stats.getMax();
+	}
+	
+	public void setLogScale(boolean flag) {
+		logScale = flag;
+	}
+	
+	public String getEdgeColor(E e) {
+		return getColor(-1);
+	}
 
-	private double theta;
-	
-	public void setTheta(double theta) {
-		this.theta = theta;
+	public String getVertexFillColor(V ego) {
+		int k = ego.getNeighbours().size();
+		double color = -1;
+		if(logScale) {
+			double min = Math.log(k_min + 1);
+			double max = Math.log(k_max + 1);
+			color = (Math.log(k + 1) - min) / (max - min);
+		} else {
+			color = (k - k_min) / (k_max - k_min);
+		}
+		
+		return getColor(color);
 	}
-	
-	public double getTheta() {
-		return theta;
-	}
-	
-	abstract public double evaluate(AdjacencyMatrix y, int i, int j, boolean y_ij);
-	
 }

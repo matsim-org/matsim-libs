@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ErgmTerm.java
+ * ErgmAge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,25 +21,30 @@
 /**
  * 
  */
-package playground.johannes.graph.mcmc;
+package playground.johannes.socialnet.mcmc;
 
+import org.matsim.core.api.population.Person;
+
+import playground.johannes.graph.mcmc.AdjacencyMatrix;
+import playground.johannes.graph.mcmc.ErgmTerm;
 
 /**
  * @author illenberger
  *
  */
-public abstract class ErgmTerm {
+public class ErgmAge extends ErgmTerm {
 
-	private double theta;
-	
-	public void setTheta(double theta) {
-		this.theta = theta;
+	@Override
+	public double evaluate(AdjacencyMatrix m, int i, int j, boolean y_ij) {
+		int age1 = ((SNAdjacencyMatrix<Person>)m).getEgo(i).getPerson().getAge();
+		int age2 = ((SNAdjacencyMatrix<Person>)m).getEgo(j).getPerson().getAge();
+		
+//		if(age1 == age2)
+//			return getTheta();
+//		else
+//			return 0;
+		
+		return getTheta() * Math.min(age1, age2) / Math.max(age1, age2);
 	}
-	
-	public double getTheta() {
-		return theta;
-	}
-	
-	abstract public double evaluate(AdjacencyMatrix y, int i, int j, boolean y_ij);
-	
+
 }

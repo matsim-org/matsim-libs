@@ -23,9 +23,15 @@
  */
 package playground.johannes.socialnet.mcmc;
 
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntObjectHashMap;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.graph.Vertex;
@@ -38,17 +44,17 @@ import playground.johannes.socialnet.SocialTie;
  * @author illenberger
  *
  */
-public class SNAdjacencyMatrix extends AdjacencyMatrix {
+public class SNAdjacencyMatrix<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> extends AdjacencyMatrix {
 
-	private List<Ego<?>> egoList;
+	private List<Ego<P>> egoList;
 	
-	public SNAdjacencyMatrix(SocialNetwork<?> g) {
+	public SNAdjacencyMatrix(SocialNetwork<P> g) {
 		super();
-		egoList = new ArrayList<Ego<?>>(g.getVertices().size());
+		egoList = new ArrayList<Ego<P>>(g.getVertices().size());
 //		TObjectIntHashMap<Vertex> vertexIndicies = new TObjectIntHashMap<Vertex>();
 		
 		int idx = 0;
-		for(Ego<?> v : g.getVertices()) {
+		for(Ego<P> v : g.getVertices()) {
 //			vertexIndicies.put(v, idx);
 			egoList.add(v);
 			addVertex();
@@ -72,5 +78,35 @@ public class SNAdjacencyMatrix extends AdjacencyMatrix {
 				throw new IllegalArgumentException(String.format("Indices i=%1$s, j=%2$s not allowed!", i, j));
 			}
 		}
+	}
+
+	
+	public SocialNetwork<P> getGraph() {
+		SocialNetwork<P> g = new SocialNetwork<P>();
+
+		TIntObjectHashMap<Ego<P>> vertexIdx = new TIntObjectHashMap<Ego<P>>();
+		for(int i = 0; i < getVertexCount(); i++) {
+			Ego<P> ego = g.addEgo(egoList.get(i).getPerson());
+			vertexIdx.put(i, ego);
+		}
+		
+		for(int i = 0; i < getVertexCount(); i++) {
+			TIntArrayList row = getNeighbours(i);
+			if(row != null) {
+				for(int idx = 0; idx < row.size(); idx++) {
+					int j = row.get(idx);
+					if(j > i) {
+						if(g.addEdge(vertexIdx.get(i), vertexIdx.get(j)) == null)
+							throw new RuntimeException();
+					}
+				}
+			}
+		}
+		
+		return g;
+	}
+	
+	public Ego<P> getEgo(int i) {
+		return egoList.get(i);
 	}
 }

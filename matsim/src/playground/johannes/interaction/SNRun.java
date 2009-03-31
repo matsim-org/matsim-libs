@@ -33,9 +33,12 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 
+import playground.johannes.graph.Edge;
+import playground.johannes.graph.Graph;
 import playground.johannes.graph.GraphStatistics;
+import playground.johannes.graph.Vertex;
+import playground.johannes.graph.io.PajekWriter;
 import playground.johannes.socialnet.SocialNetwork;
-import playground.johannes.socialnet.io.PajekVisWriter;
 import playground.johannes.socialnet.io.SNGraphMLWriter;
 import playground.johannes.statistics.WeightedStatistics;
 
@@ -64,7 +67,7 @@ public class SNRun {
 		SNGraphMLWriter writer = new SNGraphMLWriter();
 		writer.write(socialnet, c.getOutputFilename("socialnet.graphml"));
 		
-		PajekVisWriter pWriter = new PajekVisWriter();
+		PajekWriter<Graph, Vertex, Edge> pWriter = new PajekWriter();
 		pWriter.write(socialnet, c.getOutputFilename("socialnet.net"));
 	}
 

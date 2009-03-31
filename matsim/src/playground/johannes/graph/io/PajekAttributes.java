@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ErgmTerm.java
+ * PajekAttributes.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,25 +21,27 @@
 /**
  * 
  */
-package playground.johannes.graph.mcmc;
+package playground.johannes.graph.io;
 
+import java.util.List;
+
+import playground.johannes.graph.Edge;
+import playground.johannes.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public abstract class ErgmTerm {
+public interface PajekAttributes<V extends Vertex, E extends Edge> {
 
-	private double theta;
+	public final static String VERTEX_FILL_COLOR = "ic";
 	
-	public void setTheta(double theta) {
-		this.theta = theta;
-	}
+	public List<String> getVertexAttributes();
 	
-	public double getTheta() {
-		return theta;
-	}
+	public List<String> getEdgeAttributes();
 	
-	abstract public double evaluate(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	public String getVertexValue(V v, String attribute);
+	
+	public String getEdgeValue(E e, String attribute);
 	
 }

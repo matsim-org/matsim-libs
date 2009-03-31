@@ -188,4 +188,16 @@ public class AdjacencyMatrix {
 		return rows.get(i);
 	}
 	
+	public int countTriangles(int i) {
+		int triangles = 0;
+		TIntArrayList row = rows.get(i);
+		for(int u = 0; u < row.size(); u++) {
+			for(int v = u + 1; v < row.size(); v++) {
+				if(getEdge(u, v))
+					triangles++;
+			}
+		}
+		return triangles;
+	}
+	
 }

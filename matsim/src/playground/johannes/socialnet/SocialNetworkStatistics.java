@@ -26,6 +26,7 @@ package playground.johannes.socialnet;
 import gnu.trove.TDoubleDoubleHashMap;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.api.population.Person;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.johannes.statistics.WeightedStatistics;
@@ -67,5 +68,25 @@ public class SocialNetworkStatistics {
 		}
 		
 		return stats;
+	}
+	
+	public static double getAgeCorrelation(SocialNetwork<Person> g) {
+		double product = 0;
+		double sum = 0;
+		double squareSum = 0;
+
+		for (SocialTie e : g.getEdges()) {
+			Ego<Person> v1 = (Ego<Person>) e.getVertices().getFirst();
+			Ego<Person> v2 = (Ego<Person>) e.getVertices().getSecond();
+			int age1 = v1.getPerson().getAge();
+			int age2 = v2.getPerson().getAge();
+
+			sum += 0.5 * (age1 + age2);
+			squareSum += 0.5 * (Math.pow(age1, 2) + Math.pow(age2, 2));
+			product += age1 * age2;			
+		}
+		
+		double norm = 1 / (double)g.getEdges().size();
+		return ((norm * product) - Math.pow(norm * sum, 2)) / ((norm * squareSum) - Math.pow(norm * sum, 2));
 	}
 }

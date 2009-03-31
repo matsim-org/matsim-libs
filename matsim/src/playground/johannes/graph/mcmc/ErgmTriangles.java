@@ -29,9 +29,14 @@ package playground.johannes.graph.mcmc;
  * @author illenberger
  *
  */
-public class ErgmTriangles extends ErgmTerm {
+public class ErgmTriangles extends ErgmTerm {// implements MultivariatErgmTerm {
 	
 	public double evaluate(AdjacencyMatrix m, int i, int j, boolean y_ij) {
-		return getTheta() * m.countCommonNeighbours(i, j);
+		return getTheta() * -m.countCommonNeighbours(i, j);
 	}
+
+//	public double evaluate(AdjacencyMatrix y, int i, int j, int u, int v) {
+//		return getTheta() * ((y.countCommonNeighbours(i, j) + y.countCommonNeighbours(u, v))
+//				- (y.countCommonNeighbours(i, u) + y.countCommonNeighbours(j, v)));
+//	}
 }

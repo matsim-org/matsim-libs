@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ErgmTerm.java
+ * PajekClusteringColorizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,25 +21,44 @@
 /**
  * 
  */
-package playground.johannes.graph.mcmc;
+package playground.johannes.graph.io;
 
+import gnu.trove.TObjectDoubleHashMap;
+
+import org.apache.commons.math.stat.StatUtils;
+
+import playground.johannes.graph.Edge;
+import playground.johannes.graph.Graph;
+import playground.johannes.graph.GraphStatistics;
+import playground.johannes.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public abstract class ErgmTerm {
+public class PajekClusteringColorizer<V extends Vertex, E extends Edge> extends PajekColorizer<V, E> {
 
-	private double theta;
+	private double c_min;
 	
-	public void setTheta(double theta) {
-		this.theta = theta;
+	private double c_max;
+	
+	private TObjectDoubleHashMap<V> clustering;
+	
+	public PajekClusteringColorizer(Graph g) {
+		super();
+		clustering = (TObjectDoubleHashMap<V>) GraphStatistics.getClustringCoefficients(g);		
+		c_min = StatUtils.min(clustering.getValues());
+		c_max = StatUtils.max(clustering.getValues());
 	}
 	
-	public double getTheta() {
-		return theta;
+	public String getEdgeColor(E e) {
+		return getColor(-1);
 	}
-	
-	abstract public double evaluate(AdjacencyMatrix y, int i, int j, boolean y_ij);
-	
+
+	public String getVertexFillColor(V ego) {
+		double c = clustering.get(ego);
+		double color = (c - c_min) / (c_max - c_min);
+		return getColor(color);
+	}
+
 }

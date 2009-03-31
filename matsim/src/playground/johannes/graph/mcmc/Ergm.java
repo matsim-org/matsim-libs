@@ -43,14 +43,18 @@ public class Ergm implements ConditionalDistribution {
 		ergmTerms = terms;
 	}
 	
-	public double evaluate(AdjacencyMatrix m, int i, int j, boolean y_ij) {
-		return evaluateExpHamiltonian(m, i, j, y_ij);
+	public double evaluateChange_0(AdjacencyMatrix y, int i, int j, boolean y_ij) {
+		return 1 / evaluateExpHamiltonian(y, i, j, y_ij);
 	}
 
-	public double evaluateExpHamiltonian(AdjacencyMatrix m, int i, int j, boolean y_ij) {
+	public double evaluateChange_1(AdjacencyMatrix y, int i, int j, boolean y_ij) {
+		return evaluateExpHamiltonian(y, i, j, y_ij);
+	}
+
+	public double evaluateExpHamiltonian(AdjacencyMatrix y, int i, int j, boolean y_ij) {
 		double sum = 0;
 		for(ErgmTerm term : ergmTerms)
-			sum += term.evaluate(m, i, j, y_ij);
+			sum += term.evaluate(y, i, j, y_ij);
 		return Math.exp(sum);
 	}
 	

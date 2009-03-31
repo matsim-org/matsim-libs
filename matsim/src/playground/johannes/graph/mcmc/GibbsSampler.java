@@ -50,7 +50,7 @@ public class GibbsSampler {
 			
 			if(i != j) {
 				boolean y_ij = m.getEdge(i, j);
-				double p = 1 / (1 + 1/d.evaluate(m, i, j, y_ij));
+				double p = 1 / (1 + d.evaluateChange_1(m, i, j, y_ij));
 				
 				if(random.nextDouble() <= p) {
 					/*
@@ -67,6 +67,15 @@ public class GibbsSampler {
 						m.removeEdge(i, j);
 					}
 				}
+			}
+			
+			if(it%100000==0) {
+				System.out.println(it + " steps simulated.");
+				int sum = 0;
+				for(int k = 0; k < m.getVertexCount(); k++) {
+					sum += m.getNeighbours(k).size();
+				}
+				System.out.println("Mean degree is " + (sum/(float)m.getVertexCount()));
 			}
 		}
 	}
