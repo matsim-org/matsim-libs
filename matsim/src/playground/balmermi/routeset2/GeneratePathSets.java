@@ -161,6 +161,7 @@ public class GeneratePathSets {
 		gen.setPathSetSize(nofPaths);
 		gen.setVariationFactor(variantionFactor);
 		gen.setTimeout(timeout);
+//		gen.printL2SMapping();
 		
 		Map<Id,Tuple<Node,Node>> ods = GeneratePathSets.parseODs(inputODFile,network);
 

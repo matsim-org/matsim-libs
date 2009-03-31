@@ -146,6 +146,11 @@ public class PathSetGenerator {
 		return tuple;
 	}
 	
+	public final void printL2SMapping() {
+		for (Id id : l2sMapping.keySet()) {
+			System.out.println(id.toString()+"\t"+l2sMapping.get(id).getId());
+		}
+	}
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
