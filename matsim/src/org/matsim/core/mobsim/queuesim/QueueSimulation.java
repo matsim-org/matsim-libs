@@ -340,7 +340,7 @@ public class QueueSimulation {
 			PersonAgent agent = this.agentFactory.createPersonAgent(p);
 
 			QueueVehicle veh;
-			veh = new QueueVehicle();
+			veh = new QueueVehicle(agent.getPerson().getId());
 			//not needed in new agent class
 			veh.setDriver(agent);
 			agent.setVehicle(veh);

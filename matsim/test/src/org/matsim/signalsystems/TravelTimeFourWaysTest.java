@@ -56,7 +56,7 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemsConfiguration());
 		sim.run();
 		eWriter.closeFile();
-		assertEquals("different events files", CRCChecksum.getCRCFromFile(this.getClassInputDirectory() + "reference4armsWoUTurn.txt.gz"), CRCChecksum.getCRCFromFile(tempout));
+		assertEquals("different events files", CRCChecksum.getCRCFromFile(this.getInputDirectory() + "events.txt.gz"), CRCChecksum.getCRCFromFile(tempout));
 	}
 
 	public void testTrafficLightIntersection4armsWithUTurn() {

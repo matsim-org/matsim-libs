@@ -31,6 +31,7 @@ public class TransitQueueVehicle extends QueueVehicle {
 	private final QueueTransitDriver driver;
 	
 	public TransitQueueVehicle(Vehicle vehicle, QueueTransitDriver driver) {
+		super(driver.getPerson().getId());
 		this.vehicle = vehicle;
 		this.driver = driver;
 		super.setDepartureTime_s(driver.getDepartureTime());

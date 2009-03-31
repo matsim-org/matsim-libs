@@ -21,24 +21,25 @@
 package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.Identifiable;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.vis.netvis.DrawableAgentI;
 
-public class QueueVehicle implements DrawableAgentI {
+public class QueueVehicle implements Identifiable, DrawableAgentI {
 
 //	private final static Logger log = Logger.getLogger(Vehicle.class);
 
-	static private int globalID = 0;
 	private double currentDepartureTime = 0;
 	private double lastMovedTime = 0;
 
 	private DriverAgent driver = null;
 
-	private final Id id = new IdImpl(globalID++);
+	private final Id id;
 
-	public QueueVehicle() {}
+	public QueueVehicle(final Id id) {
+		this.id = id;
+	}
 
 
 	public double getDepartureTime_s() {

@@ -29,8 +29,8 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
@@ -43,6 +43,7 @@ import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.coopers.CoopersAgentLogicFactory;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
@@ -139,7 +140,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 
 	private WithindayAgent createAgent(final Link homeLink, final Link workLink) {
 		Person p = new PersonImpl(new IdImpl("1"));
-		this.plan = new org.matsim.core.population.PlanImpl(p);
+		this.plan = new PlanImpl(p);
 		p.addPlan(this.plan);
 		this.leg = null;
 		try {
@@ -166,7 +167,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		CoopersAgentLogicFactory factory = new CoopersAgentLogicFactory(
 				this.network, scoringFunctionConfig, signs);
 		//create the vehicle
-		QueueVehicle v = new QueueVehicle();
+		QueueVehicle v = new QueueVehicle(p.getId());
 		
 		//create the agent
 		int sightDistance = 1;

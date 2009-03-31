@@ -22,17 +22,12 @@ package org.matsim.core.mobsim.queuesim;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
-import org.matsim.core.mobsim.queuesim.PersonAgent;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -84,7 +79,7 @@ public class QueueLinkTest extends MatsimTestCase {
 
 
 	public void testAdd() {
-		QueueVehicle v = new QueueVehicle();
+		QueueVehicle v = new QueueVehicle(new IdImpl("1"));
 
 		Person p = new PersonImpl(new IdImpl("1"));
 		v.setDriver(new PersonAgent(p));
@@ -123,7 +118,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		this.qlink.finishInit();
 
 		new QueueSimulation(network, null, new Events());
-		QueueVehicle v1 = new QueueVehicle();
+		QueueVehicle v1 = new QueueVehicle(new IdImpl("1"));
 		Person p = new PersonImpl(new IdImpl("1"));
 		Plan plan = p.createPlan(true);
 		try {
@@ -142,7 +137,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		pa1.setVehicle(v1);
 		pa1.initialize();
 
-		QueueVehicle v2 = new QueueVehicle();
+		QueueVehicle v2 = new QueueVehicle(new IdImpl("2"));
 		PersonAgent pa2 = new PersonAgent(p);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
