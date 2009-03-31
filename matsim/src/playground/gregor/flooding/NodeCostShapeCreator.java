@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sims.riskaversion;
+package playground.gregor.flooding;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +40,8 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.gregor.flooding.RiskCostFromFloodingData.LinkInfo;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -54,13 +56,13 @@ public class NodeCostShapeCreator {
 	private FeatureType ft;
 	private final CoordinateReferenceSystem targetCRS;
 	private Collection<Feature> features;
-	private final Map<Link, Double> links;
+	private final Map<Link, LinkInfo> links;
 	private FeatureType ftPoint;
 	private Collection<Feature> pointFeatures;
 
-	public NodeCostShapeCreator(final Map<Link, Double> map,final CoordinateReferenceSystem crs) {
+	public NodeCostShapeCreator(final Map<Link, LinkInfo> lis,final CoordinateReferenceSystem crs) {
 		this.targetCRS = crs;
-		this.links = map;
+		this.links = lis;
 		initFeatures();
 		createFeatures();
 		writeFeatures();
@@ -80,7 +82,7 @@ public class NodeCostShapeCreator {
 		GeometryFactory geofac = new GeometryFactory();
 		this.features = new ArrayList<Feature>();
 		this.pointFeatures = new ArrayList<Feature>();
-		for (Entry<Link, Double> e : this.links.entrySet()) {
+		for (Entry<Link, LinkInfo> e : this.links.entrySet()) {
 			Link l = e.getKey();
 			Coordinate[] coords = {MGC.coord2Coordinate(l.getFromNode().getCoord()),MGC.coord2Coordinate(l.getToNode().getCoord())};
 			LineString ls = geofac.createLineString(coords);
@@ -90,8 +92,8 @@ public class NodeCostShapeCreator {
 			Coordinate from = MGC.coord2Coordinate(l.getFromNode().getCoord());
 			Coordinate to = MGC.coord2Coordinate(l.getToNode().getCoord());
 
-			final double dx = -from.x   + to.x;
-			final double dy = -from.y   + to.y;		
+			final double dx = -to.x   + from.x;
+			final double dy = -to.y   + from.y;		
 
 			double theta = 0.0;
 			if (dx > 0) {
@@ -115,8 +117,8 @@ public class NodeCostShapeCreator {
 			double deg = 90 - Math.toDegrees(theta);
 //			double deg = 90;
 			try {
-				Feature ft = this.ft.create(new Object[] {ls,e.getValue(),l.getFromNode().getId().toString(),l.getToNode().getId().toString(),l.getId().toString()});
-				Feature ftP = this.ftPoint.create(new Object[] {p,e.getValue(),l.getFromNode().getId().toString(),l.getToNode().getId().toString(),l.getId().toString(),deg});
+				Feature ft = this.ft.create(new Object[] {ls,e.getValue().baseCost,l.getFromNode().getId().toString(),l.getToNode().getId().toString(),l.getId().toString()});
+				Feature ftP = this.ftPoint.create(new Object[] {p,e.getValue().baseCost,l.getFromNode().getId().toString(),l.getToNode().getId().toString(),l.getId().toString(),deg,e.getValue().dist});
 				this.features.add(ft);
 				this.pointFeatures.add(ftP);
 			} catch (IllegalAttributeException e1) {
@@ -134,12 +136,13 @@ public class NodeCostShapeCreator {
 		AttributeType dblAngle = AttributeTypeFactory.newAttributeType("dblAngle", Double.class);
 		AttributeType strFrom = AttributeTypeFactory.newAttributeType("strFrom", String.class);
 		AttributeType strTo = AttributeTypeFactory.newAttributeType("strTo", String.class);
-		AttributeType strId = AttributeTypeFactory.newAttributeType("strId", String.class);		
+		AttributeType strId = AttributeTypeFactory.newAttributeType("strId", String.class);
+		AttributeType dblDist = AttributeTypeFactory.newAttributeType("dblDist", Double.class);
 		
 		Exception ex;
 		try {
 			this.ft = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, dblCost, strFrom, strTo, strId}, "NodeCost");
-			this.ftPoint = FeatureTypeFactory.newFeatureType(new AttributeType[] {point, dblCost, strFrom, strTo, strId, dblAngle}, "Point");
+			this.ftPoint = FeatureTypeFactory.newFeatureType(new AttributeType[] {point, dblCost, strFrom, strTo, strId, dblAngle,dblDist}, "Point");
 			return;
 		} catch (FactoryRegistryException e) {
 			ex = e;

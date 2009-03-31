@@ -38,6 +38,16 @@ public class EvacuationConfigGroup  extends Module{
 	 */
 	private String evacuationAreaFile;
 
+	/**
+	 * name of the flooding data file parameter in config
+	 */
+	private static final String FLOODING_DATA_FILE = "floodingDataFile";
+	
+	/**
+	 * file name of the flooding data file
+	 */
+	private String floodingDataFile;
+	
 	public EvacuationConfigGroup(){
 		super(GROUP_NAME);
 	}
@@ -46,6 +56,8 @@ public class EvacuationConfigGroup  extends Module{
 	public String getValue(final String key) {
 		if (EVACUATION_AREA_FILE.equals(key)) {
 			return getEvacuationAreaFile();
+		} else if (FLOODING_DATA_FILE.equals(key)) {
+			return getFloodingDataFile();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -54,6 +66,8 @@ public class EvacuationConfigGroup  extends Module{
 	public void addParam(final String key, final String value) {
 		if (EVACUATION_AREA_FILE.equals(key)) {
 			setEvacuationAreaFile(value.replace('\\', '/'));
+		}else if(FLOODING_DATA_FILE.equals(key)){
+			setFloodingDataFile(value.replace('\\', '/'));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -77,5 +91,21 @@ public class EvacuationConfigGroup  extends Module{
 
 	}
 
+	/**
+	 * 
+	 * @return the file name of the flooding data file
+	 */
+	public String getFloodingDataFile() {
+		return this.floodingDataFile;
+	}
+	
+	/**
+	 * 
+	 * @param floodingDataFile
+	 * the flooding data filename to set
+	 */
+	public void setFloodingDataFile(String floodingDataFile) {
+		this.floodingDataFile = floodingDataFile;
+	}
 
 }

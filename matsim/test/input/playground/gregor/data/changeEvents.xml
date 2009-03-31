@@ -46,12 +46,8 @@
 		<link refId="106090"/>
 		<link refId="4883"/>
 		<link refId="6090"/>
-		<link refId="7378"/>
-		<link refId="107378"/>
 		<link refId="102177"/>
 		<link refId="2177"/>
-		<link refId="109150"/>
-		<link refId="9150"/>
 		<freespeed type="absolute" value="0.0"/>
 	</networkChangeEvent>
 
@@ -246,18 +242,14 @@
 		<link refId="4456"/>
 		<link refId="111240"/>
 		<link refId="11240"/>
-		<link refId="101151"/>
 		<link refId="2570"/>
 		<link refId="102570"/>
-		<link refId="1151"/>
 		<link refId="12016"/>
 		<link refId="112016"/>
 		<freespeed type="absolute" value="0.0"/>
 	</networkChangeEvent>
 
 	<networkChangeEvent startTime="03:24:00">
-		<link refId="1802"/>
-		<link refId="101802"/>
 		<link refId="10139"/>
 		<link refId="8508"/>
 		<link refId="108508"/>
@@ -288,12 +280,6 @@
 	</networkChangeEvent>
 
 	<networkChangeEvent startTime="03:25:00">
-		<link refId="104102"/>
-		<link refId="11082"/>
-		<link refId="111941"/>
-		<link refId="111082"/>
-		<link refId="11941"/>
-		<link refId="4102"/>
 		<link refId="103694"/>
 		<link refId="106164"/>
 		<link refId="3694"/>
@@ -308,18 +294,8 @@
 		<link refId="103573"/>
 		<link refId="12148"/>
 		<link refId="112148"/>
-		<link refId="106258"/>
-		<link refId="1378"/>
-		<link refId="101378"/>
-		<link refId="6258"/>
 		<link refId="110072"/>
 		<link refId="10072"/>
-		<link refId="101974"/>
-		<link refId="107482"/>
-		<link refId="1974"/>
-		<link refId="7482"/>
-		<link refId="1895"/>
-		<link refId="101895"/>
 		<link refId="2588"/>
 		<link refId="42"/>
 		<link refId="100042"/>
@@ -328,30 +304,12 @@
 		<link refId="2183"/>
 		<link refId="102183"/>
 		<link refId="110656"/>
-		<link refId="112278"/>
-		<link refId="8342"/>
-		<link refId="108342"/>
-		<link refId="12278"/>
 		<freespeed type="absolute" value="0.0"/>
 	</networkChangeEvent>
 
 	<networkChangeEvent startTime="03:26:00">
 		<link refId="9162"/>
 		<link refId="109162"/>
-		<link refId="100256"/>
-		<link refId="103706"/>
-		<link refId="11536"/>
-		<link refId="111536"/>
-		<link refId="256"/>
-		<link refId="3706"/>
-		<link refId="105983"/>
-		<link refId="1567"/>
-		<link refId="101567"/>
-		<link refId="5983"/>
-		<link refId="112115"/>
-		<link refId="3928"/>
-		<link refId="103928"/>
-		<link refId="12115"/>
 		<link refId="3497"/>
 		<link refId="103497"/>
 		<link refId="106802"/>
@@ -360,18 +318,10 @@
 		<link refId="6802"/>
 		<link refId="4869"/>
 		<link refId="104869"/>
-		<link refId="105593"/>
-		<link refId="111207"/>
-		<link refId="11207"/>
-		<link refId="5593"/>
 		<link refId="8870"/>
 		<link refId="108870"/>
 		<link refId="106083"/>
 		<link refId="6083"/>
-		<link refId="105798"/>
-		<link refId="5798"/>
-		<link refId="102179"/>
-		<link refId="2179"/>
 		<link refId="5919"/>
 		<link refId="105919"/>
 		<link refId="103364"/>
@@ -404,10 +354,6 @@
 		<link refId="5851"/>
 		<link refId="105851"/>
 		<link refId="5034"/>
-		<link refId="10765"/>
-		<link refId="7442"/>
-		<link refId="107442"/>
-		<link refId="110765"/>
 		<link refId="105087"/>
 		<link refId="5087"/>
 		<link refId="5306"/>
@@ -466,8 +412,6 @@
 	<networkChangeEvent startTime="03:30:00">
 		<link refId="2568"/>
 		<link refId="102568"/>
-		<link refId="104709"/>
-		<link refId="4709"/>
 		<link refId="3015"/>
 		<link refId="103015"/>
 		<link refId="5699"/>
@@ -480,34 +424,18 @@
 		<link refId="6894"/>
 		<link refId="106894"/>
 		<link refId="6798"/>
-		<link refId="8908"/>
-		<link refId="108908"/>
 		<freespeed type="absolute" value="0.0"/>
 	</networkChangeEvent>
 
 	<networkChangeEvent startTime="03:31:00">
-		<link refId="105631"/>
-		<link refId="5631"/>
 		<link refId="102629"/>
 		<link refId="108188"/>
 		<link refId="12123"/>
 		<link refId="112123"/>
 		<link refId="2629"/>
 		<link refId="8188"/>
-		<link refId="10089"/>
-		<link refId="111828"/>
-		<link refId="110089"/>
-		<link refId="11828"/>
 		<link refId="108691"/>
 		<link refId="8691"/>
-		<link refId="100686"/>
-		<link refId="12293"/>
-		<link refId="4013"/>
-		<link refId="104013"/>
-		<link refId="112293"/>
-		<link refId="686"/>
-		<link refId="11384"/>
-		<link refId="111384"/>
 		<link refId="103355"/>
 		<link refId="4660"/>
 		<link refId="7296"/>
@@ -518,12 +446,6 @@
 		<link refId="107739"/>
 		<link refId="9802"/>
 		<link refId="109802"/>
-		<link refId="108579"/>
-		<link refId="9608"/>
-		<link refId="109608"/>
-		<link refId="8579"/>
-		<link refId="110690"/>
-		<link refId="10690"/>
 		<freespeed type="absolute" value="0.0"/>
 	</networkChangeEvent>
 
@@ -532,28 +454,10 @@
 		<link refId="9738"/>
 		<link refId="106806"/>
 		<link refId="109738"/>
-		<link refId="100316"/>
-		<link refId="1529"/>
-		<link refId="5701"/>
-		<link refId="101529"/>
-		<link refId="105701"/>
-		<link refId="316"/>
-		<link refId="106169"/>
-		<link refId="12219"/>
-		<link refId="112219"/>
-		<link refId="6169"/>
-		<link refId="111723"/>
-		<link refId="11723"/>
 		<link refId="103888"/>
 		<link refId="3888"/>
 		<link refId="9275"/>
 		<link refId="109275"/>
-		<freespeed type="absolute" value="0.0"/>
-	</networkChangeEvent>
-
-	<networkChangeEvent startTime="03:33:00">
-		<link refId="9982"/>
-		<link refId="109982"/>
 		<freespeed type="absolute" value="0.0"/>
 	</networkChangeEvent>
 
@@ -580,47 +484,15 @@
 		<link refId="7486"/>
 		<link refId="107486"/>
 		<link refId="224"/>
-		<link refId="111117"/>
-		<link refId="11117"/>
-		<freespeed type="absolute" value="0.0"/>
-	</networkChangeEvent>
-
-	<networkChangeEvent startTime="03:36:00">
-		<link refId="1252"/>
-		<link refId="101252"/>
-		<freespeed type="absolute" value="0.0"/>
-	</networkChangeEvent>
-
-	<networkChangeEvent startTime="03:37:00">
-		<link refId="104267"/>
-		<link refId="4267"/>
-		<link refId="104835"/>
-		<link refId="106623"/>
-		<link refId="4835"/>
-		<link refId="6623"/>
-		<link refId="10977"/>
-		<link refId="110977"/>
-		<link refId="111108"/>
-		<link refId="5152"/>
-		<link refId="105152"/>
-		<link refId="11108"/>
 		<freespeed type="absolute" value="0.0"/>
 	</networkChangeEvent>
 
 	<networkChangeEvent startTime="03:40:00">
-		<link refId="109693"/>
-		<link refId="9693"/>
-		<link refId="106716"/>
 		<link refId="11231"/>
 		<link refId="111231"/>
-		<link refId="6716"/>
 		<link refId="11350"/>
 		<link refId="111350"/>
-		<link refId="2380"/>
-		<link refId="102380"/>
 		<link refId="10145"/>
-		<link refId="110006"/>
-		<link refId="10006"/>
 		<link refId="110145"/>
 		<link refId="110856"/>
 		<link refId="11371"/>
@@ -628,58 +500,14 @@
 		<link refId="105723"/>
 		<link refId="10856"/>
 		<link refId="111371"/>
-		<link refId="110083"/>
-		<link refId="11090"/>
-		<link refId="4804"/>
-		<link refId="10083"/>
-		<link refId="104804"/>
-		<link refId="111090"/>
 		<link refId="107756"/>
 		<link refId="7756"/>
-		<link refId="2036"/>
-		<link refId="102036"/>
-		<freespeed type="absolute" value="0.0"/>
-	</networkChangeEvent>
-
-	<networkChangeEvent startTime="03:41:00">
-		<link refId="104596"/>
-		<link refId="2050"/>
-		<link refId="102050"/>
-		<link refId="4596"/>
 		<freespeed type="absolute" value="0.0"/>
 	</networkChangeEvent>
 
 	<networkChangeEvent startTime="03:44:00">
 		<link refId="2888"/>
 		<link refId="102888"/>
-		<freespeed type="absolute" value="0.0"/>
-	</networkChangeEvent>
-
-	<networkChangeEvent startTime="03:57:00">
-		<link refId="11735"/>
-		<link refId="111735"/>
-		<freespeed type="absolute" value="0.0"/>
-	</networkChangeEvent>
-
-	<networkChangeEvent startTime="04:05:00">
-		<link refId="101067"/>
-		<link refId="2182"/>
-		<link refId="102182"/>
-		<link refId="1067"/>
-		<freespeed type="absolute" value="0.0"/>
-	</networkChangeEvent>
-
-	<networkChangeEvent startTime="04:42:00">
-		<link refId="9278"/>
-		<link refId="109278"/>
-		<freespeed type="absolute" value="0.0"/>
-	</networkChangeEvent>
-
-	<networkChangeEvent startTime="04:47:00">
-		<link refId="103896"/>
-		<link refId="7168"/>
-		<link refId="107168"/>
-		<link refId="3896"/>
 		<freespeed type="absolute" value="0.0"/>
 	</networkChangeEvent>
 

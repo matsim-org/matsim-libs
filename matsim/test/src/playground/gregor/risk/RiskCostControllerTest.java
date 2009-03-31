@@ -36,7 +36,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.gregor.sims.riskaversion.RiskCostCalculator;
+import playground.gregor.sims.riskaversion.RiskCostFromNetworkChangeEvents;
 import playground.gregor.sims.riskaversion.RiskCostController;
 
 
@@ -98,7 +98,7 @@ public class RiskCostControllerTest extends MatsimTestCase{
 		
 		net.setNetworkChangeEvents(nc);
 		
-		RiskCostCalculator rcc = new RiskCostCalculator(net,false);
+		RiskCostFromNetworkChangeEvents rcc = new RiskCostFromNetworkChangeEvents(net,false);
 		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l0, 0.));
 		assertEquals("Risk cost:" , 107400. * 10., rcc.getLinkRisk(l1, 0.));
 		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l2, 0.));
@@ -162,7 +162,7 @@ public class RiskCostControllerTest extends MatsimTestCase{
 		
 		net.setNetworkChangeEvents(nc);
 		
-		RiskCostCalculator rcc = new RiskCostCalculator(net,true);
+		RiskCostFromNetworkChangeEvents rcc = new RiskCostFromNetworkChangeEvents(net,true);
 		
 		assertEquals("Risk cost:" , 106800. * 2.5, rcc.getLinkRisk(l0, 0.));
 		assertEquals("Risk cost:" , 107400. * 3.5, rcc.getLinkRisk(l1, 0.));

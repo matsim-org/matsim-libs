@@ -32,11 +32,13 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
 import org.xml.sax.SAXException;
 
+import playground.gregor.flooding.FloodingReader;
+import playground.gregor.flooding.RiskCostFromFloodingData;
 import playground.gregor.sims.evacbase.EvacuationAreaFileReader;
 import playground.gregor.sims.evacbase.EvacuationAreaLink;
 import playground.gregor.sims.evacbase.EvacuationPlansGeneratorAndNetworkTrimmer;
 
-public class RiskCostController extends Controler {
+public class RiskCostController extends Controler{
 
 	
 	private final static Logger log = Logger.getLogger(RiskCostController.class);
@@ -56,7 +58,14 @@ public class RiskCostController extends Controler {
 //		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 //		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
 //		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
-		RiskCostCalculator rc = new RiskCostCalculator(this.network, false);
+		
+		String netcdf = this.config.evacuation().getFloodingDataFile();
+
+		FloodingReader fr  = new FloodingReader(netcdf);
+		
+		RiskCostCalculator rc = new RiskCostFromFloodingData(this.network,fr);
+		
+//		RiskCostCalculator rc = new RiskCostFromNetworkChangeEvents(this.network, false);
 		this.events.addHandler(rc);
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 		if (this.travelTimeCalculator == null) {
