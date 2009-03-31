@@ -98,9 +98,9 @@ public class MZ05EtappenReader implements TabularFileHandler {
 				int mode = Integer.parseInt(F510);
 				if (mode >= 1 && mode <= 3)
 					tmpELV++;
-				else if (mode <= 8)
+				else if (mode >= 4 && mode <= 8)
 					tmpEMIV++;
-				else if (mode <= 12)
+				else if (mode >= 9 && mode <= 12)
 					tmpEOeV++;
 				else
 					tmpEOthers++;

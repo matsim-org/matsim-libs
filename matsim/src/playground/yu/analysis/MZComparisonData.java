@@ -119,67 +119,32 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 		count_toll = 0;
 	}
 
-	// ---------------events handle-------------------------------
-	// getter -- Daily Distance
-	public double getAvgDailyDistance_car_m() {
-		return carDist / count;
-	}
-
 	public double getAvgTollDailyDistance_car_m() {
 		return carDist_toll / count_toll;
-	}
-
-	public double getAvgDailyDistance_pt_m() {
-		return ptDist / count;
 	}
 
 	public double getAvgTollDailyDistance_pt_m() {
 		return ptDist_toll / count_toll;
 	}
 
-	public double getAvgDailyDistance_walk_m() {
-		return wlkDist / count;
-	}
-
 	public double getAvgTollDailyDistance_walk_m() {
 		return wlkDist_toll / count_toll;
-	}
-
-	public double getAvgDailyDistance_other_m() {
-		return otherDist / count;
 	}
 
 	public double getAvgTollDailyDistance_other_m() {
 		return otherDist_toll / count_toll;
 	}
 
-	// getter -- Daily En Route Time
-	public double getAvgDailyEnRouteTime_car_min() {
-		return carTime / count;
-	}
-
 	public double getAvgTollDailyEnRouteTime_car_min() {
 		return carTime_toll / count_toll;
-	}
-
-	public double getAvgDailyEnRouteTime_pt_min() {
-		return ptTime / count;
 	}
 
 	public double getAvgTollDailyEnRouteTime_pt_min() {
 		return ptTime_toll / count_toll;
 	}
 
-	public double getAvgDailyEnRouteTime_walk_min() {
-		return wlkTime / count;
-	}
-
 	public double getAvgTollDailyEnRouteTime_walk_min() {
 		return wlkTime_toll / count_toll;
-	}
-
-	public double getAvgDailyEnRouteTime_other_min() {
-		return otherTime / count;
 	}
 
 	public double getAvgTollDailyEnRouteTime_other_min() {

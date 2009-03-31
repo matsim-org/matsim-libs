@@ -6,15 +6,28 @@ package playground.yu.analysis;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.matsim.core.api.population.Population;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.xml.sax.SAXException;
 
 import playground.yu.utils.charts.StackedBarChart;
 
@@ -30,70 +43,39 @@ public class MZComparisonDataIO implements TabularFileHandler {
 	private Set<String> chartColumns = new HashSet<String>();
 
 	/**
-	 * @param arg0 -
-	 *            String chart row
-	 * @param arg1 -
-	 *            String chart column
+	 * @param arg0
+	 *            - String chart row
+	 * @param arg1
+	 *            - String chart column
 	 */
 	private Map<String, Map<String, Double>> values = new HashMap<String, Map<String, Double>>();
 
 	public void setData2Compare(MZComparisonData data2compare) {
-		setValueFromData2Compare(
-				"average daily distance of drivers [m] (MATSim)", "car",
-				data2compare.getAvgDailyDistance_car_m());
-		setValueFromData2Compare(
-				"average daily distance of public transit passengers [m] (MATSim)",
-				"pt", data2compare.getAvgDailyDistance_pt_m());
-		setValueFromData2Compare(
-				"average daily distance of pedestrians [m] (MATSim)", "walk",
-				data2compare.getAvgDailyDistance_walk_m());
-		setValueFromData2Compare(
-				"average daily distance of persons with other trip modes [m] (MATSim)",
-				"others", data2compare.getAvgDailyDistance_other_m());
+		String ADDOTA = "average daily distance [km] (MATSim)";
+		setValueFromData2Compare(ADDOTA, "car", data2compare
+				.getAvgTollDailyDistance_car_m() / 1000.0);
+		setValueFromData2Compare(ADDOTA, "pt", data2compare
+				.getAvgTollDailyDistance_pt_m() / 1000.0);
+		setValueFromData2Compare(ADDOTA, "walk", data2compare
+				.getAvgTollDailyDistance_walk_m() / 1000.0);
+		setValueFromData2Compare(ADDOTA, "others", data2compare
+				.getAvgTollDailyDistance_other_m() / 1000.0);
 
-		setValueFromData2Compare(
-				"average daily en route time of drivers [min] (MATSim)", "car",
-				data2compare.getAvgDailyEnRouteTime_car_min());
-		setValueFromData2Compare(
-				"average daily en route time of public transit passengers [min] (MATSim)",
-				"pt", data2compare.getAvgDailyEnRouteTime_pt_min());
-		setValueFromData2Compare(
-				"average daily en route time of pedestrians [min] (MATSim)",
-				"walk", data2compare.getAvgDailyEnRouteTime_walk_min());
-		setValueFromData2Compare(
-				"average daily en route time of persons with other trip modes [min] (MATSim)",
-				"others", data2compare.getAvgDailyEnRouteTime_other_min());
-
-		setValueFromData2Compare(
-				"average daily distance of drivers from toll area [m] (MATSim)",
-				"car", data2compare.getAvgTollDailyDistance_car_m());
-		setValueFromData2Compare(
-				"average daily distance of public transit passengers from toll area [m] (MATSim)",
-				"pt", data2compare.getAvgTollDailyDistance_pt_m());
-		setValueFromData2Compare(
-				"average daily distance of pedestrians from toll area [m] (MATSim)",
-				"walk", data2compare.getAvgTollDailyDistance_walk_m());
-		setValueFromData2Compare(
-				"average daily distance of persons with other trip modes from toll area [m] (MATSim)",
-				"others", data2compare.getAvgTollDailyDistance_other_m());
-
-		setValueFromData2Compare(
-				"average daily en route time of drivers from toll area [min] (MATSim)",
-				"car", data2compare.getAvgTollDailyEnRouteTime_car_min());
-		setValueFromData2Compare(
-				"average daily en route time of public transit passengers from toll area [min] (MATSim)",
-				"pt", data2compare.getAvgTollDailyEnRouteTime_pt_min());
-		setValueFromData2Compare(
-				"average daily en route time of pedestrians from toll area [min] (MATSim)",
-				"walk", data2compare.getAvgTollDailyEnRouteTime_walk_min());
-		setValueFromData2Compare(
-				"average daily en route time of persons with other trip modes from toll area [min] (MATSim)",
-				"others", data2compare.getAvgTollDailyEnRouteTime_other_min());
+		String ADERTOTA = "average daily en route time [min] (MATSim)";
+		setValueFromData2Compare(ADERTOTA, "car", data2compare
+				.getAvgTollDailyEnRouteTime_car_min());
+		setValueFromData2Compare(ADERTOTA, "pt", data2compare
+				.getAvgTollDailyEnRouteTime_pt_min());
+		setValueFromData2Compare(ADERTOTA, "walk", data2compare
+				.getAvgTollDailyEnRouteTime_walk_min());
+		setValueFromData2Compare(ADERTOTA, "others", data2compare
+				.getAvgTollDailyEnRouteTime_other_min());
 	}
 
 	private void setValueFromData2Compare(String chartColumn, String chartRow,
 			double value) {
-		chartColumns.add(chartColumn);
+		if (!chartColumns.contains(chartColumn))
+			chartColumns.add(chartColumn);
 		Map<String, Double> m = values.get(chartRow);
 		m.put(chartColumn, value);
 		values.put(chartRow, m);
@@ -103,8 +85,11 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		// TODO save information from MZ
 		if (lineCount > 0) {
 			chartColumns.add(row[0]);
+			System.out.println("row[0] :\t" + row[0] + "\twas added.");
 			for (int i = 1; i < row.length; i++) {
-				Map<String, Double> m = new HashMap<String, Double>();
+				Map<String, Double> m = values.get(chartRows[i - 1]);
+				if (m == null)
+					m = new HashMap<String, Double>();
 				m.put(row[0], Double.valueOf(row[i]));
 				values.put(chartRows[i - 1], m);
 				// chartRows[i]->String0
@@ -132,7 +117,9 @@ public class MZComparisonDataIO implements TabularFileHandler {
 				for (int i = 0; i < chartRows.length; i++) {
 					bw.write("\t" + values.get(chartRows[i]).get(chartColumn));
 				}
+				bw.write("\n");
 			}
+			bw.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -141,7 +128,12 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		// write chart
 		int chartColumnsSize = chartColumns.size();
 		double[][] values = new double[chartRows.length][chartColumnsSize];
-		String[] chartColumns = (String[]) this.chartColumns.toArray();
+		List<String> tmpChartColumns = new ArrayList<String>();
+		tmpChartColumns.addAll(chartColumns);
+		Collections.sort(tmpChartColumns);
+		String[] chartColumns = (String[]) tmpChartColumns
+				.toArray(new String[this.chartColumns.size()]);
+
 		for (int i = 0; i < chartRows.length; i++) {
 			for (int j = 0; j < chartColumnsSize; j++) {
 				values[i][j] = this.values.get(chartRows[i]).get(
@@ -149,9 +141,9 @@ public class MZComparisonDataIO implements TabularFileHandler {
 			}
 		}
 		StackedBarChart chart = new StackedBarChart(
-				"Mikrozensus 2005 vs MATSim", "category", "values");
+				"Mikrozensus 2005 vs MATSim (Kanton Zurich)", "", "values");
 		chart.addSeries(chartRows, chartColumns, values);
-		chart.saveAsPng(outputBase + ".png", 800, 600);
+		chart.saveAsPng(outputBase + ".png", 900, 600);
 	}
 
 	public void readMZData(String inputFilename) {
@@ -164,14 +156,46 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		System.out.println(this.values);
 	}
 
 	// -----------only for testing------------------------------
 	public static void main(String[] args) {
 		String inputFilename = "../matsimTests/analysis/Vergleichswert.txt";
-		String outputBase = "../matsimTests/??????";
+		String outputBase = "../matsimTests/compare";
+		String networkFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+		String plansFilename = "../runs-svn/run684/it.1000/1000.plans.xml.gz";
+		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
+
 		MZComparisonDataIO mzcdi = new MZComparisonDataIO();
 		mzcdi.readMZData(inputFilename);
+
+		Gbl.createConfig(null);
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(networkFilename);
+
+		Population population = new PopulationImpl();
+
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
+		try {
+			tollReader.parse(tollFilename);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		MZComparisonData mzcd = new MZComparisonData(tollReader.getScheme());
+		population.addAlgorithm(mzcd);
+
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
+
+		population.runAlgorithms();
+
+		mzcdi.setData2Compare(mzcd);
 		mzcdi.write(outputBase);
+		System.out.println(">>>done.");
 	}
 }

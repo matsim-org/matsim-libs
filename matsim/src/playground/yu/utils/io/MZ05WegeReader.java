@@ -12,6 +12,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 import playground.yu.utils.CollectionSum;
+import playground.yu.utils.charts.PieChart;
 
 /**
  * @author yu
@@ -19,15 +20,20 @@ import playground.yu.utils.CollectionSum;
  */
 public class MZ05WegeReader implements TabularFileHandler {
 	private SimpleWriter sw = null;
-	private String tmpPersonId = null, tmpPersonKantonZurichId = null;
+	private String tmpPersonId = null, tmpPersonKantonZurichId = null,
+			outputBase;
 	private int personCnt = 0, personKantonZurichCnt = 0, wCnt = 0,
 			wKantonZurichCnt = 0;
-	private double w_dist_obj1 = 0.0, w_dist_obj1KantonZurich = 0.0;
+	private double w_dist_obj1 = 0.0, w_dist_obj1KantonZurich = 0.0,
+			wMIV_KZ = 0.0, wOeV_KZ = 0.0, wLV_KZ = 0.0, wOthers_KZ = 0.0;
+	private double tmpWLV = 0.0, tmpWMIV = 0.0, tmpWOeV = 0.0,
+			tmpWOthers = 0.0;
 	private Set<Double> tmpWegeDists = new HashSet<Double>();
 	private boolean changePerson = false, belongs2KantonZurich = false;
 
-	public MZ05WegeReader(String outputFilename) {
-		sw = new SimpleWriter(outputFilename);
+	public MZ05WegeReader(String outputBase) {
+		this.outputBase = outputBase;
+		sw = new SimpleWriter(outputBase + ".txt");
 		sw.writeln("linearDistance\tlinearDistance [m]\tlinearDistance [km]");
 	}
 
@@ -38,6 +44,10 @@ public class MZ05WegeReader implements TabularFileHandler {
 		changePerson = false;
 		tmpPersonId = personId;
 		tmpWegeDists.clear();
+		tmpWLV = 0.0;
+		tmpWMIV = 0.0;
+		tmpWOeV = 0.0;
+		tmpWOthers = 0.0;
 	}
 
 	private void resetKantonZurich(String personId) {
@@ -53,6 +63,10 @@ public class MZ05WegeReader implements TabularFileHandler {
 			personKantonZurichCnt++;
 			wKantonZurichCnt += tmpWegeDists.size();
 			w_dist_obj1KantonZurich += CollectionSum.getSum(tmpWegeDists);
+			wLV_KZ += tmpWLV;
+			wMIV_KZ += tmpWMIV;
+			wOeV_KZ += tmpWOeV;
+			wOthers_KZ += tmpWOthers;
 		}
 	}
 
@@ -72,6 +86,29 @@ public class MZ05WegeReader implements TabularFileHandler {
 			double tmpWegDist = Double.parseDouble(w_dist_obj1);
 			if (tmpWegDist >= 0) {
 				tmpWegeDists.add(new Double(tmpWegDist));
+				int mode = Integer.parseInt(row[44]);
+				// switch (mode) {
+				// case 1:
+				// tmpWLV++;
+				// break;
+				// case 2:
+				// tmpWMIV++;
+				// break;
+				// case 3:
+				// tmpWOeV++;
+				// break;
+				// case 4:
+				// tmpWOthers++;
+				// break;
+				// }
+				if (mode == 1)
+					tmpWLV++;
+				else if (mode == 2)
+					tmpWMIV++;
+				else if (mode == 3)
+					tmpWOeV++;
+				else
+					tmpWOthers++;
 				if (row[9] != null) {
 					if (row[9].equals("1")) {
 						if (tmpPersonKantonZurichId == null) {
@@ -110,7 +147,17 @@ public class MZ05WegeReader implements TabularFileHandler {
 		sw.writeln("\npersons :\t" + personCnt + "\tWege :\t" + wCnt);
 		sw.writeln("persons KantonZurich :\t" + personKantonZurichCnt
 				+ "\tWege KantonZurich :\t" + wKantonZurichCnt);
+		sw.writeln("\nWege LV Kanton Zurich :\t" + wLV_KZ);
+		sw.writeln("Wege MIV Kanton Zurich :\t" + wMIV_KZ);
+		sw.writeln("Wege OeV Kanton Zurich :\t" + wOeV_KZ);
+		sw.writeln("Wege Others Kanton Zurich :\t" + wOthers_KZ);
+
 		sw.close();
+
+		PieChart chart2 = new PieChart("ModalSplit Center (toll area) -- Wege");
+		chart2.addSeries(new String[] { "MIV", "OeV", "LV", "Anders" },
+				new double[] { wMIV_KZ, wOeV_KZ, wLV_KZ, wOthers_KZ });
+		chart2.saveAsPng(outputBase + "_Toll.png", 800, 600);
 	}
 
 	/**
@@ -118,14 +165,14 @@ public class MZ05WegeReader implements TabularFileHandler {
 	 */
 	public static void main(String[] args) {
 		String wegeFilename = "D:/fromNB04/Archieve/MikroZensus2005/4_DB_ASCII(Sep_TAB)/Wege.dat";
-		String outputFilename = "../matsimTests/LinearDistance/MZ05linearDistanceWege_2.txt";
+		String outputBase = "../matsimTests/LinearDistance/MZ05linearDistanceWege_2";
 
 		TabularFileParserConfig tfpc = new TabularFileParserConfig();
 		tfpc.setCommentTags(new String[] { "HHNR" });
 		tfpc.setDelimiterRegex("\t");
 		tfpc.setFileName(wegeFilename);
 
-		MZ05WegeReader mz05wr = new MZ05WegeReader(outputFilename);
+		MZ05WegeReader mz05wr = new MZ05WegeReader(outputBase);
 
 		try {
 			new TabularFileParser().parse(tfpc, mz05wr);

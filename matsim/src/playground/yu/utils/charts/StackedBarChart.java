@@ -19,7 +19,7 @@ public class StackedBarChart extends ChartUtil {
 	private JFreeChart createChart(String title, String axisLabel,
 			String axisLabel2, DefaultCategoryDataset dataset) {
 		JFreeChart chart = ChartFactory.createStackedBarChart(title, axisLabel,
-				axisLabel2, dataset, PlotOrientation.HORIZONTAL, true, false,
+				axisLabel2, dataset, PlotOrientation.HORIZONTAL, true, true,
 				false);
 		return chart;
 	}
