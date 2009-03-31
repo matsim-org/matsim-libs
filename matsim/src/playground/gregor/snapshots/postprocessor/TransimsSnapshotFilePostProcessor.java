@@ -72,9 +72,9 @@ public class TransimsSnapshotFilePostProcessor {
 		new EventsReaderTXTv1(events).readFile(eventsfile);
 		
 		
-		String outfile = "../outputs/output/colorizedT.veh.txt"; 
+		String outfile = "../../outputs/output/colorizedT.veh.txt"; 
 		this.writer = new TransimsSnapshotFileWriter(outfile);
-		this.floodlineGenerator = new FloodlineGenerator("../inputs/networks/padang_flooding.txt.gz");
+		this.floodlineGenerator = new FloodlineGenerator("../../inputs/networks/padang_flooding.txt.gz");
 		this.processors = new ArrayList<PostProcessorI>();
 		addProcessor(tdc);
 		addProcessor(ddc);

@@ -62,8 +62,8 @@ public class EventFilesEvacuationTimeCompare {
 	
 	private final static Logger log = Logger.getLogger(EventFilesEvacuationTimeCompare.class);
 	
-//	private static final String INPUT_BASE="../../arbeit/svn/shared-svn/runs/";
-	private static final String INPUT_BASE="../outputs/";
+	private static final String INPUT_BASE="../../../arbeit/svn/runs-svn/";
+//	private static final String INPUT_BASE="../outputs/";
 	
 	private final CoordinateReferenceSystem crs;
 	final NetworkLayer network;
@@ -203,10 +203,10 @@ public class EventFilesEvacuationTimeCompare {
 	}
 	
 	public static void main(final String [] args) {
-		String eventsFile1 = INPUT_BASE + "output_100m_so/ITERS/it.0/0.events.txt.gz";
-		String eventsFile2 = INPUT_BASE + "output_100m/ITERS/it.0/0.events.txt.gz";
-		String network = "../inputs/networks/padang_net_evac_v20080618.xml";
-		String outfile = INPUT_BASE + "output_100m_so/analysis/evacTimeComp.shp";
+		String eventsFile1 = INPUT_BASE + "run320/stage2/output/ITERS/it.0/0.events.txt.gz";
+		String eventsFile2 = INPUT_BASE + "run316/stage2/output/ITERS/it.201/201.events.txt.gz";
+		String network = "../../inputs/networks/padang_net_evac_v20080618.xml";
+		String outfile = INPUT_BASE + "run320/output/analysis/evacTimeComp.shp";
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(network);
 		

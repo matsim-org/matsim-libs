@@ -59,7 +59,7 @@ import playground.gregor.sims.evacbase.EvacuationAreaLink;
 
 public class CutNetwork {
 
-	private static double max_x = 653088.;
+	private static double max_x = 652088.;
 	private static double max_y = 9894785.;
 	private final static double MIN_X = 650473.;
 	private final static double MIN_Y = 9892816.;
@@ -67,7 +67,7 @@ public class CutNetwork {
 	private static void cutIt(final NetworkLayer net,
 			final List<NetworkChangeEvent> events, final PopulationImpl pop, final HashMap<Id,EvacuationAreaLink> eal) {
 		
-		max_x = 652500.;
+		max_x = 652000.;
 		max_y = 9894780.;
 		ConcurrentLinkedQueue<Id> ealq = new ConcurrentLinkedQueue<Id>();
 		for (Entry<Id, EvacuationAreaLink> e :  eal.entrySet()) {
@@ -81,7 +81,7 @@ public class CutNetwork {
 			eal.remove(el);
 		}
 		System.out.println("EAL:" + eal.size());
-		max_x = 653088.;
+		max_x = 652088.;
 		max_y = 9894785.;
 		
 		ConcurrentLinkedQueue<Plan> q = new ConcurrentLinkedQueue<Plan>();

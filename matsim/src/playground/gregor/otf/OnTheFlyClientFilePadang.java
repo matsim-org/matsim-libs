@@ -31,7 +31,7 @@ import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
 public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	
-	public static final String CVSROOT = "../vsp-cvs";
+	public static final String CVSROOT = "../../../workspace/vsp-cvs";
 	private static final String BG_IMG_ROOT = CVSROOT + "/studies/padang/imagery/sliced/";
 	final String BUILDINGS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_buildings.shp";
 	final String LINKS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_links.shp";
@@ -114,7 +114,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
 		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
 		try {
-			loadFeatureLayer(this.BUILDINGS_FILE,buildingsColor);
+//			loadFeatureLayer(this.BUILDINGS_FILE,buildingsColor);
 			loadFeatureLayer(this.NODES_FILE,linksColor);
 			loadFeatureLayer(this.LINKS_FILE,nodesColor);
 		} catch (final Exception e) {
@@ -134,7 +134,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
 //		final String filename =  CVSROOT + "/runs/run314/output/ITERS/it.100/100.movie.mvi";
 //		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
-		final String filename =  "../outputs/output/ITERS/it.0/0.movie.mvi";
+		final String filename =  "../../outputs/output/ITERS/it.0/0.movie.mvi";
 		
 //		String filename = "./jam/jam.mvi";
 		
