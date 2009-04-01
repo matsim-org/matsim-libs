@@ -1,5 +1,6 @@
 package org.matsim.core.api.population;
 
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.core.api.facilities.Facility;
@@ -45,5 +46,7 @@ public interface Activity extends BasicActivity, PlanElement {
 	 */
 	@Deprecated
 	public void setDuration(double duration);
+	
+	public void setCoord(final Coord coord);
 
 }

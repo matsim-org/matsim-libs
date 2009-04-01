@@ -43,11 +43,8 @@ public interface BasicActivity extends BasicPlanElement {
 
 	public void setType(final String type);
 
-	@Deprecated // not yet clear what will happen, may not survive
 	public Coord getCoord();
 
-	@Deprecated // not yet clear what will happen, may not survive
-	public void setCoord(Coord coordinates);
 
 	public double getStartTime();
 
