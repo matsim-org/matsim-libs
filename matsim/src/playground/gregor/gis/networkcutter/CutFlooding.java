@@ -2,9 +2,11 @@ package playground.gregor.gis.networkcutter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.collections.QuadTree;
 
 import ucar.ma2.Array;
 import ucar.ma2.ArrayDouble;
@@ -19,6 +21,8 @@ import ucar.nc2.NetcdfFileWriteable;
 import ucar.nc2.Variable;
 import ucar.nc2.iosp.IOServiceProvider;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 public class CutFlooding {
 
 
@@ -28,6 +32,8 @@ public class CutFlooding {
 	private final static double MAX_Y = 9894785.;
 	private final static double MIN_X = 650473.;
 	private final static double MIN_Y = 9892816.;
+
+	private static final double DISTANCE = 10.;
 	private NetcdfFile in;
 	private NetcdfFileWriteable out;
 
@@ -163,7 +169,7 @@ public class CutFlooding {
 
 
 	private List<Integer> getIndexesToInclude() {
-
+		QuadTree<Coordinate> coords = new QuadTree<Coordinate>(MIN_X,MIN_Y,MAX_X,MAX_Y);
 
 		log.info("found " + this.idx.getSize() + " coordinates");
 
@@ -179,11 +185,18 @@ public class CutFlooding {
 			this.idxStage.set(0,i);
 			double x = this.aX.getDouble(this.idx);
 			double y = this.aY.getDouble(this.idx);
+			double z = this.aZ.getDouble(this.idx);
 
 			if (x > MAX_X || x < MIN_X || y > MAX_Y || y < MIN_Y) {
 				continue;
-			} 
-
+			}
+			Collection<Coordinate> coll = coords.get(x, y, DISTANCE);
+			if (coll.size() > 0) {
+				continue;
+			}
+			Coordinate c = new Coordinate(x,y,z);
+			coords.put(x, y,c);
+			
 			indexes.add(i);
 		}
 
