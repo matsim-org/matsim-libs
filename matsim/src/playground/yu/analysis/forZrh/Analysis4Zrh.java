@@ -31,7 +31,17 @@ package playground.yu.analysis.forZrh;
  * 
  */
 public interface Analysis4Zrh {
-	public enum ActTypeStartWith {
-		h, w, s, e, l, o
+	public enum ActType {
+		home("h"), work("w"), shopping("e"), education("e"), leisure("l"), others(
+				"o");
+		private final String firstLetter;
+
+		public String getFirstLetter() {
+			return firstLetter;
+		}
+
+		ActType(String name) {
+			this.firstLetter = name;
+		}
 	}
 }

@@ -70,20 +70,20 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 		double otherDayTime = 0.0;
 		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
 			Leg bl = (Leg) li.next();
-			ActTypeStartWith ats = null;
+			ActType ats = null;
 			String tmpActType = plan.getNextActivity(bl).getType();
 			if (tmpActType.startsWith("h"))
-				ats = ActTypeStartWith.h;
+				ats = ActType.home;
 			else if (tmpActType.startsWith("w"))
-				ats = ActTypeStartWith.w;
+				ats = ActType.work;
 			else if (tmpActType.startsWith("e"))
-				ats = ActTypeStartWith.e;
+				ats = ActType.education;
 			else if (tmpActType.startsWith("s"))
-				ats = ActTypeStartWith.s;
+				ats = ActType.shopping;
 			else if (tmpActType.startsWith("l"))
-				ats = ActTypeStartWith.l;
+				ats = ActType.leisure;
 			else
-				ats = ActTypeStartWith.o;
+				ats = ActType.others;
 			double time = bl.getTravelTime() / 60.0;
 			if (time < 0)
 				time = 0;
@@ -93,19 +93,19 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 					this.otherTime += time;
 					otherDayTime += time;
 					switch (ats) {
-					case h:
+					case home:
 						this.throughHomeTime += time;
 						break;
-					case w:
+					case work:
 						this.throughWorkTime += time;
 						break;
-					case e:
+					case education:
 						this.throughEducTime += time;
 						break;
-					case s:
+					case shopping:
 						this.throughShopTime += time;
 						break;
-					case l:
+					case leisure:
 						this.throughLeisTime += time;
 						break;
 					default:
@@ -117,19 +117,19 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 						this.carTime += time;
 						carDayTime += time;
 						switch (ats) {
-						case h:
+						case home:
 							this.carHomeTime += time;
 							break;
-						case w:
+						case work:
 							this.carWorkTime += time;
 							break;
-						case e:
+						case education:
 							this.carEducTime += time;
 							break;
-						case s:
+						case shopping:
 							this.carShopTime += time;
 							break;
-						case l:
+						case leisure:
 							this.carLeisTime += time;
 							break;
 						default:
@@ -142,19 +142,19 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 						this.ptTime += time;
 						ptDayTime += time;
 						switch (ats) {
-						case h:
+						case home:
 							this.ptHomeTime += time;
 							break;
-						case w:
+						case work:
 							this.ptWorkTime += time;
 							break;
-						case e:
+						case education:
 							this.ptEducTime += time;
 							break;
-						case s:
+						case shopping:
 							this.ptShopTime += time;
 							break;
-						case l:
+						case leisure:
 							this.ptLeisTime += time;
 							break;
 						default:
@@ -167,19 +167,19 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 						this.wlkTime += time;
 						wlkDayTime += time;
 						switch (ats) {
-						case h:
+						case home:
 							this.wlkHomeTime += time;
 							break;
-						case w:
+						case work:
 							this.wlkWorkTime += time;
 							break;
-						case e:
+						case education:
 							this.wlkEducTime += time;
 							break;
-						case s:
+						case shopping:
 							this.wlkShopTime += time;
 							break;
-						case l:
+						case leisure:
 							this.wlkLeisTime += time;
 							break;
 						default:
