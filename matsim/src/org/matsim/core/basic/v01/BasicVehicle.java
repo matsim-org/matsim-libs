@@ -19,15 +19,13 @@
 
 package org.matsim.core.basic.v01;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.Identifiable;
 
 /**
  * @author dgrether
  */
-public interface BasicVehicle {
+public interface BasicVehicle extends Identifiable {
 
 	public String getTypeId();
-	
-	public Id getId();
 	
 }
