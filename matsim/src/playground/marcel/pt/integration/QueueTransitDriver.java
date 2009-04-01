@@ -111,5 +111,10 @@ public class QueueTransitDriver implements DriverAgent {
 
 	public void setVehicle(QueueVehicle veh) {
 	}
+
+	public void legEnds(double now) {
+		// TODO [MR] Auto-generated method stub
+		
+	}
 	
 }

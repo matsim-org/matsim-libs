@@ -29,16 +29,6 @@ import org.matsim.core.api.population.Person;
 
 public interface DriverAgent {
 
-	public void setVehicle(final QueueVehicle veh);
-
-	public void setCurrentLink(final Link link);
-
-	public Link getCurrentLink();
-
-	public Link getDestinationLink();
-
-	public void incCurrentNode();
-	
 	/**
 	 * The time the agent wants to depart fromo an Activity. If the agent is currrently driving,
 	 * the return value cannot be interpreted (e.g. it is not defined if it is the departure time
@@ -56,6 +46,27 @@ public interface DriverAgent {
 	 */
 	public void setDepartureTime(final double departureTime);
 
+	/**
+	 * Informs the agent that it arrived at the destination of the current leg.
+	 * The agent can then decide if he wants to start an activity, or continue
+	 * on another leg.
+	 * 
+	 * @param now the current time in the simulation
+	 */
+	public void legEnds(final double now);
+	
+	// the methods below are yet unclear how useful they are in the interface.
+	
+	public void setVehicle(final QueueVehicle veh);
+
+	public void setCurrentLink(final Link link);
+
+	public Link getCurrentLink();
+
+	public Link getDestinationLink();
+
+	public void incCurrentNode();
+	
 	/**
 	 * Returns the next link the vehicle will drive along.
 	 *

@@ -192,6 +192,11 @@ public class PersonAgent implements DriverAgent {
 		QueueSimulation.getEvents().processEvent(new ActEndEvent(now, this.getPerson(), this.currentLink, act));
 	}
 
+	public void legEnds(double now) {
+		// TODO [MR] Auto-generated method stub
+		
+	}
+	
 	/**
 	 * Notifies the agent that it reaches its aspired activity location.
 	 *
