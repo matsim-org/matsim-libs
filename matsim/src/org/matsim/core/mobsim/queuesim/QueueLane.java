@@ -395,7 +395,8 @@ public class QueueLane implements Comparable<QueueLane> {
 
 	/**
 	 * Move vehicles from link to buffer, according to buffer capacity and
-	 * departure time of vehicle.
+	 * departure time of vehicle. Also removes vehicles from lane if the vehicle
+	 * arrived at its destination.
 	 *
 	 * @param now
 	 *          The current time.
@@ -413,7 +414,7 @@ public class QueueLane implements Comparable<QueueLane> {
 			}
 						
 			// Check if veh has reached destination:
-			if (veh.getDriver().getDestinationLink().getId() == this.queueLink.getLink().getId()) {
+			if (veh.getDriver().getDestinationLink() == this.queueLink.getLink()) {
 				processVehicleArrival(now, veh);
 				// remove _after_ processing the arrival to keep link active
 				this.vehQueue.poll();
