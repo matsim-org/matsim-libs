@@ -1,7 +1,6 @@
 package playground.gregor.flooding;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -83,7 +82,7 @@ public class FloodingReader {
 		int next = 0;
 		for (int i = 0; i < idx.getSize(); i++) {
 			if (i  >= next){
-				log.info(i + " coordinates to processed.");
+				log.info(i + " coordinates processed.");
 				next = i*2;
 			}
 			idx.set(i);
@@ -107,7 +106,7 @@ public class FloodingReader {
 	}
 	
 	public Collection<FloodingInfo> getFloodingInfos() {
-		if(!initialized) {
+		if(!this.initialized) {
 			try {
 				readFile();
 			} catch (IOException e) {
@@ -120,7 +119,7 @@ public class FloodingReader {
 	}
 	
 	public Envelope getEnvelope() {
-		if(!initialized) {
+		if(!this.initialized) {
 			try {
 				readFile();
 			} catch (IOException e) {
