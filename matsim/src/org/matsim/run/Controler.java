@@ -28,7 +28,25 @@ package org.matsim.run;
  */
 public class Controler {
 
+	private final org.matsim.core.controler.Controler controler;
+	
+	public Controler(final String[] args) {
+		this.controler = new org.matsim.core.controler.Controler(args);
+	}
+	
+	public Controler(final String configFilename) {
+		this.controler = new org.matsim.core.controler.Controler(configFilename);
+	}
+	
+	public void setOverwriteFiles(final boolean overwriteFiles) {
+		this.controler.setOverwriteFiles(overwriteFiles);
+	}
+	
+	public void run() {
+		this.controler.run();
+	}
+	
 	public  static void main(String[] args) {
-		org.matsim.core.controler.Controler.main(args);
+		new Controler(args).run();
 	}
 }
