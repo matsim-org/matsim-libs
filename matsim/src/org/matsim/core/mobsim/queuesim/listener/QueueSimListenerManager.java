@@ -80,7 +80,7 @@ public class QueueSimListenerManager {
 	/**
 	 * Creates the event and notifies all listeners
 	 */
-	public void fireQueueSimulationBeforeClenupEvent(){
+	public void fireQueueSimulationBeforeCleanupEvent(){
 		QueueSimulationBeforeCleanupEvent event = new QueueSimulationBeforeCleanupEventImpl(this.queuesim);
 		QueueSimulationBeforeCleanupListener[] listener = this.listenerList.getListeners(QueueSimulationBeforeCleanupListener.class);
 		for (int i = 0; i < listener.length; i++){

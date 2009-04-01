@@ -326,7 +326,7 @@ public class QueueSimulation {
 				SimulationTimer.incTime();
 			}
 		}
-		this.listenerManager.fireQueueSimulationBeforeClenupEvent();
+		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
 		cleanupSim();
 		//delete reference to clear memory 
 		this.listenerManager = null;
