@@ -24,15 +24,15 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.ActivitySpace;
@@ -63,7 +63,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <plans ... > ... </plans>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
+	public void startPlans(final BasicPopulation plans, final BufferedWriter out) throws IOException {
 		out.write("<plans>\n\n");
 	}
 

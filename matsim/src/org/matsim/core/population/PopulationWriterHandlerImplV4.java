@@ -23,15 +23,15 @@ package org.matsim.core.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
@@ -55,7 +55,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <plans ... > ... </plans>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
+	public void startPlans(final BasicPopulation plans, final BufferedWriter out) throws IOException {
 		out.write("<plans");
 		if (plans.getName() != null) {
 			out.write(" name=\"" + plans.getName() + "\"");

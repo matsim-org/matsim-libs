@@ -23,14 +23,14 @@ package org.matsim.core.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.utils.io.WriterHandler;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.Desires;
@@ -42,7 +42,7 @@ public interface PopulationWriterHandler extends WriterHandler {
 	// <plans ... > ... </plans>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPlans(final Population plans, final BufferedWriter out) throws IOException;
+	public void startPlans(final BasicPopulation plans, final BufferedWriter out) throws IOException;
 
 	public void endPlans(final BufferedWriter out) throws IOException;
 

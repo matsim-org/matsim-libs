@@ -24,10 +24,11 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
@@ -46,7 +47,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	private boolean fileOpened = false;
 
 	private PopulationWriterHandler handler = null;
-	private final Population population;
+	private final BasicPopulation population;
 
 	private final static Logger log = Logger.getLogger(PopulationWriter.class);
 
@@ -58,7 +59,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	 *
 	 * @param population the population to write to file
 	 */
-	public PopulationWriter(final Population population) {
+	public PopulationWriter(final BasicPopulation population) {
 		this(population, Gbl.getConfig().plans().getOutputFile(), Gbl.getConfig().plans().getOutputVersion());
 	}
 
@@ -72,7 +73,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	 * @param filename the filename where to write the data
 	 * @param version specifies the file-format
 	 */
-	public PopulationWriter(final Population population, final String filename, final String version) {
+	public PopulationWriter(final BasicPopulation population, final String filename, final String version) {
 		this(population, filename, version, Gbl.getConfig().plans().getOutputSample());
 	}
 
@@ -87,7 +88,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	 * @param version specifies the file-format
 	 * @param fraction of persons to write to the plans file
 	 */
-	public PopulationWriter(final Population population, final String filename, final String version,
+	public PopulationWriter(final BasicPopulation population, final String filename, final String version,
 			final double fraction) {
 		super();
 		this.population = population;
@@ -95,14 +96,16 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 		this.write_person_fraction = fraction;
 		createHandler(version);
 
-		if (this.population.isStreaming()) {
-			// write the file head if it is used with streaming.
-			writeStartPlans();
+		if (this.population instanceof Population) {
+			if (((Population) this.population).isStreaming()) {
+				// write the file head if it is used with streaming.
+				writeStartPlans();
+			}
 		}
 	}
 	
 	
-	public PopulationWriter(final Population population, String filename) {
+	public PopulationWriter(final BasicPopulation population, String filename) {
 		this(population, filename, "v4", 1.0);
 	}
 	
@@ -290,15 +293,15 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	 */
 	@Override
 	public void write() {
-		if (!this.population.isStreaming()) {
-			this.writeStartPlans();
-			this.writePersons();
-			this.writeEndPlans();
-		} else {
+		if ((this.population instanceof Population) && (((Population) this.population).isStreaming())) {
 			log.info("PlansStreaming is on -- plans already written, just closing file if it's open.");
 			if (this.fileOpened) {
 				writeEndPlans();
-			}
+			}			
+		} else {
+			this.writeStartPlans();
+			this.writePersons();
+			this.writeEndPlans();
 		}
 	}
 
