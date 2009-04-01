@@ -19,12 +19,6 @@
  * *********************************************************************** */
 package org.matsim.locationchoice;
 
-import org.matsim.locationchoice.constrained.ManageSubchainsTest;
-import org.matsim.locationchoice.constrained.SubChainTest;
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSetTest;
-import org.matsim.locationchoice.facilityload.FacilityPenaltyTest;
-import org.matsim.locationchoice.facilityload.ScoringPenaltyTest;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -32,20 +26,17 @@ public class AllTests {
 
 	public static Test suite() {
 
-		TestSuite suite = new TestSuite("Test for org.matsim.locationchoice");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
 
 		suite.addTestSuite(LocationChoiceTest.class);
 		suite.addTestSuite(RandomLocationMutatorTest.class);
-		suite.addTestSuite(SubChainTest.class);
-		suite.addTestSuite(ManageSubchainsTest.class);
-		suite.addTestSuite(LocationMutatorwChoiceSetTest.class);
-		suite.addTestSuite(FacilityPenaltyTest.class);
-		suite.addTestSuite(ScoringPenaltyTest.class);
 
+		suite.addTest(org.matsim.locationchoice.constrained.AllTests.suite());
+		suite.addTest(org.matsim.locationchoice.facilityload.AllTests.suite());
+
+		
 		//$JUnit-END$
 		return suite;
 	}
 }
-
-

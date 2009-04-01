@@ -26,10 +26,8 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.analysis");
-		//$JUnit-BEGIN$
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		suite.addTestSuite(LegHistogramTest.class);
-		//$JUnit-END$
 		return suite;
 	}
 

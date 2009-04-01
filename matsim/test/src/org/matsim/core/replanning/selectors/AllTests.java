@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.replanning.selectors");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
 		suite.addTestSuite(BestPlanSelectorTest.class);
 		suite.addTestSuite(ExpBetaPlanChangerTest.class);

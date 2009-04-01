@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.events;
+package org.matsim.core;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -27,21 +27,21 @@ public class AllTests {
 
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
-
-		suite.addTest(org.matsim.core.events.parallelEventsHandler.AllTests.suite());
-		suite.addTestSuite(ActEndEventTest.class);
-		suite.addTestSuite(ActStartEventTest.class);
-		suite.addTestSuite(AgentArrivalEventTest.class);
-		suite.addTestSuite(AgentDepartureEventTest.class);
-		suite.addTestSuite(AgentMoneyEventTest.class);
-		suite.addTestSuite(AgentStuckEventTest.class);
-		suite.addTestSuite(AgentWait2LinkEventTest.class);
-		suite.addTestSuite(BasicEventsHandlerTest.class);
-		suite.addTestSuite(EventsHandlerHierarchyTest.class);
-		suite.addTestSuite(EventsReadersTest.class);
-		suite.addTestSuite(LinkEnterEventTest.class);
-		suite.addTestSuite(LinkLeaveEventTest.class);
-
+		suite.addTest(org.matsim.core.basic.v01.AllTests.suite());
+		suite.addTest(org.matsim.core.config.AllTests.suite());
+		suite.addTest(org.matsim.core.controler.AllTests.suite());
+		suite.addTest(org.matsim.core.events.AllTests.suite());
+		suite.addTest(org.matsim.core.facilities.AllTests.suite());
+		suite.addTest(org.matsim.core.gbl.AllTests.suite());
+		suite.addTest(org.matsim.core.mobsim.AllTests.suite());
+		suite.addTest(org.matsim.core.network.AllTests.suite());
+		suite.addTest(org.matsim.core.population.AllTests.suite());
+		suite.addTest(org.matsim.core.replanning.AllTests.suite());
+		suite.addTest(org.matsim.core.router.AllTests.suite());
+		suite.addTest(org.matsim.core.scoring.AllTests.suite());
+		suite.addTest(org.matsim.core.trafficmonitoring.AllTests.suite());
+		suite.addTest(org.matsim.core.utils.AllTests.suite());
+		
 		return suite;
 	}
 

@@ -26,9 +26,10 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.utils.misc");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ArgumentParserTest.class);
+		suite.addTestSuite(NetworkUtilsTest.class);
 		suite.addTestSuite(StringUtilsTest.class);
 		suite.addTestSuite(TimeTest.class);
 		//$JUnit-END$

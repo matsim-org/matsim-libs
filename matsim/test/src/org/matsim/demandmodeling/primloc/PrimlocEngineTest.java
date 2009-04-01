@@ -13,6 +13,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 import Jama.Matrix;
 
+// FIXME this test-case has no Assert-statement, so it will always succeed!
 
 public class PrimlocEngineTest  extends MatsimTestCase {
 

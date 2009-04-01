@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.replanning.modules");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ChangeLegModeTest.class);
 		suite.addTestSuite(TimeAllocationMutatorTest.class);

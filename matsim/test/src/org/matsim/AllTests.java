@@ -42,30 +42,22 @@ public class AllTests {
 		TestSuite suite = new TestSuite("All tests for org.matsim");
 		//$JUnit-BEGIN$
 
-		// run unit tests
+		// first run core test
+		suite.addTest(org.matsim.core.AllTests.suite());
+
+		// now run other unit tests
 		suite.addTest(org.matsim.analysis.AllTests.suite());
-		suite.addTest(org.matsim.core.basic.v01.AllTests.suite());
-		suite.addTest(org.matsim.core.config.AllTests.suite());
-		suite.addTest(org.matsim.core.controler.AllTests.suite());
 		suite.addTest(org.matsim.counts.AllTests.suite());
 		suite.addTest(org.matsim.demandmodeling.AllTests.suite());
-		suite.addTest(org.matsim.core.events.AllTests.suite());
-		suite.addTest(org.matsim.core.facilities.AllTests.suite());
-		suite.addTest(org.matsim.core.gbl.AllTests.suite());
-		suite.addTest(org.matsim.signalsystems.AllTests.suite());
 		suite.addTest(org.matsim.locationchoice.AllTests.suite());
-		suite.addTest(org.matsim.core.mobsim.AllTests.suite());
-		suite.addTest(org.matsim.core.network.AllTests.suite());
 		suite.addTest(org.matsim.planomat.AllTests.suite());
 		suite.addTest(org.matsim.population.AllTests.suite());
-		suite.addTest(org.matsim.core.replanning.AllTests.suite());
 		suite.addTest(org.matsim.roadpricing.AllTests.suite());
-		suite.addTest(org.matsim.core.router.AllTests.suite());
-		suite.addTest(org.matsim.core.scoring.AllTests.suite());
-		suite.addTest(org.matsim.core.trafficmonitoring.AllTests.suite());
+		suite.addTest(org.matsim.signalsystems.AllTests.suite());
 		suite.addTest(org.matsim.utils.AllTests.suite());
-		suite.addTest(org.matsim.world.AllTests.suite());
+		suite.addTest(org.matsim.vis.AllTests.suite());
 		suite.addTest(org.matsim.withinday.AllTests.suite());
+		suite.addTest(org.matsim.world.AllTests.suite());
 
 		// run integration tests
 		suite.addTest(org.matsim.integration.AllTests.suite());

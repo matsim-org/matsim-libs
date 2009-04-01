@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.scoring");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
 		suite.addTestSuite(CharyparNagelScoringFunctionTest.class);
 		suite.addTestSuite(CharyparNagelOpenTimesScoringFunctionTest.class);

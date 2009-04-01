@@ -6,7 +6,8 @@ import Jama.Matrix;
 
 public class PrimlocLinearSolverTest extends MatsimTestCase {
 
-	
+	// FIXME this test-case has no Assert-statement, so it will always succeed!
+
 	public void testLinearSolver(){
 		testSolver( 10 );
 		testSolver( 100 );

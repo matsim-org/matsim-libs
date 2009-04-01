@@ -27,9 +27,10 @@ public class AllTests {
 
 	public static Test suite() {
 
-		TestSuite suite = new TestSuite("Test for org.matsim.world");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
 		suite.addTestSuite(WorldParserWriterTest.class);
+		suite.addTestSuite(WorldUtilsTest.class);
 		suite.addTest(org.matsim.world.algorithms.AllTests.suite());
 		//$JUnit-END$
 		return suite;

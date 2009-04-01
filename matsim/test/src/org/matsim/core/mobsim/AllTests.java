@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.mobsim");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
 		suite.addTest(org.matsim.core.mobsim.queuesim.AllTests.suite());
 		suite.addTest(org.matsim.core.mobsim.jdeqsim.AllTests.suite());

@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.utils.geometry.geotools");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		suite.addTestSuite(MGCTest.class);
 		return suite;
 	}

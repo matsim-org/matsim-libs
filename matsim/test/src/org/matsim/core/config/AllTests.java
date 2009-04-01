@@ -27,7 +27,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.config");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ConfigReaderMatsimV1Test.class);
 		suite.addTest(org.matsim.core.config.groups.AllTests.suite());

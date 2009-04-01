@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,9 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.events.algorithms;
-
-
+package org.matsim.core.utils;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -28,10 +26,14 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.events.algorithms");
-		//$JUnit-BEGIN$
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
-		//$JUnit-END$
+		suite.addTest(org.matsim.core.utils.charts.AllTests.suite());
+		suite.addTest(org.matsim.core.utils.collections.AllTests.suite());
+		suite.addTest(org.matsim.core.utils.geometry.AllTests.suite());
+		suite.addTest(org.matsim.core.utils.io.AllTests.suite());
+		suite.addTest(org.matsim.core.utils.misc.AllTests.suite());
+
 		return suite;
 	}
 

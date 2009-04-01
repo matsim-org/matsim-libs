@@ -28,7 +28,7 @@ import org.matsim.testcases.TestDepth;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.replanning");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		suite.addTestSuite(PlanStrategyTest.class);
 		//$JUnit-BEGIN$
 		if (TestDepth.getDepth() == TestDepth.extended) {

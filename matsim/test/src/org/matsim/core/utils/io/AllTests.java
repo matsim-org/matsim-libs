@@ -31,7 +31,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 	
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.utils.io");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
 		suite.addTestSuite(org.matsim.core.utils.io.IOUtilsTest.class);
 		suite.addTestSuite(org.matsim.core.utils.io.MatsimFileTypeGuesserTest.class);

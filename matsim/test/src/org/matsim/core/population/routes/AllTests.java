@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.population.routes");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
 		suite.addTestSuite(CompressedCarRouteTest.class);
 		suite.addTestSuite(LinkCarRouteTest.class);

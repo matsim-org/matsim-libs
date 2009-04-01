@@ -27,11 +27,10 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.trafficmonitoring");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
 		suite.addTestSuite(LinkSensorManagerTest.class);
 		suite.addTestSuite(TravelTimeCalculatorTest.class);
-//		suite.addTestSuite(TravelTimeCalculatorHashMapTest.class);
 		//$JUnit-END$
 		return suite;
 	}
