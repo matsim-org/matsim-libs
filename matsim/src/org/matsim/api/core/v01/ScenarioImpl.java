@@ -37,6 +37,7 @@ import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimLaneDefinitionsReader;
@@ -87,6 +88,23 @@ public class ScenarioImpl implements Scenario {
 
 	private static final Logger log = Logger.getLogger(ScenarioImpl.class);
 
+	public ScenarioImpl() {
+		this.world = new World();
+		this.worldFileName = null;
+		this.worldLoaded = true;
+		this.network = new NetworkLayer();
+		this.networkFactory = this.network.getFactory();
+		this.networkFileName = null;
+		this.networkLoaded = true;
+		this.facilities = new FacilitiesImpl();
+		this.facilitiesFileName = null;
+		this.facilitiesLoaded = true;
+		this.population = new PopulationImpl();
+		this.populationFileName = null;
+		this.populationLoaded = true;
+		this.config = new Config();
+	}
+	
 	/**
 	 * Loads the data from the locations specified in the configuration.
 	 * The configuration must already be loaded at this point.
