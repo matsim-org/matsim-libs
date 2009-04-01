@@ -97,9 +97,9 @@ public class ActivityLocations {
 			BufferedWriter minorLocations = new BufferedWriter(new FileWriter(new File(DESTFOLDER + PROVINCE + "MinorLocations.txt")));
 			minorLocations.write( locationHeaderString() );
 			minorLocations.newLine();
-			
-			for(int i = 0; i < vehicles.length; i++ ){
-				try{
+
+			try{
+				for(int i = 0; i < vehicles.length; i++ ){
 					File thisFile = vehicles[i];
 					if(thisFile.isFile() && !(thisFile.getName().startsWith(".")) ){ // avoid .* file names on Mac
 						//TODO Remove next line when SA run is complete
@@ -144,11 +144,11 @@ public class ActivityLocations {
 							dotsPrinted = pb.updateProgress(dotsPrinted, numberOfVehicles, totalVehicles);
 						}
 					}
-				} finally{
-					vehicleStats.close();
-					majorLocations.close();
-					minorLocations.close();
-				}
+				} 
+			}finally{
+				vehicleStats.close();
+				majorLocations.close();
+				minorLocations.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
