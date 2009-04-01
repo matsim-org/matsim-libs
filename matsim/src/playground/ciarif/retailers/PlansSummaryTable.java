@@ -4,10 +4,8 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.network.Link;
+
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -31,7 +29,8 @@ public class PlansSummaryTable implements PlanAlgorithm {
 		try {
 			fw = new FileWriter(outfile);
 			out = new BufferedWriter(fw);
-			out.write("pid\tact1\tlink1\tfacId1\t...\tactn\tlinkn\tfacIdn\tIteration\n");
+			//out.write("pid\tact1\tlink1\tfacId1\t...\tactn\tlinkn\tfacIdn\tIteration\n");
+			out.write("linkId\tfacId\tIteration\n");
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -48,19 +47,21 @@ public class PlansSummaryTable implements PlanAlgorithm {
 	public void run(Person person, int iter) {
 		try {
 			Plan plan = person.getSelectedPlan();
-			out.write(person.getId() + "\t");
+			//out.write(person.getId() + "\t");
 			//out.write(plan.getScore() + "\t");
 			for (int i=1; i<plan.getPlanElements().size()-2; i=i+2) {
 				//Leg l = (Leg)plan.getActsLegs().get(i);
 				Activity a = (Activity)plan.getPlanElements().get(i+1);
-				//Link arr_link = a.getLink();
-				out.write(a.getType() + "\t");
-				out.write(a.getLinkId() + "\t");
-				out.write(a.getFacilityId() + "\t");
-				
+				if (a.getType().contains("shop")) {
+					//Link arr_link = a.getLink();
+					//out.write(a.getType() + "\t");
+					out.write(a.getLinkId() + "\t");
+					out.write(a.getFacilityId() + "\t");
+					out.write(iter +"\n");
+				}
 				
 			}
-			out.write(iter +"\n");
+			
 			//out.write("\n");
 			
 		} catch (IOException e) {

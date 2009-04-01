@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -87,9 +88,9 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		this.pst = new PlansSummaryTable (popOutFile);
 		this.lrr = new LinksRetailerReader (controler);
 		this.links = lrr.ReadLinks(); 
-		this.txf = new MakeATableFromXMLFacilities("output/facilities_table.txt");
+		//this.txf = new MakeATableFromXMLFacilities("output/facilities_table.txt");
 		FacilitiesImpl facs = (FacilitiesImpl) controler.getFacilities();
-		txf.write(facs);
+		//txf.write(facs);
 		String retailersOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
 		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.rs = new RetailersSummaryWriter (retailersOutFile);
@@ -133,19 +134,21 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
-		System.out.println("Veryfing if the retailers need to be relocated " + controler.getIteration()%5);
-		if (controler.getIteration()%10==0) {
+		//System.out.println("Veryfing if the retailers need to be relocated " + controler.getIteration()%5);
+		if (controler.getIteration()%1==0) {
 			Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
 			
 			// works, but it is not nicely programmed. shouldn't be a global container, should be
 			// controlled by the controler (or actually added to the population)
-			//Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
+			Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
+			Utils.setFacilityQuadTree(this.createFacilityQuadTree(controler));
 			
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 			
 			for (Retailer r : this.retailers.getRetailers().values()) {
 				Map<Id,Facility> facs = r.runStrategy();
-				movedFacilities.putAll(facs);
+				movedFacilities.putAll(facs); //fc TODO this is not true!!!! Only some of this facilities will really be moved!!!!!!!!!!! 
+				// probably is only slower and not incorrect but should be changed
 				System.out.println("moved facilities =" + facs);
 			}
 			
@@ -174,25 +177,47 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		}
 	}	
 	
-//	private final QuadTree<Person> createPersonQuadTree(Controler controler) {
-//		double minx = Double.POSITIVE_INFINITY;
-//		double miny = Double.POSITIVE_INFINITY;
-//		double maxx = Double.NEGATIVE_INFINITY;
-//		double maxy = Double.NEGATIVE_INFINITY;
-//		//ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
-//		for (Facility f : controler.getFacilities().getFacilities().values()) {
-//			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
-//			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
-//			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
-//			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
-//		}
-//		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
-//		
-//		QuadTree<Person> personQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
-//		for (Person p : controler.getPopulation().getPersons().values()) {
-//			Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();
-//			personQuadTree.put(c.getX(),c.getY(),p);
-//		}
-//		return personQuadTree;
-//	}
+	private final QuadTree<Person> createPersonQuadTree(Controler controler) {
+		double minx = Double.POSITIVE_INFINITY;
+		double miny = Double.POSITIVE_INFINITY;
+		double maxx = Double.NEGATIVE_INFINITY;
+		double maxy = Double.NEGATIVE_INFINITY;
+		//ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
+		for (Facility f : controler.getFacilities().getFacilities().values()) {
+			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
+		}
+		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
+		
+		QuadTree<Person> personQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
+		for (Person p : controler.getPopulation().getPersons().values()) {
+			Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();
+			personQuadTree.put(c.getX(),c.getY(),p);
+		}
+		return personQuadTree;
+	}
+	
+	private final QuadTree<Facility> createFacilityQuadTree(Controler controler) {
+		double minx = Double.POSITIVE_INFINITY;
+		double miny = Double.POSITIVE_INFINITY;
+		double maxx = Double.NEGATIVE_INFINITY;
+		double maxy = Double.NEGATIVE_INFINITY;
+		//ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
+		for (Link l : controler.getNetwork().getLinks().values()) {
+			if (l.getCoord().getX() < minx) { minx = l.getCoord().getX(); }
+			if (l.getCoord().getY() < miny) { miny = l.getCoord().getY(); }
+			if (l.getCoord().getX() > maxx) { maxx = l.getCoord().getX(); }
+			if (l.getCoord().getY() > maxy) { maxy = l.getCoord().getY(); }
+		}
+		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
+		
+		QuadTree<Facility> facilityQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
+		for (Facility f : controler.getFacilities().getFacilities().values()) {
+			Coord c = f.getCoord();
+			facilityQuadTree.put(c.getX(),c.getY(),f);
+		}
+		return facilityQuadTree;
+	}
 }

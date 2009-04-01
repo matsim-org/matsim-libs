@@ -30,6 +30,7 @@ public abstract class Utils {
 	
 	// BAD CODE STYLE but keep that anyway for the moment
 	private static QuadTree<Person> personQuadTree = null;
+	private static QuadTree<Facility> facilityQuadTree = null;
 	
 	public static final void setPersonQuadTree(QuadTree<Person> personQuadTree) {
 		Utils.personQuadTree = personQuadTree;
@@ -37,5 +38,13 @@ public abstract class Utils {
 	
 	public static final QuadTree<Person> getPersonQuadTree() {
 		return Utils.personQuadTree;
+	}
+	
+	public static final void setFacilityQuadTree(QuadTree<Facility> facilityQuadTree) {
+		Utils.facilityQuadTree  = facilityQuadTree;
+	}
+	
+	public static final QuadTree<Facility> getFacilityQuadTree() {
+		return Utils.facilityQuadTree;
 	}
 }

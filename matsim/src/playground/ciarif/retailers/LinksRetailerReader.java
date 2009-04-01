@@ -42,14 +42,9 @@ public class LinksRetailerReader {
 					// header: l_id  max_fac
 					// index:   0       1 
 					Id lId = new IdImpl (entries[0]);
-					System.out.println("Link id " + lId);
-					System.out.println("Link in controler " + controler.getNetwork().getLink(lId));
 					LinkRetailersImpl l = new LinkRetailersImpl(controler.getNetwork().getLink(lId),controler.getNetwork());
 					// ciarif: if facilities are already on this link the number of already 
 					// existing facilities is compared with the max from the file. The larger is taken.
-					System.out.println("Link " + l.getId());
-					System.out.println("upmapping " + l.getUpMapping());
-					System.out.println("entry " + Integer.parseInt(entries[1]));
 					if (l.getUpMapping().size()>(Integer.parseInt(entries[1]))) {
 						
 						l.setMaxFacOnLink(l.getUpMapping().size());

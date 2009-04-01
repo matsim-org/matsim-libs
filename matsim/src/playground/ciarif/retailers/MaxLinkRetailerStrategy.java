@@ -1,10 +1,15 @@
 package playground.ciarif.retailers;
 
 
+
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.BasicLinkImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
@@ -29,30 +34,49 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 		
 		for (Facility f : facilities.values()) {
 			//Object[] links = controler.getNetwork().getLinks().values().toArray();
-			int rd = MatsimRandom.getRandom().nextInt(this.links.length);
-			BasicLinkImpl link = (BasicLinkImpl)this.links[rd];
-			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
-			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId());
-			double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(link.getId().toString());
-			double currentlink_volume =0;
-			double newlink_volume =0;
-			for (int j=0; j<currentlink_volumes.length;j=j+1) {
-				currentlink_volume = currentlink_volume + currentlink_volumes[j];
-				
-			}
-			for (int j=0; j<newlink_volumes.length;j=j+1) {
-				newlink_volume = newlink_volume + newlink_volumes[j];
-			}
-			
-			log.info("facility = " + f.getId());
-			log.info ("currentlink = " + f.getLink().getId());
-			log.info ("current link coord= " + f.getLink().getCoord());
-			log.info ("currentlink_volume = " + currentlink_volume);
-			log.info ("newlink_volume = " + newlink_volume);
-			if (newlink_volume >= currentlink_volume) {
-				log.info ("newlink Id= " + link.getId());
-				log.info ("newlink coord= " + link.getCoord());
-				Utils.moveFacility(f,link);
+			double rd1 = MatsimRandom.getRandom().nextDouble();
+			if (rd1 < 0.2) {
+				int rd = MatsimRandom.getRandom().nextInt(this.links.length);
+				BasicLinkImpl link = (BasicLinkImpl)this.links[rd];
+				controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
+				double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId());
+				double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(link.getId().toString());
+				double currentlink_volume =0;
+				double newlink_volume =0;
+				for (int j=0; j<currentlink_volumes.length;j=j+1) {
+					currentlink_volume = currentlink_volume + currentlink_volumes[j];
+					
+				}
+				for (int j=0; j<newlink_volumes.length;j=j+1) {
+					newlink_volume = newlink_volume + newlink_volumes[j];
+				}
+				Collection<Person> persons_actual = Utils.getPersonQuadTree().get(f.getLink().getCoord().getX(),f.getLink().getCoord().getY(),1500);
+				Collection<Person> persons_new = (ArrayList<Person>) Utils.getPersonQuadTree().get(link.getCoord().getX(),link.getCoord().getY(),1500);
+				Collection<Facility> facilities_actual = Utils.getFacilityQuadTree().get(f.getCoord().getX(),f.getCoord().getY(),1500);
+				Collection<Facility> facilities_new = Utils.getFacilityQuadTree().get(link.getCoord().getX(),link.getCoord().getY(),1500);
+				for (Facility f1:facilities_new) {
+					if (facilities.values().contains(f1)){
+						log.info("Around the proposed new link a facility of this retailer already exists ");
+					}
+					else {
+						if (persons_actual.size()/facilities_actual.size()<persons_new.size()/facilities_new.size()) {
+							log.info("Persons living around the actual location = " + persons_actual.size());
+							log.info("Persons living around the new location = " + persons_new.size());
+							log.info("Facilities already in the area = " + facilities_actual.size());
+							log.info("Facilities already in the area = " + facilities_new.size());
+							log.info("Ratio Persons/Facilities in the actual area = " + persons_actual.size()/facilities_actual.size());
+							log.info("Ratio Persons/Facilities in the new area = " + persons_new.size()/facilities_new.size());
+							log.info("facility = " + f.getId());
+							log.info ("currentlink = " + f.getLink().getId());
+							log.info ("currentlink_volume = " + currentlink_volume);
+							log.info ("newlink_volume = " + newlink_volume);
+							if (newlink_volume >= currentlink_volume) {
+								log.info ("newlink Id= " + link.getId());
+								Utils.moveFacility(f,link);
+							}
+						}
+					}
+				}
 			}
 		}
 	}
