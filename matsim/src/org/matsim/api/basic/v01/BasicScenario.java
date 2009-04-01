@@ -17,6 +17,6 @@ public interface BasicScenario {
 
 	public Id createId(String string);
 
-	public Coord createCoord(double d, double e);
+	public Coord createCoord(double x, double y);
 
 }
