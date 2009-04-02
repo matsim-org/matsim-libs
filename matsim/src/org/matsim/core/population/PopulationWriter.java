@@ -24,14 +24,15 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -150,73 +151,75 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 		}
 	}
 
-	public final void writePerson(final Person p) {
+	public final void writePerson(final BasicPerson person) {
 		//	 write only the defined fraction
 		if (MatsimRandom.getRandom().nextDouble() >= this.write_person_fraction) {
 			return;
 		}
 		try {
-			this.handler.startPerson(p,this.out);
-			// travelcards
-			if (p.getTravelcards() != null) {
-				Iterator<String> t_it = p.getTravelcards().iterator();
-				while (t_it.hasNext()) {
-					String t = t_it.next();
-					this.handler.startTravelCard(t,this.out);
-					this.handler.endTravelCard(this.out);
-				}
-			}
-			// desires
-			if (p.getDesires() != null) {
-				Desires d = p.getDesires();
-				this.handler.startDesires(d,this.out);
-				if (d.getActivityDurations() != null) {
-					for (String act_type : d.getActivityDurations().keySet()) {
-						this.handler.startActDur(act_type,d.getActivityDurations().get(act_type),this.out);
-						this.handler.endActDur(this.out);
+			this.handler.startPerson(person,this.out);
+			if (person instanceof Person) {
+				Person p = (Person)person;
+				// travelcards
+				if (p.getTravelcards() != null) {
+					Iterator<String> t_it = p.getTravelcards().iterator();
+					while (t_it.hasNext()) {
+						String t = t_it.next();
+						this.handler.startTravelCard(t,this.out);
+						this.handler.endTravelCard(this.out);
 					}
 				}
-				this.handler.endDesires(this.out);
-			}
-			// knowledge
-			if (p.getKnowledge() != null) {
-				Knowledge k = p.getKnowledge();
-				this.handler.startKnowledge(k, this.out);
-				// activity spaces
-				if (k.getActivitySpaces() != null) {
-				Iterator<ActivitySpace> as_it = k.getActivitySpaces().iterator();
-				while (as_it.hasNext()) {
-					ActivitySpace as = as_it.next();
-					if (!as.isComplete()) {
-						Gbl.errorMsg("[person_id="+p.getId()+" holds an incomplete act-space.]");
+				// desires
+				if (p.getDesires() != null) {
+					Desires d = p.getDesires();
+					this.handler.startDesires(d,this.out);
+					if (d.getActivityDurations() != null) {
+						for (String act_type : d.getActivityDurations().keySet()) {
+							this.handler.startActDur(act_type,d.getActivityDurations().get(act_type),this.out);
+							this.handler.endActDur(this.out);
+						}
 					}
-					this.handler.startActivitySpace(as, this.out);
-					// params
-					Iterator<String> name_it = as.getParams().keySet().iterator();
-					while (name_it.hasNext()) {
-						String name = name_it.next();
-						Double val = as.getParams().get(name);
-						this.handler.startParam(name, val.toString(), this.out);
-						this.handler.endParam(this.out);
-					}
-					this.handler.endActivitySpace(this.out);
+					this.handler.endDesires(this.out);
 				}
-				}
-				// activities
-				Iterator<String> at_it = k.getActivityTypes().iterator();
-				while (at_it.hasNext()) {
-					String act_type = at_it.next();
-					this.handler.startActivity(act_type,this.out);
-					// locations (primary)
-					for (ActivityOption a : k.getActivities(act_type,true)) {
-						this.handler.startPrimaryLocation(a,this.out);
-						this.handler.endPrimaryLocation(this.out);
+				// knowledge
+				if (p.getKnowledge() != null) {
+					Knowledge k = p.getKnowledge();
+					this.handler.startKnowledge(k, this.out);
+					// activity spaces
+					if (k.getActivitySpaces() != null) {
+						Iterator<ActivitySpace> as_it = k.getActivitySpaces().iterator();
+						while (as_it.hasNext()) {
+							ActivitySpace as = as_it.next();
+							if (!as.isComplete()) {
+								Gbl.errorMsg("[person_id="+p.getId()+" holds an incomplete act-space.]");
+							}
+							this.handler.startActivitySpace(as, this.out);
+							// params
+							Iterator<String> name_it = as.getParams().keySet().iterator();
+							while (name_it.hasNext()) {
+								String name = name_it.next();
+								Double val = as.getParams().get(name);
+								this.handler.startParam(name, val.toString(), this.out);
+								this.handler.endParam(this.out);
+							}
+							this.handler.endActivitySpace(this.out);
+						}
 					}
-					// locations (secondary)
-					for (ActivityOption a : k.getActivities(act_type,false)) {
-						this.handler.startSecondaryLocation(a,this.out);
-						this.handler.endSecondaryLocation(this.out);
-					}
+					// activities
+					Iterator<String> at_it = k.getActivityTypes().iterator();
+					while (at_it.hasNext()) {
+						String act_type = at_it.next();
+						this.handler.startActivity(act_type,this.out);
+						// locations (primary)
+						for (ActivityOption a : k.getActivities(act_type,true)) {
+							this.handler.startPrimaryLocation(a,this.out);
+							this.handler.endPrimaryLocation(this.out);
+						}
+						// locations (secondary)
+						for (ActivityOption a : k.getActivities(act_type,false)) {
+							this.handler.startSecondaryLocation(a,this.out);
+							this.handler.endSecondaryLocation(this.out);
+						}
 //					Iterator<Activity> a_it = k.getActivities(act_type).iterator();
 //					while (a_it.hasNext()) {
 //						Facility f = a_it.next().getFacility();
@@ -227,23 +230,27 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 //						 * is enough. (well... i think) */
 //						this.handler.endLocation(this.out);
 //					}
-					this.handler.endActivity(this.out);
+						this.handler.endActivity(this.out);
+					}
+					this.handler.endKnowledge(this.out);
 				}
-				this.handler.endKnowledge(this.out);
+				
+				
+				
 			}
 			// plans
-			for (int ii = 0; ii < p.getPlans().size(); ii++) {
-				Plan plan = p.getPlans().get(ii);
+			for (int ii = 0; ii < person.getPlans().size(); ii++) {
+				BasicPlan plan = (BasicPlan) person.getPlans().get(ii);
 				this.handler.startPlan(plan, this.out);
 				// act/leg
 				for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
 					if (jj % 2 == 0) {
-						Activity act = (Activity)plan.getPlanElements().get(jj);
+						BasicActivity act = (BasicActivity)plan.getPlanElements().get(jj);
 						this.handler.startAct(act, this.out);
 						this.handler.endAct(this.out);
 					}
 					else {
-						Leg leg = (Leg)plan.getPlanElements().get(jj);
+						BasicLeg leg = (BasicLeg)plan.getPlanElements().get(jj);
 						this.handler.startLeg(leg, this.out);
 						// route
 						if (leg.getRoute() != null) {
@@ -268,7 +275,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	public final void writePersons() {
 		Iterator<Person> p_it = this.population.getPersons().values().iterator();
 		while (p_it.hasNext()) {
-			Person p = p_it.next();
+			BasicPerson p = p_it.next();
 			writePerson(p);
 		}
 	}

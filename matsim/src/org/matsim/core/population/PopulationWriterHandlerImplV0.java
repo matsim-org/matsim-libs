@@ -24,6 +24,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.OpeningTime;
@@ -31,8 +35,6 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.ActivitySpace;
@@ -75,7 +77,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <person ... > ... </person>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPerson(final Person person, final BufferedWriter out) throws IOException {
+	public void startPerson(final BasicPerson person, final BufferedWriter out) throws IOException {
 		out.write("\t<person");
 		out.write(" id=\"" + person.getId() + "\"");
 		out.write(">\n");
@@ -195,7 +197,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <plan ... > ... </plan>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
+	public void startPlan(final BasicPlan plan, final BufferedWriter out) throws IOException {
 		out.write("\t\t<plan");
 		if (plan.getScore() != null)
 			out.write(" score=\"" + plan.getScore().toString() + "\"");
@@ -214,19 +216,22 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <act ... > ... </act>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startAct(final Activity act, final BufferedWriter out) throws IOException {
+	public void startAct(final BasicActivity act, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<act");
 		out.write(" type=\"" + act.getType() + "\"");
 		if (act.getCoord() != null) {
 			out.write(" x100=\"" + act.getCoord().getX() + "\"");
 			out.write(" y100=\"" + act.getCoord().getY() + "\"");
 		}
-		if (act.getLink() != null)
-			out.write(" link=\"" + act.getLink().getId() + "\"");
+		if (act.getLinkId() != null)
+			out.write(" link=\"" + act.getLinkId() + "\"");
 		if (act.getStartTime() != Integer.MIN_VALUE)
 			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
-		if (act.getDuration() != Integer.MIN_VALUE)
-			out.write(" dur=\"" + Time.writeTime(act.getDuration()) + "\"");
+		if (act instanceof Activity){
+			Activity a = (Activity)act;
+			if (a.getDuration() != Time.UNDEFINED_TIME)
+				out.write(" dur=\"" + Time.writeTime(a.getDuration()) + "\"");
+		}
 		if (act.getEndTime() != Integer.MIN_VALUE)
 			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
 		out.write(" />\n");
@@ -240,15 +245,18 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <leg ... > ... </leg>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
+	public void startLeg(final BasicLeg leg, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<leg");
 		out.write(" mode=\"" + leg.getMode() + "\"");
 		if (leg.getDepartureTime() != Integer.MIN_VALUE)
 			out.write(" dep_time=\"" + Time.writeTime(leg.getDepartureTime()) + "\"");
 		if (leg.getTravelTime() != Integer.MIN_VALUE)
 			out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime()) + "\"");
-		if (leg.getArrivalTime() != Integer.MIN_VALUE)
-			out.write(" arr_time=\"" + Time.writeTime(leg.getArrivalTime()) + "\"");
+		if (leg instanceof Leg){
+			Leg l = (Leg)leg;
+			if (l.getArrivalTime() != Time.UNDEFINED_TIME)
+				out.write(" arr_time=\"" + Time.writeTime(l.getArrivalTime()) + "\"");
+		}
 		out.write(">\n");
 	}
 

@@ -23,14 +23,14 @@ package org.matsim.core.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.OpeningTime;
-import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.utils.io.WriterHandler;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.Desires;
@@ -50,7 +50,7 @@ public interface PopulationWriterHandler extends WriterHandler {
 	// <person ... > ... </person>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPerson(final Person person, final BufferedWriter out) throws IOException;
+	public void startPerson(final BasicPerson person, final BufferedWriter out) throws IOException;
 
 	public void endPerson(final BufferedWriter out) throws IOException;
 
@@ -146,7 +146,7 @@ public interface PopulationWriterHandler extends WriterHandler {
 	// <plan ... > ... </plan>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPlan(final Plan plan, final BufferedWriter out) throws IOException;
+	public void startPlan(final BasicPlan plan, final BufferedWriter out) throws IOException;
 
 	public void endPlan(final BufferedWriter out) throws IOException;
 
@@ -154,7 +154,7 @@ public interface PopulationWriterHandler extends WriterHandler {
 	// <act ... > ... </act>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startAct(final Activity act, final BufferedWriter out) throws IOException;
+	public void startAct(final BasicActivity act, final BufferedWriter out) throws IOException;
 
 	public void endAct(final BufferedWriter out) throws IOException;
 
@@ -162,7 +162,7 @@ public interface PopulationWriterHandler extends WriterHandler {
 	// <leg ... > ... </leg>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startLeg(final Leg leg, final BufferedWriter out) throws IOException;
+	public void startLeg(final BasicLeg leg, final BufferedWriter out) throws IOException;
 
 	public void endLeg(final BufferedWriter out) throws IOException;
 

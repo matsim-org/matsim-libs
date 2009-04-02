@@ -23,6 +23,10 @@ package org.matsim.core.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.OpeningTime;
@@ -71,19 +75,22 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <person ... > ... </person>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPerson(final Person person, final BufferedWriter out) throws IOException {
+	public void startPerson(final BasicPerson p, final BufferedWriter out) throws IOException {
 		out.write("\t<person");
-		out.write(" id=\"" + person.getId() + "\"");
-		if (person.getSex() != null)
-			out.write(" sex=\"" + person.getSex() + "\"");
-		if (person.getAge() != Integer.MIN_VALUE)
-			out.write(" age=\"" + person.getAge() + "\"");
-		if (person.getLicense() != null)
-			out.write(" license=\"" + person.getLicense() + "\"");
-		if (person.getCarAvail() != null)
-			out.write(" car_avail=\"" + person.getCarAvail() + "\"");
-		if (person.getEmployed() != null)
-			out.write(" employed=\"" + person.getEmployed() + "\"");
+		out.write(" id=\"" + p.getId() + "\"");
+		if (p instanceof Person){
+			Person person = (Person)p;
+			if (person.getSex() != null)
+				out.write(" sex=\"" + person.getSex() + "\"");
+			if (person.getAge() != Integer.MIN_VALUE)
+				out.write(" age=\"" + person.getAge() + "\"");
+			if (person.getLicense() != null)
+				out.write(" license=\"" + person.getLicense() + "\"");
+			if (person.getCarAvail() != null)
+				out.write(" car_avail=\"" + person.getCarAvail() + "\"");
+			if (person.getEmployed() != null)
+				out.write(" employed=\"" + person.getEmployed() + "\"");
+		}
 		out.write(">\n");
 	}
 
@@ -274,7 +281,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <plan ... > ... </plan>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
+	public void startPlan(final BasicPlan plan, final BufferedWriter out) throws IOException {
 		out.write("\t\t<plan");
 		if (plan.getScore() != null)
 			out.write(" score=\"" + plan.getScore().toString() + "\"");
@@ -282,8 +289,11 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 			out.write(" selected=\"" + "yes" + "\"");
 		else
 			out.write(" selected=\"" + "no" + "\"");
-		if ((plan.getType() != null) && (plan.getType() != Plan.Type.UNDEFINED))
-			out.write(" type=\"" + plan.getType() + "\"");
+		if (plan instanceof Plan){
+			Plan p = (Plan)plan;
+			if ((p.getType() != null) && (p.getType() != Plan.Type.UNDEFINED))
+				out.write(" type=\"" + p.getType() + "\"");
+		}
 		out.write(">\n");
 	}
 
@@ -295,20 +305,23 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <act ... > ... </act>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startAct(final Activity act, final BufferedWriter out) throws IOException {
+	public void startAct(final BasicActivity act, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<act");
 		out.write(" type=\"" + act.getType() + "\"");
-		if (act.getLink() != null)
-			out.write(" link=\"" + act.getLink().getId() + "\"");
-		if (act.getFacility() != null)
-			out.write(" facility=\"" + act.getFacility().getId() + "\"");
+		if (act.getLinkId() != null)
+			out.write(" link=\"" + act.getLinkId() + "\"");
+		if (act.getFacilityId() != null)
+			out.write(" facility=\"" + act.getFacilityId() + "\"");
 		if (act.getCoord() != null) {
 			out.write(" x=\"" + act.getCoord().getX() + "\" y=\"" + act.getCoord().getY() + "\"");
 		}
 		if (act.getStartTime() != Time.UNDEFINED_TIME)
 			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
-		if (act.getDuration() != Time.UNDEFINED_TIME)
-			out.write(" dur=\"" + Time.writeTime(act.getDuration()) + "\"");
+		if (act instanceof Activity){
+			Activity a = (Activity)act;
+			if (a.getDuration() != Time.UNDEFINED_TIME)
+				out.write(" dur=\"" + Time.writeTime(a.getDuration()) + "\"");
+		}
 		if (act.getEndTime() != Time.UNDEFINED_TIME)
 			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
 		out.write(" />\n");
@@ -321,15 +334,18 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <leg ... > ... </leg>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
+	public void startLeg(final BasicLeg leg, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<leg");
 		out.write(" mode=\"" + leg.getMode() + "\"");
 		if (leg.getDepartureTime() != Time.UNDEFINED_TIME)
 			out.write(" dep_time=\"" + Time.writeTime(leg.getDepartureTime()) + "\"");
 		if (leg.getTravelTime() != Time.UNDEFINED_TIME)
 			out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime()) + "\"");
-		if (leg.getArrivalTime() != Time.UNDEFINED_TIME)
-			out.write(" arr_time=\"" + Time.writeTime(leg.getArrivalTime()) + "\"");
+		if (leg instanceof Leg){
+			Leg l = (Leg)leg;
+			if (l.getArrivalTime() != Time.UNDEFINED_TIME)
+				out.write(" arr_time=\"" + Time.writeTime(l.getArrivalTime()) + "\"");
+		}
 		out.write(">\n");
 	}
 

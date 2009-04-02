@@ -35,8 +35,8 @@ import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
@@ -330,13 +330,13 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		Link link = null;
 		Coord coord = null;
 		if (atts.getValue("link") != null) {
-			link = this.network.getLink(atts.getValue("link"));
+			link = this.network.getLink(new IdImpl(atts.getValue("link")));
 			this.curract = this.currplan.createAct(atts.getValue("type"), link);
-			if (atts.getValue("x") != null && atts.getValue("y") != null) {
+			if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 				coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
 				this.curract.setCoord(coord);
 			}
-		} else if (atts.getValue("x") != null && atts.getValue("y") != null) {
+		} else if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 			coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
 			this.curract = this.currplan.createAct(atts.getValue("type"), coord);
 		} else {
