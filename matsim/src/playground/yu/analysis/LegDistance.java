@@ -50,6 +50,8 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import playground.yu.utils.TollTools;
 
 /**
+ * make time variation curve of average <code>Leg</code> distance and their sum
+ * 
  * @author ychen
  * 
  */

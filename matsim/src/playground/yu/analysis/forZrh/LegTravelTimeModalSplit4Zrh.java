@@ -22,9 +22,14 @@ import playground.yu.utils.io.SimpleWriter;
  */
 public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 
+	private double[] throughTravelTimes;
+	private int[] throughArrCount;
+
 	public LegTravelTimeModalSplit4Zrh(int binSize, int nofBins,
 			Population plans) {
 		super(binSize, nofBins, plans);
+		throughTravelTimes = new double[nofBins + 1];
+		throughArrCount = new int[nofBins + 1];
 	}
 
 	public LegTravelTimeModalSplit4Zrh(int binSize, Population plans) {
@@ -62,8 +67,8 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 					wlkArrCount[binIdx]++;
 				}
 			} else {
-				this.otherTravelTimes[binIdx] += travelTime;
-				this.otherArrCount[binIdx]++;
+				this.throughTravelTimes[binIdx] += travelTime;
+				this.throughArrCount[binIdx]++;
 			}
 		}
 	}
@@ -76,40 +81,24 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 						+ "\tcar_traveltimes [s]\tcar_n._arrivals\tcar_avg. traveltimes [s]"
 						+ "\tpt_traveltimes [s]\tpt_n._arrivals\tpt_avg. traveltimes [s]"
 						+ "\twalk_traveltimes [s]\twalk_n._arrivals\twalk_avg. traveltimes [s]"
-						+ "\tother_traveltimes [s]\tother_n._arrivals\tother_avg. traveltimes [s]");
+						+ "\tthrough_traveltimes [s]\tthrough_n._arrivals\tthrough_avg. traveltimes [s]");
 		for (int i = 0; i < this.travelTimes.length; i++)
-			sw
-					.writeln(Time.writeTime(i * this.binSize)
-							+ "\t"
-							+ i * this.binSize
-							+ "\t"
-							+ this.travelTimes[i]
-							+ "\t"
-							+ this.arrCount[i]
-							+ "\t"
-							+ this.travelTimes[i] / (double) this.arrCount[i]
-							+ "\t"
-							+ this.carTravelTimes[i]
-							+ "\t"
-							+ this.carArrCount[i]
-							+ "\t"
-							+ this.carTravelTimes[i]
-									/ (double) this.carArrCount[i]
-							+ "\t"
-							+ this.ptTravelTimes[i]
-							+ "\t"
-							+ this.ptArrCount[i]
-							+ "\t"
-							+ this.ptTravelTimes[i]
-									/ (double) this.ptArrCount[i]
-							+ this.wlkTravelTimes[i] + "\t"
-							+ this.wlkArrCount[i] + "\t"
-							+ this.wlkTravelTimes[i]
-							/ (double) this.wlkArrCount[i]
-							+ this.otherTravelTimes[i] + "\t"
-							+ this.otherArrCount[i] + "\t"
-							+ this.otherTravelTimes[i]
-							/ (double) this.otherArrCount[i]);
+			sw.writeln(Time.writeTime(i * this.binSize) + "\t"
+					+ i * this.binSize + "\t" + this.travelTimes[i] + "\t"
+					+ this.arrCount[i] + "\t"
+					+ this.travelTimes[i] / (double) this.arrCount[i] + "\t"
+					+ this.carTravelTimes[i] + "\t" + this.carArrCount[i]
+					+ "\t"
+					+ this.carTravelTimes[i] / (double) this.carArrCount[i]
+					+ "\t" + this.ptTravelTimes[i] + "\t" + this.ptArrCount[i]
+					+ "\t"
+					+ this.ptTravelTimes[i] / (double) this.ptArrCount[i]
+					+ this.wlkTravelTimes[i] + "\t" + this.wlkArrCount[i]
+					+ "\t" + this.wlkTravelTimes[i]
+					/ (double) this.wlkArrCount[i] + this.throughTravelTimes[i]
+					+ "\t" + this.throughArrCount[i] + "\t"
+					+ this.throughTravelTimes[i]
+					/ (double) this.throughArrCount[i]);
 		sw.write("----------------------------------------\n");
 		double ttSum = 0.0, carTtSum = 0.0, ptTtSum = 0.0, wlkTtSum = 0.0, otherTtSum = 0.0;
 		int nTrips = 0, nCarTrips = 0, nPtTrips = 0, nWlkTrips = 0, nOtherTrips = 0;
@@ -118,13 +107,13 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 			carTtSum += this.carTravelTimes[i];
 			ptTtSum += this.ptTravelTimes[i];
 			wlkTtSum += this.wlkTravelTimes[i];
-			otherTtSum += otherTravelTimes[i];
+			otherTtSum += throughTravelTimes[i];
 
 			nTrips += this.arrCount[i];
 			nCarTrips += this.carArrCount[i];
 			nPtTrips += this.ptArrCount[i];
 			nWlkTrips += wlkArrCount[i];
-			nOtherTrips += otherArrCount[i];
+			nOtherTrips += throughArrCount[i];
 		}
 		sw
 				.writeln("the sum of all the traveltimes [s]: "

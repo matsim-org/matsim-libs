@@ -10,6 +10,9 @@ import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.core.api.population.Leg;
 
 /**
+ * judge, which transport mode was taken. This class can only be used with
+ * plansfile, in that an agent only can take one transport mode in a day.
+ * 
  * @author yu
  * 
  */
@@ -32,14 +35,14 @@ public class PlanModeJudger {
 		for (Iterator li = plan.getPlanElements().iterator(); li.hasNext();) {
 			Object o = li.next();
 			if (o instanceof Leg) {
-				Leg l = (Leg)o;
+				Leg l = (Leg) o;
 				BasicLeg.Mode tmpMode2 = l.getMode();
 				if (tmpMode != null) {
 					if (!tmpMode.equals(tmpMode2)) {
 						return BasicLeg.Mode.undefined;
 					}
-				}
-				tmpMode = tmpMode2;
+				} else
+					tmpMode = tmpMode2;
 			}
 		}
 		return tmpMode;

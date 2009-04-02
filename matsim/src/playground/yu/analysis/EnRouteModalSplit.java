@@ -24,8 +24,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import javax.xml.parsers.ParserConfigurationException;
-
+import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.events.AgentArrivalEvent;
@@ -45,10 +44,9 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.xml.sax.SAXException;
 
+import playground.yu.utils.CollectionSum;
 import playground.yu.utils.TollTools;
 
 /**
@@ -56,6 +54,10 @@ import playground.yu.utils.TollTools;
  * 
  *         Counts the number of vehicles departed, arrived or got stuck per time
  *         bin based on events.
+ * @author yu This class can only be used with plansfile, in that all
+ *         <code>Leg</code>s in a <code>Plan</code> muss be equiped with the
+ *         same {@code Mode}
+ *         {@link org.matsim.api.basic.v01.population.BasicLeg.Mode} in a day.
  */
 public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler, AgentStuckEventHandler {
@@ -66,8 +68,9 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 	private final double[] carDep, carArr, carStuck, carEnRoute;
 	private final double[] ptDep, ptArr, ptEnRoute;
 	private final double[] wlkDep, wlkArr, wlkEnRoute;
-	private double[] otherDep = null, otherArr = null, otherStuck = null,
-			otherEnRoute = null;
+	private final double[] bikeDep, bikeArr, bikeEnRoute;
+	private double[] othersDep = null, othersArr = null, othersStuck = null,
+			othersEnRoute = null;
 
 	private final Population plans;
 	private RoadPricingScheme toll = null;
@@ -105,15 +108,15 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		wlkArr = new double[nofBins + 1];
 		wlkDep = new double[nofBins + 1];
 		wlkEnRoute = new double[nofBins + 1];
-
-		if (this.scenario.equals("Zurich")
-				|| this.scenario.equals("Kanton_Zurich")) {
-			// through traffic
-			this.otherDep = new double[nofBins + 1];
-			this.otherArr = new double[nofBins + 1];
-			this.otherEnRoute = new double[nofBins + 1];
-			this.otherStuck = new double[nofBins + 1];
-		}
+		// bike
+		bikeArr = new double[nofBins + 1];
+		bikeDep = new double[nofBins + 1];
+		bikeEnRoute = new double[nofBins + 1];
+		// others
+		this.othersDep = new double[nofBins + 1];
+		this.othersArr = new double[nofBins + 1];
+		this.othersEnRoute = new double[nofBins + 1];
+		this.othersStuck = new double[nofBins + 1];
 		reset(0);
 		this.plans = plans;
 	}
@@ -144,22 +147,22 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 
 	public void handleEvent(final AgentDepartureEvent event) {
 		internalHandleEvent(event, this.dep, this.carDep, this.ptDep, wlkDep,
-				this.otherDep);
+				bikeDep, this.othersDep);
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
 		internalHandleEvent(event, this.arr, this.carArr, this.ptArr, wlkArr,
-				this.otherArr);
+				bikeArr, this.othersArr);
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		internalHandleEvent(event, this.stuck, this.carStuck, null, null,
-				this.otherStuck);
+		internalHandleEvent(event, this.stuck, this.carStuck, null, null, null,
+				this.othersStuck);
 	}
 
 	private void internalHandleEvent(AgentEvent ae, double[] allCount,
 			double[] carCount, double[] ptCount, double[] wlkCount,
-			double[] otherCount) {
+			double[] bikeCount, double[] othersCount) {
 		int binIdx = getBinIndex(ae.getTime());
 		Plan selectedPlan = plans.getPersons().get(ae.getPersonId())
 				.getSelectedPlan();
@@ -167,43 +170,41 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 			if (TollTools.isInRange(selectedPlan.getFirstActivity().getLink(),
 					toll)) {
 				internalCompute(binIdx, ae, selectedPlan, allCount, carCount,
-						ptCount, wlkCount, otherCount);
+						ptCount, wlkCount, bikeCount, othersCount);
 			}
 		} else {
 			internalCompute(binIdx, ae, selectedPlan, allCount, carCount,
-					ptCount, wlkCount, otherCount);
+					ptCount, wlkCount, bikeCount, othersCount);
 		}
 
 	}
 
 	protected void internalCompute(int binIdx, AgentEvent ae, Plan plan,
 			double[] allCount, double[] carCount, double[] ptCount,
-			double[] wlkCount, double[] otherCount) {
+			double[] wlkCount, double[] bikeCount, double[] othersCount) {
 		allCount[binIdx]++;
-		// if (otherCount != null)
-		// // if (Integer.parseInt(ae.getPersonId().toString()) > 1000000000)
-		// // otherCount[binIdx]++;
-		// // else
-		// {
-		// if (PlanModeJudger.useCar(plan))
-		// carCount[binIdx]++;
-		// else if (PlanModeJudger.usePt(plan)) {
-		// if (ptCount != null)
-		// ptCount[binIdx]++;
-		// } else if (PlanModeJudger.useWalk(plan))
-		// if (wlkCount != null)
-		// wlkCount[binIdx]++;
-		// } else
-		// {
-		if (PlanModeJudger.useCar(plan))
+		Mode mode = PlanModeJudger.getMode(plan);
+		switch (mode) {
+		case car:
 			carCount[binIdx]++;
-		else if (PlanModeJudger.usePt(plan)) {
+			break;
+		case pt:
 			if (ptCount != null)
 				ptCount[binIdx]++;
-		} else if (PlanModeJudger.useWalk(plan))
+			break;
+		case walk:
 			if (wlkCount != null)
 				wlkCount[binIdx]++;
-		// }
+			break;
+		case bike:
+			if (bikeCount != null)
+				bikeCount[binIdx]++;
+			break;
+		default:
+			if (othersCount != null)
+				othersCount[binIdx]++;
+			break;
+		}
 	}
 
 	/* output methods */
@@ -234,9 +235,10 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		this.carEnRoute[0] = this.carDep[0] - this.carArr[0] - this.carStuck[0];
 		this.ptEnRoute[0] = this.ptDep[0] - this.ptArr[0];
 		wlkEnRoute[0] = wlkDep[0] - wlkArr[0];
-		if (otherEnRoute != null)
-			this.otherEnRoute[0] = this.otherDep[0] - this.otherArr[0]
-					- this.otherStuck[0];
+		bikeEnRoute[0] = bikeDep[0] - bikeArr[0];
+		if (othersEnRoute != null)
+			this.othersEnRoute[0] = this.othersDep[0] - this.othersArr[0]
+					- this.othersStuck[0];
 		// *onRoute[i]
 		for (int i = 1; i < this.dep.length; i++) {
 			this.enRoute[i] = this.enRoute[i - 1] + this.dep[i] - this.arr[i]
@@ -247,10 +249,12 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 					- this.ptArr[i];
 			this.wlkEnRoute[i] = this.wlkEnRoute[i - 1] + this.wlkDep[i]
 					- this.wlkArr[i];
-			if (otherEnRoute != null)
-				this.otherEnRoute[i] = this.otherEnRoute[i - 1]
-						+ this.otherDep[i] - this.otherArr[i]
-						- this.otherStuck[i];
+			this.bikeEnRoute[i] = this.bikeEnRoute[i - 1] + this.bikeDep[i]
+					- this.bikeArr[i];
+			if (othersEnRoute != null)
+				this.othersEnRoute[i] = this.othersEnRoute[i - 1]
+						+ this.othersDep[i] - this.othersArr[i]
+						- this.othersStuck[i];
 		}
 	}
 
@@ -269,48 +273,59 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 							+ "carDepartures\tcarArrivals\tcarStuck\tcarOnRoute\t"
 							+ "ptDepartures\tptArrivals\tptStuck\tptOnRoute\t"
 							+ "walkDepartures\twalkArrivals\twalkStuck\twalkOnRoute\t"
+							+ "bikeDepartures\tbikeArrivals\tbikeStuck\tbikeOnRoute\t"
 							+ "otherDepartures\totherArrivals\totherStuck\totherOnRoute\n");
 			for (int i = 0; i < this.dep.length; i++) {
-				bw.write(Time.writeTime(i * this.binSize)
-						+ "\t"
-						+ i * this.binSize
-						+ "\t"
-						+ this.dep[i]
-						+ "\t"
-						+ this.arr[i]
-						+ "\t"
-						+ this.stuck[i]
-						+ "\t"
-						+ this.enRoute[i]
-						+ "\t"
-						+ this.carDep[i]
-						+ "\t"
-						+ this.carArr[i]
-						+ "\t"
-						+ this.carStuck[i]
-						+ "\t"
-						+ this.carEnRoute[i]
-						+ "\t"
-						+ this.ptDep[i]
-						+ "\t"
-						+ this.ptArr[i]
-						+ "\t"
-						+ 0
-						+ "\t"
-						+ this.ptEnRoute[i]
-						+ "\t"
-						+ this.wlkDep[i]
-						+ "\t"
-						+ this.wlkArr[i]
-						+ "\t"
-						+ 0
-						+ "\t"
-						+ this.wlkEnRoute[i]
-						+ "\t"
-						+ ((otherEnRoute != null) ? (this.otherDep[i] + "\t"
-								+ this.otherArr[i] + "\t" + this.otherStuck[i]
-								+ "\t" + this.otherEnRoute[i]) : (0 + "\t" + 0
-								+ "\t" + 0 + "\t" + 0)) + "\n");
+				bw
+						.write(Time.writeTime(i * this.binSize)
+								+ "\t"
+								+ i * this.binSize
+								+ "\t"
+								+ this.dep[i]
+								+ "\t"
+								+ this.arr[i]
+								+ "\t"
+								+ this.stuck[i]
+								+ "\t"
+								+ this.enRoute[i]
+								+ "\t"
+								+ this.carDep[i]
+								+ "\t"
+								+ this.carArr[i]
+								+ "\t"
+								+ this.carStuck[i]
+								+ "\t"
+								+ this.carEnRoute[i]
+								+ "\t"
+								+ this.ptDep[i]
+								+ "\t"
+								+ this.ptArr[i]
+								+ "\t"
+								+ 0
+								+ "\t"
+								+ this.ptEnRoute[i]
+								+ "\t"
+								+ this.wlkDep[i]
+								+ "\t"
+								+ this.wlkArr[i]
+								+ "\t"
+								+ 0
+								+ "\t"
+								+ this.wlkEnRoute[i]
+								+ "\t"
+								+ this.bikeDep[i]
+								+ "\t"
+								+ this.bikeArr[i]
+								+ "\t"
+								+ 0
+								+ "\t"
+								+ this.bikeEnRoute[i]
+								+ "\t"
+								+ ((othersEnRoute != null) ? (this.othersDep[i]
+										+ "\t" + this.othersArr[i] + "\t"
+										+ this.othersStuck[i] + "\t" + this.othersEnRoute[i])
+										: (0 + "\t" + 0 + "\t" + 0 + "\t" + 0))
+								+ "\n");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -346,10 +361,14 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		XYLineChart enRouteChart = new XYLineChart("Leg Histogramm - En Route",
 				"time", "agents en route from " + scenario);
 		enRouteChart.addSeries("drivers", xs, carEnRoute);
-		enRouteChart.addSeries("public transit users", xs, ptEnRoute);
-		enRouteChart.addSeries("walkers", xs, wlkEnRoute);
-		if (otherEnRoute != null)
-			enRouteChart.addSeries("others", xs, otherEnRoute);
+		if (CollectionSum.getSum(ptEnRoute) > 0)
+			enRouteChart.addSeries("public transit users", xs, ptEnRoute);
+		if (CollectionSum.getSum(wlkEnRoute) > 0)
+			enRouteChart.addSeries("walkers", xs, wlkEnRoute);
+		if (CollectionSum.getSum(bikeEnRoute) > 0)
+			enRouteChart.addSeries("cyclist", xs, bikeEnRoute);
+		if (CollectionSum.getSum(othersEnRoute) > 0)
+			enRouteChart.addSeries("others", xs, othersEnRoute);
 		enRouteChart.addSeries("all agents", xs, enRoute);
 		enRouteChart.saveAsPng(filename + "enRoute.png", 1024, 768);
 		// departures chart
@@ -357,31 +376,40 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 				"Leg Histogramm - Departures", "time", "departing agents from "
 						+ scenario);
 		departChart.addSeries("drivers", xs, carDep);
-		departChart.addSeries("public transit users", xs, ptDep);
-		departChart.addSeries("walkers", xs, wlkDep);
-		if (otherDep != null)
-			departChart.addSeries("others", xs, otherDep);
+		if (CollectionSum.getSum(ptDep) > 0)
+			departChart.addSeries("public transit users", xs, ptDep);
+		if (CollectionSum.getSum(wlkDep) > 0)
+			departChart.addSeries("walkers", xs, wlkDep);
+		if (CollectionSum.getSum(bikeDep) > 0)
+			departChart.addSeries("cyclist", xs, bikeDep);
+		if (CollectionSum.getSum(othersDep) > 0)
+			departChart.addSeries("others", xs, othersDep);
 		departChart.addSeries("all agents", xs, dep);
 		departChart.saveAsPng(filename + "departures.png", 1024, 768);
 		// arrivals chart
 		XYLineChart arrChart = new XYLineChart("Leg Histogramm - Arrivals",
 				"time", "arriving agents from " + scenario);
 		arrChart.addSeries("drivers", xs, carArr);
-		arrChart.addSeries("public transit users", xs, ptArr);
-		arrChart.addSeries("walkers", xs, wlkArr);
-		if (otherArr != null)
-			arrChart.addSeries("others", xs, otherArr);
+		if (CollectionSum.getSum(ptArr) > 0)
+			arrChart.addSeries("public transit users", xs, ptArr);
+		if (CollectionSum.getSum(wlkArr) > 0)
+			arrChart.addSeries("walkers", xs, wlkArr);
+		if (CollectionSum.getSum(bikeArr) > 0)
+			arrChart.addSeries("cyclist", xs, bikeArr);
+		if (CollectionSum.getSum(othersArr) > 0)
+			arrChart.addSeries("others", xs, othersArr);
 		arrChart.addSeries("all agents", xs, arr);
 		arrChart.saveAsPng(filename + "arrivals.png", 1024, 768);
 	}
 
 	public static void main(final String[] args) {
-		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		final String eventsFilename = "../runs_SVN/run684/it.1000/1000.events.txt.gz";
-		final String plansFilename = "../runs_SVN/run684/it.1000/1000.plans.xml.gz";
+		final String netFilename = "../berlin data/osm/bb_osm_wip_cl.xml.gz";
+		// String netFilename = "../matsim/examples/equil/network.xml";
+		final String eventsFilename = "../runs-svn/run756/it.1000/1000.events.txt.gz";
+		final String plansFilename = "../runs-svn/run756/it.1000/1000.plans.xml.gz";
 		String outputFilename = "../matsimTests/analysis/enRoute.txt";
 		String chartFilename = "../matsimTests/analysis/";
-		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
+		// String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
 
 		Gbl.createConfig(null);
 
@@ -391,20 +419,20 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		Population population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
-		try {
-			tollReader.parse(tollFilename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// RoadPricingReaderXMLv1 tollReader = new
+		// RoadPricingReaderXMLv1(network);
+		// try {
+		// tollReader.parse(tollFilename);
+		// } catch (SAXException e) {
+		// e.printStackTrace();
+		// } catch (ParserConfigurationException e) {
+		// e.printStackTrace();
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
 		Events events = new Events();
-		EnRouteModalSplit orms = new EnRouteModalSplit("Kanton_Zurich",
-				population
-		// ,tollReader.getScheme()
+		EnRouteModalSplit orms = new EnRouteModalSplit("normal", population
+		// , tollReader.getScheme()
 		);
 		events.addHandler(orms);
 		new MatsimEventsReader(events).readFile(eventsFilename);

@@ -28,6 +28,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
 import playground.yu.analysis.forZrh.Analysis4Zrh.ActType;
+import playground.yu.utils.CollectionSum;
 import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.PieChart;
 import playground.yu.utils.io.SimpleWriter;
@@ -330,7 +331,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		double avgOthersDist = this.othersDist / (double) this.count;
 
 		SimpleWriter sw = new SimpleWriter(outputFilename + "dailyDistance.txt");
-		sw.writeln("\tDaily Distance\tn_agents\twith " + count + " persons");
+		sw.writeln("\tDaily Distance\tn_agents\t" + count);
 		sw.writeln("mode\tavg. [km]\tfraction [%]\tsum [km]");
 
 		sw.writeln("car\t" + avgCarDist + "\t" + this.carDist / sum * 100.0
@@ -397,18 +398,31 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		barChart.addSeries("car", new double[] { this.carWorkDist,
 				this.carEducDist, this.carShopDist, this.carLeisDist,
 				this.carHomeDist, this.carOtherDist });
-		barChart.addSeries("pt", new double[] { this.ptWorkDist,
+
+		double[] ptDestination = new double[] { this.ptWorkDist,
 				this.ptEducDist, this.ptShopDist, this.ptLeisDist,
-				this.ptHomeDist, this.ptOtherDist });
-		barChart.addSeries("walk", new double[] { this.wlkWorkDist,
+				this.ptHomeDist, this.ptOtherDist };
+		if (CollectionSum.getSum(ptDestination) > 0)
+			barChart.addSeries("pt", ptDestination);
+
+		double[] wlkDestination = new double[] { this.wlkWorkDist,
 				this.wlkEducDist, this.wlkShopDist, this.wlkLeisDist,
-				this.wlkHomeDist, this.wlkOtherDist });
-		barChart.addSeries("bike", new double[] { this.bikeWorkDist,
+				this.wlkHomeDist, this.wlkOtherDist };
+		if (CollectionSum.getSum(wlkDestination) > 0)
+			barChart.addSeries("walk", wlkDestination);
+
+		double[] bikeDestination = new double[] { this.bikeWorkDist,
 				this.bikeEducDist, this.bikeShopDist, this.bikeLeisDist,
-				this.bikeHomeDist, this.bikeOtherDist });
-		barChart.addSeries("others", new double[] { this.othersWorkDist,
+				this.bikeHomeDist, this.bikeOtherDist };
+		if (CollectionSum.getSum(bikeDestination) > 0)
+			barChart.addSeries("bike", bikeDestination);
+
+		double[] othersDestination = new double[] { this.othersWorkDist,
 				this.othersEducDist, this.othersShopDist, this.othersLeisDist,
-				this.othersHomeDist, this.othersOtherDist });
+				this.othersHomeDist, this.othersOtherDist };
+		if (CollectionSum.getSum(othersDestination) > 0)
+			barChart.addSeries("others", othersDestination);
+
 		barChart.addMatsimLogo();
 		barChart.saveAsPng(outputFilename
 				+ "dailyDistanceTravelDistination.png", 1200, 900);
@@ -439,12 +453,17 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				"Daily Distance in km",
 				"fraction of persons with daily distance bigger than x... in %");
 		chart.addSeries("car", x, yCar);
-		chart.addSeries("pt", x, yPt);
-		chart.addSeries("walk", x, yWlk);
-		chart.addSeries("bike", x, yBike);
-		chart.addSeries("other", x, yOthers);
+		if (CollectionSum.getSum(yPt) > 0)
+			chart.addSeries("pt", x, yPt);
+		if (CollectionSum.getSum(yWlk) > 0)
+			chart.addSeries("walk", x, yWlk);
+		if (CollectionSum.getSum(yBike) > 0)
+			chart.addSeries("bike", x, yBike);
+		if (CollectionSum.getSum(yOthers) > 0)
+			chart.addSeries("other", x, yOthers);
 		chart.addSeries("total", x, yTotal);
-		chart.saveAsPng(outputFilename + "dailyDistance.png", 800, 600);
+		chart.saveAsPng(outputFilename + "dailyDistanceDistribution.png", 800,
+				600);
 
 		sw
 				.writeln("-------------------------------------------------------------");
@@ -452,8 +471,6 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		sw
 				.writeln("leg Distance [km]\tcar legs no.\tpt legs no.\twalk legs no.\tbike legs no.\tothers legs no."
 						+ "\tcar fraction [%]\tpt fraction [%]\twalk fraction [%]\tbike fraction [%]\tothers fraction [%]");
-
-		// TODO for(i<100), write...
 
 		double xs[] = new double[101];
 		double yCarFracs[] = new double[101];
@@ -476,14 +493,24 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 					* 100.0;
 			yOthersFracs[i] = othersLegDistanceCounts[i] / sumLegDistanceCounts
 					* 100.0;
+			sw.writeln(i + "+\t" + carLegDistanceCounts[i] + "\t"
+					+ ptLegDistanceCounts[i] + "\t" + wlkLegDistanceCounts[i]
+					+ "\t" + bikeLegDistanceCounts[i] + "\t"
+					+ othersLegDistanceCounts[i] + "\t" + yCarFracs + "\t"
+					+ yPtFracs + "\t" + yWlkFracs + "\t" + yBikeFracs + "\t"
+					+ yOthersFracs);
 		}
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
 				"leg Distance [km]", "mode fraction [%]");
 		chart2.addSeries("car", xs, yCarFracs);
-		chart2.addSeries("pt", xs, yPtFracs);
-		chart2.addSeries("walk", xs, yWlkFracs);
-		chart2.addSeries("bike", xs, yBikeFracs);
-		chart2.addSeries("others", xs, yOthersFracs);
+		if (CollectionSum.getSum(yPtFracs) > 0)
+			chart2.addSeries("pt", xs, yPtFracs);
+		if (CollectionSum.getSum(yWlkFracs) > 0)
+			chart2.addSeries("walk", xs, yWlkFracs);
+		if (CollectionSum.getSum(yBikeFracs) > 0)
+			chart2.addSeries("bike", xs, yBikeFracs);
+		if (CollectionSum.getSum(yOthersFracs) > 0)
+			chart2.addSeries("others", xs, yOthersFracs);
 		chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png", 800,
 				600);
 		sw.close();

@@ -19,8 +19,8 @@ import playground.yu.analysis.PlanModeJudger;
  * 
  */
 public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
-	private double[] otherDep = null, otherArr = null, otherStuck = null,
-			otherEnRoute = null;
+	private double[] throughDep = null, throughArr = null, throughStuck = null,
+			throughEnRoute = null;
 
 	/**
 	 * @param scenario
@@ -31,6 +31,13 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 	public EnRouteModalSplit4Zrh(String scenario, int binSize, int nofBins,
 			Population plans) {
 		super(scenario, binSize, nofBins, plans);
+		if (scenario.equals("Zurich") || scenario.equals("Kanton_Zurich")) {
+			// through traffic
+			this.throughDep = new double[nofBins + 1];
+			this.throughArr = new double[nofBins + 1];
+			this.throughEnRoute = new double[nofBins + 1];
+			this.throughStuck = new double[nofBins + 1];
+		}
 	}
 
 	/**

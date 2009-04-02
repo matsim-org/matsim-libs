@@ -28,6 +28,7 @@ import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -48,31 +49,33 @@ import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
+import playground.yu.utils.CollectionSum;
 import playground.yu.utils.TollTools;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
+ * make time variation curve of average {@code Leg} travel time and their sum.
+ * This class can only be used with plansfile, in that all <code>Leg</code>s in
+ * a <code>Plan</code> muss be equiped with the same {@code Mode}
+ * {@link org.matsim.api.basic.v01.population.BasicLeg.Mode} in a day.
+ * 
  * @author ychen
  * 
  */
 public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
-	// private final NetworkLayer network;
 
 	protected final Population plans;
+
 	private RoadPricingScheme toll = null;
 
 	protected final int binSize;
 
-	protected final double[] travelTimes;
-	protected final double[] carTravelTimes;
-	protected final double[] ptTravelTimes;
-	protected final double[] wlkTravelTimes;
+	protected final double[] travelTimes, carTravelTimes, ptTravelTimes,
+			wlkTravelTimes, bikeTravelTimes, othersTravelTimes;
 
-	protected final int[] arrCount;
-	protected final int[] carArrCount;
-	protected final int[] ptArrCount;
-	protected final int[] wlkArrCount;
+	protected final int[] arrCount, carArrCount, ptArrCount, wlkArrCount,
+			bikeArrCount, othersArrCount;
 
 	/**
 	 * @param arg0
@@ -81,8 +84,6 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 	 *            - Double departure time
 	 */
 	protected final HashMap<String, Double> tmpDptTimes = new HashMap<String, Double>();
-	protected double[] otherTravelTimes;
-	protected int[] otherArrCount;
 
 	/**
 	 *
@@ -98,12 +99,14 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		this.carTravelTimes = new double[nofBins + 1];
 		this.ptTravelTimes = new double[nofBins + 1];
 		this.wlkTravelTimes = new double[nofBins + 1];
-		otherTravelTimes = new double[nofBins + 1];
+		bikeTravelTimes = new double[nofBins + 1];
+		othersTravelTimes = new double[nofBins + 1];
 
 		this.carArrCount = new int[nofBins + 1];
 		this.ptArrCount = new int[nofBins + 1];
 		this.wlkArrCount = new int[nofBins + 1];
-		otherArrCount = new int[nofBins + 1];
+		bikeArrCount = new int[nofBins + 1];
+		othersArrCount = new int[nofBins + 1];
 	}
 
 	public LegTravelTimeModalSplit(final int binSize, final Population plans) {
@@ -156,18 +159,28 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 
 			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
 					.getSelectedPlan();
-			if (PlanModeJudger.useCar(selectedplan)) {
+			Mode mode = PlanModeJudger.getMode(selectedplan);
+			switch (mode) {
+			case car:
 				this.carTravelTimes[binIdx] += travelTime;
 				this.carArrCount[binIdx]++;
-			} else if (PlanModeJudger.usePt(selectedplan)) {
+				break;
+			case pt:
 				this.ptTravelTimes[binIdx] += travelTime;
 				this.ptArrCount[binIdx]++;
-			} else if (PlanModeJudger.useWalk(selectedplan)) {
+				break;
+			case walk:
 				wlkTravelTimes[binIdx] += travelTime;
 				wlkArrCount[binIdx]++;
-			} else {
-				this.otherTravelTimes[binIdx] += travelTime;
-				this.otherArrCount[binIdx]++;
+				break;
+			case bike:
+				bikeTravelTimes[binIdx] += travelTime;
+				bikeArrCount[binIdx]++;
+				break;
+			default:
+				this.othersTravelTimes[binIdx] += travelTime;
+				this.othersArrCount[binIdx]++;
+				break;
 			}
 		}
 	}
@@ -187,86 +200,82 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 						+ "\tcar_traveltimes [s]\tcar_n._arrivals\tcar_avg. traveltimes [s]"
 						+ "\tpt_traveltimes [s]\tpt_n._arrivals\tpt_avg. traveltimes [s]"
 						+ "\twalk_traveltimes [s]\twalk_n._arrivals\twalk_avg. traveltimes [s]"
-						+ "\tother_traveltimes [s]\tother_n._arrivals\tother_avg. traveltimes [s]");
+						+ "\tbike_traveltimes [s]\tbike_n._arrivals\tbike_avg. traveltimes [s]"
+						+ "\tothers_traveltimes [s]\tothers_n._arrivals\tothers_avg. traveltimes [s]");
 		for (int i = 0; i < this.travelTimes.length; i++)
-			sw
-					.writeln(Time.writeTime(i * this.binSize)
-							+ "\t"
-							+ i * this.binSize
-							+ "\t"
-							+ this.travelTimes[i]
-							+ "\t"
-							+ this.arrCount[i]
-							+ "\t"
-							+ this.travelTimes[i] / (double) this.arrCount[i]
-							+ "\t"
-							+ this.carTravelTimes[i]
-							+ "\t"
-							+ this.carArrCount[i]
-							+ "\t"
-							+ this.carTravelTimes[i]
-									/ (double) this.carArrCount[i]
-							+ "\t"
-							+ this.ptTravelTimes[i]
-							+ "\t"
-							+ this.ptArrCount[i]
-							+ "\t"
-							+ this.ptTravelTimes[i]
-									/ (double) this.ptArrCount[i]
-							+ this.wlkTravelTimes[i] + "\t"
-							+ this.wlkArrCount[i] + "\t"
-							+ this.wlkTravelTimes[i]
-							/ (double) this.wlkArrCount[i]
-							+ this.otherTravelTimes[i] + "\t"
-							+ this.otherArrCount[i] + "\t"
-							+ this.otherTravelTimes[i]
-							/ (double) this.otherArrCount[i]);
+			sw.writeln(Time.writeTime(i * this.binSize) + "\t"
+					+ i * this.binSize + "\t" + this.travelTimes[i] + "\t"
+					+ this.arrCount[i] + "\t"
+					+ this.travelTimes[i] / (double) this.arrCount[i] + "\t"
+					+ this.carTravelTimes[i] + "\t" + this.carArrCount[i]
+					+ "\t"
+					+ this.carTravelTimes[i] / (double) this.carArrCount[i]
+					+ "\t" + this.ptTravelTimes[i] + "\t" + this.ptArrCount[i]
+					+ "\t"
+					+ this.ptTravelTimes[i] / (double) this.ptArrCount[i]
+					+ "\t" + this.wlkTravelTimes[i] + "\t"
+					+ this.wlkArrCount[i] + "\t" + this.wlkTravelTimes[i]
+					/ (double) this.wlkArrCount[i] + "\t"
+					+ this.bikeTravelTimes[i] + "\t" + this.bikeArrCount[i]
+					+ "\t" + this.bikeTravelTimes[i]
+					/ (double) this.bikeArrCount[i] + "\t"
+					+ this.othersTravelTimes[i] + "\t" + this.othersArrCount[i]
+					+ "\t" + this.othersTravelTimes[i]
+					/ (double) this.othersArrCount[i]);
+
 		sw.write("----------------------------------------\n");
-		double ttSum = 0.0, carTtSum = 0.0, ptTtSum = 0.0, wlkTtSum = 0.0, otherTtSum = 0.0;
-		int nTrips = 0, nCarTrips = 0, nPtTrips = 0, nWlkTrips = 0, nOtherTrips = 0;
+		double ttSum = 0.0, carTtSum = 0.0, ptTtSum = 0.0, wlkTtSum = 0.0, bikeTtSum = 0.0, othersTtSum = 0.0;
+		int nTrips = 0, nCarTrips = 0, nPtTrips = 0, nWlkTrips = 0, nBikeTrips = 0, nOtherTrips = 0;
+		ttSum = CollectionSum.getSum(travelTimes);
+		carTtSum = CollectionSum.getSum(carTravelTimes);
 		for (int i = 0; i < this.travelTimes.length; i++) {
-			ttSum += this.travelTimes[i];
-			carTtSum += this.carTravelTimes[i];
 			ptTtSum += this.ptTravelTimes[i];
 			wlkTtSum += this.wlkTravelTimes[i];
-			otherTtSum += otherTravelTimes[i];
+			bikeTtSum += bikeTravelTimes[i];
+			othersTtSum += othersTravelTimes[i];
 
 			nTrips += this.arrCount[i];
 			nCarTrips += this.carArrCount[i];
 			nPtTrips += this.ptArrCount[i];
 			nWlkTrips += wlkArrCount[i];
-			nOtherTrips += otherArrCount[i];
+			nOtherTrips += othersArrCount[i];
 		}
 		sw
 				.writeln("the sum of all the traveltimes [s]: "
-						+ ttSum
+						+ CollectionSum.getSum(travelTimes)
 						+ "\n"
 						+ "the number of all the Trips: "
-						+ nTrips
+						+ CollectionSum.getSum(arrCount)
 						+ "\n"
-						+ "the sum of all the drivers traveltimes [s]: "
-						+ carTtSum
+						+ "the sum of all the drivers' traveltimes [s]: "
+						+ CollectionSum.getSum(carTravelTimes)
 						+ "\n"
-						+ "the number of all the drivers Trips: "
-						+ nCarTrips
+						+ "the number of all the drivers' Trips: "
+						+ CollectionSum.getSum(carArrCount)
 						+ "\n"
-						+ "the sum of all the public transit unsers traveltimes [s]: "
-						+ ptTtSum
+						+ "the sum of all the public transit unsers' traveltimes [s]: "
+						+ CollectionSum.getSum(ptTravelTimes)
 						+ "\n"
-						+ "the number of all the public users Trips: "
-						+ nPtTrips
+						+ "the number of all the public users' Trips: "
+						+ CollectionSum.getSum(ptArrCount)
 						+ "\n"
-						+ "the sum of all the walkers traveltimes [s]: "
-						+ wlkTtSum
+						+ "the sum of all the walkers' traveltimes [s]: "
+						+ CollectionSum.getSum(wlkTravelTimes)
 						+ "\n"
-						+ "the number of all the walkers Trips: "
-						+ nWlkTrips
+						+ "the number of all the walkers' Trips: "
+						+ CollectionSum.getSum(wlkArrCount)
+						+ "\n"
+						+ "the sum of all the cyclists' traveltimes [s]: "
+						+ CollectionSum.getSum(bikeTravelTimes)
+						+ "\n"
+						+ "the number of all the cyclists' Trips: "
+						+ CollectionSum.getSum(bikeArrCount)
 						+ "\n"
 						+ "the sum of all the persons with other modes traveltimes [s]: "
-						+ otherTtSum
+						+ CollectionSum.getSum(othersTravelTimes)
 						+ "\n"
 						+ "the number of all the persons with other modes Trips: "
-						+ nOtherTrips);
+						+ CollectionSum.getSum(othersArrCount));
 		sw.close();
 	}
 
@@ -279,13 +288,20 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 				"sum of TravelTimes [s]");
 		travelTimeSumChart.addSeries("sum of traveltimes of drivers", xs,
 				this.carTravelTimes);
-		travelTimeSumChart.addSeries(
-				"sum of traveltime of public transit users", xs,
-				this.ptTravelTimes);
-		travelTimeSumChart.addSeries("sum of traveltime of walkers", xs,
-				this.wlkTravelTimes);
-		travelTimeSumChart.addSeries("sum of traveltime of others", xs,
-				this.otherTravelTimes);
+		if (CollectionSum.getSum(ptTravelTimes) > 0)
+			travelTimeSumChart.addSeries(
+					"sum of traveltime of public transit users", xs,
+					this.ptTravelTimes);
+		if (CollectionSum.getSum(wlkTravelTimes) > 0)
+			travelTimeSumChart.addSeries("sum of traveltime of walkers", xs,
+					this.wlkTravelTimes);
+		if (CollectionSum.getSum(bikeTravelTimes) > 0)
+			travelTimeSumChart.addSeries("sum of traveltime of cyclists", xs,
+					this.bikeTravelTimes);
+		if (CollectionSum.getSum(othersTravelTimes) > 0)
+			travelTimeSumChart.addSeries(
+					"sum of traveltime of other modes users", xs,
+					this.othersTravelTimes);
 		travelTimeSumChart.addSeries("sum of traveltimes of all agents", xs,
 				this.travelTimes);
 		travelTimeSumChart.saveAsPng(filename + "Sum.png", 1024, 768);
@@ -299,20 +315,28 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 					: this.ptTravelTimes[j] / this.ptArrCount[j];
 			this.wlkTravelTimes[j] = this.wlkArrCount[j] == 0 ? -1
 					: this.wlkTravelTimes[j] / this.wlkArrCount[j];
-			this.otherTravelTimes[j] = this.otherArrCount[j] == 0 ? -1
-					: this.otherTravelTimes[j] / this.otherArrCount[j];
+			this.bikeTravelTimes[j] = this.bikeArrCount[j] == 0 ? -1
+					: this.bikeTravelTimes[j] / this.bikeArrCount[j];
+			this.othersTravelTimes[j] = this.othersArrCount[j] == 0 ? -1
+					: this.othersTravelTimes[j] / this.othersArrCount[j];
 		}
 		XYLineChart avgTravelTimeChart = new XYLineChart(
 				"average LegTravelTime", "time", "average TravelTimes [s]");
 		avgTravelTimeChart.addSeries("average traveltime of drivers", xs,
 				this.carTravelTimes);
-		avgTravelTimeChart.addSeries(
-				"average traveltime of public transit Users", xs,
-				this.ptTravelTimes);
-		avgTravelTimeChart.addSeries("average traveltime of walkers", xs,
-				this.wlkTravelTimes);
-		avgTravelTimeChart.addSeries("average traveltime of others", xs,
-				this.otherTravelTimes);
+		if (CollectionSum.getSum(ptArrCount) > 0)
+			avgTravelTimeChart.addSeries(
+					"average traveltime of public transit Users", xs,
+					this.ptTravelTimes);
+		if (CollectionSum.getSum(wlkArrCount) > 0)
+			avgTravelTimeChart.addSeries("average traveltime of walkers", xs,
+					this.wlkTravelTimes);
+		if (CollectionSum.getSum(bikeArrCount) > 0)
+			avgTravelTimeChart.addSeries("average traveltime of cyclists", xs,
+					this.bikeTravelTimes);
+		if (CollectionSum.getSum(othersArrCount) > 0)
+			avgTravelTimeChart.addSeries("average traveltime of others", xs,
+					this.othersTravelTimes);
 		avgTravelTimeChart.addSeries("average traveltime of all agents", xs,
 				this.travelTimes);
 		avgTravelTimeChart.saveAsPng(filename + "Avg.png", 1024, 768);

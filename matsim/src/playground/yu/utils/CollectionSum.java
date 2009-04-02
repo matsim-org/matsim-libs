@@ -49,7 +49,14 @@ public class CollectionSum {
 			sum += element;
 		return sum;
 	}
-
+	public static double getSum(final int[] array) {
+		if (array == null || array.length == 0)
+			return -1;
+		double sum = 0;
+		for (double element : array)
+			sum += element;
+		return sum;
+	}
 	public static void main(String[] args) {
 		Set<Double> dbs = new HashSet<Double>();
 		for (int i = 0; i < 10; i++)

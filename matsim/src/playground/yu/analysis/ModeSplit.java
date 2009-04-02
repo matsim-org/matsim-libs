@@ -34,8 +34,9 @@ import playground.yu.utils.io.SimpleWriter;
  * 
  */
 public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm {
-	private int carLegs = 0, ptLegs = 0, wlkLegs = 0, otherLegs = 0,
-			zrhCarLegs = 0, zrhPtLegs = 0, zrhWlkLegs = 0, zrhOtherLegs = 0;
+	private int carLegs = 0, ptLegs = 0, wlkLegs = 0, bikeLegs = 0,
+			othersLegs = 0, tollCarLegs = 0, tollPtLegs = 0, tollWlkLegs = 0,
+			tollBikeLegs = 0, tollOthersLegs = 0;
 	private RoadPricingScheme toll = null;
 
 	public ModeSplit(RoadPricingScheme toll) {
@@ -49,30 +50,38 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 
 	public void run(Plan plan) {
 		Link homeLoc = plan.getFirstActivity().getLink();
-		boolean inRange = TollTools.isInRange(homeLoc, toll);
+		boolean inRange = false;
+		if (toll != null)
+			inRange = TollTools.isInRange(homeLoc, toll);
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				Mode m = ((Leg) pe).getMode();
-				if (m.equals(Mode.car)) {
+				switch (m) {
+				case car:
 					carLegs++;
-					if (toll != null)
-						if (inRange)
-							zrhCarLegs++;
-				} else if (m.equals(Mode.pt)) {
+					if (inRange)
+						tollCarLegs++;
+					break;
+				case pt:
 					ptLegs++;
-					if (toll != null)
-						if (inRange)
-							zrhPtLegs++;
-				} else if (m.equals(Mode.walk)) {
+					if (inRange)
+						tollPtLegs++;
+					break;
+				case walk:
 					wlkLegs++;
-					if (toll != null)
-						if (inRange)
-							zrhWlkLegs++;
-				} else {
-					otherLegs++;
-					if (toll != null)
-						if (inRange)
-							zrhOtherLegs++;
+					if (inRange)
+						tollWlkLegs++;
+					break;
+				case bike:
+					bikeLegs++;
+					if (inRange)
+						tollBikeLegs++;
+					break;
+				default:
+					othersLegs++;
+					if (inRange)
+						tollOthersLegs++;
+					break;
 				}
 			}
 		}
@@ -81,27 +90,32 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(total)mode\tnumber\tfraction[%]\n");
-		double sum = carLegs + ptLegs + wlkLegs + otherLegs;
+		double sum = carLegs + ptLegs + wlkLegs + bikeLegs + othersLegs;
 		sb.append("car\t" + carLegs + "\t" + ((double) carLegs) / sum * 100.0
 				+ "\n");
 		sb.append("pt\t" + ptLegs + "\t" + ((double) ptLegs) / sum * 100.0
 				+ "\n");
 		sb.append("walk\t" + wlkLegs + "\t" + ((double) wlkLegs / sum * 100.0)
 				+ "\n");
-		sb.append("others\t" + otherLegs + "\t"
-				+ ((double) otherLegs / sum * 100.0) + "\n");
+		sb.append("bike\t" + bikeLegs + "\t"
+				+ ((double) bikeLegs / sum * 100.0) + "\n");
+		sb.append("others\t" + othersLegs + "\t"
+				+ ((double) othersLegs / sum * 100.0) + "\n");
 
 		if (toll != null) {
-			sum = zrhCarLegs + zrhPtLegs + zrhWlkLegs + zrhOtherLegs;
+			sum = tollCarLegs + tollPtLegs + tollWlkLegs + tollBikeLegs
+					+ tollOthersLegs;
 			sb.append("(toll area)mode\tnumber\tfraction[%]\n");
-			sb.append("car\t" + zrhCarLegs + "\t" + (double) zrhCarLegs / sum
+			sb.append("car\t" + tollCarLegs + "\t" + (double) tollCarLegs / sum
 					* 100.0 + "\n");
-			sb.append("pt\t" + zrhPtLegs + "\t" + (double) zrhPtLegs / sum
+			sb.append("pt\t" + tollPtLegs + "\t" + (double) tollPtLegs / sum
 					* 100.0 + "\n");
-			sb.append("walk\t" + zrhWlkLegs + "\t" + (double) zrhWlkLegs / sum
-					* 100.0 + "\n");
-			sb.append("other\t" + zrhOtherLegs + "\t" + (double) zrhOtherLegs
+			sb.append("walk\t" + tollWlkLegs + "\t" + (double) tollWlkLegs
 					/ sum * 100.0 + "\n");
+			sb.append("bike\t" + tollBikeLegs + "\t" + (double) tollBikeLegs
+					/ sum * 100.0 + "\n");
+			sb.append("other\t" + tollOthersLegs + "\t"
+					+ (double) tollOthersLegs / sum * 100.0 + "\n");
 		}
 
 		return sb.toString();
@@ -112,15 +126,18 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 		sw.write(toString());
 		sw.close();
 		PieChart chart = new PieChart("ModalSplit -- Legs");
-		chart.addSeries(new String[] { "car", "pt", "walk", "other" },
-				new double[] { carLegs, ptLegs, wlkLegs, otherLegs });
+		chart
+				.addSeries(
+						new String[] { "car", "pt", "walk", "bike", "other" },
+						new double[] { carLegs, ptLegs, wlkLegs, bikeLegs,
+								othersLegs });
 		chart.saveAsPng(outputPath + "modalSplitLegs.png", 800, 600);
 		if (toll != null) {
 			PieChart chart2 = new PieChart(
 					"ModalSplit Center (toll area) -- Legs");
-			chart2.addSeries(new String[] { "car", "pt", "walk", "other" },
-					new double[] { zrhCarLegs, zrhPtLegs, zrhWlkLegs,
-							zrhOtherLegs });
+			chart2.addSeries(new String[] { "car", "pt", "walk", "bike",
+					"other" }, new double[] { tollCarLegs, tollPtLegs,
+					tollWlkLegs, tollBikeLegs, tollOthersLegs });
 			chart2.saveAsPng(outputPath + "modalSplitTollLegs.png", 800, 600);
 		}
 	}
@@ -159,7 +176,7 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 			e.printStackTrace();
 		}
 
-		ModeSplit ms = new ModeSplit(tollReader.getScheme());
+		ModeSplit ms = new ModeSplit(null);
 		ms.run(population);
 		ms.write(outputPath);
 

@@ -40,8 +40,8 @@ public interface Analysis4Zrh {
 			return firstLetter;
 		}
 
-		ActType(String name) {
-			this.firstLetter = name;
+		ActType(String firstLetter) {
+			this.firstLetter = firstLetter;
 		}
 	}
 }
