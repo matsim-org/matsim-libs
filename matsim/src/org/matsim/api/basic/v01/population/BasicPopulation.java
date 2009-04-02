@@ -33,7 +33,10 @@ public interface BasicPopulation<T extends BasicPerson> {
 	public String getName();
 	
 	public void setName(String name);
-	
+	/**
+	 * @deprecated use getPersons().put(...) instead.
+	 */
+	@Deprecated
 	public void addPerson(T person);
 
 	/** @deprecated please use getPersons().get(personId) instead. */
