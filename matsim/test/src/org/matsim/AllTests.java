@@ -42,7 +42,10 @@ public class AllTests {
 		TestSuite suite = new TestSuite("All tests for org.matsim");
 		//$JUnit-BEGIN$
 
-		// first run core test
+		// first run api tests
+		suite.addTest(org.matsim.api.basic.v01.AllTests.suite());
+		
+		// second run core test
 		suite.addTest(org.matsim.core.AllTests.suite());
 
 		// now run other unit tests
