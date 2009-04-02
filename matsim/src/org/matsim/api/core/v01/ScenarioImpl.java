@@ -99,7 +99,7 @@ public class ScenarioImpl implements Scenario {
 		this.facilities = new FacilitiesImpl();
 		this.facilitiesFileName = null;
 		this.facilitiesLoaded = true;
-		this.population = new PopulationImpl();
+		this.population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 		this.populationFileName = null;
 		this.populationLoaded = true;
 		this.config = new Config();

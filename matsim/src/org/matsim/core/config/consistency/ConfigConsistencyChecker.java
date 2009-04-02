@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MarginalTravelCostCalculatorII.java
+ * ConfigConsistencyChecker
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.config.consistency;
 
-package playground.gregor.sims.socialcost;
+import org.matsim.core.config.Config;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.trafficmonitoring.AbstractTravelTimeCalculator;
 
-public class MarginalTravelCostCalculatorII implements TravelCost {
+/**
+ * Implement this interface to implement consistency checks of the
+ * MATSim config. Implementations of this class that are added 
+ * to the Config instance used are triggered by the parser after
+ * the config.xml file is read.
+ * 
+ * 
+ * @author dgrether
+ *
+ */
+public interface ConfigConsistencyChecker {
 
+	public void checkConsistency(Config config);
 	
-
-
-	private final SocialCostCalculator sc;
-	private final AbstractTravelTimeCalculator tc;
-
-	public MarginalTravelCostCalculatorII(final AbstractTravelTimeCalculator tc, final SocialCostCalculator sc) {
-		this.tc = tc;
-		this.sc = sc;
-	}
-	
-
-	public double getLinkTravelCost(final Link link, final double time) {
-		double t = this.tc.getLinkTravelTime(link, time);
-		double s = this.sc.getSocialCost(link, time);
-		return t + s;
-	}
-	
-
 }

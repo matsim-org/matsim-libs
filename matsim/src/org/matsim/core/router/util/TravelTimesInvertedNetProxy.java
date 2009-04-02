@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MarginalTravelCostCalculatorII.java
+ * TravelTimesInvertedNetProxy
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.gregor.sims.socialcost;
+package org.matsim.core.router.util;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.trafficmonitoring.AbstractTravelTimeCalculator;
+import org.matsim.core.api.network.Network;
 
-public class MarginalTravelCostCalculatorII implements TravelCost {
 
+/**
+ * Proxy for a LinkToLinkTravelTime instance to make it work with the 
+ * LeastCostPathCalculator working on an inverted network.
+ * @author dgrether
+ *
+ */
+public class TravelTimesInvertedNetProxy implements TravelTime {
+
+	private Network originalNetwork;
 	
+	private LinkToLinkTravelTime linkToLinkTravelTime;
 
-
-	private final SocialCostCalculator sc;
-	private final AbstractTravelTimeCalculator tc;
-
-	public MarginalTravelCostCalculatorII(final AbstractTravelTimeCalculator tc, final SocialCostCalculator sc) {
-		this.tc = tc;
-		this.sc = sc;
+	public TravelTimesInvertedNetProxy(Network originalNet, LinkToLinkTravelTime l2ltt){
+		this.linkToLinkTravelTime = l2ltt;
+		this.originalNetwork = originalNet;
 	}
 	
-
-	public double getLinkTravelCost(final Link link, final double time) {
-		double t = this.tc.getLinkTravelTime(link, time);
-		double s = this.sc.getSocialCost(link, time);
-		return t + s;
+	/**
+	 * @see org.matsim.core.router.util.TravelTime#getLinkTravelTime(org.matsim.core.api.network.Link, double)
+	 */
+	public double getLinkTravelTime(Link link, double time) {
+		Link fromLink = this.originalNetwork.getLink(link.getFromNode().getId());
+		Link toLink = this.originalNetwork.getLink(link.getToNode().getId());
+		return this.linkToLinkTravelTime.getLinkToLinkTravelTime(fromLink, toLink, time);
 	}
-	
 
 }

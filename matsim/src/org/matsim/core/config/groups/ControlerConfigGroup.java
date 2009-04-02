@@ -39,20 +39,17 @@ public class ControlerConfigGroup extends Module {
 	private static final String OUTPUT_DIRECTORY = "outputDirectory";
 	private static final String FIRST_ITERATION = "firstIteration";
 	private static final String LAST_ITERATION = "lastIteration";
-	private static final String TRAVEL_TIME_CALCULATOR = "travelTimeCalculator";
-	private static final String TRAVEL_TIME_BIN_SIZE = "travelTimeBinSize";
-	private static final String TRAVEL_TIME_AGGREGATOR = "travelTimeAggregator";
-	private static final String ROUTINGALGORITHMTYPE = "routingAlgorithmType";
+	private static final String ROUTINGALGORITHM_TYPE = "routingAlgorithmType";
 	private static final String RUNID = "runId";
+	private static final String LINKTOLINK_ROUTING_ENABLED = "enableLinkToLinkRouting";
 	
 	private String outputDirectory = "./output";
 	private int firstIteration = 0;
 	private int lastIteration = 1000;
-	private String travelTimeCalculator = "TravelTimeCalculatorArray";
-	private String travelTimeAggregator = "optimistic";
-	private int traveltimeBinSize = 15 * 60; // use a default of 15min time-bins for analyzing the travel times
-	private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.AStarLandmarks;
-
+	private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.Dijkstra;
+	
+	private boolean linkToLinkRoutingEnabled = false;
+	
 	private String runId = null;
 	
 	public ControlerConfigGroup() {
@@ -67,16 +64,12 @@ public class ControlerConfigGroup extends Module {
 			return Integer.toString(getFirstIteration());
 		} else if (LAST_ITERATION.equals(key)) {
 			return Integer.toString(getLastIteration());
-		} else if (TRAVEL_TIME_CALCULATOR.equals(key)) {
-			return getTravelTimeCalculatorType();
-		} else if (TRAVEL_TIME_AGGREGATOR.equals(key)) {
-			return getTravelTimeAggregatorType();
-		} else if (TRAVEL_TIME_BIN_SIZE.equals(key)) {
-			return Integer.toString(getTraveltimeBinSize());
-		} else if (ROUTINGALGORITHMTYPE.equals(key)){
+		} else if (ROUTINGALGORITHM_TYPE.equals(key)){
 			return this.getRoutingAlgorithmType().toString();
 		} else if (RUNID.equals(key)){
 			return this.getRunId();
+		} else if (LINKTOLINK_ROUTING_ENABLED.equals(key)){
+			return Boolean.toString(this.linkToLinkRoutingEnabled);
 		}
 		else {
 			throw new IllegalArgumentException(key);
@@ -91,13 +84,7 @@ public class ControlerConfigGroup extends Module {
 			setFirstIteration(Integer.parseInt(value));
 		} else if (LAST_ITERATION.equals(key)) {
 			setLastIteration(Integer.parseInt(value));
-		} else if (TRAVEL_TIME_CALCULATOR.equals(key)) {
-			setTravelTimeCalculatorType(value);
-		} else if (TRAVEL_TIME_AGGREGATOR.equals(key)) {
-			setTravelTimeAggregatorType(value);
-		} else if (TRAVEL_TIME_BIN_SIZE.equals(key)) {
-			setTraveltimeBinSize(Integer.parseInt(value));
-		} else if (ROUTINGALGORITHMTYPE.equals(key)){
+		} else if (ROUTINGALGORITHM_TYPE.equals(key)){
 			if (RoutingAlgorithmType.Dijkstra.toString().equalsIgnoreCase(value)){
 				setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
 			}
@@ -109,6 +96,9 @@ public class ControlerConfigGroup extends Module {
 			}
 		} else if (RUNID.equals(key)){
 			this.setRunId(value.trim());
+		} else if (LINKTOLINK_ROUTING_ENABLED.equalsIgnoreCase(key)){
+			if (value != null)
+				this.linkToLinkRoutingEnabled = Boolean.getBoolean(value.trim());
 		}
 		else {
 			throw new IllegalArgumentException(key);
@@ -121,19 +111,16 @@ public class ControlerConfigGroup extends Module {
 		map.put(OUTPUT_DIRECTORY, getValue(OUTPUT_DIRECTORY));
 		map.put(FIRST_ITERATION, getValue(FIRST_ITERATION));
 		map.put(LAST_ITERATION, getValue(LAST_ITERATION));
-		map.put(TRAVEL_TIME_CALCULATOR, getValue(TRAVEL_TIME_CALCULATOR));
-		map.put(TRAVEL_TIME_AGGREGATOR, getValue(TRAVEL_TIME_AGGREGATOR));
-		map.put(TRAVEL_TIME_BIN_SIZE, getValue(TRAVEL_TIME_BIN_SIZE));		
-		map.put(ROUTINGALGORITHMTYPE, getValue(ROUTINGALGORITHMTYPE));
+		map.put(ROUTINGALGORITHM_TYPE, getValue(ROUTINGALGORITHM_TYPE));
 		map.put(RUNID, getValue(RUNID));
+		map.put(LINKTOLINK_ROUTING_ENABLED, Boolean.toString(this.isLinkToLinkRoutingEnabled()));
 		return map;
 	}
 	
 	@Override
 	protected final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(TRAVEL_TIME_BIN_SIZE, "The size of the time bin (in sec) into which the link travel times are aggregated for the router") ;
-		map.put(ROUTINGALGORITHMTYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + " or " + RoutingAlgorithmType.AStarLandmarks);
+		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + " or " + RoutingAlgorithmType.AStarLandmarks);
 		map.put(RUNID, "An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc.");
 		return map;
 	}
@@ -164,41 +151,6 @@ public class ControlerConfigGroup extends Module {
 		return this.lastIteration;
 	}
 	
-	public void setTravelTimeCalculatorType(final String travelTimeCalculator){
-		this.travelTimeCalculator = travelTimeCalculator;
-	}
-
-	public String getTravelTimeCalculatorType(){
-		return this.travelTimeCalculator;
-	}
-
-	public void setTravelTimeAggregatorType(final String travelTimeAggregator){
-		this.travelTimeAggregator = travelTimeAggregator;
-	}
-
-	public String getTravelTimeAggregatorType(){
-		return this.travelTimeAggregator;
-	}	
-	
-	/**
-	 * Sets the size of the time-window over which the travel times are accumulated and averaged.<br>
-	 * Note that smaller values for the binSize increase memory consumption to store the travel times.
-	 *
-	 * @param binSize The size of the time-window in seconds.
-	 */
-	public final void setTraveltimeBinSize(final int binSize) {
-		this.traveltimeBinSize = binSize;
-	}
-
-	/**
-	 * Returns the size of the time-window used to accumulate and average travel times.
-	 *
-	 * @return The size of the time-window in seconds.
-	 */
-	public final int getTraveltimeBinSize() {
-		return this.traveltimeBinSize;
-	}
-	
 	public RoutingAlgorithmType getRoutingAlgorithmType(){
 		return this.routingAlgorithmType;
 	}
@@ -213,6 +165,14 @@ public class ControlerConfigGroup extends Module {
 	
 	public void setRunId(String runid){
 		this.runId = runid;
+	}
+
+	public boolean isLinkToLinkRoutingEnabled() {
+		return this.linkToLinkRoutingEnabled;
+	}
+	
+	public void setLinkToLinkRoutingEnabled(boolean enabled){
+		this.linkToLinkRoutingEnabled = enabled;
 	}
 	
 }

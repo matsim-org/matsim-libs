@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
+import java.util.TreeMap;
+
 import org.matsim.core.config.Module;
 
 
@@ -63,6 +65,14 @@ public class SignalSystemsConfigGroup extends Module {
 		else {
 			throw new IllegalArgumentException("The key : " + key + " is not supported by this config group");
 		}
+	}
+	
+	@Override
+	protected final TreeMap<String, String> getParams() {
+		TreeMap<String, String> map = new TreeMap<String, String>();
+		map.put(SIGNALSYSTEMFILE, this.getSignalSystemFile());
+		map.put(SIGNALSYSTEMCONFIGFILE, this.getSignalSystemConfigFile());
+		return map;
 	}
 
 	@Override

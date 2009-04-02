@@ -50,6 +50,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
@@ -91,11 +92,12 @@ import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorInvertedNetProxyFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.AbstractTravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
@@ -149,7 +151,7 @@ public class Controler {
 	private Counts counts = null;
 	private final NetworkFactory networkFactory = new NetworkFactory();
 
-	protected TravelTimeCalculator travelTimeCalculator = null;
+	protected AbstractTravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCost travelCostCalculator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
@@ -302,6 +304,7 @@ public class Controler {
 		} else {
 			this.config = new Config();
 			this.config.addCoreModules();
+			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		}
 		Gbl.setConfig(this.config);
 		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
@@ -436,13 +439,14 @@ public class Controler {
 	protected void setup() {
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = new TravelTimeCalculatorBuilder(this.config.controler()).createTravelTimeCalculator(this.network, (int)endTime);
+			this.travelTimeCalculator = new TravelTimeCalculatorBuilder(this.config.travelTimeCalculator()).createTravelTimeCalculator(this.network, (int)endTime);
 		}
 		if (this.travelCostCalculator == null) {
 			this.travelCostCalculator = new TravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
 		}
 		this.events.addHandler(this.travelTimeCalculator);
 
+		
 		if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.Dijkstra)){
 			this.leastCostPathCalculatorFactory = new DijkstraFactory();
 		}
@@ -452,6 +456,11 @@ public class Controler {
 		else {
 			throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
 		}
+
+		if (config.controler().isLinkToLinkRoutingEnabled()){
+			this.leastCostPathCalculatorFactory = new LeastCostPathCalculatorInvertedNetProxyFactory(this.leastCostPathCalculatorFactory);
+		}
+		
 		
 		/* TODO [MR] linkStats uses ttcalc and volumes, but ttcalc has 15min-steps,
 		 * while volumes uses 60min-steps! It works a.t.m., but the traveltimes
@@ -815,7 +824,7 @@ public class Controler {
 	 */
 	@Deprecated
 	public final int getTraveltimeBinSize() {
-		return this.config.controler().getTraveltimeBinSize();
+		return this.config.travelTimeCalculator().getTraveltimeBinSize();
 	}
 
 	/**

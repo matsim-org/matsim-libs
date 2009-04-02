@@ -30,8 +30,8 @@ import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -43,7 +43,7 @@ import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.AbstractTravelTimeCalculator;
 
 public class EvacDestinationAssigner implements ScoringListener {
 
@@ -62,7 +62,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 	
 	
 	public EvacDestinationAssigner(final TravelCost travelCostCalculator,
-			final TravelTimeCalculator travelTimeCalculator, final NetworkLayer network) {
+			final AbstractTravelTimeCalculator travelTimeCalculator, final NetworkLayer network) {
 
 		this.network = network;
 		this.plansCalcRoute = new PlansCalcRoute(network,travelCostCalculator,travelTimeCalculator, new DijkstraFactory()); 

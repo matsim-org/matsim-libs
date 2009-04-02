@@ -22,14 +22,14 @@ package playground.gregor.sims.riskaversion;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.AbstractTravelTimeCalculator;
 
 public class RiskAverseTravelCostCalculator implements TravelCost {
 
-	private final TravelTimeCalculator tc;
+	private final AbstractTravelTimeCalculator tc;
 	private final RiskCostCalculator rc;
 
-	public RiskAverseTravelCostCalculator(final TravelTimeCalculator tc, final RiskCostCalculator rc) {
+	public RiskAverseTravelCostCalculator(final AbstractTravelTimeCalculator tc, final RiskCostCalculator rc) {
 		this.tc = tc;
 		this.rc = rc;
 	}

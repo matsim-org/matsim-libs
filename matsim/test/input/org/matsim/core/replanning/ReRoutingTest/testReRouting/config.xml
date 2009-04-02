@@ -20,6 +20,7 @@
 		<param name="outputDirectory" value="test/output/rerouting/" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="1" />
+    <param name="routingAlgorithmType" value="AStarLandmarks" />
 	</module>
 
 	<module name="simulation">

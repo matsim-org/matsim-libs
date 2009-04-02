@@ -21,7 +21,6 @@ package org.matsim.core.trafficmonitoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 
 
 /**
@@ -34,29 +33,39 @@ public class TravelTimeCalculatorBuilder {
 	private static final Logger log = Logger
 			.getLogger(TravelTimeCalculatorBuilder.class);
 	
-	private ControlerConfigGroup controlerConfigGroup;
+	private TravelTimeCalculatorConfigGroup travelTimeCalcConfigGroup;
 
-	public TravelTimeCalculatorBuilder(ControlerConfigGroup group){
-		this.controlerConfigGroup = group;
+	public TravelTimeCalculatorBuilder(TravelTimeCalculatorConfigGroup group){
+		this.travelTimeCalcConfigGroup = group;
 	}
 	
-	public TravelTimeCalculator createTravelTimeCalculator(Network network, int endTime) {
+	public AbstractTravelTimeCalculator createTravelTimeCalculator(Network network, int endTime) {
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
+		AbstractTravelTimeCalculator calculator = null;
 		
-		if ("TravelTimeCalculatorHashMap".equals(controlerConfigGroup.getTravelTimeCalculatorType())) {
+		if ("TravelTimeCalculatorHashMap".equals(travelTimeCalcConfigGroup.getTravelTimeCalculatorType())) {
 			factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
-		} else if (!"TravelTimeCalculatorArray".equals(controlerConfigGroup.getTravelTimeCalculatorType())) {
-			throw new RuntimeException(controlerConfigGroup.getTravelTimeCalculatorType() + " is unknown!");
+		} else if (!"TravelTimeCalculatorArray".equals(travelTimeCalcConfigGroup.getTravelTimeCalculatorType())) {
+			throw new RuntimeException(travelTimeCalcConfigGroup.getTravelTimeCalculatorType() + " is unknown!");
 		}
 		
-		if ("experimental_LastMile".equals(this.controlerConfigGroup.getTravelTimeAggregatorType())) {
+		if ("experimental_LastMile".equals(this.travelTimeCalcConfigGroup.getTravelTimeAggregatorType())) {
 			factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
 			log.warn("Using experimental TravelTimeAggregator! \nIf this was not intendet please remove the travelTimeAggregator entry in the controler section in your config.xml!");
-		} else if (!"optimistic".equals(this.controlerConfigGroup.getTravelTimeAggregatorType())) {
-			throw new RuntimeException(this.controlerConfigGroup.getTravelTimeAggregatorType() + " is unknown!");
+		} else if (!"optimistic".equals(this.travelTimeCalcConfigGroup.getTravelTimeAggregatorType())) {
+			throw new RuntimeException(this.travelTimeCalcConfigGroup.getTravelTimeAggregatorType() + " is unknown!");
 		}
+		
+		if (this.travelTimeCalcConfigGroup.isCalculateLinkToLinkTravelTimes()){
+			calculator = new LinkToLinkTravelTimeCalculator(network, this.travelTimeCalcConfigGroup.getTraveltimeBinSize(), 
+					endTime, factory, this.travelTimeCalcConfigGroup.isCalculateLinkTravelTimes());		
+		}
+		else {
+			calculator = new TravelTimeCalculator(network, this.travelTimeCalcConfigGroup.getTraveltimeBinSize(), endTime, factory);
+		}
+		
 
-		return new TravelTimeCalculator(network, this.controlerConfigGroup.getTraveltimeBinSize(), endTime, factory);		
+		return calculator;
 	}
 	
 }

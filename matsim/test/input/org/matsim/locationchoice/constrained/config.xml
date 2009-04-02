@@ -6,9 +6,13 @@
 		<param name="outputDirectory" value="test/output/" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
-		<param name="travelTimeBinSize" value="900" />
-		<param name="travelTimeCalculator" value="TravelTimeCalculatorArray" />
 	</module>
+
+  <module name="travelTimeCalculator" >
+    <param name="travelTimeBinSize" value="900" />
+    <param name="travelTimeCalculator" value="TravelTimeCalculatorArray" />
+  </module>
+
 	
 	<module name="network">
 		<param name="inputNetworkFile" value="test/scenarios/equil/network.xml" />

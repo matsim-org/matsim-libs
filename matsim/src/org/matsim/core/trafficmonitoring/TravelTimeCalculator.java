@@ -35,20 +35,13 @@ import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.router.util.TravelTime;
 
-public class TravelTimeCalculator implements TravelTime, LinkEnterEventHandler, LinkLeaveEventHandler, 
+public class TravelTimeCalculator extends 
+AbstractTravelTimeCalculator implements TravelTime, LinkEnterEventHandler, LinkLeaveEventHandler, 
 AgentArrivalEventHandler, AgentStuckEventHandler {
 
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 	private final HashMap<String, EnterEvent> enterEvents = new HashMap<String, EnterEvent>();
-	private Network network = null;
 	private final HashMap<Link, TravelTimeData> linkData;
-	private final int timeslice;
-	private final int numSlots;
-	private final TravelTimeAggregatorFactory factory;
-	private final AbstractTravelTimeAggregator aggregator;
-
-
-
 	public TravelTimeCalculator(final Network network) {
 		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
 	}
@@ -62,22 +55,14 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	}
 
 	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime, TravelTimeAggregatorFactory factory) {
-		this.factory = factory;
-		this.network = network;
-		this.timeslice = timeslice;
-		this.numSlots = (maxTime / this.timeslice) + 1;
-		this.linkData = new HashMap<Link, TravelTimeData>((int) (this.network.getLinks().size() * 1.4));
-		this.aggregator = this.factory.createTravelTimeAggregator(this.numSlots, this.timeslice);
-
+		super(network, timeslice, maxTime, factory);
+		this.linkData = new HashMap<Link, TravelTimeData>((int) (this.getNetwork().getLinks().size() * 1.4));
+	
 		resetTravelTimes();
 	}
 
-
-
-
-
 	public void resetTravelTimes() {
-		for (Link link : this.network.getLinks().values()) {
+		for (Link link : this.getNetwork().getLinks().values()) {
 			TravelTimeData r = getTravelTimeData(link, false);
 			if (r != null) {
 				r.resetTravelTimes();
@@ -103,9 +88,9 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	public void handleEvent(final LinkLeaveEvent event) {
 		EnterEvent e = this.enterEvents.remove(event.getPersonId().toString());
 		if ((e != null) && e.linkId.equals(event.getLinkId().toString())) {
-			if (event.getLink() == null) event.setLink(this.network.getLink(new IdImpl(event.getLinkId().toString())));
+			if (event.getLink() == null) event.setLink(this.getNetwork().getLink(new IdImpl(event.getLinkId().toString())));
 			if (event.getLink() != null) {
-				this.aggregator.addTravelTime(getTravelTimeData(event.getLink(), true),e.time,event.getTime());
+				this.getTravelTimeAggregator().addTravelTime(getTravelTimeData(event.getLink(), true),e.time,event.getTime());
 			}
 		}
 	}
@@ -122,10 +107,10 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 		if ((e != null) && e.linkId.equals(event.getLinkId().toString())) {
 			Link link = event.getLink();
 			if (link == null) {
-				link = this.network.getLink(new IdImpl(event.getLinkId().toString()));
+				link = this.getNetwork().getLink(new IdImpl(event.getLinkId().toString()));
 			}
 			if (link != null) {
-				this.aggregator.addStuckEventTravelTime(getTravelTimeData(link, true),e.time,event.getTime());
+				this.getTravelTimeAggregator().addStuckEventTravelTime(getTravelTimeData(link, true),e.time,event.getTime());
 			}
 		}
 	}
@@ -133,14 +118,14 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	private TravelTimeData getTravelTimeData(final Link link, final boolean createIfMissing) {
 		TravelTimeData r = this.linkData.get(link);
 		if ((null == r) && createIfMissing) {
-			r = this.factory.createTravelTimeData(link, this.numSlots);
+			r = this.getTravelTimeAggregatorFactory().createTravelTimeData(link, this.getNumSlots());
 			this.linkData.put(link, r);
 		}
 		return r;
 	}
 
 	public double getLinkTravelTime(final Link link, final double time) {
-		return this.aggregator.getTravelTime(getTravelTimeData(link, true), time); 
+		return this.getTravelTimeAggregator().getTravelTime(getTravelTimeData(link, true), time); 
 	}
 
 	private static class EnterEvent {

@@ -20,9 +20,12 @@
 
 package org.matsim.core.config;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.ConfigConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -43,6 +46,7 @@ import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.WithindayConfigGroup;
 import org.matsim.core.config.groups.WorldConfigGroup;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
 /**
  * Stores all configuration settings specified in a configuration file
@@ -81,6 +85,10 @@ public class Config {
 	private SocNetConfigGroup socnetmodule = null;
 	private LocationChoiceConfigGroup locationchoice = null;
 	private SignalSystemsConfigGroup signalSystemConfigGroup = null;
+
+	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup;
+
+	private List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
 
 	/** static Logger-instance. */
 	private static final Logger log = Logger.getLogger(Config.class);
@@ -159,6 +167,9 @@ public class Config {
 		this.signalSystemConfigGroup = new SignalSystemsConfigGroup();
 		this.modules.put(SignalSystemsConfigGroup.GROUPNAME, this.signalSystemConfigGroup);
 
+		this.travelTimeCalculatorConfigGroup = new TravelTimeCalculatorConfigGroup();
+		this.modules.put(TravelTimeCalculatorConfigGroup.GROUPNAME, this.travelTimeCalculatorConfigGroup);
+		
 	}
 
 	/** Checks each module for consistency, e.g. if the parameters that are currently set make sense
@@ -167,6 +178,10 @@ public class Config {
 		for (Module m : this.modules.values()) {
 			m.checkConsistency();
 		}
+		for (ConfigConsistencyChecker c : this.consistencyCheckers){
+			c.checkConsistency(this);
+		}
+		
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -402,6 +417,15 @@ public class Config {
 
 	public SignalSystemsConfigGroup signalSystems() {
 		return this.signalSystemConfigGroup;
+	}
+	
+	public TravelTimeCalculatorConfigGroup travelTimeCalculator(){
+		return this.travelTimeCalculatorConfigGroup;
+	}
+
+	public void addConfigConsistencyChecker(
+			ConfigConsistencyChecker checker) {
+		this.consistencyCheckers.add(checker);
 	}
 	
 }

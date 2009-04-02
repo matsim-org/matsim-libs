@@ -107,7 +107,7 @@ public class KnowledgeControler extends Controler {
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 
 		// TravelTimeCalculator initialisieren
-		this.travelTimeCalculator = new TravelTimeCalculatorBuilder(this.config.controler()).createTravelTimeCalculator(this.network, (int)endTime);;
+		this.travelTimeCalculator = new TravelTimeCalculatorBuilder(this.config.travelTimeCalculator()).createTravelTimeCalculator(this.network, (int)endTime);;
 			
 		// Eigenen TravenCostCalculator verwenden...
 		this.travelCostCalculator = new OldKnowledgeTravelCost(this.travelTimeCalculator);

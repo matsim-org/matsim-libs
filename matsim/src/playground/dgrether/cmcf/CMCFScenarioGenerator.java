@@ -24,8 +24,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -112,7 +112,7 @@ public class CMCFScenarioGenerator {
 
 		//configure controler
 	// configure controler
-		this.config.controler().setTraveltimeBinSize(1);
+		this.config.travelTimeCalculator().setTraveltimeBinSize(1);
 
 		this.config.controler().setLastIteration(iterations + iterations2);
 		if (isAlternativeRouteEnabled)

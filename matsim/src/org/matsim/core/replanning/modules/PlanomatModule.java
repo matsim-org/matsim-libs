@@ -59,7 +59,7 @@ public class PlanomatModule extends MultithreadedModuleA {
 
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(
 				this.network,
-				Gbl.getConfig().controler().getTraveltimeBinSize());
+				Gbl.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.events.addHandler(tDepDelayCalc);
 
 	}
