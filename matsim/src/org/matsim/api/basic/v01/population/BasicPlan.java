@@ -31,7 +31,7 @@ public interface BasicPlan<P extends BasicPlanElement> {
 	public List<P> getPlanElements();
 
 	public void addLeg(final BasicLeg leg);
-
+	//TODO this should be addActivity
 	public void addAct(final BasicActivity act);
 
 	public boolean isSelected();
