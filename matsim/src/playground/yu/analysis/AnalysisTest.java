@@ -50,6 +50,8 @@ import playground.yu.utils.io.SimpleWriter;
  * 
  */
 public class AnalysisTest {
+	private static boolean withToll = false;
+
 	private static void printUsage() {
 		System.out.println();
 		System.out.println("AnalysisTest:");
@@ -87,8 +89,7 @@ public class AnalysisTest {
 			if (args[3].endsWith("xml") || args[3].endsWith("xml.gz"))
 				plansFilename = args[3];
 		}
-		String tollFilename = (!scenario.equals("Kanton_Zurich")) ? null
-				: args[args.length - 3];
+		String tollFilename = (withToll) ? args[args.length - 3] : null;
 
 		Gbl.createConfig(null);
 		NetworkLayer network = new NetworkLayer();
@@ -96,7 +97,7 @@ public class AnalysisTest {
 
 		// toll
 		RoadPricingScheme toll = null;
-		if (scenario.equals("Kanton_Zurich")) {
+		if (withToll) {
 			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
 					network);
 			try {
@@ -151,7 +152,7 @@ public class AnalysisTest {
 		CalcLinksAvgSpeed clas = null;
 		if (scenario.equals("Zurich")) {
 			clas = new CalcLinksAvgSpeed(network, 682845.0, 247388.0, 2000.0);
-		} else if (scenario.equals("Kanton_Zurich")) {
+		} else if (withToll) {
 			clas = new CalcLinksAvgSpeed(network, toll);
 		} else {
 			clas = new CalcLinksAvgSpeed(network);
@@ -234,8 +235,9 @@ public class AnalysisTest {
 		runIntern(args, "Zurich");
 	}
 
-	public static void runKantonZurich(String[] args) {
-		runIntern(args, "Kanton_Zurich");
+	public static void runTollScenario(String[] args, String scenario) {
+		withToll = true;
+		runIntern(args, scenario);
 	}
 
 	/**
@@ -249,7 +251,10 @@ public class AnalysisTest {
 			runZurich(args);
 		} else if (args[3].equals("Kanton_Zurich")
 				|| args[4].equals("Kanton_Zurich")) {
-			runKantonZurich(args);
+			runTollScenario(args, "Kanton_Zurich");
+		} else if (args[3].equals("Berlin_Hundekopf")
+				|| args[4].equals("Berlin_Hundekopf")) {
+			runTollScenario(args, "Berlin_Hundekopf");
 		} else {
 			run(args);
 		}

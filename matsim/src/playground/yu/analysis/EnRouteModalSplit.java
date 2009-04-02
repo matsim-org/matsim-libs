@@ -52,27 +52,36 @@ import playground.yu.utils.TollTools;
 /**
  * @author mrieser
  * 
- *         Counts the number of vehicles departed, arrived or got stuck per time
- *         bin based on events.
+ * Counts the number of vehicles departed, arrived or got stuck per time bin
+ * based on events.
  * @author yu This class can only be used with plansfile, in that all
- *         <code>Leg</code>s in a <code>Plan</code> muss be equiped with the
- *         same {@code Mode}
+ *         <code>Leg</code>s in a <code>Plan</code> muss be equiped with
+ *         the same {@code Mode}
  *         {@link org.matsim.api.basic.v01.population.BasicLeg.Mode} in a day.
  */
 public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler, AgentStuckEventHandler {
 	private String scenario;
+
 	private int iteration = 0;
+
 	private final int binSize;
+
 	private final double[] dep, arr, stuck, enRoute;
+
 	private final double[] carDep, carArr, carStuck, carEnRoute;
+
 	private final double[] ptDep, ptArr, ptEnRoute;
+
 	private final double[] wlkDep, wlkArr, wlkEnRoute;
+
 	private final double[] bikeDep, bikeArr, bikeEnRoute;
+
 	private double[] othersDep = null, othersArr = null, othersStuck = null,
 			othersEnRoute = null;
 
 	private final Population plans;
+
 	private RoadPricingScheme toll = null;
 
 	/**
@@ -279,7 +288,8 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 				bw
 						.write(Time.writeTime(i * this.binSize)
 								+ "\t"
-								+ i * this.binSize
+								+ i
+								* this.binSize
 								+ "\t"
 								+ this.dep[i]
 								+ "\t"

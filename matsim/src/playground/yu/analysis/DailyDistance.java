@@ -55,12 +55,16 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 
 	protected double carWorkDist, carEducDist, carShopDist, carLeisDist,
 			carOtherDist;
+
 	protected double ptWorkDist, ptEducDist, ptShopDist, ptLeisDist,
 			ptOtherDist;
+
 	protected double wlkWorkDist, wlkEducDist, wlkShopDist, wlkLeisDist,
 			wlkOtherDist;
+
 	protected double bikeWorkDist, bikeEducDist, bikeShopDist, bikeLeisDist,
 			bikeOtherDist;// TODO
+
 	protected double othersWorkDist, othersEducDist, othersShopDist,
 			othersLeisDist, othersOtherDist;// TODO
 
@@ -254,6 +258,9 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				this.wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
 				break;
 			case bike:
+				dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
+						.getLink().getCoord(), plan.getNextActivity(bl)
+						.getLink().getCoord()) / 1000.0;
 				this.bikeDist += dist;
 				bikeDayDist += dist;
 				switch (at) {
@@ -279,6 +286,9 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				this.bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
 				break;
 			default:
+				dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
+						.getLink().getCoord(), plan.getNextActivity(bl)
+						.getLink().getCoord()) / 1000.0;
 				this.othersDist += dist;
 				othersDayDist += dist;
 				switch (at) {
@@ -409,19 +419,22 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				this.wlkEducDist, this.wlkShopDist, this.wlkLeisDist,
 				this.wlkHomeDist, this.wlkOtherDist };
 		if (CollectionSum.getSum(wlkDestination) > 0)
-			barChart.addSeries("walk", wlkDestination);
+			barChart.addSeries("walk (sum of 1.5 linear distances)",
+					wlkDestination);
 
 		double[] bikeDestination = new double[] { this.bikeWorkDist,
 				this.bikeEducDist, this.bikeShopDist, this.bikeLeisDist,
 				this.bikeHomeDist, this.bikeOtherDist };
 		if (CollectionSum.getSum(bikeDestination) > 0)
-			barChart.addSeries("bike", bikeDestination);
+			barChart
+					.addSeries("bike (sum of linear distances", bikeDestination);
 
 		double[] othersDestination = new double[] { this.othersWorkDist,
 				this.othersEducDist, this.othersShopDist, this.othersLeisDist,
 				this.othersHomeDist, this.othersOtherDist };
 		if (CollectionSum.getSum(othersDestination) > 0)
-			barChart.addSeries("others", othersDestination);
+			barChart.addSeries("others (sum of linear distances)",
+					othersDestination);
 
 		barChart.addMatsimLogo();
 		barChart.saveAsPng(outputFilename

@@ -54,14 +54,19 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 
 	protected double carWorkTime, carEducTime, carShopTime, carLeisTime,
 			carOtherTime, carHomeTime;
+
 	protected double ptWorkTime, ptEducTime, ptShopTime, ptLeisTime,
 			ptOtherTime, ptHomeTime;
+
 	protected double wlkWorkTime, wlkEducTime, wlkShopTime, wlkLeisTime,
 			wlkOtherTime, wlkHomeTime;
+
 	protected double bikeWorkTime, bikeEducTime, bikeShopTime, bikeLeisTime,
 			bikeOtherTime, bikeHomeTime;
+
 	protected double othersWorkTime, othersEducTime, othersShopTime,
 			othersLeisTime, othersOtherTime, othersHomeTime;
+
 	protected Person person;
 
 	protected RoadPricingScheme toll = null;
@@ -496,9 +501,9 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		if (CollectionSum.getSum(yWlkFracs) > 0)
 			chart2.addSeries("walk", xs, yWlkFracs);
 		if (CollectionSum.getSum(yBikeFracs) > 0)
-			chart2.addSeries("walk", xs, yBikeFracs);
+			chart2.addSeries("bike", xs, yBikeFracs);
 		if (CollectionSum.getSum(yOthersFracs) > 0)
-			chart2.addSeries("walk", xs, yOthersFracs);
+			chart2.addSeries("others", xs, yOthersFracs);
 		chart2.saveAsPng(outputFilename + "legTimeModalSplit2.png", 800, 600);
 		sw.close();
 	}
