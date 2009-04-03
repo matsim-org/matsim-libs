@@ -509,9 +509,9 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 			sw.writeln(i + "+\t" + carLegDistanceCounts[i] + "\t"
 					+ ptLegDistanceCounts[i] + "\t" + wlkLegDistanceCounts[i]
 					+ "\t" + bikeLegDistanceCounts[i] + "\t"
-					+ othersLegDistanceCounts[i] + "\t" + yCarFracs + "\t"
-					+ yPtFracs + "\t" + yWlkFracs + "\t" + yBikeFracs + "\t"
-					+ yOthersFracs);
+					+ othersLegDistanceCounts[i] + "\t" + yCarFracs[i] + "\t"
+					+ yPtFracs[i] + "\t" + yWlkFracs[i] + "\t" + yBikeFracs[i] + "\t"
+					+ yOthersFracs[i]);
 		}
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
 				"leg Distance [km]", "mode fraction [%]");

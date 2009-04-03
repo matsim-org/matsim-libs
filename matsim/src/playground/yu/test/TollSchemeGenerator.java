@@ -74,9 +74,9 @@ public class TollSchemeGenerator {
 			.getLogger(TollSchemeGenerator.class);
 
 	private static final String BERLIN_HUNDEKOPF_CONF = "../matsimTests/tollBerlinHundekopf/config.xml";
-	private static final String BERLIN_HUNDEKOPF_OUTSCHEME = "../matsimTests/tollBerlinHundekopf/osm/tollBerlinHundekopf.xml";
-	private static final String BERLIN_HUNDEKOPF_OUTBASE = "../matsimTests/tollBerlinHundekopf/osm/tollBln";
-	private static final String BERLIN_HUNDEKOPF_GISOUTBASE = "../matsimTests/tollBerlinHundekopf/osm/tollBln";
+	private static final String BERLIN_HUNDEKOPF_OUTSCHEME = "../matsimTests/tollBerlinHundekopf/oldWip/tollBerlinHundekopf.xml";
+	private static final String BERLIN_HUNDEKOPF_OUTBASE = "../matsimTests/tollBerlinHundekopf/oldWip/tollBln";
+	private static final String BERLIN_HUNDEKOPF_GISOUTBASE = "../matsimTests/tollBerlinHundekopf/oldWip/tollBln";
 	// private static final String googleEarthPolyCoordsBerlin_Wip_City_Counts =
 	// "13.42949201028698,52.669100623894,0 13.03785521319206,52.53748238200121,0 13.15583275144851,52.38132985124271,0 13.62046871245894,52.36888127275979,0 "
 	// +
@@ -544,8 +544,8 @@ public class TollSchemeGenerator {
 	 * ;
 	 */
 
-	private static final double START = 21600;
-	private static final double STOP = 21400;
+	private static final double START = 0;
+	private static final double STOP = 86400;
 	private static final double AMOUNT = 2;
 	// private static final String[] linkIdsToFilterArray = { "101222", "101221"
 	// };

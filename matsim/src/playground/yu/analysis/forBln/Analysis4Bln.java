@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.analysis.forZrh;
+package playground.yu.analysis.forBln;
 
 /**
  * keep some general tools for Analysis for Zurich and respectively Kanton
@@ -30,18 +30,21 @@ package playground.yu.analysis.forZrh;
  * @author yu
  * 
  */
-public interface Analysis4Zrh {
+public interface Analysis4Bln {
 	public enum ActType {
-		home("h"), work("w"), shopping("s"), education("e"), leisure("l"), others(
-				"o");
-		private final String firstLetter;
+		home("home"), work("work"), shopping("shopping"), education("education"), leisure(
+				"leisure"), other("other"), not_specified("not specified"), business(
+				"business"), Einkauf_sonstiges("Einkauf sonstiges"), Freizeit_sonstiges_incl_Sport(
+				"Freizeit (sonstiges incl.Sport)"), see_a_doctor("see a doctor"), holiday_journey(
+				"holiday / journey"), multiple("multiple");
+		private final String actTypeName;
 
-		public String getFirstLetter() {
-			return firstLetter;
+		public String getActTypeName() {
+			return actTypeName;
 		}
 
-		ActType(String firstLetter) {
-			this.firstLetter = firstLetter;
+		ActType(String actTypeName) {
+			this.actTypeName = actTypeName;
 		}
 	}
 }

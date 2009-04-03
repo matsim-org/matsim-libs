@@ -16,6 +16,7 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -141,7 +142,8 @@ public class MZComparisonDataIO implements TabularFileHandler {
 			}
 		}
 		StackedBarChart chart = new StackedBarChart(
-				"Mikrozensus 2005 vs MATSim (Kanton Zurich)", "", "values");
+				"Mikrozensus 2005 vs MATSim (Kanton Zurich)", "", "values",
+				PlotOrientation.HORIZONTAL);
 		chart.addSeries(chartRows, chartColumns, values);
 		chart.saveAsPng(outputBase + ".png", 900, 600);
 	}

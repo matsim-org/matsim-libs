@@ -10,17 +10,18 @@ public class StackedBarChart extends ChartUtil {
 	private DefaultCategoryDataset dataset;
 
 	public StackedBarChart(String title, String categoryAxisLabel,
-			String valueLabel) {
+			String valueLabel, PlotOrientation plotOrientation) {
 		super(title, categoryAxisLabel, valueLabel);
 		dataset = new DefaultCategoryDataset();
-		this.chart = createChart(title, categoryAxisLabel, valueLabel, dataset);
+		this.chart = createChart(title, categoryAxisLabel, valueLabel, dataset,
+				plotOrientation);
 	}
 
 	private JFreeChart createChart(String title, String axisLabel,
-			String axisLabel2, DefaultCategoryDataset dataset) {
+			String axisLabel2, DefaultCategoryDataset dataset,
+			PlotOrientation plotOrientation) {
 		JFreeChart chart = ChartFactory.createStackedBarChart(title, axisLabel,
-				axisLabel2, dataset, PlotOrientation.HORIZONTAL, true, true,
-				false);
+				axisLabel2, dataset, plotOrientation, true, true, false);
 		return chart;
 	}
 
@@ -49,7 +50,7 @@ public class StackedBarChart extends ChartUtil {
 
 	public static void main(String[] args) {
 		StackedBarChart chart = new StackedBarChart("TITLE", "category",
-				"values");
+				"values", PlotOrientation.VERTICAL);
 		chart.addSeries(new String[] { "rowIdxA", "rowIdxB", "rowIdxC" },
 				new String[] { "ctgrA", "ctgrB", "ctgrC", "ctgrD" },
 				new double[][] { { 1, 2, 3, 4 }, { 8, 7, 6, 5 },
