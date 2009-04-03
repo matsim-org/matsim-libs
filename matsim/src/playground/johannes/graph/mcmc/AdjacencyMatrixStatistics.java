@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Ergm.java
+ * AdjacencyMatrixStatistics.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,32 +23,46 @@
  */
 package playground.johannes.graph.mcmc;
 
-
 /**
  * @author illenberger
  *
  */
-public class Ergm implements ConditionalDistribution {
+public class AdjacencyMatrixStatistics {
 
-	private ErgmTerm[] ergmTerms;
-	
-	public void setErgmTerms(ErgmTerm[] terms) {
-		ergmTerms = terms;
+	public static double getDensity(AdjacencyMatrix y) {
+		int N = y.getVertexCount();
+		return 2 * y.getEdgeCount()/ (double)(N * (N - 1));
 	}
 	
-	public ErgmTerm[] getErgmTerms() {
-		return ergmTerms;
+	public static double getMeanDegree(AdjacencyMatrix y) {
+		int N = y.getVertexCount();
+		int sum = 0;
+		for(int i = 0; i < N; i++) {
+			sum += y.getNeighbours(i).size();
+		}
+		
+		return sum/(double)N;
 	}
 	
-
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij) {
-		return evaluateExpHamiltonian(y, i, j, y_ij);
-	}
-
-	public double evaluateExpHamiltonian(AdjacencyMatrix y, int i, int j, boolean y_ij) {
+	public static double getLocalClusteringCoefficient(AdjacencyMatrix y) {
+		int N = y.getVertexCount();
 		double sum = 0;
-		for(ErgmTerm term : ergmTerms)
-			sum += term.changeStatistic(y, i, j, y_ij);
-		return Math.exp(sum);
+		for(int i = 0; i < N; i++) {
+			int k = y.getNeighbours(i).size();
+			if(k > 1)
+				sum += 2 * y.countTriangles(i) / (double)(k * (k-1));
+		}
+		return sum / (double)N;
+	}
+	
+	public static double getGlobalClusteringCoefficient(AdjacencyMatrix y) {
+		int N = y.getVertexCount();
+		int triangles = 0;
+		int tripples = 0;
+		for(int i = 0; i < N; i++) {
+			triangles += y.countTriangles(i);
+			tripples += y.countTripples(i);
+		}
+		return triangles/(double)tripples;
 	}
 }

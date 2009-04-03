@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Ergm.java
+ * SampleHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,32 +23,18 @@
  */
 package playground.johannes.graph.mcmc;
 
-
 /**
  * @author illenberger
  *
  */
-public class Ergm implements ConditionalDistribution {
+public interface SampleHandler {
 
-	private ErgmTerm[] ergmTerms;
+	public int getSampleSize();
 	
-	public void setErgmTerms(ErgmTerm[] terms) {
-		ergmTerms = terms;
-	}
+	public int getSampleInterval();
 	
-	public ErgmTerm[] getErgmTerms() {
-		return ergmTerms;
-	}
+	public boolean checkTerminationCondition(AdjacencyMatrix y);
 	
-
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij) {
-		return evaluateExpHamiltonian(y, i, j, y_ij);
-	}
-
-	public double evaluateExpHamiltonian(AdjacencyMatrix y, int i, int j, boolean y_ij) {
-		double sum = 0;
-		for(ErgmTerm term : ergmTerms)
-			sum += term.changeStatistic(y, i, j, y_ij);
-		return Math.exp(sum);
-	}
+	public void handleSample(AdjacencyMatrix y);
+	
 }

@@ -30,8 +30,6 @@ package playground.johannes.graph.mcmc;
  */
 public interface ConditionalDistribution {
 
-	public double evaluateChange_0(AdjacencyMatrix y, int i, int j, boolean y_ij);
-	
-	public double evaluateChange_1(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
 	
 }

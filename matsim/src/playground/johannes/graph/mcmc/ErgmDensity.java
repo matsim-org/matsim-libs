@@ -30,7 +30,7 @@ package playground.johannes.graph.mcmc;
  */
 public class ErgmDensity extends ErgmTerm {
 
-	public double evaluate(AdjacencyMatrix m, int i, int j, boolean y_ij) {
+	public double changeStatistic(AdjacencyMatrix m, int i, int j, boolean y_ij) {
 		return -getTheta();
 	}
 

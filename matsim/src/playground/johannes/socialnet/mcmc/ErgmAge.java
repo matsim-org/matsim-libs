@@ -35,7 +35,7 @@ import playground.johannes.graph.mcmc.ErgmTerm;
 public class ErgmAge extends ErgmTerm {
 
 	@Override
-	public double evaluate(AdjacencyMatrix m, int i, int j, boolean y_ij) {
+	public double changeStatistic(AdjacencyMatrix m, int i, int j, boolean y_ij) {
 		int age1 = ((SNAdjacencyMatrix<Person>)m).getEgo(i).getPerson().getAge();
 		int age2 = ((SNAdjacencyMatrix<Person>)m).getEgo(j).getPerson().getAge();
 		
@@ -46,5 +46,6 @@ public class ErgmAge extends ErgmTerm {
 		
 		return getTheta() * Math.min(age1, age2) / Math.max(age1, age2);
 	}
+
 
 }

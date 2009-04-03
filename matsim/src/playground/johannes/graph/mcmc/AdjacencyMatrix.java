@@ -193,11 +193,15 @@ public class AdjacencyMatrix {
 		TIntArrayList row = rows.get(i);
 		for(int u = 0; u < row.size(); u++) {
 			for(int v = u + 1; v < row.size(); v++) {
-				if(getEdge(u, v))
+				if(getEdge(row.get(u), row.get(v)))
 					triangles++;
 			}
 		}
 		return triangles;
 	}
 	
+	public int countTripples(int i) {
+		int N = rows.get(i).size();
+		return (int) (N * (N - 1) / 2.0);
+	}
 }

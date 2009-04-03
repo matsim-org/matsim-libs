@@ -87,10 +87,10 @@ public class GibbsEdgeSwitcher {
 			
 			if(i != u && j != v && j != u && i != v && !m.getEdge(i, u) && !m.getEdge(j, v)) {
 				
-				double p_change = d.evaluateChange_1(m, i, u, false)
-						* d.evaluateChange_1(m, j, v, false)
-						* d.evaluateChange_0(m, i, j, true)
-						* d.evaluateChange_0(m, u, v, true); 
+				double p_change = d.changeStatistic(m, i, u, false)
+						* d.changeStatistic(m, j, v, false)
+						* 1/d.changeStatistic(m, i, j, true)
+						* 1/d.changeStatistic(m, u, v, true); 
 				double p = 1 / (1 + p_change);
 				if(random.nextDouble() <= p) {
 					m.removeEdge(i, j);
@@ -123,7 +123,81 @@ public class GibbsEdgeSwitcher {
 		}
 	}
 
-
+//	public void sample2(AdjacencyMatrix m, ConditionalDistribution d, int burninTime) {
+//		int N = m.getVertexCount();
+//		int M = m.getEdgeCount();
+//		int[][] edges = new int[M][2];
+//		int idx_ij = 0;
+//		for(int i = 0; i < N; i++) {
+//			for(int j = i+1; j < N; j++) {
+//				if(m.getEdge(i, j)) {
+//					edges[idx_ij][0] = i;
+//					edges[idx_ij][1] = j;
+//					idx_ij++;
+//				}
+//			}
+//		}
+//		int accept = 0;
+//		for(int it = 0; it < burninTime; it++) {
+//			idx_ij = random.nextInt(M);
+//			int i = edges[idx_ij][0];
+//			int j = edges[idx_ij][1];
+//			
+//			int idx_uv = random.nextInt(M);
+//			while(idx_uv == idx_ij) {
+//				idx_uv = random.nextInt(M);
+//			}
+//			
+//			int u = random.nextInt(N);
+//			int v = random.nextInt(N);
+//			while(m.getEdge(u, v)) {
+//				u = random.nextInt(N);
+//				v = random.nextInt(N);
+//			}
+//			
+//			if(i != u && j != v && j != u && i != v) {
+//				
+//				double p_change = d.evaluateChange_1(m, u, v, false)
+//						* d.evaluateChange_0(m, i, j, true);
+//				double p = 1 / (1 + p_change);
+//				if(random.nextDouble() <= p) {
+//					m.removeEdge(i, j);
+//					m.addEdge(u, v);
+//					
+//					edges[idx_ij][0] = u;
+//					edges[idx_ij][1] = v;
+//					
+//					accept++;
+//				}
+//			}
+//			if(it%100000==0) {
+//				System.out.println(it + " steps simulated. Accepted " + accept + " steps.");
+//				accept = 0;
+//				int sum = 0;
+//				for(int k_3 = 0; k_3 < m.getVertexCount(); k_3++) {
+//					sum += m.getNeighbours(k_3).size();
+//				}
+//				System.out.println("Mean degree is " + (sum/(float)m.getVertexCount()));
+//			}
+//			if(it%1000000==0) {
+//				long time = System.currentTimeMillis();
+//				Graph g = ((SNAdjacencyMatrix)m).getGraph();
+//				
+//				double c = GraphStatistics.getClusteringStatistics(g).getMean();
+//				System.err.println(System.currentTimeMillis() - time);
+//				double sum = 0;
+//				time = System.currentTimeMillis();
+//				for(int count = 0; count < m.getVertexCount(); count++) {
+//					int k = m.getNeighbours(count).size();
+//					if(k > 1)
+//						sum += 2 * m.countTriangles(count) / (double)(k * (k-1));
+//				}
+//				double c2 = sum / (double)m.getVertexCount();
+//				System.err.println(System.currentTimeMillis() - time);
+//				System.out.println("*** Mean clustering is " + c + " / " + c2 + " ***");
+//			}
+//		}
+//	}
 	
 
 	
@@ -141,9 +215,9 @@ public class GibbsEdgeSwitcher {
 		
 		
 //		double theta1 = 8;
-		double theta2 = 1;
+		double theta2 = 0;
 //		double theta3 = 0;
-//		double theta4 = 1000;
+		theta4 = 10000;
 		ErgmTerm[] terms;
 		Ergm ergm = new Ergm();
 		terms = new ErgmTerm[2];

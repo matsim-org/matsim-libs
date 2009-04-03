@@ -25,6 +25,7 @@ package playground.johannes.socialnet;
 
 import gnu.trove.TDoubleDoubleHashMap;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -37,6 +38,14 @@ import playground.johannes.statistics.WeightedStatistics;
  */
 public class SocialNetworkStatistics {
 
+	public static DescriptiveStatistics getEdgeLengthStatistics(SocialNetwork<?> network) {
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		WeightedStatistics wstats = getEdgeLengthDistribution(network, false, 0);
+		for(double val : wstats.getValues())
+			stats.addValue(val);
+		return stats;
+	}
+	
 	public static WeightedStatistics getEdgeLengthDistribution(SocialNetwork<?> network) {
 		return getEdgeLengthDistribution(network, false, 0);
 	}
