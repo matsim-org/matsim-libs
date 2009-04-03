@@ -32,11 +32,14 @@
 		<param name="outputDirectory" value="&OUTPUTBASE;" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
-		<param name="travelTimeCalculator" value="TravelTimeCalculatorHashMap" />
-		<param name = "travelTimeAggregator" value = "experimental_LastMile" />
-		<param name="travelTimeBinSize" value="60" />
 	</module>	
 	
+  <module name="travelTimeCalculator">
+    <param name="travelTimeCalculator" value="TravelTimeCalculatorHashMap" />
+    <param name = "travelTimeAggregator" value = "experimental_LastMile" />
+    <param name="travelTimeBinSize" value="60" />
+  </module>  
+  
 <!-- ====================================================================== -->	
 
 	<module name="plans">

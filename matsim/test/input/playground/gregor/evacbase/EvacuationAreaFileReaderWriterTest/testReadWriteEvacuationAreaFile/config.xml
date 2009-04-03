@@ -19,6 +19,7 @@
 		<param name = "moveWaitFirst" value = "true" />
 		
 	</module>
+  
 
 <!-- ====================================================================== -->
 
@@ -33,11 +34,13 @@
 		<param name="outputDirectory" value="&OUTPUTBASE;" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
+	</module>	
+	
+  <module name="travelTimeCalculator">
 		<param name="travelTimeCalculator" value="TravelTimeCalculatorHashMap" />
 		<param name = "travelTimeAggregator" value = "experimental_LastMile" />
 		<param name="travelTimeBinSize" value="60" />
-	</module>	
-	
+  </module>
 <!-- ====================================================================== -->	
 
 	<module name="plans">
