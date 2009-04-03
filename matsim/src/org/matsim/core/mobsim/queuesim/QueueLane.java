@@ -36,10 +36,12 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.network.BasicLane;
 import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.AgentWait2LinkEvent;
+import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -121,7 +123,7 @@ public class QueueLane implements Comparable<QueueLane> {
 	 * This collection contains all Lanes downstream, if null it is the last lane 
 	 * within a QueueLink.
 	 */
-	private List<QueueLane> toLanes;
+	private List<QueueLane> toLanes = null;
 	
 	/*package*/ VisData visdata = this.new VisDataImpl();
 
@@ -146,10 +148,15 @@ public class QueueLane implements Comparable<QueueLane> {
 	private List<Link> destinationLinks = new ArrayList<Link>();
 	
 	private SortedMap<Id, BasicSignalGroupDefinition> signalGroups;
-
+	
 	private BasicLane laneData;
 
 	private boolean thisTimeStepGreen = true;
+	/**
+	 * LaneEvents should only be fired if there is more than one QueueLane on a QueueLink
+	 * because the LaneEvents are identical with LinkEnter/LeaveEvents otherwise.
+	 */
+	private boolean fireLaneEvents = false;
 
 	/*package*/ QueueLane(QueueLink ql, boolean isOriginalLane) {
 		this.queueLink = ql;
@@ -178,6 +185,19 @@ public class QueueLane implements Comparable<QueueLane> {
 		this.queueLink = ql;
 		this.laneData = laneData;
 		this.originalLane = isOriginalLane;
+	}
+	
+	public Id getLaneId(){
+		if (this.laneData != null){
+			return laneData.getId();
+		}
+		else if (this.originalLane){
+			//TODO dg cache this id somewhere, but where?
+			return new IdImpl(this.queueLink.getLink().getId().toString() + ".ol");
+		}
+		else {
+			throw new IllegalStateException("Currently a lane must have a LaneData instance or be the original lane");
+		}
 	}
 	
 	protected void addLightSignalGroupDefinition(BasicSignalGroupDefinition signalGroupDefinition) {
@@ -528,6 +548,9 @@ public class QueueLane implements Comparable<QueueLane> {
 	/*package*/ void add(final QueueVehicle veh, double now) {
 //		activateLane();
 		this.vehQueue.add(veh);
+		if (this.isFireLaneEvents()){
+			QueueSimulation.getEvents().processEvent(new LaneEnterEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), this.getLaneId()));
+		}
 		double departureTime;
 		if (this.originalLane) {
 			// It's the original lane,
@@ -548,7 +571,6 @@ public class QueueLane implements Comparable<QueueLane> {
 			// results compared to the old mobSim
 			veh.setEarliestLinkExitTime(Math.floor(veh.getEarliestLinkExitTime()));
 		}
-
 	}
 	
 	
@@ -583,7 +605,9 @@ public class QueueLane implements Comparable<QueueLane> {
 		if (v2 != null) {
 			v2.setLastMovedTime(now);
 		}
-
+		if (this.isFireLaneEvents()){
+			QueueSimulation.getEvents().processEvent(new LaneEnterEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), this.getLaneId()));
+		}
 		QueueSimulation.getEvents().processEvent(new LinkLeaveEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink()));
 
 		return veh;
@@ -718,7 +742,15 @@ public class QueueLane implements Comparable<QueueLane> {
 		return vehicles;
 	}
 	
+	protected boolean isFireLaneEvents() {
+		return fireLaneEvents;
+	}
+
+
 	
+	protected void setFireLaneEvents(boolean fireLaneEvents) {
+		this.fireLaneEvents = fireLaneEvents;
+	}
 	
 	/**
 	 * Inner class to capsulate visualization methods
@@ -1016,6 +1048,10 @@ public class QueueLane implements Comparable<QueueLane> {
 			return 0;
 		}
 	}
+
+
+	
+
 
 	
 

@@ -160,7 +160,7 @@ public class QueueLink {
 		boolean firstNodeLinkInitialized = false;
 		
 		for (BasicLane signalLane : lanes) {
-			QueueLane lane;
+			QueueLane lane = null;
 			if(!firstNodeLinkInitialized){
 				lane = new QueueLane(this, signalLane, false);
 				this.originalLane.addToLane(lane);
@@ -170,8 +170,8 @@ public class QueueLink {
 				lane.recalculateProperties(0.0, signalLane.getLength(), signalLane.getNumberOfRepresentedLanes());
 				this.originalLane.recalculateProperties(signalLane.getLength(), this.getLink().getLength() - signalLane.getLength(),
 						this.getLink().getNumberOfLanes(Time.UNDEFINED_TIME));
-				this.queueLanes.add(lane);
 				firstNodeLinkInitialized = true;
+				this.originalLane.setFireLaneEvents(true);
 			} 
 			else {
 				// Now we have the original QueueLane and one additional QueueLane
@@ -195,8 +195,9 @@ public class QueueLink {
 					
 					// Only need to fix properties of new QueueLane. Original QueueLane hasn't changed
 					lane.recalculateProperties(0.0, signalLane.getLength(), signalLane.getNumberOfRepresentedLanes());
-					this.queueLanes.add(lane);
 			}
+			lane.setFireLaneEvents(true);
+			this.queueLanes.add(lane);
 		}
 		findLayout();
 		addUTurn();
@@ -377,20 +378,28 @@ public class QueueLink {
 		this.originalLane.recalcTimeVariantAttributes(time);
 	}
 
-	/**
-	 * TODO dg
-	 * @param agentId
-	 * @return
-	 */
 	public QueueVehicle getVehicle(Id agentId) {
-		return this.originalLane.getVehicle(agentId);
+		QueueVehicle ret = null;
+		for (QueueLane lane : this.queueLanes){
+			ret = lane.getVehicle(agentId);
+			if (ret != null) {
+				return ret;
+			}
+		}
+		return ret;
 	}
-	/**
-	 * TODO dg 
-	 * @return
-	 */
+
 	public Collection<QueueVehicle> getAllVehicles() {
-		return this.originalLane.getAllVehicles();
+		Collection<QueueVehicle> ret = null;
+		for  (QueueLane lane : this.queueLanes){
+			if (ret == null) {
+				ret = lane.getAllVehicles();
+			}
+			else {
+				ret.addAll(lane.getAllVehicles());
+			}
+		}
+		return ret;
 	}
 
 	public double getSpaceCap() {
