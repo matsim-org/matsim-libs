@@ -16,7 +16,7 @@ public class JoinOutput {
 	 */
 	public static void main(String[] args) {
 		// Simple class to join the output files for all vehicles
-		String fileType = "VehicleStats";
+		String fileType = "MinorLocations";
 		
 		System.out.println("Joining the two '" + fileType + "' files:");
 		System.out.print("   Part 1... ");
@@ -36,6 +36,7 @@ public class JoinOutput {
 			try{
 				String header = input1.nextLine();
 				output.write(header);
+				output.newLine();
 
 				while(input1.hasNextLine()){
 					String line = input1.nextLine();
