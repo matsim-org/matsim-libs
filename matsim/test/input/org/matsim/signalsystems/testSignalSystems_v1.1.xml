@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <signalSystems xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalSystems_v1.1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
     <signalSystemDefinition id="23">
-        <defaultCirculationTime seconds="60.0"/>
-        <defaultSyncronizationOffset seconds="5.0"/>
-        <defaultInterimTime seconds="3.0"/>
+        <defaultCycleTime seconds="60.0"/>
+        <defaultSynchronizationOffset seconds="5.0"/>
+        <defaultInterGreenTime seconds="3.0"/>
     </signalSystemDefinition>
     <signalSystemDefinition id="42">
-        <defaultCirculationTime seconds="50.0"/>
-        <defaultSyncronizationOffset seconds="0.0"/>
-        <defaultInterimTime seconds="2.0"/>
+        <defaultCycleTime seconds="50.0"/>
+        <defaultSynchronizationOffset seconds="0.0"/>
+        <defaultInterGreenTime seconds="2.0"/>
     </signalSystemDefinition>
     
     <signalGroupDefinition linkIdRef="23" id="23">

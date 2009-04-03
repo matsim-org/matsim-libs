@@ -34,13 +34,13 @@ public interface BasicSignalGroupSettings {
 
 	public void setDropping(Integer dropping);
 
-	public Integer getInterimTimeRoughcast();
+	public Integer getInterimGreenTimeRoughcast();
 
-	public void setInterimTimeRoughcast(Integer interimTimeRoughcast);
+	public void setInterGreenTimeRoughcast(Integer interimTimeRoughcast);
 
-	public Integer getInterimTimeDropping();
+	public Integer getInterGreenTimeDropping();
 
-	public void setInterimTimeDropping(Integer interimTimeDropping);
+	public void setInterGreenTimeDropping(Integer interimTimeDropping);
 
 	public Id getReferencedSignalGroupId();
 

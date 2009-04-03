@@ -38,9 +38,9 @@ public class LSASystemsReader implements TabularFileHandler {
 				this.lsaMap.put(Integer.valueOf(row[0]), lsa);
 			}
 			
-			lsa.setDefaultCirculationTime(Double.parseDouble(row[1]));
-			lsa.setDefaultInterimTime(3.0);
-			lsa.setDefaultSyncronizationOffset(0.0);
+			lsa.setDefaultCycleTime(Double.parseDouble(row[1]));
+			lsa.setDefaultInterGreenTime(3.0);
+			lsa.setDefaultSynchronizationOffset(0.0);
 		}
 		
 	}

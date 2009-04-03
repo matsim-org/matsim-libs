@@ -43,44 +43,44 @@ public class BasicSignalSystemDefinitionImpl implements BasicSignalSystemDefinit
 	}
 	
 	/**
-	 * @see org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition#getDefaultCirculationTime()
+	 * @see org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition#getDefaultCycleTime()
 	 */
-	public double getDefaultCirculationTime() {
+	public double getDefaultCycleTime() {
 		return defaultCirculationTime;
 	}
 	
 	/**
-	 * @see org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition#setDefaultCirculationTime(double)
+	 * @see org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition#setDefaultCycleTime(double)
 	 */
-	public void setDefaultCirculationTime(double defaultCirculationTime) {
+	public void setDefaultCycleTime(double defaultCirculationTime) {
 		this.defaultCirculationTime = defaultCirculationTime;
 	}
 	
 	/**
-	 * @see org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition#getDefaultSyncronizationOffset()
+	 * @see org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition#getDefaultSynchronizationOffset()
 	 */
-	public double getDefaultSyncronizationOffset() {
+	public double getDefaultSynchronizationOffset() {
 		return syncronizationOffset;
 	}
 	
 	/**
-	 * @see org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition#setDefaultSyncronizationOffset(double)
+	 * @see org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition#setDefaultSynchronizationOffset(double)
 	 */
-	public void setDefaultSyncronizationOffset(double syncronizationOffset) {
+	public void setDefaultSynchronizationOffset(double syncronizationOffset) {
 		this.syncronizationOffset = syncronizationOffset;
 	}
 	
 	/**
-	 * @see org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition#getDefaultInterimTime()
+	 * @see org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition#getDefaultInterGreenTime()
 	 */
-	public double getDefaultInterimTime() {
+	public double getDefaultInterGreenTime() {
 		return defaultInterimTime;
 	}
 	
 	/**
-	 * @see org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition#setDefaultInterimTime(double)
+	 * @see org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition#setDefaultInterGreenTime(double)
 	 */
-	public void setDefaultInterimTime(double defaultInterimTime) {
+	public void setDefaultInterGreenTime(double defaultInterimTime) {
 		this.defaultInterimTime = defaultInterimTime;
 	}
 

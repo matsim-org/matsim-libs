@@ -5,7 +5,7 @@
             <signalSystemPlan id="8">
                 <start daytime="00:00:00"/>
                 <stop daytime="00:00:00"/>
-                <circulationTime sec="60"/>
+                <cycleTime sec="60"/>
                 <signalGroupSettings refId="23">
                     <roughcast sec="0"/>
                     <dropping sec="45"/>
@@ -19,13 +19,13 @@
             <signalSystemPlan id="5">
                 <start daytime="00:00:00"/>
                 <stop daytime="00:00:00"/>
-                <circulationTime sec="40"/>
-                <syncronizationOffset sec="3"/>
+                <cycleTime sec="40"/>
+                <synchronizationOffset sec="3"/>
                 <signalGroupSettings refId="23">
                     <roughcast sec="0"/>
                     <dropping sec="45"/>
-                    <interimTimeRoughcast sec="2"/>
-                    <interimTimeDropping sec="3"/>
+                    <interGreenTimeRoughcast sec="2"/>
+                    <interGreenTimeDropping sec="3"/>
                 </signalGroupSettings>
             </signalSystemPlan>
         </signalSystemControlInfo>
@@ -47,13 +47,13 @@
           <signalSystemPlan id="5">
                 <start daytime="00:00:00"/>
                 <stop daytime="00:00:00"/>
-                <circulationTime sec="40"/>
-                <syncronizationOffset sec="3"/>
+                <cycleTime sec="40"/>
+                <synchronizationOffset sec="3"/>
                 <signalGroupSettings refId="23">
                     <roughcast sec="0"/>
                     <dropping sec="45"/>
-                    <interimTimeRoughcast sec="2"/>
-                    <interimTimeDropping sec="3"/>
+                    <interGreenTimeRoughcast sec="2"/>
+                    <interGreenTimeDropping sec="3"/>
                 </signalGroupSettings>
             </signalSystemPlan>
         </signalSystemControlInfo>

@@ -94,7 +94,7 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 					.getControlInfo();
 			BasicSignalSystemPlan p = controlInfo.getPlans()
 					.get(new IdImpl("2"));
-			p.setCirculationTime(60);
+			p.setCycleTime(60);
 			BasicSignalGroupSettings group = p.getGroupConfigs().get(
 					new IdImpl("100"));
 			group.setDropping(60);

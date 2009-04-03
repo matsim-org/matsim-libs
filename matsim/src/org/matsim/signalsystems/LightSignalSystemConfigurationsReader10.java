@@ -92,19 +92,19 @@ public class LightSignalSystemConfigurationsReader10 extends MatsimJaxbXmlParser
 						plan.setStartTime(getSeconds(xmlplan.getStart().getDaytime()));
 						plan.setEndTime(getSeconds(xmlplan.getStop().getDaytime()));
 						if (xmlplan.getCirculationTime() != null) {
-							plan.setCirculationTime((int)xmlplan.getCirculationTime().getSeconds());
+							plan.setCycleTime((int)xmlplan.getCirculationTime().getSeconds());
 						}
 						if (xmlplan.getSyncronizationOffset() != null) {
-							plan.setSyncronizationOffset((int)xmlplan.getSyncronizationOffset().getSeconds());
+							plan.setSynchronizationOffset((int)xmlplan.getSyncronizationOffset().getSeconds());
 						}
 						for (XMLLightSignalGroupConfigurationType xmlgroupconfig : xmlplan.getLightSignalGroupConfiguration()) {
 							BasicSignalGroupSettings groupConfig = builder.createSignalGroupSettings(new IdImpl(xmlgroupconfig.getRefId()));
 							groupConfig.setRoughCast(xmlgroupconfig.getRoughcast().getSec());
 							groupConfig.setDropping(xmlgroupconfig.getDropping().getSec());
 							if (xmlgroupconfig.getInterimTimeRoughcast() != null)
-								groupConfig.setInterimTimeRoughcast(xmlgroupconfig.getInterimTimeRoughcast().getSec());
+								groupConfig.setInterGreenTimeRoughcast(xmlgroupconfig.getInterimTimeRoughcast().getSec());
 							if (xmlgroupconfig.getInterimTimeDropping() != null)
-								groupConfig.setInterimTimeDropping(xmlgroupconfig.getInterimTimeDropping().getSec());
+								groupConfig.setInterGreenTimeDropping(xmlgroupconfig.getInterimTimeDropping().getSec());
 							
 							plan.addLightSignalGroupConfiguration(groupConfig);
 						}

@@ -195,11 +195,11 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 				BasicPlanElement element = p.getPlanElements().get(i);
 				assertNotNull(element);
 			}
-			assertEquals(this.homeEndTime, p.getFirstActivity().getEndTime());
+			assertEquals(this.homeEndTime, p.getFirstActivity().getEndTime(), EPSILON);
 			assertEquals(ids.get(0), p.getFirstActivity().getLinkId());
-			assertEquals(this.workEndTime, ((BasicActivity)p.getPlanElements().get(2)).getEndTime());
+			assertEquals(this.workEndTime, ((BasicActivity)p.getPlanElements().get(2)).getEndTime(), EPSILON);
 			assertEquals(ids.get(2), ((BasicActivity)p.getPlanElements().get(2)).getLinkId());
-			assertEquals(Time.UNDEFINED_TIME, p.getLastActivity().getEndTime());
+			assertEquals(Time.UNDEFINED_TIME, p.getLastActivity().getEndTime(), EPSILON);
 			assertEquals(ids.get(0), p.getLastActivity().getLinkId());
 			
 			

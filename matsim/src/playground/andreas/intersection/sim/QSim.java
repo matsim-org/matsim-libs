@@ -101,7 +101,7 @@ public class QSim extends QueueSimulation {
 			// depends on the existence of a configuration for every signalsystem specified
 			// TODO [an] defaultSyncronizationOffset and defaultInterimTime still ignored
 			for (BasicSignalSystemDefinition basicLightSignalSystemDefinition : newSignalSystems.getSignalSystemDefinitions()) {
-				sortedLSAControlerMap.get(basicLightSignalSystemDefinition.getId()).setCirculationTime(basicLightSignalSystemDefinition.getDefaultCirculationTime());
+				sortedLSAControlerMap.get(basicLightSignalSystemDefinition.getId()).setCirculationTime(basicLightSignalSystemDefinition.getDefaultCycleTime());
 			}
 			
 			for (BasicSignalGroupDefinition basicLightSignalGroupDefinition : newSignalSystems.getSignalGroupDefinitions()) {

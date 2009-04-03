@@ -79,12 +79,12 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 				.getSignalSystemDefinition()) {
 			lssdef = builder.createLightSignalSystemDefinition(new IdImpl(xmllssDef
 					.getId()));
-			lssdef.setDefaultCirculationTime(xmllssDef.getDefaultCirculationTime()
+			lssdef.setDefaultCycleTime(xmllssDef.getDefaultCycleTime()
 					.getSeconds());
-			lssdef.setDefaultInterimTime(xmllssDef.getDefaultInterimTime()
+			lssdef.setDefaultInterGreenTime(xmllssDef.getDefaultInterGreenTime()
 					.getSeconds());
-			lssdef.setDefaultSyncronizationOffset(xmllssDef
-					.getDefaultSyncronizationOffset().getSeconds());
+			lssdef.setDefaultSynchronizationOffset(xmllssDef
+					.getDefaultSynchronizationOffset().getSeconds());
 			lightSignalSystems.addSignalSystemDefinition(lssdef);
 		}
 		// parsing lightSignalGroupDefinitions

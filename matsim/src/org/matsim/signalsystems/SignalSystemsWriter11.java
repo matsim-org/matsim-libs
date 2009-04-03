@@ -89,16 +89,16 @@ public class SignalSystemsWriter11 extends MatsimJaxbXmlWriter {
 			xmllssd.setId(lssd.getId().toString());
 			
 			XMLMatsimTimeAttributeType xmlcirculationtime = fac.createXMLMatsimTimeAttributeType();
-			xmlcirculationtime.setSeconds(lssd.getDefaultCirculationTime());
-			xmllssd.setDefaultCirculationTime(xmlcirculationtime);
+			xmlcirculationtime.setSeconds(lssd.getDefaultCycleTime());
+			xmllssd.setDefaultCycleTime(xmlcirculationtime);
 			
 			XMLMatsimTimeAttributeType xmlsyncoffset = fac.createXMLMatsimTimeAttributeType();
-			xmlsyncoffset.setSeconds(lssd.getDefaultSyncronizationOffset());
-			xmllssd.setDefaultSyncronizationOffset(xmlsyncoffset);
+			xmlsyncoffset.setSeconds(lssd.getDefaultSynchronizationOffset());
+			xmllssd.setDefaultSynchronizationOffset(xmlsyncoffset);
 			
 			XMLMatsimTimeAttributeType xmlinterimtime= fac.createXMLMatsimTimeAttributeType();
-			xmlinterimtime.setSeconds(lssd.getDefaultInterimTime());
-			xmllssd.setDefaultInterimTime(xmlinterimtime);
+			xmlinterimtime.setSeconds(lssd.getDefaultInterGreenTime());
+			xmllssd.setDefaultInterGreenTime(xmlinterimtime);
 			
 			xmllss.getSignalSystemDefinition().add(xmllssd);
 		}

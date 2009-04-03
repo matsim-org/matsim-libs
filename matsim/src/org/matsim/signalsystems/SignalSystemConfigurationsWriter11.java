@@ -50,11 +50,11 @@ import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfig;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfigurationType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType;
-import org.matsim.jaxb.signalsystemsconfig11.XMLSignalGroupSettingsType.XMLInterimTimeDropping;
-import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLCirculationTime;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalGroupSettingsType.XMLInterGreenTimeDropping;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLCycleTime;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLStart;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLStop;
-import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLSyncronizationOffset;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLSynchronizationOffset;
 
 
 public class SignalSystemConfigurationsWriter11 extends MatsimJaxbXmlWriter{
@@ -162,15 +162,15 @@ public class SignalSystemConfigurationsWriter11 extends MatsimJaxbXmlWriter{
 		stop.setDaytime(getXmlGregorianCalendar(plan.getEndTime()));
 		xmlplan.setStop(stop);
 		
-		XMLCirculationTime xmlct = new XMLCirculationTime();
-		if (plan.getCirculationTime() != null) {
-			xmlct.setSec(plan.getCirculationTime());
-			xmlplan.setCirculationTime(xmlct);
+		XMLCycleTime xmlct = new XMLCycleTime();
+		if (plan.getCycleTime() != null) {
+			xmlct.setSec(plan.getCycleTime());
+			xmlplan.setCycleTime(xmlct);
 		}
-		if (plan.getSyncronizationOffset() != null) {
-			XMLSyncronizationOffset xmlso = new XMLSyncronizationOffset();
-			xmlso.setSec(plan.getSyncronizationOffset());
-			xmlplan.setSyncronizationOffset(xmlso);
+		if (plan.getSynchronizationOffset() != null) {
+			XMLSynchronizationOffset xmlso = new XMLSynchronizationOffset();
+			xmlso.setSec(plan.getSynchronizationOffset());
+			xmlplan.setSynchronizationOffset(xmlso);
 		}
 		
 		//marshal SignalGroupConfigurations
@@ -184,16 +184,16 @@ public class SignalSystemConfigurationsWriter11 extends MatsimJaxbXmlWriter{
 			XMLSignalGroupSettingsType.XMLDropping xmldropping = new XMLSignalGroupSettingsType.XMLDropping();
 			xmldropping.setSec((int)lsgc.getDropping());
 			xmllsgc.setDropping(xmldropping);
-			if (lsgc.getInterimTimeDropping() != null) {
-				XMLSignalGroupSettingsType.XMLInterimTimeDropping xmlitd = new XMLInterimTimeDropping();
-				xmlitd.setSec((int) lsgc.getInterimTimeDropping().doubleValue());
-				xmllsgc.setInterimTimeDropping(xmlitd);
+			if (lsgc.getInterGreenTimeDropping() != null) {
+				XMLSignalGroupSettingsType.XMLInterGreenTimeDropping xmlitd = new XMLInterGreenTimeDropping();
+				xmlitd.setSec((int) lsgc.getInterGreenTimeDropping().doubleValue());
+				xmllsgc.setInterGreenTimeDropping(xmlitd);
 			}
 
-			if (lsgc.getInterimTimeRoughcast() != null) {
-				XMLSignalGroupSettingsType.XMLInterimTimeRoughcast xmlitr = new XMLSignalGroupSettingsType.XMLInterimTimeRoughcast();
-				xmlitr.setSec((int) lsgc.getInterimTimeRoughcast().doubleValue());
-				xmllsgc.setInterimTimeRoughcast(xmlitr);
+			if (lsgc.getInterimGreenTimeRoughcast() != null) {
+				XMLSignalGroupSettingsType.XMLInterGreenTimeRoughcast xmlitr = new XMLSignalGroupSettingsType.XMLInterGreenTimeRoughcast();
+				xmlitr.setSec((int) lsgc.getInterimGreenTimeRoughcast().doubleValue());
+				xmllsgc.setInterGreenTimeRoughcast(xmlitr);
 			}
 			
 			xmlplan.getSignalGroupSettings().add(xmllsgc);

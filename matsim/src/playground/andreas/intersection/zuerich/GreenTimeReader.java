@@ -43,10 +43,10 @@ public class GreenTimeReader implements TabularFileHandler {
 				lsa = lsaConfigs.getBuilder().createSignalSystemConfiguration(new IdImpl(Integer.parseInt(row[0])));
 				BasicPlanBasedSignalSystemControlInfo controlInfo = lsaConfigs.getBuilder().createPlanBasedSignalSystemControlInfo();
 				BasicSignalSystemPlan plan = lsaConfigs.getBuilder().createSignalSystemPlan(new IdImpl("1"));
-				plan.setCirculationTime(new Integer(99));
+				plan.setCycleTime(new Integer(99));
 				plan.setStartTime(0);
 				plan.setEndTime(86399);
-				plan.setSyncronizationOffset(new Integer(0));
+				plan.setSynchronizationOffset(new Integer(0));
 				controlInfo.addPlan(plan);
 				lsa.setSignalSystemControlInfo(controlInfo);
 				
@@ -56,8 +56,8 @@ public class GreenTimeReader implements TabularFileHandler {
 			BasicSignalGroupSettings sgConfig = this.lsaConfigs.getBuilder().createSignalGroupSettings(new IdImpl(row[1]));
 			sgConfig.setRoughCast(0);
 			sgConfig.setDropping(Integer.parseInt(row[2]));
-			sgConfig.setInterimTimeRoughcast(new Integer(2));
-			sgConfig.setInterimTimeDropping(new Integer(3));
+			sgConfig.setInterGreenTimeRoughcast(new Integer(2));
+			sgConfig.setInterGreenTimeDropping(new Integer(3));
 			((BasicPlanBasedSignalSystemControlInfo) lsa.getControlInfo()).getPlans().get(new IdImpl(1)).addLightSignalGroupConfiguration(sgConfig);
 
 		} 

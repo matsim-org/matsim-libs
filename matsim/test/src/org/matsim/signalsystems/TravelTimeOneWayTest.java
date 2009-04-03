@@ -87,7 +87,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase implements
 				BasicPlanBasedSignalSystemControlInfo controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfig
 						.getControlInfo();
 				BasicSignalSystemPlan p = controlInfo.getPlans().get(new IdImpl("2"));
-				p.setCirculationTime(circulationTime);
+				p.setCycleTime(circulationTime);
 				BasicSignalGroupSettings group = p.getGroupConfigs().get(
 						new IdImpl("100"));
 				group.setDropping(dropping);

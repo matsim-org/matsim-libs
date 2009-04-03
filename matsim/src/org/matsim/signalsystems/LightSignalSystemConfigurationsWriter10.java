@@ -111,13 +111,13 @@ public class LightSignalSystemConfigurationsWriter10 extends MatsimJaxbXmlWriter
 					xmlplan.setStop(stop);
 					
 					XMLMatsimTimeAttributeType xmlct = fac.createXMLMatsimTimeAttributeType();
-					if (plan.getCirculationTime() != null) {
-						xmlct.setSeconds(plan.getCirculationTime());
+					if (plan.getCycleTime() != null) {
+						xmlct.setSeconds(plan.getCycleTime());
 						xmlplan.setCirculationTime(xmlct);
 					}
-					if (plan.getSyncronizationOffset() != null) {
+					if (plan.getSynchronizationOffset() != null) {
 						XMLMatsimTimeAttributeType xmlso = fac.createXMLMatsimTimeAttributeType();
-						xmlso.setSeconds(plan.getSyncronizationOffset());
+						xmlso.setSeconds(plan.getSynchronizationOffset());
 						xmlplan.setSyncronizationOffset(xmlso);
 					}
 					
@@ -135,15 +135,15 @@ public class LightSignalSystemConfigurationsWriter10 extends MatsimJaxbXmlWriter
 						XMLLightSignalGroupConfigurationType.XMLDropping xmldropping = new XMLLightSignalGroupConfigurationType.XMLDropping();
 						xmldropping.setSec((int)lsgc.getDropping());
 						xmllsgc.setDropping(xmldropping);
-						if (lsgc.getInterimTimeDropping() != null) {
+						if (lsgc.getInterGreenTimeDropping() != null) {
 							XMLLightSignalGroupConfigurationType.XMLInterimTimeDropping xmlitd = new XMLInterimTimeDropping();
-							xmlitd.setSec((int) lsgc.getInterimTimeDropping().doubleValue());
+							xmlitd.setSec((int) lsgc.getInterGreenTimeDropping().doubleValue());
 							xmllsgc.setInterimTimeDropping(xmlitd);
 						}
 
-						if (lsgc.getInterimTimeRoughcast() != null) {
+						if (lsgc.getInterimGreenTimeRoughcast() != null) {
 							XMLLightSignalGroupConfigurationType.XMLInterimTimeRoughcast xmlitr = new XMLLightSignalGroupConfigurationType.XMLInterimTimeRoughcast();
-							xmlitr.setSec((int) lsgc.getInterimTimeRoughcast().doubleValue());
+							xmlitr.setSec((int) lsgc.getInterimGreenTimeRoughcast().doubleValue());
 							xmllsgc.setInterimTimeRoughcast(xmlitr);
 						}
 						

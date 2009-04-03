@@ -78,8 +78,8 @@ public class PlanBasedSignalSystemControler implements SignalSystemControler {
 			throw new IllegalStateException(message);
 		}
 		double circulationTime;
-		if (activePlan.getCirculationTime() != null){
-			circulationTime = activePlan.getCirculationTime();
+		if (activePlan.getCycleTime() != null){
+			circulationTime = activePlan.getCycleTime();
 		}
 		else {
 			circulationTime = this.defaultCirculationTime;

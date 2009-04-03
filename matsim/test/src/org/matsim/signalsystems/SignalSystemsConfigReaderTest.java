@@ -88,16 +88,16 @@ public class SignalSystemsConfigReaderTest extends MatsimTestCase {
 		assertEquals(id5, plan.getId());
 		assertEquals(0.0, plan.getStartTime(), EPSILON);
 		assertEquals(0.0, plan.getEndTime(), EPSILON);
-		assertEquals(Integer.valueOf(40), plan.getCirculationTime());
-		assertEquals(Integer.valueOf(3), plan.getSyncronizationOffset());
+		assertEquals(Integer.valueOf(40), plan.getCycleTime());
+		assertEquals(Integer.valueOf(3), plan.getSynchronizationOffset());
 		
 		assertEquals(1, plan.getGroupConfigs().size());
 		BasicSignalGroupSettings groupConfig = plan.getGroupConfigs().get(id23);
 		assertNotNull(groupConfig);
 		assertEquals(0.0, groupConfig.getRoughCast(), EPSILON);
 		assertEquals(45.0, groupConfig.getDropping(), EPSILON);
-		assertEquals(Integer.valueOf(2), groupConfig.getInterimTimeRoughcast());
-		assertEquals(Integer.valueOf(3), groupConfig.getInterimTimeDropping());
+		assertEquals(Integer.valueOf(2), groupConfig.getInterimGreenTimeRoughcast());
+		assertEquals(Integer.valueOf(3), groupConfig.getInterGreenTimeDropping());
 		
 		//test second
 		lssConfiguration = lssConfigs.getSignalSystemConfigurations().get(id42);
@@ -110,15 +110,15 @@ public class SignalSystemsConfigReaderTest extends MatsimTestCase {
 		assertEquals(id8, plan.getId());
 		assertEquals(0.0, plan.getStartTime(), EPSILON);
 		assertEquals(0.0, plan.getEndTime(), EPSILON);
-		assertEquals(Integer.valueOf(60), plan.getCirculationTime());
-		assertNull(plan.getSyncronizationOffset());
+		assertEquals(Integer.valueOf(60), plan.getCycleTime());
+		assertNull(plan.getSynchronizationOffset());
 		assertEquals(1, plan.getGroupConfigs().size());
 		groupConfig = plan.getGroupConfigs().get(id23);
 		assertNotNull(groupConfig);
 		assertEquals(0.0, groupConfig.getRoughCast(), EPSILON);
 		assertEquals(45.0, groupConfig.getDropping(), EPSILON);
-		assertNull(groupConfig.getInterimTimeRoughcast());
-		assertNull(groupConfig.getInterimTimeDropping());
+		assertNull(groupConfig.getInterimGreenTimeRoughcast());
+		assertNull(groupConfig.getInterGreenTimeDropping());
 		
 		//test 3rd
 		lssConfiguration = lssConfigs.getSignalSystemConfigurations().get(id43);
@@ -148,16 +148,16 @@ public class SignalSystemsConfigReaderTest extends MatsimTestCase {
 		assertEquals(id5, plan.getId());
 		assertEquals(0.0, plan.getStartTime(), EPSILON);
 		assertEquals(0.0, plan.getEndTime(), EPSILON);
-		assertEquals(Integer.valueOf(40), plan.getCirculationTime());
-		assertEquals(Integer.valueOf(3), plan.getSyncronizationOffset());
+		assertEquals(Integer.valueOf(40), plan.getCycleTime());
+		assertEquals(Integer.valueOf(3), plan.getSynchronizationOffset());
 		
 		assertEquals(1, plan.getGroupConfigs().size());
 		groupConfig = plan.getGroupConfigs().get(id23);
 		assertNotNull(groupConfig);
 		assertEquals(0.0, groupConfig.getRoughCast(), EPSILON);
 		assertEquals(45.0, groupConfig.getDropping(), EPSILON);
-		assertEquals(Integer.valueOf(2), groupConfig.getInterimTimeRoughcast());
-		assertEquals(Integer.valueOf(3), groupConfig.getInterimTimeDropping());
+		assertEquals(Integer.valueOf(2), groupConfig.getInterimGreenTimeRoughcast());
+		assertEquals(Integer.valueOf(3), groupConfig.getInterGreenTimeDropping());
 		
 		
 	}  

@@ -94,30 +94,30 @@ public class BasicSignalSystemPlanImpl implements BasicSignalSystemPlan {
 	}
 
 	/**
-	 * @see org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan#setCirculationTime(java.lang.Integer)
+	 * @see org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan#setCycleTime(java.lang.Integer)
 	 */
-	public void setCirculationTime(Integer circulationTimeSec) {
+	public void setCycleTime(Integer circulationTimeSec) {
 		this.circulationTime = circulationTimeSec;
 	}
 	
 	/**
-	 * @see org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan#setSyncronizationOffset(java.lang.Integer)
+	 * @see org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan#setSynchronizationOffset(java.lang.Integer)
 	 */
-	public void setSyncronizationOffset(Integer seconds) {
+	public void setSynchronizationOffset(Integer seconds) {
 		this.syncronizationOffset = seconds;
 	}
 
 	/**
-	 * @see org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan#getSyncronizationOffset()
+	 * @see org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan#getSynchronizationOffset()
 	 */
-	public Integer getSyncronizationOffset() {
+	public Integer getSynchronizationOffset() {
 		return syncronizationOffset;
 	}
 
 	/**
-	 * @see org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan#getCirculationTime()
+	 * @see org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan#getCycleTime()
 	 */
-	public Integer getCirculationTime() {
+	public Integer getCycleTime() {
 		return circulationTime;
 	}
 

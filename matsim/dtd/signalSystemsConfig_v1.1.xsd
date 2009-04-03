@@ -150,7 +150,7 @@ the simulation -->
 						<xs:attribute name="daytime" type="xs:time" use="required"/>
 					</xs:complexType>
   			</xs:element>
-    		<xs:element name="circulationTime">
+    		<xs:element name="cycleTime">
 		    	<xs:annotation>
     				<xs:documentation>The time in seconds needed to process this plan.</xs:documentation>
     			</xs:annotation>
@@ -158,7 +158,7 @@ the simulation -->
 					  <xs:attribute name="sec" type="xs:nonNegativeInteger" use="required"/>
 					</xs:complexType>
    		 	</xs:element>
-				<xs:element name="syncronizationOffset" minOccurs="0" maxOccurs="1" >
+				<xs:element name="synchronizationOffset" minOccurs="0" maxOccurs="1" >
     			<xs:annotation>
 		    		<xs:documentation>The second of the circulation time which is used
     				for synchronization.</xs:documentation>
@@ -215,7 +215,7 @@ the simulation -->
 						<xs:attribute name="sec" type="xs:nonNegativeInteger" use="required" />
 				  </xs:complexType>
       	</xs:element>
- 			  <xs:element name="interimTimeRoughcast" minOccurs="0" maxOccurs="1" >
+ 			  <xs:element name="interGreenTimeRoughcast" minOccurs="0" maxOccurs="1" >
 			  	<xs:annotation>
 						<xs:documentation>Number of seconds before the roughcast can be done.</xs:documentation>
 					</xs:annotation>
@@ -223,7 +223,7 @@ the simulation -->
 			     	<xs:attribute name="sec" type="xs:nonNegativeInteger" default="0" />
 			    </xs:complexType>
 		    </xs:element>
- 				<xs:element name="interimTimeDropping" minOccurs="0" maxOccurs="1" >
+ 				<xs:element name="interGreenTimeDropping" minOccurs="0" maxOccurs="1" >
 			  	<xs:annotation>
 			    	<xs:documentation>Number of seconds after the dropping. </xs:documentation>
 					</xs:annotation>

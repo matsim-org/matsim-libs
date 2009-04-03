@@ -296,7 +296,7 @@ public class QueueSimulation {
 	private void initPlanbasedControler(PlanBasedSignalSystemControler controler, BasicSignalSystemConfiguration config){
 		BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getSignalSystemId());
 		//TODO set other defaults of xml
-		controler.setDefaultCirculationTime(systemDef.getDefaultCirculationTime());
+		controler.setDefaultCirculationTime(systemDef.getDefaultCycleTime());
 
 		List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getSignalSystemId());
 		if ((groups == null) || groups.isEmpty()) {

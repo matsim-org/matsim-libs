@@ -136,20 +136,20 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 		BasicSignalSystemPlan plan = builder.createSignalSystemPlan(new IdImpl(xmlplan.getId()));					
 		plan.setStartTime(getSeconds(xmlplan.getStart().getDaytime()));
 		plan.setEndTime(getSeconds(xmlplan.getStop().getDaytime()));
-		if (xmlplan.getCirculationTime() != null) {
-			plan.setCirculationTime(xmlplan.getCirculationTime().getSec());
+		if (xmlplan.getCycleTime() != null) {
+			plan.setCycleTime(xmlplan.getCycleTime().getSec());
 		}
-		if (xmlplan.getSyncronizationOffset() != null) {
-			plan.setSyncronizationOffset(xmlplan.getSyncronizationOffset().getSec());
+		if (xmlplan.getSynchronizationOffset() != null) {
+			plan.setSynchronizationOffset(xmlplan.getSynchronizationOffset().getSec());
 		}
 		for (XMLSignalGroupSettingsType xmlgroupconfig : xmlplan.getSignalGroupSettings()) {
 			BasicSignalGroupSettings groupConfig = builder.createSignalGroupSettings(new IdImpl(xmlgroupconfig.getRefId()));
 			groupConfig.setRoughCast(xmlgroupconfig.getRoughcast().getSec());
 			groupConfig.setDropping(xmlgroupconfig.getDropping().getSec());
-			if (xmlgroupconfig.getInterimTimeRoughcast() != null)
-				groupConfig.setInterimTimeRoughcast(xmlgroupconfig.getInterimTimeRoughcast().getSec());
-			if (xmlgroupconfig.getInterimTimeDropping() != null)
-				groupConfig.setInterimTimeDropping(xmlgroupconfig.getInterimTimeDropping().getSec());
+			if (xmlgroupconfig.getInterGreenTimeRoughcast() != null)
+				groupConfig.setInterGreenTimeRoughcast(xmlgroupconfig.getInterGreenTimeRoughcast().getSec());
+			if (xmlgroupconfig.getInterGreenTimeDropping() != null)
+				groupConfig.setInterGreenTimeDropping(xmlgroupconfig.getInterGreenTimeDropping().getSec());
 			
 			plan.addLightSignalGroupConfiguration(groupConfig);
 		}		

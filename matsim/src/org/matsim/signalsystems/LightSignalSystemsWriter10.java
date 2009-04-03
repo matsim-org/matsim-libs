@@ -125,15 +125,15 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 			xmllssd.setId(lssd.getId().toString());
 			
 			XMLMatsimTimeAttributeType xmlcirculationtime = fac.createXMLMatsimTimeAttributeType();
-			xmlcirculationtime.setSeconds(lssd.getDefaultCirculationTime());
+			xmlcirculationtime.setSeconds(lssd.getDefaultCycleTime());
 			xmllssd.setDefaultCirculationTime(xmlcirculationtime);
 			
 			XMLMatsimTimeAttributeType xmlsyncoffset = fac.createXMLMatsimTimeAttributeType();
-			xmlsyncoffset.setSeconds(lssd.getDefaultSyncronizationOffset());
+			xmlsyncoffset.setSeconds(lssd.getDefaultSynchronizationOffset());
 			xmllssd.setDefaultSyncronizationOffset(xmlsyncoffset);
 			
 			XMLMatsimTimeAttributeType xmlinterimtime= fac.createXMLMatsimTimeAttributeType();
-			xmlinterimtime.setSeconds(lssd.getDefaultInterimTime());
+			xmlinterimtime.setSeconds(lssd.getDefaultInterGreenTime());
 			xmllssd.setDefaultInterimTime(xmlinterimtime);
 			
 			xmllss.getLightSignalSystemDefinition().add(xmllssd);

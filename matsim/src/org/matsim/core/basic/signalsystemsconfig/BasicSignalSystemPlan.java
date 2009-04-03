@@ -43,12 +43,12 @@ public interface BasicSignalSystemPlan {
 
 	public Map<Id, BasicSignalGroupSettings> getGroupConfigs();
 
-	public void setCirculationTime(Integer circulationTimeSec);
+	public void setCycleTime(Integer circulationTimeSec);
 
-	public void setSyncronizationOffset(Integer seconds);
+	public void setSynchronizationOffset(Integer seconds);
 
-	public Integer getSyncronizationOffset();
+	public Integer getSynchronizationOffset();
 
-	public Integer getCirculationTime();
+	public Integer getCycleTime();
 
 }
