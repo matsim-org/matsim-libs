@@ -22,20 +22,20 @@ package playground.dgrether.daganzosignal;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
 
@@ -54,25 +54,23 @@ public class DaganzoScenarioGenerator {
 	private static final Logger log = Logger
 			.getLogger(DaganzoScenarioGenerator.class);
 
-	private static final String networkFileOld = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoNetworkOldRenamed.xml";
-
-	public static final String networkFileNew = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoNetwork.xml";
+	public static final String networkFileNew = DgPaths.SHAREDSVN + "studies/dgrether/daganzo/daganzoNetwork.xml";
 
 //	public static final String networkFile 	= networkFileOld;
 
 	public static final String networkFile 	= networkFileNew;
 
-	private static final String plans1Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoPlans.xml";
+	private static final String plans1Out = DgPaths.SHAREDSVN + "studies/dgrether/daganzo/daganzoPlans.xml";
 
-	private static final String plans2Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoPlansAltRoute.xml";
+	private static final String plans2Out = DgPaths.SHAREDSVN + "studies/dgrether/daganzo/daganzoPlansAltRoute.xml";
 
 //	public static final String config1Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoConfig.xml";
 //
 //	public static final String config2Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoConfigAltRoute.xml";
 
-	public static final String config1Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoConfig.xml";
+	public static final String config1Out = DgPaths.SHAREDSVN + "studies/dgrether/daganzo/daganzoConfig.xml";
 
-	public static final String config2Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoConfigAltRoute.xml";
+	public static final String config2Out = DgPaths.SHAREDSVN + "studies/dgrether/daganzo/daganzoConfigAltRoute.xml";
 
 
 	public static String configOut, plansOut;
@@ -85,16 +83,27 @@ public class DaganzoScenarioGenerator {
 
 //	private static final int iterations = 1;
 
-	private Population plans;
+	private Population population;
 
 	private Config config;
 
-	private NetworkLayer network;
+	private Network network;
 
-	public DaganzoScenarioGenerator() throws Exception {
-//		init();
-		createPlans();
-		MatsimIo.writePlans(this.plans, plansOut);
+	private Scenario scenario;
+
+	public DaganzoScenarioGenerator() {
+		init();
+		this.config = new Config();
+//	Gbl.setConfig(this.config);
+		this.config.addCoreModules();
+		this.config.network().setInputFile(networkFile);
+		this.scenario = new ScenarioImpl(this.config);
+		this.network = this.scenario.getNetwork();
+		this.population = this.scenario.getPopulation();
+		
+		createPlans(this.population);
+		
+		MatsimIo.writePlans(this.population, plansOut);
 		//set scenario
 		this.config.network().setInputFile(networkFile);
 		this.config.plans().setInputFile(plansOut);
@@ -150,9 +159,7 @@ public class DaganzoScenarioGenerator {
 			plansOut = plans1Out;
 			configOut = config1Out;
 		}
-		this.config = new Config();
-//		Gbl.setConfig(this.config);
-		this.config.addCoreModules();
+
 
 //		this.config.plans().setOutputVersion("v4");
 //		this.config.plans().setOutputFile(plansOut);
@@ -160,38 +167,41 @@ public class DaganzoScenarioGenerator {
 //		this.network = MatsimIo.loadNetwork(networkFile);
 	}
 
-	private void createPlans() throws Exception {
-		this.plans = new PopulationImpl(false);
+	private void createPlans(Population population) {
 		int firstHomeEndTime = 0;//6 * 3600;
 		int homeEndTime = firstHomeEndTime;
-		Link l1 = this.network.getLink(IdFactory.get(1));
-		Link l6 = this.network.getLink(IdFactory.get(6));
-
+		Link l1 = this.network.getLink(this.scenario.createId("1"));
+		Link l7 = this.network.getLink(this.scenario.createId("7"));
+		PopulationBuilder builder = population.getPopulationBuilder();
+		
 		for (int i = 1; i <= 3600; i++) {
-			Person p = new PersonImpl(new IdImpl(i));
-			Plan plan = new org.matsim.core.population.PlanImpl(p);
+			Person p = builder.createPerson(this.scenario.createId(Integer.toString(i)));
+			Plan plan = builder.createPlan(p);
 			p.addPlan(plan);
 			//home
 //			homeEndTime = homeEndTime +  ((i - 1) % 3);
 			if ((i-1) % 3 == 0){
 				homeEndTime++;
 			}
-			Activity act1 = plan.createAct("h", l1.getCoord());
-			act1.setLink(l1);
+			
+			Activity act1 = builder.createActivityFromLinkId("h", l1.getId());
 			act1.setEndTime(homeEndTime);
+			plan.addAct(act1);
 			//leg to home
-			Leg leg = plan.createLeg(BasicLeg.Mode.car);
-			NetworkRoute route = new NodeNetworkRoute(l1, l6);
+			Leg leg = builder.createLeg(BasicLeg.Mode.car);
+			//TODO check this
+			NetworkRoute route = new NodeNetworkRoute(l1, l7);
 			if (isAlternativeRouteEnabled) {
-				route.setNodes(l1, NetworkUtils.getNodes(this.network, "2 3 4 5 6"), l6);
+				route.setNodes(l1, NetworkUtils.getNodes(this.network, "2 3 4 5 6"), l7);
 			}
 			else {
-				route.setNodes(l1, NetworkUtils.getNodes(this.network, "2 3 5 6"), l6);
+				route.setNodes(l1, NetworkUtils.getNodes(this.network, "2 3 5 6"), l7);
 			}
 			leg.setRoute(route);
-			Activity act2 = plan.createAct("h", l6.getCoord());
-			act2.setLink(l6);
-			this.plans.addPerson(p);
+			
+			Activity act2 = builder.createActivityFromLinkId("h", l7.getId());
+			act2.setLink(l7);
+			this.population.addPerson(p);
 		}
 	}
 

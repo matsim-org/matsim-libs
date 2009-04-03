@@ -25,17 +25,17 @@ package playground.dgrether;
  */
 public interface DgPaths {
 
-	final String VSPSVNBASE = "/Volumes/data/work/scmWorkspace/";
+	final String SCMWORKSPACE = "/Volumes/data/work/scmWorkspace/";
 	
 	final String WSBASE = "/Volumes/data/work/svnWorkspace/";
 	
 	final String VSPCVSBASE = "/Volumes/data/work/cvsRep/vsp-cvs/";
 	
-	final String IVTCHNET = VSPSVNBASE + "studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
+	final String IVTCHNET = SCMWORKSPACE + "studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
 	
-	final String IVTCHROADPRICING = VSPSVNBASE + "studies/schweiz-ivtch/baseCase/roadpricing/zurichCityArea/zurichCityAreaWithoutHighwaysPricingScheme.xml";
+	final String IVTCHROADPRICING = SCMWORKSPACE + "studies/schweiz-ivtch/baseCase/roadpricing/zurichCityArea/zurichCityAreaWithoutHighwaysPricingScheme.xml";
 	
-	final String IVTCHCOUNTS = VSPSVNBASE + "studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml";
+	final String IVTCHCOUNTS = SCMWORKSPACE + "studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml";
 
-  final String SHAREDSVN = VSPSVNBASE + "shared-svn/";
+  final String SHAREDSVN = SCMWORKSPACE + "shared-svn/";
 }

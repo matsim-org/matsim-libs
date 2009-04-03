@@ -53,20 +53,20 @@ public class CMCFScenarioGeneratorNoReroute {
 	private static final Logger log = Logger
 			.getLogger(CMCFScenarioGeneratorNoReroute.class);
 
-	private static final String networkFileOld = DgPaths.VSPSVNBASE
+	private static final String networkFileOld = DgPaths.SCMWORKSPACE
 			+ "studies/dgrether/cmcf/daganzoNetworkOldRenamed.xml";
 
-	public static final String networkFileNew = DgPaths.VSPSVNBASE
+	public static final String networkFileNew = DgPaths.SCMWORKSPACE
 			+ "studies/dgrether/cmcf/daganzoNetworkLessBottleneck.xml";
 
 	// public static final String networkFile = networkFileOld;
 
 	public static final String networkFile = networkFileNew;
 
-	private static final String plans1Out = DgPaths.VSPSVNBASE
+	private static final String plans1Out = DgPaths.SCMWORKSPACE
 			+ "studies/dgrether/cmcf/daganzoPlansNoReroute.xml";
 
-	private static final String plans2Out = DgPaths.VSPSVNBASE
+	private static final String plans2Out = DgPaths.SCMWORKSPACE
 			+ "studies/dgrether/cmcf/daganzoPlansAltRouteNoReroute.xml";
 
 	// public static final String config1Out = DgPaths.VSPSVNBASE +
@@ -75,10 +75,10 @@ public class CMCFScenarioGeneratorNoReroute {
 	// public static final String config2Out = DgPaths.VSPSVNBASE +
 	// "studies/dgrether/cmcf/daganzoConfigAltRoute.xml";
 
-	public static final String config1Out = DgPaths.VSPSVNBASE
+	public static final String config1Out = DgPaths.SCMWORKSPACE
 			+ "studies/dgrether/cmcf/daganzoConfigNoReroute.xml";
 
-	public static final String config2Out = DgPaths.VSPSVNBASE
+	public static final String config2Out = DgPaths.SCMWORKSPACE
 			+ "studies/dgrether/cmcf/daganzoConfigAltRouteNoReroute.xml";
 
 	public static String configOut, plansOut;

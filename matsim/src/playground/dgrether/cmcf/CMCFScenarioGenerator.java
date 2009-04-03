@@ -55,25 +55,25 @@ public class CMCFScenarioGenerator {
 	private static final Logger log = Logger
 			.getLogger(CMCFScenarioGenerator.class);
 
-	private static final String networkFileOld = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoNetworkOldRenamed.xml";
+	private static final String networkFileOld = DgPaths.SCMWORKSPACE + "studies/dgrether/cmcf/daganzoNetworkOldRenamed.xml";
 
-	public static final String networkFileNew = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoNetwork.xml";
+	public static final String networkFileNew = DgPaths.SCMWORKSPACE + "studies/dgrether/cmcf/daganzoNetwork.xml";
 
 //	public static final String networkFile 	= networkFileOld;
 
 	public static final String networkFile 	= networkFileNew;
 
-	private static final String plans1Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoPlans.xml";
+	private static final String plans1Out = DgPaths.SCMWORKSPACE + "studies/dgrether/cmcf/daganzoPlans.xml";
 
-	private static final String plans2Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoPlansAltRoute.xml";
+	private static final String plans2Out = DgPaths.SCMWORKSPACE + "studies/dgrether/cmcf/daganzoPlansAltRoute.xml";
 
 //	public static final String config1Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoConfig.xml";
 //
 //	public static final String config2Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoConfigAltRoute.xml";
 
-	public static final String config1Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoConfig.xml";
+	public static final String config1Out = DgPaths.SCMWORKSPACE + "studies/dgrether/cmcf/daganzoConfig.xml";
 
-	public static final String config2Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoConfigAltRoute.xml";
+	public static final String config2Out = DgPaths.SCMWORKSPACE + "studies/dgrether/cmcf/daganzoConfigAltRoute.xml";
 
 
 	public static String configOut, plansOut;
