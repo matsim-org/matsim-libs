@@ -3,6 +3,10 @@
  */
 package playground.yu.analysis.forBln;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.population.Leg;
@@ -15,7 +19,9 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.xml.sax.SAXException;
 
 import playground.yu.analysis.DailyEnRouteTime;
 import playground.yu.utils.CollectionSum;
@@ -542,14 +548,24 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 					+ ptLegTimeCounts[i] + wlkLegTimeCounts[i]
 					+ bikeLegTimeCounts[i] + othersLegTimeCounts[i];
 			xs[i] = i * 2;
-			yCarFracs[i] = this.carLegTimeCounts[i] / sumOfLegTimeCounts
-					* 100.0;
-			yPtFracs[i] = this.ptLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
-			yWlkFracs[i] = this.wlkLegTimeCounts[i] / sumOfLegTimeCounts
-					* 100.0;
-			yBikeFracs[i] = bikeLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
-			yOthersFracs[i] = othersLegTimeCounts[i] / sumOfLegTimeCounts
-					* 100.0;
+			if (sumOfLegTimeCounts > 0) {
+				yCarFracs[i] = this.carLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+				yPtFracs[i] = this.ptLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+				yWlkFracs[i] = this.wlkLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+				yBikeFracs[i] = bikeLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+				yOthersFracs[i] = othersLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+			} else {
+				yCarFracs[i] = 0;
+				yPtFracs[i] = 0;
+				yWlkFracs[i] = 0;
+				yBikeFracs[i] = 0;
+				yOthersFracs[i] = 0;
+			}
 			sw.writeln(i + "+\t" + carLegTimeCounts[i] + "\t"
 					+ ptLegTimeCounts[i] + "\t" + wlkLegTimeCounts[i] + "\t"
 					+ bikeLegTimeCounts[i] + "\t" + othersLegTimeCounts[i]
@@ -582,7 +598,7 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		final String netFilename = "../berlin data/osm/bb_osm_wip_cl.xml.gz";
 		final String plansFilename = "../runs-svn/run756/it.1000/1000.plans.xml.gz";
 		String outputFilename = "../matsimTests/run756/dailyEnRouteTime/";
-		// String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
+		String tollFilename = "../berlin data/Hundekopf/osm/tollBerlinHundekopf.xml";
 
 		Gbl.createConfig(null);
 
@@ -591,19 +607,19 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 
 		Population population = new PopulationImpl();
 
-		// RoadPricingReaderXMLv1 tollReader = new
-		// RoadPricingReaderXMLv1(network);
-		// try {
-		// tollReader.parse(tollFilename);
-		// } catch (SAXException e) {
-		// e.printStackTrace();
-		// } catch (ParserConfigurationException e) {
-		// e.printStackTrace();
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
+		try {
+			tollReader.parse(tollFilename);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		DailyEnRouteTime4Bln ert = new DailyEnRouteTime4Bln(null);
+		DailyEnRouteTime4Bln ert = new DailyEnRouteTime4Bln(tollReader
+				.getScheme());
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);

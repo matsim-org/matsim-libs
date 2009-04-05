@@ -41,34 +41,24 @@ import playground.yu.utils.io.SimpleWriter;
 public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
 	protected int count;
-
 	protected double carTime, ptTime, wlkTime, bikeTime, othersTime;
-
 	protected final double totalDayEnRouteTimeCounts[],
 			carDayEnRouteTimeCounts[], ptDayEnRouteTimeCounts[],
 			wlkDayEnRouteTimeCounts[], bikeDayEnRouteTimeCounts[],
 			othersDayEnRouteTimeCounts[];
-
 	protected final double wlkLegTimeCounts[], ptLegTimeCounts[],
 			carLegTimeCounts[], bikeLegTimeCounts[], othersLegTimeCounts[];
-
 	protected double carWorkTime, carEducTime, carShopTime, carLeisTime,
 			carOtherTime, carHomeTime;
-
 	protected double ptWorkTime, ptEducTime, ptShopTime, ptLeisTime,
 			ptOtherTime, ptHomeTime;
-
 	protected double wlkWorkTime, wlkEducTime, wlkShopTime, wlkLeisTime,
 			wlkOtherTime, wlkHomeTime;
-
 	protected double bikeWorkTime, bikeEducTime, bikeShopTime, bikeLeisTime,
 			bikeOtherTime, bikeHomeTime;
-
 	protected double othersWorkTime, othersEducTime, othersShopTime,
 			othersLeisTime, othersOtherTime, othersHomeTime;
-
 	protected Person person;
-
 	protected RoadPricingScheme toll = null;
 
 	public DailyEnRouteTime(RoadPricingScheme toll) {
@@ -478,14 +468,24 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 					+ ptLegTimeCounts[i] + wlkLegTimeCounts[i]
 					+ bikeLegTimeCounts[i] + othersLegTimeCounts[i];
 			xs[i] = i * 2;
-			yCarFracs[i] = this.carLegTimeCounts[i] / sumOfLegTimeCounts
-					* 100.0;
-			yPtFracs[i] = this.ptLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
-			yWlkFracs[i] = this.wlkLegTimeCounts[i] / sumOfLegTimeCounts
-					* 100.0;
-			yBikeFracs[i] = bikeLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
-			yOthersFracs[i] = othersLegTimeCounts[i] / sumOfLegTimeCounts
-					* 100.0;
+			if (sumOfLegTimeCounts > 0) {
+				yCarFracs[i] = this.carLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+				yPtFracs[i] = this.ptLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+				yWlkFracs[i] = this.wlkLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+				yBikeFracs[i] = bikeLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+				yOthersFracs[i] = othersLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+			} else {
+				yCarFracs[i] = 0;
+				yPtFracs[i] = 0;
+				yWlkFracs[i] = 0;
+				yBikeFracs[i] = 0;
+				yOthersFracs[i] = 0;
+			}
 			sw.writeln(i + "+\t" + carLegTimeCounts[i] + "\t"
 					+ ptLegTimeCounts[i] + "\t" + wlkLegTimeCounts[i] + "\t"
 					+ bikeLegTimeCounts[i] + "\t" + othersLegTimeCounts[i]
@@ -515,8 +515,8 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		Gbl.startMeasurement();
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		final String plansFilename = "../runs_SVN/run684/it.1000/1000.plans.xml.gz";
-		String outputFilename = "../matsimTests/analysis/";
+		final String plansFilename = "../runs-svn/run684/it.1000/1000.plans.xml.gz";
+		String outputFilename = "../matsimTests/run684/DailyEnRouteTime/";
 		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
 
 		Gbl.createConfig(null);

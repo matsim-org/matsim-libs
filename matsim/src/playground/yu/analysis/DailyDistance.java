@@ -43,38 +43,26 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
 	protected double carDist, ptDist, wlkDist, bikeDist// TODO
 			, othersDist;
-
 	protected final double totalDayDistanceCounts[], carDayDistanceCounts[],
 			ptDayDistanceCounts[], wlkDayDistanceCounts[],
-			bikeDayDistanceCounts[]// TODO
-			, othersDayDistanceCounts[];
-
+			bikeDayDistanceCounts[], othersDayDistanceCounts[];
 	protected final double wlkLegDistanceCounts[], ptLegDistanceCounts[],
 			carLegDistanceCounts[], bikeLegDistanceCounts[],
-			othersLegDistanceCounts[];// TODO
-
+			othersLegDistanceCounts[];
 	protected double carWorkDist, carEducDist, carShopDist, carLeisDist,
 			carOtherDist;
-
 	protected double ptWorkDist, ptEducDist, ptShopDist, ptLeisDist,
 			ptOtherDist;
-
 	protected double wlkWorkDist, wlkEducDist, wlkShopDist, wlkLeisDist,
 			wlkOtherDist;
-
 	protected double bikeWorkDist, bikeEducDist, bikeShopDist, bikeLeisDist,
-			bikeOtherDist;// TODO
-
+			bikeOtherDist;
 	protected double othersWorkDist, othersEducDist, othersShopDist,
-			othersLeisDist, othersOtherDist;// TODO
-
+			othersLeisDist, othersOtherDist;
 	protected double wlkHomeDist, ptHomeDist, carHomeDist, bikeHomeDist,
-			othersHomeDist;// TODO
-
+			othersHomeDist;
 	protected int count;
-
 	protected Person person;
-
 	protected RoadPricingScheme toll = null;
 
 	public DailyDistance(RoadPricingScheme toll) {
@@ -496,22 +484,30 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 					+ this.carLegDistanceCounts[i] + wlkLegDistanceCounts[i]
 					+ bikeLegDistanceCounts[i] + othersLegDistanceCounts[i];
 			xs[i] = i;
-			yCarFracs[i] = this.carLegDistanceCounts[i] / sumLegDistanceCounts
-					* 100.0;
-			yPtFracs[i] = this.ptLegDistanceCounts[i] / sumLegDistanceCounts
-					* 100.0;
-			yWlkFracs[i] = this.wlkLegDistanceCounts[i] / sumLegDistanceCounts
-					* 100.0;
-			yBikeFracs[i] = bikeLegDistanceCounts[i] / sumLegDistanceCounts
-					* 100.0;
-			yOthersFracs[i] = othersLegDistanceCounts[i] / sumLegDistanceCounts
-					* 100.0;
+			if (sumLegDistanceCounts > 0) {
+				yCarFracs[i] = this.carLegDistanceCounts[i]
+						/ sumLegDistanceCounts * 100.0;
+				yPtFracs[i] = this.ptLegDistanceCounts[i]
+						/ sumLegDistanceCounts * 100.0;
+				yWlkFracs[i] = this.wlkLegDistanceCounts[i]
+						/ sumLegDistanceCounts * 100.0;
+				yBikeFracs[i] = bikeLegDistanceCounts[i] / sumLegDistanceCounts
+						* 100.0;
+				yOthersFracs[i] = othersLegDistanceCounts[i]
+						/ sumLegDistanceCounts * 100.0;
+			} else {
+				yCarFracs[i] = 0;
+				yPtFracs[i] = 0;
+				yWlkFracs[i] = 0;
+				yBikeFracs[i] = 0;
+				yOthersFracs[i] = 0;
+			}
 			sw.writeln(i + "+\t" + carLegDistanceCounts[i] + "\t"
 					+ ptLegDistanceCounts[i] + "\t" + wlkLegDistanceCounts[i]
 					+ "\t" + bikeLegDistanceCounts[i] + "\t"
 					+ othersLegDistanceCounts[i] + "\t" + yCarFracs[i] + "\t"
-					+ yPtFracs[i] + "\t" + yWlkFracs[i] + "\t" + yBikeFracs[i] + "\t"
-					+ yOthersFracs[i]);
+					+ yPtFracs[i] + "\t" + yWlkFracs[i] + "\t" + yBikeFracs[i]
+					+ "\t" + yOthersFracs[i]);
 		}
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
 				"leg Distance [km]", "mode fraction [%]");

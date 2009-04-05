@@ -554,16 +554,24 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 					+ this.carLegDistanceCounts[i] + wlkLegDistanceCounts[i]
 					+ bikeLegDistanceCounts[i] + othersLegDistanceCounts[i];
 			xs[i] = i;
-			yCarFracs[i] = this.carLegDistanceCounts[i] / sumLegDistanceCounts
-					* 100.0;
-			yPtFracs[i] = this.ptLegDistanceCounts[i] / sumLegDistanceCounts
-					* 100.0;
-			yWlkFracs[i] = this.wlkLegDistanceCounts[i] / sumLegDistanceCounts
-					* 100.0;
-			yBikeFracs[i] = bikeLegDistanceCounts[i] / sumLegDistanceCounts
-					* 100.0;
-			yOthersFracs[i] = othersLegDistanceCounts[i] / sumLegDistanceCounts
-					* 100.0;
+			if (sumLegDistanceCounts > 0) {
+				yCarFracs[i] = this.carLegDistanceCounts[i]
+						/ sumLegDistanceCounts * 100.0;
+				yPtFracs[i] = this.ptLegDistanceCounts[i]
+						/ sumLegDistanceCounts * 100.0;
+				yWlkFracs[i] = this.wlkLegDistanceCounts[i]
+						/ sumLegDistanceCounts * 100.0;
+				yBikeFracs[i] = bikeLegDistanceCounts[i] / sumLegDistanceCounts
+						* 100.0;
+				yOthersFracs[i] = othersLegDistanceCounts[i]
+						/ sumLegDistanceCounts * 100.0;
+			} else {
+				yCarFracs[i] = 0;
+				yPtFracs[i] = 0;
+				yWlkFracs[i] = 0;
+				yBikeFracs[i] = 0;
+				yOthersFracs[i] = 0;
+			}
 			sw.writeln(i + "+\t" + carLegDistanceCounts[i] + "\t"
 					+ ptLegDistanceCounts[i] + "\t" + wlkLegDistanceCounts[i]
 					+ "\t" + bikeLegDistanceCounts[i] + "\t"

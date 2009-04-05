@@ -336,14 +336,25 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 					+ ptLegTimeCounts[i] + wlkLegTimeCounts[i]
 					+ bikeLegTimeCounts[i] + othersLegTimeCounts[i];
 			xs[i] = i * 2;
-			yCarFracs[i] = this.carLegTimeCounts[i] / sumOfLegTimeCounts
-					* 100.0;
-			yPtFracs[i] = this.ptLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
-			yWlkFracs[i] = this.wlkLegTimeCounts[i] / sumOfLegTimeCounts
-					* 100.0;
-			yBikeFracs[i] = bikeLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
-			yOthersFracs[i] = othersLegTimeCounts[i] / sumOfLegTimeCounts
-					* 100.0;
+			if (sumOfLegTimeCounts > 0) {
+				yCarFracs[i] = this.carLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+				yPtFracs[i] = this.ptLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+				yWlkFracs[i] = this.wlkLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+				yBikeFracs[i] = bikeLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+				yOthersFracs[i] = othersLegTimeCounts[i] / sumOfLegTimeCounts
+						* 100.0;
+			} else {
+				yCarFracs[i] = 0;
+				yPtFracs[i] = 0;
+				yWlkFracs[i] = 0;
+				yBikeFracs[i] = 0;
+				yOthersFracs[i] = 0;
+			}
+
 			sw.writeln(i + "+\t" + carLegTimeCounts[i] + "\t"
 					+ ptLegTimeCounts[i] + "\t" + wlkLegTimeCounts[i] + "\t"
 					+ bikeLegTimeCounts[i] + "\t" + othersLegTimeCounts[i]
@@ -359,9 +370,9 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 		if (CollectionSum.getSum(yWlkFracs) > 0)
 			chart2.addSeries("walk", xs, yWlkFracs);
 		if (CollectionSum.getSum(yBikeFracs) > 0)
-			chart2.addSeries("walk", xs, yBikeFracs);
+			chart2.addSeries("bike", xs, yBikeFracs);
 		if (CollectionSum.getSum(yOthersFracs) > 0)
-			chart2.addSeries("walk", xs, yOthersFracs);
+			chart2.addSeries("others", xs, yOthersFracs);
 		chart2.saveAsPng(outputFilename + "legTimeModalSplit2.png", 800, 600);
 		sw.close();
 	}
