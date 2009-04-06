@@ -57,6 +57,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 	private Plan plan;
 	private Config config;
 	private Facilities facilities;
+	private NetworkLayer network;
 	
 	/*package*/ static final Logger logger = Logger.getLogger(ActivityScoringFunctionTest.class);
 
@@ -85,7 +86,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		Facility facility5 = this.facilities.createFacility(new IdImpl("5"), new CoordImpl(1000.0, 1010.0));
 		
 		// generate network
-		NetworkLayer network = new NetworkLayer();
+		this.network = new NetworkLayer();
 		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(    0.0, 0.0));
 		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(  500.0, 0.0));
 		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl( 5500.0, 0.0));
@@ -357,6 +358,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		this.plan = null;
 		this.config = null;
 		this.facilities = null;
+		this.network = null;
 	}
 	
 }

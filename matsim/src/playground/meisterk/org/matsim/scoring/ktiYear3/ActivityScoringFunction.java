@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
@@ -80,6 +81,8 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		ActivityScoringFunction.DEFAULT_OPENING_TIME.add(defaultOpeningTime);
 	}
 
+	/*package*/ static final Logger logger = Logger.getLogger(ActivityScoringFunction.class);
+
 	public ActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		super(plan, params);
 		this.facilityPenalties = facilityPenalties;
@@ -104,6 +107,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		double accumulatedDuration; // retrieves activity duration for this activity type up to now
 		double additionalDuration = 0.0; // accumulates performance intervals for this activity
 		double activityStart, activityEnd; // hold effective activity start and end due to facility opening times
+		double scoreImprovement; // calculate score improvement only as basis for facility load penalties
 		double openingTime, closingTime; // hold time information of an opening time interval
 		for (BasicOpeningTime openTime : openTimes) {
 
@@ -128,7 +132,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			}
 			double duration = activityEnd - activityStart;
 			additionalDuration += duration;
-			
+
 			// - accumulate duration by activity type, save it, but do not score it here
 			accumulatedDuration = 0.0;
 			if (this.accumulatedDurations.containsKey(act.getType())) {
@@ -136,24 +140,30 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			}
 			this.accumulatedDurations.put(act.getType(), accumulatedDuration + duration);
 
-			// calculate score improvement as basis for facility load penalties
-			double scoreImprovement = 
-				this.getPerformanceScore(act.getType(), accumulatedDuration + duration) - 
-				this.getPerformanceScore(act.getType(), accumulatedDuration);
-
-			/* Penalty due to facility load:
-			 * Store the temporary score to reduce it in finish() proportionally 
-			 * to score and dep. on facility load.
-			 */
+			// calculate penalty due to facility load only when:
+			// - activity type is penalized (currently only shop and leisure-type activities)
+			// - duration is bigger than 0
 			if (act.getType().startsWith("shop") || act.getType().startsWith("leisure")) {
-				this.penalty.add(new ScoringPenalty(
-						activityStart, 
-						activityEnd, 
-						this.facilityPenalties.get(act.getFacility().getId()), 
-						scoreImprovement));
+				if (duration > 0) {
+					scoreImprovement = 
+						this.getPerformanceScore(act.getType(), accumulatedDuration + duration) - 
+						this.getPerformanceScore(act.getType(), accumulatedDuration);
+
+					/* Penalty due to facility load:
+					 * Store the temporary score to reduce it in finish() proportionally 
+					 * to score and dep. on facility load.
+					 */
+					this.penalty.add(new ScoringPenalty(
+							activityStart, 
+							activityEnd, 
+							this.facilityPenalties.get(act.getFacility().getId()), 
+							scoreImprovement));
+				}
+
 			}
+
 		}
-		
+
 		// accumulate waiting time, which is the time that could not be performed in activities due to closed facilities
 		this.accumulatedWaitingTime += (departureTime - arrivalTime) - additionalDuration;
 
@@ -171,31 +181,30 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	@Override
 	public void finish() {
 		super.finish();
-		this.finishTooShortDuration();
-		this.finishWaitingTime();
-		this.finishPerformingActivities();
-		this.finishFacilityPenalties();
+		this.score += this.getTooShortDurationScore();
+		this.score += this.getWaitingTimeScore();
+		for (String actType : this.accumulatedDurations.keySet()) {
+			this.score += this.getPerformanceScore(actType, this.accumulatedDurations.get(actType));
+		}
+		this.score += this.getFacilityPenaltiesScore();
+
 	}
 
-	protected void finishFacilityPenalties() {
+	public double getFacilityPenaltiesScore() {
+
+		double facilityPenaltiesScore = 0.0;
+
 		// copied from LocationChoiceScoringFunction
 		// reduce score by penalty from capacity restraints
 		Iterator<ScoringPenalty> pen_it = this.penalty.iterator();
 		while (pen_it.hasNext()){
 			ScoringPenalty penalty = pen_it.next();
-			this.score -= penalty.getPenalty();
+			facilityPenaltiesScore -= penalty.getPenalty();
 		}
-		this.penalty.clear();
+		return facilityPenaltiesScore;
 	}
 
-	protected void finishPerformingActivities() {
-		// process collected activity durations by activity type
-		for (String actType : this.accumulatedDurations.keySet()) {
-			this.score += this.getPerformanceScore(actType, this.accumulatedDurations.get(actType));
-		}
-	}
-
-	protected double getPerformanceScore(String actType, double duration) {
+	public double getPerformanceScore(String actType, double duration) {
 
 		double typicalDuration = this.person.getDesires().getActivityDuration(actType);
 
@@ -221,17 +230,20 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		return tmpScore;
 	}
 
-	protected void finishTooShortDuration() {
-		this.score += this.params.marginalUtilityOfEarlyDeparture * this.accumulatedTooShortDuration;
+	public double getTooShortDurationScore() {
+		return this.params.marginalUtilityOfEarlyDeparture * this.accumulatedTooShortDuration;
 	}
 
-	protected void finishWaitingTime() {
-		this.score += this.params.marginalUtilityOfWaiting * this.accumulatedWaitingTime;
+	public double getWaitingTimeScore() {
+		return this.params.marginalUtilityOfWaiting * this.accumulatedWaitingTime;
 	}
 
 	@Override
 	public void reset() {
 		super.reset();
+		if (this.penalty != null) {
+			this.penalty.clear();
+		}
 		if (this.accumulatedDurations != null) {
 			this.accumulatedDurations.clear();
 		}
@@ -253,6 +265,18 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	public double getAccumulatedWaitingTime() {
 		return accumulatedWaitingTime;
+	}
+
+	public TreeMap<Id, FacilityPenalty> getFacilityPenalties() {
+		return facilityPenalties;
+	}
+
+	public List<ScoringPenalty> getPenalty() {
+		return penalty;
+	}
+
+	public void setFacilityPenalties(TreeMap<Id, FacilityPenalty> facilityPenalties) {
+		this.facilityPenalties = facilityPenalties;
 	}
 
 }
