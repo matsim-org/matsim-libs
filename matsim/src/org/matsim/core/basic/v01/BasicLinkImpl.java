@@ -24,6 +24,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -41,6 +42,8 @@ implements BasicLink
 	protected double freespeed = Double.NaN;
 	protected double capacity = Double.NaN;
 	protected double nofLanes = Double.NaN;
+	
+	protected BasicLeg.Mode allowedModes[] = new BasicLeg.Mode[] {BasicLeg.Mode.car};
 
 	// TODO [balmermi] A link exists only iff a to- and a from node is defined.
 	// Furthermore: Since a BasicLink is a location, and a location is a geographic
@@ -130,8 +133,12 @@ implements BasicLink
 	public void setNumberOfLanes(final double lanes) {
 		this.nofLanes = lanes;
 	}
-
-	public LocationType getLocationType() {
-		return LocationType.LINK;
+	
+	public void setAllowedModes(final BasicLeg.Mode[] modes) {
+		this.allowedModes = modes.clone();
+	}
+	
+	public BasicLeg.Mode[] getAllowedModes() {
+		return this.allowedModes.clone();
 	}
 }

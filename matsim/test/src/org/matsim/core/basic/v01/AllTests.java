@@ -29,6 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
 		suite.addTestSuite(BasicHouseholdsReaderV1Test.class);
+		suite.addTestSuite(BasicLinkImplTest.class);
 		suite.addTestSuite(VehicleReaderWriterV1Test.class);
 		//$JUnit-END$
 		return suite;

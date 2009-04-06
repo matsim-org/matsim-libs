@@ -21,6 +21,7 @@
 package org.matsim.api.basic.v01.network;
 
 import org.matsim.api.basic.v01.Identifiable;
+import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.utils.misc.Time;
 
@@ -97,4 +98,8 @@ public interface BasicLink extends Identifiable {
 
 	public void setCapacity(double capacity);
 
+	public void setAllowedModes(BasicLeg.Mode[] modes);
+	
+	public BasicLeg.Mode[] getAllowedModes();
+	
 }
