@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * NetworkWriterReaderV1Test.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,27 +20,33 @@
 
 package org.matsim.core.network;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.io.IOException;
 
-public class AllTests {
+import javax.xml.parsers.ParserConfigurationException;
 
-	public static Test suite() {
+import org.xml.sax.SAXException;
 
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
-		//$JUnit-BEGIN$
-		suite.addTestSuite(KmlNetworkWriterTest.class);
-		suite.addTestSuite(LinkImplTest.class);
-		suite.addTestSuite(NetworkChangeEventsParserWriterTest.class);
-		suite.addTestSuite(NetworkFactoryTest.class);
-		suite.addTestSuite(NetworkParserWriterTest.class);
-		suite.addTestSuite(NetworkReaderMatsimV1Test.class);
-		suite.addTestSuite(NetworkWriterReaderV1Test.class);
-		suite.addTestSuite(TimeVariantLinkImplTest.class);
-		suite.addTestSuite(LaneDefinitionsReaderWriterTest.class);
-		suite.addTest(org.matsim.core.network.algorithms.AllTests.suite());
-		//$JUnit-END$
-		return suite;
+/**
+ * @author mrieser
+ */
+public class NetworkWriterReaderV1Test extends AbstractNetworkWriterReaderTest {
+
+	protected void writeNetwork(final NetworkLayer network, final String filename) {
+		NetworkWriter writer = new NetworkWriter(network, filename);
+		writer.write();
 	}
-
+	
+	protected void readNetwork(final NetworkLayer network, final String filename) {
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(network);
+		try {
+			reader.parse(filename);
+		} catch (SAXException e) {
+			throw new RuntimeException(e);
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 }

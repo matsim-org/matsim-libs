@@ -26,11 +26,13 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -148,6 +150,18 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 				Double.parseDouble(atts.getValue("permlanes")));
 		l.setOrigId(atts.getValue("origid"));
 		l.setType(atts.getValue("type"));
+		if (atts.getValue("modes") != null) {
+			String[] strModes = StringUtils.explode(atts.getValue("modes"), ',');
+			if (strModes.length == 1 && strModes[0].equals("")) {
+				l.setAllowedModes(new BasicLeg.Mode[] {});
+			} else {
+				BasicLeg.Mode[] modes = new BasicLeg.Mode[strModes.length];
+				for (int i = 0, n = strModes.length; i < n; i++) {
+					modes[i] = BasicLeg.Mode.valueOf(strModes[i].trim());
+				}
+				l.setAllowedModes(modes);
+			}
+		}
 		if (atts.getValue("volume") != null) {
 			log.info("Attribute volume for element link is deprecated.");
 		}
