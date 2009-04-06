@@ -5,33 +5,60 @@
 
 	<transitLine id="T1">
 		<transitRoute id="1">
+		<!-- the transitRoute-id must be unique within a transitLine only -->
+		<!-- different transitRoutes may be used to store the different directions
+		     of a line, day- vs. night-travel times, etc.
+		     Other data formats (e.g. VISUM) have an additional hierarchy:
+		     line > route > routeProfile(=time).
+		     I combined route and routeProfile on the same hierarchy-level (also
+		     see remark at the end of this file). -->
 			<description></description>
 			<routeProfile>
 				 <!-- arrival is optional, departure required for all but last, time infos are just offsets -->
-				<link ref="1">
-					<stop ref="stop1" departure="00:00:00" />
-				</link>
-				<link ref="3">
-					<stop ref="stop2" arrival="00:01:20" departure="00:01:40" />
-				</link>
-				<link ref="4" />
-				<link ref="5">
-					<stop ref="stop3" departure="00:03:00" />
-					<stop ref="stop4" departure="00:03:50" />
-				</link>
-				<link ref="6">
-					<stop ref="stop5" departure="00:04:50" />
-				</link>
-				<link ref="8">
-					<stop ref="stop6" arrival="00:05:30" />
-				</link>
+				<stop refId="stop1" departure="00:00:00" />
+				<stop refId="stop2" arrival="00:01:20" departure="00:01:40" />
+				<stop refId="stop3" departure="00:03:00" />
+				<stop refId="stop4" departure="00:03:50" />
+				<stop refId="stop5" departure="00:04:50" />
+				<stop refId="stop6" arrival="00:05:30" />
 			</routeProfile>
+			<!-- routeProfile contains information required for routing algorithms
+			     (together with "departures", below). Data for this can come from
+			     any time table / train schedule available. -->
+			
+			<route>
+				<link refId="1" />
+				<link refId="3" />
+				<link refId="4" />
+				<link refId="5" />
+				<link refId="6" />
+				<link refId="8" />
+			</route>
+			<!-- the route contains the information required for the simulation, 
+			     together with "routeProfle" and "departures". It specifies on
+			     which links in the network the transit vehicles travels along.
+			     This is used for the plans for the transit driver agents. When
+			     stops are modeled as facilities, and as facilities are matched
+			     to a link, the bus-driver is able to figure out on which link
+			     which stops are and can handle them accordingly. -->
+			<!-- Die unabhaengige spezifikation der route von den stops erlaubt,
+			     dass fahrplandaten netzwerk-unabhaengig gespeichert werden
+			     koennen sowie das spezielle Wendeschlaufen etc. explizit mit
+			     angegeben werden koennen, um eine realistische Routenfuehrung
+			     zu beschreiben (Bsp. gibt es in Zuerich eine Buslinie, die faehrt
+			     nach der Endhaltestelle noch gut 500m, bis es genuegend Platz gibt
+			     zu wenden, dort ist aber keine Haltestelle mehr, weil das schon 
+			     ausserhalb des Stadtgebiets liegt... -->
 
 			<departures>
 				<departure id="T1.1" departureTime="07:00:00" />
 				<departure id="T1.2" departureTime="07:10:00" />
 				<departure id="T1.3" departureTime="07:20:00" />
 			</departures>
+			<!-- the departure-id is meant to be the "Kurs-Nummer". Currently, it
+			     will not be of much use, but it may be used in an advanced setup
+			     with additional data to assigned persons as drivers for specific
+			     departures, thus allowing to simulate "Fahrereinsatzplaene". -->
 		</transitRoute>
 		
 	</transitLine>
@@ -40,7 +67,7 @@
 
 <!-- 
 Dieses Format wuerde fuer Simulation genuegen und haette alle benoetigten Daten.
-Aber fuer Router koennte es ineffizienter sein, weil er nicht eine Route mit mehreren
+Aber fuer Router koennte es ineffizienter sein, weil er nicht 1 Route mit mehreren
 Fahrzeitprofilen als 1 Route/1 Link darstellen kann (zumindest nicht ohne komplexe
 Analyse). Das fuehrt dann zu mehr Links im Router, was auf die Performance schlaegt.
 
@@ -53,5 +80,9 @@ werden, weil er vorher am Ziel ankommt. Als Optimierung koennte man noch sichers
 dass Dijkstra nie versucht, von einem Fahrzeitprofil auf das naechste innerhalb einer
 Linie umzusteigen (hmm, sinnvoll? Was, wenn Hin- und Rueckrichtung einer Linie unterschiedlich
 fahren, z.B. 32er in Morgenthal/Wollishofen, und man genau zu einer Haltestelle im Einbahnbereich
-will? Muesste also richtungsabhaengig sein...) 
+will? Muesste also richtungsabhaengig sein...).
+
+Wie auch immer: das Format kann problemlos fuer Routing verwendet werden und sollte 
+halbwegs performante Implementierungen ermoeglichen, ohne dass komplexes Pre-Processing
+notwendig waere.  
  -->

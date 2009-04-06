@@ -53,7 +53,7 @@ public class TransitScheduleReader extends MatsimXmlParser {
 	private static final String LINK = "link";
 
 	private static final String ID = "id";
-	private static final String REF = "ref";
+	private static final String REF_ID = "refId";
 
 	private final TransitSchedule schedule;
 	private final NetworkLayer network;
@@ -90,13 +90,13 @@ public class TransitScheduleReader extends MatsimXmlParser {
 		} else if (ROUTE_PROFILE.equals(name)) {
 			this.currentRouteProfile = new TempRouteProfile();
 		} else if (LINK.equals(name)) {
-			Link link = this.network.getLink(atts.getValue(REF));
+			Link link = this.network.getLink(atts.getValue(REF_ID));
 			if (link == null) {
-				throw new RuntimeException("no link with id " + atts.getValue(REF));
+				throw new RuntimeException("no link with id " + atts.getValue(REF_ID));
 			}
 			this.currentRouteProfile.addLink(link);
 		} else if (STOP.equals(name)) {
-			Id id = new IdImpl(atts.getValue(REF));
+			Id id = new IdImpl(atts.getValue(REF_ID));
 			Facility facility = this.facilities.getFacilities().get(id);
 			if (facility == null) {
 				throw new RuntimeException("no stop/facility with id " + atts.getValue(ID));
