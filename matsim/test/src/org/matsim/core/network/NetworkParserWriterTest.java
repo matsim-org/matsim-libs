@@ -22,8 +22,6 @@ package org.matsim.core.network;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks;
@@ -36,6 +34,10 @@ import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldMappingInfo;
 
+/**
+ *
+ * @author balmermi
+ */
 public class NetworkParserWriterTest extends MatsimTestCase {
 
 	private Config config = null;
@@ -100,7 +102,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 	// tests
 	//////////////////////////////////////////////////////////////////////
 
-	public void testParserWriter1() {
+	public void testParserWriter_independentOfWorld() {
 		log.info("running testParserWriter1()...");
 
 		final World world = new World();
@@ -125,7 +127,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 
 	//////////////////////////////////////////////////////////////////////
 
-	public void testParserWriter2() {
+	public void testParserWriter_asWorldLayer() {
 		log.info("running testParserWriter2()...");
 
 		final World world = new World();
@@ -150,7 +152,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 
 	//////////////////////////////////////////////////////////////////////
 
-	public void testParserWriter3() {
+	public void testParserWriter_withWorld_readWorldFirst() {
 		log.info("running testParserWriter3()...");
 
 		final World world = new World();
@@ -185,7 +187,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 
 	//////////////////////////////////////////////////////////////////////
 
-	public void testParserWriter4() {
+	public void testParserWriter_withWorld_readNetworkFirst() {
 		log.info("running testParserWriter4()...");
 
 		final World world = new World();
@@ -217,4 +219,5 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 
 		log.info("done.");
 	}
+
 }
