@@ -28,7 +28,7 @@ public class TransitRouteStop {
 	private final double departureDelay;
 	private final double arrivalDelay;
 
-	public TransitRouteStop(final Facility stop, final double departureDelay, final double arrivalDelay) {
+	public TransitRouteStop(final Facility stop, final double arrivalDelay, final double departureDelay) {
 		this.stop = stop;
 		this.departureDelay = departureDelay;
 		this.arrivalDelay = arrivalDelay;

@@ -79,7 +79,7 @@ public class TransitScheduleReader extends MatsimXmlParser {
 		if (TRANSIT_LINE.equals(name)) {
 			Id id = new IdImpl(atts.getValue(ID));
 			this.currentTransitLine = new TransitLine(id);
-			this.schedule.addTransitLine(id, this.currentTransitLine);
+			this.schedule.addTransitLine(this.currentTransitLine);
 		} else if (TRANSIT_ROUTE.equals(name)) {
 			Id id = new IdImpl(atts.getValue(ID));
 			this.currentTransitRoute = new TempTransitRoute(id);
@@ -122,16 +122,19 @@ public class TransitScheduleReader extends MatsimXmlParser {
 		} else if (TRANSIT_ROUTE.equals(name)) {
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(this.currentRouteProfile.stops.size());
 			for (TempStop tStop : this.currentRouteProfile.stops) {
-				stops.add(new TransitRouteStop(tStop.stop, tStop.departure, tStop.arrival));
+				stops.add(new TransitRouteStop(tStop.stop, tStop.arrival, tStop.departure));
 			}
-			NetworkRoute route = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, this.currentRouteProfile.firstLink, this.currentRouteProfile.lastLink);
-			route.setLinks(this.currentRouteProfile.firstLink, this.currentRouteProfile.links, this.currentRouteProfile.lastLink);
+			NetworkRoute route = null;
+			if (this.currentRouteProfile.firstLink != null) {
+				route = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, this.currentRouteProfile.firstLink, this.currentRouteProfile.lastLink);
+				route.setLinks(this.currentRouteProfile.firstLink, this.currentRouteProfile.links, this.currentRouteProfile.lastLink);
+			}
 			TransitRoute transitRoute = new TransitRoute(this.currentTransitRoute.id, route, stops);
 			transitRoute.setDescription(this.currentTransitRoute.description);
-			for (Map.Entry<Id, Departure> entry : this.currentTransitRoute.departures.entrySet()) {
-				transitRoute.addDeparture(entry.getKey(), entry.getValue());
+			for (Departure departure : this.currentTransitRoute.departures.values()) {
+				transitRoute.addDeparture(departure);
 			}
-			this.currentTransitLine.addRoute(this.currentTransitRoute.id, transitRoute);
+			this.currentTransitLine.addRoute(transitRoute);
 		}
 	}
 

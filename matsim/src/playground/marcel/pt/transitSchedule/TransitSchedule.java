@@ -33,7 +33,8 @@ public class TransitSchedule {
 	public TransitSchedule() {
 	}
 
-	public void addTransitLine(final Id id, final TransitLine line) {
+	public void addTransitLine(final TransitLine line) {
+		final Id id = line.getId();
 		if (this.transitLines.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a transit line with id " + id.toString());
 		}

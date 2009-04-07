@@ -26,9 +26,10 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.marcel.pt.transitSchedule");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
 		suite.addTestSuite(TransitScheduleReaderTest.class);
+		suite.addTestSuite(TransitScheduleWriterTest.class);
 		suite.addTest(playground.marcel.pt.transitSchedule.modules.AllTests.suite());
 
 		return suite;

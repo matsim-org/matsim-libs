@@ -20,6 +20,7 @@
 
 package playground.marcel.pt.transitSchedule;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,17 +28,17 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.core.api.population.Route;
+import org.matsim.core.api.population.NetworkRoute;
 
 public class TransitRoute {
 
 	private final Id routeId;
-	private final Route route;
+	private final NetworkRoute route;
 	private final List<TransitRouteStop> stops;
 	private String description = null;
 	private final Map<Id, Departure> departures = new HashMap<Id, Departure>();
 
-	public TransitRoute(final Id id, final Route route, final List<TransitRouteStop> stops) {
+	public TransitRoute(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops) {
 		this.routeId = id;
 		this.route = route;
 		this.stops = stops;
@@ -55,7 +56,8 @@ public class TransitRoute {
 		return this.description;
 	}
 
-	public void addDeparture(final Id id, final Departure departure) {
+	public void addDeparture(final Departure departure) {
+		final Id id = departure.getId();
 		if (this.departures.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a departure with id " + id.toString());
 		}
@@ -66,15 +68,16 @@ public class TransitRoute {
 		return Collections.unmodifiableMap(this.departures);
 	}
 
-	public Route getRoute() {
+	public NetworkRoute getRoute() {
 		return this.route;
 	}
 
 	public List<TransitRouteStop> getStops() {
+		if (this.stops == null) {
+			return Collections.unmodifiableList(new ArrayList<TransitRouteStop>(0));
+		}
 		return Collections.unmodifiableList(this.stops);
 	}
-
-
 
 	public TransitRouteStop getStop(final Facility stop) {
 		for (TransitRouteStop trStop : this.stops) {

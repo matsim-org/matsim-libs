@@ -39,15 +39,12 @@ public class TransitLine {
 		return this.lineId;
 	}
 
-	public void addRoute(final Id id, final TransitRoute transitRoute) {
+	public void addRoute(final TransitRoute transitRoute) {
+		final Id id = transitRoute.getId();
 		if (this.transitRoutes.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a transit route with id " + id.toString());
 		}
 		this.transitRoutes.put(id, transitRoute);
-	}
-
-	public TransitRoute getRoute(final Id id) {
-		return this.transitRoutes.get(id);
 	}
 
 	public Map<Id, TransitRoute> getRoutes() {

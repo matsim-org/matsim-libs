@@ -83,7 +83,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
 		assertNotNull("could not get transit line.", lineT1);
 
-		TransitRoute route1 = lineT1.getRoute(new IdImpl("1"));
+		TransitRoute route1 = lineT1.getRoutes().get(new IdImpl("1"));
 		Map<Id, Departure> departures = route1.getDepartures();
 
 		Events events = new Events();
@@ -143,7 +143,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
 		assertNotNull("could not get transit line.", lineT1);
 
-		TransitRoute route1 = lineT1.getRoute(new IdImpl("1"));
+		TransitRoute route1 = lineT1.getRoutes().get(new IdImpl("1"));
 		Map<Id, Departure> departures = route1.getDepartures();
 
 		Events events = new Events();
