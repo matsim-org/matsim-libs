@@ -27,7 +27,7 @@ package playground.johannes.graph.mcmc;
  * @author illenberger
  *
  */
-public interface SampleHandler {
+public interface MCMCSampleDelegate {
 
 	public int getSampleSize();
 	

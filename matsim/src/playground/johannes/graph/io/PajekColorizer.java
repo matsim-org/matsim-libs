@@ -26,13 +26,13 @@ package playground.johannes.graph.io;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
 import playground.johannes.graph.Edge;
 import playground.johannes.graph.Vertex;
-import de.schlichtherle.io.FileReader;
 
 /**
  * @author illenberger
@@ -88,8 +88,8 @@ public abstract class PajekColorizer<V extends Vertex, E extends Edge> {
 		
 		public PajekColorTable() {
 			try {
-				String url = ClassLoader.getSystemResource("playground/johannes/graph/io/PajekColorTable").getFile();
-				BufferedReader reader = new BufferedReader(new FileReader(url));
+				InputStream stream = ClassLoader.getSystemResourceAsStream("playground/johannes/graph/io/PajekColorTable");
+				BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 				String line;
 				String name = null;
 				float red = 0;

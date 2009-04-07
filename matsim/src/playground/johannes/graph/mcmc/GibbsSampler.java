@@ -36,7 +36,7 @@ public class GibbsSampler {
 	
 	private static final Logger logger = Logger.getLogger(GibbsSampler.class);
 
-	private Random random;
+	protected Random random;
 	
 	private int inteval = 100000;
 	
@@ -52,7 +52,7 @@ public class GibbsSampler {
 		this.inteval = interval;
 	}
 	
-	public void sample(AdjacencyMatrix y, ConditionalDistribution d, int burninTime, SampleHandler handler) {
+	public void sample(AdjacencyMatrix y, ConditionalDistribution d, int burninTime, MCMCSampleDelegate handler) {
 		long time = System.currentTimeMillis();
 		
 		int accept = 0;
