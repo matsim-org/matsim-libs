@@ -23,8 +23,11 @@ package playground.yu.analysis;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.events.AgentArrivalEvent;
@@ -52,11 +55,11 @@ import playground.yu.utils.TollTools;
 /**
  * @author mrieser
  * 
- * Counts the number of vehicles departed, arrived or got stuck per time bin
- * based on events.
+ *         Counts the number of vehicles departed, arrived or got stuck per time
+ *         bin based on events.
  * @author yu This class can only be used with plansfile, in that all
- *         <code>Leg</code>s in a <code>Plan</code> muss be equiped with
- *         the same {@code Mode}
+ *         <code>Leg</code>s in a <code>Plan</code> muss be equiped with the
+ *         same {@code Mode}
  *         {@link org.matsim.api.basic.v01.population.BasicLeg.Mode} in a day.
  */
 public class EnRouteModalSplit implements AgentDepartureEventHandler,
@@ -66,6 +69,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 	private int iteration = 0;
 
 	private final int binSize;
+	private Map<Id, Integer> legCounts = new HashMap<Id, Integer>();
 
 	private final double[] dep, arr, stuck, enRoute;
 
@@ -155,6 +159,11 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 	/* Implementation of eventhandler-Interfaces */
 
 	public void handleEvent(final AgentDepartureEvent event) {
+		Id id = event.getPersonId();
+		Integer itg = legCounts.get(id);
+		if (itg == null)
+			itg = Integer.valueOf(-1);
+		legCounts.put(id, itg.intValue() + 1);
 		internalHandleEvent(event, this.dep, this.carDep, this.ptDep, wlkDep,
 				bikeDep, this.othersDep);
 	}
@@ -192,27 +201,29 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 			double[] allCount, double[] carCount, double[] ptCount,
 			double[] wlkCount, double[] bikeCount, double[] othersCount) {
 		allCount[binIdx]++;
-		Mode mode = PlanModeJudger.getMode(plan);
-		switch (mode) {
-		case car:
-			carCount[binIdx]++;
-			break;
-		case pt:
-			if (ptCount != null)
-				ptCount[binIdx]++;
-			break;
-		case walk:
-			if (wlkCount != null)
-				wlkCount[binIdx]++;
-			break;
-		case bike:
-			if (bikeCount != null)
-				bikeCount[binIdx]++;
-			break;
-		default:
-			if (othersCount != null)
-				othersCount[binIdx]++;
-			break;
+		Integer itg = legCounts.get(ae.getPersonId());
+		if (itg != null) {
+			switch (((Leg) plan.getPlanElements().get(2 * itg + 1)).getMode()) {
+			case car:
+				carCount[binIdx]++;
+				break;
+			case pt:
+				if (ptCount != null)
+					ptCount[binIdx]++;
+				break;
+			case walk:
+				if (wlkCount != null)
+					wlkCount[binIdx]++;
+				break;
+			case bike:
+				if (bikeCount != null)
+					bikeCount[binIdx]++;
+				break;
+			default:
+				if (othersCount != null)
+					othersCount[binIdx]++;
+				break;
+			}
 		}
 	}
 
@@ -288,8 +299,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 				bw
 						.write(Time.writeTime(i * this.binSize)
 								+ "\t"
-								+ i
-								* this.binSize
+								+ i * this.binSize
 								+ "\t"
 								+ this.dep[i]
 								+ "\t"
@@ -441,8 +451,9 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		// e.printStackTrace();
 		// }
 		Events events = new Events();
-		EnRouteModalSplit orms = new EnRouteModalSplit("normal", population
-		// , tollReader.getScheme()
+		EnRouteModalSplit orms = new EnRouteModalSplit("Berlin", population,
+				null
+		// tollReader.getScheme()
 		);
 		events.addHandler(orms);
 		new MatsimEventsReader(events).readFile(eventsFilename);
