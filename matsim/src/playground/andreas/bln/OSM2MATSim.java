@@ -14,41 +14,61 @@ import org.xml.sax.SAXException;
 
 public class OSM2MATSim {
 
+	// TODO [an] keep attributes like cycleway and pedestrian in mind, but block access to motorways for those users
+	
 	public static void main(final String[] args) {
 
 		NetworkLayer network = new NetworkLayer();
 //		OsmNetworkReader osmReader = new OsmNetworkReader(network, new WGS84toCH1903LV03());
 		OsmNetworkReader osmReader = new OsmNetworkReader(network,
 				TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
-						TransformationFactory.DHDN_GK4), 1);
+						TransformationFactory.DHDN_GK4), false);
 		osmReader.setKeepPaths(false);
+		osmReader.setScaleMaxSpeed(true);
 		
 		String inputFile = "z:/osm_net/20090316_berlinbrandenburg.fused.gz";
-		String outputFile = "z:/osm_net/bb_osm_wip";
+		String outputFile = "z:/osm_net/_test3";
 		
 		// Autobahn
-		osmReader.setHighwayDefaults("motorway",      2, 120.0/3.6, 2000, true);
-		osmReader.setHighwayDefaults("motorway_link", 1,  80.0/3.6, 1500, true);
+		osmReader.setHighwayDefaults(1, "motorway",      2, 80.0/3.6, 0.5, 2000, true);
+		osmReader.setHighwayDefaults(1, "motorway_link", 1,  60.0/3.6, 0.5, 1500, true);
 		// Pseudoautobahn
-		osmReader.setHighwayDefaults("trunk",         2,  80.0/3.6, 2000);
-		osmReader.setHighwayDefaults("trunk_link",    1,  50.0/3.6, 1500);
+		osmReader.setHighwayDefaults(2, "trunk",         2,  50.0/3.6, 0.5, 2000);
+		osmReader.setHighwayDefaults(2, "trunk_link",    1,  40.0/3.6, 0.5, 1500);
 		// Durchgangsstrassen
-		osmReader.setHighwayDefaults("primary",       1,  60.0/3.6, 1500);
-		osmReader.setHighwayDefaults("primary_link",  1,  50.0/3.6, 1500);
+		osmReader.setHighwayDefaults(3, "primary",       1,  35.0/3.6, 0.5, 1500);
+		osmReader.setHighwayDefaults(3, "primary_link",  1,  30.0/3.6, 0.5, 1500);
 		
 		// Hauptstrassen
-		osmReader.setHighwayDefaults("secondary",     1,  50.0/3.6, 1000);
+		osmReader.setHighwayDefaults(4, "secondary",     1,  30.0/3.6, 0.5, 1000);
 		// Weitere Hauptstrassen
-		osmReader.setHighwayDefaults("tertiary",      1,  45.0/3.6,  600); // ca wip
+		osmReader.setHighwayDefaults(5, "tertiary",      1,  25.0/3.6, 0.5,  600); // ca wip
 		
 		// Nebenstrassen
-//		osmReader.setHighwayDefaults("minor",         1,  45.0/3.6,  600); // nix
-		// Alles M�gliche, vor allem Nebenstrassen auf dem Land, meist keine 30er Zone 
-//		osmReader.setHighwayDefaults("unclassified",  1,  45.0/3.6,  600);
+		osmReader.setHighwayDefaults(6, "minor",         1,  25.0/3.6, 1.0,  600); // nix
+		// Alles Moegliche, vor allem Nebenstrassen auf dem Land, meist keine 30er Zone 
+		osmReader.setHighwayDefaults(6, "unclassified",  1,  25.0/3.6, 1.0,  600);
 		// Nebenstrassen, meist 30er Zone
-//		osmReader.setHighwayDefaults("residential",   1,  30.0/3.6,  600);
+		osmReader.setHighwayDefaults(6, "residential",   1,  20.0/3.6, 1.0,  600);
 		// Spielstrassen
-//		osmReader.setHighwayDefaults("living_street", 1,  15.0/3.6,  300);
+		osmReader.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
+		
+		// Fahrrad
+		osmReader.setHighwayDefaults(7, "cycleway", 1,  10.0/3.6, 1.0,  300);
+		// Fussgaenger
+		osmReader.setHighwayDefaults(8, "pedestrian", 1,  3.0/3.6, 1.0,  300);
+		osmReader.setHighwayDefaults(8, "footway", 1,  3.0/3.6, 1.0,  300);
+		osmReader.setHighwayDefaults(8, "service", 1,  3.0/3.6, 1.0,  300);
+		osmReader.setHighwayDefaults(8, "steps", 1,  3.0/3.6, 1.0,  300);
+
+		
+		osmReader.setHierarchyLayer(52.742845, 12.905454, 52.206321, 13.414334, 2);
+		osmReader.setHierarchyLayer(52.408424, 13.001725, 52.393787, 13.070721, 8);
+		osmReader.setHierarchyLayer(52.410267, 13.028828, 52.379898, 13.086545, 5);
+		
+		osmReader.setHierarchyLayer(52.642299, 13.304882, 52.527397, 13.805398, 5);
+		osmReader.setHierarchyLayer(52.537028, 13.410000, 52.520000, 13.443527, 8);
+		
 		
 		
 		try {
