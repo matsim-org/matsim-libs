@@ -26,14 +26,20 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 
 
+/**
+ * A route that describes a path in a (road) network. Thus, the route is described usually
+ * as a series of links or nodes.
+ *
+ * @author mrieser
+ */
 public interface NetworkRoute extends Route {
 
 	/**
-	 * Never use String arguments as parameter except they contain a real String, i.e. 
+	 * Never use String arguments as parameter except they contain a real String, i.e.
 	 * textual information like a word or phrase.
 	 * @param route
 	 */
-	@Deprecated 
+	@Deprecated
 	public abstract void setNodes(final String route);
 
 	public abstract List<Node> getNodes();
@@ -46,11 +52,11 @@ public interface NetworkRoute extends Route {
 	 */
 	@Deprecated
 	public abstract void setNodes(final List<Node> srcRoute);
-	
+
 	public abstract void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink);
 
 	public abstract void setTravelCost(final double travelCost);
-	
+
 	public abstract double getTravelCost();
 
 	/**
