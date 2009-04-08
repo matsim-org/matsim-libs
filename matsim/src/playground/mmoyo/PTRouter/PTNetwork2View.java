@@ -1,6 +1,5 @@
 package playground.mmoyo.PTRouter;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.core.api.network.Link;
@@ -22,11 +21,10 @@ public class PTNetwork2View extends NetworkLayer {
 	}
 
 	public void createPTNView(List<PTLine> ptLineList) {
-		for (Iterator<PTLine> iterPTLines = ptLineList.iterator(); iterPTLines.hasNext();) {
-			PTLine ptLine = iterPTLines.next();
+		for (PTLine ptLine : ptLineList) {
 			boolean firstLink = true;
-			for (Iterator<String> iter = ptLine.getRoute().iterator(); iter.hasNext();) {
-				Link l = this.cityNet.getLink(iter.next());
+			for (String strIdLink : ptLine.getRoute()) {
+				Link l = this.cityNet.getLink(strIdLink);
 				if (firstLink) {
 					addNode(l.getFromNode());
 				}

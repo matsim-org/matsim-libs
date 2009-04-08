@@ -2,7 +2,6 @@ package playground.mmoyo.PTCase2;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
@@ -19,14 +18,13 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTRouter.PTNode;
-import playground.mmoyo.input.PTNetworkFactory2;
 
 /** 
  * Second version of Router using Matsims Class Dijkstra  
  * We avoid the relationship with the city network and use coordinate search instead
  *  *
- * @param nodeList  PTNodes in stored a a Node-List
- * @param linkList  Collection of org.matsim.network.Link
+ * @param nodeList PTNodes in stored a a Node-List
+ * @param linkList Collection of org.matsim.network.Link
  * @param OriginNode Node where the trip begins
  * @param DestinationNode Node where the trip must finish
  * @param ptLinkCostCalculator Class that contains the weight information of links
@@ -35,10 +33,10 @@ import playground.mmoyo.input.PTNetworkFactory2;
 public class PTRouter2 {
 	private NetworkLayer net; 
 	private Dijkstra dijkstra;
-	//private PTNetworkFactory2 ptNetworkFactory = new PTNetworkFactory2();
 	private PTTravelCost ptTravelCost;
-	public PTTravelTime ptTravelTime; //TODO: make private
+	public PTTravelTime ptTravelTime;   //> make private 
 	public final double WALKING_SPEED = 0.836;
+	//private int x=0;//--> Should be part of the method if the simulation strategy is set to re-route.
 	
 	/**
 	 * @param network
@@ -66,7 +64,7 @@ public class PTRouter2 {
 		removeWalkingLinks(walkingLinkList2);
 		net.removeNode(ptNode1);
 		net.removeNode(ptNode2);
-
+		
 		if (path!=null){
 			path.nodes.remove(ptNode1);
 			path.nodes.remove(ptNode2);
@@ -87,8 +85,8 @@ public class PTRouter2 {
 		String idLink;
 		Node fromNode;
 		Node toNode;
-		
 		int x=0;
+		
 		for (Node node : nearNodes){
 			if (to){
 				fromNode= walkNode;
@@ -101,7 +99,7 @@ public class PTRouter2 {
 			}
 			Link link= createPTLink(idLink, fromNode, toNode, "Walking");
 			//-->30 märz check if this temporary stuff improves the performance
-			link.setFreespeed(link.getLength()* WALKING_SPEED);
+			//link.setFreespeed(link.getLength()* WALKING_SPEED);
 			NewWalkLinks.add(link);
 		}
 		return NewWalkLinks;
@@ -123,12 +121,7 @@ public class PTRouter2 {
 		}
 	}
 	
-	
 	public Path findRoute(Coord coord1, Coord coord2, double time){
-		//24 feb
-		//PTNode node1= ptnProximity.getNearestNode(coord1.getX(), coord1.getY());
-		//PTNode node2= ptnProximity.getNearestNode(coord2.getX(), coord2.getY());
-		
 		Node node1= net.getNearestNode(coord1);
 		Node node2= net.getNearestNode(coord2);
 		return findRoute(node1, node2,time);
@@ -156,7 +149,6 @@ public class PTRouter2 {
 				accumulatedTime =accumulatedTime + linkTravelTime;
 				routeTravelTime =routeTravelTime+linkTravelTime;
 				
-
 				//insert first ptActivity: boarding first PTVehicle
 				if (first){ 
 					Coord coord = link.getFromNode().getCoord();
@@ -166,7 +158,6 @@ public class PTRouter2 {
 					actLegList.add(newPTAct(coord, link, startTime, dur, endTime));
 					first=false;
 				}
-				
 				
 				if (link.getType().equals("Standard")){
 					legTravTime = legTravTime+ linkTravelTime; 
@@ -193,7 +184,7 @@ public class PTRouter2 {
 					legTravTime=0;
 					num++;
 					
-					//insert transfer activity  TODO: what about walking and other posibble "pt modal choices"
+					//insert transfer activity  TODO: what about walking and other possible "pt modal choices"
 					Coord coord = link.getToNode().getCoord();
 					double startTime=depTime + routeTravelTime;
 					double dur= linkTravelTime; //double dur= linkTravelTime*60;  //Seconds
@@ -208,7 +199,6 @@ public class PTRouter2 {
 			}// for x=0
 		}//if route!null
 		return actLegList;
-		
 	}
 	
 	private Activity newPTAct(Coord coord, Link link, double startTime, double dur, double endTime){
@@ -232,8 +222,8 @@ public class PTRouter2 {
 			//}
 		
 			Id idPTLine = new IdImpl("");
-			for (Iterator<Node> iter = path.nodes.iterator(); iter.hasNext();){
-				PTNode ptNode= (PTNode)iter.next();
+			for (Node node : path.nodes){
+				PTNode ptNode= (PTNode)node;
 				if(ptNode.getIdPTLine()==idPTLine){
 					System.out.print(ptNode.getId().toString() + " ");
 				}else{
@@ -245,8 +235,7 @@ public class PTRouter2 {
 			System.out.println("\nTravel cost of route=" + path.travelCost + "  time of route:" + path.travelTime);
 		}else{
 			System.out.println("The route is null");
-		}//if null
-
+		}//if path
 	}//printroute
 
 }//class

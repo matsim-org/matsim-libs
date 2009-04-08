@@ -3,7 +3,6 @@ package playground.mmoyo.PTCase2;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
@@ -20,6 +19,7 @@ public class PTTimeTable2{
 	private List<PTLine> ptLineList = new ArrayList<PTLine>();
 	private Map<Id,Double> linkTravelTimeMap = new TreeMap<Id,Double>();
 	private Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
+	private Map <Id, Link> nextLinkMap = new TreeMap <Id, Link>();
 	private static Time time;
 	
 	public PTTimeTable2(String TimeTableFile){
@@ -34,13 +34,12 @@ public class PTTimeTable2{
 	public void calculateTravelTimes(NetworkLayer networklayer){
 		Map<Id,Double> minuteMap = new TreeMap<Id,Double>();
 		
-		for (Iterator<PTLine> iter = ptLineList.iterator(); iter.hasNext();){
-			PTLine ptLine = iter.next();
-											
+		for (PTLine ptLine : ptLineList){
 			int x= 0;
-			for (Iterator<String> iter2 = ptLine.getRoute().iterator(); iter2.hasNext();){
+			for (String strIdNode:  ptLine.getRoute()){
+			
 				//Create a map with nodes-minutes after departure
-				Id idNode = new IdImpl(iter2.next().toString());
+				Id idNode = new IdImpl(strIdNode);
 				double minAfterDep = new Double(ptLine.getMinutes().get(x));
 				minuteMap.put(idNode, minAfterDep);
 
@@ -48,11 +47,10 @@ public class PTTimeTable2{
 				//Double[] departuresArray =ptLine.getDepartures().toArray(new Double[ptLine.getDepartures().size()]);
 				double[] departuresArray =new double[ptLine.getDepartures().size()];					
 				int y=0;
-				for (Iterator<String> iter3 = ptLine.getDepartures().iterator(); iter3.hasNext();){
-					String h= iter3.next();
+				
+				for (String departure : ptLine.getDepartures()){
 					//Seconds past midnight
-					departuresArray[y]=  time.parseTime(h) + (minAfterDep*60);
-					y++;
+					departuresArray[y++]=  time.parseTime(departure) + (minAfterDep*60);
 				}
 				nodeDeparturesMap.put(idNode, departuresArray);
 				x++;
@@ -92,24 +90,53 @@ public class PTTimeTable2{
 
 	//minutes
 	public double GetTransferTime(Link link, double time){
-		Id idToNode= link.getToNode().getId();
-		double nextDeparture = nextDeparture(idToNode,time); 
+		double nextDeparture = nextDepartureB(link.getToNode().getId(),time); 
 		double transferTime= 0;
 		if (nextDeparture>=time){
 			transferTime= nextDeparture-time;
 		}else{
-			//count seconds between 01:00 am and firt departure  
-			transferTime= (86400-time)+ nodeDeparturesMap.get(idToNode)[0];
+			//wait till next day first departure
+			transferTime= 86400-time+ nextDeparture;
 		}
-		return transferTime;///return transferTime/60;  //Seconds!
+		return transferTime;
 	}
 	
 	public List<PTLine> getPtLineList() {
 		return ptLineList;
 	}
 	
-	//in minutes
-	public double nextDeparture(Id idPTNode,  double dblTime){//,
+	
+	/*
+	*If dblTime is greater than the last departure, 
+	*returns the first departure(of the next day)
+	*/
+	public double nextDepartureB(Id idPTNode,  double dblTime){//,
+		double[]arrDep= nodeDeparturesMap.get(idPTNode);
+		int index =  Arrays.binarySearch(arrDep, dblTime);
+		if (index<0){
+			index = -index;
+			if (index <= arrDep.length)index--; else index=0;	
+		}else{
+			if (index < (arrDep.length-1))index++; else index=0;	
+		}
+		return arrDep[index];
+	}
+
+	public Map<Id, Link> getNextLinkMap() {
+		return nextLinkMap;
+	}
+
+	public void setNextLinkMap(Map<Id, Link> nextLinkMap) {
+		this.nextLinkMap = nextLinkMap;
+	}
+		
+		
+}
+
+/*
+ * 
+ * //
+	public double nextDeparture999(Id idPTNode,  double dblTime){//,
 		//return dblTime +1;
 		
 		double[]arrDep= nodeDeparturesMap.get(idPTNode);
@@ -122,31 +149,9 @@ public class PTTimeTable2{
 		}
 		return arrDep[x];
 	}
-	
-	//in minutes
-	public double nextDepartureB(Id idPTNode,  double dblTime){//,
-		//return dblTime +1;
-		double[]arrDep= nodeDeparturesMap.get(idPTNode);
-		int index =  Arrays.binarySearch(arrDep, dblTime);  
-		if (index<0){
-			index = -index;
-			if (index <= arrDep.length)index--; else index=-1;	
-		}else{
-			if (index < (arrDep.length-1))index++; else index=-1;	
-		}
-		
-		if (index== -1) {
-			//TODO Define what to do here!!
-		}
-		return arrDep[index];
-		//System.out.println("Next departuere: "+ nextDep);
-	}
-		
-		
-}
-
-/*
-/*******************************
+ * 
+ */
+/* ******************************
  * Time Methods
 
 

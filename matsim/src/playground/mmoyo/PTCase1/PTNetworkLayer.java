@@ -1,7 +1,6 @@
 package playground.mmoyo.PTCase1;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -46,8 +45,8 @@ public class PTNetworkLayer extends NetworkLayer {
 		for (PTLine ptLine : ptLineList) {
 			boolean firstLink = true;
 			String idFromNode = "";
-			for (Iterator<String> iter = ptLine.getRoute().iterator(); iter.hasNext();) {
-				Link l = this.cityNet.getLink(iter.next());
+			for (String strId : ptLine.getRoute()) {
+				Link l = this.cityNet.getLink(strId);
 				idFromNode = addToSubwayPTN(l, idFromNode, firstLink, ptLine.getId());
 				firstLink = false;
 			}
@@ -118,13 +117,12 @@ public class PTNetworkLayer extends NetworkLayer {
 	}
 
 	// To print nodes and his respective children
-	public static void showMap(final Map map) {
-		Iterator iter = map.entrySet().iterator();
-		while (iter.hasNext()) {
-			Map.Entry entry = (Map.Entry) iter.next();
-			System.out.println(entry.getKey() + " = " + entry.getValue());
+	public static void showMap(final Map<Object, Object> map) {
+		for(Map.Entry <Object, Object> entry: map.entrySet() ){
+			Object key = entry.getKey(); 
+			Object value = entry.getValue();
+			System.out.println(key.toString() + " = " + value.toString());
 		}
-		iter = null;
 	}
 
 	private void createTransferlinks() {
@@ -158,15 +156,15 @@ public class PTNetworkLayer extends NetworkLayer {
 
 		//Starting links
 		List<String> uChildren = this.childrenList.get(idFromNode);
-		for (Iterator<String> iter = uChildren.iterator(); iter.hasNext();) {
-			this.createLink(--i, idFromNode.toString(), iter.next(), "Walking");
+		for (String strChild : uChildren) {
+			this.createLink(--i, idFromNode.toString(), strChild, "Walking");
 			WalkingLinkList.add(String.valueOf(i));
 		}
 
 		//Endings links
 		uChildren = this.childrenList.get(idToNode);
-		for (Iterator<String> iter = uChildren.iterator(); iter.hasNext();) {
-			this.createLink(--i, iter.next(), idToNode.toString(), "Walking");
+		for (String uChild : uChildren) {
+			this.createLink(--i, uChild, idToNode.toString(), "Walking");
 			WalkingLinkList.add(String.valueOf(i));
 		}
 		return WalkingLinkList;
@@ -174,8 +172,8 @@ public class PTNetworkLayer extends NetworkLayer {
 
 	public void removeWalkinkLinks(final List<String> WalkingLinkList){
 		//Removes temporal links at the end of the ruting process
-		for (Iterator<String> iter = WalkingLinkList.iterator(); iter.hasNext();) {
-			this.removeLink(this.getLink(iter.next()));
+		for (String strWalkLink :  WalkingLinkList) {
+			this.removeLink(this.getLink(strWalkLink));
 		}
 	}
 

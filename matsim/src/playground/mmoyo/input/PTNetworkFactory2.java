@@ -1,6 +1,5 @@
 package playground.mmoyo.input;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -89,8 +88,7 @@ public class PTNetworkFactory2 {
 		
 	private PTTimeTable2 readTimeTable(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable){
 		PTNode ptLastNode = null;
-		for (Iterator<PTLine> iterPTLines = ptTimeTable.getPtLineList().iterator(); iterPTLines.hasNext();) {
-			PTLine ptLine = iterPTLines.next();
+		for (PTLine ptLine :  ptTimeTable.getPtLineList()) {
 			//Test code
 			/*
 			System.out.println(ptLine.getId().toString());
@@ -98,14 +96,13 @@ public class PTNetworkFactory2 {
 			System.out.println(ptLine.getDepartures().toString());
 			System.out.println(ptLine.getMinutes().toString() + "\n");
 			*/
-			//Create a map with travel times for every link
+			//Create a map with travel times for every standard link
 			int indexMin=0;
 			double travelTime=0;
 			double lastTravelTime=0;
 			boolean first=true;
 			
-			for (Iterator<String> iter = ptLine.getRoute().iterator(); iter.hasNext();) {
-				String strIdNode = iter.next();
+			for (String strIdNode : ptLine.getRoute()) {
 				PTNode ptNode = ((PTNode)ptNetworkLayer.getNode(strIdNode));
 				if (ptNode==null)
 					throw new java.lang.NullPointerException("Node does not exist:" + strIdNode); 
@@ -115,11 +112,11 @@ public class PTNetworkFactory2 {
 				travelTime=min-lastTravelTime;
 				if (!first){
 					for (Link link : (ptNode.getInLinks().values())) {
-						if (link.getFromNode().equals(ptLastNode))
+						if (link.getFromNode().equals(ptLastNode)){
 							linkTravelTimeMap.put(link.getId(), travelTime);
 							//-->30 march check if this temporary stuff improves the performance
-							//link.setFreespeed(travelTime);
-					
+							link.setCapacity(travelTime);
+						}
 					}
 				}
 				ptLastNode= ((PTNode)ptNetworkLayer.getNode(strIdNode));
@@ -135,7 +132,9 @@ public class PTNetworkFactory2 {
 		return ptTimeTable;
 	}
 	
-	public String getNodeBaseId(String strId){
+	/*
+	//-Move to Class PtNode
+	public String getNodeBaseId999(String strId){
 		String baseID = strId;
 		if (baseID.charAt(0)=='_' || baseID.charAt(0)=='~')
 			baseID= baseID.substring(1,baseID.length());
@@ -143,14 +142,14 @@ public class PTNetworkFactory2 {
 			baseID= baseID.substring(0,baseID.length()-1);
 		return baseID;
 	}
-	
+	*/
 	private void createTransferLinks(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable) {
 		PTStation stationMap = new PTStation(ptTimeTable);
 		
 		stationMap.print();
 		
 		int maxLinkKey=0;
-		for (List <Id>chList : stationMap.getIntersecionMap().values()) {
+		for (List<Id> chList : stationMap.getIntersecionMap().values()) {
 			if (chList.size() > 1) {
 				for (Id idNode1 : chList) {
 					for (Id idNode2 : chList) {
@@ -162,10 +161,6 @@ public class PTNetworkFactory2 {
 			}
 		}
 	}
-	
-
-	
-
 	
 	public void createPTLink(NetworkLayer net, String strIdLink, Id idFromNode, Id idToNode, String type){
 		PTNode fromNode= (PTNode)net.getNode(idFromNode);
@@ -196,20 +191,27 @@ public class PTNetworkFactory2 {
 		System.out.println("done.");
 	}
 	
-	public void CreateDetachedTransfers (NetworkLayer net, double distance){
+	public void CreateDetachedTransfers (NetworkLayer net, double distance, PTTimeTable2 ptTimeTable){
 		int x=0;
+		String strId;
+		
 		for (Node node: net.getNodes().values()){
 			for (Node nearNode : net.getNearestNodes(node.getCoord(), distance)){
 				if(!node.getCoord().equals(nearNode.getCoord())){
 					if (!areConected(node, nearNode)){
 						PTNode ptn1 = (PTNode) node;
 						PTNode ptn2 = (PTNode) nearNode;
-						createPTLink(net, ("DT" + ++x), ptn1, ptn2, "DetTransfer");
-						createPTLink(net, ("DT" + ++x), ptn2, ptn1, "DetTransfer");
+
+						strId= "DT" + ++x;
+						createPTLink(net, strId, ptn1, ptn2, "DetTransfer");
+						
+						strId= "DT" + ++x;
+						createPTLink(net, strId, ptn2, ptn1, "DetTransfer");
 					}
 				}
 			}
 		} 
+	
 	}
 
 	//Returns true if a link exists between two nodes

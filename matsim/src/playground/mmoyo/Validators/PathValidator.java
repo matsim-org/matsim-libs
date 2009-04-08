@@ -3,7 +3,6 @@ package playground.mmoyo.Validators;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
-
 public class PathValidator {
 
 	public PathValidator (){
@@ -32,19 +31,19 @@ public class PathValidator {
 						hasStandardLinks=true;
 					}else if(linkType.equals("Transfer")){
 						if (i>0){  
-							if (!path.links.get(i-1).getType().equals("Standard") || !path.links.get(i+1).getType().equals("Standard")){ //TODO:check that transfer links are only between standard link
+							if (path.links.get(i-1).getType()!="Standard" || path.links.get(i+1).getType()!="Standard"){ //TODO:check that transfer links are only between standard link
 								return false;
 							}
 						}
-					}else if (linkType.equals("Walking")){
+					}else if (linkType=="Walking"){
 						if (i>0){
-							if (path.links.get(i-1).getType().equals("Walking")){ //TODO:check that do not have two adjacent walking link
+							if (path.links.get(i-1).getType()=="Walking"){ //TODO:check that do not have two adjacent walking link
 								return false;
 							}
 						}
-					}else if(linkType.equals("DetTransfer")){
+					}else if(linkType =="DetTransfer"){
 						if (i>0){  
-							if (!path.links.get(i-1).getType().equals("Standard") || !path.links.get(i+1).getType().equals("Standard")){
+							if (path.links.get(i-1).getType()!="Standard" || path.links.get(i+1).getType()!="Standard"){
 								return false;
 							}
 						}

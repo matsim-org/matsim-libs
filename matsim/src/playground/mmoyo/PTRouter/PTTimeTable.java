@@ -1,6 +1,5 @@
 package playground.mmoyo.PTRouter;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -114,6 +113,19 @@ public class PTTimeTable {
 	
 	//Displays the information of departures
 	public void dumpTimeTable() {
+		for(Map.Entry <Id,Map<Id,int[]>> entry: timeTableMap.entrySet() ){
+			Id idNode = entry.getKey();
+			Map<Id,int[]> map2 = entry.getValue();
+			for (Map.Entry <Id,int[]> entry2 : map2.entrySet()){
+				System.out.println("\n Node:"+ idNode + " = Line:" + entry2.getKey());
+				int[] departures = entry2.getValue();
+				for (int x=0; x< departures.length; x++){
+					System.out.print(TimeToString(departures[x])+ " ");	
+				}
+			}
+		}
+		
+		/*
 		Iterator iter = timeTableMap.entrySet().iterator();
 		while (iter.hasNext()) {
 			Map.Entry entry = (Map.Entry) iter.next();
@@ -128,7 +140,8 @@ public class PTTimeTable {
 				}
 			}
 		}
-
+		*/
+	
 	}
 
 }

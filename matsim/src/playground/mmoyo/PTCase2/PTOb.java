@@ -27,11 +27,14 @@ public class PTOb {
 		ptRouter2 = new PTRouter2(ptNetworkLayer, ptTimeTable);
 	}
 	
-	public void createPTNetWithTLinks(String inNetFile, String outNetFile ){
+	public void createPTNetWithTLinks(String inNetFile){
 		this.ptNetworkLayer = ptNetworkFactory.createNetwork(inNetFile, this.ptTimeTable, ptNetFile);
-		this.ptNetworkFactory.writeNet(this.ptNetworkLayer, outNetFile);
 	}
 
+	public void writeNet(String outNetFile){
+		this.ptNetworkFactory.writeNet(this.ptNetworkLayer, outNetFile);
+	}
+	
 	public NetworkLayer getPtNetworkLayer() {
 		return ptNetworkLayer;
 	}

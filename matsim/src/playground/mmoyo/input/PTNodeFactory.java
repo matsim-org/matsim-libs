@@ -39,7 +39,6 @@ public class PTNodeFactory {
 		return NetWithPTNodes;
 	}
 	
-	
 	public BasicNode[] CreatePTNodes(BasicNode basicNode){
 		BasicNode[] pair = new BasicNode[2];
 		
@@ -76,7 +75,8 @@ public class PTNodeFactory {
 
 		pair[0]= insertNode(strNode1, newCoord);
 		pair[1]=  insertNode(strNode2, newCoord);
-	
+		//System.out.println(pair[0].getId() + ", "  + pair[1].getId());
+
 		return pair;
 	}
 

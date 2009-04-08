@@ -67,6 +67,28 @@ public class PTLink extends LinkImpl {
 	
 	*/
 
+	/*
+	This will improve the search of the next link in detached transfers links
+	private Link getNextLink(Link dtLink){
+		Link retLink = null;
+		if (dtLink.getType().equals("DetTransfer")){
+			int numStandards =0;
+			for (Link outLink : dtLink.getToNode().getOutLinks().values()){
+				if (outLink.getType().equals("Standard")){
+					numStandards++;
+					retLink= outLink; 
+				}
+			}
+			if (numStandards>1){
+				throw new java.lang.NullPointerException(dtLink.getId() + "DetLink has no valid outLinks");
+			}
+			if (retLink==null){
+				throw new java.lang.NullPointerException("Error finding next link");
+			}
+		}
+		return retLink;
+	}
+	*/
 	
 	
 	

@@ -22,8 +22,6 @@ public class PTNetworkReader{
 		PTNodeFactory ptNodeFactory = new PTNodeFactory();
 		ptNodeFactory.TransformToPTNodes(tempNet, ptNetworkLayer);
 	
-		
-		
 		tempNet= null;
 		networkFactory= null;
 		matsimNetworkReader= null;

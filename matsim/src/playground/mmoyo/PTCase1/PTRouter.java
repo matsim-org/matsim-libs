@@ -2,13 +2,11 @@ package playground.mmoyo.PTCase1;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-
 import playground.mmoyo.PTRouter.PTNode;;
 
 public class PTRouter{

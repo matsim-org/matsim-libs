@@ -1,7 +1,6 @@
 package playground.mmoyo.PTCase1;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.core.api.network.Link;
@@ -55,8 +54,8 @@ public class MiniDijkstra {
 		this.resetValues();
 		
 		//TODO: time must be accumulated here
-		for (Iterator<Link> iter = linkList.iterator(); iter.hasNext();) {
-			updateCost ((Link) iter.next(), iniTime);
+		for (Link link : linkList) {
+			updateCost (link, iniTime);
 		}
 		
 		as[iniPosition] = 1;
@@ -116,8 +115,8 @@ public class MiniDijkstra {
 			// revert the result
 			int i = nodePath.size();
 			route = new PTNode[i];
-			for (Iterator<Integer> iter = nodePath.listIterator(); iter.hasNext();) {
-				route[--i] = (PTNode) nodeList.get(iter.next());
+			for (int intNode : nodePath) {
+				route[--i] = (PTNode) nodeList.get(intNode);
 			}
 
 		}// if

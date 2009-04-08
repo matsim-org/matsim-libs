@@ -41,12 +41,11 @@ public class PTNetworkFactory {
 	public void createPTNetwork(List<PTLine> ptLineList) {
 		// Read the route of every PTline and adds the corresponding links and
 		// nodes
-		for (Iterator<PTLine> iterPTLines = ptLineList.iterator(); iterPTLines.hasNext();) {
-			PTLine ptLine = iterPTLines.next();
+		for (PTLine ptLine: ptLineList) {
 			boolean firstLink = true;
 			String idFromNode = "";
-			for (Iterator<String> iter = ptLine.getRoute().iterator(); iter.hasNext();) {
-				Link l = this.cityNet.getLink(iter.next());
+			for (String strId : ptLine.getRoute()) {
+				Link l = this.cityNet.getLink(strId);
 				idFromNode = addToSubwayPTN(l, idFromNode, firstLink, ptLine.getId());
 				firstLink = false;
 			}
@@ -131,25 +130,17 @@ public class PTNetworkFactory {
 		Iterator it = childrenList.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry pairs = (Map.Entry) it.next();
-			List chList1 = (ArrayList) pairs.getValue();
-			List chList2 = (ArrayList) pairs.getValue();
-
+			List <String>chList1 = (ArrayList) pairs.getValue();
+			List <String>chList2 = (ArrayList) pairs.getValue();
 			if (chList1.size() > 1) {
-				String n1 = "";
-				String n2 = "";
-				for (Iterator<String> iter1 = chList1.iterator(); iter1.hasNext();) {
-					n1 = iter1.next();
-					// Create links between children nodes lines
-					for (Iterator<String> iter2 = chList2.iterator(); iter2.hasNext();) {
-						n2 = iter2.next();
+				for (String n1 : chList1) {
+					for (String n2 : chList2) {// Create links between children nodes lines
 						if (n1 != n2) {
 							maxLinkKey++;
 							this.createLink(maxLinkKey, n1, n2,"Transfer");
 						}//if n1
 					}//for iter2
 				}// for iter1
-				n1= null;
-				n2= null;
 			}// if chlist
 		}// while
 		it = null;
@@ -168,16 +159,15 @@ public class PTNetworkFactory {
 		
 		//Starting links
 		List<String> uChildren = this.childrenList.get(idFromNode);
-		for (Iterator<String> iter = uChildren.iterator(); iter.hasNext();) {
-			this.createLink(--i, idFromNode.toString(), iter.next(), "Walking");
+		for (String uChild : uChildren) {
+			this.createLink(--i, idFromNode.toString(), uChild , "Walking");
 			WalkingLinkList.add(String.valueOf(i));
 		}
 		
 		//Endings links
 		uChildren = this.childrenList.get(idToNode);
-		for (Iterator<String> iter = uChildren.iterator(); iter.hasNext();) {
-			this.createLink(--i, iter.next(), idToNode.toString(), "Walking");
-			
+		for (String uChild: uChildren) {
+			this.createLink(--i, uChild, idToNode.toString(), "Walking");
 			WalkingLinkList.add(String.valueOf(i));
 		}
 		return WalkingLinkList;
@@ -185,8 +175,8 @@ public class PTNetworkFactory {
 	
 	public void removeWalkinkLinks(List<String> WalkingLinkList){
 		//Removes temporal links at the end of the ruting process
-		for (Iterator<String> iter = WalkingLinkList.iterator(); iter.hasNext();) {
-			ptNetworkLayer.removeLink(ptNetworkLayer.getLink(iter.next()));
+		for (String strWalkLink : WalkingLinkList) {
+			ptNetworkLayer.removeLink(ptNetworkLayer.getLink(strWalkLink));
 		}
 	}
 	
@@ -213,7 +203,7 @@ public class PTNetworkFactory {
 	
 	public void printLinks() {
 		//Displays a quick visualization of links with from- and to- nodes
-		for (org.matsim.core.api.network.Link l : this.ptNetworkLayer.getLinks().values()) {
+		for (Link l : this.ptNetworkLayer.getLinks().values()) {
 			System.out.print("\n(" ); 
 			System.out.print(l.getFromNode().getId().toString()); 
 			System.out.print( ")----" ); 

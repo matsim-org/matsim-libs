@@ -1,6 +1,5 @@
 package playground.mmoyo.PTCase1;
 
-import java.util.Iterator;
 import java.util.ArrayList;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.network.NetworkLayer;
@@ -89,8 +88,7 @@ public class PTNProximity
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 
-		for (Iterator<Node> iter = nodeList.iterator(); iter.hasNext();) {
-			Node node= (Node)iter.next();
+		for (Node node : nodeList) {
 			//Define Bounds
 			if (node.getCoord().getX() < minX) { 
 				minX = node.getCoord().getX(); 
@@ -112,8 +110,7 @@ public class PTNProximity
 		
 		this.ptQuadTree = new QuadTree<Node>(minX, minY, maxX, maxY);
 
-		for (Iterator<Node> iter = nodeList.iterator(); iter.hasNext();) {
-			Node node = iter.next();	
+		for (Node node :  nodeList) {
 			this.ptQuadTree.put(node.getCoord().getX(), node.getCoord().getY(), node);
 		}
 	}//CreateQuadTree
@@ -172,9 +169,7 @@ public class PTNProximity
 	
 	public void dumpNet(){
 		System.out.println("Size of the Quedtreemap:" + this.ptQuadTree.size());
-		Node node;
-		for (Iterator<Node> iter = this.ptQuadTree.values().iterator(); iter.hasNext();) {
-			node = iter.next();	
+		for (Node node :  this.ptQuadTree.values()) {
 			System.out.println(node.getId());
 		}		
 	}

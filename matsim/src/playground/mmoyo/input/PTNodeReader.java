@@ -74,10 +74,19 @@ public class PTNodeReader extends MatsimXmlParser{
 	}
 	
 	private void startLine(){
+		nodeList = new ArrayList<BasicNode>();
 	}
 	
 	private void endLine(){
+		System.out.print("endLine: ");
 		nodeListList.add(nodeList);		
+		
+		System.out.println();
+		for (BasicNode basicNode: nodeList){
+			System.out.print(basicNode.getId().toString() + " ");
+		}
+		
+		
 	}
 
 	public List<List<BasicNode>> getNodeLists(){

@@ -1,6 +1,5 @@
 package playground.mmoyo.input;
 
-import java.util.Arrays;
 import java.util.List;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNode;
@@ -9,6 +8,7 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordUtils;
+import java.util.Map;
 
 public class PTLinkFactory {
 	NetworkLayer net;
@@ -16,25 +16,22 @@ public class PTLinkFactory {
 	
 	public PTLinkFactory(NetworkLayer net) {
 		this.net= net;
+		intNextId = getNextLinkId();
 	}
 
-	public void createLinks (List<BasicNode> nodeList){
-		int intId= getNextLinkId();
+	public void AddNewLinks (List<BasicNode> nodeList){
 		boolean isFirst= true;
-		BasicNode currentNode;
 		BasicNode lastNode = null;
 		
 		for (BasicNode basicNode : nodeList){
-			currentNode= basicNode; 
 			if(!isFirst){
-				/// 11 MARZ  createStandardLink(intId++, currentNode, lastNode, "Standard");
+				createStandardLink(++intNextId, basicNode, lastNode, "Standard");
 			}
 			isFirst=false;
 			lastNode=basicNode;
 		}
-		intNextId= intId+1;
+		lastNode = null;
 	}
-	
 	
 	private void createStandardLink(int intId, BasicNode fromBasicNode, BasicNode toBasicNode, String type){
 		Id id =  new IdImpl(intId);
@@ -55,14 +52,15 @@ public class PTLinkFactory {
 	}
 	
 	public int getNextLinkId(){
-		int [] intIdArray = new int[net.getLinks().size()];
-		int x=0;
-		for (Id id : net.getLinks().keySet()){
-			int intId =  Integer.parseInt(id.toString());
-			intIdArray[x++]=intId;
+		int maxId=0; 
+		for(Map.Entry <Id,Link> entry: this.net.getLinks().entrySet() ){
+			if (entry.getValue().getType().equals("Standard")){
+				Id id = entry.getKey();
+				int intId =  Integer.parseInt(id.toString());
+				if (intId > maxId) {maxId=intId;}
+			}
 		}
-		Arrays.sort(intIdArray);
-		return intIdArray[x-1]+1;
+		return maxId+1;
 	}
 	
 }

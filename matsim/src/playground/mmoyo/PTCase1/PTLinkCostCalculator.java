@@ -27,7 +27,7 @@ public class PTLinkCostCalculator{
 		}
 		else if (l.getType().equals("Transfer")){
 			//cost= TRANSFER_RATE + (ptTimeTableInfo2.NextDepartureR(l,time)-time);
-			//Calculate dinamicaly the travel waiting time
+			//Calculate dinamically the travel waiting time
 			cost= TRANSFER_RATE; 
 		}
 		else if (l.getType().equals("Walking")){

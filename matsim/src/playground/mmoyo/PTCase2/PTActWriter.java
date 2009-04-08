@@ -1,12 +1,10 @@
 package playground.mmoyo.PTCase2;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -26,19 +24,15 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRoute;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.network.NetworkLayer;
 
-import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.Validators.PathValidator;
 
 public class PTActWriter {
 	private final Population population;
-	private PTTravelCost ptTravelCost;
 	public PTTravelTime ptTravelTime;
-	private final Dijkstra dijkstra;
 	private NetworkLayer net; 
 	private PTRouter2 ptRouter;
 	private String outputFile;
@@ -60,7 +54,6 @@ public class PTActWriter {
 		Gbl.setConfig(config);
 
 		ptTravelTime =new PTTravelTime(timeTable);
-		dijkstra = new Dijkstra(net, ptTravelCost, ptTravelTime);
 		population = new PopulationImpl(false);
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(this.population,net);
 		String plansFile = ptOb.getPlansFile();
@@ -72,15 +65,20 @@ public class PTActWriter {
 		int x=0;
 
 		PathValidator ptPathValidator = new PathValidator ();
+		int trips=0;
 		int valid=0;
 		int invalid=0;
-		int trips=0;
+		int inWalkRange=0;
+		int lessThan2Node =0;
+		int nulls =0;
+		
 		//List<Double> travelTimes = new ArrayList<Double>();  <-This is for the performance test
 		List<Double> durations = new ArrayList<Double>();  
+		List<Path> paths = new ArrayList<Path>();  
 		
-		//for (Person person: this.population.getPersons().values()) {
-		if ( true ) {
-		Person person = population.getPersons().get(new IdImpl("3937204"));
+		for (Person person: this.population.getPersons().values()) {
+		//if ( true ) {
+		//Person person = population.getPersons().get(new IdImpl("3937204"));
 		
 			System.out.println(x + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
@@ -109,13 +107,12 @@ public class PTActWriter {
 		    		double distToWalk= distToWalk(person.getAge());
 		    		if (distanceToDestination<= distToWalk){
 		    			newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
-			    	}else{
+		    			inWalkRange++;
+		    		
+		    		}else{
 			    		startTime = System.currentTimeMillis();
 			    		Path path = ptRouter.findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
 			    		duration= System.currentTimeMillis()-startTime;
-			    		System.out.println("duration of patch search:" + duration);
-			    		durations.add(duration);
-		    		
 			    		if(path!=null){
 				    					    			
 				    		//travelTime=travelTime+ path.travelTime;
@@ -126,15 +123,20 @@ public class PTActWriter {
 			    				double dw2 = net.getLink("linkW2").getLength();
 			    				if ((dw1+dw2)>=(distanceToDestination)){
 			    					newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+			    					inWalkRange++;
 			    				}else{
-
+			    						
 			    					if (ptPathValidator.isValid(path)){
 			    						legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
 			    						valid++;
+			    						durations.add(path.travelTime);
 			    					}else{
-			    						invalid++;
 			    						newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+			    						invalid++;
+			    						addPerson=false;
+			    						paths.add(path);
 			    					}
+			    					
 			    					
 			    					//legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
 			    				}//if dw1+dw2
@@ -142,10 +144,12 @@ public class PTActWriter {
 			    			}else{
 			    				newPlan.addLeg(walkLeg(legNum++, lastAct, thisAct));
 			    				addPerson=false;
+			    				lessThan2Node++;
 			    			}//if path.nodes
 			    		}else{
 			    			newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
 			    			addPerson=false;
+			    			nulls++;
 			    		}//path=null
 					}//distanceToDestination<= distToWalk
 				}//if !First
@@ -167,36 +171,50 @@ public class PTActWriter {
 			//travelTimes.add(travelTime);
 		}//for person
 
+
 		System.out.println("writing output plan file...");
 		Gbl.getConfig().plans().setOutputFile(outputFile);
 		Gbl.getConfig().plans().setOutputVersion("v4");
-		new PopulationWriter(newPopulation).write();
+		//new PopulationWriter(newPopulation).write();
 		System.out.println("Done");
-		System.out.println("Trips:" + trips);
-		System.out.println("valid:" + valid +  " invalid:" + invalid);
-
 		
-		System.out.println("===Imprimiendo duracion de los ruteos");
+		/*
+		System.out.println("valid:        " + valid +  "\ninvalid:      " + invalid + "\ninWalkRange:  "+ inWalkRange + "\nnulls:        " + nulls + "\nlessThan2Node:" + lessThan2Node);
+		System.out.println("--------------\nTrips:" + trips);
+		*/
+		
+		/*
+		System.out.println("===Printing routing durations");
 		double total=0;
 		for (double d : durations ){
-			if (d > 0.0){
-				System.out.println(d);
-				total=total+d;
-			}
+			System.out.println(d);
+			total=total+d;
 		}
 		System.out.println("average: " + (total/durations.size()));
-
-
+		*/
+		
+		/*
+		//for(Path path: paths){
+		if (true){
+			Path path = paths.get(0);
+			for(Link link: path.links){
+				System.out.print(link.getType() + "-");
+			}
+			System.out.println("");
+		}
+		*/
+		
+		/*
 		// start the control(l)er with the network and plans as defined above
 		Controler controler = new Controler(Gbl.getConfig(),net,(Population) newPopulation);
 		// this means existing files will be over-written.  Be careful!
 		controler.setOverwriteFiles(true);
 		// start the matsim iterations (configured by the config file)
 		controler.run();
-
+		*/	
+			
 	}//createPTActs
 
-	
 	private void createWlinks(final Coord coord1, final Path path, final Coord coord2){
 		originNode= ptRouter.CreateWalkingNode(new IdImpl("w1"), coord1);
 		destinationNode= ptRouter.CreateWalkingNode(new IdImpl("w2"), coord2);
@@ -294,7 +312,6 @@ public class PTActWriter {
 					newPlan.addAct(newPTAct("exit pt veh", link.getToNode().getCoord(), link, arrTime, 0, arrTime));
 				}
 
-
 			}else if(link.getType().equals("Transfer") || link.getType().equals("DetTransfer") ){  //add the PTleg and a Transfer Act
 				if (lastLinkType.equals("Standard")){
 					arrTime= depTime+ legTravelTime;
@@ -364,12 +381,14 @@ public class PTActWriter {
 		return ptAct;
 	}
 
-	private Leg newPTLeg(final int num, final Leg.Mode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
+	private Leg newPTLeg(final int num, Leg.Mode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
 		NetworkRoute legRoute = new LinkNetworkRoute(null, null); 
 		//CarRoute legRoute = new NodeCarRoute();  25 feb
 		
 		if (mode!=Leg.Mode.walk){
 			legRoute.setLinks(null, routeLinks, null);
+		}else{
+			mode= Leg.Mode.car;    //3 april 2009
 		}
 		
 		legRoute.setTravelTime(travTime);

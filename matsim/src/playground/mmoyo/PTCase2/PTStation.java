@@ -17,6 +17,10 @@ public class PTStation {
 	Coord coord;
 	Id idFareZone;
 
+	public PTStation(PTTimeTable2 ptTimeTable) {
+		this.createIntersecionMap(ptTimeTable);
+	}
+	
 	public Map<String, List<Id>> getIntersectionMap() {
 		return IntersectionMap;
 	}
@@ -57,9 +61,7 @@ public class PTStation {
 		this.idFareZone = idFareZone;
 	}
 
-	public PTStation(PTTimeTable2 ptTimeTable) {
-		this.createIntersecionMap(ptTimeTable);
-	}
+
 	
 	/*
 	//-> eliminate this method from factory

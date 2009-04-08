@@ -1,20 +1,13 @@
 package playground.mmoyo.PTCase2;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.ArrayList;
-
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
-
 import playground.mmoyo.Validators.NetValidator;
 import playground.mmoyo.Validators.PlanValidator;
-import playground.mmoyo.input.PTNodeFactory;
-import playground.mmoyo.input.PTNodeReader;
-import playground.mmoyo.input.PTLinkFactory;
+import playground.mmoyo.input.PTLineAggregator;
 
 public class PTControler2 {
     private static String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
@@ -46,71 +39,33 @@ public class PTControler2 {
 				
 				break;
 			case -3:
-				//-> Create class to add new nodes/Ptlines 
-				
-				String filePath="C://Users/manuel/Desktop/TU/ZH_Files/bus/Basic_Bus_Network.xml";
-				
-				PTNodeReader ptNodeReader = new PTNodeReader();
-	    		ptNodeReader.readFile (filePath);
-	    		
-	    		List<List<BasicNode>> nodeListList = ptNodeReader.getNodeLists();
-	    		PTNodeFactory ptNodeFactory = new PTNodeFactory(pt.getPtNetworkLayer(), pt.getPtTimeTable());
-	    		PTLinkFactory ptLinkFactory= new PTLinkFactory (pt.getPtNetworkLayer());
-
-	    		//System.out.println(nodeListList.size());
-	    		
-	    		int iniNodes= pt.getPtNetworkLayer().getNodes().size();
-	    		int iniLinks= pt.getPtNetworkLayer().getLinks().size();
-	    		System.out.println("creating new nodes and links...");
-	    		
-	    		BasicNode[] basicNodeArr = new BasicNode[2];
-	    		List<BasicNode> basicNodeList1 = new ArrayList<BasicNode>();
-	    		List<BasicNode> basicNodeList2 = new ArrayList<BasicNode>();
-	    		for(List<BasicNode> basicNodeList: nodeListList){
-	    			for (BasicNode basicNode : basicNodeList){
-	    				basicNodeArr = ptNodeFactory.CreatePTNodes(basicNode);
-	    				basicNodeList1.add(basicNodeArr[0]);
-	    				basicNodeList2.add(basicNodeArr[1]);
-	    			}
-	    			ptLinkFactory.createLinks(basicNodeList1);
-	    			ptLinkFactory.createLinks(basicNodeList2);
-	    		}
-	    		System.out.println("Done.");
-	    		
-	    		int finNodes= pt.getPtNetworkLayer().getNodes().size() - iniNodes;
-	    		int finLinks= pt.getPtNetworkLayer().getLinks().size() - iniLinks;
-	    		
-	    		System.out.println("created Nodes:" + finNodes);
-	    		System.out.println("created Links:" + finLinks);
-	    		
-	    		System.out.println(pt.getPtNetworkLayer().toString());
-				//-->and after creating the new nodes ans links, we must create the transfers and detached again
-				
-		
+				//pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
+	    		pt.readPTNet(INPTNETFILE);
+				String newNodesfilePath="C://Users/manuel/Desktop/TU/ZH_Files/bus/Basic_Bus_Network.xml";
+				PTLineAggregator ptLineAggregator = new PTLineAggregator(newNodesfilePath, pt.getPtNetworkLayer(), pt.getPtTimeTable());
+				ptLineAggregator.AddLine();
+	    		//pt.writeNet(ZURICHPTN);
 				break;
 			case -2:
-				pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
-	    		pt.readPTNet(ZURICHPTN);
+				pt.createPTNetWithTLinks(INPTNETFILE);
+				pt.writeNet(ZURICHPTN);
+				pt.readPTNet(ZURICHPTN);
 	    		NetValidator netValidator = new NetValidator(pt.getPtNetworkLayer(), pt.getPtTimeTable());
 	    		netValidator.printNegativeTransferCosts(28800);
 				break;
 			case -1:
-				pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
-				long startTime = System.currentTimeMillis();
-				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300);
-				System.out.println("Duration of creation of detached transfers: " + (System.currentTimeMillis()-startTime));
-				pt.getPtNetworkFactory().writeNet(pt.getPtNetworkLayer(), ZURICHPTN);
+				pt.createPTNetWithTLinks(INPTNETFILE);
+				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300, pt.getPtTimeTable());
+				pt.writeNet(ZURICHPTN);
 	    		pt.readPTNet(ZURICHPTN);
 	    		PTActWriter ptActWriter1 = new PTActWriter(pt);
 	    		ptActWriter1.writePTActsLegs();
 	    		
 				break;
 			case 0: 
-	    		pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
-	    		
+	    		pt.createPTNetWithTLinks(INPTNETFILE);
 	    		//Map<String, List<IdImpl>> intersecionMap = pt.getPtNetworkFactory().createIntersecionMap(pt.getPtTimeTable());
 	    		//new StationValidator().validateStations(pt.getPtNetworkLayer(),intersecionMap);
-	    		    		
 	    		break;
 	    	case 1:
 	    		Coord coord1= new CoordImpl(708146,243607);
@@ -124,10 +79,12 @@ public class PTControler2 {
 	    		Node ptNode2 = pt.getPtNetworkLayer().getNode("101456");
 	    		pt.getPtRouter2().PrintRoute(pt.getPtRouter2().findRoute(ptNode, ptNode2, 391));
 	    		break;
-	    	
 	    	case 3:
+	    		double startTime = System.currentTimeMillis();
 	    		PTActWriter ptActWriter = new PTActWriter(pt);
 	    		ptActWriter.writePTActsLegs();
+	    		double duration= System.currentTimeMillis()-startTime;
+	    		System.out.println("duration total:" +  duration);	    		
 	    		//ptActWriter.ptTravelTime.costValidator.printNegativeVaues();
 	    		//System.out.println(ptActWriter.ptTravelTime.costValidator==null);
 	    		break;
@@ -148,8 +105,7 @@ public class PTControler2 {
 	    		}
 	    		break;
 	    	case 6:
-	    		//pt.getPtNetworkFactory().createTransferLinks2(pt.getPtNetworkLayer(),IntersecionMap );
-	    		pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 200);
+	    		pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 200, pt.getPtTimeTable());
 	    		pt.getPtNetworkFactory().writeNet(pt.getPtNetworkLayer(), ZURICHPTN);
 	    		break;
 	    	case 7:
@@ -161,8 +117,8 @@ public class PTControler2 {
 	    		System.out.println(connected);
 	    		break;
 	    	case 8:
-	    		//Temporal only for the refactoring    	
-	    		break;
+	    	
+	    	break;
 		}//switch
 	}//main
 
