@@ -30,6 +30,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
@@ -40,7 +41,9 @@ import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
 public class TransitRouterNetworkWrapper implements Network {
-	
+
+	/*package*/static final Mode[] allowedModes = new Mode[] { BasicLeg.Mode.pt };
+
 	private final TransitRouterNetwork transitNetwork;
 	private final Map<TransitRouterNetwork.TransitRouterNetworkNode, NodeWrapper> nodesLookup =
 		new HashMap<TransitRouterNetwork.TransitRouterNetworkNode, NodeWrapper>();
@@ -48,56 +51,56 @@ public class TransitRouterNetworkWrapper implements Network {
 		new HashMap<TransitRouterNetwork.TransitRouterNetworkLink, LinkWrapper>();
 	private final Map<Id, Node> nodes = new LinkedHashMap<Id, Node>();
 	private final Map<Id, Link> links = new LinkedHashMap<Id, Link>();
-	
+
 	private long nextNodeId = 0;
 	private long nextLinkId = 0;
-	
+
 	public TransitRouterNetworkWrapper(final TransitRouterNetwork transitNetwork) {
 		this.transitNetwork = transitNetwork;
 		for (TransitRouterNetwork.TransitRouterNetworkNode node : this.transitNetwork.getNodes()) {
-			NodeWrapper node2 = new NodeWrapper(node, new IdImpl(nextNodeId++));
+			NodeWrapper node2 = new NodeWrapper(node, new IdImpl(this.nextNodeId++));
 			this.nodesLookup.put(node, node2);
 			this.nodes.put(node2.getId(), node2);
 		}
 		for (TransitRouterNetwork.TransitRouterNetworkLink link : this.transitNetwork.getLinks()) {
-			LinkWrapper link2 = new LinkWrapper(link, new IdImpl(nextLinkId++));
+			LinkWrapper link2 = new LinkWrapper(link, new IdImpl(this.nextLinkId++));
 			this.linksLookup.put(link, link2);
 			this.links.put(link2.getId(), link2);
 		}
-	}	
+	}
 
-	public Link getLink(Id linkId) {
+	public Link getLink(final Id linkId) {
 		return this.links.get(linkId);
 	}
-	
-	public Node getNode(Id id) {
+
+	public Node getNode(final Id id) {
 		return this.nodes.get(id);
 	}
-	
-	public Node getNearestNode(Coord coord) {
+
+	public Node getNearestNode(final Coord coord) {
 		throw new UnsupportedOperationException();
 	}
-	
-	public Collection<Node> getNearestNodes(Coord coord, double distance) {
+
+	public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	public Map<Id, Link> getLinks() {
 		return this.links;
 	}
-	
+
 	public Map<Id, Node> getNodes() {
 		return this.nodes;
 	}
-	
+
 	/*package*/ NodeWrapper getWrappedNode(final TransitRouterNetwork.TransitRouterNetworkNode node) {
 		return this.nodesLookup.get(node);
 	}
-	
+
 	/*package*/ LinkWrapper getWrappedLink(final TransitRouterNetwork.TransitRouterNetworkLink link) {
 		return this.linksLookup.get(link);
 	}
-	
+
 	public int getCapacityPeriod() {
 		return 3600;
 	}
@@ -118,23 +121,23 @@ public class TransitRouterNetworkWrapper implements Network {
 		return "TransitRouterNetworkWrapper";
 	}
 
-	public boolean removeLink(Link link) {
+	public boolean removeLink(final Link link) {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean removeNode(Node node) {
+	public boolean removeNode(final Node node) {
 		throw new UnsupportedOperationException();
 	}
 
-	public void setCapacityPeriod(double capPeriod) {
+	public void setCapacityPeriod(final double capPeriod) {
 		throw new UnsupportedOperationException();
 	}
 
-	public void setEffectiveCellSize(double effectiveCellSize) {
+	public void setEffectiveCellSize(final double effectiveCellSize) {
 		throw new UnsupportedOperationException();
 	}
 
-	public void setEffectiveLaneWidth(double effectiveLaneWidth) {
+	public void setEffectiveLaneWidth(final double effectiveLaneWidth) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -142,16 +145,16 @@ public class TransitRouterNetworkWrapper implements Network {
 		throw new UnsupportedOperationException();
 	}
 
-	
+
 	/*package*/ class NodeWrapper implements Node {
 		final TransitRouterNetwork.TransitRouterNetworkNode node;
 		final Id id;
-		
+
 		public NodeWrapper(final TransitRouterNetwork.TransitRouterNetworkNode node, final Id id) {
 			this.node = node;
 			this.id = id;
 		}
-		
+
 		public Map<Id, ? extends Link> getInLinks() {
 			throw new UnsupportedOperationException();
 		}
@@ -193,31 +196,31 @@ public class TransitRouterNetworkWrapper implements Network {
 			return null;
 		}
 
-		public void removeInLink(Link inlink) {
+		public void removeInLink(final Link inlink) {
 			throw new UnsupportedOperationException();
 		}
 
-		public void removeOutLink(Link outlink) {
+		public void removeOutLink(final Link outlink) {
 			throw new UnsupportedOperationException();
 		}
 
-		public void setOrigId(String id) {
+		public void setOrigId(final String id) {
 			throw new UnsupportedOperationException();
 		}
 
-		public void setTopoType(int topotype) {
+		public void setTopoType(final int topotype) {
 			throw new UnsupportedOperationException();
 		}
 
-		public void setType(String type) {
+		public void setType(final String type) {
 			throw new UnsupportedOperationException();
 		}
 
-		public boolean addInLink(BasicLink link) {
+		public boolean addInLink(final BasicLink link) {
 			throw new UnsupportedOperationException();
 		}
 
-		public boolean addOutLink(BasicLink link) {
+		public boolean addOutLink(final BasicLink link) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -229,22 +232,22 @@ public class TransitRouterNetworkWrapper implements Network {
 			return this.id;
 		}
 
-		public int compareTo(Node o) {
+		public int compareTo(final Node o) {
 			return this.id.compareTo(o.getId());
 		}
 	}
-	
+
 	/*package*/ class LinkWrapper implements Link {
 
 		final TransitRouterNetwork.TransitRouterNetworkLink link;
 		final Id id;
-		
+
 		public LinkWrapper(final TransitRouterNetwork.TransitRouterNetworkLink link, final Id id) {
 			this.link = link;
 			this.id = id;
 		}
-		
-		public double calcDistance(Coord coord) {
+
+		public double calcDistance(final Coord coord) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -252,11 +255,11 @@ public class TransitRouterNetworkWrapper implements Network {
 			throw new UnsupportedOperationException();
 		}
 
-		public double getFlowCapacity(double time) {
+		public double getFlowCapacity(final double time) {
 			throw new UnsupportedOperationException();
 		}
 
-		public double getFreespeedTravelTime(double time) {
+		public double getFreespeedTravelTime(final double time) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -276,19 +279,19 @@ public class TransitRouterNetworkWrapper implements Network {
 			return null;
 		}
 
-		public void setOrigId(String origid) {
+		public void setOrigId(final String origid) {
 			throw new UnsupportedOperationException();
 		}
 
-		public void setType(String type) {
+		public void setType(final String type) {
 			throw new UnsupportedOperationException();
 		}
 
-		public double getCapacity(double time) {
+		public double getCapacity(final double time) {
 			return 9999;
 		}
 
-		public double getFreespeed(double time) {
+		public double getFreespeed(final double time) {
 			return 10;
 		}
 
@@ -296,11 +299,11 @@ public class TransitRouterNetworkWrapper implements Network {
 			return this.id;
 		}
 
-		public double getNumberOfLanes(double time) {
+		public double getNumberOfLanes(final double time) {
 			return 1;
 		}
 
-		public int getLanesAsInt(double time) {
+		public int getLanesAsInt(final double time) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -308,39 +311,39 @@ public class TransitRouterNetworkWrapper implements Network {
 			return this.link.toNode.stop.getStopFacility().calcDistance(this.link.fromNode.stop.getStopFacility().getCoord());
 		}
 
-		public void setCapacity(double capacity) {
+		public void setCapacity(final double capacity) {
 			throw new UnsupportedOperationException();
 		}
 
-		public void setFreespeed(double freespeed) {
+		public void setFreespeed(final double freespeed) {
 			throw new UnsupportedOperationException();
 		}
 
-		public boolean setFromNode(BasicNode node) {
+		public boolean setFromNode(final BasicNode node) {
 			throw new UnsupportedOperationException();
 		}
 
-		public void setNumberOfLanes(double lanes) {
+		public void setNumberOfLanes(final double lanes) {
 			throw new UnsupportedOperationException();
 		}
 
-		public void setLength(double length) {
+		public void setLength(final double length) {
 			throw new UnsupportedOperationException();
 		}
 
-		public boolean setToNode(BasicNode node) {
+		public boolean setToNode(final BasicNode node) {
 			throw new UnsupportedOperationException();
 		}
 
-		public void addDownMapping(Location other) {
+		public void addDownMapping(final Location other) {
 			throw new UnsupportedOperationException();
 		}
 
-		public void addUpMapping(Location other) {
+		public void addUpMapping(final Location other) {
 			throw new UnsupportedOperationException();
 		}
 
-		public Location downLocation(Id id) {
+		public Location downLocation(final Id id) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -352,7 +355,7 @@ public class TransitRouterNetworkWrapper implements Network {
 			throw new UnsupportedOperationException();
 		}
 
-		public Location getUpLocation(Id id) {
+		public Location getUpLocation(final Id id) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -368,7 +371,7 @@ public class TransitRouterNetworkWrapper implements Network {
 			throw new UnsupportedOperationException();
 		}
 
-		public void setId(Id id) {
+		public void setId(final Id id) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -377,12 +380,12 @@ public class TransitRouterNetworkWrapper implements Network {
 		}
 
 		public Mode[] getAllowedModes() {
-			throw new UnsupportedOperationException();
+			return allowedModes;
 		}
 
-		public void setAllowedModes(Mode[] modes) {
+		public void setAllowedModes(final Mode[] modes) {
 			throw new UnsupportedOperationException();
 		}
 	}
-	
+
 }

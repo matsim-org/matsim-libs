@@ -3,12 +3,30 @@
 <plans>
 
 <person id="1">
-	<plan type="pt">
+	<plan>
 		<act type="h" link="2" end_time="06:55:00" />
 		<leg mode="car">
 			<route>3 4 5 6 7</route>
 		</leg>
 		<act type="w" link="7" dur="09:02:22" />
+	</plan>
+</person>
+
+<person id="2">
+	<plan>
+		<act type="h" link="2" end_time="06:53:00" facility="home" />
+		<leg mode="car">
+			<route trav_time="00:03:00">3</route>
+		</leg>
+		<act type="transitInteraction" end_time="07:30:00" link="3" facility="stop2" />
+		<leg mode="bus">
+			<route trav_time="01:00:00" />
+		</leg>
+		<act type="transitInteraction" end_time="07:08:00" link="6" facility="stop5" />
+		<leg mode="car">
+			<route trav_time="00:04:00" >7</route>
+		</leg>
+		<act type="w" link="7" facility="work" />
 	</plan>
 </person>
 
