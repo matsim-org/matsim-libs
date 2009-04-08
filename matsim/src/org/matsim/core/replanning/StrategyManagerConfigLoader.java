@@ -148,7 +148,6 @@ public class StrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new PathSizeLogitSelector());
 				// JH
 			} else if (classname.equals("KSecLoc")){
-//				System.out.println(" #### Choosing social network replanning algorithm");
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherK(network, travelCostCalc, travelTimeCalc);
 				strategy.addStrategyModule(socialNetStrategyModule);
@@ -162,11 +161,9 @@ public class StrategyManagerConfigLoader {
 				strategy.addStrategyModule(socialNetStrategyModule);
 				// JH
 			} else if (classname.equals("LocationChoice")) {
-		    	strategy = new PlanStrategy(new ExpBetaPlanSelector());
-		    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
-				final PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost(config.charyparNagelScoring()));
-				preProcessRoutingData.run(network);
-				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
+	    	strategy = new PlanStrategy(new ExpBetaPlanSelector());
+	    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
+	    	strategy.addStrategyModule(new ReRoute(controler));
 				strategy.addStrategyModule(new TimeAllocationMutator());
 			}
 			//if none of the strategies above could be selected we try to load the class by name
