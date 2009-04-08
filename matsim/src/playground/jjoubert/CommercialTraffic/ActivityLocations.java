@@ -33,7 +33,7 @@ public class ActivityLocations {
 	final static String DESTFOLDER = ROOT + PROVINCE+ "/Activities/";
 	final static String VEH_FOLDER = ROOT + PROVINCE + "/XML/";
 	final static String shapeFileSource = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
-
+	
 	private final static String WGS84 = "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\", 6378137.0, 298.257223563]],PRIMEM[\"Greenwich\", 0.0],UNIT[\"degree\", 0.017453292519943295],AXIS[\"Lon\", EAST],AXIS[\"Lat\", NORTH]]";
 	private final static String WGS84_UTM35S = "PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
 
@@ -47,6 +47,12 @@ public class ActivityLocations {
 	public static int progressDots;
 	public static MultiPolygon studyArea;
 	public static Point studyAreaCentroid;
+
+	// To determine the duration histogram
+	final static int bucketSize = 30; // Expressed in MINUTES
+	final static int bucketRange = 10080; /// Expressed in MINUTES (Here, a week)
+	static int numBuckets = (bucketRange / bucketSize) + 1;
+	static ArrayList<Integer> durationBuckets;
 	// a 'BoinkPoint' is an activity that starts and ends at different locations. Currently I don't do anything with them.
 	//TODO Sort out how to handle these 'BoinkPoint's.
 	public static int numberOfBoinkPoints = 0; 
@@ -64,6 +70,12 @@ public class ActivityLocations {
 		int numberOfMajorActivities = 0;
 		int numberOfMinorActivities = 0;
 		
+		// Create an empty time ArrayList
+		durationBuckets = new ArrayList<Integer>();
+		for(int a = 1; a <= numBuckets; a++ ){
+			durationBuckets.add(0);
+		}
+		
 		MathTransform mt = getMathTransform(); // Prepare for geometric transformations
 		
 		System.out.println("Reading study area: " + PROVINCE );
@@ -79,7 +91,7 @@ public class ActivityLocations {
 		ProgressBar pb = new ProgressBar('*');
 		pb.printProgressBar();
 		int dotsPrinted = 0;
-		boolean foundPoint = false;
+//		boolean foundPoint = false;
 		
 		try {
 			File outFolder = new File( DESTFOLDER );
@@ -97,13 +109,16 @@ public class ActivityLocations {
 			BufferedWriter minorLocations = new BufferedWriter(new FileWriter(new File(DESTFOLDER + PROVINCE + "MinorLocations.txt")));
 			minorLocations.write( locationHeaderString() );
 			minorLocations.newLine();
+			BufferedWriter durationOutput = new BufferedWriter(new FileWriter(new File(DESTFOLDER + PROVINCE + "ActivityDurations.txt")));
+			durationOutput.write("Bin,Number_of_Activities");
+			durationOutput.newLine();
 
 			try{
 				for(int i = 0; i < vehicles.length; i++ ){
 					File thisFile = vehicles[i];
 					if(thisFile.isFile() && !(thisFile.getName().startsWith(".")) ){ // avoid .* file names on Mac
 						//TODO Remove next line when SA run is complete
-						if( !foundPoint ){
+//						if( !foundPoint ){
 							Vehicle thisVehicle = createNewVehicle(thisFile);
 							ArrayList<GPSPoint> log = readFileToArray(thisFile, mt);				
 							processVehicleActivities(thisVehicle, thisFile, log);
@@ -135,20 +150,26 @@ public class ActivityLocations {
 							numberOfVehicles++;				
 							dotsPrinted = pb.updateProgress(dotsPrinted, numberOfVehicles, totalVehicles);
 							//TODO The following 'else' bit must also come out... just to fix SA run
-							int theVehicle = Integer.parseInt( thisFile.getName().substring(0, thisFile.getName().length() - 4 ) );
-							if ( theVehicle == 128155 ) {
-								foundPoint = true;
-							}
-						} else{
-							numberOfVehicles++;				
-							dotsPrinted = pb.updateProgress(dotsPrinted, numberOfVehicles, totalVehicles);
-						}
+//							int theVehicle = Integer.parseInt( thisFile.getName().substring(0, thisFile.getName().length() - 4 ) );
+//							if ( theVehicle == 128155 ) {
+//								foundPoint = true;
+//							}
+//						} else{
+//							numberOfVehicles++;				
+//							dotsPrinted = pb.updateProgress(dotsPrinted, numberOfVehicles, totalVehicles);
+//						}
 					}
-				} 
+				}
+				for (int i = 0; i < durationBuckets.size(); i++) {
+					durationOutput.write((i+1)*10 + DELIMITER_OUT + durationBuckets.get(i));
+					durationOutput.newLine();
+				}
+
 			}finally{
 				vehicleStats.close();
 				majorLocations.close();
 				minorLocations.close();
+				durationOutput.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -294,6 +315,11 @@ public class ActivityLocations {
 				// Using the start position as the location of the activity
 				// TODO When sorting out 'BoinkPoints' I need to address this as well.
 				activityList.add(new Activity( log.get(0).getTime(), log.get(1).getTime(), log.get(0) ) );
+				// Add the activity's duration to the duration bucket
+				int lastActivityDuration = activityList.get(activityList.size()-1).getDuration();
+				int position = Math.min(numBuckets - 1, (lastActivityDuration / bucketSize) );
+				int dummy = durationBuckets.get(position);
+				durationBuckets.set(position, dummy + 1);
 
 				// Check if location where activity stops is within the limits from where activity started 
 				int distance = (int) ( log.get(1).getCoordinate().distance( log.get(0).getCoordinate() ) );
