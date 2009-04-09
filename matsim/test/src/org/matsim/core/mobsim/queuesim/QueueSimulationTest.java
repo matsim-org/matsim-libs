@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2009 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -31,8 +31,8 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -42,7 +42,6 @@ import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -54,45 +53,115 @@ import org.matsim.testcases.MatsimTestCase;
 public class QueueSimulationTest extends MatsimTestCase {
 
 	/**
+	 * This test is mostly useful for manual debugging, because only a single agent is simulated
+	 * on a very simple network.
+	 *
+	 * @author mrieser
+	 */
+	public void testSingleAgent() {
+		Fixture f = new Fixture();
+
+		// add a single person with leg from link1 to link3
+		Person person = new PersonImpl(new IdImpl(0));
+		Plan plan = person.createPlan(true);
+		Activity a1 = plan.createAct("h", f.link1);
+		a1.setEndTime(6*3600);
+		Leg leg = plan.createLeg(BasicLeg.Mode.car);
+		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(BasicLeg.Mode.car, f.link1, f.link3);
+		route.setNodes(f.link1, f.nodes23, f.link3);
+		leg.setRoute(route);
+		plan.createAct("w", f.link3);
+		f.plans.addPerson(person);
+
+		/* build events */
+		Events events = new Events();
+		EventCollector collector = new EventCollector();
+		events.addHandler(collector);
+
+		/* run sim */
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		sim.run();
+
+		/* finish */
+		assertEquals("wrong number of link enter events.", 2, collector.events.size());
+		assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), EPSILON);
+		assertEquals("wrong time in second event.", 6.0*3600 + 102, collector.events.get(1).getTime(), EPSILON);
+	}
+
+	/**
+	 * This test is mostly useful for manual debugging, because only two single agents are simulated
+	 * on a very simple network.
+	 *
+	 * @author mrieser
+	 */
+	public void testTwoAgent() {
+		Fixture f = new Fixture();
+
+		// add two persons with leg from link1 to link3, the first starting at 6am, the second at 7am
+		for (int i = 0; i < 2; i++) {
+			Person person = new PersonImpl(new IdImpl(i));
+			Plan plan = person.createPlan(true);
+			Activity a1 = plan.createAct("h", f.link1);
+			a1.setEndTime((6+i)*3600);
+			Leg leg = plan.createLeg(BasicLeg.Mode.car);
+			NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(BasicLeg.Mode.car, f.link1, f.link3);
+			route.setNodes(f.link1, f.nodes23, f.link3);
+			leg.setRoute(route);
+			plan.createAct("w", f.link3);
+			f.plans.addPerson(person);
+		}
+
+		/* build events */
+		Events events = new Events();
+		EventCollector collector = new EventCollector();
+		events.addHandler(collector);
+
+		/* run sim */
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		sim.run();
+
+		/* finish */
+		assertEquals("wrong number of link enter events.", 4, collector.events.size());
+		assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), EPSILON);
+		assertEquals("wrong time in second event.", 6.0*3600 + 102, collector.events.get(1).getTime(), EPSILON);
+		assertEquals("wrong time in first event.", 7.0*3600 + 1, collector.events.get(2).getTime(), EPSILON);
+		assertEquals("wrong time in second event.", 7.0*3600 + 102, collector.events.get(3).getTime(), EPSILON);
+	}
+
+	/*package*/ static class EventCollector implements LinkEnterEventHandler {
+
+		public final ArrayList<LinkEnterEvent> events = new ArrayList<LinkEnterEvent>();
+
+		public void handleEvent(final LinkEnterEvent event) {
+			this.events.add(event);
+		}
+
+		public void reset(final int iteration) {
+			this.events.clear();
+		}
+
+	}
+
+	/**
 	 * Tests that the flow capacity can be reached (but not exceeded) by
 	 * agents driving over a link.
 	 *
 	 * @author mrieser
 	 */
 	public void testFlowCapacityDriving() {
-		Config config = Gbl.createConfig(null);
-		config.simulation().setFlowCapFactor(1.0);
-		config.simulation().setStorageCapFactor(1.0);
-
-		/* build network */
-		NetworkLayer network = new NetworkLayer();
-		network.setCapacityPeriod(Time.parseTime("1:00:00"));
-		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
-		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(1100, 0));
-		Node node4 = network.createNode(new IdImpl("4"), new CoordImpl(1200, 0));
-		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 60000, 9);
-		/* ------ */ network.createLink(new IdImpl("2"), node2, node3, 1000, 10, 6000, 2);
-		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 100, 10, 60000, 9);
-
-		/* build plans */
-		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
-
-		ArrayList<Node> nodes23 = new ArrayList<Node>();
-		nodes23.add(node2);
-		nodes23.add(node3);
+		Fixture f = new Fixture();
 
 		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
 		Person person = new PersonImpl(new IdImpl(0));
 		Plan plan = person.createPlan(true);
-		Activity a1 = plan.createAct("h", link1);
+		Activity a1 = plan.createAct("h", f.link1);
 		a1.setEndTime(6*3600 - 500);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
-		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
-		route.setNodes(link1, nodes23, link3);
+		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(BasicLeg.Mode.car, f.link1, f.link3);
+		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
-		plan.createAct("w", link3);
-		plans.addPerson(person);
+		plan.createAct("w", f.link3);
+		f.plans.addPerson(person);
 
 		// add a lot of other persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
@@ -108,23 +177,23 @@ public class QueueSimulationTest extends MatsimTestCase {
 			 * to start 1 + 100 + 1 = 102 secs earlier.
 			 * So, the start time is 7*3600 - 1800 - 102 = 7*3600 - 1902
 			 */
-			Activity a = plan.createAct("h", link1);
+			Activity a = plan.createAct("h", f.link1);
 			a.setEndTime(7*3600 - 1902);
 			leg = plan.createLeg(BasicLeg.Mode.car);
-			route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
-			route.setNodes(link1, nodes23, link3);
+			route = (NetworkRoute) f.network.getFactory().createRoute(BasicLeg.Mode.car, f.link1, f.link3);
+			route.setNodes(f.link1, f.nodes23, f.link3);
 			leg.setRoute(route);
-			plan.createAct("w", link3);
-			plans.addPerson(person);
+			plan.createAct("w", f.link3);
+			f.plans.addPerson(person);
 		}
 
 		/* build events */
 		Events events = new Events();
-		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, network);
+		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(network, plans, events);
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
 		sim.run();
 
 		/* finish */
@@ -147,64 +216,41 @@ public class QueueSimulationTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testFlowCapacityStarting() {
-		Config config = Gbl.createConfig(null);
-		config.simulation().setFlowCapFactor(1.0);
-		config.simulation().setStorageCapFactor(1.0);
-
-		/* build network */
-		NetworkLayer network = new NetworkLayer();
-		network.setCapacityPeriod(Time.parseTime("1:00:00"));
-		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
-		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(1100, 0));
-		Node node4 = network.createNode(new IdImpl("4"), new CoordImpl(1200, 0));
-		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 60000, 9);
-		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1000, 10, 6000, 2);
-		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 100, 10, 60000, 9);
-
-		/* build plans */
-		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
-
-		ArrayList<Node> nodes3 = new ArrayList<Node>();
-		nodes3.add(node3);
-
-		ArrayList<Node> nodes23 = new ArrayList<Node>();
-		nodes23.add(node2);
-		nodes23.add(node3);
+		Fixture f = new Fixture();
 
 		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
 		Person person = new PersonImpl(new IdImpl(0));
 		Plan plan = person.createPlan(true);
-		Activity a1 = plan.createAct("h", link1);
+		Activity a1 = plan.createAct("h", f.link1);
 		a1.setEndTime(6*3600 - 500);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
-		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
-		route.setNodes(link1, nodes23, link3);
+		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(BasicLeg.Mode.car, f.link1, f.link3);
+		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
-		plan.createAct("w", link3);
-		plans.addPerson(person);
+		plan.createAct("w", f.link3);
+		f.plans.addPerson(person);
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 10000; i++) {
 			person = new PersonImpl(new IdImpl(i));
 			plan = person.createPlan(true);
-			Activity a2 = plan.createAct("h", link2);
+			Activity a2 = plan.createAct("h", f.link2);
 			a2.setEndTime(7*3600 - 1801);
 			leg = plan.createLeg(BasicLeg.Mode.car);
-			route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link2, link3);
-			route.setNodes(link2, nodes3, link3);
+			route = (NetworkRoute) f.network.getFactory().createRoute(BasicLeg.Mode.car, f.link2, f.link3);
+			route.setNodes(f.link2, f.nodes3, f.link3);
 			leg.setRoute(route);
-			plan.createAct("w", link3);
-			plans.addPerson(person);
+			plan.createAct("w", f.link3);
+			f.plans.addPerson(person);
 		}
 
 		/* build events */
 		Events events = new Events();
-		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, network);
+		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(network, plans, events);
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
 		sim.run();
 
 		/* finish */
@@ -226,77 +272,54 @@ public class QueueSimulationTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testFlowCapacityMixed() {
-		Config config = Gbl.createConfig(null);
-		config.simulation().setFlowCapFactor(1.0);
-		config.simulation().setStorageCapFactor(1.0);
-
-		/* build network */
-		NetworkLayer network = new NetworkLayer();
-		network.setCapacityPeriod(Time.parseTime("1:00:00"));
-		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
-		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(1100, 0));
-		Node node4 = network.createNode(new IdImpl("4"), new CoordImpl(1200, 0));
-		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 60000, 9);
-		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1000, 10, 6000, 2);
-		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 100, 10, 60000, 9);
-
-		/* build plans */
-		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
-
-		ArrayList<Node> nodes3 = new ArrayList<Node>();
-		nodes3.add(node3);
-
-		ArrayList<Node> nodes23 = new ArrayList<Node>();
-		nodes23.add(node2);
-		nodes23.add(node3);
+		Fixture f = new Fixture();
 
 		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
 		Person person = new PersonImpl(new IdImpl(0));
 		Plan plan = person.createPlan(true);
-		Activity a1 = plan.createAct("h", link1);
+		Activity a1 = plan.createAct("h", f.link1);
 		a1.setEndTime(6*3600 - 500);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
-		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
-		route.setNodes(link1, nodes23, link3);
+		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(BasicLeg.Mode.car, f.link1, f.link3);
+		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
-		plan.createAct("w", link3);
-		plans.addPerson(person);
+		plan.createAct("w", f.link3);
+		f.plans.addPerson(person);
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 5000; i++) {
 			person = new PersonImpl(new IdImpl(i));
 			plan = person.createPlan(true);
-			Activity a2 = plan.createAct("h", link2);
+			Activity a2 = plan.createAct("h", f.link2);
 			a2.setEndTime(7*3600 - 1801);
 			leg = plan.createLeg(BasicLeg.Mode.car);
-			route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link2, link3);
-			route.setNodes(link2, nodes3, link3);
+			route = (NetworkRoute) f.network.getFactory().createRoute(BasicLeg.Mode.car, f.link2, f.link3);
+			route.setNodes(f.link2, f.nodes3, f.link3);
 			leg.setRoute(route);
-			plan.createAct("w", link3);
-			plans.addPerson(person);
+			plan.createAct("w", f.link3);
+			f.plans.addPerson(person);
 		}
 		// add a lot of persons with legs from link1 to link3
 		for (int i = 5001; i <= 10000; i++) {
 			person = new PersonImpl(new IdImpl(i));
 			plan = person.createPlan(true);
-			Activity a2 = plan.createAct("h", link1);
+			Activity a2 = plan.createAct("h", f.link1);
 			a2.setEndTime(7*3600 - 1902);
 			leg = plan.createLeg(BasicLeg.Mode.car);
-			route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link2, link3);
-			route.setNodes(link1, nodes23, link3);
+			route = (NetworkRoute) f.network.getFactory().createRoute(BasicLeg.Mode.car, f.link2, f.link3);
+			route.setNodes(f.link1, f.nodes23, f.link3);
 			leg.setRoute(route);
-			plan.createAct("w", link3);
-			plans.addPerson(person);
+			plan.createAct("w", f.link3);
+			f.plans.addPerson(person);
 		}
 
 		/* build events */
 		Events events = new Events();
-		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, network);
+		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(network, plans, events);
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
 		sim.run();
 
 		/* finish */
@@ -313,6 +336,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 	/**
 	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
 	 * does not lead to the destination link.
+	 *
+	 * @author mrieser
 	 */
 	public void testConsistentRoutes_WrongRoute() {
 		new LogCounter();
@@ -332,6 +357,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
 	 * does not specify all nodes, so it is unclear at one node or another how to
 	 * continue.
+	 *
+	 * @author mrieser
 	 */
 	public void testConsistentRoutes_ImpossibleRoute() {
 		Events events = new Events();
@@ -374,50 +401,36 @@ public class QueueSimulationTest extends MatsimTestCase {
 	 * @author mrieser
 	 **/
 	private QueueSimulation prepareConsistentRoutesTest(final String nodes, final Events events) {
-		Config config = Gbl.createConfig(null);
-		config.simulation().setFlowCapFactor(1.0);
-		config.simulation().setStorageCapFactor(1.0);
+		Fixture f = new Fixture();
 
-		/* build network */
-		NetworkLayer network = new NetworkLayer();
-		network.setCapacityPeriod(Time.parseTime("1:00:00"));
-		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
-		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(1100, 0));
-		Node node4 = network.createNode(new IdImpl("4"), new CoordImpl(2100, 0));
-		Node node5 = network.createNode(new IdImpl("5"), new CoordImpl(3100, 0));
-		Node node6 = network.createNode(new IdImpl("6"), new CoordImpl(3200, 0));
-		Node node7 = network.createNode(new IdImpl("7"), new CoordImpl(3300, 0));
-		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 60000, 9);
-		network.createLink(new IdImpl("2"), node2, node3, 1000, 10, 6000, 2);
-		network.createLink(new IdImpl("3"), node3, node4, 1000, 10, 6000, 2);
-		network.createLink(new IdImpl("4"), node4, node5, 1000, 10, 6000, 2);
-		Link link5 = network.createLink(new IdImpl("5"), node5, node6, 100, 10, 60000, 9);
-		Link link6 = network.createLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
-
-		/* build plans */
-		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		/* enhance network */
+		Node node5 = f.network.createNode(new IdImpl("5"), new CoordImpl(3100, 0));
+		Node node6 = f.network.createNode(new IdImpl("6"), new CoordImpl(3200, 0));
+		Node node7 = f.network.createNode(new IdImpl("7"), new CoordImpl(3300, 0));
+		f.network.createLink(new IdImpl("4"), f.node4, node5, 1000, 10, 6000, 2);
+		Link link5 = f.network.createLink(new IdImpl("5"), node5, node6, 100, 10, 60000, 9);
+		Link link6 = f.network.createLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
 
 		// create a person with a car-leg from link1 to link5, but an incomplete route
 		Person person = new PersonImpl(new IdImpl(0));
 		Plan plan = person.createPlan(true);
-		Activity a1 = plan.createAct("h", link1);
+		Activity a1 = plan.createAct("h", f.link1);
 		a1.setEndTime(8*3600);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
-		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link5);
-		route.setNodes(link1, NetworkUtils.getNodes(network, nodes), link5);
+		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(BasicLeg.Mode.car, f.link1, link5);
+		route.setNodes(f.link1, NetworkUtils.getNodes(f.network, nodes), link5);
 		leg.setRoute(route);
 		Activity a2 = plan.createAct("w", link5);
 		a2.setEndTime(9*3600);
 		leg = plan.createLeg(BasicLeg.Mode.car);
-		route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link5, link6);
+		route = (NetworkRoute) f.network.getFactory().createRoute(BasicLeg.Mode.car, link5, link6);
 		route.setLinks(link5, null, link6);
 		leg.setRoute(route);
 		plan.createAct("h", link6);
-		plans.addPerson(person);
+		f.plans.addPerson(person);
 
 		/* build sim */
-		return new QueueSimulation(network, plans, events);
+		return new QueueSimulation(f.network, f.plans, events);
 	}
 
 	/**
@@ -460,9 +473,11 @@ public class QueueSimulationTest extends MatsimTestCase {
 			if (event.getLevel() == Level.ERROR) this.cntERROR++;
 		}
 
+		@Override
 		public void close() {
 		}
 
+		@Override
 		public boolean requiresLayout() {
 			return false;
 		}
@@ -473,6 +488,53 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 		public int getErrorCount() {
 			return this.cntERROR;
+		}
+	}
+
+	/**
+	 * Initializes some commonly used data in the tests.
+	 *
+	 * @author mrieser
+	 */
+	private static final class Fixture {
+		final Config config;
+		final NetworkLayer network;
+		final Node node1;
+		final Node node2;
+		final Node node3;
+		final Node node4;
+		final Link link1;
+		final Link link2;
+		final Link link3;
+		final Population plans;
+		final ArrayList<Node> nodes3;
+		final ArrayList<Node> nodes23;
+
+		public Fixture() {
+			this.config = Gbl.createConfig(null);
+			this.config.simulation().setFlowCapFactor(1.0);
+			this.config.simulation().setStorageCapFactor(1.0);
+
+			/* build network */
+			this.network = new NetworkLayer();
+			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
+			this.node1 = this.network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
+			this.node2 = this.network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
+			this.node3 = this.network.createNode(new IdImpl("3"), new CoordImpl(1100, 0));
+			this.node4 = this.network.createNode(new IdImpl("4"), new CoordImpl(1200, 0));
+			this.link1 = this.network.createLink(new IdImpl("1"), this.node1, this.node2, 100, 10, 60000, 9);
+			this.link2 = this.network.createLink(new IdImpl("2"), this.node2, this.node3, 1000, 10, 6000, 2);
+			this.link3 = this.network.createLink(new IdImpl("3"), this.node3, this.node4, 100, 10, 60000, 9);
+
+			/* build plans */
+			this.plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
+
+			this.nodes3 = new ArrayList<Node>();
+			this.nodes3.add(this.node3);
+
+			this.nodes23 = new ArrayList<Node>();
+			this.nodes23.add(this.node2);
+			this.nodes23.add(this.node3);
 		}
 	}
 }
