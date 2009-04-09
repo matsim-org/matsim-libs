@@ -88,9 +88,9 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		this.pst = new PlansSummaryTable (popOutFile);
 		this.lrr = new LinksRetailerReader (controler);
 		this.links = lrr.ReadLinks(); 
-		//this.txf = new MakeATableFromXMLFacilities("output/facilities_table.txt");
+		this.txf = new MakeATableFromXMLFacilities("output/facilities_table2.txt");
 		FacilitiesImpl facs = (FacilitiesImpl) controler.getFacilities();
-		//txf.write(facs);
+		txf.write(facs);
 		String retailersOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
 		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.rs = new RetailersSummaryWriter (retailersOutFile);
@@ -129,7 +129,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 				Gbl.errorMsg(e);
 			}
 		} 
-		
+		Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
 	}
 	
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
@@ -140,7 +140,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 			
 			// works, but it is not nicely programmed. shouldn't be a global container, should be
 			// controlled by the controler (or actually added to the population)
-			Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
+			
 			Utils.setFacilityQuadTree(this.createFacilityQuadTree(controler));
 			
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
