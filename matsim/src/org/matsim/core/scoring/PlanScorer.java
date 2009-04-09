@@ -43,12 +43,18 @@ public class PlanScorer {
 
 	public double getScore(final Plan plan) {
 		ScoringFunction function = this.factory.getNewScoringFunction(plan);
-	  org.matsim.core.api.population.Leg leg;
+		org.matsim.core.api.population.Leg leg;
+		org.matsim.core.api.population.Activity act;
+
 		for (int i = 1; i < plan.getPlanElements().size(); i++) {
 			if (i % 2 != 0) {
 				leg = (Leg) plan.getPlanElements().get(i);
+				act = plan.getPreviousActivity(leg);
+				function.endActivity(act.getEndTime());
 				function.startLeg(leg.getDepartureTime(), leg);
 				function.endLeg(leg.getArrivalTime());
+				act = plan.getNextActivity(leg);
+				function.startActivity(act.getStartTime(), act);
 			}
 		}
 		function.finish();

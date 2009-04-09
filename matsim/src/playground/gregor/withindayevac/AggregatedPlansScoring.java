@@ -195,11 +195,13 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 
 
 	public void handleEvent(final AgentDepartureEvent event) {
+		this.getScoringFunctionForAgent(event.getPersonId().toString()).endActivity(event.getTime());
 		getScoringFunctionForAgent(event.getPersonId().toString()).startLeg(event.getTime(), event.getLeg());
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
 		getScoringFunctionForAgent(event.getPersonId().toString()).endLeg(event.getTime());
+		this.getScoringFunctionForAgent(event.getPersonId().toString()).startActivity(event.getTime(), null);
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {

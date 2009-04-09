@@ -68,8 +68,11 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
 	@Override
 	protected double evaluate(final IChromosome a_subject) {
+
 		double planScore = 0.0;
 		Route tempRoute = null;
+		Leg leg = null;
+		Activity act = null;
 
 		this.sf.reset();
 
@@ -83,25 +86,25 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
 			if (o instanceof Leg) {
 
-				Leg legIntermediate = (Leg) o;
+				leg = (Leg) o;
 
 				now += (((IntegerGene) a_subject.getGene(legCounter)).intValue() + 0.5) * Planomat.TIME_INTERVAL_SIZE;
-
+				this.sf.endActivity(now);
 				this.sf.startLeg(now, null);
 
-				Activity origin = this.plan.getPreviousActivity(legIntermediate);
-				Activity destination = this.plan.getNextActivity(legIntermediate);
+				Activity origin = this.plan.getPreviousActivity(leg);
+				Activity destination = this.plan.getNextActivity(leg);
 
 				if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
 					// set mode
 					int subtourIndex = this.planAnalyzeSubtours.getSubtourIndexation()[legCounter];
 					int modeIndex = ((IntegerGene) a_subject.getGene(numActs + subtourIndex)).intValue();
-					legIntermediate.setMode(Gbl.getConfig().planomat().getPossibleModes()[modeIndex]);
+					leg.setMode(Gbl.getConfig().planomat().getPossibleModes()[modeIndex]);
 				} // otherwise leave modes untouched
 
 				// save original route
-				if (!legIntermediate.getMode().equals(BasicLeg.Mode.car)) {
-					tempRoute = legIntermediate.getRoute();
+				if (!leg.getMode().equals(BasicLeg.Mode.car)) {
+					tempRoute = leg.getRoute();
 				}
 
 				// set times
@@ -110,15 +113,16 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 						now,
 						origin,
 						destination,
-						legIntermediate);
+						leg);
 
 				now += travelTime;
 
-				if (!legIntermediate.getMode().equals(BasicLeg.Mode.car)) {
+				if (!leg.getMode().equals(BasicLeg.Mode.car)) {
 					// recover original route
-					legIntermediate.setRoute(tempRoute);
+					leg.setRoute(tempRoute);
 				}
 				this.sf.endLeg(now);
+				this.sf.startActivity(now, null);
 
 				legCounter++;
 
