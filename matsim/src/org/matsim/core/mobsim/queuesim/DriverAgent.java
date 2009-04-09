@@ -86,5 +86,5 @@ public interface DriverAgent {
 
 	public int getNextActivity();
 
-	public List<? extends BasicPlanElement> getActsLegs();
+	public List<? extends BasicPlanElement> getPlanElements();
 }

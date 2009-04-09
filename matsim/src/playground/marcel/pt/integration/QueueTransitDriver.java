@@ -91,7 +91,7 @@ public class QueueTransitDriver implements DriverAgent {
 	
 	// *** The methods below are currently not used... ***
 	
-	public List<? extends BasicPlanElement> getActsLegs() {
+	public List<? extends BasicPlanElement> getPlanElements() {
 		return null;
 	}
 	

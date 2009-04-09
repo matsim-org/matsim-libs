@@ -77,7 +77,7 @@ public class PersonAgent implements DriverAgent {
 	 * Convenience method delegating to person's selected plan
 	 * @return list of {@link Activity}s and {@link Leg}s of this agent's plan
 	 */
-	public List<? extends PlanElement> getActsLegs() {
+	public List<? extends PlanElement> getPlanElements() {
 		return this.person.getSelectedPlan().getPlanElements();
 	}
 
@@ -129,7 +129,7 @@ public class PersonAgent implements DriverAgent {
 	public boolean initialize() {
 		this.nextActivity = 0;
 		this.currentPlanElementIndex = 0;
-		Activity firstAct = (Activity) this.getActsLegs().get(0);
+		Activity firstAct = (Activity) this.getPlanElements().get(0);
 
 		SimulationTimer.updateSimStartTime(firstAct.getEndTime());
 		setCurrentLink(firstAct.getLink());
@@ -144,7 +144,7 @@ public class PersonAgent implements DriverAgent {
 
 	private boolean initNextLeg() {
 		double now = SimulationTimer.getTime();
-		Activity act = (Activity)this.getActsLegs().get(this.nextActivity);
+		Activity act = (Activity)this.getPlanElements().get(this.nextActivity);
 
 		if (act.getLink() != this.currentLink) {
 			log.error("The vehicle with driver " + this.getPerson().getId() + " should be on link " + act.getLink().getId().toString()
@@ -152,7 +152,7 @@ public class PersonAgent implements DriverAgent {
 			return false;
 		}
 
-		if (this.nextActivity == this.getActsLegs().size()-1) {
+		if (this.nextActivity == this.getPlanElements().size()-1) {
 			// if this is the last activity, then stop agent
 			return false;
 		}
@@ -175,10 +175,10 @@ public class PersonAgent implements DriverAgent {
 		}
 		setDepartureTime(departure);
 
-		this.destinationLink = ((Activity)this.getActsLegs().get(this.nextActivity +2)).getLink();
+		this.destinationLink = ((Activity)this.getPlanElements().get(this.nextActivity +2)).getLink();
 
 		// set the route according to the next leg
-		Leg leg = (Leg) this.getActsLegs().get(this.nextActivity+1);
+		Leg leg = (Leg) this.getPlanElements().get(this.nextActivity+1);
 		this.currentLeg = leg;
 		this.cacheRouteNodes = null;
 		this.currentNodeIndex = 1;
@@ -194,7 +194,7 @@ public class PersonAgent implements DriverAgent {
 	 * @param now the current time
 	 */
 	public void leaveActivity(final double now) {
-		Activity act = (Activity)this.getActsLegs().get(this.nextActivity - 2);
+		Activity act = (Activity)this.getPlanElements().get(this.nextActivity - 2);
 		QueueSimulation.getEvents().processEvent(new ActEndEvent(now, this.getPerson(), this.currentLink, act));
 	}
 
@@ -210,7 +210,7 @@ public class PersonAgent implements DriverAgent {
 	 * @param currentQueueLink
 	 */
 	private void reachActivity(final double now, final QueueLink currentQueueLink) {
-		Activity act = (Activity)this.getActsLegs().get(this.nextActivity);
+		Activity act = (Activity)this.getPlanElements().get(this.nextActivity);
 		// no actStartEvent for first act.
 		QueueSimulation.getEvents().processEvent(new ActStartEvent(now, this.getPerson(), this.currentLink, act));
 		// 	 this is the starting point for our vehicle, so put it in the queue

@@ -213,7 +213,7 @@ public class MyQueueNetwork extends QueueNetwork{
 						vehiclesToReplanActEnd.add(vehicle);
 						
 						DriverAgent personAgent = vehicle.getDriver();
-						Activity fromAct = (Activity)personAgent.getActsLegs().get(personAgent.getNextActivity() - 2);
+						Activity fromAct = (Activity)personAgent.getPlanElements().get(personAgent.getNextActivity() - 2);
 						fromActActEnd.add(fromAct);
 						if (fromAct == null) log.error("Found fromAct that is null!");
 					}
@@ -283,7 +283,7 @@ public class MyQueueNetwork extends QueueNetwork{
 							vehiclesToReplanActEnd.add(vehicle);
 							
 							DriverAgent personAgent = vehicle.getDriver();
-							Activity fromAct = (Activity)personAgent.getActsLegs().get(personAgent.getNextActivity() - 2);
+							Activity fromAct = (Activity)personAgent.getPlanElements().get(personAgent.getNextActivity() - 2);
 							fromActActEnd.add(fromAct);
 							if (fromAct == null) log.error("Found fromAct that is null!");
 						}
