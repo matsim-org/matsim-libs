@@ -24,32 +24,33 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 
 public class MyPersonAgent extends PersonAgent{
-	
+
 	private static final Logger log = Logger.getLogger(MyPersonAgent.class);
-	
-	public MyPersonAgent(Person p)
+
+	public MyPersonAgent(final Person p, final QueueSimulation simulation)
 	{
-		super(p);
+		super(p, simulation);
 	}
 
 	public void UpdateCachedNextLink()
 	{
 
 	}
-	
+
 	@Override
 	public Link chooseNextLink()
-	{	
+	{
 		/*
 		 * Delete cached Link. If a Person is in the Waiting Queue to leave a
 		 * Link he/she may replan his/her Route so the cached Link would be wrong.
 		 */
 		super.cachedNextLink = null;
-		
+
 		return super.chooseNextLink();
-		
+
 	}
-	
+
 }

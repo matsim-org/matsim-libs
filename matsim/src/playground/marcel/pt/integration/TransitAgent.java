@@ -23,18 +23,19 @@ package playground.marcel.pt.integration;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
 
 public class TransitAgent extends PersonAgent implements PassengerAgent {
 
 	private boolean isFirstQuery = true;
-	
-	public TransitAgent(Person p) {
-		super(p);
+
+	public TransitAgent(final Person p, final QueueSimulation simulation) {
+		super(p, simulation);
 	}
 
-	public boolean arriveAtStop(Facility stop) {
+	public boolean arriveAtStop(final Facility stop) {
 		return this.getDestinationLink() == stop.getLink(); // TODO [MR] not yet perfect...
 	}
 

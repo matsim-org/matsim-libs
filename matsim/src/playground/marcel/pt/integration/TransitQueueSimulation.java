@@ -40,34 +40,34 @@ import playground.marcel.pt.tryout.VehicleImpl;
 import playground.marcel.pt.utils.FacilityVisitors;
 
 public class TransitQueueSimulation extends QueueSimulation {
-	
+
 	private TransitSchedule schedule = null;
 	private final FacilityVisitors fv;
 	private final HashMap<Person, PersonAgent> agents = new HashMap<Person, PersonAgent>(100);
-	
+
 	public TransitQueueSimulation(final NetworkLayer network, final Population population, final Events events) {
 		super(network, population, events);
-		
-		this.setAgentFactory(new TransitAgentFactory(agents));
-		
+
+		this.setAgentFactory(new TransitAgentFactory(this, this.agents));
+
 		this.fv = new FacilityVisitors();
 		events.addHandler(this.fv);
 	}
-	
+
 	public void setTransitSchedule(final TransitSchedule schedule) {
 		this.schedule = schedule;
 	}
-	
-	
+
+
 	public PersonAgent getAgent(final Person p) {
 		return this.agents.get(p);
 	}
-	
-	
+
+
 	@Override
 	protected void createAgents() {
 		super.createAgents();
-		
+
 		if (this.schedule != null) {
 
 			for (TransitLine line : this.schedule.getTransitLines().values()) {
@@ -86,7 +86,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 				}
 			}
 		}
-		
+
 	}
-	
+
 }

@@ -29,14 +29,14 @@ import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
 
 /**
- * This extension of the QueueSimulation is used for withinday replanning. 
- * 
+ * This extension of the QueueSimulation is used for withinday replanning.
+ *
  * @author dgrether
  *
  */
 public class WithindayQueueSimulation extends QueueSimulation {
 
-	private WithindayControler controler;
+	private final WithindayControler controler;
 
 	private TrafficManagement trafficManagement;
 
@@ -44,7 +44,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 			final Population plans, final Events events, final WithindayControler controler) {
 		super(net, plans, events);
 		this.controler = controler;
-		super.setAgentFactory(new WithindayAgentFactory(controler.getConfig().withinday(), this.controler.getAgentLogicFactory()));
+		super.setAgentFactory(new WithindayAgentFactory(this, controler.getConfig().withinday(), this.controler.getAgentLogicFactory()));
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 	}
 
 
-	public void setTrafficManagement(TrafficManagement trafficManagement) {
+	public void setTrafficManagement(final TrafficManagement trafficManagement) {
 		this.trafficManagement = trafficManagement;
 	}
 

@@ -27,6 +27,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.NetworkLayer;
 
@@ -50,15 +51,15 @@ public class BDIAgent extends PersonAgent {
 	private final DecisionTree decisionTree;
 	private final int iteration;
 
-	public BDIAgent(final Person person, final InformationExchanger informationExchanger, final NetworkLayer networkLayer, final int iteration){
-		super(person);
+	public BDIAgent(final Person person, final QueueSimulation simulation, final InformationExchanger informationExchanger, final NetworkLayer networkLayer, final int iteration){
+		super(person, simulation);
 		this.informationExchanger = informationExchanger;
 		this.beliefs = new Beliefs(this.informationExchanger);
 		this.intentions = new Intentions();
 		this.intentions.setDestination(networkLayer.getNode(new IdImpl("en2")));
 		this.iteration = iteration;
 		this.decisionTree = new DecisionTree(this.beliefs,this.getPerson().getSelectedPlan(),this.intentions,networkLayer, iteration, this.informationExchanger);
-		
+
 		if (person.getId().toString().contains("guide")) {
 			this.isGuide = true;
 		} else {
@@ -70,56 +71,56 @@ public class BDIAgent extends PersonAgent {
 	public Link chooseNextLink() {
 		return this.replan(SimulationTimer.getTime(), this.getCurrentLink().getToNode().getId());
 	}
-	
+
 
 	private Link replan(final double now, final Id nodeId) {
-		
+
 		final InformationStorage infos = this.informationExchanger.getInformationStorage(nodeId);
-		
+
 		updateBeliefs(infos.getInformation(now));
-		
+
 
 		Option nextOption = this.decisionTree.getNextOption(now);
 		Link nextLink = nextOption.getNextLink();
 
-		
+
 		if (nextOption instanceof NextLinkWithEstimatedTravelTimeOption) {
 			Message msg = new NextLinkWithEstimatedTravelTimeMessage(nextLink,((NextLinkWithEstimatedTravelTimeOption)nextOption).getEstTTime());
 			final InformationEntity ie = new InformationEntity(60,now,InformationEntity.MSG_TYPE.MY_NEXT_LINK_W_EST_TRAVELTIME,msg);
 			infos.addInformationEntity(ie);
-			
-			
+
+
 		}
-		
+
 //		if (nextLink != null && this.isGuide) {
 //			this.isGuide = false;
-//		} 
+//		}
 //		if (this.isGuide && nextLink == null) {
 //			nextLink = this.chooseNextLink();
 //		}
-//		
+//
 //		if (this.isGuide) {
 //			final Message msg = new FollowGuideMessage(nextLink);
 ////			final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.FOLLOW_ME,msg);
 //			final InformationEntity ie = new InformationEntity(30*3600,now,InformationEntity.MSG_TYPE.FOLLOW_ME,msg);
-//			infos.addInformationEntity(ie);			
+//			infos.addInformationEntity(ie);
 //		}
 
-		
+
 
 		final Message msg = new NextLinkMessage(nextLink);
 		final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.MY_NEXT_LINK,msg);
 		infos.addInformationEntity(ie);
-		
+
 		return nextLink;
-		
+
 	}
 
-	
-	
+
+
 	private void updateBeliefs(final Collection<InformationEntity> information) {
 //		this.beliefs.update(information);
 		this.beliefs.setCurrentLink(this.getCurrentLink());
-		
+
 	}
 }

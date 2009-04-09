@@ -20,8 +20,6 @@
 
 package playground.christoph.mobsim;
 
-import java.util.Date;
-
 import org.matsim.core.api.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
@@ -31,36 +29,36 @@ import org.matsim.core.network.NetworkLayer;
 
 
 public class ReplanningQueueSimulation extends QueueSimulation{
-	
+
 	protected Controler controler;
-	
+
 	public ReplanningQueueSimulation(final NetworkLayer network, final Population plans, final Events events)
 	{
 		super(network, plans, events);
-		
-		// eigenes Queuenetwork hinterlegen, welches MyQueueNodes enth�lt -> n�tig f�r das Replanning!
+
+		// eigenes Queuenetwork hinterlegen, welches MyQueueNodes enthaelt -> noetig fuer das Replanning!
 		this.network = new MyQueueNetwork(network, new MyQueueNetworkFactory());
-		this.networkLayer = network;	
-		setAgentFactory(new MyAgentFactory());
+		this.networkLayer = network;
+		setAgentFactory(new MyAgentFactory(this));
 	}
-	
-	
+
+
 	public QueueNetwork getQueueNetwork()
 	{
-		return network;
+		return this.network;
 	}
-	
-	public void setControler(Controler controler)
+
+	public void setControler(final Controler controler)
 	{
 		this.controler = controler;
 
 		// Referenz auf den Controler mit dem Replanning Algorithmus hinterlegen
 		((MyQueueNetwork)this.network).setControler(controler);
 	}
-	
+
 	public Controler getControler()
 	{
-		return controler;
+		return this.controler;
 	}
 
 }

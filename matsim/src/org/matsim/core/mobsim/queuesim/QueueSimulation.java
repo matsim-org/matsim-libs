@@ -75,7 +75,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
  * @author dstrippgen
  * @author mrieser
  * @author dgrether
- * 
+ *
  */
 public class QueueSimulation {
 
@@ -108,7 +108,7 @@ public class QueueSimulation {
 	final private static Logger log = Logger.getLogger(QueueSimulation.class);
 
 	private AgentFactory agentFactory;
-	
+
 	/**
 	 * The SignalSystemDefinitions accessible by their Id
 	 */
@@ -139,7 +139,7 @@ public class QueueSimulation {
 	 * @param events
 	 */
 	public QueueSimulation(final NetworkLayer network, final Population plans, final Events events) {
-		listenerManager = new QueueSimListenerManager(this);
+		this.listenerManager = new QueueSimListenerManager(this);
 		Simulation.reset();
 		this.config = Gbl.getConfig();
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
@@ -148,27 +148,27 @@ public class QueueSimulation {
 
 		this.network = new QueueNetwork(network);
 		this.networkLayer = network;
-		this.agentFactory = new AgentFactory();
+		this.agentFactory = new AgentFactory(this);
 	}
-	
+
 	/**
 	 * Adds all QueueSimulation listener instances in the List given as parameters as
 	 * listeners to this QueueSimulation instance.
 	 * @param listeners
 	 */
-	public void addQueueSimulationListeners(List<QueueSimulationListener> listeners){
+	public void addQueueSimulationListeners(final List<QueueSimulationListener> listeners){
 		if (listeners != null){
 			for (QueueSimulationListener l : listeners){
 				this.listenerManager.addQueueSimulationListener(l);
 			}
 		}
 	}
-	
+
 	/**
 	 * Set the lanes used in the simulation
 	 * @param laneDefs
 	 */
-	public void setLaneDefinitions(BasicLaneDefinitions laneDefs){
+	public void setLaneDefinitions(final BasicLaneDefinitions laneDefs){
 		this.laneDefintions = laneDefs;
 	}
 
@@ -177,13 +177,13 @@ public class QueueSimulation {
 	 * @param signalSystems
 	 * @param basicSignalSystemConfigurations
 	 */
-	public void setSignalSystems(BasicSignalSystems signalSystems, BasicSignalSystemConfigurations basicSignalSystemConfigurations){
+	public void setSignalSystems(final BasicSignalSystems signalSystems, final BasicSignalSystemConfigurations basicSignalSystemConfigurations){
 		this.signalSystems = signalSystems;
 		this.signalSystemsConfig = basicSignalSystemConfigurations;
 	}
-	
-	
-	private void initLanes(BasicLaneDefinitions lanedefs) {
+
+
+	private void initLanes(final BasicLaneDefinitions lanedefs) {
 		for (BasicLanesToLinkAssignment laneToLink : lanedefs.getLanesToLinkAssignments()){
 			QueueLink link = this.network.getQueueLink(laneToLink.getLinkId());
 			if (link == null) {
@@ -195,7 +195,7 @@ public class QueueSimulation {
 		}
 	}
 
-	private void initSignalSystems(BasicSignalSystems signalSystems) {
+	private void initSignalSystems(final BasicSignalSystems signalSystems) {
 		//store the signalSystemDefinitions in a Map
 		this.signalSystemDefinitions = new TreeMap<Id, BasicSignalSystemDefinition>();
 		for (BasicSignalSystemDefinition signalSystem : signalSystems.getSignalSystemDefinitions()) {
@@ -216,10 +216,10 @@ public class QueueSimulation {
 			this.network.getNodes().get(queueLink.getLink().getToNode().getId()).setSignalized(true);
 		}
 	}
-	
-	private void initSignalSystemController(BasicSignalSystemConfigurations basicSignalSystemConfigurations) {
+
+	private void initSignalSystemController(final BasicSignalSystemConfigurations basicSignalSystemConfigurations) {
 		this.signalSystemControlerBySystemId = new TreeMap<Id, SignalSystemControler>();
-		for (BasicSignalSystemConfiguration config : 
+		for (BasicSignalSystemConfiguration config :
 			basicSignalSystemConfigurations.getSignalSystemConfigurations().values()) {
 			SignalSystemControler systemControler = null;
 			if (this.signalSystemControlerBySystemId.containsKey(config.getSignalSystemId())){
@@ -254,9 +254,9 @@ public class QueueSimulation {
 			}
 		}
 	}
-	
+
 	private AdaptiveSignalSystemControler createAdaptiveControler(
-			BasicAdaptiveSignalSystemControlInfo config) {
+			final BasicAdaptiveSignalSystemControlInfo config) {
 		if (config.getAdaptiveControlerClass() == null){
 			throw new IllegalArgumentException("controler class must be given");
 		}
@@ -293,7 +293,7 @@ public class QueueSimulation {
 		return controler;
 	}
 
-	private void initPlanbasedControler(PlanBasedSignalSystemControler controler, BasicSignalSystemConfiguration config){
+	private void initPlanbasedControler(final PlanBasedSignalSystemControler controler, final BasicSignalSystemConfiguration config){
 		BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getSignalSystemId());
 		//TODO set other defaults of xml
 		controler.setDefaultCirculationTime(systemDef.getDefaultCycleTime());
@@ -307,11 +307,11 @@ public class QueueSimulation {
 			for (BasicSignalGroupDefinition group : groups){
 				group.setResponsibleLSAControler(controler);
 			}
-		}				
-		
+		}
+
 	}
-	
-	
+
+
 	public final void run() {
 		prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
@@ -328,7 +328,7 @@ public class QueueSimulation {
 		}
 		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
 		cleanupSim();
-		//delete reference to clear memory 
+		//delete reference to clear memory
 		this.listenerManager = null;
 	}
 
@@ -451,9 +451,9 @@ public class QueueSimulation {
 		prepareNetwork();
 
 		prepareLanes();
-		
+
 		prepareSignalSystems();
-		
+
 		double startTime = this.config.simulation().getStartTime();
 		this.stopTime = this.config.simulation().getEndTime();
 
@@ -473,13 +473,13 @@ public class QueueSimulation {
 
 		prepareNetworkChangeEventsQueue();
 	}
-	
+
 	private void prepareLanes(){
 		if (this.laneDefintions != null){
 			initLanes(this.laneDefintions);
 		}
 	}
-	
+
 	/**
 	 * Initialize the signal systems
 	 */
@@ -623,14 +623,14 @@ public class QueueSimulation {
 		this.agentFactory = fac;
 	}
 
-	
+
 	public SortedMap<Id, SignalSystemControler> getSignalSystemControlerBySystemId() {
-		return signalSystemControlerBySystemId;
+		return this.signalSystemControlerBySystemId;
 	}
 
-	
+
 	public SortedMap<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions() {
-		return signalSystemDefinitions;
+		return this.signalSystemDefinitions;
 	}
 
 }

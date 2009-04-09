@@ -23,28 +23,30 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.config.groups.WithindayConfigGroup;
 import org.matsim.core.mobsim.queuesim.AgentFactory;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 
 /**
  * Factory for withinday replanning agents
- * 
+ *
  * @author dgrether
  */
 public class WithindayAgentFactory extends AgentFactory {
-	
-	
-	private WithindayConfigGroup withindayConfigGroup;
-	private WithindayAgentLogicFactory agentLogicFactory;
 
-	public WithindayAgentFactory(WithindayConfigGroup withindayConfig,
-			WithindayAgentLogicFactory agentLogicFactory) {
+
+	private final WithindayConfigGroup withindayConfigGroup;
+	private final WithindayAgentLogicFactory agentLogicFactory;
+
+	public WithindayAgentFactory(final QueueSimulation simulation, final WithindayConfigGroup withindayConfig,
+			final WithindayAgentLogicFactory agentLogicFactory) {
+		super(simulation);
 		this.withindayConfigGroup = withindayConfig;
 		this.agentLogicFactory = agentLogicFactory;
-		
+
 	}
 
 	@Override
-	public PersonAgent createPersonAgent(Person p) {
-		WithindayAgent agent = new WithindayAgent(p, this.withindayConfigGroup.getAgentVisibilityRange(), this.agentLogicFactory);
+	public PersonAgent createPersonAgent(final Person p) {
+		WithindayAgent agent = new WithindayAgent(p, this.simulation, this.withindayConfigGroup.getAgentVisibilityRange(), this.agentLogicFactory);
 		//set the agent's replanning interval
 		agent.setReplanningInterval(this.withindayConfigGroup.getReplanningInterval());
 		//set the contentment threshold

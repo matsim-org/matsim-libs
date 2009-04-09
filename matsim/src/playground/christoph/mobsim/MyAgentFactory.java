@@ -22,12 +22,18 @@ package playground.christoph.mobsim;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.mobsim.queuesim.AgentFactory;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 
 public class MyAgentFactory extends AgentFactory {
-	
-	public PersonAgent createPersonAgent(Person p) 
+
+	public MyAgentFactory(final QueueSimulation simulation) {
+		super(simulation);
+	}
+
+	@Override
+	public PersonAgent createPersonAgent(final Person p)
 	{
-		MyPersonAgent agent = new MyPersonAgent(p);
+		MyPersonAgent agent = new MyPersonAgent(p, this.simulation);
 		return agent;
 	}
 

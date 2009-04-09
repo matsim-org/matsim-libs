@@ -70,14 +70,14 @@ public class WithindayAgent extends PersonAgent {
 
 	private double replanningInterval;
 
-	private double lastReplaningTimeStep;
+	private final double lastReplaningTimeStep;
 
 	private double replanningThreshold;
 
-	private List<AgentPercepts> percepts;
+	private final List<AgentPercepts> percepts;
 
-	public WithindayAgent(final Person person, final int sightDistance, final WithindayAgentLogicFactory factory) {
-		super(person);
+	public WithindayAgent(final Person person, final QueueSimulation simulation, final int sightDistance, final WithindayAgentLogicFactory factory) {
+		super(person, simulation);
 //		this.person = person;
 //		this.vehicle = v;
 //		this.setVehicle(v);
@@ -187,7 +187,7 @@ public class WithindayAgent extends PersonAgent {
     newRoute.setNodes(oldRoute.getStartLink(), newRouteConcatedList, oldRoute.getEndLink());
     //put the new route in the leg and the leg in the plan
     newLeg.setRoute(newRoute);
-    ((List) newPlan.getPlanElements()).add(currentLegIndex, newLeg);
+    (newPlan.getPlanElements()).add(currentLegIndex, newLeg);
     //score plans and select best
     double currentScore = this.planScorer.getScore(oldPlan);
     double newScore = this.planScorer.getScore(newPlan);
@@ -211,7 +211,7 @@ public class WithindayAgent extends PersonAgent {
     	}
     	this.getPerson().exchangeSelectedPlan(newPlan, false);
     	this.exchangeCurrentLeg(newLeg);
-  
+
     	QueueSimulation.getEvents().processEvent(new AgentReplanEvent(SimulationTimer.getTime(), this.getPerson().getId(), alternativeRoute));
     }
 	}
@@ -250,7 +250,7 @@ public class WithindayAgent extends PersonAgent {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public Link chooseNextLink() {
 		this.replan();
@@ -261,7 +261,7 @@ public class WithindayAgent extends PersonAgent {
 		return l;
 	}
 
-	public void exchangeCurrentLeg(Leg newLeg) {
+	public void exchangeCurrentLeg(final Leg newLeg) {
 		this.cachedNextLink = null;
 		this.setCurrentLeg(newLeg);
 	}
@@ -299,6 +299,6 @@ public class WithindayAgent extends PersonAgent {
 	public void setReplanningThreshold(final double replanningThreshold) {
 		this.replanningThreshold = replanningThreshold;
 	}
-	
+
 
 }

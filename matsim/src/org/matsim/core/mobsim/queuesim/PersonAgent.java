@@ -44,7 +44,9 @@ public class PersonAgent implements DriverAgent {
 	private final Person person;
 	private QueueVehicle vehicle;
 	protected Link cachedNextLink = null;
-	
+
+	private final QueueSimulation simulation;
+
 	private double activityDepartureTime = Time.UNDEFINED_TIME;
 
 	private Link currentLink;
@@ -60,8 +62,9 @@ public class PersonAgent implements DriverAgent {
 
 	private int currentNodeIndex;
 
-	public PersonAgent(final Person p) {
+	public PersonAgent(final Person p, final QueueSimulation simulation) {
 		this.person = p;
+		this.simulation = simulation;
 	}
 
 	public Person getPerson() {
@@ -192,11 +195,10 @@ public class PersonAgent implements DriverAgent {
 		QueueSimulation.getEvents().processEvent(new ActEndEvent(now, this.getPerson(), this.currentLink, act));
 	}
 
-	public void legEnds(double now) {
-		// TODO [MR] Auto-generated method stub
-		
+	public void legEnds(final double now) {
+		reachActivity(now, this.simulation.network.getQueueLink(this.currentLink.getId())); // TODO [MR] change code to something like simulation.scheduleDeparture(this, time);
 	}
-	
+
 	/**
 	 * Notifies the agent that it reaches its aspired activity location.
 	 *
@@ -233,7 +235,7 @@ public class PersonAgent implements DriverAgent {
 		if (this.cacheRouteNodes == null) {
 			this.cacheRouteNodes = ((NetworkRoute) this.currentLeg.getRoute()).getNodes();
 		}
-		
+
 		if (this.currentNodeIndex >= this.cacheRouteNodes.size() ) {
 			// we have no more information for the route, so we should have arrived at the destination link
 			if (this.currentLink.getToNode().equals(this.destinationLink.getFromNode())) {

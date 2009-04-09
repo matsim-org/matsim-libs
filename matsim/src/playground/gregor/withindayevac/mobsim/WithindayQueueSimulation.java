@@ -51,11 +51,11 @@ public class WithindayQueueSimulation extends QueueSimulation {
 		this.network = qNet;
 		this.controler = withindayControler;
 		this.informationExchanger = new InformationExchanger(net);
-		super.setAgentFactory(new WithindayAgentFactory(this.informationExchanger, this.network.getNetworkLayer(),Controler.getIteration()));
-		
+		super.setAgentFactory(new WithindayAgentFactory(this, this.informationExchanger, this.network.getNetworkLayer(),Controler.getIteration()));
+
 	}
-	
-	
+
+
 
 
 

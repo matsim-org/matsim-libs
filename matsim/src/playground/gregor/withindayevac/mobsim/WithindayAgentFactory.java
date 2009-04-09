@@ -21,6 +21,7 @@ package playground.gregor.withindayevac.mobsim;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.mobsim.queuesim.AgentFactory;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.gregor.withindayevac.BDIAgent;
@@ -37,8 +38,9 @@ public class WithindayAgentFactory extends AgentFactory {
 	private final NetworkLayer network;
 	private final int iteration;
 
-	public WithindayAgentFactory(final InformationExchanger informationExchanger,
+	public WithindayAgentFactory(final QueueSimulation simulation, final InformationExchanger informationExchanger,
 			final NetworkLayer networkLayer, final int iteration) {
+		super(simulation);
 		this.informationExchanger = informationExchanger;
 		this.network = networkLayer;
 		this.iteration = iteration;
@@ -46,10 +48,10 @@ public class WithindayAgentFactory extends AgentFactory {
 
 	@Override
 	public PersonAgent createPersonAgent(final Person p) {
-		return new BDIAgent(p, this.informationExchanger, this.network, this.iteration);
+		return new BDIAgent(p, this.simulation, this.informationExchanger, this.network, this.iteration);
 	}
-	
-	
-	
+
+
+
 
 }

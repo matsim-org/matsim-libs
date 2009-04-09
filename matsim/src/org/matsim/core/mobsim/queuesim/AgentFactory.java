@@ -25,10 +25,16 @@ import org.matsim.core.api.population.Person;
  * @author dgrether
  */
 public class AgentFactory {
-	
-	public PersonAgent createPersonAgent(Person p) {
-		PersonAgent agent = new PersonAgent(p);
+
+	protected final QueueSimulation simulation;
+
+	public AgentFactory(final QueueSimulation simulation) {
+		this.simulation = simulation;
+	}
+
+	public PersonAgent createPersonAgent(final Person p) {
+		PersonAgent agent = new PersonAgent(p, this.simulation);
 		return agent;
 	}
-	
+
 }
