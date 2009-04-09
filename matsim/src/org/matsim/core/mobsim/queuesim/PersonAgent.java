@@ -53,6 +53,7 @@ public class PersonAgent implements DriverAgent {
 	/**
 	 * specifies the position of the next activity in the acts legs list
 	 */
+	@Deprecated
 	private int nextActivity;
 
 	private int currentPlanElementIndex = 0;
@@ -118,6 +119,7 @@ public class PersonAgent implements DriverAgent {
 		return this.currentNodeIndex;
 	}
 
+	@Deprecated
 	public int getNextActivity() {
 		return this.nextActivity;
 	}
@@ -130,61 +132,25 @@ public class PersonAgent implements DriverAgent {
 		this.nextActivity = 0;
 		this.currentPlanElementIndex = 0;
 		Activity firstAct = (Activity) this.getPlanElements().get(0);
-
+		setDepartureTime(firstAct.getEndTime());
 		SimulationTimer.updateSimStartTime(firstAct.getEndTime());
 		setCurrentLink(firstAct.getLink());
 
-		if (initNextLeg()) {
-			Simulation.incLiving();
-			// this is the starting point for our vehicle, so put it in the queue
-			return true;
-		}
-		return false;
+		initNextLeg((Leg) this.getPlanElements().get(1));
+		Simulation.incLiving();
+		// this is the starting point for our vehicle, so put it in the queue
+		return true;
 	}
 
-	private boolean initNextLeg() {
-		double now = SimulationTimer.getTime();
-		Activity act = (Activity)this.getPlanElements().get(this.nextActivity);
-
-		if (act.getLink() != this.currentLink) {
-			log.error("The vehicle with driver " + this.getPerson().getId() + " should be on link " + act.getLink().getId().toString()
-					+ ", but is on link " + this.currentLink.getId().toString() + ". Removing the agent from the simulation.");
-			return false;
-		}
-
-		if (this.nextActivity == this.getPlanElements().size()-1) {
-			// if this is the last activity, then stop agent
-			return false;
-		}
-
-		double departure = 0;
-		/* WELL, THAT'S IMPORTANT:
-		 * The person leaves the activity either 'actDur' later or
-		 * when the end is defined of the activity, whatever comes first. */
-		if (act.getDuration() == Time.UNDEFINED_TIME) {
-			departure = act.getEndTime();
-		} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
-			departure = now + act.getDuration();
-		} else {
-			departure = Math.min(act.getEndTime(), now + act.getDuration());
-		}
-		if (departure < now) {
-			// we cannot depart before we arrived, thus change the time so the timestamp in events will be right
-			departure = now;
-			// actually, we will depart in (now+1) because we already missed the departing in this time step
-		}
-		setDepartureTime(departure);
-
-		this.destinationLink = ((Activity)this.getPlanElements().get(this.nextActivity +2)).getLink();
+	private void initNextLeg(final Leg leg) {
+		this.destinationLink = leg.getRoute().getEndLink();
 
 		// set the route according to the next leg
-		Leg leg = (Leg) this.getPlanElements().get(this.nextActivity+1);
 		this.currentLeg = leg;
 		this.cacheRouteNodes = null;
 		this.currentNodeIndex = 1;
 		this.cachedNextLink = null;
 		this.nextActivity += 2;
-		return true;
 	}
 
 	/**
@@ -194,31 +160,73 @@ public class PersonAgent implements DriverAgent {
 	 * @param now the current time
 	 */
 	public void leaveActivity(final double now) {
-		Activity act = (Activity)this.getPlanElements().get(this.nextActivity - 2);
+		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
 		QueueSimulation.getEvents().processEvent(new ActEndEvent(now, this.getPerson(), this.currentLink, act));
+		advancePlanElement(now);
 	}
 
 	public void legEnds(final double now) {
-//		PlanElement pe = this.getActsLegs().get(this.currentPlanElementIndex + 1);
-		reachActivity(now, this.simulation.network.getQueueLink(this.currentLink.getId())); // TODO [MR] change code to something like simulation.scheduleDeparture(this, time);
+		if (this.currentLink != this.destinationLink) {
+			log.error("The vehicle with driver " + this.getPerson().getId() + " should be on link " + this.destinationLink.getId()
+					+ ", but is on link " + this.currentLink.getId() + ". Removing the agent from the simulation.");
+			Simulation.decLiving();
+			return;
+		}
+		advancePlanElement(now);
+	}
+
+	private void advancePlanElement(final double now) {
+		this.currentPlanElementIndex++;
+		PlanElement pe = this.getPlanElements().get(this.currentPlanElementIndex);
+		if (pe instanceof Activity) {
+			reachActivity(now, (Activity) pe);
+
+			if ((this.currentPlanElementIndex+1) < this.getPlanElements().size()) {
+				// there is still at least on plan element left
+				// TODO [MR] change code to something like simulation.scheduleDeparture(this, time);
+				this.simulation.network.getQueueLink(this.currentLink.getId()).addParking(this.vehicle);
+			} else {
+				// this is the last activity
+				Simulation.decLiving();
+			}
+
+		} else if (pe instanceof Leg) {
+			initNextLeg((Leg) pe);
+		} else {
+			throw new RuntimeException("Unknown PlanElement of type " + pe.getClass().getName());
+		}
 	}
 
 	/**
 	 * Notifies the agent that it reaches its aspired activity location.
 	 *
 	 * @param now the current time
-	 * @param currentQueueLink
+	 * @param act the activity the agent reaches
 	 */
-	private void reachActivity(final double now, final QueueLink currentQueueLink) {
-		Activity act = (Activity)this.getPlanElements().get(this.nextActivity);
-		// no actStartEvent for first act.
+	private void reachActivity(final double now, final Activity act) {
 		QueueSimulation.getEvents().processEvent(new ActStartEvent(now, this.getPerson(), this.currentLink, act));
-		// 	 this is the starting point for our vehicle, so put it in the queue
-		if (!initNextLeg()) {
-			Simulation.decLiving();
-		}
-		else {
-			currentQueueLink.addParking(this.vehicle);
+		/* schedule a departure if either duration or endtime is set of the activity.
+		 * Otherwise, the agent will just stay at this activity for ever...
+		 */
+		if (act.getDuration() == Time.UNDEFINED_TIME && act.getEndTime() == Time.UNDEFINED_TIME) {
+			setDepartureTime(Double.POSITIVE_INFINITY);
+		} else {
+			/* The person leaves the activity either 'actDur' later or
+			 * when the end is defined of the activity, whatever comes first. */
+			double departure = 0;
+			if (act.getDuration() == Time.UNDEFINED_TIME) {
+				departure = act.getEndTime();
+			} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
+				departure = now + act.getDuration();
+			} else {
+				departure = Math.min(act.getEndTime(), now + act.getDuration());
+			}
+			if (departure < now) {
+				// we cannot depart before we arrived, thus change the time so the timestamp in events will be right
+				departure = now;
+				// actually, we will depart in (now+1) because we already missed the departing in this time step
+			}
+			setDepartureTime(departure);
 		}
 	}
 
