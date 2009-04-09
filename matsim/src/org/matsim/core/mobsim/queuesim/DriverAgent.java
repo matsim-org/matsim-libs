@@ -78,8 +78,6 @@ public interface DriverAgent {
 
 	public Person getPerson();
 
-	public void reachActivity(final double now, final QueueLink currentQueueLink);
-
 	public void leaveActivity(final double now);
 
 	public Leg getCurrentLeg();

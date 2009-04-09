@@ -594,10 +594,10 @@ public class QueueSimulation {
 	  		if (veh.getEarliestLinkExitTime() <= now) {
 	  			teleportationList.poll();
 
-				getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getPerson(),
-						veh.getCurrentLink(), veh.getCurrentLeg()));
-	  			veh.getDriver().reachActivity(now, this.network.getQueueLink(veh.getCurrentLink().getId()));
-
+	  			getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getPerson(),
+	  					veh.getCurrentLink(), veh.getCurrentLeg()));
+	  			veh.getDriver().legEnds(now);
+//	  			veh.getDriver().reachActivity(now, this.network.getQueueLink(veh.getCurrentLink().getId()));
 	  		} else break;
   		}
 	}

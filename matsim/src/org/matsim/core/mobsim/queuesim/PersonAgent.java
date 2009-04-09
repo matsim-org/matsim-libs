@@ -23,13 +23,13 @@ package org.matsim.core.mobsim.queuesim;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.events.ActEndEvent;
 import org.matsim.core.events.ActStartEvent;
 import org.matsim.core.utils.misc.Time;
@@ -55,6 +55,8 @@ public class PersonAgent implements DriverAgent {
 	 */
 	private int nextActivity;
 
+	private int currentPlanElementIndex = 0;
+
 	private transient Link destinationLink;
 
 	private Leg currentLeg;
@@ -75,7 +77,7 @@ public class PersonAgent implements DriverAgent {
 	 * Convenience method delegating to person's selected plan
 	 * @return list of {@link Activity}s and {@link Leg}s of this agent's plan
 	 */
-	public List<? extends BasicPlanElement> getActsLegs() {
+	public List<? extends PlanElement> getActsLegs() {
 		return this.person.getSelectedPlan().getPlanElements();
 	}
 
@@ -126,6 +128,7 @@ public class PersonAgent implements DriverAgent {
 
 	public boolean initialize() {
 		this.nextActivity = 0;
+		this.currentPlanElementIndex = 0;
 		Activity firstAct = (Activity) this.getActsLegs().get(0);
 
 		SimulationTimer.updateSimStartTime(firstAct.getEndTime());
@@ -196,6 +199,7 @@ public class PersonAgent implements DriverAgent {
 	}
 
 	public void legEnds(final double now) {
+//		PlanElement pe = this.getActsLegs().get(this.currentPlanElementIndex + 1);
 		reachActivity(now, this.simulation.network.getQueueLink(this.currentLink.getId())); // TODO [MR] change code to something like simulation.scheduleDeparture(this, time);
 	}
 
@@ -205,7 +209,7 @@ public class PersonAgent implements DriverAgent {
 	 * @param now the current time
 	 * @param currentQueueLink
 	 */
-	public void reachActivity(final double now, final QueueLink currentQueueLink) {
+	private void reachActivity(final double now, final QueueLink currentQueueLink) {
 		Activity act = (Activity)this.getActsLegs().get(this.nextActivity);
 		// no actStartEvent for first act.
 		QueueSimulation.getEvents().processEvent(new ActStartEvent(now, this.getPerson(), this.currentLink, act));
