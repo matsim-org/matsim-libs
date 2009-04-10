@@ -43,11 +43,13 @@ import org.matsim.core.utils.misc.Time;
 public class CalcTripDurations implements AgentArrivalEventHandler, AgentDepartureEventHandler {
 
 	private static final int BIN_SIZE = Gbl.getConfig().travelTimeCalculator().getTraveltimeBinSize();
-	private static final int TRIP_DURATIONS_ARRAY_SIZE = 30 * 3600 / CalcTripDurations.BIN_SIZE;
+	private static final int TRIP_DURATIONS_ARRAY_SIZE = 30 * 3600 / CalcTripDurations.BIN_SIZE + 1;
 
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
 	private final TreeMap<BasicLeg.Mode, int[]> tripDurations = new TreeMap<BasicLeg.Mode, int[]>();
 	private final TreeMap<BasicLeg.Mode, int[]> numTrips = new TreeMap<BasicLeg.Mode, int[]>();
+	private final TreeMap<BasicLeg.Mode, Double> overallTripDurations = new TreeMap<BasicLeg.Mode, Double>();
+	private final TreeMap<BasicLeg.Mode, Integer> overallNumTrips = new TreeMap<BasicLeg.Mode, Integer>();
 
 	private int[] timeOfDayData;
 	private BasicLeg.Mode mode;
@@ -65,7 +67,8 @@ public class CalcTripDurations implements AgentArrivalEventHandler, AgentDepartu
 		if (depTime != null) {
 			mode = event.getLeg().getMode();
 			double tripDuration = event.getTime() - depTime;
-			// log trip duration
+			
+			// log trip duration for time slot
 			timeOfDayData = this.tripDurations.get(mode);
 			if (timeOfDayData == null) {
 				timeOfDayData = new int[TRIP_DURATIONS_ARRAY_SIZE];
@@ -74,7 +77,11 @@ public class CalcTripDurations implements AgentArrivalEventHandler, AgentDepartu
 			}
 			timeOfDayData[this.getTimeslotIndex(depTime)] += tripDuration;
 
-			// increase trip counter
+			// log trip duration for overall average
+			double oldOverallTripDuration = ( (this.overallTripDurations.get(mode) == null) ? 0.0 : this.overallTripDurations.get(mode) );
+			this.overallTripDurations.put(mode, oldOverallTripDuration + tripDuration);
+			
+			// increase trip counter for time slot
 			timeOfDayData = this.numTrips.get(mode);
 			if (timeOfDayData == null) {
 				// mode has to be initialized
@@ -83,6 +90,10 @@ public class CalcTripDurations implements AgentArrivalEventHandler, AgentDepartu
 				this.numTrips.put(mode, timeOfDayData);
 			}
 			timeOfDayData[this.getTimeslotIndex(depTime)]++;
+			
+			// increase overall trip counter
+			int oldNumTrips = ( (this.overallNumTrips.get(mode) == null) ? 0 : this.overallNumTrips.get(mode));
+			this.overallNumTrips.put(mode, ++oldNumTrips);
 		}
 	}
 
@@ -90,6 +101,8 @@ public class CalcTripDurations implements AgentArrivalEventHandler, AgentDepartu
 		this.agentDepartures.clear();
 		this.tripDurations.clear();
 		this.numTrips.clear();
+		this.overallNumTrips.clear();
+		this.overallTripDurations.clear();
 	}
 
 	public void writeStats(final String filename) {
@@ -109,12 +122,9 @@ public class CalcTripDurations implements AgentArrivalEventHandler, AgentDepartu
 		}
 	}
 
-
 	protected void writeStats(final java.io.Writer out) throws IOException {
 		
 		double avgTripDuration;
-		TreeMap<BasicLeg.Mode, Double> overallTripDurations = new TreeMap<BasicLeg.Mode, Double>();
-		TreeMap<BasicLeg.Mode, Integer> overallNumTrips = new TreeMap<BasicLeg.Mode, Integer>();
 		
 		// header
 		out.write("time\ttime\t");
@@ -127,23 +137,7 @@ public class CalcTripDurations implements AgentArrivalEventHandler, AgentDepartu
 		for (int ii=0; ii < CalcTripDurations.TRIP_DURATIONS_ARRAY_SIZE; ii++) {
 			out.write(Integer.toString(ii * BIN_SIZE) + "\t" + Time.writeTime(ii * BIN_SIZE));
 			for (BasicLeg.Mode mode : this.tripDurations.keySet()) {
-				if (this.numTrips.get(mode)[ii] == 0) {
-					avgTripDuration = Double.NaN;
-				} else {
-					avgTripDuration = this.tripDurations.get(mode)[ii] / this.numTrips.get(mode)[ii];
-					if (overallTripDurations.containsKey(mode)) {
-						double old = overallTripDurations.get(mode);
-						overallTripDurations.put(mode, old + this.tripDurations.get(mode)[ii]);
-					} else {
-						overallTripDurations.put(mode, 0.0);
-					}
-					if (overallNumTrips.containsKey(mode)) {
-						int old = overallNumTrips.get(mode);
-						overallNumTrips.put(mode, old + this.numTrips.get(mode)[ii]);
-					} else {
-						overallNumTrips.put(mode, 0);
-					}
-				}
+				avgTripDuration = ( (this.numTrips.get(mode)[ii] == 0) ? Double.NaN : (this.tripDurations.get(mode)[ii] / this.numTrips.get(mode)[ii]) );
 				out.write("\t" + Double.toString(avgTripDuration));
 			}
 			out.write(System.getProperty("line.separator"));
@@ -154,10 +148,12 @@ public class CalcTripDurations implements AgentArrivalEventHandler, AgentDepartu
 		for (BasicLeg.Mode mode : overallTripDurations.keySet()) {
 			out.write(
 					"average trip duration for mode " + mode.toString() + ": " +
-					Double.toString(overallTripDurations.get(mode) / overallNumTrips.get(mode)) + " seconds = " +
-					Time.writeTime(overallTripDurations.get(mode) / overallNumTrips.get(mode)));
+					Double.toString(this.overallTripDurations.get(mode) / this.overallNumTrips.get(mode)) + " seconds = " +
+					Time.writeTime(this.overallTripDurations.get(mode) / this.overallNumTrips.get(mode)));
 			out.write(System.getProperty("line.separator"));
 		}
+		
+		// flush
 		out.flush();
 	}
 	
