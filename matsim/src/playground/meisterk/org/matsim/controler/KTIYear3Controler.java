@@ -65,7 +65,7 @@ public class KTIYear3Controler {
 
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
 			if (this.calcTripDurations != null) {
-				this.calcTripDurations.writeStats(Controler.getIterationFilename("tripDurations.txt"));
+				this.calcTripDurations.writeStats(Controler.getIterationFilename(this.calcTripDurations.getClass().getCanonicalName() + ".txt"));
 			}
 		}
 		
