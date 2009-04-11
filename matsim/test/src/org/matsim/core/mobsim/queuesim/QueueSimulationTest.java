@@ -344,11 +344,39 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Events events = new Events();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
-		QueueSimulation sim = prepareConsistentRoutesTest("2 3", events); // route should continue on 4, 5
-		LogCounter logger = new LogCounter();
-		Logger.getRootLogger().addAppender(logger);
-		sim.run();
-		Logger.getRootLogger().removeAppender(logger);
+		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "5", events); // route should continue on link 4
+		assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
+		assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
+	}
+	
+	/**
+	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
+	 * starts at another link than the previous activity is located at.
+	 *
+	 * @author mrieser
+	 */
+	public void testConsistentRoutes_WrongStartLink() {
+		new LogCounter();
+		Events events = new Events();
+		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
+		events.addHandler(counter);
+		LogCounter logger = runConsistentRoutesTestSim("2", "3 4", "5", events); // first act is on link 1, not 2
+		assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
+		assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
+	}
+	
+	/**
+	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
+	 * starts at another link than the previous activity is located at.
+	 *
+	 * @author mrieser
+	 */
+	public void testConsistentRoutes_WrongEndLink() {
+		new LogCounter();
+		Events events = new Events();
+		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
+		events.addHandler(counter);
+		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "4", events); // second act is on link 5, not 4
 		assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
 		assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
@@ -364,11 +392,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Events events = new Events();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
-		QueueSimulation sim = prepareConsistentRoutesTest("2 3 5", events); // node 4 is missing
-		LogCounter logger = new LogCounter();
-		Logger.getRootLogger().addAppender(logger);
-		sim.run();
-		Logger.getRootLogger().removeAppender(logger);
+		LogCounter logger = runConsistentRoutesTestSim("1", "2 4", "5", events); // link 3 is missing
 		assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
 		assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
@@ -381,11 +405,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Events events = new Events();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
-		QueueSimulation sim = prepareConsistentRoutesTest("", events); // no nodes at all
-		LogCounter logger = new LogCounter();
-		Logger.getRootLogger().addAppender(logger);
-		sim.run();
-		Logger.getRootLogger().removeAppender(logger);
+		LogCounter logger = runConsistentRoutesTestSim("1", "", "5", events); // no links at all
 		assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
 		assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
@@ -394,13 +414,15 @@ public class QueueSimulationTest extends MatsimTestCase {
 	 * Creates a network of 6 links, and a population of one person driving from
 	 * link 1 to link 5, and then from link 5 to link 6.
 	 *
-	 * @param nodes a list of node ids the agent should travel along for the first leg.
+	 * @param startLinkId the start link of the route for the first leg
+	 * @param linkIds the links the agent should travel along on the first leg
+	 * @param endLinkId the end link of the route for the first leg
 	 * @param events the Events object to be used by the simulation.
 	 * @return A QueueSimulation which can be started immediately.
 	 *
 	 * @author mrieser
 	 **/
-	private QueueSimulation prepareConsistentRoutesTest(final String nodes, final Events events) {
+	private LogCounter runConsistentRoutesTestSim(final String startLinkId, final String linkIds, final String endLinkId, final Events events) {
 		Fixture f = new Fixture();
 
 		/* enhance network */
@@ -418,7 +440,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		a1.setEndTime(8*3600);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
 		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(BasicLeg.Mode.car, f.link1, link5);
-		route.setNodes(f.link1, NetworkUtils.getNodes(f.network, nodes), link5);
+		route.setLinks(f.network.getLink(new IdImpl(startLinkId)), NetworkUtils.getLinks(f.network, linkIds), f.network.getLink(new IdImpl(endLinkId)));
 		leg.setRoute(route);
 		Activity a2 = plan.createAct("w", link5);
 		a2.setEndTime(9*3600);
@@ -429,8 +451,13 @@ public class QueueSimulationTest extends MatsimTestCase {
 		plan.createAct("h", link6);
 		f.plans.addPerson(person);
 
-		/* build sim */
-		return new QueueSimulation(f.network, f.plans, events);
+		/* run sim with special logger */		
+		LogCounter logger = new LogCounter();
+		Logger.getRootLogger().addAppender(logger);
+		new QueueSimulation(f.network, f.plans, events).run();
+		Logger.getRootLogger().removeAppender(logger);
+		
+		return logger;
 	}
 
 	/**
