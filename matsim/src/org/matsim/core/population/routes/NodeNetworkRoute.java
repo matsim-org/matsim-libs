@@ -107,7 +107,12 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 		this.route.clear();
 		setStartLink(startLink);
 		setEndLink(endLink);
-		if (srcRoute != null) {
+		if (srcRoute == null) {
+			if (startLink != endLink) {
+				// we do not check that start link and end link are really connected with the same node
+				this.route.add(startLink.getToNode());
+			}
+		} else {
 			if (srcRoute.size() == 0) {
 				if (startLink != endLink) {
 					// we do not check that start link and end link are really connected with the same node
