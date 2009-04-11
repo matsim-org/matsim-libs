@@ -22,7 +22,7 @@ package org.matsim.socialnetworks.replanning;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.replanning.modules.MultithreadedModuleA;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -36,7 +36,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  */
 
-public class RandomFacilitySwitcherK extends MultithreadedModuleA {
+public class RandomFacilitySwitcherK extends AbstractMultithreadedModule {
 	private final static Logger log = Logger.getLogger(RandomFacilitySwitcherK.class);
 	private NetworkLayer network=null;
 	private TravelCost tcost=null;

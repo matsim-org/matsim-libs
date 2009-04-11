@@ -32,7 +32,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  * Initialiser for TimeOptimizer module.
  */
 
-public class TimeOptInitialiser extends MultithreadedModuleA{
+public class TimeOptInitialiser extends AbstractMultithreadedModule{
 	
 	private final PlanScorer 				scorer;
 	private final LegTravelTimeEstimator	estimator;

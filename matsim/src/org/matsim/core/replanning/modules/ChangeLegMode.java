@@ -45,7 +45,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author mrieser
  */
-public class ChangeLegMode extends MultithreadedModuleA {
+public class ChangeLegMode extends AbstractMultithreadedModule {
 
 	/*package*/ final static String CONFIG_MODULE = "changeLegMode";
 	/*package*/ final static String CONFIG_PARAM_MODES = "modes";

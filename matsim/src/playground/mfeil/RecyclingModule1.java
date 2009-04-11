@@ -29,7 +29,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.modules.MultithreadedModuleA;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 
 
 /**
@@ -42,7 +42,7 @@ public class RecyclingModule1 extends RecyclingModule implements PlanStrategyMod
 		
 	private final int iterations, noOfAgents, noOfSoftCoefficients;
 	private final DistanceCoefficients coefficients;
-	private final MultithreadedModuleA assignmentModule;
+	private final AbstractMultithreadedModule assignmentModule;
 	private final String primActsDistance, homeLocationDistance, sex, age, license, car_avail, employed; 
 	private final ArrayList<String> softCoef; 
 	private final ArrayList<String> allCoef; 

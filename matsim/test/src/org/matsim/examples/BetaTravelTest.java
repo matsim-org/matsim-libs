@@ -48,7 +48,7 @@ import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.modules.MultithreadedModuleA;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.utils.charts.XYScatterChart;
@@ -138,13 +138,13 @@ public class BetaTravelTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	private static class LinkAnalyzer implements LinkEnterEventHandler, LinkLeaveEventHandler {
-		public final String linkId;
-		public double firstCarEnter = Double.POSITIVE_INFINITY;
-		public double lastCarEnter = Double.NEGATIVE_INFINITY;
-		public double firstCarLeave = Double.POSITIVE_INFINITY;
-		public double lastCarLeave = Double.NEGATIVE_INFINITY;
-		public int maxCarsOnLink = Integer.MIN_VALUE;
-		public double maxCarsOnLinkTime = Double.NEGATIVE_INFINITY;
+		private final String linkId;
+		protected double firstCarEnter = Double.POSITIVE_INFINITY;
+		protected double lastCarEnter = Double.NEGATIVE_INFINITY;
+		protected double firstCarLeave = Double.POSITIVE_INFINITY;
+		protected double lastCarLeave = Double.NEGATIVE_INFINITY;
+		protected int maxCarsOnLink = Integer.MIN_VALUE;
+		protected double maxCarsOnLinkTime = Double.NEGATIVE_INFINITY;
 		private int iteration = -1;
 
 		private final ArrayList<Double> enterTimes = new ArrayList<Double>(100);
@@ -152,7 +152,7 @@ public class BetaTravelTest extends MatsimTestCase {
 
 		private static final Logger log = Logger.getLogger(TestControlerListener.class);
 
-		public LinkAnalyzer(final String linkId) {
+		protected LinkAnalyzer(final String linkId) {
 			this.linkId = linkId;
 			reset(0);
 		}
@@ -186,7 +186,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			}
 		}
 
-		public void calcMaxCars() {
+		protected void calcMaxCars() {
 			Collections.sort(this.enterTimes);
 			Collections.sort(this.leaveTimes);
 			int idxEnter = 0;
@@ -224,7 +224,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			}
 		}
 
-		public void printInfo() {
+		protected void printInfo() {
 			log.info("Statistics for link " + this.linkId + " in iteration " + this.iteration);
 			log.info("  first car entered: " + this.firstCarEnter);
 			log.info("   last car entered: " + this.lastCarEnter);
@@ -244,7 +244,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	 */
 	private static class TestControler extends Controler {
 
-		public TestControler(final Config config) {
+		protected TestControler(final Config config) {
 			super(config);
 		}
 
@@ -372,7 +372,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	}
 
 	/** A special variant of the TimeAllocationMutator, suitable for the Bottleneck Analysis */
-	private static class TimeAllocationMutatorBottleneck extends MultithreadedModuleA {
+	private static class TimeAllocationMutatorBottleneck extends AbstractMultithreadedModule {
 		public TimeAllocationMutatorBottleneck() {
 			// empty public constructor for private class
 		}
@@ -388,7 +388,7 @@ public class BetaTravelTest extends MatsimTestCase {
 
 		private final int mutationRange;
 
-		public PlanMutateTimeAllocationBottleneck(final int mutationRange) {
+		protected PlanMutateTimeAllocationBottleneck(final int mutationRange) {
 			this.mutationRange = mutationRange;
 		}
 
@@ -473,7 +473,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		private final double[] depTimes;
 		private final double[] arrTimes;
 
-		public BottleneckTravelTimeAnalyzer(final int popSize) {
+		protected BottleneckTravelTimeAnalyzer(final int popSize) {
 			this.depTimes = new double[popSize];
 			this.arrTimes = new double[popSize];
 		}
@@ -501,7 +501,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			this.agentCounter = 0;
 		}
 
-		public void plot(final String filename) {
+		protected void plot(final String filename) {
 			XYScatterChart graph = new XYScatterChart("Bottleneck Analysis", "departure time", "arrival time");
 			graph.addSeries("", this.depTimes, this.arrTimes);
 			graph.saveAsPng(filename, 800, 600);

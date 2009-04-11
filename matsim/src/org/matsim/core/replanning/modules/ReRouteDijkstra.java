@@ -32,7 +32,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author mrieser
  */
-public class ReRouteDijkstra extends MultithreadedModuleA {
+public class ReRouteDijkstra extends AbstractMultithreadedModule {
 
 	TravelCost costCalculator = null;
 	TravelTime timeCalculator = null;

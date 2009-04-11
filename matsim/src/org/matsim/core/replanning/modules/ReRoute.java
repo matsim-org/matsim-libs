@@ -29,7 +29,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author mrieser
  */
-public class ReRoute extends MultithreadedModuleA {
+public class ReRoute extends AbstractMultithreadedModule {
 
 	private final Controler controler;
 	

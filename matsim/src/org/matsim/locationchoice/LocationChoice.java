@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.replanning.modules.MultithreadedModuleA;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scoring.LocationChoiceScoringFunctionFactory;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
@@ -36,7 +36,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 
 
-public class LocationChoice extends MultithreadedModuleA {
+public class LocationChoice extends AbstractMultithreadedModule {
 
 	private NetworkLayer network=null;
 	private Controler controler = null;

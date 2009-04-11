@@ -25,7 +25,7 @@ package playground.johannes.eut;
 
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.replanning.modules.MultithreadedModuleA;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -33,7 +33,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @author illenberger
  *
  */
-public class EUTReRoute extends MultithreadedModuleA {
+public class EUTReRoute extends AbstractMultithreadedModule {
 	
 //	private static final int rho = 0;
 	

@@ -19,7 +19,7 @@ package playground.jhackney.replanning;
  *                                                                         *
  * *********************************************************************** */
 
-import org.matsim.core.replanning.modules.MultithreadedModuleA;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 /**
  * A sample of schedule coordination in a replanning StrategyModule. The departure
@@ -29,7 +29,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  */
 
-public class SNCoordinateArrivalTimes extends MultithreadedModuleA {
+public class SNCoordinateArrivalTimes extends AbstractMultithreadedModule {
 
 	private playground.jhackney.controler.SNController3 controler;
 

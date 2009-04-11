@@ -35,7 +35,7 @@ import org.matsim.population.algorithms.PlanMutateTimeAllocation;
  * @author mrieser
  * @see org.matsim.population.algorithms.PlanMutateTimeAllocation
  */
-public class TimeAllocationMutator extends MultithreadedModuleA {
+public class TimeAllocationMutator extends AbstractMultithreadedModule {
 
 	public final static String CONFIG_GROUP = "TimeAllocationMutator";
 	public final static String CONFIG_MUTATION_RANGE = "mutationRange";

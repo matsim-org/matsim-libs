@@ -45,7 +45,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author mrieser
  */
-abstract public class MultithreadedModuleA implements PlanStrategyModule {
+abstract public class AbstractMultithreadedModule implements PlanStrategyModule {
 	private final int numOfThreads;
 
 	private PlanAlgoThread[] algothreads = null;
@@ -56,15 +56,15 @@ abstract public class MultithreadedModuleA implements PlanStrategyModule {
 	private int counter = 0;
 	private int nextCounter = 1;
 
-	static final private Logger log = Logger.getLogger(MultithreadedModuleA.class);
+	static final private Logger log = Logger.getLogger(AbstractMultithreadedModule.class);
 
 	abstract public PlanAlgorithm getPlanAlgoInstance();
 
-	public MultithreadedModuleA() {
+	public AbstractMultithreadedModule() {
 		this.numOfThreads = Gbl.getConfig().global().getNumberOfThreads();
 	}
 
-	public MultithreadedModuleA(final int numOfThreads) {
+	public AbstractMultithreadedModule(final int numOfThreads) {
 		this.numOfThreads = numOfThreads;
 	}
 

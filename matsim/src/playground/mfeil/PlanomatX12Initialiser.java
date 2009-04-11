@@ -34,7 +34,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * Replacing the PlanomatOptimizeTimes class to initialise the PlanomatX module.
  */
 
-public class PlanomatX12Initialiser extends MultithreadedModuleA{
+public class PlanomatX12Initialiser extends AbstractMultithreadedModule{
 	
 	
 	private final NetworkLayer 				network;

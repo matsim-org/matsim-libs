@@ -35,7 +35,7 @@ import java.util.LinkedList;
  * Initializes the agentsAssigner.
  */
 
-public class AgentsAssignmentInitialiser extends MultithreadedModuleA{
+public class AgentsAssignmentInitialiser extends AbstractMultithreadedModule{
 	
 	
 	protected final NetworkLayer 				network;

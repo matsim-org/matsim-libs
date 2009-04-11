@@ -37,7 +37,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author meisterk
  */
-public class PlanomatModule extends MultithreadedModuleA {
+public class PlanomatModule extends AbstractMultithreadedModule {
 
 	private NetworkLayer network;
 	private Events events;

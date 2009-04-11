@@ -22,7 +22,7 @@ package org.matsim.socialnetworks.replanning;
 
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.replanning.modules.MultithreadedModuleA;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -36,7 +36,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  */
 
-public class RandomFacilitySwitcherF extends MultithreadedModuleA {
+public class RandomFacilitySwitcherF extends AbstractMultithreadedModule {
 	private NetworkLayer network=null;
 	private TravelCost tcost=null;
 	private TravelTime ttime=null;

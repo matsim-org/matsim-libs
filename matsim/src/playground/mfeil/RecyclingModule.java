@@ -29,7 +29,7 @@ import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.modules.MultithreadedModuleA;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
@@ -57,8 +57,8 @@ import java.util.LinkedList;
 public class RecyclingModule implements PlanStrategyModule {
 	
 	protected  ArrayList<Plan> []				list;
-	protected final MultithreadedModuleA 		schedulingModule;
-	protected final MultithreadedModuleA		assignmentModule;
+	protected final AbstractMultithreadedModule 		schedulingModule;
+	protected final AbstractMultithreadedModule		assignmentModule;
 	protected final PreProcessLandmarks			preProcessRoutingData;
 	protected final LocationMutatorwChoiceSet 	locator;
 	protected final PlanScorer					scorer;
