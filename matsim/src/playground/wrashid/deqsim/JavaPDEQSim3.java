@@ -26,15 +26,13 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.Road;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
 
 import playground.wrashid.PDES3.PScheduler;
 import playground.wrashid.PDES3.PVehicle;
@@ -55,32 +53,31 @@ public class JavaPDEQSim3 {
 		//SimulationParameters.setLinkCapacityPeriod(network.getCapacityPeriod());
 		// the thread for processing the events
 		SimulationParameters.setProcessEventThread( events);
+		
+		SimulationConfigGroup config = Gbl.getConfig().simulation();
 
-		SimulationParameters.setSqueezeTime(Double.parseDouble(Gbl.getConfig().getParam("simulation",
-				"stuckTime")));
-		SimulationParameters.setFlowCapacityFactor( Double.parseDouble(Gbl.getConfig().getParam("simulation",
-				"flowCapacityFactor")));
-		SimulationParameters.setStorageCapacityFactor ( Double.parseDouble(Gbl.getConfig().getParam(
-				"simulation", "storageCapacityFactor")));
+		SimulationParameters.setSqueezeTime(config.getStuckTime());
+		SimulationParameters.setFlowCapacityFactor(config.getFlowCapFactor());
+		SimulationParameters.setStorageCapacityFactor (config.getStorageCapFactor());
 
 		// allowed testing to hook in here
-		if (SimulationParameters.getTestEventHandler() != null) {
-			SimulationParameters.getProcessEventThread().addHandler(SimulationParameters.getTestEventHandler());
-		}
-
-		if (SimulationParameters.getTestPlanPath() != null) {
-			// read population
-			Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
-			PopulationReader plansReader = new MatsimPopulationReader(pop, network);
-			plansReader.readFile(SimulationParameters.getTestPlanPath());
-
-			this.population = pop;
-
-		}
-
-		if (SimulationParameters.getTestPopulationModifier() != null) {
-			this.population = SimulationParameters.getTestPopulationModifier().modifyPopulation(this.population);
-		}
+//		if (SimulationParameters.getTestEventHandler() != null) {
+//			SimulationParameters.getProcessEventThread().addHandler(SimulationParameters.getTestEventHandler());
+//		}
+//
+//		if (SimulationParameters.getTestPlanPath() != null) {
+//			// read population
+//			Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
+//			PopulationReader plansReader = new MatsimPopulationReader(pop, network);
+//			plansReader.readFile(SimulationParameters.getTestPlanPath());
+//
+//			this.population = pop;
+//
+//		}
+//
+//		if (SimulationParameters.getTestPopulationModifier() != null) {
+//			this.population = SimulationParameters.getTestPopulationModifier().modifyPopulation(this.population);
+//		}
 	}
 
 	public void run() {

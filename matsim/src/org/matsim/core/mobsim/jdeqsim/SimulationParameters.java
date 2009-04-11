@@ -22,8 +22,6 @@ package org.matsim.core.mobsim.jdeqsim;
 import java.util.HashMap;
 
 import org.matsim.core.events.Events;
-import org.matsim.core.mobsim.jdeqsim.util.testable.PopulationModifier;
-import org.matsim.core.mobsim.jdeqsim.util.testable.TestHandler;
 
 public class SimulationParameters {
 
@@ -73,12 +71,6 @@ public class SimulationParameters {
 	// OUTPUT
 	// The thread for processing the events
 	private static Events processEventThread = null;
-
-	// TESTING
-	// test injection variables
-	private static TestHandler testEventHandler = null;
-	private static String testPlanPath = null;
-	private static PopulationModifier testPopulationModifier = null;
 
 	// METHODS
 	public static boolean isGC_MESSAGES() {
@@ -152,18 +144,6 @@ public class SimulationParameters {
 	public static void setProcessEventThread(Events processEventThread) {
 		SimulationParameters.processEventThread = processEventThread;
 	}
-
-	public static TestHandler getTestEventHandler() {
-		return testEventHandler;
-	}	
-
-	public static String getTestPlanPath() {
-		return testPlanPath;
-	}
-
-	public static PopulationModifier getTestPopulationModifier() {
-		return testPopulationModifier;
-	}	
 
 	public static HashMap<String, Road> getAllRoads() {
 		return allRoads;
