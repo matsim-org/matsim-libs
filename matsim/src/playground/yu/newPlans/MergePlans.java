@@ -87,17 +87,16 @@ public class MergePlans {
 		final int lower_limit = 1000000000;
 		Config config = Gbl.createConfig(null);
 		config.plans().setOutputFile(outputPlansFilename);
-		config.plans().switchOffPlansStreaming(false);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population plansA = new PopulationImpl();
+		Population plansA = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		PopulationWriter pw = new PopulationWriter(plansA);
 		new MatsimPopulationReader(plansA, network).readFile(plansFilenameA);
 		new CopyPlans(pw).run(plansA);
 
-		Population plansB = new PopulationImpl();
+		Population plansB = new PopulationImpl(PopulationImpl.USE_STREAMING);
 		new MatsimPopulationReader(plansB, network).readFile(plansFilenameB);
 		new PersonIdCopyPlans(pw, lower_limit).run(plansB);
 		pw.write();

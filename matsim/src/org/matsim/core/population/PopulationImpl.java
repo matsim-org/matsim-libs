@@ -63,7 +63,7 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 	//////////////////////////////////////////////////////////////////////
 
 	public PopulationImpl() {
-		this(!Gbl.getConfig().plans().switchOffPlansStreaming());
+		this(false);
 	}
 
 	public PopulationImpl(final boolean isStreaming) {

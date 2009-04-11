@@ -42,7 +42,6 @@ public class PlansConfigGroup extends Module {
 	private static final String INPUT_VERSION = "inputVersion";
 	private static final String OUTPUT_DTD = "outputPlansDTD";
 
-	private boolean switchOffPlansStreaming = true;
 	private double outputSample = 1.0;
 
 	private String inputFile = null;
@@ -57,9 +56,7 @@ public class PlansConfigGroup extends Module {
 
 	@Override
 	public String getValue(final String key) {
-		if (SWITCH_OFF_PLANS_STREAMING.equals(key)) {
-			return switchOffPlansStreaming() ? "yes" : "no";
-		} else if (OUTPUT_SAMPLE.equals(key)) {
+		if (OUTPUT_SAMPLE.equals(key)) {
 			return Double.toString(getOutputSample());
 		} else if (INPUT_FILE.equals(key)) {
 			return getInputFile();
@@ -75,7 +72,12 @@ public class PlansConfigGroup extends Module {
 	@Override
 	public void addParam(final String key, final String value) {
 		if (SWITCH_OFF_PLANS_STREAMING.equals(key)) {
-			switchOffPlansStreaming("yes".equals(value) || "true".equals(value));
+			if ("yes".equals(value) || "true".equals(value)) {
+				log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer supported and should be removed from the configuration file.");
+			} else {
+				log.warn("The parameter " + key + " in module " + GROUP_NAME + " can no longer be configured in the config-file. If you want to use streaming, use the appropriate constructor in PopulationImpl and remove the setting in the config-file.");
+				throw new RuntimeException("plans-streaming is no longer supported from the config-file. see logfile for more informations.");
+			}
 		} else if (OUTPUT_SAMPLE.equals(key)) {
 			setOutputSample(Double.parseDouble(value));
 		} else if (INPUT_FILE.equals(key)) {
@@ -94,7 +96,6 @@ public class PlansConfigGroup extends Module {
 	@Override
 	protected final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		map.put(SWITCH_OFF_PLANS_STREAMING, getValue(SWITCH_OFF_PLANS_STREAMING));
 		map.put(OUTPUT_SAMPLE, getValue(OUTPUT_SAMPLE));
 		addParameterToMap(map, INPUT_FILE);
 		addParameterToMap(map, OUTPUT_FILE);
@@ -103,13 +104,6 @@ public class PlansConfigGroup extends Module {
 	}
 
 	/* direct access */
-
-	public boolean switchOffPlansStreaming() {
-		return this.switchOffPlansStreaming;
-	}
-	public void switchOffPlansStreaming(final boolean switchOffPlansStreaming) {
-		this.switchOffPlansStreaming = switchOffPlansStreaming;
-	}
 
 	public double getOutputSample() {
 		return this.outputSample;
