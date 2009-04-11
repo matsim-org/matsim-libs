@@ -394,8 +394,8 @@ public class OsmNetworkReader {
 					// thus only correct freespeed if maxspeed is lower than freespeed.
 					freespeed = maxspeed;
 				}
-			} catch (Exception e) {
-				// Nothing to do here, simply ignore it
+			} catch (NumberFormatException e) {
+				log.warn("Could not parse freespeed tag:" + e.getMessage() + ". Ignoring it.");
 			}			
 		}
 
