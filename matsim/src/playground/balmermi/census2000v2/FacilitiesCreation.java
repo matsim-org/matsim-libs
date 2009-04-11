@@ -24,8 +24,8 @@ import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.facilities.algorithms.FacilitiesCombine;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.facilities.algorithms.FacilitiesCombine;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 

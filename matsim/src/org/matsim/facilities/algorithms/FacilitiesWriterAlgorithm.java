@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilityFilter.java
+ * FacilitiesWriterAlgorithm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,30 +18,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities.filters;
+package org.matsim.facilities.algorithms;
 
+import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
-import org.matsim.population.filters.Filter;
+import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 
 /**
+ * Use this facilities writer when streaming facilities.
+ *
  * @author meisterk
  *
  */
-public interface FacilityFilter extends FacilityAlgorithm, Filter {
+public class FacilitiesWriterAlgorithm extends AbstractFacilityAlgorithm {
+
+	private FacilitiesWriter facilitiesWriter = null;
+
+	public FacilitiesWriterAlgorithm(final Facilities facilities) {
+		super();
+		this.facilitiesWriter = new FacilitiesWriter(facilities);
+		this.facilitiesWriter.writeOpenAndInit();
+	}
+
+	public void run(final Facility facility) {
+		this.facilitiesWriter.writeFacility(facility);
+	}
 
 	/**
-	 * Judges whether the facility will be selected or not.
-	 *
-	 * @param facility
-	 * @return true if the facility meets the criterion of the filter.
+	 * Calls the facilities writer to close the out stream.
+	 * Don't forget to call this method after streaming all facilities.
 	 */
-	boolean judge(Facility facility);
+	public void finish() {
+		this.facilitiesWriter.writeFinish();
+	}
 
-	/**
-	 * Sends the facility to the next algorithm
-	 *
-	 * @param facility
-	 */
-	void run(Facility facility);
 }

@@ -68,7 +68,6 @@ import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.facilities.algorithms.FacilitiesWriterAlgorithm;
 import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimResource;
@@ -76,6 +75,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.algorithms.FacilitiesWriterAlgorithm;
 import org.matsim.vis.kml.KMZWriter;
 
 import playground.meisterk.org.matsim.facilities.ShopId;

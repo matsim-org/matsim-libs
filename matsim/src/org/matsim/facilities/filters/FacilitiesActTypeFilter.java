@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilitiesRandomizeHectareCoordinates.java
+ * FacilitiesActTypeFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,25 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities.algorithms;
+package org.matsim.facilities.filters;
 
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.facilities.Facilities;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
+
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 
-public class FacilitiesRandomizeHectareCoordinates {
+/**
+ * Keeps all facilities if they contain one OR more of the specified activities.
+ *
+ * @author meisterk
+ *
+ */
+public class FacilitiesActTypeFilter extends AbstractFacilityFilter {
 
-	public void run(Facilities facilities) {
-		System.out.println("    running " + this.getClass().getName() + " algorithm...");
+	private final Set<String> actTypePatterns = new TreeSet<String>();
 
-		for (Facility f : facilities.getFacilities().values()) {
-			Coord coord = f.getCoord();
-			coord.setX((Double.valueOf(coord.getX()).intValue() / 100) * 100 + MatsimRandom.getRandom().nextInt(99));
-			coord.setY((Double.valueOf(coord.getY()).intValue() / 100) * 100 + MatsimRandom.getRandom().nextInt(99));
+	public FacilitiesActTypeFilter(final FacilityAlgorithm nextAlgorithm) {
+		super();
+		this.nextAlgorithm = nextAlgorithm;
+	}
+
+	public void addActTypePattern(final String actTypePattern) {
+		this.actTypePatterns.add(actTypePattern);
+	}
+
+	public boolean judge(final Facility facility) {
+
+		Iterator<String> activityIterator = facility.getActivityOptions().keySet().iterator();
+		while (activityIterator.hasNext()) {
+			String activity = activityIterator.next();
+			for (String actTypePattern : this.actTypePatterns) {
+				if (Pattern.matches(actTypePattern, activity)) {
+					return true;
+				}
+			}
 		}
-
-		System.out.println("    done.");
+		return false;
 	}
 
 }

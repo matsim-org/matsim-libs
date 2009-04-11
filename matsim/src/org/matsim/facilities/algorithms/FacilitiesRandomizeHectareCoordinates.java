@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractFacilityFilter.java
+ * FacilitiesRandomizeHectareCoordinates.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,29 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities.filters;
+package org.matsim.facilities.algorithms;
 
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
+import org.matsim.core.gbl.MatsimRandom;
 
-public abstract class AbstractFacilityFilter implements FacilityAlgorithm, FacilityFilter {
+public class FacilitiesRandomizeHectareCoordinates {
 
-	protected FacilityAlgorithm nextAlgorithm = null;
-	private int count = 0;
+	public void run(Facilities facilities) {
+		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-	public void run(final Facility facility) {
-		if (judge(facility)) {
-			count();
-			this.nextAlgorithm.run(facility);
+		for (Facility f : facilities.getFacilities().values()) {
+			Coord coord = f.getCoord();
+			coord.setX((Double.valueOf(coord.getX()).intValue() / 100) * 100 + MatsimRandom.getRandom().nextInt(99));
+			coord.setY((Double.valueOf(coord.getY()).intValue() / 100) * 100 + MatsimRandom.getRandom().nextInt(99));
 		}
-	}
 
-	public void count() {
-		this.count++;
-	}
-
-	public int getCount() {
-		return this.count;
+		System.out.println("    done.");
 	}
 
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilitiesActTypeFilter.java
+ * AbstractFacilityFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,47 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities.filters;
-
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
+package org.matsim.facilities.filters;
 
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 
-/**
- * Keeps all facilities if they contain one OR more of the specified activities.
- *
- * @author meisterk
- *
- */
-public class FacilitiesActTypeFilter extends AbstractFacilityFilter {
+public abstract class AbstractFacilityFilter implements FacilityAlgorithm, FacilityFilter {
 
-	private final Set<String> actTypePatterns = new TreeSet<String>();
+	protected FacilityAlgorithm nextAlgorithm = null;
+	private int count = 0;
 
-	public FacilitiesActTypeFilter(final FacilityAlgorithm nextAlgorithm) {
-		super();
-		this.nextAlgorithm = nextAlgorithm;
-	}
-
-	public void addActTypePattern(final String actTypePattern) {
-		this.actTypePatterns.add(actTypePattern);
-	}
-
-	public boolean judge(final Facility facility) {
-
-		Iterator<String> activityIterator = facility.getActivityOptions().keySet().iterator();
-		while (activityIterator.hasNext()) {
-			String activity = activityIterator.next();
-			for (String actTypePattern : this.actTypePatterns) {
-				if (Pattern.matches(actTypePattern, activity)) {
-					return true;
-				}
-			}
+	public void run(final Facility facility) {
+		if (judge(facility)) {
+			count();
+			this.nextAlgorithm.run(facility);
 		}
-		return false;
+	}
+
+	public void count() {
+		this.count++;
+	}
+
+	public int getCount() {
+		return this.count;
 	}
 
 }

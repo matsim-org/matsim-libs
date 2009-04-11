@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilitiesWriterAlgorithm.java
+ * FacilityFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,38 +18,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities.algorithms;
+package org.matsim.facilities.filters;
 
-import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
+import org.matsim.population.filters.Filter;
 
 /**
- * Use this facilities writer when streaming facilities.
- *
  * @author meisterk
  *
  */
-public class FacilitiesWriterAlgorithm extends AbstractFacilityAlgorithm {
-
-	private FacilitiesWriter facilitiesWriter = null;
-
-	public FacilitiesWriterAlgorithm(final Facilities facilities) {
-		super();
-		this.facilitiesWriter = new FacilitiesWriter(facilities);
-		this.facilitiesWriter.writeOpenAndInit();
-	}
-
-	public void run(final Facility facility) {
-		this.facilitiesWriter.writeFacility(facility);
-	}
+public interface FacilityFilter extends FacilityAlgorithm, Filter {
 
 	/**
-	 * Calls the facilities writer to close the out stream.
-	 * Don't forget to call this method after streaming all facilities.
+	 * Judges whether the facility will be selected or not.
+	 *
+	 * @param facility
+	 * @return true if the facility meets the criterion of the filter.
 	 */
-	public void finish() {
-		this.facilitiesWriter.writeFinish();
-	}
+	boolean judge(Facility facility);
 
+	/**
+	 * Sends the facility to the next algorithm
+	 *
+	 * @param facility
+	 */
+	void run(Facility facility);
 }
