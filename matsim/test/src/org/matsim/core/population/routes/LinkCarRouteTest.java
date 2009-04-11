@@ -33,7 +33,7 @@ import org.matsim.core.population.routes.LinkNetworkRoute;
 /**
  * @author mrieser
  */
-public class LinkCarRouteTest extends AbstractCarRouteTest {
+public class LinkCarRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
 	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink) {

@@ -27,7 +27,7 @@ import org.matsim.core.population.routes.NodeNetworkRoute;
 /**
  * @author mrieser
  */
-public class NodeCarRouteTest extends AbstractCarRouteTest {
+public class NodeCarRouteTest extends AbstractNetworkRouteTest {
 
 	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink) {
 		return new NodeNetworkRoute(fromLink, toLink);

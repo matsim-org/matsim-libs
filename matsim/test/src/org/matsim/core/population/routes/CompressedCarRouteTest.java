@@ -38,7 +38,7 @@ import org.matsim.core.population.routes.CompressedNetworkRoute;
 /**
  * @author mrieser
  */
-public class CompressedCarRouteTest extends AbstractCarRouteTest {
+public class CompressedCarRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
 	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink) {
