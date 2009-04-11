@@ -20,41 +20,38 @@
 
 package org.matsim.core.scoring;
 
+import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-
-
+import org.matsim.core.api.population.PlanElement;
 
 /**
  * @author dgrether
- *
  */
 public class PlanScorer {
 
 	private ScoringFunctionFactory factory;
-	/**
-	 *
-	 * @param factory
-	 */
+
 	public PlanScorer(final ScoringFunctionFactory factory) {
 		this.factory = factory;
 	}
 
-
 	public double getScore(final Plan plan) {
 		ScoringFunction function = this.factory.getNewScoringFunction(plan);
-		org.matsim.core.api.population.Leg leg;
-		org.matsim.core.api.population.Activity act;
+		boolean firstActivityDone = false;
 
-		for (int i = 1; i < plan.getPlanElements().size(); i++) {
-			if (i % 2 != 0) {
-				leg = (Leg) plan.getPlanElements().get(i);
-				act = plan.getPreviousActivity(leg);
-				function.endActivity(act.getEndTime());
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if (firstActivityDone) {
+					function.startActivity(act.getStartTime(), act);
+					firstActivityDone = true;
+				}
+				function.endActivity(act.getEndTime());					
+			} else if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
 				function.startLeg(leg.getDepartureTime(), leg);
 				function.endLeg(leg.getArrivalTime());
-				act = plan.getNextActivity(leg);
-				function.startActivity(act.getStartTime(), act);
 			}
 		}
 		function.finish();
