@@ -30,7 +30,6 @@ import org.matsim.core.api.population.Person;
 public abstract class LinkEvent extends PersonEvent implements BasicLinkEvent {
 
 	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_LEG = "leg";
 
 	private final Id linkId;
 	private transient Link link;

@@ -33,10 +33,7 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 	
 	private static final long serialVersionUID = 1L;
 
-	public static final String GROUPNAME = "travelTimeCalculator";
-
-	public enum TravelTimeCalculatorType {};
-	
+	public static final String GROUPNAME = "travelTimeCalculator";	
 	
 	private static final String TRAVEL_TIME_CALCULATOR = "travelTimeCalculator";
 	private static final String TRAVEL_TIME_BIN_SIZE = "travelTimeBinSize";
@@ -54,9 +51,6 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 	private boolean calculateLinkTravelTimes = true;
 	private boolean calculateLinkToLinkTravelTimes = false;
 	
-	/**
-	 * @param name
-	 */
 	public TravelTimeCalculatorConfigGroup() {
 		super(GROUPNAME);
 	}

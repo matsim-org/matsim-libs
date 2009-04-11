@@ -41,7 +41,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.counts.Count;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -452,17 +451,13 @@ public class OsmNetworkReader {
 	}
 
 	private static class OsmNode {
-		public final Id id;
-		public final double lat;
-		public final double lon;
+		public final Id id;		
 		public boolean used = false;
 		public int ways = 0;
 		public final Coord coord;
 
-		public OsmNode(final Id id, final Coord coord, final double lat, final double lon) {
+		public OsmNode(final Id id, final Coord coord) {
 			this.id = id;
-			this.lat = lat;
-			this.lon = lon;
 			this.coord = coord;
 		}
 	}
@@ -470,9 +465,7 @@ public class OsmNetworkReader {
 	private static class OsmWay {
 		public final long id;
 		public final List<String> nodes = new ArrayList<String>();
-		public final Map<String, String> tags = new HashMap<String, String>();
-		public Count count = null;
-		public OsmNode countFromNode = null;
+		public final Map<String, String> tags = new HashMap<String, String>();				
 		public int hierarchy;
 
 		public OsmWay(final long id) {
@@ -522,7 +515,7 @@ public class OsmNetworkReader {
 				Id id = new IdImpl(atts.getValue("id"));
 				double lat = Double.parseDouble(atts.getValue("lat"));
 				double lon = Double.parseDouble(atts.getValue("lon"));
-				this.nodes.put(atts.getValue("id"), new OsmNode(id, this.transform.transform(new CoordImpl(lon, lat)), lat, lon));
+				this.nodes.put(atts.getValue("id"), new OsmNode(id, this.transform.transform(new CoordImpl(lon, lat))));
 				this.nodeCounter.incCounter();
 			} else if ("way".equals(name)) {
 				this.currentWay = new OsmWay(Long.parseLong(atts.getValue("id")));

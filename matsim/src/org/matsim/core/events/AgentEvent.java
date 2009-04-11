@@ -30,8 +30,7 @@ import org.matsim.core.api.population.Person;
 
 public abstract class AgentEvent extends PersonEvent implements BasicAgentEvent {
 
-	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_LEG = "leg";
+	public static final String ATTRIBUTE_LINK = "link";	
 
 	private Link link;
 	private Leg leg;

@@ -28,6 +28,7 @@ import org.matsim.core.utils.misc.Time;
 
 public abstract class BasicEventImpl implements BasicEvent {
 
+	public final static String ATTRIBUTE_TIME = "time";
 	public final static String ATTRIBUTE_TYPE = "type";
 
 	private final double time;
@@ -41,8 +42,8 @@ public abstract class BasicEventImpl implements BasicEvent {
 
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = new LinkedHashMap<String, String>();
-		attr.put("time", Double.toString(this.time));
-		attr.put("type", getEventType());
+		attr.put(ATTRIBUTE_TIME, Double.toString(this.time));
+		attr.put(ATTRIBUTE_TYPE, getEventType());
 		return attr;
 	}
 

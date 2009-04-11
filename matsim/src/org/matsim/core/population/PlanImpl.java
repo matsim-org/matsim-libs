@@ -53,10 +53,6 @@ public class PlanImpl implements Plan {
 		this.delegate = new BasicPlanImpl(person);
 	}
 
-	public static Plan createPlan( final Person p) {
-		return new PlanImpl(p) ;
-	}
-
 	public final Activity createAct(final String type, final Coord coord) throws IllegalStateException {
 		verifyCreateAct(Time.UNDEFINED_TIME);
 		Activity a = new ActivityImpl(type, coord);

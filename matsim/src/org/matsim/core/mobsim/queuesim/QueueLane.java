@@ -718,18 +718,6 @@ public class QueueLane implements Comparable<QueueLane> {
 		return null;
 	}
 
-	/*
-	 * The visualization is interested in this status
-	 *
-	 * It is NOT the same as the boolean "active", because we DO NOT need to wait
-	 * for buffer_cap to accumulate AND we DO need to know if there are vehs in
-	 * the buffer, which is not important for active state, as they are used by
-	 * node only
-	 */
-	public boolean hasDrivingCars() {
-		return ((this.vehQueue.size() + this.waitingList.size() + this.buffer.size()) != 0);
-	}
-
 	/**
 	 * @return Returns a collection of all vehicles (driving, parking, in buffer,
 	 *         ...) on the link.

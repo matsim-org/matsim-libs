@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.utils.misc.Time;
@@ -79,7 +78,6 @@ import org.matsim.core.utils.misc.Time;
  */
 
 public class CharyparNagelScoringFunction implements ScoringFunction {
-	protected final Person person;
 	protected final Plan plan;
 
 	protected double score;
@@ -105,7 +103,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		this.reset();
 
 		this.plan = plan;
-		this.person = this.plan.getPerson();
+		this.plan.getPerson();
 		this.lastActIndex = this.plan.getPlanElements().size() - 1;
 	}
 

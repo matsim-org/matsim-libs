@@ -80,12 +80,6 @@ public class SimulationParameters {
 	private static String testPlanPath = null;
 	private static PopulationModifier testPopulationModifier = null;
 
-	/**
-	 * how far can the average usage of links differ for a unit test to pass in
-	 * percent
-	 */
-	public static final double maxAbsLinkAverage = 0.01;
-
 	// METHODS
 	public static boolean isGC_MESSAGES() {
 		return GC_MESSAGES;
@@ -161,27 +155,15 @@ public class SimulationParameters {
 
 	public static TestHandler getTestEventHandler() {
 		return testEventHandler;
-	}
-
-	public static void setTestEventHandler(TestHandler testEventHandler) {
-		SimulationParameters.testEventHandler = testEventHandler;
-	}
+	}	
 
 	public static String getTestPlanPath() {
 		return testPlanPath;
 	}
 
-	public static void setTestPlanPath(String testPlanPath) {
-		SimulationParameters.testPlanPath = testPlanPath;
-	}
-
 	public static PopulationModifier getTestPopulationModifier() {
 		return testPopulationModifier;
-	}
-
-	public static void setTestPopulationModifier(PopulationModifier testPopulationModifier) {
-		SimulationParameters.testPopulationModifier = testPopulationModifier;
-	}
+	}	
 
 	public static HashMap<String, Road> getAllRoads() {
 		return allRoads;

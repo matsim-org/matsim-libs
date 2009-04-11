@@ -22,7 +22,6 @@ package org.matsim.core.scoring.charyparNagel;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.population.Leg;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
@@ -33,7 +32,6 @@ import org.matsim.core.scoring.interfaces.LegScoring;
 
 public class LegScoringFunction implements LegScoring, BasicScoring {
 
-	protected final Person person;
 	protected final Plan plan;
 
 	protected double score;
@@ -52,7 +50,6 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 		this.reset();
 
 		this.plan = plan;
-		this.person = this.plan.getPerson();
 	}
 
 	public void reset() {
