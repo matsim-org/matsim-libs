@@ -121,6 +121,10 @@ public class QueueLink {
 	 * A List holding all QueueLane instances of the QueueLink
 	 */
 	private List<QueueLane> queueLanes;
+
+	/** set to <code>true</code> if there is more than one lane (the originalLane). */
+	private boolean hasLanes = false;
+
 	/**
 	 * If more than one QueueLane exists this list holds all QueueLanes connected to 
 	 * the (To)QueueNode of the QueueLink
@@ -152,7 +156,8 @@ public class QueueLink {
 	 * @param lanes
 	 */
 	/*package*/ void createLanes(List<BasicLane> lanes) {
-		//TODO remove this assumption/warning
+		this.hasLanes = true;
+		//TODO dg remove this assumption/warning
 		if (this.getLink().getLength() < 60.0){
 			log.warn("Link " + this.getLink().getId() + " is signalized by traffic light, but its length is less than 60m. This is not recommended." +
 				"Recommended minimum lane length is 45m for the signal lane and at least additional 15m space to store 2 vehicles at the original link.");
@@ -204,10 +209,6 @@ public class QueueLink {
 		resortQueueLanes();
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	protected List<QueueLane> getToNodeQueueLanes() {
 		if ((this.toNodeQueueLanes == null) && (this.queueLanes.size() == 1)){
 			return this.queueLanes;
@@ -333,17 +334,24 @@ public class QueueLink {
 	protected boolean moveLink(double now) {
 		boolean ret = false;	
 		if (this.queueNetwork.isMoveWaitFirst()){
-			for (QueueLane lane : this.queueLanes){
-				if (lane.moveLaneWaitFirst(now)){
-					ret = true;
+			if (this.hasLanes) { // performance optimization: "if" is faster then "for(queueLanes)" with only one lane
+				for (QueueLane lane : this.queueLanes){
+					if (lane.moveLaneWaitFirst(now)){
+						ret = true;
+					}
 				}
+			} else {
+				ret = this.originalLane.moveLaneWaitFirst(now);
 			}
-		}
-		else {
-			for (QueueLane lane : this.queueLanes){
-				if (lane.moveLane(now)){
-					ret = true;
+		} else {
+			if (this.hasLanes) { // performance optimization: "if" is faster then "for(queueLanes)" with only one lane
+				for (QueueLane lane : this.queueLanes){
+					if (lane.moveLane(now)){
+						ret = true;
+					}
 				}
+			} else {
+				ret = this.originalLane.moveLane(now);
 			}
 		}
 		this.active = ret;
@@ -370,11 +378,9 @@ public class QueueLink {
 	public boolean hasSpace() {
 		return this.originalLane.hasSpace();
 	}
-	/**
-	 * TODO dg
-	 * @param time
-	 */
+
 	public void recalcTimeVariantAttributes(double time) {
+		// TODO dg
 		this.originalLane.recalcTimeVariantAttributes(time);
 	}
 
