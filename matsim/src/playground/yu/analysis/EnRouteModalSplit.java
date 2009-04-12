@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -60,14 +59,12 @@ import playground.yu.utils.TollTools;
  *         bin based on events.
  * @author yu This class can only be used with plansfile, in that all
  *         <code>Leg</code>s in a <code>Plan</code> muss be equiped with the
- *         same {@code Mode}
- *         {@link org.matsim.api.basic.v01.TransportMode} in a day.
+ *         same {@code Mode} {@link org.matsim.api.basic.v01.TransportMode} in a
+ *         day.
  */
 public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler, AgentStuckEventHandler {
 	private String scenario;
-
-	private int iteration = 0;
 
 	private final int binSize;
 	private Map<Id, Integer> legCounts = new HashMap<Id, Integer>();
@@ -364,7 +361,6 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 	}
 
 	public void reset(final int iteration) {
-		this.iteration = iteration;
 		for (int i = 0; i < this.dep.length; i++) {
 			this.dep[i] = 0;
 			this.arr[i] = 0;

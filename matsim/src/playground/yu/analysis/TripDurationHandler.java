@@ -87,7 +87,8 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 			this.tmpDptTimes.remove(agentId);
 
 			// Type planType = event.agent.getSelectedPlan().getType();d
-			Plan selectedPlan = plans.getPerson(new IdImpl(event.getPersonId().toString()))
+			Plan selectedPlan = plans.getPersons().get(
+					new IdImpl(event.getPersonId().toString()))
 					.getSelectedPlan();
 			if (
 			// planType != null && Plan.Type.UNDEFINED != planType

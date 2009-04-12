@@ -38,7 +38,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.Events;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.roadpricing.CalcPaidToll;
@@ -96,7 +95,7 @@ public class NewPtcheckControler extends Controler {
 			Events events = ctl.getEvents();
 			events.addHandler(cas);
 			events.addHandler(ctpf);
-			if (Gbl.getConfig().roadpricing() != null) {
+			if (cf.roadpricing() != null) {
 				cattl = new CalcAverageTolledTripLength(network, ctl
 						.getRoadPricing().getRoadPricingScheme());
 				events.addHandler(cattl);
@@ -124,10 +123,9 @@ public class NewPtcheckControler extends Controler {
 									+ cf.getParam("planCalcScore",
 											"travelingPt")
 									+ "\t"
-									+ ((Gbl.getConfig().roadpricing() != null) ? rp
+									+ ((cf.roadpricing() != null) ? rp
 											.getRoadPricingScheme()
-											.getCostArray()[0].amount
-											: 0)
+											.getCostArray()[0].amount : 0)
 									+ "\t"
 									+ ((tollCalc != null) ? tollCalc
 											.getAllAgentsToll() : 0.0)
@@ -155,7 +153,7 @@ public class NewPtcheckControler extends Controler {
 			int it = event.getIteration();
 			cas.reset(it);
 			ctpf.reset(it);
-			if (Gbl.getConfig().roadpricing() != null) {
+			if (event.getControler().getConfig().roadpricing() != null) {
 				cattl.reset(it);
 			}
 		}
@@ -171,8 +169,8 @@ public class NewPtcheckControler extends Controler {
 
 	// -------------------------MAIN FUNCTION--------------------
 	/**
-	 * @param args -
-	 *            the path of config-file
+	 * @param args
+	 *            - the path of config-file
 	 */
 	public static void main(final String[] args) {
 		final NewPtcheckControler controler;

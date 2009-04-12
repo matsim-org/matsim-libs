@@ -224,22 +224,6 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 					/ (double) this.othersArrCount[i]);
 
 		sw.write("----------------------------------------\n");
-		double ttSum = 0.0, carTtSum = 0.0, ptTtSum = 0.0, wlkTtSum = 0.0, bikeTtSum = 0.0, othersTtSum = 0.0;
-		int nTrips = 0, nCarTrips = 0, nPtTrips = 0, nWlkTrips = 0, nBikeTrips = 0, nOtherTrips = 0;
-		ttSum = CollectionSum.getSum(travelTimes);
-		carTtSum = CollectionSum.getSum(carTravelTimes);
-		for (int i = 0; i < this.travelTimes.length; i++) {
-			ptTtSum += this.ptTravelTimes[i];
-			wlkTtSum += this.wlkTravelTimes[i];
-			bikeTtSum += bikeTravelTimes[i];
-			othersTtSum += othersTravelTimes[i];
-
-			nTrips += this.arrCount[i];
-			nCarTrips += this.carArrCount[i];
-			nPtTrips += this.ptArrCount[i];
-			nWlkTrips += wlkArrCount[i];
-			nOtherTrips += othersArrCount[i];
-		}
 		sw
 				.writeln("the sum of all the traveltimes [s]: "
 						+ CollectionSum.getSum(travelTimes)

@@ -33,11 +33,10 @@ import java.util.Set;
  * 
  */
 public class CollectionSum {
-	public static double getSum(Collection clt) {
+	public static double getSum(Collection<Double> clt) {
 		double sum = 0.0;
-		for (Iterator ir = clt.iterator(); ir.hasNext();) {
-			sum += (Double) ir.next();
-		}
+		for (Iterator<Double> ir = clt.iterator(); ir.hasNext();)
+			sum += ir.next();
 		return sum;
 	}
 
@@ -49,6 +48,7 @@ public class CollectionSum {
 			sum += element;
 		return sum;
 	}
+
 	public static double getSum(final int[] array) {
 		if (array == null || array.length == 0)
 			return -1;
@@ -57,6 +57,7 @@ public class CollectionSum {
 			sum += element;
 		return sum;
 	}
+
 	public static void main(String[] args) {
 		Set<Double> dbs = new HashSet<Double>();
 		for (int i = 0; i < 10; i++)

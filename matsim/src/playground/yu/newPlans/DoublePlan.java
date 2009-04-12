@@ -23,7 +23,6 @@ package playground.yu.newPlans;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -81,7 +80,7 @@ public class DoublePlan extends NewPopulation {
 		String plansFilename = "../berlin data/v2/bln_car_c.xml.gz";
 		String outputPlansFilename = "../berlin data/v2/bln_car_c_5x.xml.gz";
 
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);

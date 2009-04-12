@@ -45,7 +45,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author yu
- *
+ * 
  */
 public class CarDepartureCounter implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
@@ -79,7 +79,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		Population ppl = new PopulationImpl();
 
 		System.out.println("->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(ppl,network).readFile(plansFilename);
+		new MatsimPopulationReader(ppl, network).readFile(plansFilename);
 
 		Events events = new Events();
 		CarDepartureCounter cdc = new CarDepartureCounter(ppl);
@@ -106,7 +106,8 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		Person p = this.ppl.getPerson(new IdImpl(event.getPersonId().toString()));
+		Person p = this.ppl.getPersons().get(
+				new IdImpl(event.getPersonId().toString()));
 		if (PlanModeJudger.useCar(p.getSelectedPlan()))
 			this.cdc++;
 	}
@@ -121,7 +122,8 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		Person p = this.ppl.getPerson(new IdImpl(event.getPersonId().toString()));
+		Person p = this.ppl.getPersons().get(
+				new IdImpl(event.getPersonId().toString()));
 		if (PlanModeJudger.useCar(p.getSelectedPlan()))
 			this.cac++;
 

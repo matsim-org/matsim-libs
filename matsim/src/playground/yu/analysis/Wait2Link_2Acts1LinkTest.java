@@ -32,6 +32,7 @@ import java.util.Set;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.Events;
@@ -85,7 +86,7 @@ public class Wait2Link_2Acts1LinkTest {
 			if (person != null) {
 				Plan p = person.getSelectedPlan();
 				if (p != null) {
-					List actsLegs = p.getPlanElements();
+					List<PlanElement> actsLegs = p.getPlanElements();
 					int max = actsLegs.size();
 					for (int i = 0; i < max; i++)
 						if (i % 2 == 0) {

@@ -41,10 +41,10 @@ public abstract class FinalEventFilterA extends EventFilterA {
 	/**
 	 * builds a FinalEventFilterA
 	 * 
-	 * @param plans -
-	 *            the Plans, which will be created in test
-	 * @param network -
-	 *            the NetworkLayer, which will be created in test
+	 * @param plans
+	 *            - the Plans, which will be created in test
+	 * @param network
+	 *            - the NetworkLayer, which will be created in test
 	 */
 	public FinalEventFilterA(Population plans, NetworkLayer network) {
 		this.plans = plans;
@@ -55,14 +55,15 @@ public abstract class FinalEventFilterA extends EventFilterA {
 	/**
 	 * rebuilds a real LinkEnterEvent-event.
 	 * 
-	 * @param enter -
-	 *            the event, that a Person enters in a link.
+	 * @param enter
+	 *            - the event, that a Person enters in a link.
 	 * @return a real LinkEnterEvent-event.
 	 */
 	public LinkEnterEvent rebuildEventLinkEnter(LinkEnterEvent enter) {
 		// very important to rebuild LinkEventData Object: event, aim to get
 		// the id and the length of the right link
-		enter.setPerson(this.plans.getPerson(new IdImpl(enter.getPersonId().toString())));
+		enter.setPerson(this.plans.getPersons().get(
+				(new IdImpl(enter.getPersonId().toString()))));
 		enter.setLink(network.getLink(enter.getLinkId().toString()));
 		return enter;
 	}
