@@ -30,6 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReaderMatsimV1;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.matrices.Matrices;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
@@ -72,7 +73,7 @@ public abstract class Gbl {
 
 		if ((args != null) && (args.length == 1)) {
 			log.info("Input config file: " + args[0]);
-			ConfigReaderMatsimV1 reader = new ConfigReaderMatsimV1(Gbl.config);
+			MatsimConfigReader reader = new MatsimConfigReader(Gbl.config);
 			try {
 				reader.parse(args[0]);
 			} catch (SAXException e) {
