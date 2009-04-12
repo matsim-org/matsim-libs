@@ -133,7 +133,7 @@ public class Utils {
 	 * @param homeCoord
 	 */
 	public static void makeHomePlan( Plan plan, Coord homeCoord ) {
-		plan.createAct(ACT_HOME, homeCoord) ;
+		plan.createActivity(ACT_HOME, homeCoord) ;
 	}
 
 	public static void makeHomePlan( BasicPopulationBuilder pb, BasicPlan plan, Coord homeCoord ) {
@@ -153,11 +153,11 @@ public class Utils {
 		Coord homeCoord = act.getCoord();
 
 		plan.createLeg(TransportMode.car);
-		act = plan.createAct(ACT_WORK, workCoord ) ;
+		act = plan.createActivity(ACT_WORK, workCoord ) ;
 		act.setDuration( 8.*3600. ) ;
 
 		plan.createLeg(TransportMode.car) ;
-		plan.createAct(ACT_HOME, homeCoord ) ;				
+		plan.createActivity(ACT_HOME, homeCoord ) ;				
 	}
 
 }

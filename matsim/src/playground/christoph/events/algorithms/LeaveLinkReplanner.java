@@ -192,13 +192,13 @@ public class LeaveLinkReplanner {
 		person.setSelectedPlan(newPlan);
 			
 		// here we are at the moment
-		newPlan.addAct(newFromAct);
+		newPlan.addActivity(newFromAct);
 		
 		// Route from the current position to the next destination.
 		newPlan.addLeg(newLeg);
 		
 		// next Activity
-		newPlan.addAct(nextAct);
+		newPlan.addActivity(nextAct);
 
 		/*
 		 *  If it's a PersonPlansCalcRoute Object -> set the current Person.

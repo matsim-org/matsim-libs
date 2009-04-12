@@ -88,14 +88,14 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 	private Plan getBeeline(final Plan plan) {
 		Plan beeline = new PlanImpl(plan.getPerson());
 		ActIterator it = plan.getIteratorAct();
-		beeline.addAct(it.next());
+		beeline.addActivity(it.next());
 		while (it.hasNext()) {
 			Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);
 			beeline.addLeg(leg);
-			beeline.addAct(it.next());
+			beeline.addActivity(it.next());
 		}
 		this.router.run(beeline);
 		return beeline;

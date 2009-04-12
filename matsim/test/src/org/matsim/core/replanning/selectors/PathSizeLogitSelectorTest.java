@@ -91,9 +91,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		srcRoute.add(n3);
 		r.setNodes(l6, srcRoute, l7);
 		leg.setRoute(r);
-		p1.addAct(a);
+		p1.addActivity(a);
 		p1.addLeg(leg);
-		p1.addAct(b);
+		p1.addActivity(b);
 		p1.setScore(-10.0);
 		person.addPlan(p1);
 
@@ -114,9 +114,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		srcRoute.add(n3);
 		r.setNodes(l6, srcRoute, l7);
 		leg.setRoute(r);
-		p2.addAct(a);
+		p2.addActivity(a);
 		p2.addLeg(leg);
-		p2.addAct(b);
+		p2.addActivity(b);
 		p2.setScore(-10.0);
 		person.addPlan(p2);
 
@@ -135,9 +135,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		srcRoute.add(n3);
 		r.setNodes(l6, srcRoute, l7);
 		leg.setRoute(r);
-		p3.addAct(a);
+		p3.addActivity(a);
 		p3.addLeg(leg);
-		p3.addAct(b);
+		p3.addActivity(b);
 		p3.setScore(-10.0);
 		person.addPlan(p3);
 		assertNotNull(selector.selectPlan(person));
@@ -161,9 +161,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		srcRoute.add(n3);
 		r.setNodes(l6, srcRoute, l7);
 		leg.setRoute(r);
-		p1.addAct(a);
+		p1.addActivity(a);
 		p1.addLeg(leg);
-		p1.addAct(b);
+		p1.addActivity(b);
 		p1.setScore(Double.NEGATIVE_INFINITY);
 		person.addPlan(p1);		
 		assertNotNull(selector.selectPlan(person));
@@ -195,9 +195,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		srcRoute.add(n3);
 		r.setNodes(l6, srcRoute, l7);
 		leg.setRoute(r);
-		p1.addAct(a);
+		p1.addActivity(a);
 		p1.addLeg(leg);
-		p1.addAct(b);
+		p1.addActivity(b);
 		p1.setScore(0.0);
 		person.addPlan(p1);
 		
@@ -229,9 +229,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		srcRoute.add(n3);
 		r.setNodes(l6, srcRoute, l7);
 		leg.setRoute(r);
-		p1.addAct(a);
+		p1.addActivity(a);
 		p1.addLeg(leg);
-		p1.addAct(b);
+		p1.addActivity(b);
 		p1.setScore(-10.0);
 		person.addPlan(p1);
 	
@@ -249,9 +249,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		srcRoute.add(n3);
 		r.setNodes(l6, srcRoute, l7);
 		leg.setRoute(r);
-		p2.addAct(a);
+		p2.addActivity(a);
 		p2.addLeg(leg);
-		p2.addAct(b);
+		p2.addActivity(b);
 		p2.setScore(-10.0);
 		person.addPlan(p2);
 		
@@ -270,9 +270,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		srcRoute.add(n3);
 		r.setNodes(l6, srcRoute, l7);
 		leg.setRoute(r);
-		p3.addAct(a);
+		p3.addActivity(a);
 		p3.addLeg(leg);
-		p3.addAct(b);
+		p3.addActivity(b);
 		p3.setScore(-10.0);
 		person.addPlan(p3);
 

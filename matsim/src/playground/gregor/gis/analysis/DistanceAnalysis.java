@@ -236,13 +236,13 @@ public class DistanceAnalysis {
 			dist[0] +=  l1;
 			dist[2] += person.getSelectedPlan().getScoreAsPrimitiveType();
 			Plan plan = new org.matsim.core.population.PlanImpl(person);
-			plan.addAct(person.getSelectedPlan().getFirstActivity());
+			plan.addActivity(person.getSelectedPlan().getFirstActivity());
 			Leg ll = new org.matsim.core.population.LegImpl(TransportMode.car);
 			ll.setArrivalTime(0.0);
 			ll.setDepartureTime(0.0);
 			ll.setTravelTime(0.0);
 			plan.addLeg(ll);
-			plan.addAct(person.getSelectedPlan().getNextActivity(leg));
+			plan.addActivity(person.getSelectedPlan().getNextActivity(leg));
 			this.router.run(plan);
 			Leg leg2 = plan.getNextLeg(plan.getFirstActivity());
 			double l2 = leg2.getRoute().getDistance();

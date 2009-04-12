@@ -177,12 +177,12 @@ public class Fixture {
 		Person person = new PersonImpl(new IdImpl(personId));
 		Plan plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
-		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
+		plan.createActivity("h", homeLink).setEndTime(Time.parseTime(startTime));
 		Leg leg = plan.createLeg(TransportMode.car);//"car", startTime, "00:01", null);
 		NetworkRoute route = new NodeNetworkRoute(homeLink, workLink);
 		route.setNodes(homeLink, routeNodes, workLink);
 		leg.setRoute(route);
-		plan.createAct("w", workLink);//, null, "24:00", null, "yes");
+		plan.createActivity("w", workLink);//, null, "24:00", null, "yes");
 		return person;
 	}
 
@@ -190,11 +190,11 @@ public class Fixture {
 		Person person = new PersonImpl(new IdImpl(personId));
 		Plan plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
-		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
+		plan.createActivity("h", homeLink).setEndTime(Time.parseTime(startTime));
 		plan.createLeg(TransportMode.car);
-		plan.createAct("w", workLink).setEndTime(16.0 * 3600);
+		plan.createActivity("w", workLink).setEndTime(16.0 * 3600);
 		plan.createLeg(TransportMode.car);
-		plan.createAct("h", finishLink);
+		plan.createActivity("h", finishLink);
 		return person;
 	}
 

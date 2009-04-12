@@ -227,7 +227,7 @@ public class PlansCreateFromMZ {
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
-					Activity act = plan.createAct(acttype,to);
+					Activity act = plan.createActivity(acttype,to);
 					act.setStartTime(arrival);
 
 					// coordinate consistency check
@@ -237,7 +237,7 @@ public class PlansCreateFromMZ {
 					}
 				}
 				else {
-					Activity homeAct = plan.createAct(HOME,from);
+					Activity homeAct = plan.createActivity(HOME,from);
 					homeAct.setEndTime(departure);
 					Leg leg = plan.createLeg(mode);
 					leg.setDepartureTime(departure);
@@ -247,7 +247,7 @@ public class PlansCreateFromMZ {
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
-					Activity act = plan.createAct(acttype,to);
+					Activity act = plan.createActivity(acttype,to);
 					act.setStartTime(arrival);
 				}
 			}
@@ -365,7 +365,7 @@ public class PlansCreateFromMZ {
 			Plan plan2 = new org.matsim.core.population.PlanImpl(p);
 			plan2.setSelected(true);
 			plan2.setScore(plan.getScoreAsPrimitiveType());
-			plan2.addAct((Activity)plan.getPlanElements().get(0));
+			plan2.addActivity((Activity)plan.getPlanElements().get(0));
 
 			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
 				Activity prev_act = (Activity)plan.getPlanElements().get(i-2);
@@ -405,7 +405,7 @@ public class PlansCreateFromMZ {
 				}
 				else {
 					plan2.addLeg(leg);
-					plan2.addAct(curr_act);
+					plan2.addActivity(curr_act);
 				}
 			}
 			if (has_changed) { cnt_p++; }

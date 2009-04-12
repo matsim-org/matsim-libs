@@ -122,7 +122,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 				act.setType("e");
 			} else {
 				// nothing we're interested in, remove
-				plan.removeAct(i);
+				plan.removeActivity(i);
 				i -= 2;
 			}
 		}
@@ -137,7 +137,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 	private void shortenPlan(final Plan plan) {
 		List<?> actsLegs = plan.getPlanElements();
 		while (actsLegs.size() > 5) {
-			plan.removeAct(4);
+			plan.removeActivity(4);
 		}
 	}
 

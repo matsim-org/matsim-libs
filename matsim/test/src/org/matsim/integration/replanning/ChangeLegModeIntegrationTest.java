@@ -66,11 +66,11 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		Person person = new PersonImpl(new IdImpl(1));
 		population.addPerson(person);
 		Plan plan = person.createPlan(true);
-		Activity act = plan.createAct("home", new CoordImpl(0, 0));
+		Activity act = plan.createActivity("home", new CoordImpl(0, 0));
 		act.setLink(link);
 		act.setEndTime(8.0 * 3600);
 		plan.createLeg(TransportMode.car);
-		act = plan.createAct("work", new CoordImpl(0, 500));
+		act = plan.createActivity("work", new CoordImpl(0, 500));
 		act.setLink(link);
 
 		// setup strategy manager and load from config

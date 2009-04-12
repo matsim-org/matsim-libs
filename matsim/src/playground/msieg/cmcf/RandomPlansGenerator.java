@@ -153,7 +153,7 @@ public class RandomPlansGenerator {
 			Coord homeCoord = lHome.getCoord(), workCoord = lWork.getCoord();
 
 			//create home act
-			Activity a = plan.createAct("h", homeCoord);
+			Activity a = plan.createActivity("h", homeCoord);
 			a.setLink(lHome);
 			a.setStartTime(startTime);
 			a.setEndTime(endTime);
@@ -166,7 +166,7 @@ public class RandomPlansGenerator {
 			leg.setRoute(route);
 
 			//create work act
-			a = plan.createAct("h", workCoord);
+			a = plan.createActivity("h", workCoord);
 			a.setLink(lWork);
 			a.setDuration(this.workDuration);
 

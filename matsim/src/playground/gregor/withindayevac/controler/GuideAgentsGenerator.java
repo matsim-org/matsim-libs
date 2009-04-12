@@ -64,9 +64,9 @@ public class GuideAgentsGenerator {
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);
 			Activity actB = new org.matsim.core.population.ActivityImpl("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
-			plan.addAct(actA);
+			plan.addActivity(actA);
 			plan.addLeg(leg);
-			plan.addAct(actB);
+			plan.addActivity(actB);
 			router.run(plan);
 			p.addPlan(plan);
 			try {

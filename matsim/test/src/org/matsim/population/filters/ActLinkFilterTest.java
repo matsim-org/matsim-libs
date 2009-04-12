@@ -65,7 +65,7 @@ public class ActLinkFilterTest extends MatsimTestCase {
 				linkId = "2";
 				actType = NINETEEN_HOUR_HOME_ACT_TYPE;
 			}
-			plan.createAct(actType, network.getLink(linkId));
+			plan.createActivity(actType, network.getLink(linkId));
 			persons.put(personId, person);
 		}
 

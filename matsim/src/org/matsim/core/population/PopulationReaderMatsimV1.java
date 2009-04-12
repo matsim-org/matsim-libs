@@ -189,14 +189,14 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 		Activity act = null;
 		if (atts.getValue("link") != null) {
 			link = this.network.getLink(atts.getValue("link"));
-			act = this.currplan.createAct(atts.getValue("type"), link);
+			act = this.currplan.createActivity(atts.getValue("type"), link);
 			if (atts.getValue("x100") != null && atts.getValue("y100") != null) {
 				coord = new CoordImpl(atts.getValue("x100"), atts.getValue("y100"));
 				act.setCoord(coord);
 			}
 		} else if (atts.getValue("x100") != null && atts.getValue("y100") != null) {
 			coord = new CoordImpl(atts.getValue("x100"), atts.getValue("y100"));
-			act = this.currplan.createAct(atts.getValue("type"), coord);
+			act = this.currplan.createActivity(atts.getValue("type"), coord);
 		} else {
 			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
 		}

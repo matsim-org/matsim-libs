@@ -98,7 +98,7 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 						
 			
 			act.setLink(fac.getLink());
-			plan.addAct(act);
+			plan.addActivity(act);
 			router.run(plan);
 		}
 	}

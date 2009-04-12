@@ -128,7 +128,7 @@ public class Converter {
 					tmpCoord = this.tmpHome;
 				}
 
-				Activity act = pl.createAct(tabs[7], tmpCoord);
+				Activity act = pl.createActivity(tabs[7], tmpCoord);
 				act.setEndTime(convertTime(tabs[3]));
 				act.setDuration(dur);
 
@@ -149,7 +149,7 @@ public class Converter {
 					if (this.tmpTabs[10].equals("H")) {
 						tmpCoord2 = this.tmpHome;
 					}
-					Activity lastAct = tmpPl.createAct(this.tmpTabs[10], tmpCoord2);
+					Activity lastAct = tmpPl.createActivity(this.tmpTabs[10], tmpCoord2);
 
 					// make a copy of the just finished plan and set it to use public transit mode
 					Plan nonCarPlan = new org.matsim.core.population.PlanImpl(p);
@@ -166,7 +166,7 @@ public class Converter {
 				endTime = convertTime(tabs[3]);
 
 				this.tmpHome = getRandomCoordInZone(tabs[9]);
-				Activity homeAct = pl.createAct(tabs[7], this.tmpHome);
+				Activity homeAct = pl.createActivity(tabs[7], this.tmpHome);
 				homeAct.setEndTime(convertTime(tabs[3]));
 				p.addPlan(pl);
 				this.pop.addPerson(p);

@@ -122,27 +122,27 @@ public class MyControler1 extends Controler {
 
 			try {
 				Plan plan1 = new org.matsim.core.population.PlanImpl(p);
-				Activity act1a = plan1.createAct("h", new CoordImpl(100., 100.));
+				Activity act1a = plan1.createActivity("h", new CoordImpl(100., 100.));
 				act1a.setLink(link9);
 				act1a.setEndTime(0*60*60.);
 				Leg leg = plan1.createLeg(TransportMode.car);
 				NetworkRoute route = new NodeNetworkRoute(link9, link15);
 				route.setNodes(link9, NetworkUtils.getNodes(this.network, "3 4"), link15);
 				leg.setRoute(route);
-				Activity act1b = plan1.createAct("h", new CoordImpl(200., 200.));
+				Activity act1b = plan1.createActivity("h", new CoordImpl(200., 200.));
 				act1b.setLink(link15);
 				act1b.setStartTime(8*60*60);
 				p.addPlan(plan1);
 
 				Plan plan2 = new org.matsim.core.population.PlanImpl(p);
-				Activity act2a = plan1.createAct("h", new CoordImpl(100., 100.));
+				Activity act2a = plan1.createActivity("h", new CoordImpl(100., 100.));
 				act2a.setLink(link9);
 				act2a.setEndTime(0*60*60.);
 				Leg leg2 = plan2.createLeg(TransportMode.car);
 				NetworkRoute route2 = new NodeNetworkRoute(link9, link15);
 				route2.setNodes(link9, NetworkUtils.getNodes(this.network, "3 6 4"), link15);
 				leg2.setRoute(route2);
-				Activity act2b = plan1.createAct("h", new CoordImpl(200., 200.));
+				Activity act2b = plan1.createActivity("h", new CoordImpl(200., 200.));
 				act2b.setLink(link15);
 				act2b.setStartTime(8*60*60);
 				p.addPlan(plan2);
@@ -327,13 +327,13 @@ public class MyControler1 extends Controler {
 		Person p = new PersonImpl(new IdImpl(ii));
 		Plan plan = new org.matsim.core.population.PlanImpl(p);
 		try {
-			Activity act1 = plan.createAct("h", new CoordImpl(100., 100.));
+			Activity act1 = plan.createActivity("h", new CoordImpl(100., 100.));
 			act1.setLink(sourceLink);
 			act1.setStartTime(0.);
 			act1.setEndTime(0 * 60 * 60.);
 
 			plan.createLeg(TransportMode.car);
-			Activity act2 = plan.createAct("h", new CoordImpl(200., 200.));
+			Activity act2 = plan.createActivity("h", new CoordImpl(200., 200.));
 			act2.setLink(destLink);
 			act2.setStartTime(8 * 60 * 60);
 

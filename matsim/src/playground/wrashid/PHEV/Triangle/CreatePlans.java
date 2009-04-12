@@ -81,14 +81,14 @@ public class CreatePlans {
 			double depTime=3600*8;
 			double duration=3600*8;
 
-			Activity a = plan.createAct("home",home_facility.getCoord());
+			Activity a = plan.createActivity("home",home_facility.getCoord());
 			a.setLink(home_facility.getLink());
 			a.setEndTime(depTime);
 			Leg l = plan.createLeg(TransportMode.car);
 			l.setArrivalTime(depTime);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTime);
-			a = plan.createAct("work",work_facility.getCoord());
+			a = plan.createActivity("work",work_facility.getCoord());
 			a.setLink(work_facility.getLink());
 			a.setStartTime(depTime);
 			a.setEndTime(depTime+duration);
@@ -97,7 +97,7 @@ public class CreatePlans {
 			l.setArrivalTime(depTime+duration);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTime+duration);
-			a = plan.createAct("home",home_facility.getCoord());
+			a = plan.createActivity("home",home_facility.getCoord());
 			a.setLink(home_facility.getLink());
 			// assign home-work-home activities to each person
 

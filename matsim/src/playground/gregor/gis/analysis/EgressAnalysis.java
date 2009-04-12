@@ -181,13 +181,13 @@ public class EgressAnalysis {
 				Node node = route.get(route.size()-2);
 				this.egressNodes.get(node.getId()).num_current++;
 				Plan plan = new org.matsim.core.population.PlanImpl(person);
-				plan.addAct(person.getSelectedPlan().getFirstActivity());
+				plan.addActivity(person.getSelectedPlan().getFirstActivity());
 				Leg l = new org.matsim.core.population.LegImpl(TransportMode.car);
 				l.setDepartureTime(0.0);
 				l.setTravelTime(0.0);
 				l.setArrivalTime(0.0);
 				plan.addLeg(l);
-				plan.addAct(person.getSelectedPlan().getNextActivity(leg));
+				plan.addActivity(person.getSelectedPlan().getNextActivity(leg));
 				this.router.run(plan);
 				Leg leg2 = plan.getNextLeg(plan.getFirstActivity());
 				List<Node> route2 = ((NetworkRoute) leg2.getRoute()).getNodes();

@@ -237,7 +237,7 @@ public class PopulationReaderKutter implements PopulationReader {
 				l.setTravelTime(travTime);
 				l.setArrivalTime(arrTime);
 				this.currTime = this.currTime + duration;
-				Activity a = this.currPlan.createAct(activity, coord);
+				Activity a = this.currPlan.createActivity(activity, coord);
 				a.setStartTime(arrTime);
 				a.setEndTime(this.currTime);
 				a.setDuration(duration);
@@ -293,7 +293,7 @@ public class PopulationReaderKutter implements PopulationReader {
 			}
 
 
-			Activity a = this.currPlan.createAct("home", this.currHome);
+			Activity a = this.currPlan.createActivity("home", this.currHome);
 			a.setEndTime(duration);
 			this.currTime = (int)duration;
 

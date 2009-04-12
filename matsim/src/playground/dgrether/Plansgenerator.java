@@ -81,7 +81,7 @@ public class Plansgenerator {
 			p.addPlan(plan);
 			//home
 			homeEndtime += 0.5 * 60;
-			Activity a = plan.createAct("h", homeCoord);
+			Activity a = plan.createActivity("h", homeCoord);
 			a.setLink(link1);
 			a.setEndTime(homeEndtime);
 			//leg to work
@@ -90,7 +90,7 @@ public class Plansgenerator {
 			route.setNodes(link1, NetworkUtils.getNodes(networkLayer, "2 4 5"), link20);
 			leg.setRoute(route);
 			//work
-			a = plan.createAct("w", workCoord);
+			a = plan.createActivity("w", workCoord);
 			a.setLink(link20);
 			a.setDuration(2.5 * 3600);
 			//leg to work
@@ -98,7 +98,7 @@ public class Plansgenerator {
 			route = new NodeNetworkRoute(link20, link1);
 			route.setNodes(link20, NetworkUtils.getNodes(networkLayer, "13 14 15 1"), link1);
 			leg.setRoute(route);
-			a = plan.createAct("h", homeCoord);
+			a = plan.createActivity("h", homeCoord);
 			a.setLink(link1);
 
 

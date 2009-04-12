@@ -102,7 +102,7 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 			plan.addLeg(leg);
 
 			Activity actB = new org.matsim.core.population.ActivityImpl("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
-			plan.addAct(actB);
+			plan.addActivity(actB);
 
 			router.run(plan);
 			
@@ -110,9 +110,9 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 			Leg eLeg = getELeg(leg);
 			Activity actEvac = new org.matsim.core.population.ActivityImpl("h",el);
 			
-			plan.removeAct(2);
+			plan.removeActivity(2);
 			plan.addLeg(eLeg);
-			plan.addAct(actEvac);
+			plan.addActivity(actEvac);
 		}
 	}
 

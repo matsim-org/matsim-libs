@@ -92,7 +92,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 		Plan p = person.createPlan(true);
 		try {
 			if ((work==null)&&(educ==null)) {
-				Activity act = p.createAct(home.getType(),home.getFacility().getCoord());
+				Activity act = p.createActivity(home.getType(),home.getFacility().getCoord());
 				act.setStartTime(0);
 				act.setEndTime(24*3600);
 				act.setDuration(24*3600);
@@ -104,7 +104,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				double end_time = 6*3600 + (MatsimRandom.getRandom().nextInt(2*3600));
 				double sum_dur = end_time;
 				int leg_cnt = 0;
-				Activity act = p.createAct(home.getType(),home.getFacility().getCoord());
+				Activity act = p.createActivity(home.getType(),home.getFacility().getCoord());
 				act.setStartTime(start_time);
 				act.setEndTime(end_time);
 				act.setDuration(end_time);
@@ -120,7 +120,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					start_time = end_time;
 					end_time = end_time + 7*3600 + (MatsimRandom.getRandom().nextInt(1*3600));
 					sum_dur = sum_dur + (end_time-start_time);
-					act = p.createAct(work.getType(),work.getFacility().getCoord());
+					act = p.createActivity(work.getType(),work.getFacility().getCoord());
 					act.setStartTime(start_time);
 					act.setEndTime(end_time);
 					act.setDuration(end_time-start_time);
@@ -137,7 +137,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					start_time = end_time;
 					end_time = end_time + 4*3600 + (MatsimRandom.getRandom().nextInt(2*3600));
 					sum_dur = sum_dur + (end_time-start_time);
-					act = p.createAct(educ.getType(),educ.getFacility().getCoord());
+					act = p.createActivity(educ.getType(),educ.getFacility().getCoord());
 					act.setStartTime(start_time);
 					act.setEndTime(end_time);
 					act.setDuration(end_time-start_time);
@@ -151,7 +151,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				start_time = end_time;
 				end_time = 24*3600;
 				sum_dur = sum_dur + (end_time-start_time);
-				act = p.createAct(home.getType(),home.getFacility().getCoord());
+				act = p.createActivity(home.getType(),home.getFacility().getCoord());
 				act.setStartTime(start_time);
 				act.setEndTime(end_time);
 				act.setDuration(end_time-start_time);

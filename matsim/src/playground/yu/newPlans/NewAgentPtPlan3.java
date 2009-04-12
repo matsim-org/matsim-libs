@@ -91,7 +91,7 @@ public class NewAgentPtPlan3 extends NewPopulation implements PersonAlgorithm {
 				for (int i = 0; i < actsLegsSize; i++) {
 					Object o = actsLegs.get(i);
 					if (i % 2 == 0)
-						copyPlan.addAct((Activity) o);
+						copyPlan.addActivity((Activity) o);
 					else {
 						Leg leg = (Leg) o;
 						Leg copyLeg = new org.matsim.core.population.LegImpl(leg);

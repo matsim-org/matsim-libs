@@ -81,7 +81,7 @@ public class NewAgentWalkPlan extends NewPopulation implements PersonAlgorithm {
 					for (int i = 0; i < actsLegs.size(); i++) {
 						Object o = actsLegs.get(i);
 						if (i % 2 == 0) {
-							walkPlan.addAct((Activity) o);
+							walkPlan.addActivity((Activity) o);
 						} else {
 							Leg leg = (Leg) o;
 							// -----------------------------------------------

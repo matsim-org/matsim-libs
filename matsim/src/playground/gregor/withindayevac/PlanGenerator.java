@@ -131,13 +131,13 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 		
 		Activity oldB = pers.getSelectedPlan().getNextActivity(oldLeg);
 		Activity b = new org.matsim.core.population.ActivityImpl(oldB);
-		plan.addAct(a);
+		plan.addActivity(a);
 		NetworkRoute route = new NodeNetworkRoute();
 		route.setNodes(nodes);
 		route.getDistance();
 		l.setRoute(route);
 		plan.addLeg(l);
-		plan.addAct(b);
+		plan.addActivity(b);
 		plan.setScore(Plan.UNDEF_SCORE);
 		
 		pers.removeWorstPlans(Gbl.getConfig().strategy().getMaxAgentPlanMemorySize()-1);

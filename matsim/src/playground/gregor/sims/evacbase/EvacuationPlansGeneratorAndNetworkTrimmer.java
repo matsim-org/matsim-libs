@@ -123,7 +123,7 @@ public class EvacuationPlansGeneratorAndNetworkTrimmer {
 			leg.setArrivalTime(0.0);
 			plan.addLeg(leg);
 
-			plan.addAct(new org.matsim.core.population.ActivityImpl("h", saveCoord, saveLink));
+			plan.addActivity(new org.matsim.core.population.ActivityImpl("h", saveCoord, saveLink));
 
 			router.run(plan);
 		}

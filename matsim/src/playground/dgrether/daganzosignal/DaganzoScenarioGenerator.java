@@ -186,7 +186,7 @@ public class DaganzoScenarioGenerator {
 			
 			Activity act1 = builder.createActivityFromLinkId("h", l1.getId());
 			act1.setEndTime(homeEndTime);
-			plan.addAct(act1);
+			plan.addActivity(act1);
 			//leg to home
 			Leg leg = builder.createLeg(TransportMode.car);
 			//TODO check this

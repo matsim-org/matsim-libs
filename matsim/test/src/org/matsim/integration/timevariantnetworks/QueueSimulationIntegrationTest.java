@@ -199,7 +199,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		for(int i = 0; i < count; i++) {
 			Person person = new PersonImpl(new IdImpl(i + (int)departureTime));
 			Plan plan1 = person.createPlan(true);
-			Activity a1 = plan1.createAct("h", depLink);
+			Activity a1 = plan1.createActivity("h", depLink);
 			a1.setEndTime(departureTime);
 			Leg leg1 = plan1.createLeg(TransportMode.car);
 			leg1.setDepartureTime(departureTime);
@@ -207,7 +207,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, depLink, destLink);
 			route.setNodes(depLink, NetworkUtils.getNodes(network, "2 3"), destLink);
 			leg1.setRoute(route);
-			plan1.createAct("w", destLink);
+			plan1.createActivity("w", destLink);
 
 			persons.add(person);
 			departureTime++;

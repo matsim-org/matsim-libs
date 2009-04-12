@@ -184,7 +184,7 @@ public class CMCFScenarioGeneratorNoReroute {
 			p.addPlan(plan);
 			// home % 2
 			homeEndTime = homeEndTime + firstHomeEndTime + ((i - 1) % 2);
-			Activity act1 = plan.createAct("h", l1.getCoord());
+			Activity act1 = plan.createActivity("h", l1.getCoord());
 			act1.setLink(l1);
 			act1.setEndTime(homeEndTime);
 			// leg to home
@@ -197,7 +197,7 @@ public class CMCFScenarioGeneratorNoReroute {
 				route.setNodes(l1, NetworkUtils.getNodes(this.network, "2 3 4 5 6"), l6);
 			}
 			leg.setRoute(route);
-			Activity act2 = plan.createAct("h", l6.getCoord());
+			Activity act2 = plan.createActivity("h", l6.getCoord());
 			act2.setLink(l6);
 			this.plans.addPerson(p);
 		}

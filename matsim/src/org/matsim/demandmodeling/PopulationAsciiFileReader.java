@@ -113,17 +113,17 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 			Coord primaryCoord = WorldUtils.getRandomCoordInZone(primaryZone, this.zoneLayer);
 			double homeEndTime = SIXOCLOCK + MatsimRandom.getRandom().nextDouble() * TWOHOURS;
 
-			Activity act1 = plan.createAct(ACTTYPE_HOME, homeCoord);
+			Activity act1 = plan.createActivity(ACTTYPE_HOME, homeCoord);
 			act1.setEndTime(homeEndTime);
 
 			plan.createLeg(TransportMode.car);
 
-			Activity act2 = plan.createAct(row[5], primaryCoord);
+			Activity act2 = plan.createActivity(row[5], primaryCoord);
 			act2.setDuration(WORKDURATION);
 
 			plan.createLeg(TransportMode.car);
 
-			/*Act act3 = */plan.createAct(ACTTYPE_HOME, homeCoord);
+			/*Act act3 = */plan.createActivity(ACTTYPE_HOME, homeCoord);
 			this.plans.addPerson(p);
 		}
 	}

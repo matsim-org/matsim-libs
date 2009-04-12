@@ -122,13 +122,13 @@ public class QueueLinkTest extends MatsimTestCase {
 		Person p = new PersonImpl(new IdImpl("1"));
 		Plan plan = p.createPlan(true);
 		try {
-			plan.createAct("h", link1);
+			plan.createActivity("h", link1);
 			Leg leg = plan.createLeg(TransportMode.car);
 			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link2);
 			leg.setRoute(route);
 			route.setLinks(link1, null, link2);
 			leg.setRoute(route);
-			plan.createAct("w", link2);
+			plan.createActivity("w", link2);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

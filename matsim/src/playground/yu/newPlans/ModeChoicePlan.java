@@ -70,7 +70,7 @@ public class ModeChoicePlan extends NewPopulation {
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);
 				if (i % 2 == 0) {
-					cp.addAct((Activity) o);
+					cp.addActivity((Activity) o);
 				} else {
 					Leg cl = new org.matsim.core.population.LegImpl((Leg) o);
 					cl.setMode(
@@ -88,7 +88,7 @@ public class ModeChoicePlan extends NewPopulation {
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);
 				if (i % 2 == 0) {
-					cp.addAct((Activity) o);
+					cp.addActivity((Activity) o);
 				} else {
 					Leg cl = new org.matsim.core.population.LegImpl((Leg) o);
 					cl.setMode(

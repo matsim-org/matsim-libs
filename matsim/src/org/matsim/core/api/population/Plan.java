@@ -24,13 +24,13 @@ public interface Plan extends BasicPlan<PlanElement> {
 	@Deprecated
 	public static final double UNDEF_SCORE = Double.NaN;
 
-	public Activity createAct(final String type, final Coord coord) throws IllegalStateException;
+	public Activity createActivity(final String type, final Coord coord);
 
-	public Activity createAct(final String type, final Facility fac) throws IllegalStateException;
+	public Activity createActivity(final String type, final Facility fac);
 
-	public Activity createAct(final String type, final Link link) throws IllegalStateException;
+	public Activity createActivity(final String type, final Link link);
 
-	public Leg createLeg(final TransportMode mode) throws IllegalStateException;
+	public Leg createLeg(final TransportMode mode);
 
 	/**
 	 * Removes the specified act from the plan as well as a leg according to the following rule:
@@ -42,7 +42,7 @@ public interface Plan extends BasicPlan<PlanElement> {
 	 *
 	 * @param index
 	 */
-	public void removeAct(final int index);
+	public void removeActivity(final int index);
 
 	/**
 	 * Removes the specified leg <b>and</b> the following act, too! If the following act is not the last one,

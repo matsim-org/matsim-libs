@@ -710,9 +710,9 @@ public class Flow {
 						Id matsimid  = new IdImpl(stringid);
 						Person p = new PersonImpl(matsimid);
 						Plan plan = new org.matsim.core.population.PlanImpl(p);
-						plan.addAct(home);
+						plan.addActivity(home);
 						plan.addLeg(leg);					
-						plan.addAct(work);
+						plan.addActivity(work);
 						p.addPlan(plan);
 						result.addPerson(p);
 						id++;

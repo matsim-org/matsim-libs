@@ -64,13 +64,13 @@ public class QueueSimulationTest extends MatsimTestCase {
 		// add a single person with leg from link1 to link3
 		Person person = new PersonImpl(new IdImpl(0));
 		Plan plan = person.createPlan(true);
-		Activity a1 = plan.createAct("h", f.link1);
+		Activity a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600);
 		Leg leg = plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
-		plan.createAct("w", f.link3);
+		plan.createActivity("w", f.link3);
 		f.plans.addPerson(person);
 
 		/* build events */
@@ -101,13 +101,13 @@ public class QueueSimulationTest extends MatsimTestCase {
 		for (int i = 0; i < 2; i++) {
 			Person person = new PersonImpl(new IdImpl(i));
 			Plan plan = person.createPlan(true);
-			Activity a1 = plan.createAct("h", f.link1);
+			Activity a1 = plan.createActivity("h", f.link1);
 			a1.setEndTime((6+i)*3600);
 			Leg leg = plan.createLeg(TransportMode.car);
 			NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 			route.setNodes(f.link1, f.nodes23, f.link3);
 			leg.setRoute(route);
-			plan.createAct("w", f.link3);
+			plan.createActivity("w", f.link3);
 			f.plans.addPerson(person);
 		}
 
@@ -151,7 +151,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		
 		Person person = new PersonImpl(new IdImpl(1));
 		Plan plan = person.createPlan(true);
-		Activity act = plan.createAct("home", f.link1);
+		Activity act = plan.createActivity("home", f.link1);
 		f.plans.addPerson(person);
 		
 		/* build events */
@@ -179,13 +179,13 @@ public class QueueSimulationTest extends MatsimTestCase {
 		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
 		Person person = new PersonImpl(new IdImpl(0));
 		Plan plan = person.createPlan(true);
-		Activity a1 = plan.createAct("h", f.link1);
+		Activity a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600 - 500);
 		Leg leg = plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
-		plan.createAct("w", f.link3);
+		plan.createActivity("w", f.link3);
 		f.plans.addPerson(person);
 
 		// add a lot of other persons with legs from link1 to link3, starting at 6:30
@@ -202,13 +202,13 @@ public class QueueSimulationTest extends MatsimTestCase {
 			 * to start 1 + 100 + 1 = 102 secs earlier.
 			 * So, the start time is 7*3600 - 1800 - 102 = 7*3600 - 1902
 			 */
-			Activity a = plan.createAct("h", f.link1);
+			Activity a = plan.createActivity("h", f.link1);
 			a.setEndTime(7*3600 - 1902);
 			leg = plan.createLeg(TransportMode.car);
 			route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 			route.setNodes(f.link1, f.nodes23, f.link3);
 			leg.setRoute(route);
-			plan.createAct("w", f.link3);
+			plan.createActivity("w", f.link3);
 			f.plans.addPerson(person);
 		}
 
@@ -246,26 +246,26 @@ public class QueueSimulationTest extends MatsimTestCase {
 		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
 		Person person = new PersonImpl(new IdImpl(0));
 		Plan plan = person.createPlan(true);
-		Activity a1 = plan.createAct("h", f.link1);
+		Activity a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600 - 500);
 		Leg leg = plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
-		plan.createAct("w", f.link3);
+		plan.createActivity("w", f.link3);
 		f.plans.addPerson(person);
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 10000; i++) {
 			person = new PersonImpl(new IdImpl(i));
 			plan = person.createPlan(true);
-			Activity a2 = plan.createAct("h", f.link2);
+			Activity a2 = plan.createActivity("h", f.link2);
 			a2.setEndTime(7*3600 - 1801);
 			leg = plan.createLeg(TransportMode.car);
 			route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2, f.link3);
 			route.setNodes(f.link2, f.nodes3, f.link3);
 			leg.setRoute(route);
-			plan.createAct("w", f.link3);
+			plan.createActivity("w", f.link3);
 			f.plans.addPerson(person);
 		}
 
@@ -302,39 +302,39 @@ public class QueueSimulationTest extends MatsimTestCase {
 		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
 		Person person = new PersonImpl(new IdImpl(0));
 		Plan plan = person.createPlan(true);
-		Activity a1 = plan.createAct("h", f.link1);
+		Activity a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600 - 500);
 		Leg leg = plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
-		plan.createAct("w", f.link3);
+		plan.createActivity("w", f.link3);
 		f.plans.addPerson(person);
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 5000; i++) {
 			person = new PersonImpl(new IdImpl(i));
 			plan = person.createPlan(true);
-			Activity a2 = plan.createAct("h", f.link2);
+			Activity a2 = plan.createActivity("h", f.link2);
 			a2.setEndTime(7*3600 - 1801);
 			leg = plan.createLeg(TransportMode.car);
 			route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2, f.link3);
 			route.setNodes(f.link2, f.nodes3, f.link3);
 			leg.setRoute(route);
-			plan.createAct("w", f.link3);
+			plan.createActivity("w", f.link3);
 			f.plans.addPerson(person);
 		}
 		// add a lot of persons with legs from link1 to link3
 		for (int i = 5001; i <= 10000; i++) {
 			person = new PersonImpl(new IdImpl(i));
 			plan = person.createPlan(true);
-			Activity a2 = plan.createAct("h", f.link1);
+			Activity a2 = plan.createActivity("h", f.link1);
 			a2.setEndTime(7*3600 - 1902);
 			leg = plan.createLeg(TransportMode.car);
 			route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2, f.link3);
 			route.setNodes(f.link1, f.nodes23, f.link3);
 			leg.setRoute(route);
-			plan.createAct("w", f.link3);
+			plan.createActivity("w", f.link3);
 			f.plans.addPerson(person);
 		}
 
@@ -461,19 +461,19 @@ public class QueueSimulationTest extends MatsimTestCase {
 		// create a person with a car-leg from link1 to link5, but an incomplete route
 		Person person = new PersonImpl(new IdImpl(0));
 		Plan plan = person.createPlan(true);
-		Activity a1 = plan.createAct("h", f.link1);
+		Activity a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(8*3600);
 		Leg leg = plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, link5);
 		route.setLinks(f.network.getLink(new IdImpl(startLinkId)), NetworkUtils.getLinks(f.network, linkIds), f.network.getLink(new IdImpl(endLinkId)));
 		leg.setRoute(route);
-		Activity a2 = plan.createAct("w", link5);
+		Activity a2 = plan.createActivity("w", link5);
 		a2.setEndTime(9*3600);
 		leg = plan.createLeg(TransportMode.car);
 		route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, link5, link6);
 		route.setLinks(link5, null, link6);
 		leg.setRoute(route);
-		plan.createAct("h", link6);
+		plan.createActivity("h", link6);
 		f.plans.addPerson(person);
 
 		/* run sim with special logger */		

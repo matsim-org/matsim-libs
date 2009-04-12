@@ -44,7 +44,7 @@ public class FacilityVisitorsTest extends MatsimTestCase {
 		final Link link = network.createLink(new IdImpl("1"), network.createNode(new IdImpl("1"), new CoordImpl(0, 0)), network.createNode(new IdImpl("2"), new CoordImpl(100, 0)), 100, 100, 3600, 1);
 		final Person person = new PersonImpl(new IdImpl("1"));
 		final Plan plan = person.createPlan(true);
-		final Activity workAct = plan.createAct("work", facility);
+		final Activity workAct = plan.createActivity("work", facility);
 
 		final FacilityVisitors facVis = new FacilityVisitors();
 		assertEquals("there should be no visitors yet.", 0, facVis.getVisitors(facility, "work").size());
@@ -60,7 +60,7 @@ public class FacilityVisitorsTest extends MatsimTestCase {
 		final Link link = network.createLink(new IdImpl("1"), network.createNode(new IdImpl("1"), new CoordImpl(0, 0)), network.createNode(new IdImpl("2"), new CoordImpl(100, 0)), 100, 100, 3600, 1);
 		final Person person = new PersonImpl(new IdImpl("1"));
 		final Plan plan = person.createPlan(true);
-		final Activity workAct = plan.createAct("work", facility);
+		final Activity workAct = plan.createActivity("work", facility);
 
 		final FacilityVisitors facVis = new FacilityVisitors();
 		facVis.handleEvent(new ActStartEvent(7.0*3600, person, link, workAct));
@@ -78,7 +78,7 @@ public class FacilityVisitorsTest extends MatsimTestCase {
 		final Link link = network.createLink(new IdImpl("1"), network.createNode(new IdImpl("1"), new CoordImpl(0, 0)), network.createNode(new IdImpl("2"), new CoordImpl(100, 0)), 100, 100, 3600, 1);
 		final Person person = new PersonImpl(new IdImpl("1"));
 		final Plan plan = person.createPlan(true);
-		final Activity workAct = plan.createAct("work", facility);
+		final Activity workAct = plan.createActivity("work", facility);
 
 		final FacilityVisitors facVis = new FacilityVisitors();
 		assertEquals("there should be no visitors yet.", 0, facVis.getVisitors(facility, "work").size());

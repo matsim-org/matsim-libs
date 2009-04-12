@@ -112,7 +112,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 			assertNotNull(activity);
 			assertEquals(0, plan.getPlanElements().size());
 			//this should be called addActivity
-			plan.addAct(activity);
+			plan.addActivity(activity);
 			assertEquals(1, plan.getPlanElements().size());
 			activity.setEndTime(homeEndTime);
 			
@@ -131,7 +131,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 			assertNotNull(activity);
 			activity.setEndTime(workEndTime);
 			assertEquals(2, plan.getPlanElements().size());
-			plan.addAct(activity);
+			plan.addActivity(activity);
 			assertEquals(3, plan.getPlanElements().size());
 			
 			leg = builder.createLeg(TransportMode.car);
@@ -148,7 +148,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 			activity = builder.createActivityFromLinkId("h", ids.get(0));
 			assertNotNull(activity);
 			assertEquals(4, plan.getPlanElements().size());
-			plan.addAct(activity);
+			plan.addActivity(activity);
 			assertEquals(5, plan.getPlanElements().size());
 			
 		}

@@ -54,14 +54,14 @@ public class PlanImpl implements Plan {
 		this.delegate = new BasicPlanImpl(person);
 	}
 
-	public final Activity createAct(final String type, final Coord coord) throws IllegalStateException {
+	public final Activity createActivity(final String type, final Coord coord) {
 		verifyCreateAct(Time.UNDEFINED_TIME);
 		Activity a = new ActivityImpl(type, coord);
 		getPlanElements().add(a);
 		return a;
 	}
 
-	public final Activity createAct(final String type, final Facility fac) throws IllegalStateException {
+	public final Activity createActivity(final String type, final Facility fac) {
 		verifyCreateAct(Time.UNDEFINED_TIME);
 		Activity a = new ActivityImpl(type, fac);
 		getPlanElements().add(a);
@@ -69,7 +69,7 @@ public class PlanImpl implements Plan {
 	}
 
 
-	public final Activity createAct(final String type, final Link link) throws IllegalStateException {
+	public final Activity createActivity(final String type, final Link link) {
 		verifyCreateAct(Time.UNDEFINED_TIME);
 		Activity a = new ActivityImpl(type, link);
 		getPlanElements().add(a);
@@ -80,7 +80,7 @@ public class PlanImpl implements Plan {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public Leg createLeg(final TransportMode mode) throws IllegalStateException {
+	public Leg createLeg(final TransportMode mode) {
 		verifyCreateLeg();
 		Leg leg = new LegImpl(mode);
 		// Override leg number with an appropriate value
@@ -122,7 +122,7 @@ public class PlanImpl implements Plan {
 	 *
 	 * @param index
 	 */
-	public final void removeAct(final int index) {
+	public final void removeActivity(final int index) {
 		if ((index % 2 != 0) || (index < 0) || (index > getPlanElements().size()-1)) {
 			log.warn(this + "[index=" + index +" is wrong. nothing removed]");
 		}
@@ -327,8 +327,8 @@ public class PlanImpl implements Plan {
 		return getScore().doubleValue();
 	}
 
-	public void addAct(BasicActivity act) {
-		delegate.addAct(act);
+	public void addActivity(BasicActivity act) {
+		delegate.addActivity(act);
 	}
 
 	public void addLeg(BasicLeg leg) {

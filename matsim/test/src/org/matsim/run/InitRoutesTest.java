@@ -66,10 +66,10 @@ public class InitRoutesTest extends MatsimTestCase {
 		Person person = new PersonImpl(new IdImpl("1"));
 		population.addPerson(person);
 		Plan plan = person.createPlan(true);
-		Activity a1 = plan.createAct("h", network.getLink(new IdImpl("1")));
+		Activity a1 = plan.createActivity("h", network.getLink(new IdImpl("1")));
 		a1.setEndTime(3600);
 		plan.createLeg(TransportMode.car);
-		plan.createAct("w", network.getLink(new IdImpl("20")));
+		plan.createActivity("w", network.getLink(new IdImpl("20")));
 
 		// write person to file
 		new PopulationWriter(population, PLANS_FILE_TESTINPUT, "v4").write();

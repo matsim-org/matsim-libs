@@ -47,7 +47,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		int time = 7*3600 + (MatsimRandom.getRandom().nextInt(2*3600));
 
 		// first act (= home)
-		Activity a = p.createAct("home", home_facility.getCoord());
+		Activity a = p.createActivity("home", home_facility.getCoord());
 		a.setLink(home_facility.getLink());
 		a.setStartTime(0.0);
 		a.setDuration(time);
@@ -66,7 +66,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 			int act_index = MatsimRandom.getRandom().nextInt(acts.size());
 			ActivityOption act = acts.get(act_index);
 			Facility f = act.getFacility();
-			a = p.createAct(act.getType(),f.getCoord());
+			a = p.createActivity(act.getType(),f.getCoord());
 			a.setLink(f.getLink());
 			a.setStartTime(time);
 			a.setDuration(dur);
@@ -80,7 +80,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		}
 
 		// last act (= home)
-		a = p.createAct("home",home_facility.getCoord());
+		a = p.createActivity("home",home_facility.getCoord());
 		a.setLink(home_facility.getLink());
 		a.setStartTime(time);
 		a.setEndTime(24*3600);

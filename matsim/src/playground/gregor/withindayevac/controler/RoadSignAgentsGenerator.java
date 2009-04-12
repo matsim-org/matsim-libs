@@ -65,9 +65,9 @@ public class RoadSignAgentsGenerator {
 				leg.setTravelTime(0.0);
 				leg.setArrivalTime(0.0);
 				Activity actB = new org.matsim.core.population.ActivityImpl("h",dest.getCoord(), dest);
-				plan.addAct(actA);
+				plan.addActivity(actA);
 				plan.addLeg(leg);
-				plan.addAct(actB);
+				plan.addActivity(actB);
 				router.run(plan);
 		
 //				plan.setScore(-144.0);

@@ -52,13 +52,13 @@ public class PersonRemoveCertainActs extends AbstractPersonAlgorithm {
 					String act_type = act.getType();
 
 					if (!(act_type.equals("work1") || act_type.equals("work2") || act_type.equals("work3"))) {
-						plan.removeAct(jj);
+						plan.removeActivity(jj);
 					}
 				}
 			}
 
 			if (plan.getPlanElements().size() == 3) {
-				plan.removeAct(2); // new method! See Plan.java.
+				plan.removeActivity(2); // new method! See Plan.java.
 			}
 		}
 	}

@@ -217,7 +217,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 			if (i == chain.size()-1) {
 				int start_time = time_sum;
 				try {
-					Activity a = plan.createAct(type, new CoordImpl(0.0,0.0));
+					Activity a = plan.createActivity(type, new CoordImpl(0.0,0.0));
 					a.setStartTime(start_time);
 				}
 				catch (Exception e) { Gbl.errorMsg(e); }
@@ -228,7 +228,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 				time_sum += dur;
 				int end_time = time_sum;
 				try {
-					Activity a = plan.createAct(type, new CoordImpl(0.0,0.0));
+					Activity a = plan.createActivity(type, new CoordImpl(0.0,0.0));
 					a.setStartTime(start_time);
 					a.setEndTime(end_time);
 					a.setDuration(dur);

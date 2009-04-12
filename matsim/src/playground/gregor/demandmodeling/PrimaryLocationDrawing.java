@@ -172,7 +172,7 @@ public class PrimaryLocationDrawing {
 				final Plan plan = new org.matsim.core.population.PlanImpl(pers);
 				final Activity act = new org.matsim.core.population.ActivityImpl("h",link.getCoord(),link);
 				act.setEndTime(6*3600);
-				plan.addAct(act);
+				plan.addActivity(act);
 				pers.addPlan(plan);
 				try {
 					ret.add(pers);
@@ -243,7 +243,7 @@ public class PrimaryLocationDrawing {
 				leg.setTravelTime(Time.UNDEFINED_TIME);
 				Activity act = new org.matsim.core.population.ActivityImpl("w",link.getCoord(),link);
 				pers.getSelectedPlan().addLeg(leg);
-				pers.getSelectedPlan().addAct(act);
+				pers.getSelectedPlan().addActivity(act);
 				try {
 					population.addPerson(pers);
 				} catch (Exception e1) {

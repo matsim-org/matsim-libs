@@ -66,9 +66,9 @@ public class CMCFPlanSplitter {
 				Plan planNew = new org.matsim.core.population.PlanImpl(pNew);
 				Leg leg = (Leg) legIter.next();
 
-				planNew.addAct(pl.getPreviousActivity(leg));
+				planNew.addActivity(pl.getPreviousActivity(leg));
 				planNew.addLeg(leg);
-				planNew.addAct(pl.getNextActivity(leg));
+				planNew.addActivity(pl.getNextActivity(leg));
 
 				pNew.addPlan(planNew);
 

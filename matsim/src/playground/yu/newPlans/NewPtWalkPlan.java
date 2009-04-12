@@ -91,8 +91,8 @@ public class NewPtWalkPlan extends NewPopulation implements PersonAlgorithm,
 		for (int i = 0; i < actsLegs.size(); i++) {
 			Object o = actsLegs.get(i);
 			if (i % 2 == 0) {
-				ptPlan.addAct((Activity) o);
-				walkPlan.addAct((Activity) o);
+				ptPlan.addActivity((Activity) o);
+				walkPlan.addActivity((Activity) o);
 			} else {
 				Leg leg = (Leg) o;
 				Leg ptLeg = new org.matsim.core.population.LegImpl(leg);

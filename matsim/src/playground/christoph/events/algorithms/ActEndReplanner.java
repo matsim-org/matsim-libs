@@ -164,13 +164,13 @@ public class ActEndReplanner implements ActEndEventHandler {
 		person.setSelectedPlan(newPlan);
 		
 		// Here we are at the moment.
-		newPlan.addAct(fromAct);
+		newPlan.addActivity(fromAct);
 		
 		// Current Route between fromAct and toAct - this Route shall be replanned.
 		newPlan.addLeg(betweenLeg);
 		
 		// We still want to go there...
-		newPlan.addAct(toAct);
+		newPlan.addActivity(toAct);
 			
 		/*
 		 *  If it's a PersonPlansCalcRoute Object -> set the current Person.

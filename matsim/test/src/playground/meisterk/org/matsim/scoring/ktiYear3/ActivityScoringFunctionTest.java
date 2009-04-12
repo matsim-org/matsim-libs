@@ -107,7 +107,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		// generate plan
 		plan = person.createPlan(true);
 
-		Activity act = plan.createAct("home", facility1);
+		Activity act = plan.createActivity("home", facility1);
 		act.setLink(link1);
 		Leg leg = this.plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link3);
@@ -115,7 +115,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		route.setDistance(25000.0);
 		route.setTravelTime(Time.parseTime("00:30:00"));
 
-		act = plan.createAct("work_sector3", facility3);
+		act = plan.createActivity("work_sector3", facility3);
 		act.setLink(link3);
 		leg = this.plan.createLeg(TransportMode.pt);
 		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link3, link5);
@@ -123,7 +123,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		route.setDistance(2000.0);
 		route.setTravelTime(Time.parseTime("00:05:00"));
 
-		act = plan.createAct("leisure", facility5);
+		act = plan.createActivity("leisure", facility5);
 		act.setLink(link5);
 		leg = this.plan.createLeg(TransportMode.pt);
 		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link5, link3);
@@ -131,7 +131,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		route.setDistance(2000.0);
 		route.setTravelTime(Time.parseTime("00:05:00"));
 
-		act = plan.createAct("work_sector3", facility3);
+		act = plan.createActivity("work_sector3", facility3);
 		act.setLink(link3);
 		leg = this.plan.createLeg(TransportMode.car);
 		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link3, link1);
@@ -139,7 +139,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		route.setDistance(25000.0);
 		route.setTravelTime(Time.parseTime("00:30:00"));
 		
-		act = plan.createAct("home", facility1);
+		act = plan.createActivity("home", facility1);
 		act.setLink(link1);
 
 	}

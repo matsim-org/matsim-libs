@@ -145,14 +145,14 @@ public class PtPlansFileCreator {
 			Plan pl = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(pl);
 			Link startLink = this.network.getLink(new IdImpl(startLinkId));
-			Activity a = pl.createAct("h", startLink);
+			Activity a = pl.createActivity("h", startLink);
 			a.setEndTime(Time.parseTime(endTime));
 			Leg leg = pl.createLeg(TransportMode.car);
 			leg.setDepartureTime(Time.parseTime(endTime));
 			NetworkRoute route = new NodeNetworkRoute();
 			leg.setRoute(route);
 			Link endLink = this.network.getLink(new IdImpl(endLinkId));
-			pl.createAct("w", endLink);
+			pl.createActivity("w", endLink);
 			route.setNodes(startLink, srcRoute, endLink);
 			this.pop.addPerson(p);
 			this.personCount++;

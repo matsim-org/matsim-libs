@@ -70,7 +70,7 @@ public class BkTestPlansCreator {
 			BasicActivityImpl act1 = new BasicActivityImpl("h");
 			act1.setLinkId(id1);
 			act1.setEndTime(homeEndTime);
-			plan.addAct(act1);
+			plan.addActivity(act1);
 			
 			BasicLeg leg = new BasicLegImpl(TransportMode.car);
 			BasicRouteImpl route = new BasicRouteImpl(id1, id4);
@@ -85,7 +85,7 @@ public class BkTestPlansCreator {
 			act2.setLinkId(id4);
 			act2.setStartTime(7.0 * 3600.0);
 			act2.setEndTime(15.0 * 3600.0);
-			plan.addAct(act2);
+			plan.addActivity(act2);
 			
 			BasicLeg leg2 = new BasicLegImpl(TransportMode.car);
 			route = new BasicRouteImpl(id4, id1);
@@ -99,7 +99,7 @@ public class BkTestPlansCreator {
 			
 			BasicActivityImpl act3 = new BasicActivityImpl("h");
 			act3.setLinkId(id1);
-			plan.addAct(act3);
+			plan.addActivity(act3);
 			
 			pop.addPerson(p);
 //			homeEndTime++;				

@@ -90,10 +90,10 @@ public class PlansCreateTripsFromODMatrix {
 						}
 					}
 
-					Activity a = plan.createAct("work", coord);
+					Activity a = plan.createActivity("work", coord);
 					a.setEndTime(endTime);
 					plan.createLeg(TransportMode.car);
-					a = plan.createAct("work", coord);
+					a = plan.createActivity("work", coord);
 
 					plans.addPerson(person); // add person should be last for when plans-streaming is one, because in this moment the plans are written to file.
 				}

@@ -45,7 +45,7 @@ public class PlanTest extends MatsimTestCase {
 		} catch (IllegalStateException e) {
 			log.debug("catched expected exception.", e);
 		}
-		plan.createAct("h", new CoordImpl(0, 0));
+		plan.createActivity("h", new CoordImpl(0, 0));
 		plan.createLeg(TransportMode.car);
 		try {
 			plan.createLeg(TransportMode.bike);
@@ -53,9 +53,9 @@ public class PlanTest extends MatsimTestCase {
 		} catch (IllegalStateException e) {
 			log.debug("catched expected exception.", e);
 		}
-		plan.createAct("w", new CoordImpl(100, 200));
+		plan.createActivity("w", new CoordImpl(100, 200));
 		plan.createLeg(TransportMode.bike);
-		plan.createAct("h", new CoordImpl(0, 0));
+		plan.createActivity("h", new CoordImpl(0, 0));
 	}
 
 	/**
@@ -63,17 +63,17 @@ public class PlanTest extends MatsimTestCase {
 	 */
 	public void testCreateAct() {
 		Plan plan = new org.matsim.core.population.PlanImpl(new PersonImpl(new IdImpl(1)));
-		plan.createAct("h", new CoordImpl(0, 0));
+		plan.createActivity("h", new CoordImpl(0, 0));
 		// don't allow a second act directly after the first
 		try {
-			plan.createAct("w", new CoordImpl(100, 200));
+			plan.createActivity("w", new CoordImpl(100, 200));
 			fail("expected IllegalStateException.");
 		} catch (IllegalStateException e) {
 			log.debug("catched expected exception.", e);
 		}
 		plan.createLeg(TransportMode.car);
 		// but after a leg, it must be possible to add an additional act
-		plan.createAct("w", new CoordImpl(100, 200));
+		plan.createActivity("w", new CoordImpl(100, 200));
 	}
 
 	/**
@@ -81,9 +81,9 @@ public class PlanTest extends MatsimTestCase {
 	 */
 	public void testInsertActLeg_Between() {
 		Plan plan = new org.matsim.core.population.PlanImpl(new PersonImpl(new IdImpl(1)));
-		Activity homeAct = plan.createAct("h", new CoordImpl(0, 0));
+		Activity homeAct = plan.createActivity("h", new CoordImpl(0, 0));
 		Leg leg1 = plan.createLeg(TransportMode.car);
-		Activity workAct = plan.createAct("w", new CoordImpl(100, 200));
+		Activity workAct = plan.createActivity("w", new CoordImpl(100, 200));
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());
@@ -107,9 +107,9 @@ public class PlanTest extends MatsimTestCase {
 	 */
 	public void testInsertActLeg_AtEnd() {
 		Plan plan = new org.matsim.core.population.PlanImpl(new PersonImpl(new IdImpl(1)));
-		Activity homeAct = plan.createAct("h", new CoordImpl(0, 0));
+		Activity homeAct = plan.createActivity("h", new CoordImpl(0, 0));
 		Leg leg1 = plan.createLeg(TransportMode.car);
-		Activity workAct = plan.createAct("w", new CoordImpl(100, 200));
+		Activity workAct = plan.createActivity("w", new CoordImpl(100, 200));
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());
@@ -133,9 +133,9 @@ public class PlanTest extends MatsimTestCase {
 	 */
 	public void testInsertActLeg_AtWrongPosition() {
 		Plan plan = new org.matsim.core.population.PlanImpl(new PersonImpl(new IdImpl(1)));
-		plan.createAct("h", new CoordImpl(0, 0));
+		plan.createActivity("h", new CoordImpl(0, 0));
 		plan.createLeg(TransportMode.car);
-		plan.createAct("w", new CoordImpl(100, 200));
+		plan.createActivity("w", new CoordImpl(100, 200));
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());
@@ -156,9 +156,9 @@ public class PlanTest extends MatsimTestCase {
 	 */
 	public void testInsertActLeg_AtStart() {
 		Plan plan = new org.matsim.core.population.PlanImpl(new PersonImpl(new IdImpl(1)));
-		plan.createAct("h", new CoordImpl(0, 0));
+		plan.createActivity("h", new CoordImpl(0, 0));
 		plan.createLeg(TransportMode.car);
-		plan.createAct("w", new CoordImpl(100, 200));
+		plan.createActivity("w", new CoordImpl(100, 200));
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());
@@ -180,9 +180,9 @@ public class PlanTest extends MatsimTestCase {
 	 */
 	public void testInsertActLeg_BehindEnd() {
 		Plan plan = new org.matsim.core.population.PlanImpl(new PersonImpl(new IdImpl(1)));
-		plan.createAct("h", new CoordImpl(0, 0));
+		plan.createActivity("h", new CoordImpl(0, 0));
 		plan.createLeg(TransportMode.car);
-		plan.createAct("w", new CoordImpl(100, 200));
+		plan.createActivity("w", new CoordImpl(100, 200));
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());

@@ -158,7 +158,7 @@ public class PTActWriter {
 		    	//-->Attention: this should be read from the city network not from pt network!!! 
 		    	thisAct.setLink(net.getNearestLink(thisAct.getCoord()));
 
-		    	newPlan.addAct(thisAct);
+		    	newPlan.addActivity(thisAct);
 				lastAct = thisAct;
 				first=false;
 			}//Iterator<BasicActImpl>
@@ -289,7 +289,7 @@ public class PTActWriter {
 
 			if (link.getType().equals("Standard")){
 				if (first){ //first PTAct: getting on
-					newPlan.addAct(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime , linkTravelTime, accumulatedTime + linkTravelTime));
+					newPlan.addActivity(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime , linkTravelTime, accumulatedTime + linkTravelTime));
 					accumulatedTime =accumulatedTime+ linkTravelTime;
 					first=false;
 				}
@@ -310,7 +310,7 @@ public class PTActWriter {
 										
 					//test: Check what method describes the location more exactly
 					//newPlan.addAct(newPTAct("exit pt veh", link.getFromNode().getCoord(), link, arrTime, 0, arrTime));
-					newPlan.addAct(newPTAct("exit pt veh", link.getToNode().getCoord(), link, arrTime, 0, arrTime));
+					newPlan.addActivity(newPTAct("exit pt veh", link.getToNode().getCoord(), link, arrTime, 0, arrTime));
 				}
 
 			}else if(link.getType().equals("Transfer") || link.getType().equals("DetTransfer") ){  //add the PTleg and a Transfer Act
@@ -320,7 +320,7 @@ public class PTActWriter {
 					//-->: The legMode car is temporal only for visualization purposes
 					newPlan.addLeg(newPTLeg(legNum++, TransportMode.car, legRouteLinks, legDistance, depTime, legTravelTime, arrTime));
 					//newPlan.addAct(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
-					newPlan.addAct(newPTAct("Wait pt veh", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
+					newPlan.addActivity(newPTAct("Wait pt veh", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
 					first=false;
 				}
 
@@ -352,7 +352,7 @@ public class PTActWriter {
 					double startWaitingTime = arrTime;
 					double waitingTime = linkTravelTime -walkTime;  // The ptTravelTime must calculated it like this: travelTime = walk + transferTime;
 					double endActTime= startWaitingTime + waitingTime;
-					newPlan.addAct(newPTAct("Change ptv", link.getFromNode().getCoord(), link, startWaitingTime, waitingTime, endActTime));
+					newPlan.addActivity(newPTAct("Change ptv", link.getFromNode().getCoord(), link, startWaitingTime, waitingTime, endActTime));
 					first=false;
 				}
 			}

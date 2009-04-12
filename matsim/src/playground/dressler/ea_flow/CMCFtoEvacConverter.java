@@ -145,9 +145,9 @@ public class CMCFtoEvacConverter {
 					home.setLinkId(fromlink.getId());
 					work.setLinkId(tolink.getId());
 				 }
-				 plan.addAct(home);
+				 plan.addActivity(home);
 				 plan.addLeg(leg);
-				 plan.addAct(work);
+				 plan.addActivity(work);
 				 p.addPlan(plan);
 				 result.addPerson(p);
 			 

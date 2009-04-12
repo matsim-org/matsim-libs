@@ -331,14 +331,14 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		Coord coord = null;
 		if (atts.getValue("link") != null) {
 			link = this.network.getLink(new IdImpl(atts.getValue("link")));
-			this.curract = this.currplan.createAct(atts.getValue("type"), link);
+			this.curract = this.currplan.createActivity(atts.getValue("type"), link);
 			if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 				coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 			coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
-			this.curract = this.currplan.createAct(atts.getValue("type"), coord);
+			this.curract = this.currplan.createActivity(atts.getValue("type"), coord);
 		} else {
 			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
 		}

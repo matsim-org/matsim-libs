@@ -146,7 +146,7 @@ public class BasicPlanImpl implements BasicPlan {
 		this.actsLegs.add(leg);
 	}
 
-	public void addAct(final BasicActivity act) {
+	public void addActivity(final BasicActivity act) {
 		if (this.actsLegs.size() %2 != 0 ) throw (new IndexOutOfBoundsException("Error: Tried to insert act at non-act position"));
 		this.actsLegs.add(act);
 	}

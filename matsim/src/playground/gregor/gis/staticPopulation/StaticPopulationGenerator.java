@@ -109,7 +109,7 @@ public class StaticPopulationGenerator {
 					// (I still think it would make more sense to leave the starting time of the first activity undefined. kai)
 					act.setEndTime(3 *3600.0);
 					act.setDuration(0);
-					plan.addAct(act);
+					plan.addActivity(act);
 					pers.addPlan(plan);
 					try {
 						population.addPerson(pers);

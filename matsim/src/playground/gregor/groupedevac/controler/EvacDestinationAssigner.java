@@ -161,7 +161,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 			plan = pers.getSelectedPlan();
 			plan.removeLeg(1);
 			plan.addLeg(leg);
-			plan.addAct(act);
+			plan.addActivity(act);
 //			this.plansCalcRoute.handleLeg(leg,((Act)plan.getActsLegs().get(0)), act, 3 * 3600);
 			
 //			pers.addPlan(plan);

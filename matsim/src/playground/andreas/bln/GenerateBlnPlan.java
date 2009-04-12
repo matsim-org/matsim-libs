@@ -320,7 +320,7 @@ public class GenerateBlnPlan {
 
 						}
 
-						actPlan.addAct(newAct);				
+						actPlan.addActivity(newAct);				
 						//				log.info("hold");
 
 					}

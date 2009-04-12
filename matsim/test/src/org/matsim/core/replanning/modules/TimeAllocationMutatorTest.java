@@ -121,13 +121,13 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 			 */
 			Person person = new PersonImpl(new IdImpl("1"));
 			plan = person.createPlan(true);
-			act1 = plan.createAct("h", link1);
+			act1 = plan.createActivity("h", link1);
 			act1.setEndTime(4*3600);
 			plan.createLeg(TransportMode.car);
-			act2 = plan.createAct("w", link1);
+			act2 = plan.createActivity("w", link1);
 			act2.setDuration(14*3600);
 			plan.createLeg(TransportMode.car);
-			plan.createAct("h", link1);
+			plan.createActivity("h", link1);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

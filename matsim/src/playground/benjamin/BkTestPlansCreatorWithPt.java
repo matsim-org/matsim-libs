@@ -73,7 +73,7 @@ public class BkTestPlansCreatorWithPt {
 			BasicActivityImpl act1 = new BasicActivityImpl("h");
 			act1.setLinkId(id1);
 			act1.setEndTime(homeEndTime);
-			plan.addAct(act1);
+			plan.addActivity(act1);
 			
 			BasicLeg leg1Car = new BasicLegImpl(TransportMode.car);
 			BasicRouteImpl routeCar = new BasicRouteImpl(id1, id4);
@@ -89,7 +89,7 @@ public class BkTestPlansCreatorWithPt {
 			act2.setStartTime(7.0 * 3600.0);
 			act2.setEndTime(15.0 * 3600.0);
 //			act2.setDuration(8.0 * 3600.0);
-			plan.addAct(act2);
+			plan.addActivity(act2);
 			
 			BasicLeg leg2Car = new BasicLegImpl(TransportMode.car);
 			routeCar = new BasicRouteImpl(id4, id1);
@@ -103,7 +103,7 @@ public class BkTestPlansCreatorWithPt {
 			
 			BasicActivityImpl act3 = new BasicActivityImpl("h");
 			act3.setLinkId(id1);
-			plan.addAct(act3);
+			plan.addActivity(act3);
 			
 			//adding ptPlan to person
 			
@@ -113,7 +113,7 @@ public class BkTestPlansCreatorWithPt {
 //			p.addPlan(plan);
 			
 			
-			plan.addAct(act1);
+			plan.addActivity(act1);
 			
 			BasicLeg leg1Pt = new BasicLegImpl(TransportMode.pt);
 //			BasicRouteImpl routePt = new BasicRouteImpl(id1, id4);
@@ -123,7 +123,7 @@ public class BkTestPlansCreatorWithPt {
 			plan.addLeg(leg1Pt);
 			
 
-			plan.addAct(act2);
+			plan.addActivity(act2);
 			
 			BasicLeg leg2Pt = new BasicLegImpl(TransportMode.pt);
 //			routePt = new BasicRouteImpl(id4, id1);
@@ -133,7 +133,7 @@ public class BkTestPlansCreatorWithPt {
 			plan.addLeg(leg2Pt);
 			
 
-			plan.addAct(act3);
+			plan.addActivity(act3);
 			
 			pop.addPerson(p);
 //			homeEndTime++;				

@@ -333,7 +333,7 @@ public class GenerateBlnPlan2 {
 					}
 				}
 				
-				curPlan.addAct(newAct);	
+				curPlan.addActivity(newAct);	
 				lastAct = newAct;				 
 			}
 		}				

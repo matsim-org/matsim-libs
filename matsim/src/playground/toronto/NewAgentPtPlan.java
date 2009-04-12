@@ -73,7 +73,7 @@ public class NewAgentPtPlan extends NewPopulation {
 				for (int i = 0; i < actsLegs.size(); i++) {
 					Object o = actsLegs.get(i);
 					if (i % 2 == 0) {
-						ptPlan.addAct((Activity) o);
+						ptPlan.addActivity((Activity) o);
 //						walkPlan.addAct((Act) o);
 					} else {
 						Leg leg = (Leg) o;

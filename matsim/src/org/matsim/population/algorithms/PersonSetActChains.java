@@ -232,7 +232,7 @@ public class PersonSetActChains extends AbstractPersonAlgorithm {
 				if (j != 1) {
 					p.createLeg(TransportMode.car);
 				}
-				p.createAct(acttypes[j], new CoordImpl(-1, -1));//,"-1","-1",null,"00:00:00", "00:00:00", "00:00:00", null);
+				p.createActivity(acttypes[j], new CoordImpl(-1, -1));//,"-1","-1",null,"00:00:00", "00:00:00", "00:00:00", null);
 			}
 			catch (Exception e) {
 				throw new RuntimeException(e);

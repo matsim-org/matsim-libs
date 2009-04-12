@@ -85,7 +85,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 		Activity actA = new org.matsim.core.population.ActivityImpl("h", new CoordImpl(position.getEasting(), position.getNorthing()),
 				position.getLink());
 		actA.setEndTime(this.currenttime);
-		plan.addAct(actA);
+		plan.addActivity(actA);
 		pers.addPlan(plan);
 		this.plans.addPerson(pers);
 	}

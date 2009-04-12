@@ -192,9 +192,9 @@ public class TransitDriverTest extends MatsimTestCase {
 	private BusPassenger createPassenger(final String id, final Facility enterStop, final Facility exitStop) {
 		BusPassenger passenger = new BusPassenger(new IdImpl("1"), exitStop);
 		Plan plan = passenger.createPlan(true);
-		plan.createAct(TransitConstants.INTERACTION_ACTIVITY_TYPE, enterStop);
+		plan.createActivity(TransitConstants.INTERACTION_ACTIVITY_TYPE, enterStop);
 		plan.createLeg(TransportMode.bus);
-		plan.createAct("work", exitStop);
+		plan.createActivity("work", exitStop);
 		return passenger;
 	}
 }
