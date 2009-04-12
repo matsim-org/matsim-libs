@@ -28,8 +28,8 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
@@ -39,7 +39,6 @@ import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -52,7 +51,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 	
 	protected static final Id TEST_PERSON_ID = new IdImpl("1");
 	private static final int TEST_PLAN_NR = 0;
-	protected static final int TEST_LEG_NR = 0;
+	private static final int TEST_LEG_NR = 0;
 	private static final int TIME_BIN_SIZE = 900;
 
 	protected Person testPerson = null;
@@ -76,12 +75,13 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		super.setUp();
 
 		Config config = super.loadConfig(CONFIGFILE);
+		config.plans().setInputFile("test/scenarios/equil/plans1.xml");
 
 		this.scenario = new ScenarioImpl(config);
 		
 		// the estimator is tested on the central route alternative through equil-net
 		// first person
-		this.testPerson = this.scenario.getPopulation().getPerson(TEST_PERSON_ID);
+		this.testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
 		this.testPlan = this.testPerson.getPlans().get(TEST_PLAN_NR);
 		// first leg
@@ -93,8 +93,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE);
 		this.linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE);
-		this.linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(this.linkTravelTimeEstimator, Gbl.getConfig().charyparNagelScoring());
-
+		this.linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(this.linkTravelTimeEstimator, config.charyparNagelScoring());
 	}
 
 	@Override
@@ -113,7 +112,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 	public void testGetLegTravelTimeEstimation() {
 
-		Gbl.getConfig().charyparNagelScoring().setMarginalUtlOfDistanceCar(0.0);
+		this.scenario.getConfig().charyparNagelScoring().setMarginalUtlOfDistanceCar(0.0);
 
 		this.testee = new FixedRouteLegTravelTimeEstimator(
 				this.linkTravelTimeEstimator,
