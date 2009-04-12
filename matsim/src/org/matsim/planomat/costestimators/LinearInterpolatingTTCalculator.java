@@ -22,6 +22,7 @@ package org.matsim.planomat.costestimators;
 
 import java.util.HashMap;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.events.AgentArrivalEvent;
@@ -57,10 +58,10 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 
 	static private class EnterEvent /*implements Comparable<EnterEvent>*/ {
 
-		private final String linkId;
-		private final String vehId;
+		private final Id linkId;
+		private final Id vehId;
 
-		public EnterEvent(final String linkId, final String vehId) {
+		public EnterEvent(final Id linkId, final Id vehId) {
 			this.linkId = linkId;
 			this.vehId = vehId;
 		}
@@ -216,12 +217,12 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
-		EnterEvent e = new EnterEvent(event.getLinkId().toString(), event.getPersonId().toString());
+		EnterEvent e = new EnterEvent(event.getLinkId(), event.getPersonId());
 		this.enterEvents.put(e, event.getTime());
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
-		EnterEvent e = new EnterEvent(event.getLinkId().toString(), event.getPersonId().toString());
+		EnterEvent e = new EnterEvent(event.getLinkId(), event.getPersonId());
 		Double starttime = this.enterEvents.remove(e);
 		if (starttime != null) {
 			double timediff = event.getTime() - starttime.intValue();
@@ -240,7 +241,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 		// remove EnterEvents from list when an agent arrives.
 		// otherwise, the activity duration would counted as travel time, when the
 		// agent departs again and leaves the link!
-		EnterEvent e = new EnterEvent(event.getLinkId().toString(), event.getPersonId().toString());
+		EnterEvent e = new EnterEvent(event.getLinkId(), event.getPersonId());
 		this.enterEvents.remove(e);
 	}
 
