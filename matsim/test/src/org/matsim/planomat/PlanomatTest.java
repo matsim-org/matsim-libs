@@ -36,7 +36,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -68,8 +67,9 @@ public class PlanomatTest extends MatsimTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		Config config = super.loadConfig(this.getClassInputDirectory() + "config.xml");
+		config.plans().setInputFile(this.getPackageInputDirectory() + "testPlans.xml");
 		if (this.getName().equals("testRunDefaultManyModes")) {
-			Gbl.getConfig().plans().setInputFile(this.getInputDirectory() + "input_plans.xml.gz");
+			config.plans().setInputFile(this.getInputDirectory() + "input_plans.xml.gz");
 		}
 		this.scenario = new ScenarioImpl(config);
 	}
@@ -97,7 +97,7 @@ public class PlanomatTest extends MatsimTestCase {
 	private void runATestRun(final PlanomatTestRun testRun) {
 
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), 900);
-		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, Gbl.getConfig().charyparNagelScoring());
+		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.scenario.getConfig().charyparNagelScoring());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
 
 		Events events = new Events();
@@ -105,10 +105,10 @@ public class PlanomatTest extends MatsimTestCase {
 		events.addHandler(depDelayCalc);
 
 		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, this.scenario.getNetwork());
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(Gbl.getConfig().charyparNagelScoring());
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().charyparNagelScoring());
 
 		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
-		testee.getSeedGenerator().setSeed(Gbl.getConfig().global().getRandomSeed());
+		testee.getSeedGenerator().setSeed(this.scenario.getConfig().global().getRandomSeed());
 
 		log.info("Testing " + testRun.toString() + "...");
 
@@ -116,7 +116,7 @@ public class PlanomatTest extends MatsimTestCase {
 				PlanomatTestRun.NOEVENTS_CAR_PT.equals(testRun) ||
 				PlanomatTestRun.WITHEVENTS_CAR_PT.equals(testRun)) {
 
-			Gbl.getConfig().planomat().setPossibleModes("car,pt");
+			this.scenario.getConfig().planomat().setPossibleModes("car,pt");
 		}
 
 		tTravelEstimator.resetTravelTimes();
@@ -134,7 +134,7 @@ public class PlanomatTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = this.scenario.getPopulation().getPerson(TEST_PERSON_ID);
+		Person testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
@@ -164,7 +164,7 @@ public class PlanomatTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = this.scenario.getPopulation().getPerson(TEST_PERSON_ID);
+		Person testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
@@ -195,7 +195,7 @@ public class PlanomatTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = this.scenario.getPopulation().getPerson(TEST_PERSON_ID);
+		Person testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
 		testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
@@ -209,19 +209,23 @@ public class PlanomatTest extends MatsimTestCase {
 		try {
 			Gene[] testGenes = new Gene[numActs + planAnalyzeSubtours.getNumSubtours()];
 
+			Integer i31 = Integer.valueOf(31);
+			Integer i32 = Integer.valueOf(32);
+			Integer i0 = Integer.valueOf(0);
+			
 			for (int ii=0; ii < testGenes.length; ii++) {
 				switch(ii) {
 				case 0:
 					testGenes[ii] = new IntegerGene(jgapConfiguration);
-					testGenes[ii].setAllele(31);
+					testGenes[ii].setAllele(i31);
 					break;
 				case 1:
 					testGenes[ii] = new IntegerGene(jgapConfiguration);
-					testGenes[ii].setAllele(32);
+					testGenes[ii].setAllele(i32);
 					break;
 				case 2:
 					testGenes[ii] = new IntegerGene(jgapConfiguration);
-					testGenes[ii].setAllele(0);
+					testGenes[ii].setAllele(i0);
 					break;
 				}
 
@@ -235,7 +239,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 		// init LegTravelTimeEstimator
 		TravelTime tTravelEstimator = new LinearInterpolatingTTCalculator(this.scenario.getNetwork(), 900);
-		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, Gbl.getConfig().charyparNagelScoring());
+		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.scenario.getConfig().charyparNagelScoring());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
 		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, this.scenario.getNetwork());
 
@@ -265,8 +269,8 @@ public class PlanomatTest extends MatsimTestCase {
 
 	@Override
 	protected void tearDown() throws Exception {
-		super.tearDown();
 		this.scenario = null;
+		super.tearDown();
 	}
 
 }

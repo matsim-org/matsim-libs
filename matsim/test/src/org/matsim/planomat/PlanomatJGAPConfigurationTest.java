@@ -22,7 +22,6 @@ package org.matsim.planomat;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
 import org.jgap.BaseGeneticOperator;
 import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.MutationOperator;
@@ -37,14 +36,13 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 
-	private static final Logger log = Logger.getLogger(PlanomatJGAPConfigurationTest.class);
-
 	private ScenarioImpl scenario;
 	
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		Config config = super.loadConfig(this.getInputDirectory() + "config.xml");
+		config.plans().setInputFile(getPackageInputDirectory() + "testPlans.xml");
 		this.scenario = new ScenarioImpl(config);
 	}
 
@@ -54,7 +52,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = this.scenario.getPopulation().getPerson(new IdImpl("100"));
+		Person testPerson = this.scenario.getPopulation().getPersons().get(new IdImpl("100"));
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
@@ -92,7 +90,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = this.scenario.getPopulation().getPerson(new IdImpl("100"));
+		Person testPerson = this.scenario.getPopulation().getPersons().get(new IdImpl("100"));
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
