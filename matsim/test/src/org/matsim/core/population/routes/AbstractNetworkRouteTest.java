@@ -117,7 +117,6 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		Link link2 = network.getLink(new IdImpl("2"));
 		route.setLinks(link1, null, link2);
 		nodes = route.getNodes();
-		nodes = route.getNodes();
 		assertEquals("number of nodes in route.", 1, nodes.size());
 		assertEquals("wrong node in route.", network.getNode(new IdImpl("2")), nodes.get(0));
 	}
