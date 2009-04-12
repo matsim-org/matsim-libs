@@ -22,9 +22,9 @@ package org.matsim.core.trafficmonitoring;
 
 import java.util.HashMap;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.LinkEnterEvent;
@@ -33,10 +33,9 @@ import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.router.util.TravelTime;
 
 public class TravelTimeCalculator extends 
-AbstractTravelTimeCalculator implements TravelTime, LinkEnterEventHandler, LinkLeaveEventHandler, 
+AbstractTravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 AgentArrivalEventHandler, AgentStuckEventHandler {
 
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
@@ -81,14 +80,14 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
-		EnterEvent e = new EnterEvent(event.getLinkId().toString(), event.getTime());
+		EnterEvent e = new EnterEvent(event.getLinkId(), event.getTime());
 		this.enterEvents.put(event.getPersonId().toString(), e);
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
 		EnterEvent e = this.enterEvents.remove(event.getPersonId().toString());
-		if ((e != null) && e.linkId.equals(event.getLinkId().toString())) {
-			if (event.getLink() == null) event.setLink(this.getNetwork().getLink(new IdImpl(event.getLinkId().toString())));
+		if ((e != null) && e.linkId.equals(event.getLinkId())) {
+			if (event.getLink() == null) event.setLink(this.getNetwork().getLink(event.getLinkId()));
 			if (event.getLink() != null) {
 				this.getTravelTimeAggregator().addTravelTime(getTravelTimeData(event.getLink(), true),e.time,event.getTime());
 			}
@@ -104,10 +103,10 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 
 	public void handleEvent(AgentStuckEvent event) {
 		EnterEvent e = this.enterEvents.remove(event.getPersonId().toString());
-		if ((e != null) && e.linkId.equals(event.getLinkId().toString())) {
+		if ((e != null) && e.linkId.equals(event.getLinkId())) {
 			Link link = event.getLink();
 			if (link == null) {
-				link = this.getNetwork().getLink(new IdImpl(event.getLinkId().toString()));
+				link = this.getNetwork().getLink(event.getLinkId());
 			}
 			if (link != null) {
 				this.getTravelTimeAggregator().addStuckEventTravelTime(getTravelTimeData(link, true),e.time,event.getTime());
@@ -130,10 +129,10 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 
 	private static class EnterEvent {
 
-		public final String linkId;
-		public final double time;
+		protected final Id linkId;
+		protected final double time;
 
-		public EnterEvent(final String linkId, final double time) {
+		protected EnterEvent(final Id linkId, final double time) {
 			this.linkId = linkId;
 			this.time = time;
 		}

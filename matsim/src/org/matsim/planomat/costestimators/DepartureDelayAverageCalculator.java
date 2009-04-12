@@ -25,7 +25,6 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
@@ -68,9 +67,8 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 		DepartureDelayData ddd = this.getDepartureDelayRole(link);
 		if (ddd == null) {
 			return 0.0;
-		} else {
-			return ddd.getDepartureDelay(departureTime);
 		}
+		return ddd.getDepartureDelay(departureTime);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -137,12 +135,12 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	//////////////////////////////////////////////////////////////////////
 
 	public void handleEvent(AgentDepartureEvent event) {
-		DepartureEvent depEvent = new DepartureEvent(new IdImpl(event.getPersonId().toString()));
+		DepartureEvent depEvent = new DepartureEvent(event.getPersonId());
 		this.departureEventsTimes.put(depEvent, event.getTime());
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		DepartureEvent removeMe = new DepartureEvent(new IdImpl(event.getPersonId().toString()));
+		DepartureEvent removeMe = new DepartureEvent(event.getPersonId());
 		Double departureTime = departureEventsTimes.remove(removeMe);
 		if (departureTime != null) {
 			double departureDelay = event.getTime() - departureTime.intValue();
@@ -150,7 +148,7 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 				throw new RuntimeException("departureDelay cannot be < 0.");
 			}
 			Link link = event.getLink();
-			if (null == link) link = this.network.getLink(new IdImpl(event.getLinkId().toString()));
+			if (null == link) link = this.network.getLink(event.getLinkId());
 			if (null != link) {
 				DepartureDelayData ddd = this.getDepartureDelayRole(link);
 				if (ddd == null) {

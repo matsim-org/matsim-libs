@@ -24,7 +24,6 @@ import java.util.HashMap;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
@@ -230,7 +229,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 				Gbl.errorMsg("");
 			}
 			Link link = event.getLink();
-			if (null == link) link = this.network.getLink(new IdImpl(event.getLinkId().toString()));
+			if (null == link) link = this.network.getLink(event.getLinkId());
 			if (null != link) {
 				getTravelTimeRole(link).addTravelTime(starttime.intValue(), timediff);
 			}

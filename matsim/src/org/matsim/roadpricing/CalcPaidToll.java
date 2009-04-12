@@ -73,7 +73,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	public void handleEvent(final LinkEnterEvent event) {
 		Link link = event.getLink();
 		if (link == null) {
-			link = this.network.getLink(new IdImpl(event.getLinkId().toString()));
+			link = this.network.getLink(event.getLinkId());
 		}
 		this.handler.handleEvent(event, link);
 	}
@@ -81,7 +81,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	public void handleEvent(final AgentWait2LinkEvent event) {
 		Link link = event.getLink();
 		if (link == null) {
-			link = this.network.getLink(new IdImpl(event.getLinkId().toString()));
+			link = this.network.getLink(event.getLinkId());
 		}
 		this.handler.handleEvent(event, link);
 	}

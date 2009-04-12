@@ -25,7 +25,6 @@ import java.util.HashMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentStuckEvent;
@@ -103,15 +102,15 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 
 	public void handleEvent(final AgentDepartureEvent event) {
 
-		DepartureEvent depEvent = new DepartureEvent(new IdImpl(event.getPersonId().toString()));
+		DepartureEvent depEvent = new DepartureEvent(event.getPersonId());
 
 		this.departureEventsTimes.put(depEvent, event.getTime());
-		this.departureEventsLinkIDs.put(depEvent, new IdImpl(event.getLinkId().toString()));
+		this.departureEventsLinkIDs.put(depEvent, event.getLinkId());
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
 
-		IdImpl agentId = new IdImpl(event.getPersonId().toString());
+		Id agentId = event.getPersonId();
 
 		DepartureEvent removeMe = new DepartureEvent(agentId);
 
@@ -120,7 +119,7 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 
 		Double travelTime = event.getTime() - departureTime;
 
-		LegTravelTimeEntry newLtte = new LegTravelTimeEntry(agentId, departureLinkId, new IdImpl(event.getLinkId().toString()), "car");
+		LegTravelTimeEntry newLtte = new LegTravelTimeEntry(agentId, departureLinkId, event.getLinkId(), "car");
 		this.legTravelTimeEstimations.put(newLtte, travelTime);
 	}
 

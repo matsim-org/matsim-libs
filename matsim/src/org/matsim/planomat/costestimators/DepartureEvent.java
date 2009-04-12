@@ -20,13 +20,13 @@
 
 package org.matsim.planomat.costestimators;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.basic.v01.Id;
 
 public class DepartureEvent {
 
-	private final IdImpl agentId;
+	private final Id agentId;
 
-	public DepartureEvent(final IdImpl agentId) {
+	public DepartureEvent(final Id agentId) {
 		this.agentId = agentId;
 	}
 

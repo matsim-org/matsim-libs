@@ -22,9 +22,9 @@ package org.matsim.analysis;
 
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
@@ -44,37 +44,37 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Agent
 	private int cntTrips = 0;
 	private RoadPricingScheme scheme = null;
 	private Network network = null;
-	private TreeMap<String, Double> agentDistance = null;
+	private TreeMap<Id, Double> agentDistance = null;
 
 	public CalcAverageTolledTripLength(final Network network, final RoadPricingScheme scheme) {
 		this.scheme = scheme;
 		this.network = network;
-		this.agentDistance = new TreeMap<String, Double>();
+		this.agentDistance = new TreeMap<Id, Double>();
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
-		Cost cost = this.scheme.getLinkCost(new IdImpl(event.getLinkId().toString()), event.getTime());
+		Cost cost = this.scheme.getLinkCost(event.getLinkId(), event.getTime());
 		if (cost != null) {
 			Link link = event.getLink();
 			if (link == null) {
-				link = this.network.getLink(new IdImpl(event.getLinkId().toString()));
+				link = this.network.getLink(event.getLinkId());
 			}
 			if (link != null) {
-				Double length = this.agentDistance.get(event.getPersonId().toString());
+				Double length = this.agentDistance.get(event.getPersonId());
 				if (length == null) {
 					length = 0.0;
 				}
 				length += link.getLength();
-				this.agentDistance.put(event.getPersonId().toString(), length);
+				this.agentDistance.put(event.getPersonId(), length);
 			}
 		}
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		Double length = this.agentDistance.get(event.getPersonId().toString());
+		Double length = this.agentDistance.get(event.getPersonId());
 		if (length != null) {
 			this.sumLength += length;
-			this.agentDistance.put(event.getPersonId().toString(), 0.0);
+			this.agentDistance.put(event.getPersonId(), 0.0);
 		}
 		this.cntTrips++;
 	}
