@@ -130,16 +130,20 @@ public class PersonAgent implements DriverAgent {
 
 	public boolean initialize() {
 		this.nextActivity = 0;
+		List<? extends PlanElement> planElements = this.getPlanElements();
 		this.currentPlanElementIndex = 0;
-		Activity firstAct = (Activity) this.getPlanElements().get(0);
+		Activity firstAct = (Activity) planElements.get(0);
 		setDepartureTime(firstAct.getEndTime());
 		SimulationTimer.updateSimStartTime(firstAct.getEndTime());
 		setCurrentLink(firstAct.getLink());
 
-		initNextLeg((Leg) this.getPlanElements().get(1));
-		Simulation.incLiving();
-		// this is the starting point for our vehicle, so put it in the queue
-		return true;
+		if (planElements.size() > 1) {
+			initNextLeg((Leg) planElements.get(1));
+			Simulation.incLiving();
+			// this is the starting point for our vehicle, so put it in the queue
+			return true;
+		}
+		return false; // the agent has no leg, so nothing more to do
 	}
 
 	private void initNextLeg(final Leg leg) {

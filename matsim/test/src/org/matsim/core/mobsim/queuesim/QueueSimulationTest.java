@@ -143,6 +143,31 @@ public class QueueSimulationTest extends MatsimTestCase {
 	}
 
 	/**
+	 * Tests that no Exception occurs if an agent has no leg at all.
+	 */
+	public void testAgentWithoutLeg() {
+		Fixture f = new Fixture();
+
+		
+		Person person = new PersonImpl(new IdImpl(1));
+		Plan plan = person.createPlan(true);
+		Activity act = plan.createAct("home", f.link1);
+		f.plans.addPerson(person);
+		
+		/* build events */
+		Events events = new Events();
+		EventCollector collector = new EventCollector();
+		events.addHandler(collector);
+
+		/* run sim */
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		sim.run();
+
+		/* finish */
+		assertEquals("wrong number of link enter events.", 0, collector.events.size());
+	}
+	
+	/**
 	 * Tests that the flow capacity can be reached (but not exceeded) by
 	 * agents driving over a link.
 	 *
@@ -552,7 +577,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			this.link3 = this.network.createLink(new IdImpl("3"), this.node3, this.node4, 100, 10, 60000, 9);
 
 			/* build plans */
-			this.plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
+			this.plans = new PopulationImpl();
 
 			this.nodes3 = new ArrayList<Node>();
 			this.nodes3.add(this.node3);
