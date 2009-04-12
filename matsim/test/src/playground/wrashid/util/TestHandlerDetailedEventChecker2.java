@@ -7,8 +7,8 @@ import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -17,9 +17,9 @@ import org.matsim.core.events.PersonEvent;
 import org.matsim.core.mobsim.jdeqsim.util.DummyPopulationModifier;
 import org.matsim.core.mobsim.jdeqsim.util.TestHandlerDetailedEventChecker;
 import org.matsim.core.mobsim.jdeqsim.util.testable.PopulationModifier;
-import org.matsim.core.mobsim.jdeqsim.util.testable.TestHandler;
 
 import playground.wrashid.PDES2.Road;
+import playground.wrashid.PDES2.TestHandler;
 import playground.wrashid.deqsim.PDESStarter2;
 
 
@@ -29,6 +29,7 @@ public class TestHandlerDetailedEventChecker2 extends TestHandlerDetailedEventCh
 	public LinkedList<PersonEvent> allEvents = new LinkedList<PersonEvent>();
 	private HashMap<String, ExpectedNumberOfEvents> expectedNumberOfMessages = new HashMap<String, ExpectedNumberOfEvents>();
 
+	Population population = null;
 
 	// if populationModifier == null, then the DummyPopulationModifier is used
 	// if planFilePath == null, then the plan specified in the config file is
@@ -60,9 +61,12 @@ public class TestHandlerDetailedEventChecker2 extends TestHandlerDetailedEventCh
 				.checkAssertions();
 	}
 
+	public void checkAssertions() {
+		super.checkAssertions(this.population);
+	}
+	
 	public void calculateExpectedNumberOfEvents(Population population) {
 		this.population = population;
-
 		for (Person p : population.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			ExpectedNumberOfEvents expected = new ExpectedNumberOfEvents();

@@ -9,7 +9,6 @@ import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.jdeqsim.util.testable.PopulationModifier;
-import org.matsim.core.mobsim.jdeqsim.util.testable.TestHandler;
 
 import playground.wrashid.PDES2.util.ConcurrentListMPDSC;
 import playground.wrashid.PDES2.util.ConcurrentListMPSC;

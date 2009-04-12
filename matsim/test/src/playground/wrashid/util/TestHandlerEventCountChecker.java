@@ -33,10 +33,10 @@ import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.jdeqsim.util.DummyPopulationModifier;
 import org.matsim.core.mobsim.jdeqsim.util.testable.PopulationModifier;
-import org.matsim.core.mobsim.jdeqsim.util.testable.TestHandler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.wrashid.PDES2.TestHandler;
 import playground.wrashid.deqsim.PDESStarter2;
 
 public class TestHandlerEventCountChecker extends MatsimTestCase implements

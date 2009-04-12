@@ -38,9 +38,8 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 	public LinkedList<PersonEvent> allEvents = new LinkedList<PersonEvent>();
 //	private HashMap<Id, ExpectedNumberOfEvents> expectedNumberOfMessages = new HashMap<Id, ExpectedNumberOfEvents>();
 	protected boolean printEvent = true;
-	protected Population population;
 
-	public void checkAssertions() {
+	public void checkAssertions(final Population population) {
 
 		// at least one event
 		assertTrue(events.size() > 0);
@@ -173,12 +172,11 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 		new JDEQSimulation(network, population, events).run();
 		events.finishProcessing();
 
-//		this.calculateExpectedNumberOfEvents(population); // this method doesn't do any useful stuff, deactivated it
-		this.checkAssertions();
+//		this.calculateExpectedNumberOfEvents(population); // this method doesn't do anything useful/stateful
+		this.checkAssertions(population);
 	}
 
 //	public void calculateExpectedNumberOfEvents(Population population) {
-//		this.population = population;
 //
 //		for (Person p : population.getPersons().values()) {
 //			Plan plan = p.getSelectedPlan();
