@@ -23,6 +23,7 @@ package org.matsim.core.trafficmonitoring;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
@@ -41,12 +42,12 @@ AgentArrivalEventHandler {
 	 */
 	private static LinkTravelTimeCounter instance;
 
-	final private Map<String, Double> enterEvents;
-	final private Map<String, Double> travelTimes;
+	final private Map<Id, Double> enterEvents;
+	final private Map<Id, Double> travelTimes;
 
 	private LinkTravelTimeCounter(final int numberOfLinks) {
-		this.enterEvents = new HashMap<String, Double>(numberOfLinks);
-		this.travelTimes = new HashMap<String, Double>(numberOfLinks);
+		this.enterEvents = new HashMap<Id, Double>(numberOfLinks);
+		this.travelTimes = new HashMap<Id, Double>(numberOfLinks);
 	}
 
 	public static void init(final Events events, final int numberOfLinks) {
@@ -55,7 +56,7 @@ AgentArrivalEventHandler {
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
-		this.enterEvents.put(event.getPersonId().toString(), Double.valueOf(event.getTime()));
+		this.enterEvents.put(event.getPersonId(), Double.valueOf(event.getTime()));
 	}
 
 	public void reset(final int iteration) {
@@ -64,17 +65,17 @@ AgentArrivalEventHandler {
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
-		Double startTime = this.enterEvents.get(event.getPersonId().toString());
+		Double startTime = this.enterEvents.get(event.getPersonId());
 		if (startTime != null) {
-			this.travelTimes.put(event.getLinkId().toString(), event.getTime() - startTime.doubleValue());
+			this.travelTimes.put(event.getLinkId(), event.getTime() - startTime.doubleValue());
 		}
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		this.enterEvents.remove(event.getPersonId().toString());
+		this.enterEvents.remove(event.getPersonId());
 	}
 
-	public Double getLastLinkTravelTime(final String linkId) {
+	public Double getLastLinkTravelTime(final Id linkId) {
 		return this.travelTimes.get(linkId);
 	}
 

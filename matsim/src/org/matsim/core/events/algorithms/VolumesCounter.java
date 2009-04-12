@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 
@@ -35,18 +36,18 @@ import org.matsim.core.events.handler.LinkEnterEventHandler;
  */
 public class VolumesCounter implements LinkEnterEventHandler {
 
-	private final TreeMap<String, Integer> links = new TreeMap<String, Integer>();
+	private final TreeMap<Id, Integer> links = new TreeMap<Id, Integer>();
 
 	private static Integer ONE = Integer.valueOf(1);
 	
 	public void handleEvent(LinkEnterEvent event) {
-		Integer volume = this.links.get(event.getLinkId().toString());
+		Integer volume = this.links.get(event.getLinkId());
 		if (volume == null) {
 			volume = ONE;
 		} else {
 			volume = Integer.valueOf(volume.intValue() + 1);
 		}
-		this.links.put(event.getLinkId().toString(), volume);
+		this.links.put(event.getLinkId(), volume);
 	}
 
 	public void reset(int iteration) {
@@ -54,7 +55,7 @@ public class VolumesCounter implements LinkEnterEventHandler {
 	}
 
 	public void dumpLinks(Writer out) throws IOException {
-		for (String linkId : this.links.keySet()) {
+		for (Id linkId : this.links.keySet()) {
 			Integer volume = this.links.get(linkId);
 			if (volume == null) {
 				out.write("0");

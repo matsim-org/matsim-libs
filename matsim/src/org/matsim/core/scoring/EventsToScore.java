@@ -26,7 +26,6 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.ActEndEvent;
 import org.matsim.core.events.ActStartEvent;
 import org.matsim.core.events.AgentArrivalEvent;
@@ -56,7 +55,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 
 	private Population population = null;
 	private ScoringFunctionFactory sfFactory = null;
-	private final TreeMap<String, ScoringFunction> agentScorers = new TreeMap<String, ScoringFunction>();
+	private final TreeMap<Id, ScoringFunction> agentScorers = new TreeMap<Id, ScoringFunction>();
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
 	private final double learningRate;
@@ -73,27 +72,27 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		getScoringFunctionForAgent(event.getPersonId().toString()).startLeg(event.getTime(), event.getLeg());
+		getScoringFunctionForAgent(event.getPersonId()).startLeg(event.getTime(), event.getLeg());
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		getScoringFunctionForAgent(event.getPersonId().toString()).endLeg(event.getTime());
+		getScoringFunctionForAgent(event.getPersonId()).endLeg(event.getTime());
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		getScoringFunctionForAgent(event.getPersonId().toString()).agentStuck(event.getTime());
+		getScoringFunctionForAgent(event.getPersonId()).agentStuck(event.getTime());
 	}
 
 	public void handleEvent(final AgentMoneyEvent event) {
-		getScoringFunctionForAgent(event.getPersonId().toString()).addMoney(event.getAmount());
+		getScoringFunctionForAgent(event.getPersonId()).addMoney(event.getAmount());
 	}
 
 	public void handleEvent(ActStartEvent event) {
-		getScoringFunctionForAgent(event.getPersonId().toString()).startActivity(event.getTime(), event.getAct());
+		getScoringFunctionForAgent(event.getPersonId()).startActivity(event.getTime(), event.getAct());
 	}
 
 	public void handleEvent(ActEndEvent event) {
-		getScoringFunctionForAgent(event.getPersonId().toString()).endActivity(event.getTime());
+		getScoringFunctionForAgent(event.getPersonId()).endActivity(event.getTime());
 	}
 
 	/**
@@ -101,12 +100,12 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	 * to the plans.
 	 */
 	public void finish() {
-		for (Map.Entry<String, ScoringFunction> entry : this.agentScorers.entrySet()) {
-			String agentId = entry.getKey();
+		for (Map.Entry<Id, ScoringFunction> entry : this.agentScorers.entrySet()) {
+			Id agentId = entry.getKey();
 			ScoringFunction sf = entry.getValue();
 			sf.finish();
 			double score = sf.getScore();
-			Plan plan = this.population.getPerson(new IdImpl(agentId)).getSelectedPlan();
+			Plan plan = this.population.getPersons().get(agentId).getSelectedPlan();
 			Double oldScore = plan.getScore();
 			if (oldScore == null) {
 				plan.setScore(score);
@@ -141,7 +140,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	 * @return The score of the specified agent.
 	 */
 	public Double getAgentScore(final Id agentId) {
-		ScoringFunction sf = this.agentScorers.get(agentId.toString());
+		ScoringFunction sf = this.agentScorers.get(agentId);
 		if (sf == null)
 			return null;
 		return sf.getScore();
@@ -163,10 +162,10 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	 *            The id of the agent the scoring function is requested for.
 	 * @return The scoring function for the specified agent.
 	 */
-	private ScoringFunction getScoringFunctionForAgent(final String agentId) {
+	private ScoringFunction getScoringFunctionForAgent(final Id agentId) {
 		ScoringFunction sf = this.agentScorers.get(agentId);
 		if (sf == null) {
-			sf = this.sfFactory.getNewScoringFunction(this.population.getPerson(new IdImpl(agentId)).getSelectedPlan());
+			sf = this.sfFactory.getNewScoringFunction(this.population.getPersons().get(agentId).getSelectedPlan());
 			this.agentScorers.put(agentId, sf);
 		}
 		return sf;

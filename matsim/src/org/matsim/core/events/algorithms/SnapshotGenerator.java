@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.core.api.network.Link;
@@ -60,16 +61,16 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	private final Network network;
 	private int lastSnapshotIndex = -1;
 	private final double snapshotPeriod;
-	protected final HashMap<String, EventLink> eventLinks;
-	private final HashMap<String, EventAgent> eventAgents;
+	protected final HashMap<Id, EventLink> eventLinks;
+	private final HashMap<Id, EventAgent> eventAgents;
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 	private final double capCorrectionFactor;
 	private final String snapshotStyle;
 
 	public SnapshotGenerator(final Network network, final double snapshotPeriod) {
 		this.network = network;
-		this.eventLinks = new HashMap<String, EventLink>((int)(network.getLinks().size()*1.1), 0.95f);
-		this.eventAgents = new HashMap<String, EventAgent>(1000, 0.95f);
+		this.eventLinks = new HashMap<Id, EventLink>((int)(network.getLinks().size()*1.1), 0.95f);
+		this.eventAgents = new HashMap<Id, EventAgent>(1000, 0.95f);
 		this.snapshotPeriod = snapshotPeriod;
 		this.capCorrectionFactor = Gbl.getConfig().simulation().getFlowCapFactor() / network.getCapacityPeriod();
 		this.snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
@@ -86,48 +87,48 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 
 	public void handleEvent(final AgentDepartureEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId().toString()).departure(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId()).departure(getEventAgent(event));
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId().toString()).arrival(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId()).arrival(getEventAgent(event));
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId().toString()).enter(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId()).enter(getEventAgent(event));
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId().toString()).leave(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId()).leave(getEventAgent(event));
 	}
 
 	public void handleEvent(final AgentWait2LinkEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId().toString()).wait2link(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId()).wait2link(getEventAgent(event));
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId().toString()).stuck(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId()).stuck(getEventAgent(event));
 	}
 
 	public void reset(final int iteration) {
 		this.eventLinks.clear();
 		for (Link link : this.network.getLinks().values()) {
-			this.eventLinks.put(link.getId().toString(), new EventLink(link, this.capCorrectionFactor, this.network.getEffectiveCellSize()));
+			this.eventLinks.put(link.getId(), new EventLink(link, this.capCorrectionFactor, this.network.getEffectiveCellSize()));
 		}
 		this.eventAgents.clear();
 		this.lastSnapshotIndex = -1;
 	}
 
 	private EventAgent getEventAgent(final PersonEvent event) {
-		EventAgent agent = this.eventAgents.get(event.getPersonId().toString());
+		EventAgent agent = this.eventAgents.get(event.getPersonId());
 		if (agent == null) {
 			agent = new EventAgent(event.getPersonId().toString(), event.getTime());
-			this.eventAgents.put(event.getPersonId().toString(), agent);
+			this.eventAgents.put(event.getPersonId(), agent);
 		}
 		agent.time = event.getTime();
 		return agent;
@@ -194,17 +195,17 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		private final double timeCap;
 		private final double inverseTimeCap;
 
-		protected final double radioLengthToEuklideanDist; // ratio of link.length / euklideanDist
+		private final double ratioLengthToEuklideanDist; // ratio of link.length / euklideanDist
 		private final double effectiveCellSize;
 
-		public EventLink(final Link link2, final double capCorrectionFactor, final double effectiveCellSize) {
+		protected EventLink(final Link link2, final double capCorrectionFactor, final double effectiveCellSize) {
 			this.link = link2;
 			this.drivingQueue = new ArrayList<EventAgent>();
 			this.parkingQueue = new ArrayList<EventAgent>();
 			this.waitingQueue = new ArrayList<EventAgent>();
 			this.buffer = new ArrayList<EventAgent>();
 			this.euklideanDist = CoordUtils.calcDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord());
-			this.radioLengthToEuklideanDist = this.link.getLength() / this.euklideanDist;
+			this.ratioLengthToEuklideanDist = this.link.getLength() / this.euklideanDist;
 			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed(Time.UNDEFINED_TIME);
 			this.timeCap = this.link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) * capCorrectionFactor;
 			this.inverseTimeCap = 1.0 / this.timeCap;
@@ -212,7 +213,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			this.spaceCap = (this.link.getLength() * this.link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)) / this.effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
 		}
 
-		public void enter(final EventAgent agent) {
+		protected void enter(final EventAgent agent) {
 			if (agent.currentLink != null) {
 				agent.currentLink.stuck(agent); // use stuck to remove it from wherever it is
 			}
@@ -220,30 +221,30 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			this.drivingQueue.add(agent);
 		}
 
-		public void leave(final EventAgent agent) {
+		protected void leave(final EventAgent agent) {
 			this.drivingQueue.remove(agent);
 			this.buffer.remove(agent);
 			agent.currentLink = null;
 		}
 
-		public void arrival(final EventAgent agent) {
+		protected void arrival(final EventAgent agent) {
 			this.buffer.remove(agent);
 			this.drivingQueue.remove(agent);
 			this.parkingQueue.add(agent);
 		}
 
-		public void departure(final EventAgent agent) {
+		protected void departure(final EventAgent agent) {
 			agent.currentLink = this;
 			this.parkingQueue.remove(agent);
 			this.waitingQueue.add(agent);
 		}
 
-		public void wait2link(final EventAgent agent) {
+		protected void wait2link(final EventAgent agent) {
 			this.waitingQueue.remove(agent);
 			this.buffer.add(agent);
 		}
 
-		public void stuck(final EventAgent agent) {
+		protected void stuck(final EventAgent agent) {
 			// vehicles can be anywhere when they get stuck
 			this.drivingQueue.remove(agent);
 			this.parkingQueue.remove(agent);
@@ -260,7 +261,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		 * @param positions A collection where the calculated positions can be stored.
 		 * @param time The current timestep
 		 */
-		public void getVehiclePositionsQueue(final Collection<PositionInfo> positions, final double time) {
+		protected void getVehiclePositionsQueue(final Collection<PositionInfo> positions, final double time) {
 			double queueEnd = this.link.getLength(); // the length of the queue jammed vehicles build at the end of the link
 			double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 			double vehLen = Math.min(	// the length of a vehicle in visualization
@@ -279,7 +280,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 				PositionInfo position = new PositionInfo(agent.id,
 						this.link, queueEnd/* + NetworkLayer.CELL_LENGTH*/,
 						lane, speed, PositionInfo.VehicleState.Driving,null);
-				agent.linkPosition = queueEnd * this.radioLengthToEuklideanDist;
+				agent.linkPosition = queueEnd * this.ratioLengthToEuklideanDist;
 				positions.add(position);
 				queueEnd -= vehLen;
 			}
@@ -316,7 +317,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 						this.link, distanceOnLink/* + NetworkLayer.CELL_LENGTH*/,
 						lane, speed, PositionInfo.VehicleState.Driving,null);
 				positions.add(position);
-				agent.linkPosition = distanceOnLink * this.radioLengthToEuklideanDist;
+				agent.linkPosition = distanceOnLink * this.ratioLengthToEuklideanDist;
 				lastDistance = distanceOnLink;
 			}
 
@@ -349,7 +350,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		 * @param positions A collection where the calculated positions can be stored.
 		 * @param time The current timestep
 		 */
-		public void getVehiclePositionsEquil(final Collection<PositionInfo> positions, final double time) {
+		protected void getVehiclePositionsEquil(final Collection<PositionInfo> positions, final double time) {
 			int cnt = this.buffer.size() + this.drivingQueue.size();
 			int nLanes = this.link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 			if (cnt > 0) {
@@ -425,15 +426,15 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	}
 
 	private static class EventAgent implements Comparable<EventAgent>, DrawableAgentI {
-		public final IdImpl id;
-		public final int intId;
-		public double time;
-		public EventLink currentLink = null;
-		public double speed = 0.0;
-		public int lane = 1;
-		public double linkPosition = 0.0;
+		protected final IdImpl id;
+		protected final int intId;
+		protected double time;
+		protected EventLink currentLink = null;
+		protected double speed = 0.0;
+		protected int lane = 1;
+		protected double linkPosition = 0.0;
 
-		public EventAgent(final String id, final double time) {
+		protected EventAgent(final String id, final double time) {
 			this.id = new IdImpl(id);
 			this.time = time;
 			this.intId = id.hashCode();
@@ -506,13 +507,13 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 
 		@Override
 		protected double getLinkDisplValue(final BasicLink link, final int index) {
-			EventLink mylink = SnapshotGenerator.this.eventLinks.get(link.getId().toString());
+			EventLink mylink = SnapshotGenerator.this.eventLinks.get(link.getId());
 			return (mylink.buffer.size() + mylink.drivingQueue.size()) / mylink.spaceCap;
 		}
 
 		@Override
 		protected Collection<? extends DrawableAgentI> getAgentsOnLink(final BasicLink link) {
-			EventLink mylink = SnapshotGenerator.this.eventLinks.get(link.getId().toString());
+			EventLink mylink = SnapshotGenerator.this.eventLinks.get(link.getId());
 			Collection<EventAgent> agents = new ArrayList<EventAgent>(mylink.buffer.size() + mylink.drivingQueue.size());
 			agents.addAll(mylink.buffer);
 			agents.addAll(mylink.drivingQueue);

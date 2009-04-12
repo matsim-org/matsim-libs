@@ -23,9 +23,9 @@ package org.matsim.roadpricing;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.Events;
@@ -50,7 +50,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	}
 
 	final RoadPricingScheme scheme;
-	final TreeMap<String, AgentInfo> agents = new TreeMap<String, AgentInfo>();
+	final TreeMap<Id, AgentInfo> agents = new TreeMap<Id, AgentInfo>();
 	private final Network network;
 
 	private TollBehaviourI handler = null;
@@ -98,8 +98,8 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 * @param events the {@link Events} collection, the generated events are sent to for processing
 	 */
 	public void sendUtilityEvents(final double time, final Events events) {
-		for (Map.Entry<String, AgentInfo> entries : this.agents.entrySet()) {
-			events.processEvent(new AgentMoneyEvent(time, new IdImpl(entries.getKey()), -entries.getValue().toll));
+		for (Map.Entry<Id, AgentInfo> entries : this.agents.entrySet()) {
+			events.processEvent(new AgentMoneyEvent(time, entries.getKey(), -entries.getValue().toll));
 		}
 	}
 
@@ -114,7 +114,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 * @param agentId
 	 * @return The toll paid by the specified agent, 0.0 if no toll was paid.
 	 */
-	public double getAgentToll(final String agentId) {
+	public double getAgentToll(final Id agentId) {
 		AgentInfo info = this.agents.get(agentId);
 		if (info == null) {
 			return 0.0;
@@ -171,10 +171,10 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 					event.getTime());
 			if (cost != null) {
 				double newToll = link.getLength() * cost.amount;
-				AgentInfo info = CalcPaidToll.this.agents.get(event.getPersonId().toString());
+				AgentInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
 					info = new AgentInfo();
-					CalcPaidToll.this.agents.put(event.getPersonId().toString(), info);
+					CalcPaidToll.this.agents.put(event.getPersonId(), info);
 				}
 				info.toll += newToll;
 			}
@@ -187,10 +187,10 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 		public void handleEvent(final PersonEvent event, final Link link) {
 			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(), event.getTime());
 			if (cost != null) {
-				AgentInfo info = CalcPaidToll.this.agents.get(event.getPersonId().toString());
+				AgentInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
 					info = new AgentInfo();
-					CalcPaidToll.this.agents.put(event.getPersonId().toString(), info);
+					CalcPaidToll.this.agents.put(event.getPersonId(), info);
 					info.toll = cost.amount;
 				}
 			}
@@ -206,11 +206,11 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(), event.getTime());
 			if (cost != null) {
 				// this is a link inside the toll area.
-				AgentInfo info = CalcPaidToll.this.agents.get(event.getPersonId().toString());
+				AgentInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
 					// no information about this agent, so it did not yet pay the toll
 					info = new AgentInfo();
-					CalcPaidToll.this.agents.put(event.getPersonId().toString(), info);
+					CalcPaidToll.this.agents.put(event.getPersonId(), info);
 					info.toll = 0.0; // we start in the area, do not toll
 				} else if (!info.insideCordonArea) {
 					// agent was outside before, now inside the toll area --> agent has to pay
@@ -219,10 +219,10 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 				}
 			} else {
 				// this is a link outside the toll area.
-				AgentInfo info = CalcPaidToll.this.agents.get(event.getPersonId().toString());
+				AgentInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
 					info = new AgentInfo();
-					CalcPaidToll.this.agents.put(event.getPersonId().toString(), info);
+					CalcPaidToll.this.agents.put(event.getPersonId(), info);
 				}
 				info.insideCordonArea = false;
 			}

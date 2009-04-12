@@ -68,7 +68,7 @@ public class NextLinkTravelTimePerception implements TravelTime, AgentPercepts {
 		while (!nodes.isEmpty()) {
 			current = nodes.remove(0);
 			for (Link l : current.getOutLinks().values()) {
-				this.linkMap.put(l, LinkTravelTimeCounter.getInstance().getLastLinkTravelTime(l.getId().toString()));
+				this.linkMap.put(l, LinkTravelTimeCounter.getInstance().getLastLinkTravelTime(l.getId()));
 				if (depth < this.sightDistance) {
 					nodes.add(l.getToNode());
 				}
