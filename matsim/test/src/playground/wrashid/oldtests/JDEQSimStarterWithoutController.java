@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.jdeqsim;
+package playground.wrashid.oldtests;
 
 import java.io.IOException;
 

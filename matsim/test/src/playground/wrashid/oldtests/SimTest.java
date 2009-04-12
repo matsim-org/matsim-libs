@@ -3,7 +3,6 @@ package playground.wrashid.oldtests;
 import java.util.ArrayList;
 
 import org.matsim.core.mobsim.jdeqsim.EventLog;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimStarterWithoutController;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 
