@@ -26,7 +26,6 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 
 import org.matsim.vis.netvis.DisplayableLinkI;
 import org.matsim.vis.netvis.DrawableAgentI;
@@ -47,7 +46,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 
 	private double laneWidth;
 
-	private BufferedImage image;
+//	private BufferedImage image;
 
 	public LinkSetRendererCOOPERSVehiclesOnly(VisConfig visConfig, DisplayNet network) {
 		super(visConfig);
@@ -132,8 +131,8 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 			renderLinks(display, boxTransform);
 		} else {
 			renderLinks(display, boxTransform);
-			display.setTransform(new AffineTransform());
-			display.drawImage(image, null, 0, 0);
+//			display.setTransform(new AffineTransform());
+//			display.drawImage(image, null, 0, 0);
 			display.setTransform(originalTransform);
 
 			for (DisplayableLinkI link : network.getLinks().values()) {
