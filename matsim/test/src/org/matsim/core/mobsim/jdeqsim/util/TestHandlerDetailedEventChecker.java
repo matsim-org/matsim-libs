@@ -2,19 +2,17 @@ package org.matsim.core.mobsim.jdeqsim.util;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.config.Config;
@@ -36,9 +34,9 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class TestHandlerDetailedEventChecker extends MatsimTestCase implements PersonEventHandler {
 
-	protected HashMap<String, LinkedList<PersonEvent>> events = new HashMap<String, LinkedList<PersonEvent>>();
+	protected HashMap<Id, LinkedList<PersonEvent>> events = new HashMap<Id, LinkedList<PersonEvent>>();
 	public LinkedList<PersonEvent> allEvents = new LinkedList<PersonEvent>();
-	private HashMap<String, ExpectedNumberOfEvents> expectedNumberOfMessages = new HashMap<String, ExpectedNumberOfEvents>();
+//	private HashMap<Id, ExpectedNumberOfEvents> expectedNumberOfMessages = new HashMap<Id, ExpectedNumberOfEvents>();
 	protected boolean printEvent = true;
 	protected Population population;
 
@@ -69,7 +67,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 		// compare plan and events for each agent
 		// compare: type of events, linkId
 		for (LinkedList<PersonEvent> list : events.values()) {
-			Person p = population.getPersons().get(new IdImpl(list.get(0).getPersonId().toString()));
+			Person p = population.getPersons().get(list.get(0).getPersonId());
 			// printEvents(list.get(0).agentId);
 			Plan plan = p.getSelectedPlan();
 			int index = 0;
@@ -139,10 +137,10 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 	}
 
 	public void handleEvent(PersonEvent event) {
-		if (!events.containsKey(event.getPersonId().toString())) {
-			events.put(event.getPersonId().toString(), new LinkedList<PersonEvent>());
+		if (!events.containsKey(event.getPersonId())) {
+			events.put(event.getPersonId(), new LinkedList<PersonEvent>());
 		}
-		events.get(event.getPersonId().toString()).add(event);
+		events.get(event.getPersonId()).add(event);
 		if (printEvent) {
 			System.out.println(event.toString());
 		}
@@ -175,41 +173,41 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 		new JDEQSimulation(network, population, events).run();
 		events.finishProcessing();
 
-		this.calculateExpectedNumberOfEvents(population);
+//		this.calculateExpectedNumberOfEvents(population); // this method doesn't do any useful stuff, deactivated it
 		this.checkAssertions();
 	}
 
-	public void calculateExpectedNumberOfEvents(Population population) {
-		this.population = population;
+//	public void calculateExpectedNumberOfEvents(Population population) {
+//		this.population = population;
+//
+//		for (Person p : population.getPersons().values()) {
+//			Plan plan = p.getSelectedPlan();
+//			ExpectedNumberOfEvents expected = new ExpectedNumberOfEvents();
+//			List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
+//			expected.expectedDepartureEvents += actsLegs.size() / 2;
+//
+//			LegIterator iter = plan.getIteratorLeg();
+//			while (iter.hasNext()) {
+//				Leg leg = (Leg) iter.next();
+//				// at the moment only cars are simulated on the road
+//				if (leg.getMode().equals(TransportMode.car)) {
+//					expected.expectedLinkEnterEvents += ((NetworkRoute) leg.getRoute()).getLinks().size() + 1;
+//				}
+//			}
+//
+//			expected.expectedArrivalEvents = expected.expectedDepartureEvents;
+//			expected.expectedLinkLeaveEvents = expected.expectedLinkEnterEvents;
+//
+//			expectedNumberOfMessages.put(p.getId(), expected);
+//
+//		}
+//	}
 
-		for (Person p : population.getPersons().values()) {
-			Plan plan = p.getSelectedPlan();
-			ExpectedNumberOfEvents expected = new ExpectedNumberOfEvents();
-			List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
-			expected.expectedDepartureEvents += actsLegs.size() / 2;
-
-			LegIterator iter = plan.getIteratorLeg();
-			while (iter.hasNext()) {
-				Leg leg = (Leg) iter.next();
-				// at the moment only cars are simulated on the road
-				if (leg.getMode().equals(TransportMode.car)) {
-					expected.expectedLinkEnterEvents += ((NetworkRoute) leg.getRoute()).getLinks().size() + 1;
-				}
-			}
-
-			expected.expectedArrivalEvents = expected.expectedDepartureEvents;
-			expected.expectedLinkLeaveEvents = expected.expectedLinkEnterEvents;
-
-			expectedNumberOfMessages.put(p.getId().toString(), expected);
-
-		}
-	}
-
-	/*package*/ static class ExpectedNumberOfEvents {
-		public int expectedLinkEnterEvents;
-		public int expectedLinkLeaveEvents;
-		public int expectedDepartureEvents;
-		public int expectedArrivalEvents;
-	}
+//	/*package*/ static class ExpectedNumberOfEvents {
+//		public int expectedLinkEnterEvents;
+//		public int expectedLinkLeaveEvents;
+//		public int expectedDepartureEvents;
+//		public int expectedArrivalEvents;
+//	}
 
 }

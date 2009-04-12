@@ -22,10 +22,8 @@ package org.matsim.vis.netvis.renderers;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -57,19 +55,19 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 
 		this.laneWidth = DisplayLink.LANE_WIDTH * visConfig.getLinkWidthFactor();
 	}
-
-	public BufferedImage captureScreen(Graphics2D display) {
-		Component target = getNetJComponent();
-		Rectangle rect = getNetJComponent().getVisibleRect();
-
-		image = new BufferedImage((int)rect.getWidth(), (int)rect.getHeight()+40, BufferedImage.TYPE_INT_RGB);
-		Graphics2D imdisplay = image.createGraphics();
-		imdisplay.fillRect( 0, 0, (int)rect.getWidth() - 1, (int)rect.getHeight() - 1 );
-		imdisplay.setTransform(display.getTransform());
-		target.paint(imdisplay);
-
-		return image;
-	}
+//
+//	public BufferedImage captureScreen(Graphics2D display) {
+//		Component target = getNetJComponent();
+//		Rectangle rect = getNetJComponent().getVisibleRect();
+//
+//		image = new BufferedImage((int)rect.getWidth(), (int)rect.getHeight()+40, BufferedImage.TYPE_INT_RGB);
+//		Graphics2D imdisplay = image.createGraphics();
+//		imdisplay.fillRect( 0, 0, (int)rect.getWidth() - 1, (int)rect.getHeight() - 1 );
+//		imdisplay.setTransform(display.getTransform());
+//		target.paint(imdisplay);
+//
+//		return image;
+//	}
 
 	// -------------------- RENDERING --------------------
 

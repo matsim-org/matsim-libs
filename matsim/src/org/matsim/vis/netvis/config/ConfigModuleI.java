@@ -42,7 +42,7 @@ public interface ConfigModuleI {
      */
     public static final String MODULE_NAME_ATTR = "name";
 
-    public static final String MODULE_CLASS_ATTR = "class";
+//    public static final String MODULE_CLASS_ATTR = "class";
 
 //    /**
 //     * Returns this sub-configuration's name.

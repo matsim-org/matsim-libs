@@ -112,9 +112,9 @@ public abstract class StreamReaderA implements SimStateReaderI {
         return temporalConfig.getEndTime_s();
     }
 
-    public boolean represents(int time_s) {
-        return (time_s / timeStepLength_s()) * timeStepLength_s() == getCurrentTime_s();
-    }
+//    public boolean represents(int time_s) {
+//        return (time_s / timeStepLength_s()) * timeStepLength_s() == getCurrentTime_s();
+//    }
 
     // -------------------- READER IMPLEMENTATION --------------------
 

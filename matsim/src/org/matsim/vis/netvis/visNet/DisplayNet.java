@@ -83,9 +83,6 @@ public class DisplayNet implements BasicNetwork, DisplayableNetI {
 
 	// -------------------- IMPLEMENTATION OF BasicNetworkI --------------------
 
-	public void connect() {
-	}
-
 	public Map<Id, ? extends DisplayNode> getNodes() {
 		return nodes;
 	}

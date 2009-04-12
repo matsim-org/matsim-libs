@@ -137,10 +137,10 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
         }
         return null;
     }
-
-    public boolean containsKey(String name) {
-        return get(name) != null;
-    }
+//
+//    public boolean containsKey(String name) {
+//        return get(name) != null;
+//    }
 
     // -------------------- MISC --------------------
 

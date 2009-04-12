@@ -52,7 +52,6 @@ import org.matsim.vis.otfvis.data.OTFData;
 import org.matsim.vis.otfvis.data.OTFDataQuad;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgent;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.interfaces.OTFQuery;
 
 
 /**
@@ -137,13 +136,13 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
     	viewMaxY  = networkClippingMinNorthing() + (1.-minY) * networkClippingHeight();
     }
 
-    public void moveViewClipCoords( double deltaX, double deltaY) {
-    	viewMinX  += deltaX * networkClippingWidth();
-    	viewMaxX  += deltaX * networkClippingWidth();
-
-    	viewMinY  -= deltaY * networkClippingHeight();
-    	viewMaxY  -= deltaY * networkClippingHeight();
-    }
+//    public void moveViewClipCoords( double deltaX, double deltaY) {
+//    	viewMinX  += deltaX * networkClippingWidth();
+//    	viewMaxX  += deltaX * networkClippingWidth();
+//
+//    	viewMinY  -= deltaY * networkClippingHeight();
+//    	viewMaxY  -= deltaY * networkClippingHeight();
+//    }
 
     // returns something like this
     // 0  1  2
@@ -158,19 +157,19 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
     	return xquart + 4* yquart;
     }
 
-    public boolean checkLineInClip(double sx, double sy, double ex, double ey) {
-    	int qstart = checkViewClip(sx,sy);
-    	int qend = checkViewClip(ex,ey);
-
-    	// both in same sector, that is not middle sector
-    	if ( (qstart == qend) && qstart != 5) return false;
-    	// both are either left or right and not in the middle
-    	if( (qstart % 4) == ( qend % 4) && (qstart % 4) != 1 ) return false;
-    	// both are either top or bottom but not in the middle
-    	if( (qstart / 4) == ( qend / 4) && (qstart / 4) != 1 ) return false;
-
-    	return true; // all other cases are possibly visible
-    }
+//    public boolean checkLineInClip(double sx, double sy, double ex, double ey) {
+//    	int qstart = checkViewClip(sx,sy);
+//    	int qend = checkViewClip(ex,ey);
+//
+//    	// both in same sector, that is not middle sector
+//    	if ( (qstart == qend) && qstart != 5) return false;
+//    	// both are either left or right and not in the middle
+//    	if( (qstart % 4) == ( qend % 4) && (qstart % 4) != 1 ) return false;
+//    	// both are either top or bottom but not in the middle
+//    	if( (qstart / 4) == ( qend / 4) && (qstart / 4) != 1 ) return false;
+//
+//    	return true; // all other cases are possibly visible
+//    }
 
     // --------------- CONSTRUCTION ---------------
 
@@ -282,18 +281,18 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
     }
 
     // --------------------
-    public Point2D.Double getNetCoord (double x, double y) {
-    	Point2D.Double result = new Point2D.Double();
-        Dimension prefSize = getPreferredSize();
-    	result.x = x /prefSize.width;
-    	result.y = 1.- y /prefSize.height;
-    	result.x *= (quad.getMaxEasting() - quad.getMinEasting());
-    	result.y *= (quad.getMaxNorthing() - quad.getMinNorthing());
-    	//result.x += network.minEasting();
-    	//result.y += network.minNorthing();
-
-    	return result;
-    }
+//    public Point2D.Double getNetCoord (double x, double y) {
+//    	Point2D.Double result = new Point2D.Double();
+//        Dimension prefSize = getPreferredSize();
+//    	result.x = x /prefSize.width;
+//    	result.y = 1.- y /prefSize.height;
+//    	result.x *= (quad.getMaxEasting() - quad.getMinEasting());
+//    	result.y *= (quad.getMaxNorthing() - quad.getMinNorthing());
+//    	//result.x += network.minEasting();
+//    	//result.y += network.minNorthing();
+//
+//    	return result;
+//    }
     // -------------------- PAINTING --------------------
 
     @Override
@@ -349,7 +348,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	 */
 	public static class SimpleQuadDrawer extends OTFSwingDrawable implements OTFDataQuad.Receiver{
 		protected final Point2D.Float[] quad = new Point2D.Float[4];
-		protected float coloridx = 0;
+//		protected float coloridx = 0;
 		
 
 		Point2D.Float calcOrtho(Point2D.Float start, Point2D.Float end, int nrLanes){
@@ -377,7 +376,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		}
 
 		public void setColor(float coloridx) {
-			this.coloridx = coloridx;
+//			this.coloridx = coloridx;
 		}
 
 		@Override
@@ -423,15 +422,15 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			this.state = state;
 		}
 
-		protected void setColor(Graphics2D display) {
-			Color color = colorizer.getColor(0.1 + 0.9*this.color);
-			if ((state & 1) != 0) {
-				color = Color.lightGray;
-			}
-			display.setColor(color);
-
-		}
-		
+//		protected void setColor(Graphics2D display) {
+//			Color color = colorizer.getColor(0.1 + 0.9*this.color);
+//			if ((state & 1) != 0) {
+//				color = Color.lightGray;
+//			}
+//			display.setColor(color);
+//
+//		}
+//		
 
 		@Override
 		public void onDraw(Graphics2D display) {
@@ -563,16 +562,14 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 	}
 
-
-	public void addQuery(OTFQuery query) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void removeQueries() {
-		// TODO Auto-generated method stub
-		
-	}
+//
+//	public void addQuery(OTFQuery query) {
+//		// TODO Auto-generated method stub
+//	}
+//
+//	public void removeQueries() {
+//		// TODO Auto-generated method stub
+//	}
 	
 	public void clearCache() {
 		if(quad != null) quad.clearCache();

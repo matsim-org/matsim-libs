@@ -26,7 +26,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 
 import javax.swing.JComponent;
 
@@ -64,13 +63,13 @@ public class NetJComponent extends JComponent {
     	viewMaxY  = networkClippingMinNorthing() + (1.-minY) * networkClippingHeight();
     }
 
-    public void moveViewClipCoords( double deltaX, double deltaY) {
-    	viewMinX  += deltaX * networkClippingWidth();
-    	viewMaxX  += deltaX * networkClippingWidth();
-
-    	viewMinY  -= deltaY * networkClippingHeight();
-    	viewMaxY  -= deltaY * networkClippingHeight();
-    }
+//    public void moveViewClipCoords( double deltaX, double deltaY) {
+//    	viewMinX  += deltaX * networkClippingWidth();
+//    	viewMaxX  += deltaX * networkClippingWidth();
+//
+//    	viewMinY  -= deltaY * networkClippingHeight();
+//    	viewMaxY  -= deltaY * networkClippingHeight();
+//    }
 
     // returns something like this
     // 0  1  2
@@ -203,18 +202,18 @@ public class NetJComponent extends JComponent {
     }
 
     // --------------------
-    public Point2D.Double getNetCoord (double x, double y) {
-    	Point2D.Double result = new Point2D.Double();
-        Dimension prefSize = getPreferredSize();
-    	result.x = x /prefSize.width;
-    	result.y = 1.- y /prefSize.height;
-    	result.x *= (network.maxEasting() - network.minEasting());
-    	result.y *= (network.maxNorthing() - network.minNorthing());
-    	result.x += network.minEasting();
-    	result.y += network.minNorthing();
-
-    	return result;
-    }
+//    public Point2D.Double getNetCoord (double x, double y) {
+//    	Point2D.Double result = new Point2D.Double();
+//        Dimension prefSize = getPreferredSize();
+//    	result.x = x /prefSize.width;
+//    	result.y = 1.- y /prefSize.height;
+//    	result.x *= (network.maxEasting() - network.minEasting());
+//    	result.y *= (network.maxNorthing() - network.minNorthing());
+//    	result.x += network.minEasting();
+//    	result.y += network.minNorthing();
+//
+//    	return result;
+//    }
     // -------------------- PAINTING --------------------
 
     @Override
