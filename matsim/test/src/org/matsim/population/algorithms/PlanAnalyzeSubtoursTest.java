@@ -60,7 +60,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		
 		config.planomat().setTripStructureAnalysisLayer("link");
-		this.runDemo(network);
+		this.runDemo(network, config);
 	}
 	
 	public void testFacilitiesBased() {
@@ -69,11 +69,10 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 
 		config.planomat().setTripStructureAnalysisLayer("facility");
-		this.runDemo(facilities);
+		this.runDemo(facilities, config);
 	}
 	
-	protected void runDemo(Layer layer) {
-		Config config = loadConfig(PlanAnalyzeSubtoursTest.CONFIGFILE);
+	protected void runDemo(Layer layer, Config config) {
 
 		PlanAnalyzeSubtours testee = new PlanAnalyzeSubtours();
 
