@@ -41,6 +41,8 @@ import org.xml.sax.SAXException;
  */
 public class MatsimConfigReader extends MatsimXmlParser {
 
+	private final static Logger log = Logger.getLogger(MatsimConfigReader.class);
+	
 	private final static String CONFIG_V1 = "config_v1.dtd";
 
 	private final Config config;
@@ -117,7 +119,7 @@ public class MatsimConfigReader extends MatsimXmlParser {
 		// Currently the only config-type is v1
 		if (CONFIG_V1.equals(doctype)) {
 			this.delegate = new ConfigReaderMatsimV1(this.config);
-			Logger.getLogger(MatsimConfigReader.class).info("using config_v1-reader.");
+			log.info("using config_v1-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 		}
@@ -134,7 +136,7 @@ public class MatsimConfigReader extends MatsimXmlParser {
 		if (this.localDtd != null) {
 			File dtdFile = new File(this.localDtd);
 			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
-				Logger.getLogger(MatsimConfigReader.class).info("Using the local DTD " + this.localDtd);
+				log.info("Using the local DTD " + this.localDtd);
 				return new InputSource(this.localDtd);
 			}
 		}
@@ -143,7 +145,7 @@ public class MatsimConfigReader extends MatsimXmlParser {
 		String shortSystemId = systemId.substring(index + 1);
 		InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId);
 		if (stream != null) {
-			Logger.getLogger(this.getClass()).info("Using local DTD from jar-file " + shortSystemId);
+			log.info("Using local DTD from jar-file " + shortSystemId);
 			return new InputSource(stream);
 		}
 		// we fail...
