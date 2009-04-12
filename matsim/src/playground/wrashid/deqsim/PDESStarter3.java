@@ -20,12 +20,9 @@
 
 package playground.wrashid.deqsim;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -39,17 +36,7 @@ public class PDESStarter3 {
 		}
 		
 		// read, prepare configuratiaon
-		Config config = Gbl.createConfig(null);
-		if (args.length > 1 && args[1].toLowerCase().endsWith(".dtd")) {
-			try {
-				new MatsimConfigReader(config).readFile(args[0], args[1]);
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
-			}
-		} else {
-			new MatsimConfigReader(config).readFile(args[0]);
-		}
+		Config config = Gbl.createConfig(args);
 		
 		// prepare data
 		ScenarioImpl data = new ScenarioImpl(config);
