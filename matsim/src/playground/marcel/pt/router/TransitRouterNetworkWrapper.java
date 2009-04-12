@@ -28,10 +28,9 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
@@ -42,7 +41,7 @@ import org.matsim.world.Location;
 
 public class TransitRouterNetworkWrapper implements Network {
 
-	/*package*/static final Mode[] allowedModes = new Mode[] { BasicLeg.Mode.pt };
+	/*package*/static final TransportMode[] allowedModes = new TransportMode[] { TransportMode.pt };
 
 	private final TransitRouterNetwork transitNetwork;
 	private final Map<TransitRouterNetwork.TransitRouterNetworkNode, NodeWrapper> nodesLookup =
@@ -379,11 +378,11 @@ public class TransitRouterNetworkWrapper implements Network {
 			throw new UnsupportedOperationException();
 		}
 
-		public Mode[] getAllowedModes() {
+		public TransportMode[] getAllowedModes() {
 			return allowedModes;
 		}
 
-		public void setAllowedModes(final Mode[] modes) {
+		public void setAllowedModes(final TransportMode[] modes) {
 			throw new UnsupportedOperationException();
 		}
 	}

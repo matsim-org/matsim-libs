@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -407,39 +407,39 @@ public class GenerateBlnPlan {
 		switch (Integer.parseInt(tripData[48])) {
 		case 0:
 			// "keine Angabe"
-			leg = new LegImpl(BasicLeg.Mode.undefined);
+			leg = new LegImpl(TransportMode.undefined);
 			break;
 		case 1:
 			// "Fuss"
-			leg = new LegImpl(BasicLeg.Mode.walk);
+			leg = new LegImpl(TransportMode.walk);
 			break;
 		case 2:
 			// "Rad"
-			leg = new LegImpl(BasicLeg.Mode.bike);
+			leg = new LegImpl(TransportMode.bike);
 			break;
 		case 3:
 			// "MIV"
-			leg = new LegImpl(BasicLeg.Mode.miv);
+			leg = new LegImpl(TransportMode.miv);
 			break;
 		case 4:
 			// "OEV"
-			leg = new LegImpl(BasicLeg.Mode.pt);
+			leg = new LegImpl(TransportMode.pt);
 			break;
 		case 5:
 			// "Rad/OEV"
-			leg = new LegImpl(BasicLeg.Mode.pt);
+			leg = new LegImpl(TransportMode.pt);
 			break;
 		case 6:
 			// "IV/OEV"
-			leg = new LegImpl(BasicLeg.Mode.pt);
+			leg = new LegImpl(TransportMode.pt);
 			break;
 		case 7:
 			// "sonstiges"
-			leg = new LegImpl(BasicLeg.Mode.undefined);
+			leg = new LegImpl(TransportMode.undefined);
 			break;
 		default:
 			log.error("transport mode not defined");
-			leg = new LegImpl(BasicLeg.Mode.walk);
+			leg = new LegImpl(TransportMode.walk);
 		}
 
 		// Read travel trip time from survey (min) 

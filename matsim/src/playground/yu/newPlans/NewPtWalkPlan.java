@@ -23,7 +23,7 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -96,7 +96,7 @@ public class NewPtWalkPlan extends NewPopulation implements PersonAlgorithm,
 			} else {
 				Leg leg = (Leg) o;
 				Leg ptLeg = new org.matsim.core.population.LegImpl(leg);
-				ptLeg.setMode(Mode.pt);
+				ptLeg.setMode(TransportMode.pt);
 				ptLeg.setRoute(null);
 				// -----------------------------------------------
 				// WITHOUT routeSetting!! traveltime of PT can be
@@ -105,12 +105,12 @@ public class NewPtWalkPlan extends NewPopulation implements PersonAlgorithm,
 				ptPlan.addLeg(ptLeg);
 
 				Leg walkLeg = new org.matsim.core.population.LegImpl(leg);
-				walkLeg.setMode(Mode.walk);
+				walkLeg.setMode(TransportMode.walk);
 				walkLeg.setRoute(null);
 				walkPlan.addLeg(walkLeg);
-				if (!leg.getMode().equals(Mode.car)) {
+				if (!leg.getMode().equals(TransportMode.car)) {
 					leg.setRoute(null);
-					leg.setMode(Mode.car);
+					leg.setMode(TransportMode.car);
 				}
 			}
 		}

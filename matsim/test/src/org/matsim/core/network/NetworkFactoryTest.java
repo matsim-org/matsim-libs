@@ -21,7 +21,7 @@
 package org.matsim.core.network;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.network.NetworkFactory;
@@ -41,35 +41,35 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		NetworkFactory factory = new NetworkFactory();
 
 		// test default
-		Route carRoute = factory.createRoute(BasicLeg.Mode.car, null, null);
+		Route carRoute = factory.createRoute(TransportMode.car, null, null);
 		assertTrue(carRoute instanceof NodeNetworkRoute);
 
 		try {
-			Route route = factory.createRoute(BasicLeg.Mode.pt, null, null);
+			Route route = factory.createRoute(TransportMode.pt, null, null);
 			fail("expected IllegalArgumentException, but got route " + route.toString());
 		} catch (IllegalArgumentException e) {
 			log.info("Catched expected IllegalArgumentException: " + e.getMessage());
 		}
 
 		// overwrite car-mode
-		factory.setRouteFactory(BasicLeg.Mode.car, new CarRouteMockFactory());
+		factory.setRouteFactory(TransportMode.car, new CarRouteMockFactory());
 		// add pt-mode
-		factory.setRouteFactory(BasicLeg.Mode.pt, new PtRouteMockFactory());
+		factory.setRouteFactory(TransportMode.pt, new PtRouteMockFactory());
 
 		// test car-mode
-		carRoute = factory.createRoute(BasicLeg.Mode.car, null, null);
+		carRoute = factory.createRoute(TransportMode.car, null, null);
 		assertTrue(carRoute instanceof CarRouteMock);
 
 		// add pt-mode
-		Route ptRoute = factory.createRoute(BasicLeg.Mode.pt, null, null);
+		Route ptRoute = factory.createRoute(TransportMode.pt, null, null);
 		assertTrue(ptRoute instanceof PtRouteMock);
 
 		// remove pt-mode
-		factory.setRouteFactory(BasicLeg.Mode.pt, null);
+		factory.setRouteFactory(TransportMode.pt, null);
 
 		// test pt again
 		try {
-			Route route = factory.createRoute(BasicLeg.Mode.pt, null, null);
+			Route route = factory.createRoute(TransportMode.pt, null, null);
 			fail("expected IllegalArgumentException, but got route " + route.toString());
 		} catch (IllegalArgumentException e) {
 			log.info("Catched expected IllegalArgumentException: " + e.getMessage());

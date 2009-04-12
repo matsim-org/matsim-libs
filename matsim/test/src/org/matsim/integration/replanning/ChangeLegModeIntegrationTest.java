@@ -20,7 +20,7 @@
 
 package org.matsim.integration.replanning;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -69,7 +69,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		Activity act = plan.createAct("home", new CoordImpl(0, 0));
 		act.setLink(link);
 		act.setEndTime(8.0 * 3600);
-		plan.createLeg(BasicLeg.Mode.car);
+		plan.createLeg(TransportMode.car);
 		act = plan.createAct("work", new CoordImpl(0, 500));
 		act.setLink(link);
 
@@ -85,7 +85,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
 		Plan newPlan = person.getSelectedPlan();
 		Leg newLeg = (Leg) newPlan.getPlanElements().get(1);
-		assertEquals(BasicLeg.Mode.walk, newLeg.getMode());
+		assertEquals(TransportMode.walk, newLeg.getMode());
 		assertNotNull("the leg should now have a route.", newLeg.getRoute());
 	}
 

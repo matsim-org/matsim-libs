@@ -8,7 +8,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
@@ -51,11 +51,11 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 		Coord homeLoc = plan.getFirstActivity().getCoord();
 		String mode = "";
 		if (PlanModeJudger.useCar(plan)) {
-			mode = Mode.car.name();
+			mode = TransportMode.car.name();
 		} else if (PlanModeJudger.usePt(plan)) {
-			mode = Mode.pt.name();
+			mode = TransportMode.pt.name();
 		} else if (PlanModeJudger.useWalk(plan)) {
-			mode = Mode.walk.name();
+			mode = TransportMode.walk.name();
 		}
 		writer.writeln(homeLoc.getX() + "\t" + homeLoc.getY() + "\t" + mode);
 	}

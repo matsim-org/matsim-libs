@@ -22,7 +22,7 @@ package org.matsim.run;
 
 import java.io.File;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
@@ -68,7 +68,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		Plan plan = person.createPlan(true);
 		Activity a1 = plan.createAct("h", network.getLink(new IdImpl("1")));
 		a1.setEndTime(3600);
-		plan.createLeg(BasicLeg.Mode.car);
+		plan.createLeg(TransportMode.car);
 		plan.createAct("w", network.getLink(new IdImpl("20")));
 
 		// write person to file

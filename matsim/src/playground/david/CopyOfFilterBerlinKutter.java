@@ -23,7 +23,7 @@ package playground.david;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -56,7 +56,7 @@ class FilterPersonsNonCarMode extends AbstractPersonAlgorithm{
 			} else {
 				Leg leg = (Leg)plan.getPlanElements().get(jj);
 				// route
-				if (!leg.getMode().equals(BasicLeg.Mode.car)  && (this.count < 10)) {
+				if (!leg.getMode().equals(TransportMode.car)  && (this.count < 10)) {
 					try {
 						CopyOfFilterBerlinKutter.relevantPopulation.addPerson(person);
 						this.count++;

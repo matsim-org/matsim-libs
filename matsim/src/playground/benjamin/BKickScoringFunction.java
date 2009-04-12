@@ -21,7 +21,7 @@ package playground.benjamin;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -292,7 +292,7 @@ public class BKickScoringFunction implements ScoringFunction {
 		double dist = 0.0; // distance in meters
 
 
-		if (BasicLeg.Mode.car.equals(leg.getMode())) {
+		if (TransportMode.car.equals(leg.getMode())) {
 			if (marginalUtilityOfFuel != 0.0) {
 				/* we only as for the route when we have to calculate a distance cost,
 				 * because route.getDist() may calculate the distance if not yet
@@ -311,14 +311,14 @@ public class BKickScoringFunction implements ScoringFunction {
 			tmpScore += travelTime * marginalUtilityOfTraveling + marginalUtilityOfFuel * 0.12d/1000.0d * dist;
 		
 		} 
-		else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
+		else if (TransportMode.pt.equals(leg.getMode())) {
 			if (marginalUtilityOfPtFare != 0.0) {
 				Route route = leg.getRoute();
 				dist = route.getDistance();
 			}
 			tmpScore = tmpScore + travelTime * marginalUtilityOfTravelingPT + marginalUtilityOfPtFare * 0.28d/1000.0d * dist;
 		} 
-		else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
+		else if (TransportMode.walk.equals(leg.getMode())) {
 			tmpScore += travelTime * marginalUtilityOfTravelingWalk;
 		} 
 		else {

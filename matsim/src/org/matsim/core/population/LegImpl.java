@@ -20,7 +20,7 @@
 
 package org.matsim.core.population;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Route;
@@ -30,7 +30,7 @@ import org.matsim.core.utils.misc.Time;
 
 public class LegImpl extends BasicLegImpl implements Leg {
 
-	public LegImpl(final BasicLeg.Mode mode) {
+	public LegImpl(final TransportMode mode) {
 		super(mode);
 	}
 

@@ -20,17 +20,17 @@
 
 package org.matsim.api.basic.v01.population;
 
+import org.matsim.api.basic.v01.TransportMode;
+
 
 /**
 * @author dgrether
 */
 public interface BasicLeg extends BasicPlanElement {
 
-	public enum Mode {miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, other, undefined}
+	public TransportMode getMode();
 
-	public Mode getMode();
-
-	public void setMode(Mode mode);
+	public void setMode(TransportMode mode);
 
 	public BasicRoute getRoute();
 

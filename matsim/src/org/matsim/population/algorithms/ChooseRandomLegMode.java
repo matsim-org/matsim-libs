@@ -22,6 +22,7 @@ package org.matsim.population.algorithms;
 
 import java.util.Random;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
@@ -36,24 +37,24 @@ import org.matsim.core.gbl.MatsimRandom;
  */
 public class ChooseRandomLegMode implements PlanAlgorithm {
 
-	private final BasicLeg.Mode[] possibleModes;
+	private final TransportMode[] possibleModes;
 	private final Random rng;
 
 	/**
 	 * @param possibleModes
 	 * @param rng The random number generator used to draw random numbers to select another mode.
 	 *
-	 * @see BasicLeg.Mode
+	 * @see TransportMode
 	 * @see MatsimRandom
 	 */
-	public ChooseRandomLegMode(final BasicLeg.Mode[] possibleModes, final Random rng) {
+	public ChooseRandomLegMode(final TransportMode[] possibleModes, final Random rng) {
 		this.possibleModes = possibleModes.clone();
 		this.rng = rng;
 	}
 
 	public void run(final Plan plan) {
 		if (plan.getPlanElements().size() > 1) {
-			final BasicLeg.Mode currentMode = ((BasicLeg) (plan.getPlanElements().get(1))).getMode();
+			final TransportMode currentMode = ((BasicLeg) (plan.getPlanElements().get(1))).getMode();
 			int newModeIdx = this.rng.nextInt(this.possibleModes.length - 1);
 			for (int i = 0; i <= newModeIdx; i++) {
 				if (this.possibleModes[i].equals(currentMode)) {
@@ -64,7 +65,7 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 					break;
 				}
 			}
-			BasicLeg.Mode newMode = this.possibleModes[newModeIdx];
+			TransportMode newMode = this.possibleModes[newModeIdx];
 			for (LegIterator iter = plan.getIteratorLeg(); iter.hasNext(); ) {
 				iter.next().setMode(newMode);
 			}

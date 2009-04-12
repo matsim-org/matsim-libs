@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Route;
@@ -38,11 +38,11 @@ public class NetworkFactory {
 
 	private LinkFactory linkFactory = null;
 
-	private final Map<BasicLeg.Mode, RouteFactory> routeFactories = new HashMap<BasicLeg.Mode, RouteFactory>();
+	private final Map<TransportMode, RouteFactory> routeFactories = new HashMap<TransportMode, RouteFactory>();
 
 	public NetworkFactory() {
 		this.linkFactory = new LinkFactoryImpl();
-		this.routeFactories.put(BasicLeg.Mode.car, new NodeNetworkRouteFactory());
+		this.routeFactories.put(TransportMode.car, new NodeNetworkRouteFactory());
 	}
 
 	public Node createNode(final Id id, final Coord coord, final String type) {
@@ -62,9 +62,9 @@ public class NetworkFactory {
 	 * @return a new Route for the specified mode
 	 * @throws IllegalArgumentException if no {@link RouteFactory} is registered that creates routes for the specified mode.
 	 *
-	 * @see #setRouteFactory(org.matsim.api.basic.v01.population.BasicLeg.Mode, RouteFactory)
+	 * @see #setRouteFactory(org.matsim.api.basic.v01.population.BasicLeg.TransportMode, RouteFactory)
 	 */
-	public Route createRoute(final BasicLeg.Mode mode, final Link startLink, final Link endLink) {
+	public Route createRoute(final TransportMode mode, final Link startLink, final Link endLink) {
 		final RouteFactory factory = this.routeFactories.get(mode);
 		if (factory == null) {
 			throw new IllegalArgumentException("There is no factory known to create routes for leg-mode " + mode.toString());
@@ -73,7 +73,7 @@ public class NetworkFactory {
 	}
 
 	@Deprecated
-	public Route createRoute(final BasicLeg.Mode mode) {
+	public Route createRoute(final TransportMode mode) {
 		final RouteFactory factory = this.routeFactories.get(mode);
 		if (factory == null) {
 			throw new IllegalArgumentException("There is no factory known to create routes for leg-mode " + mode.toString());
@@ -88,7 +88,7 @@ public class NetworkFactory {
 	 * @param mode
 	 * @param factory
 	 */
-	public void setRouteFactory(final BasicLeg.Mode mode, final RouteFactory factory) {
+	public void setRouteFactory(final TransportMode mode, final RouteFactory factory) {
 		if (factory == null) {
 			this.routeFactories.remove(mode);
 		} else {

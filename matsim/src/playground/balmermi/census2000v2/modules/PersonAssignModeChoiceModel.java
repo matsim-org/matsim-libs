@@ -27,7 +27,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -125,11 +125,11 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		Activity act = (Activity)p.getPlanElements().get(s_act_idx);
 		if (act.getType().startsWith(H)) { return -1; }
 		Leg leg = (Leg)p.getPlanElements().get(s_act_idx-1);
-		if (leg.getMode().equals(BasicLeg.Mode.car)) { return 0; }
-		else if (leg.getMode().equals(BasicLeg.Mode.pt)) { return 1; }
-		else if (leg.getMode().equals(BasicLeg.Mode.ride)) { return 2; }
-		else if (leg.getMode().equals(BasicLeg.Mode.bike)) { return 3; }
-		else if (leg.getMode().equals(BasicLeg.Mode.walk)) { return 4; }
+		if (leg.getMode().equals(TransportMode.car)) { return 0; }
+		else if (leg.getMode().equals(TransportMode.pt)) { return 1; }
+		else if (leg.getMode().equals(TransportMode.ride)) { return 2; }
+		else if (leg.getMode().equals(TransportMode.bike)) { return 3; }
+		else if (leg.getMode().equals(TransportMode.walk)) { return 4; }
 		else { Gbl.errorMsg("pid="+p.getPerson().getId()+": leg_mode="+leg.getMode()+" not known!"); return -2; }
 	}
 	
@@ -283,12 +283,12 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 			// CALC mode
 			int modechoice = model.calcModeChoice();
-			BasicLeg.Mode mode = null;
-			if (modechoice == 0) { mode = BasicLeg.Mode.car; }
-			else if (modechoice == 1) { mode = BasicLeg.Mode.pt; }
-			else if (modechoice == 2) { mode = BasicLeg.Mode.ride; }
-			else if (modechoice == 3) { mode = BasicLeg.Mode.bike; }
-			else if (modechoice == 4) { mode = BasicLeg.Mode.walk; }
+			TransportMode mode = null;
+			if (modechoice == 0) { mode = TransportMode.car; }
+			else if (modechoice == 1) { mode = TransportMode.pt; }
+			else if (modechoice == 2) { mode = TransportMode.ride; }
+			else if (modechoice == 3) { mode = TransportMode.bike; }
+			else if (modechoice == 4) { mode = TransportMode.walk; }
 			else { Gbl.errorMsg("pid="+person.getId()+": modechoice="+modechoice+" knot known!"); }
 
 			// SET the mode for the legs of the subtour
@@ -313,12 +313,12 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 				int subtourid = pid*100+i;
 				out.write(subtourid+"\t");
 				out.write(mainpurpose+"\t");
-				if (prev_mode == 0) { out.write(BasicLeg.Mode.car.toString() + "\t"); }
-				else if (prev_mode == 1) { out.write(BasicLeg.Mode.pt.toString() + "\t"); }
-				else if (prev_mode == 2) { out.write(BasicLeg.Mode.ride.toString() + "\t"); }
-				else if (prev_mode == 3) { out.write(BasicLeg.Mode.bike.toString() + "\t"); }
-				else if (prev_mode == 4) { out.write(BasicLeg.Mode.walk.toString() + "\t"); }
-				else if (prev_mode == -1) { out.write(BasicLeg.Mode.undefined.toString() + "\t"); }
+				if (prev_mode == 0) { out.write(TransportMode.car.toString() + "\t"); }
+				else if (prev_mode == 1) { out.write(TransportMode.pt.toString() + "\t"); }
+				else if (prev_mode == 2) { out.write(TransportMode.ride.toString() + "\t"); }
+				else if (prev_mode == 3) { out.write(TransportMode.bike.toString() + "\t"); }
+				else if (prev_mode == 4) { out.write(TransportMode.walk.toString() + "\t"); }
+				else if (prev_mode == -1) { out.write(TransportMode.undefined.toString() + "\t"); }
 				else { Gbl.errorMsg("pid="+person.getId()+": prev_mode="+prev_mode+" knot known!"); }
 				out.write(mode.toString()+"\t");
 				Activity st_startact = (Activity)person.getSelectedPlan().getPlanElements().get(act_indices.get(0));

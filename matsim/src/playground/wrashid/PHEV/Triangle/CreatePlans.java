@@ -3,7 +3,7 @@ package playground.wrashid.PHEV.Triangle;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
@@ -84,7 +84,7 @@ public class CreatePlans {
 			Activity a = plan.createAct("home",home_facility.getCoord());
 			a.setLink(home_facility.getLink());
 			a.setEndTime(depTime);
-			Leg l = plan.createLeg(BasicLeg.Mode.car);
+			Leg l = plan.createLeg(TransportMode.car);
 			l.setArrivalTime(depTime);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTime);
@@ -93,7 +93,7 @@ public class CreatePlans {
 			a.setStartTime(depTime);
 			a.setEndTime(depTime+duration);
 			a.setDuration(duration);
-			l = plan.createLeg(BasicLeg.Mode.car);
+			l = plan.createLeg(TransportMode.car);
 			l.setArrivalTime(depTime+duration);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTime+duration);

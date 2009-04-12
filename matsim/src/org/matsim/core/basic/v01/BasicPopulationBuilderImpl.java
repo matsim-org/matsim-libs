@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPerson;
@@ -31,7 +32,6 @@ import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.api.basic.v01.population.BasicRoute;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 
 /**
  * @author dgrether
@@ -70,7 +70,7 @@ public class BasicPopulationBuilderImpl implements BasicPopulationBuilder {
 		return act;
 	}
 	
-	public BasicLeg createLeg(final Mode legMode) {
+	public BasicLeg createLeg(final TransportMode legMode) {
 		BasicLegImpl leg = new BasicLegImpl(legMode);
 		return leg;
 	}

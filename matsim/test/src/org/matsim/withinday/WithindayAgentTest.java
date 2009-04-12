@@ -25,8 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Leg;
@@ -88,9 +87,9 @@ public class WithindayAgentTest extends MatsimTestCase {
 	private void createRoutes() {
 		Link startLink = this.network.getLink(new IdImpl("2"));
 		Link endLink = this.network.getLink(new IdImpl("7"));
-		this.route1 = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, startLink, endLink);
-		this.route2 = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, startLink, endLink);
-		this.agentRoute = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, startLink, endLink);
+		this.route1 = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
+		this.route2 = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
+		this.agentRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
 		ArrayList<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("31"));
@@ -140,7 +139,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		this.leg = null;
 		try {
 			this.plan.createAct("h", homeLink);
-			this.leg = this.plan.createLeg(Mode.car);
+			this.leg = this.plan.createLeg(TransportMode.car);
 			this.plan.createAct("work", workLink);
 		} catch (Exception e) {
 			e.printStackTrace();

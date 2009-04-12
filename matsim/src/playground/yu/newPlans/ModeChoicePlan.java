@@ -22,7 +22,7 @@ package playground.yu.newPlans;
 
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -75,7 +75,7 @@ public class ModeChoicePlan extends NewPopulation {
 					Leg cl = new org.matsim.core.population.LegImpl((Leg) o);
 					cl.setMode(
 					// "pt"
-							BasicLeg.Mode.pt);
+							TransportMode.pt);
 					cl.setRoute(null);
 					cp.addLeg(cl);
 				}
@@ -93,7 +93,7 @@ public class ModeChoicePlan extends NewPopulation {
 					Leg cl = new org.matsim.core.population.LegImpl((Leg) o);
 					cl.setMode(
 					// "car"
-							BasicLeg.Mode.car);
+							TransportMode.car);
 					cl.setRoute(null);
 					cp.addLeg(cl);
 				}

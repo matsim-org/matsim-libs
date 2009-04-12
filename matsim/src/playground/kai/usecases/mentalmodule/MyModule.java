@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.basic.v01.population.BasicLeg;
@@ -164,7 +165,7 @@ ActStartEventHandler
 //			hAct.setFacility( fac ) ;
 //			plan.addAct( hAct ) ;
 			
-			BasicLeg leg = pb.createLeg(BasicLeg.Mode.bike) ;
+			BasicLeg leg = pb.createLeg(TransportMode.bike) ;
 			plan.addLeg( leg ) ;
 			
 			List<Id> routeIdList = new ArrayList<Id>() ;

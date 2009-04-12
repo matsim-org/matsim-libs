@@ -20,6 +20,7 @@
 
 package org.matsim.population.algorithms;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
@@ -33,24 +34,24 @@ import org.matsim.testcases.MatsimTestCase;
 public class ChooseRandomLegModeTest extends MatsimTestCase {
 
 	public void testRandomChoice() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk}, MatsimRandom.getRandom());
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		Plan plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createAct("home", new CoordImpl(0, 0));
-		Leg leg = plan.createLeg(BasicLeg.Mode.car);
+		Leg leg = plan.createLeg(TransportMode.car);
 		plan.createAct("work", new CoordImpl(0, 0));
 		boolean foundCarMode = false;
 		boolean foundPtMode = false;
 		boolean foundWalkMode = false;
-		BasicLeg.Mode previousMode = leg.getMode();
+		TransportMode previousMode = leg.getMode();
 		for (int i = 0; i < 5; i++) {
 			algo.run(plan);
 			assertNotSame("leg mode must have changed.", previousMode, leg.getMode());
 			previousMode = leg.getMode();
-			if (BasicLeg.Mode.car.equals(previousMode)) {
+			if (TransportMode.car.equals(previousMode)) {
 				foundCarMode = true;
-			} else if (BasicLeg.Mode.pt.equals(previousMode)) {
+			} else if (TransportMode.pt.equals(previousMode)) {
 				foundPtMode = true;
-			} else if (BasicLeg.Mode.walk.equals(previousMode)) {
+			} else if (TransportMode.walk.equals(previousMode)) {
 				foundWalkMode = true;
 			} else {
 				fail("unexpected mode: " + previousMode.toString());
@@ -62,14 +63,14 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	}
 
 	public void testHandleEmptyPlan() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk}, MatsimRandom.getRandom());
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		Plan plan = new org.matsim.core.population.PlanImpl(null);
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
 
 	public void testHandlePlanWithoutLeg() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk}, MatsimRandom.getRandom());
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		Plan plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createAct("home", new CoordImpl(0, 0));
 		algo.run(plan);
@@ -80,19 +81,19 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	 * Test that all the legs have the same, changed mode
 	 */
 	public void testMultipleLegs() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt}, MatsimRandom.getRandom());
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt}, MatsimRandom.getRandom());
 		Plan plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createAct("home", new CoordImpl(0, 0));
-		plan.createLeg(BasicLeg.Mode.car);
+		plan.createLeg(TransportMode.car);
 		plan.createAct("work", new CoordImpl(0, 0));
-		plan.createLeg(BasicLeg.Mode.car);
+		plan.createLeg(TransportMode.car);
 		plan.createAct("shop", new CoordImpl(0, 0));
-		plan.createLeg(BasicLeg.Mode.car);
+		plan.createLeg(TransportMode.car);
 		plan.createAct("home", new CoordImpl(0, 0));
 		algo.run(plan);
-		assertEquals("unexpected leg mode in leg 1.", BasicLeg.Mode.pt, ((BasicLeg) plan.getPlanElements().get(1)).getMode());
-		assertEquals("unexpected leg mode in leg 2.", BasicLeg.Mode.pt, ((BasicLeg) plan.getPlanElements().get(3)).getMode());
-		assertEquals("unexpected leg mode in leg 3.", BasicLeg.Mode.pt, ((BasicLeg) plan.getPlanElements().get(5)).getMode());
+		assertEquals("unexpected leg mode in leg 1.", TransportMode.pt, ((BasicLeg) plan.getPlanElements().get(1)).getMode());
+		assertEquals("unexpected leg mode in leg 2.", TransportMode.pt, ((BasicLeg) plan.getPlanElements().get(3)).getMode());
+		assertEquals("unexpected leg mode in leg 3.", TransportMode.pt, ((BasicLeg) plan.getPlanElements().get(5)).getMode());
 	}
 
 }

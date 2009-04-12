@@ -20,9 +20,9 @@
 
 package org.matsim.core.basic.v01;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -41,22 +41,22 @@ public class BasicLinkImplTest extends MatsimTestCase {
 		BasicLink l = new BasicLinkImpl(network, new IdImpl(1), n1, n2);
 		
 		// test default
-		BasicLeg.Mode[] modes = l.getAllowedModes();
+		TransportMode[] modes = l.getAllowedModes();
 		assertEquals("wrong number of default entries.", 1, modes.length);
-		assertEquals("wrong default.", BasicLeg.Mode.car, modes[0]);
+		assertEquals("wrong default.", TransportMode.car, modes[0]);
 		
 		// test set/get empty list
-		l.setAllowedModes(new BasicLeg.Mode[] {});
+		l.setAllowedModes(new TransportMode[] {});
 		modes = l.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 0, modes.length);
 		
 		// test set/get list with entries
-		l.setAllowedModes(new BasicLeg.Mode[] {BasicLeg.Mode.bus, BasicLeg.Mode.car, BasicLeg.Mode.bike});
+		l.setAllowedModes(new TransportMode[] {TransportMode.bus, TransportMode.car, TransportMode.bike});
 		modes = l.getAllowedModes();
 		assertEquals("wrong number of allowed modes", 3, modes.length);
-		assertEquals(BasicLeg.Mode.bus, modes[0]);
-		assertEquals(BasicLeg.Mode.car, modes[1]);
-		assertEquals(BasicLeg.Mode.bike, modes[2]);
+		assertEquals(TransportMode.bus, modes[0]);
+		assertEquals(TransportMode.car, modes[1]);
+		assertEquals(TransportMode.bike, modes[2]);
 
 	}
 

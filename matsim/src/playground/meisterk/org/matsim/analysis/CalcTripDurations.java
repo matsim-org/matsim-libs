@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
@@ -46,13 +46,13 @@ public class CalcTripDurations implements AgentArrivalEventHandler, AgentDepartu
 	private static final int TRIP_DURATIONS_ARRAY_SIZE = 30 * 3600 / CalcTripDurations.BIN_SIZE + 1;
 
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
-	private final TreeMap<BasicLeg.Mode, int[]> tripDurations = new TreeMap<BasicLeg.Mode, int[]>();
-	private final TreeMap<BasicLeg.Mode, int[]> numTrips = new TreeMap<BasicLeg.Mode, int[]>();
-	private final TreeMap<BasicLeg.Mode, Double> overallTripDurations = new TreeMap<BasicLeg.Mode, Double>();
-	private final TreeMap<BasicLeg.Mode, Integer> overallNumTrips = new TreeMap<BasicLeg.Mode, Integer>();
+	private final TreeMap<TransportMode, int[]> tripDurations = new TreeMap<TransportMode, int[]>();
+	private final TreeMap<TransportMode, int[]> numTrips = new TreeMap<TransportMode, int[]>();
+	private final TreeMap<TransportMode, Double> overallTripDurations = new TreeMap<TransportMode, Double>();
+	private final TreeMap<TransportMode, Integer> overallNumTrips = new TreeMap<TransportMode, Integer>();
 
 	private int[] timeOfDayData;
-	private BasicLeg.Mode mode;
+	private TransportMode mode;
 	private Double depTime;
 	
 	public CalcTripDurations() {
@@ -128,7 +128,7 @@ public class CalcTripDurations implements AgentArrivalEventHandler, AgentDepartu
 		
 		// header
 		out.write("time\ttime\t");
-		for (BasicLeg.Mode mode : this.tripDurations.keySet()) {
+		for (TransportMode mode : this.tripDurations.keySet()) {
 			out.write(mode.toString() + "\t");
 		}
 		out.write(System.getProperty("line.separator"));
@@ -136,7 +136,7 @@ public class CalcTripDurations implements AgentArrivalEventHandler, AgentDepartu
 		// time-of-day data
 		for (int ii=0; ii < CalcTripDurations.TRIP_DURATIONS_ARRAY_SIZE; ii++) {
 			out.write(Integer.toString(ii * BIN_SIZE) + "\t" + Time.writeTime(ii * BIN_SIZE));
-			for (BasicLeg.Mode mode : this.tripDurations.keySet()) {
+			for (TransportMode mode : this.tripDurations.keySet()) {
 				avgTripDuration = ( (this.numTrips.get(mode)[ii] == 0) ? Double.NaN : (this.tripDurations.get(mode)[ii] / this.numTrips.get(mode)[ii]) );
 				out.write("\t" + Double.toString(avgTripDuration));
 			}
@@ -145,7 +145,7 @@ public class CalcTripDurations implements AgentArrivalEventHandler, AgentDepartu
 		out.write(System.getProperty("line.separator"));
 
 		// average data by mode
-		for (BasicLeg.Mode mode : overallTripDurations.keySet()) {
+		for (TransportMode mode : overallTripDurations.keySet()) {
 			out.write(
 					"average trip duration for mode " + mode.toString() + ": " +
 					Double.toString(this.overallTripDurations.get(mode) / this.overallNumTrips.get(mode)) + " seconds = " +

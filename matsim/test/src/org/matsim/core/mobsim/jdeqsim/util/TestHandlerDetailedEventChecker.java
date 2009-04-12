@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
@@ -94,7 +94,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 				index++;
 
 				// each CAR leg must enter/leave act link
-				if (leg.getMode().equals(BasicLeg.Mode.car)) {
+				if (leg.getMode().equals(TransportMode.car)) {
 					// the first LinkEnterEvent is a AgentWait2LinkEvent
 					assertTrue(list.get(index) instanceof AgentWait2LinkEvent);
 					assertTrue(act.getLinkId().toString().equalsIgnoreCase(
@@ -192,7 +192,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 			while (iter.hasNext()) {
 				Leg leg = (Leg) iter.next();
 				// at the moment only cars are simulated on the road
-				if (leg.getMode().equals(BasicLeg.Mode.car)) {
+				if (leg.getMode().equals(TransportMode.car)) {
 					expected.expectedLinkEnterEvents += ((NetworkRoute) leg.getRoute()).getLinks().size() + 1;
 				}
 			}

@@ -21,7 +21,7 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.NetworkRoute;
@@ -61,7 +61,7 @@ public class CetinCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTi
 
 		double legTravelTimeEstimation;
 		
-		if (legIntermediate.getMode().equals(BasicLeg.Mode.car)) {
+		if (legIntermediate.getMode().equals(TransportMode.car)) {
 
 			double now = departureTime;
 

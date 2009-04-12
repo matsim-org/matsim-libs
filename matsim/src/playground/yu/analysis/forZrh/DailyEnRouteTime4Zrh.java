@@ -23,7 +23,7 @@
  */
 package playground.yu.analysis.forZrh;
 
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
@@ -113,7 +113,7 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 						break;
 					}
 				} else {
-					if (bl.getMode().equals(Mode.car)) {
+					if (bl.getMode().equals(TransportMode.car)) {
 						this.carTime += time;
 						carDayTime += time;
 						switch (ats) {
@@ -137,7 +137,7 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 							break;
 						}
 						this.carLegTimeCounts[Math.min(100, (int) time / 2)]++;
-					} else if (bl.getMode().equals(Mode.pt)) {
+					} else if (bl.getMode().equals(TransportMode.pt)) {
 						this.ptTime += time;
 						ptDayTime += time;
 						switch (ats) {
@@ -161,7 +161,7 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 							break;
 						}
 						this.ptLegTimeCounts[Math.min(100, (int) time / 2)]++;
-					} else if (bl.getMode().equals(Mode.walk)) {
+					} else if (bl.getMode().equals(TransportMode.walk)) {
 						this.wlkTime += time;
 						wlkDayTime += time;
 						switch (ats) {

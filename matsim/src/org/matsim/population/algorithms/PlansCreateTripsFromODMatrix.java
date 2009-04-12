@@ -23,7 +23,7 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -92,7 +92,7 @@ public class PlansCreateTripsFromODMatrix {
 
 					Activity a = plan.createAct("work", coord);
 					a.setEndTime(endTime);
-					plan.createLeg(BasicLeg.Mode.car);
+					plan.createLeg(TransportMode.car);
 					a = plan.createAct("work", coord);
 
 					plans.addPerson(person); // add person should be last for when plans-streaming is one, because in this moment the plans are written to file.

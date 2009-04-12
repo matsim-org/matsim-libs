@@ -27,7 +27,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -129,7 +129,7 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 					break;
 				}
 				throughLegDistanceCounts[Math.min(100, (int) dist)]++;
-			} else if (bl.getMode().equals(Leg.Mode.car)) {
+			} else if (bl.getMode().equals(TransportMode.car)) {
 				this.carDist += dist;
 				carDayDist += dist;
 				switch (ats) {
@@ -153,7 +153,7 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 					break;
 				}
 				this.carLegDistanceCounts[Math.min(100, (int) dist)]++;
-			} else if (bl.getMode().equals(Mode.pt)) {
+			} else if (bl.getMode().equals(TransportMode.pt)) {
 				this.ptDist += dist;
 				ptDayDist += dist;
 				switch (ats) {
@@ -177,7 +177,7 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 					break;
 				}
 				this.ptLegDistanceCounts[Math.min(100, (int) dist)]++;
-			} else if (bl.getMode().equals(Mode.walk)) {
+			} else if (bl.getMode().equals(TransportMode.walk)) {
 				dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
 						.getLink().getCoord(), plan.getNextActivity(bl)
 						.getLink().getCoord()) * 1.5 / 1000.0;

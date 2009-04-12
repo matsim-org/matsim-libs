@@ -14,9 +14,9 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.utils.io.IOUtils;
@@ -152,11 +152,11 @@ public class Utils {
 		act.setEndTime( 7.*3600. ) ;
 		Coord homeCoord = act.getCoord();
 
-		plan.createLeg(Mode.car);
+		plan.createLeg(TransportMode.car);
 		act = plan.createAct(ACT_WORK, workCoord ) ;
 		act.setDuration( 8.*3600. ) ;
 
-		plan.createLeg(Mode.car) ;
+		plan.createLeg(TransportMode.car) ;
 		plan.createAct(ACT_HOME, homeCoord ) ;				
 	}
 

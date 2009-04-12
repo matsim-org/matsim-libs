@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
@@ -71,7 +72,7 @@ public class BkTestPlansCreator {
 			act1.setEndTime(homeEndTime);
 			plan.addAct(act1);
 			
-			BasicLeg leg = new BasicLegImpl(BasicLeg.Mode.car);
+			BasicLeg leg = new BasicLegImpl(TransportMode.car);
 			BasicRouteImpl route = new BasicRouteImpl(id1, id4);
 			List<Id> linkids = new ArrayList<Id>();
 			linkids.add(id2);
@@ -86,7 +87,7 @@ public class BkTestPlansCreator {
 			act2.setEndTime(15.0 * 3600.0);
 			plan.addAct(act2);
 			
-			BasicLeg leg2 = new BasicLegImpl(BasicLeg.Mode.car);
+			BasicLeg leg2 = new BasicLegImpl(TransportMode.car);
 			route = new BasicRouteImpl(id4, id1);
 			linkids = new ArrayList<Id>();
 			linkids.add(id5);

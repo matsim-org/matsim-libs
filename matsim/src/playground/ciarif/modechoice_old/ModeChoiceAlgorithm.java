@@ -23,7 +23,7 @@ package playground.ciarif.modechoice_old;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -116,17 +116,17 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 			if (index == 0) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
 					Leg leg = (Leg)acts_legs.get(i);
-					leg.setMode(BasicLeg.Mode.walk);
+					leg.setMode(TransportMode.walk);
 				}
 			} else if (index == 1) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
 					Leg leg = (Leg)acts_legs.get(i);
-					leg.setMode(BasicLeg.Mode.bike);
+					leg.setMode(TransportMode.bike);
 				}
 			} else if (index == 2) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
 					Leg leg = (Leg)acts_legs.get(i);
-					leg.setMode(BasicLeg.Mode.car);
+					leg.setMode(TransportMode.car);
 					// Modify because now also persons without driving license can have the option car available.
 					//which is correct, but they don't produce traffic,since they get a ride from someone else
 					//who is already accounted for.
@@ -134,12 +134,12 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 			} else if (index == 3) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
 					Leg leg = (Leg)acts_legs.get(i);
-					leg.setMode(BasicLeg.Mode.pt);
+					leg.setMode(TransportMode.pt);
 				}
 			} else if (index == 4) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
 					Leg leg = (Leg)acts_legs.get(i);
-					leg.setMode(BasicLeg.Mode.undefined);
+					leg.setMode(TransportMode.undefined);
 				}
 			}
 		}

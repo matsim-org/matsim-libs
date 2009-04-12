@@ -23,7 +23,7 @@ package org.matsim.population.algorithms;
 import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
@@ -230,7 +230,7 @@ public class PersonSetActChains extends AbstractPersonAlgorithm {
 		for (int j=1; j<acttypes.length; j++) {
 			try {
 				if (j != 1) {
-					p.createLeg(BasicLeg.Mode.car);
+					p.createLeg(TransportMode.car);
 				}
 				p.createAct(acttypes[j], new CoordImpl(-1, -1));//,"-1","-1",null,"00:00:00", "00:00:00", "00:00:00", null);
 			}

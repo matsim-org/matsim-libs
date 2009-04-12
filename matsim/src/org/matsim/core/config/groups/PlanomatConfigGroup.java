@@ -1,7 +1,7 @@
 package org.matsim.core.config.groups;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.config.Module;
 import org.matsim.core.router.util.TravelCost;
@@ -222,20 +222,20 @@ public class PlanomatConfigGroup extends Module {
 		return Integer.parseInt(PlanomatConfigParameter.JGAP_MAX_GENERATIONS.getActualValue());
 	}
 
-	private BasicLeg.Mode[] cachedPossibleModes = null;
+	private TransportMode[] cachedPossibleModes = null;
 	
-	public BasicLeg.Mode[] getPossibleModes() {
+	public TransportMode[] getPossibleModes() {
 
 		if (this.cachedPossibleModes == null) {
 		
 			if (!PlanomatConfigParameter.POSSIBLE_MODES.getActualValue().equals(PlanomatConfigParameter.POSSIBLE_MODES.getDefaultValue())) {
 				String[] possibleModesStringArray = PlanomatConfigParameter.POSSIBLE_MODES.getActualValue().split(",");
-				cachedPossibleModes = new BasicLeg.Mode[possibleModesStringArray.length];
+				cachedPossibleModes = new TransportMode[possibleModesStringArray.length];
 				for (int ii=0; ii < possibleModesStringArray.length; ii++) {
-					cachedPossibleModes[ii] = BasicLeg.Mode.valueOf(possibleModesStringArray[ii]);
+					cachedPossibleModes[ii] = TransportMode.valueOf(possibleModesStringArray[ii]);
 				}
 			} else {
-				this.cachedPossibleModes = new BasicLeg.Mode[]{};
+				this.cachedPossibleModes = new TransportMode[]{};
 			}
 			
 		}

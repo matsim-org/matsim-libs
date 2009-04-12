@@ -27,7 +27,7 @@ import java.util.Random;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.NetworkRoute;
@@ -159,7 +159,7 @@ public class RandomPlansGenerator {
 			a.setEndTime(endTime);
 
 			//create leg to work
-			Leg leg = plan.createLeg(Mode.car);
+			Leg leg = plan.createLeg(TransportMode.car);
 			leg.setDepartureTime(randTime);
 			NetworkRoute route = new NodeNetworkRoute(lHome, lWork);
 			route.setNodes(lHome, lPath.nodes, lWork);

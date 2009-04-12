@@ -23,7 +23,7 @@ package org.matsim.core.replanning.selectors;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -80,7 +80,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Plan p1 = new org.matsim.core.population.PlanImpl(person);
 		Activity a = new org.matsim.core.population.ActivityImpl("h", l6);
 		Activity b = new org.matsim.core.population.ActivityImpl("w", l7);
-		Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+		Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -102,7 +102,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		// ... test with multiple plans that all have negative score
 		a = new org.matsim.core.population.ActivityImpl("h", l6);
 		b = new org.matsim.core.population.ActivityImpl("w", l7);
-		leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+		leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -122,7 +122,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 		a = new org.matsim.core.population.ActivityImpl("h", l6);
 		b = new org.matsim.core.population.ActivityImpl("w", l7);
-		leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+		leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -151,7 +151,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p1 = new org.matsim.core.population.PlanImpl(person);
 		a = new org.matsim.core.population.ActivityImpl("h", l6);
 		b = new org.matsim.core.population.ActivityImpl("w", l7);
-		leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+		leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -184,7 +184,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Plan p1 = new org.matsim.core.population.PlanImpl(person);
 		Activity a = new org.matsim.core.population.ActivityImpl("h", l6);
 		Activity b = new org.matsim.core.population.ActivityImpl("w", l7);
-		Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+		Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -219,7 +219,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Plan p1 = new org.matsim.core.population.PlanImpl(person);
 		Activity a = new org.matsim.core.population.ActivityImpl("h", l6);
 		Activity b = new org.matsim.core.population.ActivityImpl("w", l7);
-		Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+		Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -237,7 +237,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	
 		a = new org.matsim.core.population.ActivityImpl("h", l6);
 		b = new org.matsim.core.population.ActivityImpl("w", l7);
-		leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+		leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -257,7 +257,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		
 		a = new org.matsim.core.population.ActivityImpl("h", l6);
 		b = new org.matsim.core.population.ActivityImpl("w", l7);
-		leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+		leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);

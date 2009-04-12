@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
@@ -685,7 +685,7 @@ public class Flow {
 						route.setLinks(startLink, routeLinks, endLink);
 
 						
-						LegImpl leg = new LegImpl(BasicLeg.Mode.car);
+						LegImpl leg = new LegImpl(TransportMode.car);
 						//Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 						leg.setRoute(route);
 						Link fromlink =_network.getLink(ids.getFirst());

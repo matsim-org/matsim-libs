@@ -23,7 +23,7 @@ package org.matsim.core.replanning.modules;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Config;
@@ -41,7 +41,7 @@ public class ChangeLegModeTest extends MatsimTestCase {
 		config.global().setNumberOfThreads(0);
 
 		final ChangeLegMode module = new ChangeLegMode();
-		final BasicLeg.Mode[] modes = new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt};
+		final TransportMode[] modes = new TransportMode[] {TransportMode.car, TransportMode.pt};
 		runTest(module, modes);
 	}
 
@@ -51,20 +51,20 @@ public class ChangeLegModeTest extends MatsimTestCase {
 		config.setParam(ChangeLegMode.CONFIG_MODULE, ChangeLegMode.CONFIG_PARAM_MODES, " car,pt ,bike,walk ");
 
 		final ChangeLegMode module = new ChangeLegMode(config);
-		final BasicLeg.Mode[] modes = new BasicLeg.Mode[] {BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.bike, BasicLeg.Mode.walk};
+		final TransportMode[] modes = new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
 		runTest(module, modes);
 	}
 
-	private void runTest(final ChangeLegMode module, final BasicLeg.Mode[] possibleModes) {
+	private void runTest(final ChangeLegMode module, final TransportMode[] possibleModes) {
 		module.prepareReplanning();
 
 		Plan plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createAct("home", new CoordImpl(0, 0));
-		Leg leg = plan.createLeg(BasicLeg.Mode.car);
+		Leg leg = plan.createLeg(TransportMode.car);
 		plan.createAct("work", new CoordImpl(0, 0));
 
-		HashMap<BasicLeg.Mode, Integer> counter = new HashMap<BasicLeg.Mode, Integer>();
-		for (BasicLeg.Mode mode : possibleModes) {
+		HashMap<TransportMode, Integer> counter = new HashMap<TransportMode, Integer>();
+		for (TransportMode mode : possibleModes) {
 			counter.put(mode, Integer.valueOf(0));
 		}
 
@@ -75,7 +75,7 @@ public class ChangeLegModeTest extends MatsimTestCase {
 			counter.put(leg.getMode(), Integer.valueOf(count.intValue() + 1));
 		}
 
-		for (Map.Entry<BasicLeg.Mode, Integer> entry : counter.entrySet()) {
+		for (Map.Entry<TransportMode, Integer> entry : counter.entrySet()) {
 			int count = entry.getValue().intValue();
 			assertTrue("mode " + entry.getKey().toString() + " was never chosen.", count > 0);
 		}

@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -95,7 +95,7 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 				Gbl.errorMsg("For each initial evacuation plan only one Act is allowed - and no Leg at all");
 			}
 
-			Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+			Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);
@@ -119,7 +119,7 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 	private Leg getELeg(final Leg leg) {
 		List<Node> nodeRoute = ((NetworkRoute) leg.getRoute()).getNodes();
 		nodeRoute.remove(nodeRoute.size()-1);
-		Leg l = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+		Leg l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		NetworkRoute route = new NodeNetworkRoute();
 		route.setNodes(nodeRoute);
 		l.setRoute(route);

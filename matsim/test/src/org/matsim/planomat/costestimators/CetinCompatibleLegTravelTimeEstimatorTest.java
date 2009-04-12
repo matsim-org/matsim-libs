@@ -22,7 +22,7 @@ package org.matsim.planomat.costestimators;
 
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.events.AgentDepartureEvent;
@@ -143,7 +143,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 
 		// test public transport mode
 		departureTime = Time.parseTime("06:10:00");
-		testLeg.setMode(BasicLeg.Mode.pt);
+		testLeg.setMode(TransportMode.pt);
 		legTravelTime = testee.getLegTravelTimeEstimation(
 				TEST_PERSON_ID,
 				departureTime,

@@ -3,7 +3,7 @@
  */
 package playground.yu.analysis;
 
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -83,7 +83,7 @@ public class DailyDistanceModalSplit extends AbstractPersonAlgorithm implements
 			double legDist = leg.getRoute().getDistance() / 1000.0;
 			if (Integer.parseInt(this.person.getId().toString()) < 1000000000
 					&& leg.getDepartureTime() < 86400)
-				if (leg.getMode().equals(Mode.car)) {
+				if (leg.getMode().equals(TransportMode.car)) {
 					if (this.person.getSex().equals("m"))
 						this.maleCarDist += legDist;
 					else
@@ -110,7 +110,7 @@ public class DailyDistanceModalSplit extends AbstractPersonAlgorithm implements
 						this.isEmployedCarDist += legDist;
 					else
 						this.notEmployedCarDist += legDist;
-				} else if (leg.getMode().equals(Mode.pt)) {
+				} else if (leg.getMode().equals(TransportMode.pt)) {
 					if (this.person.getSex().equals("m"))
 						this.malePtDist += legDist;
 					else

@@ -22,7 +22,7 @@ package playground.balmermi;
 
 import java.util.Date;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
@@ -68,7 +68,7 @@ public class PlansRunAlgorithm {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running plans module... ");
-		new PlansFilterByLegMode(BasicLeg.Mode.car,true).run(plans);
+		new PlansFilterByLegMode(TransportMode.car,true).run(plans);
 		new XY2Links(network).run(plans);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		new PlansCalcRoute(network, timeCostCalc, timeCostCalc).run(plans);

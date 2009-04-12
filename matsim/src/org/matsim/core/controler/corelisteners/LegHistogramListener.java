@@ -22,7 +22,7 @@ package org.matsim.core.controler.corelisteners;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -61,7 +61,7 @@ public class LegHistogramListener implements IterationEndsListener, IterationSta
 		this.printStats();
 		if (this.outputGraph) {
 			this.histogram.writeGraphic(Controler.getIterationFilename("legHistogram_all.png"));
-			for (BasicLeg.Mode legMode : this.histogram.getLegModes()) {
+			for (TransportMode legMode : this.histogram.getLegModes()) {
 				this.histogram.writeGraphic(Controler.getIterationFilename("legHistogram_" + legMode.toString() + ".png"), legMode);
 			}
 		}
@@ -74,7 +74,7 @@ public class LegHistogramListener implements IterationEndsListener, IterationSta
 			nofLegs += nofDepartures;
 		}
 		log.info("number of legs:\t"  + nofLegs + "\t100%");
-		for (BasicLeg.Mode legMode : this.histogram.getLegModes()) {
+		for (TransportMode legMode : this.histogram.getLegModes()) {
 			int nofModeLegs = 0;
 			for (int nofDepartures : this.histogram.getDepartures(legMode)) {
 				nofModeLegs += nofDepartures;

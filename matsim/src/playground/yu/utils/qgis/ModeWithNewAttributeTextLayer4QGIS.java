@@ -4,7 +4,7 @@
 package playground.yu.utils.qgis;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -47,11 +47,11 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 		String mode = "";
 
 		if (PlanModeJudger.useCar(plan))
-			mode = Mode.car.name();
+			mode = TransportMode.car.name();
 		else if (PlanModeJudger.usePt(plan))
-			mode = Mode.pt.name();
+			mode = TransportMode.pt.name();
 		else if (PlanModeJudger.useWalk(plan))
-			mode = Mode.walk.name();
+			mode = TransportMode.walk.name();
 
 		if (endTime ==
 		// 21600.0
@@ -59,9 +59,9 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 			writer.writeln(homeLoc.getX() + "\t" + homeLoc.getY() + "\t" + mode
 					+ "\t6\t" + travelTime);
 			am6hTravelTime += travelTime;
-			if (mode.equals(Mode.car.name()))
+			if (mode.equals(TransportMode.car.name()))
 				car6hCount++;
-			if (mode.equals(Mode.pt.name()))
+			if (mode.equals(TransportMode.pt.name()))
 				pt6hCount++;
 		} else {
 			writer.writeln(homeLoc.getX() + "\t" + homeLoc.getY() + "\t" + mode

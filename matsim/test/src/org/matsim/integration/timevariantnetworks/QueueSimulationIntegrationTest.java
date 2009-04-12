@@ -23,7 +23,7 @@ package org.matsim.integration.timevariantnetworks;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -201,10 +201,10 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			Plan plan1 = person.createPlan(true);
 			Activity a1 = plan1.createAct("h", depLink);
 			a1.setEndTime(departureTime);
-			Leg leg1 = plan1.createLeg(BasicLeg.Mode.car);
+			Leg leg1 = plan1.createLeg(TransportMode.car);
 			leg1.setDepartureTime(departureTime);
 			leg1.setTravelTime(10);
-			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, depLink, destLink);
+			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, depLink, destLink);
 			route.setNodes(depLink, NetworkUtils.getNodes(network, "2 3"), destLink);
 			leg1.setRoute(route);
 			plan1.createAct("w", destLink);

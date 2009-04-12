@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -144,7 +144,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 	private void modifyPlans(final Link dest, final ArrayList<Node> evacRoute, final Link origin, final ArrayList<Plan> plans) {
 		
 		for (Plan plan : plans) {
-			Leg leg = new org.matsim.core.population.LegImpl(Mode.car);
+			Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 			NetworkRoute route = new NodeNetworkRoute();
 			route.setNodes(evacRoute);
 			leg.setRoute(route);

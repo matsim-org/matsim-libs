@@ -1,7 +1,7 @@
 package playground.anhorni.locationchoice.cs.test;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -47,7 +47,7 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 	
 	
 	private Leg computeLeg(Activity fromAct, Activity toAct, Controler controler) {	
-		Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);		
+		Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);		
 		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());	
 		return leg;

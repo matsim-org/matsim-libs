@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicActEndEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActEndEventHandler;
 import org.matsim.api.basic.v01.facilities.BasicFacilities;
@@ -142,7 +143,7 @@ BasicActEndEventHandler
 			act.setType("home") ;
 			act.setStartTime(122.) ;
 			
-			BasicLeg leg = pb.createLeg(BasicLeg.Mode.bike) ;
+			BasicLeg leg = pb.createLeg(TransportMode.bike) ;
 			plan.addLeg( leg ) ;
 			
 			List<Id> routeIdList = new ArrayList<Id>() ;

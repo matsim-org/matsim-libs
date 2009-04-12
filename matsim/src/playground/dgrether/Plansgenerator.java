@@ -21,7 +21,7 @@
 package playground.dgrether;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.NetworkRoute;
@@ -85,7 +85,7 @@ public class Plansgenerator {
 			a.setLink(link1);
 			a.setEndTime(homeEndtime);
 			//leg to work
-			Leg leg = plan.createLeg(Mode.car);
+			Leg leg = plan.createLeg(TransportMode.car);
 			NetworkRoute route = new NodeNetworkRoute(link1, link20);
 			route.setNodes(link1, NetworkUtils.getNodes(networkLayer, "2 4 5"), link20);
 			leg.setRoute(route);
@@ -94,7 +94,7 @@ public class Plansgenerator {
 			a.setLink(link20);
 			a.setDuration(2.5 * 3600);
 			//leg to work
-			leg = plan.createLeg(Mode.car);
+			leg = plan.createLeg(TransportMode.car);
 			route = new NodeNetworkRoute(link20, link1);
 			route.setNodes(link20, NetworkUtils.getNodes(networkLayer, "13 14 15 1"), link1);
 			leg.setRoute(route);

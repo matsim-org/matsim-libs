@@ -19,7 +19,7 @@
 
 package org.matsim.core.mobsim.queuesim;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Leg;
@@ -123,8 +123,8 @@ public class QueueLinkTest extends MatsimTestCase {
 		Plan plan = p.createPlan(true);
 		try {
 			plan.createAct("h", link1);
-			Leg leg = plan.createLeg(BasicLeg.Mode.car);
-			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link2);
+			Leg leg = plan.createLeg(TransportMode.car);
+			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link2);
 			leg.setRoute(route);
 			route.setLinks(link1, null, link2);
 			leg.setRoute(route);

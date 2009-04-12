@@ -20,7 +20,7 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -33,17 +33,17 @@ import org.matsim.core.api.population.Plan;
  */
 public class PlanReplaceLegModes extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
-	private final BasicLeg.Mode[] fromMode;
-	private final BasicLeg.Mode[] toMode;
+	private final TransportMode[] fromMode;
+	private final TransportMode[] toMode;
 
-	public PlanReplaceLegModes(final BasicLeg.Mode from, final BasicLeg.Mode to) {
-		this.fromMode = new BasicLeg.Mode[1];
+	public PlanReplaceLegModes(final TransportMode from, final TransportMode to) {
+		this.fromMode = new TransportMode[1];
 		this.fromMode[0] = from;
-		this.toMode = new BasicLeg.Mode[1];
+		this.toMode = new TransportMode[1];
 		this.toMode[0] = to;
 	}
 
-	public PlanReplaceLegModes(final BasicLeg.Mode[] from, final BasicLeg.Mode to[]) {
+	public PlanReplaceLegModes(final TransportMode[] from, final TransportMode to[]) {
 		this.fromMode = from.clone();
 		this.toMode = to.clone();
 	}
@@ -58,7 +58,7 @@ public class PlanReplaceLegModes extends AbstractPersonAlgorithm implements Plan
 	public void run(final Plan plan) {
 		for (int i = 1, max = plan.getPlanElements().size(); i < max; i += 2) {
 			Leg leg = (Leg)plan.getPlanElements().get(i);
-			BasicLeg.Mode mode = leg.getMode();
+			TransportMode mode = leg.getMode();
 			for (int idx = 1; idx < this.fromMode.length; idx++) {
 				if (this.fromMode[idx].equals(mode)) {
 					leg.setMode(this.toMode[idx]);

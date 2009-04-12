@@ -20,7 +20,7 @@
 
 package org.matsim.core.scoring;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -89,7 +89,7 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 		Person person1 = new PersonImpl(new IdImpl(1));
 		Plan plan1 = person1.createPlan(true);
 		Activity act1a = plan1.createAct("home", (Link)null);//, 0, 7.0*3600, 7*3600, false);
-		Leg leg1 = plan1.createLeg(BasicLeg.Mode.car);//, 7*3600, 100, 7*3600+100);
+		Leg leg1 = plan1.createLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
 		Activity act1b = plan1.createAct("work", (Link)null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
 		ScoringFunction sf1 = getScoringFunctionInstance(plan1);
 		sf1.startActivity(0, act1a);

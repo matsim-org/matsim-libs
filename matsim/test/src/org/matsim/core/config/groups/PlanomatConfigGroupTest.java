@@ -22,7 +22,7 @@ package org.matsim.core.config.groups;
 
 import java.util.Arrays;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
@@ -42,7 +42,7 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 				Gbl.getConfig().planomat().getJgapMaxGenerations() );
 		assertTrue(
 				Arrays.deepEquals(
-						new BasicLeg.Mode[]{}, 
+						new TransportMode[]{}, 
 						Gbl.getConfig().planomat().getPossibleModes()));
 		assertEquals( 
 				PlanomatConfigGroup.PlanomatConfigParameter.LEG_TRAVEL_TIME_ESTIMATOR_NAME.getDefaultValue(), 
@@ -64,7 +64,7 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 
 		assertEquals( 10, Gbl.getConfig().planomat().getPopSize() );
 		assertTrue(Arrays.deepEquals(
-				new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt}, 
+				new TransportMode[]{TransportMode.car, TransportMode.pt}, 
 				Gbl.getConfig().planomat().getPossibleModes()));
 		assertEquals( PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE, Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
 		assertEquals( 1000, Gbl.getConfig().planomat().getJgapMaxGenerations() );

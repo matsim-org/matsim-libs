@@ -22,7 +22,7 @@ package org.matsim.core.router;
 
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
@@ -166,19 +166,19 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * @return the estimated travel time for this leg
 	 */
 	public double handleLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		BasicLeg.Mode legmode = leg.getMode();
+		TransportMode legmode = leg.getMode();
 
-		if (legmode == BasicLeg.Mode.car) {
+		if (legmode == TransportMode.car) {
 			return handleCarLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == BasicLeg.Mode.ride) {
+		} else if (legmode == TransportMode.ride) {
 			return handleRideLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == BasicLeg.Mode.pt) {
+		} else if (legmode == TransportMode.pt) {
 			return handlePtLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == BasicLeg.Mode.walk) {
+		} else if (legmode == TransportMode.walk) {
 			return handleWalkLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == BasicLeg.Mode.bike) {
+		} else if (legmode == TransportMode.bike) {
 			return handleBikeLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == BasicLeg.Mode.undefined) {
+		} else if (legmode == TransportMode.undefined) {
 			/* balmermi: No clue how to handle legs with 'undef' mode
 			 *                Therefore, handle it similar like bike mode with 50 km/h
 			 *                and no route assigned  */
@@ -204,7 +204,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			// do not drive/walk around, if we stay on the same link
 			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			NetworkRoute route = (NetworkRoute) ((Network) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, fromLink, toLink);
+			NetworkRoute route = (NetworkRoute) ((Network) fromLink.getLayer()).getFactory().createRoute(TransportMode.car, fromLink, toLink);
 			route.setNodes(fromLink, path.nodes, toLink);
 			route.setTravelTime((int) path.travelTime);
 			route.setTravelCost(path.travelCost);
@@ -212,7 +212,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			travTime = (int) path.travelTime;
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			NetworkRoute route = (NetworkRoute) ((Network) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, fromLink, toLink);
+			NetworkRoute route = (NetworkRoute) ((Network) fromLink.getLayer()).getFactory().createRoute(TransportMode.car, fromLink, toLink);
 			route.setTravelTime(0);
 			leg.setRoute(route);
 			travTime = 0;

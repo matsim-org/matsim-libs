@@ -1,7 +1,7 @@
 package org.matsim.core.api.population;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
@@ -30,7 +30,7 @@ public interface Plan extends BasicPlan<PlanElement> {
 
 	public Activity createAct(final String type, final Link link) throws IllegalStateException;
 
-	public Leg createLeg(final BasicLeg.Mode mode) throws IllegalStateException;
+	public Leg createLeg(final TransportMode mode) throws IllegalStateException;
 
 	/**
 	 * Removes the specified act from the plan as well as a leg according to the following rule:

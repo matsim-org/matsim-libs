@@ -21,7 +21,7 @@
 package playground.gregor.withindayevac.controler;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -59,7 +59,7 @@ public class GuideAgentsGenerator {
 			Plan plan  = new org.matsim.core.population.PlanImpl(p);
 			Activity actA = new org.matsim.core.population.ActivityImpl("h", new CoordImpl(12000.0, -12000.0), l);
 			actA.setEndTime(3600 * 3);
-			Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+			Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);

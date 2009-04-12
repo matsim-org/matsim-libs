@@ -23,7 +23,7 @@ package playground.meisterk.org.matsim.config.groups;
 import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.config.Module;
 
 public class MeisterkConfigGroup extends Module {
@@ -100,17 +100,17 @@ public class MeisterkConfigGroup extends Module {
 
 	}
 	
-	private EnumSet<BasicLeg.Mode> cachedChainBasedModes = null;
+	private EnumSet<TransportMode> cachedChainBasedModes = null;
 
-	public EnumSet<BasicLeg.Mode> getChainBasedModes() {
+	public EnumSet<TransportMode> getChainBasedModes() {
 
 		if (this.cachedChainBasedModes == null) {
-			this.cachedChainBasedModes = EnumSet.noneOf(BasicLeg.Mode.class);
+			this.cachedChainBasedModes = EnumSet.noneOf(TransportMode.class);
 			
 			if (MeisterkConfigParameter.CHAIN_BASED_MODES.getActualValue().length() > 0) {
 				String[] chainBasedModesStringArray = MeisterkConfigParameter.CHAIN_BASED_MODES.getActualValue().split(",");
 				for (int ii=0; ii < chainBasedModesStringArray.length; ii++) {
-					this.cachedChainBasedModes.add(BasicLeg.Mode.valueOf(chainBasedModesStringArray[ii]));
+					this.cachedChainBasedModes.add(TransportMode.valueOf(chainBasedModesStringArray[ii]));
 				}
 			}
 		}

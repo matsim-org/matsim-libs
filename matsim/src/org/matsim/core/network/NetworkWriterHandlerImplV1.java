@@ -23,7 +23,7 @@ package org.matsim.core.network;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
@@ -122,7 +122,7 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 		out.write(" permlanes=\"" + link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + "\"");
 		out.write(" oneway=\"1\"");
 		
-		BasicLeg.Mode[] modes = link.getAllowedModes();
+		TransportMode[] modes = link.getAllowedModes();
 		StringBuffer buffer = new StringBuffer();
 		if (modes.length > 0) {
 			buffer.append(modes[0].toString());

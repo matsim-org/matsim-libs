@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -450,7 +450,7 @@ public class GenerateBlnPlan2 {
 		
 		if(GenerateBlnPlan2.setAllLegsToCar == true){
 			
-			leg = new LegImpl(BasicLeg.Mode.car);
+			leg = new LegImpl(TransportMode.car);
 			this.modalSplit[3]++;
 			
 		} else {		
@@ -458,47 +458,47 @@ public class GenerateBlnPlan2 {
 			switch (Integer.parseInt(tripData[48])) {
 			case 0:
 				// "keine Angabe"
-				leg = new LegImpl(BasicLeg.Mode.undefined);
+				leg = new LegImpl(TransportMode.undefined);
 				this.modalSplit[0]++;
 				break;
 			case 1:
 				// "Fuss"
-				leg = new LegImpl(BasicLeg.Mode.walk);
+				leg = new LegImpl(TransportMode.walk);
 				this.modalSplit[1]++;
 				break;
 			case 2:
 				// "Rad"
-				leg = new LegImpl(BasicLeg.Mode.bike);
+				leg = new LegImpl(TransportMode.bike);
 				this.modalSplit[2]++;
 				break;
 			case 3:
 				// "MIV" TODO [an] BasicLeg.Mode.miv cannot be handled by PersonPrepareForSim.1
-				leg = new LegImpl(BasicLeg.Mode.car);
+				leg = new LegImpl(TransportMode.car);
 				this.modalSplit[3]++;
 				break;
 			case 4:
 				// "OEV"
-				leg = new LegImpl(BasicLeg.Mode.pt);
+				leg = new LegImpl(TransportMode.pt);
 				this.modalSplit[4]++;
 				break;
 			case 5:
 				// "Rad/OEV"
-				leg = new LegImpl(BasicLeg.Mode.pt);
+				leg = new LegImpl(TransportMode.pt);
 				this.modalSplit[5]++;
 				break;
 			case 6:
 				// "IV/OEV"
-				leg = new LegImpl(BasicLeg.Mode.pt);
+				leg = new LegImpl(TransportMode.pt);
 				this.modalSplit[6]++;
 				break;
 			case 7:
 				// "sonstiges"
-				leg = new LegImpl(BasicLeg.Mode.undefined);
+				leg = new LegImpl(TransportMode.undefined);
 				this.modalSplit[7]++;
 				break;
 			default:
 				log.error("transport mode not defined");
-				leg = new LegImpl(BasicLeg.Mode.walk);
+				leg = new LegImpl(TransportMode.walk);
 				this.modalSplit[8]++;
 			}
 

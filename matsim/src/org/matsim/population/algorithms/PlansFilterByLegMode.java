@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -44,7 +44,7 @@ public class PlansFilterByLegMode {
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
-	private BasicLeg.Mode legMode;
+	private TransportMode legMode;
 	private boolean exclusiveFilter;
 
 	// optimization: instead of doing a String.equals() every time, we do it once and store the result
@@ -54,11 +54,11 @@ public class PlansFilterByLegMode {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansFilterByLegMode(final BasicLeg.Mode legMode, final boolean exclusiveFilter) {
+	public PlansFilterByLegMode(final TransportMode legMode, final boolean exclusiveFilter) {
 		super();
 		this.legMode = legMode;
 		this.exclusiveFilter = exclusiveFilter;
-		this.legModeIsCar = legMode.equals(BasicLeg.Mode.car);
+		this.legModeIsCar = legMode.equals(TransportMode.car);
 	}
 
 	//////////////////////////////////////////////////////////////////////

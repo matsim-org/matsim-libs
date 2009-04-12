@@ -22,7 +22,7 @@ package playground.marcel.pt.integration;
 
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
@@ -40,7 +40,7 @@ import playground.marcel.pt.implementations.TransitDriver;
 public class QueueTransitDriver implements DriverAgent {
 
 	private final Person dummyPerson = new PersonImpl(new IdImpl("busDrvr"));
-	private final Leg currentLeg = new LegImpl(BasicLeg.Mode.car);
+	private final Leg currentLeg = new LegImpl(TransportMode.car);
 	private final TransitDriver driver;
 	private Link currentLink;
 	

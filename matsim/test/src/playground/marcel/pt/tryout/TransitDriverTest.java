@@ -26,7 +26,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
@@ -193,7 +193,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		BusPassenger passenger = new BusPassenger(new IdImpl("1"), exitStop);
 		Plan plan = passenger.createPlan(true);
 		plan.createAct(TransitConstants.INTERACTION_ACTIVITY_TYPE, enterStop);
-		plan.createLeg(BasicLeg.Mode.bus);
+		plan.createLeg(TransportMode.bus);
 		plan.createAct("work", exitStop);
 		return passenger;
 	}

@@ -23,8 +23,7 @@ package org.matsim.core.controler;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -89,8 +88,8 @@ public class ControlerTest extends MatsimTestCase {
 		Plan plan1 = person1.createPlan(true);
 		Activity a1 = plan1.createAct("h", link1);
 		a1.setEndTime(7.0*3600);
-		Leg leg1 = plan1.createLeg(Mode.car);
-		NetworkRoute route1 = (NetworkRoute)network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
+		Leg leg1 = plan1.createLeg(TransportMode.car);
+		NetworkRoute route1 = (NetworkRoute)network.getFactory().createRoute(TransportMode.car, link1, link3);
 		leg1.setRoute(route1);
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		nodes.add(node2);
@@ -103,8 +102,8 @@ public class ControlerTest extends MatsimTestCase {
 		Plan plan2 = person2.createPlan(true);
 		Activity a2 = plan2.createAct("h", link1);
 		a2.setEndTime(7.0*3600);
-		Leg leg2 = plan2.createLeg(Mode.car);
-		NetworkRoute route2 = (NetworkRoute)network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
+		Leg leg2 = plan2.createLeg(TransportMode.car);
+		NetworkRoute route2 = (NetworkRoute)network.getFactory().createRoute(TransportMode.car, link1, link3);
 		leg2.setRoute(route2);
 		route2.setNodes(link1, nodes, link3);
 		plan2.createAct("h", link3);
@@ -216,7 +215,7 @@ public class ControlerTest extends MatsimTestCase {
 		Plan plan1 = person1.createPlan(true);
 		Activity a1 = plan1.createAct("h", link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 		a1.setEndTime(7.0*3600);
-		leg1 = plan1.createLeg(Mode.car);
+		leg1 = plan1.createLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
 		plan1.createAct("h", link3);
 		// --- plan 2 ---
@@ -224,7 +223,7 @@ public class ControlerTest extends MatsimTestCase {
 		Activity a2 = plan2.createAct("h", link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 		a2.setEndTime(7.0*3600);
 
-		leg2 = plan2.createLeg(Mode.car);
+		leg2 = plan2.createLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
 		plan2.createAct("h", link3);
 		population.addPerson(person1);
@@ -295,14 +294,14 @@ public class ControlerTest extends MatsimTestCase {
 		Plan plan1 = person1.createPlan(true);
 		act1a = plan1.createAct("h", new CoordImpl(-50.0, 10.0));
 		act1a.setEndTime(7.0*3600);
-		leg1 = plan1.createLeg(Mode.car);
+		leg1 = plan1.createLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
 		act1b = plan1.createAct("h", new CoordImpl(1075.0, -10.0));
 		// --- plan 2 ---
 		Plan plan2 = person1.createPlan(true);
 		act2a = plan2.createAct("h", new CoordImpl(-50.0, -10.0));
 		act2a.setEndTime(7.9*3600);
-		leg2 = plan2.createLeg(Mode.car);
+		leg2 = plan2.createLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
 		act2b = plan2.createAct("h", new CoordImpl(1111.1, 10.0));
 		population.addPerson(person1);

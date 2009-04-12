@@ -21,7 +21,7 @@ package playground.mfeil;
 
 
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
@@ -228,7 +228,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 		if (Gbl.getConfig().planomat().getPossibleModes().length>0){
 			for (int z=1;z<plan.getPlanElements().size();z+=2){
 				//((Leg)(plan.getActsLegs().get(z))).setMode(Gbl.getConfig().planomat().getPossibleModes()[y]);
-				((Leg)(plan.getPlanElements().get(z))).setMode(BasicLeg.Mode.car);
+				((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
 			}
 		}
 		this.router.run(plan);

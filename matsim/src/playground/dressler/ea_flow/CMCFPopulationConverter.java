@@ -31,7 +31,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
@@ -100,7 +100,7 @@ public class CMCFPopulationConverter {
 				 BasicActivityImpl home = new BasicActivityImpl("home");
 				 home.setEndTime(0.);
 				 BasicActivityImpl work = new BasicActivityImpl("work");
-				 BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.walk);
+				 BasicLegImpl leg = new BasicLegImpl(TransportMode.walk);
 				 if (coordinates){
 					home.setCoord(coordfrom);
 					work.setCoord(coordto);

@@ -23,7 +23,7 @@ package org.matsim.population.filters;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -69,13 +69,13 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		Activity act1 = plan.createAct("h", link0);
 		act1.setEndTime(8.0*3600);
 
-		Leg leg = plan.createLeg(BasicLeg.Mode.car);
+		Leg leg = plan.createLeg(TransportMode.car);
 		leg.setDepartureTime(8.0*3600);
 		leg.setTravelTime(2.0*60);
 
 		plan.createAct("w", link5);
 
-		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link0, link5);
+		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link0, link5);
 		leg.setRoute(route);
 
 		// prepare route
@@ -112,8 +112,8 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		assertFalse("test route outside aoi", filter.judge(person));
 
 		// prepare bee-line tests
-		leg.setMode(BasicLeg.Mode.walk);
-		leg.setRoute(network.getFactory().createRoute(BasicLeg.Mode.car, link0, link5)); // empty route // TODO should be switched to WalkRoute once that exists...
+		leg.setMode(TransportMode.walk);
+		leg.setRoute(network.getFactory().createRoute(TransportMode.car, link0, link5)); // empty route // TODO should be switched to WalkRoute once that exists...
 
 		// test bee-line without alternative aoi
 		aoi.clear();

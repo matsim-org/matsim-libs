@@ -19,7 +19,7 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.events.ActEndEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.BasicEventImpl;
@@ -34,7 +34,7 @@ public class StartingLegMessage extends EventMessage {
 	@Override
 	public void handleMessage() {
 		// if current leg is in car mode, then enter request in first road
-		if (vehicle.getCurrentLeg().getMode().equals(BasicLeg.Mode.car)) {
+		if (vehicle.getCurrentLeg().getMode().equals(TransportMode.car)) {
 			Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
 			road.enterRequest(vehicle, getMessageArrivalTime());
 		} else {

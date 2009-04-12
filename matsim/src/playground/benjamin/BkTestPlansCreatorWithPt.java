@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
@@ -74,7 +75,7 @@ public class BkTestPlansCreatorWithPt {
 			act1.setEndTime(homeEndTime);
 			plan.addAct(act1);
 			
-			BasicLeg leg1Car = new BasicLegImpl(BasicLeg.Mode.car);
+			BasicLeg leg1Car = new BasicLegImpl(TransportMode.car);
 			BasicRouteImpl routeCar = new BasicRouteImpl(id1, id4);
 			List<Id> linkidsCar = new ArrayList<Id>();
 			linkidsCar.add(id2);
@@ -90,7 +91,7 @@ public class BkTestPlansCreatorWithPt {
 //			act2.setDuration(8.0 * 3600.0);
 			plan.addAct(act2);
 			
-			BasicLeg leg2Car = new BasicLegImpl(BasicLeg.Mode.car);
+			BasicLeg leg2Car = new BasicLegImpl(TransportMode.car);
 			routeCar = new BasicRouteImpl(id4, id1);
 			linkidsCar = new ArrayList<Id>();
 			linkidsCar.add(id5);
@@ -114,7 +115,7 @@ public class BkTestPlansCreatorWithPt {
 			
 			plan.addAct(act1);
 			
-			BasicLeg leg1Pt = new BasicLegImpl(BasicLeg.Mode.pt);
+			BasicLeg leg1Pt = new BasicLegImpl(TransportMode.pt);
 //			BasicRouteImpl routePt = new BasicRouteImpl(id1, id4);
 //			List<Id> linkidsPt = new ArrayList<Id>();
 //			routePt.setLinkIds(linkidsPt);
@@ -124,7 +125,7 @@ public class BkTestPlansCreatorWithPt {
 
 			plan.addAct(act2);
 			
-			BasicLeg leg2Pt = new BasicLegImpl(BasicLeg.Mode.pt);
+			BasicLeg leg2Pt = new BasicLegImpl(TransportMode.pt);
 //			routePt = new BasicRouteImpl(id4, id1);
 //			linkidsPt = new ArrayList<Id>();
 //			routePt.setLinkIds(linkidsPt);

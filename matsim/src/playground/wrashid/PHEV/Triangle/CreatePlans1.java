@@ -3,7 +3,7 @@ package playground.wrashid.PHEV.Triangle;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
@@ -97,7 +97,7 @@ public class CreatePlans1 {
 			Activity a = plan.createAct("home",home_facility.getCoord());
 			a.setLink(home_facility.getLink());
 			a.setEndTime(depTimeHome);
-			Leg l = plan.createLeg(BasicLeg.Mode.car);
+			Leg l = plan.createLeg(TransportMode.car);
 			l.setArrivalTime(depTimeHome);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTimeHome);
@@ -106,7 +106,7 @@ public class CreatePlans1 {
 			a.setStartTime(depTimeHome);
 			a.setEndTime(depTimeWork);
 			a.setDuration(depTimeWork-depTimeHome);
-			l = plan.createLeg(BasicLeg.Mode.car);
+			l = plan.createLeg(TransportMode.car);
 			l.setArrivalTime(depTimeWork);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTimeWork);
@@ -115,7 +115,7 @@ public class CreatePlans1 {
 			a.setStartTime(depTimeWork);
 			a.setEndTime(depTimeShop);
 			a.setDuration(depTimeShop-depTimeWork);
-			l = plan.createLeg(BasicLeg.Mode.car);
+			l = plan.createLeg(TransportMode.car);
 			l.setArrivalTime(depTimeShop);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTimeShop);

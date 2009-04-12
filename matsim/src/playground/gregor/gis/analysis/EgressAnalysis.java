@@ -39,7 +39,7 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
@@ -182,7 +182,7 @@ public class EgressAnalysis {
 				this.egressNodes.get(node.getId()).num_current++;
 				Plan plan = new org.matsim.core.population.PlanImpl(person);
 				plan.addAct(person.getSelectedPlan().getFirstActivity());
-				Leg l = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+				Leg l = new org.matsim.core.population.LegImpl(TransportMode.car);
 				l.setDepartureTime(0.0);
 				l.setTravelTime(0.0);
 				l.setArrivalTime(0.0);

@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.facilities.Facility;
@@ -79,7 +80,7 @@ public class PlanImpl implements Plan {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public Leg createLeg(final BasicLeg.Mode mode) throws IllegalStateException {
+	public Leg createLeg(final TransportMode mode) throws IllegalStateException {
 		verifyCreateLeg();
 		Leg leg = new LegImpl(mode);
 		// Override leg number with an appropriate value

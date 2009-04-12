@@ -26,9 +26,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.vis.netvis.DisplayableLinkI;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.netvis.drawableNet.DrawableLinkI;
@@ -193,11 +193,11 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLink {
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
 	
-	public Mode[] getAllowedModes() {
+	public TransportMode[] getAllowedModes() {
 		throw new UnsupportedOperationException();
 	}
 	
-	public void setAllowedModes(Mode[] modes) {
+	public void setAllowedModes(TransportMode[] modes) {
 		throw new UnsupportedOperationException();
 	}
 	

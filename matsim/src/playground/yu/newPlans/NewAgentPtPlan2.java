@@ -23,7 +23,7 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -46,7 +46,7 @@ import org.matsim.core.population.PopulationReader;
  */
 public class NewAgentPtPlan2 extends NewPopulation {
 	private List<Plan> copyPlans = new ArrayList<Plan>();
-	private List<BasicLeg.Mode> copyPlansModes = new ArrayList<BasicLeg.Mode>();
+	private List<TransportMode> copyPlansModes = new ArrayList<TransportMode>();
 
 	/**
 	 * Constructor, writes file-head
@@ -67,19 +67,19 @@ public class NewAgentPtPlan2 extends NewPopulation {
 			// copyPlans: the copy of the plans.
 			for (Plan pl : person.getPlans()) {
 				Leg firstLeg = (Leg) pl.getPlanElements().get(1);
-				BasicLeg.Mode legMode = firstLeg.getMode();
+				TransportMode legMode = firstLeg.getMode();
 				// pl.setType(getPlanType(legMode));//????????????
 
-				if (!legMode.equals(BasicLeg.Mode.car)) {
+				if (!legMode.equals(TransportMode.car)) {
 					Plan copyPlan = new org.matsim.core.population.PlanImpl(person);
 					// copyPlan.setType(Plan.Type.CAR);//????????????
 					this.copyPlans.add(copyPlan);
-					this.copyPlansModes.add(BasicLeg.Mode.car);
-				} else if (!legMode.equals(BasicLeg.Mode.pt)) {
+					this.copyPlansModes.add(TransportMode.car);
+				} else if (!legMode.equals(TransportMode.pt)) {
 					Plan copyPlan = new org.matsim.core.population.PlanImpl(person);
 					// copyPlan.setType(Plan.Type.PT);//??????????????
 					this.copyPlans.add(copyPlan);
-					this.copyPlansModes.add(BasicLeg.Mode.pt);
+					this.copyPlansModes.add(TransportMode.pt);
 				}
 
 				List actsLegs = pl.getPlanElements();

@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
@@ -136,7 +136,7 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 			Leg l = (Leg) li.next();
 			double dist = (((int) l.getRoute().getDistance()) / 1000 * 1000);
 			if (dist < 320000) {
-				if (l.getMode().equals(Mode.car)) {
+				if (l.getMode().equals(TransportMode.car)) {
 					Double carLegsCounter = this.carLegs.get(dist);
 					if (carLegsCounter == null) {
 						carLegsCounter = new Double(0.0);
@@ -144,7 +144,7 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 					carLegsCounter = new Double(
 							carLegsCounter.doubleValue() + 1.0);
 					this.carLegs.put(dist, carLegsCounter);
-				} else if (l.getMode().equals(Mode.pt)) {
+				} else if (l.getMode().equals(TransportMode.pt)) {
 					Double ptLegsCounter = this.ptLegs.get(dist);
 					if (ptLegsCounter == null) {
 						ptLegsCounter = new Double(0.0);

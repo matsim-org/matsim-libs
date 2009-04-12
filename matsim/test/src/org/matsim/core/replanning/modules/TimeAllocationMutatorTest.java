@@ -20,7 +20,7 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -123,10 +123,10 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 			plan = person.createPlan(true);
 			act1 = plan.createAct("h", link1);
 			act1.setEndTime(4*3600);
-			plan.createLeg(BasicLeg.Mode.car);
+			plan.createLeg(TransportMode.car);
 			act2 = plan.createAct("w", link1);
 			act2.setDuration(14*3600);
-			plan.createLeg(BasicLeg.Mode.car);
+			plan.createLeg(TransportMode.car);
 			plan.createAct("h", link1);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

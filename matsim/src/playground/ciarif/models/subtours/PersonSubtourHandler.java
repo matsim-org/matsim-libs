@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
@@ -79,15 +79,15 @@ public class PersonSubtourHandler {
 				prev = curr;
 				
 				// Getting the main mode at the sub-tour level
-				BasicLeg.Mode mode =((Leg)plan.getPlanElements().get(subtour.get(k)-1)).getMode();
+				TransportMode mode =((Leg)plan.getPlanElements().get(subtour.get(k)-1)).getMode();
 				int license = 0;
 				if (plan.getPerson().hasLicense()){license =1;}
 				int modechoice = 0;
-				if (mode == BasicLeg.Mode.car) {modechoice=0;}
-				else if (mode == BasicLeg.Mode.pt) {modechoice=1;}
-				else if ((mode == BasicLeg.Mode.car) && (license==0)) {modechoice=2;}
-				else if (mode == BasicLeg.Mode.bike) {modechoice=3;}
-				else if (mode == BasicLeg.Mode.walk) {modechoice=4;}
+				if (mode == TransportMode.car) {modechoice=0;}
+				else if (mode == TransportMode.pt) {modechoice=1;}
+				else if ((mode == TransportMode.car) && (license==0)) {modechoice=2;}
+				else if (mode == TransportMode.bike) {modechoice=3;}
+				else if (mode == TransportMode.walk) {modechoice=4;}
 				if (sub.getMode() > modechoice) {sub.setMode(modechoice);}
 			}
 			System.out.println("subtour mode = " + sub.getMode());

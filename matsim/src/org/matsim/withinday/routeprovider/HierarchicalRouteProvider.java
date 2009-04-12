@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
@@ -54,7 +54,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 	@Override
 	public NetworkRoute requestRoute(Link departureLink, final Link destinationLink, final double time) {
 		NetworkRoute subRoute;
-		NetworkRoute returnRoute = (NetworkRoute) ((NetworkLayer) departureLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, departureLink, destinationLink);
+		NetworkRoute returnRoute = (NetworkRoute) ((NetworkLayer) departureLink.getLayer()).getFactory().createRoute(TransportMode.car, departureLink, destinationLink);
 		ArrayList<Node> routeNodes = new ArrayList<Node>();
 		for (RouteProvider rp : this.providers) {
 			if (log.isTraceEnabled()) {

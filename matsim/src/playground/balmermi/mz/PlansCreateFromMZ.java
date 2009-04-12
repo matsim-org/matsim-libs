@@ -29,7 +29,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
@@ -152,13 +152,13 @@ public class PlansCreateFromMZ {
 
 				// trip mode type
 				int m = Integer.parseInt(entries[12].trim());
-				BasicLeg.Mode mode = null;
-				if (m == 1) { mode = BasicLeg.Mode.walk; }
-				else if (m == 2) { mode = BasicLeg.Mode.bike; }
-				else if (m == 3) { mode = BasicLeg.Mode.car; }
-				else if (m == 4) { mode = BasicLeg.Mode.pt; }
-				else if (m == 5) { mode = BasicLeg.Mode.ride; }
-				else if (m == 6) { mode = BasicLeg.Mode.undefined; }
+				TransportMode mode = null;
+				if (m == 1) { mode = TransportMode.walk; }
+				else if (m == 2) { mode = TransportMode.bike; }
+				else if (m == 3) { mode = TransportMode.car; }
+				else if (m == 4) { mode = TransportMode.pt; }
+				else if (m == 5) { mode = TransportMode.ride; }
+				else if (m == 6) { mode = TransportMode.undefined; }
 				else { Gbl.errorMsg("pid=" + pid + ": m=" + m + " not known!"); }
 
 				// micro census person weight
@@ -463,7 +463,7 @@ public class PlansCreateFromMZ {
 			LegIterator leg_it = plan.getIteratorLeg();
 			while (leg_it.hasNext()) {
 				Leg leg = (Leg)leg_it.next();
-				if ((leg.getMode().equals(BasicLeg.Mode.walk))&&(leg.getRoute().getDistance()>10000.0)) {ids.add(p.getId()); }
+				if ((leg.getMode().equals(TransportMode.walk))&&(leg.getRoute().getDistance()>10000.0)) {ids.add(p.getId()); }
 			}
 		}
 		return ids;

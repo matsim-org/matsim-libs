@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -83,12 +83,12 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 
 		// get the subtour mode
 		int idx = -1;
-		BasicLeg.Mode mode = ((Leg)plan.getPlanElements().get(start+1)).getMode();
-		if (mode.equals(BasicLeg.Mode.walk)) { idx = WALK; }
-		else if (mode.equals(BasicLeg.Mode.bike)) { idx = BIKE; }
-		else if (mode.equals(BasicLeg.Mode.car)) { idx = CAR; }
-		else if (mode.equals(BasicLeg.Mode.pt)) { idx = PT; }
-		else if (mode.equals(BasicLeg.Mode.undefined)) { idx = UNDEF; }
+		TransportMode mode = ((Leg)plan.getPlanElements().get(start+1)).getMode();
+		if (mode.equals(TransportMode.walk)) { idx = WALK; }
+		else if (mode.equals(TransportMode.bike)) { idx = BIKE; }
+		else if (mode.equals(TransportMode.car)) { idx = CAR; }
+		else if (mode.equals(TransportMode.pt)) { idx = PT; }
+		else if (mode.equals(TransportMode.undefined)) { idx = UNDEF; }
 		else { Gbl.errorMsg("pid=" + plan.getPerson().getId() + ": mode=" + mode + " unknown!"); }
 
 		// calculate the SubTour distance (in 1 km time bins)

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 
 public class SubChain {
@@ -42,7 +42,7 @@ public class SubChain {
 	//car, walk, mixed
 	private String mode = null;
 
-	public void defineMode(Mode mode) {
+	public void defineMode(TransportMode mode) {
 		if (this.mode == null) {
 			this.mode = mode.toString();
 			return;

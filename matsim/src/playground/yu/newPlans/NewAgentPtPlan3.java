@@ -23,7 +23,7 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -69,17 +69,17 @@ public class NewAgentPtPlan3 extends NewPopulation implements PersonAlgorithm {
 		// copyPlans: the copy of the plans.
 		for (Plan pl : person.getPlans()) {
 			Leg firstLeg = (Leg) pl.getPlanElements().get(1);
-			BasicLeg.Mode legMode = firstLeg.getMode();
+			TransportMode legMode = firstLeg.getMode();
 			//pl.setType(NewAgentPtPlan2.getPlanType(legMode));//???????????????
 
-			if (!legMode.equals(BasicLeg.Mode.car)) {
+			if (!legMode.equals(TransportMode.car)) {
 				if (person.getLicense().equals("yes")) {
 					Plan copyPlan = new org.matsim.core.population.PlanImpl(person);
 					//copyPlan.setType(Plan.Type.CAR);//????????????????????????
 					// ??
 					copyPlans.add(copyPlan);
 				}
-			} else if (!legMode.equals(BasicLeg.Mode.pt)) {
+			} else if (!legMode.equals(TransportMode.pt)) {
 				Plan copyPlan = new org.matsim.core.population.PlanImpl(person);
 				// copyPlan.setType(Plan.Type.PT);//?????????????????????
 				copyPlans.add(copyPlan);
@@ -118,7 +118,7 @@ public class NewAgentPtPlan3 extends NewPopulation implements PersonAlgorithm {
 			for (Plan pl : plans)
 				if (
 				// pl.getType().equals(BasicLeg.CARMODE)
-				PlanModeJudger.getMode(pl).equals(BasicLeg.Mode.car))
+				PlanModeJudger.getMode(pl).equals(TransportMode.car))
 					plans.remove(pl);
 		}
 

@@ -30,7 +30,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
@@ -376,7 +376,7 @@ public class QueueLane implements Comparable<QueueLane> {
 			 */
 			Leg leg = veh.getCurrentLeg();
 
-			if (!leg.getMode().equals(BasicLeg.Mode.car)) {
+			if (!leg.getMode().equals(TransportMode.car)) {
 				QueueSimulation.handleUnknownLegMode(veh);
 			} else {
 				if (((NetworkRoute) leg.getRoute()).getNodes().size() != 0) {

@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
@@ -186,7 +186,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 				}
 				act.setEndTime(10*3600);
 				if (aa != (locationIdSequence.length - 1)) {
-					plan.createLeg(BasicLeg.Mode.car);
+					plan.createLeg(TransportMode.car);
 				}
 			}
 			testee.run(plan);

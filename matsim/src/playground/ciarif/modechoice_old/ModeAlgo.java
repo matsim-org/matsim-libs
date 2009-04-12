@@ -25,7 +25,7 @@ package playground.ciarif.modechoice_old ;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -60,7 +60,7 @@ public class ModeAlgo extends AbstractPersonAlgorithm{
 		for (int i=1; i<acts_legs.size()-1; i=i+2) {
 			Leg leg = (Leg)acts_legs.get(i);
 			if (rd<0.5){
-				(leg).setMode(BasicLeg.Mode.train);
+				(leg).setMode(TransportMode.train);
 			}
 		}
 	}

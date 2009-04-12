@@ -23,7 +23,7 @@ package playground.andreas.intersection;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
@@ -169,7 +169,7 @@ public class PlansGeneratorControler extends Controler {
 			act1.setStartTime(0.);
 			act1.setEndTime(3 * 60 * 60.);
 //			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60. + 3600 * MatsimRandom.getLocalInstance().nextDouble(), Time.UNDEFINED_TIME, true);
-			plan.createLeg(BasicLeg.Mode.car);
+			plan.createLeg(TransportMode.car);
 			Activity act2 = plan.createAct("h", new CoordImpl(200., 200.));
 			act2.setLink(toLink);
 			act2.setStartTime(8 * 60 * 60);

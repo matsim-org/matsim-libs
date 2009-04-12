@@ -22,7 +22,7 @@ package playground.mfeil.config;
 
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.config.Module;
 
 public class TimeModeChoicerConfigGroup extends Module {
@@ -171,16 +171,16 @@ public class TimeModeChoicerConfigGroup extends Module {
 	}
 	
 	// TODO all "static" to be removed later, only bypassing solution
-	private static BasicLeg.Mode[] cachedPossibleModes = null;
+	private static TransportMode[] cachedPossibleModes = null;
 	
-	public static BasicLeg.Mode[] getPossibleModes() {
+	public static TransportMode[] getPossibleModes() {
 		if (cachedPossibleModes == null) {
-			if (possible_modes == null) cachedPossibleModes = new BasicLeg.Mode [0];
+			if (possible_modes == null) cachedPossibleModes = new TransportMode [0];
 			else {
 				String[] possibleModesStringArray = possible_modes.split(",");
-				cachedPossibleModes = new BasicLeg.Mode[possibleModesStringArray.length];
+				cachedPossibleModes = new TransportMode[possibleModesStringArray.length];
 				for (int i=0; i < possibleModesStringArray.length; i++) {
-					cachedPossibleModes[i] = BasicLeg.Mode.valueOf(possibleModesStringArray[i]);
+					cachedPossibleModes[i] = TransportMode.valueOf(possibleModesStringArray[i]);
 				}	
 			}
 		}

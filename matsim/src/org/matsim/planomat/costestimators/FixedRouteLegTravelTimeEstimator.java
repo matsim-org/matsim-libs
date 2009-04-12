@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
@@ -50,7 +50,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	private PlansCalcRoute plansCalcRoute;
 
 	private HashMap<Route, List<Link>> linkRoutesCache = new HashMap<Route, List<Link>>();
-	private HashMap<Leg, HashMap<BasicLeg.Mode, Double>> travelTimeCache = new HashMap<Leg, HashMap<BasicLeg.Mode, Double>>();
+	private HashMap<Leg, HashMap<TransportMode, Double>> travelTimeCache = new HashMap<Leg, HashMap<TransportMode, Double>>();
 
 	public FixedRouteLegTravelTimeEstimator(
 			TravelTime linkTravelTimeEstimator,
@@ -67,11 +67,11 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			Activity actOrigin, Activity actDestination, Leg legIntermediate) {
 
-		HashMap<BasicLeg.Mode, Double> legInformation = null; 
+		HashMap<TransportMode, Double> legInformation = null; 
 		if (this.travelTimeCache.containsKey(legIntermediate)) {
 			legInformation = this.travelTimeCache.get(legIntermediate);
 		} else {
-			legInformation = new HashMap<BasicLeg.Mode, Double>();
+			legInformation = new HashMap<TransportMode, Double>();
 			this.travelTimeCache.put(legIntermediate, legInformation);
 		}
 		double cachedTravelTimeInformation;

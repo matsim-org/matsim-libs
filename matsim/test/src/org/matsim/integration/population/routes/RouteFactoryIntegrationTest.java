@@ -22,6 +22,7 @@ package org.matsim.integration.population.routes;
 
 import java.util.Collection;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.api.population.Person;
@@ -108,7 +109,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		@Override
 		protected Population loadPopulation() {
 			NetworkFactory factory = getNetworkFactory();
-			factory.setRouteFactory(BasicLeg.Mode.car, new CompressedNetworkRouteFactory(getNetwork()));
+			factory.setRouteFactory(TransportMode.car, new CompressedNetworkRouteFactory(getNetwork()));
 			return super.loadPopulation();
 		}
 	}

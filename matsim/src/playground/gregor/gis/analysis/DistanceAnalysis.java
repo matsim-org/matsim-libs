@@ -40,7 +40,7 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
@@ -237,7 +237,7 @@ public class DistanceAnalysis {
 			dist[2] += person.getSelectedPlan().getScoreAsPrimitiveType();
 			Plan plan = new org.matsim.core.population.PlanImpl(person);
 			plan.addAct(person.getSelectedPlan().getFirstActivity());
-			Leg ll = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+			Leg ll = new org.matsim.core.population.LegImpl(TransportMode.car);
 			ll.setArrivalTime(0.0);
 			ll.setDepartureTime(0.0);
 			ll.setTravelTime(0.0);

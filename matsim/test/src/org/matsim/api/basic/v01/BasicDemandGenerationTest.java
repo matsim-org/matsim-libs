@@ -116,7 +116,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 			assertEquals(1, plan.getPlanElements().size());
 			activity.setEndTime(homeEndTime);
 			
-			leg = builder.createLeg(BasicLeg.Mode.car);
+			leg = builder.createLeg(TransportMode.car);
 			assertNotNull(leg);
 			assertEquals(1, plan.getPlanElements().size());
 			plan.addLeg(leg);
@@ -134,7 +134,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 			plan.addAct(activity);
 			assertEquals(3, plan.getPlanElements().size());
 			
-			leg = builder.createLeg(BasicLeg.Mode.car);
+			leg = builder.createLeg(TransportMode.car);
 			assertNotNull(leg);
 			assertEquals(3, plan.getPlanElements().size());
 			plan.addLeg(leg);
@@ -203,9 +203,9 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 			assertEquals(ids.get(0), p.getLastActivity().getLinkId());
 			
 			
-			assertEquals(BasicLeg.Mode.car, p.getNextLeg(p.getFirstActivity()).getMode());
+			assertEquals(TransportMode.car, p.getNextLeg(p.getFirstActivity()).getMode());
 			assertNull(p.getNextLeg(p.getFirstActivity()).getRoute());
-			assertEquals(BasicLeg.Mode.car, p.getPreviousLeg(p.getLastActivity()).getMode());
+			assertEquals(TransportMode.car, p.getPreviousLeg(p.getLastActivity()).getMode());
 			assertNull(p.getPreviousLeg(p.getLastActivity()).getRoute());
 		}
 		

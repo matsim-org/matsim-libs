@@ -28,7 +28,7 @@ import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -57,7 +57,7 @@ import playground.yu.utils.io.SimpleWriter;
  * make time variation curve of average {@code Leg} travel time and their sum.
  * This class can only be used with plansfile, in that all <code>Leg</code>s in
  * a <code>Plan</code> muss be equiped with the same {@code Mode}
- * {@link org.matsim.api.basic.v01.population.BasicLeg.Mode} in a day.
+ * {@link org.matsim.api.basic.v01.TransportMode} in a day.
  * 
  * @author ychen
  * 
@@ -159,7 +159,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 
 			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
 					.getSelectedPlan();
-			Mode mode = PlanModeJudger.getMode(selectedplan);
+			TransportMode mode = PlanModeJudger.getMode(selectedplan);
 			switch (mode) {
 			case car:
 				this.carTravelTimes[binIdx] += travelTime;

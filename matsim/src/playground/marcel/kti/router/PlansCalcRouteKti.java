@@ -23,7 +23,7 @@ package playground.marcel.kti.router;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
@@ -69,7 +69,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 
 	@Override
 	public double handleLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		if (BasicLeg.Mode.pt.equals(leg.getMode())) {
+		if (TransportMode.pt.equals(leg.getMode())) {
 			return handleSwissPtLeg(fromAct, leg, toAct);
 		}
 		return super.handleLeg(leg, fromAct, toAct, depTime);
@@ -97,11 +97,11 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 //		Route oldRoute = leg.getRoute();
 		NetworkRoute newRoute;
 		if (beeLineWalkTime < (timeInVehicle + walkTime)) {
-			newRoute = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+			newRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car);
 			leg.setRoute(newRoute);
 			newRoute.setTravelTime(beeLineWalkTime);
 		} else {
-			newRoute = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+			newRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car);
 			leg.setRoute(newRoute);
 			newRoute.setTravelTime(timeInVehicle + walkTime);
 		}

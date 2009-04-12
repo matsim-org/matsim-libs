@@ -30,7 +30,7 @@ import java.util.List;
 import javax.media.opengl.GL;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -93,7 +93,7 @@ public class QueryAgentPlan implements OTFQuery {
 			} else if (o instanceof Leg) {
 				Leg leg = (Leg)o;
 
-				if (leg.getMode().equals(Mode.car)) {
+				if (leg.getMode().equals(TransportMode.car)) {
 					List<Link> route = ((NetworkRoute) leg.getRoute()).getLinks();
 					count += route.size();
 					if(route.size() != 0) count++; //add last position if there is a path
@@ -138,7 +138,7 @@ public class QueryAgentPlan implements OTFQuery {
 			} else if (o instanceof Leg) {
 				Leg leg = (Leg)o;
 
-				if (leg.getMode().equals(Mode.car)) {
+				if (leg.getMode().equals(TransportMode.car)) {
 					Node last = null;
 					for (Link driven : ((NetworkRoute) leg.getRoute()).getLinks()) {
 						Node node = driven.getFromNode();

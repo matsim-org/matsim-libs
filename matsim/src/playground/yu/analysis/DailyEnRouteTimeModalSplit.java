@@ -3,7 +3,7 @@
  */
 package playground.yu.analysis;
 
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -83,7 +83,7 @@ public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 			double legTime = leg.getRoute().getTravelTime() / 60.0;
 			if (Integer.parseInt(this.person.getId().toString()) < 1000000000
 					&& leg.getDepartureTime() < 86400)
-				if (leg.getMode().equals(Mode.car)) {
+				if (leg.getMode().equals(TransportMode.car)) {
 					if (this.person.getSex().equals("m"))
 						this.maleCarTime += legTime;
 					else
@@ -110,7 +110,7 @@ public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 						this.isEmployedCarTime += legTime;
 					else
 						this.notEmployedCarTime += legTime;
-				} else if (leg.getMode().equals(Mode.pt)) {
+				} else if (leg.getMode().equals(TransportMode.pt)) {
 					if (this.person.getSex().equals("m"))
 						this.malePtTime += legTime;
 					else

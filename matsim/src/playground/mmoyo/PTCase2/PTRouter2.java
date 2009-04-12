@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -98,7 +99,7 @@ public class PTRouter2 {
 				idLink= "WLD" + x++;
 			}
 			Link link= createPTLink(idLink, fromNode, toNode, "Walking");
-			//-->30 märz check if this temporary stuff improves the performance
+			//-->30 mï¿½rz check if this temporary stuff improves the performance
 			//link.setFreespeed(link.getLength()* WALKING_SPEED);
 			NewWalkLinks.add(link);
 		}
@@ -170,7 +171,7 @@ public class PTRouter2 {
 					if (linkList.size()>0) {legRoute.setLinks(null, linkList, null);}
 					
 					//insert leg 
-					Leg leg = new org.matsim.core.population.LegImpl(Leg.Mode.pt);
+					Leg leg = new org.matsim.core.population.LegImpl(TransportMode.pt);
 					//routeTravelTime =routeTravelTime; // routeTravelTime =routeTravelTime*3600;  //Seconds
 					leg.setDepartureTime(accumulatedTime);
 					leg.setTravelTime(routeTravelTime);

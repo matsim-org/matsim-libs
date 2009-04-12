@@ -25,7 +25,7 @@ import java.util.List;
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 import org.jgap.impl.IntegerGene;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -103,7 +103,7 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 				} // otherwise leave modes untouched
 
 				// save original route
-				if (!leg.getMode().equals(BasicLeg.Mode.car)) {
+				if (!leg.getMode().equals(TransportMode.car)) {
 					tempRoute = leg.getRoute();
 				}
 
@@ -117,7 +117,7 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
 				now += travelTime;
 
-				if (!leg.getMode().equals(BasicLeg.Mode.car)) {
+				if (!leg.getMode().equals(TransportMode.car)) {
 					// recover original route
 					leg.setRoute(tempRoute);
 				}

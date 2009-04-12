@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -44,8 +45,8 @@ public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 	
-	TreeMap<BasicLeg.Mode, Integer> modeStatistics =
-		new TreeMap<BasicLeg.Mode, Integer>();
+	TreeMap<TransportMode, Integer> modeStatistics =
+		new TreeMap<TransportMode, Integer>();
 	
 	public ModeChoiceAnalyzer() {
 		super();
@@ -61,7 +62,7 @@ public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
 		
 		while (legIt.hasNext()) {
 			BasicLeg leg = legIt.next();
-			BasicLeg.Mode mode = leg.getMode();
+			TransportMode mode = leg.getMode();
 			int modeCount = 0;
 			
 			if (modeStatistics.containsKey(mode)) {
@@ -73,7 +74,7 @@ public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
 	}
 	
 	public void printInformation() {
-		Iterator<Map.Entry<BasicLeg.Mode, Integer>> modeIt = modeStatistics.entrySet().iterator();
+		Iterator<Map.Entry<TransportMode, Integer>> modeIt = modeStatistics.entrySet().iterator();
 		while (modeIt.hasNext()) {
 			Map.Entry entry = modeIt.next();
 			System.out.println("There are " + entry.getValue() + " modes of "
@@ -85,7 +86,7 @@ public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
 		BufferedWriter out;
 		try {
 			out = new BufferedWriter(new FileWriter(filename));
-			Iterator<Map.Entry<BasicLeg.Mode, Integer>> modeIt = modeStatistics.entrySet().iterator();
+			Iterator<Map.Entry<TransportMode, Integer>> modeIt = modeStatistics.entrySet().iterator();
 			while (modeIt.hasNext()) {
 				Map.Entry entry = modeIt.next();
 				out.write(entry.getKey() + ";" + entry.getValue() + "\n");

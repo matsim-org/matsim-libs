@@ -21,7 +21,7 @@
 package org.matsim.core.population;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
@@ -40,21 +40,21 @@ public class PlanTest extends MatsimTestCase {
 	public void testCreateLeg() {
 		Plan plan = new org.matsim.core.population.PlanImpl(new PersonImpl(new IdImpl(1)));
 		try {
-			plan.createLeg(Mode.car);
+			plan.createLeg(TransportMode.car);
 			fail("expected IllegalStateException when creating a leg in an empty plan.");
 		} catch (IllegalStateException e) {
 			log.debug("catched expected exception.", e);
 		}
 		plan.createAct("h", new CoordImpl(0, 0));
-		plan.createLeg(Mode.car);
+		plan.createLeg(TransportMode.car);
 		try {
-			plan.createLeg(Mode.bike);
+			plan.createLeg(TransportMode.bike);
 			fail("expected IllegalStateException.");
 		} catch (IllegalStateException e) {
 			log.debug("catched expected exception.", e);
 		}
 		plan.createAct("w", new CoordImpl(100, 200));
-		plan.createLeg(Mode.bike);
+		plan.createLeg(TransportMode.bike);
 		plan.createAct("h", new CoordImpl(0, 0));
 	}
 
@@ -71,7 +71,7 @@ public class PlanTest extends MatsimTestCase {
 		} catch (IllegalStateException e) {
 			log.debug("catched expected exception.", e);
 		}
-		plan.createLeg(Mode.car);
+		plan.createLeg(TransportMode.car);
 		// but after a leg, it must be possible to add an additional act
 		plan.createAct("w", new CoordImpl(100, 200));
 	}
@@ -82,7 +82,7 @@ public class PlanTest extends MatsimTestCase {
 	public void testInsertActLeg_Between() {
 		Plan plan = new org.matsim.core.population.PlanImpl(new PersonImpl(new IdImpl(1)));
 		Activity homeAct = plan.createAct("h", new CoordImpl(0, 0));
-		Leg leg1 = plan.createLeg(Mode.car);
+		Leg leg1 = plan.createLeg(TransportMode.car);
 		Activity workAct = plan.createAct("w", new CoordImpl(100, 200));
 
 		// precondition
@@ -90,7 +90,7 @@ public class PlanTest extends MatsimTestCase {
 
 		// modification
 		Activity a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
-		Leg l = new org.matsim.core.population.LegImpl(Mode.car);
+		Leg l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		plan.insertLegAct(1, l, a);
 
 		// test
@@ -108,7 +108,7 @@ public class PlanTest extends MatsimTestCase {
 	public void testInsertActLeg_AtEnd() {
 		Plan plan = new org.matsim.core.population.PlanImpl(new PersonImpl(new IdImpl(1)));
 		Activity homeAct = plan.createAct("h", new CoordImpl(0, 0));
-		Leg leg1 = plan.createLeg(Mode.car);
+		Leg leg1 = plan.createLeg(TransportMode.car);
 		Activity workAct = plan.createAct("w", new CoordImpl(100, 200));
 
 		// precondition
@@ -116,7 +116,7 @@ public class PlanTest extends MatsimTestCase {
 
 		// modification
 		Activity a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
-		Leg l = new org.matsim.core.population.LegImpl(Mode.car);
+		Leg l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		plan.insertLegAct(3, l, a);
 
 		// test
@@ -134,7 +134,7 @@ public class PlanTest extends MatsimTestCase {
 	public void testInsertActLeg_AtWrongPosition() {
 		Plan plan = new org.matsim.core.population.PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createAct("h", new CoordImpl(0, 0));
-		plan.createLeg(Mode.car);
+		plan.createLeg(TransportMode.car);
 		plan.createAct("w", new CoordImpl(100, 200));
 
 		// precondition
@@ -142,7 +142,7 @@ public class PlanTest extends MatsimTestCase {
 
 		// modification
 		Activity a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
-		Leg l = new org.matsim.core.population.LegImpl(Mode.car);
+		Leg l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		try {
 			plan.insertLegAct(2, l, a);
 			fail("expected Exception because of wrong act/leg-index.");
@@ -157,7 +157,7 @@ public class PlanTest extends MatsimTestCase {
 	public void testInsertActLeg_AtStart() {
 		Plan plan = new org.matsim.core.population.PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createAct("h", new CoordImpl(0, 0));
-		plan.createLeg(Mode.car);
+		plan.createLeg(TransportMode.car);
 		plan.createAct("w", new CoordImpl(100, 200));
 
 		// precondition
@@ -165,7 +165,7 @@ public class PlanTest extends MatsimTestCase {
 
 		// modification
 		Activity a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
-		Leg l = new org.matsim.core.population.LegImpl(Mode.car);
+		Leg l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		try {
 			plan.insertLegAct(0, l, a);
 			fail("expected Exception because of wrong act/leg-index.");
@@ -181,7 +181,7 @@ public class PlanTest extends MatsimTestCase {
 	public void testInsertActLeg_BehindEnd() {
 		Plan plan = new org.matsim.core.population.PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createAct("h", new CoordImpl(0, 0));
-		plan.createLeg(Mode.car);
+		plan.createLeg(TransportMode.car);
 		plan.createAct("w", new CoordImpl(100, 200));
 
 		// precondition
@@ -189,7 +189,7 @@ public class PlanTest extends MatsimTestCase {
 
 		// modification
 		Activity a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
-		Leg l = new org.matsim.core.population.LegImpl(Mode.car);
+		Leg l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		try {
 			plan.insertLegAct(4, l, a);
 			fail("expected Exception because of wrong act/leg-index.");

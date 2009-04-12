@@ -24,7 +24,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -298,11 +298,11 @@ public class JohScoringFunction implements ScoringFunction {
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist = 0.0; // distance in meters
 
-		if (BasicLeg.Mode.car.equals(leg.getMode())) {
+		if (TransportMode.car.equals(leg.getMode())) {
 			tmpScore += travelTime * marginalUtilityOfTraveling / 3600 + marginalUtilityOfDistance / 3600 * dist;
-		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
+		} else if (TransportMode.pt.equals(leg.getMode())) {
 			tmpScore += travelTime * marginalUtilityOfTravelingPT / 3600 + marginalUtilityOfDistance / 3600 * dist;
-		} else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
+		} else if (TransportMode.walk.equals(leg.getMode())) {
 			tmpScore += travelTime * marginalUtilityOfTravelingWalk / 3600 + marginalUtilityOfDistance / 3600 * dist;
 		} else {
 			// use the same values as for "car"

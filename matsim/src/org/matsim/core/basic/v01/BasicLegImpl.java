@@ -20,6 +20,7 @@
 
 package org.matsim.core.basic.v01;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.utils.misc.Time;
@@ -31,10 +32,10 @@ public class BasicLegImpl implements BasicLeg {
 	private double depTime = Time.UNDEFINED_TIME;
 	private double travTime = Time.UNDEFINED_TIME;
 	private double arrTime = Time.UNDEFINED_TIME;
-	private Mode mode;
+	private TransportMode mode;
 
 	
-	public BasicLegImpl(BasicLeg.Mode mode) {
+	public BasicLegImpl(TransportMode mode) {
 		this.mode = mode;
 	}
 
@@ -46,11 +47,11 @@ public class BasicLegImpl implements BasicLeg {
 		this.route = route;
 	}
 
-	public final Mode getMode() {
+	public final TransportMode getMode() {
 		return this.mode;
 	}
 
-	public final void setMode(Mode mode) {
+	public final void setMode(TransportMode mode) {
 		this.mode = mode;
 	}
 

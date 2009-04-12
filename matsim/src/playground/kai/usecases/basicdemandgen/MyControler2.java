@@ -38,6 +38,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPerson;
@@ -134,7 +135,7 @@ public class MyControler2 {
 			// (with replacement.  W/o replacement, make sure that there are enough workplaces!)
 //			playground.kai.urbansim.Utils.completePlanToHwh(plan, workCoord) ; // FIXME once createAct methods are there
 			
-			BasicLeg leg = pb.createLeg(BasicLeg.Mode.bike) ;
+			BasicLeg leg = pb.createLeg(TransportMode.bike) ;
 			plan.getPlanElements().add(leg) ;
 			
 		}

@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -116,12 +116,12 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 			Activity act1 = plan.createAct(ACTTYPE_HOME, homeCoord);
 			act1.setEndTime(homeEndTime);
 
-			plan.createLeg(BasicLeg.Mode.car);
+			plan.createLeg(TransportMode.car);
 
 			Activity act2 = plan.createAct(row[5], primaryCoord);
 			act2.setDuration(WORKDURATION);
 
-			plan.createLeg(BasicLeg.Mode.car);
+			plan.createLeg(TransportMode.car);
 
 			/*Act act3 = */plan.createAct(ACTTYPE_HOME, homeCoord);
 			this.plans.addPerson(p);

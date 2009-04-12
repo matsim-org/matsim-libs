@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -305,7 +306,7 @@ public class PTActWriter {
 					legDistance=legDistance + linkDistance;
 
 					//Attention: The legMode car is temporal only for visualization purposes
-					newPlan.addLeg(newPTLeg(legNum++, Leg.Mode.car, legRouteLinks, legDistance, arrTime-legTravelTime, legTravelTime, arrTime));
+					newPlan.addLeg(newPTLeg(legNum++, TransportMode.car, legRouteLinks, legDistance, arrTime-legTravelTime, legTravelTime, arrTime));
 										
 					//test: Check what method describes the location more exactly
 					//newPlan.addAct(newPTAct("exit pt veh", link.getFromNode().getCoord(), link, arrTime, 0, arrTime));
@@ -317,7 +318,7 @@ public class PTActWriter {
 					arrTime= depTime+ legTravelTime;
 					legDistance= legDistance+ linkDistance;
 					//-->: The legMode car is temporal only for visualization purposes
-					newPlan.addLeg(newPTLeg(legNum++, Leg.Mode.car, legRouteLinks, legDistance, depTime, legTravelTime, arrTime));
+					newPlan.addLeg(newPTLeg(legNum++, TransportMode.car, legRouteLinks, legDistance, depTime, legTravelTime, arrTime));
 					//newPlan.addAct(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
 					newPlan.addAct(newPTAct("Wait pt veh", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
 					first=false;
@@ -344,7 +345,7 @@ public class PTActWriter {
 				legRouteLinks.clear();
 				legRouteLinks.add(link);
 				arrTime= accumulatedTime+ walkTime;
-				newPlan.addLeg(newPTLeg(legNum++, Leg.Mode.walk, legRouteLinks, linkDistance, accumulatedTime, walkTime, arrTime));
+				newPlan.addLeg(newPTLeg(legNum++, TransportMode.walk, legRouteLinks, linkDistance, accumulatedTime, walkTime, arrTime));
 
 				//like a transfer link
 				if (lastLinkType.equals("Standard")){  //-> how can be validated that the next link must be a standard link?
@@ -361,7 +362,7 @@ public class PTActWriter {
 				legRouteLinks.add(link);
 				linkTravelTime= linkTravelTime/60;
 				arrTime= accumulatedTime+ linkTravelTime;
-				newPlan.addLeg(newPTLeg(legNum++, Leg.Mode.walk, legRouteLinks, linkDistance, accumulatedTime, linkTravelTime, arrTime));
+				newPlan.addLeg(newPTLeg(legNum++, TransportMode.walk, legRouteLinks, linkDistance, accumulatedTime, linkTravelTime, arrTime));
 			}
 
 			accumulatedTime =accumulatedTime+ linkTravelTime;
@@ -381,14 +382,14 @@ public class PTActWriter {
 		return ptAct;
 	}
 
-	private Leg newPTLeg(final int num, Leg.Mode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
+	private Leg newPTLeg(final int num, TransportMode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
 		NetworkRoute legRoute = new LinkNetworkRoute(null, null); 
 		//CarRoute legRoute = new NodeCarRoute();  25 feb
 		
-		if (mode!=Leg.Mode.walk){
+		if (mode!=TransportMode.walk){
 			legRoute.setLinks(null, routeLinks, null);
 		}else{
-			mode= Leg.Mode.car;    //3 april 2009
+			mode= TransportMode.car;    //3 april 2009
 		}
 		
 		legRoute.setTravelTime(travTime);
@@ -407,7 +408,7 @@ public class PTActWriter {
 		double walkTravelTime = walkTravelTime(distance); 
 		double depTime = act1.getEndTime();
 		double arrTime = depTime + walkTravelTime;
-		return newPTLeg(legNum, Leg.Mode.walk, new ArrayList<Link>(), distance, depTime, walkTravelTime, arrTime);
+		return newPTLeg(legNum, TransportMode.walk, new ArrayList<Link>(), distance, depTime, walkTravelTime, arrTime);
 	}
 }
 

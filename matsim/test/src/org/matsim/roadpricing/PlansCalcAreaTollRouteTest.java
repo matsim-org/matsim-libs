@@ -21,7 +21,7 @@
 package org.matsim.roadpricing;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Population;
@@ -79,8 +79,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		Fixture.compareRoutes("6 7 9 10", (NetworkRoute) leg2.getRoute());
 
 		// case 3: change the second leg to a non-car mode, than it should be the same as case 1
-		BasicLeg.Mode oldMode = leg2.getMode();
-		leg2.setMode(BasicLeg.Mode.pt);
+		TransportMode oldMode = leg2.getMode();
+		leg2.setMode(TransportMode.pt);
 		new PlansCalcAreaTollRoute(network, timeCostCalc, timeCostCalc, factory, toll).run(population);
 		Fixture.compareRoutes("1 2 3 4 5", (NetworkRoute) leg1.getRoute());
 		Fixture.compareRoutes("6 7 9 10", (NetworkRoute) leg2.getRoute());

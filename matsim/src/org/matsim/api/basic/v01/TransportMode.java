@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Mode.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.api.basic.v01.population;
-
-import java.util.List;
-
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
+/**
+ * 
+ */
+package org.matsim.api.basic.v01;
 
 /**
- * @author dgrether
+ * Enumeration of transport modes known to MATSim.
  */
-public interface BasicPopulationBuilder {
-
-	public BasicPerson createPerson(Id id);
-
-	public BasicPlan createPlan(BasicPerson person);
-
-	public BasicActivity createActivityFromCoord(String actType, Coord coord);
-
-	public BasicActivity createActivityFromFacilityId(String actType, Id facilityId);
-
-	public BasicActivity createActivityFromLinkId(String actType, Id linkId);
-	
-	public BasicLeg createLeg(TransportMode legMode);
-
-	/**
-	 * Creates a new Route object
-	 * @param currentRouteLinkIds List of Ids including the start and the end Link Id of the route's links
-	 * @return a BasicRoute Object with the links set accordingly
-	 * @deprecated needs to be verified
-	 */
-	public BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds); // TODO [MR] check this
-
+public enum TransportMode {
+	miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, other, undefined
 }

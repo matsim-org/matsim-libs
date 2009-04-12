@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
@@ -73,7 +73,7 @@ public class TestHandlerDetailedEventChecker2 extends TestHandlerDetailedEventCh
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
 					// at the moment only cars are simulated on the road
-					if (leg.getMode().equals(BasicLeg.Mode.car)) {
+					if (leg.getMode().equals(TransportMode.car)) {
 						expected.expectedLinkEnterEvents += ((NetworkRoute) leg.getRoute()).getLinks().size() + 1;
 					}
 				}

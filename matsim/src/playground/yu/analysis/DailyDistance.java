@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -165,7 +165,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 
 			double dist = bl.getRoute().getDistance() / 1000.0;
 			// if (bl.getDepartureTime() < 86400)
-			Mode mode = bl.getMode();
+			TransportMode mode = bl.getMode();
 			switch (mode) {
 			case car:
 				this.carDist += dist;

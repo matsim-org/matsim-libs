@@ -23,8 +23,7 @@ package org.matsim.population.filters;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -77,8 +76,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		plan = person.createPlan(true);
 		Activity a = plan.createAct("h", link1);
 		a.setEndTime(7.0 * 3600);
-		leg = plan.createLeg(Mode.car);
-		route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link20);
+		leg = plan.createLeg(TransportMode.car);
+		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link20);
 		route.setNodes(link1, getNodesFromString(network, "2 7 12"), link20);
 		leg.setRoute(route);
 		plan.createAct("w", link20);
@@ -88,8 +87,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		plan = person.createPlan(true);
 		Activity a2 = plan.createAct("h", link1);
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
-		leg = plan.createLeg(Mode.car);
-		route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link20);
+		leg = plan.createLeg(TransportMode.car);
+		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link20);
 		route.setNodes(link1, getNodesFromString(network, "2 7 12"), link20);
 		leg.setRoute(route);
 		plan.createAct("w", link20);
@@ -99,8 +98,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		plan = person.createPlan(true);
 		Activity a3 = plan.createAct("h", link1);
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
-		leg = plan.createLeg(Mode.car);
-		route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link20);
+		leg = plan.createLeg(TransportMode.car);
+		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link20);
 		route.setNodes(link1, getNodesFromString(network, "2 6 12"), link20);
 		leg.setRoute(route);
 		plan.createAct("w", link20);

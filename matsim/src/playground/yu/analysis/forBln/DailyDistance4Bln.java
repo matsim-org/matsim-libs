@@ -4,7 +4,7 @@
 package playground.yu.analysis.forBln;
 
 import org.jfree.chart.plot.PlotOrientation;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -79,7 +79,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 
 			double dist = bl.getRoute().getDistance() / 1000.0;
 			// if (bl.getDepartureTime() < 86400)
-			Mode mode = bl.getMode();
+			TransportMode mode = bl.getMode();
 			switch (mode) {
 			case car:
 				this.carDist += dist;

@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -503,11 +503,11 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 			 * distance in the leg is the actual distance driven by the agent.
 			 */
 		}
-		if (BasicLeg.Mode.car.equals(leg.getMode())) {
+		if (TransportMode.car.equals(leg.getMode())) {
 			tmpScore=travelTime * marginalUtilityOfTraveling - marginalUtilityOfDistance * dist; 
-		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
+		} else if (TransportMode.pt.equals(leg.getMode())) {
 			tmpScore= travelTime * marginalUtilityOfTravelingPT - marginalUtilityOfDistance * dist;
-		} else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
+		} else if (TransportMode.walk.equals(leg.getMode())) {
 			tmpScore= travelTime * marginalUtilityOfTravelingWalk - marginalUtilityOfDistance * dist;
 		} else {
 			// use the same values as for "car"

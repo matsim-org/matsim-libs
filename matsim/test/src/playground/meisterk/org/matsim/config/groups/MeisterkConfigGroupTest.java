@@ -23,7 +23,7 @@ package playground.meisterk.org.matsim.config.groups;
 import java.util.EnumSet;
 import java.util.Iterator;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.testcases.MatsimTestCase;
 
 public class MeisterkConfigGroupTest extends MatsimTestCase {
@@ -37,14 +37,14 @@ public class MeisterkConfigGroupTest extends MatsimTestCase {
 
 	public void testMeisterkConfigGroup() {
 
-		EnumSet<BasicLeg.Mode> expected = EnumSet.of(BasicLeg.Mode.car, BasicLeg.Mode.bike);
+		EnumSet<TransportMode> expected = EnumSet.of(TransportMode.car, TransportMode.bike);
 		this.runTest(expected);
 	}
 	
 	public void testAddParam() {
 
 		meisterk.addParam(MeisterkConfigGroup.MeisterkConfigParameter.CHAIN_BASED_MODES.getParameterName(), "miv");
-		EnumSet<BasicLeg.Mode> expected = EnumSet.of(BasicLeg.Mode.miv);
+		EnumSet<TransportMode> expected = EnumSet.of(TransportMode.miv);
 		this.runTest(expected);
 
 	}
@@ -52,18 +52,18 @@ public class MeisterkConfigGroupTest extends MatsimTestCase {
 	public void testAddEmptyParam() {
 
 		meisterk.addParam(MeisterkConfigGroup.MeisterkConfigParameter.CHAIN_BASED_MODES.getParameterName(), "");
-		EnumSet<BasicLeg.Mode> expected = EnumSet.noneOf(BasicLeg.Mode.class);
+		EnumSet<TransportMode> expected = EnumSet.noneOf(TransportMode.class);
 		this.runTest(expected);
 
 	}
 	
-	private void runTest(EnumSet<BasicLeg.Mode> expected) {
+	private void runTest(EnumSet<TransportMode> expected) {
 
-		EnumSet<BasicLeg.Mode> actual = meisterk.getChainBasedModes();
+		EnumSet<TransportMode> actual = meisterk.getChainBasedModes();
 		assertEquals(actual.size(), expected.size());
-		Iterator<BasicLeg.Mode> modeIterator = actual.iterator();
+		Iterator<TransportMode> modeIterator = actual.iterator();
 		while (modeIterator.hasNext()) {
-			BasicLeg.Mode mode = modeIterator.next();
+			TransportMode mode = modeIterator.next();
 			assertTrue(expected.contains(mode));
 		}
 		

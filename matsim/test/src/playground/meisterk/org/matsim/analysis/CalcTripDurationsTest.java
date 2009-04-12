@@ -20,7 +20,7 @@
 
 package playground.meisterk.org.matsim.analysis;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Leg;
@@ -89,25 +89,25 @@ public class CalcTripDurationsTest extends MatsimTestCase {
 		Events events = new Events();
 		events.addHandler(testee);
 		
-		Leg leg = new LegImpl(BasicLeg.Mode.car);
+		Leg leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:10:00"));
 		leg.setArrivalTime(Time.parseTime("07:30:00"));
 		testee.handleEvent(new AgentDepartureEvent(leg.getDepartureTime(), this.person, this.link, leg));
 		testee.handleEvent(new AgentArrivalEvent(leg.getArrivalTime(), this.person, this.link, leg));
 
-		leg = new LegImpl(BasicLeg.Mode.pt);
+		leg = new LegImpl(TransportMode.pt);
 		leg.setDepartureTime(Time.parseTime("12:00:00"));
 		leg.setArrivalTime(Time.parseTime("15:45:00"));
 		testee.handleEvent(new AgentDepartureEvent(leg.getDepartureTime(), this.person, this.link, leg));
 		testee.handleEvent(new AgentArrivalEvent(leg.getArrivalTime(), this.person, this.link, leg));
 		
-		leg = new LegImpl(BasicLeg.Mode.bike);
+		leg = new LegImpl(TransportMode.bike);
 		leg.setDepartureTime(Time.parseTime("30:05:00"));
 		leg.setArrivalTime(Time.parseTime("30:08:00"));
 		testee.handleEvent(new AgentDepartureEvent(leg.getDepartureTime(), this.person, this.link, leg));
 		testee.handleEvent(new AgentArrivalEvent(leg.getArrivalTime(), this.person, this.link, leg));
 		
-		leg = new LegImpl(BasicLeg.Mode.walk);
+		leg = new LegImpl(TransportMode.walk);
 		leg.setDepartureTime(Time.parseTime("31:00:00"));
 		leg.setArrivalTime(Time.parseTime("32:00:00"));
 		testee.handleEvent(new AgentDepartureEvent(leg.getDepartureTime(), this.person, this.link, leg));
@@ -123,25 +123,25 @@ public class CalcTripDurationsTest extends MatsimTestCase {
 		Events events = new Events();
 		events.addHandler(testee);
 
-		Leg leg = new LegImpl(BasicLeg.Mode.car);
+		Leg leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:10:00"));
 		leg.setArrivalTime(Time.parseTime("07:30:00"));
 		testee.handleEvent(new AgentDepartureEvent(leg.getDepartureTime(), this.person, this.link, leg));
 		testee.handleEvent(new AgentArrivalEvent(leg.getArrivalTime(), this.person, this.link, leg));
 
-		leg = new LegImpl(BasicLeg.Mode.car);
+		leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:00:00"));
 		leg.setArrivalTime(Time.parseTime("07:10:00"));
 		testee.handleEvent(new AgentDepartureEvent(leg.getDepartureTime(), this.person, this.link, leg));
 		testee.handleEvent(new AgentArrivalEvent(leg.getArrivalTime(), this.person, this.link, leg));
 		
-		leg = new LegImpl(BasicLeg.Mode.car);
+		leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("31:12:00"));
 		leg.setArrivalTime(Time.parseTime("31:22:00"));
 		testee.handleEvent(new AgentDepartureEvent(leg.getDepartureTime(), this.person, this.link, leg));
 		testee.handleEvent(new AgentArrivalEvent(leg.getArrivalTime(), this.person, this.link, leg));
 		
-		leg = new LegImpl(BasicLeg.Mode.car);
+		leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("30:12:00"));
 		leg.setArrivalTime(Time.parseTime("30:12:00"));
 		testee.handleEvent(new AgentDepartureEvent(leg.getDepartureTime(), this.person, this.link, leg));

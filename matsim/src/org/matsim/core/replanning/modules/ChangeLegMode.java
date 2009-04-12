@@ -20,7 +20,7 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.misc.StringUtils;
@@ -50,12 +50,12 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 	/*package*/ final static String CONFIG_MODULE = "changeLegMode";
 	/*package*/ final static String CONFIG_PARAM_MODES = "modes";
 
-	private BasicLeg.Mode[] availableModes = new BasicLeg.Mode[] { BasicLeg.Mode.car, BasicLeg.Mode.pt };
+	private TransportMode[] availableModes = new TransportMode[] { TransportMode.car, TransportMode.pt };
 
 	public ChangeLegMode() {
 	}
 
-	public ChangeLegMode(final BasicLeg.Mode[] availableModes) {
+	public ChangeLegMode(final TransportMode[] availableModes) {
 		this.availableModes = availableModes.clone();
 	}
 
@@ -63,9 +63,9 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 		String modes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_MODES);
 		if (modes != null) {
 			String[] parts = StringUtils.explode(modes, ',');
-			this.availableModes = new BasicLeg.Mode[parts.length];
+			this.availableModes = new TransportMode[parts.length];
 			for (int i = 0, n = parts.length; i < n; i++) {
-				this.availableModes[i] = BasicLeg.Mode.valueOf(parts[i].trim());
+				this.availableModes[i] = TransportMode.valueOf(parts[i].trim());
 			}
 		}
 	}

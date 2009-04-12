@@ -23,7 +23,7 @@ package playground.andreas.itsumo;
 import java.io.File;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.NetworkRoute;
@@ -125,7 +125,7 @@ public class MyControler1 extends Controler {
 				Activity act1a = plan1.createAct("h", new CoordImpl(100., 100.));
 				act1a.setLink(link9);
 				act1a.setEndTime(0*60*60.);
-				Leg leg = plan1.createLeg(BasicLeg.Mode.car);
+				Leg leg = plan1.createLeg(TransportMode.car);
 				NetworkRoute route = new NodeNetworkRoute(link9, link15);
 				route.setNodes(link9, NetworkUtils.getNodes(this.network, "3 4"), link15);
 				leg.setRoute(route);
@@ -138,7 +138,7 @@ public class MyControler1 extends Controler {
 				Activity act2a = plan1.createAct("h", new CoordImpl(100., 100.));
 				act2a.setLink(link9);
 				act2a.setEndTime(0*60*60.);
-				Leg leg2 = plan2.createLeg(BasicLeg.Mode.car);
+				Leg leg2 = plan2.createLeg(TransportMode.car);
 				NetworkRoute route2 = new NodeNetworkRoute(link9, link15);
 				route2.setNodes(link9, NetworkUtils.getNodes(this.network, "3 6 4"), link15);
 				leg2.setRoute(route2);
@@ -332,7 +332,7 @@ public class MyControler1 extends Controler {
 			act1.setStartTime(0.);
 			act1.setEndTime(0 * 60 * 60.);
 
-			plan.createLeg(BasicLeg.Mode.car);
+			plan.createLeg(TransportMode.car);
 			Activity act2 = plan.createAct("h", new CoordImpl(200., 200.));
 			act2.setLink(destLink);
 			act2.setStartTime(8 * 60 * 60);

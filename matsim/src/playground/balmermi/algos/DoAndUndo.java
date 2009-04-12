@@ -22,7 +22,7 @@ package playground.balmermi.algos;
 
 import java.util.ArrayList;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -37,7 +37,7 @@ public class DoAndUndo extends AbstractPersonAlgorithm implements PlanAlgorithm 
 	//////////////////////////////////////////////////////////////////////
 
 	private boolean doIt = true;
-	private final ArrayList<BasicLeg.Mode> leg_modes = new ArrayList<BasicLeg.Mode>();
+	private final ArrayList<TransportMode> leg_modes = new ArrayList<TransportMode>();
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -59,7 +59,7 @@ public class DoAndUndo extends AbstractPersonAlgorithm implements PlanAlgorithm 
 		for (int i=1; i<plan.getPlanElements().size(); i=i+2) {
 			Leg leg = (Leg)plan.getPlanElements().get(i);
 			leg_modes.add(leg.getMode());
-			leg.setMode(BasicLeg.Mode.car);
+			leg.setMode(TransportMode.car);
 		}
 	}
 	

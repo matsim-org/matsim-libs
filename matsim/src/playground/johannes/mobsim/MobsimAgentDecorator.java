@@ -24,7 +24,7 @@
 package playground.johannes.mobsim;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 
 /**
@@ -68,7 +68,7 @@ public abstract class MobsimAgentDecorator<A extends MobsimAgent> implements
 		return agent.getDepartureTime(time);
 	}
 
-	public BasicLeg.Mode getMode(double time) {
+	public TransportMode getMode(double time) {
 		return agent.getMode(time);
 	}
 

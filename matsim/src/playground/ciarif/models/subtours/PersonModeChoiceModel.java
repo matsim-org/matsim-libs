@@ -27,7 +27,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -208,12 +208,12 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			
 			// getting the chosen mode
 			int modechoice = model.calcModeChoice();
-			BasicLeg.Mode mode = null;
-			if (modechoice == 0) { mode = BasicLeg.Mode.car; }
-			else if (modechoice == 1) { mode = BasicLeg.Mode.pt; }
-			else if (modechoice == 2) { mode = BasicLeg.Mode.ride; }
-			else if (modechoice == 3) { mode = BasicLeg.Mode.bike; }
-			else if (modechoice == 4) { mode = BasicLeg.Mode.walk; }
+			TransportMode mode = null;
+			if (modechoice == 0) { mode = TransportMode.car; }
+			else if (modechoice == 1) { mode = TransportMode.pt; }
+			else if (modechoice == 2) { mode = TransportMode.ride; }
+			else if (modechoice == 3) { mode = TransportMode.bike; }
+			else if (modechoice == 4) { mode = TransportMode.walk; }
 			else { Gbl.errorMsg("Mode choice returns undefined value!"); }
 			System.out.println("modechoice = " + modechoice);
 			System.out.println();

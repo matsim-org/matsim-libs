@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -56,7 +56,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	private static final Logger 			log = Logger.getLogger(TimeModeChoicer1.class);
 	private final double					maxWalkingDistance;
 	private final String					modeChoice;
-	private final BasicLeg.Mode[]			possibleModes;
+	private final TransportMode[]			possibleModes;
 	private List<LinkNetworkRoute> 				routes;
 	
 	//////////////////////////////////////////////////////////////////////
@@ -93,7 +93,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		
 		boolean carIsIn = false;
 		for (int i=0;i<this.possibleModes.length;i++){
-			if (this.possibleModes[i]==BasicLeg.Mode.car){
+			if (this.possibleModes[i]==TransportMode.car){
 				carIsIn = true;
 				break;
 			}
@@ -127,7 +127,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		planAnalyzeSubtours.run(basePlan);
 		
 		/* Make sure that all legs of a subtour have the same mode*/
-		BasicLeg.Mode [] subtourModes = new BasicLeg.Mode [planAnalyzeSubtours.getNumSubtours()];
+		TransportMode [] subtourModes = new TransportMode [planAnalyzeSubtours.getNumSubtours()];
 		boolean [] subtourFilled = new boolean [subtourModes.length];
 		int [] subtourDis = new int [subtourModes.length];
 		for (int i=0;i<subtourFilled.length;i++) {
@@ -138,7 +138,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			if (subtourFilled[planAnalyzeSubtours.getSubtourIndexation()[(i-1)/2]]==false){
 				/*Make sure that all subtours with distance = 0 are set to "walk" */
 				if (subtourDis[planAnalyzeSubtours.getSubtourIndexation()[(i-1)/2]]==0) {
-					((Leg)(basePlan.getPlanElements().get(i))).setMode(BasicLeg.Mode.walk);
+					((Leg)(basePlan.getPlanElements().get(i))).setMode(TransportMode.walk);
 				}
 				subtourModes[planAnalyzeSubtours.getSubtourIndexation()[(i-1)/2]]=(((Leg)(basePlan.getPlanElements().get(i))).getMode());
 				subtourFilled[planAnalyzeSubtours.getSubtourIndexation()[(i-1)/2]]=true;
@@ -535,8 +535,8 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			PlanAnalyzeSubtours planAnalyzeSubtours, int[]subtourDis){
 		List<? extends BasicPlanElement> actslegsResult = this.copyActsLegs(actslegs);
 		double score=-100000;
-		BasicLeg.Mode subtour1=this.possibleModes[0];
-		BasicLeg.Mode subtour2=this.possibleModes[0];
+		TransportMode subtour1=this.possibleModes[0];
+		TransportMode subtour2=this.possibleModes[0];
 		
 		/* outer loop */
 		int distanceOuter = subtourDis[planAnalyzeSubtours.getSubtourIndexation()[outer/2]];
@@ -657,7 +657,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			if (subtourDistances.get(subtourDistances.size()-1)[2]==0) {
 				subtourDistances.remove(subtourDistances.size()-1);
 				for (int j=1;j<plan.getPlanElements().size();j=j+2){
-					if (planAnalyzeSubtours.getSubtourIndexation()[(j-1)/2]==i)((Leg)(actslegsBase.get(j))).setMode(BasicLeg.Mode.walk);
+					if (planAnalyzeSubtours.getSubtourIndexation()[(j-1)/2]==i)((Leg)(actslegsBase.get(j))).setMode(TransportMode.walk);
 				}
 			}
 		}
@@ -767,7 +767,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			((Leg)(plan.getPlanElements().get(i))).setDepartureTime(now);
 			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Activity)(plan.getPlanElements().get(i-1)), (Activity)(plan.getPlanElements().get(i+1)), (Leg)(plan.getPlanElements().get(i)));
 			// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
-			if (((Leg)(plan.getPlanElements().get(i))).getMode()!=BasicLeg.Mode.car){
+			if (((Leg)(plan.getPlanElements().get(i))).getMode()!=TransportMode.car){
 				((Leg)(plan.getPlanElements().get(i))).setRoute(this.routes.get((int)(i/2)));
 			}
 			((Leg)(plan.getPlanElements().get(i))).setArrivalTime(now+travelTime);
@@ -879,7 +879,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			((Leg)(actslegs.get(i))).setDepartureTime(now);
 			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Activity)(actslegs.get(i-1)), (Activity)(actslegs.get(i+1)), (Leg)(actslegs.get(i)));
 			// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
-			if (((Leg)(actslegs.get(i))).getMode()!=BasicLeg.Mode.car){
+			if (((Leg)(actslegs.get(i))).getMode()!=TransportMode.car){
 				((Leg)(actslegs.get(i))).setRoute(this.routes.get((i-1)/2));
 				//log.warn(((Leg)(actslegs.get(i))).getMode());
 			}
@@ -900,7 +900,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			((Leg)(actslegs.get(i))).setDepartureTime(now);
 			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Activity)(actslegs.get(i-1)), (Activity)(actslegs.get(i+1)), (Leg)(actslegs.get(i)));
 			// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
-			if (((Leg)(actslegs.get(i))).getMode()!=BasicLeg.Mode.car){
+			if (((Leg)(actslegs.get(i))).getMode()!=TransportMode.car){
 				((Leg)(actslegs.get(i))).setRoute(this.routes.get((i-1)/2));
 				//log.warn(((Leg)(actslegs.get(i))).getMode());
 			}
@@ -924,7 +924,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 						((Leg)(actslegs.get(i+2))).setDepartureTime(now);
 						travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Activity)(actslegs.get(i+1)), (Activity)(actslegs.get(i+3)), (Leg)(actslegs.get(i+2)));
 						// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
-						if (((Leg)(actslegs.get(i+2))).getMode()!=BasicLeg.Mode.car){
+						if (((Leg)(actslegs.get(i+2))).getMode()!=TransportMode.car){
 							((Leg)(actslegs.get(i+2))).setRoute(this.routes.get((i+1)/2));
 						//	log.warn(((Leg)(actslegs.get(i+2))).getMode());
 						}
@@ -952,7 +952,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				((Leg)(actslegs.get(i))).setDepartureTime(now);
 				travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Activity)(actslegs.get(i-1)), (Activity)(actslegs.get(i+1)), (Leg)(actslegs.get(i)));
 				// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
-				if (((Leg)(actslegs.get(i))).getMode()!=BasicLeg.Mode.car){
+				if (((Leg)(actslegs.get(i))).getMode()!=TransportMode.car){
 					((Leg)(actslegs.get(i))).setRoute(this.routes.get((i-1)/2));
 				}
 				((Leg)(actslegs.get(i))).setArrivalTime(now+travelTime);
@@ -970,7 +970,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 						((Leg)(actslegs.get(i+2))).setDepartureTime(now);
 						travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Activity)(actslegs.get(i+1)), (Activity)(actslegs.get(i+3)), (Leg)(actslegs.get(i+2)));
 						// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
-						if (((Leg)(actslegs.get(i+2))).getMode()!=BasicLeg.Mode.car){
+						if (((Leg)(actslegs.get(i+2))).getMode()!=TransportMode.car){
 							((Leg)(actslegs.get(i+2))).setRoute(this.routes.get((i+1)/2));
 						}
 						((Leg)(actslegs.get(i+2))).setArrivalTime(now+travelTime);

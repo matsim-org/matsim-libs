@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
@@ -205,7 +205,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
 	//	if (Gbl.getConfig().planomat().getPossibleModes().length>0){
 			for (int z=1;z<plan.getPlanElements().size();z+=2){
-				((Leg)(plan.getPlanElements().get(z))).setMode(BasicLeg.Mode.car);
+				((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
 			}
 	//	}
 		this.router.run(plan);
@@ -229,7 +229,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			/* Routing*/
 		//	if (Gbl.getConfig().planomat().getPossibleModes().length>0){
 				for (int z=1;z<plan.getPlanElements().size();z+=2){
-					((Leg)(plan.getPlanElements().get(z))).setMode(BasicLeg.Mode.car);
+					((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
 				}
 		//	}
 			this.router.run(plan);
@@ -295,7 +295,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					/* Routing*/
 				//	if (Gbl.getConfig().planomat().getPossibleModes().length>0){
 						for (int z=1;z<neighbourhood[x].getPlanElements().size();z+=2){
-							((Leg)(neighbourhood[x].getPlanElements().get(z))).setMode(BasicLeg.Mode.car);
+							((Leg)(neighbourhood[x].getPlanElements().get(z))).setMode(TransportMode.car);
 						}
 				//	}
 					this.router.run(neighbourhood[x]);
@@ -627,7 +627,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			actHelp.setStartTime(12*3600);
 			
 			Leg legHelp;
-			legHelp = new LegImpl (BasicLeg.Mode.walk); // First and second acts must be "home" acts at same location so walk is appropriate
+			legHelp = new LegImpl (TransportMode.walk); // First and second acts must be "home" acts at same location so walk is appropriate
 			
 			actslegs.add(legHelp);
 			actslegs.add(actHelp);	

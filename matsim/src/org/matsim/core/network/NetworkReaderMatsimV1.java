@@ -26,7 +26,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -153,11 +153,11 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		if (atts.getValue("modes") != null) {
 			String[] strModes = StringUtils.explode(atts.getValue("modes"), ',');
 			if (strModes.length == 1 && strModes[0].equals("")) {
-				l.setAllowedModes(new BasicLeg.Mode[] {});
+				l.setAllowedModes(new TransportMode[] {});
 			} else {
-				BasicLeg.Mode[] modes = new BasicLeg.Mode[strModes.length];
+				TransportMode[] modes = new TransportMode[strModes.length];
 				for (int i = 0, n = strModes.length; i < n; i++) {
-					modes[i] = BasicLeg.Mode.valueOf(strModes[i].trim());
+					modes[i] = TransportMode.valueOf(strModes[i].trim());
 				}
 				l.setAllowedModes(modes);
 			}

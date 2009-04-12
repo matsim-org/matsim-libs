@@ -22,7 +22,7 @@ package playground.balmermi.census2000v2.modules;
 
 import java.util.ArrayList;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -109,7 +109,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				act.setEndTime(end_time);
 				act.setDuration(end_time);
 				act.setFacility(home.getFacility());
-				Leg leg = p.createLeg(BasicLeg.Mode.car);
+				Leg leg = p.createLeg(TransportMode.car);
 				leg.setDepartureTime(end_time);
 				leg.setTravelTime(0.0);
 				leg.setArrivalTime(end_time);
@@ -125,7 +125,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					act.setEndTime(end_time);
 					act.setDuration(end_time-start_time);
 					act.setFacility(work.getFacility());
-					Leg leg2 = p.createLeg(BasicLeg.Mode.car);
+					Leg leg2 = p.createLeg(TransportMode.car);
 					leg2.setDepartureTime(end_time);
 					leg2.setTravelTime(0.0);
 					leg2.setArrivalTime(end_time);
@@ -142,7 +142,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					act.setEndTime(end_time);
 					act.setDuration(end_time-start_time);
 					act.setFacility(educ.getFacility());
-					Leg leg2 = p.createLeg(BasicLeg.Mode.car);
+					Leg leg2 = p.createLeg(TransportMode.car);
 					leg2.setDepartureTime(end_time);
 					leg2.setTravelTime(0.0);
 					leg2.setArrivalTime(end_time);

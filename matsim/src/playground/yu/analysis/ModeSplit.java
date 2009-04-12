@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -55,7 +55,7 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 			inRange = TollTools.isInRange(homeLoc, toll);
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
-				Mode m = ((Leg) pe).getMode();
+				TransportMode m = ((Leg) pe).getMode();
 				switch (m) {
 				case car:
 					carLegs++;

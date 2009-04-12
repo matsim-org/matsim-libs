@@ -24,9 +24,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
@@ -110,32 +109,32 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		Activity act = plan.createAct("home", facility1);
 		act.setLink(link1);
-		Leg leg = this.plan.createLeg(Mode.car);
-		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
+		Leg leg = this.plan.createLeg(TransportMode.car);
+		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link3);
 		leg.setRoute(route);
 		route.setDistance(25000.0);
 		route.setTravelTime(Time.parseTime("00:30:00"));
 
 		act = plan.createAct("work_sector3", facility3);
 		act.setLink(link3);
-		leg = this.plan.createLeg(Mode.pt);
-		route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link3, link5);
+		leg = this.plan.createLeg(TransportMode.pt);
+		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link3, link5);
 		leg.setRoute(route);
 		route.setDistance(2000.0);
 		route.setTravelTime(Time.parseTime("00:05:00"));
 
 		act = plan.createAct("leisure", facility5);
 		act.setLink(link5);
-		leg = this.plan.createLeg(Mode.pt);
-		route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link5, link3);
+		leg = this.plan.createLeg(TransportMode.pt);
+		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link5, link3);
 		leg.setRoute(route);
 		route.setDistance(2000.0);
 		route.setTravelTime(Time.parseTime("00:05:00"));
 
 		act = plan.createAct("work_sector3", facility3);
 		act.setLink(link3);
-		leg = this.plan.createLeg(Mode.car);
-		route = (NetworkRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link3, link1);
+		leg = this.plan.createLeg(TransportMode.car);
+		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link3, link1);
 		leg.setRoute(route);
 		route.setDistance(25000.0);
 		route.setTravelTime(Time.parseTime("00:30:00"));

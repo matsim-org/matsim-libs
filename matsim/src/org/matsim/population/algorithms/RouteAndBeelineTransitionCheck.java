@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
@@ -90,7 +90,7 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 		ActIterator it = plan.getIteratorAct();
 		beeline.addAct(it.next());
 		while (it.hasNext()) {
-			Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+			Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);

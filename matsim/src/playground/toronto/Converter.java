@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -120,7 +120,7 @@ public class Converter {
 				endTime = convertTime(tabs[3]);
 				double dur = endTime - this.tmpEndTime;
 
-				Leg leg = pl.createLeg(Mode.car);
+				Leg leg = pl.createLeg(TransportMode.car);
 				leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 				Coord tmpCoord = getRandomCoordInZone(tabs[9]);
@@ -141,7 +141,7 @@ public class Converter {
 					Person p = this.pop.getPerson(new IdImpl(this.tmpPersonId));
 					Plan tmpPl = p.getSelectedPlan();
 
-					Leg leg = tmpPl.createLeg(Mode.car);
+					Leg leg = tmpPl.createLeg(TransportMode.car);
 					leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 					// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 
@@ -155,7 +155,7 @@ public class Converter {
 					Plan nonCarPlan = new org.matsim.core.population.PlanImpl(p);
 					nonCarPlan.copyPlan(tmpPl);
 					for (LegIterator li = nonCarPlan.getIteratorLeg(); li.hasNext();) {
-						li.next().setMode(Mode.pt);
+						li.next().setMode(TransportMode.pt);
 					}
 					p.addPlan(nonCarPlan);
 				}

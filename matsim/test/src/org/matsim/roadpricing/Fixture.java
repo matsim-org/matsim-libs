@@ -24,7 +24,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
@@ -178,7 +178,7 @@ public class Fixture {
 		Plan plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
-		Leg leg = plan.createLeg(Mode.car);//"car", startTime, "00:01", null);
+		Leg leg = plan.createLeg(TransportMode.car);//"car", startTime, "00:01", null);
 		NetworkRoute route = new NodeNetworkRoute(homeLink, workLink);
 		route.setNodes(homeLink, routeNodes, workLink);
 		leg.setRoute(route);
@@ -191,9 +191,9 @@ public class Fixture {
 		Plan plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
-		plan.createLeg(Mode.car);
+		plan.createLeg(TransportMode.car);
 		plan.createAct("w", workLink).setEndTime(16.0 * 3600);
-		plan.createLeg(Mode.car);
+		plan.createLeg(TransportMode.car);
 		plan.createAct("h", finishLink);
 		return person;
 	}

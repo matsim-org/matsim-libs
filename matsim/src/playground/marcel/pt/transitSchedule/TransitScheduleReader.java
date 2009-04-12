@@ -30,7 +30,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
@@ -126,7 +126,7 @@ public class TransitScheduleReader extends MatsimXmlParser {
 			}
 			NetworkRoute route = null;
 			if (this.currentRouteProfile.firstLink != null) {
-				route = (NetworkRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, this.currentRouteProfile.firstLink, this.currentRouteProfile.lastLink);
+				route = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, this.currentRouteProfile.firstLink, this.currentRouteProfile.lastLink);
 				route.setLinks(this.currentRouteProfile.firstLink, this.currentRouteProfile.links, this.currentRouteProfile.lastLink);
 			}
 			TransitRoute transitRoute = new TransitRoute(this.currentTransitRoute.id, route, stops);

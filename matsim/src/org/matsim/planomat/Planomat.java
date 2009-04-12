@@ -31,8 +31,7 @@ import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 import org.jgap.impl.StockRandomGenerator;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
@@ -262,12 +261,12 @@ public class Planomat implements PlanAlgorithm {
 					// set mode to result from optimization
 					int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[ii / 2];
 					int modeIndex = ((IntegerGene) individual.getGene(planAnalyzeSubtours.getSubtourIndexation().length + subtourIndex)).intValue();
-					Mode mode = Gbl.getConfig().planomat().getPossibleModes()[modeIndex];
+					TransportMode mode = Gbl.getConfig().planomat().getPossibleModes()[modeIndex];
 //					System.out.println(ii + "\t" + subtourIndex + "\t" + modeIndex + "\t" + modeName);
 					leg.setMode(mode);
 				} // otherwise leave modes untouched
 
-				if (!leg.getMode().equals(BasicLeg.Mode.car)) {
+				if (!leg.getMode().equals(TransportMode.car)) {
 					tempRoute = leg.getRoute();
 				}
 
@@ -287,7 +286,7 @@ public class Planomat implements PlanAlgorithm {
 
 				leg.setTravelTime(travelTimeEstimation);
 
-				if (!leg.getMode().equals(BasicLeg.Mode.car)) {
+				if (!leg.getMode().equals(TransportMode.car)) {
 					// restore original routes, because planomat must not alter routes at all
 					leg.setRoute(tempRoute);
 				}

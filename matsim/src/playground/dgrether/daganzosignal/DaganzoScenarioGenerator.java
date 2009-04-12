@@ -21,7 +21,7 @@
 package playground.dgrether.daganzosignal;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
@@ -188,7 +188,7 @@ public class DaganzoScenarioGenerator {
 			act1.setEndTime(homeEndTime);
 			plan.addAct(act1);
 			//leg to home
-			Leg leg = builder.createLeg(BasicLeg.Mode.car);
+			Leg leg = builder.createLeg(TransportMode.car);
 			//TODO check this
 			NetworkRoute route = new NodeNetworkRoute(l1, l7);
 			if (isAlternativeRouteEnabled) {

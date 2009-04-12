@@ -22,7 +22,7 @@ package org.matsim.core.network;
 
 import java.util.Stack;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -36,15 +36,15 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	 */
 	public void testAllowedModes_singleMode() {
 		Link link = prepareTestAllowedModes("car");
-		BasicLeg.Mode[] modes = link.getAllowedModes();
+		TransportMode[] modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 1, modes.length);
-		assertEquals("wrong mode.", BasicLeg.Mode.car, modes[0]);
+		assertEquals("wrong mode.", TransportMode.car, modes[0]);
 
 		// make sure we do not just get some default-value back...
 		link = prepareTestAllowedModes("bike");
 		modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 1, modes.length);
-		assertEquals("wrong mode.", BasicLeg.Mode.bike, modes[0]);
+		assertEquals("wrong mode.", TransportMode.bike, modes[0]);
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	 */
 	public void testAllowedModes_emptyMode() {
 		Link link = prepareTestAllowedModes("");
-		BasicLeg.Mode[] modes = link.getAllowedModes();
+		TransportMode[] modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 0, modes.length);
 	}
 	
@@ -61,23 +61,23 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	 */
 	public void testAllowedModes_multipleModes() {
 		Link link = prepareTestAllowedModes("car,bus");
-		BasicLeg.Mode[] modes = link.getAllowedModes();
+		TransportMode[] modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 2, modes.length);
-		assertEquals("wrong mode.", BasicLeg.Mode.car, modes[0]);
-		assertEquals("wrong mode.", BasicLeg.Mode.bus, modes[1]);
+		assertEquals("wrong mode.", TransportMode.car, modes[0]);
+		assertEquals("wrong mode.", TransportMode.bus, modes[1]);
 
 		link = prepareTestAllowedModes("bike,bus,walk");
 		modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 3, modes.length);
-		assertEquals("wrong mode.", BasicLeg.Mode.bike, modes[0]);
-		assertEquals("wrong mode.", BasicLeg.Mode.bus, modes[1]);
-		assertEquals("wrong mode.", BasicLeg.Mode.walk, modes[2]);
+		assertEquals("wrong mode.", TransportMode.bike, modes[0]);
+		assertEquals("wrong mode.", TransportMode.bus, modes[1]);
+		assertEquals("wrong mode.", TransportMode.walk, modes[2]);
 
 		link = prepareTestAllowedModes("pt, train"); // test with space after comma
 		modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 2, modes.length);
-		assertEquals("wrong mode.", BasicLeg.Mode.pt, modes[0]);
-		assertEquals("wrong mode.", BasicLeg.Mode.train, modes[1]);
+		assertEquals("wrong mode.", TransportMode.pt, modes[0]);
+		assertEquals("wrong mode.", TransportMode.train, modes[1]);
 	}
 
 	/**

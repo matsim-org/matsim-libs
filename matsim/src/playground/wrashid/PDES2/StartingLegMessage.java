@@ -2,7 +2,7 @@ package playground.wrashid.PDES2;
 
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
@@ -30,7 +30,7 @@ public class StartingLegMessage extends EventMessage {
 		
 		//System.out.println("starting leg message");
 		
-		if (vehicle.getCurrentLeg().getMode().equals(BasicLeg.Mode.car)){
+		if (vehicle.getCurrentLeg().getMode().equals(TransportMode.car)){
 			Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
 			//road.enterRequest(vehicle);
 			

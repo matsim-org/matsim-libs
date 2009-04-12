@@ -20,7 +20,7 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -43,11 +43,11 @@ public class PlanCalcType extends AbstractPersonAlgorithm implements PlanAlgorit
 
 		for (int i = 1, max = plan.getPlanElements().size(); i < max; i += 2) {
 			Leg leg = (Leg)plan.getPlanElements().get(i);
-			if (leg.getMode().equals(BasicLeg.Mode.car)) hasCar = true;
-			else if (leg.getMode().equals(BasicLeg.Mode.pt)) hasPt = true;
-			else if (leg.getMode().equals(BasicLeg.Mode.ride)) hasRide = true;
-			else if (leg.getMode().equals(BasicLeg.Mode.bike)) hasBike = true;
-			else if (leg.getMode().equals(BasicLeg.Mode.walk)) hasWalk = true;
+			if (leg.getMode().equals(TransportMode.car)) hasCar = true;
+			else if (leg.getMode().equals(TransportMode.pt)) hasPt = true;
+			else if (leg.getMode().equals(TransportMode.ride)) hasRide = true;
+			else if (leg.getMode().equals(TransportMode.bike)) hasBike = true;
+			else if (leg.getMode().equals(TransportMode.walk)) hasWalk = true;
 		}
 
 		if (hasCar) plan.setType(Plan.Type.CAR);

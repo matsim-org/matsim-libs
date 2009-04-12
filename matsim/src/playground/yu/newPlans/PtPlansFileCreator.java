@@ -6,7 +6,7 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -147,7 +147,7 @@ public class PtPlansFileCreator {
 			Link startLink = this.network.getLink(new IdImpl(startLinkId));
 			Activity a = pl.createAct("h", startLink);
 			a.setEndTime(Time.parseTime(endTime));
-			Leg leg = pl.createLeg(Mode.car);
+			Leg leg = pl.createLeg(TransportMode.car);
 			leg.setDepartureTime(Time.parseTime(endTime));
 			NetworkRoute route = new NodeNetworkRoute();
 			leg.setRoute(route);

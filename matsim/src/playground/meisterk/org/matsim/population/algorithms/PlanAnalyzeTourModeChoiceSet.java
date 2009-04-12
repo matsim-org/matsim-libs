@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
@@ -57,19 +57,19 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 		this.meisterk = meisterk;
 	}
 
-	private EnumSet<BasicLeg.Mode> modeSet = null;
+	private EnumSet<TransportMode> modeSet = null;
 
-	private ArrayList<BasicLeg.Mode[]> result = null;
+	private ArrayList<TransportMode[]> result = null;
 
-	public ArrayList<BasicLeg.Mode[]> getResult() {
+	public ArrayList<TransportMode[]> getResult() {
 		return result;
 	}
 
-	public EnumSet<BasicLeg.Mode> getModeSet() {
+	public EnumSet<TransportMode> getModeSet() {
 		return modeSet;
 	}
 
-	public void setModeSet(EnumSet<BasicLeg.Mode> modeSet) {
+	public void setModeSet(EnumSet<TransportMode> modeSet) {
 		this.modeSet = modeSet;
 	}
 
@@ -83,13 +83,13 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
 		int numCombinations = (int) Math.pow(this.modeSet.size(), numLegs);
 
-		this.result = new ArrayList<BasicLeg.Mode[]>();
+		this.result = new ArrayList<TransportMode[]>();
 
 		for (int numCombination = 0; numCombination < numCombinations; numCombination++) {
 
 			// setup the trackers for all chain-based modes, set all chain-based modes starting at the first location (usually home)
-			HashMap<BasicLeg.Mode, Location> modeTracker = new HashMap<BasicLeg.Mode, Location>();
-			for (BasicLeg.Mode mode : this.modeSet) {
+			HashMap<TransportMode, Location> modeTracker = new HashMap<TransportMode, Location>();
+			for (TransportMode mode : this.modeSet) {
 				if (meisterk.getChainBasedModes().contains(mode)) {
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
 						currentLocation = plan.getFirstActivity().getFacility();
@@ -100,7 +100,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 				}
 			}
 
-			BasicLeg.Mode[] candidate = new BasicLeg.Mode[numLegs]; 
+			TransportMode[] candidate = new TransportMode[numLegs]; 
 
 			String modeIndices = Integer.toString(numCombination, this.modeSet.size());
 			while (modeIndices.length() < numLegs) {
@@ -113,7 +113,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
 				Leg currentLeg = (Leg) legIterator.next();
 
-				BasicLeg.Mode legMode = (BasicLeg.Mode) this.modeSet.toArray()[Integer.parseInt(modeIndices.substring(legNum, legNum + 1))];
+				TransportMode legMode = (TransportMode) this.modeSet.toArray()[Integer.parseInt(modeIndices.substring(legNum, legNum + 1))];
 				if (meisterk.getChainBasedModes().contains(legMode)) {
 					currentLocation = modeTracker.get(legMode);
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
@@ -149,9 +149,9 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 				allowedLocations.add(plan.getFirstActivity().getLink());
 				allowedLocations.add(plan.getLastActivity().getLink());
 			}
-			Iterator<BasicLeg.Mode> modeTrackerCheck = modeTracker.keySet().iterator();
+			Iterator<TransportMode> modeTrackerCheck = modeTracker.keySet().iterator();
 			while(modeChainIsFeasible && modeTrackerCheck.hasNext()) {
-				BasicLeg.Mode mode = modeTrackerCheck.next();
+				TransportMode mode = modeTrackerCheck.next();
 				currentLocation = modeTracker.get(mode);
 				if (!allowedLocations.contains(currentLocation)) {
 					modeChainIsFeasible = false;

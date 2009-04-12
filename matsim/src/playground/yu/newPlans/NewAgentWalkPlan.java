@@ -23,7 +23,7 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicLeg.Mode;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -88,7 +88,7 @@ public class NewAgentWalkPlan extends NewPopulation implements PersonAlgorithm {
 							// WITHOUT routeSetting!
 							// -----------------------------------------------
 							Leg walkLeg = new org.matsim.core.population.LegImpl(
-									Mode.walk);
+									TransportMode.walk);
 							walkLeg.setDepartureTime(leg.getDepartureTime());
 							walkLeg.setTravelTime(leg.getTravelTime());
 							walkLeg.setArrivalTime(leg.getArrivalTime());

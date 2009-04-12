@@ -22,7 +22,7 @@ package org.matsim.core.network;
 
 import java.io.File;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -55,21 +55,21 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	 */
 	protected abstract void readNetwork(final NetworkLayer network, final String filename);	
 	public void testAllowedModes_multipleModes() {
-		doTestAllowedModes(new BasicLeg.Mode[] {BasicLeg.Mode.bus, BasicLeg.Mode.train}, 
+		doTestAllowedModes(new TransportMode[] {TransportMode.bus, TransportMode.train}, 
 				getOutputDirectory() + "network.xml");
 	}
 
 	public void testAllowedModes_singleMode() {
-		doTestAllowedModes(new BasicLeg.Mode[] {BasicLeg.Mode.miv}, 
+		doTestAllowedModes(new TransportMode[] {TransportMode.miv}, 
 				getOutputDirectory() + "network.xml");
 	}
 
 	public void testAllowedModes_noMode() {
-		doTestAllowedModes(new BasicLeg.Mode[] {}, 
+		doTestAllowedModes(new TransportMode[] {}, 
 				getOutputDirectory() + "network.xml");
 	}
 
-	private void doTestAllowedModes(final BasicLeg.Mode[] modes, final String filename) {
+	private void doTestAllowedModes(final TransportMode[] modes, final String filename) {
 		NetworkLayer network1 = new NetworkLayer();
 		Node n1 = network1.createNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node n2 = network1.createNode(new IdImpl("2"), new CoordImpl(1000, 0));
@@ -88,7 +88,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 		Link link1 = network2.getLinks().get(new IdImpl("1"));
 		assertNotNull("link not found in read-in network.", link1);
 		
-		BasicLeg.Mode[] modes2 = link1.getAllowedModes();
+		TransportMode[] modes2 = link1.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", modes.length, modes2.length);
 		for (int i = 0, n = modes.length; i < n; i++) {
 			assertEquals("wrong mode.", modes[i], modes2[i]);

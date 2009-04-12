@@ -21,7 +21,7 @@
 package org.matsim.core.scoring;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
@@ -286,7 +286,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		double dist = 0.0; // distance in meters
 
 
-		if (BasicLeg.Mode.car.equals(leg.getMode())) {
+		if (TransportMode.car.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
 				Route route = leg.getRoute();
 				dist = route.getDistance();
@@ -299,12 +299,12 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 				 */
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
-		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
+		} else if (TransportMode.pt.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistancePt != 0.0){
 				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT + this.params.marginalUtilityOfDistancePt * dist;
-		} else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
+		} else if (TransportMode.walk.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceWalk != 0.0){
 				dist = leg.getRoute().getDistance();
 			}

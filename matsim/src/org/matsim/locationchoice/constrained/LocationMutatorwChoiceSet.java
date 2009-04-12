@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -170,7 +170,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	}
 	
 	protected double computeTravelTime(Activity fromAct, Activity toAct) {	
-		Leg leg = new org.matsim.core.population.LegImpl(BasicLeg.Mode.car);
+		Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(0.0);

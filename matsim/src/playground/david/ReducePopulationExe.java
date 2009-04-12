@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -88,7 +88,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 				} else {
 					// Leg
 					Leg l = (Leg) actl.get(i);
-					if(l.getMode().equals(BasicLeg.Mode.car) && l.getRoute() != null){
+					if(l.getMode().equals(TransportMode.car) && l.getRoute() != null){
 						
 						List<Link> ll = ((NetworkRoute) l.getRoute()).getLinks();
 						for(Link link : ll) {
@@ -112,7 +112,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 				} else {
 					// Leg
 					Leg l = (Leg) actl.get(i);
-					Leg l2 = new LegImpl(BasicLeg.Mode.pt);
+					Leg l2 = new LegImpl(TransportMode.pt);
 					l2.setDepartureTime(l.getDepartureTime());
 					l2.setTravelTime(l.getTravelTime());
 					l2.setArrivalTime(l.getArrivalTime());
@@ -131,7 +131,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 		// check for selected plans routes, if any of the relevant nodes shows up
 		Plan plan = person.getSelectedPlan();
 		Leg leg = plan.getNextLeg(plan.getFirstActivity());
-		if(leg.getMode().equals(BasicLeg.Mode.car) && leg.getRoute() == null) {
+		if(leg.getMode().equals(TransportMode.car) && leg.getRoute() == null) {
 			// car leg without route make all legs mode = PT
 			plan.setSelected(false);
 			plan = copyPlanToPT(plan);
