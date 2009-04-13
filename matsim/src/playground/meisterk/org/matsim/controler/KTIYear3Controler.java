@@ -22,14 +22,8 @@ package playground.meisterk.org.matsim.controler;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
-
-import playground.meisterk.org.matsim.analysis.CalcTripDurations;
 
 public class KTIYear3Controler {
 
@@ -44,7 +38,6 @@ public class KTIYear3Controler {
 		// the scoring function processes facility loads independent of whether a location choice module is used or not
 		controler.addControlerListener(new FacilitiesLoadCalculator(controler.getFacilityPenalties()));
 		// standard controler listeners for KTI Year 3 runs
-		controler.addControlerListener(new KTIYear3ControlerListener());
 		controler.setScoringFunctionFactory(new playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory(
 				Gbl.getConfig().charyparNagelScoring(), 
 				controler.getFacilityPenalties()));
@@ -53,22 +46,4 @@ public class KTIYear3Controler {
 
 	}
 
-	protected static class KTIYear3ControlerListener implements StartupListener, AfterMobsimListener {
-
-		private CalcTripDurations calcTripDurations;
-
-		public void notifyStartup(StartupEvent event) {
-			this.calcTripDurations = new CalcTripDurations();
-			Controler c = event.getControler();
-			c.getEvents().addHandler(this.calcTripDurations);
-		}
-
-		public void notifyAfterMobsim(AfterMobsimEvent event) {
-			if (this.calcTripDurations != null) {
-				this.calcTripDurations.writeStats(Controler.getIterationFilename(this.calcTripDurations.getClass().getCanonicalName() + ".txt"));
-			}
-		}
-		
-	}
-	
 }

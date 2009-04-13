@@ -44,6 +44,7 @@ import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
@@ -1172,7 +1173,13 @@ public class Controler {
 
 			if (controler.legTimes != null) {
 				controler.legTimes.writeStats(getIterationFilename("tripdurations.txt"));
-				// - print average in log
+				// - print averages in log
+				for (TransportMode mode : controler.legTimes.getAverageTripDurationsByMode().keySet()) {
+					log.info(
+							"[" + iteration + "] average trip duration of mode " + mode.toString() + ": " +
+							controler.legTimes.getAverageTripDurationsByMode().get(mode).intValue() + " seconds = " +
+							Time.writeTime(controler.legTimes.getAverageTripDurationsByMode().get(mode)));
+				}
 				log.info("[" + iteration + "] average trip duration is: "
 						+ (int)controler.legTimes.getAverageTripDuration() + " seconds = "
 						+ Time.writeTime(controler.legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));

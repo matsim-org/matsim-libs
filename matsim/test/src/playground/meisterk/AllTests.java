@@ -28,7 +28,6 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for playground.meisterk");
 		//$JUnit-BEGIN$
-		suite.addTest(playground.meisterk.org.matsim.analysis.AllTests.suite());
 		suite.addTest(playground.meisterk.org.matsim.config.groups.AllTests.suite());
 		suite.addTest(playground.meisterk.org.matsim.population.algorithms.AllTests.suite());
 		suite.addTest(playground.meisterk.org.matsim.scoring.ktiYear3.AllTests.suite());

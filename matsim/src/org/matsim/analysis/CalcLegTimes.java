@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -53,6 +54,8 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
 	private final TreeMap<Id, Integer> agentLegs = new TreeMap<Id, Integer>();
 	private final TreeMap<String, int[]> legStats = new TreeMap<String, int[]>();
+	private TreeMap<TransportMode, Double> sumTripDurationsByMode = new TreeMap<TransportMode, Double>();
+	private TreeMap<TransportMode, Integer> sumTripsByMode = new TreeMap<TransportMode, Integer>();
 	private double sumTripDurations = 0;
 	private int sumTrips = 0;
 
@@ -87,6 +90,14 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 				this.legStats.put(legType, stats);
 			}
 			stats[getTimeslotIndex(travTime)]++;
+
+			Double oldSumTripDuration = this.sumTripDurationsByMode.get(event.getLeg().getMode());
+			if (oldSumTripDuration == null) oldSumTripDuration = 0.0;
+			this.sumTripDurationsByMode.put(event.getLeg().getMode(), oldSumTripDuration + travTime);
+			Integer oldSumTripsByMode = this.sumTripsByMode.get(event.getLeg().getMode());
+			if (oldSumTripsByMode == null) oldSumTripsByMode = 0;
+			this.sumTripsByMode.put(event.getLeg().getMode(), oldSumTripsByMode + 1);
+			
 			this.sumTripDurations += travTime;
 			this.sumTrips++;
 		}
@@ -96,6 +107,8 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		this.agentDepartures.clear();
 		this.agentLegs.clear();
 		this.legStats.clear();
+		this.sumTripDurationsByMode.clear();
+		this.sumTripsByMode.clear();
 		this.sumTripDurations = 0;
 		this.sumTrips = 0;
 	}
@@ -114,6 +127,14 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		return (this.sumTripDurations / this.sumTrips);
 	}
 
+	public TreeMap<TransportMode, Double> getAverageTripDurationsByMode() {
+		TreeMap<TransportMode, Double> averageTripDurations = new TreeMap<TransportMode, Double>();
+		for (TransportMode mode : this.sumTripDurationsByMode.keySet()) {
+			averageTripDurations.put(mode, this.sumTripDurationsByMode.get(mode) / this.sumTripsByMode.get(mode));
+		}
+		return averageTripDurations;
+	}
+	
 	public void writeStats(final String filename) {
 		BufferedWriter legStatsFile = null;
 		try {
@@ -150,6 +171,14 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 			out.write("\n");
 		}
 		out.write("\n");
+		for (TransportMode mode : this.sumTripDurationsByMode.keySet()) {
+			double avgTripDuration = this.sumTripDurationsByMode.get(mode) / this.sumTripsByMode.get(mode);
+			out.write(
+					"average trip duration for mode " + mode.toString() + ": " + 
+					Double.toString(avgTripDuration) + " seconds = " + 
+					Time.writeTime(avgTripDuration));
+			out.write(System.getProperty("line.separator"));
+		}
 		if (this.sumTrips == 0) {
 			out.write("average trip duration: no trips!");
 		} else {
