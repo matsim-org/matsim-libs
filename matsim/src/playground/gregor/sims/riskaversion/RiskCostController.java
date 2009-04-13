@@ -52,7 +52,7 @@ public class RiskCostController extends Controler{
 
 	
 	@Override
-	protected void setup() {
+	protected void setUp() {
 		
 //		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 //		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
@@ -102,7 +102,7 @@ public class RiskCostController extends Controler{
 		log.info("done");
 
 
-		super.setup();
+		super.setUp();
 		
 		
 

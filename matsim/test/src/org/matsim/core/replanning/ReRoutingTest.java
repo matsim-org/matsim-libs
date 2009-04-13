@@ -54,8 +54,8 @@ public class ReRoutingTest extends MatsimTestCase {
 		}
 
 		@Override
-		protected void setup() {
-			super.setup();
+		protected void setUp() {
+			super.setUp();
 
 			// do some test to ensure the scenario is correct
 			int lastIter = this.config.controler().getLastIteration();

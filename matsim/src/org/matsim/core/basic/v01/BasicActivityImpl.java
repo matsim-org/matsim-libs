@@ -70,11 +70,11 @@ public class BasicActivityImpl implements BasicActivity {
 	public final void setStartTime(final double startTime) {
 		this.startTime = startTime;
 	}
-
-	@Override
-	public int hashCode() {
-		return this.type.hashCode() ^ this.getLinkId().toString().hashCode(); // XOR of two hashes
-	}
+//
+//	@Override
+//	public int hashCode() {
+//		return this.type.hashCode() ^ this.getLinkId().toString().hashCode(); // XOR of two hashes
+//	}
 
 	public void setFacilityId(Id locationId) {
 		this.facilityId = locationId;

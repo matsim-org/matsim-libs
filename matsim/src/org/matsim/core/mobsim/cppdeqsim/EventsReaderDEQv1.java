@@ -173,6 +173,8 @@ public class EventsReaderDEQv1 {
 			case 0:
 				event = new AgentArrivalEvent(time, new IdImpl(agentID), new IdImpl(linkID));
 				break;
+			default:
+				throw new RuntimeException("unknown event type: " + flag);
 		}
 		return event;
 	}

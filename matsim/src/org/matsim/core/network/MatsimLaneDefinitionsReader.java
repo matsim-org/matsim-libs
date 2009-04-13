@@ -30,10 +30,8 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.xml.sax.SAXException;
 
-
 /**
  * @author dgrether
- *
  */
 public class MatsimLaneDefinitionsReader {
 	
@@ -44,17 +42,13 @@ public class MatsimLaneDefinitionsReader {
 	
 	private BasicLaneDefinitions laneDefinitions;
 
-	/**
-	 * @param laneDefs
-	 */
 	public MatsimLaneDefinitionsReader(BasicLaneDefinitions laneDefs) {
 		this.laneDefinitions = laneDefs;
 	}
 
 	public void readFile(final String filename) {
 		try {
-			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(
-					filename);
+			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);
 			String sid = fileTypeGuesser.getSystemId();
 			
 			MatsimJaxbXmlParser reader = null;
@@ -63,6 +57,8 @@ public class MatsimLaneDefinitionsReader {
 				if (sid.compareTo(SCHEMALOCATIONV11) == 0) {
 					reader = new LaneDefinitionsReader11(this.laneDefinitions, sid);
 					log.info("Using LaneDefinitionReader11...");
+				} else {
+					throw new RuntimeException("Unsupported file format: " + sid);
 				}
 			}
 			else {
@@ -83,7 +79,4 @@ public class MatsimLaneDefinitionsReader {
 
 	}
 
-	
-	
-	
 }

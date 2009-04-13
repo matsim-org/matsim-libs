@@ -36,8 +36,8 @@ public class MarginalCostControler extends EvacuationQSimControler{
 	}
 
 	@Override
-	protected void setup() {
-		super.setup();
+	protected void setUp() {
+		super.setUp();
 		
 		
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();

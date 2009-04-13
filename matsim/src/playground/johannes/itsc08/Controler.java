@@ -73,14 +73,14 @@ public class Controler extends WithindayControler {
 	}
 
 	@Override
-	protected void setup() {
+	protected void setUp() {
 		IncidentGenerator i = new IncidentGenerator(Double.parseDouble(config.getParam("eut", "capacityFactor")));
 		this.addControlerListener(i);
 		
 		Analyzer analyzer = new Analyzer(this);
 		this.addControlerListener(analyzer);
 		this.equipmentFraction = string2Double(config.getParam("eut", "alpha"));
-		super.setup();
+		super.setUp();
 		/*
 		 * Create a new factory for our withinday agents.
 		 */

@@ -42,8 +42,8 @@ public class WithindayControler extends EvacuationQSimControler {
 	}
 
 	@Override
-	protected void setup() {
-		super.setup();
+	protected void setUp() {
+		super.setUp();
 		log.info("adding additional guide agents...");
 //		new RoadSignAgentsGenerator().generateGuides(this.population,this.network);
 		log.info("done.");

@@ -249,8 +249,8 @@ public class BetaTravelTest extends MatsimTestCase {
 		}
 
 		@Override
-		protected void setup() {
-			super.setup();
+		protected void setUp() {
+			super.setUp();
 
 			// do some test to ensure the scenario is correct
 			double beta_travel = this.config.charyparNagelScoring().getTraveling();

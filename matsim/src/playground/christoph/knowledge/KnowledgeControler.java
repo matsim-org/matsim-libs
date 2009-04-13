@@ -75,7 +75,7 @@ public class KnowledgeControler extends Controler {
 	// Workaround!
 	// Wo wird der TravelCostCalculator festgelegt? Gibt's dafuer ein Feld in der Konfigurationsdatei?
 	@Override
-	protected void setup() {
+	protected void setUp() {
 		
 		// Diese beiden Befehle muessen sind unabhaengig vom initialisieren der CostCalculators.
 		// Auch wenn diese via Configfile geladen werden, werden die Zeilen benoetigt!
@@ -113,7 +113,7 @@ public class KnowledgeControler extends Controler {
 		this.travelCostCalculator = new OldKnowledgeTravelCost(this.travelTimeCalculator);
 		
 		// ... dieser wird von nun folgenden Setup nicht mehr ueberschrieben.
-		super.setup();
+		super.setUp();
 	}
 	
 	// Hier werden die neuen Knowledge-Attribute erzeugt.

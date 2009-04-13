@@ -67,8 +67,8 @@ public class KtiControler extends Controler {
 	}
 
 	@Override
-	protected void setup() {
-		super.setup();
+	protected void setUp() {
+		super.setUp();
 		
 		// read additional data for the special pt-router
 		VisumMatrixReader reader = new VisumMatrixReader("pt_traveltime", getWorld().getLayer("municipality"));

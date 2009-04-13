@@ -326,11 +326,11 @@ public class Controler {
 
 	private void init() {
 		loadConfig();
-		setupOutputDir();
+		setUpOutputDir();
 		initEvents();
 		initLogging();
 		loadData();
-		setup();
+		setUp();
 		loadCoreListeners();
 		loadControlerListeners();
 		this.controlerListenerManager.fireControlerStartupEvent();
@@ -437,7 +437,7 @@ public class Controler {
 	 * This method is called after the configuration is loaded, and after the
 	 * scenario data (network, population) is read.
 	 */
-	protected void setup() {
+	protected void setUp() {
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 		if (this.travelTimeCalculator == null) {
 			this.travelTimeCalculator = new TravelTimeCalculatorBuilder(this.config.travelTimeCalculator()).createTravelTimeCalculator(this.network, (int)endTime);
@@ -525,7 +525,7 @@ public class Controler {
 		}
 	}
 
-	private final void setupOutputDir() {
+	private final void setUpOutputDir() {
 		outputPath = this.config.controler().getOutputDirectory();
 		if (outputPath.endsWith("/")) {
 			outputPath = outputPath.substring(0, outputPath.length()-1);

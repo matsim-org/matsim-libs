@@ -64,9 +64,9 @@ public class BasicControler extends Controler{
 	}
 
 	// Workaround!
-	protected void setup() {
+	protected void setUp() {
 				
-		super.setup();
+		super.setUp();
 	}
 	
 	protected void runMobSim() 

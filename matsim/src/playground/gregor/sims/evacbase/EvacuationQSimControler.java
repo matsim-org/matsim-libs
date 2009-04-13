@@ -44,7 +44,7 @@ public class EvacuationQSimControler extends Controler {
 	}
 
 	@Override
-	protected void setup() {
+	protected void setUp() {
 
 		// first modify network and plans
 
@@ -68,7 +68,7 @@ public class EvacuationQSimControler extends Controler {
 
 		// then do the regular setup with the modified data
 
-		super.setup();
+		super.setUp();
 	}
 
 	public static void main(final String[] args) {

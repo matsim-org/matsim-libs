@@ -48,7 +48,7 @@ public class GroupedEvacControler extends Controler {
 	}
 
 	@Override
-	protected void setup() {
+	protected void setUp() {
 		// first modify network and plans
 
 		try {
@@ -71,7 +71,7 @@ public class GroupedEvacControler extends Controler {
 
 		// then do the regular setup with the modified data
 
-		super.setup();
+		super.setUp();
 	}
 
 	@Override

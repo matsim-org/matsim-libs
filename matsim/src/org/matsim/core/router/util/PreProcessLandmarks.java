@@ -21,7 +21,6 @@
 package org.matsim.core.router.util;
 
 import java.awt.geom.Rectangle2D;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -248,9 +247,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 *
 	 * @author lnicolas
 	 */
-	static class LandmarksTravelTimeComparator implements Comparator<Node>, Serializable {
-		private static final long serialVersionUID = 1L;
-
+	static class LandmarksTravelTimeComparator implements Comparator<Node> {
 		private final Map<Node, DeadEndData> roleData;
 		private final int landmarkIndex;
 

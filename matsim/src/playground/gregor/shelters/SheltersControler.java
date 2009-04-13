@@ -48,7 +48,7 @@ public class SheltersControler extends Controler {
 
 
 	@Override
-	protected void setup() {
+	protected void setUp() {
 
 		
 		
@@ -74,7 +74,7 @@ public class SheltersControler extends Controler {
 
 		// then do the regular setup with the modified data
 
-		super.setup();
+		super.setUp();
 		
 	}
 	

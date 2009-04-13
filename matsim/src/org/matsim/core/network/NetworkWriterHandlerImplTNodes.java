@@ -31,7 +31,6 @@ import org.matsim.core.utils.io.IOUtils;
 public class NetworkWriterHandlerImplTNodes {
 
 	private final Network network;
-	private BufferedWriter out;
 
 	public NetworkWriterHandlerImplTNodes(final Network network) {
 		this.network = network;
@@ -40,11 +39,11 @@ public class NetworkWriterHandlerImplTNodes {
 	public void writeFile(String filename) {
 		try {
 
-			this.out = IOUtils.getBufferedWriter(filename);
+			BufferedWriter out = IOUtils.getBufferedWriter(filename);
 
-			startNodes();
+			startNodes(out);
 			for (Node n : this.network.getNodes().values()) {
-				writeNode(n);
+				writeNode(n, out);
 			}
 			out.close();
 		}
@@ -53,7 +52,7 @@ public class NetworkWriterHandlerImplTNodes {
 		}
 	}
 
-	private void startNodes() throws IOException {
+	private void startNodes(final BufferedWriter out) throws IOException {
 		out.write("ID\t");
 		out.write("EASTING\t");
 		out.write("NORTHING\t");
@@ -61,7 +60,7 @@ public class NetworkWriterHandlerImplTNodes {
 		out.write("NOTES\n");
 	}
 
-	private void writeNode(final Node node) throws IOException {
+	private void writeNode(final Node node, final BufferedWriter out) throws IOException {
 
 		out.write(node.getId() + "\t");
 		out.write(node.getCoord().getX() + "\t");

@@ -65,11 +65,11 @@ public class QControler extends Controler {
 	}
 
 	@Override
-	protected void setup() {
+	protected void setUp() {
 		// TODO Auto-generated method stub
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 		this.travelTimeCalculator = new TravelTimeCalculatorTrafficLight(this.network, getTraveltimeBinSize(), (int) endTime);
-		super.setup();
+		super.setUp();
 	}
 
 	@Override

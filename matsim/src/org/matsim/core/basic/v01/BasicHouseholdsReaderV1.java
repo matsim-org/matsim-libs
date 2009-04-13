@@ -39,27 +39,27 @@ import org.xml.sax.SAXException;
  */
 public class BasicHouseholdsReaderV1 extends MatsimXmlParser {
 	
-	private Map<Id, BasicHousehold> households;
+	private final Map<Id, BasicHousehold> households;
 
-	private BasicHousehold currentHousehold;
+	private BasicHousehold currentHousehold = null;
 
-	private List<Id> currentmembers;
+	private List<Id> currentmembers = null;
 
-	private BasicLocationImpl currentlocation;
+	private BasicLocationImpl currentlocation = null;
 
-	private Double currentXCoord;
+	private double currentXCoord = 0;
 
-	private Double currentYCoord;
+	private double currentYCoord = 0;
 
-	private BasicIncomeImpl currentincome;
+	private BasicIncomeImpl currentincome = null;
 
-	private HouseholdBuilder builder;
+	private HouseholdBuilder builder = null;
 
-	private Id currentHhId;
+	private Id currentHhId = null;
 
-	private String currentLanguage;
+	private String currentLanguage = null;
 
-	private List<Id> currentVehicleIds;
+	private List<Id> currentVehicleIds = null;
 
 
 	public BasicHouseholdsReaderV1(Map<Id, BasicHousehold> households) {
@@ -108,14 +108,12 @@ public class BasicHouseholdsReaderV1 extends MatsimXmlParser {
 		}
 		else if (HouseholdsSchemaV1Names.COORDINATE.equalsIgnoreCase(name)) {
 			this.currentlocation.setCoord(new CoordImpl(this.currentXCoord, this.currentYCoord));
-			this.currentXCoord = null;
-			this.currentYCoord = null;
 		}
 		else if (HouseholdsSchemaV1Names.XCOORD.equalsIgnoreCase(name)) {
-			this.currentXCoord = Double.valueOf(content);
+			this.currentXCoord = Double.parseDouble(content);
 		}
 		else if (HouseholdsSchemaV1Names.YCOORD.equalsIgnoreCase(name)) {
-			this.currentYCoord = Double.valueOf(content);
+			this.currentYCoord = Double.parseDouble(content);
 		}
 	}
 

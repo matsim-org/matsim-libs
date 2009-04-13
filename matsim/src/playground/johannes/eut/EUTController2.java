@@ -75,7 +75,7 @@ public class EUTController2 extends WithindayControler {
 	}
 
 	@Override
-	protected void setup() {
+	protected void setUp() {
 		this.equipmentFraction = string2Double(getConfig().getParam(CONFIG_MODULE_NAME, "equipmentFraction"));
 		this.incidentProba = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "incidentProba"));
 		this.rho = Integer.parseInt(getConfig().findParam(CONFIG_MODULE_NAME, "rho"));
@@ -85,7 +85,7 @@ public class EUTController2 extends WithindayControler {
 		 */
 		this.summaryWriter = new SummaryWriter(getConfig().findParam(CONFIG_MODULE_NAME, "summaryFile"));
 		addControlerListener(this.summaryWriter);
-		super.setup();
+		super.setUp();
 		/*
 		 * Create a new factory for our withinday agents.
 		 */

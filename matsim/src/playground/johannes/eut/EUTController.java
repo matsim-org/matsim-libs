@@ -131,7 +131,7 @@ public class EUTController extends WithindayControler {
 	}
 
 	@Override
-	protected void setup() {
+	protected void setUp() {
 		this.equipmentFraction = string2Double(getConfig().getParam(CONFIG_MODULE_NAME, "equipmentFraction"));
 		this.replanningFraction = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "replanFraction"));
 		this.incidentProba = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "incidentProba"));
@@ -144,7 +144,7 @@ public class EUTController extends WithindayControler {
 
 		this.summaryWriter = new SummaryWriter(getConfig().findParam(CONFIG_MODULE_NAME, "summaryFile"));
 		addControlerListener(this.summaryWriter);
-		super.setup();
+		super.setUp();
 		
 		/*
 		 * Add the ttmemory updater for day2day re-replanning.

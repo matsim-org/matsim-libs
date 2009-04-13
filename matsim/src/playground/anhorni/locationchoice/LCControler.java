@@ -41,8 +41,8 @@ public class LCControler extends Controler {
 	}
 
     @Override
-    protected void setup() {
-      super.setup();
+    protected void setUp() {
+      super.setUp();
       this.scoringFunctionFactory = new LocationChoiceScoringFunctionFactory(this.config.charyparNagelScoring(), this.facilityPenalties);
     }
  
