@@ -32,6 +32,7 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueNetworkFactory;
@@ -212,7 +213,7 @@ public class MyQueueNetwork extends QueueNetwork{
 					{				
 						vehiclesToReplanActEnd.add(vehicle);
 						
-						DriverAgent personAgent = vehicle.getDriver();
+						PersonAgent personAgent = (PersonAgent) vehicle.getDriver();
 						Activity fromAct = (Activity)personAgent.getPlanElements().get(personAgent.getNextActivity() - 2);
 						fromActActEnd.add(fromAct);
 						if (fromAct == null) log.error("Found fromAct that is null!");
@@ -282,7 +283,7 @@ public class MyQueueNetwork extends QueueNetwork{
 						{				
 							vehiclesToReplanActEnd.add(vehicle);
 							
-							DriverAgent personAgent = vehicle.getDriver();
+							PersonAgent personAgent = (PersonAgent) vehicle.getDriver();
 							Activity fromAct = (Activity)personAgent.getPlanElements().get(personAgent.getNextActivity() - 2);
 							fromActActEnd.add(fromAct);
 							if (fromAct == null) log.error("Found fromAct that is null!");

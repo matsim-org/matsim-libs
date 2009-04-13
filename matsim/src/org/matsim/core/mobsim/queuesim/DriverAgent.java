@@ -20,9 +20,6 @@
 
 package org.matsim.core.mobsim.queuesim;
 
-import java.util.List;
-
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -30,21 +27,16 @@ import org.matsim.core.api.population.Person;
 public interface DriverAgent {
 
 	/**
-	 * The time the agent wants to depart from an Activity. If the agent is currrently driving,
+	 * The time the agent wants to depart from an Activity. If the agent is currently driving,
 	 * the return value cannot be interpreted (e.g. it is not defined if it is the departure time
 	 * from the previous activity, or from the next one).
 	 *
 	 * @return the time when the agent wants to depart from an activity.
 	 */
 	public double getDepartureTime();
-
-	/**
-	 * Sets the time when the agent wants to leave the next (or current, if currently not driving)
-	 * Activity.
-	 *
-	 * @param departureTime
+	/* there is no corresponding setter, as the implementation should set the the corresponding time
+	 * internally, e.g. in legEnds().
 	 */
-	public void setDepartureTime(final double departureTime);
 
 	/**
 	 * Informs the agent that it arrived at the destination of the current leg.
@@ -54,16 +46,14 @@ public interface DriverAgent {
 	 * @param now the current time in the simulation
 	 */
 	public void legEnds(final double now);
+	
+	public Link getDestinationLink();
 
-	// the methods below are yet unclear how useful they are in the interface.
+	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
 
-	public void setVehicle(final QueueVehicle veh);
-
-	public void setCurrentLink(final Link link);
+	public void setCurrentLink(final Link link); // the agent should not by itself on which link it is
 
 	public Link getCurrentLink();
-
-	public Link getDestinationLink();
 
 	public void incCurrentNode();
 
@@ -78,13 +68,8 @@ public interface DriverAgent {
 
 	public Person getPerson();
 
-	public void leaveActivity(final double now);
+	public void leaveActivity(final double now); // the agent should decide when it leaves the activity, and handle it appropriately
 
 	public Leg getCurrentLeg();
 
-	public int getCurrentNodeIndex();
-
-	public int getNextActivity();
-
-	public List<? extends BasicPlanElement> getPlanElements();
 }

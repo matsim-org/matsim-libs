@@ -94,7 +94,7 @@ public class PersonAgent implements DriverAgent {
 		return this.activityDepartureTime;
 	}
 
-	public void setDepartureTime(final double seconds) {
+	private void setDepartureTime(final double seconds) {
 		this.activityDepartureTime = seconds;
 	}
 

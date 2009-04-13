@@ -27,11 +27,11 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -65,7 +65,7 @@ public class LeaveLinkReplanner {
 	protected Activity prevAct;
 	protected Leg leg;
 	protected double time;
-	protected DriverAgent personAgent;
+	protected PersonAgent personAgent;
 	protected Person person;
 	protected Node node;
 	protected Plan plan;
@@ -82,7 +82,7 @@ public class LeaveLinkReplanner {
 		this.node = queueNode.getNode();
 		this.time = time;
 		this.vehicle = vehicle;
-		this.personAgent = vehicle.getDriver();
+		this.personAgent = (PersonAgent) vehicle.getDriver();
 		this.person = vehicle.getDriver().getPerson();
 		this.replanner = replanner;
 		
@@ -95,7 +95,7 @@ public class LeaveLinkReplanner {
 		this.node = queueNode.getNode();
 		this.time = time;
 		this.vehicle = vehicle;
-		this.personAgent = vehicle.getDriver();
+		this.personAgent = (PersonAgent) vehicle.getDriver();
 		this.person = vehicle.getDriver().getPerson();
 
 		replanner = (PlanAlgorithm)person.getCustomAttributes().get("Replanner");

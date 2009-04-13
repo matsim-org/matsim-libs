@@ -20,18 +20,12 @@
 
 package playground.marcel.pt.integration;
 
-import java.util.List;
-
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
-import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
@@ -80,36 +74,12 @@ public class QueueTransitDriver implements DriverAgent {
 		return this.driver.getDepartureTime();
 	}
 	
-	public void setDepartureTime(final double time) {
-		throw new UnsupportedOperationException();
-		// ignore this, the bus-driver has its own schedule
-	}
-	
-	public void reachActivity(double now, QueueLink currentQueueLink) {
-		Simulation.decLiving();
-	}
-	
 	// *** The methods below are currently not used... ***
-	
-	public List<? extends BasicPlanElement> getPlanElements() {
-		return null;
-	}
-	
-	public int getCurrentNodeIndex() {
-		return 0;
-	}
-
-	public int getNextActivity() {
-		return 0;
-	}
 
 	public void leaveActivity(double now) {
 	}
 
 	public void setCurrentLink(Link link) {
-	}
-
-	public void setVehicle(QueueVehicle veh) {
 	}
 
 	public void legEnds(double now) {
