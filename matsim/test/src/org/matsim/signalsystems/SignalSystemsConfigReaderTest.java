@@ -154,12 +154,10 @@ public class SignalSystemsConfigReaderTest extends MatsimTestCase {
 		assertEquals(1, plan.getGroupConfigs().size());
 		groupConfig = plan.getGroupConfigs().get(id23);
 		assertNotNull(groupConfig);
-		assertEquals(0.0, groupConfig.getRoughCast(), EPSILON);
-		assertEquals(45.0, groupConfig.getDropping(), EPSILON);
+		assertEquals(0, groupConfig.getRoughCast().intValue());
+		assertEquals(45, groupConfig.getDropping().intValue());
 		assertEquals(Integer.valueOf(2), groupConfig.getInterimGreenTimeRoughcast());
 		assertEquals(Integer.valueOf(3), groupConfig.getInterGreenTimeDropping());
-		
-		
 	}  
 	
 }
