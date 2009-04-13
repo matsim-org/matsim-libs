@@ -58,7 +58,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	private final String id;
 	private final OTFServerRemote host;
 	private OTFConnectionManager connect;
-	private static boolean cachingAllowed = true;
+//	private static boolean cachingAllowed = true;
 
 	private final List<OTFDataReader> additionalElements= new LinkedList<OTFDataReader>();
 
@@ -375,9 +375,9 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 
 
 	public boolean replace(OTFDrawer otfdrawer, double x, double y, Class class_old, Class class_new, Class class_src) {
-		final ArrayList<OTFDataReader> list = new ArrayList<OTFDataReader>();
-		double xl = x -offsetEast;
-		double yl = y-offsetNorth;
+//		final ArrayList<OTFDataReader> list = new ArrayList<OTFDataReader>();
+//		double xl = x -offsetEast;
+//		double yl = y-offsetNorth;
 		QuadTree.Rect rect = new QuadTree.Rect(x,y,x+200,y+200);
 		CollectExecutor exe = new CollectExecutor(class_old);
 		this.execute(rect, exe);

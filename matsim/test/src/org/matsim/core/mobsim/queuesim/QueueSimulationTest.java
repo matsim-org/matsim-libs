@@ -151,7 +151,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		
 		Person person = new PersonImpl(new IdImpl(1));
 		Plan plan = person.createPlan(true);
-		Activity act = plan.createActivity("home", f.link1);
+		plan.createActivity("home", f.link1);
 		f.plans.addPerson(person);
 		
 		/* build events */

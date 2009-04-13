@@ -21,7 +21,6 @@
 package org.matsim.core.config.groups;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -49,7 +48,7 @@ public class StrategyConfigGroupTest extends MatsimTestCase {
 			fail("Expected to get an IllegalArgumentException, but got none.");
 		}
 		catch (IllegalArgumentException e) {
-			log.info("Catched IllegalArgumentException, as exptected: "  + e.getMessage());
+			log.info("Catched IllegalArgumentException, as expected: "  + e.getMessage());
 		}
 	}
 
