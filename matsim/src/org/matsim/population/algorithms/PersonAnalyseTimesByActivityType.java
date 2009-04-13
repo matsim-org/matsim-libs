@@ -20,12 +20,11 @@
 
 package org.matsim.population.algorithms;
 
-import java.util.Iterator;
-
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -97,61 +96,45 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 
 		Plan plan = person.getPlans().get(0);
 
-		Iterator actIter = plan.getIteratorAct();
-		while (actIter.hasNext()) {
-
-			Activity act = (Activity) actIter.next();
-			String actType = act.getType().substring(0, 1);
-			double depTime = act.getEndTime();
-			if (depTime != Time.UNDEFINED_TIME) {
-
-				int actIndex = Activities.valueOf(actType).getPosition();
-
-				int timeIndex = ((int) depTime) / this.timeBinSize;
-				int oldLength = this.numDeps[actIndex].length;
-
-//				System.out.println("time index: " + timeIndex);
-//				System.out.println("old length: " + oldLength);
-
-				if (timeIndex >= oldLength) {
-
-					this.numDeps[actIndex] = (int[]) PersonAnalyseTimesByActivityType.resizeArray(this.numDeps[actIndex], timeIndex + 1);
-
-					// init new fields with 0
-					for (int ii=oldLength; ii < this.numDeps[actIndex].length; ii++) {
-
-						this.numDeps[actIndex][ii] = 0;
-
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				String actType = act.getType().substring(0, 1);
+				double depTime = act.getEndTime();
+				if (depTime != Time.UNDEFINED_TIME) {
+					int actIndex = Activities.valueOf(actType).getPosition();
+					int timeIndex = ((int) depTime) / this.timeBinSize;
+					int oldLength = this.numDeps[actIndex].length;
+	
+					if (timeIndex >= oldLength) {
+						this.numDeps[actIndex] = (int[]) PersonAnalyseTimesByActivityType.resizeArray(this.numDeps[actIndex], timeIndex + 1);
+	
+						// init new fields with 0
+						for (int ii=oldLength; ii < this.numDeps[actIndex].length; ii++) {
+							this.numDeps[actIndex][ii] = 0;
+						}
+	
+						System.out.println("new length of " + actType + ": " + this.numDeps[actIndex].length);
 					}
-
-					System.out.println("new length of " + actType + ": " + this.numDeps[actIndex].length);
-
-				}
-
-				this.numDeps[actIndex][timeIndex]++;
-
-				// resize summary array too
-				if (this.numDeps[actIndex].length > this.numDeps[ALL_POS].length) {
-
-					oldLength = this.numDeps[ALL_POS].length;
-					this.numDeps[ALL_POS] = (int[]) PersonAnalyseTimesByActivityType.resizeArray(this.numDeps[ALL_POS], timeIndex + 1);
-
-					// init new fields with 0
-					for (int ii=oldLength; ii < this.numDeps[ALL_POS].length; ii++) {
-
-						this.numDeps[ALL_POS][ii] = 0;
-
+	
+					this.numDeps[actIndex][timeIndex]++;
+	
+					// resize summary array too
+					if (this.numDeps[actIndex].length > this.numDeps[ALL_POS].length) {
+						oldLength = this.numDeps[ALL_POS].length;
+						this.numDeps[ALL_POS] = (int[]) PersonAnalyseTimesByActivityType.resizeArray(this.numDeps[ALL_POS], timeIndex + 1);
+	
+						// init new fields with 0
+						for (int ii=oldLength; ii < this.numDeps[ALL_POS].length; ii++) {
+							this.numDeps[ALL_POS][ii] = 0;
+						}
+	
+						System.out.println("new length of " + actType + ": " + this.numDeps[actIndex].length);
 					}
-
-					System.out.println("new length of " + actType + ": " + this.numDeps[actIndex].length);
-
+	
+					this.numDeps[ALL_POS][timeIndex]++;
 				}
-
-				this.numDeps[ALL_POS][timeIndex]++;
-
 			}
-//			System.out.println(act.getType());
-
 		}
 	}
 
@@ -159,58 +142,48 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 
 		Plan plan = person.getPlans().get(0);
 
-		Iterator actIter = plan.getIteratorAct();
-		while (actIter.hasNext()) {
-
-			Activity act = (Activity) actIter.next();
-			String actType = act.getType().substring(0, 1);
-			double arrTime = act.getStartTime();
-			if (arrTime != 0.0) {
-
-				int actIndex = Activities.valueOf(actType).getPosition();
-
-				int timeIndex = ((int) arrTime) / this.timeBinSize;
-				int oldLength = this.numArrs[actIndex].length;
-
-//				System.out.println("time index: " + timeIndex);
-//				System.out.println("old length: " + oldLength);
-
-				if (timeIndex >= oldLength) {
-
-					this.numArrs[actIndex] = (int[]) PersonAnalyseTimesByActivityType.resizeArray(this.numArrs[actIndex], timeIndex + 1);
-
-					// init new fields with 0
-					for (int ii=oldLength; ii < this.numArrs[actIndex].length; ii++) {
-
-						this.numArrs[actIndex][ii] = 0;
-
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				String actType = act.getType().substring(0, 1);
+				double arrTime = act.getStartTime();
+				if (arrTime != 0.0) {
+	
+					int actIndex = Activities.valueOf(actType).getPosition();
+	
+					int timeIndex = ((int) arrTime) / this.timeBinSize;
+					int oldLength = this.numArrs[actIndex].length;
+	
+					if (timeIndex >= oldLength) {
+	
+						this.numArrs[actIndex] = (int[]) PersonAnalyseTimesByActivityType.resizeArray(this.numArrs[actIndex], timeIndex + 1);
+	
+						// init new fields with 0
+						for (int ii=oldLength; ii < this.numArrs[actIndex].length; ii++) {
+							this.numArrs[actIndex][ii] = 0;
+						}
+	
+						System.out.println("new length of " + actType + ": " + this.numArrs[actIndex].length);
 					}
-
-					System.out.println("new length of " + actType + ": " + this.numArrs[actIndex].length);
-
-				}
-
-				this.numArrs[actIndex][timeIndex]++;
-
-				// resize summary array too
-				if (this.numArrs[actIndex].length > this.numArrs[ALL_POS].length) {
-
-					oldLength = this.numArrs[ALL_POS].length;
-					this.numArrs[ALL_POS] = (int[]) PersonAnalyseTimesByActivityType.resizeArray(this.numArrs[ALL_POS], timeIndex + 1);
-
-					// init new fields with 0
-					for (int ii=oldLength; ii < this.numArrs[ALL_POS].length; ii++) {
-
-						this.numArrs[ALL_POS][ii] = 0;
-
+	
+					this.numArrs[actIndex][timeIndex]++;
+	
+					// resize summary array too
+					if (this.numArrs[actIndex].length > this.numArrs[ALL_POS].length) {
+	
+						oldLength = this.numArrs[ALL_POS].length;
+						this.numArrs[ALL_POS] = (int[]) PersonAnalyseTimesByActivityType.resizeArray(this.numArrs[ALL_POS], timeIndex + 1);
+	
+						// init new fields with 0
+						for (int ii=oldLength; ii < this.numArrs[ALL_POS].length; ii++) {
+							this.numArrs[ALL_POS][ii] = 0;
+						}
+	
+						System.out.println("new length of " + actType + ": " + this.numArrs[actIndex].length);
 					}
-
-					System.out.println("new length of " + actType + ": " + this.numArrs[actIndex].length);
-
+	
+					this.numArrs[ALL_POS][timeIndex]++;
 				}
-
-				this.numArrs[ALL_POS][timeIndex]++;
-
 			}
 //			System.out.println(act.getType());
 

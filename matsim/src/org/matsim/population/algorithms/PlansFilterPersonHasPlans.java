@@ -47,7 +47,7 @@ public class PlansFilterPersonHasPlans {
 		Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
 		while (pid_it.hasNext()) {
 			Id personId = pid_it.next();
-			Person person = plans.getPerson(personId);
+			Person person = plans.getPersons().get(personId);
 
 			if (person.getPlans().isEmpty()) {
 				// the person has no plans left. remove the person afterwards (so we do not disrupt the Iterator)

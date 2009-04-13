@@ -30,8 +30,8 @@ import javax.media.opengl.GL;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -124,7 +124,7 @@ public class QueryAgentPTBus implements OTFQuery {
 		
 		if (allIds.size()==0) return;
 
-		Plan plan = plans.getPerson(new IdImpl(allIds.get(0))).getSelectedPlan();
+		Plan plan = plans.getPersons().get(new IdImpl(allIds.get(0))).getSelectedPlan();
 
 //		this.acts = new Object [plan.getActsLegs().size()/2];
 //		for (int i=0;i< this.acts.length; i++) {

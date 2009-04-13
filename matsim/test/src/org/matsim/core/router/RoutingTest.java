@@ -29,10 +29,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.router.AStarEuclidean;
-import org.matsim.core.router.AStarLandmarks;
-import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PreProcessDijkstra;
@@ -115,9 +111,8 @@ public class RoutingTest extends MatsimTestCase {
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
 		String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile(inPlansName);
-		population.printPlansCount();
 		long referenceChecksum = CRCChecksum.getCRCFromFile(inPlansName);
 		log.info("Reference checksum = " + referenceChecksum + " file: " + inPlansName);
 

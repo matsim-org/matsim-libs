@@ -27,8 +27,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -74,7 +74,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		network.addNetworkChangeEvent(change);
 
 		// create a population
-		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population plans = new PopulationImpl();
 		Person person1 = createPersons(7*3600, link1, link3, network, 1).get(0);
 		Person person2 = createPersons(9*3600, link1, link3, network, 1).get(0);
 		plans.addPerson(person1);
@@ -125,7 +125,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
-		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population plans = new PopulationImpl();
 		List<Person> persons1 = createPersons(0, link1, link3, network, personsPerWave);
 		for(Person p : persons1)
 			plans.addPerson(p);
@@ -225,12 +225,12 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		private final Person person1;
 		private final Person person2;
 		private final Link link;
-		public double person1enterTime = Time.UNDEFINED_TIME;
-		public double person1leaveTime = Time.UNDEFINED_TIME;
-		public double person2enterTime = Time.UNDEFINED_TIME;
-		public double person2leaveTime = Time.UNDEFINED_TIME;
+		protected double person1enterTime = Time.UNDEFINED_TIME;
+		protected double person1leaveTime = Time.UNDEFINED_TIME;
+		protected double person2enterTime = Time.UNDEFINED_TIME;
+		protected double person2leaveTime = Time.UNDEFINED_TIME;
 
-		public TestTravelTimeCalculator(final Person person1, final Person person2, final Link link) {
+		protected TestTravelTimeCalculator(final Person person1, final Person person2, final Link link) {
 			this.person1 = person1;
 			this.person2 = person2;
 			this.link = link;

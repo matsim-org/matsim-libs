@@ -26,8 +26,8 @@ import java.io.IOException;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -167,7 +167,7 @@ public class CreateSelectedPlansTables {
 
 				// method person.toString() not appropriate
 				out.write(person_id.toString()+"\t");
-				final Person person=this.plans0.getPerson(person_id);
+				final Person person=this.plans0.getPersons().get(person_id);
 				out.write(person.getSex()+"\t");
 				out.write(person.getAge()+"\t");
 				out.write(person.getLicense()+"\t");
@@ -201,7 +201,7 @@ public class CreateSelectedPlansTables {
 				// plan1 ----------------------------------------------
 				if (this.twoPlans) {
 
-					final Person person_comp=this.plans1.getPerson(person_id);
+					final Person person_comp=this.plans1.getPersons().get(person_id);
 					out.write(person_comp.getSelectedPlan().getScore()+"\t");
 					out.write(this.getTravelTime(person_comp)+"\t");
 					this.sumPlanTraveltime[1]+=this.getTravelTime(person_comp);
@@ -228,35 +228,31 @@ public class CreateSelectedPlansTables {
 	 *  See playground.anhorni.locationchoice.analysis.PersonTimeDistanceCalculator */
 
 	private double getTravelTime(final Person person) {
-
 		double travelTime=0.0;
-		final LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
-		while (leg_it.hasNext()) {
-			final Leg leg = (Leg)leg_it.next();
-			travelTime+=leg.getTravelTime();
+		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Leg) {
+				travelTime+=((Leg) pe).getTravelTime();
+			}
 		}
 		return travelTime;
 	}
 
 	private double getTravelDist(final Person person) {
-
 		double travelDist=0.0;
-		final LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
-
-		while (leg_it.hasNext()) {
-			final Leg leg = (Leg)leg_it.next();
-			travelDist+=leg.getRoute().getDistance();
+		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Leg) {
+				travelDist+=((Leg) pe).getRoute().getDistance();
+			}
 		}
 		return travelDist;
 	}
 
 	private int getNumberOfTrips(final Person person) {
-
 		int numberOfLegs=0;
-		final LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
-		while (leg_it.hasNext()) {
-			leg_it.next();
-			numberOfLegs++;
+		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Leg) {
+				numberOfLegs++;
+			}
 		}
 		return numberOfLegs;
 	}

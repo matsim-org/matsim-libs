@@ -23,19 +23,13 @@ package playground.kai.usecases.basicdemandgen;
  */
 
 import java.io.IOException;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
-
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
@@ -48,6 +42,7 @@ import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -56,6 +51,10 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 
@@ -66,7 +65,7 @@ public class MyControler2 {
 		List<Coord> workPlaces = new ArrayList<Coord>() ;
 
 //		BasicPopulation<? extends BasicPerson<? extends BasicPlan>> population = new PopulationImpl(PopulationImpl.NO_STREAMING) ;
-		BasicPopulation population = new PopulationImpl(PopulationImpl.NO_STREAMING) ;
+		BasicPopulation population = new PopulationImpl() ;
 		// FIXME: select specific implementation here.  Makes sense, but is it what we want?  (Could also be empty population
 		// taken from controler.)
 		// TODO: The generics approach, as of now, is awful.
@@ -161,12 +160,13 @@ public class MyControler2 {
 		log.info("### DONE with demand generation from urbansim ###") ;
 
 		// parse the config arguments so we have a config.  generate scenario data from this
+		Config config;
 		if ( args.length==0 ) {
-			Gbl.createConfig(new String[] {"./src/playground/duncan/myconfig1.xml"});
+			config = Gbl.createConfig(new String[] {"./src/playground/duncan/myconfig1.xml"});
 		} else {
-			Gbl.createConfig(args) ;
+			config = Gbl.createConfig(args) ;
 		}
-		ScenarioImpl scenarioData = new ScenarioImpl( Gbl.getConfig() ) ;
+		ScenarioImpl scenarioData = new ScenarioImpl( config ) ;
 
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.
@@ -177,7 +177,7 @@ public class MyControler2 {
 		log.info("... finished cleaning network.") ; log.info("") ;
 
 		// start the control(l)er with the network and plans as defined above
-		Controler controler = new Controler(Gbl.getConfig(),network,(Population) plans) ;
+		Controler controler = new Controler(config,network,(Population) plans) ;
 
 		// this means existing files will be over-written.  Be careful!
 		controler.setOverwriteFiles(true);

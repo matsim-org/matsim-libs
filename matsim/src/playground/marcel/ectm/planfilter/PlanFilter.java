@@ -66,10 +66,9 @@ public class PlanFilter {
 		System.out.println("  done.");
 
 		System.out.println("  reading population... " + (new Date()));
-		final Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		final Population population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(config.plans().getInputFile());
-		population.printPlansCount();
 
 		System.out.println("  finding sub-networks... " + (new Date()));
 		System.out.println("smallRadius\tbigRadius\t#linksSmall\t#linksBig\t#peopleSmall\t#peopleLeavingBig");
@@ -133,10 +132,9 @@ public class PlanFilter {
 		System.out.println("  done.");
 
 		System.out.println("  reading population... " + (new Date()));
-		final Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		final Population population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(config.plans().getInputFile());
-		population.printPlansCount();
 		System.out.println("  finding AOI links");
 
 		final Map<Id, Link> smallAOI = new HashMap<Id, Link>();

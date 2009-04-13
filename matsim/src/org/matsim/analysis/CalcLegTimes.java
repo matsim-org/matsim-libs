@@ -54,8 +54,8 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
 	private final TreeMap<Id, Integer> agentLegs = new TreeMap<Id, Integer>();
 	private final TreeMap<String, int[]> legStats = new TreeMap<String, int[]>();
-	private TreeMap<TransportMode, Double> sumTripDurationsByMode = new TreeMap<TransportMode, Double>();
-	private TreeMap<TransportMode, Integer> sumTripsByMode = new TreeMap<TransportMode, Integer>();
+	private final TreeMap<TransportMode, Double> sumTripDurationsByMode = new TreeMap<TransportMode, Double>();
+	private final TreeMap<TransportMode, Integer> sumTripsByMode = new TreeMap<TransportMode, Integer>();
 	private double sumTripDurations = 0;
 	private int sumTrips = 0;
 
@@ -72,7 +72,7 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 
 	public void handleEvent(final AgentArrivalEvent event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
-		Person agent = this.population.getPerson(event.getPersonId());
+		Person agent = this.population.getPersons().get(event.getPersonId());
 		if (depTime != null && agent != null) {
 			double travTime = event.getTime() - depTime;
 			int legNr = this.agentLegs.get(event.getPersonId());

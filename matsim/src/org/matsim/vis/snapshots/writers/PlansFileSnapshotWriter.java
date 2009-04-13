@@ -58,7 +58,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 	}
 
 	public void beginSnapshot(final double time) {
-		this.plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		this.plans = new PopulationImpl();
 		this.filename = this.filePrefix + Time.writeTime(time, "-") + "." + this.fileSuffix;
 		this.currenttime = time;
 	}

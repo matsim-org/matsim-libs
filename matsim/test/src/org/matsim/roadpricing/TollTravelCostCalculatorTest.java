@@ -20,14 +20,13 @@
 
 package org.matsim.roadpricing;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.PlansCalcRoute;
@@ -65,7 +64,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
 		commonRouterData.run(network);
 
-		Person person1 = population.getPerson(new IdImpl("1"));
+		Person person1 = population.getPersons().get(new IdImpl("1"));
 		Leg leg = ((Leg) (person1.getPlans().get(0).getPlanElements().get(1)));
 
 		// 1st case: without toll, agent chooses shortest path
@@ -114,7 +113,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
 
-		Person person1 = population.getPerson(new IdImpl("1"));
+		Person person1 = population.getPersons().get(new IdImpl("1"));
 		Leg leg = ((Leg) (person1.getPlans().get(0).getPlanElements().get(1)));
 
 		// 1st case: without toll, agent chooses shortest path
@@ -155,9 +154,10 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 	private void clearRoutes(final Population population) {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				for (LegIterator i = plan.getIteratorLeg(); i.hasNext(); ) {
-					BasicLeg leg = i.next();
-					leg.setRoute(null);
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof Leg) {
+						((Leg) pe).setRoute(null);
+					}
 				}
 			}
 		}

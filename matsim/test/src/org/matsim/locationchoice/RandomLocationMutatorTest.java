@@ -33,6 +33,6 @@ public class RandomLocationMutatorTest  extends MatsimTestCase {
 	public void testHandlePlan() {
 		this.initialize();
 		this.randomlocationmutator.handlePlan(
-				this.initializer.getControler().getPopulation().getPerson(new IdImpl("1")).getSelectedPlan());	
+				this.initializer.getControler().getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan());	
 	}	
 }

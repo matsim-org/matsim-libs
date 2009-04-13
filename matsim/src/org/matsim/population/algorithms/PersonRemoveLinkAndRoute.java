@@ -21,37 +21,27 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.api.population.PlanElement;
 
 public class PersonRemoveLinkAndRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
-	public PersonRemoveLinkAndRoute() {
-		super();
-	}
-
 	@Override
 	public void run(final Person person) {
-		int nofPlans = person.getPlans().size();
-		for (int planId = 0; planId < nofPlans; planId++) {
-			Plan plan = person.getPlans().get(planId);
+		for (Plan plan : person.getPlans()) {
 			run(plan);
 		}
 	}
 
 	public void run(final Plan plan) {
-		//		 loop over all <act>s, remove link-information
-		ActIterator actIter = plan.getIteratorAct();
-		while (actIter.hasNext()) {
-			((Activity)actIter.next()).setLink(null);
-		}
-
-		//		 loop over all <leg>s, remove route-information
-		LegIterator legIter = plan.getIteratorLeg();
-		while (legIter.hasNext()) {
-			legIter.next().setRoute(null);
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				((Activity) pe).setLink(null);
+			} else if (pe instanceof Leg) {
+				((Leg) pe).setRoute(null);
+			}
 		}
 	}
 }

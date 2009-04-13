@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
@@ -52,29 +53,22 @@ public class PlanomatPerformanceTest extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(PlanomatTest.class);
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		super.loadConfig(this.getInputDirectory() + "config.xml");
-
-	}
-
 	public void testPerformanceTest() {
+		Config config = super.loadConfig(this.getInputDirectory() + "config.xml");
 
 		NetworkLayer network = null;
 		Population population = null;
 
 		log.info("Reading network xml file...");
 		network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		log.info("Reading network xml file...done.");
 		Gbl.printMemoryUsage();
 
 		log.info("Reading plans xml file...");
-		population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		population.printPlansCount();
+		plansReader.readFile(config.plans().getInputFile());
 		log.info("Reading plans xml file...done.");
 		Gbl.printMemoryUsage();
 
@@ -92,11 +86,11 @@ public class PlanomatPerformanceTest extends MatsimTestCase {
 		Events events = new Events();
 		events.addHandler(tTravelEstimator);
 		events.addHandler(depDelayCalc);
-		new MatsimEventsReader(events).readFile(Gbl.getConfig().events().getInputFile());
+		new MatsimEventsReader(events).readFile(config.events().getInputFile());
 		log.info("Reading events...done.");
 
 		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, network);
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(Gbl.getConfig().charyparNagelScoring());
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
 
 		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
 		Gbl.printMemoryUsage();

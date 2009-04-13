@@ -74,7 +74,7 @@ public class PlansFilterByLegMode {
 		Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
 		while (pid_it.hasNext()) {
 			Id personId = pid_it.next();
-			Person person = plans.getPerson(personId);
+			Person person = plans.getPersons().get(personId);
 
 			for (int i=person.getPlans().size()-1; i>=0; i--) {
 				Plan plan = person.getPlans().get(i);

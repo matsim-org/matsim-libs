@@ -62,10 +62,20 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Creates a new population with streaming deactivated.
+	 * 
+	 * @see #PopulationImpl(boolean)
+	 */
 	public PopulationImpl() {
 		this(false);
 	}
 
+	/**
+	 * @param isStreaming if set to <code>true</code>, persons will not be really stored in
+	 * the population, but algorithms are run over the person when the person is added, and
+	 * the person is discarded again.
+	 */
 	public PopulationImpl(final boolean isStreaming) {
 		this.isStreaming = isStreaming;
 	}

@@ -30,9 +30,6 @@ import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scoring.EventsToScore;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -44,7 +41,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 	 * Tests that an AgentUtilityEvent is handled by calling the method addUtility() of a scoring function.
 	 */
 	public void testAddMoney() {
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		Person person = new PersonImpl(new IdImpl(1));
 		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
@@ -68,8 +65,8 @@ public class EventsToScoreTest extends MatsimTestCase {
 
 	private static class MockScoringFunctionFactory implements ScoringFunctionFactory {
 
-		public final MockScoringFunction sf = new MockScoringFunction();
-		public int counter = 0;
+		protected final MockScoringFunction sf = new MockScoringFunction();
+		protected int counter = 0;
 
 		public MockScoringFunctionFactory() {
 			// empty public constructor for private inner class
@@ -84,15 +81,15 @@ public class EventsToScoreTest extends MatsimTestCase {
 
 	private static class MockScoringFunction implements ScoringFunction {
 
-		public int cntMoney = 0;
-		public int cntStuck = 0;
-		public int cntEndAct = 0;
-		public int cntEndLeg = 0;
-		public int cntStartLeg = 0;
-		public int cntStartAct = 0;
-		public int cntFinish = 0;
-		public int cntGetScore = 0;
-		public int cntReset = 0;
+		protected int cntMoney = 0;
+		protected int cntStuck = 0;
+		protected int cntEndAct = 0;
+		protected int cntEndLeg = 0;
+		protected int cntStartLeg = 0;
+		protected int cntStartAct = 0;
+		protected int cntFinish = 0;
+		protected int cntGetScore = 0;
+		protected int cntReset = 0;
 
 		public MockScoringFunction() {
 			// empty public constructor for private inner class

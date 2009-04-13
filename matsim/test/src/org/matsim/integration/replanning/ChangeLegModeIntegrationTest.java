@@ -62,7 +62,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		Link link = network.createLink(new IdImpl(1), node1, node2, 1000, 10, 3600, 1);
 
 		// setup population with one person
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		Person person = new PersonImpl(new IdImpl(1));
 		population.addPerson(person);
 		Plan plan = person.createPlan(true);

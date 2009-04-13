@@ -48,8 +48,8 @@ public class PopulationAsciiFileReaderTest extends MatsimTestCase {
 		Population plans = p.readFile(f);
 		assertNotNull(plans);
 		assertEquals(2, plans.getPersons().size());
-		Person p1 = plans.getPerson(new IdImpl("1"));
-		Person p2 = plans.getPerson(new IdImpl("2"));
+		Person p1 = plans.getPersons().get(new IdImpl("1"));
+		Person p2 = plans.getPersons().get(new IdImpl("2"));
 		assertNotNull(p1);
 		assertNotNull(p2);
 		assertEquals(1, p1.getAge());

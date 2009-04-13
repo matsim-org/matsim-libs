@@ -99,7 +99,7 @@ public class TRBAnalysis implements AgentDepartureEventHandler, AgentArrivalEven
 		double depTime = this.agentDepartures.remove(event.getPersonId().toString()).doubleValue();
 		double travTime = event.getTime() - depTime;
 		int slot = getTimeSlot(depTime);
-		final Person person = this.population.getPerson(new IdImpl(event.getPersonId().toString()));
+		final Person person = this.population.getPersons().get(new IdImpl(event.getPersonId().toString()));
 		int modeSlot = getModeSlot(person);
 //		System.out.println(modeSlot + " -- " + slot);
 		this.sumTravelTimes[modeSlot][slot] += travTime;

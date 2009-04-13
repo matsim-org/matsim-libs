@@ -58,7 +58,7 @@ public class MyControler2 {
 	private static Population createPlansFromShp(final FeatureSource n) {
 		List<Coord> workPlaces = new ArrayList<Coord>() ;
 
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING) ;
+		Population population = new PopulationImpl() ;
 		int popCnt = 0 ;
 
 		FeatureIterator it = null; try {

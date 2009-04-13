@@ -24,8 +24,8 @@ import java.io.File;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -62,7 +62,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		new MatsimNetworkReader(network).parse(NETWORK_FILE);
 
 		// create one person with missing link in act
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		Person person = new PersonImpl(new IdImpl("1"));
 		population.addPerson(person);
 		Plan plan = person.createPlan(true);
@@ -89,10 +89,10 @@ public class InitRoutesTest extends MatsimTestCase {
 
 		// now perform some tests
 		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
-		Population population2 = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population2 = new PopulationImpl();
 		new MatsimPopulationReader(population2, network).parse(PLANS_FILE_TESTOUTPUT);
 		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
-		Person person2 = population2.getPerson(new IdImpl("1"));
+		Person person2 = population2.getPersons().get(new IdImpl("1"));
 		assertNotNull("person 1 missing", person2);
 		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
 		Plan plan2 = person2.getPlans().get(0);

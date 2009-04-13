@@ -71,7 +71,7 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 	public PopulationAsciiFileReader(final ZoneLayer zoneLayer) {
 		this.zoneLayer = zoneLayer;
 		this.tabFileParserConfig = new TabularFileParserConfig();
-		this.plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		this.plans = new PopulationImpl();
 	}
 
 	public void startRow(final String[] row) throws IllegalArgumentException {

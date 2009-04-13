@@ -103,7 +103,7 @@ public class Matsim4Urbansim {
 			oldPop=null ;
 		}
 
-		Population newPop = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population newPop = new PopulationImpl();
 		// read urbansim persons.  Generates hwh acts as side effect
 		readFromUrbansim.readPersons( oldPop, newPop, facilities, network, samplingRate ) ;
 		oldPop=null ;

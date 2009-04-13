@@ -183,7 +183,7 @@ public class Events2Snapshot {
 		this.events = new Events();
 
 		// create SnapshotGenerator
-		this.visualizer = new SnapshotGenerator(this.network, this.config.simulation().getSnapshotPeriod());
+		this.visualizer = new SnapshotGenerator(this.network, this.config.simulation().getSnapshotPeriod(), this.config.simulation());
 		this.events.addHandler(this.visualizer);
 	}
 

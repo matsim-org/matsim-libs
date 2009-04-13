@@ -38,8 +38,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -257,7 +257,7 @@ public class SelectedPlans2ESRIShape {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");

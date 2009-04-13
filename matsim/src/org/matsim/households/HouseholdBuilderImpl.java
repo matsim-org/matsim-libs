@@ -61,7 +61,7 @@ public class HouseholdBuilderImpl implements HouseholdBuilder {
 		HouseholdImpl hh = new HouseholdImpl(householdId);
 		Person p;
 		for (Id id : membersPersonIds){
-			p = this.population.getPerson(id);
+			p = this.population.getPersons().get(id);
 			if (p !=  null) {
 				hh.addMember(p);
 			}

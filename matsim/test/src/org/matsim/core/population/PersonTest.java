@@ -23,8 +23,6 @@ package org.matsim.core.population;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -192,7 +190,7 @@ public class PersonTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetRandomUnscoredPlan() {
-		PopulationImpl population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		PopulationImpl population = new PopulationImpl();
 		Person person = null;
 		Plan[] plans = new Plan[10];
 		// create a person with 4 unscored plans

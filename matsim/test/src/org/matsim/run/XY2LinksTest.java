@@ -60,7 +60,7 @@ public class XY2LinksTest extends MatsimTestCase {
 		new MatsimNetworkReader(network).parse(NETWORK_FILE);
 
 		// create one person with missing link in act
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		Person person = new PersonImpl(new IdImpl("1"));
 		population.addPerson(person);
 		Plan plan = person.createPlan(true);
@@ -85,10 +85,10 @@ public class XY2LinksTest extends MatsimTestCase {
 
 		// now perform some tests
 		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
-		Population population2 = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population2 = new PopulationImpl();
 		new MatsimPopulationReader(population2, network).parse(PLANS_FILE_TESTOUTPUT);
 		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
-		Person person2 = population2.getPerson(new IdImpl("1"));
+		Person person2 = population2.getPersons().get(new IdImpl("1"));
 		assertNotNull("person 1 missing", person2);
 		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
 		Plan plan2 = person2.getPlans().get(0);

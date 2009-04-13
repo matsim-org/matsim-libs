@@ -57,7 +57,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 
-		PopulationImpl population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		PopulationImpl population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(popFileName);
 		population.printPlansCount();

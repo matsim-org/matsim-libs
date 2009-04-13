@@ -26,8 +26,6 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
@@ -43,7 +41,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testChangeRequests() {
 
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		for (int i = 0; i < 1000; i++) {
 			population.addPerson(new PersonImpl(new IdImpl(i)));
 		}
@@ -122,7 +120,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testRemoveStrategy() {
 
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		for (int i = 0; i < 100; i++) {
 			population.addPerson(new PersonImpl(new IdImpl(i)));
 		}
@@ -178,7 +176,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testOptimisticBehavior() {
 
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		Person person = null;
 		Plan[] plans = new Plan[10];
 		// create a person with 4 unscored plans
@@ -233,9 +231,9 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	static private class StrategyCounter extends PlanStrategy {
 
-		int counter = 0;
+		private int counter = 0;
 
-		public StrategyCounter(final PlanSelector selector) {
+		protected StrategyCounter(final PlanSelector selector) {
 			super(selector);
 		}
 
@@ -249,7 +247,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 			return this.counter;
 		}
 
-		public void resetCounter() {
+		protected void resetCounter() {
 			this.counter = 0;
 		}
 	}

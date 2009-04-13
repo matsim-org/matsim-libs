@@ -27,14 +27,14 @@ import junit.framework.TestCase;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.Events;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
@@ -51,14 +51,14 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author mrieser
  */
-public class Fixture {
+/*package*/ class Fixture {
 
 	private Fixture() {
 		// static class
 	}
 
 	/** @return a simple network consisting of 5 equal links in a row. */
-	public static NetworkLayer createNetwork1() {
+	protected static NetworkLayer createNetwork1() {
 		/* This creates the following network:
 		 *
 		 * (1)-------(2)-------(3)-------(4)-------(5)-------(6)
@@ -84,7 +84,7 @@ public class Fixture {
 	}
 
 	/** @return a simple network with route alternatives in 2 places. */
-	public static NetworkLayer createNetwork2() {
+	protected static NetworkLayer createNetwork2() {
 		/* This creates the following network:
 		 *
 		 *            3 /----(3)----\ 4
@@ -139,8 +139,8 @@ public class Fixture {
 	 * @param network the network returned by {@link #createNetwork1()}
 	 * @return a population for network1
 	 **/
-	public static Population createPopulation1(final NetworkLayer network) {
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+	protected static Population createPopulation1(final NetworkLayer network) {
+		Population population = new PopulationImpl();
 
 		Link link0 = network.getLink(new IdImpl(0));
 		Link link1 = network.getLink(new IdImpl(1));
@@ -165,8 +165,8 @@ public class Fixture {
 	 * @param network the network returned by {@link #createNetwork2()}
 	 * @return a population for network2
 	 **/
-	public static Population createPopulation2(final NetworkLayer network) {
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+	protected static Population createPopulation2(final NetworkLayer network) {
+		Population population = new PopulationImpl();
 
 		population.addPerson(Fixture.createPerson2(1, "07:00", network.getLink("1"), network.getLink("7"), network.getLink("13")));
 
@@ -198,12 +198,12 @@ public class Fixture {
 		return person;
 	}
 
-	public static Population createReferencePopulation1() {
+	protected static Population createReferencePopulation1(final CharyparNagelScoringConfigGroup config) {
 		// run mobsim once without toll and get score for network1/population1
 		NetworkLayer network = createNetwork1();
 		Population referencePopulation = Fixture.createPopulation1(network);
 		Events events = new Events();
-		EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory(Gbl.getConfig().charyparNagelScoring()));
+		EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory(config));
 		events.addHandler(scoring);
 		QueueSimulation sim = new QueueSimulation(network, referencePopulation, events);
 		sim.run();
@@ -212,7 +212,7 @@ public class Fixture {
 		return referencePopulation;
 	}
 
-	public static void compareRoutes(final String expectedRoute, final NetworkRoute realRoute) {
+	protected static void compareRoutes(final String expectedRoute, final NetworkRoute realRoute) {
 		StringBuilder strBuilder = new StringBuilder();
 		for (Node node : realRoute.getNodes()) {
 			strBuilder.append(node.getId().toString());

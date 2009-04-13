@@ -89,7 +89,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 		if(handler == null) {
 			handler = new MyEventsHandler(agentId);
 			events.addHandler(handler);
-			Person person = plans.getPerson(new IdImpl(this.agentId));
+			Person person = plans.getPersons().get(new IdImpl(this.agentId));
 			if (person == null) return;
 
 			Plan plan = person.getSelectedPlan();

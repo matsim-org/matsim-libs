@@ -27,8 +27,8 @@ import java.util.TreeMap;
 import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -204,7 +204,7 @@ public class ExternalModule implements PlanStrategyModule {
 	}
 
 	private void reReadPlans() {
-		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population plans = new PopulationImpl();
 		PopulationReader plansReader = getPlansReader(plans);
 		plansReader.readFile(this.outFileRoot + this.moduleId + ExternalOutFileName);
 		new PersonCalcTimes().run(plans);

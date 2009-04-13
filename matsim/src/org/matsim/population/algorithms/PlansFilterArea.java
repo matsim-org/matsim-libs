@@ -59,7 +59,7 @@ public class PlansFilterArea {
 		Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
 		while (pid_it.hasNext()) {
 			Id personId = pid_it.next();
-			Person person = plans.getPerson(personId);
+			Person person = plans.getPersons().get(personId);
 
 			run(person);	// handle the person; in this step plans may get removed from a person
 			if (person.getPlans().isEmpty()) {

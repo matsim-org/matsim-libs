@@ -32,8 +32,6 @@ import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -49,12 +47,12 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 	public void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
 		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).parse("test/scenarios/equil/network.xml");
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(population, network);
 		reader.parse(getInputDirectory() + "plans2.xml");
 
 		assertEquals("population size.", 2, population.getPersons().size());
-		Person person1 = population.getPerson(new IdImpl("1"));
+		Person person1 = population.getPersons().get(new IdImpl("1"));
 		Plan plan1 = person1.getPlans().get(0);
 		Leg leg1a = (Leg) plan1.getPlanElements().get(1);
 		Route route1a = leg1a.getRoute();
@@ -69,7 +67,7 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		assertEquals("different startLink for third leg.", network.getLink(new IdImpl("20")), route1c.getStartLink());
 		assertEquals("different endLink for third leg.", network.getLink(new IdImpl("1")), route1c.getEndLink());
 
-		Person person2 = population.getPerson(new IdImpl("2"));
+		Person person2 = population.getPersons().get(new IdImpl("2"));
 		Plan plan2 = person2.getPlans().get(0);
 		Leg leg2a = (Leg) plan2.getPlanElements().get(1);
 		Route route2a = leg2a.getRoute();

@@ -33,6 +33,7 @@ import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentStuckEvent;
@@ -46,7 +47,6 @@ import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.DisplayNetStateWriter;
@@ -65,15 +65,17 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	private final HashMap<Id, EventAgent> eventAgents;
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 	private final double capCorrectionFactor;
+	private final double storageCapFactor;
 	private final String snapshotStyle;
 
-	public SnapshotGenerator(final Network network, final double snapshotPeriod) {
+	public SnapshotGenerator(final Network network, final double snapshotPeriod, final SimulationConfigGroup config) {
 		this.network = network;
 		this.eventLinks = new HashMap<Id, EventLink>((int)(network.getLinks().size()*1.1), 0.95f);
 		this.eventAgents = new HashMap<Id, EventAgent>(1000, 0.95f);
 		this.snapshotPeriod = snapshotPeriod;
-		this.capCorrectionFactor = Gbl.getConfig().simulation().getFlowCapFactor() / network.getCapacityPeriod();
-		this.snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
+		this.capCorrectionFactor = config.getFlowCapFactor() / network.getCapacityPeriod();
+		this.storageCapFactor = config.getStorageCapFactor();
+		this.snapshotStyle = config.getSnapshotStyle();
 		reset(-1);
 	}
 
@@ -118,7 +120,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	public void reset(final int iteration) {
 		this.eventLinks.clear();
 		for (Link link : this.network.getLinks().values()) {
-			this.eventLinks.put(link.getId(), new EventLink(link, this.capCorrectionFactor, this.network.getEffectiveCellSize()));
+			this.eventLinks.put(link.getId(), new EventLink(link, this.capCorrectionFactor, this.network.getEffectiveCellSize(), this.storageCapFactor));
 		}
 		this.eventAgents.clear();
 		this.lastSnapshotIndex = -1;
@@ -193,12 +195,13 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		private final double freespeedTravelTime;
 		protected final double spaceCap;
 		private final double timeCap;
+		private final double storageCapFactor;
 		private final double inverseTimeCap;
 
 		private final double ratioLengthToEuklideanDist; // ratio of link.length / euklideanDist
 		private final double effectiveCellSize;
 
-		protected EventLink(final Link link2, final double capCorrectionFactor, final double effectiveCellSize) {
+		protected EventLink(final Link link2, final double capCorrectionFactor, final double effectiveCellSize, final double storageCapFactor) {
 			this.link = link2;
 			this.drivingQueue = new ArrayList<EventAgent>();
 			this.parkingQueue = new ArrayList<EventAgent>();
@@ -208,9 +211,10 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			this.ratioLengthToEuklideanDist = this.link.getLength() / this.euklideanDist;
 			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed(Time.UNDEFINED_TIME);
 			this.timeCap = this.link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) * capCorrectionFactor;
+			this.storageCapFactor = storageCapFactor;
 			this.inverseTimeCap = 1.0 / this.timeCap;
 			this.effectiveCellSize = effectiveCellSize;
-			this.spaceCap = (this.link.getLength() * this.link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)) / this.effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
+			this.spaceCap = (this.link.getLength() * this.link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)) / this.effectiveCellSize * storageCapFactor;
 		}
 
 		protected void enter(final EventAgent agent) {
@@ -263,7 +267,6 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		 */
 		protected void getVehiclePositionsQueue(final Collection<PositionInfo> positions, final double time) {
 			double queueEnd = this.link.getLength(); // the length of the queue jammed vehicles build at the end of the link
-			double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 			double vehLen = Math.min(	// the length of a vehicle in visualization
 					this.euklideanDist / this.spaceCap, // all vehicles must have place on the link
 					this.effectiveCellSize / storageCapFactor); // a vehicle should not be larger than it's actual size

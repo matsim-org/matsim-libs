@@ -79,13 +79,12 @@ public class KtiSpeedTest {
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
-		final Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		final Population population = new PopulationImpl();
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		population.printPlansCount();
+		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading events, calculating travel times...");

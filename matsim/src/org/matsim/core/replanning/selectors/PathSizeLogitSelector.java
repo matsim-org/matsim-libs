@@ -26,10 +26,11 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.basic.v01.BasicPlanImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -86,7 +87,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 	}
 
 	//updates the path size logit weights
-	public void calcPSLWeights(final List<Plan> plans, final WeightsContainer wc) {
+	private void calcPSLWeights(final List<Plan> plans, final WeightsContainer wc) {
 
 		wc.maxScore = Double.NEGATIVE_INFINITY;
 
@@ -101,9 +102,9 @@ public class PathSizeLogitSelector implements PlanSelector {
 
 			double pathSize = 0;
 			double currentEndTime = 0.0;
-			BasicPlanImpl.LegIterator it = plan.getIteratorLeg();
-			while (it.hasNext()){
-					Leg leg = ((Leg)it.next());
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
 					currentEndTime = leg.getDepartureTime();
 					NetworkRoute r = (NetworkRoute) leg.getRoute();
 					pathSize += r.getDistance();
@@ -115,6 +116,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 						}
 						lit.add(currentEndTime);
 					}
+				}
 			}
 			planLength.put(plan.hashCode(), pathSize);
 		}
@@ -158,10 +160,10 @@ public class PathSizeLogitSelector implements PlanSelector {
 	}
 
 	private static class WeightsContainer {
-		public double[] weights;
-		public double sumWeights;
-		public double maxScore;
-		public WeightsContainer(final List<Plan> plans) {
+		protected double[] weights;
+		protected double sumWeights;
+		protected double maxScore;
+		protected WeightsContainer(final List<Plan> plans) {
 			this.weights = new double[plans.size()];
 		}
 	}

@@ -31,7 +31,7 @@ public class ManageSubchainsTest extends MatsimTestCase {
 	}
 	
 	public void testPrimarySecondaryActivityFound() {
-		Plan plan = this.initializer.getControler().getPopulation().getPerson(new IdImpl("1")).getSelectedPlan();
+		Plan plan = this.initializer.getControler().getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan();
 		Activity act = plan.getFirstActivity();
 		Leg leg = plan.getNextLeg(act);
 		this.manager.primaryActivityFound(act, leg);

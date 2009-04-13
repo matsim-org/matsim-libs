@@ -21,15 +21,18 @@
 package org.matsim.roadpricing;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.Events;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
@@ -48,13 +51,8 @@ public class CalcPaidTollTest extends MatsimTestCase {
 
 	static private final Logger log = Logger.getLogger(CalcPaidTollTest.class);
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		loadConfig(this.getClassInputDirectory() + "config.xml");
-	}
-
 	public void testDistanceToll() {
+		Config config = loadConfig(this.getClassInputDirectory() + "config.xml");
 		final String tollFile = this.getClassInputDirectory() + "/roadpricing1.xml";
 
 		Id id1 = new IdImpl("1");
@@ -63,32 +61,33 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Id id4 = new IdImpl("4");
 		Id id5 = new IdImpl("5");
 		
-		Population referencePopulation = Fixture.createReferencePopulation1();
-		Population population = runTollSimulation(tollFile, "distance");
+		Map<Id, Person> referencePopulation = Fixture.createReferencePopulation1(config.charyparNagelScoring()).getPersons();
+		Map<Id, Person> population = runTollSimulation(tollFile, "distance", config.charyparNagelScoring()).getPersons();
 
 		compareScores(
-				referencePopulation.getPerson(id1).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id1).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id1).getPlans().get(0).getScore().doubleValue(),
+				population.get(id1).getPlans().get(0).getScore().doubleValue(),
 				300 * 0.00020);
 		compareScores(
-				referencePopulation.getPerson(id2).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id2).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id2).getPlans().get(0).getScore().doubleValue(),
+				population.get(id2).getPlans().get(0).getScore().doubleValue(),
 				300 * 0.00010);
 		compareScores(
-				referencePopulation.getPerson(id3).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id3).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id3).getPlans().get(0).getScore().doubleValue(),
+				population.get(id3).getPlans().get(0).getScore().doubleValue(),
 				300 * 0.00020);
 		compareScores(
-				referencePopulation.getPerson(id4).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id4).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id4).getPlans().get(0).getScore().doubleValue(),
+				population.get(id4).getPlans().get(0).getScore().doubleValue(),
 				100 * 0.00020 + 200 * 0.00010);
 		compareScores(
-				referencePopulation.getPerson(id5).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id5).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id5).getPlans().get(0).getScore().doubleValue(),
+				population.get(id5).getPlans().get(0).getScore().doubleValue(),
 				200 * 0.00020); // agent departs on a tolled link which must NOT be paid.
 	}
 
 	public void testAreaToll() {
+		Config config = loadConfig(this.getClassInputDirectory() + "config.xml");
 		final String tollFile = this.getClassInputDirectory() + "/roadpricing2.xml";
 
 		Id id1 = new IdImpl("1");
@@ -100,44 +99,45 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Id id8 = new IdImpl("8");
 		Id id10 = new IdImpl("10");
 
-		Population referencePopulation = Fixture.createReferencePopulation1();
-		Population population = runTollSimulation(tollFile, "area");
+		Map<Id, Person> referencePopulation = Fixture.createReferencePopulation1(config.charyparNagelScoring()).getPersons();
+		Map<Id, Person> population = runTollSimulation(tollFile, "area", config.charyparNagelScoring()).getPersons();
 
 		compareScores(
-				referencePopulation.getPerson(id1).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id1).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id1).getPlans().get(0).getScore().doubleValue(),
+				population.get(id1).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id2).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id2).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id2).getPlans().get(0).getScore().doubleValue(),
+				population.get(id2).getPlans().get(0).getScore().doubleValue(),
 				0.00);
 		compareScores(
-				referencePopulation.getPerson(id3).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id3).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id3).getPlans().get(0).getScore().doubleValue(),
+				population.get(id3).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id4).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id4).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id4).getPlans().get(0).getScore().doubleValue(),
+				population.get(id4).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id5).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id5).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id5).getPlans().get(0).getScore().doubleValue(),
+				population.get(id5).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id7).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id7).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id7).getPlans().get(0).getScore().doubleValue(),
+				population.get(id7).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id8).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id8).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id8).getPlans().get(0).getScore().doubleValue(),
+				population.get(id8).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id10).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id10).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id10).getPlans().get(0).getScore().doubleValue(),
+				population.get(id10).getPlans().get(0).getScore().doubleValue(),
 				2.00); // drives out of the area, must still pay the toll
 	}
 
 	public void testCordonToll() {
+		Config config = loadConfig(this.getClassInputDirectory() + "config.xml");
 		final String tollFile = this.getClassInputDirectory() + "/roadpricing3.xml";
 
 		Id id1 = new IdImpl("1");
@@ -148,36 +148,36 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Id id7 = new IdImpl("7");
 		Id id8 = new IdImpl("8");
 
-		Population referencePopulation = Fixture.createReferencePopulation1();
-		Population population = runTollSimulation(tollFile, "cordon");
+		Map<Id, Person> referencePopulation = Fixture.createReferencePopulation1(config.charyparNagelScoring()).getPersons();
+		Map<Id, Person> population = runTollSimulation(tollFile, "cordon", config.charyparNagelScoring()).getPersons();
 
 		compareScores(
-				referencePopulation.getPerson(id1).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id1).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id1).getPlans().get(0).getScore().doubleValue(),
+				population.get(id1).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id2).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id2).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id2).getPlans().get(0).getScore().doubleValue(),
+				population.get(id2).getPlans().get(0).getScore().doubleValue(),
 				1.00);
 		compareScores(
-				referencePopulation.getPerson(id3).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id3).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id3).getPlans().get(0).getScore().doubleValue(),
+				population.get(id3).getPlans().get(0).getScore().doubleValue(),
 				2.00);
 		compareScores(
-				referencePopulation.getPerson(id4).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id4).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id4).getPlans().get(0).getScore().doubleValue(),
+				population.get(id4).getPlans().get(0).getScore().doubleValue(),
 				1.50);
 		compareScores(
-				referencePopulation.getPerson(id5).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id5).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id5).getPlans().get(0).getScore().doubleValue(),
+				population.get(id5).getPlans().get(0).getScore().doubleValue(),
 				1.00); // this agent only pays when entering in the second area, as it starts in the first where it should not be tolled.
 		compareScores(
-				referencePopulation.getPerson(id7).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id7).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id7).getPlans().get(0).getScore().doubleValue(),
+				population.get(id7).getPlans().get(0).getScore().doubleValue(),
 				0.00); // this agent only leaves the area and should thus never pay a toll
 		compareScores(
-				referencePopulation.getPerson(id8).getPlans().get(0).getScore().doubleValue(),
-				population.getPerson(id8).getPlans().get(0).getScore().doubleValue(),
+				referencePopulation.get(id8).getPlans().get(0).getScore().doubleValue(),
+				population.get(id8).getPlans().get(0).getScore().doubleValue(),
 				0.00); // this agent only travels within the area and should thus never pay a toll
 	}
 
@@ -188,7 +188,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		assertEquals(expectedToll, scoreWithoutToll - scoreWithToll, 1e-8);
 	}
 
-	private Population runTollSimulation(final String tollFile, final String tollType) {
+	private Population runTollSimulation(final String tollFile, final String tollType, final CharyparNagelScoringConfigGroup config) {
 		NetworkLayer network = Fixture.createNetwork1();
 
 		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(network);
@@ -205,15 +205,15 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		assertEquals(tollType, scheme.getType());
 
 		Population population = Fixture.createPopulation1(network);
-		runTollSimulation(network, population, scheme);
+		runTollSimulation(network, population, scheme, config);
 		return population;
 	}
 
-	private void runTollSimulation(final NetworkLayer network, final Population population, final RoadPricingScheme toll) {
+	private void runTollSimulation(final NetworkLayer network, final Population population, final RoadPricingScheme toll, final CharyparNagelScoringConfigGroup config) {
 		Events events = new Events();
 		CalcPaidToll paidToll = new CalcPaidToll(network, toll);
 		events.addHandler(paidToll);
-		EventsToScore scoring = new EventsToScore(population, new CharyparNagelScoringFunctionFactory(Gbl.getConfig().charyparNagelScoring()));
+		EventsToScore scoring = new EventsToScore(population, new CharyparNagelScoringFunctionFactory(config));
 		events.addHandler(scoring);
 
 		QueueSimulation sim = new QueueSimulation(network, population, events);

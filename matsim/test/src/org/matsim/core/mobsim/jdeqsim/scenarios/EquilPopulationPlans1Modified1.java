@@ -13,7 +13,7 @@ import org.matsim.core.mobsim.jdeqsim.util.testable.PopulationModifier;
 
 public class EquilPopulationPlans1Modified1 implements PopulationModifier{
 
-	Population population=null;
+	private Population population=null;
 	
 	public Population getPopulation(){
 		return population;
@@ -22,7 +22,7 @@ public class EquilPopulationPlans1Modified1 implements PopulationModifier{
 	public Population modifyPopulation(Population population) {
 		// modify population: a plan was needed, which contained some properties to be compared with C++
 		this.population=population;
-		Person p=population.getPerson(new IdImpl("1"));
+		Person p=population.getPersons().get(new IdImpl("1"));
 		Plan plan= p.getSelectedPlan();
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 		((Activity)actsLegs.get(0)).setEndTime(360);

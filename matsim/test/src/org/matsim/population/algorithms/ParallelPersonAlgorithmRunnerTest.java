@@ -44,7 +44,7 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 	 */
 	public void testNumberOfThreads() {
 		loadConfig(null);
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		PersonAlgorithmTester algo = new PersonAlgorithmTester();
 		PersonAlgoProviderTester tester = new PersonAlgoProviderTester(algo);
 		ParallelPersonAlgorithmRunner.run(population, 2, tester);
@@ -62,7 +62,7 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 	 */
 	public void testNofPersons() {
 		loadConfig(null);
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		for (int i = 0; i < 100; i++) {
 			Person person = new PersonImpl(new IdImpl(i));
 			population.addPerson(person);
@@ -78,7 +78,7 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 		// build the sum of the personId's
 		for (int i = 0, n = population.getPersons().size(); i < n; i++) {
 			sumRef += i;
-			sum += Integer.parseInt(population.getPerson(tester.personIds.get(i)).getId().toString());
+			sum += Integer.parseInt(population.getPersons().get(tester.personIds.get(i)).getId().toString());
 		}
 		assertEquals(sumRef, sum);
 	}
@@ -89,10 +89,10 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	private static class PersonAlgoProviderTester implements ParallelPersonAlgorithmRunner.PersonAlgorithmProvider {
-		public int counter = 0;
+		protected int counter = 0;
 		private final AbstractPersonAlgorithm algo;
 
-		public PersonAlgoProviderTester(final AbstractPersonAlgorithm algo) {
+		protected PersonAlgoProviderTester(final AbstractPersonAlgorithm algo) {
 			this.algo = algo;
 		}
 		public AbstractPersonAlgorithm getPersonAlgorithm() {
@@ -107,7 +107,7 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	private static class PersonAlgorithmTester extends AbstractPersonAlgorithm {
-		public final ArrayList<Id> personIds = new ArrayList<Id>(100);
+		protected final ArrayList<Id> personIds = new ArrayList<Id>(100);
 
 		public PersonAlgorithmTester() {
 			// make constructor public

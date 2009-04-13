@@ -34,8 +34,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -154,7 +154,7 @@ public class QueryAgentPlan implements OTFQuery {
 	}
 
 	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
-		Person person = plans.getPerson(new IdImpl(this.agentId));
+		Person person = plans.getPersons().get(new IdImpl(this.agentId));
 		if (person == null) return;
 
 		Plan plan = person.getSelectedPlan();

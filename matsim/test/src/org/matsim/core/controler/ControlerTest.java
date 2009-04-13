@@ -27,8 +27,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -37,7 +37,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -81,7 +80,7 @@ public class ControlerTest extends MatsimTestCase {
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
 		 * same time at 7am.  */
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		Person person1 = null;
 
 		person1 = new PersonImpl(new IdImpl(1));
@@ -162,7 +161,7 @@ public class ControlerTest extends MatsimTestCase {
 		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(100, 0));
 		network.createLink(new IdImpl(1), node1, node2, 100, 1, 3600, 1);
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 
 		final Controler controler = new Controler(config, network, population);
 		controler.setCreateGraphs(false);
@@ -205,7 +204,7 @@ public class ControlerTest extends MatsimTestCase {
 		Link link3 = network.createLink(new IdImpl(3), node3, node4,  100, 10, 7200, 1);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		Person person1 = null;
 		Leg leg1 = null;
 		Leg leg2 = null;
@@ -280,7 +279,7 @@ public class ControlerTest extends MatsimTestCase {
 		Link link3 = network.createLink(new IdImpl(3), node3, node4,  100, 10, 7200, 1);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		Person person1 = null;
 		Activity act1a = null;
 		Activity act1b = null;

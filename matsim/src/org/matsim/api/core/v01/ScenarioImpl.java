@@ -99,7 +99,7 @@ public class ScenarioImpl implements Scenario {
 		this.facilities = new FacilitiesImpl();
 		this.facilitiesFileName = null;
 		this.facilitiesLoaded = true;
-		this.population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		this.population = new PopulationImpl();
 		this.populationFileName = null;
 		this.populationLoaded = true;
 		this.config = new Config();
@@ -221,7 +221,7 @@ public class ScenarioImpl implements Scenario {
 
 	public Population getPopulation() throws RuntimeException {
 		if (!this.populationLoaded) {
-			this.population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+			this.population = new PopulationImpl();
 			// make sure that world, facilities and network are loaded as well
 			getWorld();
 			getNetwork();
