@@ -34,6 +34,7 @@ import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
@@ -41,7 +42,6 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -78,7 +78,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private final static String ROUTE = "route";
 
 	private final BasicPopulation plans;
-	private final NetworkLayer network;
+	private final Network network;
 	private final Facilities facilities;
 
 	private Person currperson = null;
@@ -100,7 +100,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 
 	private int warnPlanTypeCount = 0;
 
-	public PopulationReaderMatsimV4(final BasicPopulation pop, final NetworkLayer network) {
+	public PopulationReaderMatsimV4(final BasicPopulation pop, final Network network) {
 		this.plans = pop;
 		this.network = network;
 		this.facilities = (Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
@@ -330,7 +330,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		Link link = null;
 		Coord coord = null;
 		if (atts.getValue("link") != null) {
-			link = this.network.getLink(new IdImpl(atts.getValue("link")));
+			link = this.network.getLinks().get(new IdImpl(atts.getValue("link")));
 			this.curract = this.currplan.createActivity(atts.getValue("type"), link);
 			if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 				coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));

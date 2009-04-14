@@ -30,14 +30,14 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -62,7 +62,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	private final static String ROUTE = "route";
 
 	private final BasicPopulation plans;
-	private final NetworkLayer network;
+	private final Network network;
 
 	private Person currperson = null;
 
@@ -75,7 +75,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 
 	private Activity prevAct = null;
 
-	public PopulationReaderMatsimV1(final BasicPopulation plans, final NetworkLayer network) {
+	public PopulationReaderMatsimV1(final BasicPopulation plans, final Network network) {
 		this.plans = plans;
 		this.network = network;
 	}
@@ -188,7 +188,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 		Coord coord = null;
 		Activity act = null;
 		if (atts.getValue("link") != null) {
-			link = this.network.getLink(atts.getValue("link"));
+			link = this.network.getLinks().get(new IdImpl(atts.getValue("link")));
 			act = this.currplan.createActivity(atts.getValue("type"), link);
 			if (atts.getValue("x100") != null && atts.getValue("y100") != null) {
 				coord = new CoordImpl(atts.getValue("x100"), atts.getValue("y100"));
