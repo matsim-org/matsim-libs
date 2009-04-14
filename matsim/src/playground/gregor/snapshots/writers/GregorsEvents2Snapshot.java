@@ -198,7 +198,7 @@ public class GregorsEvents2Snapshot {
 	}
 
 	private Collection<Feature> getFeatures() {
-		final String file = "../../inputs/padang/network_v20080618/d_ls.shp";
+		final String file = "../../../workspace/vsp-cvs/studies/padang/gis/network_v20080618/d_ls.shp";
 		FeatureSource fts = null;
 		try {
 			fts = ShapeFileReader.readDataFile(file);
