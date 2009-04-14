@@ -149,16 +149,18 @@ public class ScenarioImpl implements Scenario {
 
 	public World getWorld() throws RuntimeException {
 		if (!this.worldLoaded) {
+			this.world = Gbl.getWorld();
 			if (this.worldFileName != null) {
 				log.info("loading world from " + this.worldFileName);
-				this.world = Gbl.getWorld();
-				try {
-					new MatsimWorldReader(this.world).parse(this.worldFileName);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			} else {
-				this.world = Gbl.getWorld();
+					try {
+						new MatsimWorldReader(this.world).parse(this.worldFileName);
+					} catch (SAXException e) {
+						throw new RuntimeException(e);
+					} catch (ParserConfigurationException e) {
+						throw new RuntimeException(e);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
 			}
 			this.worldLoaded = true;
 		}
