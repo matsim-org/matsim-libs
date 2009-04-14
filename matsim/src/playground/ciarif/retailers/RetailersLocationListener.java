@@ -135,7 +135,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
 		//System.out.println("Veryfing if the retailers need to be relocated " + controler.getIteration()%5);
-		if (controler.getIteration()%1==0) {
+		if (controler.getIteration()%5==0 & controler.getLastIteration()-controler.getIteration()>=50) {
 			Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
 			
 			// works, but it is not nicely programmed. shouldn't be a global container, should be

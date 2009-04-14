@@ -35,7 +35,11 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 		for (Facility f : facilities.values()) {
 			//Object[] links = controler.getNetwork().getLinks().values().toArray();
 			double rd1 = MatsimRandom.getRandom().nextDouble();
-			if (rd1 < 0.2) {
+			if (rd1 < 0.1 & f.getActivityOption("shop").getCapacity()>50 ) { 
+				//First it is ensured that only a given percentage of facilities can be moved at one step,
+				// then the specific shop is moved only if it exceeds a given capacity. This allows for moving 
+				// only "interesting" facilities (large enough to notice differences in the customer data), but 
+				// avoid to move to 
 				int rd = MatsimRandom.getRandom().nextInt(this.links.length);
 				BasicLinkImpl link = (BasicLinkImpl)this.links[rd];
 				controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
