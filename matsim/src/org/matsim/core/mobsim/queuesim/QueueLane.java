@@ -19,8 +19,10 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.queuesim;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -62,7 +64,7 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  * @author mrieser
  *
  */
-public class QueueLane implements Comparable<QueueLane> {
+public class QueueLane {
 
 	private static final Logger log = Logger.getLogger(QueueLane.class);
 
@@ -1017,27 +1019,24 @@ public class QueueLane implements Comparable<QueueLane> {
 		return this.destinationLinks;
 	}
 
-
 	protected int getVisualizerLane() {
 		return this.visualizerLane;
 	}
-
 
 	protected void setVisualizerLane(final int visualizerLane) {
 		this.visualizerLane = visualizerLane;
 	}
 
-	// --- Implementation of Comparable interface ---
-	// Sorts SubLinks of a QueueLink
-
-	public int compareTo(final QueueLane queueLane) {
-		if (this.meterFromLinkEnd < queueLane.getMeterFromLinkEnd()) {
-			return -1;
-		} else if (this.meterFromLinkEnd > queueLane.getMeterFromLinkEnd()) {
-			return 1;
-		} else {
-			return 0;
+	public static class FromLinkEndComparator implements Comparator<QueueLane>, Serializable {
+		private static final long serialVersionUID = 1L;
+		public int compare(QueueLane o1, QueueLane o2) {
+			if (o1.getMeterFromLinkEnd() < o2.getMeterFromLinkEnd()) {
+				return -1;
+			} else if (o1.getMeterFromLinkEnd() > o2.getMeterFromLinkEnd()) {
+				return 1;
+			} else {
+				return 0;
+			}
 		}
 	}
-
 }

@@ -100,7 +100,9 @@ import org.matsim.signalsystems.CalculateAngle;
 public class QueueLink {
 
 	final private static Logger log = Logger.getLogger(QueueLink.class);
-		
+
+	final private static QueueLane.FromLinkEndComparator fromLinkEndComparator = new QueueLane.FromLinkEndComparator();
+	
 	/**
 	 * The Link instance containing the data
 	 */
@@ -257,10 +259,10 @@ public class QueueLink {
 
 	private void addUTurn() {
 		for (Link outLink : this.getLink().getToNode().getOutLinks().values()) {
-			if((outLink.getToNode().equals(this.getLink().getFromNode()))){
+			if ((outLink.getToNode().equals(this.getLink().getFromNode()))) {
 				QueueLane tempPseudoLink = null;
 				for (QueueLane pseudoLink : this.queueLanes) {
-					if( (tempPseudoLink == null) ||
+					if ((tempPseudoLink == null) ||
 							((pseudoLink.getVisualizerLane() == 1) && (pseudoLink.getMeterFromLinkEnd() == 0))) {
 						tempPseudoLink = pseudoLink;
 						tempPseudoLink.addDestinationLink(outLink);
@@ -271,31 +273,26 @@ public class QueueLink {
 		}
 	}
 
-	private void resortQueueLanes(){
+	private void resortQueueLanes() {
 		this.toNodeQueueLanes = new ArrayList<QueueLane>();
 		for (QueueLane pseudoLink : this.queueLanes) {
-			if (pseudoLink.getMeterFromLinkEnd() == 0.0){
+			if (pseudoLink.getMeterFromLinkEnd() == 0.0) {
 				this.toNodeQueueLanes.add(pseudoLink);
 			}
 		}
-		Collections.sort(this.queueLanes);
+		Collections.sort(this.queueLanes, QueueLink.fromLinkEndComparator);
 	}
-	
-	
 
-	// ////////////////////////////////////////////////////////////////////
-	// Is called after link has been read completely
-	// ////////////////////////////////////////////////////////////////////
+	/** Is called after link has been read completely */
 	public void finishInit() {
-		for (QueueLane lane : this.queueLanes){
+		for (QueueLane lane : this.queueLanes) {
 			lane.finishInit();
 		}
 		this.active = false;
 	}
 
-
 	public void activateLink() {
-		if (!this.active){
+		if (!this.active) {
 			this.getQueueNetwork().addActiveLink(this);
 			this.active = true;
 		}
