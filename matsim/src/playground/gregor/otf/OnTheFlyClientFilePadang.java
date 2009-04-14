@@ -2,6 +2,8 @@ package playground.gregor.otf;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 
 import javax.swing.JFrame;
@@ -33,12 +35,15 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	
 	public static final String CVSROOT = "../../../workspace/vsp-cvs";
 	private static final String BG_IMG_ROOT = CVSROOT + "/studies/padang/imagery/sliced/";
-	final String BUILDINGS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_buildings.shp";
-	final String LINKS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_links.shp";
-	final String NODES_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_nodes.shp";
-	final private static float [] buildingsColor = new float [] {.1f,.1f,.1f,.99f};
-	final private static float [] linksColor = new float [] {.1f,.1f,.1f,7.f};
-	final private static float [] nodesColor = new float [] {.0f,.0f,.0f,7.f};
+//	final String BUILDINGS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_buildings.shp";
+//	final String LINKS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_links.shp";
+//	final String NODES_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_nodes.shp";
+	final String BUILDINGS_FILE =  "../../inputs/gis/shelters.shp";
+	final String LINKS_FILE = "../../inputs/gis/links.shp";
+	final String NODES_FILE = "../../inputs/gis/nodes.shp";
+	final private static float [] buildingsColor = new float [] {.0f,1.f,.0f,.8f};
+	final private static float [] linksColor = new float [] {.5f,.5f,.5f,.7f};
+	final private static float [] nodesColor = new float [] {.4f,.4f,.4f,.7f};
 	
 	public OnTheFlyClientFilePadang(final String filename2, final OTFConnectionManager connect, final boolean split) {
 		super(filename2, connect, split);
@@ -83,7 +88,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 			for (int yc = 0; yc < num_y; yc++) {
 				final String slice =  BG_IMG_ROOT + dir + "/slice_"+ xc + "_" + yc + ".png";
 				System.out.println(slice);
-				OGLSimpleBackgroundLayer.addPersistentItem(new SimpleBackgroundDrawer(slice, new Rectangle2D.Float(x,y,-size,-size)));				
+				OGLSimpleBackgroundLayer.addPersistentItem(new SimpleBackgroundDrawer(slice, new Rectangle2D.Float(x,y,-size,-size)));
+				
 				y-=size;
 				
 			}
@@ -93,6 +99,39 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 		
 	}
+	
+	private void loadTilesFromServer() {
+		InetAddress addr = null;
+		try {
+			addr = InetAddress.getByName("localhost");
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		BGLoader bgl = new BGLoader(addr,8080);
+		bgl.start();
+		double centerX = 651190.2;
+		double centerY = 9893337.5;
+		double z = 0.01;
+		double pz = z / 0.3;
+		
+		double sizeX = 250;
+		double sizeY = 250;
+		
+		int pxSize = (int) Math.round(sizeX * z/0.3);
+		int pySize = (int) Math.round(sizeY * z/0.3);
+		double currentX = 648931;
+		while (currentX < 654026){
+			double currentY = 9893264;
+			while (currentY < 9900963){
+				OGLSimpleBackgroundLayer.addPersistentItem(new BackgroundFromStreamDrawer(bgl,currentX,currentY,sizeX,sizeY,pxSize,pySize));
+				currentY += sizeY;
+			}
+			currentX += sizeX;
+		}
+//		OGLSimpleBackgroundLayer.addPersistentItem(new BackgroundFromStreamDrawer(addr,8080,centerX+400/pz,centerY+400/pz,z,400,400));
+		
+	}
+	
 	private void loadFeatureLayer(final String shapeFile, final float [] color) throws Exception {
 		final FeatureSource fs = ShapeFileReader.readDataFile(shapeFile);
 		OGLSimpleBackgroundLayer.addPersistentItem(new SimpleBackgroundFeatureDrawer(fs,color));
@@ -101,6 +140,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 	}
 
+	
+	
 	
 	
 	@Override
@@ -112,17 +153,21 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		OTFGLOverlay overlay = new OTFGLOverlay();
 //		drawer2.addOverlay(overlay)
 //		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
-		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
+//		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
+		loadTilesFromServer();
 		try {
-//			loadFeatureLayer(this.BUILDINGS_FILE,buildingsColor);
+			loadFeatureLayer(this.BUILDINGS_FILE,buildingsColor);
 			loadFeatureLayer(this.NODES_FILE,linksColor);
 			loadFeatureLayer(this.LINKS_FILE,nodesColor);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
+		
 		return drawer2;
 	}
 	
+
+
 
 	public static void main(final String[] args) {
 //		String filename = "../MatsimJ/output/OTFQuadfileSCHWEIZ2.3.mvi.gz";
@@ -134,7 +179,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
 //		final String filename =  CVSROOT + "/runs/run314/output/ITERS/it.100/100.movie.mvi";
 //		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
-		final String filename =  "../../outputs/output/ITERS/it.0/0.movie.mvi";
+		final String filename =  "../../outputs/output/ITERS/it.200/200.movie.mvi";
 		
 //		String filename = "./jam/jam.mvi";
 		
