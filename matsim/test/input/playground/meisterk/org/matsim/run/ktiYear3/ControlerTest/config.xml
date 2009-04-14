@@ -1,0 +1,105 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+	[
+		<!ENTITY STUDYBASE    "/home/meisterk/sandbox00/ivt/studies/switzerland">
+	]
+>
+<config>
+
+	<!-- ====================================================================== -->
+
+	<module name="controler">
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="10" />
+		<param name="routingAlgorithmType" value="AStarLandmarks" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+	<module name="counts" >
+		<param name="countsScaleFactor" value="10" />
+		<param name="inputCountsFile" value="&STUDYBASE;/counts/ivtch/countsIVTCH.xml" />
+		<param name="outputformat" value="all" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+	<module name="facilities">
+		<!-- specified in code -->
+<!--		<param name="inputFacilitiesFile" value="&STUDYBASE;/facilities/facilities.xml.gz" />-->
+	</module>
+
+	<!-- ====================================================================== -->
+
+	<module name="global">
+		<param name="coordinateSystem" value="CH1903_LV03" />
+		<param name="numberOfThreads" value="2" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+	<module name="JDEQSim">
+		<!-- see http://matsim.org/docs/jdeqsim -->
+<!--		<param name="flowCapacityFactor" value="0.3" />-->
+<!--		<param name="storageCapacityFactor" value="0.3" />-->
+		<param name="flowCapacityFactor" value="0.13" />
+		<param name="storageCapacityFactor" value="0.3" />
+		<param name="squeezeTime" value="10" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+	<module name="locationchoice">
+		<!-- see http://matsim.org/node/218 -->
+		<!-- according to restraintFcn* parameter values from Horni et al. (2008) -->
+		<param name="restraintFcnFactor" value="0.1316872" />
+		<param name="restraintFcnExp" value="5.0" />
+		<param name="scaleFactor" value="10" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+	<module name="network">
+		<param name="inputNetworkFile" value="&STUDYBASE;/networks/ivtch/network.xml" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+	<module name="planCalcScore">
+		<!-- according to Charypar and Nagel (2005) -->
+		<param name="earlyDeparture" value="-6.0" />
+		<param name="performing" value="6.0" />
+		<param name="traveling" value="0.0" />
+		<param name="travelingPt" value="0.0" />
+		<param name="travelingWalk" value="0.0" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+	<module name="parallelEventHandling">
+<!--		 see http://matsim.org/node/238 -->
+		<param name="numberOfThreads" value="1" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+	<module name="plans">
+		<!-- specified in code -->
+<!--		<param name="inputPlansFile" value="&STUDYBASE;/plans/ivtch/census2000v2_dilZh30km_10pct/plans.xml.gz" />-->
+	</module>
+
+	<!-- ====================================================================== -->
+
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="4" />
+		<param name="ModuleProbability_1" value="0.1" />
+		<param name="Module_1" value="ReRoute" />
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="TimeAllocationMutator" />
+		<param name="ModuleProbability_3" value="0.8" />
+		<param name="Module_3" value="ChangeExpBeta" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+</config>
