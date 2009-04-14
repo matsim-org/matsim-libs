@@ -24,8 +24,12 @@ import org.matsim.core.config.Module;
 
 public class EvacuationConfigGroup  extends Module{
 
+	
+	
 	private static final long serialVersionUID = 1L;
 
+	public enum Scenario {day,night}
+	
 	public static final String GROUP_NAME = "evacuation";
 
 	/**
@@ -42,12 +46,33 @@ public class EvacuationConfigGroup  extends Module{
 	 * name of the flooding data file parameter in config
 	 */
 	private static final String FLOODING_DATA_FILE = "floodingDataFile";
+
+	/**
+	 * name of the buildings shape file in config
+	 */
+	private static final String BUILDINGS_FILE = "buildingsFile";
+	
+	/**
+	 * type of the scenario 
+	 */
+	private static final String SCENARIO = "scenario";
 	
 	/**
 	 * file name of the flooding data file
 	 */
 	private String floodingDataFile;
+
+	/**
+	 * file name of the buildings shape file
+	 */
+	private String buildingsFile;
 	
+	/**
+	 * the scenario type
+	 */
+	private Scenario scenario;
+	
+
 	public EvacuationConfigGroup(){
 		super(GROUP_NAME);
 	}
@@ -56,8 +81,10 @@ public class EvacuationConfigGroup  extends Module{
 	public String getValue(final String key) {
 		if (EVACUATION_AREA_FILE.equals(key)) {
 			return getEvacuationAreaFile();
-		} else if (FLOODING_DATA_FILE.equals(key)) {
+		}else if (FLOODING_DATA_FILE.equals(key)) {
 			return getFloodingDataFile();
+		}else if (BUILDINGS_FILE.equals(key)) {
+			return getBuildingsFile();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -68,7 +95,11 @@ public class EvacuationConfigGroup  extends Module{
 			setEvacuationAreaFile(value.replace('\\', '/'));
 		}else if(FLOODING_DATA_FILE.equals(key)){
 			setFloodingDataFile(value.replace('\\', '/'));
-		} else {
+		}else if(BUILDINGS_FILE.equals(key)){
+			setBuildingsFile(value.replace('\\', '/'));
+		}else if(SCENARIO.equals(key)){
+			setScenario(value);
+		}else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -98,7 +129,7 @@ public class EvacuationConfigGroup  extends Module{
 	public String getFloodingDataFile() {
 		return this.floodingDataFile;
 	}
-	
+
 	/**
 	 * 
 	 * @param floodingDataFile
@@ -106,6 +137,46 @@ public class EvacuationConfigGroup  extends Module{
 	 */
 	public void setFloodingDataFile(String floodingDataFile) {
 		this.floodingDataFile = floodingDataFile;
+	}
+
+	/**
+	 * 
+	 * @return the shapes of the buildings
+	 */
+	public String getBuildingsFile() {
+		return this.buildingsFile;
+	}
+
+	/**
+	 * 
+	 * @param buildingsFile
+	 * the shapes of the buildings
+	 */
+	public void setBuildingsFile(String buildingsFile) {
+		this.buildingsFile = buildingsFile;
+	}
+	
+	/**
+	 * 
+	 * @return the scenario type (i.e. day or night)
+	 */
+	public Scenario getScanrio() {
+		return this.scenario;
+	}
+	
+	/**
+	 * 
+	 * @param scenario
+	 * the type of the scenario (i.e. day or night)
+	 */
+	public void setScenario(String scenario) {
+		if (scenario.equals("day")) {
+			this.scenario = Scenario.day;
+		} else if (scenario.equals("night")) {
+			this.scenario = Scenario.night;
+		} else {
+			throw new RuntimeException("unkown scenario type:" + scenario);
+		}
 	}
 
 }
