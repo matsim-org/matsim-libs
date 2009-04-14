@@ -102,8 +102,8 @@ public class OutFlowRate implements AgentArrivalEventHandler {
 	
 	public static void main(final String [] args) {
 		
-		String baseDir = "../../outputs/output/ITERS";
-		String baseOutput = "../../outputs/output/analysis";
+		String baseDir = "../../outputs/tmp/ITERS";
+		String baseOutput = "../../outputs/tmp/analysis";
 		ArrayList<Integer> its = new ArrayList<Integer>();
 //		its.add(0); its.add(1); its.add(10); its.add(50); its.add(100); its.add(200);
 		its.add(0);

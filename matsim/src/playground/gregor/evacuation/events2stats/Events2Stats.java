@@ -84,7 +84,7 @@ public class Events2Stats implements AgentDepartureEventHandler, AgentArrivalEve
 	}
 	
 	public static void main(final String [] args) {
-		String root = "../outputs/output/ITERS";
+		String root = "../../outputs/output/ITERS";
 		int start = 0;
 		int stop = 200;
 			

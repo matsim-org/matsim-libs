@@ -56,7 +56,7 @@ public class TransimsSnapshotFilePostProcessor {
 //	private final Plans plans;
 
 	private final List<PostProcessorI> processors;
-	private FloodlineGenerator floodlineGenerator = null;
+	private final FloodlineGenerator floodlineGenerator = null;
 
 
 	public TransimsSnapshotFilePostProcessor(final String eventsfile, final String tVehFile){
@@ -74,7 +74,7 @@ public class TransimsSnapshotFilePostProcessor {
 		
 		String outfile = "../../outputs/output/colorizedT.veh.txt"; 
 		this.writer = new TransimsSnapshotFileWriter(outfile);
-		this.floodlineGenerator = new FloodlineGenerator("../../inputs/networks/padang_flooding.txt.gz");
+//		this.floodlineGenerator = new FloodlineGenerator("../../inputs/networks/padang_flooding.txt.gz");
 		this.processors = new ArrayList<PostProcessorI>();
 		addProcessor(tdc);
 		addProcessor(ddc);
@@ -92,7 +92,7 @@ public class TransimsSnapshotFilePostProcessor {
 		while (line != null){
 
 			double time = Double.parseDouble(line[1]);
-			if (time > 5*3600) {
+			if (time > 14*3600) {
 				break;
 			}
 			
