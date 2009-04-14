@@ -60,33 +60,6 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 		close();
 	}
 
-	@Deprecated // set to deprecated 20090301/marcel
-	public static void main(String[] args) {
-		throw new RuntimeException("Deprecated. Please use org.matsim.run.OTFVis to convert event-files to visualizer files.");
-
-//		// FIXME_ hard-coded file names
-//		if ( args.length==0 )
-//			args = new String[] {"../../tmp/studies/berlin-wip/config_ds.xml"};
-//
-//		Gbl.createConfig(args);
-//		Gbl.startMeasurement();
-//		World world = Gbl.createWorld();
-//
-//		String netFileName = Gbl.getConfig().getParam("network","inputNetworkFile");
-//		NetworkLayer net = new NetworkLayer();
-//		new MatsimNetworkReader(net).readFile(netFileName);
-//		world.setNetworkLayer(net);
-//		world.complete();
-//		QueueNetwork qnet = new QueueNetwork(net);
-//
-//		String eventFile = null;
-//		eventFile = "output/current/ITERS/it.0/0.events.txt.gz";
-//		eventFile = "../../tmp/studies/berlin-wip/run125/200.events.txt.gz";
-//
-//		OTFEvent2MVI test  = new OTFEvent2MVI(qnet, eventFile, "output/ds_fromEvent.mvi",600);
-//		test.convert();
-	}
-
 	@Override
 	public void addAgent(PositionInfo position) {
 		//drop all parking vehicles
