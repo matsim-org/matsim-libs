@@ -20,6 +20,7 @@
 
 package org.matsim.core.mobsim.queuesim;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -37,8 +38,9 @@ public class QueueNode {
 
 	private static final Logger log = Logger.getLogger(QueueNode.class);
 
-	private final QueueLink[] inLinksArrayCache;
+	private static final QueueLinkIdComparator qlinkIdComparator = new QueueLinkIdComparator();
 
+	private final QueueLink[] inLinksArrayCache;
 	private final QueueLink[] tempLinks;
 
 	private boolean active = false;
@@ -75,11 +77,7 @@ public class QueueNode {
 		/* As the order of nodes has an influence on the simulation results,
 		 * the nodes are sorted to avoid indeterministic simulations. dg[april08]
 		 */
-		Arrays.sort(this.inLinksArrayCache, new Comparator<QueueLink>() {
-			public int compare(final QueueLink o1, final QueueLink o2) {
-				return o1.getLink().getId().compareTo(o2.getLink().getId());
-			}
-		});
+		Arrays.sort(this.inLinksArrayCache, QueueNode.qlinkIdComparator);
 	}
 
 	public Node getNode() {
@@ -89,6 +87,13 @@ public class QueueNode {
 	// ////////////////////////////////////////////////////////////////////
 	// Queue related movement code
 	// ////////////////////////////////////////////////////////////////////
+	/**
+	 * @param veh
+	 * @param currentLane
+	 * @param now
+	 * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code> 
+	 * otherwise (e.g. in case where the next link is jammed)
+	 */
 	protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLane currentLane, final double now) {
 		Link nextLink = veh.getDriver().chooseNextLink();
 		Link currentLink = veh.getCurrentLink();
@@ -119,7 +124,7 @@ public class QueueNode {
 				 * of if there is space on the next link or not.. optionally we let them
 				 * die here, we have a config setting for that!
 				 */
-				if (removeStuckVehicle()) {
+				if (Gbl.getConfig().simulation().removeStuckVehicles()) {
 					currentLane.popFirstFromBuffer();
 					Simulation.decLiving();
 					Simulation.incLost();
@@ -146,7 +151,7 @@ public class QueueNode {
 		return true;
 	}
 
-	final public void activateNode() {
+	protected final void activateNode() {
 		this.active = true;
 	}
 
@@ -181,12 +186,11 @@ public class QueueNode {
 				}
 			}
 		}
-		else { // Node is not signal controled -> inLink selection randomized based on capacity
+		else { // Node is not signal controlled -> inLink selection randomized based on capacity
 			int inLinksCounter = 0;
 			double inLinksCapSum = 0.0;
 			// Check all incoming links for buffered agents
 			for (QueueLink link : this.inLinksArrayCache) {
-//				link.setLanesToGreen(true);
 				if (!link.bufferIsEmpty()) {
 					this.tempLinks[inLinksCounter] = link;
 					inLinksCounter++;
@@ -210,7 +214,6 @@ public class QueueNode {
 						continue;
 					selCap += link.getLink().getCapacity(now);
 					if (selCap >= rndNum) {
-//					this.auxLinks[auxCounter] = link;
 						auxCounter++;
 						inLinksCapSum -= link.getLink().getCapacity(now);
 						this.tempLinks[i] = null;
@@ -233,7 +236,6 @@ public class QueueNode {
 			}
 		}	
 	}
-	
 
 	public void setSignalized(final boolean b) {
 		this.signalized = b;
@@ -242,18 +244,12 @@ public class QueueNode {
 	public boolean isSignalized(){
 		return this.signalized;
 	}
-
-	static boolean removeVehInitialized = false;
-
-	static boolean removeVehicles = true;
-
-	static boolean removeStuckVehicle() {
-		if (removeVehInitialized) {
-			return removeVehicles;
+	
+	protected static class QueueLinkIdComparator implements Comparator<QueueLink>, Serializable {
+		private static final long serialVersionUID = 1L;
+		public int compare(final QueueLink o1, final QueueLink o2) {
+			return o1.getLink().getId().compareTo(o2.getLink().getId());
 		}
-		removeVehicles = Gbl.getConfig().simulation().removeStuckVehicles();
-		removeVehInitialized = true;
-		return removeVehicles;
 	}
 
 }
