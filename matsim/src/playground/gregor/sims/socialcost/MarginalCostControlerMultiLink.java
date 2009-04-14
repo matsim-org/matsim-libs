@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialCostCalculator.java
+ * MarginalCostControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,15 +20,39 @@
 
 package playground.gregor.sims.socialcost;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
+import org.matsim.core.trafficmonitoring.TravelTimeAggregatorFactory;
+import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
+
+public class MarginalCostControlerMultiLink extends Controler{
 
 
-public interface SocialCostCalculator extends ControlerListener, EventHandler, QueueSimulationListener {
 
+	public MarginalCostControlerMultiLink(final String[] args) {
+		super(args);
+	}
+
+	@Override
+	protected void setUp() {
+		super.setUp();
 		
-	public double getSocialCost(final Link link, final double time);
+		
+		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
+		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
+		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
+		SocialCostCalculator sc = new SocialCostCalculatorMultiLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), this.travelTimeCalculator, this.population);
+		
+		this.events.addHandler(sc);
+		this.getQueueSimulationListener().add(sc);
+		this.travelCostCalculator = new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc);
+		this.strategyManager = loadStrategyManager();
+		this.addControlerListener(sc);
+	}
 
+	public static void main(final String[] args) {
+		final Controler controler = new MarginalCostControlerMultiLink(args);
+		controler.run();
+		System.exit(0);
+	}
 }
