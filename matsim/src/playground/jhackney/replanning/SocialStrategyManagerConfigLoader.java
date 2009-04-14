@@ -106,20 +106,7 @@ public class SocialStrategyManagerConfigLoader {
 				externalCounter++;
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				String exePath = config.getParam("strategy", "ModuleExePath_" + i);
-				strategy.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter));
-//			} else if (classname.equals("Planomat")) {
-//				strategy = new PlanStrategy(new RandomPlanSelector());
-//				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
-//				strategy.addStrategyModule(planomatStrategyModule);
-//				setDecayingModuleProbability(manager, strategy, 100, rate); // FIXME [KM] Why "100" and not controler.firstIteration as in "PlanomatReRoute"
-//			} else if (classname.equals("PlanomatReRoute")) {
-//				strategy = new PlanStrategy(new RandomPlanSelector());
-//				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
-//				strategy.addStrategyModule(planomatStrategyModule);
-//				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
-//				preProcessRoutingData.run(network);
-//				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
-//				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);
+				strategy.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter, network));
 			} else if (classname.equals("BestScore")) {
 				strategy = new PlanStrategy(new BestPlanSelector());
 			} else if (classname.equals("SelectExpBeta")) {
@@ -192,7 +179,6 @@ public class SocialStrategyManagerConfigLoader {
 //
 //			manager.addChangeRequest(iter, strategy, pReplan);
 
-//			new code: TODO [KM] please check that this does the same as the old code above. /marcel,18jan2008
 			if (iter > iterationStartDecay) {
 				double pReplan = Math.min(pReplanInit, slope / (iter - iterationStartDecay + iterOffset) + pReplanFinal);
 				manager.addChangeRequest(iter, strategy, pReplan);

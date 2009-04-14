@@ -26,6 +26,7 @@ import java.util.TreeMap;
 
 import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
@@ -77,15 +78,17 @@ public class ExternalModule implements PlanStrategyModule {
 	protected PopulationWriter plansWriter = null;
 	private PopulationWriterHandler handler = null;
 	private BufferedWriter writer = null;
+	private final Network network;
 	protected Config extConfig;
 	protected String exePath = "";
 	protected String moduleId = "";
 	protected String outFileRoot = "";
 
-	public ExternalModule(final String exePath, final String moduleId) {
+	public ExternalModule(final String exePath, final String moduleId, final Network network) {
 		this.exePath = exePath;
 		this.moduleId = moduleId + "_";
 		this.outFileRoot = Controler.getTempPath() + "/";
+		this.network = network;
 	}
 
 	public void prepareReplanning() {
@@ -212,7 +215,7 @@ public class ExternalModule implements PlanStrategyModule {
 	}
 
 	protected PopulationReader getPlansReader(final Population plans) {
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, this.network);
 		return plansReader;
 	}
 

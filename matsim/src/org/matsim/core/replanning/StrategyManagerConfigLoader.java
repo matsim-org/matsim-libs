@@ -120,7 +120,7 @@ public class StrategyManagerConfigLoader {
 				externalCounter++;
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				String exePath = settings.getExePath();
-				strategy.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter));
+				strategy.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter, controler.getNetwork()));
 			} else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler.getNetwork(), controler.getEvents(), controler.getTravelTimeCalculator(), controler.getTravelCostCalculator(), controler.getScoringFunctionFactory());
