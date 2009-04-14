@@ -26,14 +26,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkIdComparator;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
-import org.matsim.core.population.routes.CompressedNetworkRoute;
-
 
 /**
  * @author mrieser
@@ -41,9 +39,7 @@ import org.matsim.core.population.routes.CompressedNetworkRoute;
 public class CompressedCarRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink) {
-
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
+	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink, Network network) {
 		SubsequentLinksAnalyzer subsequent = new SubsequentLinksAnalyzer(network);
 		return new CompressedNetworkRoute(fromLink, toLink, subsequent.getSubsequentLinks());
 	}
@@ -68,7 +64,7 @@ public class CompressedCarRouteTest extends AbstractNetworkRouteTest {
 		links.add(link12);
 		links.add(link13);
 		links.add(linkM24);
-		NetworkRoute route = getCarRouteInstance(link1, link4);
+		NetworkRoute route = getCarRouteInstance(link1, link4, network);
 		route.setLinks(link1, links, link4);
 
 		List<Link> links2 = route.getLinks();

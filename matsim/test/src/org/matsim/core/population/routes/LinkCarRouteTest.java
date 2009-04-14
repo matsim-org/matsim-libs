@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
@@ -36,7 +37,7 @@ import org.matsim.core.population.routes.LinkNetworkRoute;
 public class LinkCarRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink) {
+	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink, Network network) {
 		return new LinkNetworkRoute(fromLink, toLink);
 	}
 

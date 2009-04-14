@@ -21,6 +21,7 @@
 package org.matsim.core.population.routes;
 
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 
@@ -29,7 +30,7 @@ import org.matsim.core.population.routes.NodeNetworkRoute;
  */
 public class NodeCarRouteTest extends AbstractNetworkRouteTest {
 
-	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink) {
+	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink, Network network) {
 		return new NodeNetworkRoute(fromLink, toLink);
 	}
 	
