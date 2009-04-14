@@ -28,7 +28,7 @@ public class IntegerCache {
 		
 	
 	private static final int MIN_VALUE = 0;
-	private static final int MAX_VALUE = 4096;
+	private static final int MAX_VALUE = 8192;
 	
 	private static boolean initialized = false;
 	private static Integer [] cache;
