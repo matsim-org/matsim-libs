@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.signalsystems.control.SignalSystemControler;
 
 /**
@@ -47,7 +46,7 @@ public class BasicSignalGroupDefinitionImpl implements BasicSignalGroupDefinitio
 	/**
 	 * @see org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition#setLightSignalSystemDefinitionId(org.matsim.core.basic.v01.IdImpl)
 	 */
-	public void setLightSignalSystemDefinitionId(IdImpl id) {
+	public void setLightSignalSystemDefinitionId(Id id) {
 		this.lightSignalSystemDefinitionId = id;
 	}
 

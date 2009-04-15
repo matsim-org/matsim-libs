@@ -21,7 +21,6 @@ package org.matsim.core.basic.signalsystems;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.signalsystems.control.SignalSystemControler;
 /**
  * 
@@ -30,7 +29,7 @@ import org.matsim.signalsystems.control.SignalSystemControler;
  */
 public interface BasicSignalGroupDefinition {
 
-	public void setLightSignalSystemDefinitionId(IdImpl id);
+	public void setLightSignalSystemDefinitionId(Id id);
 
 	public void addLaneId(Id laneId);
 
