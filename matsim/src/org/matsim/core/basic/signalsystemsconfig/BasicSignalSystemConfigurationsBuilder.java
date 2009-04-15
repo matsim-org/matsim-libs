@@ -26,7 +26,7 @@ import org.matsim.api.basic.v01.Id;
  */
 public class BasicSignalSystemConfigurationsBuilder {
 
-	BasicSignalSystemConfigurationsBuilder(){}
+	public BasicSignalSystemConfigurationsBuilder(){}
 	
 	public BasicSignalSystemConfiguration createSignalSystemConfiguration(
 			Id refId) {
