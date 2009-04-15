@@ -44,7 +44,6 @@ import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
@@ -175,6 +174,7 @@ public class Controler {
 
 	public final IterationStopWatch stopwatch = new IterationStopWatch();
 	private ScenarioImpl scenarioData = null;
+	private PlansScoring plansScoring = null;
 	private RoadPricing roadPricing = null;
 	private ScoreStats scoreStats = null;
 	private TravelDistanceStats travelDistanceStats = null;
@@ -648,7 +648,8 @@ public class Controler {
 		this.addCoreControlerListener(new CoreControlerListener());
 
 		// the default handling of plans
-		this.addCoreControlerListener(new PlansScoring());
+		this.plansScoring = new PlansScoring();
+		this.addCoreControlerListener(this.plansScoring);
 
 
 		// load road pricing, if requested
@@ -1174,12 +1175,6 @@ public class Controler {
 			if (controler.legTimes != null) {
 				controler.legTimes.writeStats(getIterationFilename("tripdurations.txt"));
 				// - print averages in log
-				for (TransportMode mode : controler.legTimes.getAverageTripDurationsByMode().keySet()) {
-					log.info(
-							"[" + iteration + "] average trip duration of mode " + mode.toString() + ": " +
-							controler.legTimes.getAverageTripDurationsByMode().get(mode).intValue() + " seconds = " +
-							Time.writeTime(controler.legTimes.getAverageTripDurationsByMode().get(mode)));
-				}
 				log.info("[" + iteration + "] average trip duration is: "
 						+ (int)controler.legTimes.getAverageTripDuration() + " seconds = "
 						+ Time.writeTime(controler.legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
@@ -1213,6 +1208,10 @@ public class Controler {
 	
 	public List<QueueSimulationListener> getQueueSimulationListener() {
 		return queueSimulationListener;
+	}
+
+	public PlansScoring getPlansScoring() {
+		return plansScoring;
 	}
 
 }

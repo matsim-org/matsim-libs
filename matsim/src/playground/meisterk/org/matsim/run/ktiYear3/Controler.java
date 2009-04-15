@@ -21,18 +21,15 @@
 package playground.meisterk.org.matsim.run.ktiYear3;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 
+import playground.meisterk.org.matsim.controler.listeners.CalcLegTimesKTIListener;
+import playground.meisterk.org.matsim.controler.listeners.ScoreElements;
 import playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory;
 
 public class Controler {
 
-	private Config config;
 	private org.matsim.core.controler.Controler controler;
 	
 	public Controler(String[] args) {
@@ -40,7 +37,6 @@ public class Controler {
 	}
 
 	public Controler(Config config) {
-		this.config = config;
 		this.controler = new org.matsim.core.controler.Controler(config);
 	}
 
@@ -50,24 +46,14 @@ public class Controler {
 				Gbl.getConfig().charyparNagelScoring(), 
 				controler.getFacilityPenalties()
 				);
+		controler.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 		
 		// the scoring function processes facility loads independent of whether a location choice module is used or not
 		controler.addControlerListener(new FacilitiesLoadCalculator(controler.getFacilityPenalties()));
-		// standard controler listeners for KTI Year 3 runs
-		controler.addControlerListener(new KTIYear3ControlerListener());
-		controler.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
+		controler.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));
+		controler.addControlerListener(new CalcLegTimesKTIListener("calcLegTimesKTI.txt"));
 		
 		controler.run();
-		
-	}
-	
-	protected static class KTIYear3ControlerListener implements StartupListener, AfterMobsimListener {
-
-		public void notifyStartup(StartupEvent event) {
-		}
-
-		public void notifyAfterMobsim(AfterMobsimEvent event) {
-		}
 		
 	}
 

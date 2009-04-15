@@ -57,4 +57,8 @@ public class PlansScoring implements StartupListener, ScoringListener, Iteration
 		this.planScorer.finish();
 	}
 
+	public EventsToScore getPlanScorer() {
+		return planScorer;
+	}
+
 }

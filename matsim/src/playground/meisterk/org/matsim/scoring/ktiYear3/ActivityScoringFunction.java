@@ -183,9 +183,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		super.finish();
 		this.score += this.getTooShortDurationScore();
 		this.score += this.getWaitingTimeScore();
-		for (String actType : this.accumulatedDurations.keySet()) {
-			this.score += this.getPerformanceScore(actType, this.accumulatedDurations.get(actType));
-		}
+		this.score += this.getPerformanceScore();
 		this.score += this.getFacilityPenaltiesScore();
 
 	}
@@ -204,7 +202,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		return facilityPenaltiesScore;
 	}
 
-	public double getPerformanceScore(String actType, double duration) {
+	protected double getPerformanceScore(String actType, double duration) {
 
 		double typicalDuration = this.person.getDesires().getActivityDuration(actType);
 
@@ -238,6 +236,14 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		return this.params.marginalUtilityOfWaiting * this.accumulatedWaitingTime;
 	}
 
+	public double getPerformanceScore() {
+		double performanceScore = 0.0;
+		for (String actType : this.accumulatedDurations.keySet()) {
+			performanceScore += this.getPerformanceScore(actType, this.accumulatedDurations.get(actType));
+		}
+		return performanceScore;
+	}
+	
 	@Override
 	public void reset() {
 		super.reset();

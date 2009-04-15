@@ -124,4 +124,8 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 
 	}
 
+	public ArrayList<ActivityScoring> getActivityScoringFunctions() {
+		return activityScoringFunctions;
+	}
+
 }
