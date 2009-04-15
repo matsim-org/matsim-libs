@@ -43,7 +43,7 @@ public class ReaderTripHandler {
 		
 		this.chosenFacilityId = chosenFacilityId;
 			
-		Coord afterShoppingCoord = mzTrip.getCoord();
+		Coord afterShoppingCoord = mzTrip.getCoordEnd();
 		Activity afterShoppingAct = new org.matsim.core.population.ActivityImpl("end", afterShoppingCoord);
 		afterShoppingAct.setLink(network.getNearestLink(afterShoppingCoord));
 		
