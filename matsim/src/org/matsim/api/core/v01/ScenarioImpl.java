@@ -300,5 +300,17 @@ public class ScenarioImpl implements Scenario {
 	public Id createId(final String string) {
 		return new IdImpl( string) ;
 	}
+	
+	public void setLaneDefinitions(BasicLaneDefinitions laneDefinitions) {
+		this.laneDefinitions = laneDefinitions;
+	}
+	
+	public void setSignalSystems(BasicSignalSystems signalSystems) {
+		this.signalSystems = signalSystems;
+	}
+	
+	public void setSignalSystemConfigurations(BasicSignalSystemConfigurations signalSystemConfigurations) {
+		this.signalSystemConfigurations = signalSystemConfigurations;
+	}
 
 }
