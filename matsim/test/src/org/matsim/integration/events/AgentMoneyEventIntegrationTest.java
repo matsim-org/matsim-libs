@@ -38,7 +38,7 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 
-	public void testWriteReadTXT() {
+	public void testWriteReadTxt() {
 		final AgentMoneyEvent event1 = new AgentMoneyEvent(7.0*3600, new IdImpl(1), 2.34);
 		final AgentMoneyEvent event2 = new AgentMoneyEvent(8.5*3600, new IdImpl(2), -3.45);
 
@@ -80,7 +80,7 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 		assertEquals(event2.getAmount(), e2.getAmount(), EPSILON);
 	}
 
-	public void testWriteReadXML() {
+	public void testWriteReadXxml() {
 		final AgentMoneyEvent event1 = new AgentMoneyEvent(7.0*3600, new IdImpl(1), 2.34);
 		final AgentMoneyEvent event2 = new AgentMoneyEvent(8.5*3600, new IdImpl(2), -3.45);
 
@@ -122,12 +122,8 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 		assertEquals(event2.getAmount(), e2.getAmount(), EPSILON);
 	}
 
-	private static class EventCollector implements BasicEventHandler {
-		final public List<BasicEventImpl> events = new ArrayList<BasicEventImpl>();
-
-		public EventCollector() {
-			// empty, but public constructor for private class
-		}
+	/*package*/ static class EventCollector implements BasicEventHandler {
+		final protected List<BasicEventImpl> events = new ArrayList<BasicEventImpl>();
 
 		public void handleEvent(BasicEventImpl event) {
 			this.events.add(event);
