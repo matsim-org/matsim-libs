@@ -85,7 +85,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		/* finish */
 		assertEquals("wrong number of link enter events.", 2, collector.events.size());
 		assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), EPSILON);
-		assertEquals("wrong time in second event.", 6.0*3600 + 102, collector.events.get(1).getTime(), EPSILON);
+		assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), EPSILON);
 	}
 
 	/**
@@ -123,9 +123,9 @@ public class QueueSimulationTest extends MatsimTestCase {
 		/* finish */
 		assertEquals("wrong number of link enter events.", 4, collector.events.size());
 		assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), EPSILON);
-		assertEquals("wrong time in second event.", 6.0*3600 + 102, collector.events.get(1).getTime(), EPSILON);
+		assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), EPSILON);
 		assertEquals("wrong time in first event.", 7.0*3600 + 1, collector.events.get(2).getTime(), EPSILON);
-		assertEquals("wrong time in second event.", 7.0*3600 + 102, collector.events.get(3).getTime(), EPSILON);
+		assertEquals("wrong time in second event.", 7.0*3600 + 12, collector.events.get(3).getTime(), EPSILON);
 	}
 
 	/*package*/ static class EventCollector implements LinkEnterEventHandler {
@@ -192,18 +192,18 @@ public class QueueSimulationTest extends MatsimTestCase {
 		for (int i = 1; i <= 10000; i++) {
 			person = new PersonImpl(new IdImpl(i));
 			plan = person.createPlan(true);
-			/* exact dep. time: 6:28:18. The agents needs:
+			/* exact dep. time: 6:29:48. The agents needs:
 			 * - at the specified time, the agent goes into the waiting list, and if space is available, into
 			 * the buffer of link 1.
 			 * - 1 sec later, it leaves the buffer on link 1 and enters link 2
-			 * - the agent takes 100 sec. to travel along link 2, after which it gets placed in the buffer of link 2
+			 * - the agent takes 10 sec. to travel along link 2, after which it gets placed in the buffer of link 2
 			 * - 1 sec later, the agent leaves the buffer on link 2 (if flow-cap allows this) and enters link 3
 			 * - as we measure the vehicles leaving link 2, and the first veh should leave at exactly 6:30, it has
-			 * to start 1 + 100 + 1 = 102 secs earlier.
-			 * So, the start time is 7*3600 - 1800 - 102 = 7*3600 - 1902
+			 * to start 1 + 10 + 1 = 12 secs earlier.
+			 * So, the start time is 7*3600 - 1800 - 12 = 7*3600 - 1812
 			 */
 			Activity a = plan.createActivity("h", f.link1);
-			a.setEndTime(7*3600 - 1902);
+			a.setEndTime(7*3600 - 1812);
 			leg = plan.createLeg(TransportMode.car);
 			route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 			route.setNodes(f.link1, f.nodes23, f.link3);
@@ -220,7 +220,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		/* run sim */
 		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
 		sim.run();
-
+		
 		/* finish */
 		int[] volume = vAnalyzer.getVolumesForLink("2");
 		System.out.println("#vehicles 6-7: " + Integer.toString(volume[6]));
@@ -329,7 +329,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			person = new PersonImpl(new IdImpl(i));
 			plan = person.createPlan(true);
 			Activity a2 = plan.createActivity("h", f.link1);
-			a2.setEndTime(7*3600 - 1902);
+			a2.setEndTime(7*3600 - 1812);
 			leg = plan.createLeg(TransportMode.car);
 			route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2, f.link3);
 			route.setNodes(f.link1, f.nodes23, f.link3);
@@ -572,9 +572,9 @@ public class QueueSimulationTest extends MatsimTestCase {
 			this.node2 = this.network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
 			this.node3 = this.network.createNode(new IdImpl("3"), new CoordImpl(1100, 0));
 			this.node4 = this.network.createNode(new IdImpl("4"), new CoordImpl(1200, 0));
-			this.link1 = this.network.createLink(new IdImpl("1"), this.node1, this.node2, 100, 10, 60000, 9);
-			this.link2 = this.network.createLink(new IdImpl("2"), this.node2, this.node3, 1000, 10, 6000, 2);
-			this.link3 = this.network.createLink(new IdImpl("3"), this.node3, this.node4, 100, 10, 60000, 9);
+			this.link1 = this.network.createLink(new IdImpl("1"), this.node1, this.node2, 100, 100, 60000, 9);
+			this.link2 = this.network.createLink(new IdImpl("2"), this.node2, this.node3, 1000, 100, 6000, 2);
+			this.link3 = this.network.createLink(new IdImpl("3"), this.node3, this.node4, 100, 100, 60000, 9);
 
 			/* build plans */
 			this.plans = new PopulationImpl();
