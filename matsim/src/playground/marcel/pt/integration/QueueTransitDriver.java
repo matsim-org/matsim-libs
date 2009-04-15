@@ -36,12 +36,10 @@ public class QueueTransitDriver implements DriverAgent {
 	private final Person dummyPerson = new PersonImpl(new IdImpl("busDrvr"));
 	private final Leg currentLeg = new LegImpl(TransportMode.car);
 	private final TransitDriver driver;
-	private Link currentLink;
 	
 	public QueueTransitDriver(TransitDriver driver) {
 		this.driver = driver;
 		currentLeg.setRoute(driver.getCarRoute());
-		this.currentLink = driver.chooseNextLink();
 		driver.enterNextLink();
 	}
 
@@ -53,10 +51,6 @@ public class QueueTransitDriver implements DriverAgent {
 		return this.currentLeg;
 	}
 
-	public Link getCurrentLink() {
-		return this.currentLink;
-	}
-
 	public Link getDestinationLink() {
 		return this.currentLeg.getRoute().getEndLink();
 	}
@@ -66,7 +60,6 @@ public class QueueTransitDriver implements DriverAgent {
 	}
 	
 	public void incCurrentNode() {
-		this.currentLink = this.driver.chooseNextLink();
 		this.driver.enterNextLink();
 	}
 
@@ -77,9 +70,6 @@ public class QueueTransitDriver implements DriverAgent {
 	// *** The methods below are currently not used... ***
 
 	public void leaveActivity(double now) {
-	}
-
-	public void setCurrentLink(Link link) {
 	}
 
 	public void legEnds(double now) {

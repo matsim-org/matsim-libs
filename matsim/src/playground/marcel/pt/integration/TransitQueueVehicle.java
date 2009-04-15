@@ -20,7 +20,6 @@
 
 package playground.marcel.pt.integration;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
 
 import playground.marcel.pt.interfaces.Vehicle;
@@ -35,10 +34,6 @@ public class TransitQueueVehicle extends QueueVehicleImpl {
 		this.vehicle = vehicle;
 		this.driver = driver;
 		super.setEarliestLinkExitTime(driver.getDepartureTime()); // TODO [MR] driver.setDepartureTime()
-	}
-	
-	public Link getCurrentLink() {
-		return this.driver.getCurrentLink(); //this.vehicle.getDriver().getCurrentLink();
 	}
 	
 }
