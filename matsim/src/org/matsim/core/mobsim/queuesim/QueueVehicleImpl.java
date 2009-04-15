@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitQueueVehicle.java
+ * Vehicle.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2009 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.integration;
+package org.matsim.core.mobsim.queuesim;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
 
-import playground.marcel.pt.interfaces.Vehicle;
+public class QueueVehicleImpl implements QueueVehicle {
 
-public class TransitQueueVehicle extends QueueVehicleImpl {
+	private double earliestLinkExitTime = 0;
 
-	private final Vehicle vehicle;
-	private final QueueTransitDriver driver;
-	
-	public TransitQueueVehicle(Vehicle vehicle, QueueTransitDriver driver) {
-		super(driver.getPerson().getId());
-		this.vehicle = vehicle;
-		this.driver = driver;
-		super.setEarliestLinkExitTime(driver.getDepartureTime()); // TODO [MR] driver.setDepartureTime()
+	private DriverAgent driver = null;
+
+	private final Id id;
+
+	public QueueVehicleImpl(final Id id) {
+		this.id = id;
 	}
-	
+
+	public double getEarliestLinkExitTime() {
+		return this.earliestLinkExitTime;
+	}
+
+	public void setEarliestLinkExitTime(final double time) {
+		this.earliestLinkExitTime = time;
+	}
+
 	public Link getCurrentLink() {
-		return this.driver.getCurrentLink(); //this.vehicle.getDriver().getCurrentLink();
+		return this.driver.getCurrentLink();
 	}
-	
+
+	public DriverAgent getDriver() {
+		return this.driver;
+	}
+
+	public void setDriver(final DriverAgent driver) {
+		this.driver = driver;
+	}
+
+	public Id getId() {
+		return this.id;
+	}
+
+	@Override
+	public String toString() {
+		return "Vehicle Id " + getId() + ", driven by (personId) " + this.driver.getPerson().getId()
+				+ ", on link " + this.driver.getCurrentLink().getId();
+	}
+
 }

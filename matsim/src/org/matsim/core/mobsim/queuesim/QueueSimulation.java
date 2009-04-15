@@ -339,8 +339,7 @@ public class QueueSimulation {
 		for (Person p : this.plans.getPersons().values()) {
 			PersonAgent agent = this.agentFactory.createPersonAgent(p);
 
-			QueueVehicle veh;
-			veh = new QueueVehicle(agent.getPerson().getId());
+			QueueVehicle veh = new QueueVehicleImpl(agent.getPerson().getId());
 			//not needed in new agent class
 			veh.setDriver(agent);
 			agent.setVehicle(veh);
@@ -499,7 +498,7 @@ public class QueueSimulation {
 		this.network.afterSim();
 		double now = SimulationTimer.getTime();
 		for (QueueVehicle veh : teleportationList) {
-			new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getCurrentLeg());
+			new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getDriver().getCurrentLeg());
 		}
 		QueueSimulation.teleportationList.clear();
 
@@ -583,7 +582,7 @@ public class QueueSimulation {
 	}
 
 	protected static final void handleUnknownLegMode(final QueueVehicle veh) {
-		veh.setEarliestLinkExitTime(SimulationTimer.getTime() + veh.getCurrentLeg().getTravelTime());
+		veh.setEarliestLinkExitTime(SimulationTimer.getTime() + veh.getDriver().getCurrentLeg().getTravelTime());
 		veh.getDriver().setCurrentLink(veh.getDriver().getDestinationLink());
 		teleportationList.add(veh);
 	}
@@ -595,7 +594,7 @@ public class QueueSimulation {
 	  			teleportationList.poll();
 
 	  			getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getPerson(),
-	  					veh.getCurrentLink(), veh.getCurrentLeg()));
+	  					veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
 	  			veh.getDriver().legEnds(now);
 //	  			veh.getDriver().reachActivity(now, this.network.getQueueLink(veh.getCurrentLink().getId()));
 	  		} else break;

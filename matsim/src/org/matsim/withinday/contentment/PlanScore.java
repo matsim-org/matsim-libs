@@ -25,8 +25,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.router.util.TravelCost;
@@ -93,7 +93,7 @@ public class PlanScore implements AgentContentment {
 		double time = SimulationTimer.getTime();
 		if (time > this.lastCallTime) {
 			if (this.agent.isEnRoute()) {
-				Leg leg = this.agent.getVehicle().getCurrentLeg();
+				Leg leg = this.agent.getVehicle().getDriver().getCurrentLeg();
 				if (leg.getRoute() != null) {
 					this.contentment = calcContentment(leg, time);
 				} else {
@@ -160,7 +160,7 @@ public class PlanScore implements AgentContentment {
 
 		int planIdx = 0;
 		for (Object o : this.agent.getPerson().getSelectedPlan().getPlanElements()) {
-			if (o.equals(this.agent.getVehicle().getCurrentLeg())) {
+			if (o.equals(this.agent.getVehicle().getDriver().getCurrentLeg())) {
 				break;
 			}
 			planIdx++;

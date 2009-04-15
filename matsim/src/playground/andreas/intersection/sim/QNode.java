@@ -5,15 +5,12 @@ import java.util.Comparator;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueNode;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
-import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 
 public class QNode extends QueueNode{
@@ -114,26 +111,27 @@ public class QNode extends QueueNode{
 			}
 			// check if veh is stuck!
 
-			if ((now - veh.getLastMovedTime()) > Simulation.getStuckTime()) {
-				/* We just push the vehicle further after stucktime is over, regardless
-				 * of if there is space on the next link or not.. optionally we let them
-				 * die here, we have a config setting for that!
-				 */
-				if (removeStuckVehicle()) {
-					pseudoLink.pollFirstFromBuffer();
-					Simulation.decLiving();
-					Simulation.incLost();
-					QueueSimulation.getEvents().processEvent(
-							new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getCurrentLeg()));
-				}
-				else {
-					pseudoLink.pollFirstFromBuffer();
-					veh.getDriver().incCurrentNode();
-					nextQLink.add(veh);
-					return true;
-				}
-			}
-			return false;
+			// deadlock-prevention works no longer
+//			if ((now - veh.getLastMovedTime()) > Simulation.getStuckTime()) {
+//				/* We just push the vehicle further after stucktime is over, regardless
+//				 * of if there is space on the next link or not.. optionally we let them
+//				 * die here, we have a config setting for that!
+//				 */
+//				if (removeStuckVehicle()) {
+//					pseudoLink.pollFirstFromBuffer();
+//					Simulation.decLiving();
+//					Simulation.incLost();
+//					QueueSimulation.getEvents().processEvent(
+//							new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
+//				}
+//				else {
+//					pseudoLink.pollFirstFromBuffer();
+//					veh.getDriver().incCurrentNode();
+//					nextQLink.add(veh);
+//					return true;
+//				}
+//			}
+//			return false;
 		}
 		return true;
 	}

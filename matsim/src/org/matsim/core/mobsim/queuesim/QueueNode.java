@@ -119,7 +119,7 @@ public class QueueNode {
 
 			// check if veh is stuck!
 
-			if ((now - veh.getLastMovedTime()) > Simulation.getStuckTime()) {
+			if ((now - currentLane.bufferLastMovedTime) > Simulation.getStuckTime()) {
 				/* We just push the vehicle further after stucktime is over, regardless
 				 * of if there is space on the next link or not.. optionally we let them
 				 * die here, we have a config setting for that!
@@ -129,7 +129,7 @@ public class QueueNode {
 					Simulation.decLiving();
 					Simulation.incLost();
 					QueueSimulation.getEvents().processEvent(
-							new AgentStuckEvent(now, veh.getDriver().getPerson(), currentLink, veh.getCurrentLeg()));
+							new AgentStuckEvent(now, veh.getDriver().getPerson(), currentLink, veh.getDriver().getCurrentLeg()));
 				} else {
 					currentLane.popFirstFromBuffer();
 					veh.getDriver().incCurrentNode();

@@ -63,9 +63,10 @@ public class QueryAgentActivityStatus implements OTFQuery {
 			for (QueueVehicle veh : allVehicles) {
 				if (veh.getDriver().getPerson().getId().compareTo(this.agentId) == 0) {
 					// we found the little nutty, now lets reason about the length of 1st activity
-					double departure = veh.getDriver().getDepartureTime(); 
-					double diff =  departure - veh.getLastMovedTime();
-					this.finished = (this.now - veh.getLastMovedTime()) / diff;
+					double departure = veh.getDriver().getDepartureTime();
+					double arrival = departure - 4.0 * 3600; // assume fixed duration of 4 hours
+					double diff =  departure - arrival;
+					this.finished = (this.now - arrival) / diff;
 					this.activityNr = i/2;
 				}
 			}

@@ -220,7 +220,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 
 			if (veh.getDriver().getDestinationLink().getId() == this.realLink.getLink().getId()) {
 				QueueSimulation.getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getPerson(),
-								this.realLink.getLink(), veh.getCurrentLeg()));
+								this.realLink.getLink(), veh.getDriver().getCurrentLeg()));
 				veh.getDriver().legEnds(now);
 //				veh.getDriver().reachActivity(now, this.realLink);
 				this.storageQueue.poll();
@@ -267,7 +267,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		}
 
 		this.flowQueue.add(veh);
-		veh.setLastMovedTime(now);
+//		veh.setLastMovedTime(now);
 	}
 
 	// Decision to only consider the StorageQueue when calculating hasSpace
@@ -340,8 +340,8 @@ public class PseudoLink implements Comparable<PseudoLink> {
 			}
 			veh.getDriver().leaveActivity(now);
 			QueueSimulation.getEvents().processEvent(new AgentDepartureEvent(now, veh.getDriver().getPerson(),
-							this.realLink.getLink(), veh.getCurrentLeg()));
-			Leg actLeg = veh.getCurrentLeg();
+							this.realLink.getLink(), veh.getDriver().getCurrentLeg()));
+			Leg actLeg = veh.getDriver().getCurrentLeg();
 			if (actLeg.getRoute() != null) {
 				if (((NetworkRoute) actLeg.getRoute()).getNodes() != null){
 					this.parkToLinkQueue.add(veh);
@@ -366,7 +366,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 			}
 			addToFlowQueue(veh, now);
 			QueueSimulation.getEvents().processEvent(new AgentWait2LinkEvent(now, veh.getDriver().getPerson(),
-							this.realLink.getLink(), veh.getCurrentLeg()));
+							this.realLink.getLink(), veh.getDriver().getCurrentLeg()));
 			 // remove the just handled vehicle from parkToLinkQueue
 			this.parkToLinkQueue.poll();
 		}
