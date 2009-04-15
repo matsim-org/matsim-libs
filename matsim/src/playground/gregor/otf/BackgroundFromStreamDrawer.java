@@ -5,6 +5,7 @@ import static javax.media.opengl.GL.GL_QUADS;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Float;
+import java.util.HashMap;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLException;
@@ -13,37 +14,34 @@ import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
-import com.sun.opengl.util.texture.TextureData;
 import com.sun.opengl.util.texture.TextureIO;
 
 public class BackgroundFromStreamDrawer extends AbstractBackgroundDrawer {
 
 	private Float abskoords;
 	private Texture picture = null;
-	private Texture defaultPicture;
-	private Texture cache3 = null;
-	private Texture cache4 = null;
+	public enum ZoomLevel {high,mid,near,brink};
+	ZoomLevel oldZoom = null;
+	private final HashMap<ZoomLevel,Texture> txCache = new HashMap<ZoomLevel, Texture>();
 
-	private static final long MIN_UPDATE_INTERVAL = 200;
+	private static final long MIN_UPDATE_INTERVAL = 100;
 	private long lastUpdate = 0;
 
 	private final double xs;
 	private final double ys;
 	private final BGLoader bgl;
-	private boolean openRequest = false;
-	private boolean newInput = false;
-	private Float newKoords;
-	private TextureData tData;
 	private final double topX;
 	private final double topY;
 	private  int pxSize;
 	private  int pySize;
 	private final double centerX;
 	private final double centerY;
-	private int oldZoom = -1;
+	
+	private  BGRequest request = null;
 
 	double [] modelview = new double [16];
 	private double dist;
+	private double hight;
 
 	//	public BackgroundFromStreamDrawer(InputStream is, Float koords) {
 	//		this.abskoords = koords;
@@ -59,105 +57,129 @@ public class BackgroundFromStreamDrawer extends AbstractBackgroundDrawer {
 		this.pxSize = pxSize;
 		this.pySize = pySize;
 		this.bgl = bgl;
-		this.centerX = topX - xs/2;
+		this.centerX = topX + xs/2;
 		this.centerY = topY - ys/2;
 	}
 
 
 	private void upDateTx(GL gl) {
-		if (this.openRequest) {
-			return;
-		}
 		long time = System.currentTimeMillis();
-		if (time - this.lastUpdate < MIN_UPDATE_INTERVAL || this.openRequest){
+		if (time - this.lastUpdate < MIN_UPDATE_INTERVAL){
 			return;
 		}
-		gl.glGetDoublev( GL_MODELVIEW_MATRIX, this.modelview,0 );
 		this.lastUpdate = time;
+		
+		if (this.request != null && !this.request.getLock()) {
+//			System.out.println("111 cant get lock!");
+			return;
+		}
+		
+		if (this.request != null && this.request.getState() == BGRequest.State.processed) {
+			this.request.unLock();
+			return;
+		}
 
-		double hight = -this.modelview[14];
+		gl.glGetDoublev( GL_MODELVIEW_MATRIX, this.modelview,0 );
+		this.hight = -this.modelview[14];
 		double x = this.offsetEast - this.modelview[12];
 		double y = this.offsetNorth - this.modelview[13];
 		this.dist = Math.sqrt(Math.pow((this.centerX - x),2)+Math.pow((this.centerY - y),2));
-		//		System.out.println("hight:" + hight + " dist:" + dist);
-		if (hight > 1000){
-			//			this.cache4 = null;
-			//			this.cache3 = null;
-			if (this.oldZoom == 2) {
-				return;
-			}
-			this.oldZoom = 2;
-			if (this.defaultPicture == null){
-				this.pxSize = (int) Math.round(this.xs * 0.1/0.3);
-				this.pySize = (int) Math.round(this.ys * 0.1/0.3);			
-			} else {
-				this.picture = this.defaultPicture;
-				return;
-			}
-		} else if (this.dist <= 3*this.xs && hight > 500) {
-			if (this.oldZoom == 3) {
-				return;
-			}
-			this.oldZoom = 3;
-			if (this.cache3 != null) {
-				this.picture = this.cache3;
-				return;
-			}
-
-			this.pxSize = (int) Math.round(this.xs * 0.25/0.3);
-			this.pySize = (int) Math.round(this.ys * 0.25/0.3);
-		} else if (this.dist <= 2*this.xs) {
-			if (this.oldZoom == 4){
-				return;
-			}
-			this.oldZoom = 4;
-			if (this.cache4 != null) {
-				this.picture = this.cache4;
-				return;
-			} else if (this.cache3 != null){
-				this.picture = this.cache3;
-			}
-			this.pxSize = (int) Math.round(this.xs * 1.0/0.3);
-			this.pySize = (int) Math.round(this.ys * 1.0/0.3);
-		} else if (this.defaultPicture != null){
+		
+		ZoomLevel desiredZoom;
+		
+		if (this.hight > 2000){
+			desiredZoom = ZoomLevel.high;
+		} else if (this.dist <= 4*this.xs && this.hight > 800) {
+			desiredZoom = ZoomLevel.mid;
+		}else if (this.dist <= 4*this.xs) {
+			desiredZoom = ZoomLevel.near;
+		} else {
+			desiredZoom = ZoomLevel.high;
 			if (this.dist > 10*this.xs) {
-				this.cache4 = null;
-				//				this.cache3 = null;				
+				this.txCache.remove(ZoomLevel.near);
 			}
-
-			this.picture = this.defaultPicture;
-			this.oldZoom = 2;
+		}
+		
+		if (desiredZoom == this.oldZoom) {
+//			System.out.println("222 already at this zoom level!");
+			if (this.request != null) {
+				this.request.setState(BGRequest.State.obsolete);
+				this.request.unLock();
+				this.request = null;
+			}
 			return;
 		}
-		sendPictureRequest();
+		
+		Texture tx;
+		if ((tx = this.txCache.get(desiredZoom)) != null) {
+			this.picture = tx;
+			this.oldZoom = desiredZoom;
+//			System.out.println("333 got from cache! ---> desired zoom:" + desiredZoom);
+			if (this.request != null) {
+				this.request.setState(BGRequest.State.obsolete);
+				this.request.unLock();
+				this.request = null;
+			}
+			return;
+		}
+
+		if (this.request != null && this.request.getZoomLevel() == desiredZoom) {
+//			System.out.println("444 already requesting this zoom level!");
+			this.request.unLock();
+			return;
+		}
+		
+		if (this.request != null) {
+			this.request.setState(BGRequest.State.obsolete);
+//			System.out.println("555 old request obsoltete!");
+			this.request.unLock();
+			this.request = null;
+		}
+		
+//		System.out.println("desired Zoom:" + desiredZoom);
+		
+		if (desiredZoom == ZoomLevel.high) {
+			this.pxSize = (int) Math.round(this.xs * 0.1/0.3);
+			this.pySize = (int) Math.round(this.ys * 0.1/0.3);
+		} else if (desiredZoom == ZoomLevel.mid) {
+			this.pxSize = (int) Math.round(this.xs * 0.25/0.3);
+			this.pySize = (int) Math.round(this.ys * 0.25/0.3);
+			if ((tx = this.txCache.get(ZoomLevel.near)) != null) {
+				this.picture = tx;
+			}
+		} else if (desiredZoom == ZoomLevel.near) {
+			this.pxSize = (int) Math.round(this.xs * 1./0.3);
+			this.pySize = (int) Math.round(this.ys * 1./0.3);
+			if ((tx = this.txCache.get(ZoomLevel.mid)) != null) {
+				this.picture = tx;
+			}
+		}
+		
+		sendPictureRequest(desiredZoom);
 	}
 
 	public void onDraw(final GL gl) {
 
 		upDateTx(gl);
 
-		if (this.newInput) {
-			this.abskoords = this.newKoords;
-			try {
-				this.picture = TextureIO.newTexture(this.tData);
-			} catch (GLException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} 
-			if (this.defaultPicture == null) {
-				this.defaultPicture = this.picture;
+		if (this.request != null && this.request.getLock()) {
+			if (this.request.getState() == BGRequest.State.processed){
+				try {
+					this.picture = TextureIO.newTexture(this.request.getTxData());
+				} catch (GLException e) {
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} 	
+				this.abskoords = this.request.getKoords();
+				this.txCache.put(this.request.getZoomLevel(), this.picture);
+				this.oldZoom = this.request.getZoomLevel();
+				this.request.setState(BGRequest.State.obsolete);
+				this.request.unLock();
+				this.request = null;
+			} else {
+				this.request.unLock();
 			}
-			if (this.oldZoom == 4) {
-				this.cache4 = this.picture;
-
-			}
-			if (this.oldZoom == 3) {
-				this.cache3 = this.picture;
-			}
-
-			this.newInput = false;
-			this.openRequest = false;
 		}
 
 		if (this.picture == null) return;
@@ -194,45 +216,16 @@ public class BackgroundFromStreamDrawer extends AbstractBackgroundDrawer {
 
 
 
-	private void sendPictureRequest() {
-		if (!this.openRequest) {
-			this.bgl.addRequest(new BGRequest(this));
-			this.openRequest  = true;
+	private void sendPictureRequest(ZoomLevel desiredZoom) {
+		this.request = new BGRequest(this,desiredZoom);
+		if (!this.request.getLock()) {
+			throw new RuntimeException("could not get lock on new BGRequest");
 		}
-
+		this.request.setState(BGRequest.State.open);
+		this.bgl.addRequest(this.request);
+		this.request.unLock();
 	}
 
-	public void response(TextureData t, Float koords) {
-		this.tData = t;
-		this.newKoords = koords;
-		this.newInput = true;
-	
-	}
-
-
-	//	private Texture getPicture() {
-	//		InputStream is = null;
-	//		try {
-	//			is = this.bgl.getBGImageStream(this.centerX, this.centerY, this.z, this.xs, this.ys);
-	//		} catch (IOException e) {
-	//			e.printStackTrace();
-	//		}
-	//		
-	//		double z2 = this.z / 0.3;
-	//		double topX = (this.centerX - (this.xs/2)/z2) + 2*(this.xs/2)/z2;
-	//		double topY = this.centerY - (this.ys/2)/z2;
-	//		double xS = -this.xs/z2;
-	//		double yS = this.ys/z2;
-	//		this.abskoords =  new Rectangle2D.Float((int)topX,(int)topY,(int)xS,(int)yS);
-	//		
-	//		Texture tx = OTFOGLDrawer.createTexture(is);
-	//		try {
-	//			is.close();
-	//		} catch (IOException e) {
-	//			e.printStackTrace();
-	//		}
-	//		return tx;
-	//	}
 
 
 
@@ -268,6 +261,9 @@ public class BackgroundFromStreamDrawer extends AbstractBackgroundDrawer {
 
 	public double getDist() {
 		return this.dist;
+	}
+	public double getHight() {
+		return this.hight;
 	}
 
 

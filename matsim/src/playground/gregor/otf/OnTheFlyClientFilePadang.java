@@ -114,15 +114,15 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		double z = 0.01;
 		double pz = z / 0.3;
 		
-		double sizeX = 250;
-		double sizeY = 250;
+		double sizeX = 400;
+		double sizeY = 400;
 		
 		int pxSize = (int) Math.round(sizeX * z/0.3);
 		int pySize = (int) Math.round(sizeY * z/0.3);
-		double currentX = 648931;
-		while (currentX < 654026){
-			double currentY = 9893264;
-			while (currentY < 9900963){
+		double currentX = 648931-1000;
+		while (currentX < 654026+1000){
+			double currentY = 9893264-1000;
+			while (currentY < 9900963+2000){
 				OGLSimpleBackgroundLayer.addPersistentItem(new BackgroundFromStreamDrawer(bgl,currentX,currentY,sizeX,sizeY,pxSize,pySize));
 				currentY += sizeY;
 			}
@@ -179,7 +179,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
 //		final String filename =  CVSROOT + "/runs/run314/output/ITERS/it.100/100.movie.mvi";
 //		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
-		final String filename =  "../../outputs/output/ITERS/it.200/200.movie.mvi";
+		final String filename =  "../../outputs/output_100m_so/ITERS/it.0/0.movie.mvi";
 		
 //		String filename = "./jam/jam.mvi";
 		

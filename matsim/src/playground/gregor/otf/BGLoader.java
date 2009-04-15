@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.PriorityQueue;
-import java.util.Queue;
 
 import com.sun.opengl.util.texture.TextureData;
 import com.sun.opengl.util.texture.TextureIO;
@@ -18,7 +17,7 @@ public class BGLoader extends Thread {
 	private final InetAddress addr;
 	private final int port;
 
-	Queue<BGRequest> requests = new PriorityQueue<BGRequest>();
+	PriorityQueue<BGRequest> requests = new PriorityQueue<BGRequest>();
 
 	public BGLoader(InetAddress addr, int port) {
 		this.addr = addr;
@@ -31,18 +30,40 @@ public class BGLoader extends Thread {
 		while (true) {
 			if (this.requests.size() == 0) {
 				try {
-					sleep(250);
+					sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 				continue;
 			}
-			handleRequest(this.requests.poll());
+			if (this.requests.peek().getLock()){
+					BGRequest bgr =this.requests.poll();
+					handleRequest(bgr);
+					bgr.unLock();
+					
+			} else {
+				try {
+					sleep(50);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
 		}
 
 	}
 
 	private void handleRequest(BGRequest bgr) {
+		if (bgr.getState() == BGRequest.State.obsolete) {
+			return;
+		}
+		
+		if (bgr.getState() != BGRequest.State.open) {
+			System.err.println("this should not happen!");
+			return;
+		}		
+		
+		
 		BackgroundFromStreamDrawer bgs = bgr.getBGS();
 		double topX = bgs.getTopX();
 		double topY = bgs.getTopY();
@@ -67,7 +88,9 @@ public class BGLoader extends Thread {
 			e.printStackTrace();
 		}
 
-		bgs.response(t,koords);		
+		bgr.response(t,koords);
+		bgr.setState(BGRequest.State.processed);
+		
 	}
 
 	public void addRequest(BGRequest r) {
