@@ -1,6 +1,7 @@
 package playground.gregor.sims.shelters;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,6 +10,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -33,6 +35,7 @@ public class EvacuationShelterNetLoader {
 
 	private final Set<Link> shelterLinks = new HashSet<Link>();
 
+	private final HashMap<Id,Building> buildingsLinkMapping = new HashMap<Id, Building>();
 
 	private NetworkLayer network = null;
 
@@ -67,7 +70,8 @@ public class EvacuationShelterNetLoader {
 			Node from = this.network.getNearestNode(c);
 			Node sn1 = this.network.createNode(new IdImpl("sn" + count + "a"), c);
 			Node sn2 = this.network.createNode(new IdImpl("sn" + count + "b"), c);
-			Link l1 = this.network.createLink(new IdImpl("sl" + count + "a"), from, sn1, getDist(from,sn1) , 1.66, 1, 1); //FIXME find right values flow cap, lanes, ... 
+			Link l1 = this.network.createLink(new IdImpl("sl" + count + "a"), from, sn1, getDist(from,sn1) , 1.66, 1, 1); //FIXME find right values flow cap, lanes, ...
+			this.buildingsLinkMapping.put(l1.getId(), building);
 			Link l2 = this.network.createLink(new IdImpl("sl" + count + "b"), sn1,sn2, 20 , 20, 1, 1); //FIXME find right values flow cap, lanes, ...
 			Link l3 = this.network.createLink(new IdImpl("sl" + count++ + "c"), sn2,saveNode, 10 , 10000, 10000, 1); //FIXME find right values flow cap, lanes, ...
 			this.shelterLinks.add(l1);
@@ -77,6 +81,13 @@ public class EvacuationShelterNetLoader {
 		
 	}
 	
+	
+	public HashMap<Id,Building> getShelterLinkMapping() {
+		
+		getNetwork(); //make sure that mapping has been created;
+		
+		return this.buildingsLinkMapping;
+	}
 	
 	public Set<Link> getShelterLinks() {
 		if (this.network == null) {
