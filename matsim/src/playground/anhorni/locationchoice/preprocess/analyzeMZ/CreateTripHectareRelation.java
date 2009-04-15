@@ -17,7 +17,7 @@ public class CreateTripHectareRelation {
 		Iterator<MZTrip> mztrips_it = mzTrips.iterator();
 		while (mztrips_it.hasNext()) {
 			MZTrip mzTrip = mztrips_it.next();
-			Hectare hectare = getClosestHectare(mzTrip.getCoord(), hectares);
+			Hectare hectare = getClosestHectare(mzTrip.getCoordEnd(), hectares);
 			relations.add(new MZTripHectare(mzTrip, hectare));
 		}
 			

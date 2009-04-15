@@ -29,6 +29,9 @@ public class AnalyzeMZ {
 		GroceryFilter groceryfilter = new GroceryFilter();
 		mzTrips = groceryfilter.filterTrips(mzTrips);
 		
+		GeographicalFilter geographicalfilter = new GeographicalFilter();
+		mzTrips = geographicalfilter.filterTrips(mzTrips);
+		
 		BZReader bzReader = new BZReader();
 		List<Hectare> hectares = bzReader.readBZGrocery("input/facilities/BZ01_UNT_P_DSVIEW.TXT");
 		

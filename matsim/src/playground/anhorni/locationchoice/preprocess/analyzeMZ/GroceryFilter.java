@@ -15,7 +15,7 @@ public class GroceryFilter {
 		Iterator<MZTrip> mztrips_it = mzTrips.iterator();
 		while (mztrips_it.hasNext()) {
 			MZTrip mztrip = mztrips_it.next();
-			if (mztrip.getPurpose().equals("1")) {
+			if (mztrip.getPurposeCode().equals("1")) {
 				filteredTrips.add(mztrip);
 			}	
 		}

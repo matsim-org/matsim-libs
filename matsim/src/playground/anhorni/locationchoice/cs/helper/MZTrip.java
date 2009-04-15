@@ -2,12 +2,14 @@ package playground.anhorni.locationchoice.cs.helper;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 public class MZTrip {
 	
 	private Id id = null;
-	// Nelson: E_X, E_Y
-	private Coord coord = null;
+
+	private CoordImpl coordEnd = null;
+	private CoordImpl coordStart = null;
 	
 	// F58
 	private double startTime = 0.0;
@@ -17,17 +19,18 @@ public class MZTrip {
 	
 	private String wmittel;
 	private String ausmittel;	
-	private String purpose;
+	private String purposeCode;
 	
+	private String shopOrLeisure;
 	
-	public MZTrip(Id id, Coord coord, double startTime, double endTime) {
+	public MZTrip(Id id, Coord coordStart, Coord coordEnd, double startTime, double endTime) {
 		super();
 		this.id = id;
-		this.coord = coord;
+		this.coordStart = new CoordImpl(coordStart.getX(), coordStart.getY());
+		this.coordEnd = new CoordImpl(coordEnd.getX(), coordEnd.getY());
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}
-
 
 	public Id getId() {
 		return id;
@@ -35,11 +38,17 @@ public class MZTrip {
 	public void setId(Id id) {
 		this.id = id;
 	}
-	public Coord getCoord() {
-		return coord;
+	public CoordImpl getCoordEnd() {
+		return coordEnd;
 	}
-	public void setCoord(Coord coord) {
-		this.coord = coord;
+	public void setCoordEnd(Coord coordEnd) {
+		this.coordEnd = new CoordImpl(coordEnd.getX(), coordEnd.getY());
+	}
+	public CoordImpl getCoordStart() {
+		return coordStart;
+	}
+	public void setCoordStart(Coord coordStart) {
+		this.coordStart = new CoordImpl(coordStart.getX(), coordStart.getY());
 	}
 	public double getStartTime() {
 		return startTime;
@@ -65,10 +74,18 @@ public class MZTrip {
 	public void setAusmittel(String ausmittel) {
 		this.ausmittel = ausmittel;
 	}
-	public String getPurpose() {
-		return purpose;
+	public String getPurposeCode() {
+		return purposeCode;
 	}
-	public void setPurpose(String purpose) {
-		this.purpose = purpose;
+	public void setPurposeCode(String purposeCode) {
+		this.purposeCode = purposeCode;
+	}
+
+	public String getShopOrLeisure() {
+		return shopOrLeisure;
+	}
+
+	public void setShopOrLeisure(String shopOrLeisure) {
+		this.shopOrLeisure = shopOrLeisure;
 	}
 }
