@@ -25,8 +25,6 @@ import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -50,7 +48,7 @@ public class BasicEventsHandlerTest extends MatsimTestCase {
 	}
 	
 	
-	/*package*/ class MyBasicLinkEnterEventHandler implements BasicLinkEnterEventHandler {
+	/*package*/ static class MyBasicLinkEnterEventHandler implements BasicLinkEnterEventHandler {
 
 		/*package*/ int counter = 0;
 		
