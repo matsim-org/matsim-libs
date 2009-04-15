@@ -22,11 +22,11 @@ package org.matsim.planomat.costestimators;
 
 import org.matsim.api.basic.v01.Id;
 
-public class DepartureEvent {
+/*package*/ class DepartureEvent {
 
 	private final Id agentId;
 
-	public DepartureEvent(final Id agentId) {
+	protected DepartureEvent(final Id agentId) {
 		this.agentId = agentId;
 	}
 
