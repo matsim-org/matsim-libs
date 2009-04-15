@@ -20,8 +20,6 @@
 
 package org.matsim.api.basic.v01.population;
 
-import java.util.List;
-
 import org.matsim.api.basic.v01.Id;
 
 
@@ -38,13 +36,7 @@ public interface BasicRoute {
 
 	public void setTravelTime(final double travelTime);
 
-	public List<Id> getLinkIds();
-
-//	public void setStartLinkId(final Id linkId);
-
 	public Id getStartLinkId();
-
-//	public void setEndLinkId(final Id linkId);
 
 	public Id getEndLinkId();
 
