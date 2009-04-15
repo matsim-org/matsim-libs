@@ -348,7 +348,6 @@ public class QueueLane {
 						this.queueLink.getLink(), veh.getDriver().getCurrentLeg()));
 		// Need to inform the veh that it now reached its destination.
 		veh.getDriver().legEnds(now);
-//		veh.getDriver().reachActivity(now, this.queueLink);
 	}
 
 	/**

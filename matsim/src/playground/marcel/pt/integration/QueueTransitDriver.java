@@ -66,9 +66,12 @@ public class QueueTransitDriver implements DriverAgent {
 	public double getDepartureTime() {
 		return this.driver.getDepartureTime();
 	}
-	
 	// *** The methods below are currently not used... ***
-
+	
+	public void teleportToLink(Link link) {
+		// TODO [MR] Auto-generated method stub
+	}
+	
 	public void leaveActivity(double now) {
 	}
 

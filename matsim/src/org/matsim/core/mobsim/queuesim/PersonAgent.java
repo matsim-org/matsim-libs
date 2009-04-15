@@ -168,12 +168,17 @@ public class PersonAgent implements DriverAgent {
 
 	public void legEnds(final double now) {
 		if (this.currentLink != this.destinationLink) {
-			log.error("The vehicle with driver " + this.getPerson().getId() + " should be on link " + this.destinationLink.getId()
-					+ ", but is on link " + this.currentLink.getId() + ". Removing the agent from the simulation.");
+			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.destinationLink.getId()
+					+ ", but arrived on link " + this.currentLink.getId() + ". Removing the agent from the simulation.");
 			Simulation.decLiving();
+			Simulation.incLost();
 			return;
 		}
 		advancePlanElement(now);
+	}
+	
+	public void teleportToLink(final Link link) {
+		this.currentLink = link;
 	}
 
 	private void advancePlanElement(final double now) {

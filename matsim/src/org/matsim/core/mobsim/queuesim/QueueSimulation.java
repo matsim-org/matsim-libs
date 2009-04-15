@@ -588,17 +588,19 @@ public class QueueSimulation {
 	}
 
 	private final void moveVehiclesWithUnknownLegMode(final double now) {
-	  	while (teleportationList.peek() != null ) {
-	  		QueueVehicle veh = teleportationList.peek();
-	  		if (veh.getEarliestLinkExitTime() <= now) {
-	  			teleportationList.poll();
-	  			veh.setCurrentLink(veh.getDriver().getDestinationLink());
+		while (teleportationList.peek() != null ) {
+			QueueVehicle veh = teleportationList.peek();
+			if (veh.getEarliestLinkExitTime() <= now) {
+				teleportationList.poll();
+				Link destinationLink = veh.getDriver().getDestinationLink();
+				veh.setCurrentLink(destinationLink);
+				veh.getDriver().teleportToLink(destinationLink);
 
-	  			getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getPerson(),
-	  					veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
-	  			veh.getDriver().legEnds(now);
-	  		} else break;
-  		}
+				getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getPerson(),
+						veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
+				veh.getDriver().legEnds(now);
+			} else break;
+		}
 	}
 
 	private void handleNetworkChangeEvents(final double time) {

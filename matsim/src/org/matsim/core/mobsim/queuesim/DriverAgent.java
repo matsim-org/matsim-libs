@@ -52,6 +52,8 @@ public interface DriverAgent {
 	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
 
 	public void incCurrentNode();
+	
+	public void teleportToLink(final Link link);
 
 	/**
 	 * Returns the next link the vehicle will drive along.

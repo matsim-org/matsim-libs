@@ -170,7 +170,9 @@ public class WithindayAgentTest extends MatsimTestCase {
 		pa.setVehicle(v);
 		v.setDriver(pa);
 		pa.initialize();
-		v.setCurrentLink(this.network.getLink("2"));
+		Link link2 = this.network.getLink("2");
+		v.setCurrentLink(link2);
+		pa.teleportToLink(link2);
 
 	  return pa;
 	}
@@ -202,6 +204,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newLegsRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newLegsRoute.get(1));
 		assertEquals("check the last node of rerouting!", this.network.getNode("4"), newLegsRoute.get(newLegsRoute.size()-1));
+
 		//enlarge scenario
 		List<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNode("2"));
