@@ -25,16 +25,19 @@ import org.matsim.core.api.network.Link;
 
 public interface QueueVehicle extends Identifiable {
 
-	public void setDriver(final DriverAgent driver);
-
 	public DriverAgent getDriver();
 
+	public void setDriver(final DriverAgent driver);
+	
+	public Link getCurrentLink();
+	
+	public void setCurrentLink(final Link link);
+	
 	// unclear about the methods below...
 
 	public double getEarliestLinkExitTime();
 
 	public void setEarliestLinkExitTime(final double time);
 
-	public Link getCurrentLink();
 
 }

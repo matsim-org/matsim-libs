@@ -30,6 +30,8 @@ public class QueueVehicleImpl implements QueueVehicle {
 	private DriverAgent driver = null;
 
 	private final Id id;
+	
+	private Link currentLink = null;
 
 	public QueueVehicleImpl(final Id id) {
 		this.id = id;
@@ -44,7 +46,11 @@ public class QueueVehicleImpl implements QueueVehicle {
 	}
 
 	public Link getCurrentLink() {
-		return this.driver.getCurrentLink();
+		return this.currentLink;
+	}
+	
+	public void setCurrentLink(final Link link) {
+		this.currentLink = link;
 	}
 
 	public DriverAgent getDriver() {
@@ -62,7 +68,7 @@ public class QueueVehicleImpl implements QueueVehicle {
 	@Override
 	public String toString() {
 		return "Vehicle Id " + getId() + ", driven by (personId) " + this.driver.getPerson().getId()
-				+ ", on link " + this.driver.getCurrentLink().getId();
+				+ ", on link " + this.currentLink.getId();
 	}
 
 }

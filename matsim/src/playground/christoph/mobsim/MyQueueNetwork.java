@@ -31,7 +31,6 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
@@ -52,14 +51,7 @@ public class MyQueueNetwork extends QueueNetwork{
 	
 	final private static Logger log = Logger.getLogger(MyQueueNetwork.class);
 	protected Map <Node, QueueLink[]> lookupTable;
-	
-	public MyQueueNetwork(NetworkLayer networkLayer)
-	{
-		super(networkLayer);
-		
-		createLookupTable();
-	}
-	
+
 	public MyQueueNetwork(NetworkLayer networkLayer, QueueNetworkFactory<QueueNode, QueueLink> factory) {
 		super(networkLayer, factory);
 		

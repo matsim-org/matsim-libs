@@ -48,8 +48,9 @@ public class PersonAgent implements DriverAgent {
 	private final QueueSimulation simulation;
 
 	private double activityDepartureTime = Time.UNDEFINED_TIME;
+	
+	private Link currentLink = null;
 
-	private Link currentLink;
 	/**
 	 * specifies the position of the next activity in the acts legs list
 	 */
@@ -97,12 +98,8 @@ public class PersonAgent implements DriverAgent {
 	private void setDepartureTime(final double seconds) {
 		this.activityDepartureTime = seconds;
 	}
-
-	public void setCurrentLink(final Link link) {
-		this.currentLink = link;
-	}
-
-	public Link getCurrentLink() {
+	
+	protected Link getCurrentLink() {
 		return this.currentLink;
 	}
 
@@ -114,7 +111,7 @@ public class PersonAgent implements DriverAgent {
 		this.currentLeg  = leg;
 		this.cacheRouteNodes = null;
 	}
-
+	
 	public int getCurrentNodeIndex() {
 		return this.currentNodeIndex;
 	}
@@ -135,7 +132,7 @@ public class PersonAgent implements DriverAgent {
 		Activity firstAct = (Activity) planElements.get(0);
 		setDepartureTime(firstAct.getEndTime());
 		SimulationTimer.updateSimStartTime(firstAct.getEndTime());
-		setCurrentLink(firstAct.getLink());
+		this.currentLink = firstAct.getLink();
 
 		if (planElements.size() > 1) {
 			initNextLeg((Leg) planElements.get(1));
@@ -235,6 +232,7 @@ public class PersonAgent implements DriverAgent {
 	}
 
 	public void incCurrentNode() {
+		this.currentLink = this.cachedNextLink;
 		this.currentNodeIndex++;
 		this.cachedNextLink = null; //reset cached nextLink
 	}

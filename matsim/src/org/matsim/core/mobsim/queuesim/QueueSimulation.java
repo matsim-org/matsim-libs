@@ -345,6 +345,7 @@ public class QueueSimulation {
 			agent.setVehicle(veh);
 
 			if (agent.initialize()) {
+				veh.setCurrentLink(agent.getCurrentLink());
 				addVehicleToLink(veh);
 			}
 		}
@@ -583,7 +584,6 @@ public class QueueSimulation {
 
 	protected static final void handleUnknownLegMode(final QueueVehicle veh) {
 		veh.setEarliestLinkExitTime(SimulationTimer.getTime() + veh.getDriver().getCurrentLeg().getTravelTime());
-		veh.getDriver().setCurrentLink(veh.getDriver().getDestinationLink());
 		teleportationList.add(veh);
 	}
 
@@ -592,11 +592,11 @@ public class QueueSimulation {
 	  		QueueVehicle veh = teleportationList.peek();
 	  		if (veh.getEarliestLinkExitTime() <= now) {
 	  			teleportationList.poll();
+	  			veh.setCurrentLink(veh.getDriver().getDestinationLink());
 
 	  			getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getPerson(),
 	  					veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
 	  			veh.getDriver().legEnds(now);
-//	  			veh.getDriver().reachActivity(now, this.network.getQueueLink(veh.getCurrentLink().getId()));
 	  		} else break;
   		}
 	}

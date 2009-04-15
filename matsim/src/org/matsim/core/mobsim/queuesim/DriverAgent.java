@@ -51,10 +51,6 @@ public interface DriverAgent {
 
 	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
 
-	public void setCurrentLink(final Link link); // the agent should not by itself on which link it is
-
-	public Link getCurrentLink();
-
 	public void incCurrentNode();
 
 	/**

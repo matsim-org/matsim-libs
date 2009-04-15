@@ -309,7 +309,7 @@ public class QueueLink {
 		double now = SimulationTimer.getTime();
 		activateLink();
 		this.originalLane.add(veh, now);
-		veh.getDriver().setCurrentLink(this.getLink());
+		veh.setCurrentLink(this.getLink());
 		QueueSimulation.getEvents().processEvent(
 				new LinkEnterEvent(now, veh.getDriver().getPerson(),
 						this.getLink()));
