@@ -23,8 +23,7 @@ import org.matsim.api.basic.v01.Id;
 
 /**
  * Builder for Objects to be used within BasicSignalSystems container
- * Even if more a Factory t
- * his class is called builder to be consistent with ohter
+ * Even if more a Factory this class is called builder to be consistent with other
  * MATSim container content builders which are in fact builder due to their more
  * complex build behavior. 
  * @author dgrether
