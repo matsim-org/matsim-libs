@@ -11,21 +11,21 @@ public class TripWriter {
 	
 	
 	/*
-	B015211A = 408;	Verbraucherm�rkte (> 2500 m2) 
-	B015211B = 409; Grosse Superm�rkte (1000-2499 m2)
-	B015211C = 410;	Kleine Superm�rkte (400-999 m2)
-	B015211D = 411;	Grosse Gesch�fte (100-399 m2)
-	B015211E = 412;	Kleine Gesch�fte (< 100 m2)
-	B015212A = 413; Warenh�user
+	B015211A = 408;	Verbrauchermaerkte (> 2500 m2) 
+	B015211B = 409; Grosse Supermaerkte (1000-2499 m2)
+	B015211C = 410;	Kleine Supermaerkte (400-999 m2)
+	B015211D = 411;	Grosse Geschaefte (100-399 m2)
+	B015211E = 412;	Kleine Geschaefte (< 100 m2)
+	B015212A = 413; Warenhaeuser
 	*
-	B015221A = 415; Detailhandel mit Obst und Gem�se
+	B015221A = 415; Detailhandel mit Obst und Gemuese
 	B015222A = 416; Detailhandel mit Fleisch und Fleischwaren	
-	B015223A = 417; Detailhandel mit Fisch und Meeresfr�chten	
-	B015224A = 418; Detailhandel mit Brot, Back- und S�sswaren	
-	B015225A = 419;	Detailhandel mit Getr�nken
+	B015223A = 417; Detailhandel mit Fisch und Meeresfruechten	
+	B015224A = 418; Detailhandel mit Brot, Back- und Suesswaren	
+	B015225A = 419;	Detailhandel mit Getraenken
 	*
 	B015227A = 421; Detailhandel mit Milcherzeugnissen und Eiern	
-	B015227B = 422; Sonstiger Fachdetailhandel mit Nahrungsmitteln, Getr�nken und Tabak a.n.g. (in Verkaufsr�umen)
+	B015227B = 422; Sonstiger Fachdetailhandel mit Nahrungsmitteln, Getraenken und Tabak a.n.g. (in Verkaufsraeumen)
 	*/
 	
 	
