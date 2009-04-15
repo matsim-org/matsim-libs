@@ -134,7 +134,7 @@ public class NelsonTripReader {
 					endTime = 60* Double.parseDouble(entries[41].trim());
 				}
 					
-				MZTrip mzTrip = new MZTrip(id, coord, startTime, endTime);
+				MZTrip mzTrip = new MZTrip(id, null, coord, startTime, endTime);
 				this.mzTrips.put(id, mzTrip);
 			}
 		} catch (IOException e) {

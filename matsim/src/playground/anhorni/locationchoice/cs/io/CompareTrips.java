@@ -160,7 +160,7 @@ public class CompareTrips {
 					endTime = 60* Double.parseDouble(entries[41].trim());
 				}
 					
-				MZTrip mzTrip = new MZTrip(id, coord, startTime, endTime);
+				MZTrip mzTrip = new MZTrip(id, null, coord, startTime, endTime);
 				
 				String wmittel = entries[53].trim();
 				mzTrip.setWmittel(this.getWmittel(wmittel));
