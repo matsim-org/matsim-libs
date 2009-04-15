@@ -1,9 +1,9 @@
 package org.matsim.socialnetworks.algorithms;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,7 +16,7 @@ public class SortHashMapByValue {
 //	public static LinkedHashMap makeSortedMap (LinkedHashMap m) {
 	public LinkedHashMap makeSortedMap (LinkedHashMap m) {
 		LinkedHashMap sortedMap=new LinkedHashMap();
-		ArrayList outputList = sortMap(m);
+		List outputList = sortMap(m);
 //		int count = 0;
 //		count = outputList.size();
 //		while(count > 0) {
@@ -37,34 +37,29 @@ public class SortHashMapByValue {
 	 * @param map
 	 * @return outputList of Map.Entries
 	 */
-	public static ArrayList<Map.Entry> sortMap(Map map) {
-		ArrayList<Map.Entry> outputList = null;
-		int count = 0;
-		Set<Map.Entry> set = null;
-		Map.Entry[] entries = null;
+	private static List<Map.Entry> sortMap(Map map) {
+//		List<Map.Entry> outputList = null;
+//		int count = 0;
 		// Logic:
 		// get a set from Map
 		// Build a Map.Entry[] from set
 		// Sort the list using Arrays.sort
 		// Add the sorted Map.Entries into arrayList and return
 
-		set = map.entrySet();
-		entries = set.toArray(new Map.Entry[set.size()]);
+		Set<Map.Entry> set = map.entrySet();
+		Map.Entry[] entries = set.toArray(new Map.Entry[set.size()]);
 
 		// Sort the entries with your own comparator for the values:
 		Arrays.sort(entries, new Comparator<Map.Entry>() {
-			public int compareTo(Map.Entry lhs, Map.Entry rhs) {
-				return ((Comparable)lhs.getValue()).compareTo((Comparable)rhs.getValue());
-			}
-
 			public int compare(Map.Entry lhs, Map.Entry rhs) {
 				return ((Comparable)lhs.getValue()).compareTo((Comparable)rhs.getValue());
 			}
 		});
-		outputList = new ArrayList<Map.Entry>();
-		for(int i = 0; i < entries.length; i++) {
-			outputList.add(entries[i]);
-		}
-		return outputList;
+		return Arrays.asList(entries);
+//		outputList = new ArrayList<Map.Entry>(entries);
+//		for(int i = 0; i < entries.length; i++) {
+//			outputList.add(entries[i]);
+//		}
+//		return outputList;
 	}//End of sortMap
 }
