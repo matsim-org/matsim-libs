@@ -360,16 +360,19 @@ public class QueueLane {
 	private void moveParkToWait(final double now) {
 		QueueVehicle veh;
 		while ((veh = this.parkingList.peek()) != null) {
-			if (veh.getDriver().getDepartureTime() > now) {
+			DriverAgent driver = veh.getDriver();
+			if (driver.getDepartureTime() > now) {
 				return;
 			}
 
 			// Need to inform the veh that it now leaves its activity.
-			veh.getDriver().leaveActivity(now);
+			if (driver instanceof PersonAgent) {
+				((PersonAgent) driver).leaveActivity(now);
+			}
 
 			// Generate departure event
 			QueueSimulation.getEvents().processEvent(
-					new AgentDepartureEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), veh.getDriver().getCurrentLeg()));
+					new AgentDepartureEvent(now, driver.getPerson(), this.queueLink.getLink(), driver.getCurrentLeg()));
 
 			/*
 			 * A.) we have an unknown leg mode (aka != "car").
@@ -377,7 +380,7 @@ public class QueueLane {
 			 * B.) we have no route (aka "next activity on same link") -> no waitingList
 			 * C.) route known AND mode == "car" -> regular case, put veh in waitingList
 			 */
-			Leg leg = veh.getDriver().getCurrentLeg();
+			Leg leg = driver.getCurrentLeg();
 
 			if (!leg.getMode().equals(TransportMode.car)) {
 				QueueSimulation.handleUnknownLegMode(veh);
@@ -552,36 +555,31 @@ public class QueueLane {
 	 * @param now the current time
 	 */
 	/*package*/ void add(final QueueVehicle veh, final double now) {
-//		activateLane();
 		this.vehQueue.add(veh);
 		if (this.isFireLaneEvents()){
 			QueueSimulation.getEvents().processEvent(new LaneEnterEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), this.getLaneId()));
 		}
 		double departureTime;
 		if (this.originalLane) {
-			// It's the original lane,
-			// so we need to start with a 'clean' freeSpeedTravelTime
+			/* It's the original lane,
+			 * so we need to start with a 'clean' freeSpeedTravelTime */
 			departureTime = (now + this.freespeedTravelTime);
-		}
-		else {
-			// It's not the original lane,
-			// so there is a fractional rest we add to this link's freeSpeedTravelTime
+		} else {
+			/* It's not the original lane,
+			 * so there is a fractional rest we add to this link's freeSpeedTravelTime */
 			departureTime = now + this.freespeedTravelTime
 			+ veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
 		}
-		veh.setEarliestLinkExitTime(departureTime);
-
 		if (this.meterFromLinkEnd == 0.0) {
-			// It's a QueueLane that is directly connected to a QueueNode,
-			// so we have to floor the freeLinkTravelTime in order the get the same
-			// results compared to the old mobSim
-			veh.setEarliestLinkExitTime(Math.floor(veh.getEarliestLinkExitTime()));
+			/* It's a QueueLane that is directly connected to a QueueNode,
+			 * so we have to floor the freeLinkTravelTime in order the get the same
+			 * results compared to the old mobSim */
+			departureTime = Math.floor(departureTime);
 		}
+		veh.setEarliestLinkExitTime(departureTime);
 	}
 
-
 	private void addToBuffer(final QueueVehicle veh, final double now) {
-//		log.debug("addToBuffer: " + now);
 		if (this.bufferCap >= 1.0) {
 			this.bufferCap--;
 		}

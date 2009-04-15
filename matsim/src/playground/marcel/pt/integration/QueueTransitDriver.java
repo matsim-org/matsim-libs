@@ -71,9 +71,6 @@ public class QueueTransitDriver implements DriverAgent {
 	public void teleportToLink(Link link) {
 		// TODO [MR] Auto-generated method stub
 	}
-	
-	public void leaveActivity(double now) {
-	}
 
 	public void legEnds(double now) {
 		// TODO [MR] Auto-generated method stub

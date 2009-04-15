@@ -37,6 +37,15 @@ public interface DriverAgent {
 	/* there is no corresponding setter, as the implementation should set the the corresponding time
 	 * internally, e.g. in legEnds().
 	 */
+	
+	public Link getDestinationLink();
+	
+	/**
+	 * Returns the next link the vehicle will drive along.
+	 *
+	 * @return The next link the vehicle will drive on, or null if an error has happened.
+	 */
+	public Link chooseNextLink();
 
 	/**
 	 * Informs the agent that it arrived at the destination of the current leg.
@@ -47,27 +56,14 @@ public interface DriverAgent {
 	 */
 	public void legEnds(final double now);
 	
-	public Link getDestinationLink();
+	public void teleportToLink(final Link link);
 
 	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
 
 	public void incCurrentNode();
-	
-	public void teleportToLink(final Link link);
-
-	/**
-	 * Returns the next link the vehicle will drive along.
-	 *
-	 * @return The next link the vehicle will drive on, or null if an error has happened.
-	 */
-	public Link chooseNextLink();
-
-	// those below shouldn't be part of the interface in my opinion...
-
-	public Person getPerson();
-
-	public void leaveActivity(final double now); // the agent should decide when it leaves the activity, and handle it appropriately
 
 	public Leg getCurrentLeg();
+
+	public Person getPerson();
 
 }
