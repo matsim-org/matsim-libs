@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -36,10 +37,17 @@ import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.events.ActEndEvent;
+import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -75,7 +83,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 		/* build events */
 		Events events = new Events();
-		EventCollector collector = new EventCollector();
+		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
 		/* run sim */
@@ -113,7 +121,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 		/* build events */
 		Events events = new Events();
-		EventCollector collector = new EventCollector();
+		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
 		/* run sim */
@@ -128,18 +136,65 @@ public class QueueSimulationTest extends MatsimTestCase {
 		assertEquals("wrong time in second event.", 7.0*3600 + 12, collector.events.get(3).getTime(), EPSILON);
 	}
 
-	/*package*/ static class EventCollector implements LinkEnterEventHandler {
+	/**
+	 * A single agent is simulated that uses teleportation for its one and only leg.
+	 *
+	 * @author mrieser
+	 */
+	public void testTeleportationSingleAgent() {
+		Fixture f = new Fixture();
 
+		// add a single person with leg from link1 to link3
+		Person person = new PersonImpl(new IdImpl(0));
+		Plan plan = person.createPlan(true);
+		Activity a1 = plan.createActivity("h", f.link1);
+		a1.setEndTime(6*3600);
+		Leg leg = plan.createLeg(TransportMode.other);
+		Route route = f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3); // TODO [MR] use different factory/mode here
+		leg.setRoute(route);
+		leg.setTravelTime(15.0);
+		plan.createActivity("w", f.link3);
+		f.plans.addPerson(person);
+
+		/* build events */
+		Events events = new Events();
+		BasicEventCollector collector = new BasicEventCollector();
+		events.addHandler(collector);
+
+		/* run sim */
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		sim.run();
+
+		/* finish */
+		assertEquals("wrong number of events.", 4, collector.events.size());
+		assertEquals("wrong type of 1st event.", ActEndEvent.class, collector.events.get(0).getClass());
+		assertEquals("wrong type of 2nd event.", AgentDepartureEvent.class, collector.events.get(1).getClass());
+		assertEquals("wrong type of 3rd event.", AgentArrivalEvent.class, collector.events.get(2).getClass());
+		assertEquals("wrong type of 4th event.", ActStartEvent.class, collector.events.get(3).getClass());
+		assertEquals("wrong time in 1st event.", 6.0*3600 + 0, collector.events.get(0).getTime(), EPSILON);
+		assertEquals("wrong time in 2nd event.", 6.0*3600 + 0, collector.events.get(1).getTime(), EPSILON);
+		assertEquals("wrong time in 3rd event.", 6.0*3600 + 15, collector.events.get(2).getTime(), EPSILON);
+		assertEquals("wrong time in 4th event.", 6.0*3600 + 15, collector.events.get(3).getTime(), EPSILON);
+	}
+
+	/*package*/ static class LinkEnterEventCollector implements LinkEnterEventHandler {
 		public final ArrayList<LinkEnterEvent> events = new ArrayList<LinkEnterEvent>();
-
 		public void handleEvent(final LinkEnterEvent event) {
 			this.events.add(event);
 		}
-
 		public void reset(final int iteration) {
 			this.events.clear();
 		}
+	}
 
+	/*package*/ static class BasicEventCollector implements BasicEventHandler {
+		public final ArrayList<BasicEvent> events = new ArrayList<BasicEvent>();
+		public void handleEvent(final BasicEventImpl event) {
+			this.events.add(event);
+		}
+		public void reset(final int iteration) {
+			this.events.clear();
+		}
 	}
 
 	/**
@@ -156,7 +211,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		
 		/* build events */
 		Events events = new Events();
-		EventCollector collector = new EventCollector();
+		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
 		/* run sim */
@@ -220,7 +275,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		/* run sim */
 		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
 		sim.run();
-		
+
 		/* finish */
 		int[] volume = vAnalyzer.getVolumesForLink("2");
 		System.out.println("#vehicles 6-7: " + Integer.toString(volume[6]));
