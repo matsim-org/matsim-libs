@@ -96,7 +96,8 @@ public class TimeWindowCalcTimeCorrelations {
 						n_egonet++;
 						ti_egonet=ti_egonet+tw2.startTime;
 						tf_egonet=tf_egonet+tw2.endTime;
-						double tdurunfolded=(tw2.endTime-tw2.startTime+numbins*binwidth)%(numbins*binwidth);
+						//double tdurunfolded=(tw2.endTime-tw2.startTime+numbins*binwidth)%(numbins*binwidth);
+						double tdurunfolded=(CompareTimeWindows.getTimeWindowOverlapDuration(tw1, tw2)+numbins*binwidth)%(numbins*binwidth);
 						tdur_egonet=tdur_egonet+tdurunfolded;
 						dist_egonet=dist_egonet+dist_alter;
 
@@ -104,7 +105,8 @@ public class TimeWindowCalcTimeCorrelations {
 					// Others there, not necessarily friends
 					if(CompareTimeWindows.overlapTimePlaceType(tw1, tw2)){										
 						n_act++;
-						double tdurunfolded=(tw1.endTime-tw1.startTime+numbins*binwidth)%(numbins*binwidth);
+//						double tdurunfolded=(tw1.endTime-tw1.startTime+numbins*binwidth)%(numbins*binwidth);
+						double tdurunfolded=(CompareTimeWindows.getTimeWindowOverlapDuration(tw1, tw2)+numbins*binwidth)%(numbins*binwidth);
 						tdur_act=tdur_act+tdurunfolded;
 						dist_act=dist_act+dist_alter;
 					}
