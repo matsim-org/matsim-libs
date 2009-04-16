@@ -16,6 +16,8 @@ public class TimeWindow {
 		 *
 		 */		
 		public TimeWindow(double st, double et, Person person, Activity eventAct){
+			//TODO jhackney startTime and endTime are redundant and could be 
+			// extracted from the eventAct; they do not need to be here
 			this.startTime=st;
 			this.endTime=et;
 			this.person=person;
