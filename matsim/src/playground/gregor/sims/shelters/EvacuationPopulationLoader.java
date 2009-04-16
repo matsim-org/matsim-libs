@@ -24,6 +24,8 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.collections.QuadTree;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 public class EvacuationPopulationLoader {
 
 	
@@ -74,8 +76,12 @@ public class EvacuationPopulationLoader {
 		
 		int count = 0;
 		for (Building building : this.buildings) {
-			
-			Link link = this.quadTree.get(building.getGeo().getCentroid().getX(), building.getGeo().getCentroid().getY());
+			if (count > 100) {
+				break;
+			}
+			Coordinate c = building.getGeo().getCoordinate();
+			Link link = this.quadTree.get(c.x,c.y);
+//			Link link = this.network.getNearestLink(new CoordImpl(c.x,c.y));
 			
 			
 			int i = 0;
@@ -111,7 +117,7 @@ public class EvacuationPopulationLoader {
 	}
 
 	private void buildQuadTree() {
-		this.quadTree = new QuadTree<Link>(640000,670000,9880000,9900000);
+		this.quadTree = new QuadTree<Link>(600000,9800000,700000,9990000);
 		for (Link link : this.network.getLinks().values()) {
 			if (link.getId().toString().contains("el") || link.getId().toString().contains("s") ) {
 				continue;

@@ -2,13 +2,14 @@ package playground.gregor.sims.shelters.signalsystems;
 
 import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.core.basic.signalsystemsconfig.BasicAdaptiveSignalSystemControlInfo;
+import org.matsim.signalsystems.control.AdaptiveSignalSystemControler;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
 
-public class SheltersDoorBlocker extends AdaptiveSignalSystemControlerImpl {
+public class SheltersDoorBlockerController extends AdaptiveSignalSystemControlerImpl implements AdaptiveSignalSystemControler {
 
 	private ShelterInputCounter shelterInputCounter;
 
-	public SheltersDoorBlocker(BasicAdaptiveSignalSystemControlInfo controlInfo) {
+	public SheltersDoorBlockerController(BasicAdaptiveSignalSystemControlInfo controlInfo) {
 		super(controlInfo);
 	}
 

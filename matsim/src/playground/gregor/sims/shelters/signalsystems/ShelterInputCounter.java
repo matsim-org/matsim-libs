@@ -27,7 +27,7 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, AfterMobsimLi
 	public ShelterInputCounter(NetworkLayer network, HashMap<Id,Building> shelterLinkMapping) {
 		
 		this.shelterLinkMapping = shelterLinkMapping;
-
+		
 		for (Link link : network.getLinks().values()) {
 			if (link.getId().toString().contains("sl") && link.getId().toString().contains("a")) {
 				this.counts.put(link.getId(), new Counter());
@@ -64,10 +64,10 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, AfterMobsimLi
 	public void notifySimulationInitialized(QueueSimulationInitializedEvent e) {
 		this.scs = e.getQueueSimulation().getSignalSystemControlerBySystemId();
 		for (SignalSystemControler ssc : this.scs.values()) {
-			if (!(ssc instanceof SheltersDoorBlocker) ){
+			if (!(ssc instanceof SheltersDoorBlockerController) ){
 				throw new RuntimeException("wrong SignalsystemsController type!");
 			}
-			((SheltersDoorBlocker)ssc).shelterInputCounter(this);
+			((SheltersDoorBlockerController)ssc).shelterInputCounter(this);
 		}
 		
 	}

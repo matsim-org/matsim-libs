@@ -78,7 +78,7 @@ public class EvacuationShelterNetLoader {
 			this.shelterLinks.add(l2);
 			this.shelterLinks.add(l3);
 		}
-		
+		this.network.connect();
 	}
 	
 	

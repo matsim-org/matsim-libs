@@ -11,6 +11,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 
+import playground.gregor.sims.shelters.signalsystems.ShelterDoorBlockerSetup;
 import playground.gregor.sims.shelters.signalsystems.ShelterInputCounter;
 
 
@@ -35,7 +36,9 @@ public class ShelterEvacuationController extends Controler {
 		ShelterInputCounter sic = new ShelterInputCounter(this.network,this.shelterLinkMapping);
 		this.events.addHandler(sic);
 		this.addControlerListener(sic);
+		this.addControlerListener(new ShelterDoorBlockerSetup());
 		this.getQueueSimulationListener().add(sic);
+		
 	}
 
 
