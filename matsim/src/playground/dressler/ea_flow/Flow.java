@@ -603,11 +603,11 @@ public class Flow {
 	 */
 	public Population createPoulation(String oldfile){
 		//check whether oldfile exists
-		boolean org = (oldfile!=null);
-		HashMap<Node,LinkedList<Person>> orgpersons = new  HashMap<Node,LinkedList<Person>>();
+		//boolean org = (oldfile!=null);
+		//HashMap<Node,LinkedList<Person>> orgpersons = new  HashMap<Node,LinkedList<Person>>();
 		
 		//read old network an find out the startnodes of persons if oldfile exists
-		if(org){
+		/*if(org){
 			Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
 			new MatsimPopulationReader(population,_network).readFile(oldfile);
 			_network.connect();
@@ -625,7 +625,7 @@ public class Flow {
 					list.add(person);
 				}
 			}
-		}
+		}*/
 		
 		//construct Population
 		Population result =new PopulationImpl(PopulationImpl.NO_STREAMING);
@@ -652,7 +652,7 @@ public class Flow {
 						//add the first edge if olfile exists
 						String stringid = null;
 						Person orgperson = null;
-						if(org && (( orgpersons.get(firstnode))!=null) ){
+						/*if(org && (( orgpersons.get(firstnode))!=null) ){
 							LinkedList<Person> list = orgpersons.get(firstnode);
 							orgperson = list.getFirst();
 							list.remove(0);
@@ -664,11 +664,11 @@ public class Flow {
 							ids.add(0,firstlink.getId());
 							}
 							stringid = orgperson.getId().toString();
-						}else{
+						}else{*/
 							stringid = "new"+String.valueOf(id);
 							id++;
-						}
-
+						//}
+						
 //						route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
 						Link startLink = _network.getLink(ids.get(0));
 						Link endLink = _network.getLink(ids.get(ids.size()-1));
