@@ -87,7 +87,10 @@ public class OTFVis {
 		if (args.length == 0) {
 			args2 = chooseFile(args2);
 		}
-		
+		if (args2.length == 0) {
+			printUsage();
+			return;
+		}
 		String arg0l = args2[0].toLowerCase();
 		
 		if (arg0l.endsWith(".veh.gz") || arg0l.toLowerCase().endsWith(".veh")) {
@@ -106,6 +109,8 @@ public class OTFVis {
 				playConfig(args2);
 			} else if (FileType.Network.equals(type)) {
 				playNetwork(args2);
+			} else {
+				printUsage();
 			}
 		} else if (arg0l.equals("-convert")) {
 			convert(args2);
@@ -126,7 +131,7 @@ public class OTFVis {
 	      } 
 	      @Override public String getDescription() 
 	      { 
-	        return "MATSIM net or config file (*.xml)"; 
+	        return "MATSim net or config file (*.xml)"; 
 	      } 
 	    } ); 
 
@@ -146,10 +151,9 @@ public class OTFVis {
 	    { 
 	    	String [] args_new = {fc.getSelectedFile().getAbsolutePath()};
 	    	return args_new;
-	    }  else {  
-	      System.out.println( "Auswahl abgebrochen" );
-	      return args;
 	    }
+      System.out.println( "No file selected." );
+      return args;
 	}
 
 	public static final void playMVI(final String[] args) {
