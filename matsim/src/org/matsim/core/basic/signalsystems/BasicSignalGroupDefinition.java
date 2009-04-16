@@ -45,6 +45,7 @@ public interface BasicSignalGroupDefinition {
 
 	public List<Id> getToLinkIds();
 
+	//TODO dg remove the methods below from basic interface
 	public void setResponsibleLSAControler(
 			SignalSystemControler signalSystemControler);
 
