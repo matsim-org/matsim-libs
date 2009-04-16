@@ -126,7 +126,7 @@ public class SignalSystemsConfigReaderTest extends MatsimTestCase {
 		assertEquals(id43, lssConfiguration.getSignalSystemId());
 		BasicAdaptiveSignalSystemControlInfo adaptiveControlInfo = (BasicAdaptiveSignalSystemControlInfo) lssConfiguration.getControlInfo();
 		assertNotNull(adaptiveControlInfo);
-		assertEquals("org.matism.nonexistingpackage.Nonexistingcontroler.class", adaptiveControlInfo.getAdaptiveControlerClass());
+		assertEquals("org.matism.nonexistingpackage.Nonexistingcontroler", adaptiveControlInfo.getAdaptiveControlerClass());
 		assertEquals(2, adaptiveControlInfo.getSignalGroupIds().size());
 		assertEquals(id23, adaptiveControlInfo.getSignalGroupIds().get(0));
 		assertEquals(id42, adaptiveControlInfo.getSignalGroupIds().get(1));
@@ -138,7 +138,7 @@ public class SignalSystemsConfigReaderTest extends MatsimTestCase {
 		assertEquals(id24, lssConfiguration.getSignalSystemId());
 		BasicAdaptivePlanBasedSignalSystemControlInfo adaptivePbControlInfo = (BasicAdaptivePlanBasedSignalSystemControlInfo) lssConfiguration.getControlInfo();
 		assertNotNull(adaptivePbControlInfo);
-		assertEquals("org.matism.nonexistingpackage.Nonexistingcontroler.class", adaptiveControlInfo.getAdaptiveControlerClass());
+		assertEquals("org.matism.nonexistingpackage.Nonexistingcontroler", adaptiveControlInfo.getAdaptiveControlerClass());
 		assertEquals(2, adaptivePbControlInfo.getSignalGroupIds().size());
 		assertEquals(id23, adaptivePbControlInfo.getSignalGroupIds().get(0));
 		assertEquals(id42, adaptivePbControlInfo.getSignalGroupIds().get(1));
