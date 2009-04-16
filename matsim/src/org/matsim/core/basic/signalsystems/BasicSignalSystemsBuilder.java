@@ -29,17 +29,21 @@ import org.matsim.api.basic.v01.Id;
  * @author dgrether
  */
 public class BasicSignalSystemsBuilder {
-	
+	/**
+	 * The constructor is only visible in the package because instances should 
+	 * be retrieved from the container, i.e. an instance of BasicSignalSystems
+	 * @see org.matsim.core.basic.signalsystems.BasicSignalSystems#getSignalSystemsBuilder()
+	 */
 	BasicSignalSystemsBuilder(){}
 	
-	public BasicSignalSystemDefinition createLightSignalSystemDefinition(
-			Id id) {
-		return new BasicSignalSystemDefinitionImpl(id);
+	public BasicSignalSystemDefinition createSignalSystemDefinition(
+			Id signalSystemId) {
+		return new BasicSignalSystemDefinitionImpl(signalSystemId);
 	}
 
-	public BasicSignalGroupDefinition createLightSignalGroupDefinition(
-			Id linkRefId, Id id) {
-		return new BasicSignalGroupDefinitionImpl(linkRefId, id);
+	public BasicSignalGroupDefinition createSignalGroupDefinition(
+			Id linkRefId, Id signalGroupId) {
+		return new BasicSignalGroupDefinitionImpl(linkRefId, signalGroupId);
 	}
 	
 }

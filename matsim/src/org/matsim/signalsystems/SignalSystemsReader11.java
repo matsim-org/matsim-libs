@@ -77,7 +77,7 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 		BasicSignalSystemDefinition lssdef;
 		for (XMLSignalSystemDefinitionType xmllssDef : xmlLssDefinition
 				.getSignalSystemDefinition()) {
-			lssdef = builder.createLightSignalSystemDefinition(new IdImpl(xmllssDef
+			lssdef = builder.createSignalSystemDefinition(new IdImpl(xmllssDef
 					.getId()));
 			lssdef.setDefaultCycleTime(xmllssDef.getDefaultCycleTime()
 					.getSeconds());
@@ -91,7 +91,7 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 		BasicSignalGroupDefinition lsgdef;
 		for (XMLSignalGroupDefinitionType xmllsgdef : xmlLssDefinition
 				.getSignalGroupDefinition()) {
-			lsgdef = builder.createLightSignalGroupDefinition(new IdImpl(xmllsgdef
+			lsgdef = builder.createSignalGroupDefinition(new IdImpl(xmllsgdef
 					.getLinkIdRef()), new IdImpl(xmllsgdef.getId()));
 			lsgdef.setLightSignalSystemDefinitionId(new IdImpl(xmllsgdef
 					.getSignalSystemDefinition().getRefId()));

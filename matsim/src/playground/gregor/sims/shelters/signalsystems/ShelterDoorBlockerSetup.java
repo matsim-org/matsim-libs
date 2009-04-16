@@ -55,10 +55,10 @@ public class ShelterDoorBlockerSetup implements StartupListener{
 			
 			Id id = new IdImpl(lsdId++);
 			
-			BasicSignalSystemDefinition ssd = bssb.createLightSignalSystemDefinition(id);
+			BasicSignalSystemDefinition ssd = bssb.createSignalSystemDefinition(id);
 
 			Id id2 = new IdImpl(lsgId);
-			BasicSignalGroupDefinition ssg = bssb.createLightSignalGroupDefinition(link.getId(), id2 );
+			BasicSignalGroupDefinition ssg = bssb.createSignalGroupDefinition(link.getId(), id2 );
 			ssg.addLaneId(lane.getId());
 			ssg.addToLinkId(toLink);
 			ssg.setLightSignalSystemDefinitionId(id);
