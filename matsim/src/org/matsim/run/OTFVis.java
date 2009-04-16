@@ -20,7 +20,11 @@
 
 package org.matsim.run;
 
+import java.io.File;
 import java.io.IOException;
+
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Population;
@@ -78,33 +82,74 @@ public class OTFVis {
 	}
 
 	public static void main(final String[] args) {
+		String [] args2 = args;
+		
 		if (args.length == 0) {
-			printUsage();
-			return;
+			args2 = chooseFile(args2);
 		}
-		String arg0l = args[0].toLowerCase();
+		
+		String arg0l = args2[0].toLowerCase();
+		
 		if (arg0l.endsWith(".veh.gz") || arg0l.toLowerCase().endsWith(".veh")) {
-			playVEH(args);
+			playVEH(args2);
 		} else if (arg0l.endsWith(".mvi")) {
-			playMVI(args);
+			playMVI(args2);
 		} else if ((arg0l.endsWith(".xml") || arg0l.endsWith(".xml.gz"))) {
 			FileType type;
 			try {
-				type = new MatsimFileTypeGuesser(args[0]).getGuessedFileType();
+				type = new MatsimFileTypeGuesser(arg0l).getGuessedFileType();
 			} catch (IOException e) {
 				e.printStackTrace();
 				return;
 			}
 			if (FileType.Config.equals(type)) {
-				playConfig(args);
+				playConfig(args2);
 			} else if (FileType.Network.equals(type)) {
-				playNetwork(args);
+				playNetwork(args2);
 			}
 		} else if (arg0l.equals("-convert")) {
-			convert(args);
+			convert(args2);
 		} else {
 			printUsage();
 		}
+	}
+
+	public static final String[] chooseFile(final String[] args) {
+		JFileChooser fc = new JFileChooser();
+	    
+	    fc.setFileFilter( new FileFilter() 
+	    { 
+	      @Override public boolean accept( File f ) 
+	      { 
+	        return f.isDirectory() || 
+	          f.getName().toLowerCase().endsWith( ".xml" ); 
+	      } 
+	      @Override public String getDescription() 
+	      { 
+	        return "MATSIM net or config file (*.xml)"; 
+	      } 
+	    } ); 
+
+	    fc.setFileFilter( new FileFilter() 
+	    { 
+	      @Override public boolean accept( File f ) 
+	      { 
+	        return f.isDirectory() || 
+	          f.getName().toLowerCase().endsWith( ".mvi" ); 
+	      } 
+	      @Override public String getDescription() 
+	      { return "OTFVis movie file (*.mvi)"; } 
+	    } ); 
+
+	    int state = fc.showOpenDialog( null ); 
+	    if ( state == JFileChooser.APPROVE_OPTION ) 
+	    { 
+	    	String [] args_new = {fc.getSelectedFile().getAbsolutePath()};
+	    	return args_new;
+	    }  else {  
+	      System.out.println( "Auswahl abgebrochen" );
+	      return args;
+	    }
 	}
 
 	public static final void playMVI(final String[] args) {

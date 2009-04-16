@@ -31,7 +31,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsDevice;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -58,9 +62,11 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
+import javax.media.opengl.GLCapabilitiesChooser;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
+import javax.media.opengl.GLJPanel;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -266,7 +272,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	//private boolean isValid = false;
 	//	public boolean isActiveNet = false;
 	private GL gl = null;
-	private GLCanvas canvas = null;
 	private VisGUIMouseHandler mouseMan = null;
 	private final OTFClientQuad clientQ;
 	private String lastTime = "";
@@ -460,18 +465,57 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	protected static volatile GLContext motherContext = null;
 
 
+	public static class MyGLCanvas extends GLJPanel {
+
+		public MyGLCanvas(GLCapabilities arg0, GLCapabilitiesChooser arg1, GLContext arg2, GraphicsDevice arg3) {
+			super(arg0, arg1, arg2);
+			// TODO Auto-generated constructor stub
+		}
+		public Graphics2D graphics = null;
+		public MyGLCanvas(GLCapabilities caps) {
+			super(caps);
+		}
+		@Override
+		public void paint(Graphics arg0) {
+			this.graphics = (Graphics2D)arg0;
+			super.paint(arg0);
+		}
+		
+	}
+	private Component canvas = null;
+	private JFrame  frame = null;
+	
+	public Insets getInsets() {
+		return this.frame.getInsets();
+	}
+	public int getWidth() {
+		return this.frame.getWidth();
+	}
+	public int getHeight() {
+		return this.frame.getHeight();
+	}
+	
+	protected Component createGLCanvas(OTFOGLDrawer drawer, GLCapabilities caps,  GLContext motherContext) {
+		GLCanvas canvas = null;
+		if (motherContext == null) {
+			canvas = new GLCanvas(caps);
+			//set later in init() motherContext = this.canvas.getContext();
+		} else {
+			canvas = new GLCanvas(caps, null, motherContext, null);
+		}
+		
+		canvas.addGLEventListener(drawer);
+		return canvas;
+		
+	}
 	public OTFOGLDrawer(JFrame frame, OTFClientQuad clientQ) {
 		this.clientQ = clientQ;
+		this.frame = frame;
 		GLCapabilities caps = new GLCapabilities();
-		if (motherContext == null) {
-			this.canvas = new GLCanvas(caps);
-			motherContext = this.canvas.getContext();
-		} else {
-			this.canvas = new GLCanvas(caps, null, motherContext, null);
-		}
 		this.config = (OTFVisConfig) Gbl.getConfig().getModule("otfvis");
 
-		this.canvas.addGLEventListener(this);
+		this.canvas = createGLCanvas(this, caps, motherContext);
+		
 		this.mouseMan = new VisGUIMouseHandler(this);
 		this.mouseMan.setBounds((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing(), 100);
 
@@ -485,7 +529,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.canvas.setMinimumSize(new Dimension(50,50));
 		this.canvas.setPreferredSize(new Dimension(300,300));
 		this.canvas.setMaximumSize(new Dimension(1024,1024));
-
+		
 		OTFClientQuad.ClassCountExecutor counter = new ClassCountExecutor(OTFDefaultLinkHandler.class);
 		clientQ.execute(null, counter);
 		double linkcount = counter.getCount();
@@ -593,6 +637,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.config = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis"));
 
 		this.gl = drawable.getGL();
+		
 
 		float[] components = this.config.getBackgroundColor().getColorComponents(new float[4]);
 		this.gl.glClearColor(components[0], components[1], components[2], components[3]);
@@ -648,7 +693,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		if(current == null) current = Screenshot.readToBufferedImage(drawable.getWidth(), drawable.getHeight());
 	}
 
-	public void addOverlay(OTFGLOverlay overlay) {
+	public void addOverlay(OTFGLDrawableImpl overlay) {
 		overlayItems.add(overlay);
 	}
 
@@ -849,7 +894,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	 * if the displayed Rect is moved or enlarged, we need to call invalidate, to get the correct data from the host
 	 */
 	public void redraw() {
-		this.canvas.display();
+		this.canvas.repaint();
 	}
 
 	private final Object blockRefresh = new Object();
@@ -975,6 +1020,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	 */
 	public void setQueryHandler(OTFQueryHandler queryHandler) {
 		if(queryHandler != null) this.queryHandler = queryHandler;
+	}
+
+	public Point3f getOGLPos(int x, int y) {
+		return mouseMan.getOGLPos(x, y);
 	}
 
 

@@ -212,7 +212,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
 			if (user != 2) {
-				drawer.addAgent(id, startX, startY, colorizer.getColor(0.1 + 0.9*color), true);
+				drawer.addAgent(id, startX, startY, colorizer.getColor(color), true);
 			} else {
 				drawer.addAgent(id, startX, startY, new Color(0.0f, 0.7f, 1.0f), true);
 			}

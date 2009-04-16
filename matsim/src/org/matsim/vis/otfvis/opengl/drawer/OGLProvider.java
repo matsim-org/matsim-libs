@@ -29,5 +29,6 @@ import org.matsim.vis.otfvis.opengl.gl.Point3f;
 public interface OGLProvider {
 	public GL getGL();
 	public Point3f getView() ;
-	OTFClientQuad getQuad();
+	public OTFClientQuad getQuad();
+	public Point3f getOGLPos(int x, int y);
 }

@@ -29,8 +29,6 @@ import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
@@ -83,7 +81,7 @@ class CALink extends QueueLink {
 	public static int LINKLEN = 1000;
 	public static int LANECOUNT = 2;
 
-	private VisData visdata = this.new VisDataImpl();
+	private final VisData visdata = this.new VisDataImpl();
 	
 	int VMAX=5 ;
 
@@ -404,10 +402,12 @@ public class CALinkOTFVis extends Thread {
 
 	public static class  MyControlBar extends OTFHostControlBar {
 		JButton verbot;
+		int delay = 20;
 
 		public MyControlBar(String address) throws RemoteException, InterruptedException, NotBoundException {
 			super(address);
-			this.DELAYSIM = 20;
+			OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+			if(config != null) config.setDelay_ms(20);
 
 			verbot = createButton("�-Verbot ist AUS", "vb", null, "toggle �berholverbot");
 			verbot.putClientProperty("JButton.buttonType","text");
@@ -435,7 +435,7 @@ public class CALinkOTFVis extends Thread {
 			// TODO Auto-generated method stub
 			super.invalidateHandlers();
 			try {
-				sleep(DELAYSIM);
+				sleep(delay);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

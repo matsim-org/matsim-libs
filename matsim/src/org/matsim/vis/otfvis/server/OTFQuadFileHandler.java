@@ -49,8 +49,6 @@ import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vis.netvis.streaming.SimStateWriterI;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFDefaultNetWriterFactoryImpl;
-import org.matsim.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
@@ -362,6 +360,7 @@ public class OTFQuadFileHandler {
 			}
 		}
 
+
 		private void readQuad() {
 			try {
 				// we do not cache anymore ...readZIPFile();
@@ -506,6 +505,10 @@ public class OTFQuadFileHandler {
 			double lastTime = -1;
 			double foundTime = -1;
 			for (Double timestep : this.timesteps.keySet()) {
+				if(timestep == time) {
+					foundTime = time;
+					break;
+				}else 
 				if (searchDirection == TimePreference.EARLIER) {
 					if (timestep >= time) {
 						// take next lesser time than requested, if not exacty

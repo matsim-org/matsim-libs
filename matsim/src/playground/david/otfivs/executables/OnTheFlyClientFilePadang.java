@@ -1,6 +1,5 @@
 package playground.david.otfivs.executables;
 
-import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.rmi.RemoteException;
 
@@ -97,7 +96,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	}
 	
 	public static void main(String[] args) {
-//		String filename = "../MatsimJ/output/OTFQuadfileSCHWEIZ2.3.mvi.gz";
+		String filename = "../../tmp/150.movie.mvi";
 //		String filename = "../MatsimJ/output/testSWI2.mvi.gz";
 //		String filename = "test/padang.mvi";
 
@@ -105,7 +104,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		String filename = "../OnTheFlyVis/test/padang.mvi"; //Flooding.mvi";
 //		String filename = "../OnTheFlyVis/test/testPadabang1.3.mvi"; //Flooding.mvi";
 //		String filename = "../vsp-cvs/runs/run306/output/ITERS/it.100/100.movie.mvi";
-		String filename = "otfvis.mvi";
+//		String filename = "otfvis.mvi";
 
 		connect1.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect1.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
@@ -135,9 +134,9 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		conf.setLinkWidth(10);
 		Gbl.getConfig().addModule("otfvis", conf);
 		
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(10); 
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50));
-		OnTheFlyClientFileQuad client = new OnTheFlyClientFilePadang(filename, null, true);
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(10); 
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50));
+		OnTheFlyClientFileQuad client = new OnTheFlyClientFilePadang(filename, null, false);
 		
 //		new OnTheFlyClientFilePadang()
 		client.run();

@@ -63,6 +63,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	private JSlider agentSizeSlider = null;
 
 	private JSlider linkWidthSlider;
+	private JSlider delaySlider = null;
 
 	// private JSlider linkWidthSlider = null;
 
@@ -209,6 +210,24 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		 getContentPane().add(this.linkWidthSlider);
 		 }
 
+		 //Delay ms
+		 {
+		 JLabel label = new JLabel();
+		 getContentPane().add(label);
+		 label.setText("AnimSpeed:");
+		 label.setBounds(10, 245, 110, 31);
+		 this.delaySlider = new JSlider();
+		 BoundedRangeModel model2 = new DefaultBoundedRangeModel(cfg.getDelay_ms(),10,0,500);
+		 this.delaySlider.setModel(model2);
+		 this.delaySlider.setLabelTable(this.delaySlider.
+		 createStandardLabels(500, 00));
+		 this.delaySlider.setPaintLabels(true);
+		 this.delaySlider.setBounds(120, 240, 123, 45);
+		 this.delaySlider.addChangeListener(this);
+		 getContentPane().add(label);
+		 getContentPane().add(this.delaySlider);
+		 }
+
 	}
 
 	public void stateChanged(final ChangeEvent e) {
@@ -218,8 +237,13 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			if (this.host != null)
 				this.host.invalidateHandlers();
 			System.out.println("val: " + this.agentSizeSlider.getValue());
-			 } else if (e.getSource() == this.linkWidthSlider) {
+		 } else if (e.getSource() == this.linkWidthSlider) {
 			 this.cfg.setLinkWidth(this.linkWidthSlider.getValue());
+			 if (this.host != null){
+				host.redrawHandlers();
+			 }
+		 } else if (e.getSource() == this.delaySlider) {
+			 this.cfg.setDelay_ms(this.delaySlider.getValue());
 			 if (this.host != null){
 				host.redrawHandlers();
 			 }

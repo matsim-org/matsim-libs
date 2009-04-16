@@ -141,7 +141,20 @@ public class OTFVisConfig extends Module {
 	private boolean renderImages = false;
 	private boolean modified = false;
 	private boolean cachingAllowed = true;
+	private int delay_ms = 30;
 
+	/**
+	 * @return the delay_ms
+	 */
+	public int getDelay_ms() {
+		return delay_ms;
+	}
+	/**
+	 * @param delay_ms the delay_ms to set
+	 */
+	public void setDelay_ms(int delay_ms) {
+		this.delay_ms = delay_ms;
+	}
 	public boolean isCachingAllowed() {
 		return cachingAllowed;
 	}

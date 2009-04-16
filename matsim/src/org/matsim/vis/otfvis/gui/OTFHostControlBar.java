@@ -28,7 +28,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -56,7 +55,6 @@ import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -83,7 +81,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private static final String STEP_B = "step_b";
 	private static final String FULLSCREEN = "fullscreen";
 
-	protected static int DELAYSIM = 30; // time to wait per simstep while play in millisec
+	//protected static int DELAYSIM = 30; // time to wait per simstep while play in millisec
 
 	// -------------------- MEMBER VARIABLES --------------------
 
@@ -262,8 +260,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				}
 				if (timeLine != null) timeLine.setCachedTime(-1);
 			} catch (RemoteException e) {
-				e.printStackTrace();
-			} catch (OutOfMemoryError e) {
 				e.printStackTrace();
 			}
 			
@@ -654,12 +650,15 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 		@Override
 		public void run() {
-
+			int delay = 30;
+			
 			int actTime = 0;
 
 			while (!terminate) {
 				try {
-					sleep(DELAYSIM);
+					OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+					if(config != null) delay = config.getDelay_ms();
+					sleep(delay);
 					synchronized(blockReading) {
 						if (isActive && synchronizedPlay &&
 							(simTime >= loopEnd || !host.requestNewTime(simTime+1, OTFServerRemote.TimePreference.LATER))) {
