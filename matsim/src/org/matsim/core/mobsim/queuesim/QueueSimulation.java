@@ -247,6 +247,17 @@ public class QueueSimulation {
 			}
 			if (systemControler != null){
 				this.signalSystemControlerBySystemId.put(config.getSignalSystemId(), systemControler);
+				//add controller to signal groups
+				List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getSignalSystemId());
+				if ((groups == null) || groups.isEmpty()) {
+					String message = "SignalSystemControler for SignalSystem Id: " + config.getSignalSystemId() + "without any SignalGroups defined in SignalSystemConfiguration!";
+					log.warn(message);
+				}
+				else {
+					for (BasicSignalGroupDefinition group : groups){
+						group.setResponsibleLSAControler(systemControler);
+					}
+				}
 			}
 			else {
 				log.error("Could not initialize signal system controler for signal system with id: " + config.getSignalSystemId() + " " +
@@ -292,22 +303,13 @@ public class QueueSimulation {
 		}
 		return controler;
 	}
+	
+	
 
 	private void initPlanbasedControler(final PlanBasedSignalSystemControler controler, final BasicSignalSystemConfiguration config){
 		BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getSignalSystemId());
 		//TODO set other defaults of xml
 		controler.setDefaultCirculationTime(systemDef.getDefaultCycleTime());
-
-		List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getSignalSystemId());
-		if ((groups == null) || groups.isEmpty()) {
-			String message = "SignalSystemControler for SignalSystem Id: " + config.getSignalSystemId() + "without any SignalGroups defined in SignalSystemConfiguration!";
-			log.warn(message);
-		}
-		else {
-			for (BasicSignalGroupDefinition group : groups){
-				group.setResponsibleLSAControler(controler);
-			}
-		}
 
 	}
 
