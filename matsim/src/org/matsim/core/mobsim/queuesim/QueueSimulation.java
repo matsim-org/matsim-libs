@@ -34,7 +34,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.network.BasicLaneDefinitions;
@@ -50,6 +53,7 @@ import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
@@ -131,6 +135,8 @@ public class QueueSimulation {
 	private BasicLaneDefinitions laneDefintions;
 
 	private QueueSimListenerManager listenerManager;
+	
+	private final PriorityQueue<QueueVehicle> activityEndsList = new PriorityQueue<QueueVehicle>(500, new DriverAgentDepartureTimeComparator()); // TODO [MR] change this to PQ<DriverAgent>
 
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -355,13 +361,7 @@ public class QueueSimulation {
 
 	//TODO remove this method when agent representation is completely implemented
 	protected void addVehicleToLink(final QueueVehicle veh) {
-		Link link = veh.getCurrentLink();
-		if ( link==null ) {
-			log.error( "vehicle has no link; will not be inserted into the simulation." + this ) ;
-			return ;
-		}
-		QueueLink qlink = this.network.getQueueLink(link.getId());
-		qlink.addParking(veh);
+		registerAgentDeparture(veh);
 	}
 
 	protected void prepareNetwork() {
@@ -501,9 +501,14 @@ public class QueueSimulation {
 		this.network.afterSim();
 		double now = SimulationTimer.getTime();
 		for (QueueVehicle veh : teleportationList) {
-			new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getDriver().getCurrentLeg());
+			events.processEvent(new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
 		}
 		QueueSimulation.teleportationList.clear();
+
+		for (QueueVehicle veh : this.activityEndsList) {
+			events.processEvent(new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
+		}
+		this.activityEndsList.clear();
 
 		for (SnapshotWriter writer : this.snapshotWriters) {
 			writer.finish();
@@ -534,6 +539,7 @@ public class QueueSimulation {
 	 */
 	protected boolean doSimStep(final double time) {
 		this.moveVehiclesWithUnknownLegMode(time);
+		this.handleActivityEnds(time);
 		this.network.simStep(time);
 
 		if (time % INFO_PERIOD == 0) {
@@ -610,6 +616,73 @@ public class QueueSimulation {
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
 			for (Link link : event.getLinks()) {
 				this.network.getQueueLink(link.getId()).recalcTimeVariantAttributes(time);
+			}
+		}
+	}
+	
+	/**
+	 * Registers this agent as performing an activity and makes sure that the
+	 * agent will be informed once his departure time has come.
+	 * 
+	 * @param agent
+	 * 
+	 * @see DriverAgent#getDepartureTime()
+	 */
+	/*package*/ void registerAgentDeparture(final QueueVehicle vehicle) {
+		this.activityEndsList.add(vehicle);
+	}
+	
+	private void handleActivityEnds(final double time) {
+		while (this.activityEndsList.peek() != null) {
+			QueueVehicle vehicle = this.activityEndsList.peek();
+			if (vehicle.getDriver().getDepartureTime() <= time) {
+				this.activityEndsList.poll();
+				this.agentDeparts(vehicle, vehicle.getCurrentLink());
+			} else {
+				return;
+			}
+		}
+	}
+	
+	/**
+	 * Informs the simulation that the specified agent wants to depart from its current activity.
+	 * The simulation can then put the agent onto its vehicle on a link or teleport it to its destination.
+	 * 
+	 * @param agent
+	 * @param link the link where the agent departs
+	 */
+	/*package*/ void agentDeparts(final QueueVehicle vehicle, final Link link) {
+		DriverAgent agent = vehicle.getDriver();
+		double now = SimulationTimer.getTime();
+
+		// Need to inform the agent that it now leaves its activity.
+		if (agent instanceof PersonAgent) {
+			((PersonAgent) agent).leaveActivity(now);
+		}
+
+		Leg leg = agent.getCurrentLeg();
+
+		
+		events.processEvent(
+				new AgentDepartureEvent(now, agent.getPerson(), link, leg));
+
+		/*
+		 * A.) we have an unknown leg mode (aka != "car").
+		 *     In this case teleport veh to next activity location
+		 * B.) we have no route (aka "next activity on same link") -> no waitingList
+		 * C.) route known AND mode == "car" -> regular case, put veh in waitingList
+		 */
+
+		if (!leg.getMode().equals(TransportMode.car)) {
+			QueueSimulation.handleUnknownLegMode(vehicle);
+		} else {
+			QueueLink qlink = this.network.getQueueLink(link.getId());
+			if (((NetworkRoute) leg.getRoute()).getNodes().size() != 0) {
+				qlink.originalLane.waitingList.add(vehicle);
+				qlink.activateLink();
+			} else {
+				// this is the case where (hopefully) the next act happens at the same location as this act
+				qlink.processVehicleArrival(now, vehicle);
 			}
 		}
 	}

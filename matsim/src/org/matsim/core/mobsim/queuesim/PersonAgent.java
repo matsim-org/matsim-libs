@@ -189,8 +189,7 @@ public class PersonAgent implements DriverAgent {
 
 			if ((this.currentPlanElementIndex+1) < this.getPlanElements().size()) {
 				// there is still at least on plan element left
-				// TODO [MR] change code to something like simulation.scheduleDeparture(this, time);
-				this.simulation.network.getQueueLink(this.currentLink.getId()).addParking(this.vehicle);
+				this.simulation.registerAgentDeparture(this.vehicle);
 			} else {
 				// this is the last activity
 				Simulation.decLiving();

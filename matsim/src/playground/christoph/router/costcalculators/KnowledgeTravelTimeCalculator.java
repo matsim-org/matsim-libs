@@ -124,7 +124,7 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 //		buffer -> count
 				
 		// number of vehicles that are on the link or that are already waiting to enter the link
-		double vehicles = queueLink.getAllVehicles().size() - queueLink.getVehiclesOnParkingList().size();
+		double vehicles = queueLink.getAllVehicles().size();// - queueLink.getVehiclesOnParkingList().size();
 		
 		return vehicles;
 	}

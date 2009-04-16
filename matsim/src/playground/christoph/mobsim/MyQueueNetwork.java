@@ -22,7 +22,6 @@ package playground.christoph.mobsim;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.TreeMap;
 
@@ -31,7 +30,6 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueNetworkFactory;
@@ -184,47 +182,51 @@ public class MyQueueNetwork extends QueueNetwork{
 		 * Checking if the current QueueNode is active is not allowed here!
 		 * So we check every Link within the QueueNetwork.
 		 */
-		for (QueueLink queueLink : this.getLinks().values())
-		{	
-			/*
-			 * For every Vehicle in the Parking List of the QueueLink is checked,
-			 * if the current time is after the planned departure time. If true,
-			 * the vehicle is going to end it's current activity in this SimStep,
-			 * so Act End Replanning is needed.
-			 */
-			PriorityQueue<QueueVehicle> onParkingListVehiclesQueue = queueLink.getVehiclesOnParkingList();
-							
-			for (QueueVehicle vehicle : onParkingListVehiclesQueue)
-			{	
-				// check if Act End Replanning flag is set
-				boolean actEndReplanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("endActivityReplanning");
-				if(actEndReplanning) 
-				{
-					// if the current Activity has ended
-					if (vehicle.getDriver().getDepartureTime() <= time)
-					{				
-						vehiclesToReplanActEnd.add(vehicle);
-						
-						PersonAgent personAgent = (PersonAgent) vehicle.getDriver();
-						Activity fromAct = (Activity)personAgent.getPlanElements().get(personAgent.getNextActivity() - 2);
-						fromActActEnd.add(fromAct);
-						if (fromAct == null) log.error("Found fromAct that is null!");
-					}
-					
-					/*
-					 * onParkingListVehiclesQueue is a PriorityQueue which is sorted by the departure time
-					 * of its Vehicles. So if a vehicle has not reached its departure time the is no need to
-					 * check the following vehicles.
-					 */
-					else
-					{	
-						break;
-					}
-				}
-					
-			}	// for all QueueLink in the Lookup Table
 		
-		}	// for all QueueNodes in the Network
+//		code should be migrated to QueueSimulation.handleActivityEnds();
+//    please talk to me (mrieser) about that. // DISCUSS [MR]
+		
+//		for (QueueLink queueLink : this.getLinks().values())
+//		{	
+//			/*
+//			 * For every Vehicle in the Parking List of the QueueLink is checked,
+//			 * if the current time is after the planned departure time. If true,
+//			 * the vehicle is going to end it's current activity in this SimStep,
+//			 * so Act End Replanning is needed.
+//			 */
+//			PriorityQueue<QueueVehicle> onParkingListVehiclesQueue = queueLink.getVehiclesOnParkingList();
+//							
+//			for (QueueVehicle vehicle : onParkingListVehiclesQueue)
+//			{	
+//				// check if Act End Replanning flag is set
+//				boolean actEndReplanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("endActivityReplanning");
+//				if(actEndReplanning) 
+//				{
+//					// if the current Activity has ended
+//					if (vehicle.getDriver().getDepartureTime() <= time)
+//					{				
+//						vehiclesToReplanActEnd.add(vehicle);
+//						
+//						PersonAgent personAgent = (PersonAgent) vehicle.getDriver();
+//						Activity fromAct = (Activity)personAgent.getPlanElements().get(personAgent.getNextActivity() - 2);
+//						fromActActEnd.add(fromAct);
+//						if (fromAct == null) log.error("Found fromAct that is null!");
+//					}
+//					
+//					/*
+//					 * onParkingListVehiclesQueue is a PriorityQueue which is sorted by the departure time
+//					 * of its Vehicles. So if a vehicle has not reached its departure time the is no need to
+//					 * check the following vehicles.
+//					 */
+//					else
+//					{	
+//						break;
+//					}
+//				}
+//					
+//			}	// for all QueueLink in the Lookup Table
+//		
+//		}	// for all QueueNodes in the Network
 		
 	
 		if (vehiclesToReplanActEnd.size() > 0)
@@ -250,53 +252,57 @@ public class MyQueueNetwork extends QueueNetwork{
 		 * late for us, so we have to check EVERY QueueNode for Agents that will
 		 * end their current Activity now.  
 		 */
-		for (QueueNode queueNode : this.getNodes().values())
-		{	
-			QueueLink[] queueLinks = lookupTable.get(queueNode.getNode());
-				
-			for (int i = 0; i < queueLinks.length; i++)
-			{
-				/*
-				 * For every Vehicle in the Parking List of the QueueLink is checked,
-				 * if the current time is after the planned departure time. If true,
-				 * the vehicle is going to end it's current activity in this SimStep,
-				 * so Act End Replanning is needed.
-				 */
-				PriorityQueue<QueueVehicle> onParkingListVehiclesQueue = queueLinks[i].getVehiclesOnParkingList();
-								
-				for (QueueVehicle vehicle : onParkingListVehiclesQueue)
-				{	
-					// check if Act End Replanning flag is set
-					boolean actEndReplanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("endActivityReplanning");
-					if(actEndReplanning) 
-					{						
-						// if the current Activity has ended
-						if (vehicle.getDriver().getDepartureTime() <= time)
-						{				
-							vehiclesToReplanActEnd.add(vehicle);
-							
-							PersonAgent personAgent = (PersonAgent) vehicle.getDriver();
-							Activity fromAct = (Activity)personAgent.getPlanElements().get(personAgent.getNextActivity() - 2);
-							fromActActEnd.add(fromAct);
-							if (fromAct == null) log.error("Found fromAct that is null!");
-						}
-						
-						/*
-						 * onParkingListVehiclesQueue is a PriorityQueue which is sorted by the departure time
-						 * of its Vehicles. So if a vehicle has not reached its departure time the is no need to
-						 * check the following vehicles.
-						 */
-						else
-						{	
-							break;
-						}
-					}
-				}
-					
-			}	// for all QueueLink in the Lookup Table
 		
-		}	// for all QueueNodes in the Network
+//	code should be migrated to QueueSimulation.handleActivityEnds();
+//  please talk to me (mrieser) about that. // DISCUSS [MR]
 		
+//		for (QueueNode queueNode : this.getNodes().values())
+//		{	
+//			QueueLink[] queueLinks = lookupTable.get(queueNode.getNode());
+//				
+//			for (int i = 0; i < queueLinks.length; i++)
+//			{
+//				/*
+//				 * For every Vehicle in the Parking List of the QueueLink is checked,
+//				 * if the current time is after the planned departure time. If true,
+//				 * the vehicle is going to end it's current activity in this SimStep,
+//				 * so Act End Replanning is needed.
+//				 */
+//				PriorityQueue<QueueVehicle> onParkingListVehiclesQueue = queueLinks[i].getVehiclesOnParkingList();
+//								
+//				for (QueueVehicle vehicle : onParkingListVehiclesQueue)
+//				{	
+//					// check if Act End Replanning flag is set
+//					boolean actEndReplanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("endActivityReplanning");
+//					if(actEndReplanning) 
+//					{						
+//						// if the current Activity has ended
+//						if (vehicle.getDriver().getDepartureTime() <= time)
+//						{				
+//							vehiclesToReplanActEnd.add(vehicle);
+//							
+//							PersonAgent personAgent = (PersonAgent) vehicle.getDriver();
+//							Activity fromAct = (Activity)personAgent.getPlanElements().get(personAgent.getNextActivity() - 2);
+//							fromActActEnd.add(fromAct);
+//							if (fromAct == null) log.error("Found fromAct that is null!");
+//						}
+//						
+//						/*
+//						 * onParkingListVehiclesQueue is a PriorityQueue which is sorted by the departure time
+//						 * of its Vehicles. So if a vehicle has not reached its departure time the is no need to
+//						 * check the following vehicles.
+//						 */
+//						else
+//						{	
+//							break;
+//						}
+//					}
+//				}
+//					
+//			}	// for all QueueLink in the Lookup Table
+//		
+//		}	// for all QueueNodes in the Network
+//		
 	
 		if (vehiclesToReplanActEnd.size() > 0)
 		{	
