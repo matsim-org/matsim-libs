@@ -130,7 +130,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 	public void notifyScoring(final ScoringEvent event){
 
 		this.log.info("scoring");
-		if( event.getIteration()%interact_interval==0){
+//		if( event.getIteration()%interact_interval==0){ old bracket position
 //			Got new events from mobsim
 //			Now make new TimeWindows and update the Map of Agent<->TimeWindow (uses old plans and new events)
 			Gbl.printMemoryUsage();
@@ -142,6 +142,8 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 			this.log.info(" ... done making time windows and map");
 			controler.stopwatch.endOperation("timewindowmap");
 
+// New bracket position			
+		if( event.getIteration()%interact_interval==0){
 //			Spatial interactions can change the social network and/or knowledge
 			controler.stopwatch.beginOperation("spatialencounters");
 			this.log.info(" Beginning spatial encounters");
@@ -182,17 +184,20 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 			this.snet.removeLinks(snIter);
 			this.log.info(" ... removing social links done");
 			controler.stopwatch.endOperation("dissolvelinks");
+//New bracket position ensures scoring is called each iteration and that
+// actStats are updated to the events
+		}
 
 //			Update activity statistics with pruned social network
 			this.log.info(" Remaking actStats from events");
 			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
-
+		
 			Gbl.printMemoryUsage();
 
 			this.log.info("SSTEST Finish Scoring with actStats "+snIter);
 			scoring.finish();
 			this.log.info(" ... scoring with actStats finished");
-		}
+		//} old bracket position only updated scores each replanning_interval!!!!!
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
