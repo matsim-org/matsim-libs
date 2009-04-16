@@ -81,7 +81,7 @@ public class BGLoader extends Thread {
 
 
 		TextureData t = null;
-
+		
 		try {
 			t = TextureIO.newTextureData(is,false,"png");
 		} catch (IOException e) {

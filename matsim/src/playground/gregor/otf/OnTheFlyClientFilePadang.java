@@ -101,6 +101,9 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	}
 	
 	private void loadTilesFromServer() {
+		
+		
+		
 		InetAddress addr = null;
 		try {
 			addr = InetAddress.getByName("localhost");
@@ -114,15 +117,15 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		double z = 0.01;
 		double pz = z / 0.3;
 		
-		double sizeX = 400;
-		double sizeY = 400;
+		double sizeX = 300;
+		double sizeY = 300;
 		
 		int pxSize = (int) Math.round(sizeX * z/0.3);
 		int pySize = (int) Math.round(sizeY * z/0.3);
 		double currentX = 648931-1000;
-		while (currentX < 654026+1000){
-			double currentY = 9893264-1000;
-			while (currentY < 9900963+2000){
+		while (currentX < 654026+5000){
+			double currentY = 9893264-5000;
+			while (currentY < 9900963+8000){
 				OGLSimpleBackgroundLayer.addPersistentItem(new BackgroundFromStreamDrawer(bgl,currentX,currentY,sizeX,sizeY,pxSize,pySize));
 				currentY += sizeY;
 			}
@@ -162,7 +165,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-		
+//		OGLSimpleBackgroundLayer.addPersistentItem(new ScalelableBackgroundDraw("test.png","scalebar2.png","scalebar3.png"));
+		drawer2.addOverlay(new ScalelableBackgroundDraw("test.png","scalebar2.png","scalebar3.png"));
 		return drawer2;
 	}
 	

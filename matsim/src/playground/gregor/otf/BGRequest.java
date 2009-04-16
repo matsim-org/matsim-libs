@@ -16,14 +16,17 @@ public class BGRequest implements Comparable<BGRequest>{
 
 	private TextureData t;
 	
+	private final double priority;
+	
 	public enum State { open, processed, obsolete };
 	private State state;
 
 	private final ZoomLevel z;
 	
-	public BGRequest(BackgroundFromStreamDrawer backgroundFromStreamDrawer, ZoomLevel z) {
+	public BGRequest(BackgroundFromStreamDrawer backgroundFromStreamDrawer, ZoomLevel z, double priority) {
 		this.bgs = backgroundFromStreamDrawer;
 		this.z = z;
+		this.priority = priority;
 	}
 	
 	public BackgroundFromStreamDrawer getBGS() {
@@ -44,11 +47,11 @@ public class BGRequest implements Comparable<BGRequest>{
 	}
 	
 	public int compareTo(BGRequest o) {
-		if (this.bgs.getDist()*this.bgs.getHight() < o.getBGS().getDist()*o.getBGS().getHight()) {
+		if (this.priority < o.priority) {
 			return -1;
 		}
 		
-		if (this.bgs.getDist()*this.bgs.getHight() > o.getBGS().getDist()*o.getBGS().getHight()) {
+		if (this.priority > o.priority) {
 			return 1;
 		}
 		return 0;

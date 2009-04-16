@@ -91,7 +91,7 @@ public class BackgroundFromStreamDrawer extends AbstractBackgroundDrawer {
 			desiredZoom = ZoomLevel.high;
 		} else if (this.dist <= 4*this.xs && this.hight > 800) {
 			desiredZoom = ZoomLevel.mid;
-		}else if (this.dist <= 4*this.xs) {
+		}else if (this.dist <= 2*this.xs) {
 			desiredZoom = ZoomLevel.near;
 		} else {
 			desiredZoom = ZoomLevel.high;
@@ -136,18 +136,21 @@ public class BackgroundFromStreamDrawer extends AbstractBackgroundDrawer {
 			this.request = null;
 		}
 		
-//		System.out.println("desired Zoom:" + desiredZoom);
-		
+//		System.out.println("desired Zothis.centerYom:" + desiredZoom);
+		double priority = 0;
 		if (desiredZoom == ZoomLevel.high) {
+			priority = Math.sqrt(Math.pow((651228 - this.centerX),2)+Math.pow((9895420 - this.centerY),2))*this.hight;//HACK
 			this.pxSize = (int) Math.round(this.xs * 0.1/0.3);
 			this.pySize = (int) Math.round(this.ys * 0.1/0.3);
 		} else if (desiredZoom == ZoomLevel.mid) {
+			priority = this.hight * this.dist;
 			this.pxSize = (int) Math.round(this.xs * 0.25/0.3);
 			this.pySize = (int) Math.round(this.ys * 0.25/0.3);
 			if ((tx = this.txCache.get(ZoomLevel.near)) != null) {
 				this.picture = tx;
 			}
 		} else if (desiredZoom == ZoomLevel.near) {
+			priority = this.hight * this.dist;
 			this.pxSize = (int) Math.round(this.xs * 1./0.3);
 			this.pySize = (int) Math.round(this.ys * 1./0.3);
 			if ((tx = this.txCache.get(ZoomLevel.mid)) != null) {
@@ -155,7 +158,7 @@ public class BackgroundFromStreamDrawer extends AbstractBackgroundDrawer {
 			}
 		}
 		
-		sendPictureRequest(desiredZoom);
+		sendPictureRequest(desiredZoom,priority);
 	}
 
 	public void onDraw(final GL gl) {
@@ -196,6 +199,8 @@ public class BackgroundFromStreamDrawer extends AbstractBackgroundDrawer {
 		final float z = 1.1f;
 		this.picture.enable();
 		this.picture.bind();
+		
+		
 
 		gl.glColor4f(1,1,1,1);
 
@@ -216,8 +221,8 @@ public class BackgroundFromStreamDrawer extends AbstractBackgroundDrawer {
 
 
 
-	private void sendPictureRequest(ZoomLevel desiredZoom) {
-		this.request = new BGRequest(this,desiredZoom);
+	private void sendPictureRequest(ZoomLevel desiredZoom, double priority) {
+		this.request = new BGRequest(this,desiredZoom,priority);
 		if (!this.request.getLock()) {
 			throw new RuntimeException("could not get lock on new BGRequest");
 		}
