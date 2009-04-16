@@ -1,14 +1,19 @@
 package playground.mmoyo.Validators;
 
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-
+import org.matsim.core.api.population.PlanElement;
 
 public class PlanValidator {
+	PathValidator pathValidator= new PathValidator (); 
 
 	public PlanValidator() {
 	}
@@ -27,7 +32,18 @@ public class PlanValidator {
 				//--> validate the paths of each plan with path validator
 			}
 		}
-			
+	}
+
+	public boolean hasAllLegs(Plan plan){
+		int i=0;
+		for (BasicPlanElement basicPlanElement: plan.getPlanElements()){
+			if (++i%2==0){  //if (basicPlanElement instanceof Leg) {
+				Leg leg = (Leg)basicPlanElement;
+				//if (!pathValidator.isValid(leg.getRoute())){ }
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	

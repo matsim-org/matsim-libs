@@ -15,7 +15,7 @@ public class PathValidator {
 	 * transfer links must be always between standard links
 	 * must not have two adjacent walking links
 	 */
-	public boolean isValid(Path path) {
+	public static boolean isValid(Path path) {
 		boolean valid = true;
 		
 		if (path!=null){
@@ -31,26 +31,26 @@ public class PathValidator {
 						hasStandardLinks=true;
 					}else if(linkType.equals("Transfer")){
 						if (i>0){  
-							if (path.links.get(i-1).getType()!="Standard" || path.links.get(i+1).getType()!="Standard"){ //TODO:check that transfer links are only between standard link
+							if (!path.links.get(i-1).getType().equals("Standard") || !path.links.get(i+1).equals("Standard")){ //TODO:check that transfer links are only between standard link
 								return false;
 							}
 						}
-					}else if (linkType=="Walking"){
+					}else if (linkType.equals("Walking")){
 						if (i>0){
-							if (path.links.get(i-1).getType()=="Walking"){ //TODO:check that do not have two adjacent walking link
+							if (path.links.get(i-1).getType().equals("Walking")){ //TODO:check that the path does not have two adjacent walking link
 								return false;
 							}
 						}
-					}else if(linkType =="DetTransfer"){
+					}else if(linkType.equals("DetTransfer")){
 						if (i>0){  
-							if (path.links.get(i-1).getType()!="Standard" || path.links.get(i+1).getType()!="Standard"){
+							if (!path.links.get(i-1).getType().equals("Standard") || !path.links.get(i+1).getType().equals("Standard")){
 								return false;
 							}
 						}
 					}//linktype
 					i++;
 				}//for interator
-				if(hasStandardLinks==false){return false;}
+				if(!hasStandardLinks) return false;
 			}else{
 				valid=false;
 			}//if pathlinks

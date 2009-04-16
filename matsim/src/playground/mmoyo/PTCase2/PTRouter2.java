@@ -36,7 +36,7 @@ public class PTRouter2 {
 	private Dijkstra dijkstra;
 	private PTTravelCost ptTravelCost;
 	public PTTravelTime ptTravelTime;   //> make private 
-	public final double WALKING_SPEED = 0.836;
+	
 	//private int x=0;//--> Should be part of the method if the simulation strategy is set to re-route.
 	
 	/**

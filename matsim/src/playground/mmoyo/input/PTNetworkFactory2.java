@@ -1,6 +1,7 @@
 package playground.mmoyo.input;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
@@ -211,6 +212,37 @@ public class PTNetworkFactory2 {
 				}
 			}
 		} 
+	
+	}
+
+	public void setDetNextLinks (NetworkLayer net, PTTimeTable2 ptTimeTable){
+		List <Link> eliminar = new ArrayList<Link>();
+		for (Link link: net.getLinks().values()){
+			if (link.getType().equals("DetTransfer")){
+				Link nextLink= null;
+				int numStandards =0;
+				for (Link outLink : link.getToNode().getOutLinks().values()) {
+					if (outLink.getType().equals("Standard")){
+						numStandards++;
+						nextLink=outLink;
+					}
+				}
+				if (numStandards>1)
+					throw new java.lang.NullPointerException(link.getId() + "DetLink has no valid outLinks");				
+				
+				if (nextLink!=null){
+					ptTimeTable.putNextDTLink(link.getId(), nextLink);
+				}else{
+					eliminar.add(link);
+				}
+				
+			}
+		}
+
+		System.out.println("eliminar " + eliminar.size());
+		for (Link link:eliminar){
+			net.removeLink(link);
+		}
 	
 	}
 

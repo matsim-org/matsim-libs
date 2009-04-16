@@ -8,6 +8,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import playground.mmoyo.Validators.NetValidator;
 import playground.mmoyo.Validators.PlanValidator;
 import playground.mmoyo.input.PTLineAggregator;
+//import org.matsim.core.api.network.Link;
+//import org.matsim.api.basic.v01.Id;
+//import java.util.Map;
 
 public class PTControler2 {
     private static String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
@@ -44,7 +47,7 @@ public class PTControler2 {
 				String newNodesfilePath="C://Users/manuel/Desktop/TU/ZH_Files/bus/Basic_Bus_Network.xml";
 				PTLineAggregator ptLineAggregator = new PTLineAggregator(newNodesfilePath, pt.getPtNetworkLayer(), pt.getPtTimeTable());
 				ptLineAggregator.AddLine();
-	    		//pt.writeNet(ZURICHPTN);
+	    		pt.writeNet(ZURICHPTN);
 				break;
 			case -2:
 				pt.createPTNetWithTLinks(INPTNETFILE);
@@ -80,11 +83,10 @@ public class PTControler2 {
 	    		pt.getPtRouter2().PrintRoute(pt.getPtRouter2().findRoute(ptNode, ptNode2, 391));
 	    		break;
 	    	case 3:
-	    		double startTime = System.currentTimeMillis();
+	    		//pt.getPtNetworkFactory().setDetNextLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
 	    		PTActWriter ptActWriter = new PTActWriter(pt);
-	    		ptActWriter.writePTActsLegs();
-	    		double duration= System.currentTimeMillis()-startTime;
-	    		System.out.println("duration total:" +  duration);	    		
+	    		//ptActWriter.writePTActsLegs();
+	    		ptActWriter.SimplifyPtLegs();
 	    		//ptActWriter.ptTravelTime.costValidator.printNegativeVaues();
 	    		//System.out.println(ptActWriter.ptTravelTime.costValidator==null);
 	    		break;
@@ -117,7 +119,7 @@ public class PTControler2 {
 	    		System.out.println(connected);
 	    		break;
 	    	case 8:
-	    	
+	    		
 	    	break;
 		}//switch
 	}//main

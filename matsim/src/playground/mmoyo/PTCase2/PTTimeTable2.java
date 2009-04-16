@@ -27,6 +27,9 @@ public class PTTimeTable2{
 		this.ptLineList = ptLinesReader.ptLineList;
 	}
 
+	public PTTimeTable2(){
+	}
+	
 	public void setMaps(Map<Id,Double> linkTravelTimeMap){
 		this.linkTravelTimeMap = linkTravelTimeMap;
 	}
@@ -112,12 +115,13 @@ public class PTTimeTable2{
 	*/
 	public double nextDepartureB(Id idPTNode,  double dblTime){//,
 		double[]arrDep= nodeDeparturesMap.get(idPTNode);
+		int length = arrDep.length;
 		int index =  Arrays.binarySearch(arrDep, dblTime);
 		if (index<0){
 			index = -index;
-			if (index <= arrDep.length)index--; else index=0;	
+			if (index <= length)index--; else index=0;	
 		}else{
-			if (index < (arrDep.length-1))index++; else index=0;	
+			if (index < (length-1))index++; else index=0;	
 		}
 		return arrDep[index];
 	}
@@ -126,8 +130,8 @@ public class PTTimeTable2{
 		return nextLinkMap;
 	}
 
-	public void setNextLinkMap(Map<Id, Link> nextLinkMap) {
-		this.nextLinkMap = nextLinkMap;
+	public void putNextDTLink(Id id, Link link) {
+		nextLinkMap.put(id, link);
 	}
 		
 		

@@ -13,6 +13,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 public class PTTester {
+	private Walk walk = new Walk();
 	private final PTOb pt;
 
 	public PTTester(final PTOb pt) {
@@ -42,7 +43,7 @@ public class PTTester {
 		    	if (val) {
 					Coord lastActCoord = lastAct.getCoord();
 		    		Coord actCoord = thisAct.getCoord();
-		    		int distToWalk= distToWalk(person.getAge());
+		    		int distToWalk= walk.distToWalk(person.getAge());
 		    		Path path = this.pt.getPtRouter2().findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
 		    		if(path!=null){
 		    			routes++;
@@ -56,15 +57,5 @@ public class PTTester {
 		}//for person
 		System.out.println("acts:" + acts + " routes:"+ routes);
 	}//countRoutes
-
-	private int distToWalk(final int personAge){
-		int distance=0;
-		if (personAge>=60)distance=300;
-		if (personAge>=40 || personAge<60)distance=400;
-		if (personAge>=18 || personAge<40)distance=800;
-		if (personAge<18)distance=300;
-		return distance;
-	}
-
 
 }

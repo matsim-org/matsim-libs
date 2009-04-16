@@ -44,6 +44,7 @@ public class PTLineAggregator {
 			ptLinkFactory.AddNewLinks(basicNodeList1);
 			ptLinkFactory.AddNewLinks(basicNodeList2);
 		}
+		
 		System.out.println("Done.");
 		
 		int finNodes= net.getNodes().size() - iniNodes;
