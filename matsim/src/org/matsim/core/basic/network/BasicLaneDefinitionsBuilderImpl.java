@@ -31,8 +31,8 @@ public class BasicLaneDefinitionsBuilderImpl implements BasicLaneDefinitionsBuil
 	/**
 	 * @see org.matsim.core.basic.network.BasicLaneDefinitionsBuilder#createLanesToLinkAssignment(org.matsim.api.basic.v01.Id)
 	 */
-	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id id) {
-		return new BasicLanesToLinkAssignmentImpl(id);
+	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference) {
+		return new BasicLanesToLinkAssignmentImpl(linkIdReference);
 	}
 	/**
 	 * @see org.matsim.core.basic.network.BasicLaneDefinitionsBuilder#createLane(org.matsim.api.basic.v01.Id)

@@ -23,12 +23,21 @@ import org.matsim.api.basic.v01.Id;
 
 
 /**
+ * Builder for the content of BasicLaneDefinitions
  * @author dgrether
- *
  */
 public interface BasicLaneDefinitionsBuilder {
 
-	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id id);
-
-	public BasicLane createLane(Id id);
+	/**
+	 * 
+	 * @param linkIdReference id of the links the lanes of the created object belong to
+	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
+	 */
+	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference);
+	/**
+	 * Creates an instance of BasicLane with the id given as parameter.
+	 * @param laneId
+	 * @return
+	 */
+	public BasicLane createLane(Id laneId);
 }
