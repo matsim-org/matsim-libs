@@ -228,7 +228,7 @@ public class QueueSimulation {
 						" signal system's configuration file.");
 			}
 			if (config.getControlInfo() instanceof BasicAdaptivePlanBasedSignalSystemControlInfo) {
-				AdaptiveSignalSystemControler c = createAdaptiveControler((BasicAdaptiveSignalSystemControlInfo)config);
+				AdaptiveSignalSystemControler c = createAdaptiveControler((BasicAdaptiveSignalSystemControlInfo)config.getControlInfo());
 				if (!(c instanceof PlanBasedSignalSystemControler)){
 					throw new IllegalArgumentException("Class " + c.getClass().getName() + "is no PlanBasedSignalSystemControler instance. Check your configuration of the signal system control!");
 				}
@@ -237,7 +237,7 @@ public class QueueSimulation {
 				systemControler = controler;
 			}
 			else if (config.getControlInfo() instanceof BasicAdaptiveSignalSystemControlInfo) {
-				AdaptiveSignalSystemControler controler = createAdaptiveControler((BasicAdaptiveSignalSystemControlInfo)config);
+				AdaptiveSignalSystemControler controler = createAdaptiveControler((BasicAdaptiveSignalSystemControlInfo)config.getControlInfo());
 				systemControler = controler;
 			}
 			else if (config.getControlInfo() instanceof BasicPlanBasedSignalSystemControlInfo){
