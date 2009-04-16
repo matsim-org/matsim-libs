@@ -158,7 +158,8 @@ public class SocialNetwork {
 			Coord home1=((Activity)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
 			Coord home2=((Activity)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
 			double distance = CoordUtils.calcDistance(home1, home2);
-			double pdist=c*Math.pow((distance+rmin),-alpha);
+//			double pdist=c*Math.pow((distance+rmin),-alpha);
+			double pdist=p0*Math.pow((distance/rmin+1),-alpha);
 
 			if(MatsimRandom.getRandom().nextDouble()<pdist){
 				if(makeSocialContactNotify(person1, person2, 0, "random")==2){//new link made
