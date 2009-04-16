@@ -740,7 +740,7 @@ public class Controler {
 			} else {
 				QueueSimulation sim = new QueueSimulation(this.network, this.population, this.events);
 				sim.addQueueSimulationListeners(this.getQueueSimulationListener());
-				if ((this.scenarioData != null) && (this.scenarioData.getLaneDefinitions() != null)){
+				if ((this.scenarioData != null) && (this.config.network().getLaneDefinitionsFile() != null)){
 					sim.setLaneDefinitions(this.scenarioData.getLaneDefinitions());
 				}
 				if ((this.scenarioData != null) && (this.scenarioData.getSignalSystems() != null) && (this.scenarioData.getSignalSystemsConfiguration() != null)){

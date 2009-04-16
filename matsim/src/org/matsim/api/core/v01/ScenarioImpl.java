@@ -74,6 +74,9 @@ public class ScenarioImpl implements Scenario {
 	private boolean networkLoaded = false;
 	private boolean facilitiesLoaded = false;
 	private boolean populationLoaded = false;
+	private boolean lanesLoaded = false;
+	private boolean signalSystemsLoaded = false;
+	private boolean signalSystemsConfigurationsLoaded = false;
 
 	private World world = null;
 	private NetworkLayer network = null;
@@ -228,14 +231,20 @@ public class ScenarioImpl implements Scenario {
 			getWorld();
 			getNetwork();
 			getFacilities();
-
-			log.info("loading population from " + this.populationFileName);
-			try {
-				new MatsimPopulationReader(this.population, this.network).parse(this.populationFileName);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
+			
+			if (this.populationFileName != null) {
+				log.info("loading population from " + this.populationFileName);
+				try {
+					new MatsimPopulationReader(this.population, this.network).parse(this.populationFileName);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+				this.population.printPlansCount();
 			}
-			this.population.printPlansCount();
+			else {
+				log.info("no population file set in config, creating empty population");
+			}
+			
 
 			this.populationLoaded = true;
 		}
@@ -243,11 +252,18 @@ public class ScenarioImpl implements Scenario {
 	}
 	
 	public BasicLaneDefinitions getLaneDefinitions(){
+		if (this.lanesLoaded){
+			return this.laneDefinitions;
+		}
 		if ((this.laneDefinitions == null) && (this.config.network().getLaneDefinitionsFile() != null)){
 			this.laneDefinitions = new BasicLaneDefinitionsImpl();
 			MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(this.laneDefinitions);
 			reader.readFile(this.config.network().getLaneDefinitionsFile());
 		}
+		else {
+			this.laneDefinitions = new BasicLaneDefinitionsImpl();
+		}
+		this.lanesLoaded = true;
 		return this.laneDefinitions;
 	}
 
