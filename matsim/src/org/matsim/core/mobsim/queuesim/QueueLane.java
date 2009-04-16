@@ -25,23 +25,17 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.network.BasicLane;
 import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.LaneEnterEvent;
@@ -68,14 +62,7 @@ public class QueueLane {
 	private static final Logger log = Logger.getLogger(QueueLane.class);
 
 	private static int spaceCapWarningCount = 0;
-
-	/**
-	 * parking list includes all vehicles that do not have yet reached their start
-	 * time, but will start at this link at some time
-	 */
-	/*package*/ final PriorityQueue<QueueVehicle> parkingList = new PriorityQueue<QueueVehicle>(
-			10, new QueueVehicleDepartureTimeComparator());
-
+	
 	/**
 	 * All vehicles from parkingList move to the waitingList as soon as their time
 	 * has come. They are then filled into the vehQueue, depending on free space
@@ -342,68 +329,6 @@ public class QueueLane {
 		this.thisTimeStepGreen = b;
 	}
 
-	private void processVehicleArrival(final double now, final QueueVehicle veh) {
-		QueueSimulation.getEvents().processEvent(
-				new AgentArrivalEvent(now, veh.getDriver().getPerson(),
-						this.queueLink.getLink(), veh.getDriver().getCurrentLeg()));
-		// Need to inform the veh that it now reached its destination.
-		veh.getDriver().legEnds(now);
-	}
-
-	/**
-	 * Moves those vehicles, whose departure time has come, from the parking list
-	 * to the wait list, from where they can later enter the link.
-	 *
-	 * @param now
-	 *          the current time
-	 */
-	private void moveParkToWait(final double now) {
-		QueueVehicle veh;
-		while ((veh = this.parkingList.peek()) != null) {
-			DriverAgent driver = veh.getDriver();
-			if (driver.getDepartureTime() > now) {
-				return;
-			}
-
-			// Need to inform the veh that it now leaves its activity.
-			if (driver instanceof PersonAgent) {
-				((PersonAgent) driver).leaveActivity(now);
-			}
-
-			// Generate departure event
-			QueueSimulation.getEvents().processEvent(
-					new AgentDepartureEvent(now, driver.getPerson(), this.queueLink.getLink(), driver.getCurrentLeg()));
-
-			/*
-			 * A.) we have an unknown leg mode (aka != "car").
-			 *     In this case teleport veh to next activity location
-			 * B.) we have no route (aka "next activity on same link") -> no waitingList
-			 * C.) route known AND mode == "car" -> regular case, put veh in waitingList
-			 */
-			Leg leg = driver.getCurrentLeg();
-
-			if (!leg.getMode().equals(TransportMode.car)) {
-				QueueSimulation.handleUnknownLegMode(veh);
-			} else {
-				if (((NetworkRoute) leg.getRoute()).getNodes().size() != 0) {
-					this.waitingList.add(veh);
-				} else {
-					// this is the case where (hopefully) the next act happens at the same location as this act
-					processVehicleArrival(now, veh);
-				}
-			}
-
-			/*
-			 * Remove vehicle from parkingList Do that as the last step to guarantee
-			 * that the link is ACTIVE all the time because veh.reinitVeh() calls
-			 * addParking which might come to the false conclusion, that this link
-			 * needs to be activated, as parkingQueue is empty
-			 */
-
-			this.parkingList.poll();
-		}
-	}
-
 	/**
 	 * Move as many waiting cars to the link as it is possible
 	 *
@@ -444,7 +369,7 @@ public class QueueLane {
 
 			// Check if veh has reached destination:
 			if (veh.getDriver().getDestinationLink() == this.queueLink.getLink()) {
-				processVehicleArrival(now, veh);
+				this.queueLink.processVehicleArrival(now, veh);
 				// remove _after_ processing the arrival to keep link active
 				this.vehQueue.poll();
 				continue;
@@ -481,10 +406,6 @@ public class QueueLane {
 	protected boolean moveLane(final double now) {
 		updateBufferCapacity();
 
-		if (this.originalLane) {
-			// move vehicles from parking into waitingQueue if applicable
-			moveParkToWait(now);
-		}
 		// move vehicles from link to buffer
 		moveLaneToBuffer(now);
 
@@ -501,8 +422,6 @@ public class QueueLane {
 		updateBufferCapacity();
 
 		if (this.originalLane) {
-			// move vehicles from parking into waitingQueue if applicable
-			moveParkToWait(now);
 			// move vehicles from waitingQueue into buffer if possible
 			moveWaitToBuffer(now);
 		}
@@ -542,10 +461,6 @@ public class QueueLane {
 		if (this.thisTimeStepGreen  && (this.buffercap_accumulate < 1.0)) {
 			this.buffercap_accumulate += this.flowCapFraction;
 		}
-	}
-
-	/*package*/ protected void addParking(final QueueVehicle veh) {
-		this.parkingList.add(veh);
 	}
 
 	/**
@@ -636,11 +551,6 @@ public class QueueLane {
 		return this.buffer;
 	}
 
-	public PriorityQueue<QueueVehicle> getVehiclesOnParkingList() {
-		return this.parkingList;
-	}
-
-
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer + vehQueue (=
 	 *         the whole link), than there is space for vehicles.
@@ -663,14 +573,6 @@ public class QueueLane {
 
 	void clearVehicles() {
 		double now = SimulationTimer.getTime();
-
-		for (QueueVehicle veh : this.parkingList) {
-			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
-		}
-		Simulation.decLiving(this.parkingList.size());
-		Simulation.incLost(this.parkingList.size());
-		this.parkingList.clear();
 
 		for (QueueVehicle veh : this.waitingList) {
 			QueueSimulation.getEvents().processEvent(
@@ -707,10 +609,6 @@ public class QueueLane {
 			if (veh.getDriver().getPerson().getId().equals(id))
 				return veh;
 		}
-		for (QueueVehicle veh : this.parkingList) {
-			if (veh.getDriver().getPerson().getId().equals(id))
-				return veh;
-		}
 		for (QueueVehicle veh : this.waitingList) {
 			if (veh.getDriver().getPerson().getId().equals(id))
 				return veh;
@@ -726,7 +624,6 @@ public class QueueLane {
 		Collection<QueueVehicle> vehicles = new ArrayList<QueueVehicle>();
 
 		vehicles.addAll(this.waitingList);
-		vehicles.addAll(this.parkingList);
 		vehicles.addAll(this.vehQueue);
 		vehicles.addAll(this.buffer);
 
@@ -866,21 +763,6 @@ public class QueueLane {
 				}
 			}
 
-			// the cars in the parkingQueue
-			// the actual position doesn't matter, so they're distributed next to the
-			// link
-			cnt = QueueLane.this.parkingList.size();
-			if (cnt > 0) {
-				int lane = nLanes + 4;
-				double cellSize = QueueLane.this.queueLink.getLink().getLength() / cnt;
-				double distFromFromNode = QueueLane.this.queueLink.getLink().getLength() - cellSize / 2.0;
-				for (QueueVehicle veh : QueueLane.this.parkingList) {
-					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(),
-							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
-					positions.add(position);
-					distFromFromNode -= cellSize;
-				}
-			}
 		}
 
 		/**
@@ -967,21 +849,9 @@ public class QueueLane {
 				positions.add(position);
 			}
 
-			/*
-			 * put the vehicles from the parking list in positions their actual position
-			 * doesn't matter, so they are just placed to the coordinates of the from
-			 * node
-			 */
-			lane = QueueLane.this.queueLink.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + 2; // place them next to the link
-			for (QueueVehicle veh : QueueLane.this.parkingList) {
-				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(),
-						((NetworkLayer) QueueLane.this.queueLink.getLink().getLayer()).getEffectiveCellSize(), lane, 0.0,
-						PositionInfo.VehicleState.Parking, null);
-				positions.add(position);
-			}
 		}
 
-	};
+	}
 
 	// //////////////////////////////////////////////////////////
 	// For NetStateWriter

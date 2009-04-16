@@ -30,9 +30,15 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.network.BasicLane;
 import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.signalsystems.CalculateAngle;
@@ -134,6 +140,13 @@ public class QueueLink {
 	private List<QueueLane> toNodeQueueLanes = null;
 	
 	private boolean active = false;
+
+	/**
+	 * parking list includes all vehicles that do not have yet reached their start
+	 * time, but will start at this link at some time
+	 */
+	/*package*/ final PriorityQueue<QueueVehicle> parkingList = new PriorityQueue<QueueVehicle>(
+			10, new QueueVehicleDepartureTimeComparator());
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -316,6 +329,14 @@ public class QueueLink {
 	}
 	
 	public void clearVehicles() {
+		double now = SimulationTimer.getTime();
+		for (QueueVehicle veh : this.parkingList) {
+			QueueSimulation.getEvents().processEvent(
+					new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
+		}
+		Simulation.decLiving(this.parkingList.size());
+		Simulation.incLost(this.parkingList.size());
+		this.parkingList.clear();
 		for (QueueLane lane : this.queueLanes){
 			lane.clearVehicles();
 		}
@@ -323,13 +344,15 @@ public class QueueLink {
 
 	
 	public void addParking(QueueVehicle vehicle) {
-		this.originalLane.addParking(vehicle);
+		this.parkingList.add(vehicle);
+//		this.originalLane.addParking(vehicle);
 		this.getQueueNetwork().setLinkActivation(
 				vehicle.getDriver().getDepartureTime(), this);
 	}
 
 	protected boolean moveLink(double now) {
 		boolean ret = false;	
+		moveParkToWait(now);
 		if (this.queueNetwork.isMoveWaitFirst()){
 			if (this.hasLanes) { // performance optimization: "if" is faster then "for(queueLanes)" with only one lane
 				for (QueueLane lane : this.queueLanes){
@@ -354,10 +377,70 @@ public class QueueLink {
 		this.active = ret;
 		return ret;
 	}
-	
-	
-	
-	
+
+	/**
+	 * Moves those vehicles, whose departure time has come, from the parking list
+	 * to the wait list, from where they can later enter the link.
+	 *
+	 * @param now
+	 *          the current time
+	 */
+	private void moveParkToWait(final double now) {
+		QueueVehicle veh;
+		while ((veh = this.parkingList.peek()) != null) {
+			DriverAgent driver = veh.getDriver();
+			if (driver.getDepartureTime() > now) {
+				return;
+			}
+
+			// Need to inform the veh that it now leaves its activity.
+			if (driver instanceof PersonAgent) {
+				((PersonAgent) driver).leaveActivity(now);
+			}
+
+			// Generate departure event
+			QueueSimulation.getEvents().processEvent(
+					new AgentDepartureEvent(now, driver.getPerson(), this.getLink(), driver.getCurrentLeg()));
+
+			/*
+			 * A.) we have an unknown leg mode (aka != "car").
+			 *     In this case teleport veh to next activity location
+			 * B.) we have no route (aka "next activity on same link") -> no waitingList
+			 * C.) route known AND mode == "car" -> regular case, put veh in waitingList
+			 */
+			Leg leg = driver.getCurrentLeg();
+
+			if (!leg.getMode().equals(TransportMode.car)) {
+				QueueSimulation.handleUnknownLegMode(veh);
+			} else {
+				if (((NetworkRoute) leg.getRoute()).getNodes().size() != 0) {
+					this.originalLane.waitingList.add(veh);
+				} else {
+					// this is the case where (hopefully) the next act happens at the same location as this act
+					this.processVehicleArrival(now, veh);
+				}
+			}
+
+			/*
+			 * Remove vehicle from parkingList Do that as the last step to guarantee
+			 * that the link is ACTIVE all the time because veh.reinitVeh() calls
+			 * addParking which might come to the false conclusion, that this link
+			 * needs to be activated, as parkingQueue is empty
+			 */
+
+			this.parkingList.poll();
+		}
+	}
+
+	/*package*/ void processVehicleArrival(final double now, final QueueVehicle veh) {
+		QueueSimulation.getEvents().processEvent(
+				new AgentArrivalEvent(now, veh.getDriver().getPerson(),
+						this.getLink(), veh.getDriver().getCurrentLeg()));
+		// Need to inform the veh that it now reached its destination.
+		veh.getDriver().legEnds(now);
+	}
+
+
 	protected boolean bufferIsEmpty() {
 		//if there is only one lane...
 		if (this.toNodeQueueLanes == null){
@@ -382,6 +465,10 @@ public class QueueLink {
 	}
 
 	public QueueVehicle getVehicle(Id agentId) {
+		for (QueueVehicle veh : this.parkingList) {
+			if (veh.getDriver().getPerson().getId().equals(agentId))
+				return veh;
+		}
 		QueueVehicle ret = null;
 		for (QueueLane lane : this.queueLanes){
 			ret = lane.getVehicle(agentId);
@@ -393,14 +480,9 @@ public class QueueLink {
 	}
 
 	public Collection<QueueVehicle> getAllVehicles() {
-		Collection<QueueVehicle> ret = null;
+		Collection<QueueVehicle> ret = new ArrayList<QueueVehicle>(this.parkingList);
 		for  (QueueLane lane : this.queueLanes){
-			if (ret == null) {
-				ret = lane.getAllVehicles();
-			}
-			else {
-				ret.addAll(lane.getAllVehicles());
-			}
+			ret.addAll(lane.getAllVehicles());
 		}
 		return ret;
 	}
@@ -414,7 +496,7 @@ public class QueueLink {
 	}
 	
 	public PriorityQueue<QueueVehicle> getVehiclesOnParkingList() {
-		return this.originalLane.getVehiclesOnParkingList();
+		return this.parkingList;
 	}
 	
 	/**
