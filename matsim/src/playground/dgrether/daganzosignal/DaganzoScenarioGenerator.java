@@ -69,42 +69,42 @@ public class DaganzoScenarioGenerator {
 	private static final Logger log = Logger
 			.getLogger(DaganzoScenarioGenerator.class);
 
-	private static final String DAGANZOBASE = DgPaths.SHAREDSVN + "studies/dgrether/daganzo/";
+	private static final String DAGANZOBASEDIR = DgPaths.SHAREDSVN + "studies/dgrether/daganzo/";
 	
-	private static final String networkFileNew = DAGANZOBASE
+	private static final String DAGANZONETWORKFILE = DAGANZOBASEDIR
 			+ "daganzoNetwork.xml";
 
-	public static final String networkFile = networkFileNew;
+	public static final String NETWORKFILE = DAGANZONETWORKFILE;
 
-	private static final String plans1Out = DAGANZOBASE
+	private static final String PLANS1OUT = DAGANZOBASEDIR
 			+ "daganzoPlansNormalRoute.xml";
 
-	private static final String plans2Out = DAGANZOBASE
+	private static final String PLANS2OUT = DAGANZOBASEDIR
 			+ "daganzoPlansAlternativeRoute.xml";
 
-	private static final String config1Out = DAGANZOBASE
+	private static final String CONFIG1OUT = DAGANZOBASEDIR
 			+ "daganzoConfigNormalRoute.xml";
 
-	private static final String config2Out = DAGANZOBASE
+	private static final String CONFIG2OUT = DAGANZOBASEDIR
 			+ "daganzoConfigAlternativeRoute.xml";
 
-	public static final String lanesOutputFile = DAGANZOBASE
+	public static final String LANESOUTPUTFILE = DAGANZOBASEDIR
 		+ "daganzoLaneDefinitions.xml";
 
-	public static final String signalSystemsOutputFile = DAGANZOBASE
+	public static final String SIGNALSYSTEMSOUTPUTFILE = DAGANZOBASEDIR
 		+ "daganzoSignalSystems.xml";
 	
-	public static final String signalSystemConfigurationsOutputFile = DAGANZOBASE 
+	public static final String SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE = DAGANZOBASEDIR 
 		+ "daganzoSignalSystemsConfigs.xml";
 	
-	private static final String outputDirectoryNormalRoute = DAGANZOBASE
+	private static final String OUTPUTDIRECTORYNORMALROUTE = DAGANZOBASEDIR
 		+ "output/normalRoute/";
 	
-	private static final String outputDirectoryAlternativeRoute = DAGANZOBASE
+	private static final String OUTPUTDIRECTORYALTERNATIVEROUTE = DAGANZOBASEDIR
 		+ "output/alternativeRoute/";
 	
 	
-	public static String configOut, plansOut, outputDirectory;
+	public String configOut, plansOut, outputDirectory;
 
 	private static final boolean isAlternativeRouteEnabled = true;
 
@@ -122,14 +122,14 @@ public class DaganzoScenarioGenerator {
 
 	private void init() {
 		if (isAlternativeRouteEnabled) {
-			plansOut = plans2Out;
-			configOut = config2Out;
-			outputDirectory = outputDirectoryAlternativeRoute;
+			plansOut = PLANS2OUT;
+			configOut = CONFIG2OUT;
+			outputDirectory = OUTPUTDIRECTORYALTERNATIVEROUTE;
 		}
 		else {
-			plansOut = plans1Out;
-			configOut = config1Out;
-			outputDirectory = outputDirectoryNormalRoute;
+			plansOut = PLANS1OUT;
+			configOut = CONFIG1OUT;
+			outputDirectory = OUTPUTDIRECTORYNORMALROUTE;
 		}
 	}
 	
@@ -146,7 +146,7 @@ public class DaganzoScenarioGenerator {
 		Config config = new Config();
 		config.addCoreModules();
 		//set the network
-		config.network().setInputFile(networkFile);
+		config.network().setInputFile(NETWORKFILE);
 		//create a scenario instance (we have to work on the implemenation not on the interface
 		//because some methods are not standardized yet)
 		ScenarioImpl scenario = new ScenarioImpl(config);
@@ -159,15 +159,15 @@ public class DaganzoScenarioGenerator {
 		//create the lanes and write them
 		BasicLaneDefinitions lanes = createLanes(scenario);
 		MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(lanes);
-		laneWriter.writeFile(lanesOutputFile);
+		laneWriter.writeFile(LANESOUTPUTFILE);
 		//create the signal systems and write them
 		BasicSignalSystems signalSystems = createSignalSystems(scenario);
 		MatsimSignalSystemsWriter ssWriter = new MatsimSignalSystemsWriter(signalSystems);
-		ssWriter.writeFile(signalSystemsOutputFile);
+		ssWriter.writeFile(SIGNALSYSTEMSOUTPUTFILE);
 		//create the signal system's configurations and write them
 		BasicSignalSystemConfigurations ssConfigs = createSignalSystemsConfig(scenario);
 		MatsimSignalSystemConfigurationsWriter ssConfigsWriter = new MatsimSignalSystemConfigurationsWriter(ssConfigs);	
-		ssConfigsWriter.writeFile(signalSystemConfigurationsOutputFile);
+		ssConfigsWriter.writeFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
 		
 		//create and write the config with the correct paths to the files created above
 		createConfig(config);
@@ -222,11 +222,11 @@ public class DaganzoScenarioGenerator {
 	
 	private void createConfig(Config config) {
 	// set scenario
-		config.network().setInputFile(networkFile);
+		config.network().setInputFile(NETWORKFILE);
 		config.plans().setInputFile(plansOut);
-		config.network().setLaneDefinitionsFile(lanesOutputFile);
-		config.signalSystems().setSignalSystemFile(signalSystemsOutputFile);
-		config.signalSystems().setSignalSystemConfigFile(signalSystemConfigurationsOutputFile);
+		config.network().setLaneDefinitionsFile(LANESOUTPUTFILE);
+		config.signalSystems().setSignalSystemFile(SIGNALSYSTEMSOUTPUTFILE);
+		config.signalSystems().setSignalSystemConfigFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
 		
 		// configure scoring for plans
 		config.charyparNagelScoring().setLateArrival(0.0);

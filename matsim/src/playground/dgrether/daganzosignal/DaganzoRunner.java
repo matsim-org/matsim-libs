@@ -45,10 +45,10 @@ public class DaganzoRunner {
 		if (visualizationOnly){
 			config = new Config();
 			MatsimConfigReader reader = new MatsimConfigReader(config);
-			reader.readFile(DaganzoScenarioGenerator.configOut);
+			reader.readFile(scenarioGenerator.configOut);
 		}
 		else {
-			Controler controler = new Controler(DaganzoScenarioGenerator.configOut);
+			Controler controler = new Controler(scenarioGenerator.configOut);
 			controler.setOverwriteFiles(true);
 			controler.run();
 		}
