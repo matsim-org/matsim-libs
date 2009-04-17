@@ -30,8 +30,8 @@ import org.matsim.api.basic.v01.Id;
 public class BasicLaneImpl implements BasicLane {
 
 	private Id id;
-	private int numberOfRepresentedLanes;
-	private double length;
+	private int numberOfRepresentedLanes = 1;
+	private double length = 45.0;
 	private List<Id> toLinkIds;
 
 	/**
