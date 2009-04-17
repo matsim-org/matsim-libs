@@ -22,10 +22,12 @@ package org.matsim.core.mobsim.queuesim;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -61,6 +63,7 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.signalsystems.control.AdaptivePlanBasedSignalSystemControler;
@@ -105,7 +108,7 @@ public class QueueSimulation {
 	 * Includes all vehicle that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
-	private static PriorityQueue<QueueVehicle> teleportationList = new PriorityQueue<QueueVehicle>(30, new QueueVehicleEarliestLinkExitTimeComparator());
+	private static PriorityQueue<Tuple<Double, DriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, DriverAgent>>(30, new TeleportationArrivalTimeComparator());
 
 	private final Date starttime = new Date();
 
@@ -138,7 +141,7 @@ public class QueueSimulation {
 
 	private QueueSimListenerManager listenerManager;
 	
-	private final PriorityQueue<PersonAgent> activityEndsList = new PriorityQueue<PersonAgent>(500, new DriverAgentDepartureTimeComparator()); // TODO [MR] change this to PQ<DriverAgent>
+	private final PriorityQueue<PersonAgent> activityEndsList = new PriorityQueue<PersonAgent>(500, new DriverAgentDepartureTimeComparator());
 
 	/** @see #setTeleportVehicles(boolean) */
 	private boolean teleportVehicles = true;
@@ -500,8 +503,9 @@ public class QueueSimulation {
 	protected void cleanupSim() {
 		this.network.afterSim();
 		double now = SimulationTimer.getTime();
-		for (QueueVehicle veh : teleportationList) {
-			events.processEvent(new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
+		for (Tuple<Double, DriverAgent> entry : teleportationList) {
+			DriverAgent agent = entry.getSecond();
+			events.processEvent(new AgentStuckEvent(now, agent.getPerson(), agent.getDestinationLink(), agent.getCurrentLeg()));
 		}
 		QueueSimulation.teleportationList.clear();
 
@@ -590,23 +594,23 @@ public class QueueSimulation {
 		QueueSimulation.events = events;
 	}
 
-	protected static final void handleUnknownLegMode(final QueueVehicle veh) {
-		veh.setEarliestLinkExitTime(SimulationTimer.getTime() + veh.getDriver().getCurrentLeg().getTravelTime());
-		teleportationList.add(veh);
+	private static final void handleUnknownLegMode(final DriverAgent agent) {
+		double arrivalTime = SimulationTimer.getTime() + agent.getCurrentLeg().getTravelTime();
+		teleportationList.add(new Tuple<Double, DriverAgent>(arrivalTime, agent));
 	}
 
 	private final void moveVehiclesWithUnknownLegMode(final double now) {
 		while (teleportationList.peek() != null ) {
-			QueueVehicle veh = teleportationList.peek();
-			if (veh.getEarliestLinkExitTime() <= now) {
+			Tuple<Double, DriverAgent> entry = teleportationList.peek();
+			if (entry.getFirst().doubleValue() <= now) {
 				teleportationList.poll();
-				Link destinationLink = veh.getDriver().getDestinationLink();
-				veh.setCurrentLink(destinationLink);
-				veh.getDriver().teleportToLink(destinationLink);
+				DriverAgent driver = entry.getSecond();
+				Link destinationLink = driver.getDestinationLink();
+				driver.teleportToLink(destinationLink);
 
-				getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getPerson(),
-						veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
-				veh.getDriver().legEnds(now);
+				getEvents().processEvent(new AgentArrivalEvent(now, driver.getPerson(),
+						destinationLink, driver.getCurrentLeg()));
+				driver.legEnds(now);
 			} else break;
 		}
 	}
@@ -682,8 +686,7 @@ public class QueueSimulation {
 			}
 		} else {
 			// unknown leg mode
-			QueueVehicle vehicle = ((PersonAgent) agent).getVehicle();
-			QueueSimulation.handleUnknownLegMode(vehicle);
+			QueueSimulation.handleUnknownLegMode(agent);
 		}
 	}
 
@@ -721,6 +724,17 @@ public class QueueSimulation {
 	 */
 	public void setTeleportVehicles(final boolean teleportVehicles) {
 		this.teleportVehicles = teleportVehicles;
+	}
+
+	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, DriverAgent>>, Serializable {
+		private static final long serialVersionUID = 1L;
+		public int compare(Tuple<Double, DriverAgent> o1, Tuple<Double, DriverAgent> o2) {
+			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
+			if (ret == 0) {
+				ret = o2.getSecond().getPerson().getId().compareTo(o1.getSecond().getPerson().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
+			}
+			return ret;
+		}
 	}
 	
 }
