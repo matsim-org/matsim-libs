@@ -21,10 +21,11 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
@@ -60,14 +61,18 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimator extends FixedRouteLegT
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			Activity actOrigin, Activity actDestination, Leg legIntermediate) {
 
-		double now = departureTime;
-
-		now = this.processDeparture(actOrigin.getLink(), now);
-		now = this.processLink(actOrigin.getLink(), now);
-		now = this.processRouteTravelTime((NetworkRoute) legIntermediate.getRoute(), now);
+		double legTravelTimeEstimation;
 		
-		double legTravelTimeEstimation = now - departureTime;
-
+		if (legIntermediate.getMode().equals(TransportMode.car)) {
+			double now = departureTime;
+			now = this.processDeparture(actOrigin.getLink(), now);
+			now = this.processLink(actOrigin.getLink(), now);
+			now = this.processRouteTravelTime((NetworkRoute) legIntermediate.getRoute(), now);
+			legTravelTimeEstimation = now - departureTime;
+		} else {
+			legTravelTimeEstimation = super.getLegTravelTimeEstimation(personId, departureTime, actOrigin, actDestination, legIntermediate);
+		}
+		
 		return legTravelTimeEstimation;
 	
 	
