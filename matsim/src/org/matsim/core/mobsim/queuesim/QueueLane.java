@@ -39,6 +39,7 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.LaneEnterEvent;
+import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -278,6 +279,7 @@ public class QueueLane {
 
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
+		
 		this.storageCapacity = (this.length_m * numberOfRepresentedLanes) /
 								this.queueLink.getQueueNetwork().getNetworkLayer().getEffectiveCellSize() * config.getStorageCapFactor();
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
@@ -444,6 +446,8 @@ public class QueueLane {
 						if (qLink.equals(nextLink)) {
 							if (toQueueLane.hasSpace()) {
 								this.buffer.poll();
+								QueueSimulation.getEvents().processEvent(
+										new LaneLeaveEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), this.getLaneId()));
 								toQueueLane.add(veh, now);
 							} else
 								moveOn = false;
@@ -524,7 +528,7 @@ public class QueueLane {
 		QueueVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if (this.isFireLaneEvents()){
-			QueueSimulation.getEvents().processEvent(new LaneEnterEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), this.getLaneId()));
+			QueueSimulation.getEvents().processEvent(new LaneLeaveEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), this.getLaneId()));
 		}
 		QueueSimulation.getEvents().processEvent(new LinkLeaveEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink()));
 
