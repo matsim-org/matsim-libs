@@ -261,7 +261,7 @@ public class QueueLane {
 		 * TODO Check if this is correct! dg[jan09]*/
 		double averageSimulatedFlowCapacityPerLane_Veh_s = this.queueLink.getSimulatedFlowCapacity() / this.queueLink.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
 
-		if(laneLength_m < 15){
+		if(laneLength_m < 15){//why this hard coded vehicle lengths? in the evac sim the vehicle length is 0.26 m. I would suggest to change this criterion to 2*cell_size - gl apr09 
 			log.warn("Length of one of link " + this.queueLink.getLink().getId() + " sublinks is less than 15m." +
 					" Will enlarge length to 15m, since I need at least additional 15m space to store 2 vehicles" +
 					" at the original link.");
