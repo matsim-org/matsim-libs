@@ -632,7 +632,7 @@ public class QueueSimulation {
 	 * 
 	 * @see DriverAgent#getDepartureTime()
 	 */
-	/*package*/ void registerAgentDeparture(final PersonAgent agent) {
+	/*package*/ void scheduleActivityEnd(final PersonAgent agent) {
 		this.activityEndsList.add(agent);
 	}
 	

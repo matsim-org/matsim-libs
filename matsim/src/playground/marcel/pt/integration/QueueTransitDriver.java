@@ -59,7 +59,7 @@ public class QueueTransitDriver implements DriverAgent {
 		return this.dummyPerson;
 	}
 	
-	public void incCurrentNode() {
+	public void moveOverNode() {
 		this.driver.enterNextLink();
 	}
 

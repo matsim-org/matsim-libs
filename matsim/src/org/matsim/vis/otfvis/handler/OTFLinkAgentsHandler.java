@@ -76,11 +76,15 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 				} else {
 					DriverAgent driver = veh.getDriver(); 
 					Leg leg = driver.getCurrentLeg();
-					if(leg.getMode() == TransportMode.pt) {
-						out.putInt(2);
-					} else if(leg.getMode() == TransportMode.bus) {
-						out.putInt(3);
-					} else {
+					if (leg != null) {
+						if(leg.getMode() == TransportMode.pt) {
+							out.putInt(2);
+						} else if(leg.getMode() == TransportMode.bus) {
+							out.putInt(3);
+						} else {
+							out.putInt(1);
+						}
+					} else {						
 						out.putInt(1);
 					}
 				}

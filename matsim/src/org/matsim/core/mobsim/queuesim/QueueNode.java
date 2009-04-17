@@ -112,7 +112,7 @@ public class QueueNode {
 
 			if (nextQueueLink.hasSpace()) {
 				currentLane.popFirstFromBuffer();
-				veh.getDriver().incCurrentNode();
+				veh.getDriver().moveOverNode();
 				nextQueueLink.add(veh);
 				return true;
 			}
@@ -132,7 +132,7 @@ public class QueueNode {
 							new AgentStuckEvent(now, veh.getDriver().getPerson(), currentLink, veh.getDriver().getCurrentLeg()));
 				} else {
 					currentLane.popFirstFromBuffer();
-					veh.getDriver().incCurrentNode();
+					veh.getDriver().moveOverNode();
 					nextQueueLink.add(veh);
 					return true;
 				}

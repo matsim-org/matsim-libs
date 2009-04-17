@@ -135,7 +135,7 @@ public class PersonAgent implements DriverAgent {
 		if (departureTime != Time.UNDEFINED_TIME) {
 			setDepartureTime(departureTime);
 			SimulationTimer.updateSimStartTime(departureTime);
-			this.simulation.registerAgentDeparture(this);
+			this.simulation.scheduleActivityEnd(this);
 			Simulation.incLiving();
 			return true;			
 		}
@@ -190,7 +190,7 @@ public class PersonAgent implements DriverAgent {
 
 			if ((this.currentPlanElementIndex+1) < this.getPlanElements().size()) {
 				// there is still at least on plan element left
-				this.simulation.registerAgentDeparture(this);
+				this.simulation.scheduleActivityEnd(this);
 			} else {
 				// this is the last activity
 				Simulation.decLiving();
@@ -236,7 +236,7 @@ public class PersonAgent implements DriverAgent {
 		}
 	}
 
-	public void incCurrentNode() {
+	public void moveOverNode() {
 		this.currentLink = this.cachedNextLink;
 		this.currentNodeIndex++;
 		this.cachedNextLink = null; //reset cached nextLink

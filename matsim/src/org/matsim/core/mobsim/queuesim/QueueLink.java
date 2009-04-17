@@ -36,8 +36,10 @@ import org.matsim.core.basic.network.BasicLane;
 import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.signalsystems.CalculateAngle;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
  * @author dstrippgen
@@ -139,6 +141,8 @@ public class QueueLink {
 
 	private final Map<Id, QueueVehicle> parkedVehicles = new LinkedHashMap<Id, QueueVehicle>(10);
 
+	/*package*/ VisData visdata = this.new VisDataImpl();
+	
 	/**
 	 * Initializes a QueueLink with one QueueLane.
 	 * @param l
@@ -405,7 +409,10 @@ public class QueueLink {
 	}
 
 	public QueueVehicle getVehicle(Id agentId) {
-		QueueVehicle ret = null;
+		QueueVehicle ret = getParkedVehicle(agentId);
+		if (ret != null) {
+			return ret;
+		}
 		for (QueueLane lane : this.queueLanes){
 			ret = lane.getVehicle(agentId);
 			if (ret != null) {
@@ -416,7 +423,7 @@ public class QueueLink {
 	}
 
 	public Collection<QueueVehicle> getAllVehicles() {
-		Collection<QueueVehicle> ret = new ArrayList<QueueVehicle>();
+		Collection<QueueVehicle> ret = new ArrayList<QueueVehicle>(this.parkedVehicles.values());
 		for  (QueueLane lane : this.queueLanes){
 			ret.addAll(lane.getAllVehicles());
 		}
@@ -465,7 +472,61 @@ public class QueueLink {
 	}
 	
 	public VisData getVisData() {
-		return this.originalLane.visdata;
+		return this.visdata;
+	}
+	
+	/**
+	 * Inner class to capsulate visualization methods
+	 * @author dgrether
+	 *
+	 */
+	class VisDataImpl implements VisData {
+
+		public double getDisplayableSpaceCapValue() {
+			return originalLane.visdata.getDisplayableSpaceCapValue();
+		}
+
+		public double getDisplayableTimeCapValue() {
+			return originalLane.visdata.getDisplayableTimeCapValue();
+		}
+
+		public Collection<AgentOnLink> getDrawableCollection() {
+			Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
+			getVehiclePositions(positions);
+
+			List<AgentOnLink> vehs = new ArrayList<AgentOnLink>();
+			for (PositionInfo pos : positions) {
+				if (pos.getVehicleState() == PositionInfo.VehicleState.Driving) {
+					AgentOnLink veh = new AgentOnLink();
+					veh.posInLink_m = pos.getDistanceOnLink();
+					vehs.add(veh);
+				}
+			}
+
+			return vehs;
+		}
+
+		public Collection<PositionInfo> getVehiclePositions(final Collection<PositionInfo> positions) {
+			originalLane.visdata.getVehiclePositions(positions);
+
+			// add the parked vehicles
+			int cnt = parkedVehicles.size();
+			if (cnt > 0) {
+				int nLanes = getLink().getLanesAsInt(Time.UNDEFINED_TIME);
+				int lane = nLanes + 4;
+				double cellSize = Math.min(7.5, getLink().getLength() / cnt);
+				double distFromFromNode = getLink().getLength() - cellSize / 2.0;
+				for (QueueVehicle veh : parkedVehicles.values()) {
+					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(),
+							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
+					positions.add(position);
+					distFromFromNode -= cellSize;
+				}
+			}
+
+			return positions;
+		}
+
 	}
 	
 }

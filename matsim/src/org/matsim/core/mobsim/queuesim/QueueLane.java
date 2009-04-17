@@ -279,7 +279,6 @@ public class QueueLane {
 
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
-		
 		this.storageCapacity = (this.length_m * numberOfRepresentedLanes) /
 								this.queueLink.getQueueNetwork().getNetworkLayer().getEffectiveCellSize() * config.getStorageCapFactor();
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
@@ -719,7 +718,7 @@ public class QueueLane {
 		 * @param positions
 		 *          A collection where the calculated positions can be stored.
 		 */
-		public void getVehiclePositionsEquil(final Collection<PositionInfo> positions) {
+		private void getVehiclePositionsEquil(final Collection<PositionInfo> positions) {
 			double time = SimulationTimer.getTime();
 			int cnt = QueueLane.this.buffer.size() + QueueLane.this.vehQueue.size();
 			int nLanes = QueueLane.this.queueLink.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
@@ -730,7 +729,7 @@ public class QueueLane {
 
 				// the cars in the buffer
 				for (QueueVehicle veh : QueueLane.this.buffer) {
-					int lane = 1 + Integer.parseInt(veh.getId().toString()) % nLanes;
+					int lane = 1 + (veh.getId().hashCode() % nLanes);
 					int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLane.this.inverseSimulatedFlowCapacity + 2.0);
 					double speed = (time > cmp ? 0.0 : freespeed);
 					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(),
@@ -741,7 +740,7 @@ public class QueueLane {
 
 				// the cars in the drivingQueue
 				for (QueueVehicle veh : QueueLane.this.vehQueue) {
-					int lane = 1 + Integer.parseInt(veh.getId().toString()) % nLanes;
+					int lane = 1 + (veh.getId().hashCode() % nLanes);
 					int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLane.this.inverseSimulatedFlowCapacity + 2.0);
 					double speed = (time > cmp ? 0.0 : freespeed);
 					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(),
@@ -779,7 +778,7 @@ public class QueueLane {
 		 * @param positions
 		 *          A collection where the calculated positions can be stored.
 		 */
-		public void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
+		private void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
 			double now = SimulationTimer.getTime();
 			double queueEnd = QueueLane.this.queueLink.getLink().getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
 			double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
@@ -790,7 +789,7 @@ public class QueueLane {
 			// put all cars in the buffer one after the other
 			for (QueueVehicle veh : QueueLane.this.buffer) {
 
-				int lane = 1 + (Integer.parseInt(veh.getId().toString()) % QueueLane.this.queueLink.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
+				int lane = 1 + (veh.getId().hashCode() % QueueLane.this.queueLink.getLink().getLanesAsInt(Time.UNDEFINED_TIME));
 
 				int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLane.this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp) ? 0.0 : QueueLane.this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
@@ -833,7 +832,7 @@ public class QueueLane {
 				}
 				int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLane.this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp) ? 0.0 : QueueLane.this.queueLink.getLink().getFreespeed(now);
-				int lane = 1 + (Integer.parseInt(veh.getId().toString()) % QueueLane.this.queueLink.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
+				int lane = 1 + (veh.getId().hashCode() % QueueLane.this.queueLink.getLink().getLanesAsInt(Time.UNDEFINED_TIME));
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(), distanceOnLink,
 						lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
@@ -845,7 +844,7 @@ public class QueueLane {
 			 * position doesn't matter, so they are just placed to the coordinates of
 			 * the from node
 			 */
-			int lane = QueueLane.this.queueLink.getLink().getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + 1; // place them next to the link
+			int lane = QueueLane.this.queueLink.getLink().getLanesAsInt(Time.UNDEFINED_TIME) + 1; // place them next to the link
 			for (QueueVehicle veh : QueueLane.this.waitingList) {
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(),
 						((NetworkLayer) QueueLane.this.queueLink.getLink().getLayer()).getEffectiveCellSize(), lane, 0.0,
