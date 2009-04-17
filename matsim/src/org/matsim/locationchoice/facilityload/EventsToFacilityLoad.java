@@ -99,7 +99,7 @@ public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHa
 
 
 	public void reset(final int iteration) {
-		log.info("EventsToFacilityLoad resetted"); 
+		log.info("Not really resetting anything here."); 
 	}
 	
 	public void resetAll(final int iteration) {

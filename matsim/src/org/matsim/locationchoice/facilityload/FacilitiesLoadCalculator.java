@@ -31,9 +31,11 @@ import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
@@ -44,7 +46,7 @@ import org.matsim.core.utils.io.IOUtils;
  *
  * @author anhorni
  */
-public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimListener, IterationEndsListener {
+public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
 	private EventsToFacilityLoad eventsToFacilityLoad;
 	private TreeMap<Id, FacilityPenalty> facilityPenalties = null;
@@ -80,6 +82,10 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 //		log.info("world checking done.");
 	}
 
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		this.eventsToFacilityLoad.resetAll(event.getIteration());
+	}
+
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {	
 		this.eventsToFacilityLoad.finish();		
 	}
@@ -96,7 +102,6 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 			this.printStatistics(facilities, Controler.getIterationPath(), event.getIteration(), 
 					this.eventsToFacilityLoad.getFacilityPenalties());
 		}	
-		this.eventsToFacilityLoad.resetAll(event.getIteration());
 	}
 
 	/*
@@ -150,4 +155,5 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 				Gbl.errorMsg(e);
 			}
 	}
+
 }
