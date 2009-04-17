@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2009 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -29,7 +29,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.PriorityQueue;
 
 import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Id;
@@ -66,7 +65,7 @@ public class QueueNetwork{
 	private final ArrayList<QueueLink> simActivateThis = new ArrayList<QueueLink>();
 	/** This is a queue of links and times, at which the links will have to be activated again. This queue is mostly used
 	 * when vehicles are parking on a link but no other traffic occurs on that link. */
-	private final PriorityQueue<LinkActivation> activationQueue = new PriorityQueue<LinkActivation>();
+//	private final PriorityQueue<LinkActivation> activationQueue = new PriorityQueue<LinkActivation>();
 
 	// set to true to move vehicles from waitingList before vehQueue
 	private boolean moveWaitFirst = false;
@@ -130,7 +129,7 @@ public class QueueNetwork{
 	 */
 	protected void simStep(final double time) {
 		moveNodes(time);
-		reactivateLinks(time);
+		reactivateLinks();
 		moveLinks(time);
 	}
 	
@@ -199,26 +198,12 @@ public class QueueNetwork{
 		}
 	}
 
-	private void reactivateLinks(final double now) {
+	private void reactivateLinks() {
 		if (!simulateAllLinks) {
-			// links being activated because somebody's leaving on that link
-			LinkActivation activation = this.activationQueue.peek();
-			while ((activation != null) && (activation.time <= now)) {
-				activation = this.activationQueue.poll();
-				activation.link.activateLink();
-				activation = this.activationQueue.peek();
-			}
-			// links being activated because somebody's driving on them
 			if (!this.simActivateThis.isEmpty()) {
 				this.simLinksArray.addAll(this.simActivateThis);
 				this.simActivateThis.clear();
 			}
-		}
-	}
-
-	/*package*/ void setLinkActivation(final double time, final QueueLink link) {
-		if (!simulateAllLinks) {
-			this.activationQueue.add(new LinkActivation(time, link));
 		}
 	}
 
@@ -238,34 +223,6 @@ public class QueueNetwork{
 		return Collections.unmodifiableMap(this.nodes);
 	}
 
-	final private static class LinkActivation implements Comparable<LinkActivation> {
-		/*package*/ final double time;
-		/*package*/ final QueueLink link;
-		protected LinkActivation(final double time, final QueueLink link) {
-			this.time = time;
-			this.link = link;
-		}
-
-		public int compareTo(final LinkActivation o) {
-			if (this.time < o.time) return -1;
-			if (this.time > o.time) return +1;
-			return 0;
-		}
-
-		@Override
-		public boolean equals(final Object obj) {
-			if (obj == null) return false;
-			if (!(obj instanceof LinkActivation)) return false;
-			LinkActivation la = (LinkActivation)obj;
-			return (this.time == la.time) && (this.link.equals(la.link));
-		}
-
-		@Override
-		public int hashCode() {
-			return this.link.hashCode();
-		}
-	}
-
 	public QueueLink getQueueLink(final Id id) {
 		return this.links.get(id);
 	}
@@ -283,8 +240,5 @@ public class QueueNetwork{
 		Log.warn("ATTENTION: simulateAllNodes is set. Make sure this is not happening while the simulation is running AND ONLY FOR TESTING PURPOSES!!!");
 		simulateAllNodes = simulateAll;
 	}
-	
-	
-
 	
 }
