@@ -75,7 +75,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 					for (Departure departure : route.getDepartures().values()) {
 						TransitDriver driver = new TransitDriver(route, departure, this);
 						driver.setFacilityVisitorObserver(this.fv);
-						Vehicle bus = new VehicleImpl(20, events);
+						Vehicle bus = new VehicleImpl(20, getEvents());
 						driver.setVehicle(bus);
 						QueueTransitDriver qDriver = new QueueTransitDriver(driver);
 						TransitQueueVehicle qVeh = new TransitQueueVehicle(bus, qDriver);

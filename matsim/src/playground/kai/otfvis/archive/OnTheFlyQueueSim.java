@@ -56,12 +56,12 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 
 	@Override
 	protected void prepareSim() {
-		this.myOTFServer = OnTheFlyServer.createInstance("AName1", this.network, this.plans, events, false);
+		this.myOTFServer = OnTheFlyServer.createInstance("AName1", this.network, this.plans, getEvents(), false);
 
 		super.prepareSim();
 
 		this.hist = new LegHistogram(300);
-		events.addHandler(this.hist);
+		getEvents().addHandler(this.hist);
 
 		// FOR TESTING ONLY!
 		new Thread(){@Override

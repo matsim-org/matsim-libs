@@ -49,7 +49,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 	protected void prepareSim() {
 		UUID idOne = UUID.randomUUID();
 
-		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.network, this.plans, events, false);
+		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.network, this.plans, getEvents(), false);
 
 		super.prepareSim();
 

@@ -39,7 +39,7 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 
 	@Override
 	protected void prepareSim() {
-		this.myOTFServer = OnTheFlyServer.createInstance("AName1", this.network, this.plans, events, false);
+		this.myOTFServer = OnTheFlyServer.createInstance("AName1", this.network, this.plans, getEvents(), false);
 
 		super.prepareSim();
 

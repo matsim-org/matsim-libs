@@ -97,7 +97,7 @@ public class QueueSimulation {
 	protected QueueNetwork network;
 	protected NetworkLayer networkLayer;
 
-	protected static Events events = null;
+	private static Events events = null;
 	protected  SimStateWriterI netStateWriter = null;
 
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
