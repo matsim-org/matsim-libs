@@ -75,7 +75,7 @@ public class FacilityPenalty {
 			 */
 		}
 		capPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
-		capPenaltyFactor = Math.min(1.0, capPenaltyFactor);		
+		capPenaltyFactor = Math.min(0.5, capPenaltyFactor);		
 		this.sumCapacityPenaltyFactor += capPenaltyFactor * this.scaleNumberOfPersons;
 		return capPenaltyFactor;
 	}
