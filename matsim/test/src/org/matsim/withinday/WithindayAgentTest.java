@@ -62,6 +62,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 	private NetworkRoute agentRoute = null;
 	private Plan plan = null;
 	private Leg leg = null;
+	private QueueSimulation simulation = null;
 
 	@Override
 	protected void setUp() throws Exception {
@@ -71,6 +72,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		MatsimNetworkReader parser = new MatsimNetworkReader(this.network);
 		parser.readFile(networkFile);
 		this.createRoutes();
+		this.simulation = new QueueSimulation(this.network, null, new Events());
 	}
 
 	@Override
@@ -81,6 +83,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		this.plan = null;
 		this.route1 = null;
 		this.route2 = null;
+		this.simulation = null;
 		super.tearDown();
 	}
 
@@ -166,10 +169,11 @@ public class WithindayAgentTest extends MatsimTestCase {
 		//create the agent
 		int sightDistance = 1;
 
-		WithindayAgent pa = new WithindayAgent(p, null, sightDistance, factory);
+		WithindayAgent pa = new WithindayAgent(p, this.simulation, sightDistance, factory);
 		pa.setVehicle(v);
 		v.setDriver(pa);
 		pa.initialize();
+		pa.leaveActivity(7.0*3600);
 		Link link2 = this.network.getLink("2");
 		v.setCurrentLink(link2);
 		pa.teleportToLink(link2);
@@ -182,9 +186,6 @@ public class WithindayAgentTest extends MatsimTestCase {
 	 * {@link org.matsim.withinday.WithindayAgent#replan()}.
 	 */
 	public void testReplan() {
-		Events events = new Events();
-		new QueueSimulation(this.network, null, events); // needed to initialize static QueueSimulation.events...
-
 		Link link1 = this.network.getLink("1");
 		Link link2 = this.network.getLink("2");
 		Link link7 = this.network.getLink("7");

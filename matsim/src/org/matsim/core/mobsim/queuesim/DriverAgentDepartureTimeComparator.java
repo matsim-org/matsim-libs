@@ -20,6 +20,7 @@
 
 package org.matsim.core.mobsim.queuesim;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -30,13 +31,15 @@ import java.util.Comparator;
  * 
  * @see DriverAgent#getDepartureTime()
  */
-/*package*/ class DriverAgentDepartureTimeComparator implements Comparator<QueueVehicle> {
+/*package*/ class DriverAgentDepartureTimeComparator implements Comparator<DriverAgent>, Serializable {
 
-	public int compare(QueueVehicle veh1, QueueVehicle veh2) {
-		int cmp = Double.compare(veh1.getDriver().getDepartureTime(), veh2.getDriver().getDepartureTime());
+	private static final long serialVersionUID = 1L;
+
+	public int compare(DriverAgent agent1, DriverAgent agent2) {
+		int cmp = Double.compare(agent1.getDepartureTime(), agent2.getDepartureTime());
 		if (cmp == 0) {
 			// Both depart at the same time -> let the one with the larger id be first (=smaller)
-			return veh2.getDriver().getPerson().getId().compareTo(veh1.getDriver().getPerson().getId());
+			return agent2.getPerson().getId().compareTo(agent1.getPerson().getId());
 		}
 		return cmp;
 	}

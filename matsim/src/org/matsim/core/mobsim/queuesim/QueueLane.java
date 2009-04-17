@@ -68,7 +68,7 @@ public class QueueLane {
 	 * has come. They are then filled into the vehQueue, depending on free space
 	 * in the vehQueue
 	 */
-	/*package*/ final Queue<QueueVehicle> waitingList = new LinkedList<QueueVehicle>();
+	/*package*/ final Queue<QueueVehicle> waitingList;
 
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
@@ -153,6 +153,7 @@ public class QueueLane {
 	/*package*/ QueueLane(final QueueLink ql, final boolean isOriginalLane) {
 		this.queueLink = ql;
 		this.originalLane = isOriginalLane;
+		this.waitingList = new LinkedList<QueueVehicle>();
 		this.freespeedTravelTime = ql.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
 		this.length_m = ql.getLink().getLength();
 		this.meterFromLinkEnd = 0.0;
@@ -166,7 +167,7 @@ public class QueueLane {
 
 
 	/**
-	 * Call recalculateProperties(...) if you use this constructor, otherwise the QueueLane
+	 * Call {@link #recalculateProperties(double, double, double)} if you use this Constructor, otherwise the QueueLane
 	 * is not initialized correctly!
 	 * TODO consider unifying the Constructor and the method
 	 * @param ql
@@ -174,9 +175,8 @@ public class QueueLane {
 	 * @param isOriginalLane
 	 */
 	/*package*/ QueueLane(final QueueLink ql, final BasicLane laneData, final boolean isOriginalLane) {
-		this.queueLink = ql;
+		this(ql, isOriginalLane);
 		this.laneData = laneData;
-		this.originalLane = isOriginalLane;
 	}
 
 	public Id getLaneId(){

@@ -130,15 +130,14 @@ public class PersonAgent implements DriverAgent {
 		List<? extends PlanElement> planElements = this.getPlanElements();
 		this.currentPlanElementIndex = 0;
 		Activity firstAct = (Activity) planElements.get(0);
-		setDepartureTime(firstAct.getEndTime());
-		SimulationTimer.updateSimStartTime(firstAct.getEndTime());
+		double departureTime = firstAct.getEndTime();
 		this.currentLink = firstAct.getLink();
-
-		if (planElements.size() > 1) {
-			initNextLeg((Leg) planElements.get(1));
+		if (departureTime != Time.UNDEFINED_TIME) {
+			setDepartureTime(departureTime);
+			SimulationTimer.updateSimStartTime(departureTime);
+			this.simulation.registerAgentDeparture(this);
 			Simulation.incLiving();
-			// this is the starting point for our vehicle, so put it in the queue
-			return true;
+			return true;			
 		}
 		return false; // the agent has no leg, so nothing more to do
 	}
@@ -152,6 +151,8 @@ public class PersonAgent implements DriverAgent {
 		this.currentNodeIndex = 1;
 		this.cachedNextLink = null;
 		this.nextActivity += 2;
+		
+		this.simulation.agentDeparts(this, this.currentLink);
 	}
 
 	/**
@@ -189,7 +190,7 @@ public class PersonAgent implements DriverAgent {
 
 			if ((this.currentPlanElementIndex+1) < this.getPlanElements().size()) {
 				// there is still at least on plan element left
-				this.simulation.registerAgentDeparture(this.vehicle);
+				this.simulation.registerAgentDeparture(this);
 			} else {
 				// this is the last activity
 				Simulation.decLiving();

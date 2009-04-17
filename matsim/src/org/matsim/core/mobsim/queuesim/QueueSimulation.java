@@ -136,7 +136,7 @@ public class QueueSimulation {
 
 	private QueueSimListenerManager listenerManager;
 	
-	private final PriorityQueue<QueueVehicle> activityEndsList = new PriorityQueue<QueueVehicle>(500, new DriverAgentDepartureTimeComparator()); // TODO [MR] change this to PQ<DriverAgent>
+	private final PriorityQueue<PersonAgent> activityEndsList = new PriorityQueue<PersonAgent>(500, new DriverAgentDepartureTimeComparator()); // TODO [MR] change this to PQ<DriverAgent>
 
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -354,14 +354,8 @@ public class QueueSimulation {
 
 			if (agent.initialize()) {
 				veh.setCurrentLink(agent.getCurrentLink());
-				addVehicleToLink(veh);
 			}
 		}
-	}
-
-	//TODO remove this method when agent representation is completely implemented
-	protected void addVehicleToLink(final QueueVehicle veh) {
-		registerAgentDeparture(veh);
 	}
 
 	protected void prepareNetwork() {
@@ -505,8 +499,8 @@ public class QueueSimulation {
 		}
 		QueueSimulation.teleportationList.clear();
 
-		for (QueueVehicle veh : this.activityEndsList) {
-			events.processEvent(new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
+		for (DriverAgent agent : this.activityEndsList) {
+			events.processEvent(new AgentStuckEvent(now, agent.getPerson(), agent.getDestinationLink(), agent.getCurrentLeg()));
 		}
 		this.activityEndsList.clear();
 
@@ -628,16 +622,16 @@ public class QueueSimulation {
 	 * 
 	 * @see DriverAgent#getDepartureTime()
 	 */
-	/*package*/ void registerAgentDeparture(final QueueVehicle vehicle) {
-		this.activityEndsList.add(vehicle);
+	/*package*/ void registerAgentDeparture(final PersonAgent agent) {
+		this.activityEndsList.add(agent);
 	}
 	
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
-			QueueVehicle vehicle = this.activityEndsList.peek();
-			if (vehicle.getDriver().getDepartureTime() <= time) {
+			PersonAgent agent = this.activityEndsList.peek();
+			if (agent.getDepartureTime() <= time) {
 				this.activityEndsList.poll();
-				this.agentDeparts(vehicle, vehicle.getCurrentLink());
+				agent.leaveActivity(time);
 			} else {
 				return;
 			}
@@ -651,18 +645,11 @@ public class QueueSimulation {
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
-	/*package*/ void agentDeparts(final QueueVehicle vehicle, final Link link) {
-		DriverAgent agent = vehicle.getDriver();
+	/*package*/ void agentDeparts(final DriverAgent agent, final Link link) {
 		double now = SimulationTimer.getTime();
-
-		// Need to inform the agent that it now leaves its activity.
-		if (agent instanceof PersonAgent) {
-			((PersonAgent) agent).leaveActivity(now);
-		}
 
 		Leg leg = agent.getCurrentLeg();
 
-		
 		events.processEvent(
 				new AgentDepartureEvent(now, agent.getPerson(), link, leg));
 
@@ -672,7 +659,7 @@ public class QueueSimulation {
 		 * B.) we have no route (aka "next activity on same link") -> no waitingList
 		 * C.) route known AND mode == "car" -> regular case, put veh in waitingList
 		 */
-
+		QueueVehicle vehicle = ((PersonAgent) agent).getVehicle(); // FIXME[MR]
 		if (!leg.getMode().equals(TransportMode.car)) {
 			QueueSimulation.handleUnknownLegMode(vehicle);
 		} else {

@@ -316,7 +316,6 @@ public class QueueLink {
 	}
 	
 	public void clearVehicles() {
-		double now = SimulationTimer.getTime();
 		for (QueueLane lane : this.queueLanes){
 			lane.clearVehicles();
 		}

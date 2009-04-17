@@ -80,7 +80,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 						QueueTransitDriver qDriver = new QueueTransitDriver(driver);
 						TransitQueueVehicle qVeh = new TransitQueueVehicle(bus, qDriver);
 						qVeh.setDriver(qDriver);
-						addVehicleToLink(qVeh);
+//						addVehicleToLink(qVeh);
 						Simulation.incLiving();
 					}
 				}
