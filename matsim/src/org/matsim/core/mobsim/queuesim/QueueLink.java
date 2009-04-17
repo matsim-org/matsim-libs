@@ -23,7 +23,9 @@ package org.matsim.core.mobsim.queuesim;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.SortedMap;
 
@@ -118,7 +120,7 @@ public class QueueLink {
 	/**
 	 * The QueueLane instance which always exists.
 	 */
-	/*package*/ QueueLane originalLane; // TODO [MR] try to make it private again
+	private QueueLane originalLane;
 	/**
 	 * A List holding all QueueLane instances of the QueueLink
 	 */
@@ -134,6 +136,8 @@ public class QueueLink {
 	private List<QueueLane> toNodeQueueLanes = null;
 	
 	private boolean active = false;
+
+	private final Map<Id, QueueVehicle> parkedVehicles = new LinkedHashMap<Id, QueueVehicle>(10);
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -315,10 +319,29 @@ public class QueueLink {
 						this.getLink()));
 	}
 	
-	public void clearVehicles() {
+	/*package*/ void clearVehicles() {
+		this.parkedVehicles.clear();
 		for (QueueLane lane : this.queueLanes){
 			lane.clearVehicles();
 		}
+	}
+
+	/*package*/ void addParkedVehicle(QueueVehicle vehicle) {
+		this.parkedVehicles.put(vehicle.getId(), vehicle);
+		vehicle.setCurrentLink(this.link);
+	}
+
+	/*package*/ QueueVehicle getParkedVehicle(Id vehicleId) {
+		return this.parkedVehicles.get(vehicleId);
+	}
+
+	/*package*/ QueueVehicle removeParkedVehicle(Id vehicleId) {
+		return this.parkedVehicles.remove(vehicleId);
+	}
+	
+	/*package*/ void addDepartingVehicle(QueueVehicle vehicle) {
+		this.originalLane.waitingList.add(vehicle);
+		this.activateLink();
 	}
 
 	protected boolean moveLink(double now) {
@@ -354,6 +377,7 @@ public class QueueLink {
 						this.getLink(), veh.getDriver().getCurrentLeg()));
 		// Need to inform the veh that it now reached its destination.
 		veh.getDriver().legEnds(now);
+		addParkedVehicle(veh);
 	}
 
 
@@ -371,7 +395,7 @@ public class QueueLink {
 		return true;
 	}
 
-	public boolean hasSpace() {
+	/*package*/ boolean hasSpace() {
 		return this.originalLane.hasSpace();
 	}
 

@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2009 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -75,11 +75,13 @@ import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
+
 /**
+ * Implementation of a queue-based transport simulation.
+ * 
  * @author dstrippgen
  * @author mrieser
  * @author dgrether
- *
  */
 public class QueueSimulation {
 
@@ -138,6 +140,9 @@ public class QueueSimulation {
 	
 	private final PriorityQueue<PersonAgent> activityEndsList = new PriorityQueue<PersonAgent>(500, new DriverAgentDepartureTimeComparator()); // TODO [MR] change this to PQ<DriverAgent>
 
+	/** @see #setTeleportVehicles(boolean) */
+	private boolean teleportVehicles = true;
+	
 	/**
 	 * Initialize the QueueSimulation without signal systems
 	 * @param network
@@ -353,7 +358,8 @@ public class QueueSimulation {
 			agent.setVehicle(veh);
 
 			if (agent.initialize()) {
-				veh.setCurrentLink(agent.getCurrentLink());
+				QueueLink qlink = this.network.getQueueLink(agent.getCurrentLink().getId());
+				qlink.addParkedVehicle(veh);
 			}
 		}
 	}
@@ -650,27 +656,34 @@ public class QueueSimulation {
 
 		Leg leg = agent.getCurrentLeg();
 
-		events.processEvent(
-				new AgentDepartureEvent(now, agent.getPerson(), link, leg));
+		events.processEvent(new AgentDepartureEvent(now, agent.getPerson(), link, leg));
 
-		/*
-		 * A.) we have an unknown leg mode (aka != "car").
-		 *     In this case teleport veh to next activity location
-		 * B.) we have no route (aka "next activity on same link") -> no waitingList
-		 * C.) route known AND mode == "car" -> regular case, put veh in waitingList
-		 */
-		QueueVehicle vehicle = ((PersonAgent) agent).getVehicle(); // FIXME[MR]
-		if (!leg.getMode().equals(TransportMode.car)) {
-			QueueSimulation.handleUnknownLegMode(vehicle);
-		} else {
+		if (leg.getMode().equals(TransportMode.car)) {
+			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			QueueLink qlink = this.network.getQueueLink(link.getId());
-			if (((NetworkRoute) leg.getRoute()).getNodes().size() != 0) {
-				qlink.originalLane.waitingList.add(vehicle);
-				qlink.activateLink();
+			QueueVehicle vehicle = qlink.removeParkedVehicle(agent.getPerson().getId());
+			if (vehicle == null) {
+				if (this.teleportVehicles) {
+					vehicle = ((PersonAgent) agent).getVehicle();
+					if (vehicle.getCurrentLink() != null) {
+						log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + link.getId());
+						QueueLink qlinkOld = this.network.getQueueLink(vehicle.getCurrentLink().getId());
+						qlinkOld.removeParkedVehicle(vehicle.getId());
+					}
+				} else {
+					throw new RuntimeException("car not available for agent " + agent.getPerson().getId() + " on link " + link.getId());
+				}
+			}
+			if (route.getNodes().size() != 0) {
+				qlink.addDepartingVehicle(vehicle);
 			} else {
-				// this is the case where (hopefully) the next act happens at the same location as this act
+				// empty route; this is the case where (hopefully) the next act happens at the same location as this act
 				qlink.processVehicleArrival(now, vehicle);
 			}
+		} else {
+			// unknown leg mode
+			QueueVehicle vehicle = ((PersonAgent) agent).getVehicle();
+			QueueSimulation.handleUnknownLegMode(vehicle);
 		}
 	}
 
@@ -696,4 +709,18 @@ public class QueueSimulation {
 		return this.signalSystemDefinitions;
 	}
 
+	/** Specifies whether the simulation should track vehicle usage and throw an Exception
+	 * if an agent tries to use a car on a link where the car is not available, or not.
+	 * Set <code>teleportVehicles</code> to <code>true</code> if agents always have a 
+	 * vehicle available. If the requested vehicle is parked somewhere else, the vehicle
+	 * will be teleported to wherever it is requested to for usage. Set to <code>false</code>
+	 * will generate an Exception in the case when an tries to depart with a car on link
+	 * where the car is not parked.
+	 * 
+	 * @param teleportVehicles
+	 */
+	public void setTeleportVehicles(final boolean teleportVehicles) {
+		this.teleportVehicles = teleportVehicles;
+	}
+	
 }

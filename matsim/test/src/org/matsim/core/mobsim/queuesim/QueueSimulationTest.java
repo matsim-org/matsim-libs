@@ -26,6 +26,7 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.jfree.util.Log;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicEvent;
@@ -44,9 +45,11 @@ import org.matsim.core.events.ActEndEvent;
 import org.matsim.core.events.ActStartEvent;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -413,6 +416,93 @@ public class QueueSimulationTest extends MatsimTestCase {
 		assertEquals(1000, volume[8]); // all the rest
 	}
 
+	public void testVehicleTeleportationTrue() {
+		Fixture f = new Fixture();
+		Person person = new PersonImpl(new IdImpl(1));
+		Plan plan = person.createPlan(true);
+		Activity a1 = plan.createActivity("h", f.link1);
+		a1.setEndTime(7.0*3600);
+		Leg l1 = plan.createLeg(TransportMode.other);
+		l1.setTravelTime(10);
+		l1.setRoute(f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link2)); // TODO [MR] use different factory / TransportationMode
+		Activity a2 = plan.createActivity("w", f.link2);
+		a2.setEndTime(7.0*3600 + 20);
+		Leg l2 = plan.createLeg(TransportMode.car);
+		NetworkRoute route2 = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2, f.link3);
+		route2.setNodes(f.link2, f.nodes3, f.link3);
+		l2.setRoute(route2);
+		plan.createActivity("l", f.link3);
+		f.plans.addPerson(person);
+		
+		/* build events */
+		Events events = new Events();
+		BasicEventCollector collector = new BasicEventCollector();
+		events.addHandler(collector);
+
+		/* run sim */
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		sim.setTeleportVehicles(true);
+		sim.run();
+		
+		/* finish */
+		assertEquals("wrong number of events.", 11, collector.events.size());
+		assertEquals("wrong type of event.", ActEndEvent.class, collector.events.get(0).getClass());
+		assertEquals("wrong type of event.", AgentDepartureEvent.class, collector.events.get(1).getClass());
+		assertEquals("wrong type of event.", AgentArrivalEvent.class, collector.events.get(2).getClass());
+		assertEquals("wrong type of event.", ActStartEvent.class, collector.events.get(3).getClass());
+		assertEquals("wrong type of event.", ActEndEvent.class, collector.events.get(4).getClass());
+		assertEquals("wrong type of event.", AgentDepartureEvent.class, collector.events.get(5).getClass());
+		assertEquals("wrong type of event.", AgentWait2LinkEvent.class, collector.events.get(6).getClass());
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, collector.events.get(7).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, collector.events.get(8).getClass());
+		assertEquals("wrong type of event.", AgentArrivalEvent.class, collector.events.get(9).getClass());
+		assertEquals("wrong type of event.", ActStartEvent.class, collector.events.get(10).getClass());
+	}
+	
+	
+	public void testVehicleTeleportationFalse() {
+		Fixture f = new Fixture();
+		Person person = new PersonImpl(new IdImpl(1));
+		Plan plan = person.createPlan(true);
+		Activity a1 = plan.createActivity("h", f.link1);
+		a1.setEndTime(7.0*3600);
+		Leg l1 = plan.createLeg(TransportMode.other);
+		l1.setTravelTime(10);
+		l1.setRoute(f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link2)); // TODO [MR] use different factory / TransportationMode
+		Activity a2 = plan.createActivity("w", f.link2);
+		a2.setEndTime(7.0*3600 + 20);
+		Leg l2 = plan.createLeg(TransportMode.car);
+		NetworkRoute route2 = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2, f.link3);
+		route2.setNodes(f.link2, f.nodes3, f.link3);
+		l2.setRoute(route2);
+		plan.createActivity("l", f.link3);
+		f.plans.addPerson(person);
+		
+		/* build events */
+		Events events = new Events();
+		BasicEventCollector collector = new BasicEventCollector();
+		events.addHandler(collector);
+		
+		/* run sim */
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		sim.setTeleportVehicles(false);
+		try {
+			sim.run();
+			fail("expected RuntimeException, but there was none.");
+		} catch (RuntimeException e) {
+			Log.info("catched expected RuntimeException: " + e.getMessage());
+		}
+		
+		/* finish */
+		assertEquals("wrong number of events.", 6, collector.events.size());
+		assertEquals("wrong type of event.", ActEndEvent.class, collector.events.get(0).getClass());
+		assertEquals("wrong type of event.", AgentDepartureEvent.class, collector.events.get(1).getClass());
+		assertEquals("wrong type of event.", AgentArrivalEvent.class, collector.events.get(2).getClass());
+		assertEquals("wrong type of event.", ActStartEvent.class, collector.events.get(3).getClass());
+		assertEquals("wrong type of event.", ActEndEvent.class, collector.events.get(4).getClass());
+		assertEquals("wrong type of event.", AgentDepartureEvent.class, collector.events.get(5).getClass());
+	}
+	
 	/**
 	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
 	 * does not lead to the destination link.
@@ -633,7 +723,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 			/* build plans */
 			this.plans = new PopulationImpl();
-
+			
 			this.nodes3 = new ArrayList<Node>();
 			this.nodes3.add(this.node3);
 
