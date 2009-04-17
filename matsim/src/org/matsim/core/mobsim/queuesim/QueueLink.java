@@ -408,13 +408,13 @@ public class QueueLink {
 		this.originalLane.recalcTimeVariantAttributes(time);
 	}
 
-	public QueueVehicle getVehicle(Id agentId) {
-		QueueVehicle ret = getParkedVehicle(agentId);
+	public QueueVehicle getVehicle(Id vehicleId) {
+		QueueVehicle ret = getParkedVehicle(vehicleId);
 		if (ret != null) {
 			return ret;
 		}
 		for (QueueLane lane : this.queueLanes){
-			ret = lane.getVehicle(agentId);
+			ret = lane.getVehicle(vehicleId);
 			if (ret != null) {
 				return ret;
 			}

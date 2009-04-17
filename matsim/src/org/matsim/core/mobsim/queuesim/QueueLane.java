@@ -603,17 +603,17 @@ public class QueueLane {
 	}
 
 	// search for vehicleId..
-	public QueueVehicle getVehicle(final Id id) {
+	/*package*/ QueueVehicle getVehicle(final Id id) {
 		for (QueueVehicle veh : this.vehQueue) {
-			if (veh.getDriver().getPerson().getId().equals(id))
+			if (veh.getId().equals(id))
 				return veh;
 		}
 		for (QueueVehicle veh : this.buffer) {
-			if (veh.getDriver().getPerson().getId().equals(id))
+			if (veh.getId().equals(id))
 				return veh;
 		}
 		for (QueueVehicle veh : this.waitingList) {
-			if (veh.getDriver().getPerson().getId().equals(id))
+			if (veh.getId().equals(id))
 				return veh;
 		}
 		return null;

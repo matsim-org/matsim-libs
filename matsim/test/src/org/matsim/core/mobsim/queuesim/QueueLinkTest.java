@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.queuesim;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
@@ -35,50 +36,32 @@ import org.matsim.testcases.MatsimTestCase;
 
 /**
  * @author dgrether
+ * @author mrieser
  */
 public class QueueLinkTest extends MatsimTestCase {
-
-	private Link link = null;
-	private QueueNetwork queueNetwork = null;
-	private QueueLink qlink = null;
 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		NetworkLayer network = new NetworkLayer();
-		network.setCapacityPeriod(1.0);
-		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(1, 0));
-		this.link = network.createLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
-		super.loadConfig(null);
-		this.queueNetwork = new QueueNetwork(network);
-		this.qlink = this.queueNetwork.getQueueLink(new IdImpl("1"));
-		this.qlink.finishInit();
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		this.link = null;
-		this.queueNetwork = null;
-		this.qlink = null;
-		super.tearDown();
+		loadConfig(null);
 	}
 
 	public void testInit() {
-		assertNotNull(this.qlink);
-		assertEquals(1.0, this.qlink.getSimulatedFlowCapacity(), EPSILON);
-		assertEquals(1.0, this.qlink.getSpaceCap(), EPSILON);
+		Fixture f = new Fixture();
+		assertNotNull(f.qlink);
+		assertEquals(1.0, f.qlink.getSimulatedFlowCapacity(), EPSILON);
+		assertEquals(1.0, f.qlink.getSpaceCap(), EPSILON);
 		// TODO dg[april2008] this assertions are not covering everything in
 		// QueueLink's constructor.
 		// Extend the tests by checking the methods initFlowCapacity and
 		// recalcCapacity
-		assertEquals(this.link, this.qlink.getLink());
-		assertEquals(this.queueNetwork.getQueueNode(new IdImpl("2")), this.qlink
-				.getToQueueNode());
+		assertEquals(f.link, f.qlink.getLink());
+		assertEquals(f.queueNetwork.getQueueNode(new IdImpl("2")), f.qlink.getToQueueNode());
 	}
 
 
 	public void testAdd() {
+		Fixture f = new Fixture();
 		QueueVehicleImpl v = new QueueVehicleImpl(new IdImpl("1"));
 
 		Person p = new PersonImpl(new IdImpl("1"));
@@ -89,15 +72,139 @@ public class QueueLinkTest extends MatsimTestCase {
 		//we have to do it like this
 		//can be seen as reason why static access from an object should be avoided
 		try {
-			this.qlink.add(v);
+			f.qlink.add(v);
 		}
 		catch (Exception ex) {
 			e = ex;
 		}
 		assertNotNull(e);
-		assertEquals(1, this.qlink.vehOnLinkCount());
-		assertFalse(this.qlink.hasSpace());
-		assertTrue(this.qlink.bufferIsEmpty());
+		assertEquals(1, f.qlink.vehOnLinkCount());
+		assertFalse(f.qlink.hasSpace());
+		assertTrue(f.qlink.bufferIsEmpty());
+	}
+
+	/**
+	 * Tests that vehicles driving on a link are found with {@link QueueLink#getVehicle(Id)}
+	 * and {@link QueueLink#getAllVehicles()}. 
+	 * 
+	 * @author mrieser 
+	 */
+	public void testGetVehicle_Driving() {
+		Fixture f = new Fixture();
+		Id id1 = new IdImpl("1");
+
+		QueueSimulation qsim = new QueueSimulation(f.network, null, new Events());
+
+		QueueVehicle veh = new QueueVehicleImpl(id1);
+		Person p = new PersonImpl(new IdImpl(23));
+		veh.setDriver(new PersonAgent(p, qsim));
+
+		// start test, check initial conditions
+		assertTrue(f.qlink.bufferIsEmpty());
+		assertEquals(0, f.qlink.vehOnLinkCount());
+		assertNull(f.qlink.getVehicle(id1));
+		assertEquals(0, f.qlink.getAllVehicles().size());
+
+		// add a vehicle, it should be now in the vehicle queue
+		f.qlink.add(veh);
+		assertTrue(f.qlink.bufferIsEmpty());
+		assertEquals(1, f.qlink.vehOnLinkCount());
+		assertEquals("vehicle not found on link.", veh, f.qlink.getVehicle(id1));
+		assertEquals(1, f.qlink.getAllVehicles().size());
+
+		// time step 1, vehicle should be now in the buffer
+		f.qlink.moveLink(1.0);
+		assertFalse(f.qlink.bufferIsEmpty());
+		assertEquals(0, f.qlink.vehOnLinkCount());
+		assertEquals("vehicle not found in buffer.", veh, f.qlink.getVehicle(id1));
+		assertEquals(1, f.qlink.getAllVehicles().size());
+		assertEquals(veh, f.qlink.getAllVehicles().iterator().next());
+
+		// time step 2, vehicle leaves link
+		f.qlink.moveLink(2.0);
+		assertEquals(veh, f.qlink.getToNodeQueueLanes().get(0).popFirstFromBuffer());
+		assertTrue(f.qlink.bufferIsEmpty());
+		assertEquals(0, f.qlink.vehOnLinkCount());
+		assertNull("vehicle should not be on link anymore.", f.qlink.getVehicle(id1));
+		assertEquals(0, f.qlink.getAllVehicles().size());
+	}
+
+	/**
+	 * Tests that vehicles parked on a link are found with {@link QueueLink#getVehicle(Id)}
+	 * and {@link QueueLink#getAllVehicles()}.
+	 *  
+	 * @author mrieser 
+	 */
+	public void testGetVehicle_Parking() {
+		Fixture f = new Fixture();
+		Id id2 = new IdImpl("2");
+
+		QueueSimulation qsim = new QueueSimulation(f.network, null, new Events());
+
+		QueueVehicle veh = new QueueVehicleImpl(id2);
+		Person p = new PersonImpl(new IdImpl(42));
+		veh.setDriver(new PersonAgent(p, qsim));
+
+		// start test, check initial conditions
+		assertTrue(f.qlink.bufferIsEmpty());
+		assertEquals(0, f.qlink.vehOnLinkCount());
+		assertEquals(0, f.qlink.getAllVehicles().size());
+
+		f.qlink.addParkedVehicle(veh);
+		assertTrue(f.qlink.bufferIsEmpty());
+		assertEquals(0, f.qlink.vehOnLinkCount());
+		assertEquals("vehicle not found in parking list.", veh, f.qlink.getVehicle(id2));
+		assertEquals(1, f.qlink.getAllVehicles().size());
+		assertEquals(veh, f.qlink.getAllVehicles().iterator().next());
+
+		assertEquals("removed wrong vehicle.", veh, f.qlink.removeParkedVehicle(veh.getId()));
+		assertTrue(f.qlink.bufferIsEmpty());
+		assertEquals(0, f.qlink.vehOnLinkCount());
+		assertNull("vehicle not found in parking list.", f.qlink.getVehicle(id2));
+		assertEquals(0, f.qlink.getAllVehicles().size());
+	}
+
+	/**
+	 * Tests that vehicles departing on a link are found with {@link QueueLink#getVehicle(Id)}
+	 * and {@link QueueLink#getAllVehicles()}.
+	 * 
+	 * @author mrieser 
+	 */
+	public void testGetVehicle_Departing() {
+		Fixture f = new Fixture();
+		Id id3 = new IdImpl("3");
+
+		QueueSimulation qsim = new QueueSimulation(f.network, null, new Events());
+
+		QueueVehicle veh = new QueueVehicleImpl(id3);
+		Person p = new PersonImpl(new IdImpl(80));
+		veh.setDriver(new PersonAgent(p, qsim));
+
+		// start test, check initial conditions
+		assertTrue(f.qlink.bufferIsEmpty());
+		assertEquals(0, f.qlink.vehOnLinkCount());
+		assertEquals(0, f.qlink.getAllVehicles().size());
+
+		f.qlink.addDepartingVehicle(veh);
+		assertTrue(f.qlink.bufferIsEmpty());
+		assertEquals(0, f.qlink.vehOnLinkCount());
+		assertEquals("vehicle not found in waiting list.", veh, f.qlink.getVehicle(id3));
+		assertEquals(1, f.qlink.getAllVehicles().size());
+		assertEquals(veh, f.qlink.getAllVehicles().iterator().next());
+
+		// time step 1, vehicle should be now in the buffer
+		f.qlink.moveLink(1.0);
+		assertFalse(f.qlink.bufferIsEmpty());
+		assertEquals(0, f.qlink.vehOnLinkCount());
+		assertEquals("vehicle not found in buffer.", veh, f.qlink.getVehicle(id3));
+		assertEquals(1, f.qlink.getAllVehicles().size());
+
+		// vehicle leaves link
+		assertEquals(veh, f.qlink.getToNodeQueueLanes().get(0).popFirstFromBuffer());
+		assertTrue(f.qlink.bufferIsEmpty());
+		assertEquals(0, f.qlink.vehOnLinkCount());
+		assertNull("vehicle should not be on link anymore.", f.qlink.getVehicle(id3));
+		assertEquals(0, f.qlink.getAllVehicles().size());
 	}
 
 	/**
@@ -113,9 +220,9 @@ public class QueueLinkTest extends MatsimTestCase {
 		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(2, 0));
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
 		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
-		this.queueNetwork = new QueueNetwork(network);
-		this.qlink = this.queueNetwork.getQueueLink(new IdImpl("1"));
-		this.qlink.finishInit();
+		QueueNetwork queueNetwork = new QueueNetwork(network);
+		QueueLink qlink = queueNetwork.getQueueLink(new IdImpl("1"));
+		qlink.finishInit();
 
 		QueueSimulation qsim = new QueueSimulation(network, null, new Events());
 		QueueVehicleImpl v1 = new QueueVehicleImpl(new IdImpl("1"));
@@ -144,39 +251,64 @@ public class QueueLinkTest extends MatsimTestCase {
 		pa2.initialize();
 
 		// start test
-		assertTrue(this.qlink.bufferIsEmpty());
-		assertEquals(0, this.qlink.vehOnLinkCount());
+		assertTrue(qlink.bufferIsEmpty());
+		assertEquals(0, qlink.vehOnLinkCount());
 		// add v1
-		this.qlink.add(v1);
-		assertEquals(1, this.qlink.vehOnLinkCount());
-		assertTrue(this.qlink.bufferIsEmpty());
+		qlink.add(v1);
+		assertEquals(1, qlink.vehOnLinkCount());
+		assertTrue(qlink.bufferIsEmpty());
 		// time step 1, v1 is moved to buffer
-		this.qlink.moveLink(1.0);
-		assertEquals(0, this.qlink.vehOnLinkCount());
-		assertFalse(this.qlink.bufferIsEmpty());
+		qlink.moveLink(1.0);
+		assertEquals(0, qlink.vehOnLinkCount());
+		assertFalse(qlink.bufferIsEmpty());
 		// add v2, still time step 1
-		this.qlink.add(v2);
-		assertEquals(1, this.qlink.vehOnLinkCount());
-		assertFalse(this.qlink.bufferIsEmpty());
+		qlink.add(v2);
+		assertEquals(1, qlink.vehOnLinkCount());
+		assertFalse(qlink.bufferIsEmpty());
 		// time step 2, v1 still in buffer, v2 cannot enter buffer, so still on link
-		this.qlink.moveLink(2.0);
-		assertEquals(1, this.qlink.vehOnLinkCount());
-		assertFalse(this.qlink.bufferIsEmpty());
+		qlink.moveLink(2.0);
+		assertEquals(1, qlink.vehOnLinkCount());
+		assertFalse(qlink.bufferIsEmpty());
 		// v1 leaves buffer
-		assertEquals(v1, this.qlink.getToNodeQueueLanes().get(0).popFirstFromBuffer());
-		assertEquals(1, this.qlink.vehOnLinkCount());
-		assertTrue(this.qlink.bufferIsEmpty());
+		assertEquals(v1, qlink.getToNodeQueueLanes().get(0).popFirstFromBuffer());
+		assertEquals(1, qlink.vehOnLinkCount());
+		assertTrue(qlink.bufferIsEmpty());
 		// time step 3, v2 moves to buffer
-		this.qlink.moveLink(3.0);
-		assertEquals(0, this.qlink.vehOnLinkCount());
-		assertFalse(this.qlink.bufferIsEmpty());
+		qlink.moveLink(3.0);
+		assertEquals(0, qlink.vehOnLinkCount());
+		assertFalse(qlink.bufferIsEmpty());
 		// v2 leaves buffer
-		assertEquals(v2, this.qlink.getToNodeQueueLanes().get(0).popFirstFromBuffer());
-		assertEquals(0, this.qlink.vehOnLinkCount());
-		assertTrue(this.qlink.bufferIsEmpty());
+		assertEquals(v2, qlink.getToNodeQueueLanes().get(0).popFirstFromBuffer());
+		assertEquals(0, qlink.vehOnLinkCount());
+		assertTrue(qlink.bufferIsEmpty());
 		// time step 4, empty link
-		this.qlink.moveLink(4.0);
-		assertEquals(0, this.qlink.vehOnLinkCount());
-		assertTrue(this.qlink.bufferIsEmpty());
+		qlink.moveLink(4.0);
+		assertEquals(0, qlink.vehOnLinkCount());
+		assertTrue(qlink.bufferIsEmpty());
 	}
+
+	/**
+	 * Initializes some commonly used data in the tests.
+	 *
+	 * @author mrieser
+	 */
+	private static final class Fixture {
+		/*package*/ final Link link;
+		/*package*/ final NetworkLayer network;
+		/*package*/ final QueueNetwork queueNetwork;
+		/*package*/ final QueueLink qlink;
+
+		/*package*/ Fixture() {
+			this.network = new NetworkLayer();
+			this.network.setCapacityPeriod(1.0);
+			Node node1 = this.network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
+			Node node2 = this.network.createNode(new IdImpl("2"), new CoordImpl(1, 0));
+			this.link = this.network.createLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
+			this.queueNetwork = new QueueNetwork(this.network);
+			this.qlink = this.queueNetwork.getQueueLink(new IdImpl("1"));
+			this.qlink.finishInit();
+		}
+
+	}
+
 }
