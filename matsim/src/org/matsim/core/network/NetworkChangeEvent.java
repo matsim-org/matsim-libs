@@ -26,6 +26,7 @@ package org.matsim.core.network;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.matsim.core.api.network.Link;
@@ -37,7 +38,7 @@ import org.matsim.core.api.network.Link;
  * @author illenberger
  * 
  */
-public class NetworkChangeEvent implements Comparable{
+public class NetworkChangeEvent {
 
 	public static enum ChangeType {
 		ABSOLUTE, FACTOR
@@ -192,12 +193,9 @@ public class NetworkChangeEvent implements Comparable{
 		this.lanesChange = lanesChange;
 	}
 
-	public int compareTo(Object o) {
-		if (this.startTime < ((NetworkChangeEvent) o).getStartTime()) {
-			return -1;
-		} else if (this.startTime > ((NetworkChangeEvent) o).getStartTime()){
-			return 1;
+	public static class StartTimeComparator implements Comparator<NetworkChangeEvent> {
+		public int compare(NetworkChangeEvent o1, NetworkChangeEvent o2) {
+			return Double.compare(o1.getStartTime(), o2.getStartTime());
 		}
-		return 0;
 	}
 }

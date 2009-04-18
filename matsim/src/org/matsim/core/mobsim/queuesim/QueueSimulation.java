@@ -440,9 +440,11 @@ public class QueueSimulation {
 	}
 
 	private void prepareNetworkChangeEventsQueue() {
-			if ((this.networkLayer.getNetworkChangeEvents() != null) && (this.networkLayer.getNetworkChangeEvents().size() > 0)) {
-				this.networkChangeEventsQueue = new PriorityQueue<NetworkChangeEvent>(this.networkLayer.getNetworkChangeEvents());
-			}
+		Collection<NetworkChangeEvent> changeEvents = this.networkLayer.getNetworkChangeEvents();
+		if ((changeEvents != null) && (changeEvents.size() > 0)) {
+			this.networkChangeEventsQueue = new PriorityQueue<NetworkChangeEvent>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
+			this.networkChangeEventsQueue.addAll(changeEvents);
+		}
 	}
 
 	/**

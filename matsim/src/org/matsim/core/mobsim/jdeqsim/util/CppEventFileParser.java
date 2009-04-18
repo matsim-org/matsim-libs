@@ -34,9 +34,10 @@ public class CppEventFileParser {
 	public static ArrayList<EventLog> parseFile(final String filePath) {
 		int counter = 0;
 		ArrayList<EventLog> rows = new ArrayList<EventLog>();
+		BufferedReader br = null;
 		try {
 			FileReader fr = new FileReader(filePath);
-			BufferedReader br = new BufferedReader(fr);
+			br = new BufferedReader(fr);
 			String line = null;
 			StringTokenizer tokenizer = null;
 			line = br.readLine();
@@ -84,15 +85,20 @@ public class CppEventFileParser {
 
 				// ignore 'enter net' events (which seem useless)
 				if (!eventType.equalsIgnoreCase("enter net")) {
-					EventLog eventLog = new EventLog(first, second, third, fourth, fifth, sixth, eventType);
-					rows.add(eventLog);
+					rows.add(new EventLog(first, second, third, fourth, fifth, sixth, eventType));
 				}
 
 				line = br.readLine();
 			}
-			br.close();
 		} catch (IOException ex) {
 			System.out.println(ex);
+		} finally {
+			try {
+				if (br != null) br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
 		}
 
 		return rows;

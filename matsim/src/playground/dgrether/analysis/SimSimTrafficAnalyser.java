@@ -85,10 +85,10 @@ public class SimSimTrafficAnalyser {
 		this.countSimComp = new ArrayList<CountSimComparison>(this.network.getLinks().size());
 		
 		for (Link l : this.network.getLinks().values()) {
-			double[] volumes = this.linkStats.getAvgLinkVolumes(l.getId().toString());
-			double[] volumes2 = this.linkStats2.getAvgLinkVolumes(l.getId().toString());
+			double[] volumes = this.linkStats.getAvgLinkVolumes(l.getId());
+			double[] volumes2 = this.linkStats2.getAvgLinkVolumes(l.getId());
 			
-			if ((volumes == null) || (volumes2 == null)) {
+			if ((volumes.length == 0) || (volumes2.length == 0)) {
 				log.warn("No volumes for link: " + l.getId().toString());
 				continue;
 			}

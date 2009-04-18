@@ -258,7 +258,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	public int[] getDepartures(final TransportMode legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
-			return null;
+			return new int[0];
 		}
 		return modeData.countsDep.clone();
 	}
@@ -270,7 +270,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	public int[] getArrivals(final TransportMode legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
-			return null;
+			return new int[0];
 		}
 		return modeData.countsArr.clone();
 	}
@@ -282,7 +282,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	public int[] getStuck(final TransportMode legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
-			return null;
+			return new int[0];
 		}
 		return modeData.countsStuck.clone();
 	}

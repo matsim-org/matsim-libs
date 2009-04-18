@@ -94,7 +94,7 @@ public class CountsComparisonAlgorithm {
 				continue;
 			}
 			double[] volumes = this.linkStats.getAvgLinkVolumes(count.getLocId());
-			if (volumes== null) {
+			if (volumes.length == 0) {
 				log.warn("No volumes for link: " + count.getLocId().toString());
 				continue;
 			}

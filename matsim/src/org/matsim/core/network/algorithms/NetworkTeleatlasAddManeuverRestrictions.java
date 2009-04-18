@@ -278,18 +278,16 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 					}
 				}
 				// complete the matrix
-				for (Id fromLinkId : mmatrix.keySet()) {
+				for (TreeMap<Id, Boolean> fromLinkEntry : mmatrix.values()) {
 					// detect inlinks with restricted maneuvers
 					boolean hasRestrictedManeuver = false;
-					for (Id toLinkId : mmatrix.get(fromLinkId).keySet()) {
-						Boolean b = mmatrix.get(fromLinkId).get(toLinkId);
-						if (b) { hasRestrictedManeuver = true; }
+					for (Boolean b : fromLinkEntry.values()) {
+						if (b.booleanValue()) { hasRestrictedManeuver = true; }
 					}
 					// add missing toLink maneuvers
 					for (Id toLinkId : n.getOutLinks().keySet()) {
-						if (!mmatrix.get(fromLinkId).containsKey(toLinkId)) {
-							if (hasRestrictedManeuver) { mmatrix.get(fromLinkId).put(toLinkId, Boolean.FALSE); }
-							else { mmatrix.get(fromLinkId).put(toLinkId, Boolean.TRUE); }
+						if (!fromLinkEntry.containsKey(toLinkId)) {
+							fromLinkEntry.put(toLinkId, Boolean.valueOf(!hasRestrictedManeuver));
 						}
 					}
 				}
@@ -314,10 +312,12 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 				}
 				// create arraylist with turn tuples
 				ArrayList<Tuple<Id,Id>> turns = new ArrayList<Tuple<Id,Id>>();
-				for (Id fromLinkId : mmatrix.keySet()) {
-					for (Id toLinkId : mmatrix.get(fromLinkId).keySet()) {
-						Boolean b = mmatrix.get(fromLinkId).get(toLinkId);
-						if (b) { turns.add(new Tuple<Id, Id>(fromLinkId,toLinkId)); }
+				for (Map.Entry<Id, TreeMap<Id, Boolean>> fromLinkEntry : mmatrix.entrySet()) {
+					Id fromLinkId = fromLinkEntry.getKey();
+					for (Map.Entry<Id, Boolean> toLinkEntry : fromLinkEntry.getValue().entrySet()) {
+						if (toLinkEntry.getValue().booleanValue()) {
+							turns.add(new Tuple<Id, Id>(fromLinkId, toLinkEntry.getKey()));
+						}
 					}
 				}
 				// expand the node

@@ -28,7 +28,7 @@ public class PlanomatConfigGroup extends Module {
 	public static final String CETIN_COMPATIBLE = "org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator";
 	public static final String CHARYPAR_ET_AL_COMPATIBLE = "org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator";
 
-	public static enum TripStructureAnalysisLayerOption {facility,link};
+	public static enum TripStructureAnalysisLayerOption {facility,link}
 	
 	/**
 	 * Holds all planomat parameter names, their default and their actual values.
@@ -176,7 +176,7 @@ public class PlanomatConfigGroup extends Module {
 
 		for (PlanomatConfigParameter param : PlanomatConfigParameter.values()) {
 			param.setActualValue(param.getDefaultValue());
-			super.addParam(param.parameterName, param.defaultValue);
+			super.addParam(param.getParameterName(), param.getDefaultValue());
 		}
 
 	}
@@ -188,7 +188,7 @@ public class PlanomatConfigGroup extends Module {
 
 		for (PlanomatConfigParameter param : PlanomatConfigParameter.values()) {
 
-			if (param.parameterName.equals(param_name)) {
+			if (param.getParameterName().equals(param_name)) {
 				param.setActualValue(value);
 				super.addParam(param_name, value);
 				validParameterName = true;
@@ -240,7 +240,7 @@ public class PlanomatConfigGroup extends Module {
 			
 		}
 
-		return this.cachedPossibleModes;
+		return this.cachedPossibleModes.clone();
 
 	}
 

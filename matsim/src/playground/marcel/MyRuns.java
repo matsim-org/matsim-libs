@@ -79,6 +79,7 @@ import org.matsim.core.events.algorithms.CalcODMatrices;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -2006,6 +2007,39 @@ public class MyRuns {
 			qvds[i].writeGraph("link" + links[i] + "_qv.png");
 		}
 	}
+	
+	public static void runSimulation() {
+		Config config = Gbl.createConfig(null);
+		String netFileName = "test/scenarios/berlin/network.xml";
+		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
+
+		// this needs to be done before reading the network
+		// because QueueLinks timeCap dependents on SIM_TICK_TIME_S
+		config.simulation().setFlowCapFactor(0.01);
+		config.simulation().setStorageCapFactor(0.04);
+		config.charyparNagelScoring().setLearningRate(1.0);
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFileName);
+
+		PopulationImpl population = new PopulationImpl();
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		plansReader.readFile(popFileName);
+		population.printPlansCount();
+
+		Events events = new Events();
+//		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
+//		events.addHandler(writer);
+
+		QueueSimulation sim = new QueueSimulation(network, population, events);
+		sim.run();
+
+//		writer.closeFile();
+
+//		final long checksum1 = CRCChecksum.getCRCFromFile(referenceFileName);
+//		final long checksum2 = CRCChecksum.getCRCFromFile(eventsFileName);
+//		assertEquals("different event files", checksum1, checksum2);
+	}
 
 	public static void someTest(final String[] args) {
 
@@ -2149,6 +2183,7 @@ public class MyRuns {
 //		readCounts(args);
 //		writeKml();
 //		createQVDiagramm(args);
+		runSimulation();
 //		someTest(args);
 
 		Gbl.printSystemInfo();	

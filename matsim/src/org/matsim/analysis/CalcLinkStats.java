@@ -167,8 +167,9 @@ public class CalcLinkStats {
 			out.write("\n");
 
 			// write data
-			for (Id linkId : this.linkData.keySet()) {
-				LinkData data = this.linkData.get(linkId);
+			for (Map.Entry<Id, LinkData> entry : this.linkData.entrySet()) {
+				Id linkId = entry.getKey();
+				LinkData data = entry.getValue();
 				Link link = this.network.getLinks().get(linkId);
 
 				out.write(linkId.toString());
@@ -336,18 +337,17 @@ public class CalcLinkStats {
 		}
 	}
 
-	/** @deprecated use getAvgLinkVolumes(Id) */
-	public double[] getAvgLinkVolumes(final String linkId) {
-		return getAvgLinkVolumes(new IdImpl(linkId));
-	}
-	
+	/**
+	 * @param linkId
+	 * @return if no data is available, an array with length 0 is returned.
+	 */
 	public double[] getAvgLinkVolumes(final Id linkId) {
 		LinkData data = this.linkData.get(linkId);
 		if (data == null) {
-			return null;
+			return new double[0];
 		}
 		if (this.count == 0) {
-			return null;
+			return new double[0];
 		}
 		double[] volumes = new double[this.nofHours];
 		for (int i = 0; i < this.nofHours; i++) {

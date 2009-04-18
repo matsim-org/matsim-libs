@@ -7,19 +7,18 @@ import org.matsim.core.events.ActEndEvent;
 import org.matsim.core.events.ActStartEvent;
 import org.matsim.core.events.PersonEvent;
 import org.matsim.core.mobsim.jdeqsim.EventLog;
-import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 
 
 public class DEQSimEventFileComparator extends TestHandlerDetailedEventChecker {
 
-	public String pathToDEQSimEventsFile = null;
+	private String pathToDEQSimEventsFile = null;
 
 	public DEQSimEventFileComparator(String path) {
 		pathToDEQSimEventsFile = path;
 	}
 
 	/*
-	 * compare events to deq event file The order of events must also be the
+	 * compare events to deq event file. The order of events must also be the
 	 * same. (this test will only succeed for simple tests with one car
 	 * often!!!) => reason: at junctions the order of cars can change + stuck
 	 * vehicles are dealt with in different ways

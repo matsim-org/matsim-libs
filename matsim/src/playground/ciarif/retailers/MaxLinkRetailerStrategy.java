@@ -3,9 +3,9 @@ package playground.ciarif.retailers;
 
 
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.Facility;
@@ -44,7 +44,7 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 				BasicLinkImpl link = (BasicLinkImpl)this.links[rd];
 				controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 				double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId());
-				double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(link.getId().toString());
+				double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(link.getId());
 				double currentlink_volume =0;
 				double newlink_volume =0;
 				for (int j=0; j<currentlink_volumes.length;j=j+1) {
@@ -55,7 +55,7 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 					newlink_volume = newlink_volume + newlink_volumes[j];
 				}
 				Collection<Person> persons_actual = Utils.getPersonQuadTree().get(f.getLink().getCoord().getX(),f.getLink().getCoord().getY(),1500);
-				Collection<Person> persons_new = (ArrayList<Person>) Utils.getPersonQuadTree().get(link.getCoord().getX(),link.getCoord().getY(),1500);
+				Collection<Person> persons_new = Utils.getPersonQuadTree().get(link.getCoord().getX(),link.getCoord().getY(),1500);
 				Collection<Facility> facilities_actual = Utils.getFacilityQuadTree().get(f.getCoord().getX(),f.getCoord().getY(),1500);
 				Collection<Facility> facilities_new = Utils.getFacilityQuadTree().get(link.getCoord().getX(),link.getCoord().getY(),1500);
 				for (Facility f1:facilities_new) {
