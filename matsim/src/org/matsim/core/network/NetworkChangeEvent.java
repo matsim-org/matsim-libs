@@ -23,6 +23,7 @@
  */
 package org.matsim.core.network;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -193,7 +194,8 @@ public class NetworkChangeEvent {
 		this.lanesChange = lanesChange;
 	}
 
-	public static class StartTimeComparator implements Comparator<NetworkChangeEvent> {
+	public static class StartTimeComparator implements Comparator<NetworkChangeEvent>, Serializable {
+		private static final long serialVersionUID = 1L;
 		public int compare(NetworkChangeEvent o1, NetworkChangeEvent o2) {
 			return Double.compare(o1.getStartTime(), o2.getStartTime());
 		}

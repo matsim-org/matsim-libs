@@ -28,7 +28,6 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicPersonImpl;
@@ -39,16 +38,15 @@ import org.matsim.population.Knowledge;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
 /**
- * For comments see interface
+ * Default implementation of {@link Person} interface.
+ * 
  * @see org.matsim.core.api.population.Person
- * @author dgrether
- *
  */
-public class PersonImpl implements Person{
+public class PersonImpl implements Person {
 
 	private final static Logger log = Logger.getLogger(Person.class);
 
-	private final BasicPersonImpl delegate;
+	private final BasicPersonImpl<Plan> delegate;
 
 	private Customizable customizableDelegate;
 
@@ -57,7 +55,7 @@ public class PersonImpl implements Person{
 	protected Plan selectedPlan = null;
 
 	public PersonImpl(final Id id) {
-		this.delegate = new BasicPersonImpl(id);
+		this.delegate = new BasicPersonImpl<Plan>(id);
 	}
 
 	public void addPlan(final Plan plan) {
@@ -66,9 +64,6 @@ public class PersonImpl implements Person{
 		if (this.selectedPlan == null) this.selectedPlan = plan;
 	}
 
-	/**
-	 * @see org.matsim.core.api.population.Person#getSelectedPlan()
-	 */
 	public Plan getSelectedPlan() {
 		return this.selectedPlan;
 	}
@@ -76,14 +71,6 @@ public class PersonImpl implements Person{
 	public void setSelectedPlan(final Plan selectedPlan) {
 		if (this.delegate.getPlans().contains(selectedPlan)) {
 			this.selectedPlan = selectedPlan;
-
-		//_FIXME dg nov 08: we should think about the following: the
-		//methods comment states that nothing is changed if the plan
-		//is not contained in the db, however from my point of view
-		//this could be reason for bugs -> Exception???
-
-		// I like the idea. I thus enabled the code you wrote below. mr/27dec2008
-
 		} else if (selectedPlan != null) {
 			throw new IllegalStateException("The plan to be set as selected is not stored in the person's plans");
 		}
@@ -143,7 +130,7 @@ public class PersonImpl implements Person{
 
 	public void exchangeSelectedPlan(final Plan newPlan, final boolean appendPlan) {
 		newPlan.setPerson(this);
-		BasicPlan oldSelectedPlan = getSelectedPlan();
+		Plan oldSelectedPlan = getSelectedPlan();
 		if (appendPlan || (oldSelectedPlan == null)) {
 			this.delegate.getPlans().add(newPlan);
 		} else {
@@ -175,48 +162,15 @@ public class PersonImpl implements Person{
 	@Override
 	public final String toString() {
 		StringBuilder b = new StringBuilder();
-		b.append("[id=");
-		b.append(this.getId() );
-		b.append("]");
-		b.append("[sex=");
-		b.append(this.getSex());
-		b.append("]");
-		b.append("[age=");
-		b.append(this.getAge());
-		b.append("]");
-		b.append("[license=");
-		b.append(this.getLicense());
-		b.append("]");
-		b.append("[car_avail=");
-		b.append(this.getCarAvail());
-		b.append("]");
-		b.append("[employed=");
-		b.append(this.getEmployed());
-		b.append("]");
-		b.append("[travelcards=");
-		if (this.getTravelcards() != null) {
-			b.append(this.getTravelcards().size());
-		}
-		else {
-			b.append("null");
-		}
-		b.append("]");
-		b.append("[knowledge=");
-		if (this.getKnowledge() != null){
-			b.append(this.getKnowledge());
-		}
-		else {
-			b.append("null");
-		}
-		b.append("]");
-		b.append("[nof_plans=");
-		if (this.getPlans() != null) {
-			b.append(this.getPlans().size());
-		}
-		else {
-			b.append("null");
-		}
-		b.append("]");
+		b.append("[id=").append(this.getId()).append("]");
+		b.append("[sex=").append(this.getSex()).append("]");
+		b.append("[age=").append(this.getAge()).append("]");
+		b.append("[license=").append(this.getLicense()).append("]");
+		b.append("[car_avail=").append(this.getCarAvail()).append("]");
+		b.append("[employed=").append(this.getEmployed()).append("]");
+		b.append("[travelcards=").append(this.getTravelcards() == null ? "null" : this.getTravelcards().size()).append("]");
+		b.append("[knowledge=").append(this.getKnowledge() == null ? "null" : this.getKnowledge()).append("]");
+		b.append("[nof_plans=").append(this.getPlans() == null ? "null" : this.getPlans().size()).append("]");
 	  return b.toString();
 	}
 
@@ -294,15 +248,13 @@ public class PersonImpl implements Person{
 			throw new IllegalStateException("The household with id: " + hh.getId() + " already has a member"
 					+ " with id: " + this.getId() + " the referenced objects however are not equal!");
 		}
-
 	}
-
 
 	public Knowledge createKnowledge(final String desc) {
 		if (this.delegate.getKnowledge() == null) {
 			Knowledge k = new Knowledge();
 			k.setDescription(desc);
-			((BasicPersonImpl)this.delegate).setKnowledge(k);
+			this.delegate.setKnowledge(k);
 		}
 		return (Knowledge) this.delegate.getKnowledge();
 	}
@@ -333,7 +285,7 @@ public class PersonImpl implements Person{
 	 */
 	@Deprecated
 	public String getEmployed() {
-		return this.delegate.getEmployed();
+		return (isEmployed() ? "yes" : "no");
 	}
 
 	public Id getId() {
@@ -400,7 +352,7 @@ public class PersonImpl implements Person{
 	}
 
 	public void setKnowledge(final Knowledge knowledge) {
-		((BasicPersonImpl)this.delegate).setKnowledge(knowledge);
+		this.delegate.setKnowledge(knowledge);
 	}
 
 }

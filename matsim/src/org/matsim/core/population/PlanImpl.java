@@ -335,10 +335,6 @@ public class PlanImpl implements Plan {
 		delegate.addLeg(leg);
 	}
 
-	public boolean containsActivity(String activityType) {
-		return delegate.containsActivity(activityType);
-	}
-
 	public ActIterator getIteratorAct() {
 		return delegate.getIteratorAct();
 	}

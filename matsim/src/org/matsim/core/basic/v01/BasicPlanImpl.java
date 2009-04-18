@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPerson;
@@ -36,8 +35,6 @@ import org.matsim.core.api.population.Plan;
  * @author david
  */
 public class BasicPlanImpl implements BasicPlan {
-
-	private final static Logger log = Logger.getLogger(BasicPlanImpl.class);
 
 	protected ArrayList<BasicPlanElement> actsLegs = new ArrayList<BasicPlanElement>();
 
@@ -151,11 +148,4 @@ public class BasicPlanImpl implements BasicPlan {
 		this.actsLegs.add(act);
 	}
 
-	public boolean containsActivity( String activityType ){
-		ActIterator planit = getIteratorAct();		
-		while( planit.hasNext())	
-			if( planit.next().getType().equals(activityType) )
-				return true;
-		return false;
-	}
 }

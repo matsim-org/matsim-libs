@@ -47,7 +47,6 @@ public interface Person extends BasicPerson<Plan>, Customizable{
 	 */
 	public void setSelectedPlan(final Plan selectedPlan);
 	
-	
 	/**
 	 * Removes all plans except the selected one.
 	 */
@@ -145,8 +144,6 @@ public interface Person extends BasicPerson<Plan>, Customizable{
 
 	public void setEmployed(final String employed);
 
-//	public Knowledge createKnowledge(final String desc);
-
 	@Deprecated // should either be in Builder, or not there at all (too new)
 	public Desires createDesires(final String desc);
 
@@ -161,8 +158,5 @@ public interface Person extends BasicPerson<Plan>, Customizable{
 	public Desires getDesires();
 
 	public Id getFiscalHouseholdId();
-
-	
 	
 }
-

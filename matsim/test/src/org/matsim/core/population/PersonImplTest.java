@@ -20,17 +20,19 @@
 
 package org.matsim.core.population;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
- *
- * @author cello
+ * @author mrieser
  */
-public class PersonTest extends MatsimTestCase {
+public class PersonImplTest extends MatsimTestCase {
 
+	private final static Logger log = Logger.getLogger(PersonImplTest.class);
+	
 	/**
 	 * Tests {@link org.matsim.core.api.population.Person#removeWorstPlans(int)} when all
 	 * plans have the type <code>null</code>.
@@ -249,6 +251,50 @@ public class PersonTest extends MatsimTestCase {
 
 		assertEquals("person should have 1 plan.", 1, person.getPlans().size());
 		assertEquals("remaining plan should be selPlan.", selPlan, person.getPlans().get(0));
+	}
+	
+	public void testRemovePlan() {
+		Person person = new PersonImpl(new IdImpl(5));
+		Plan p1 = person.createPlan(false);
+		Plan p2 = person.createPlan(true);
+		Plan p3 = person.createPlan(false);
+		Plan p4 = person.createPlan(false);
+		Plan p5 = new PlanImpl(null);
+		
+		assertEquals("wrong number of plans.", 4, person.getPlans().size());
+		assertEquals("expected different selected plan.", p2, person.getSelectedPlan());
+		assertTrue(person.removePlan(p3));
+		assertEquals("wrong number of plans.", 3, person.getPlans().size());
+		assertEquals("expected different selected plan.", p2, person.getSelectedPlan());
+		assertFalse(person.removePlan(p5));
+		assertEquals("wrong number of plans.", 3, person.getPlans().size());
+		assertTrue(person.removePlan(p2));
+		assertEquals("wrong number of plans.", 2, person.getPlans().size());
+		assertNotSame("removed plan still set as selected.", p2, person.getSelectedPlan());
+		assertFalse("plan cannot be removed twice.", person.removePlan(p2));
+		assertEquals("wrong number of plans.", 2, person.getPlans().size());
+		assertTrue(person.removePlan(p1));
+		assertTrue(person.removePlan(p4));
+		assertEquals("wrong number of plans.", 0, person.getPlans().size());
+	}
+	
+	public void testSetSelectedPlan() {
+		Person person = new PersonImpl(new IdImpl(11));
+		Plan p1 = person.createPlan(false);
+		assertEquals(p1, person.getSelectedPlan());
+		Plan p2 = person.createPlan(false);
+		assertEquals(p1, person.getSelectedPlan());
+		Plan p3 = person.createPlan(true);
+		assertEquals(p3, person.getSelectedPlan());
+		person.setSelectedPlan(p2);
+		assertEquals(p2, person.getSelectedPlan());
+		Plan p4 = new PlanImpl(null);
+		try {
+			person.setSelectedPlan(p4);
+			fail("expected Exception when setting a plan as selected that is not part of person.");
+		} catch (IllegalStateException e) {
+			log.info("catched expected exception: " + e.getMessage());
+		}
 	}
 
 }

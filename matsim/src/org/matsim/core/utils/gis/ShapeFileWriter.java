@@ -25,30 +25,21 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.Feature;
 /**
- *
  * This is a simple utility class that provides methods to write Feature instances
- * of the geotools framework to an esri shape file.
- * @author glaemmel
+ * of the geotools framework to an ESRI shape file.
  *
+ * @author glaemmel
  */
 public class ShapeFileWriter {
 
-
-	private static final Logger log = Logger.getLogger(ShapeFileWriter.class);
-
-
 	public static void writeGeometries(final Collection<Feature> features, final String filename) throws IOException {
 
-		// removed log statement as I call the method > 600 times (ah 04.02.2009)
-		//log.info("writing features to: " + filename);
-		
 		URL fileURL = (new File(filename)).toURL();
 		ShapefileDataStore datastore = new ShapefileDataStore(fileURL);
 		Feature feature = features.iterator().next();
@@ -60,8 +51,5 @@ public class ShapeFileWriter {
 		FeatureReader aReader = DataUtilities.reader(features);
 
 		featureStore.addFeatures( aReader);
-		
-		// removed log statement as I call the method > 600 times (ah 04.02.2009)
-		//log.info("done");
 	}
 }

@@ -61,38 +61,22 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 		return this.householdId;
 	}
 
-	/**
-	 * @see org.matsim.api.basic.v01.population.BasicPerson#addPlan(T)
-	 */
 	public void addPlan(final T plan) {
 		this.plans.add(plan);
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPerson#getPlans()
-	 */
 	public List<T> getPlans() {
 		return this.plans;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPerson#getId()
-	 */
 	public Id getId() {
 		return this.id;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPerson#setId(org.matsim.utils.identifiers.IdI)
-	 */
 	public void setId(final Id id) {
 		this.id = id;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPerson#setId(java.lang.String)
-	 */
 	public void setId(final String idstring) {
 		this.id = new IdImpl(idstring);
 	}
@@ -115,15 +99,6 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 
 	public final String getCarAvail() {
 		return this.carAvail;
-	}
-
-	/**
-	 * @return "yes" if the person has a job
-	 * @deprecated use {@link #isEmployed()}
-	 */
-	@Deprecated
-	public final String getEmployed() {
-		return this.isEmployed;
 	}
 
 	public final boolean isEmployed() {

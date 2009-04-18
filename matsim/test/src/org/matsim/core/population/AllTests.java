@@ -29,7 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
 		suite.addTestSuite(ActivityTest.class);
-		suite.addTestSuite(PersonTest.class);
+		suite.addTestSuite(PersonImplTest.class);
 		suite.addTestSuite(PlanTest.class);
 		suite.addTestSuite(PopulationReaderMatsimV4Test.class);
 		suite.addTest(org.matsim.core.population.routes.AllTests.suite());
