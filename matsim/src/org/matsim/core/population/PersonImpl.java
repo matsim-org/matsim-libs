@@ -285,6 +285,9 @@ public class PersonImpl implements Person {
 	 */
 	@Deprecated
 	public String getEmployed() {
+		if (isEmployed() == null) {
+			return null;
+		}
 		return (isEmployed() ? "yes" : "no");
 	}
 
@@ -316,7 +319,7 @@ public class PersonImpl implements Person {
 		return this.delegate.hasLicense();
 	}
 
-	public boolean isEmployed() {
+	public Boolean isEmployed() {
 		return this.delegate.isEmployed();
 	}
 

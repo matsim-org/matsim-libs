@@ -131,7 +131,7 @@ public interface Person extends BasicPerson<Plan>, Customizable{
 	@Deprecated
 	public String getEmployed();
 
-	public boolean isEmployed();
+	public Boolean isEmployed();
 	// TODO [kn]: need setter
 
 	public void setAge(final int age);

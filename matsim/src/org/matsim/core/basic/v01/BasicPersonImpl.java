@@ -101,7 +101,10 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 		return this.carAvail;
 	}
 
-	public final boolean isEmployed() {
+	public final Boolean isEmployed() {
+		if (this.isEmployed == null) {
+			return null;
+		}
 		return ("yes".equals(this.isEmployed)) || ("true".equals(this.isEmployed));
 	}
 
