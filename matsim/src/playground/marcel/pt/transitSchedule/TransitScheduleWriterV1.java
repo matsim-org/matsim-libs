@@ -60,7 +60,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 	public void write(final String filename) throws IOException {
 		this.openFile(filename);
 		this.writeXmlHead();
-//		this.writeDoctype(TRANSIT_SCHEDULE, "dummy.dtd");
+		this.writeDoctype(TRANSIT_SCHEDULE, "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd");
 		this.writeStartTag(TRANSIT_SCHEDULE, null);
 
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
