@@ -35,7 +35,7 @@ import org.matsim.run.OTFVis;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.marcel.pt.transitSchedule.TransitScheduleReader;
+import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 
 
 public class TestIntegration {
@@ -54,7 +54,7 @@ public class TestIntegration {
 //		System.out.println(facilities.getFacilities().size());
 		
 		try {
-			new TransitScheduleReader(schedule, network, facilities).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
+			new TransitScheduleReaderV1(schedule, network, facilities).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
 		
 			final TransitQueueSimulation sim = new TransitQueueSimulation(scenario.getNetwork(), scenario.getPopulation(), events);
 			sim.setTransitSchedule(schedule);

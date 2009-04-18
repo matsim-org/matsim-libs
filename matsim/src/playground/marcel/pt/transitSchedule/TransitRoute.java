@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.NetworkRoute;
 
@@ -37,11 +38,13 @@ public class TransitRoute {
 	private final List<TransitRouteStop> stops;
 	private String description = null;
 	private final Map<Id, Departure> departures = new HashMap<Id, Departure>();
+	private TransportMode transportMode;
 
-	public TransitRoute(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops) {
+	public TransitRoute(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final TransportMode mode) {
 		this.routeId = id;
 		this.route = route;
 		this.stops = stops;
+		this.transportMode = mode;
 	}
 
 	public Id getId() {
@@ -56,6 +59,20 @@ public class TransitRoute {
 		return this.description;
 	}
 
+	/**
+	 * Sets the transport mode with which this transit route is handled, e.g.
+	 * {@link TransportMode#bus} or {@link TransportMode#train}.
+	 * 
+	 * @param mode
+	 */
+	public void setTransportMode(final TransportMode mode) {
+		this.transportMode = mode;
+	}
+	
+	public TransportMode getTransportMode() {
+		return this.transportMode;
+	}
+	
 	public void addDeparture(final Departure departure) {
 		final Id id = departure.getId();
 		if (this.departures.containsKey(id)) {

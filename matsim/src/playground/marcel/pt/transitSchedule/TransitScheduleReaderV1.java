@@ -42,18 +42,21 @@ import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-public class TransitScheduleReader extends MatsimXmlParser {
+public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
 	private static final String TRANSIT_LINE = "transitLine";
 	private static final String TRANSIT_ROUTE = "transitRoute";
 	private static final String DESCRIPTION = "description";
 	private static final String DEPARTURE = "departure";
 	private static final String ROUTE_PROFILE = "routeProfile";
+	private static final String TRANSPORT_MODE = "transportMode";
 	private static final String STOP = "stop";
 	private static final String LINK = "link";
 
 	private static final String ID = "id";
 	private static final String REF_ID = "refId";
+	private static final String ARRIVAL_OFFSET = "arrivalOffset";
+	private static final String DEPARTURE_OFFSET = "departureOffset";
 
 	private final TransitSchedule schedule;
 	private final NetworkLayer network;
@@ -61,13 +64,13 @@ public class TransitScheduleReader extends MatsimXmlParser {
 
 	private TransitLine currentTransitLine = null;
 	private TempTransitRoute currentTransitRoute = null;
-	private TempRouteProfile currentRouteProfile = null;
+	private TempRoute currentRouteProfile = null;
 
-	public TransitScheduleReader(final TransitSchedule schedule, final NetworkLayer network, final Facilities facilities) {
+	public TransitScheduleReaderV1(final TransitSchedule schedule, final NetworkLayer network, final Facilities facilities) {
 		this.schedule = schedule;
 		this.network = network;
 		this.facilities = facilities;
-		this.setValidating(false);
+//		this.setValidating(false);
 	}
 
 	public void readFile(final String fileName) throws SAXException, ParserConfigurationException, IOException {
@@ -88,7 +91,7 @@ public class TransitScheduleReader extends MatsimXmlParser {
 			Departure departure = new Departure(id, Time.parseTime(atts.getValue("departureTime")));
 			this.currentTransitRoute.departures.put(id, departure);
 		} else if (ROUTE_PROFILE.equals(name)) {
-			this.currentRouteProfile = new TempRouteProfile();
+			this.currentRouteProfile = new TempRoute();
 		} else if (LINK.equals(name)) {
 			Link link = this.network.getLink(atts.getValue(REF_ID));
 			if (link == null) {
@@ -102,17 +105,16 @@ public class TransitScheduleReader extends MatsimXmlParser {
 				throw new RuntimeException("no stop/facility with id " + atts.getValue(ID));
 			}
 			TempStop stop = new TempStop(facility);
-			String arrival = atts.getValue("arrival");
-			String departure = atts.getValue("departure");
+			String arrival = atts.getValue(ARRIVAL_OFFSET);
+			String departure = atts.getValue(DEPARTURE_OFFSET);
 			if (arrival != null) {
 				stop.arrival = Time.parseTime(arrival);
 			}
 			if (departure != null) {
 				stop.departure = Time.parseTime(departure);
 			}
-			this.currentRouteProfile.addStop(stop);
+			this.currentTransitRoute.stops.add(stop);
 		}
-
 	}
 
 	@Override
@@ -120,8 +122,8 @@ public class TransitScheduleReader extends MatsimXmlParser {
 		if (DESCRIPTION.equals(name) && TRANSIT_ROUTE.equals(context.peek())) {
 			this.currentTransitRoute.description = content;
 		} else if (TRANSIT_ROUTE.equals(name)) {
-			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(this.currentRouteProfile.stops.size());
-			for (TempStop tStop : this.currentRouteProfile.stops) {
+			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(this.currentTransitRoute.stops.size());
+			for (TempStop tStop : this.currentTransitRoute.stops) {
 				stops.add(new TransitRouteStop(tStop.stop, tStop.arrival, tStop.departure));
 			}
 			NetworkRoute route = null;
@@ -129,7 +131,7 @@ public class TransitScheduleReader extends MatsimXmlParser {
 				route = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, this.currentRouteProfile.firstLink, this.currentRouteProfile.lastLink);
 				route.setLinks(this.currentRouteProfile.firstLink, this.currentRouteProfile.links, this.currentRouteProfile.lastLink);
 			}
-			TransitRoute transitRoute = new TransitRoute(this.currentTransitRoute.id, route, stops);
+			TransitRoute transitRoute = new TransitRoute(this.currentTransitRoute.id, route, stops, this.currentTransitRoute.mode);
 			transitRoute.setDescription(this.currentTransitRoute.description);
 			for (Departure departure : this.currentTransitRoute.departures.values()) {
 				transitRoute.addDeparture(departure);
@@ -139,41 +141,37 @@ public class TransitScheduleReader extends MatsimXmlParser {
 	}
 
 	private static class TempTransitRoute {
-		public final Id id;
-		public String description = null;
-		public Map<Id, Departure> departures = new LinkedHashMap<Id, Departure>();
+		protected final Id id;
+		protected String description = null;
+		protected Map<Id, Departure> departures = new LinkedHashMap<Id, Departure>();
+		/*package*/ List<TempStop> stops = new ArrayList<TempStop>();
+		/*package*/ TransportMode mode = null;
 
-		public TempTransitRoute(final Id id) {
+		protected TempTransitRoute(final Id id) {
 			this.id = id;
 		}
 	}
 
 	private static class TempStop {
-		public final Facility stop;
-		public double departure = Time.UNDEFINED_TIME;
-		public double arrival = Time.UNDEFINED_TIME;
+		protected final Facility stop;
+		protected double departure = Time.UNDEFINED_TIME;
+		protected double arrival = Time.UNDEFINED_TIME;
 
-		public TempStop(final Facility stop) {
+		protected TempStop(final Facility stop) {
 			this.stop = stop;
 		}
 	}
 
-	private static class TempRouteProfile {
-
-		/*package*/ List<TempStop> stops = new ArrayList<TempStop>();
+	private static class TempRoute {
 		/*package*/ List<Link> links = new ArrayList<Link>();
 		/*package*/ Link firstLink = null;
 		/*package*/ Link lastLink = null;
 
-		public TempRouteProfile() {
+		protected TempRoute() {
 			// public constructor for private inner class
 		}
 
-		public void addStop(final TempStop stop) {
-			this.stops.add(stop);
-		}
-
-		public void addLink(final Link link) {
+		protected void addLink(final Link link) {
 			if (this.firstLink == null) {
 				this.firstLink = link;
 			} else if (this.lastLink == null) {

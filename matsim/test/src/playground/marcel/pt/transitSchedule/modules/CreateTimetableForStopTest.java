@@ -36,8 +36,8 @@ import org.xml.sax.SAXException;
 
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.marcel.pt.transitSchedule.TransitScheduleReader;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
+import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 
 public class CreateTimetableForStopTest extends MatsimTestCase {
 
@@ -59,7 +59,7 @@ public class CreateTimetableForStopTest extends MatsimTestCase {
 		world.complete();
 
 		TransitSchedule schedule = new TransitSchedule();
-		new TransitScheduleReader(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitLine line = schedule.getTransitLines().get(new IdImpl("T1"));
 		CreateTimetableForStop timetable = new CreateTimetableForStop(line);

@@ -39,9 +39,9 @@ import org.xml.sax.SAXException;
 
 public class TransitScheduleReaderTest extends MatsimTestCase {
 
-	public static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
-	public static final String INPUT_TEST_FILE_NETWORK = "network.xml";
-	public static final String INPUT_TEST_FILE_FACILITIES = "facilities.xml";
+	private static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
+	private static final String INPUT_TEST_FILE_NETWORK = "network.xml";
+	private static final String INPUT_TEST_FILE_FACILITIES = "facilities.xml";
 
 	public void testReadFile_General() throws SAXException, ParserConfigurationException, IOException {
 		final String inputDir = getPackageInputDirectory();
@@ -57,7 +57,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 		world.complete();
 
 		TransitSchedule schedule = new TransitSchedule();
-		new TransitScheduleReader(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		assertEquals("wrong number of transit lines.", 1, schedule.getTransitLines().size());
 		assertEquals("wrong line id.", new IdImpl("T1"), schedule.getTransitLines().keySet().iterator().next());

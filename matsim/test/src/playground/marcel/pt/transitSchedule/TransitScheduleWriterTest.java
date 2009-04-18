@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
@@ -68,7 +69,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		stops.add(new TransitRouteStop(stop3, Time.UNDEFINED_TIME, 300));
 		stops.add(new TransitRouteStop(stop4, 400, Time.UNDEFINED_TIME));
 
-		TransitRoute route1 = new TransitRoute(new IdImpl(1), null, stops);
+		TransitRoute route1 = new TransitRoute(new IdImpl(1), null, stops, TransportMode.bus);
 		route1.setDescription("Just a comment.");
 
 		route1.addDeparture(new Departure(new IdImpl("2"), 7.0*3600));
@@ -83,9 +84,9 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 
 		// write and read it
 		String filename = getOutputDirectory() + "scheduleNoRoute.xml";
-		new TransitScheduleWriter(schedule1).write(filename);
+		new TransitScheduleWriterV1(schedule1).write(filename);
 		TransitSchedule schedule2 = new TransitSchedule();
-		new TransitScheduleReader(schedule2, network, facilities).readFile(filename);
+		new TransitScheduleReaderV1(schedule2, network, facilities).readFile(filename);
 
 		// first test, without network-route
 		assertEquals(schedule1, schedule2);
@@ -96,14 +97,14 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		links.add(l2);
 		links.add(l3);
 		route.setLinks(l1, links, l4);
-		TransitRoute route2 = new TransitRoute(new IdImpl(2), route, stops);
+		TransitRoute route2 = new TransitRoute(new IdImpl(2), route, stops, TransportMode.bus);
 		line1.addRoute(route2);
 
 		// write and read version with network-route
 		filename = getOutputDirectory() + "scheduleWithRoute.xml";
-		new TransitScheduleWriter(schedule1).write(filename);
+		new TransitScheduleWriterV1(schedule1).write(filename);
 		TransitSchedule schedule3 = new TransitSchedule();
-		new TransitScheduleReader(schedule3, network, facilities).readFile(filename);
+		new TransitScheduleReaderV1(schedule3, network, facilities).readFile(filename);
 
 		assertEquals(schedule1, schedule3);
 	}

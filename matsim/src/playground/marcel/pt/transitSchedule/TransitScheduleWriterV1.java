@@ -32,7 +32,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 
-public class TransitScheduleWriter extends MatsimXmlWriter {
+public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 
 	private static final String TRANSIT_SCHEDULE = "transitSchedule";
 	private static final String TRANSIT_LINE = "transitLine";
@@ -46,13 +46,14 @@ public class TransitScheduleWriter extends MatsimXmlWriter {
 	private static final String DEPARTURE = "departure";
 	private static final String ID = "id";
 	private static final String REF_ID = "refId";
+	private static final String TRANSPORT_MODE = "transportMode";
 	private static final String DEPARTURE_TIME = "departureTime";
-	private static final String DEPARTURE_DELAY = "departure";
-	private static final String ARRIVAL_DELAY = "arrival";
+	private static final String DEPARTURE_OFFSET = "departureOffset";
+	private static final String ARRIVAL_OFFSET = "arrivalOffset";
 
 	private final TransitSchedule schedule;
 
-	public TransitScheduleWriter(final TransitSchedule schedule) {
+	public TransitScheduleWriterV1(final TransitSchedule schedule) {
 		this.schedule = schedule;
 	}
 
@@ -92,6 +93,10 @@ public class TransitScheduleWriter extends MatsimXmlWriter {
 			this.writeContent(route.getDescription(), false);
 			this.writeEndTag(DESCRIPTION);
 		}
+		
+		this.writeStartTag(TRANSPORT_MODE, null);
+		this.writeContent(route.getTransportMode().toString(), false);
+		this.writeEndTag(TRANSPORT_MODE);
 
 		this.writeRouteProfile(route.getStops());
 		this.writeRoute(route.getRoute());
@@ -110,10 +115,10 @@ public class TransitScheduleWriter extends MatsimXmlWriter {
 				attributes.clear();
 				attributes.add(this.createTuple(REF_ID, stop.getStopFacility().getId().toString()));
 				if (stop.getArrivalDelay() != Time.UNDEFINED_TIME) {
-					attributes.add(this.createTimeTuple(ARRIVAL_DELAY, stop.getArrivalDelay()));
+					attributes.add(this.createTimeTuple(ARRIVAL_OFFSET, stop.getArrivalDelay()));
 				}
 				if (stop.getDepartureDelay() != Time.UNDEFINED_TIME) {
-					attributes.add(this.createTimeTuple(DEPARTURE_DELAY, stop.getDepartureDelay()));
+					attributes.add(this.createTimeTuple(DEPARTURE_OFFSET, stop.getDepartureDelay()));
 				}
 				this.writeStartTag(STOP, attributes, true);
 			}

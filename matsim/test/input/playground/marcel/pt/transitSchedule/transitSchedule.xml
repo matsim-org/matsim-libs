@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- <!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.xsd">-->
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
 
 <transitSchedule>
 
@@ -13,14 +13,15 @@
 		     I combined route and routeProfile on the same hierarchy-level (also
 		     see remark at the end of this file). -->
 			<description></description>
+			<transportMode>bus</transportMode>
 			<routeProfile>
-				 <!-- arrival is optional, departure required for all but last, time infos are just offsets -->
-				<stop refId="stop1" departure="00:00:00" />
-				<stop refId="stop2" arrival="00:01:20" departure="00:01:40" />
-				<stop refId="stop3" departure="00:03:00" />
-				<stop refId="stop4" departure="00:03:50" />
-				<stop refId="stop5" departure="00:04:50" />
-				<stop refId="stop6" arrival="00:05:30" />
+				 <!-- arrival is optional, departure required for all but last, time info are just offsets -->
+				<stop refId="stop1" departureOffset="00:00:00" />
+				<stop refId="stop2" arrivalOffset="00:01:20" departureOffset="00:01:40" />
+				<stop refId="stop3" departureOffset="00:03:00" />
+				<stop refId="stop4" departureOffset="00:03:50" />
+				<stop refId="stop5" departureOffset="00:04:50" />
+				<stop refId="stop6" arrivalOffset="00:05:30" />
 			</routeProfile>
 			<!-- routeProfile contains information required for routing algorithms
 			     (together with "departures", below). Data for this can come from
@@ -41,7 +42,7 @@
 			     stops are modeled as facilities, and as facilities are matched
 			     to a link, the bus-driver is able to figure out on which link
 			     which stops are and can handle them accordingly. -->
-			<!-- Die unabhaengige spezifikation der route von den stops erlaubt,
+			<!-- Die unabhaengige Spezifikation der route von den stops erlaubt,
 			     dass fahrplandaten netzwerk-unabhaengig gespeichert werden
 			     koennen sowie das spezielle Wendeschlaufen etc. explizit mit
 			     angegeben werden koennen, um eine realistische Routenfuehrung

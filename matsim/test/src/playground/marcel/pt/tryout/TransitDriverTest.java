@@ -51,16 +51,16 @@ import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.marcel.pt.transitSchedule.TransitScheduleReader;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
+import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.transitSchedule.modules.CreateTimetableForStop;
 import playground.marcel.pt.utils.FacilityVisitors;
 
 public class TransitDriverTest extends MatsimTestCase {
 
-	public static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
-	public static final String INPUT_TEST_FILE_NETWORK = "network.xml";
-	public static final String INPUT_TEST_FILE_FACILITIES = "facilities.xml";
+	private static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
+	private static final String INPUT_TEST_FILE_NETWORK = "network.xml";
+	private static final String INPUT_TEST_FILE_FACILITIES = "facilities.xml";
 
 	public void testPersonsLeavingBus() throws SAXException, ParserConfigurationException, IOException {
 		loadConfig(null);
@@ -77,7 +77,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		world.complete();
 
 		TransitSchedule schedule = new TransitSchedule();
-		new TransitScheduleReader(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
 		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
@@ -137,7 +137,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		world.complete();
 
 		TransitSchedule schedule = new TransitSchedule();
-		new TransitScheduleReader(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
 		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);

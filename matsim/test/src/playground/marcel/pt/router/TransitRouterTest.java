@@ -37,8 +37,8 @@ import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.marcel.pt.transitSchedule.TransitScheduleReader;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
+import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.utils.FacilityNetworkMatching;
 
 public class TransitRouterTest extends MatsimTestCase {
@@ -67,7 +67,7 @@ public class TransitRouterTest extends MatsimTestCase {
 //		PrintFacilityNetworkMatching.printMatching(facilities);
 
 		TransitSchedule schedule = new TransitSchedule();
-		new TransitScheduleReader(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitRouter router = new TransitRouter(schedule);
 //		router.getNextDeparturesAtStop(facilities.getFacilities().get(new IdImpl("stop2")), Time.parseTime("07:01:00"));
@@ -93,7 +93,7 @@ public class TransitRouterTest extends MatsimTestCase {
 		FacilityNetworkMatching.loadMapping(facilities, network, world, "../thesis-data/examples/minibln/facilityMatching.txt");
 
 		TransitSchedule schedule = new TransitSchedule();
-		new TransitScheduleReader(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitRouter router = new TransitRouter(schedule);
 		//		router.calcRoute(new CoordImpl(200, 200), new CoordImpl(4800, 800), Time.parseTime("07:01:00"));
