@@ -33,8 +33,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFDefaultNetWriterFactoryImpl;
-import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFQueryControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
@@ -121,6 +119,9 @@ public class OnTheFlyClientQuad extends Thread {
 			
 			OTFHostControlBar hostControl = new OTFHostControlBar(url);
 			hostControl.frame = frame;
+			if (hostControl.isLiveHost()) {
+				visconf.setCachingAllowed(false); // no use to cache in live mode
+			}
 			frame.getContentPane().add(hostControl, BorderLayout.NORTH);
 			String netName= Gbl.getConfig().network().getInputFile();
 			OTFFileSettingsSaver saver = new OTFFileSettingsSaver(netName);
