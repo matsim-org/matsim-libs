@@ -21,7 +21,7 @@
 package playground.marcel.pt.transitSchedule;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
@@ -29,7 +29,7 @@ import org.matsim.api.basic.v01.Id;
 public class TransitLine {
 
 	private final Id lineId;
-	private final Map<Id, TransitRoute> transitRoutes = new HashMap<Id, TransitRoute>();
+	private final Map<Id, TransitRoute> transitRoutes = new LinkedHashMap<Id, TransitRoute>();
 
 	public TransitLine(final Id id) {
 		this.lineId = id;

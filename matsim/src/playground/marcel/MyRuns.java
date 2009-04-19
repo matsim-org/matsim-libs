@@ -58,9 +58,6 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.network.Link;
@@ -2007,7 +2004,7 @@ public class MyRuns {
 			qvds[i].writeGraph("link" + links[i] + "_qv.png");
 		}
 	}
-	
+
 	public static void runSimulation() {
 		Config config = Gbl.createConfig(null);
 		String netFileName = "test/scenarios/berlin/network.xml";
@@ -2043,56 +2040,11 @@ public class MyRuns {
 
 	public static void someTest(final String[] args) {
 
-//		Double UNDEF = null;
-//		double score = UNDEF;
-//		
-//		System.out.println(System.getProperties().get("java.class.path"));
-		
-		List<? extends BasicPlan> basicList = new ArrayList<BasicPlan>();
-		
-		List<BasicPlan> basicList2 = (List<BasicPlan>) basicList;
-		
-		List genericList = basicList;
-		
-		List<? extends BasicPlan> basicList3 = basicList2;
-		
-		List<? extends Plan> list = (List) basicList;
-		
-		List<? extends Plan> list2 = genericList;
-		List<Plan> list3 = genericList;
-		
-//		basicList.add(new BasicPlanImpl()); // doesn't compile
-//		basicList2.add(new BasicPlanImpl());
-		BasicPopulationBuilder pb = null;
-		BasicPerson person = null;
-//		person.getPlans().add(pb.createPlan(person));
-//		person.addPlan(..);
-		
-		basicList3.get(0);
-		
-		for (BasicPlan plan : basicList) {
-			plan.getScore();
-		}
-		
-		for (Plan plan : list) {
-			plan.getFirstActivity();
-		}
-		
-		A a;
-		B b;
-//		List<A> l = b.getList1();
-//		l.add(a);
-		
-	}
-	
-	public static interface A {
-		public List<A> getList1();
-		public List<? extends A> getList2();
-	}
-	
-	public static interface B extends A {
-//		public List<B> getList1(); // doesn't compile
-		public  List<? extends B> getList2();
+		CoordinateTransformation transformation = new SoldnerBerlinToWGS84();
+		Coord alexanderplatz = new CoordImpl(25466670/1000.0, 21618520/1000.0);
+		Coord wgs84 = transformation.transform(alexanderplatz);
+		System.out.println(wgs84.getX() + " / " + wgs84.getY()); // expected: 13.41 / 52.52
+
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -2183,10 +2135,10 @@ public class MyRuns {
 //		readCounts(args);
 //		writeKml();
 //		createQVDiagramm(args);
-		runSimulation();
-//		someTest(args);
+//		runSimulation();
+		someTest(args);
 
-		Gbl.printSystemInfo();	
+		Gbl.printSystemInfo();
 
 		System.out.println("stop at " + (new Date()));
 		System.exit(0); // currently only used for calcRouteMT();
