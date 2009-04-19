@@ -65,6 +65,8 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	private boolean isValidating = true;
 	private boolean isNamespaceAware = true;
 
+	private String localDtdBase = null;
+
 	private String doctype = null;
 	/**
 	 * As the mechanism implemented in InputSource is not really working for error handling
@@ -80,6 +82,10 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	}
 
 	public MatsimXmlParser(final boolean validateXml) {
+		Config config = Gbl.getConfig();
+		if (config != null && config.global() != null) {
+			this.localDtdBase = config.global().getLocalDtdBase();
+		}
 		this.isValidating = validateXml;
 	}
 
@@ -122,6 +128,16 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	 */
 	public void setNamespaceAware(final boolean awareness) {
 		this.isNamespaceAware = awareness;
+	}
+
+	/**
+	 * Sets the directory where to look for DTD and XSD files if they are not found
+	 * at the location specified in the XML.
+	 *
+	 * @param localDtdDirectory
+	 */
+	public void setLocalDtdDirectory(final String localDtdDirectory) {
+		this.localDtdBase = localDtdDirectory;
 	}
 
 	/**
@@ -207,9 +223,8 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 			log.error(e.toString() + ". May not be fatal." ) ;
 		}
 		// systemId could not be resolved, try it locally
-		final Config config = Gbl.getConfig();
-		if ((config != null) && (config.global() != null)) {
-			String localFileName = config.global().getLocalDtdBase() + shortSystemId;
+		if (this.localDtdBase != null) {
+			String localFileName = this.localDtdBase + shortSystemId;
 			File dtdFile = new File(localFileName);
 			log.debug("dtdfile: " + dtdFile.getAbsolutePath());
 			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
