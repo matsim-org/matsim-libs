@@ -65,8 +65,6 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	private JSlider linkWidthSlider;
 	private JSlider delaySlider = null;
 
-	// private JSlider linkWidthSlider = null;
-
 	/**
 	 * Auto-generated main method to display this JDialog
 	 */
@@ -167,14 +165,6 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 		}
 
-		// SpinnerNumberModel model = new SpinnerNumberModel(cfg.getAgentSize(),
-		// 10, 500, 10);
-		// JSpinner spin = addLabeledSpinner(getContentPane(), "agentSize",
-		// model);
-		// spin.setMaximumSize(new Dimension(75,30));
-		// spin.addChangeListener(this);
-		// spin.setBounds(50, 120, 92, 27);
-
 		// Agent size
 		{
 			JLabel label = new JLabel();
@@ -250,25 +240,6 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			 //System.out.println("val: "+ this.linkWidthSlider.getValue());
 		}
 	}
-
-	// static protected JSpinner addLabeledSpinner(Container c, String label,
-	// SpinnerModel model)
-	// {
-	// JLabel l = new JLabel(label);
-	// c.add(l);
-	// JSpinner spinner = new JSpinner(model);
-	// l.setLabelFor(spinner);
-	// c.add(spinner);
-	// return spinner;
-	// }
-	//
-	// public void stateChanged(ChangeEvent e) {
-	// JSpinner spinner = (JSpinner)e.getSource();
-	// int i = ((SpinnerNumberModel)spinner.getModel()).getNumber().intValue();
-	// cfg.addParam(OTFVisConfig.AGENT_SIZE, Float.toString(i));
-	// repaint();
-	// //networkScrollPane.repaint();
-	// }
 
 	public JComboBox getLeftMFunc() {
 		return this.leftMFunc;

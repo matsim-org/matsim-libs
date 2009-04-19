@@ -47,8 +47,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.border.Border;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimResource;
@@ -62,11 +61,12 @@ import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
+import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.vis.otfvis.server.OTFTVehServer;
 
 
-public class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener, ChangeListener {
+public class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener {
 
 //	private static final String CONNECT = "connect";
 	private static final String TO_START = "to_start";
@@ -85,7 +85,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	// -------------------- MEMBER VARIABLES --------------------
 
-	//private DisplayableNetI network;
 	private transient MovieTimer movieTimer = null;
 	private JButton playButton;
 	private JFormattedTextField timeField;
@@ -167,7 +166,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		Registry registry = LocateRegistry.getRegistry(hostname, port, new SslRMIClientSocketFactory());
 
 		if(servername == null) servername = "OTFServer_"; // take any
-		
+
 		String[] liste = registry.list();
 		for (String name : liste) {
 			if (name.indexOf(servername) != -1){
@@ -183,7 +182,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		Registry registry = LocateRegistry.getRegistry(hostname, port);
 
 		if(servername == null) servername = "OTFServer_"; // take any
-		
+
 		String[] liste = registry.list();
 		for (String name : liste) {
 			if (name.indexOf(servername) != -1){
@@ -262,7 +261,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
-			
+
 //			((OTFQuadFileHandler.Reader)host).closeFile();
 		}
 		@Override
@@ -303,7 +302,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private void addButtons() {
-
 		this.setFloatable(false);
 
     playIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPlay.png"), "Play");
@@ -333,29 +331,15 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 		createCheckBoxes();
 
-//		Integer value = new Integer(50);
-//		Integer min = new Integer(0);
-//		Integer max = new Integer(200);
-//		Integer step = new Integer(1);
-//		SpinnerNumberModel model = new SpinnerNumberModel(new Integer(155), min, max, step);
-//		JSpinner spin = addLabeledSpinner(this, "Lanewidth", model);
-//		spin.setMaximumSize(new Dimension(75,30));
-//		spin.addChangeListener(this);
-//		JButton button = createButton(address,CONNECT, null, "Server connection established");
-//		add(button);
-		add(new JLabel(address));
+		add(new JLabel(this.address));
 	}
 
-	protected JButton createButton(String altText, String actionCommand, String imageName, String toolTipText) {
-		JButton button;
-
-	    //Create and initialize the button.
-		button = new JButton();
+	protected JButton createButton(String altText, String actionCommand, String imageName, final String toolTipText) {
+		BorderlessButton button = new BorderlessButton();
 		button.putClientProperty("JButton.buttonType","icon");
 		button.setActionCommand(actionCommand);
 		button.addActionListener(this);
 	  button.setToolTipText(toolTipText);
-	  button.setBorder(null);
 
 	  if (imageName != null) {
 	  	// with image
@@ -426,6 +410,11 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			frame.setBounds(this.windowBounds);
 			frame.setVisible(true);
 		}
+		OTFVisConfig cfg = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME));
+		float linkWidth = cfg.getLinkWidth();
+		cfg.setLinkWidth(linkWidth + 0.01f);// forces redraw of network, haven't found a better way to do it. marcel/19apr2009
+		SimpleStaticNetLayer.marktex = null;
+		redrawHandlers();
 	}
 
 	private boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime)  throws IOException {
@@ -544,16 +533,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		//networkScrollPane.repaint();
 	}
 
-	// deactivated the method below as it is nowhere used. Marcel, 30sep2008
-//	protected JSpinner addLabeledSpinner(Container c,   String label,  SpinnerModel model)
-//	{
-//		JLabel l = new JLabel(label);
-//		c.add(l);
-//		JSpinner spinner = new JSpinner(model);
-//		l.setLabelFor(spinner);
-//		c.add(spinner);
-//		return spinner;
-//	}
 	private void createCheckBoxes() {
 		if ( liveHost) {
 			JCheckBox SynchBox = new JCheckBox(TOGGLE_SYNCH);
@@ -573,14 +552,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		repaint();
 	}
 
-	public void stateChanged(ChangeEvent e) {
-		//JSpinner spinner = (JSpinner)e.getSource();
-		//int i = ((SpinnerNumberModel)spinner.getModel()).getNumber().intValue();
-
-		//visConfig.set(VisConfig.LINK_WIDTH_FACTOR, Integer.toString(i));
-		repaint();
-		//networkScrollPane.repaint();
-	}
 	public Collection<Double> getTimeSteps() {
 		try {
 			return this.host.getTimeSteps();
@@ -651,7 +622,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		@Override
 		public void run() {
 			int delay = 30;
-			
+
 			int actTime = 0;
 
 			while (!terminate) {
@@ -715,15 +686,26 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				//repaint();
 				//invalidateHandlers();
 //				System.out.println(simTime);
-			
+
 			}
-			
+
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		System.out.println("FERTIHHHH");
+	}
+
+	private static class BorderlessButton extends JButton {
+		public BorderlessButton() {
+			super();
+			super.setBorder(null);
+		}
+		@Override
+		public void setBorder(final Border border) {
+			// ignore border setting to overwrite specific look&feel
+		}
 	}
 
 }
