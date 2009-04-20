@@ -46,34 +46,23 @@ public class SaturationLevel2QGIS implements X2QGIS {
 		for (int i = 0; i < 24; i++) {
 			saturationLevels.add(i, null);
 		}
+		double capPeriod = (double) net.getCapacityPeriod() / 3600.0;
 		for (Link link : (net.getLinks()).values()) {
 			Id linkId = link.getId();
 			int[] v = va.getVolumesForLink(linkId.toString());
 			for (int i = 0; i < 24; i++) {
 				Map<Id, Double> m = saturationLevels.get(i);
-				if (m != null) {
-					m
-							.put(
-									linkId,
-									(double) ((v != null) ? v[i] : 0)
-											* 10.0
-											/ link
-													.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
-											* (double) net.getCapacityPeriod()
-											/ 3600.0);
-				} else if (m == null) {
+				if (m == null)
 					m = new HashMap<Id, Double>();
-					m
-							.put(
-									linkId,
-									(double) ((v != null) ? v[i] : 0)
-											* 10.0
-											/ link
-													.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
-											* (double) net.getCapacityPeriod()
-											/ 3600.0);
-					saturationLevels.add(i, m);
-				}
+				m
+						.put(
+								linkId,
+								(double) ((v != null) ? v[i] : 0)
+										* 10.0
+										/ link
+												.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
+										* capPeriod);
+				saturationLevels.set(i, m);
 			}
 		}
 		return saturationLevels;
@@ -85,22 +74,22 @@ public class SaturationLevel2QGIS implements X2QGIS {
 	public static void main(String[] args) {
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
 		/*
-		 * //////////////////////////////////////////////////////////////////////////////////
-		 * Traffic saturation level and MATSim-network to Shp-file
-		 * /////////////////////////////////////////////////////////////////////////////////
+		 * //////////////////////////////////////////////////////////////////////
+		 * /Traffic saturation level and MATSim-network to Shp-file
+		 * /////////////////////////////////////////////////////////////////////
 		 */
-		mn2q
-				.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu-flama-noUetli.xml");
+		mn2q.readNetwork("../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml");
 		mn2q.setCrs(ch1903);
 		NetworkLayer net = mn2q.getNetwork();
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		mn2q.readEvents("../runs/run468/500.events.txt.gz", va);
+		mn2q.readEvents("../matsimTests/Calibration/680.events.txt.gz", va);
 		List<Map<Id, Double>> sls = createSaturationLevels(net, va);
 		for (int i = 0; i < 24; i++) {
 			mn2q.addParameter("sl" + i + "-" + (i + 1) + "h", Double.class, sls
 					.get(i));
 		}
-		mn2q.writeShapeFile("../runs/run468/468.500.saturationLevel.shp");
+		mn2q
+				.writeShapeFile("../matsimTests/Calibration/rop.1-24.680.saturationLevel.shp");
 	}
 
 }
