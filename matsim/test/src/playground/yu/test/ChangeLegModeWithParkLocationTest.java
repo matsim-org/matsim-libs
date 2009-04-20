@@ -10,8 +10,14 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
+
+import playground.yu.bottleneck.TimeAllocationMutatorBottleneck;
 
 /**
  * @author yu
@@ -69,26 +75,36 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 					.toString());
 		}
 	}
-
-	// protected void tearDown() throws Exception {
-	// super.tearDown();
-	// Gbl.reset();
-	// }
-
 	public void testLegChainModes() {
-		Controler ctl = new Controler(new String[] { getInputDirectory()
+		Controler ctl = new ChangeLegModeWithParkLocationControler(new String[] { getInputDirectory()
 				+ "config.xml" });
 		ctl.addControlerListener(new LegChainModesListener());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
 		ctl.run();
-		ctl.getStrategyManager().addStrategy(
-				new PlanStrategy4ChangeLegModeWithParkLocation(
-						new ExpBetaPlanChanger()), 0.9);
-		//TODO override load...
-		// ctl.run();
-		// System.out.println(">>>>>"
-		// + ctl.getStrategyManager().getMaxPlansPerAgent());
+		// ctl.getStrategyManager().addStrategy(
+		// new PlanStrategy4ChangeLegModeWithParkLocation(
+		// new ExpBetaPlanChanger()), 0.9);
+		// TODO override load...
+	}
 
+	private static class ChangeLegModeWithParkLocationControler extends
+			Controler {
+		public ChangeLegModeWithParkLocationControler(String[] args) {
+			super(args);
+		}
+		protected StrategyManager loadStrategyManager() {
+			StrategyManager manager = new StrategyManager();
+			manager.setMaxPlansPerAgent(5);
+			//
+			PlanStrategy strategy1 = new PlanStrategy(new ExpBetaPlanChanger());
+			manager.addStrategy(strategy1, 0.1);
+
+			PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
+			strategy2.addStrategyModule(new ChangeLegModeWithParkLocation(this.config));
+			strategy2.addStrategyModule(new ReRoute(this));
+			manager.addStrategy(strategy2, 0.9);
+			return manager;
+		}
 	}
 }

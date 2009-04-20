@@ -3,6 +3,8 @@
  */
 package playground.yu.test;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -10,21 +12,53 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
+import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.replanning.modules.ChangeLegMode;
+import org.matsim.core.replanning.modules.ExternalModule;
+import org.matsim.core.replanning.modules.PlanomatModule;
+import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.modules.ReRouteDijkstra;
+import org.matsim.core.replanning.modules.ReRouteLandmarks;
+import org.matsim.core.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.KeepSelected;
+import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.StringUtils;
+import org.matsim.locationchoice.LocationChoice;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherF;
+import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherK;
+import org.matsim.socialnetworks.replanning.SNPickFacilityFromAlter;
 
 /**
  * this class contains some codes from ChangeLegMode
@@ -454,5 +488,4 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			return lastActIdx;
 		}
 	}
-
 }
