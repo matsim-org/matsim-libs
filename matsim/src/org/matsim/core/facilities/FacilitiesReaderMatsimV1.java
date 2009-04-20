@@ -102,7 +102,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 	
 	private void startCapacity(final Attributes atts) {
-		int cap = Integer.parseInt(atts.getValue("value"));
+		double cap = Double.parseDouble(atts.getValue("value"));
 		this.curractivity.setCapacity(cap);
 	}
 	
