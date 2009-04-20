@@ -83,8 +83,8 @@ public class ShapeFileTransformer {
 	}
 
 	public static void main(String [] args) {
-		String inFile = "./tmp/semantic_classification/SemanticClassification_1.shp";
-		String outFile = "./tmp/SemanticClassification_1.shp";
+		String inFile = "../../inputs/padang/zona_5_1.shp";
+		String outFile = "./tmp/zone_5_10.shp";
 		try {
 			new ShapeFileTransformer(inFile,outFile).run();
 		} catch (IOException e) {

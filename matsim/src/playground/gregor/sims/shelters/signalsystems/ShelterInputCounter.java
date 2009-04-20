@@ -19,10 +19,11 @@ import playground.gregor.sims.shelters.Building;
 
 public class ShelterInputCounter implements LinkLeaveEventHandler, AfterMobsimListener, QueueSimulationInitializedListener {
 
-//	private static final int MAX_CAP = 50;
+	private static final double MAX_CAP = 50;
 	private SortedMap<Id, SignalSystemControler> scs;
 	private final HashMap<Id,Counter> counts = new HashMap<Id, Counter>();
 	private final HashMap<Id, Building> shelterLinkMapping;
+	private int it = 0;
 	
 	public ShelterInputCounter(NetworkLayer network, HashMap<Id,Building> shelterLinkMapping) {
 		
@@ -36,29 +37,58 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, AfterMobsimLi
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		Counter c = this.counts.get(event.getLink()); 
+//		if (event.getLink().getId().toString().contains("s")){
+//			System.out.println(event.getLink().getId());
+//			System.out.println(event.getLinkId());
+//			System.out.println();
+//		}
+		Counter c = this.counts.get(event.getLink().getId()); 
 		if (c != null) {
+			Building b = this.shelterLinkMapping.get(event.getLink().getId());
 			c.count++;
-//			if (c.count > MAX_CAP) {
-//				AgentMoneyEvent e = new AgentMoneyEvent(event.getTime(),event.getPersonId(),-(c.count - MAX_CAP)/10);
+//			if (c.count > b.getShelterSpace()) {
+//				AgentMoneyEvent e = new AgentMoneyEvent(event.getTime(),event.getPersonId(),-(c.count - b.getShelterSpace())/10);
 //				QueueSimulation.getEvents().processEvent(e);
-//			}			
+//			}
+
 		}
 		
 	}
 	
 	boolean getShelterOfLinkHasSpace(Id linkRefId) {
+		if (this.it >= 200) {
+			return true;
+		}
 		Counter c = this.counts.get(linkRefId);
 		Building b = this.shelterLinkMapping.get(linkRefId);
 		
+		if (c.count <= b.getShelterSpace()) {
+			return true;
+		}
+		else if (!c.open) {
+			return false;
+		}
+		c.open = false;
+//		c.open = (MatsimRandom.getRandom().nextDouble()/2) > (c.count/b.getShelterSpace()-1);
 		
-		return c.count <= b.getShelterSpace();
+//		return MatsimRandom.getRandom().nextDouble() < (1/60); 
+		return c.open;
 	}
 
 	public void reset(int iteration) {
-		for (Counter c : this.counts.values()) {
-			c.count = 0;
+		this.it = iteration;
+		int c = 0;
+		double o = 0;
+		for (Entry<Id, Counter> e : this.counts.entrySet()) {
+			int count = e.getValue().count;
+			int max = this.shelterLinkMapping.get(e.getKey()).getShelterSpace();
+			double overload = (double)count / max;
+			System.out.println("Link:" + e.getKey() + "  count:" + count + " should be at most:" + max + " overload:" + overload);
+			e.getValue().count = 0;
+			c++;
+			o+=overload;
 		}
+		System.err.println("avgOverload:" + o/c);
 	}
 
 	public void notifySimulationInitialized(QueueSimulationInitializedEvent e) {
@@ -73,15 +103,22 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, AfterMobsimLi
 	}
 
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		for (Entry<Id, Counter> e : this.counts.entrySet()) {
-			System.out.println("Link:" + e.getKey() + "  count:" + e.getValue().count);
-		}
+
 		
 	}
 
 	private static class Counter {
 		int count = 0;
+		boolean open = true;
 	}
+
+//	public void handleEvent(LaneEnterEvent event) {
+//		System.err.println("LaneEnterEvent " + event.getLaneId());
+//	}
+//
+//	public void handleEvent(LaneLeaveEvent event) {
+//		System.err.println("LaneLeaveEvent " + event.getLaneId());
+//	}
 
 
 

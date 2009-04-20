@@ -59,7 +59,7 @@ public class EvacuationShelterNetLoader {
 	}
 
 
-	private void generateShelterLinks() {
+	public void generateShelterLinks() {
 		Node saveNode = this.network.getNode("en1"); //TODO GL Apr. 09 -- evacuation node should not retrieved via String id
 		int count = 0;
 		for (Building building : this.buildings) {
@@ -70,9 +70,9 @@ public class EvacuationShelterNetLoader {
 			Node from = this.network.getNearestNode(c);
 			Node sn1 = this.network.createNode(new IdImpl("sn" + count + "a"), c);
 			Node sn2 = this.network.createNode(new IdImpl("sn" + count + "b"), c);
-			Link l1 = this.network.createLink(new IdImpl("sl" + count + "a"), from, sn1, getDist(from,sn1) , 1.66, 1, 1); //FIXME find right values flow cap, lanes, ...
+			Link l1 = this.network.createLink(new IdImpl("sl" + count + "a"), from, sn1, getDist(from,sn1) , 1.66, 6, 6); //FIXME find right values flow cap, lanes, ...
 			this.buildingsLinkMapping.put(l1.getId(), building);
-			Link l2 = this.network.createLink(new IdImpl("sl" + count + "b"), sn1,sn2, 20 , 20, 1, 1); //FIXME find right values flow cap, lanes, ...
+			Link l2 = this.network.createLink(new IdImpl("sl" + count + "b"), sn1,sn2, 10 , 10000, 6, 6); //FIXME find right values flow cap, lanes, ...
 			Link l3 = this.network.createLink(new IdImpl("sl" + count++ + "c"), sn2,saveNode, 10 , 10000, 10000, 1); //FIXME find right values flow cap, lanes, ...
 			this.shelterLinks.add(l1);
 			this.shelterLinks.add(l2);

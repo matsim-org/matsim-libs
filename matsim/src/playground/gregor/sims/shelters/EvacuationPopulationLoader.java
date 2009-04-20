@@ -76,9 +76,12 @@ public class EvacuationPopulationLoader {
 		
 		int count = 0;
 		for (Building building : this.buildings) {
-			if (count > 100) {
-				break;
-			}
+//			if (count >= 1) {
+//				break;
+//			}
+//			if (!building.isQuakeProof() ) {
+//				continue;
+//			}
 			Coordinate c = building.getGeo().getCoordinate();
 			Link link = this.quadTree.get(c.x,c.y);
 //			Link link = this.network.getNearestLink(new CoordImpl(c.x,c.y));
@@ -90,6 +93,13 @@ public class EvacuationPopulationLoader {
 			} else if (scenario == Scenario.night){
 				i = (int) Math.round(building.getPopNight() * sample);
 			}
+			
+			if (building.isQuakeProof()) {
+				building.setShelterSpace(Math.max(0, building.getShelterSpace()-i));
+				continue;
+			}
+			
+//			i=1;
 			
 			for (int j = 0; j < i; j++) {
 				Person pers = new PersonImpl(new IdImpl(count++));
@@ -117,7 +127,7 @@ public class EvacuationPopulationLoader {
 	}
 
 	private void buildQuadTree() {
-		this.quadTree = new QuadTree<Link>(600000,9800000,700000,9990000);
+		this.quadTree = new QuadTree<Link>(0,0,700000,9990000);
 		for (Link link : this.network.getLinks().values()) {
 			if (link.getId().toString().contains("el") || link.getId().toString().contains("s") ) {
 				continue;

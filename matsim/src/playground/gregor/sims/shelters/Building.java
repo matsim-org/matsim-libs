@@ -14,7 +14,7 @@ public class Building {
 	private final int quakeProof;
 	private final Geometry geo;
 	
-	private final int shelterSpace;
+	private int shelterSpace;
 	
 	
 	public  Building(Id id, int popNight, int popDay, int floor, double space,
@@ -27,7 +27,7 @@ public class Building {
 		this.quakeProof = quakeProof;
 		this.geo = geo;
 		
-		this.shelterSpace = (int)(((floor - 1.) * space)/2.);
+		this.shelterSpace = (int)((((floor - 1.) * space)/2.)/10);
 		
 	}
 
@@ -73,6 +73,10 @@ public class Building {
 
 	public int getShelterSpace() {
 		return this.shelterSpace;
+	}
+	
+	public void setShelterSpace(int space) {
+		this.shelterSpace = space;
 	}
 	
 }

@@ -90,7 +90,7 @@ public class Events2Stats implements AgentDepartureEventHandler, AgentArrivalEve
 			
 		BufferedWriter writer = null;
 		try {
-			 writer = IOUtils.getBufferedWriter("tt.csv", false);
+			 writer = IOUtils.getBufferedWriter("../../outputs/output/analysis/tt.csv", false);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

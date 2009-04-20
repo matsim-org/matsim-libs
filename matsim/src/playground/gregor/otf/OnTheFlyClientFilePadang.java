@@ -41,7 +41,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	final String BUILDINGS_FILE =  "../../inputs/gis/shelters.shp";
 	final String LINKS_FILE = "../../inputs/gis/links.shp";
 	final String NODES_FILE = "../../inputs/gis/nodes.shp";
-	final private static float [] buildingsColor = new float [] {.0f,1.f,.0f,.8f};
+	final private static float [] buildingsColor = new float [] {.0f,0.f,1.0f,.8f};
 	final private static float [] linksColor = new float [] {.5f,.5f,.5f,.7f};
 	final private static float [] nodesColor = new float [] {.4f,.4f,.4f,.7f};
 	
@@ -166,7 +166,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 			e.printStackTrace();
 		}
 //		OGLSimpleBackgroundLayer.addPersistentItem(new ScalelableBackgroundDraw("test.png","scalebar2.png","scalebar3.png"));
-		drawer2.addOverlay(new ScalelableBackgroundDraw("test.png","scalebar2.png","scalebar3.png"));
+		drawer2.addOverlay(new ScalelableBackgroundDraw("./res/sb_background.png","./res/scalebar.png"));
 		return drawer2;
 	}
 	
@@ -183,7 +183,9 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
 //		final String filename =  CVSROOT + "/runs/run314/output/ITERS/it.100/100.movie.mvi";
 //		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
-		final String filename =  "../../outputs/output_100m_so/ITERS/it.0/0.movie.mvi";
+//		final String filename =  "../../outputs/output_100m_so/ITERS/it.0/0.movie.mvi";
+		final String filename =  "../../outputs/output/ITERS/it.200/200.movie.mvi";
+//		final String filename =  "./output/ITERS/it.0/0.otfvis.mvi";
 		
 //		String filename = "./jam/jam.mvi";
 		
@@ -226,9 +228,9 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(0); 
 		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50,255));
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setAgentSize(200.f);
+		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setAgentSize(100.f);
 		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawTime(true);
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawOverlays(false);
+		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawOverlays(true);
 		
 		
 		final OnTheFlyClientFileQuad client = new OnTheFlyClientFilePadang(filename, null, false);

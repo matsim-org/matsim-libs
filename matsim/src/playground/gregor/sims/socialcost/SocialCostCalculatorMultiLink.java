@@ -40,8 +40,11 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 	
 	Map<Id,LinkInfo> linkInfos = new HashMap<Id,LinkInfo>();
 	Set<Id> stuckedAgents = new HashSet<Id>();
+	private int it;
 	
 
+	private final static int MSA_OFFSET = 0;
+	
 	public SocialCostCalculatorMultiLink(NetworkLayer network, int binSize,AbstractTravelTimeCalculator travelTimeCalculator, Population population) {
 		this.network = network;
 		this.binSize = binSize;
@@ -57,19 +60,24 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 		}
 		
 		LinkTimeCostInfo ltc = li.getLinkTimeCostInfo(getTimeBin(time));
-
-		return Math.max(0,ltc.c1 + ltc.c2);
+		if (Double.isNaN(ltc.cost) || Double.isInfinite(ltc.cost)) {
+			System.out.println(ltc.cost);
+		}
+		return Math.max(0,ltc.cost);
+//		return 0.;
 	}
 
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
+		this.it = iteration;
 		
 	}
 
 	
 	public void notifySimulationBeforeCleanup(
 			QueueSimulationBeforeCleanupEvent e) {
+		
 		recalculateSocialCosts();
+//		this.linkInfos.clear();
 
 	}
 
@@ -84,7 +92,60 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 			
 		}
 		calcLinkTimeCosts();
+		updateCosts();
 		scorePlans();
+		cleanUp();
+	}
+
+	private void cleanUp() {
+		for (LinkInfo li : this.linkInfos.values()) {
+			li.resetAgentEnterInfos();
+		}
+		
+	}
+
+	private void updateCosts() {
+		double maxCost = 0;
+		double minCost = Double.POSITIVE_INFINITY;
+		if (this.it > MSA_OFFSET) {
+			double n = this.it - MSA_OFFSET;
+			double oldCoef = n / (n+1);
+			double newCoef = 1 /(n+1);
+			for (LinkInfo li : this.linkInfos.values()) {
+				for (LinkTimeCostInfo lci : li.linkTimeCosts.values()) {
+					lci.cost = newCoef * (lci.c1 + lci.c2) + oldCoef * lci.cost;
+					if (lci.cost > maxCost) {
+						maxCost = lci.cost;
+					}
+					if (lci.cost < minCost) {
+						minCost = lci.cost;
+					}
+					lci.in = 0;
+					lci.c1 = 0;
+					lci.c2 = 0;
+					lci.linkDelay = 0;
+					lci.out = 0; 
+				}
+			}
+		}else {
+			for (LinkInfo li : this.linkInfos.values()) {
+				for (LinkTimeCostInfo lci : li.linkTimeCosts.values()) {
+					lci.cost = lci.c1 + lci.c2;
+					if (lci.cost > maxCost) {
+						maxCost = lci.cost;
+					}
+					if (lci.cost < minCost) {
+						minCost = lci.cost;
+					}
+					lci.in = 0;
+					lci.c1 = 0;
+					lci.c2 = 0;
+					lci.linkDelay = 0;
+					lci.out = 0;
+				}
+			}			
+		}
+		System.err.println("maxCost:" + maxCost + "    minCost:" + minCost);
 	}
 
 	private void scorePlans() {
@@ -97,6 +158,10 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 			double cost = 0;
 			for (Id id : links) {
 				LinkInfo li = this.linkInfos.get(id);
+				Double enterTime = li.getAgentEnterTime(pers.getId());
+				if (enterTime == null) {
+					return;
+				}
 				cost += getSocialCost(this.network.getLink(id), li.getAgentEnterTime(pers.getId()));
 			}
 			AgentMoneyEvent e = new AgentMoneyEvent(this.maxK * this.binSize,pers.getId(),cost/-600);
@@ -114,18 +179,19 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 			int kE = this.maxK;
 			for (int k = this.maxK; k >= this.minK; k--) {
 				Integer kInteger = IntegerCache.getInteger(k);
-				LinkTimeCostInfo ltc = li.getLinkTimeCostInfo(kInteger);
+				
 				
 				double tauAk = this.travelTimeCalculator.getLinkTravelTime(link, k*this.binSize);
 				double tauAFree = Math.ceil(link.getFreespeedTravelTime(k*this.binSize));
 				if (tauAk <= tauAFree) {
-					ltc.c2 = 0;
 					kE = k;
-				} else {
-					double last = li.getLinkTimeCostInfo(IntegerCache.getInteger(k+1)).c2;
-					double delay = li.getLinkTimeCostInfo(kInteger).linkDelay; 
-					ltc.c2 =  last + delay;  
-				}
+					continue;
+				} 
+				
+				LinkTimeCostInfo ltc = li.getLinkTimeCostInfo(kInteger);
+				double last = li.getLinkTimeCostInfo(IntegerCache.getInteger(k+1)).c2;
+				double delay = li.getLinkTimeCostInfo(kInteger).linkDelay; 
+				ltc.c2 =  last + delay;  
 				ltc.c1 = Math.max(0, (kE-k)*this.binSize - tauAFree);
 			}
 		}
@@ -136,7 +202,11 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 		for (int i = links.size()-1; i >= 0; i--) {
 			Id linkId = links.get(i);
 			LinkInfo li = this.linkInfos.get(linkId); //Direct access
-			double enterTime = li.getAgentEnterTime(agentId);
+			Double enterTime = li.getAgentEnterTime(agentId);
+			if (enterTime == null) {
+				return;
+			}
+			
 			Integer timeBin = getTimeBin(enterTime);
 			LinkTimeCostInfo ltc = li.getLinkTimeCostInfo(timeBin);
 			ltc.linkDelay += agentDelay;
@@ -147,10 +217,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 			
 			if (ltc2 != null && ltc2.out > 0){
 				agentDelay += ((double)ltc.in/this.binSize - (double)ltc.out/this.binSize) / ((double)ltc2.out/this.binSize);
-			} else { //DEBUG
-				int ii = 0;
-				ii++;
-			}
+			} 
 		}
 		AgentMoneyEvent e = new AgentMoneyEvent(this.maxK * this.binSize,agentId,agentDelay/-600);
 		QueueSimulation.getEvents().processEvent(e);
@@ -189,7 +256,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 	
 	private static class LinkInfo {
 		HashMap<Integer,LinkTimeCostInfo> linkTimeCosts = new HashMap<Integer, LinkTimeCostInfo>();
-		HashMap<Id,Double> agentEnterInfos = new HashMap<Id, Double>();
+		HashMap<Id,Double> agentEnterInfos = new HashMap<Id, Double>(500);
 		
 		public void incrementInFlow(Integer timeBin) {
 			LinkTimeCostInfo ltc = this.linkTimeCosts.get(timeBin);
@@ -221,8 +288,12 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 			this.agentEnterInfos.put(agentId, enterTime);
 		}
 		
-		public double getAgentEnterTime(Id agentId) {
+		public Double getAgentEnterTime(Id agentId) {
 			return this.agentEnterInfos.get(agentId);
+		}
+		
+		public void resetAgentEnterInfos() {
+			this.agentEnterInfos.clear();
 		}
 		
 		public LinkTimeCostInfo getLinkTimeCostInfo(Integer timeBin) {
@@ -237,6 +308,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 	}
 
 	private static class LinkTimeCostInfo {
+		public double cost;
 		double c2 = 0;
 		double c1 = 0;
 		double linkDelay = 0;

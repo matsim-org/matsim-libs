@@ -100,6 +100,8 @@ public class ShelterDoorBlockerSetup implements StartupListener{
 						
 		}
 		
+		
+		
 		scenario.setLaneDefinitions(bld);
 		scenario.setSignalSystems(bss);
 		scenario.setSignalSystemConfigurations(bssc);

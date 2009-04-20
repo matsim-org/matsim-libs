@@ -10,22 +10,28 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
+import org.matsim.core.trafficmonitoring.TravelTimeAggregatorFactory;
+import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
 
 import playground.gregor.sims.shelters.signalsystems.ShelterDoorBlockerSetup;
 import playground.gregor.sims.shelters.signalsystems.ShelterInputCounter;
+import playground.gregor.sims.socialcost.MarginalTravelCostCalculatorII;
+import playground.gregor.sims.socialcost.SocialCostCalculator;
+import playground.gregor.sims.socialcost.SocialCostCalculatorMultiLink;
 
 
 
-public class ShelterEvacuationController extends Controler {
+public class ShelterEvacuationControllerSCMultiKink extends Controler {
 
 	private List<Building> buildings = null;
 	private Set<Link> shelterLinks;
 	private HashMap<Id,Building> shelterLinkMapping;
 	private EvacuationShelterNetLoader esnl;
 	
-	final private static Logger log = Logger.getLogger(ShelterEvacuationController.class);
+	final private static Logger log = Logger.getLogger(ShelterEvacuationControllerSCMultiKink.class);
 
-	public ShelterEvacuationController(final String[] args) {
+	public ShelterEvacuationControllerSCMultiKink(final String[] args) {
 		super(args);
 		//TODO remove
 //		this.setOverwriteFiles(true);
@@ -47,6 +53,7 @@ public class ShelterEvacuationController extends Controler {
 		this.events.addHandler(sic);
 		this.addControlerListener(sic);
 		
+		
 //		//link penalty
 //		this.travelCostCalculator = new PenaltyLinkCostCalculator(this.travelTimeCalculator,sic);
 //		this.strategyManager = loadStrategyManager();
@@ -56,6 +63,16 @@ public class ShelterEvacuationController extends Controler {
 		this.addControlerListener(new ShelterDoorBlockerSetup());
 		this.getQueueSimulationListener().add(sic);
 		
+		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
+		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
+		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
+		SocialCostCalculator sc = new SocialCostCalculatorMultiLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), this.travelTimeCalculator, this.population);
+		
+		this.events.addHandler(sc);
+		this.getQueueSimulationListener().add(sc);
+		this.travelCostCalculator = new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc);
+		this.strategyManager = loadStrategyManager();
+		this.addControlerListener(sc);
 	}
 
 
@@ -83,7 +100,7 @@ public class ShelterEvacuationController extends Controler {
 		}
 		EvacuationPopulationLoader epl = new EvacuationPopulationLoader(this.buildings,this.network,this.shelterLinks,this.config);
 		Population pop = epl.getPopulation();
-//		this.esnl.generateShelterLinks();
+		this.esnl.generateShelterLinks();
 		return pop;
 	}
 	
@@ -92,7 +109,7 @@ public class ShelterEvacuationController extends Controler {
 	}
 
 	public static void main(final String[] args) {
-		final Controler controler = new ShelterEvacuationController(args);
+		final Controler controler = new ShelterEvacuationControllerSCMultiKink(args);
 		controler.run();
 		System.exit(0);
 	}

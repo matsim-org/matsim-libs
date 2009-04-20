@@ -27,17 +27,15 @@ public class ScalelableBackgroundDraw extends OTFGLDrawableImpl {
 	int[] viewport = new int[4];
 	
 	Texture back = null;
-	Texture sc2 = null;
-	Texture sc3 = null;
-	Texture current = null;
+	private Texture sc;
 	
 	private final String bg;
-	private final String sb3;
-//	private final String sb2;
+	private final String sb;
 
-	public ScalelableBackgroundDraw(String picturePath, String sb2, String sb3) {
+
+	public ScalelableBackgroundDraw(String picturePath, String sb) {
 		this.bg = picturePath;
-		this.sb3 = sb3;
+		this.sb = sb;
 		initTextRenderer();
 //		this.sb2 = sb2;
 	}
@@ -57,7 +55,7 @@ public class ScalelableBackgroundDraw extends OTFGLDrawableImpl {
 		if (this.back == null){
 			this.back = OTFOGLDrawer.createTexture(this.bg);
 //			this.sc2 = OTFOGLDrawer.createTexture(this.sb2);
-			this.sc3 = OTFOGLDrawer.createTexture(this.sb3);
+			this.sc = OTFOGLDrawer.createTexture(this.sb);
 		}
 		
 		updateMatrices(gl);
@@ -90,8 +88,8 @@ public class ScalelableBackgroundDraw extends OTFGLDrawableImpl {
 
 		
 
-		this.current.enable();
-		this.current.bind();
+		this.sc.enable();
+		this.sc.bind();
 		
 
 		
@@ -104,7 +102,7 @@ public class ScalelableBackgroundDraw extends OTFGLDrawableImpl {
 		gl.glTexCoord2f(tx2, ty2); gl.glVertex3f(fl[2], fl[3], z);
 		gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(fl[2], fl[1], z);
 		gl.glEnd();
-		this.current.disable();
+		this.sc.disable();
 		
 		Font font = new Font("SansSerif", Font.PLAIN, 32);
 		this.textRenderer = new TextRenderer(font, true, false);
@@ -154,7 +152,6 @@ public class ScalelableBackgroundDraw extends OTFGLDrawableImpl {
 //		float diff3 = (glWidth*.4f) - 3.f*modWidth3;
 		
 //		float diff2 = (glWidth*.4f) - 2.f*modWidth2;
-		this.current = this.sc3;
 		
 		float width;
 		if (diff30km < diff3km) {
