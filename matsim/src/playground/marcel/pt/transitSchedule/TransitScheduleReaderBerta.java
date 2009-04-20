@@ -33,6 +33,7 @@ import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
@@ -55,10 +56,15 @@ import playground.marcel.pt.router.TransitRouter;
 
 public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
-	// Linie
-//	private static final String LINIE = "Linie";
-	private static final String OEFFENTLICHE_LINIENNUMMER = "öffentlicheLiniennummer";
+	private final static Logger log = Logger.getLogger(TransitScheduleReaderBerta.class);
+	
 	private static final String LINIENFAHRPLAN = "Linienfahrplan";
+	private static final String BETRIEBSZWEIGNAME = "Betriebszweigname";
+	
+	// Linie
+	private static final String LINIE = "Linie";
+	private static final String INTERNE_LINIENNUMMER = "interneLiniennummer";
+	private static final String OEFFENTLICHE_LINIENNUMMER = "öffentlicheLiniennummer";
 
 	// Haltepunkt
 	private static final String HALTEPUNKT = "Haltepunkt";
@@ -91,6 +97,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	private final TransitSchedule schedule;
 	private final Facilities facilities;
 	private TransitLine currentTransitLine = null;
+	private BLinie tmpLinie = null;
 	private BHaltepunkt tmpHaltepunkt = null;
 	private BRoute tmpRoute = null;
 	private BRoutenpunkt tmpRoutenpunkt = null;
@@ -123,7 +130,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		File[] files = directory.listFiles();
 		for (File file : files) {
 			if (file.getName().endsWith(".xml")) {
-				System.out.println("Parsing file: " + file.getAbsolutePath());
+				log.info("Parsing file: " + file.getAbsolutePath());
 				readFile(file);
 			}
 		}
@@ -143,6 +150,8 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 			this.tmpFahrzeitprofilpunkt = new BFahrzeitprofilpunkt();
 		} else if (FAHRT.equals(name)) {
 			this.tmpFahrt = new BFahrt();
+		} else if (LINIENFAHRPLAN.equals(name)) {
+			this.tmpLinie = new BLinie();
 		}
 	}
 
@@ -178,9 +187,18 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		} else if (FAHRGASTWECHSEL.equals(name)) {
 			this.tmpRoutenpunkt.realStop = !("N".equals(content));
 		} else if (OEFFENTLICHE_LINIENNUMMER.equals(name)) {
-			this.currentTransitLine = new TransitLine(new IdImpl(content));
+			this.tmpLinie.publicId = content;
+		} else if (INTERNE_LINIENNUMMER.equals(name)) {
+			this.tmpLinie.id = content;
+		} else if (BETRIEBSZWEIGNAME.equals(name)) {
+			this.tmpLinie.betriebszweig = content;
+		} else if (LINIE.equals(name)) {
+			this.currentTransitLine = new TransitLine(new IdImpl(this.tmpLinie.betriebszweig + " " + this.tmpLinie.id));
+			this.tmpLinie = null;
 		} else if (LINIENFAHRPLAN.equals(name)) {
-			this.schedule.addTransitLine(this.currentTransitLine);
+			if (this.currentTransitLine.getRoutes().size() > 0) {
+				this.schedule.addTransitLine(this.currentTransitLine);
+			}
 			this.currentTransitLine = null;
 			this.departureCounter = 0;
 		} else if (FAHRZEITPROFIL.equals(name)) {
@@ -251,6 +269,12 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		return facility;
 	}
 
+	protected static class BLinie {
+		/*package*/ String id = null;
+		/*package*/ String publicId = null;
+		/*package*/ String betriebszweig = null;
+	}
+	
 	protected static class BHaltepunkt {
 		/*package*/ Id id = null;
 		/*package*/ double x = 0;
@@ -298,9 +322,12 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 //		reader.readFile("../thesis-data/examples/berta/Bus145.xml");
 		reader.readDirectory("../thesis-data/examples/berta/sample/");
 
-		new TransitScheduleWriterV1(schedule).write("../thesis-data/examples/berta/converted.xml");
+		log.info("writing schedule.xml");
+		new TransitScheduleWriterV1(schedule).write("../thesis-data/examples/berta/schedule.xml");
+		log.info("writing facilities.xml");
 		new FacilitiesWriter(facilities, "../thesis-data/examples/berta/facilities.xml").write();
 
+		log.info("creating routing network.xml");
 		new TransitRouter(schedule); // writes out "wrappedNetwork.xml" for debugging
 	}
 
