@@ -65,9 +65,11 @@ public abstract class Scenario {
 
 //	private static final String output_directory="D:/eclipse_workspace/matsim/output/EventsInt5_10/timecorr/";
 //	private static final String input_directory="D:/eclipse_workspace/matsim/output/EventsInt5_10/";
-	private static final String thisrun = "52_HC";
-	private static final String output_directory="D:/SocialNetsFolder/Battery/"+thisrun+"/timecorr/";//AnalyzeTimeCorrelation
-	private static final String input_directory="D:/SocialNetsFolder/Battery/"+thisrun+"/";//AnalyzeTimeCorrelation
+	private static final String thisrun = "3_HC_4";
+//	private static final String output_directory="D:/SocialNetsFolder/SNController4/"+thisrun+"/timecorr/";//AnalyzeTimeCorrelation
+//	private static final String input_directory="D:/SocialNetsFolder/SNController4/"+thisrun+"/";//AnalyzeTimeCorrelation
+	private static final String output_directory="/data/matsim/jhackney/results/matsim/SNController4/"+thisrun+"/timecorr/";//AnalyzeTimeCorrelation
+	private static final String input_directory="/data/matsim/jhackney/results/matsim/SNController4/"+thisrun+"/";//AnalyzeTimeCorrelation
 	private static final String out2 = thisrun+".out";
 	private static final String out1 = "AgentsAtActivities"+thisrun+".out";
 
