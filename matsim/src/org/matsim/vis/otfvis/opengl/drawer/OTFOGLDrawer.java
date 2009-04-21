@@ -223,11 +223,12 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 
 
 		//push 1:1 screen matrix
-		gl.glPushMatrix();
 		gl.glMatrixMode( GL.GL_PROJECTION);
+		gl.glPushMatrix();
 		gl.glLoadIdentity();
 		//glu.gluOrtho2D( 0.0, width, 0.0, height);
 		gl.glMatrixMode( GL.GL_MODELVIEW);
+		gl.glPushMatrix();
 		gl.glLoadIdentity();
 		//gl.glViewport( 0, 0, 1, 1);
 		//drawQuad
@@ -249,6 +250,10 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 		if(!this.opaque) {
 			this.gl.glDisable(GL.GL_BLEND);
 		}
+		//glu.gluOrtho2D( 0.0, width, 0.0, height);
+		gl.glMatrixMode( GL.GL_MODELVIEW);
+		gl.glPopMatrix();
+		gl.glMatrixMode( GL.GL_PROJECTION);
 		gl.glPopMatrix();
 	}
 
@@ -797,7 +802,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	private void storeZoom(boolean withName, String name) {
 		Point3f zoomstore = mouseMan.getView();
-		current = null;
 
 		if(withName) {
 
@@ -814,7 +818,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 				d.setVisible(true);
 				name = field.getText();
 		}
-		redraw();
+		canvas.repaint();
+		
 		BufferedImage image = ImageUtil.createThumbnail(current, 300);
 		config.addZoom(new ZoomEntry(image,zoomstore, name));
 
@@ -835,6 +840,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	public void handleClick(final Point2D.Double point, int mouseButton, MouseEvent e) {
 		if(mouseButton == 4 ){
+			current = null;
+
 			JPopupMenu popmen = new JPopupMenu(); 
 			JMenuItem menu1 = new JMenuItem( "Zoom"); 
 			menu1.setBackground(Color.lightGray);
@@ -974,6 +981,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		return this.mouseMan.getView();
 	}
 
+	public Rect getViewBounds() {
+		return this.mouseMan.getBounds();
+	}
+
 	public void setView(Point3f point) {
 		this.mouseMan.setToNewPos(point);
 		redraw();
@@ -1008,6 +1019,14 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		} catch (IOException e) {
 			log.error("Error loading Texture from stream", e);
 		}
+		return t;
+	}
+
+	static public Texture createTexture(final BufferedImage data) {
+		Texture t = null;
+		t = TextureIO.newTexture(data, true);
+		t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		return t;
 	}
 
