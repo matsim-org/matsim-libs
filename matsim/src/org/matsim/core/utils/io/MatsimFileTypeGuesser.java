@@ -177,7 +177,7 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 				this.exception  = new XMLTypeDetectionException(publicId, systemId);
 				this.detectedFirstEntity = true;
 			}
-			return null;
+			throw this.exception;
 		}
 
 		@Override
