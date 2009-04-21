@@ -20,7 +20,8 @@
 
 package playground.wrashid.deqsim;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -39,8 +40,10 @@ public class PDESStarter3 {
 		Config config = Gbl.createConfig(args);
 		
 		// prepare data
-		ScenarioImpl data = new ScenarioImpl(config);
-		NetworkLayer network = data.getNetwork();
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadPopulation();
+		Scenario data = loader.getScenario();
+		NetworkLayer network = (NetworkLayer) data.getNetwork();
 		Population population = data.getPopulation();
 		Events events = new Events();
 		

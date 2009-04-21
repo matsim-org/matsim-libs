@@ -20,6 +20,7 @@
 
 package org.matsim.signalsystems;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -45,15 +46,21 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		conf.network().setLaneDefinitionsFile(laneDefinitions);
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
-		ScenarioImpl data = new ScenarioImpl(conf);
 
+		conf.scenario().setUseLanes(true);
+		conf.scenario().setUseSignalSystems(true);
+		ScenarioImpl data = new ScenarioImpl(conf);
+		ScenarioLoader loader = new ScenarioLoader(data);
+		loader.loadScenario();
+		
+		
 		Events events = new Events();
 		String tempout = this.getOutputDirectory() + "events.txt.gz";
 		EventWriterTXT eWriter = new EventWriterTXT(tempout);
 		events.addHandler(eWriter);
 		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
 		sim.setLaneDefinitions(data.getLaneDefinitions());
-		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemsConfiguration());
+		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemConfigurations());
 		sim.run();
 		eWriter.closeFile();
 		assertEquals("different events files", CRCChecksum.getCRCFromFile(this.getInputDirectory() + "events.txt.gz"), CRCChecksum.getCRCFromFile(tempout));
@@ -71,14 +78,19 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 		conf.plans().setInputFile(this.getClassInputDirectory() + "plans_uturn.xml.gz");
+		conf.scenario().setUseLanes(true);
+		conf.scenario().setUseSignalSystems(true);
 		ScenarioImpl data = new ScenarioImpl(conf);
+		ScenarioLoader loader = new ScenarioLoader(data);
+		loader.loadScenario();
+
 		Events events = new Events();
 		String tempout = this.getOutputDirectory() + "events.txt";
 		EventWriterTXT eWriter = new EventWriterTXT(tempout);
 		events.addHandler(eWriter);
 		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
 		sim.setLaneDefinitions(data.getLaneDefinitions());
-		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemsConfiguration());
+		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemConfigurations());
 		sim.run();
 		eWriter.closeFile();
 		assertEquals("different events files", CRCChecksum.getCRCFromFile(this.getClassInputDirectory() + "reference_uturn.txt"), CRCChecksum.getCRCFromFile(tempout));

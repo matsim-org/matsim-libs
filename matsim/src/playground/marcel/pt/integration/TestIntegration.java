@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.config.Config;
@@ -42,12 +43,15 @@ public class TestIntegration {
 
 	public static void main(final String[] args) {
 		final Config config = Gbl.createConfig(new String[] {"test/input/playground/marcel/pt/config.xml"});
-		final ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioLoader loader = new ScenarioLoader(scenario);
+		loader.loadScenario();	
+
 		final TransitSchedule schedule = new TransitSchedule();
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
-		NetworkLayer network = scenario.getNetwork();
+		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
 		Facilities facilities = scenario.getFacilities();
 //		FacilityNetworkMatching.loadMapping(facilities, network, scenario.getWorld(), "../thesis-data/examples/minibln/facilityMatching.txt");
 //		System.out.println(network.getLinks().size());
@@ -55,8 +59,7 @@ public class TestIntegration {
 		
 		try {
 			new TransitScheduleReaderV1(schedule, network, facilities).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
-		
-			final TransitQueueSimulation sim = new TransitQueueSimulation(scenario.getNetwork(), scenario.getPopulation(), events);
+			final TransitQueueSimulation sim = new TransitQueueSimulation((NetworkLayer) scenario.getNetwork(), scenario.getPopulation(), events);
 			sim.setTransitSchedule(schedule);
 			sim.run();
 			OTFVis.playMVI(new String[] {"./otfvis.mvi"});

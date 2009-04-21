@@ -150,7 +150,9 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 				this.fileType = FileType.SignalSystemConfigs;
 			}	else if ("laneDefinitions".equals(e.rootTag)){
 				this.fileType = FileType.LaneDefinitions;
-			}	else {
+			}	else if ("counts".equals(e.rootTag)){
+				this.fileType = FileType.Counts;
+			} else {
 				log.warn("got unexpected rootTag: " + e.rootTag);
 			}
 			log.debug("Detected root tag: " +  e.rootTag);
@@ -177,7 +179,10 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 				this.exception  = new XMLTypeDetectionException(publicId, systemId);
 				this.detectedFirstEntity = true;
 			}
-			throw this.exception;
+			if (systemId.endsWith(".dtd")){
+				throw this.exception;
+			}
+			return null;
 		}
 
 		@Override

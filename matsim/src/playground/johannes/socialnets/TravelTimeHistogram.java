@@ -36,7 +36,8 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
@@ -79,9 +80,11 @@ public class TravelTimeHistogram {
 //		NetworkLayer network = new NetworkLayer();
 //		new MatsimNetworkReader(network).readFile(networkfile);
 		Config config = Gbl.createConfig(new String[]{configfile});
-		ScenarioImpl data = new ScenarioImpl(config);
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadPopulation();
+		Scenario data = loader.getScenario();
 		Population population = data.getPopulation();
-		NetworkLayer network = data.getNetwork();
+		NetworkLayer network = (NetworkLayer) data.getNetwork();
 		/*
 		 * Make grid...
 		 */
@@ -109,8 +112,8 @@ public class TravelTimeHistogram {
 				ego.id = tokens[0];
 				Coord coord = new CoordImpl(Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
 				ego.homeloc = transform.transform(coord);
-				if(ego.homeloc.getX() >= minX && ego.homeloc.getX() <= maxX &&
-						ego.homeloc.getY() >= minY && ego.homeloc.getY() <= maxY)
+				if((ego.homeloc.getX() >= minX) && (ego.homeloc.getX() <= maxX) &&
+						(ego.homeloc.getY() >= minY) && (ego.homeloc.getY() <= maxY))
 					egos.put(ego.id, ego);
 			}
 		} catch (IOException e) {
@@ -137,8 +140,8 @@ public class TravelTimeHistogram {
 					writer3.write("\t");
 					writer3.write(String.valueOf(coord.getY() + Math.random()*100 - 50));
 					writer3.newLine();
-					if(coord.getX() >= minX && coord.getX() <= maxX &&
-							coord.getY() >= minY && coord.getY() <= maxY)
+					if((coord.getX() >= minX) && (coord.getX() <= maxX) &&
+							(coord.getY() >= minY) && (coord.getY() <= maxY))
 						ego.alters.add(coord);
 				}
 			}

@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
@@ -149,7 +150,9 @@ public class DaganzoScenarioGenerator {
 		config.network().setInputFile(NETWORKFILE);
 		//create a scenario instance (we have to work on the implemenation not on the interface
 		//because some methods are not standardized yet)
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadNetwork();
+		ScenarioImpl scenario = (ScenarioImpl) loader.getScenario();
 		//create some ids as members of the class for convenience reasons
 		createIds(scenario);
 		//create the plans and write them
@@ -310,7 +313,7 @@ public class DaganzoScenarioGenerator {
 
 	private BasicSignalSystemConfigurations createSignalSystemsConfig(
 			ScenarioImpl scenario) {
-		BasicSignalSystemConfigurations configs = scenario.getSignalSystemsConfiguration();
+		BasicSignalSystemConfigurations configs = scenario.getSignalSystemConfigurations();
 		BasicSignalSystemConfigurationsBuilder builder = configs.getBuilder();
 		
 		BasicSignalSystemConfiguration systemConfig = builder.createSignalSystemConfiguration(id1);

@@ -21,6 +21,7 @@ package org.matsim.signalsystems;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.network.BasicLaneDefinitions;
 import org.matsim.core.basic.signalsystems.BasicSignalSystems;
@@ -36,6 +37,7 @@ import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -79,7 +81,12 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 		conf.plans().setInputFile(plansFile);
+		conf.scenario().setUseLanes(true);
+		conf.scenario().setUseSignalSystems(true);
 		ScenarioImpl data = new ScenarioImpl(conf);
+		ScenarioLoader loader = new ScenarioLoader(data);
+		loader.loadScenario();
+		
 		BasicLaneDefinitions lanedefs = data.getLaneDefinitions();
 		BasicSignalSystems signalSystems = data.getSignalSystems();
 
@@ -100,14 +107,14 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 			group.setDropping(60);
 		}
 
-		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data
+		QueueSimulation sim = new QueueSimulation((NetworkLayer) data.getNetwork(), data
 				.getPopulation(), events);
 		sim.setLaneDefinitions(lanedefs);
 		sim.setSignalSystems(signalSystems, lssConfigs);
 		sim.run();
 		
 		
-		sim = new QueueSimulation(data.getNetwork(), data
+		sim = new QueueSimulation((NetworkLayer) data.getNetwork(), data
 				.getPopulation(), events);
 		sim.run();
 		

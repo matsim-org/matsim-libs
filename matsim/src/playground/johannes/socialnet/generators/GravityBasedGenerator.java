@@ -33,7 +33,8 @@ import java.util.Locale;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
@@ -77,7 +78,9 @@ public class GravityBasedGenerator {
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		Config config = Gbl.createConfig(new String[]{args[0]});
-		ScenarioImpl data = new ScenarioImpl(config);
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadPopulation();
+		Scenario data = loader.getScenario();
 		Population population = data.getPopulation();
 		
 		String outputDir = config.getParam(MODULE_NAME, "output");
@@ -210,6 +213,7 @@ public class GravityBasedGenerator {
 			this.sampleInterval = sampleInterval;
 		}
 
+		@Override
 		public String toString() {
 			return String.format("var(m)=%1$.4f, var(<k>)=%2$.4f, var(<c_local>)=%3$s.4f, var(<d>)=%4$.4f",
 					StatUtils.variance(edges.toNativeArray()),

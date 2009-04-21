@@ -26,7 +26,8 @@ package playground.johannes.socialnet.generators;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
@@ -68,7 +69,9 @@ public class GravityBasedAnnealer {
 	 */
 	public static void main(String[] args) throws IOException {
 		Config config = Gbl.createConfig(new String[]{args[0]});
-		ScenarioImpl data = new ScenarioImpl(config);
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadPopulation();
+		Scenario data = loader.getScenario();
 		Population population = data.getPopulation();
 		
 		String outputDir = config.getParam(MODULE_NAME, "output");

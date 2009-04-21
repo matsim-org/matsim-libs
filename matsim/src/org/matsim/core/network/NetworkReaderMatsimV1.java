@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -49,11 +50,11 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	private final static String NODE = "node";
 	private final static String LINK = "link";
 
-	private final NetworkLayer network;
+	private final Network network;
 
 	private final static Logger log = Logger.getLogger(NetworkReaderMatsimV1.class);
 
-	public NetworkReaderMatsimV1(final NetworkLayer network) {
+	public NetworkReaderMatsimV1(final Network network) {
 		super();
 		this.network = network;
 	}
@@ -97,7 +98,12 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startNetwork(final Attributes atts) {
-		this.network.setName(atts.getValue("name"));
+		if (network instanceof NetworkLayer){
+			((NetworkLayer) this.network).setName(atts.getValue("name"));
+		}
+		else {
+			log.warn("used instance of Network doesn't support names, ignoring attribute.");
+		}
 		if (atts.getValue("type") != null) {
 			log.info("Attribute 'type' is deprecated. There's always only ONE network, where the links and nodes define, which transportation mode is allowed to use it (for the future)");
 		}
@@ -137,7 +143,8 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startNode(final Attributes atts) {
-		Node node = this.network.createNode( new IdImpl(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
+		//TODO dg refactor network to support factory and remove cast
+		Node node = ((NetworkLayer)this.network).createNode( new IdImpl(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
 		node.setType(atts.getValue("type"));
 		if (atts.getValue("origid") != null) {
 			node.setOrigId(atts.getValue("origid"));
@@ -145,14 +152,15 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startLink(final Attributes atts) {
-		Link l = this.network.createLink(new IdImpl(atts.getValue("id")), this.network.getNode(atts.getValue("from")), this.network.getNode(atts.getValue("to")),
+		//TODO dg refactor network to support factory/builder and remove cast
+		Link l = ((NetworkLayer)this.network).createLink(new IdImpl(atts.getValue("id")), this.network.getNode(new IdImpl(atts.getValue("from"))), this.network.getNode(new IdImpl(atts.getValue("to"))),
 				Double.parseDouble(atts.getValue("length")), Double.parseDouble(atts.getValue("freespeed")), Double.parseDouble(atts.getValue("capacity")),
 				Double.parseDouble(atts.getValue("permlanes")));
 		l.setOrigId(atts.getValue("origid"));
 		l.setType(atts.getValue("type"));
 		if (atts.getValue("modes") != null) {
 			String[] strModes = StringUtils.explode(atts.getValue("modes"), ',');
-			if (strModes.length == 1 && strModes[0].equals("")) {
+			if ((strModes.length == 1) && strModes[0].equals("")) {
 				l.setAllowedModes(new TransportMode[] {});
 			} else {
 				TransportMode[] modes = new TransportMode[strModes.length];

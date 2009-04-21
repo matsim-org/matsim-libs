@@ -14,7 +14,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -50,14 +50,14 @@ ActStartEventHandler
 {
 	private static final Logger log = Logger.getLogger(MyModule.class);
 	
-	ScenarioImpl sc ;
+	Scenario sc ;
 	NetworkLayer net ;
 	Population pop ;
 	
 	public MyModule(Controler controler) {
 		
 		sc = controler.getScenarioData() ; // TODO in controler
-		net = sc.getNetwork() ;
+		net = (NetworkLayer) sc.getNetwork() ;
 		pop = sc.getPopulation() ;
 		
 	}

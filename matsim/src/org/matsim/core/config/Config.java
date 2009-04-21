@@ -40,6 +40,7 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.RoadPricingConfigGroup;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.SocNetConfigGroup;
@@ -85,6 +86,7 @@ public class Config {
 	private SocNetConfigGroup socnetmodule = null;
 	private LocationChoiceConfigGroup locationchoice = null;
 	private SignalSystemsConfigGroup signalSystemConfigGroup = null;
+	private ScenarioConfigGroup scenarioConfigGroup = null;
 
 	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup;
 
@@ -170,6 +172,8 @@ public class Config {
 		this.travelTimeCalculatorConfigGroup = new TravelTimeCalculatorConfigGroup();
 		this.modules.put(TravelTimeCalculatorConfigGroup.GROUPNAME, this.travelTimeCalculatorConfigGroup);
 		
+		this.scenarioConfigGroup = new ScenarioConfigGroup();
+		this.modules.put(ScenarioConfigGroup.GROUP_NAME, this.scenarioConfigGroup);
 	}
 
 	/** Checks each module for consistency, e.g. if the parameters that are currently set make sense
@@ -421,6 +425,10 @@ public class Config {
 	
 	public TravelTimeCalculatorConfigGroup travelTimeCalculator(){
 		return this.travelTimeCalculatorConfigGroup;
+	}
+	
+	public ScenarioConfigGroup scenario(){
+		return this.scenarioConfigGroup;
 	}
 
 	public void addConfigConsistencyChecker(

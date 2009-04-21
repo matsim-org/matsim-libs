@@ -25,6 +25,9 @@ import java.util.Collection;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicRoute;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -33,7 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.CompressedNetworkRoute;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -60,7 +63,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		}
 		config.controler().setLastIteration(1);
 
-		// test the default
+//		 test the default
 		config.controler().setOutputDirectory(getOutputDirectory() + "/default");
 		Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
@@ -81,7 +84,12 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		// test another setting
 		Gbl.reset();
 		config.controler().setOutputDirectory(getOutputDirectory() + "/variant1");
-		Controler controler2 = new TestControler(config);
+		Scenario scenario = new ScenarioImpl(config);
+		((NetworkLayer)scenario.getNetwork()).getFactory().setRouteFactory(TransportMode.car, new CompressedNetworkRouteFactory(scenario.getNetwork()));
+		ScenarioLoader loader = new ScenarioLoader(scenario);
+		loader.loadScenario();
+		
+		Controler controler2 = new Controler(scenario);
 		controler2.setCreateGraphs(false);
 		controler2.setWriteEventsInterval(0);
 		controler2.run();
@@ -99,19 +107,6 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 			}
 		}
 
-	}
-
-	private final static class TestControler extends Controler {
-		/*package*/ TestControler(final Config config) {
-			super(config);
-		}
-
-		@Override
-		protected Population loadPopulation() {
-			NetworkFactory factory = getNetworkFactory();
-			factory.setRouteFactory(TransportMode.car, new CompressedNetworkRouteFactory(getNetwork()));
-			return super.loadPopulation();
-		}
-	}
+	}	
 
 }

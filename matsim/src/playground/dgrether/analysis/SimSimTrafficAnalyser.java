@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.gbl.Gbl;
@@ -58,8 +59,14 @@ public class SimSimTrafficAnalyser {
 
 	
 	private void loadData(String networkFile, String linkAttributes1, String linkAttributes2) {
-		ScenarioImpl scenario = new ScenarioImpl(null, networkFile, null, null);	
-		network = scenario.getNetwork();
+		
+		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().addCoreModules();
+		scenario.getConfig().network().setInputFile(networkFile);
+		ScenarioLoader loader = new ScenarioLoader(scenario);
+		loader.loadNetwork();
+		
+		network = (NetworkLayer) scenario.getNetwork();
 		
 		this.linkStats = new CalcLinkStats(this.network);
 		this.linkStats.readFile(linkAttributes1);

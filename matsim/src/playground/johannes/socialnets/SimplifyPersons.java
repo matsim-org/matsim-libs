@@ -27,7 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -47,8 +48,10 @@ public class SimplifyPersons {
 	public static void main(String[] args) {
 		Config config = Gbl.createConfig(new String[]{args[0]});
 		
-		ScenarioImpl data = new ScenarioImpl(config);
-
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadPopulation();
+		Scenario data = loader.getScenario();
+		
 		double centerX = 683000;
 		double centerY = 247000;
 		double radius = Double.parseDouble(args[2]);
@@ -70,7 +73,7 @@ public class SimplifyPersons {
 				selected.getPlanElements().remove(i);
 			}
 			Coord c = p.getPlans().get(0).getFirstActivity().getCoord();
-			if(!(c.getX() >= minX && c.getX() <= maxX && c.getY() >= minY && c.getY() <= maxY))
+			if(!((c.getX() >= minX) && (c.getX() <= maxX) && (c.getY() >= minY) && (c.getY() <= maxY)))
 				remove.add(p);
 		}
 		

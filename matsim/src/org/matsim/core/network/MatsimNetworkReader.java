@@ -26,6 +26,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -40,7 +41,7 @@ public class MatsimNetworkReader extends MatsimXmlParser {
 
 	private final static String NETWORK_V1 = "network_v1.dtd";
 
-	private final NetworkLayer network;
+	private final Network network;
 	private MatsimXmlParser delegate = null;
 
 	/**
@@ -48,7 +49,7 @@ public class MatsimNetworkReader extends MatsimXmlParser {
 	 *
 	 * @param network The NetworkLayer-object to store the configuration settings in.
 	 */
-	public MatsimNetworkReader(final NetworkLayer network) {
+	public MatsimNetworkReader(final Network network) {
 		this.network = network;
 	}
 

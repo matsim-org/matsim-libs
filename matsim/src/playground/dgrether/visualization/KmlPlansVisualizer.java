@@ -31,9 +31,14 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
@@ -42,7 +47,6 @@ import org.matsim.population.filters.SelectedPlanFilter;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 
-import playground.dgrether.analysis.ScenarioLoader;
 import playground.dgrether.matsimkml.KmlPlansWriter;
 
 
@@ -66,10 +70,15 @@ public class KmlPlansVisualizer {
 
 	private List<Tuple<String, String>> linkTuples;
 
-	private ScenarioLoader scenario;
+	private ScenarioImpl scenario;
+
 
 	public KmlPlansVisualizer(final String config, final List<Tuple<String, String>> linkTuples) {
-		this.scenario = new ScenarioLoader(config);
+		Config conf = new Config();
+		MatsimConfigReader reader = new MatsimConfigReader(conf);
+		reader.readFile(config);
+		scenario = new ScenarioImpl(conf);
+		new ScenarioLoader(conf).loadScenario();
 		this.linkTuples = linkTuples;
 	}
 
@@ -95,12 +104,11 @@ public class KmlPlansVisualizer {
 			if (i > max)
 				break;
 		}
-		this.scenario.setPlans(null);
 		try {
 			// add the matsim logo to the kml
 			ScreenOverlayType logo = MatsimKMLLogo.writeMatsimKMLLogo(writer);
 			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(logo));
-			KmlPlansWriter plansWriter = new KmlPlansWriter(this.scenario.getNetwork(),
+			KmlPlansWriter plansWriter = new KmlPlansWriter((NetworkLayer) this.scenario.getNetwork(),
 					TransformationFactory.getCoordinateTransformation(Gbl.getConfig().global().getCoordinateSystem(), TransformationFactory.WGS84), this.writer, this.mainDoc);
 			FolderType plansFolder = plansWriter.getPlansFolder(planSet);
 			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(plansFolder));
@@ -123,7 +131,7 @@ public class KmlPlansVisualizer {
 		}
 
 		SelectedPlanFilter selectedPlanFilter = new SelectedPlanFilter(linkFilter);
-		selectedPlanFilter.run(this.scenario.getPlans());
+		selectedPlanFilter.run(this.scenario.getPopulation());
 		return collector.getPlans();
 	}
 

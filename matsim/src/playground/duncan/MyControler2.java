@@ -32,7 +32,9 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -142,18 +144,20 @@ public class MyControler2 {
 		} else {
 			Gbl.createConfig(args) ;
 		}
-		ScenarioImpl scenarioData = new ScenarioImpl( Gbl.getConfig() ) ;
+		ScenarioLoader loader = new ScenarioLoader(Gbl.getConfig());
+		loader.loadNetwork();
+		Scenario scenarioData = loader.getScenario();
 
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.
-		NetworkLayer network = scenarioData.getNetwork() ;
+		Network network = scenarioData.getNetwork() ;
 		log.info("") ; 	log.info("cleaning network ...");
 		NetworkCleaner nwCleaner = new NetworkCleaner() ;
 		nwCleaner.run( network ) ;
 		log.info("... finished cleaning network.") ; log.info("") ;
 
 		// start the control(l)er with the network and plans as defined above
-		Controler controler = new Controler(Gbl.getConfig(),network,plans) ;
+		Controler controler = new Controler(Gbl.getConfig(),(NetworkLayer)network,plans) ;
 
 		// this means existing files will be over-written.  Be careful!
 		controler.setOverwriteFiles(true);

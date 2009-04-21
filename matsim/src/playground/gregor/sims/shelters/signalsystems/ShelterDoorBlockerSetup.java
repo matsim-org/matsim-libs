@@ -9,19 +9,15 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.network.BasicLane;
 import org.matsim.core.basic.network.BasicLaneDefinitions;
 import org.matsim.core.basic.network.BasicLaneDefinitionsBuilder;
-import org.matsim.core.basic.network.BasicLaneDefinitionsBuilderImpl;
-import org.matsim.core.basic.network.BasicLaneDefinitionsImpl;
 import org.matsim.core.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.core.basic.signalsystems.BasicSignalSystems;
 import org.matsim.core.basic.signalsystems.BasicSignalSystemsBuilder;
-import org.matsim.core.basic.signalsystems.BasicSignalSystemsImpl;
 import org.matsim.core.basic.signalsystemsconfig.BasicAdaptiveSignalSystemControlInfo;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurationsBuilder;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -40,17 +36,18 @@ public class ShelterDoorBlockerSetup implements StartupListener{
 		}
 		ShelterEvacuationController c = (ShelterEvacuationController) event.getControler();
 		
-		ScenarioImpl scenario = c.getScenarioData();
+		ScenarioImpl scenario = (ScenarioImpl)c.getScenarioData();
 		
 		List<Link> doorBlockerLinks = getDoorBlockerLinks(c.getNetwork());
-		BasicSignalSystemConfigurations bssc = new BasicSignalSystemConfigurationsImpl();
-		BasicSignalSystems bss = new BasicSignalSystemsImpl();
-		BasicLaneDefinitionsBuilder bldb = new BasicLaneDefinitionsBuilderImpl();
+		BasicSignalSystemConfigurations bssc = scenario.getSignalSystemConfigurations();
+		BasicSignalSystems bss = scenario.getSignalSystems();
+		BasicLaneDefinitions bld = scenario.getLaneDefinitions();
+
+		BasicLaneDefinitionsBuilder bldb = bld.getLaneDefinitionBuilder();
 		BasicSignalSystemsBuilder bssb = bss.getSignalSystemsBuilder();
 		BasicSignalSystemConfigurationsBuilder sscb = bssc.getBuilder();
 		
 		
-		BasicLaneDefinitions bld = new BasicLaneDefinitionsImpl();
 		
 		
 		
@@ -100,12 +97,10 @@ public class ShelterDoorBlockerSetup implements StartupListener{
 						
 		}
 		
-		
-		
-		scenario.setLaneDefinitions(bld);
-		scenario.setSignalSystems(bss);
-		scenario.setSignalSystemConfigurations(bssc);
-		
+//		scenario.setLaneDefinitions(bld);
+//		scenario.setSignalSystems(bss);
+//		scenario.setSignalSystemConfigurations(bssc);
+//		
 		new SignalSystemConfigurationsWriter11(bssc).writeFile("sigSysConf.xml");
 		new SignalSystemsWriter11(bss).writeFile("sigSys.xml");
 		

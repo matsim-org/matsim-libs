@@ -27,7 +27,8 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
@@ -71,9 +72,12 @@ public class ScenarioCut {
 	public static void run() {
 		
 		System.out.println("read scenario data... " + (new Date()));
-		ScenarioImpl sd = new ScenarioImpl(Gbl.getConfig());
+		ScenarioLoader loader = new ScenarioLoader(Gbl.getConfig());
+		loader.loadPopulation();
+		Scenario sd = loader.getScenario();
+//		ScenarioImpl sd = new ScenarioImpl(Gbl.getConfig());
 		Facilities facilities = sd.getFacilities();
-		NetworkLayer network = sd.getNetwork();
+		NetworkLayer network = (NetworkLayer) sd.getNetwork();
 		Population population = sd.getPopulation();
 		System.out.println("done. " + (new Date()));
 		

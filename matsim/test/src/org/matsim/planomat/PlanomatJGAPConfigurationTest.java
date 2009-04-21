@@ -26,7 +26,8 @@ import org.jgap.BaseGeneticOperator;
 import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.WeightedRouletteSelector;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
@@ -36,14 +37,16 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 
-	private ScenarioImpl scenario;
+	private Scenario scenario;
 	
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		Config config = super.loadConfig(this.getInputDirectory() + "config.xml");
 		config.plans().setInputFile(getPackageInputDirectory() + "testPlans.xml");
-		this.scenario = new ScenarioImpl(config);
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadScenario();
+		this.scenario = loader.getScenario();
 	}
 
 	public void testPlanomatJGAPConfiguration() {

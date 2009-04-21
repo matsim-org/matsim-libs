@@ -58,7 +58,7 @@ public class NetworkLayer extends Layer implements Network {
 
 	private final static Logger log = Logger.getLogger(NetworkLayer.class);
 
-	private final NetworkFactory factory;
+	private NetworkFactory factory;
 
 	private Collection<NetworkChangeEvent> networkChangeEvents = null;
 
@@ -545,6 +545,10 @@ public class NetworkLayer extends Layer implements Network {
 
 	public Link getLink(final Id linkId) {
 		return (Link) this.locations.get(linkId);
+	}
+
+	public void setFactory(NetworkFactory networkFactory) {
+		this.factory = networkFactory;
 	}
 
 }

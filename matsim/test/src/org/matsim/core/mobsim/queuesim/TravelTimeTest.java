@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -55,6 +56,9 @@ public class TravelTimeTest extends MatsimTestCase implements
 		conf.plans().setInputFile(popFileName);
 
 		ScenarioImpl data = new ScenarioImpl(conf);
+		ScenarioLoader loader = new ScenarioLoader(data);
+		loader.loadScenario();
+		
 		Events events = new Events();
 		events.addHandler(this);
 
@@ -75,8 +79,11 @@ public class TravelTimeTest extends MatsimTestCase implements
 		String popFileName = "test/scenarios/equil/plans2.xml";
 
 		conf.plans().setInputFile(popFileName);
-
+		
 		ScenarioImpl data = new ScenarioImpl(conf);
+		ScenarioLoader loader = new ScenarioLoader(data);
+		loader.loadScenario();
+		
 		Events events = new Events();
 		events.addHandler(this);
 

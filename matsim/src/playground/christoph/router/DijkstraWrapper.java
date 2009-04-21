@@ -21,10 +21,10 @@
 package playground.christoph.router;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -135,11 +135,12 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 		return dijkstra;
 	}
 	
+	@Override
 	public DijkstraWrapper clone()
 	{
 		TravelCost costFunctionClone;
 		TravelTime timeFunctionClone;
-		NetworkLayer networkClone = this.queueNetwork.getNetworkLayer();
+		Network networkClone = this.queueNetwork.getNetworkLayer();
 		
 		if(this.costFunction instanceof KnowledgeTravelCost)
 		{

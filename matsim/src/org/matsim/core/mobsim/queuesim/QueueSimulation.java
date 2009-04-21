@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -95,7 +96,7 @@ public class QueueSimulation {
 	private final Config config;
 	protected final Population plans;
 	protected QueueNetwork network;
-	protected NetworkLayer networkLayer;
+	protected Network networkLayer;
 
 	private static Events events = null;
 	protected  SimStateWriterI netStateWriter = null;
@@ -152,7 +153,7 @@ public class QueueSimulation {
 	 * @param plans
 	 * @param events
 	 */
-	public QueueSimulation(final NetworkLayer network, final Population plans, final Events events) {
+	public QueueSimulation(final Network network, final Population plans, final Events events) {
 		this.listenerManager = new QueueSimListenerManager(this);
 		Simulation.reset();
 		this.config = Gbl.getConfig();
@@ -440,7 +441,7 @@ public class QueueSimulation {
 	}
 
 	private void prepareNetworkChangeEventsQueue() {
-		Collection<NetworkChangeEvent> changeEvents = this.networkLayer.getNetworkChangeEvents();
+		Collection<NetworkChangeEvent> changeEvents = ((NetworkLayer)this.networkLayer).getNetworkChangeEvents();
 		if ((changeEvents != null) && (changeEvents.size() > 0)) {
 			this.networkChangeEventsQueue = new PriorityQueue<NetworkChangeEvent>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
 			this.networkChangeEventsQueue.addAll(changeEvents);

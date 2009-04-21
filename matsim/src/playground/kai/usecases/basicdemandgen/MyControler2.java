@@ -39,7 +39,8 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -166,11 +167,14 @@ public class MyControler2 {
 		} else {
 			config = Gbl.createConfig(args) ;
 		}
-		ScenarioImpl scenarioData = new ScenarioImpl( config ) ;
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadNetwork();
+		
+		Scenario scenarioData = loader.getScenario();
 
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.
-		NetworkLayer network = scenarioData.getNetwork() ;
+		NetworkLayer network = (NetworkLayer) scenarioData.getNetwork() ;
 		log.info("") ; 	log.info("cleaning network ...");
 		NetworkCleaner nwCleaner = new NetworkCleaner() ;
 		nwCleaner.run( network ) ;

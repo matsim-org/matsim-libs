@@ -29,8 +29,8 @@ import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 
 public class CompressedNetworkRouteFactory implements RouteFactory {
 
-	private final Map<Link, Link> subsequentLinks;
-
+	private Map<Link, Link> subsequentLinks = null;
+	private Network network;
 	/**
 	 * Uses {@link SubsequentLinksAnalyzer} to get the map of subsequent links,
 	 * used to compress the route information stored.
@@ -38,14 +38,14 @@ public class CompressedNetworkRouteFactory implements RouteFactory {
 	 * @param network
 	 */
 	public CompressedNetworkRouteFactory(final Network network) {
-		this(new SubsequentLinksAnalyzer(network).getSubsequentLinks());
+		this.network = network;
 	}
 
-	public CompressedNetworkRouteFactory(final Map<Link, Link> subsequentLinks) {
-		this.subsequentLinks = subsequentLinks;
-	}
 
 	public Route createRoute(Link startLink, Link endLink) {
+		if (this.subsequentLinks == null) {
+			this.subsequentLinks = new SubsequentLinksAnalyzer(this.network).getSubsequentLinks();
+		}
 		return new CompressedNetworkRoute(startLink, endLink, this.subsequentLinks);
 	}
 

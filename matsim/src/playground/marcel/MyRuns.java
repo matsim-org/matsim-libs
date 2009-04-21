@@ -58,6 +58,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.network.Link;
@@ -268,12 +269,10 @@ public class MyRuns {
 		Gbl.printSystemInfo();
 
 		final Config config = Gbl.createConfig(new String[] {"../mystudies/navteq-config.xml"}); // overwrite args
-		final ScenarioImpl data = new ScenarioImpl(config);
-
 		log.info("reading world, facilities and network ... ");
-		data.getWorld();
-		data.getFacilities();
-		data.getNetwork();
+		ScenarioImpl data = new ScenarioImpl(config);
+		ScenarioLoader loader = new ScenarioLoader(data);
+		loader.loadScenario();
 		log.info("done.");
 
 //		log.info("analyzing subsequent links");
@@ -1990,9 +1989,12 @@ public class MyRuns {
 
 		Config config = Gbl.createConfig(args);
 		ScenarioImpl data = new ScenarioImpl(config);
-
+		ScenarioLoader loader = new ScenarioLoader(data);
+		loader.loadNetwork();
+		
+		
 		Events events = new Events();
-		NetworkLayer network = data.getNetwork();
+		NetworkLayer network = (NetworkLayer) data.getNetwork();
 		for (int i = 0; i < links.length; i++) {
 			qvds[i] = new QVDiagramm(network, links[i]);
 			events.addHandler(qvds[i]);

@@ -33,7 +33,7 @@ import net.opengis.kml._2.ScreenOverlayType;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -1132,7 +1132,6 @@ public class TollSchemeGenerator {
 	private Config config;
 	private NetworkLayer network;
 	private Coord[] usedCoords;
-	private ScenarioImpl scenario;
 
 	// TODO change used data here:
 	private String usedConf = BRANDENBURG_CONF;
@@ -1179,8 +1178,8 @@ public class TollSchemeGenerator {
 	}
 
 	private NetworkLayer createTollScheme(Config config) {
-		this.scenario = new ScenarioImpl(config);
-		this.network = this.scenario.getNetwork();
+		ScenarioLoader loader = new ScenarioLoader(config);
+		this.network = (NetworkLayer) loader.getScenario().getNetwork();
 
 		NetworkLayer net = filterNetwork(this.network, false);
 		log.info("Filtered the network, filtered network layer contains "

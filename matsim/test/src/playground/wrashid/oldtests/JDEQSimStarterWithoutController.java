@@ -22,7 +22,8 @@ package playground.wrashid.oldtests;
 
 import java.io.IOException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -43,7 +44,7 @@ public class JDEQSimStarterWithoutController {
 		
 		// read, prepare configuration
 		Config config = Gbl.createConfig(null);
-		if (args.length > 1 && args[1].toLowerCase().endsWith(".dtd")) {
+		if ((args.length > 1) && args[1].toLowerCase().endsWith(".dtd")) {
 			try {
 				new MatsimConfigReader(config).readFile(args[0], args[1]);
 			} catch (IOException e) {
@@ -55,8 +56,10 @@ public class JDEQSimStarterWithoutController {
 		}
 		
 		// prepare data
-		ScenarioImpl data = new ScenarioImpl(config);
-		NetworkLayer network = data.getNetwork();
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadPopulation();
+		Scenario data = loader.getScenario();
+		NetworkLayer network = (NetworkLayer) data.getNetwork();
 		Population population = data.getPopulation();
 		// TODO: remove this after integration into core.
 		Events events = new ParallelEvents(1);

@@ -1,7 +1,8 @@
 package playground.kai.urbansim;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
@@ -67,11 +68,14 @@ public class Matsim4Urbansim {
 
 		// parse the config arguments so we have a config.  generate scenario data from this
 		Config config = Gbl.createConfig(args);
-		ScenarioImpl scenarioData = new ScenarioImpl(config) ;
-
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadPopulation();
+		Scenario scenarioData = loader.getScenario();
+		
+		
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
-		NetworkLayer network = scenarioData.getNetwork() ;
+		NetworkLayer network = (NetworkLayer) scenarioData.getNetwork() ;
 
 		log.info("") ;
 		log.info("cleaning network ...");

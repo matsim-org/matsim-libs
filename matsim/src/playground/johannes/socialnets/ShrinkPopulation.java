@@ -23,7 +23,8 @@
  */
 package playground.johannes.socialnets;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -40,7 +41,9 @@ public class ShrinkPopulation {
 	 */
 	public static void main(String[] args) {
 		Config config = Gbl.createConfig(new String[]{args[0]});
-		ScenarioImpl data = new ScenarioImpl(config);
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadPopulation();
+		Scenario data = loader.getScenario();
 		Population population = data.getPopulation();
 		double sample = Double.parseDouble(args[2]);
 		PopulationWriter writer = new PopulationWriter(population, args[1], "v4", sample);

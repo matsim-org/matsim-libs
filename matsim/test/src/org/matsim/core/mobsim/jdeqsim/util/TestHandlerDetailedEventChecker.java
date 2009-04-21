@@ -5,7 +5,8 @@ import java.util.LinkedList;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -159,9 +160,10 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 			config.plans().setInputFile(planFilePath);
 		}
 		this.printEvent = printEvent;
-
-		ScenarioImpl data = new ScenarioImpl(config);
-		NetworkLayer network = data.getNetwork();
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadScenario();
+		Scenario data = loader.getScenario();
+		NetworkLayer network = (NetworkLayer) data.getNetwork();
 		Population population = data.getPopulation();
 		if (populationModifier != null) {
 			population = populationModifier.modifyPopulation(population);

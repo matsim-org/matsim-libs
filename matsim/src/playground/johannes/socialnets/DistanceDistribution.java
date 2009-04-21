@@ -31,7 +31,8 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
@@ -53,7 +54,9 @@ public class DistanceDistribution {
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		Config config = Gbl.createConfig(new String[]{args[0]});
-		ScenarioImpl data = new ScenarioImpl(config);
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadPopulation();
+		Scenario data = loader.getScenario();
 		Population population = data.getPopulation();
 		
 		Collection<Person> persons2 = new HashSet<Person>();
@@ -63,7 +66,7 @@ public class DistanceDistribution {
 		double ymax = 254000;
 		for(Person p : population.getPersons().values()) {
 			Coord c = p.getSelectedPlan().getFirstActivity().getCoord();
-			if(c.getX() >= xmin && c.getX() <= xmax && c.getY() >= ymin && c.getY() <= ymax)
+			if((c.getX() >= xmin) && (c.getX() <= xmax) && (c.getY() >= ymin) && (c.getY() <= ymax))
 				persons2.add(p);
 		}
 		

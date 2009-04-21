@@ -25,7 +25,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -39,6 +40,7 @@ import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -47,7 +49,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
-	protected ScenarioImpl scenario = null;
+	protected Scenario scenario = null;
 	
 	protected static final Id TEST_PERSON_ID = new IdImpl("1");
 	private static final int TEST_PLAN_NR = 0;
@@ -77,7 +79,9 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		Config config = super.loadConfig(CONFIGFILE);
 		config.plans().setInputFile("test/scenarios/equil/plans1.xml");
 
-		this.scenario = new ScenarioImpl(config);
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadScenario();
+		this.scenario = loader.getScenario();
 		
 		// the estimator is tested on the central route alternative through equil-net
 		// first person
@@ -283,7 +287,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		assertEquals(linkEndTime, Time.parseTime("06:02:48"), EPSILON);
 
 		// for start times outside the time bin, the free speed travel time is returned
-		double freeSpeedTravelTime = this.scenario.getNetwork().getLink(linkId.toString()).getFreespeedTravelTime(Time.UNDEFINED_TIME);
+		double freeSpeedTravelTime = ((NetworkLayer)this.scenario.getNetwork()).getLink(linkId.toString()).getFreespeedTravelTime(Time.UNDEFINED_TIME);
 
 		startTime = Time.parseTime("05:59:00");
 		linkEndTime = this.testee.processLink(this.scenario.getNetwork().getLink(linkId), startTime);

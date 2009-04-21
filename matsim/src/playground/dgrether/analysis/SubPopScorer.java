@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -57,8 +58,9 @@ public class SubPopScorer {
 
 	public SubPopScorer(final String config, final List<String> linkIds) {
 		this.scenario = new ScenarioLoader(config);
+		this.scenario.loadScenario();
 		this.linkIds = linkIds;
-		Set<Id> idSet = filterPlans(this.scenario.getPlans());
+		Set<Id> idSet = filterPlans(this.scenario.getScenario().getPopulation());
 		calculateScore(idSet);
 
 	}
@@ -72,7 +74,7 @@ public class SubPopScorer {
   	PersonEventFilter filter = new PersonEventFilter(idSet);
   	events.addFilter(filter);
   	//add the handler to score
-  	EventsToScore scorer = new EventsToScore(this.scenario.getPlans(), new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring()));
+  	EventsToScore scorer = new EventsToScore(this.scenario.getScenario().getPopulation(), new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring()));
   	events.addHandler(scorer);
 
   	reader.readFile(eventsFilePath);

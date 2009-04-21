@@ -3,9 +3,10 @@ package playground.wrashid.util;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -163,9 +164,11 @@ LinkEnterEventHandler, LinkLeaveEventHandler  {
 			config.plans().setInputFile(planFilePath);
 		}
 		this.printEvent=printEvent;
-
-		ScenarioImpl data = new ScenarioImpl(config);
-		NetworkLayer network = data.getNetwork();
+		
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadScenario();
+		Scenario data = loader.getScenario();
+		NetworkLayer network = (NetworkLayer) data.getNetwork();
 		Population population = data.getPopulation();
 		if (populationModifier != null) {
 			population = populationModifier.modifyPopulation(population);

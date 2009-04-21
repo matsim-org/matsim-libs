@@ -22,6 +22,7 @@ package org.matsim.signalsystems;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.network.BasicLaneDefinitions;
 import org.matsim.core.basic.signalsystems.BasicSignalSystems;
@@ -66,8 +67,15 @@ public class TravelTimeOneWayTest extends MatsimTestCase implements
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 
+		conf.scenario().setUseLanes(true);
+		conf.scenario().setUseSignalSystems(true);
 		ScenarioImpl data = new ScenarioImpl(conf);
+		ScenarioLoader loader = new ScenarioLoader(data);
+		loader.loadScenario();
+		
 		BasicLaneDefinitions lanedefs = data.getLaneDefinitions();
+		BasicSignalSystems signalSystems = data.getSignalSystems();
+		
 		Events events = new Events();
 		events.addHandler(this);
 
@@ -76,8 +84,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase implements
 		int circulationTime = 60;
 
 		BasicSignalSystems lssDefs = data.getSignalSystems();
-		BasicSignalSystemConfigurations lssConfigs = data
-				.getSignalSystemsConfiguration();
+		BasicSignalSystemConfigurations lssConfigs = data.getSignalSystemConfigurations();
 
 		for (int dropping = 1; dropping <= circulationTime; dropping = dropping + 1) {
 			this.beginningOfLink2 = null;
@@ -119,15 +126,19 @@ public class TravelTimeOneWayTest extends MatsimTestCase implements
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 
+		conf.scenario().setUseLanes(true);
+		conf.scenario().setUseSignalSystems(true);
 		ScenarioImpl data = new ScenarioImpl(conf);
-		BasicLaneDefinitions lanedefs = data.getLaneDefinitions();
+		ScenarioLoader loader = new ScenarioLoader(data);
+		loader.loadScenario();
+		
 		Events events = new Events();
 		events.addHandler(this);
 		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data
 				.getPopulation(), events);
-		sim.setLaneDefinitions(lanedefs);
+		sim.setLaneDefinitions(data.getLaneDefinitions());
 		sim.setSignalSystems(data.getSignalSystems(), data
-				.getSignalSystemsConfiguration());
+				.getSignalSystemConfigurations());
 		sim.run();
 		// log.debug("tF = 60s, " +
 		// this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure + ", " +

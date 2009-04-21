@@ -26,7 +26,8 @@ import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -186,7 +187,9 @@ public class OTFVis {
 		} else {
 			new MatsimConfigReader(config).readFile(args[0]);
 		}
-		ScenarioImpl data = new ScenarioImpl(config);
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadPopulation();
+		Scenario data = loader.getScenario();
 		Events events = new Events();
 
 		Population pop;
@@ -198,7 +201,7 @@ public class OTFVis {
 			pop = new PopulationImpl();
 		}
 
-		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(data.getNetwork(), pop, events);
+		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad((NetworkLayer)data.getNetwork(), pop, events);
 		client.run();
 	}
 	

@@ -44,6 +44,8 @@ import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
@@ -82,7 +84,6 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
@@ -204,6 +205,7 @@ public class Controler {
 			shutdown(true);
 		}
 	};
+	private ScenarioLoader loader;
 
 	/** initializes Log4J */
 	static {
@@ -278,6 +280,9 @@ public class Controler {
 	 */
 	public Controler(final Config config, final NetworkLayer network, final Population population) {
 		this(null, null, config);
+		this.scenarioData = new ScenarioImpl(config);
+		this.scenarioData.setNetwork(network);
+		this.scenarioData.setPopulation(population);
 		this.network = network;
 		this.population = population;
 		//FIXME dg march 09: this warning should not be needed if there wouldn't be a
@@ -287,6 +292,14 @@ public class Controler {
 				"if set in config! " +
 				"Take care that this is done by yourself.");
 	}
+	
+	public Controler(Scenario scenario){
+		this(null, null, scenario.getConfig());
+		this.scenarioData = (ScenarioImpl) scenario;
+		this.network = (NetworkLayer) this.scenarioData.getNetwork();
+		this.population = this.scenarioData.getPopulation();
+	}
+	
 
 	private Controler(final String configFileName, final String dtdFileName, final Config config) {
 		super();
@@ -415,7 +428,7 @@ public class Controler {
 			new NetworkWriter(this.network, getOutputFilename("output_network.xml.gz")).write();
 			// dump world
 			new WorldWriter(Gbl.getWorld(), getOutputFilename("output_world.xml.gz")).write();
-			// dump config
+  		// dump config
 			new ConfigWriter(this.config, getOutputFilename("output_config.xml.gz")).write();
 			// dump facilities
 			Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
@@ -518,11 +531,6 @@ public class Controler {
 		configwriter.write();
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
-
-		if (this.config.network().isTimeVariantNetwork()) {
-			log.info("use TimeVariantLinks in NetworkFactory.");
-			this.networkFactory.setLinkFactory(new TimeVariantLinkFactory());
-		}
 	}
 
 	private final void setUpOutputDir() {
@@ -572,13 +580,17 @@ public class Controler {
 	 * additional data should be loaded by implementing a {@link org.matsim.core.controler.listener.StartupListener}.
 	 */
 	protected void loadData() {
-		if (this.network == null) {
-			this.scenarioData = new ScenarioImpl(this.config, this.networkFactory);
+		if (this.scenarioData == null){
+			this.scenarioData = new ScenarioImpl(this.config);
+			((NetworkLayer)this.scenarioData.getNetwork()).setFactory(this.getNetworkFactory());
+			this.loader = new ScenarioLoader(this.scenarioData);
+			loader.loadScenario();
 			this.network = loadNetwork();
 			this.population = loadPopulation();
-		}
-		if (this.getWorld() != null) {
-			new WorldCheck().run(this.getWorld());
+			
+			if (this.getWorld() != null) {
+				new WorldCheck().run(this.getWorld());
+			}
 		}
 	}
 
@@ -590,11 +602,12 @@ public class Controler {
 	 * only protected at the moment because of backward-compatibility with the old Controler class. In general,
 	 * it is recommended to pass a custom network and population using the special
 	 * {@link #Controler(Config, QueueNetwork, Population) Constructor}.
-	 *
+	 * @deprecated Use the constructor {@link #Controler(Config, NetworkLayer, Population)} instead.
 	 * @return The network to be used for the simulation.
 	 */
+	@Deprecated 
 	protected NetworkLayer loadNetwork() {
-		return this.scenarioData.getNetwork();
+		return (NetworkLayer)this.scenarioData.getNetwork();
 	}
 
 	/**
@@ -605,8 +618,10 @@ public class Controler {
 	 * it is recommended to pass a custom network and population using the special
 	 * {@link #Controler(Config, QueueNetwork, Population) Constructor}.
 	 *
+	 * @deprecated Use the constructor {@link #Controler(Config, NetworkLayer, Population)} instead.
 	 * @return The population to be used for the simulation.
 	 */
+	@Deprecated 
 	protected Population loadPopulation() {
 		return this.scenarioData.getPopulation();
 	}
@@ -740,11 +755,17 @@ public class Controler {
 			} else {
 				QueueSimulation sim = new QueueSimulation(this.network, this.population, this.events);
 				sim.addQueueSimulationListeners(this.getQueueSimulationListener());
-				if ((this.scenarioData != null) && (this.config.network().getLaneDefinitionsFile() != null)){
+				if (this.config.scenario().isUseLanes()){
+					if (this.scenarioData.getLaneDefinitions() == null) {
+						throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
+					}
 					sim.setLaneDefinitions(this.scenarioData.getLaneDefinitions());
 				}
-				if ((this.scenarioData != null) && (this.scenarioData.getSignalSystems() != null) && (this.scenarioData.getSignalSystemsConfiguration() != null)){
-					sim.setSignalSystems(this.scenarioData.getSignalSystems(), this.scenarioData.getSignalSystemsConfiguration());
+				if (this.config.scenario().isUseSignalSystems()){
+					if ((this.scenarioData.getSignalSystems() == null)|| (this.scenarioData.getSignalSystemConfigurations() == null)){
+						throw new IllegalStateException("Signal systems and signal system configurations have to be set if feature is enabled!");
+					}
+					sim.setSignalSystems(this.scenarioData.getSignalSystems(), this.scenarioData.getSignalSystemConfigurations());
 				}
 				sim.run();
 			}
@@ -964,13 +985,11 @@ public class Controler {
 	}
 
 	public final World getWorld() {
-		if (this.scenarioData == null) {
-			return null;
-		}
 		return this.scenarioData.getWorld();
 	}
 
 	public final Facilities getFacilities() {
+		//TODO dg
 		if (this.scenarioData == null) {
 			return null;
 		}
@@ -993,7 +1012,7 @@ public class Controler {
 	 * This is here for testing purposes only.  Kai, mar08
 	 */
 	@Deprecated
-	public final ScenarioImpl getScenarioData() {
+	public final Scenario getScenarioData() {
 		return this.scenarioData ;
 	}
 
@@ -1021,6 +1040,7 @@ public class Controler {
 	 *         pricing is simulated.
 	 */
 	public final RoadPricing getRoadPricing() {
+		//TODO dg
 		return this.roadPricing;
 	}
 

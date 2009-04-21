@@ -33,9 +33,9 @@ import java.util.Map;
 import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
@@ -74,15 +74,15 @@ public class QueueNetwork{
 
 	private final Map<Id, QueueNode> nodes;
 
-	private final NetworkLayer networkLayer;
+	private final Network networkLayer;
 
 	private final QueueNetworkFactory<QueueNode, QueueLink> queueNetworkFactory;
 
-	public QueueNetwork(final NetworkLayer networkLayer) {
+	public QueueNetwork(final Network networkLayer) {
 		this(networkLayer, new DefaultQueueNetworkFactory());
 	}
 
-	public QueueNetwork(final NetworkLayer networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory) {
+	public QueueNetwork(final Network networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory) {
 		this.networkLayer = networkLayer;
 		this.queueNetworkFactory = factory;
 		this.links = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
@@ -107,7 +107,7 @@ public class QueueNetwork{
 		});
 	}
 
-	public NetworkLayer getNetworkLayer() {
+	public Network getNetworkLayer() {
 		return this.networkLayer;
 	}
 

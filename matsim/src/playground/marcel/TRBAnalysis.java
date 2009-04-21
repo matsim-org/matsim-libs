@@ -22,7 +22,8 @@ package playground.marcel;
 
 import java.util.HashMap;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -48,7 +49,9 @@ public class TRBAnalysis implements AgentDepartureEventHandler, AgentArrivalEven
 
 	public TRBAnalysis(final String[] args) {
 		this.config = Gbl.createConfig(args);
-		final ScenarioImpl data = new ScenarioImpl(config);
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadScenario();
+		final Scenario data = loader.getScenario();
 		this.population = data.getPopulation();
 	}
 
@@ -113,7 +116,7 @@ public class TRBAnalysis implements AgentDepartureEventHandler, AgentArrivalEven
 
 	private int getModeSlot(final Person person) {
 		final Plan.Type type = person.getSelectedPlan().getType();
-		if (type == null || Plan.Type.UNDEFINED.equals(type)) {
+		if ((type == null) || Plan.Type.UNDEFINED.equals(type)) {
 			return 2; // through traffic
 		}
 		if (Plan.Type.PT.equals(type)) {
