@@ -33,6 +33,7 @@ import com.vividsolutions.jts.geom.*;
 
 import org.matsim.api.basic.v01.*;
 import org.matsim.api.basic.v01.population.*;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 
@@ -88,6 +89,8 @@ public class MyControler2 {
 				population.getPersons().put( id, person ) ;
 				
 				BasicPlan plan = pb.createPlan(person) ;
+				person.getPlans().add(plan) ;
+				
 				plan.setSelected(true) ; // will also work without
 
 				BasicActivity act = pb.createActivityFromCoord("home",coord) ;
@@ -131,7 +134,7 @@ public class MyControler2 {
 
 	public static void main(final String[] args) {
 
-		final String shpFile = "/Users/nagel/shared-svn/studies/north-america/ca/vancouver/facilities/shp/landuse.shp";
+		final String shpFile = "/Users/nagel/shared-svn/studies/countries/ca/vancouver/facilities/shp/landuse.shp";
 
 		BasicPopulation plans=null ;
 		try {
@@ -139,6 +142,8 @@ public class MyControler2 {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		Gbl.createConfig(null) ;
 
 		// write the population for debugging purposes
 		BasicPopulationWriter popWriter = new BasicPopulationWriter( plans ) ;
