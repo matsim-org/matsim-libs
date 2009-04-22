@@ -109,13 +109,13 @@ public class MyControler2 {
 //			workPlaces.remove( idx ) ;
 			// (with replacement.  W/o replacement, make sure that there are enough workplaces!)
 			
-			BasicLeg legH2W = pb.createLeg(BasicLeg.Mode.car) ;
+			BasicLeg legH2W = pb.createLeg(TransportMode.car) ;
 			plan.getPlanElements().add(legH2W) ;
 			
 			BasicActivity workAct = pb.createActivityFromCoord("work", workCoord ) ;
 			plan.getPlanElements().add(workAct) ;
 			
-			BasicLeg legW2H = pb.createLeg(BasicLeg.Mode.bike) ;
+			BasicLeg legW2H = pb.createLeg(TransportMode.bike) ;
 			plan.getPlanElements().add(legW2H) ;
 			
 			BasicActivity homeAct1 = (BasicActivity) plan.getPlanElements().get(0) ;
