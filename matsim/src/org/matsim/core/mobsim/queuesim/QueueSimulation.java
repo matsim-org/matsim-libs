@@ -90,8 +90,10 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 public class QueueSimulation {
 
 	private int snapshotPeriod = Integer.MAX_VALUE;
-
+	private double snapshotTime = 0;
+	
 	protected static final int INFO_PERIOD = 3600;
+	private double infoTime = 0;
 
 	private final Config config;
 	protected final Population plans;
@@ -474,7 +476,13 @@ public class QueueSimulation {
 		createAgents();
 
 		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
-		SimulationTimer.setSimStartTime(Math.max(startTime,SimulationTimer.getSimStartTime()));
+		double simStartTime = Math.floor(Math.max(startTime, SimulationTimer.getSimStartTime()));
+		this.infoTime = (simStartTime % INFO_PERIOD) * INFO_PERIOD; // infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already
+		this.snapshotTime = (simStartTime % this.snapshotPeriod) * this.snapshotPeriod;
+		if (this.snapshotTime < simStartTime) {
+			this.snapshotTime += this.snapshotPeriod;
+		}
+		SimulationTimer.setSimStartTime(simStartTime);
 		SimulationTimer.setTime(SimulationTimer.getSimStartTime());
 
 		createSnapshotwriter();
@@ -549,7 +557,8 @@ public class QueueSimulation {
 		this.handleActivityEnds(time);
 		this.network.simStep(time);
 
-		if (time % INFO_PERIOD == 0) {
+		if (time > infoTime) {
+			infoTime += INFO_PERIOD;
 			Date endtime = new Date();
 			long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
 			double diffsim  = time - SimulationTimer.getSimStartTime();
