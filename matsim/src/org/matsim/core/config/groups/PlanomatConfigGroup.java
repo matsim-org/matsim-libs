@@ -2,7 +2,6 @@ package org.matsim.core.config.groups;
 
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -15,7 +14,6 @@ import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.api.basic.v01.TransportMode;
 
 /**
  * Provides access to planomat config parameters.
@@ -238,17 +236,14 @@ public class PlanomatConfigGroup extends Module {
 
 			if (!PlanomatConfigParameter.POSSIBLE_MODES.getActualValue().equals(PlanomatConfigParameter.POSSIBLE_MODES.getDefaultValue())) {
 				String[] possibleModesStringArray = PlanomatConfigParameter.POSSIBLE_MODES.getActualValue().split(",");
-//				cachedPossibleModes = new TransportMode[possibleModesStringArray.length];
 				for (int ii=0; ii < possibleModesStringArray.length; ii++) {
 					this.cachedPossibleModes.add(TransportMode.valueOf(possibleModesStringArray[ii]));
-//					cachedPossibleModes[ii] = TransportMode.valueOf(possibleModesStringArray[ii]);
 				}
 			}
 
 		}
 
 		return Collections.unmodifiableSet(this.cachedPossibleModes);
-//		return this.cachedPossibleModes.clone();
 
 	}
 
