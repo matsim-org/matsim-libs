@@ -477,8 +477,8 @@ public class QueueSimulation {
 
 		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
 		double simStartTime = Math.floor(Math.max(startTime, SimulationTimer.getSimStartTime()));
-		this.infoTime = (simStartTime % INFO_PERIOD) * INFO_PERIOD; // infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already
-		this.snapshotTime = (simStartTime % this.snapshotPeriod) * this.snapshotPeriod;
+		this.infoTime = Math.floor(simStartTime / INFO_PERIOD) * INFO_PERIOD; // infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already
+		this.snapshotTime = Math.floor(simStartTime / this.snapshotPeriod) * this.snapshotPeriod;
 		if (this.snapshotTime < simStartTime) {
 			this.snapshotTime += this.snapshotPeriod;
 		}
@@ -557,7 +557,7 @@ public class QueueSimulation {
 		this.handleActivityEnds(time);
 		this.network.simStep(time);
 
-		if (time > infoTime) {
+		if (time >= infoTime) {
 			infoTime += INFO_PERIOD;
 			Date endtime = new Date();
 			long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
@@ -572,7 +572,7 @@ public class QueueSimulation {
 	}
 
 	protected void afterSimStep(final double time) {
-		if (time % this.snapshotPeriod == 0) {
+		if (time >= this.snapshotPeriod) {
 			doSnapshot(time);
 		}
 	}
