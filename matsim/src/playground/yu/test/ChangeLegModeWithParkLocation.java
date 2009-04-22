@@ -11,7 +11,6 @@ import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
@@ -19,11 +18,28 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;
+import playground.yu.utils.io.SimpleWriter;
 
 /**
  * this class contains some codes from ChangeLegMode
@@ -216,7 +232,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 						tmpTpls.add(tpl);
 					}
 				}
-			else if(legTuples.size()==1)
+			else if (legTuples.size() == 1)
 				tmpTpls.add(legTuples.iterator().next());
 			return tmpTpls;
 		}
@@ -397,29 +413,22 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		}
 
 		// reserve
-		private static boolean checkParkSensible(Plan plan) {
-			int carLegCnt = 0;
-			Id OrigPark = null, lastNextPark = null;
-
-			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Leg) {
-					Leg leg = (Leg) pe;
-					if (leg.getMode().equals(TransportMode.car)) {
-						Id prePark = plan.getPreviousActivity(leg).getLinkId();
-						Id nextPark = plan.getNextActivity(leg).getLinkId();
-
-						if (carLegCnt == 0)
-							OrigPark = prePark;
-						else if (!prePark.equals(lastNextPark))
-							return false;
-
-						lastNextPark = nextPark;
-						carLegCnt++;
-					}
-				}
-			}
-			return OrigPark.equals(lastNextPark);
-		}
+		/*
+		 * private static boolean checkParkSensible(Plan plan) { int carLegCnt =
+		 * 0; Id OrigPark = null, lastNextPark = null;
+		 * 
+		 * for (PlanElement pe : plan.getPlanElements()) { if (pe instanceof
+		 * Leg) { Leg leg = (Leg) pe; if
+		 * (leg.getMode().equals(TransportMode.car)) { Id prePark =
+		 * plan.getPreviousActivity(leg).getLinkId(); Id nextPark =
+		 * plan.getNextActivity(leg).getLinkId();
+		 * 
+		 * if (carLegCnt == 0) OrigPark = prePark; else if
+		 * (!prePark.equals(lastNextPark)) return false;
+		 * 
+		 * lastNextPark = nextPark; carLegCnt++; } } } return
+		 * OrigPark.equals(lastNextPark); }
+		 */
 	}
 
 	/**
@@ -524,5 +533,83 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		public int getLastActIdx() {
 			return lastActIdx;
 		}
+	}
+
+	private static class ChangeLegModeWithParkLocationControler extends
+			Controler {
+		public ChangeLegModeWithParkLocationControler(String[] args) {
+			super(args);
+		}
+
+		protected StrategyManager loadStrategyManager() {
+			StrategyManager manager = new StrategyManager();
+			manager.setMaxPlansPerAgent(5);
+
+			// ChangeExpBeta
+			PlanStrategy strategy1 = new PlanStrategy(new ExpBetaPlanChanger());
+			manager.addStrategy(strategy1, 0.1);
+
+			// ChangeLegModeWithParkLocation
+			PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
+			strategy2.addStrategyModule(new ChangeLegModeWithParkLocation(
+					this.config));
+			strategy2.addStrategyModule(new ReRoute(this));
+			manager.addStrategy(strategy2, 0.1);
+
+			// ReRoute
+			PlanStrategy strategy3 = new PlanStrategy(new RandomPlanSelector());
+			strategy3.addStrategyModule(new ReRoute(this));
+			manager.addStrategy(strategy3, 0.1);
+
+			// TimeAllocationMutator
+			PlanStrategy strategy4 = new PlanStrategy(new RandomPlanSelector());
+			strategy4.addStrategyModule(new TimeAllocationMutator());
+			manager.addStrategy(strategy4, 0.1);
+
+			return manager;
+		}
+	}
+
+	private static class LegChainModesListener implements StartupListener,
+			IterationEndsListener, ShutdownListener {
+		private SimpleWriter writer = null;
+
+		public void notifyStartup(StartupEvent event) {
+			writer = new SimpleWriter(Controler
+					.getOutputFilename("legModesPattern.txt"));
+			writer.writeln("iteration\tlegModesPattern");
+		}
+
+		public void notifyIterationEnds(IterationEndsEvent event) {
+			Controler ctl = event.getControler();
+			int itr = event.getIteration();
+
+			StringBuilder legChainModes = new StringBuilder("|");
+			// get the leg modes of the selected plan of the first Person
+			for (PlanElement pe : ctl.getPopulation().getPersons().values()
+					.iterator().next().getSelectedPlan().getPlanElements())
+				if (pe instanceof Leg)
+					legChainModes.append(((Leg) pe).getMode() + "|");
+
+			writer.writeln(itr + "\t" + legChainModes);
+			writer.flush();
+		}
+
+		public void notifyShutdown(ShutdownEvent event) {
+			writer.close();
+		}
+	}
+
+	public static void main(String[] arg) {
+		String[] args = new String[] { "../matsimTests/changeLegModeTests/config.xml" };
+		Config config = Gbl.createConfig(args);
+		Controler ctl = new ChangeLegModeWithParkLocationControler(args);
+		ctl.addControlerListener(new LegChainModesListener());
+		 ctl.setCreateGraphs(false);
+		ctl.setWriteEventsInterval(0);
+		ctl
+				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
+						config.charyparNagelScoring()));
+		ctl.run();
 	}
 }

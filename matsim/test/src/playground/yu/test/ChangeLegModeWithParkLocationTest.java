@@ -52,10 +52,10 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 				criterion = "|car|walk|walk|walk|walk|walk|car|car|";
 				break;
 			case 7:
-				criterion = "|walk|walk|walk|walk|walk|walk|walk|pt|";
+				criterion = "|pt|walk|walk|walk|walk|walk|walk|pt|";
 				break;
 			case 8:
-				criterion = "|car|walk|walk|walk|pt|car|car|car|";
+				criterion = "|car|walk|walk|walk|walk|pt|car|car|";
 				break;
 			case 9:
 				criterion = "|car|walk|pt|walk|walk|car|car|car|";
@@ -65,12 +65,14 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 				break;
 			}
 			System.out.println("----->currentIteration=" + itr);
+			
 			Plan plan = ctl.getPopulation().getPersons().values().iterator()
 					.next().getSelectedPlan();
 			StringBuilder legChainModes = new StringBuilder("|");
 			for (PlanElement pe : plan.getPlanElements())
 				if (pe instanceof Leg)
 					legChainModes.append(((Leg) pe).getMode() + "|");
+			
 			assertEquals("different legChainModes?", criterion, legChainModes
 					.toString());
 		}
