@@ -6,9 +6,12 @@ package playground.yu.analysis;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.events.Events;
@@ -28,6 +31,15 @@ import org.matsim.counts.MatsimCountsReader;
  * 
  */
 public class CountsSimCompareTest {
+	private static boolean isInRange(final Id linkid, final NetworkLayer net) {
+		Link l = net.getLink(linkid);
+		if (l == null) {
+			System.out.println("Cannot find requested link: "
+					+ linkid.toString());
+			return false;
+		}
+		return l.calcDistance(net.getNode("2531").getCoord()) < 30000;
+	}
 
 	/**
 	 * @param args
@@ -35,8 +47,8 @@ public class CountsSimCompareTest {
 	public static void main(String[] args) {
 		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		String countsFilename = "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.xml";
-		String eventsFilename = "../runs/run626/it.500/500.events.txt.gz";
-		String outputPath = "../runs/run626/it.500/compareCountsSim/";
+		String eventsFilename = "../runs-svn/run669/it.500/500.events.txt.gz";
+		String outputPath = "../matsimTests/compareCountsSim/";
 		double countsScaleFactor = 10.0;
 
 		Gbl.createConfig(null);
@@ -51,27 +63,33 @@ public class CountsSimCompareTest {
 
 		System.out.println("  reading the events...");
 		Events events = new Events();
-		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, network);
+		VolumesAnalyzer va = new VolumesAnalyzer(3600, 10 * 3600 - 1, network);
 		events.addHandler(va);
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
+		List<Double> diffs = new ArrayList<Double>();
+		Map<Integer, Integer> plusDiffSet = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> minusDiffSet = new HashMap<Integer, Integer>();
 		try {
-			for (int h = 0; h < 24; h++) {
+			for (int h = 8; h < 9; h++) {
 				BufferedWriter writer = IOUtils.getBufferedWriter(outputPath
 						+ h + "-" + (h + 1) + ".txt");
-				writer.write("linkId\t" + "fromHour\ttoHour\t"
-						+ "X\tY\tcountValue\tsimValue\tdeviation\n");
+				// writer.write("linkId\t" + "fromHour\ttoHour\t"
+				// + "X\tY\tcountValue\tsimValue\tdeviation\n");
+				writer.write("simuliert-gemessen\tAnzahl\n");
+
 				for (Id linkId : counts.getCounts().keySet()) {
-					Count count = counts.getCount(linkId);
-					Link link = network.getLink(linkId);
-					if (link != null) {
-						Coord toCoord = link.getToNode().getCoord();
-						Coord fromCoord = link.getFromNode().getCoord();
-						double x = 0.7 * toCoord.getX() + 0.3
-								* fromCoord.getX();
-						double y = 0.7 * toCoord.getY() + 0.3
-								* fromCoord.getY();
-						if (x != 0 && y != 0)
+					if (isInRange(linkId, network)) {
+						Count count = counts.getCount(linkId);
+						Link link = network.getLink(linkId);
+						if (link != null) {
+							// Coord toCoord = link.getToNode().getCoord();
+							// Coord fromCoord = link.getFromNode().getCoord();
+							// double x = 0.7 * toCoord.getX() + 0.3
+							// * fromCoord.getX();
+							// double y = 0.7 * toCoord.getY() + 0.3
+							// * fromCoord.getY();
+							// if (x != 0 && y != 0)
 
 							if (va.getVolumesForLink(linkId.toString()) != null) {
 								double countVal = count.getVolume(h + 1)
@@ -79,16 +97,41 @@ public class CountsSimCompareTest {
 								double simVal = va.getVolumesForLink(linkId
 										.toString())[h]
 										* countsScaleFactor;
-								writer
-										.write(linkId + "\t" + h + "\t"
-												+ (h + 1) + "\t" + x + "\t" + y
-												+ "\t" + countVal + "\t"
-												+ simVal + "\t"
-												+ (simVal - countVal)
-												/ countVal + "\n");
+								diffs.add(simVal - countVal);
+								// writer
+								// .write(linkId + "\t" + h + "\t"
+								// + (h + 1) + "\t" + x + "\t" + y
+								// + "\t" + countVal + "\t"
+								// + simVal + "\t"
+								// + (simVal - countVal)
+								// / countVal + "\n");
 							}
-
+						}
 					}
+				}
+				for (Double d : diffs) {
+					int key = ((int) d.doubleValue()) / 25 * 25;
+					if (key == 0 && d > 0)
+						key = 10000;
+					if (key == 0 && d < 0)
+						key = -10000;
+					if (key >= 0) {
+						Integer num = plusDiffSet.get(key);
+						if (num == null)
+							num = Integer.valueOf(0);
+						plusDiffSet.put(key, num + 1);
+					} else {
+						Integer num = minusDiffSet.get(key);
+						if (num == null)
+							num = Integer.valueOf(0);
+						minusDiffSet.put(key, num + 1);
+					}
+				}
+				for (Integer itg : plusDiffSet.keySet()) {
+					writer.write(itg + "\t" + plusDiffSet.get(itg) + "\n");
+				}
+				for (Integer itg : minusDiffSet.keySet()) {
+					writer.write(itg + "\t" + minusDiffSet.get(itg) + "\n");
 				}
 				writer.close();
 			}
@@ -99,5 +142,4 @@ public class CountsSimCompareTest {
 		}
 		System.out.println("  done!");
 	}
-
 }

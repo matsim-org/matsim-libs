@@ -216,7 +216,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 						tmpTpls.add(tpl);
 					}
 				}
-			else
+			else if(legTuples.size()==1)
 				tmpTpls.add(legTuples.iterator().next());
 			return tmpTpls;
 		}
@@ -236,28 +236,73 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			if (firstCarActIdx < 0) {// no car legs in this copyPlan
 				System.out.println("----->no car legs in this plan, legIdx="
 						+ legIdx);
-
-				for (int l = legIdx - 1; l >= 0; l -= 2)
-					for (int r = legIdx + 1; r < pesSize; r += 2)
+				List<Tuple<Integer, Integer>> samePLActIds = new ArrayList<Tuple<Integer, Integer>>();
+				for (int l = 0; l < pesSize; l += 2)
+					for (int r = pesSize - 1; r > l; r -= 2)
 						if (new ParkLocation((Activity) pes.get(l))
 								.equals(new ParkLocation((Activity) pes.get(r)))) {
-							boolean tmp = setLegChainMode(plan, l, r,
-									TransportMode.car);
-							System.out.println("----->tmp=" + tmp);
-							if (tmp) {
-								// plan = copyPlan;
-								System.out
-										.println("----->\"in changeUnCar2Car\" plan:");
-								for (int i = 1; i < plan.getPlanElements()
-										.size(); i += 2)
-									System.out.println("----->"
-											+ ((Leg) plan.getPlanElements()
-													.get(i)).getMode());
-								return true;
-							}
+							if (samePLActIds.size() > 0) {
+								Tuple<Integer, Integer> lastTuple = samePLActIds
+										.get(samePLActIds.size() - 1);
+								if (lastTuple.getFirst() != l
+										&& lastTuple.getSecond() != r) {
+									samePLActIds
+											.add(new Tuple<Integer, Integer>(l,
+													r));
+								}
+							} else
+								samePLActIds.add(new Tuple<Integer, Integer>(l,
+										r));
+
+							// boolean tmp = setLegChainMode(plan, l, r,
+							// TransportMode.car);
+							//
+							// System.out.println("----->tmp=" + tmp);
+							// if (tmp) {
+							// // plan = copyPlan;
+							// System.out
+							// .println("----->\"in changeUnCar2Car\" plan:");
+							// for (int i = 1; i < plan.getPlanElements()
+							// .size(); i += 2)
+							// System.out.println("----->"
+							// + ((Leg) plan.getPlanElements()
+							// .get(i)).getMode());
+							// return true;
+							// }
+
 						}
-				System.out
-						.println("2 park locations with the same parklocation can not be found in this copyPlan");
+				int size = samePLActIds.size();
+				if (size >= 2) {
+					Tuple<Integer, Integer> firstBoundary = samePLActIds.get(0);
+					for (int i = 1; i < size; i++) {
+						Tuple<Integer, Integer> iBoundary = samePLActIds.get(i);
+						if ((legIdx > firstBoundary.getFirst() && legIdx < iBoundary
+								.getFirst())
+								|| (legIdx > iBoundary.getSecond() && legIdx < firstBoundary
+										.getSecond())) {
+							return setLegChainMode(plan, firstBoundary
+									.getFirst(), iBoundary.getFirst(),
+									TransportMode.car)
+									&& setLegChainMode(plan, iBoundary
+											.getSecond(), firstBoundary
+											.getSecond(), TransportMode.car);
+						}
+					}
+					Tuple<Integer, Integer> secondBoundary = samePLActIds
+							.get(1);
+
+					return setLegChainMode(plan, firstBoundary.getFirst(),
+							secondBoundary.getFirst(), TransportMode.car)
+							&& setLegChainMode(plan,
+									secondBoundary.getSecond(), firstBoundary
+											.getSecond(), TransportMode.car);
+				} else if (size == 1) {
+					Tuple<Integer, Integer> boundary = samePLActIds.get(0);
+					return setLegChainMode(plan, boundary.getFirst(), boundary
+							.getSecond(), TransportMode.car);
+				} else if (size < 1)
+					System.out
+							.println("2 park locations with the same parklocation can not be found in this copyPlan");
 				return false;
 			} else if (legIdx < firstCarActIdx || legIdx > lastCarActIdx) {
 				boolean done = false;

@@ -37,31 +37,31 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 				criterion = "|pt|walk|walk|walk|walk|walk|walk|walk|";
 				break;
 			case 2:
-				criterion = "|pt|car|car|car|walk|walk|walk|walk|";
+				criterion = "|car|walk|walk|walk|walk|walk|car|car|";
 				break;
 			case 3:
-				criterion = "|pt|car|car|car|car|car|walk|walk|";
+				criterion = "|car|walk|walk|walk|walk|car|car|car|";
 				break;
 			case 4:
-				criterion = "|car|car|car|car|car|car|car|car|";
+				criterion = "|car|walk|walk|walk|walk|walk|car|car|";
 				break;
 			case 5:
 				criterion = "|walk|walk|walk|walk|walk|walk|walk|walk|";
 				break;
 			case 6:
-				criterion = "|walk|walk|walk|walk|car|car|walk|walk|";
+				criterion = "|car|walk|walk|walk|walk|walk|car|car|";
 				break;
 			case 7:
 				criterion = "|walk|walk|walk|walk|walk|walk|walk|pt|";
 				break;
 			case 8:
-				criterion = "|walk|car|car|car|car|car|walk|walk|";
+				criterion = "|car|walk|walk|walk|pt|car|car|car|";
 				break;
 			case 9:
-				criterion = "|pt|car|car|car|walk|walk|walk|walk|";
+				criterion = "|car|walk|pt|walk|walk|car|car|car|";
 				break;
 			case 10:
-				criterion = "|car|car|car|car|walk|walk|car|car|";
+				criterion = "|car|walk|pt|walk|pt|car|car|car|";
 				break;
 			}
 			System.out.println("----->currentIteration=" + itr);
