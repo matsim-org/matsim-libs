@@ -95,11 +95,11 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 				Activity origin = this.plan.getPreviousActivity(leg);
 				Activity destination = this.plan.getNextActivity(leg);
 
-				if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
+				if (Gbl.getConfig().planomat().getPossibleModes().size() > 0) {
 					// set mode
 					int subtourIndex = this.planAnalyzeSubtours.getSubtourIndexation()[legCounter];
 					int modeIndex = ((IntegerGene) a_subject.getGene(numActs + subtourIndex)).intValue();
-					leg.setMode(Gbl.getConfig().planomat().getPossibleModes()[modeIndex]);
+					leg.setMode((TransportMode) (Gbl.getConfig().planomat().getPossibleModes().toArray()[modeIndex]));
 				} // otherwise leave modes untouched
 
 				// save original route

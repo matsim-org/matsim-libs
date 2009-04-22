@@ -88,7 +88,7 @@ public class Planomat implements PlanAlgorithm {
 		// perform subtour analysis only if mode choice on subtour basis is optimized
 		// (if only times are optimized, subtour analysis is not necessary)
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
-		if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
+		if (Gbl.getConfig().planomat().getPossibleModes().size() > 0) {
 			if (Gbl.getConfig().planomat().isDoLogging()) {
 				logger.info("Running subtour analysis...");
 			}
@@ -180,9 +180,9 @@ public class Planomat implements PlanAlgorithm {
 				sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Planomat.NUM_TIME_INTERVALS - 1));
 			}
 
-			if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
+			if (Gbl.getConfig().planomat().getPossibleModes().size() > 0) {
 				for (int ii=0; ii < planAnalyzeSubtours.getNumSubtours(); ii++) {
-					sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Gbl.getConfig().planomat().getPossibleModes().length - 1));
+					sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Gbl.getConfig().planomat().getPossibleModes().size() - 1));
 				}
 			}
 
@@ -257,11 +257,11 @@ public class Planomat implements PlanAlgorithm {
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);
 
-				if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
+				if (Gbl.getConfig().planomat().getPossibleModes().size() > 0) {
 					// set mode to result from optimization
 					int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[ii / 2];
 					int modeIndex = ((IntegerGene) individual.getGene(planAnalyzeSubtours.getSubtourIndexation().length + subtourIndex)).intValue();
-					TransportMode mode = Gbl.getConfig().planomat().getPossibleModes()[modeIndex];
+					TransportMode mode = (TransportMode) (Gbl.getConfig().planomat().getPossibleModes().toArray()[modeIndex]);
 //					System.out.println(ii + "\t" + subtourIndex + "\t" + modeIndex + "\t" + modeName);
 					leg.setMode(mode);
 				} // otherwise leave modes untouched

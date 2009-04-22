@@ -225,7 +225,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 		this.writePlan(agents.getAgentPlan(assignedAgent), plan);
 		this.locator.handlePlan(plan);
 		// TODO check this with Konrad or someone who knows the router
-		if (Gbl.getConfig().planomat().getPossibleModes().length>0){
+		if (Gbl.getConfig().planomat().getPossibleModes().size()>0){
 			for (int z=1;z<plan.getPlanElements().size();z+=2){
 				//((Leg)(plan.getActsLegs().get(z))).setMode(Gbl.getConfig().planomat().getPossibleModes()[y]);
 				((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);

@@ -20,10 +20,7 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Arrays;
-
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -33,44 +30,50 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		
 		super.loadConfig(this.getInputDirectory() + "empty_config.xml");
 		
+		PlanomatConfigGroup expectedConfig = Gbl.getConfig().planomat();
+		
 //		assertEquals( PlanomatConfigGroup.DEFAULT_OPTIMIZATION_TOOLBOX, Gbl.getConfig().planomat().getOptimizationToolbox() );
 		assertEquals( 
 				Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.POPSIZE.getDefaultValue()), 
-				Gbl.getConfig().planomat().getPopSize() );
+				expectedConfig.getPopSize() );
 		assertEquals( 
 				Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.JGAP_MAX_GENERATIONS.getDefaultValue()), 
-				Gbl.getConfig().planomat().getJgapMaxGenerations() );
-		assertTrue(
-				Arrays.deepEquals(
-						new TransportMode[]{}, 
-						Gbl.getConfig().planomat().getPossibleModes()));
+				expectedConfig.getJgapMaxGenerations() );
+		assertEquals(0, expectedConfig.getPossibleModes().toArray().length);
 		assertEquals( 
 				PlanomatConfigGroup.PlanomatConfigParameter.LEG_TRAVEL_TIME_ESTIMATOR_NAME.getDefaultValue(), 
-				Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
+				expectedConfig.getLegTravelTimeEstimatorName() );
 		assertEquals( 
 				Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.LEVEL_OF_TIME_RESOLUTION.getDefaultValue()), 
-				Gbl.getConfig().planomat().getLevelOfTimeResolution());
+				expectedConfig.getLevelOfTimeResolution());
 		assertEquals( 
 				Boolean.parseBoolean(PlanomatConfigGroup.PlanomatConfigParameter.DO_LOGGING.getDefaultValue()), 
-				Gbl.getConfig().planomat().isDoLogging() );
+				expectedConfig.isDoLogging() );
 		assertEquals(
 				PlanomatConfigGroup.TripStructureAnalysisLayerOption.valueOf(PlanomatConfigGroup.PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.getDefaultValue()),
-				Gbl.getConfig().planomat().getTripStructureAnalysisLayer());
+				expectedConfig.getTripStructureAnalysisLayer());
 	}
 
 	public void testAddParam() {
 
 		super.loadConfig(this.getInputDirectory() + "config.xml");
 
-		assertEquals( 10, Gbl.getConfig().planomat().getPopSize() );
-		assertTrue(Arrays.deepEquals(
-				new TransportMode[]{TransportMode.car, TransportMode.pt}, 
-				Gbl.getConfig().planomat().getPossibleModes()));
-		assertEquals( PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE, Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
-		assertEquals( 1000, Gbl.getConfig().planomat().getJgapMaxGenerations() );
-		assertEquals( 6, Gbl.getConfig().planomat().getLevelOfTimeResolution() );
-		assertEquals( true, Gbl.getConfig().planomat().isDoLogging() );
-		assertEquals( PlanomatConfigGroup.TripStructureAnalysisLayerOption.link, Gbl.getConfig().planomat().getTripStructureAnalysisLayer());
+		PlanomatConfigGroup expectedConfig = Gbl.getConfig().planomat();
+
+		assertEquals( 10, expectedConfig.getPopSize() );
+		
+		assertEquals(2, expectedConfig.getPossibleModes().toArray().length);
+		assertEquals(TransportMode.car, expectedConfig.getPossibleModes().toArray()[0]);
+		assertEquals(TransportMode.pt, expectedConfig.getPossibleModes().toArray()[1]);
+//		
+//		assertTrue(Arrays.deepEquals(
+//				new TransportMode[]{TransportMode.car, TransportMode.pt}, 
+//				Gbl.getConfig().planomat().getPossibleModes()));
+		assertEquals( PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE, expectedConfig.getLegTravelTimeEstimatorName() );
+		assertEquals( 1000, expectedConfig.getJgapMaxGenerations() );
+		assertEquals( 6, expectedConfig.getLevelOfTimeResolution() );
+		assertEquals( true, expectedConfig.isDoLogging() );
+		assertEquals( PlanomatConfigGroup.TripStructureAnalysisLayerOption.link, expectedConfig.getTripStructureAnalysisLayer());
 	}
 	
 }

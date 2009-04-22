@@ -1,5 +1,10 @@
 package org.matsim.core.config.groups;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Network;
@@ -10,6 +15,7 @@ import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.api.basic.v01.TransportMode;
 
 /**
  * Provides access to planomat config parameters.
@@ -29,7 +35,7 @@ public class PlanomatConfigGroup extends Module {
 	public static final String CHARYPAR_ET_AL_COMPATIBLE = "org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator";
 
 	public static enum TripStructureAnalysisLayerOption {facility,link}
-	
+
 	/**
 	 * Holds all planomat parameter names, their default and their actual values.
 	 * 
@@ -124,7 +130,7 @@ public class PlanomatConfigGroup extends Module {
 		 * TODO This parameter does not really belong to the planomat config group, but can be used by whatever algorithm. Might be moved to {@link GlobalConfigGroup}. 
 		 */
 		TRIP_STRUCTURE_ANALYSIS_LAYER("tripStructureAnalysisLayer", PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.toString(), "");
-		
+
 
 		private final String parameterName;
 		private final String defaultValue;
@@ -222,25 +228,27 @@ public class PlanomatConfigGroup extends Module {
 		return Integer.parseInt(PlanomatConfigParameter.JGAP_MAX_GENERATIONS.getActualValue());
 	}
 
-	private TransportMode[] cachedPossibleModes = null;
-	
-	public TransportMode[] getPossibleModes() {
+	private EnumSet<TransportMode> cachedPossibleModes = null;
+
+	public Set<TransportMode> getPossibleModes() {
 
 		if (this.cachedPossibleModes == null) {
-		
+
+			this.cachedPossibleModes = EnumSet.noneOf(TransportMode.class);
+
 			if (!PlanomatConfigParameter.POSSIBLE_MODES.getActualValue().equals(PlanomatConfigParameter.POSSIBLE_MODES.getDefaultValue())) {
 				String[] possibleModesStringArray = PlanomatConfigParameter.POSSIBLE_MODES.getActualValue().split(",");
-				cachedPossibleModes = new TransportMode[possibleModesStringArray.length];
+//				cachedPossibleModes = new TransportMode[possibleModesStringArray.length];
 				for (int ii=0; ii < possibleModesStringArray.length; ii++) {
-					cachedPossibleModes[ii] = TransportMode.valueOf(possibleModesStringArray[ii]);
+					this.cachedPossibleModes.add(TransportMode.valueOf(possibleModesStringArray[ii]));
+//					cachedPossibleModes[ii] = TransportMode.valueOf(possibleModesStringArray[ii]);
 				}
-			} else {
-				this.cachedPossibleModes = new TransportMode[]{};
 			}
-			
+
 		}
 
-		return this.cachedPossibleModes.clone();
+		return Collections.unmodifiableSet(this.cachedPossibleModes);
+//		return this.cachedPossibleModes.clone();
 
 	}
 
@@ -261,7 +269,7 @@ public class PlanomatConfigGroup extends Module {
 	}
 
 //	public String getOptimizationToolbox() {
-//		return PlanomatConfigParameter.OPTIMIZATION_TOOLBOX.getActualValue();
+//	return PlanomatConfigParameter.OPTIMIZATION_TOOLBOX.getActualValue();
 //	}
 
 	public int getPopSize() {
@@ -279,9 +287,9 @@ public class PlanomatConfigGroup extends Module {
 	public PlanomatConfigGroup.TripStructureAnalysisLayerOption getTripStructureAnalysisLayer() {
 		return PlanomatConfigGroup.TripStructureAnalysisLayerOption.valueOf(PlanomatConfigGroup.PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.getActualValue());
 	}
-	
+
 	public void setTripStructureAnalysisLayer(String str) {
 		PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.setActualValue(PlanomatConfigGroup.TripStructureAnalysisLayerOption.valueOf(str).toString());
 	}
-	
+
 }
