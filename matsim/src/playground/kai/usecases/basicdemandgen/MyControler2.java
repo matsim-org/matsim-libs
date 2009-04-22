@@ -143,6 +143,7 @@ public class MyControler2 {
 			e.printStackTrace();
 		}
 		
+		// BasicPopulationWriter.write needs a parameter from the config that I don't know how else to create. :-(  Kai
 		Gbl.createConfig(null) ;
 
 		// write the population for debugging purposes
