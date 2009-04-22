@@ -26,14 +26,16 @@ package org.matsim.demandmodeling.primloc;
  * 
  * This Module modifies the Person by adding know Facilities to the Knowledge of the Person
  * 
- * The following came from Fabrice in an email:
+ * It solves primary location choice with capacity constraints (limited number of facilities)
  * 
- * No documentation except the paper in NSE.
+ * The method is described in : F. Marchal (2005), "A trip generation method for time-dependent
+ * large-scale simulations of transport and land-use", Networks and Spatial Economics 5(2),
+ * Kluwer Academic Publishers, 179-192.
  *
  * The CumulativeDistribution is in the same unit as the O-D Travel penalties
  * so if the input is travel time in minutes -> trip distribution as a function of time in minutes.
  * 
- * There is some config file in
+ * There are some config files and tests with some verbosity in
  * test/input/org/matsim/demandmodeling/primloc
  * 
  * you can use the module without any distribution but then you cannot
