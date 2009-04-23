@@ -275,7 +275,7 @@ public class QueueLane {
 		this.freespeedTravelTime = this.length_m / this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 
 		this.simulatedFlowCapacity = numberOfRepresentedLanes * averageSimulatedFlowCapacityPerLane_Veh_s
-				* SimulationTimer.getSimTickTime() * config.getFlowCapFactor();
+				* SimulationTimer.getSimTickTime();
 
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
