@@ -119,6 +119,17 @@ public class Planomat implements PlanAlgorithm {
 
 	}
 
+//	protected EnumSet<TransportMode> getModifiedModeChoiceSet(final Plan plan) {
+//		
+//		EnumSet<TransportMode> modeChoiceSet = Gbl.getConfig().planomat().getPossibleModes().clone();
+//		
+//		if (!plan.getPerson().getCarAvail().equals("always")) {
+//			modeChoiceSet.remove(TransportMode.car);
+//		}
+//		
+//		return modeChoiceSet;
+//	}
+	
 	protected synchronized Genotype initJGAP(final Plan plan, final PlanAnalyzeSubtours planAnalyzeSubtours) {
 
 		Genotype population = null;
@@ -233,7 +244,7 @@ public class Planomat implements PlanAlgorithm {
 
 					activity.setStartTime(now);
 					// the new activity duration is
-					// - a random value in the time interval which was the res ult of the optimization
+					// - a random value in the time interval which was the result of the optimization
 					// - rounded to a full second with Math.rint() to stay consistent with the time step-based queue simulations
 					activity.setDuration(Math.rint((((IntegerGene) individual.getGenes()[ii / 2]).intValue() + this.seedGenerator.nextDouble()) * Planomat.TIME_INTERVAL_SIZE));
 					now += activity.getDuration();

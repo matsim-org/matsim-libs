@@ -161,6 +161,12 @@ public class PlanomatTest extends MatsimTestCase {
 		log.info("Testing " + testRun.toString() + "...done.");
 	}
 
+//	public void testGetModifiedModeChoiceSet() {
+//		
+//		fail("Not yet implemented");
+//		
+//	}
+	
 	public void testInitSampleChromosome() {
 
 		// init test Plan
