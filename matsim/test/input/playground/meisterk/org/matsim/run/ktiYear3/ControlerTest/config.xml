@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY STUDYBASE    "/home/meisterk/sandbox00/ivt/studies/switzerland">
+		<!ENTITY STUDYBASE    "/home/konrad/sandbox00/ivt/studies/switzerland">
 	]
 >
 <config>
@@ -10,7 +10,7 @@
 
 	<module name="controler">
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="10" />
+		<param name="lastIteration" value="1" />
 		<param name="routingAlgorithmType" value="AStarLandmarks" />
 	</module>
 
@@ -45,6 +45,15 @@
 		<param name="flowCapacityFactor" value="0.13" />
 		<param name="storageCapacityFactor" value="0.3" />
 		<param name="squeezeTime" value="10" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+	<module name="kti">
+		<param name="usePlansCalcRouteKti" value="true" />
+		<param name="pt_traveltime_matrix_filename" value="&STUDYBASE;/externals/ptNationalModel/2005_OEV_Befoerderungszeit.mtx" />
+		<param name="pt_haltestellen_filename" value="&STUDYBASE;/externals/ptNationalModel/Haltestellen.txt" />
+		<param name="worldInputFilename" value="&STUDYBASE;/world/world.xml" />
 	</module>
 
 	<!-- ====================================================================== -->
@@ -95,7 +104,7 @@
 		<param name="ModuleProbability_1" value="0.1" />
 		<param name="Module_1" value="ReRoute" />
 		<param name="ModuleProbability_2" value="0.1" />
-		<param name="Module_2" value="Planomat" />
+		<param name="Module_2" value="TimeAllocationMutator" />
 		<param name="ModuleProbability_3" value="0.8" />
 		<param name="Module_3" value="ChangeExpBeta" />
 	</module>

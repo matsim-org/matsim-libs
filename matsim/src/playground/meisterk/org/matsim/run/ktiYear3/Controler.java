@@ -25,6 +25,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 
 import playground.meisterk.org.matsim.controler.listeners.CalcLegTimesKTIListener;
+import playground.meisterk.org.matsim.controler.listeners.KtiRouterListener;
 import playground.meisterk.org.matsim.controler.listeners.ScoreElements;
 import playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory;
 
@@ -52,11 +53,12 @@ public class Controler {
 		controler.addControlerListener(new FacilitiesLoadCalculator(controler.getFacilityPenalties()));
 		controler.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));
 		controler.addControlerListener(new CalcLegTimesKTIListener("calcLegTimesKTI.txt"));
+		controler.addControlerListener(new KtiRouterListener());
 		
 		controler.run();
 		
 	}
-
+	
 	/**
 	 * @param args
 	 */
