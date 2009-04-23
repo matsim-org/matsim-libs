@@ -52,7 +52,7 @@ public class Matrices {
 	}
 
 	public static void reset() {
-		Matrices.singleton = null;
+		Matrices.singleton = new Matrices();
 	}
 
 
