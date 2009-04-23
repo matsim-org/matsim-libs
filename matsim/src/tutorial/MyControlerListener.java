@@ -24,14 +24,14 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class MyControlerListener implements StartupListener, IterationEndsListener, ShutdownListener {
 
-	private MyEventHandler eventHandler;
+	private MyEventHandler2 eventHandler;
 
 	private Map<Integer, Double> timePerIterationMap = new HashMap<Integer, Double>();
 
 
 	public void notifyStartup(StartupEvent event) {
 		// after the controler is started create and add the event handler for events of the mobility simulation
-		this.eventHandler = new MyEventHandler(event.getControler().getPopulation().getPersons().size());
+		this.eventHandler = new MyEventHandler2(event.getControler().getPopulation().getPersons().size());
 		event.getControler().getEvents().addHandler(this.eventHandler);
 	}
 
