@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Person;
@@ -29,6 +30,7 @@ import org.matsim.core.utils.misc.IntegerCache;
 
 public class SocialCostCalculatorMultiLink implements SocialCostCalculator,BeforeMobsimListener, QueueSimulationBeforeCleanupListener, LinkEnterEventHandler, LinkLeaveEventHandler, AgentStuckEventHandler{
 
+	private static final Logger  log = Logger.getLogger(SocialCostCalculatorMultiLink.class);
 	
 	private final NetworkLayer network;
 	private final int binSize;
@@ -60,9 +62,6 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 		}
 		
 		LinkTimeCostInfo ltc = li.getLinkTimeCostInfo(getTimeBin(time));
-		if (Double.isNaN(ltc.cost) || Double.isInfinite(ltc.cost)) {
-			System.out.println(ltc.cost);
-		}
 		return Math.max(0,ltc.cost);
 //		return 0.;
 	}
@@ -107,6 +106,8 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 	private void updateCosts() {
 		double maxCost = 0;
 		double minCost = Double.POSITIVE_INFINITY;
+		double costSum = 0;
+		int count = 0;
 		if (this.it > MSA_OFFSET) {
 			double n = this.it - MSA_OFFSET;
 			double oldCoef = n / (n+1);
@@ -120,6 +121,8 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 					if (lci.cost < minCost) {
 						minCost = lci.cost;
 					}
+					costSum += lci.cost;
+					count++;
 					lci.in = 0;
 					lci.c1 = 0;
 					lci.c2 = 0;
@@ -137,6 +140,8 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 					if (lci.cost < minCost) {
 						minCost = lci.cost;
 					}
+					costSum += lci.cost;
+					count++;
 					lci.in = 0;
 					lci.c1 = 0;
 					lci.c2 = 0;
@@ -145,7 +150,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 				}
 			}			
 		}
-		System.err.println("maxCost:" + maxCost + "    minCost:" + minCost);
+		log.info("maxCost: " + maxCost + " minCost: " + minCost + " avg: " + costSum/count);
 	}
 
 	private void scorePlans() {
@@ -255,7 +260,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 	}
 	
 	private static class LinkInfo {
-		HashMap<Integer,LinkTimeCostInfo> linkTimeCosts = new HashMap<Integer, LinkTimeCostInfo>();
+		HashMap<Integer,LinkTimeCostInfo> linkTimeCosts = new HashMap<Integer, LinkTimeCostInfo>(500);
 		HashMap<Id,Double> agentEnterInfos = new HashMap<Id, Double>(500);
 		
 		public void incrementInFlow(Integer timeBin) {
