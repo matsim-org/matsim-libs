@@ -68,11 +68,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		
 		log.info("adding FacilitiesLoadCalculator");
 		controler.addControlerListener(new FacilitiesLoadCalculator(controler.getFacilityPenalties()));
-		
-		log.info("Scoring with LocationChoiceScoringFunction");
-		controler.setScoringFunctionFactory(
-				new LocationChoiceScoringFunctionFactory(controler.getConfig().charyparNagelScoring(), controler.getFacilityPenalties()));
-				
+						
 		if (Gbl.getConfig().locationchoice().getMode().equals("true")) {
 			this.constrained = true;
 			log.info("Doing constrained location choice");
