@@ -25,6 +25,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.world.Location;
 
 public interface BasicFacility extends Location {
+	// FIXME [kn] In my unterstanding, it is really not so great that this extends from Location and not from
+	// BasicLocation.  kai, apr'09
 
 	public Map<String, ? extends BasicActivityOption> getActivityOptions();
 
