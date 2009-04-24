@@ -22,22 +22,22 @@ package org.matsim.demandmodeling.primloc;
 
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.config.*;
+import org.matsim.core.facilities.*;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.*;
+import org.matsim.core.population.*;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
-import org.matsim.world.WorldWriter;
+import org.matsim.world.*;
 
+/**
+ * Test case that uses the "primloc" module in a matsim setting.
+ * 
+ * Note that it uses a "zone" layer, which is defined in "world.xml".
+ * 
+ * @author fabrice and wisinee
+ *
+ */
 public class PrimlocModuleTest extends MatsimTestCase{
 
 	// FIXME this test-case has no Assert-statement, so it will always succeed!
