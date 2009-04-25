@@ -65,17 +65,23 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 				break;
 			}
 			System.out.println("----->currentIteration=" + itr);
-			
+
 			Plan plan = ctl.getPopulation().getPersons().values().iterator()
 					.next().getSelectedPlan();
 			StringBuilder legChainModes = new StringBuilder("|");
 			for (PlanElement pe : plan.getPlanElements())
 				if (pe instanceof Leg)
 					legChainModes.append(((Leg) pe).getMode() + "|");
-			
+
 			assertEquals("different legChainModes?", criterion, legChainModes
 					.toString());
 		}
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		Gbl.reset();
 	}
 
 	public void testLegChainModes() {

@@ -6,6 +6,7 @@ package playground.yu.test;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -31,7 +32,6 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.utils.collections.Tuple;
@@ -82,7 +82,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 				.getLocalInstance());
 	}
 
-	public static class ChooseRandomLegModeWithParkLink implements
+	private static class ChooseRandomLegModeWithParkLink implements
 			PlanAlgorithm {
 		private TransportMode[] possibleModes;
 
@@ -103,22 +103,15 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 					// changed.
 					int legIdx = rnd.nextInt(peSize / 2) * 2 + 1;
 
-					TransportMode tm = ((Leg) plan.getPlanElements()
+					TransportMode mode2change = ((Leg) plan.getPlanElements()
 							.get(legIdx)).getMode();
-
-					int crtModeIdx = -1;
-					for (int i = 0; i < possibleModes.length; i++) {
-						if (possibleModes[i].equals(tm))
-							crtModeIdx = i;
+					TransportMode newMode = mode2change;
+					while (newMode.equals(mode2change)) {
+						newMode = possibleModes[rnd
+								.nextInt(possibleModes.length)];
 					}
 
-					int newModeIdx = -1;
-					while (newModeIdx < 0 || newModeIdx == crtModeIdx) {
-						newModeIdx = rnd.nextInt(possibleModes.length);
-					}
-
-					TransportMode newMode = possibleModes[newModeIdx];
-					if (tm.equals(TransportMode.car)) {
+					if (mode2change.equals(TransportMode.car)) {
 						done = changeCar2UnCar(plan, legIdx, newMode);
 					} else {
 						if (newMode.equals(TransportMode.car)) {
@@ -157,84 +150,119 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			}
 
 			List<PlanElement> pes = plan.getPlanElements();
+			Set<Tuple<Integer, Integer>> tuples = new HashSet<Tuple<Integer, Integer>>();
 			// looks for "car" legs from left to right, where man can "get off"
 			ParkLocation leftPl = new ParkLocation((Activity) pes.get(l));
-			List<Tuple<Integer, Integer>> linkTuples = new ArrayList<Tuple<Integer, Integer>>();
 			int tmpL = l;
 			for (int i = l + 2; i < r; i += 2) {
 				if (new ParkLocation((Activity) pes.get(i)).equals(leftPl)) {
-					linkTuples.add(new Tuple<Integer, Integer>(tmpL, i));
+					tuples.add(new Tuple<Integer, Integer>(tmpL, i));
 					tmpL = i;
 				}
 			}
+
 			// looks for "car" legs from right to left, where man can "get off"
 			ParkLocation rightPl = new ParkLocation((Activity) pes.get(r));
-			List<Tuple<Integer, Integer>> rightTuples = new ArrayList<Tuple<Integer, Integer>>();
 			int tmpR = r;
 			for (int j = r - 2; j > l; j -= 2)
 				if (new ParkLocation((Activity) pes.get(j)).equals(rightPl)) {
-					rightTuples.add(new Tuple<Integer, Integer>(j, tmpR));
+					tuples.add(new Tuple<Integer, Integer>(j, tmpR));
 					tmpR = j;
 				}
-			// looks for "car" les from both sides to middle, where man can
+
+			// looks for "car" legs from both sides to middle, where man can
 			// "get off"
-			List<Tuple<Integer, Integer>> midTuples = new ArrayList<Tuple<Integer, Integer>>();
 			for (int i = l + 2; i <= r - 4; i += 2)
 				for (int j = r - 2; j > i; j -= 2)
 					if (new ParkLocation((Activity) pes.get(i))
 							.equals(new ParkLocation((Activity) pes.get(j))))
-						midTuples.add(new Tuple<Integer, Integer>(i, j));
+						tuples.add(new Tuple<Integer, Integer>(i, j));
 
-			Set<Tuple<Integer, Integer>> tuples = new HashSet<Tuple<Integer, Integer>>();
-			tuples.addAll(linkTuples);
-			tuples.addAll(rightTuples);
-			tuples.addAll(midTuples);
-			// Is there changeable leg chain, which also contains leg with this
-			// legIdx
-			Set<Tuple<Integer, Integer>> legTuples = new HashSet<Tuple<Integer, Integer>>();
-			for (Tuple<Integer, Integer> tpl : tuples) {
-				if (tpl.getFirst() < legIdx && tpl.getSecond() > legIdx)
-					legTuples.add(tpl);
-			}
-			// which is the shortest?
-
-			if (legTuples.size() > 0) {
-				List<Tuple<Integer, Integer>> tmpTpls = computeShortestLegTuples(legTuples);
-				Tuple<Integer, Integer> tuple = tmpTpls.get(rnd.nextInt(tmpTpls
-						.size()));
-				return setLegChainMode(plan, tuple.getFirst(), tuple
-						.getSecond(), mode);
-			} else {// there is not changeable leg chain containing legIdx
-				List<Tuple<Integer, Integer>> tmpTpls = computeShortestLegTuples(tuples);
-				int tmpTplsSize = tmpTpls.size();
-				if (tmpTplsSize > 0) {
-					Tuple<Integer, Integer> tuple = tmpTpls.get(rnd
-							.nextInt(tmpTplsSize));
-					return setLegChainMode(plan, tuple.getFirst(), tuple
-							.getSecond(), mode);
+			if (tuples.size() > 0) {
+				// Is there changeable leg chain, which also contains leg with
+				// this
+				// legIdx
+				Set<Tuple<Integer, Integer>> legTuples = new HashSet<Tuple<Integer, Integer>>();
+				for (Tuple<Integer, Integer> tpl : tuples) {
+					if (tpl.getFirst() < legIdx && tpl.getSecond() > legIdx)
+						legTuples.add(tpl);
 				}
-				return false;
+
+				// which is the shortest?
+				Tuple<Integer, Integer> tuple = null;
+				boolean toReturn = true;
+				if (legTuples.size() > 0) {
+					tuple = getShortestLegTuple(legTuples);
+					toReturn = toReturn
+							&& setLegRandomModeWithoutModeA(plan, tuple,
+									TransportMode.car);
+					toReturn = toReturn && setLegMode(plan, legIdx, mode);
+				} else {// there is not changeable leg chain containing legIdx
+					tuple = getShortestLegTuple(tuples);
+					toReturn = toReturn
+							&& setLegRandomModeWithoutModeA(plan, tuple,
+									TransportMode.car);
+				}
+				return toReturn;
 			}
+			return false;
+
 		}
 
-		private List<Tuple<Integer, Integer>> computeShortestLegTuples(
+		/*
+		 * private boolean setLegRandomModeWithoutModeAs(Plan plan,
+		 * Tuple<Integer, Integer> tuple, Set<TransportMode> modeAs) { boolean
+		 * toReturn = true; for (int i = tuple.getFirst() + 1; i <
+		 * tuple.getSecond(); i += 2) { TransportMode newMode =
+		 * possibleModes[rnd .nextInt(possibleModes.length)]; while
+		 * (modeAs.contains(newMode)) newMode =
+		 * possibleModes[rnd.nextInt(possibleModes.length)]; toReturn = toReturn
+		 * && setLegMode(plan, i, newMode); } return toReturn; }
+		 */
+
+		private boolean setLegRandomModeWithoutModeA(Plan plan,
+				Tuple<Integer, Integer> tuple, TransportMode modeA) {
+			boolean toReturn = true;
+			for (int i = tuple.getFirst() + 1; i < tuple.getSecond(); i += 2) {
+				TransportMode newMode = possibleModes[rnd
+						.nextInt(possibleModes.length)];
+				while (modeA.equals(newMode))
+					newMode = possibleModes[rnd.nextInt(possibleModes.length)];
+				toReturn = toReturn && setLegMode(plan, i, newMode);
+			}
+			return toReturn;
+		}
+
+		private Tuple<Integer, Integer> getShortestLegTuple(
 				Set<Tuple<Integer, Integer>> legTuples) {
 			List<Tuple<Integer, Integer>> tmpTpls = new ArrayList<Tuple<Integer, Integer>>();
-			int shortestLeg = 10000;
-			if (legTuples.size() > 1)
+			int shortestLegActIdxDiff = 10000;
+			if (legTuples.size() > 1) {
 				for (Tuple<Integer, Integer> tpl : legTuples) {
 					int diff = tpl.getSecond() - tpl.getFirst();
-					if (diff < shortestLeg) {
-						shortestLeg = diff;
+					if (diff < shortestLegActIdxDiff) {
+						shortestLegActIdxDiff = diff;
 						tmpTpls.clear();
 						tmpTpls.add(tpl);
-					} else if (diff == shortestLeg) {
+					} else if (diff == shortestLegActIdxDiff) {
 						tmpTpls.add(tpl);
 					}
 				}
-			else if (legTuples.size() == 1)
-				tmpTpls.add(legTuples.iterator().next());
-			return tmpTpls;
+				if (tmpTpls.size() == 1)
+					return tmpTpls.iterator().next();
+				else {
+					int cnt = 0;
+					int rndInt = rnd.nextInt(tmpTpls.size());
+					for (Iterator<Tuple<Integer, Integer>> itr = tmpTpls
+							.iterator(); itr.hasNext();) {
+						if (cnt == rndInt)
+							return itr.next();
+						cnt++;
+					}
+				}
+			} else if (legTuples.size() == 1)
+				return legTuples.iterator().next();
+			return null;
 		}
 
 		private boolean changeUnCar2Car(Plan plan, int legIdx) {
@@ -400,18 +428,44 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			return false;
 		}
 
+		public static void main(String[] arg) {
+			String[] args = new String[] { "../matsimTests/changeLegModeTests/config.xml" };
+			Config config = Gbl.createConfig(args);
+			Controler ctl = new ChangeLegModeWithParkLocationControler(args);
+			ctl.addControlerListener(new LegChainModesListener());
+			ctl.setCreateGraphs(false);
+			ctl.setWriteEventsInterval(0);
+			ctl
+					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
+							config.charyparNagelScoring()));
+			ctl.run();
+		}
+
 		private static boolean setLegChainMode(Plan plan, int leftActIdx,
 				int rightActIdx, TransportMode mode) {
-			if (leftActIdx % 2 != 0 || rightActIdx % 2 != 0) {
+			if (leftActIdx % 2 != 0 || rightActIdx % 2 != 0 || leftActIdx < 0
+					|| rightActIdx > plan.getPlanElements().size()) {
 				System.err
-						.println("----->ERROR: leftActIdx and rightActIdx should be 2 even number!");
+						.println("----->ERROR: leftActIdx and rightActIdx should be 2 even number! Or actIdx out of Bound!");
 				System.exit(1);
 			}
 			for (int i = leftActIdx + 1; i < rightActIdx; i += 2)
-				((Leg) plan.getPlanElements().get(i)).setMode(mode);
+				setLegMode(plan, i, mode);
 			return rightActIdx >= leftActIdx + 2;
 		}
 
+		private static boolean setLegMode(Plan plan, int legIdx,
+				TransportMode mode) {
+			List<PlanElement> pes = plan.getPlanElements();
+			int size = pes.size();
+			if (legIdx % 2 == 0 || legIdx < 0 || legIdx > size) {
+				System.err
+						.println("----->ERROR: legIdx should be an odd number! Or legIdx out of bound!");
+				System.exit(1);
+			}
+			((Leg) pes.get(legIdx)).setMode(mode);
+			return legIdx % 2 == 1 && legIdx > 0 && legIdx < size;
+		}
 		// reserve
 		/*
 		 * private static boolean checkParkSensible(Plan plan) { int carLegCnt =
@@ -547,7 +601,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 
 			// ChangeExpBeta
 			PlanStrategy strategy1 = new PlanStrategy(new ExpBetaPlanChanger());
-			manager.addStrategy(strategy1, 0.1);
+			manager.addStrategy(strategy1, 0.9);
 
 			// ChangeLegModeWithParkLocation
 			PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
@@ -557,14 +611,16 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			manager.addStrategy(strategy2, 0.1);
 
 			// ReRoute
-			PlanStrategy strategy3 = new PlanStrategy(new RandomPlanSelector());
-			strategy3.addStrategyModule(new ReRoute(this));
-			manager.addStrategy(strategy3, 0.1);
+			// PlanStrategy strategy3 = new PlanStrategy(new
+			// RandomPlanSelector());
+			// strategy3.addStrategyModule(new ReRoute(this));
+			// manager.addStrategy(strategy3, 0.1);
 
 			// TimeAllocationMutator
-			PlanStrategy strategy4 = new PlanStrategy(new RandomPlanSelector());
-			strategy4.addStrategyModule(new TimeAllocationMutator());
-			manager.addStrategy(strategy4, 0.1);
+			// PlanStrategy strategy4 = new PlanStrategy(new
+			// RandomPlanSelector());
+			// strategy4.addStrategyModule(new TimeAllocationMutator());
+			// manager.addStrategy(strategy4, 0.1);
 
 			return manager;
 		}
@@ -600,16 +656,4 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		}
 	}
 
-	public static void main(String[] arg) {
-		String[] args = new String[] { "../matsimTests/changeLegModeTests/config.xml" };
-		Config config = Gbl.createConfig(args);
-		Controler ctl = new ChangeLegModeWithParkLocationControler(args);
-		ctl.addControlerListener(new LegChainModesListener());
-		 ctl.setCreateGraphs(false);
-		ctl.setWriteEventsInterval(0);
-		ctl
-				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring()));
-		ctl.run();
-	}
 }
