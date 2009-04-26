@@ -43,6 +43,8 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 	Map<Id,LinkInfo> linkInfos = new HashMap<Id,LinkInfo>();
 	Set<Id> stuckedAgents = new HashSet<Id>();
 	private int it;
+
+	private final double discount;
 	
 
 	private final static int MSA_OFFSET = 0;
@@ -53,6 +55,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 		this.minK = (int)(3 * 3600 / (double)binSize); //just a HACK needs to be fixed
 		this.travelTimeCalculator = travelTimeCalculator;
 		this.population = population;
+		this.discount = MarginalCostControlerMultiLink.QUICKnDIRTY;
 	}
 	
 	public double getSocialCost(Link link, double time) {
@@ -221,7 +224,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 			LinkTimeCostInfo ltc2 = li.getLinkTimeCostInfo(timeBin2);
 			
 			if (ltc2 != null && ltc2.out > 0){
-				agentDelay += ((double)ltc.in/this.binSize - (double)ltc.out/this.binSize) / ((double)ltc2.out/this.binSize);
+				agentDelay = this.discount * agentDelay + ((double)ltc.in/this.binSize - (double)ltc.out/this.binSize) / ((double)ltc2.out/this.binSize);
 			} 
 		}
 		AgentMoneyEvent e = new AgentMoneyEvent(this.maxK * this.binSize,agentId,agentDelay/-600);

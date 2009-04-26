@@ -27,7 +27,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
 
 public class MarginalCostControlerMultiLink extends Controler{
 
-
+	public static double QUICKnDIRTY;
 
 	public MarginalCostControlerMultiLink(final String[] args) {
 		super(args);
@@ -51,7 +51,10 @@ public class MarginalCostControlerMultiLink extends Controler{
 	}
 
 	public static void main(final String[] args) {
-		final Controler controler = new MarginalCostControlerMultiLink(args);
+		QUICKnDIRTY = Double.parseDouble(args[1]);
+		System.out.println("DISCOUNT:" + QUICKnDIRTY);
+		String [] args2 = {args[0]}; 
+		final Controler controler = new MarginalCostControlerMultiLink(args2);
 		controler.run();
 		System.exit(0);
 	}
