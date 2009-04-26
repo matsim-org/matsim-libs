@@ -50,6 +50,7 @@ public class AllTests {
 //		}
 		suite.addTest(playground.gregor.AllTests.suite());
 		suite.addTest(playground.jhackney.socialnetworks.AllTests.suite());
+		suite.addTest(playground.yu.AllTests.suite());
 		
 		//$JUnit-END$
 		return suite;
