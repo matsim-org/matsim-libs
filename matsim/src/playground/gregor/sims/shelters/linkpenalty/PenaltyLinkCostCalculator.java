@@ -4,6 +4,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.AbstractTravelTimeCalculator;
 
+
 public class PenaltyLinkCostCalculator implements TravelCost{
 
 	private final AbstractTravelTimeCalculator tc;
@@ -15,5 +16,6 @@ public class PenaltyLinkCostCalculator implements TravelCost{
 	public double getLinkTravelCost(Link link, double time) {
 		return this.tc.getLinkTravelTime(link, time) + this.sc.getLinkPenalty(link, time);
 	}
+	
 
 }

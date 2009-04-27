@@ -11,9 +11,6 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 
-import playground.gregor.sims.shelters.signalsystems.ShelterDoorBlockerSetup;
-import playground.gregor.sims.shelters.signalsystems.ShelterInputCounter;
-
 
 
 public class ShelterEvacuationController extends Controler {
@@ -29,6 +26,8 @@ public class ShelterEvacuationController extends Controler {
 		super(args);
 		//TODO remove
 //		this.setOverwriteFiles(true);
+//		this.config.scenario().setUseSignalSystems(true);
+//		this.config.scenario().setUseLanes(true);
 	}
 
 	
@@ -36,16 +35,18 @@ public class ShelterEvacuationController extends Controler {
 
 	@Override
 	protected void setUp() {
+		
 		//signalsystems
-		this.config.network().setLaneDefinitionsFile("nullnull");
+//		this.config.network().setLaneDefinitionsFile("nullnull");
+
 		
 //		//TODO remove
 //		this.config.controler().setLastIteration(0);
 		super.setUp();
 		
-		ShelterInputCounter sic = new ShelterInputCounter(this.network,this.shelterLinkMapping);
-		this.events.addHandler(sic);
-		this.addControlerListener(sic);
+//		ShelterInputCounter sic = new ShelterInputCounter(this.network,this.shelterLinkMapping);
+//		this.events.addHandler(sic);
+//		this.addControlerListener(sic);
 		
 //		//link penalty
 //		this.travelCostCalculator = new PenaltyLinkCostCalculator(this.travelTimeCalculator,sic);
@@ -53,8 +54,8 @@ public class ShelterEvacuationController extends Controler {
 		
 		
 //		signalsystems
-		this.addControlerListener(new ShelterDoorBlockerSetup());
-		this.getQueueSimulationListener().add(sic);
+//		this.addControlerListener(new ShelterDoorBlockerSetup());
+//		this.getQueueSimulationListener().add(sic);
 		
 	}
 

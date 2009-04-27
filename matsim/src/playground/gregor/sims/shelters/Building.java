@@ -27,7 +27,7 @@ public class Building {
 		this.quakeProof = quakeProof;
 		this.geo = geo;
 		
-		this.shelterSpace = (int)((((floor - 1.) * space)/2.)/10);
+		this.shelterSpace = (int)((((floor - 1.) * space)/2.));
 		
 	}
 
