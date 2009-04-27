@@ -57,9 +57,13 @@ public class RandomLocationMutator extends LocationMutator {
 			
 			boolean isPrimary = false;
 			boolean movable = false;
-			if (this.config.getFixByActType().equals("false")) {	
-				isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
-				movable = movablePrimaryActivities.contains(act);
+			if (this.config.getFixByActType().equals("false")) {
+				// test for home if by accident home is not declared as primary
+				isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId()) ||
+					act.getType().startsWith("h");
+				if (isPrimary) {
+					movable = movablePrimaryActivities.contains(act);
+				}
 			}
 			else {
 				isPrimary = plan.getPerson().getKnowledge().isSomewherePrimary(act.getType());
