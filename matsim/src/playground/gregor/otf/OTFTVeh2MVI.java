@@ -190,7 +190,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 //		
 //		String vehFileName = "../runs/run301/output/100.T.veh.gz";
 		final String outFileName = "../../outputs/output/ITERS/it.200/200.movie.mvi";
-		final int intervall_s = 60;
+		final int intervall_s = 10;
 
 		Gbl.createConfig(null);
 		Gbl.startMeasurement();

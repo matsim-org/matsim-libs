@@ -135,6 +135,11 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 	}
 	
+	private void loadTileDrawer() {
+		OGLSimpleBackgroundLayer.addPersistentItem(new TileDrawer());
+		
+	}
+	
 	private void loadFeatureLayer(final String shapeFile, final float [] color) throws Exception {
 		final FeatureSource fs = ShapeFileReader.readDataFile(shapeFile);
 		OGLSimpleBackgroundLayer.addPersistentItem(new SimpleBackgroundFeatureDrawer(fs,color));
@@ -157,7 +162,9 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		drawer2.addOverlay(overlay)
 //		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
 //		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
-		loadTilesFromServer();
+//		loadTilesFromServer();
+		loadTileDrawer();
+		
 		try {
 			loadFeatureLayer(this.BUILDINGS_FILE,buildingsColor);
 			loadFeatureLayer(this.NODES_FILE,linksColor);
@@ -173,6 +180,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 
 
 
+
+
 	public static void main(final String[] args) {
 //		String filename = "../MatsimJ/output/OTFQuadfileSCHWEIZ2.3.mvi.gz";
 //		String filename = "../MatsimJ/output/testSWI2.mvi.gz";
@@ -184,6 +193,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		final String filename =  CVSROOT + "/runs/run314/output/ITERS/it.100/100.movie.mvi";
 //		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
 //		final String filename =  "../../outputs/output_100m_so/ITERS/it.0/0.movie.mvi";
+//		final String filename =  "../../outputs/output_shelter_noWave/ITERS/it.100/100.movie.mvi";
 		final String filename =  "../../outputs/output/ITERS/it.200/200.movie.mvi";
 //		final String filename =  "./output/ITERS/it.0/0.otfvis.mvi";
 		
