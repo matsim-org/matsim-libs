@@ -32,9 +32,7 @@ import org.matsim.core.config.Module;
  *
  */
 public class SignalSystemsConfigGroup extends Module {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 2346649035049406334L;
 
 	private static final String SIGNALSYSTEMFILE = "signalsystems";
