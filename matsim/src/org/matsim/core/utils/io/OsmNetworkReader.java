@@ -246,8 +246,13 @@ public class OsmNetworkReader {
 
 					for (String nodeId : way.nodes) {
 						OsmNode node = this.nodes.get(nodeId);
-						node.used = true;
-						node.ways++;
+						for (OsmFilter osmFilter : this.hierarchyLayers) {
+							if(osmFilter.coordInFilter(node.coord, way.hierarchy)){
+								node.used = true;
+								node.ways++;
+								break;
+							}
+						}
 					}
 				}
 			}
@@ -401,7 +406,11 @@ public class OsmNetworkReader {
 
 		// check tag "lanes"
 		if (way.tags.containsKey("lanes")) {
-			nofLanes = Double.parseDouble(way.tags.get("lanes"));
+			try {
+				nofLanes = Double.parseDouble(way.tags.get("lanes"));
+			} catch (Exception e) {
+				// Nothing to do here, simply ignore it
+			}			
 		}
 		
 		// create the link(s)
@@ -411,15 +420,20 @@ public class OsmNetworkReader {
 			freespeed = freespeed * freespeedFactor;
 		}
 
-		if (!onewayReverse) {
-			Link l = network.createLink(new IdImpl(this.id), network.getNode(fromNode.id), network.getNode(toNode.id), length, freespeed, capacity, nofLanes);
-			l.setOrigId(origId);
-			this.id++;
-		}
-		if (!oneway) {
-			Link l = network.createLink(new IdImpl(this.id), network.getNode(toNode.id), network.getNode(fromNode.id), length, freespeed, capacity, nofLanes);
-			l.setOrigId(origId);
-			this.id++;
+		// only create link, if both nodes were found, node could be null, since nodes outside a layer were dropped
+		if(network.getNode(fromNode.id) != null && network.getNode(toNode.id) != null){
+		
+			if (!onewayReverse) {
+				Link l = network.createLink(new IdImpl(this.id), network.getNode(fromNode.id), network.getNode(toNode.id), length, freespeed, capacity, nofLanes);
+				l.setOrigId(origId);
+				this.id++;
+			}
+			if (!oneway) {
+				Link l = network.createLink(new IdImpl(this.id), network.getNode(toNode.id), network.getNode(fromNode.id), length, freespeed, capacity, nofLanes);
+				l.setOrigId(origId);
+				this.id++;
+			}
+		
 		}
 	}
 	
