@@ -25,7 +25,9 @@ import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
 import org.matsim.core.trafficmonitoring.TravelTimeAggregatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
 
-public class MarginalCostControler extends Controler{
+import playground.gregor.sims.evacbase.EvacuationQSimControler;
+
+public class MarginalCostControler extends EvacuationQSimControler{
 
 
 
