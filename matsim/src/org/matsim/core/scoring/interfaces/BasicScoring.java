@@ -20,6 +20,11 @@
 
 package org.matsim.core.scoring.interfaces;
 
+/**
+ * The methods related to scoring generally.
+ *
+ * @author rashid_waraich
+ */
 public interface BasicScoring {
 
 	public void finish();

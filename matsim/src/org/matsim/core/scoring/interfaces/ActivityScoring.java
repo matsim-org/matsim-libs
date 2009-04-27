@@ -22,6 +22,11 @@ package org.matsim.core.scoring.interfaces;
 
 import org.matsim.core.api.population.Activity;
 
+/**
+ * The scoring methods related to activities.
+ *
+ * @author rashid_waraich
+ */
 public interface ActivityScoring {
 
 	public void startActivity(final double time, final Activity act);

@@ -20,6 +20,11 @@
 
 package org.matsim.core.scoring.interfaces;
 
+/**
+ * The scoring methods related to money.
+ *
+ * @author rashid_waraich
+ */
 public interface MoneyScoring {
 	public void addMoney(final double amount);
 }

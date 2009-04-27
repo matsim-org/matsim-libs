@@ -27,6 +27,12 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
+/**
+ * This is a re-implementation of the original CharyparNagel function, based on a
+ * modular approach.
+ * 
+ * @author rashid_waraich
+ */
 public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final CharyparNagelScoringParameters params;

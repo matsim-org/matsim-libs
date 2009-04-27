@@ -24,7 +24,12 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.AgentStuckScoring;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 
-
+/**
+ * This is a re-implementation of the original CharyparNagel function, based on a
+ * modular approach.
+ * 
+ * @author rashid_waraich
+ */
 public class AgentStuckScoringFunction implements AgentStuckScoring, BasicScoring {
 
 	protected double score;

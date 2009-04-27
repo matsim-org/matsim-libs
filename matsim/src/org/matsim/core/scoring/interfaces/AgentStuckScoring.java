@@ -20,6 +20,11 @@
 
 package org.matsim.core.scoring.interfaces;
 
+/**
+ * The scoring methods related to stuck vehicles.
+ *
+ * @author rashid_waraich
+ */
 public interface AgentStuckScoring {
 	public void agentStuck(final double time);
 }

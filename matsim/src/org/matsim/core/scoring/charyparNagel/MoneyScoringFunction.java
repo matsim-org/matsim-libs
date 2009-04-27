@@ -24,7 +24,12 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.MoneyScoring;
 
-
+/**
+ * This is a re-implementation of the original CharyparNagel function, based on a
+ * modular approach.
+ * 
+ * @author rashid_waraich
+ */
 public class MoneyScoringFunction implements MoneyScoring, BasicScoring {
 
 	protected double score;

@@ -30,6 +30,11 @@ import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 import org.matsim.core.scoring.interfaces.MoneyScoring;
 
+/**
+ * The accumulator adds up the different parts of the score.
+ *
+ * @author rashid_waraich
+ */
 public class ScoringFunctionAccumulator implements ScoringFunction {
 
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();

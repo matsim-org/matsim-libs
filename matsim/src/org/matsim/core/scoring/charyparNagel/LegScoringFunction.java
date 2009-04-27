@@ -28,8 +28,12 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 
-
-
+/**
+ * This is a re-implementation of the original CharyparNagel function, based on a
+ * modular approach.
+ * 
+ * @author rashid_waraich
+ */
 public class LegScoringFunction implements LegScoring, BasicScoring {
 
 	protected final Plan plan;
