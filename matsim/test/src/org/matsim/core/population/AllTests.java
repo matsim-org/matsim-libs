@@ -30,8 +30,9 @@ public class AllTests {
 
 		suite.addTestSuite(ActivityTest.class);
 		suite.addTestSuite(PersonImplTest.class);
-		suite.addTestSuite(PlanTest.class);
+		suite.addTestSuite(PlanImplTest.class);
 		suite.addTestSuite(PopulationReaderMatsimV4Test.class);
+		suite.addTestSuite(PopulationWriterHandlerImplV4Test.class);
 		suite.addTest(org.matsim.core.population.routes.AllTests.suite());
 
 		return suite;

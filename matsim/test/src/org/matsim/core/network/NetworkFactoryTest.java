@@ -20,11 +20,10 @@
 
 package org.matsim.core.network;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.Route;
-import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
@@ -35,8 +34,6 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class NetworkFactoryTest extends MatsimTestCase {
 
-	private final static Logger log = Logger.getLogger(NetworkFactoryTest.class);
-
 	public void testSetRouteFactory() {
 		NetworkFactory factory = new NetworkFactory();
 
@@ -44,12 +41,8 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		Route carRoute = factory.createRoute(TransportMode.car, null, null);
 		assertTrue(carRoute instanceof NodeNetworkRoute);
 
-		try {
-			Route route = factory.createRoute(TransportMode.pt, null, null);
-			fail("expected IllegalArgumentException, but got route " + route.toString());
-		} catch (IllegalArgumentException e) {
-			log.info("Catched expected IllegalArgumentException: " + e.getMessage());
-		}
+		Route route = factory.createRoute(TransportMode.pt, null, null);
+		assertTrue(route instanceof GenericRoute);
 
 		// overwrite car-mode
 		factory.setRouteFactory(TransportMode.car, new CarRouteMockFactory());
@@ -68,12 +61,8 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		factory.setRouteFactory(TransportMode.pt, null);
 
 		// test pt again
-		try {
-			Route route = factory.createRoute(TransportMode.pt, null, null);
-			fail("expected IllegalArgumentException, but got route " + route.toString());
-		} catch (IllegalArgumentException e) {
-			log.info("Catched expected IllegalArgumentException: " + e.getMessage());
-		}		
+		route = factory.createRoute(TransportMode.pt, null, null);
+		assertTrue(route instanceof GenericRoute);
 
 	}
 	

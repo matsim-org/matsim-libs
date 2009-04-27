@@ -36,10 +36,12 @@ import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -91,8 +93,8 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private Plan currplan = null;
 	private Activity curract = null;
 	private Leg currleg = null;
-	private NetworkRoute currroute = null;
-	private String routeNodes = null;
+	private Route currRoute = null;
+	private String routeDescription = null;
 
 	private Activity prevAct = null;
 
@@ -173,10 +175,8 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		} else if (ACT.equals(name)) {
 			this.prevAct = this.curract;
 			this.curract = null;
-		} else if (LEG.equals(name)) {
-			this.currleg = null;
 		} else if (ROUTE.equals(name)) {
-			this.routeNodes = content;
+			this.routeDescription = content;
 		}
 	}
 
@@ -289,7 +289,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			throw new NumberFormatException(
 					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
-		this.routeNodes = null;
+		this.routeDescription = null;
 		this.currplan = this.currperson.createPlan(selected);
 
 		String scoreString = atts.getValue("score");
@@ -352,10 +352,14 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			}
 			this.curract.setFacility(f);
 		}
-		if (this.routeNodes != null) {
-			this.currroute.setNodes(this.prevAct.getLink(), NetworkUtils.getNodes(this.network, this.routeNodes), this.curract.getLink());
-			this.routeNodes = null;
-			this.currroute = null;
+		if (this.routeDescription != null) {
+			if (this.currleg.getMode() == TransportMode.pt) {
+				((GenericRoute) this.currRoute).setRouteDescription(this.prevAct.getLink(), this.routeDescription.trim(), this.curract.getLink());
+			} else {
+				((NetworkRoute) this.currRoute).setNodes(this.prevAct.getLink(), NetworkUtils.getNodes(this.network, this.routeDescription), this.curract.getLink());
+			}
+			this.routeDescription = null;
+			this.currRoute = null;
 		}
 	}
 
@@ -367,13 +371,17 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currroute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, this.prevAct.getLink(), this.prevAct.getLink());
-		this.currleg.setRoute(this.currroute);
+		if (this.currleg.getMode() == TransportMode.pt) {
+			this.currRoute = this.network.getFactory().createRoute(this.currleg.getMode(), this.prevAct.getLink(), this.prevAct.getLink());
+		} else {
+			this.currRoute = this.network.getFactory().createRoute(TransportMode.car, this.prevAct.getLink(), this.prevAct.getLink());
+		}
+		this.currleg.setRoute(this.currRoute);
 		if (atts.getValue("dist") != null) {
-			this.currroute.setDistance(Double.parseDouble(atts.getValue("dist")));
+			this.currRoute.setDistance(Double.parseDouble(atts.getValue("dist")));
 		}
 		if (atts.getValue("trav_time") != null) {
-			this.currroute.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
+			this.currRoute.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
 		}
 	}
 

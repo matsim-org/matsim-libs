@@ -181,6 +181,9 @@ public class SelectedPlans2ESRIShape {
 	}
 
 	private Feature getLegFeature(final Leg leg, final String id) {
+		if (!(leg.getRoute() instanceof NetworkRoute)) {
+			return null;
+		}
 		TransportMode mode = leg.getMode();
 		Double depTime = leg.getDepartureTime();
 		Double travTime = leg.getTravelTime();
