@@ -188,7 +188,7 @@ public class OTFVis {
 			new MatsimConfigReader(config).readFile(args[0]);
 		}
 		ScenarioLoader loader = new ScenarioLoader(config);
-		loader.loadPopulation();
+		loader.loadScenario();
 		Scenario data = loader.getScenario();
 		Events events = new Events();
 
