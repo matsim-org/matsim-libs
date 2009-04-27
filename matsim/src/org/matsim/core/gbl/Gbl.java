@@ -20,28 +20,24 @@
 
 package org.matsim.core.gbl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigReaderMatsimV1;
-import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.matrices.Matrices;
-import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
-/* The usage of Gbl.getConfig() all throughout the code makes it very hard
+import org.matsim.core.config.*;
+import org.matsim.matrices.Matrices;
+import org.matsim.world.World;
+
+/** @deprecated The usage of Gbl.getConfig() all throughout the code makes it very hard
  * to debug. We would thus prefer if Gbl.getConfig() could be removed in
  * the longer term and the config-object, or single params from the config,
  * could be handed as parameters where needed. // VSP/mrieser, 11sep2007
- * The same holds true for Gbl.getConfig(). // VSP/mrieser, 06jun2008
+ * The same holds true for Gbl.getConfig(). // VSP/mrieser, 06jun2008 // ???  kai, apr09
  */
-
 public abstract class Gbl {
 	public final static String ONLYONCE=" This message given only once.";
 	
@@ -101,12 +97,10 @@ public abstract class Gbl {
 	 * config is used somewhere in the code, the config (or the needed
 	 * parameters) need to be passed explicitly.
 	 */
-  @Deprecated
 	public static final Config getConfig() {
 		return Gbl.config;
 	}
 
-  @Deprecated
 	public static final void setConfig(final Config config) {
 		Gbl.config = config;
 	}
