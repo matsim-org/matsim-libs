@@ -169,6 +169,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		final List actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);
+			if (act.getType().startsWith("h")) continue;
 			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
 			
 			if (isPrimary) {
