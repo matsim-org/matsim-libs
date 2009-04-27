@@ -77,7 +77,7 @@ public class NewAgentCarPlan extends NewPopulation implements PlanAlgorithm {
 	public static void main(final String[] args) {
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String plansFilename = "../schweiz-ivtch-SVN/baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
-		final String outputPlansFilename = "output/newplans/plans_allMIV_zrh30km_transitincl_10pct.xml.gz";
+		final String outputPlansFilename = "../schweiz-ivtch-SVN/baseCase/plans/plans_all_with_car_zrh30km_transitincl_10pct.xml.gz";
 		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();

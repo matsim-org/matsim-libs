@@ -75,7 +75,7 @@ public class Volume2PolygonGraph extends Network2PolygonGraph {
 	@Override
 	protected double getLinkWidth(BasicLink link) {
 		Integer i = (Integer) parameters.get(0).get(link.getId());
-		return ((double) i.intValue()) / 2.0;
+		return ((double) i.intValue()) / 20.0;
 	}
 
 	@Override

@@ -32,12 +32,13 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.roadpricing.RoadPricingScheme;
 
 /**
  * @author yu
  * 
  */
-public class SaturationLevel2QGIS implements X2QGIS {
+public class SaturationLevel2QGIS extends MATSimNet2QGIS implements X2QGIS {
 
 	public static List<Map<Id, Double>> createSaturationLevels(
 			NetworkLayer net, VolumesAnalyzer va) {
@@ -59,6 +60,35 @@ public class SaturationLevel2QGIS implements X2QGIS {
 								linkId,
 								(double) ((v != null) ? v[i] : 0)
 										* 10.0
+										/ link
+												.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
+										* capPeriod);
+				saturationLevels.set(i, m);
+			}
+		}
+		return saturationLevels;
+	}
+
+	public static List<Map<Id, Double>> createSaturationLevels(
+			NetworkLayer net, RoadPricingScheme rps, VolumesAnalyzer va) {
+		List<Map<Id, Double>> saturationLevels = new ArrayList<Map<Id, Double>>(
+				24);
+		for (int i = 0; i < 24; i++) {
+			saturationLevels.add(i, null);
+		}
+		double capPeriod = (double) net.getCapacityPeriod() / 3600.0;
+		for (Link link : rps.getLinks()) {
+			Id linkId = link.getId();
+			int[] v = va.getVolumesForLink(linkId.toString());
+			for (int i = 0; i < 24; i++) {
+				Map<Id, Double> m = saturationLevels.get(i);
+				if (m == null)
+					m = new HashMap<Id, Double>();
+				m
+						.put(
+								linkId,
+								(double) ((v != null) ? v[i] : 0)
+										/ flowCapFactor
 										/ link
 												.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 										* capPeriod);
