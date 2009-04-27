@@ -28,10 +28,12 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -357,7 +359,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <route ... > ... </route>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startRoute(final NetworkRoute route, final BufferedWriter out) throws IOException {
+	public void startRoute(final BasicRoute route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route");
 		if (!Double.isNaN(route.getDistance()))
 			out.write(" dist=\"" + route.getDistance() + "\"");
@@ -366,8 +368,16 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 		out.write(">\n");
 
 		out.write("\t\t\t\t\t");
-		for (Node n : route.getNodes()) {
-			out.write(n.getId() + " ");
+		if (route instanceof NetworkRoute) {
+			for (Node n : ((NetworkRoute) route).getNodes()) {
+				out.write(n.getId() + " ");
+			}
+		} else if (route instanceof GenericRoute) {
+			String rd = ((GenericRoute) route).getRouteDescription();
+			if (rd != null) {
+				out.write(rd);
+				out.write(" "); // TODO [MR] remove again, this is at the moment only to maintain binary compatibility
+			}
 		}
 		out.write("\n");
 	}

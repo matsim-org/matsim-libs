@@ -30,15 +30,18 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
+import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicPlanImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.misc.Time;
 
@@ -211,13 +214,14 @@ public class PlanImpl implements Plan {
 				"[nof_acts_legs=" + getPlanElements().size() + "]";
 	}
 
-	/** loads a copy of an existing plan
+	/** loads a copy of an existing plan, but keeps the person reference
 	 * @param in a plan who's data will be loaded into this plan
 	 **/
 	public void copyPlan(final Plan in) {
+		// TODO should be re-implemented making use of Cloneable
 		setScore(in.getScore());
 		this.setType(in.getType());
-		setPerson(in.getPerson());
+//		setPerson(in.getPerson()); // do not copy person, but keep the person we're assigned to
 		List<?> actl = in.getPlanElements();
 		for (int i= 0; i< actl.size() ; i++) {
 			try {
@@ -232,9 +236,18 @@ public class PlanImpl implements Plan {
 					l2.setDepartureTime(l.getDepartureTime());
 					l2.setTravelTime(l.getTravelTime());
 					l2.setArrivalTime(l.getArrivalTime());
-					if (l.getRoute() != null) {
-						NetworkRoute r = new NodeNetworkRoute((NetworkRoute) l.getRoute());
-						l2.setRoute(r);
+					Route route = l.getRoute();
+					if (route != null) {
+						if (route instanceof NetworkRoute) {
+							NetworkRoute r = new NodeNetworkRoute((NetworkRoute) route);
+							l2.setRoute(r);
+						} else if (l.getRoute() instanceof GenericRoute) {
+							GenericRoute r = new GenericRouteImpl(route.getStartLink(), route.getEndLink());
+							r.setRouteDescription(route.getStartLink(), ((GenericRoute) route).getRouteDescription(), route.getEndLink());
+							l2.setRoute(r);
+						} else {
+							log.warn("could not fully copy plan to agent " + this.getPerson().getId() + " because of unknown Route-type.");
+						}
 					}
 				}
 			} catch (Exception e) {

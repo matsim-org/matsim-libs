@@ -29,8 +29,8 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Population;
@@ -253,9 +253,9 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 						BasicLeg leg = (BasicLeg)plan.getPlanElements().get(jj);
 						this.handler.startLeg(leg, this.out);
 						// route
-						if (leg.getRoute() != null) {
-							NetworkRoute r = (NetworkRoute) leg.getRoute();
-							this.handler.startRoute(r, this.out);
+						BasicRoute route = leg.getRoute();
+						if (route != null) {
+							this.handler.startRoute(route, this.out);
 							this.handler.endRoute(this.out);
 						}
 						this.handler.endLeg(this.out);

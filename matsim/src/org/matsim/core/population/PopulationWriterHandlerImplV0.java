@@ -22,17 +22,18 @@ package org.matsim.core.population;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -268,21 +269,20 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <route ... > ... </route>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startRoute(final NetworkRoute route, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t\t<route");
-		out.write(">\n");
+	public void startRoute(final BasicRoute route, final BufferedWriter out) throws IOException {
+		out.write("\t\t\t\t<route>");
 
-		out.write("\t\t\t\t\t");
-		Iterator<Node> it = route.getNodes().iterator();
-		while (it.hasNext()) {
-			Node n = it.next();
-			out.write(n.getId() + " ");
+		if (route instanceof NetworkRoute) {
+			for (Node n : ((NetworkRoute) route).getNodes()) {
+				out.write(n.getId() + " ");
+			}
+		} else if (route instanceof GenericRoute) {
+			out.write(((GenericRoute) route).getRouteDescription());
 		}
-		out.write("\n");
 	}
 
 	public void endRoute(final BufferedWriter out) throws IOException {
-		out.write("\t\t\t\t</route>\n");
+		out.write("</route>\n");
 	}
 
 	//////////////////////////////////////////////////////////////////////
