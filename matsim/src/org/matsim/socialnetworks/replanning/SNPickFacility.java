@@ -206,7 +206,7 @@ public class SNPickFacility implements PlanAlgorithm {
 					leg.setRoute(null);
 				}
 //				Reset the score.
-				newPlan.setScore(Plan.UNDEF_SCORE);
+//				newPlan.setScore(Plan.UNDEF_SCORE);
 
 				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), network).run(newPlan.getPerson());
 //				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
