@@ -196,10 +196,10 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			boolean movable = false;
 			if (this.config.getFixByActType().equals("false")) {	
 				isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
-				// test for home if by accident home is not declared as primary
-				if (isPrimary && !act.getType().startsWith("h")) {
+				// "if" makes things actually slower!
+				//if (isPrimary && !act.getType().startsWith("h")) {
 					movable = movablePrimaryActivities.contains(act);
-				}
+				//}
 			}
 			else {
 				isPrimary = plan.getPerson().getKnowledge().isSomewherePrimary(act.getType());
