@@ -14,6 +14,11 @@ import org.matsim.core.events.PersonEvent;
 import org.matsim.core.mobsim.jdeqsim.EventLog;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 
+/**
+ * This parser can read the event output files of the C++ DEQSim.
+ * 
+ * @author rashid_waraich
+ */
 public class CppEventFileParser {
 
 	private static ArrayList<EventLog> eventLog = null;
@@ -25,10 +30,10 @@ public class CppEventFileParser {
 	}
 
 	public void parse(final String eventFileName) {
-		setEventLog (CppEventFileParser.parseFile(eventFileName));
-//		for (int i = 0; i < eventLog.size(); i++) {
-//			 eventLog.get(i).print();
-//		}
+		setEventLog(CppEventFileParser.parseFile(eventFileName));
+		// for (int i = 0; i < eventLog.size(); i++) {
+		// eventLog.get(i).print();
+		// }
 	}
 
 	public static ArrayList<EventLog> parseFile(final String filePath) {
@@ -94,11 +99,12 @@ public class CppEventFileParser {
 			System.out.println(ex);
 		} finally {
 			try {
-				if (br != null) br.close();
+				if (br != null)
+					br.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+
 		}
 
 		return rows;

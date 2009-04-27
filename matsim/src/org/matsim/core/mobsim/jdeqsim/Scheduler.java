@@ -21,6 +21,11 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import org.matsim.core.gbl.Gbl;
 
+/**
+ * The scheduler of the micro-simulation.
+ *
+ * @author rashid_waraich
+ */
 public class Scheduler {
 	private double simTime = 0;
 	private MessageQueue queue = new MessageQueue();

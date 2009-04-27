@@ -7,7 +7,11 @@ import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.PersonEvent;
 
-
+/**
+ * This class is used to calculate statistical values (used among others in some tests).
+ *
+ * @author rashid_waraich
+ */
 public class EventLibrary {
 
 	/*

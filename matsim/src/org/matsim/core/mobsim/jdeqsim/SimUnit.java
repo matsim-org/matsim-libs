@@ -19,6 +19,11 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+/**
+ * The basic building block for all simulation units.
+ *
+ * @author rashid_waraich
+ */
 public abstract class SimUnit {
 
 	protected Scheduler scheduler = null;

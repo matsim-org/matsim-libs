@@ -33,6 +33,12 @@ import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 
+
+/**
+ * The starting point of the whole micro-simulation.
+ *
+ * @author rashid_waraich
+ */
 public class JDEQSimulation {
 
 	private static final Logger log = Logger.getLogger(Controler.class);

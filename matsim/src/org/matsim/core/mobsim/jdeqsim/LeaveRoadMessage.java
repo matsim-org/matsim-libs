@@ -22,6 +22,11 @@ package org.matsim.core.mobsim.jdeqsim;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.LinkLeaveEvent;
 
+/**
+ * The micro-simulation internal handler for leaving a road.
+ *
+ * @author rashid_waraich
+ */
 public class LeaveRoadMessage extends EventMessage {
 
 	@Override

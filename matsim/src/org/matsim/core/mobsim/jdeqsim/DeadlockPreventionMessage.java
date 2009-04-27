@@ -19,6 +19,11 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+/**
+ * The micro-simulation internal handler for preventig deadlocks.
+ *
+ * @author rashid_waraich
+ */
 public class DeadlockPreventionMessage extends EventMessage {
 
 	@Override

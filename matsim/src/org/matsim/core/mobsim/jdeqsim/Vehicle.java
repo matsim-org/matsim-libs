@@ -30,6 +30,11 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 
+/**
+ * Represents a vehicle.
+ *
+ * @author rashid_waraich
+ */
 public class Vehicle extends SimUnit {
 
 	private static final Logger log = Logger.getLogger(Vehicle.class);

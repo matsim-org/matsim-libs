@@ -30,6 +30,11 @@ import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.utils.misc.Time;
 
+/**
+ * The micro-simulation internal handler for ending a leg.
+ *
+ * @author rashid_waraich
+ */
 public class EndLegMessage extends EventMessage {
 
 	public EndLegMessage(final Scheduler scheduler, final Vehicle vehicle) {

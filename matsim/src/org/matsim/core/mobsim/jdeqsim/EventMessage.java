@@ -19,6 +19,11 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+/**
+ * The basic EventMessage type.
+ *
+ * @author rashid_waraich
+ */
 public abstract class EventMessage extends Message {
 	public Vehicle vehicle;
 	public Scheduler scheduler;

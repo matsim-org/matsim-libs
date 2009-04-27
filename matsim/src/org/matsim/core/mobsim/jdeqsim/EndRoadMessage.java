@@ -19,6 +19,11 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+/**
+ * The micro-simulation internal handler, when the end of a road is reached.
+ *
+ * @author rashid_waraich
+ */
 public class EndRoadMessage extends EventMessage {
 
 	@Override

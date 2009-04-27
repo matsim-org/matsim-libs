@@ -23,6 +23,11 @@ import java.util.HashMap;
 
 import org.matsim.core.events.Events;
 
+/**
+ * The micro-simulation parameters.
+ *
+ * @author rashid_waraich
+ */
 public class SimulationParameters {
 
 	// CONSTANTS

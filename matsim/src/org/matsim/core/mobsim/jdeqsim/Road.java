@@ -24,6 +24,11 @@ import java.util.LinkedList;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.utils.misc.Time;
 
+/**
+ * The road is simulated as an active agent, moving arround vehicles.
+ *
+ * @author rashid_waraich
+ */
 public class Road extends SimUnit {
 
 	protected Link link;

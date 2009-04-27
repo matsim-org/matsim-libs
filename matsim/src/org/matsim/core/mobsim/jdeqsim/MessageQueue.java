@@ -21,6 +21,11 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.PriorityQueue;
 
+/**
+ * The message queue of the micro-simulation.
+ *
+ * @author rashid_waraich
+ */
 public class MessageQueue {
 	private PriorityQueue<Message> queue1 = new PriorityQueue<Message>();
 	private int queueSize = 0;

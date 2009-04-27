@@ -23,6 +23,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+/**
+ * This class is used for comparing results with the historical C++
+ * implementation results of DEQSim.
+ * 
+ * @author rashid_waraich
+ */
 public class EventLog {
 	double time = 0.0;
 	int vehicleId = 0;
@@ -32,8 +38,7 @@ public class EventLog {
 	int toNodeId = 0;
 	String type = null;
 
-	public EventLog(double time, int vehicleId, int legNo, int linkId, int fromNodeId, int toNodeId,
-			String type) {
+	public EventLog(double time, int vehicleId, int legNo, int linkId, int fromNodeId, int toNodeId, String type) {
 		super();
 		this.time = time;
 		this.vehicleId = vehicleId;
@@ -181,8 +186,8 @@ public class EventLog {
 		 * (startCurrentLink1,totalUsageDurationLink1,startCurrentLink2,totalUsageDurationLink2)
 		 */
 
-		assert eventLog1.size() == eventLog2.size() : "The size of both eventLogs must be the same!"
-				+ eventLog1.size() + " - " + eventLog2.size();
+		assert eventLog1.size() == eventLog2.size() : "The size of both eventLogs must be the same!" + eventLog1.size() + " - "
+				+ eventLog2.size();
 
 		for (int i = 0; i < eventLog1.size(); i++) {
 

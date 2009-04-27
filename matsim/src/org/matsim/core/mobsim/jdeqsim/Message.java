@@ -19,6 +19,11 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+/**
+ * The basic message type used in the micro-simulation.
+ *
+ * @author rashid_waraich
+ */
 public abstract class Message implements Comparable<Message> {
 
 	private double messageArrivalTime = 0;

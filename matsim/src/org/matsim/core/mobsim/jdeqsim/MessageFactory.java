@@ -21,6 +21,12 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.LinkedList;
 
+/**
+ * The message factory is used for creating and disposing messages - mainly for
+ * performance gain to have lesser garbage collection.
+ * 
+ * @author rashid_waraich
+ */
 public class MessageFactory {
 
 	private static LinkedList<EndLegMessage> endLegMessageQueue = new LinkedList<EndLegMessage>();

@@ -23,6 +23,11 @@ import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.LinkEnterEvent;
 
+/**
+ * The micro-simulation internal handler for entering a road.
+ *
+ * @author rashid_waraich
+ */
 public class EnterRoadMessage extends EventMessage {
 
 	@Override

@@ -20,6 +20,11 @@
 
 package org.matsim.core.mobsim.jdeqsim.util;
 
+/**
+ * A simple timer implementation.
+ *
+ * @author rashid_waraich
+ */
 public class Timer {
 	private long startTime = 0;
 	private long endTime = 0;

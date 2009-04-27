@@ -24,6 +24,11 @@ import org.matsim.core.events.ActEndEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.BasicEventImpl;
 
+/**
+ * The micro-simulation internal handler for starting a leg.
+ *
+ * @author rashid_waraich
+ */
 public class StartingLegMessage extends EventMessage {
 
 	public StartingLegMessage(Scheduler scheduler, Vehicle vehicle) {
