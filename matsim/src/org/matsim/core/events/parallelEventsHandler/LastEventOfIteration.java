@@ -22,6 +22,11 @@ package org.matsim.core.events.parallelEventsHandler;
 
 import org.matsim.core.events.BasicEventImpl;
 
+/**
+ * Special event needed for synchronizing the threads.
+ *
+ * @author rashid_waraich
+ */
 public class LastEventOfIteration extends BasicEventImpl {
 
 	public LastEventOfIteration(final double time) {

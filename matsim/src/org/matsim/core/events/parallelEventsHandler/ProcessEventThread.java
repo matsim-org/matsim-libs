@@ -27,6 +27,11 @@ import java.util.concurrent.CyclicBarrier;
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.events.Events;
 
+/**
+ * The wrapper around the Events class for allowing parallelization.
+ *
+ * @author rashid_waraich
+ */
 public class ProcessEventThread implements Runnable {
 	ArrayList<BasicEvent> preInputBuffer = null;
 	ConcurrentListSPSC<BasicEvent> eventQueue = null;

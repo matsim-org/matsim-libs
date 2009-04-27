@@ -23,8 +23,12 @@ package org.matsim.core.events.parallelEventsHandler;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-// optimized for single producer, single consumer
-// it can be used by multiple producers, but it is not optimized for that case
+/**
+ * This implementation of a concurrent list is optimized for the single producer - single consumer threading.
+ * It can be used by multiple producers, but it is not optimized for that case.
+ *
+ * @author rashid_waraich
+ */
 public class ConcurrentListSPSC<T> {
 	private LinkedList<T> inputBuffer = new LinkedList<T>();
 	private LinkedList<T> outputBuffer = new LinkedList<T>();
