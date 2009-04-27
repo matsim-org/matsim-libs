@@ -24,14 +24,15 @@ import java.util.Map;
 
 import org.matsim.core.api.population.Person;
 import org.matsim.core.mobsim.queuesim.AgentFactory;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 
 public class TransitAgentFactory extends AgentFactory {
 
-	private final Map<Person, PersonAgent> agentsMap;
+	private final Map<Person, DriverAgent> agentsMap;
 
-	public TransitAgentFactory(final QueueSimulation simulation, final Map<Person, PersonAgent> agents) {
+	public TransitAgentFactory(final QueueSimulation simulation, final Map<Person, DriverAgent> agents) {
 		super(simulation);
 		this.agentsMap = agents;
 	}

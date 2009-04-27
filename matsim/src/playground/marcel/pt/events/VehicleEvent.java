@@ -24,13 +24,13 @@ import java.util.Map;
 
 import org.matsim.core.events.BasicEventImpl;
 
-import playground.marcel.pt.interfaces.Vehicle;
+import playground.marcel.pt.interfaces.TransitVehicle;
 
 public abstract class VehicleEvent extends BasicEventImpl {
 
-	public Vehicle vehicle;
+	public TransitVehicle vehicle;
 
-	public VehicleEvent(final double time, final Vehicle vehicle) {
+	public VehicleEvent(final double time, final TransitVehicle vehicle) {
 		super(time);
 		this.vehicle = vehicle;
 	}

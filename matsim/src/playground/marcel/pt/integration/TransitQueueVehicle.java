@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.tryout;
+package playground.marcel.pt.integration;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,18 +27,17 @@ import java.util.List;
 
 import org.matsim.core.events.Events;
 
-import playground.marcel.pt.interfaces.DriverAgent;
 import playground.marcel.pt.interfaces.PassengerAgent;
-import playground.marcel.pt.interfaces.Vehicle;
+import playground.marcel.pt.interfaces.TransitVehicle;
 
-public class VehicleImpl implements Vehicle {
+public class TransitQueueVehicle implements TransitVehicle {
 
 	private final int passengerCapacity;
-	private DriverAgent driver = null;
+//	private DriverAgent driver = null;
 	private final List<PassengerAgent> passengers;
 	private final Events events;
 
-	public VehicleImpl(final int passengerCapacity, final Events events) {
+	public TransitQueueVehicle(final int passengerCapacity, final Events events) {
 		this.passengerCapacity = passengerCapacity;
 		this.events = events;
 		this.passengers = new ArrayList<PassengerAgent>(this.passengerCapacity);
@@ -66,13 +65,13 @@ public class VehicleImpl implements Vehicle {
 		}
 		return removed;
 	}
-
-	public void setDriver(final DriverAgent driver) {
-		this.driver = driver;
-	}
-
-	public DriverAgent getDriver() {
-		return this.driver;
-	}
+//
+//	public void setDriver(final DriverAgent driver) {
+//		this.driver = driver;
+//	}
+//
+//	public DriverAgent getDriver() {
+//		return this.driver;
+//	}
 
 }

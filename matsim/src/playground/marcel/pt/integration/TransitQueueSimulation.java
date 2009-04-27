@@ -22,28 +22,26 @@ package playground.marcel.pt.integration;
 
 import java.util.HashMap;
 
+import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.events.Events;
-import org.matsim.core.mobsim.queuesim.PersonAgent;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.network.NetworkLayer;
 
-import playground.marcel.pt.implementations.TransitDriver;
-import playground.marcel.pt.interfaces.Vehicle;
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.marcel.pt.tryout.VehicleImpl;
 import playground.marcel.pt.utils.FacilityVisitors;
 
 public class TransitQueueSimulation extends QueueSimulation {
 
 	private TransitSchedule schedule = null;
 	private final FacilityVisitors fv;
-	private final HashMap<Person, PersonAgent> agents = new HashMap<Person, PersonAgent>(100);
+	private final HashMap<Person, DriverAgent> agents = new HashMap<Person, DriverAgent>(100);
 
 	public TransitQueueSimulation(final NetworkLayer network, final Population population, final Events events) {
 		super(network, population, events);
@@ -58,7 +56,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 		this.schedule = schedule;
 	}
 
-	public PersonAgent getAgent(final Person p) {
+	public Object getAgent(final Person p) {
 		return this.agents.get(p);
 	}
 
@@ -73,8 +71,8 @@ public class TransitQueueSimulation extends QueueSimulation {
 					for (Departure departure : route.getDepartures().values()) {
 						TransitDriver driver = new TransitDriver(route, departure, this);
 						driver.setFacilityVisitorObserver(this.fv);
-						Vehicle bus = new VehicleImpl(20, getEvents());
-						driver.setVehicle(bus);
+//						Vehicle bus = new VehicleImpl(20, getEvents());
+//						driver.setVehicle(bus);
 						this.scheduleActivityEnd(driver);
 						Simulation.incLiving();
 					}
@@ -82,6 +80,11 @@ public class TransitQueueSimulation extends QueueSimulation {
 			}
 		}
 
+	}
+	
+	// just for visibility reasons
+	protected void agentDeparts(final DriverAgent agent, final Link link) {
+		super.agentDeparts(agent, link);
 	}
 
 }

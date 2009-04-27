@@ -30,7 +30,9 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.ActStartEvent;
 import org.matsim.core.events.Events;
@@ -43,10 +45,11 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.implementations.TransitDriver;
 import playground.marcel.pt.integration.TransitConstants;
+import playground.marcel.pt.integration.TransitDriver;
 import playground.marcel.pt.integration.TransitQueueSimulation;
-import playground.marcel.pt.interfaces.Vehicle;
+import playground.marcel.pt.integration.TransitQueueVehicle;
+import playground.marcel.pt.interfaces.TransitVehicle;
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
@@ -90,7 +93,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(false), events);
 
 		TransitDriver driver = new TransitDriver(route1, departures.values().iterator().next(), sim);
-		Vehicle bus = new VehicleImpl(20, events);
+		TransitVehicle bus = new TransitQueueVehicle(20, events);
 		driver.setVehicle(bus);
 
 		BusPassenger passenger1 = new BusPassenger(new IdImpl("1"), facilities.getFacilities().get(new IdImpl("stop2")));
@@ -122,7 +125,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		assertEquals("wrong number of passengers.", 0, bus.getPassengers().size());
 	}
 
-	public void xtestPersonsEnteringBus() throws SAXException, ParserConfigurationException, IOException { // TODO [MR] disabled test
+	public void testPersonsEnteringBus() throws SAXException, ParserConfigurationException, IOException { // TODO [MR] disabled test
 		loadConfig(null);
 		final String inputDir = "test/input/" + TransitScheduleReaderTest.class.getPackage().getName().replace('.', '/') + "/";
 
@@ -140,17 +143,17 @@ public class TransitDriverTest extends MatsimTestCase {
 		new TransitScheduleReaderV1(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
-		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
+//		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
 		assertNotNull("could not get transit line.", lineT1);
 
 		TransitRoute route1 = lineT1.getRoutes().get(new IdImpl("1"));
 		Map<Id, Departure> departures = route1.getDepartures();
 
 		Events events = new Events();
-		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(false), events);
+		TransitQueueSimulation sim = new MyQueueSim(network, new PopulationImpl(false), events);
 		
 		TransitDriver driver = new TransitDriver(route1, departures.values().iterator().next(), sim);
-		Vehicle bus = new VehicleImpl(20, events);
+		TransitVehicle bus = new TransitQueueVehicle(20, events);
 		driver.setVehicle(bus);
 
 		FacilityVisitors fv = new FacilityVisitors();
@@ -165,10 +168,10 @@ public class TransitDriverTest extends MatsimTestCase {
 		BusPassenger passenger4 = createPassenger("4", facilities.getFacilities().get(new IdImpl("stop5")), workFacility);
 		BusPassenger passenger5 = createPassenger("5", facilities.getFacilities().get(new IdImpl("stop6")), workFacility);
 		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("3"), (Activity) passenger1.getPlans().get(0).getPlanElements().get(0)));
-		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("5"), (Activity) passenger2.getPlans().get(0).getPlanElements().get(0)));
-		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("5"), (Activity) passenger3.getPlans().get(0).getPlanElements().get(0)));
-		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("6"), (Activity) passenger4.getPlans().get(0).getPlanElements().get(0)));
-		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("8"), (Activity) passenger5.getPlans().get(0).getPlanElements().get(0)));
+		events.processEvent(new ActStartEvent(6.0*3600, passenger2, network.getLink("5"), (Activity) passenger2.getPlans().get(0).getPlanElements().get(0)));
+		events.processEvent(new ActStartEvent(6.0*3600, passenger3, network.getLink("5"), (Activity) passenger3.getPlans().get(0).getPlanElements().get(0)));
+		events.processEvent(new ActStartEvent(6.0*3600, passenger4, network.getLink("6"), (Activity) passenger4.getPlans().get(0).getPlanElements().get(0)));
+		events.processEvent(new ActStartEvent(6.0*3600, passenger5, network.getLink("8"), (Activity) passenger5.getPlans().get(0).getPlanElements().get(0)));
 
 		assertEquals("wrong number of passengers.", 0, bus.getPassengers().size());
 
@@ -196,5 +199,18 @@ public class TransitDriverTest extends MatsimTestCase {
 		plan.createLeg(TransportMode.bus);
 		plan.createActivity("work", exitStop);
 		return passenger;
+	}
+	
+	private static class MyQueueSim extends TransitQueueSimulation {
+
+		public MyQueueSim(NetworkLayer network, Population population, Events events) {
+			super(network, population, events);
+		}
+		
+		@Override
+		public Object getAgent(Person p) {
+			return p;
+		}
+		
 	}
 }

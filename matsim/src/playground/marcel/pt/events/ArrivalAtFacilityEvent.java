@@ -22,7 +22,7 @@ package playground.marcel.pt.events;
 
 import org.matsim.core.api.facilities.Facility;
 
-import playground.marcel.pt.interfaces.Vehicle;
+import playground.marcel.pt.interfaces.TransitVehicle;
 
 public class ArrivalAtFacilityEvent extends VehicleEvent {
 
@@ -30,7 +30,7 @@ public class ArrivalAtFacilityEvent extends VehicleEvent {
 
 	public final Facility facility;
 
-	public ArrivalAtFacilityEvent(final double time, final Vehicle vehicle, final Facility facility) {
+	public ArrivalAtFacilityEvent(final double time, final TransitVehicle vehicle, final Facility facility) {
 		super(time, vehicle);
 		this.facility = facility;
 	}

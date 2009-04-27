@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.implementations;
+package playground.marcel.pt.integration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +34,8 @@ import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
-import playground.marcel.pt.integration.TransitConstants;
-import playground.marcel.pt.integration.TransitQueueSimulation;
 import playground.marcel.pt.interfaces.PassengerAgent;
-import playground.marcel.pt.interfaces.Vehicle;
+import playground.marcel.pt.interfaces.TransitVehicle;
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
@@ -50,7 +48,7 @@ public class TransitDriver implements DriverAgent {
 		private final NetworkRoute carRoute;
 		private final double departureTime;
 
-		private Vehicle vehicle = null;
+		private TransitVehicle vehicle = null;
 
 		private int nextLinkIndex = 0;
 		private Link currentLink = null;
@@ -75,14 +73,14 @@ public class TransitDriver implements DriverAgent {
 			this.sim = sim;
 			
 			this.currentLeg.setRoute(this.carRoute);
-			this.moveOverNode();// why is this needed?
+//			this.moveOverNode();// why is this needed?
 		}
 
 		public void setFacilityVisitorObserver(final FacilityVisitors fv) {
 			this.facilityVisitors  = fv;
 		}
 
-		public void setVehicle(final Vehicle vehicle) {
+		public void setVehicle(final TransitVehicle vehicle) {
 			this.vehicle = vehicle;
 		}
 
@@ -134,13 +132,9 @@ public class TransitDriver implements DriverAgent {
 		public double getDepartureTime() {
 			return this.departureTime;
 		}
-//		
-//		public NetworkRoute getCarRoute() {
-//			return this.carRoute;
-//		}
 
 		public void activityEnds(double now) {
-			// TODO 
+			this.sim.agentDeparts(this, this.currentLeg.getRoute().getStartLink());
 		}
 
 		public Leg getCurrentLeg() {

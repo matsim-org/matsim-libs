@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DriverAgent.java
+ * Vehicle.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,14 +20,36 @@
 
 package playground.marcel.pt.interfaces;
 
-import org.matsim.core.api.network.Link;
+import java.util.Collection;
 
-public interface DriverAgent {
+public interface TransitVehicle {
+//
+//	public void setDriver(final DriverAgent driver);
+//
+//	public DriverAgent getDriver();
 
-	public Link chooseNextLink();
+	/**
+	 * Adds a passenger to this vehicle.
+	 * 
+	 * @param passenger
+	 * @return <tt>true</tt> when the agent was added as a passenger (as per the general contract of the Collection.add method).
+	 */
+	public boolean addPassenger(final PassengerAgent passenger);
 
-	public void enterNextLink(); // corresponds to PersonAgent.incCurrentNode; also called for very first link
+	/**
+	 * Removes the passenger from this vehicle.
+	 * 
+	 * @param passenger
+	 * @return <tt>true</tt> when the agent was removed as a passenger, <tt>false</tt> if the agent was not a passenger of this vehicle or could not be removed for other reasons
+	 */
+	public boolean removePassenger(final PassengerAgent passenger);
 
-	public void leaveCurrentLink();
+	public Collection<PassengerAgent> getPassengers();
 
+	/**
+	 * TODO [MR] not sure if passengerCapacity or general capacity (including driver) is better
+	 *
+	 * @return number of passengers this vehicle can transport
+	 */
+	public int getPassengerCapacity();
 }
