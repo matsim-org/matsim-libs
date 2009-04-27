@@ -58,11 +58,9 @@ public class TransitQueueSimulation extends QueueSimulation {
 		this.schedule = schedule;
 	}
 
-
 	public PersonAgent getAgent(final Person p) {
 		return this.agents.get(p);
 	}
-
 
 	@Override
 	protected void createAgents() {
@@ -77,10 +75,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 						driver.setFacilityVisitorObserver(this.fv);
 						Vehicle bus = new VehicleImpl(20, getEvents());
 						driver.setVehicle(bus);
-						QueueTransitDriver qDriver = new QueueTransitDriver(driver);
-						TransitQueueVehicle qVeh = new TransitQueueVehicle(bus, qDriver);
-						qVeh.setDriver(qDriver);
-//						addVehicleToLink(qVeh);
+						this.scheduleActivityEnd(driver);
 						Simulation.incLiving();
 					}
 				}

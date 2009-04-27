@@ -144,7 +144,7 @@ public class QueueSimulation {
 
 	private QueueSimListenerManager listenerManager;
 	
-	private final PriorityQueue<PersonAgent> activityEndsList = new PriorityQueue<PersonAgent>(500, new DriverAgentDepartureTimeComparator());
+	private final PriorityQueue<DriverAgent> activityEndsList = new PriorityQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
 
 	/** @see #setTeleportVehicles(boolean) */
 	private boolean teleportVehicles = true;
@@ -644,16 +644,16 @@ public class QueueSimulation {
 	 * 
 	 * @see DriverAgent#getDepartureTime()
 	 */
-	/*package*/ void scheduleActivityEnd(final PersonAgent agent) {
+	protected void scheduleActivityEnd(final DriverAgent agent) {
 		this.activityEndsList.add(agent);
 	}
 	
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
-			PersonAgent agent = this.activityEndsList.peek();
+			DriverAgent agent = this.activityEndsList.peek();
 			if (agent.getDepartureTime() <= time) {
 				this.activityEndsList.poll();
-				agent.leaveActivity(time);
+				agent.activityEnds(time);
 			} else {
 				return;
 			}
@@ -667,7 +667,7 @@ public class QueueSimulation {
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
-	/*package*/ void agentDeparts(final DriverAgent agent, final Link link) {
+	protected void agentDeparts(final DriverAgent agent, final Link link) {
 		double now = SimulationTimer.getTime();
 
 		Leg leg = agent.getCurrentLeg();

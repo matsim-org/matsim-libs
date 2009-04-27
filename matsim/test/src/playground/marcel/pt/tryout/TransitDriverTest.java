@@ -106,16 +106,16 @@ public class TransitDriverTest extends MatsimTestCase {
 		assertEquals("wrong number of passengers.", 5, bus.getPassengers().size());
 
 		Link link = driver.chooseNextLink();
-		driver.enterNextLink();
+		driver.moveOverNode();
 		while (link != null) {
 			Link nextLink = driver.chooseNextLink();
 			if (nextLink != null) {
 				assertEquals("current link and next link must have common node.", link.getToNode(), nextLink.getFromNode());
 			}
-			driver.leaveCurrentLink();
+//			driver.leaveCurrentLink();
 			link = nextLink;
 			if (link != null) {
-				driver.enterNextLink();
+				driver.moveOverNode();
 			}
 		}
 
@@ -173,16 +173,16 @@ public class TransitDriverTest extends MatsimTestCase {
 		assertEquals("wrong number of passengers.", 0, bus.getPassengers().size());
 
 		Link link = driver.chooseNextLink();
-		driver.enterNextLink();
+		driver.moveOverNode();
 		while (link != null) {
 			Link nextLink = driver.chooseNextLink();
 			if (nextLink != null) {
 				assertEquals("current link and next link must have common node.", link.getToNode(), nextLink.getFromNode());
 			}
-			driver.leaveCurrentLink();
+//			driver.leaveCurrentLink();
 			link = nextLink;
 			if (link != null) {
-				driver.enterNextLink();
+				driver.moveOverNode();
 			}
 		}
 
@@ -190,7 +190,7 @@ public class TransitDriverTest extends MatsimTestCase {
 	}
 
 	private BusPassenger createPassenger(final String id, final Facility enterStop, final Facility exitStop) {
-		BusPassenger passenger = new BusPassenger(new IdImpl("1"), exitStop);
+		BusPassenger passenger = new BusPassenger(new IdImpl(id), exitStop);
 		Plan plan = passenger.createPlan(true);
 		plan.createActivity(TransitConstants.INTERACTION_ACTIVITY_TYPE, enterStop);
 		plan.createLeg(TransportMode.bus);

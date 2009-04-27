@@ -56,6 +56,14 @@ public interface DriverAgent {
 	 */
 	public void legEnds(final double now);
 	
+	/**
+	 * Informs the agent that the currently executed activity is ended / is
+	 * no longer performed.
+	 * 
+	 * @param now
+	 */
+	public void activityEnds(final double now);
+	
 	public void teleportToLink(final Link link);
 
 	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.

@@ -23,10 +23,16 @@ package playground.marcel.pt.implementations;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 
 import playground.marcel.pt.integration.TransitConstants;
 import playground.marcel.pt.integration.TransitQueueSimulation;
@@ -37,7 +43,7 @@ import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
 import playground.marcel.pt.utils.FacilityVisitors;
 
-public class TransitDriver {
+public class TransitDriver implements DriverAgent {
 
 		private final List<Facility> stops;
 		private final List<Link> linkRoute;
@@ -51,6 +57,9 @@ public class TransitDriver {
 		private FacilityVisitors facilityVisitors = null;
 		private final TransitQueueSimulation sim;
 
+		private final Leg currentLeg = new LegImpl(TransportMode.car);
+		private final Person dummyPerson = new PersonImpl(new IdImpl("busDrvr"));
+		
 		public TransitDriver(final TransitRoute route, final Departure departure, final TransitQueueSimulation sim) {
 			this.stops = new ArrayList<Facility>(route.getStops().size());
 			for (TransitRouteStop stop : route.getStops()) {
@@ -64,6 +73,9 @@ public class TransitDriver {
 			this.linkRoute.add(carRoute.getEndLink());
 			this.departureTime = departure.getDepartureTime();
 			this.sim = sim;
+			
+			this.currentLeg.setRoute(this.carRoute);
+			this.moveOverNode();// why is this needed?
 		}
 
 		public void setFacilityVisitorObserver(final FacilityVisitors fv) {
@@ -81,11 +93,7 @@ public class TransitDriver {
 			return null;
 		}
 
-		public void leaveCurrentLink() {
-			this.currentLink = null;
-		}
-
-		public void enterNextLink() {
+		public void moveOverNode() {
 			this.currentLink = this.linkRoute.get(this.nextLinkIndex);
 			this.nextLinkIndex++;
 			// let's see if we have a stop at that link
@@ -126,8 +134,30 @@ public class TransitDriver {
 		public double getDepartureTime() {
 			return this.departureTime;
 		}
-		
-		public NetworkRoute getCarRoute() {
-			return this.carRoute;
+//		
+//		public NetworkRoute getCarRoute() {
+//			return this.carRoute;
+//		}
+
+		public void activityEnds(double now) {
+			// TODO 
+		}
+
+		public Leg getCurrentLeg() {
+			return this.currentLeg;
+		}
+
+		public Link getDestinationLink() {
+			return this.currentLeg.getRoute().getEndLink();
+		}
+
+		public Person getPerson() {
+			return this.dummyPerson;
+		}
+
+		public void legEnds(double now) {
+		}
+
+		public void teleportToLink(Link link) {
 		}
 }

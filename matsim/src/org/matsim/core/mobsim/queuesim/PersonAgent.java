@@ -161,7 +161,7 @@ public class PersonAgent implements DriverAgent {
 	 *
 	 * @param now the current time
 	 */
-	public void leaveActivity(final double now) {
+	public void activityEnds(final double now) {
 		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
 		QueueSimulation.getEvents().processEvent(new ActEndEvent(now, this.getPerson(), this.currentLink, act));
 		advancePlanElement(now);

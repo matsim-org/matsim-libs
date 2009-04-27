@@ -173,7 +173,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		pa.setVehicle(v);
 		v.setDriver(pa);
 		pa.initialize();
-		pa.leaveActivity(7.0*3600);
+		pa.activityEnds(7.0*3600);
 		Link link2 = this.network.getLink("2");
 		v.setCurrentLink(link2);
 		pa.teleportToLink(link2);
