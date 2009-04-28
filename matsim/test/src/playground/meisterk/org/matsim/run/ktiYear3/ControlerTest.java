@@ -38,7 +38,7 @@ public class ControlerTest extends MatsimTestCase {
 
 	public void testRun() {
 		
-		playground.meisterk.org.matsim.run.ktiYear3.Controler testee = new playground.meisterk.org.matsim.run.ktiYear3.Controler(this.config);
+		KTIControler testee = new KTIControler(this.config);
 //		testee.getControler().setCreateGraphs(false);
 		testee.run();
 		
