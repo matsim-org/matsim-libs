@@ -49,7 +49,6 @@ public class MyControler5 {
 		final String netFilename = "./examples/equil/network.xml";
 		final String plansFilename = "./examples/equil/plans100.xml";
 
-		@SuppressWarnings("unused")
 		Config config = Gbl.createConfig(new String[] {"./examples/tutorial/myConfigScoring.xml"});
 
 		NetworkLayer network = new NetworkLayer();
