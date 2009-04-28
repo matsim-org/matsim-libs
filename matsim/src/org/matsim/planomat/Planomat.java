@@ -36,6 +36,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scoring.ScoringFunction;
@@ -62,10 +63,14 @@ public class Planomat implements PlanAlgorithm {
 	/**
 	 * Maximum possible activity duration. Serves as upper limit for double encoding of activity durations in GA plan chromosome.
 	 */
-	protected static final double MAX_ACTIVITY_DURATION = 24.0 * 3600;
-	protected static final int NUM_TIME_INTERVALS = (int) Math.pow(2, Gbl.getConfig().planomat().getLevelOfTimeResolution());
-	protected static final double TIME_INTERVAL_SIZE = Planomat.MAX_ACTIVITY_DURATION / Planomat.NUM_TIME_INTERVALS;
+	private static final double MAX_ACTIVITY_DURATION = 24.0 * 3600;
 
+	private final PlanomatConfigGroup config = Gbl.getConfig().planomat();
+	private final int numTimeIntervals = (int) Math.pow(2, config.getLevelOfTimeResolution());
+	protected final double timeIntervalSize = Planomat.MAX_ACTIVITY_DURATION / numTimeIntervals;
+
+	private final TransportMode[] possibleModes = this.config.getPossibleModes().toArray(new TransportMode[this.config.getPossibleModes().size()]);
+	
 	private LegTravelTimeEstimator legTravelTimeEstimator = null;
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 	private Random seedGenerator = null;
@@ -77,40 +82,39 @@ public class Planomat implements PlanAlgorithm {
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.seedGenerator = MatsimRandom.getLocalInstance();
-
 	}
 
 	public void run(final Plan plan) {
-
-		if (Gbl.getConfig().planomat().isDoLogging()) {
+		boolean doLogging = this.config.isDoLogging();
+		if (doLogging) {
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...");
 		}
 		// perform subtour analysis only if mode choice on subtour basis is optimized
 		// (if only times are optimized, subtour analysis is not necessary)
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
-		if (Gbl.getConfig().planomat().getPossibleModes().size() > 0) {
-			if (Gbl.getConfig().planomat().isDoLogging()) {
+		if (this.possibleModes.length > 0) {
+			if (doLogging) {
 				logger.info("Running subtour analysis...");
 			}
 			planAnalyzeSubtours = new PlanAnalyzeSubtours();
 			planAnalyzeSubtours.run(plan);
 		}
-		if (Gbl.getConfig().planomat().isDoLogging()) {
+		if (doLogging) {
 			logger.info("Running subtour analysis...done.");
 			logger.info("Initialization of JGAP configuration...");
 		}
 		Genotype population = this.initJGAP(plan, planAnalyzeSubtours);
-		if (Gbl.getConfig().planomat().isDoLogging()) {
+		if (doLogging) {
 			logger.info("Initialization of JGAP configuration...done.");
 			logger.info("Running evolution...");
 		}
 		IChromosome fittest = this.evolveAndReturnFittest(population);
-		if (Gbl.getConfig().planomat().isDoLogging()) {
+		if (doLogging) {
 			logger.info("Running evolution...done.");
 			logger.info("Writing solution back to Plan object...");
 		}
 		this.writeChromosome2Plan(fittest, plan, planAnalyzeSubtours );
-		if (Gbl.getConfig().planomat().isDoLogging()) {
+		if (doLogging) {
 			logger.info("Writing solution back to Plan object...done.");
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...done.");
 		}
@@ -130,7 +134,7 @@ public class Planomat implements PlanAlgorithm {
 //		return modeChoiceSet;
 //	}
 	
-	protected synchronized Genotype initJGAP(final Plan plan, final PlanAnalyzeSubtours planAnalyzeSubtours) {
+	private synchronized Genotype initJGAP(final Plan plan, final PlanAnalyzeSubtours planAnalyzeSubtours) {
 
 		Genotype population = null;
 
@@ -153,7 +157,9 @@ public class Planomat implements PlanAlgorithm {
 				sf,
 				plan,
 				this.legTravelTimeEstimator,
-				planAnalyzeSubtours );
+				planAnalyzeSubtours,
+				this.timeIntervalSize,
+				this.possibleModes);
 
 		try {
 			jgapConfiguration.setFitnessFunction( fitnessFunction );
@@ -165,11 +171,11 @@ public class Planomat implements PlanAlgorithm {
 		return population;
 	}
 
-	protected IChromosome evolveAndReturnFittest(final Genotype population) {
+	private IChromosome evolveAndReturnFittest(final Genotype population) {
 
 //		IChromosome fittest = null;
 //		String logMessage = null;
-		for (int i = 0; i < Gbl.getConfig().planomat().getJgapMaxGenerations(); i++) {
+		for (int i = 0, n = this.config.getJgapMaxGenerations(); i < n; i++) {
 			population.evolve();
 //			if (Gbl.getConfig().planomat().isDoLogging()) {
 //				fittest = population.getFittestChromosome();
@@ -188,12 +194,12 @@ public class Planomat implements PlanAlgorithm {
 
 			int numActs = plan.getPlanElements().size() / 2;
 			for (int ii=0; ii < numActs; ii++) {
-				sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Planomat.NUM_TIME_INTERVALS - 1));
+				sampleGenes.add(new IntegerGene(jgapConfiguration, 0, this.numTimeIntervals - 1));
 			}
 
-			if (Gbl.getConfig().planomat().getPossibleModes().size() > 0) {
+			if (this.possibleModes.length > 0) {
 				for (int ii=0; ii < planAnalyzeSubtours.getNumSubtours(); ii++) {
-					sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Gbl.getConfig().planomat().getPossibleModes().size() - 1));
+					sampleGenes.add(new IntegerGene(jgapConfiguration, 0, this.possibleModes.length - 1));
 				}
 			}
 
@@ -222,7 +228,7 @@ public class Planomat implements PlanAlgorithm {
 			final IChromosome individual,
 			final Plan plan,
 			final PlanAnalyzeSubtours planAnalyzeSubtours ) {
-
+		
 		Activity activity = null;
 		Leg leg = null;
 
@@ -246,7 +252,7 @@ public class Planomat implements PlanAlgorithm {
 					// the new activity duration is
 					// - a random value in the time interval which was the result of the optimization
 					// - rounded to a full second with Math.rint() to stay consistent with the time step-based queue simulations
-					activity.setDuration(Math.rint((((IntegerGene) individual.getGenes()[ii / 2]).intValue() + this.seedGenerator.nextDouble()) * Planomat.TIME_INTERVAL_SIZE));
+					activity.setDuration(Math.rint((((IntegerGene) individual.getGenes()[ii / 2]).intValue() + this.seedGenerator.nextDouble()) * this.timeIntervalSize));
 					now += activity.getDuration();
 					activity.setEndTime(now);
 
@@ -268,11 +274,11 @@ public class Planomat implements PlanAlgorithm {
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);
 
-				if (Gbl.getConfig().planomat().getPossibleModes().size() > 0) {
+				if (this.possibleModes.length > 0) {
 					// set mode to result from optimization
 					int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[ii / 2];
 					int modeIndex = ((IntegerGene) individual.getGene(planAnalyzeSubtours.getSubtourIndexation().length + subtourIndex)).intValue();
-					TransportMode mode = (TransportMode) (Gbl.getConfig().planomat().getPossibleModes().toArray()[modeIndex]);
+					TransportMode mode = this.possibleModes[modeIndex];
 //					System.out.println(ii + "\t" + subtourIndex + "\t" + modeIndex + "\t" + modeName);
 					leg.setMode(mode);
 				} // otherwise leave modes untouched

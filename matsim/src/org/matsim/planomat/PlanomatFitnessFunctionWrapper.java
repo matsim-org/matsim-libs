@@ -31,7 +31,6 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
@@ -53,17 +52,23 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 	private transient final LegTravelTimeEstimator legTravelTimeEstimator;
 	private transient final ScoringFunction sf;
 	private transient final PlanAnalyzeSubtours planAnalyzeSubtours;
+	private transient final double timeIntervalSize;
+	private transient final TransportMode[] possibleModes;
 
 	public PlanomatFitnessFunctionWrapper(
 			final ScoringFunction sf,
 			final Plan plan,
 			final LegTravelTimeEstimator legTravelTimeEstimator,
-			final PlanAnalyzeSubtours planAnalyzeSubtours) {
+			final PlanAnalyzeSubtours planAnalyzeSubtours,
+			final double timeInvervalSize,
+			final TransportMode[] possibleModes) {
 
 		this.sf = sf;
 		this.plan = plan;
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
 		this.planAnalyzeSubtours = planAnalyzeSubtours;
+		this.timeIntervalSize = timeInvervalSize;
+		this.possibleModes = possibleModes;
 	}
 
 	@Override
@@ -72,7 +77,6 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 		double planScore = 0.0;
 		Route tempRoute = null;
 		Leg leg = null;
-		Activity act = null;
 
 		this.sf.reset();
 
@@ -88,18 +92,18 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
 				leg = (Leg) o;
 
-				now += (((IntegerGene) a_subject.getGene(legCounter)).intValue() + 0.5) * Planomat.TIME_INTERVAL_SIZE;
+				now += (((IntegerGene) a_subject.getGene(legCounter)).intValue() + 0.5) * this.timeIntervalSize;
 				this.sf.endActivity(now);
 				this.sf.startLeg(now, null);
 
 				Activity origin = this.plan.getPreviousActivity(leg);
 				Activity destination = this.plan.getNextActivity(leg);
 
-				if (Gbl.getConfig().planomat().getPossibleModes().size() > 0) {
+				if (possibleModes.length > 0) {
 					// set mode
 					int subtourIndex = this.planAnalyzeSubtours.getSubtourIndexation()[legCounter];
 					int modeIndex = ((IntegerGene) a_subject.getGene(numActs + subtourIndex)).intValue();
-					leg.setMode((TransportMode) (Gbl.getConfig().planomat().getPossibleModes().toArray()[modeIndex]));
+					leg.setMode(possibleModes[modeIndex]);
 				} // otherwise leave modes untouched
 
 				// save original route

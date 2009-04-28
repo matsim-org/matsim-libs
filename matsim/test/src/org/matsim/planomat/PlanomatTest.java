@@ -110,17 +110,19 @@ public class PlanomatTest extends MatsimTestCase {
 		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, this.scenario.getNetwork());
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().charyparNagelScoring());
 
-		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
-		testee.getSeedGenerator().setSeed(this.scenario.getConfig().global().getRandomSeed());
-
 		log.info("Testing " + testRun.toString() + "...");
 
+		// setup config
 		if (
 				PlanomatTestRun.NOEVENTS_CAR_PT.equals(testRun) ||
 				PlanomatTestRun.WITHEVENTS_CAR_PT.equals(testRun)) {
 
 			this.scenario.getConfig().planomat().setPossibleModes("car,pt");
 		}
+		
+		// init Planomat, which loads config!
+		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
+		testee.getSeedGenerator().setSeed(this.scenario.getConfig().global().getRandomSeed());
 
 		tTravelEstimator.resetTravelTimes();
 		depDelayCalc.resetDepartureDelays();
