@@ -138,6 +138,11 @@ public class OsmNetworkReader {
 	 * @throws IOException
 	 */
 	public void parse(final String osmFilename) throws SAXException, ParserConfigurationException, IOException {
+		
+		if(this.hierarchyLayers.isEmpty()){
+			log.error("No hierarchy layer specified. Resulting network won't contain any links. Continuing anyway.");
+		}
+		
 		OsmXmlParser parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
 		parser.parse(osmFilename);
 		convert();
