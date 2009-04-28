@@ -69,4 +69,12 @@ public class KtiRouterListener implements StartupListener {
 
 	}
 
+	public Matrix getPtTravelTimes() {
+		return ptTravelTimes;
+	}
+
+	public SwissHaltestellen getHaltestellen() {
+		return haltestellen;
+	}
+
 }
