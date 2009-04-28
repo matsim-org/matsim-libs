@@ -30,6 +30,7 @@ import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDefaultNetWriterFactoryImpl;
@@ -40,7 +41,10 @@ import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 
 
@@ -55,6 +59,10 @@ public class OnTheFlyClientQuadSwing{
 
 		connect2.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect2.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
+		connect2.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		connect2.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		connect2.add(OTFLinkLanesAgentsNoParkingHandler.class, NetJComponent.SimpleQuadDrawer.class);
+		connect2.add(OTFLinkLanesAgentsNoParkingHandler.class,  NetJComponent.AgentDrawer.class);
 		connect2.add(OTFLinkAgentsHandler.class,  NetJComponent.SimpleQuadDrawer.class);
 		connect2.add(OTFLinkAgentsHandler.class,  NetJComponent.AgentDrawer.class);
 

@@ -126,7 +126,10 @@ public class OTFFileSettingsSaver implements OTFSettingsSaver {
 				//load config settings
 				inFile = new OTFQuadFileHandler.Reader.OTFObjectInputStream(zipFile.getInputStream(infoEntry));
 				Gbl.getConfig().removeModule(OTFVisConfig.GROUP_NAME);
-				Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, (OTFVisConfig)inFile.readObject());
+				OTFVisConfig cfg = (OTFVisConfig)inFile.readObject();
+				// force this to 30 if zero!
+				cfg.setDelay_ms(cfg.getDelay_ms() == 0 ? 30: cfg.getDelay_ms());
+				Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, cfg);
 			} 
 		} catch (IOException e1) {
 			e1.printStackTrace();

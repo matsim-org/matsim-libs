@@ -42,6 +42,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
 import com.sun.opengl.util.texture.Texture;
+import com.sun.opengl.util.texture.TextureCoords;
 
 
 public class SimpleStaticNetLayer  extends SimpleSceneLayer{
@@ -53,16 +54,31 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 		protected char[] id;
 		protected int nrLanes;
 
-		public void onDraw( GL gl) {
+		public void onDraw2( GL gl) {
 			final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, nrLanes*SimpleStaticNetLayer.cellWidth_m);
 			this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
 			this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
 			//Draw quad
 			gl.glBegin(GL.GL_QUADS);
-			gl.glTexCoord2f(1,1); gl.glVertex3f(quad[0].x, quad[0].y, 0);
-			gl.glTexCoord2f(1,0); gl.glVertex3f(quad[1].x, quad[1].y, 0);
-			gl.glTexCoord2f(0,0); gl.glVertex3f(quad[3].x, quad[3].y, 0);
-			gl.glTexCoord2f(0,1); gl.glVertex3f(quad[2].x, quad[2].y, 0);
+			gl.glVertex3f(quad[0].x, quad[0].y, 0);
+			gl.glVertex3f(quad[1].x, quad[1].y, 0);
+			gl.glVertex3f(quad[3].x, quad[3].y, 0);
+			gl.glVertex3f(quad[2].x, quad[2].y, 0);
+			gl.glEnd();
+		}
+		
+		public void onDraw( GL gl) {
+			final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, nrLanes*SimpleStaticNetLayer.cellWidth_m);
+			this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
+			this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
+			//Draw quad
+			TextureCoords co = new TextureCoords(0,0,1,1);
+			if(marktex != null) co =  marktex.getImageTexCoords();
+			gl.glBegin(GL.GL_QUADS);
+			gl.glTexCoord2f(co.right(),co.bottom()); gl.glVertex3f(quad[0].x, quad[0].y, 0);
+			gl.glTexCoord2f(co.right(),co.top()); gl.glVertex3f(quad[1].x, quad[1].y, 0);
+			gl.glTexCoord2f(co.left(), co.top()); gl.glVertex3f(quad[3].x, quad[3].y, 0);
+			gl.glTexCoord2f(co.left(),co.bottom()); gl.glVertex3f(quad[2].x, quad[2].y, 0);
 			gl.glEnd();
 		}
 
@@ -127,7 +143,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	private static final Map<OGLProvider, List<OTFDrawable>> itemsListMap = new HashMap<OGLProvider, List<OTFDrawable>>(); // not yet defined
 
 	protected int netDisplList = -1;
-	/*package*/ static float cellWidth_m = -1.f;
+	/*package*/ static float cellWidth_m = 30.f;
 
 	@Override
 	public void addItem(Receiver item) {
@@ -178,15 +194,17 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	@Override
 	public void draw() {
 		GL gl = myDrawer.getGL();
+
 		checkNetList(gl);
 
 		checkTexture(gl);
 		if (marktex != null) {
 			marktex.enable();
 			gl.glEnable(GL.GL_TEXTURE_2D);
-			//gl.glTexEnvf(GL.GL_POINT_SPRITE_ARB, GL.GL_COORD_REPLACE_ARB, GL.GL_TRUE);
+			//gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_MODULATE);
 			marktex.bind();
 		}
+		//gl.glDisable(GL.GL_BLEND);
 		Color netColor = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getNetworkColor();
 		float[] components = netColor.getColorComponents(new float[4]);
 		gl.glColor4d(components[0], components[1], components[2], netColor.getAlpha() / 255.0f);

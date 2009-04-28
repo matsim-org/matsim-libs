@@ -706,6 +706,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	}
 
 	public void init(GLAutoDrawable drawable) {
+		if(motherContext == null) motherContext = drawable.getContext();
+		
 		this.gl = drawable.getGL();
 		this.gl.setSwapInterval(0);
 		float[] components = this.config.getBackgroundColor().getColorComponents(new float[4]);

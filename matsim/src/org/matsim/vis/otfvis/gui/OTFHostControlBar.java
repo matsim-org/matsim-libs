@@ -34,8 +34,10 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.rmi.ssl.SslRMIClientSocketFactory;
@@ -96,6 +98,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	protected OTFServerRemote host = null;
 	private final Map <String,OTFDrawer> handlers = new HashMap<String,OTFDrawer>();
 	private final Map <String,OTFClientQuad> quads = new HashMap<String,OTFClientQuad>();
+	private final List <OTFSlaveHost> slaves = new ArrayList<OTFSlaveHost>();
 
 	private ImageIcon playIcon = null;
 	private ImageIcon pauseIcon = null;
@@ -104,13 +107,16 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	private Rectangle windowBounds = null;
 
-	private final Object blockReading = new Object();
+	protected Object blockReading = new Object();
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public OTFHostControlBar(String address) throws RemoteException, InterruptedException, NotBoundException {
+	public OTFHostControlBar(String address, boolean makeButtons) throws RemoteException, InterruptedException, NotBoundException {
 		openAddress(address);
-		addButtons();
+		if(makeButtons) addButtons();
+	}
+	public OTFHostControlBar(String address) throws RemoteException, InterruptedException, NotBoundException {
+		this(address, true);
 	}
 
 	protected void openAddress(final String address) throws RemoteException, InterruptedException, NotBoundException {
@@ -226,7 +232,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		return clientQ;
 	}
 
-	private void readConstData(OTFClientQuad clientQ) throws RemoteException {
+	protected void readConstData(OTFClientQuad clientQ) throws RemoteException {
 		clientQ.getConstData();
 		// if this is a recorded session, build random access index
 		if (!liveHost ) buildIndex();
@@ -234,7 +240,21 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		updateTimeLabel();
 
 	}
-	/*package*/ class PreloadHelper extends Thread {
+	protected boolean preCacheCurrentTime(int time, OTFTimeLine timeLine) throws IOException {
+		boolean result = host.requestNewTime(time, OTFServerRemote.TimePreference.LATER);
+		
+		for(OTFDrawer handler : handlers.values()) {
+			if(handler != timeLine) handler.getQuad().getSceneGraphNoCache(host.getLocalTime(), null, handler);
+		}
+		
+		for(OTFSlaveHost slave : slaves) {
+			slave.preCacheCurrentTime(time, timeLine);
+		}
+
+		return result;
+	}
+	
+	private class PreloadHelper extends Thread {
 
 		public void preloadCache() {
 			boolean hasNext = true;
@@ -247,18 +267,17 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 					synchronized(blockReading) {
 						// remember time the block had before caching next step
 						int	origtime = host.getLocalTime();
-						hasNext = host.requestNewTime(time, OTFServerRemote.TimePreference.LATER);
-						for(OTFDrawer handler : handlers.values()) {
-							if(handler != timeLine) handler.getQuad().getSceneGraphNoCache(host.getLocalTime(), null, handler);
-							else if (timeLine != null) timeLine.setCachedTime(host.getLocalTime()); // add this to the chaed times in the timeline drawer
-						}
 						time = host.getLocalTime() + 1;
-						// restore actual time that is experienced
-						host.requestNewTime(origtime, OTFServerRemote.TimePreference.LATER);
+						hasNext = preCacheCurrentTime(time,timeLine);
+						time = host.getLocalTime();
 					}
+					timeLine.setCachedTime(time); // add this to the cached times in the time line drawer
 				}
 				if (timeLine != null) timeLine.setCachedTime(-1);
 			} catch (RemoteException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -279,13 +298,16 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	public void invalidateHandlers() {
+		try {
 		for (OTFDrawer handler : handlers.values()) {
-			try {
 				handler.invalidate(simTime);
-			} catch (RemoteException e) {
-				// Possibly lost contact to host DS TODO Handle this!
-				e.printStackTrace();
-			}
+		}
+		for(OTFSlaveHost slave : slaves) {
+			slave.invalidateHandlers();
+		}
+		} catch (RemoteException e) {
+			// Possibly lost contact to host DS TODO Handle this!
+			e.printStackTrace();
 		}
 	}
 
@@ -293,11 +315,17 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		for (OTFDrawer handler : handlers.values()) {
 			handler.redraw();
 		}
+		for(OTFSlaveHost slave : slaves) {
+			slave.redrawHandlers();
+		}
 	}
 
 	public void clearCaches() {
 		for (OTFDrawer handler : handlers.values()) {
 			handler.clearCache();
+		}
+		for(OTFSlaveHost slave : slaves) {
+			slave.clearCaches();
 		}
 	}
 
@@ -417,9 +445,12 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		redrawHandlers();
 	}
 
-	private boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime)  throws IOException {
+	protected boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime)  throws IOException {
 		if (host.requestNewTime(newTime, prefTime)) {
 			simTime = host.getLocalTime();
+			for(OTFSlaveHost slave : slaves) {
+				slave.host.requestNewTime(newTime, prefTime);
+			}
 			invalidateHandlers();
 			return true;
 		}
@@ -459,11 +490,13 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private transient OTFAbortGoto progressBar = null;
 	public void gotoTime() {
 		try {
+			synchronized(blockReading) {
 			if (!requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER))
 				requestTimeStep(gotoTime, OTFServerRemote.TimePreference.LATER);
 			if (progressBar != null) progressBar.terminate = true;
 			simTime = host.getLocalTime();
 			updateTimeLabel();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -638,10 +671,16 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 						actTime = simTime;
 						simTime = host.getLocalTime();
+						for(OTFSlaveHost slave : slaves) {
+							slave.host.requestNewTime(simTime, OTFServerRemote.TimePreference.LATER);
+						}
+						
 						if (simTime != actTime) {
 							updateTimeLabel();
 							repaint();
-							if (isActive)  invalidateHandlers();
+							if (isActive)  {
+								invalidateHandlers();
+							}
 						}
 					}
 					//simTime = actTime;
@@ -708,4 +747,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 	}
 
+	public void addSlave(OTFSlaveHost slave) {
+		this.slaves.add(slave);
+		slave.blockReading = this.blockReading;
+	}
 }

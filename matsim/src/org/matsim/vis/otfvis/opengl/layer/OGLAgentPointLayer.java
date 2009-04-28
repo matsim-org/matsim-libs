@@ -130,7 +130,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			if (isEmpty()) {
 				return;
 			}
-			gl.glEnable(GL.GL_POINT_SPRITE_ARB);
+			gl.glEnable(GL.GL_POINT_SPRITE);
 
 			setAgentSize();
 
@@ -138,12 +138,14 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			gl.glEnableClientState (GL.GL_VERTEX_ARRAY);   
 
 			setTexture();
+			//texture = null;
 			if (texture != null) {
 				texture.enable();
 				gl.glEnable(GL.GL_TEXTURE_2D);
-				gl.glTexEnvf(GL.GL_POINT_SPRITE_ARB, GL.GL_COORD_REPLACE_ARB, GL.GL_TRUE);
+				gl.glTexEnvf(GL.GL_POINT_SPRITE, GL.GL_COORD_REPLACE, GL.GL_TRUE);
 				texture.bind();	        	
 			}
+			gl.glDepthMask(false);
 
 			drawArray(gl);
 			
@@ -153,7 +155,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 				texture.disable();	
 			}
 
-			gl.glDisable(GL.GL_POINT_SPRITE_ARB);
+			gl.glDisable(GL.GL_POINT_SPRITE);
 		}
 		
 		public int getNearestAgent(Point2D.Double point) {

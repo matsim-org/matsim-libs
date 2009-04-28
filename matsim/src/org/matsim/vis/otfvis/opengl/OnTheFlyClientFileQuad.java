@@ -148,13 +148,14 @@ public class OnTheFlyClientFileQuad extends Thread {
 
 	private final String filename;
 	private boolean splitLayout = true;
+	protected JSplitPane pane = null;
 
-	OTFConnectionManager connect = new OTFConnectionManager();
+	protected OTFConnectionManager connect = new OTFConnectionManager();
 
 	//NetworkLayer network = new NetworkLayer();
 
 
-	public OTFDrawer getLeftDrawerComponent( JFrame frame) throws RemoteException {
+	public OTFDrawer getLeftDrawerComponent(JFrame frame) throws RemoteException {
 		OTFConnectionManager connectL = this.connect.clone();
 		connectL.remove(OTFLinkAgentsHandler.class);
 
@@ -167,7 +168,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 		return drawer;
 	}
 
-	public OTFDrawer getRightDrawerComponent( JFrame frame) throws RemoteException {
+	public OTFDrawer getRightDrawerComponent(JFrame frame) throws RemoteException {
 		OTFConnectionManager connectR = this.connect.clone();
 		connectR.remove(OTFLinkAgentsHandler.class);
 
@@ -186,8 +187,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 	}
 
 
-	@Override
-	public void run() {
+	protected JFrame prepareRun() {
 		System.setProperty("javax.net.ssl.keyStore", "input/keystore");
 		System.setProperty("javax.net.ssl.keyStorePassword", "vspVSP");
 		System.setProperty("javax.net.ssl.trustStore", "input/truststore");
@@ -198,40 +198,42 @@ public class OnTheFlyClientFileQuad extends Thread {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 		}
 
+		JFrame frame = new OTFFrame("MATSim OTFVis");
+	    frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ); 
+
+		if (isMac) {
+			frame.getRootPane().putClientProperty("apple.awt.brushMetalLook", Boolean.TRUE);
+		}
+		JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		pane.setContinuousLayout(true);
+		pane.setOneTouchExpandable(true);
+		frame.getContentPane().add(pane);
+		this.pane = pane;
+
+		//Make sure menus appear above JOGL Layer
+		JPopupMenu.setDefaultLightWeightPopupEnabled(false); 
+		
+		if (Gbl.getConfig() == null) Gbl.createConfig(null);
+		OTFFileSettingsSaver saver = new OTFFileSettingsSaver(this.filename);
+		
+		OTFVisConfig visconf = (OTFVisConfig) Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+		if (visconf == null) {
+			visconf = saver.openAndReadConfig();
+		} else {
+			System.out.println("OTFVisConfig already defined, cant read settings from file");
+		}
+
 		try {
 
-			//Make sure menus appear above JOGL Layer
-			JPopupMenu.setDefaultLightWeightPopupEnabled(false); 
-			
-			if (Gbl.getConfig() == null) Gbl.createConfig(null);
-			OTFFileSettingsSaver saver = new OTFFileSettingsSaver(this.filename);
-			
-			OTFVisConfig visconf = (OTFVisConfig) Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
-			if (visconf == null) {
-				visconf = saver.openAndReadConfig();
-			} else {
-				System.out.println("OTFVisConfig already defined, cant read settings from file");
-			}
 			
 			System.out.println("Loading file " + this.filename + " ....");
 			this.hostControl = new OTFHostControlBar("file:" + this.filename);
-			JFrame frame = new OTFFrame("MATSim OTFVis");
-		    frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ); 
-
-			if (isMac) {
-				frame.getRootPane().putClientProperty("apple.awt.brushMetalLook", Boolean.TRUE);
-			}
 			hostControl.frame = frame;
 
 			frame.getContentPane().add(this.hostControl, BorderLayout.NORTH);
-			JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-			pane.setContinuousLayout(true);
-			pane.setOneTouchExpandable(true);
-			frame.getContentPane().add(pane);
 			PreferencesDialog.buildMenu(frame, visconf, this.hostControl, saver);
 
 			if(!hostControl.isLiveHost()) frame.getContentPane().add(new OTFTimeLine("time", hostControl), BorderLayout.SOUTH);
-
 
 			// Maybe later: connect.add(QueueLink.class, OTFDefaultLinkHandler.Writer.class);
 			// connect.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
@@ -256,7 +258,6 @@ public class OnTheFlyClientFileQuad extends Thread {
 
 			//InfoText.showText("Loaded...");
 
-			hostControl.finishedInitialisition();
 
 
 		}catch (RemoteException e) {
@@ -269,6 +270,13 @@ public class OnTheFlyClientFileQuad extends Thread {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return frame;
+	}
+	
+	@Override
+	public void run() {
+		prepareRun();
+		hostControl.finishedInitialisition();
 	}
 
 	public static void main( String[] args) {
@@ -283,7 +291,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 //			filename = "../../tmp/1000.events.mvi";
 //			filename = "/TU Berlin/workspace/MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi";
 //			filename = "/TU Berlin/workspace/MatsimJ/otfvisSwitzerland10p.mvi";
-//			filename = "testCUDA10p.mvi";
+			filename = "testCUDA10p.mvi";
 		}
 
 		
@@ -316,6 +324,12 @@ public class OnTheFlyClientFileQuad extends Thread {
 	public OnTheFlyClientFileQuad( String filename2,  OTFConnectionManager connect,  boolean split) {
 		this(filename2);
 		this.connect = connect;
+		this.splitLayout = split;
+	}
+
+
+	public OnTheFlyClientFileQuad( String filename2,  boolean split) {
+		this(filename2);
 		this.splitLayout = split;
 	}
 
