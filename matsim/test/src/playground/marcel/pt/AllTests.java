@@ -34,7 +34,6 @@ public class AllTests {
 		suite.addTest(playground.marcel.pt.router.AllTests.suite());
 		suite.addTest(playground.marcel.pt.transitSchedule.AllTests.suite());
 		suite.addTest(playground.marcel.pt.tryout.AllTests.suite());
-		suite.addTest(playground.marcel.pt.utils.AllTests.suite());
 
 		return suite;
 	}
