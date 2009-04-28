@@ -330,7 +330,7 @@ public class QueueLink {
 		}
 	}
 
-	/*package*/ void addParkedVehicle(QueueVehicle vehicle) {
+	public void addParkedVehicle(QueueVehicle vehicle) {
 		this.parkedVehicles.put(vehicle.getId(), vehicle);
 		vehicle.setCurrentLink(this.link);
 	}
