@@ -16,7 +16,7 @@ import playground.mmoyo.PTRouter.*;
 
 public class PTTimeTable2{
 	private PTLinesReader2 ptLinesReader = new PTLinesReader2();
-	private List<PTLine> ptLineList = new ArrayList<PTLine>();
+	private List<PTLine> ptLineList; //= new ArrayList<PTLine>();
 	private Map<Id,Double> linkTravelTimeMap = new TreeMap<Id,Double>();
 	private Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
 	private Map <Id, Link> nextLinkMap = new TreeMap <Id, Link>();
@@ -32,6 +32,10 @@ public class PTTimeTable2{
 	
 	public void setMaps(Map<Id,Double> linkTravelTimeMap){
 		this.linkTravelTimeMap = linkTravelTimeMap;
+	}
+	
+	public void setptLineList(List<PTLine> ptLineList){
+		this.ptLineList= ptLineList;
 	}
 	
 	public void calculateTravelTimes(NetworkLayer networklayer){
@@ -52,7 +56,6 @@ public class PTTimeTable2{
 				int y=0;
 				
 				for (String departure : ptLine.getDepartures()){
-					//Seconds past midnight
 					departuresArray[y++]=  time.parseTime(departure) + (minAfterDep*60);
 				}
 				nodeDeparturesMap.put(idNode, departuresArray);
@@ -107,7 +110,6 @@ public class PTTimeTable2{
 	public List<PTLine> getPtLineList() {
 		return ptLineList;
 	}
-	
 	
 	/*
 	*If dblTime is greater than the last departure, 

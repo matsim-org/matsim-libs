@@ -17,7 +17,7 @@ public class PTTimeTableInfo {
 
 	//Reports the next departure to matsim
 	public int nextDeparture(Link l, int time){
-		return ptTimeTable.nextDeparture(((PTNode)l.getFromNode()).getIdFather(),time );
+		return ptTimeTable.nextDeparture(((PTNode)l.getFromNode()).getIdStation(),time );
 	}
 	
 	//Calculates the travel time to cross a link on the basis of the information available in 
@@ -25,8 +25,8 @@ public class PTTimeTableInfo {
 	//The expected parameter is a Link from PTNetwork so it is assumed to get PTNodes
 	public int travelTime (Link l, int time){
 		Id idPtLine = ((PTNode)l.getFromNode()).getIdPTLine(); 
-		Id idFromFather = ((PTNode)l.getFromNode()).getIdFather();
-        Id idToFather= ((PTNode)l.getToNode()).getIdFather();
+		Id idFromFather = ((PTNode)l.getFromNode()).getIdStation();
+        Id idToFather= ((PTNode)l.getToNode()).getIdStation();
    		int departure = ptTimeTable.nextDepartureXLine(idFromFather, idPtLine, time); 
 		int arrival =ptTimeTable.nextDepartureXLine(idToFather, idPtLine, departure+1); 
 		

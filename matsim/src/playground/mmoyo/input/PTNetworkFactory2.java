@@ -33,7 +33,6 @@ public class PTNetworkFactory2 {
 		return ptNetworkLayer1;
 	}
 
-	
 	public NetworkLayer readNetwork(String inFileName, PTTimeTable2 ptTimeTable){
 		NetworkLayer ptNetworkLayer = readNetFile(inFileName);
 		readTimeTable(ptNetworkLayer, ptTimeTable);
@@ -105,13 +104,16 @@ public class PTNetworkFactory2 {
 			
 			for (String strIdNode : ptLine.getRoute()) {
 				PTNode ptNode = ((PTNode)ptNetworkLayer.getNode(strIdNode));
-				if (ptNode==null)
-					throw new java.lang.NullPointerException("Node does not exist:" + strIdNode); 
-	
-				ptNode.setIdPTLine(ptLine.getId());
-				double min = ptLine.getMinutes().get(indexMin);
-				travelTime=min-lastTravelTime;
+				if (ptNode==null){
+					//23 april-> temporarly commented 
+					//throw new java.lang.NullPointerException("Node does not exist:" + strIdNode); 
+				}
+				//23 april->ptNode.setIdPTLine(ptLine.getId());
+				//23 april->double min = ptLine.getMinutes().get(indexMin);
+				
+				travelTime = 1;	//23 april->travelTime=min-lastTravelTime;
 				if (!first){
+					System.out.println(( ptNode==null) + " " + strIdNode);
 					for (Link link : (ptNode.getInLinks().values())) {
 						if (link.getFromNode().equals(ptLastNode)){
 							linkTravelTimeMap.put(link.getId(), travelTime);
@@ -121,7 +123,7 @@ public class PTNetworkFactory2 {
 					}
 				}
 				ptLastNode= ((PTNode)ptNetworkLayer.getNode(strIdNode));
-				lastTravelTime= min;
+				//23 april-> lastTravelTime= min;
 				first=false;
 				indexMin++;
 			}//for interator String
@@ -144,7 +146,7 @@ public class PTNetworkFactory2 {
 		return baseID;
 	}
 	*/
-	private void createTransferLinks(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable) {
+	public void createTransferLinks(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable) {
 		PTStation stationMap = new PTStation(ptTimeTable);
 		
 		stationMap.print();

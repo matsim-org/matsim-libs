@@ -8,9 +8,13 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import playground.mmoyo.Validators.NetValidator;
 import playground.mmoyo.Validators.PlanValidator;
 import playground.mmoyo.input.PTLineAggregator;
+import org.matsim.core.network.NetworkLayer;
 //import org.matsim.core.api.network.Link;
 //import org.matsim.api.basic.v01.Id;
 //import java.util.Map;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+
 
 public class PTControler2 {
     private static String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
@@ -27,12 +31,12 @@ public class PTControler2 {
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, INPTNETFILE, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
 		
-		int option =3;
+		int option =-5;
 		
 		if (option>0){pt.readPTNet(ZURICHPTN);}
 		switch (option){
 		
-			case -4:
+			case -6:
 				String plansFile = path + "@All_plans .xml";
 				plansFile = path + "plans.xml";
 				
@@ -41,11 +45,33 @@ public class PTControler2 {
 				System.out.println(num);
 				
 				break;
+			case -5:
+				//It works!
+				String newNodesfilePath="C://Users/manuel/Desktop/TU/ZH_Files/bus/Basic_Bus_Network.xml";
+				NetworkLayer net = new NetworkLayer();
+				pt.setPtNetworkLayer(net);
+				PTLineAggregator ptLineAggregator = new PTLineAggregator(newNodesfilePath, pt.getPtNetworkLayer(), pt.getPtTimeTable());
+				ptLineAggregator.AddLines();
+				
+				pt.getPtNetworkFactory().createTransferLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
+				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300, pt.getPtTimeTable());
+				
+				
+				pt.writeNet(ZURICHPTN);				
+				pt.createRouter();
+				PTActWriter ptActWriter1 = new PTActWriter(pt);
+	    		ptActWriter1.writePTActsLegs();
+				
+				break;
+			case -4:
+			
+
+				break;
 			case -3:
 				//pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
 	    		pt.readPTNet(INPTNETFILE);
-				String newNodesfilePath="C://Users/manuel/Desktop/TU/ZH_Files/bus/Basic_Bus_Network.xml";
-				PTLineAggregator ptLineAggregator = new PTLineAggregator(newNodesfilePath, pt.getPtNetworkLayer(), pt.getPtTimeTable());
+				newNodesfilePath="C://Users/manuel/Desktop/TU/ZH_Files/bus/Basic_Bus_Network.xml";
+				ptLineAggregator = new PTLineAggregator(newNodesfilePath, pt.getPtNetworkLayer(), pt.getPtTimeTable());
 				ptLineAggregator.AddLine();
 	    		pt.writeNet(ZURICHPTN);
 				break;
@@ -58,10 +84,10 @@ public class PTControler2 {
 				break;
 			case -1:
 				pt.createPTNetWithTLinks(INPTNETFILE);
-				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300, pt.getPtTimeTable());
+				//pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300, pt.getPtTimeTable());
 				pt.writeNet(ZURICHPTN);
 	    		pt.readPTNet(ZURICHPTN);
-	    		PTActWriter ptActWriter1 = new PTActWriter(pt);
+	    		ptActWriter1 = new PTActWriter(pt);
 	    		ptActWriter1.writePTActsLegs();
 	    		
 				break;
@@ -70,7 +96,13 @@ public class PTControler2 {
 	    		//Map<String, List<IdImpl>> intersecionMap = pt.getPtNetworkFactory().createIntersecionMap(pt.getPtTimeTable());
 	    		//new StationValidator().validateStations(pt.getPtNetworkLayer(),intersecionMap);
 	    		break;
-	    	case 1:
+	    	
+			case 1:
+				pt.createPTNetWithTLinks(INPTNETFILE);
+				pt.writeNet(ZURICHPTN);
+				break;
+
+			case 11:
 	    		Coord coord1= new CoordImpl(708146,243607);
     			Coord coord2= new CoordImpl(709915,244793);
 	    		Path path = pt.getPtRouter2().findRoute(coord1, coord2, 24060,400);
@@ -85,8 +117,8 @@ public class PTControler2 {
 	    	case 3:
 	    		//pt.getPtNetworkFactory().setDetNextLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
 	    		PTActWriter ptActWriter = new PTActWriter(pt);
-	    		//ptActWriter.writePTActsLegs();
-	    		ptActWriter.SimplifyPtLegs();
+	    		ptActWriter.writePTActsLegs();
+	    		//ptActWriter.SimplifyPtLegs();
 	    		//ptActWriter.ptTravelTime.costValidator.printNegativeVaues();
 	    		//System.out.println(ptActWriter.ptTravelTime.costValidator==null);
 	    		break;

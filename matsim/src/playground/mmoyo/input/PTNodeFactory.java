@@ -39,6 +39,11 @@ public class PTNodeFactory {
 		return NetWithPTNodes;
 	}
 	
+	public void createPtNode(){
+		
+		
+	}
+	
 	public BasicNode[] CreatePTNodes(BasicNode basicNode){
 		BasicNode[] pair = new BasicNode[2];
 		
@@ -53,7 +58,9 @@ public class PTNodeFactory {
     		Coord coord = net.getNode(firstId).getCoord();
     		
    			if (!coord.equals(newCoord)){
-    			throw new IllegalArgumentException("Wrong coordinates in node: " + strBaseId + " " + newCoord);
+    			//-> 23 apr decide what to do here: throw exception or correct the coordinate taking first value
+   				//throw new IllegalArgumentException("Wrong coordinates in node: " + strBaseId + " " + newCoord);
+   				newCoord=coord;
    			}
     		
     		char greatestChar = 'a';

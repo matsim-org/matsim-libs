@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -23,8 +25,9 @@ import org.xml.sax.SAXException;
 public class PTNodeReader extends MatsimXmlParser{
 	private final static String NODE = "node";
 	private final static String LINE = "ptLine";
-	List<List<BasicNode>> nodeListList = new ArrayList<List<BasicNode>>();
-	List<BasicNode> nodeList = new ArrayList<BasicNode>();
+	String strPTLine;
+	List<BasicNode> nodeList;
+	Map <String, List<BasicNode>> lineMap = new TreeMap <String, List<BasicNode>>();
 	
 	public PTNodeReader(){
 		super();
@@ -47,7 +50,7 @@ public class PTNodeReader extends MatsimXmlParser{
 		if (NODE.equals(name)){
 			startNode(atts);
 		}else if (LINE.equals(name)){
-			startLine();
+			startLine(atts);
 		}
 	}
 
@@ -73,24 +76,21 @@ public class PTNodeReader extends MatsimXmlParser{
 		
 	}
 	
-	private void startLine(){
+	private void startLine(final Attributes atts){
 		nodeList = new ArrayList<BasicNode>();
+		strPTLine = atts.getValue("id");
 	}
 	
 	private void endLine(){
 		System.out.print("endLine: ");
-		nodeListList.add(nodeList);		
+		lineMap.put(strPTLine, nodeList);
 		
 		System.out.println();
 		for (BasicNode basicNode: nodeList){
 			System.out.print(basicNode.getId().toString() + " ");
 		}
-		
-		
 	}
 
-	public List<List<BasicNode>> getNodeLists(){
-		return this.nodeListList;
-	}
+	
 	
 }

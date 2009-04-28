@@ -37,10 +37,15 @@ public class PTTravelTime implements TravelTime {
 		
 		}else if (type.equals("DetTransfer")){
 			double walkTime=link.getLength()* walkSpeed;
+			travelTime= walkTime + 600;
+			
+			/* TODO What´s the problem here?????   28 april
 			Link nextLink = ptTimeTable.getNextLinkMap().get(link.getId());
-			double waitingTime= transferTime(nextLink, (time+walkTime));
+			double waitingTime= transferTime(nextLink, (time+walkTime));  //-> should not it be next departure from fromNode???
 			double nextLinkTravelTime = ptTimeTable.GetTravelTime(nextLink);
 			travelTime= walkTime + waitingTime - nextLinkTravelTime; 
+			*/
+			
 			
 			//double waitingTime= transferTime(link, (time+walkTime));			
 			//Fix this

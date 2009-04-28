@@ -35,7 +35,7 @@ public class PTNProximity
 		
 		for (Node node: ptNetworkLayer.getNodes().values()) {
 			PTNode ptnode = (PTNode)node;
-			Node fatherNode= cityNetworkLayer.getNode(ptnode.getIdFather());
+			Node fatherNode= cityNetworkLayer.getNode(ptnode.getIdStation());
 			if (!FatherNodeList.contains(fatherNode)) {
 				FatherNodeList.add(fatherNode);
 			}

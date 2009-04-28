@@ -23,16 +23,20 @@ public class PTStationMap {
 	public void createIntersecionMap(PTTimeTable2 ptTimeTable){
 		for (PTLine ptLine : ptTimeTable.getPtLineList()) {
 			for (String strIdNode: ptLine.getRoute()) {
-				String strNodeBaseId =  getNodeBaseId(strIdNode);
-				if (!IntersectionMap.containsKey(strNodeBaseId)){
-	    			List<Id> ch = new ArrayList<Id>();
-	    			IntersectionMap.put(strNodeBaseId, ch);
-	    		}
-	    		IntersectionMap.get(strNodeBaseId).add(new IdImpl(strIdNode));
+				insertNode(strIdNode);
 			}
 		}
 	}
 
+	public void insertNode(String strIdNode){
+		String strNodeBaseId =  getNodeBaseId(strIdNode);
+		if (!IntersectionMap.containsKey(strNodeBaseId)){
+			List<Id> ch = new ArrayList<Id>();
+			IntersectionMap.put(strNodeBaseId, ch);
+		}
+		IntersectionMap.get(strNodeBaseId).add(new IdImpl(strIdNode));
+	}
+	
 
 	public Map<String, List<Id>> getIntersecionMap(){
 		return this.IntersectionMap;

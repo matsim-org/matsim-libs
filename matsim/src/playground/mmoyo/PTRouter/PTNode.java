@@ -12,23 +12,34 @@ import org.matsim.core.network.NodeImpl;
  * @param idPTLine the PT line that exclusively travels through the node
  */
 public class PTNode extends NodeImpl {
-	private Id idFather;   //--> this must be changed to "idStation"
+	private Id idStation;   
 	private Id idPTLine;
-	private int indexInRoute; 
+	private int lineSequenceindex; 
 	private int minutesAfterDeparture;
 	
-	public PTNode(final Id id, final Coord coord, final String type, final Id idFather, final Id idPTLine) {
+	public PTNode(final Id id, final Coord coord, final String type, final Id idStation, final Id idPTLine) {
 		super(id, coord, type);
-		this.idFather = idFather;
+		this.idStation = idStation;
 		this.idPTLine = idPTLine;
 	}
 
-	public int getIndexInRoute() {
-		return indexInRoute;
+	public PTNode(final Id id, final Coord coord, final Id idStation, final Id idPTLine, int lineSequenceindex) {
+		super(id, coord, "PtNode");
+		this.idStation = idStation;
+		this.idPTLine = idPTLine;
+		this.lineSequenceindex= lineSequenceindex;
+	}
+	
+	public PTNode(final Id id, final Coord coord, final String type){
+		super(id, coord, type);
+	}
+	
+	public int getLineSequenceindex() {
+		return lineSequenceindex;
 	}
 
-	public void setIndexInRoute(int indexInRoute) {
-		this.indexInRoute = indexInRoute;
+	public void setLineSequenceindex(int lineSequenceindex) {
+		this.lineSequenceindex = lineSequenceindex;
 	}
 
 	public int getMinutesAfterDeparture() {
@@ -39,20 +50,14 @@ public class PTNode extends NodeImpl {
 		this.minutesAfterDeparture = minutesAfterDeparture;
 	}
 
-	public PTNode(final Id id, final Coord coord, final String type){
-		super(id, coord, type);
+	public Id getIdStation() {
+		return this.idStation;
 	}
 
-	
-	public Id getIdFather() {
-		return this.idFather;
-	}
-
-	public void setIdFather(final Id idFather) {
-		this.idFather = idFather;
+	public void setIdStation(final Id idStation) {
+		this.idStation = idStation;
 	}
 	
-
 	public Id getIdPTLine() {
 		return this.idPTLine;
 	}
@@ -60,4 +65,5 @@ public class PTNode extends NodeImpl {
 	public void setIdPTLine(final Id idPTLine) {
 		this.idPTLine = idPTLine;
 	}
+		
 }

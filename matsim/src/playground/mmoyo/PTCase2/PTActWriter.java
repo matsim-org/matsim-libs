@@ -38,6 +38,7 @@ public class PTActWriter {
 	private NetworkLayer net; 
 	private PTRouter2 ptRouter;
 	private String outputFile;
+	private String plansFile;
 	
 	private Node originNode;
 	private Node destinationNode;
@@ -49,14 +50,14 @@ public class PTActWriter {
 		net= ptOb.getPtNetworkLayer();
 		String conf = ptOb.getConfig();
 		outputFile = ptOb.getOutPutFile();
+		plansFile =  ptOb.getPlansFile(); 
 		
 		Config config = new org.matsim.core.config.Config();
 		config = Gbl.createConfig(new String[]{conf, "http://www.matsim.org/files/dtd/plans_v4.dtd"});
 		Gbl.setConfig(config);
-
+		
 		population = new PopulationImpl(false);
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(this.population,net);
-		String plansFile = ptOb.getPlansFile();
 		plansReader.readFile(plansFile);
 	}
 
@@ -88,9 +89,9 @@ public class PTActWriter {
 		List<Double> durations = new ArrayList<Double>();  
 		List<Path> paths = new ArrayList<Path>();  
 		
-		//for (Person person: this.population.getPersons().values()) {
-		if ( true ) {
-		Person person = population.getPersons().get(new IdImpl("3937204"));
+		for (Person person: this.population.getPersons().values()) {
+		//if ( true ) {
+		//Person person = population.getPersons().get(new IdImpl("3937204"));
 		
 			System.out.println(x + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
@@ -137,7 +138,8 @@ public class PTActWriter {
 			    					newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
 			    					inWalkRange++;
 			    				}else{
-			    						
+			    					
+			    					/*
 			    					if (ptPathValidator.isValid(path)){
 			    						legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
 			    						valid++;
@@ -148,9 +150,9 @@ public class PTActWriter {
 			    						addPerson=false;
 			    						paths.add(path);
 			    					}
+			    					*/
 			    					
-			    					
-			    					//legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
+			    					legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
 			    				}//if dw1+dw2
 			   				removeWlinks();
 			    			}else{
@@ -187,7 +189,7 @@ public class PTActWriter {
 		System.out.println("writing output plan file...");
 		Gbl.getConfig().plans().setOutputFile(outputFile);
 		Gbl.getConfig().plans().setOutputVersion("v4");
-		//new PopulationWriter(newPopulation).write();
+		new PopulationWriter(newPopulation).write();
 		System.out.println("Done");
 		
 		/*
@@ -216,14 +218,14 @@ public class PTActWriter {
 		}
 		*/
 		
-		/*
+		
 		// start the control(l)er with the network and plans as defined above
-		Controler controler = new Controler(Gbl.getConfig(),net,(Population) newPopulation);
+		//Controler controler = new Controler(Gbl.getConfig(),net,(Population) newPopulation);
 		// this means existing files will be over-written.  Be careful!
-		controler.setOverwriteFiles(true);
+		//controler.setOverwriteFiles(true);
 		// start the matsim iterations (configured by the config file)
-		controler.run();
-		*/
+		//controler.run();
+		
 			
 	}//createPTActs
 	

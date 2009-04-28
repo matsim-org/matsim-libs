@@ -84,7 +84,7 @@ public class PTNetworkFactory {
 		
 		Node n = this.cityNet.getNode(id);
 		PTNode node = new PTNode(id, n.getCoord(), n.getType());
-		node.setIdFather(id);        //All ptnodes must have a father, including fathers (themselves)
+		node.setIdStation(id);        //All ptnodes must have a father, including fathers (themselves)
 		node.setIdPTLine(new IdImpl("Walk"));
 		this.ptNetworkLayer.getNodes().put(id, node);
 		n= null;
@@ -212,11 +212,11 @@ public class PTNetworkFactory {
 			System.out.print( l.getToNode().getId().toString() ); 
 			System.out.print( ")   " + l.getType() ); 
 			System.out.print( "      (" ); 
-			System.out.print( ((PTNode) l.getFromNode()).getIdFather().toString()); 
+			System.out.print( ((PTNode) l.getFromNode()).getIdStation().toString()); 
 			System.out.print( ")----" ); 
 			System.out.print( l.getId().toString() ); 
 			System.out.print( "--->(" ); 
-			System.out.print( ((PTNode) l.getToNode()).getIdFather().toString() ); 
+			System.out.print( ((PTNode) l.getToNode()).getIdStation().toString() ); 
 			System.out.print( ")");
 		}
 	}

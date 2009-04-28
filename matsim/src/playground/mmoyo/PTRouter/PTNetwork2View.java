@@ -55,7 +55,7 @@ public class PTNetwork2View extends NetworkLayer {
 	
 	public void printLinks() {
 		for (org.matsim.core.api.network.Link l : this.getLinks().values()) {
-			System.out.println("(" + l.getFromNode().getId().toString() + ")----" + l.getId().toString() + "--->(" + l.getToNode().getId().toString() + ")   " + "      (" + ((PTNode) l.getFromNode()).getIdFather().toString()+ ")----" + l.getId().toString() + "--->(" + ((PTNode) l.getToNode()).getIdFather().toString() + ")");
+			System.out.println("(" + l.getFromNode().getId().toString() + ")----" + l.getId().toString() + "--->(" + l.getToNode().getId().toString() + ")   " + "      (" + ((PTNode) l.getFromNode()).getIdStation().toString()+ ")----" + l.getId().toString() + "--->(" + ((PTNode) l.getToNode()).getIdStation().toString() + ")");
 		}
 	}
 	

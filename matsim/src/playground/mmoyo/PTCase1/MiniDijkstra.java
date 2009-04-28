@@ -43,7 +43,6 @@ public class MiniDijkstra {
 	}
 	
 	public void shortestPath(Node OriginNode, Node DestinationNode, int iniTime){
-		////validate the nodes
 		int iniPosition = nodeList.indexOf(OriginNode);
 		int endPosition = nodeList.indexOf(DestinationNode);
 
@@ -53,7 +52,7 @@ public class MiniDijkstra {
 		
 		this.resetValues();
 		
-		//TODO: time must be accumulated here
+		//-->: time must be accumulated here
 		for (Link link : linkList) {
 			updateCost (link, iniTime);
 		}
@@ -145,4 +144,4 @@ public class MiniDijkstra {
 		linkArray[toNodeIndex][fromNodeIndex] = cost;
 	}
 	
-}// Class
+}

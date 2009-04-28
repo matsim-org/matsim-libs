@@ -24,6 +24,10 @@ public class PTOb {
 
 	public void readPTNet(String netFile){
 		this.ptNetworkLayer= this.ptNetworkFactory.readNetwork(netFile,ptTimeTable);
+		createRouter();
+	}
+	
+	public void createRouter(){
 		ptRouter2 = new PTRouter2(ptNetworkLayer, ptTimeTable);
 	}
 	
@@ -61,6 +65,14 @@ public class PTOb {
 
 	public PTNetworkFactory2 getPtNetworkFactory() {
 		return ptNetworkFactory;
+	}
+
+	public void setPtNetworkLayer(NetworkLayer ptNetworkLayer) {
+		this.ptNetworkLayer = ptNetworkLayer;
+	}
+
+	public void setPtRouter2(PTRouter2 ptRouter2) {
+		this.ptRouter2 = ptRouter2;
 	}	
 		
 }

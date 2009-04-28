@@ -29,9 +29,6 @@ public class PTNetworkLayer extends NetworkLayer {
 
 	private final NetworkLayer cityNet;
 
-
-	// This map stores the children nodes of each father node, necessary to
-	// create the transfer between them
 	public Map<Id, ArrayList<String>> childrenList = new TreeMap<Id, ArrayList<String>>();
 
 	public PTNetworkLayer(final NetworkLayer cityNet) {
@@ -40,8 +37,6 @@ public class PTNetworkLayer extends NetworkLayer {
 	}
 
 	public void createPTNetwork(final List<PTLine> ptLineList) {
-		// Read the route of every PTline and adds the corresponding links and
-		// nodes
 		for (PTLine ptLine : ptLineList) {
 			boolean firstLink = true;
 			String idFromNode = "";
@@ -55,26 +50,21 @@ public class PTNetworkLayer extends NetworkLayer {
 	}
 
 	public String addToSubwayPTN(final Link l, String idFromNode, final boolean firstLink,final Id IdPTLine) {
-		// Create the "Metro underground paths" related to the city network
-
-		// Create FromNode
 		if (firstLink) {
 			this.maxNodekey++;
 			idFromNode = String.valueOf(this.maxNodekey);
 			addPTNode(idFromNode, l.getFromNode(), IdPTLine);
 		}
 
-		// Create ToNode
 		this.maxNodekey++;
 		String idToNode = String.valueOf(this.maxNodekey);
 		addPTNode(idToNode, l.getToNode(), IdPTLine);// ToNode
 
-		// Create the Link
 		this.maxLinkKey++;
 		this.createLink(this.maxLinkKey, idFromNode, idToNode, "Standard");
 
 		return idToNode;
-	}// AddToSub
+	}
 
 	private void addWalkingNode(final Id id) {
 		//System.out.print(idImpl.toString() + " " + this.nodes.containsKey(idImpl) + " " );
@@ -85,7 +75,7 @@ public class PTNetworkLayer extends NetworkLayer {
 
 		Node n = this.cityNet.getNode(id);
 		PTNode node = new PTNode(id,	n.getCoord(), n.getType());
-		node.setIdFather(id);        //All ptnodes must have a father, including fathers (themselves)
+		node.setIdStation(id);        //All ptnodes must have a father, including fathers (themselves)
 		node.setIdPTLine(new IdImpl("Walk"));
 		this.getNodes().put(id, node);
 		n= null;
@@ -221,11 +211,11 @@ public class PTNetworkLayer extends NetworkLayer {
 			System.out.print( l.getToNode().getId().toString() );
 			System.out.print( ")   " + l.getType() );
 			System.out.print( "      (" );
-			System.out.print( ((PTNode) l.getFromNode()).getIdFather().toString());
+			System.out.print( ((PTNode) l.getFromNode()).getIdStation().toString());
 			System.out.print( ")----" );
 			System.out.print( l.getId().toString() );
 			System.out.print( "--->(" );
-			System.out.print( ((PTNode) l.getToNode()).getIdFather().toString() );
+			System.out.print( ((PTNode) l.getToNode()).getIdStation().toString() );
 			System.out.print( ")");
 		}
 	}

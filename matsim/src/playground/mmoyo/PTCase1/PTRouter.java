@@ -104,7 +104,7 @@ public class PTRouter{
 					busLine = route[i].getIdPTLine().toString();
 					System.out.println("\n" + busLine + ": ");
 				}
-				System.out.print(route[i].getIdFather().toString() + "-");
+				System.out.print(route[i].getIdStation().toString() + "-");
 			}
 		}
     }
