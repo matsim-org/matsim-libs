@@ -414,7 +414,7 @@ public class OsmNetworkReader {
 			try {
 				nofLanes = Double.parseDouble(way.tags.get("lanes"));
 			} catch (Exception e) {
-				// Nothing to do here, simply ignore it
+				log.warn("Could not parse lanes tag:" + e.getMessage() + ". Ignoring it.");
 			}			
 		}
 		
@@ -443,13 +443,11 @@ public class OsmNetworkReader {
 	}
 	
 	private static class OsmFilter {
-//		public final Id id;
-		public final Coord coordNW;
-		public final Coord coordSE;
-		public final int hierarchy;
+		private final Coord coordNW;
+		private final Coord coordSE;
+		private final int hierarchy;
 
 		public OsmFilter(final Coord coordNW, final Coord coordSE, final int hierarchy) {
-//			this.id = id;
 			this.coordNW = coordNW;
 			this.coordSE = coordSE;
 			this.hierarchy = hierarchy;
