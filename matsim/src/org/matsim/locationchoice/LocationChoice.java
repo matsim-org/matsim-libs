@@ -56,6 +56,22 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		// TODO: why does this module need the control(l)er as argument?  Gets a bit awkward
 		// when you use it in demandmodelling where you don't really need a control(l)er.
 		// kai, jan09
+		
+		/*
+		 	Using the controler in the replanning module actually looks quite inconsiderately. 
+		 	But controler creates a new instance of router in every iteration! 
+		 	Thus, the controler must be given to the replanning module by now (see below).
+		
+			controler.getRoutingAlgorithm(f) {		
+				return new PlansCalcRoute(this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
+			}
+
+			TODO: extend handlePlan() by the argument "router". Maybe some kind of startup method is needed, which is called 
+			everytime before handlePlan is called. But that seems to
+			require extended refactorings of replanning code. 
+			
+			anhorni: april09
+		 */
 
 		this.initLocal(network, controler);
 	}
