@@ -26,15 +26,9 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.ActStartEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -45,11 +39,11 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.integration.TransitConstants;
 import playground.marcel.pt.integration.TransitDriver;
 import playground.marcel.pt.integration.TransitQueueSimulation;
 import playground.marcel.pt.integration.TransitQueueVehicle;
 import playground.marcel.pt.interfaces.TransitVehicle;
+import playground.marcel.pt.mocks.MockAgent;
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
@@ -57,7 +51,6 @@ import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.transitSchedule.modules.CreateTimetableForStop;
-import playground.marcel.pt.utils.FacilityVisitors;
 
 public class TransitDriverTest extends MatsimTestCase {
 
@@ -90,22 +83,29 @@ public class TransitDriverTest extends MatsimTestCase {
 		Map<Id, Departure> departures = route1.getDepartures();
 
 		Events events = new Events();
-		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(false), events);
+		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(false), events, facilities);
 
 		TransitDriver driver = new TransitDriver(route1, departures.values().iterator().next(), sim);
 		TransitVehicle bus = new TransitQueueVehicle(20, events);
 		driver.setVehicle(bus);
 
-		BusPassenger passenger1 = new BusPassenger(new IdImpl("1"), facilities.getFacilities().get(new IdImpl("stop2")));
-		BusPassenger passenger2 = new BusPassenger(new IdImpl("2"), facilities.getFacilities().get(new IdImpl("stop3")));
-		BusPassenger passenger3 = new BusPassenger(new IdImpl("3"), facilities.getFacilities().get(new IdImpl("stop4")));
-		BusPassenger passenger4 = new BusPassenger(new IdImpl("4"), facilities.getFacilities().get(new IdImpl("stop5")));
-		BusPassenger passenger5 = new BusPassenger(new IdImpl("5"), facilities.getFacilities().get(new IdImpl("stop6")));
-		bus.addPassenger(passenger1);
-		bus.addPassenger(passenger2);
-		bus.addPassenger(passenger3);
-		bus.addPassenger(passenger4);
-		bus.addPassenger(passenger5);
+		Facility home = facilities.getFacilities().get(new IdImpl("home"));
+		Facility stop2 = facilities.getFacilities().get(new IdImpl("stop2"));
+		Facility stop3 = facilities.getFacilities().get(new IdImpl("stop3"));
+		Facility stop4 = facilities.getFacilities().get(new IdImpl("stop4"));
+		Facility stop6 = facilities.getFacilities().get(new IdImpl("stop6"));
+
+		MockAgent agent1 = new MockAgent(home, stop2);
+		MockAgent agent2 = new MockAgent(home, stop3);
+		MockAgent agent3 = new MockAgent(home, stop4);
+		MockAgent agent4 = new MockAgent(home, stop3);
+		MockAgent agent5 = new MockAgent(home, stop6);
+		bus.addPassenger(agent1);
+		bus.addPassenger(agent2);
+		bus.addPassenger(agent3);
+		bus.addPassenger(agent4);
+		bus.addPassenger(agent5);
+		
 		assertEquals("wrong number of passengers.", 5, bus.getPassengers().size());
 
 		Link link = driver.chooseNextLink();
@@ -115,7 +115,6 @@ public class TransitDriverTest extends MatsimTestCase {
 			if (nextLink != null) {
 				assertEquals("current link and next link must have common node.", link.getToNode(), nextLink.getFromNode());
 			}
-//			driver.leaveCurrentLink();
 			link = nextLink;
 			if (link != null) {
 				driver.moveOverNode();
@@ -150,29 +149,29 @@ public class TransitDriverTest extends MatsimTestCase {
 		Map<Id, Departure> departures = route1.getDepartures();
 
 		Events events = new Events();
-		TransitQueueSimulation sim = new MyQueueSim(network, new PopulationImpl(false), events);
+		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(false), events, facilities);
 		
 		TransitDriver driver = new TransitDriver(route1, departures.values().iterator().next(), sim);
 		TransitVehicle bus = new TransitQueueVehicle(20, events);
 		driver.setVehicle(bus);
 
-		FacilityVisitors fv = new FacilityVisitors();
-		events.addHandler(fv);
-		driver.setFacilityVisitorObserver(fv);
+		Facility work = facilities.getFacilities().get(new IdImpl("work"));
+		Facility stop2 = facilities.getFacilities().get(new IdImpl("stop2"));
+		Facility stop3 = facilities.getFacilities().get(new IdImpl("stop3"));
+		Facility stop4 = facilities.getFacilities().get(new IdImpl("stop4"));
+		Facility stop6 = facilities.getFacilities().get(new IdImpl("stop6"));
 
-		Facility workFacility = facilities.getFacilities().get(new IdImpl("work"));
-
-		BusPassenger passenger1 = createPassenger("1", facilities.getFacilities().get(new IdImpl("stop2")), workFacility);
-		BusPassenger passenger2 = createPassenger("2", facilities.getFacilities().get(new IdImpl("stop3")), workFacility);
-		BusPassenger passenger3 = createPassenger("3", facilities.getFacilities().get(new IdImpl("stop4")), workFacility);
-		BusPassenger passenger4 = createPassenger("4", facilities.getFacilities().get(new IdImpl("stop5")), workFacility);
-		BusPassenger passenger5 = createPassenger("5", facilities.getFacilities().get(new IdImpl("stop6")), workFacility);
-		events.processEvent(new ActStartEvent(6.0*3600, passenger1, network.getLink("3"), (Activity) passenger1.getPlans().get(0).getPlanElements().get(0)));
-		events.processEvent(new ActStartEvent(6.0*3600, passenger2, network.getLink("5"), (Activity) passenger2.getPlans().get(0).getPlanElements().get(0)));
-		events.processEvent(new ActStartEvent(6.0*3600, passenger3, network.getLink("5"), (Activity) passenger3.getPlans().get(0).getPlanElements().get(0)));
-		events.processEvent(new ActStartEvent(6.0*3600, passenger4, network.getLink("6"), (Activity) passenger4.getPlans().get(0).getPlanElements().get(0)));
-		events.processEvent(new ActStartEvent(6.0*3600, passenger5, network.getLink("8"), (Activity) passenger5.getPlans().get(0).getPlanElements().get(0)));
-
+		MockAgent agent1 = new MockAgent(stop2, work);
+		MockAgent agent2 = new MockAgent(stop3, work);
+		MockAgent agent3 = new MockAgent(stop4, work);
+		MockAgent agent4 = new MockAgent(stop3, work);
+		MockAgent agent5 = new MockAgent(stop6, work);
+		sim.agentDeparts(agent1, stop2.getLink());
+		sim.agentDeparts(agent2, stop3.getLink());
+		sim.agentDeparts(agent3, stop4.getLink());
+		sim.agentDeparts(agent4, stop3.getLink());
+		sim.agentDeparts(agent5, stop6.getLink());
+		
 		assertEquals("wrong number of passengers.", 0, bus.getPassengers().size());
 
 		Link link = driver.chooseNextLink();
@@ -182,7 +181,6 @@ public class TransitDriverTest extends MatsimTestCase {
 			if (nextLink != null) {
 				assertEquals("current link and next link must have common node.", link.getToNode(), nextLink.getFromNode());
 			}
-//			driver.leaveCurrentLink();
 			link = nextLink;
 			if (link != null) {
 				driver.moveOverNode();
@@ -192,25 +190,4 @@ public class TransitDriverTest extends MatsimTestCase {
 		assertEquals("wrong number of passengers.", 5, bus.getPassengers().size());
 	}
 
-	private BusPassenger createPassenger(final String id, final Facility enterStop, final Facility exitStop) {
-		BusPassenger passenger = new BusPassenger(new IdImpl(id), exitStop);
-		Plan plan = passenger.createPlan(true);
-		plan.createActivity(TransitConstants.INTERACTION_ACTIVITY_TYPE, enterStop);
-		plan.createLeg(TransportMode.bus);
-		plan.createActivity("work", exitStop);
-		return passenger;
-	}
-	
-	private static class MyQueueSim extends TransitQueueSimulation {
-
-		public MyQueueSim(NetworkLayer network, Population population, Events events) {
-			super(network, population, events);
-		}
-		
-		@Override
-		public Object getAgent(Person p) {
-			return p;
-		}
-		
-	}
 }

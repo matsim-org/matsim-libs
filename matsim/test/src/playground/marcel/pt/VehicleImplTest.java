@@ -30,8 +30,8 @@ import playground.marcel.pt.mocks.MockPassengerAgent;
 public class VehicleImplTest extends MatsimTestCase {
 
 	public void testAddPassenger() {
-		MockPassengerAgent passenger1 = new MockPassengerAgent();
-		MockPassengerAgent passenger2 = new MockPassengerAgent();
+		MockPassengerAgent passenger1 = new MockPassengerAgent(null);
+		MockPassengerAgent passenger2 = new MockPassengerAgent(null);
 		TransitVehicle vehicle = new TransitQueueVehicle(3, new Events());
 
 		vehicle.addPassenger(passenger1);
@@ -45,9 +45,9 @@ public class VehicleImplTest extends MatsimTestCase {
 	}
 
 	public void testRemovePassenger() {
-		MockPassengerAgent passenger1 = new MockPassengerAgent();
-		MockPassengerAgent passenger2 = new MockPassengerAgent();
-		MockPassengerAgent passenger3 = new MockPassengerAgent();
+		MockPassengerAgent passenger1 = new MockPassengerAgent(null);
+		MockPassengerAgent passenger2 = new MockPassengerAgent(null);
+		MockPassengerAgent passenger3 = new MockPassengerAgent(null);
 		TransitVehicle vehicle = new TransitQueueVehicle(3, new Events());
 
 		vehicle.addPassenger(passenger1);

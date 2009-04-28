@@ -20,9 +20,9 @@
 
 package playground.marcel.pt.integration;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.core.events.Events;
@@ -34,13 +34,12 @@ public class TransitQueueVehicle implements TransitVehicle {
 
 	private final int passengerCapacity;
 //	private DriverAgent driver = null;
-	private final List<PassengerAgent> passengers;
+	private final List<PassengerAgent> passengers = new LinkedList<PassengerAgent>();
 	private final Events events;
 
 	public TransitQueueVehicle(final int passengerCapacity, final Events events) {
 		this.passengerCapacity = passengerCapacity;
 		this.events = events;
-		this.passengers = new ArrayList<PassengerAgent>(this.passengerCapacity);
 	}
 
 	public boolean addPassenger(final PassengerAgent passenger) {

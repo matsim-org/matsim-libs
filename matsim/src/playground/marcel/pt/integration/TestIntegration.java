@@ -24,8 +24,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -59,7 +59,7 @@ public class TestIntegration {
 		
 		try {
 			new TransitScheduleReaderV1(schedule, network, facilities).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
-			final TransitQueueSimulation sim = new TransitQueueSimulation((NetworkLayer) scenario.getNetwork(), scenario.getPopulation(), events);
+			final TransitQueueSimulation sim = new TransitQueueSimulation((NetworkLayer) scenario.getNetwork(), scenario.getPopulation(), events, facilities);
 			sim.setTransitSchedule(schedule);
 			sim.run();
 			OTFVis.playMVI(new String[] {"./otfvis.mvi"});

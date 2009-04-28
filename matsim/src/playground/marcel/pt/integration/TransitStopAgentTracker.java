@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MockPassengerAgent.java
+ * TransitStop.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,26 +18,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.mocks;
+package playground.marcel.pt.integration;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
 
-import playground.marcel.pt.interfaces.PassengerAgent;
+public class TransitStopAgentTracker {
 
-public class MockPassengerAgent implements PassengerAgent {
-
-	private final Facility exitStop;
+	private final Map<Facility, List<DriverAgent>> agentsAtStops = new HashMap<Facility, List<DriverAgent>>();
+	private final List<DriverAgent> emptyList = new LinkedList<DriverAgent>();
 	
-	public MockPassengerAgent(final Facility exitStop) {
-		this.exitStop = exitStop;
+	public void addAgentToStop(final DriverAgent agent, final Facility stop) {
+		List<DriverAgent> agents = this.agentsAtStops.get(stop);
+		if (agents == null) {
+			agents = new LinkedList<DriverAgent>();
+			this.agentsAtStops.put(stop, agents);
+		}
+		agents.add(agent);
 	}
 	
-	public boolean arriveAtStop(final Facility stop) {
-		return stop == exitStop;
+	public List<DriverAgent> getAgentsAtStop(final Facility stop) {
+		List<DriverAgent> agents = this.agentsAtStops.get(stop);
+		if (agents == null) {
+			return this.emptyList;
+		}
+		return agents;
 	}
-
-	public boolean ptLineAvailable() {
-		return true;
-	}
-
 }

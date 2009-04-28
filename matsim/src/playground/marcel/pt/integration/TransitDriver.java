@@ -21,6 +21,7 @@
 package playground.marcel.pt.integration;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
@@ -31,6 +32,8 @@ import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.core.mobsim.queuesim.Simulation;
+import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
@@ -39,7 +42,6 @@ import playground.marcel.pt.interfaces.TransitVehicle;
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
-import playground.marcel.pt.utils.FacilityVisitors;
 
 public class TransitDriver implements DriverAgent {
 
@@ -52,18 +54,18 @@ public class TransitDriver implements DriverAgent {
 
 		private int nextLinkIndex = 0;
 		private Link currentLink = null;
-		private FacilityVisitors facilityVisitors = null;
 		private final TransitQueueSimulation sim;
 
 		private final Leg currentLeg = new LegImpl(TransportMode.car);
-		private final Person dummyPerson = new PersonImpl(new IdImpl("busDrvr"));
+		private final Person dummyPerson;
 		
 		public TransitDriver(final TransitRoute route, final Departure departure, final TransitQueueSimulation sim) {
+			this.dummyPerson = new PersonImpl(new IdImpl("ptDrvr_" + departure.getId().toString()));
 			this.stops = new ArrayList<Facility>(route.getStops().size());
 			for (TransitRouteStop stop : route.getStops()) {
 				this.stops.add(stop.getStopFacility());
 			}
-			this.carRoute = (NetworkRoute) route.getRoute();
+			this.carRoute = route.getRoute();
 			List<Link> links = carRoute.getLinks();
 			this.linkRoute = new ArrayList<Link>(2 + links.size());
 			this.linkRoute.add(carRoute.getStartLink());
@@ -74,10 +76,6 @@ public class TransitDriver implements DriverAgent {
 			
 			this.currentLeg.setRoute(this.carRoute);
 //			this.moveOverNode();// why is this needed?
-		}
-
-		public void setFacilityVisitorObserver(final FacilityVisitors fv) {
-			this.facilityVisitors  = fv;
 		}
 
 		public void setVehicle(final TransitVehicle vehicle) {
@@ -96,14 +94,13 @@ public class TransitDriver implements DriverAgent {
 			this.nextLinkIndex++;
 			// let's see if we have a stop at that link
 			for (Facility stop : this.stops) {
-				Link link = stop.getLink();
 				if (stop.getLink() == this.currentLink) {
-					handleStop(stop);
+					handleStop(stop, SimulationTimer.getTime());
 				}
 			}
 		}
 
-		private void handleStop(final Facility stop) {
+		private void handleStop(final Facility stop, double now) {
 			// let passengers get out if they want
 			ArrayList<PassengerAgent> passengersLeaving = new ArrayList<PassengerAgent>();
 			for (PassengerAgent passenger : this.vehicle.getPassengers()) {
@@ -113,18 +110,19 @@ public class TransitDriver implements DriverAgent {
 			}
 			for (PassengerAgent passenger : passengersLeaving) {
 				this.vehicle.removePassenger(passenger);
-				System.out.println("passenger exit: ");
+				DriverAgent agent = (DriverAgent) passenger;
+				System.out.println("passenger exit: agent=" + agent.getPerson().getId() + " facility=" + stop.getId());
+				agent.teleportToLink(stop.getLink());
+				agent.legEnds(now);
 			}
 
-			if (this.facilityVisitors != null) {
-				Person[] people = this.facilityVisitors.getVisitors(stop, TransitConstants.INTERACTION_ACTIVITY_TYPE).toArray(new Person[0]);
-				for (Person person : people) {
-					PassengerAgent passenger = (PassengerAgent) sim.getAgent(person);
-					if (passenger.ptLineAvailable()) {
-						this.vehicle.addPassenger(passenger);
-						System.out.println("passenger enter: ");
-						// TODO [MR] remove person from facility
-					}
+			for (Iterator<DriverAgent> iter = this.sim.agentTracker.getAgentsAtStop(stop).iterator(); iter.hasNext(); ) {
+				DriverAgent agent = iter.next();
+				PassengerAgent passenger = (PassengerAgent) agent;
+				if (passenger.ptLineAvailable()) {
+					this.vehicle.addPassenger(passenger);
+					System.out.println("passenger enter: agent=" + agent.getPerson().getId() + " facility=" + stop.getId());
+					iter.remove();
 				}
 			}
 		}
@@ -150,6 +148,7 @@ public class TransitDriver implements DriverAgent {
 		}
 
 		public void legEnds(double now) {
+			Simulation.decLiving();
 		}
 
 		public void teleportToLink(Link link) {

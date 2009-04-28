@@ -42,7 +42,6 @@ public class TransitAgent extends PersonAgent implements PassengerAgent {
 	public boolean ptLineAvailable() {
 		if (this.isFirstQuery) {
 			this.isFirstQuery = false;
-			this.activityEnds(7*3600);
 			return true;
 		}
 		return false;
