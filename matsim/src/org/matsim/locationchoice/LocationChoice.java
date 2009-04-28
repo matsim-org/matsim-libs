@@ -51,9 +51,9 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	private boolean constrained = false;
 	
-	protected TreeMap<String, QuadTree<Facility>> quad_trees;
+	protected TreeMap<String, QuadTree<Facility>> quad_trees = new TreeMap<String, QuadTree<Facility>>();
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
-	protected TreeMap<String, Facility []> facilities_of_type;
+	protected TreeMap<String, Facility []> facilities_of_type = new TreeMap<String, Facility []>();
 	
 	
 	public LocationChoice() {
