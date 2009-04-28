@@ -65,6 +65,18 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		this.initLocal(network, controler);		
 	}
 	
+	
+	public LocationMutator(final NetworkLayer network, final Controler controler, 
+			TreeMap<String, QuadTree<Facility>> quad_trees,
+			TreeMap<String, Facility []> facilities_of_type) {
+		this.quad_trees = quad_trees;
+		this.facilities_of_type = facilities_of_type;
+		this.config = Gbl.getConfig().locationchoice();	
+		this.network = network;
+		this.controler = controler;
+	}
+	
+	
 	/*
 	 * Initialize the quadtrees of all available activity types
 	 */
@@ -100,8 +112,6 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 			this.quad_trees.put(type, this.builFacQuadTree(type, tree_of_type));
 			this.facilities_of_type.put(type, tree_of_type.values().toArray(new Facility[tree_of_type.size()]));
 		}
-		
-		
 	}
 
 	private void initLocal(final NetworkLayer network, Controler controler) {		

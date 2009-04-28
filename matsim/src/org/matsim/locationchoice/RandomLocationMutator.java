@@ -21,6 +21,7 @@
 package org.matsim.locationchoice;
 
 import java.util.List;
+import java.util.TreeMap;
 
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
@@ -29,6 +30,7 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.collections.QuadTree;
 
 
 public class RandomLocationMutator extends LocationMutator {
@@ -36,6 +38,12 @@ public class RandomLocationMutator extends LocationMutator {
 	//private static final Logger log = Logger.getLogger(RandomLocationMutator.class);
 	public RandomLocationMutator(final NetworkLayer network, Controler controler) {
 		super(network, controler);
+	}
+	
+	public RandomLocationMutator(final NetworkLayer network, Controler controler,
+			TreeMap<String, QuadTree<Facility>> quad_trees,
+			TreeMap<String, Facility []> facilities_of_type) {
+		super(network, controler, quad_trees, facilities_of_type);
 	}
 
 	/*

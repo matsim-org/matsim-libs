@@ -22,14 +22,21 @@ package org.matsim.locationchoice;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scoring.LocationChoiceScoringFunctionFactory;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -41,10 +48,12 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private NetworkLayer network=null;
 	private Controler controler = null;
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
-	
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
-	
 	private boolean constrained = false;
+	
+	protected TreeMap<String, QuadTree<Facility>> quad_trees;
+	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
+	protected TreeMap<String, Facility []> facilities_of_type;
 	
 	
 	public LocationChoice() {
@@ -82,8 +91,10 @@ public class LocationChoice extends AbstractMultithreadedModule {
 			final Controler controler) {
 		// TODO: see above (why do you need the control(l)er as argument?)
 		
-		log.info("adding FacilitiesLoadCalculator");
-		controler.addControlerListener(new FacilitiesLoadCalculator(controler.getFacilityPenalties()));
+		/* 	This has to be done in the controler
+			log.info("adding FacilitiesLoadCalculator");
+			controler.addControlerListener(new FacilitiesLoadCalculator(controler.getFacilityPenalties()));
+		*/
 						
 		if (Gbl.getConfig().locationchoice().getMode().equals("true")) {
 			this.constrained = true;
@@ -96,6 +107,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		this.controler = controler;
 		this.network = network;
 		this.network.connect();
+		this.initTrees(controler.getFacilities());
 	}
 	
 	@Override
@@ -123,10 +135,12 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		if (!this.constrained) {
-			this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler));
+			this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, 
+					this.quad_trees, this.facilities_of_type));
 		}
 		else {
-			this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler));
+			this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  
+					this.quad_trees, this.facilities_of_type));
 		}		
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
@@ -161,4 +175,68 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		this.controler = controler;
 	}
 	
+	/*
+	 * Initialize the quadtrees of all available activity types
+	 */
+	private void initTrees(Facilities facilities) {
+		
+		TreeMap<String, TreeMap<Id, Facility>> trees = new TreeMap<String, TreeMap<Id, Facility>>();
+		
+		// get all types of activities
+		for (Facility f : facilities.getFacilities().values()) {
+			Map<String, ActivityOption> activities = f.getActivityOptions();
+			
+			Iterator<ActivityOption> act_it = activities.values().iterator();
+			while (act_it.hasNext()) {
+				ActivityOption act = act_it.next();
+				
+				if (!trees.containsKey(act.getType())) {
+					trees.put(act.getType(), new TreeMap<Id, Facility>());
+				}
+				trees.get(act.getType()).put(f.getId(), f);
+			}	
+		}
+		
+		// create the quadtrees and the arrays
+		Iterator<TreeMap<Id, Facility>> tree_it = trees.values().iterator();
+		Iterator<String> type_it = trees.keySet().iterator();
+			
+		while (tree_it.hasNext()) {
+			TreeMap<Id, Facility> tree_of_type = tree_it.next();
+			String type = type_it.next();
+			
+			// do not construct tree for home act
+			if (type.startsWith("h")) continue;
+			this.quad_trees.put(type, this.builFacQuadTree(type, tree_of_type));
+			this.facilities_of_type.put(type, tree_of_type.values().toArray(new Facility[tree_of_type.size()]));
+		}
+	}
+	
+	private QuadTree<Facility> builFacQuadTree(String type, TreeMap<Id,Facility> facilities_of_type) {
+		Gbl.startMeasurement();
+		log.info(" building " + type + " facility quad tree");
+		double minx = Double.POSITIVE_INFINITY;
+		double miny = Double.POSITIVE_INFINITY;
+		double maxx = Double.NEGATIVE_INFINITY;
+		double maxy = Double.NEGATIVE_INFINITY;
+
+		for (final Facility f : facilities_of_type.values()) {
+			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
+		}
+		minx -= 1.0;
+		miny -= 1.0;
+		maxx += 1.0;
+		maxy += 1.0;
+		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
+		QuadTree<Facility> quadtree = new QuadTree<Facility>(minx, miny, maxx, maxy);
+		for (final Facility f : facilities_of_type.values()) {
+			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
+		}
+		log.info("    done");
+		Gbl.printRoundTime();
+		return quadtree;
+	}	
 }
