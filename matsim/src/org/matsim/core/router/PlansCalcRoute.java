@@ -27,8 +27,8 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -152,7 +152,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 				throw new RuntimeException("act " + (j-2) + " of plan of person " + plan.getPerson().getId().toString() + " has neither end-time nor duration.");
 			}
 
-			handleLeg(leg, fromAct, toAct, now);
+			now += handleLeg(leg, fromAct, toAct, now);
 
 			fromAct = toAct;
 		}
