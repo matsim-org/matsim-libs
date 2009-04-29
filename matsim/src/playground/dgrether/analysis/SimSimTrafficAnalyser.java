@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
-import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
