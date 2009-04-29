@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.api.core.v01;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.Facilities;
@@ -48,27 +47,26 @@ import org.matsim.world.World;
  */
 public class ScenarioImpl implements Scenario {
 
-	private static final Logger log = Logger.getLogger(ScenarioImpl.class);
 	//mandatory attributes 
 	private Config config;
 	private Network network;
 	private Population population;
 	private Facilities facilities;
-	//nonmandatory attributes
+	//non-mandatory attributes
 	private BasicLaneDefinitions laneDefinitions;
 	private BasicSignalSystems signalSystems;
 	private BasicSignalSystemConfigurations signalSystemConfigurations;
 	private RoadPricingScheme roadPricingScheme;
 	
-	@SuppressWarnings("deprecation")
 	public ScenarioImpl(){
 		this.config = new Config();
 		this.config.addCoreModules();
+		Gbl.setConfig(config);
 		initContainers();
 	}
 	
-	public ScenarioImpl(Config conf){
-		this.config = conf;
+	public ScenarioImpl(Config config) {
+		this.config = config;
 		initContainers();
 		
 	}
@@ -77,7 +75,7 @@ public class ScenarioImpl implements Scenario {
 		this.network = new NetworkLayer();
 		this.getWorld().setNetworkLayer((NetworkLayer) this.network);
 		this.getWorld().complete();
-		this.population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		this.population = new PopulationImpl();
 		this.facilities = new FacilitiesImpl();
 		this.getWorld().setFacilityLayer((FacilitiesImpl) this.facilities);
 		if (this.config.scenario().isUseLanes()){
@@ -171,7 +169,5 @@ public class ScenarioImpl implements Scenario {
 	public void setPopulation(Population population2) {
 		this.population = population2;
 	}
-	
-	
 
 }

@@ -32,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimLaneDefinitionsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
@@ -65,10 +66,12 @@ public class ScenarioLoader {
 		this.config = this.scenario.getConfig();
 	}
 
-	public ScenarioLoader(String conf) {
+	public ScenarioLoader(String configFilename) {
 		this.config = new Config();
+		this.config.addCoreModules();
 		MatsimConfigReader reader = new MatsimConfigReader(this.config);
-		reader.readFile(conf);
+		reader.readFile(configFilename);
+		MatsimRandom.reset(config.global().getRandomSeed());
 		this.scenario = new ScenarioImpl(this.config);
 	}
 
@@ -76,7 +79,7 @@ public class ScenarioLoader {
 		return this.scenario;
 	}
 
-	public void loadScenario() {
+	public Scenario loadScenario() {
 		this.loadWorld();
 		this.loadNetwork();
 		this.loadFacilities();
@@ -88,7 +91,7 @@ public class ScenarioLoader {
 			this.loadSignalSystems();
 			this.loadSignalSystemConfigurations();
 		}
-
+		return this.scenario;
 	}
 
 	private void loadSignalSystemConfigurations() {
@@ -226,7 +229,7 @@ public class ScenarioLoader {
 			String populationFileName = this.config.plans().getInputFile();
 			log.info("loading population from " + populationFileName);
 			try {
-				new MatsimPopulationReader(this.scenario.getPopulation(), this.scenario.getNetwork()).parse(populationFileName);
+				new MatsimPopulationReader(this.scenario).parse(populationFileName);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
