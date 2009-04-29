@@ -23,6 +23,7 @@ public class KtiRouterListener implements StartupListener {
 
 	private Matrix ptTravelTimes = null;
 	private SwissHaltestellen haltestellen = null;
+	private World localWorld=null;
 
 	private static final Logger log = Logger.getLogger(playground.meisterk.org.matsim.run.ktiYear3.Controler.class);
 
@@ -38,7 +39,7 @@ public class KtiRouterListener implements StartupListener {
 	public void prepareKTIRouter(Controler c) {
 
 		// municipality layer vom world file
-		World localWorld = new World();
+		this.localWorld = new World();
 		String worldFilename = Gbl.getConfig().getModule("kti").getValue("worldInputFilename");
 		try {
 			new MatsimWorldReader(localWorld).parse(worldFilename);
@@ -75,6 +76,10 @@ public class KtiRouterListener implements StartupListener {
 
 	public SwissHaltestellen getHaltestellen() {
 		return haltestellen;
+	}
+
+	public World getLocalWorld() {
+		return localWorld;
 	}
 
 }

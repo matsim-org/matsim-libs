@@ -49,6 +49,7 @@ public class KTIControler extends Controler {
 		// ktiRouterListener here (it has been inserted in the getRoutingAlgorithm implementation
 		//ktiRouterListener.prepareKTIRouter(this);
 		//this.addControlerListener(ktiRouterListener);
+		// TODO: remove the ktiRouterListener when during refactoring.
 		// ATTENTION, remove this line for the runs!!!!!!!!!!!!!!!!
 		this.setOverwriteFiles(true);
 
@@ -80,7 +81,7 @@ public class KTIControler extends Controler {
 		}
 
 		return new PlansCalcRouteKti(this.network, this.commonRoutingData, travelCosts, travelTimes, this.ktiRouterListener.getPtTravelTimes(), this.ktiRouterListener.getHaltestellen(),
-				getWorld().getLayer("municipality"));
+				this.ktiRouterListener.getLocalWorld().getLayer("municipality"));
 	}
 
 }
