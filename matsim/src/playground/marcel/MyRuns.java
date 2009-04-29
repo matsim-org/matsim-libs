@@ -58,8 +58,8 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
@@ -1165,7 +1165,8 @@ public class MyRuns {
 		final Config config = Gbl.createConfig(args);
 
 		System.out.println("  reading matrices xml file... ");
-		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton(), Gbl.getWorld());
+		World world = new World();
+		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton(), world);
 		reader.readFile(config.matrices().getInputFile());
 		System.out.println("  done.");
 
@@ -1798,16 +1799,6 @@ public class MyRuns {
 			e.printStackTrace();
 		}
 	}
-//
-//	public static void speedEventsDat(final String[] args) {
-//		Gbl.createConfig(args);
-//		Events events = new Events();
-//		Gbl.startMeasurement();
-//		new EventsReaderDEQv1(events).readFile("../mystudies/deqsimtest/10.deq_events.dat");
-//		events.printEventsCount();
-//		Gbl.printElapsedTime();
-//	}
-
 
 	public static void readMatrices(final String[] args) {
 		/* only used for performance testing */
@@ -1823,7 +1814,7 @@ public class MyRuns {
 		Gbl.printRoundTime();
 
 		System.out.println("  reading matrices xml file... ");
-		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton(), Gbl.getWorld());
+		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton(), world);
 		reader.readFile(config.matrices().getInputFile());
 		System.out.println("  done.");
 		Gbl.printRoundTime();
@@ -2042,10 +2033,14 @@ public class MyRuns {
 
 	public static void someTest(final String[] args) {
 
-		CoordinateTransformation transformation = new SoldnerBerlinToWGS84();
-		Coord alexanderplatz = new CoordImpl(25466670/1000.0, 21618520/1000.0);
-		Coord wgs84 = transformation.transform(alexanderplatz);
-		System.out.println(wgs84.getX() + " / " + wgs84.getY()); // expected: 13.41 / 52.52
+//		CoordinateTransformation transformation = new SoldnerBerlinToWGS84();
+//		Coord alexanderplatz = new CoordImpl(25466670/1000.0, 21618520/1000.0);
+//		Coord wgs84 = transformation.transform(alexanderplatz);
+//		System.out.println(wgs84.getX() + " / " + wgs84.getY()); // expected: 13.41 / 52.52
+		
+		Gbl.printSystemInfo();
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile("/Volumes/Data/ETH/cvs/ivt/studies/switzerland/networks/navteq/network.xml.gz");
 
 	}
 

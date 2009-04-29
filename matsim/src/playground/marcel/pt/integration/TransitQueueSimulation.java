@@ -50,7 +50,6 @@ public class TransitQueueSimulation extends QueueSimulation {
 
 	private final Facilities facilities;
 	private TransitSchedule schedule = null;
-//	private final FacilityVisitors fv;
 	/*package*/ final TransitStopAgentTracker agentTracker;
 	private final HashMap<Person, DriverAgent> agents = new HashMap<Person, DriverAgent>(100);
 
@@ -61,8 +60,6 @@ public class TransitQueueSimulation extends QueueSimulation {
 		this.setAgentFactory(new TransitAgentFactory(this, this.agents));
 
 		this.agentTracker = new TransitStopAgentTracker();
-//		this.fv = new FacilityVisitors();
-//		events.addHandler(this.fv);
 	}
 
 	public void setTransitSchedule(final TransitSchedule schedule) {
@@ -83,7 +80,6 @@ public class TransitQueueSimulation extends QueueSimulation {
 				for (TransitRoute route : line.getRoutes().values()) {
 					for (Departure departure : route.getDepartures().values()) {
 						TransitDriver driver = new TransitDriver(route, departure, this);
-//						driver.setFacilityVisitorObserver(this.fv);
 
 						QueueVehicle veh = new QueueVehicleImpl(driver.getPerson().getId());
 						veh.setDriver(driver);
