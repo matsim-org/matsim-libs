@@ -35,7 +35,7 @@ public class KtiRouterListener implements StartupListener {
 		
 	}
 
-	protected void prepareKTIRouter(Controler c) {
+	public void prepareKTIRouter(Controler c) {
 
 		// municipality layer vom world file
 		World localWorld = new World();
