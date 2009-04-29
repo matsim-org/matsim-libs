@@ -32,11 +32,14 @@ public class IdImpl implements Id, Serializable {
 	private final String id;
 
 	public IdImpl(final String id) {
-		this.id = id.intern();
+		if (id == null) {
+			throw new NullPointerException("id cannot be null");
+		}
+		this.id = id;
 	}
 
 	public IdImpl(final long id) {
-		this.id = Long.toString(id).intern();
+		this.id = Long.toString(id);
 	}
 
 	@Override
