@@ -101,7 +101,7 @@ public class OTFVis {
 		} else if ((arg0l.endsWith(".xml") || arg0l.endsWith(".xml.gz"))) {
 			FileType type;
 			try {
-				type = new MatsimFileTypeGuesser(arg0l).getGuessedFileType();
+				type = new MatsimFileTypeGuesser(args2[0]).getGuessedFileType();
 			} catch (IOException e) {
 				e.printStackTrace();
 				return;
