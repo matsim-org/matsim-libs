@@ -140,7 +140,7 @@ public class OsmNetworkReader {
 	public void parse(final String osmFilename) throws SAXException, ParserConfigurationException, IOException {
 		
 		if(this.hierarchyLayers.isEmpty()){
-			log.error("No hierarchy layer specified. Resulting network won't contain any links. Continuing anyway.");
+			log.warn("No hierarchy layer specified. Will convert every highway specified by setHighwayDefaults.");
 		}
 		
 		OsmXmlParser parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
@@ -251,11 +251,16 @@ public class OsmNetworkReader {
 
 					for (String nodeId : way.nodes) {
 						OsmNode node = this.nodes.get(nodeId);
-						for (OsmFilter osmFilter : this.hierarchyLayers) {
-							if(osmFilter.coordInFilter(node.coord, way.hierarchy)){
-								node.used = true;
-								node.ways++;
-								break;
+						if(this.hierarchyLayers.isEmpty()){
+							node.used = true;
+							node.ways++;
+						} else {
+							for (OsmFilter osmFilter : this.hierarchyLayers) {
+								if(osmFilter.coordInFilter(node.coord, way.hierarchy)){
+									node.used = true;
+									node.ways++;
+									break;
+								}
 							}
 						}
 					}
