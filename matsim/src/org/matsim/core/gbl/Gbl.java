@@ -20,19 +20,22 @@
 
 package org.matsim.core.gbl;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.SAXException;
-
-import org.matsim.core.config.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigReaderMatsimV1;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.matrices.Matrices;
 import org.matsim.world.World;
+import org.xml.sax.SAXException;
 
-/** @deprecated The usage of Gbl.getConfig() all throughout the code makes it very hard
+/* The usage of Gbl.getConfig() all throughout the code makes it very hard
  * to debug. We would thus prefer if Gbl.getConfig() could be removed in
  * the longer term and the config-object, or single params from the config,
  * could be handed as parameters where needed. // VSP/mrieser, 11sep2007
@@ -59,6 +62,11 @@ public abstract class Gbl {
 	//////////////////////////////////////////////////////////////////////
 	// config creation
 	//////////////////////////////////////////////////////////////////////
+//	/**
+//	 * @param args
+//	 * @return
+//	 * @deprecated use "ScenarioLoader(filename).loadScenario(); scenario.getConfig();"
+//	 */
 	public static final Config createConfig(final String[] args) {
 		if (Gbl.config != null) {
 			Gbl.errorMsg("config exists already! Cannot create a 2nd global config.");
@@ -97,10 +105,12 @@ public abstract class Gbl {
 	 * config is used somewhere in the code, the config (or the needed
 	 * parameters) need to be passed explicitly.
 	 */
+	@Deprecated
 	public static final Config getConfig() {
 		return Gbl.config;
 	}
 
+	@Deprecated
 	public static final void setConfig(final Config config) {
 		Gbl.config = config;
 	}
