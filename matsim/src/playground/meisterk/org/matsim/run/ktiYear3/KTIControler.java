@@ -22,6 +22,7 @@ public class KTIControler extends Controler {
 
 	private PreProcessLandmarks commonRoutingData = null;
 	private KtiRouterListener ktiRouterListener=null;
+	private static boolean firstTime=true;
 
 	public KTIControler(String[] args) {
 		super(Gbl.createConfig(args));
@@ -43,7 +44,11 @@ public class KTIControler extends Controler {
 		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));
 		this.addControlerListener(new CalcLegTimesKTIListener("calcLegTimesKTI.txt"));
-		this.addControlerListener(ktiRouterListener);
+		
+		// unfortunatly, the startup method of the config is launched after the 'getRoutingAlgorithm', for this reason it will not work to put the
+		// ktiRouterListener here (it has been inserted in the getRoutingAlgorithm implementation
+		//ktiRouterListener.prepareKTIRouter(this);
+		//this.addControlerListener(ktiRouterListener);
 		// ATTENTION, remove this line for the runs!!!!!!!!!!!!!!!!
 		this.setOverwriteFiles(true);
 
@@ -66,6 +71,12 @@ public class KTIControler extends Controler {
 				this.commonRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
 				this.commonRoutingData.run(this.network);
 			}
+		}
+		
+		// at this position, we need to read the information about pt routing once
+		if (firstTime){
+			firstTime=false;
+			this.ktiRouterListener.prepareKTIRouter(this);
 		}
 
 		return new PlansCalcRouteKti(this.network, this.commonRoutingData, travelCosts, travelTimes, this.ktiRouterListener.getPtTravelTimes(), this.ktiRouterListener.getHaltestellen(),
