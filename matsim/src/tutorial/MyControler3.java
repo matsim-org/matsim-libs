@@ -20,18 +20,16 @@
 
 package tutorial;
 
-import org.matsim.core.api.population.Population;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.netvis.NetVis;
-
 
 public class MyControler3 {
 
@@ -39,27 +37,24 @@ public class MyControler3 {
 		final String netFilename = "./examples/equil/network.xml";
 		final String plansFilename = "./examples/equil/plans100.xml";
 
-		@SuppressWarnings("unused")
 		Config config = Gbl.createConfig(new String[] {"./examples/tutorial/myConfig.xml"});
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		Scenario scenario = new ScenarioImpl(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
 
-		Population population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		Events events = new Events();
 
 		EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
 		events.addHandler(eventWriter);
 
-		QueueSimulation sim = new QueueSimulation(network, population, events);
+		QueueSimulation sim = new QueueSimulation(scenario, events);
 		sim.openNetStateWriter("./output/simout", netFilename, 10);
 		sim.run();
 
 		eventWriter.closeFile();
 
-		Gbl.setConfig(null);
 		String[] visargs = {"./output/simout"};
 		NetVis.main(visargs);
 	}

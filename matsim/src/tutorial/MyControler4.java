@@ -20,16 +20,15 @@
 
 package tutorial;
 
-import org.matsim.core.api.population.Population;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.population.algorithms.PlanAverageScore;
@@ -44,11 +43,10 @@ public class MyControler4 {
 
 		Config config = Gbl.createConfig(new String[] {"./examples/tutorial/myConfigScoring.xml"});
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		Scenario scenario = new ScenarioImpl(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
 
-		Population population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		Events events = new Events();
 
@@ -56,22 +54,21 @@ public class MyControler4 {
 		events.addHandler(eventWriter);
 
 		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
-		EventsToScore scoring = new EventsToScore(population, factory);
+		EventsToScore scoring = new EventsToScore(scenario.getPopulation(), factory);
 		events.addHandler(scoring);
 
-		QueueSimulation sim = new QueueSimulation(network, population, events);
+		QueueSimulation sim = new QueueSimulation(scenario, events);
 		sim.openNetStateWriter("./output/simout", netFilename, 10);
 		sim.run();
 
 		scoring.finish();
 
 		PlanAverageScore average = new PlanAverageScore();
-		average.run(population);
+		average.run(scenario.getPopulation());
 		System.out.println("### the average score is: " + average.getAverage());
 
 		eventWriter.closeFile();
 
-		Gbl.setConfig(null);
 		String[] visargs = {"./output/simout"};
 		NetVis.main(visargs);
 	}

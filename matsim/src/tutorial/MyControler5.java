@@ -20,16 +20,15 @@
 
 package tutorial;
 
-import org.matsim.core.api.population.Population;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRouteDijkstra;
@@ -51,11 +50,10 @@ public class MyControler5 {
 
 		Config config = Gbl.createConfig(new String[] {"./examples/tutorial/myConfigScoring.xml"});
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		Scenario scenario = new ScenarioImpl(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
 
-		Population population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		Events events = new Events();
 
@@ -63,7 +61,7 @@ public class MyControler5 {
 		events.addHandler(eventWriter);
 
 		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
-		EventsToScore scoring = new EventsToScore(population, factory);
+		EventsToScore scoring = new EventsToScore(scenario.getPopulation(), factory);
 		events.addHandler(scoring);
 
 		StrategyManager strategyManager = new StrategyManager();
@@ -72,29 +70,28 @@ public class MyControler5 {
 		strategyManager.addStrategy(strategy1, 0.9);
 		strategyManager.addStrategy(strategy2, 0.1);
 
-		TravelTimeCalculator ttimeCalc = new TravelTimeCalculator(network);
-		TravelTimeDistanceCostCalculator costCalc = new TravelTimeDistanceCostCalculator(ttimeCalc);
-		strategy2.addStrategyModule(new ReRouteDijkstra(network, costCalc, ttimeCalc));
+		TravelTimeCalculator ttimeCalc = new TravelTimeCalculator(scenario.getNetwork());
+		TravelTimeDistanceCostCalculator costCalc = new TravelTimeDistanceCostCalculator(ttimeCalc, config.charyparNagelScoring());
+		strategy2.addStrategyModule(new ReRouteDijkstra(scenario.getNetwork(), costCalc, ttimeCalc));
 		events.addHandler(ttimeCalc);
 
 		for (int iteration = 0; iteration <= 10; iteration++) {
 			events.resetHandlers(iteration);
 			eventWriter.init("./output/events.txt");
 
-			QueueSimulation sim = new QueueSimulation(network, population, events);
+			QueueSimulation sim = new QueueSimulation(scenario, events);
 			sim.openNetStateWriter("./output/simout", netFilename, 10);
 			sim.run();
 
 			scoring.finish();
 
 			PlanAverageScore average = new PlanAverageScore();
-			average.run(population);
+			average.run(scenario.getPopulation());
 			System.out.println("### the average score in iteration " + iteration + " is: " + average.getAverage());
 
-			strategyManager.run(population);
+			strategyManager.run(scenario.getPopulation());
 		}
 
-		Gbl.setConfig(null);
 		String[] visargs = {"./output/simout"};
 		NetVis.main(visargs);
 	}
