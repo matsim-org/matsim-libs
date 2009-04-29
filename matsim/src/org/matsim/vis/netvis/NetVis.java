@@ -246,7 +246,9 @@ public class NetVis {
     }
 
     public static void main(String[] args) {
-    	Gbl.createConfig(null);
+    	if (Gbl.getConfig() == null) {
+    		Gbl.createConfig(null);
+    	}
     	if (args.length == 1) {
    			String configFile = StreamConfig.getConfigFileName(args[0], FILE_SUFFIX);
    			(new NetVis(configFile, configFile, args[0])).run();
