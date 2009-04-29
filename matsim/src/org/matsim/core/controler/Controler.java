@@ -45,8 +45,8 @@ import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
@@ -71,7 +71,9 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.Events;
+import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
@@ -126,7 +128,8 @@ import org.matsim.world.algorithms.WorldCheck;
 public class Controler {
 
 	private static final String DIRECTORY_ITERS = "ITERS";
-	/*package*/ static final String FILENAME_EVENTS = "events.txt.gz";
+	/*package*/ static final String FILENAME_EVENTS_TXT = "events.txt.gz";
+	/*package*/ static final String FILENAME_EVENTS_XML = "events.xml.gz";
 	public static final String FILENAME_LINKSTATS = "linkstats.txt";
 	public static final String FILENAME_SCORESTATS = "scorestats.txt";
 	public static final String FILENAME_TRAVELDISTANCESTATS="traveldistancestats.txt";
@@ -1130,7 +1133,7 @@ public class Controler {
 	 */
 	protected static class CoreControlerListener implements StartupListener, IterationStartsListener, BeforeMobsimListener, AfterMobsimListener, ShutdownListener {
 
-		private EventWriterTXT eventWriter = null;
+		private EventWriter eventWriter = null;
 
 		public CoreControlerListener() {
 			// empty public constructor for protected class
@@ -1157,7 +1160,17 @@ public class Controler {
 			controler.travelTimeCalculator.resetTravelTimes();
 
 			if ((controler.writeEventsInterval > 0) && (event.getIteration() % controler.writeEventsInterval == 0)) {
-				this.eventWriter = new EventWriterTXT(Controler.getIterationFilename(FILENAME_EVENTS));
+				switch (controler.config.controler().getEventsFileFormat()) {
+					case txt:
+						this.eventWriter = new EventWriterTXT(Controler.getIterationFilename(FILENAME_EVENTS_TXT));
+						break;
+					case xml:
+						this.eventWriter = new EventWriterXML(Controler.getIterationFilename(FILENAME_EVENTS_XML));
+						break;
+					default:
+						log.warn("Unknown events file format specified: " + controler.config.controler().getEventsFileFormat() + ". Using xml-format instead.");
+						this.eventWriter = new EventWriterXML(Controler.getIterationFilename(FILENAME_EVENTS_XML));
+				}
 				controler.getEvents().addHandler(this.eventWriter);
 			}
 

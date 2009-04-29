@@ -23,17 +23,16 @@ package org.matsim.core.config.groups;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 public class ControlerConfigGroup extends Module {
 
-	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks};
+	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks}
+	
+	public enum EventsFileFormat {txt, xml}
 	
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger log = Logger.getLogger(ControlerConfigGroup.class);
-	
 	public static final String GROUP_NAME = "controler";
 
 	private static final String OUTPUT_DIRECTORY = "outputDirectory";
@@ -42,6 +41,7 @@ public class ControlerConfigGroup extends Module {
 	private static final String ROUTINGALGORITHM_TYPE = "routingAlgorithmType";
 	private static final String RUNID = "runId";
 	private static final String LINKTOLINK_ROUTING_ENABLED = "enableLinkToLinkRouting";
+	private static final String EVENTS_FILE_FORMAT = "eventsFileFormat";
 	
 	private String outputDirectory = "./output";
 	private int firstIteration = 0;
@@ -51,6 +51,8 @@ public class ControlerConfigGroup extends Module {
 	private boolean linkToLinkRoutingEnabled = false;
 	
 	private String runId = null;
+	
+	private EventsFileFormat eventsFileFormat = EventsFileFormat.txt;
 	
 	public ControlerConfigGroup() {
 		super(GROUP_NAME);
@@ -70,8 +72,9 @@ public class ControlerConfigGroup extends Module {
 			return this.getRunId();
 		} else if (LINKTOLINK_ROUTING_ENABLED.equals(key)){
 			return Boolean.toString(this.linkToLinkRoutingEnabled);
-		}
-		else {
+		} else if (EVENTS_FILE_FORMAT.equals(key)) {
+			return this.eventsFileFormat.toString();
+		} else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -97,10 +100,12 @@ public class ControlerConfigGroup extends Module {
 		} else if (RUNID.equals(key)){
 			this.setRunId(value.trim());
 		} else if (LINKTOLINK_ROUTING_ENABLED.equalsIgnoreCase(key)){
-			if (value != null)
+			if (value != null) {
 				this.linkToLinkRoutingEnabled = Boolean.getBoolean(value.trim());
-		}
-		else {
+			}
+		} else if (EVENTS_FILE_FORMAT.equals(key)) {
+			this.eventsFileFormat = EventsFileFormat.valueOf(value);
+		} else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -114,6 +119,7 @@ public class ControlerConfigGroup extends Module {
 		map.put(ROUTINGALGORITHM_TYPE, getValue(ROUTINGALGORITHM_TYPE));
 		map.put(RUNID, getValue(RUNID));
 		map.put(LINKTOLINK_ROUTING_ENABLED, Boolean.toString(this.isLinkToLinkRoutingEnabled()));
+		map.put(EVENTS_FILE_FORMAT, getValue(EVENTS_FILE_FORMAT));
 		return map;
 	}
 	
@@ -122,6 +128,7 @@ public class ControlerConfigGroup extends Module {
 		Map<String,String> map = super.getComments();
 		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + " or " + RoutingAlgorithmType.AStarLandmarks);
 		map.put(RUNID, "An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc.");
+		map.put(EVENTS_FILE_FORMAT, "Specifies the file format for writing events. Currently supported: txt, xml");
 		return map;
 	}
 
@@ -150,29 +157,37 @@ public class ControlerConfigGroup extends Module {
 	public int getLastIteration() {
 		return this.lastIteration;
 	}
-	
-	public RoutingAlgorithmType getRoutingAlgorithmType(){
+
+	public RoutingAlgorithmType getRoutingAlgorithmType() {
 		return this.routingAlgorithmType;
 	}
-	
-	public void setRoutingAlgorithmType(RoutingAlgorithmType type){
+
+	public void setRoutingAlgorithmType(final RoutingAlgorithmType type) {
 		this.routingAlgorithmType = type;
 	}
-	
-	public String getRunId(){
+
+	public String getRunId() {
 		return this.runId;
 	}
-	
-	public void setRunId(String runid){
+
+	public void setRunId(String runid) {
 		this.runId = runid;
 	}
 
 	public boolean isLinkToLinkRoutingEnabled() {
 		return this.linkToLinkRoutingEnabled;
 	}
-	
-	public void setLinkToLinkRoutingEnabled(boolean enabled){
+
+	public void setLinkToLinkRoutingEnabled(final boolean enabled) {
 		this.linkToLinkRoutingEnabled = enabled;
 	}
-	
+
+	public EventsFileFormat getEventsFileFormat() {
+		return this.eventsFileFormat;
+	}
+
+	public void setEventsFileFormat(final EventsFileFormat eventsFileFormat) {
+		this.eventsFileFormat = eventsFileFormat;
+	}
+
 }
