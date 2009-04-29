@@ -45,7 +45,7 @@ import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-public class EventWriterTXT implements ActEndEventHandler, ActStartEventHandler, AgentArrivalEventHandler, 
+public class EventWriterTXT implements EventWriter, ActEndEventHandler, ActStartEventHandler, AgentArrivalEventHandler, 
 		AgentDepartureEventHandler, AgentReplanEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler, 
 		AgentWait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 	

@@ -28,7 +28,7 @@ import java.util.Map;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 
-public class EventWriterXML implements BasicEventHandler {
+public class EventWriterXML implements EventWriter, BasicEventHandler {
 	private BufferedWriter out = null;
 
 	public EventWriterXML(final String filename) {
