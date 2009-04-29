@@ -26,7 +26,6 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
-import org.jfree.util.Log;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicEvent;
@@ -63,6 +62,8 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class QueueSimulationTest extends MatsimTestCase {
 
+	private final static Logger log = Logger.getLogger(QueueSimulationTest.class);
+	
 	/**
 	 * This test is mostly useful for manual debugging, because only a single agent is simulated
 	 * on a very simple network.
@@ -178,6 +179,52 @@ public class QueueSimulationTest extends MatsimTestCase {
 		assertEquals("wrong time in 2nd event.", 6.0*3600 + 0, collector.events.get(1).getTime(), EPSILON);
 		assertEquals("wrong time in 3rd event.", 6.0*3600 + 15, collector.events.get(2).getTime(), EPSILON);
 		assertEquals("wrong time in 4th event.", 6.0*3600 + 15, collector.events.get(3).getTime(), EPSILON);
+	}
+	
+	/**
+	 * Simulates a single agent that has two activities on the same link. Tests if the simulation
+	 * correctly recognizes such cases.
+	 *
+	 * @author mrieser
+	 */
+	public void testSingleAgent_EmptyRoute() {
+		Fixture f = new Fixture();
+
+		// add a single person with leg from link1 to link3
+		Person person = new PersonImpl(new IdImpl(0));
+		Plan plan = person.createPlan(true);
+		Activity a1 = plan.createActivity("h", f.link1);
+		a1.setEndTime(6*3600);
+		Leg leg = plan.createLeg(TransportMode.car);
+		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link1);
+		route.setNodes(f.link1, new ArrayList<Node>(0), f.link1);
+		leg.setRoute(route);
+		plan.createActivity("w", f.link1);
+		f.plans.addPerson(person);
+
+		/* build events */
+		Events events = new Events();
+		BasicEventCollector collector = new BasicEventCollector();
+		events.addHandler(collector);
+
+		/* run sim */
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		sim.run();
+
+		/* finish */
+		assertEquals("wrong number of events.", 4, collector.events.size());
+		assertEquals("wrong type of 1st event.", ActEndEvent.class, collector.events.get(0).getClass());
+		assertEquals("wrong type of 2nd event.", AgentDepartureEvent.class, collector.events.get(1).getClass());
+		assertEquals("wrong type of 3rd event.", AgentArrivalEvent.class, collector.events.get(2).getClass());
+		assertEquals("wrong type of 4th event.", ActStartEvent.class, collector.events.get(3).getClass());
+		assertEquals("wrong time in 1st event.", 6.0*3600 + 0, collector.events.get(0).getTime(), EPSILON);
+		assertEquals("wrong time in 2nd event.", 6.0*3600 + 0, collector.events.get(1).getTime(), EPSILON);
+		assertEquals("wrong time in 3rd event.", 6.0*3600 + 0, collector.events.get(2).getTime(), EPSILON);
+		assertEquals("wrong time in 4th event.", 6.0*3600 + 0, collector.events.get(3).getTime(), EPSILON);
+		assertEquals("wrong link in 1st event.", f.link1, ((ActEndEvent) collector.events.get(0)).getLink());
+		assertEquals("wrong link in 2nd event.", f.link1, ((AgentDepartureEvent) collector.events.get(1)).getLink());
+		assertEquals("wrong link in 3rd event.", f.link1, ((AgentArrivalEvent) collector.events.get(2)).getLink());
+		assertEquals("wrong link in 4th event.", f.link1, ((ActStartEvent) collector.events.get(3)).getLink());
 	}
 
 	/*package*/ static class LinkEnterEventCollector implements LinkEnterEventHandler {
@@ -490,7 +537,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			sim.run();
 			fail("expected RuntimeException, but there was none.");
 		} catch (RuntimeException e) {
-			Log.info("catched expected RuntimeException: " + e.getMessage());
+			log.info("catched expected RuntimeException: " + e.getMessage());
 		}
 		
 		/* finish */

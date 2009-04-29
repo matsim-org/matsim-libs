@@ -108,11 +108,11 @@ public class QueueSimulation {
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
 
 	/**
-	 * Includes all vehicle that have transportation modes unknown to
+	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
 	private static PriorityQueue<Tuple<Double, DriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, DriverAgent>>(30, new TeleportationArrivalTimeComparator());
-
+	
 	private final Date starttime = new Date();
 
 	private double stopTime = 100*3600;
@@ -148,6 +148,7 @@ public class QueueSimulation {
 
 	/** @see #setTeleportVehicles(boolean) */
 	private boolean teleportVehicles = true;
+	private int cntTeleportVehicle = 0;
 	
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -683,7 +684,13 @@ public class QueueSimulation {
 					if (agent instanceof PersonAgent) {
 						vehicle = ((PersonAgent) agent).getVehicle();
 						if (vehicle.getCurrentLink() != null) {
-							log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + link.getId());
+							if (this.cntTeleportVehicle < 9) {
+								this.cntTeleportVehicle++;
+								log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + link.getId());
+								if (this.cntTeleportVehicle == 9) {
+									log.info("No more occurrences of teleported vehicles will be reported.");
+								}
+							}
 							QueueLink qlinkOld = this.network.getQueueLink(vehicle.getCurrentLink().getId());
 							qlinkOld.removeParkedVehicle(vehicle.getId());
 						}
@@ -692,11 +699,10 @@ public class QueueSimulation {
 					throw new RuntimeException("car not available for agent " + agent.getPerson().getId() + " on link " + link.getId());
 				}
 			}
-			if (route.getNodes().size() != 0) {
-				qlink.addDepartingVehicle(vehicle);
-			} else {
-				// empty route; this is the case where (hopefully) the next act happens at the same location as this act
+			if (route.getEndLink() == link) {
 				qlink.processVehicleArrival(now, vehicle);
+			} else {
+				qlink.addDepartingVehicle(vehicle);
 			}
 		} else {
 			// unknown leg mode
