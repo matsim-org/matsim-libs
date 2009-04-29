@@ -21,47 +21,31 @@
 package org.matsim.population;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
+/**
+ * @author balmermi
+ */
 public class DesiresTest extends MatsimTestCase {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(DesiresTest.class);
 
-	//////////////////////////////////////////////////////////////////////
-	// setUp / tearDown
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		super.loadConfig(null);
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// tests
-	//////////////////////////////////////////////////////////////////////
-
 	public void testReadWriteDesires() {
+		loadConfig(null);
 		log.info("running testReadWriteDesires()... ");
 
 		log.info("  creating single person with desires... ");
-		PopulationImpl pop = new PopulationImpl(false);
+		Scenario scenario = new ScenarioImpl();
+		Population pop = scenario.getPopulation();
 		Person p = new PersonImpl(new IdImpl(0));
 		pop.addPerson(p);
 		Desires d = p.createDesires("created by 'DesiresTest.testReadWriteDesires'");
@@ -77,11 +61,12 @@ public class DesiresTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  clean up population...");
-		pop.clearPersons();
+		scenario = new ScenarioImpl();
+		pop = scenario.getPopulation();
 		log.info("  done.");
 
 		log.info("  reading in created population file...");
-		new PopulationReaderMatsimV4(pop, null).readFile(super.getOutputDirectory()+"plans.xml");
+		new PopulationReaderMatsimV4(scenario).readFile(super.getOutputDirectory()+"plans.xml");
 		log.info("  done.");
 
 		log.info("  writing population file again...");

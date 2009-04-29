@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
@@ -102,10 +103,22 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 
 	private int warnPlanTypeCount = 0;
 
-	public PopulationReaderMatsimV4(final BasicPopulation pop, final Network network) {
+	/**
+	 * @param pop
+	 * @param network
+	 * @param facilities
+	 * @deprecated use PoopulationReaderMatsimV4(Scenario)
+	 */
+	public PopulationReaderMatsimV4(final BasicPopulation pop, final Network network, final Facilities facilities) {
 		this.plans = pop;
 		this.network = network;
-		this.facilities = (Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
+		this.facilities = facilities;
+	}
+	
+	public PopulationReaderMatsimV4(final Scenario scenario) {
+		this.plans = scenario.getPopulation();
+		this.network = scenario.getNetwork();
+		this.facilities = scenario.getFacilities();
 	}
 
 	@Override

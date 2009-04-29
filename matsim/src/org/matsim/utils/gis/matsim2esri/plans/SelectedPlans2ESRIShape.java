@@ -36,6 +36,8 @@ import org.geotools.feature.SchemaException;
 import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -47,9 +49,7 @@ import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -257,14 +257,12 @@ public class SelectedPlans2ESRIShape {
 
 		final String outputDir = "./plans/";
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkFilename);
-
-		Population population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(populationFilename);
+		Scenario scenario = new ScenarioImpl();
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
+		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, crs, outputDir);
+		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(scenario.getPopulation(), crs, outputDir);
 		sp.setOutputSample(0.05);
 		sp.setActBlurFactor(100);
 		sp.setLegBlurFactor(100);

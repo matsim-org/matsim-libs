@@ -37,6 +37,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Leg;
@@ -167,6 +168,15 @@ public class QueueSimulation {
 		this.network = new QueueNetwork(network);
 		this.networkLayer = network;
 		this.agentFactory = new AgentFactory(this);
+	}
+
+	/**
+	 * Initialize the QueueSimulation without signal systems
+	 * @param scenario
+	 * @param events
+	 */
+	public QueueSimulation(final Scenario scenario, final Events events) {
+		this(scenario.getNetwork(), scenario.getPopulation(), events);
 	}
 
 	/**

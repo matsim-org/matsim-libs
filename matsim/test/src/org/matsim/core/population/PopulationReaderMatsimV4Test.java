@@ -24,6 +24,9 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -31,7 +34,6 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -45,11 +47,12 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 	 * @throws IOException
 	 */
 	public void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
-		final NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).parse("test/scenarios/equil/network.xml");
-		Population population = new PopulationImpl();
-		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(population, network);
-		reader.parse(getInputDirectory() + "plans2.xml");
+		final Scenario scenario = new ScenarioImpl();
+		final Network network = scenario.getNetwork();
+		final Population population = scenario.getPopulation();
+		
+		new MatsimNetworkReader(scenario.getNetwork()).parse("test/scenarios/equil/network.xml");
+		new PopulationReaderMatsimV4(scenario).parse(getInputDirectory() + "plans2.xml");
 
 		assertEquals("population size.", 2, population.getPersons().size());
 		Person person1 = population.getPersons().get(new IdImpl("1"));
