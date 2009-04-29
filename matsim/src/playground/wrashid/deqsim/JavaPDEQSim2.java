@@ -26,11 +26,12 @@ import java.util.List;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
@@ -52,20 +53,17 @@ public class JavaPDEQSim2 {
 	public JavaPDEQSim2(final NetworkLayer network, final Population population, final Events events) {
 		// constructor
 
-
-
-
 		this.population = population;
 		this.network = network;
-
-
+		
+		Config config = Gbl.getConfig();
 
 		// initialize Simulation parameters
 		SimulationParameters.linkCapacityPeriod=network.getCapacityPeriod();
 		SimulationParameters.events=events;
-		SimulationParameters.stuckTime= Gbl.getConfig().simulation().getStuckTime();//getParam("simulation", "stuckTime"));
-		SimulationParameters.flowCapacityFactor= Double.parseDouble(Gbl.getConfig().getParam("simulation", "flowCapacityFactor"));
-		SimulationParameters.storageCapacityFactor= Double.parseDouble(Gbl.getConfig().getParam("simulation", "storageCapacityFactor"));
+		SimulationParameters.stuckTime= config.simulation().getStuckTime();//getParam("simulation", "stuckTime"));
+		SimulationParameters.flowCapacityFactor= Double.parseDouble(config.getParam("simulation", "flowCapacityFactor"));
+		SimulationParameters.storageCapacityFactor= Double.parseDouble(config.getParam("simulation", "storageCapacityFactor"));
 
 
 		// allowed testing to hook in here
@@ -75,7 +73,7 @@ public class JavaPDEQSim2 {
 
 		if (SimulationParameters.testPlanPath!=null){
 			// read population
-			Population pop=new PopulationImpl(PopulationImpl.NO_STREAMING);
+			Population pop=new PopulationImpl();
 			PopulationReader plansReader = new MatsimPopulationReader(pop, network);
 			plansReader.readFile(SimulationParameters.testPlanPath);
 

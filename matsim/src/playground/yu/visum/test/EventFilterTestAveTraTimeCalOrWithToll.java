@@ -22,7 +22,6 @@ package playground.yu.visum.test;
 
 import java.io.IOException;
 
-import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
@@ -44,8 +43,7 @@ import playground.yu.visum.writer.PrintStreamUDANET;
  */
 public class EventFilterTestAveTraTimeCalOrWithToll {
 
-	public static void testRunAveTraTimeCal() throws IOException {
-		Config config = Gbl.getConfig();
+	public static void testRunAveTraTimeCal(Config config) throws IOException {
 
 		// network
 		System.out.println("  creating network object... ");
@@ -58,7 +56,8 @@ public class EventFilterTestAveTraTimeCalOrWithToll {
 		System.out.println("  done.");
 		// plans
 		System.out.println("  creating plans object... ");
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		System.out.println("  done.");
 
 		// events
@@ -118,8 +117,8 @@ public class EventFilterTestAveTraTimeCalOrWithToll {
 	public static void main(final String[] args) throws Exception {
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(args);
-		testRunAveTraTimeCal();
+		Config config = Gbl.createConfig(args);
+		testRunAveTraTimeCal(config);
 		Gbl.printElapsedTime();
 	}
 }

@@ -5,23 +5,22 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.Population;
+import org.matsim.core.basic.v01.BasicActivityImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.basic.v01.BasicActivityImpl;
-
 
 import playground.mmoyo.PTCase2.PTOb;
-import playground.mmoyo.Validators.PathValidator;
 import playground.mmoyo.PTCase2.PTRouter2;
+import playground.mmoyo.Validators.PathValidator;
 
 public class PTconnectionfinder {
 	private NetworkLayer net; 
@@ -30,7 +29,7 @@ public class PTconnectionfinder {
 	
 	public PTconnectionfinder(final PTOb ptOb){
 		net = ptOb.getPtNetworkLayer();
-		population = new PopulationImpl(false);
+		population = new PopulationImpl();
 		ptRouter= ptOb.getPtRouter2();
 		
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population,net);

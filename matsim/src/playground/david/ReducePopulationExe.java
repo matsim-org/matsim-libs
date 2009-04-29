@@ -29,11 +29,10 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -47,7 +46,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.world.World;
 
 class EventHH implements LinkEnterEventHandler {
 
@@ -165,7 +163,7 @@ public class ReducePopulationExe {
 	public static NetworkLayer network;
 	public static String outpopFileName = "../../tmp/studies/ivtch/Diss/input/plans";
 
-	public static Population relevantPopulation;
+	public static PopulationImpl relevantPopulation;
 	public static PopulationWriter plansWriter1;
 	public static PopulationWriter plansWriter10 ;
 	public static PopulationWriter plansWriter25;
@@ -188,22 +186,20 @@ public class ReducePopulationExe {
 		Gbl.startMeasurement();
 		Gbl.createConfig(args);
 
-		World world = Gbl.getWorld();
-
 		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
-		world.setNetworkLayer(network);
-		world.complete();
 
-		relevantPopulation = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		relevantPopulation = new PopulationImpl();
+		relevantPopulation.setIsStreaming(true);
 		plansWriter1 = new PopulationWriter(relevantPopulation, outpopFileName + "1p.xml", "v4");
 		plansWriter10 = new PopulationWriter(relevantPopulation, outpopFileName + "10p.xml", "v4");
 		plansWriter25 = new PopulationWriter(relevantPopulation, outpopFileName + "25p.xml", "v4");
 		plansWriter50 = new PopulationWriter(relevantPopulation, outpopFileName + "50p.xml", "v4");
 		plansWriter100 = new PopulationWriter(relevantPopulation, outpopFileName + "100p.xml", "v4");
 
-		Population population = new PopulationImpl(PopulationImpl.USE_STREAMING);
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationImpl population = new PopulationImpl();
+		population.setIsStreaming(true);
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, network);
 		FilterPersons2 filter = new FilterPersons2();
 		population.addAlgorithm(filter);
 		plansReader.readFile(popFileName);

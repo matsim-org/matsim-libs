@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -22,7 +22,7 @@ import playground.yu.visum.filter.finalFilters.NewPlansWriter;
  */
 public class NewPlansTest {
 
-	public static void testRun() {
+	public static void testRun(Config config) {
 
 		System.out.println("TEST RUN ---FilterTest---:");
 		// reading all available input
@@ -32,12 +32,13 @@ public class NewPlansTest {
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network()
+		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		System.out.println("  done.");
 
 		System.out.println("  setting plans algorithms... ");
@@ -129,7 +130,7 @@ public class NewPlansTest {
 		System.out.println("  reading plans xml file... ");
 		PopulationReader plansReader = new MatsimPopulationReader(plans,
 				network);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  running plans algos ... ");
@@ -156,8 +157,8 @@ public class NewPlansTest {
 	 */
 	public static void main(final String[] args) throws Exception {
 		Gbl.startMeasurement();
-		Gbl.createConfig(args);
-		testRun();
+		Config config = Gbl.createConfig(args);
+		testRun(config);
 		Gbl.printElapsedTime();
 	}
 }

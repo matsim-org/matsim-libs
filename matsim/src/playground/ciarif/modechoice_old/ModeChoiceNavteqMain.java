@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 package playground.ciarif.modechoice_old;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -27,6 +27,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.world.World;
 
 
 
@@ -39,7 +40,9 @@ public class ModeChoiceNavteqMain {
 
 
 
-	public static void testRun01() {
+	public static void testRun01(Config config) {
+		World world = Gbl.createWorld();
+		
 //		System.out.println("TEST RUN 01:");
 //		System.out.println("  reading world xml file... ");
 //		WorldParser world_parser = new WorldParser(Gbl.getWorld());
@@ -47,10 +50,10 @@ public class ModeChoiceNavteqMain {
 //		System.out.println("  done.");
 
 		System.out.println("  creating network layer... ");
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		System.out.println("  done.");
 		System.out.println("  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 //		System.out.println();
@@ -76,7 +79,8 @@ public class ModeChoiceNavteqMain {
 //		System.out.println("3. CREATING A POPULATION BASED ON THE NETWORK");
 //		System.out.println();
 //		System.out.println("  creating plans object... ");
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 //		System.out.println("  done.");
 //		System.out.println("  running plans algorithms... ");
 //		PlansCreateFromNetwork pcfn_algo = new PlansCreateFromNetwork(network,ns_algo);
@@ -86,7 +90,7 @@ public class ModeChoiceNavteqMain {
 
 //		PlansParser plansParser = new MatsimPopulationReader(plans);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 		System.out.println("  adding plans algorithm... ");
 		//plans.addAlgorithm (new ModeChoiceAlgorithm2 ());
@@ -96,7 +100,7 @@ public class ModeChoiceNavteqMain {
 		System.out.println("  done.");
 		System.out.println("  reading, processing, writing plans...");
 		plans.addAlgorithm(plansWriter);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		plans.runAlgorithms();
 		modeAnalyzer.printInformation();
@@ -195,9 +199,9 @@ public class ModeChoiceNavteqMain {
 
 		Gbl.startMeasurement();
 
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
 
-		testRun01();
+		testRun01(config);
 
 		Gbl.printElapsedTime();
 	}

@@ -192,7 +192,7 @@ public abstract class ScenarioConfig {
 
 	public static final NetworkLayer readNetwork() {
 		System.out.println("  reading the network xml file...");
-		System.out.println(Gbl.getConfig().network().getInputFile());
+		System.out.println(config.network().getInputFile());
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 //		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		new MatsimNetworkReader(network).readFile(netFileName);
@@ -203,7 +203,7 @@ public abstract class ScenarioConfig {
 	public static final Counts readCounts() {
 		System.out.println("  reading the counts...");
 		final Counts counts = new Counts();
-		new MatsimCountsReader(counts).readFile(Gbl.getConfig().counts().getCountsFileName());
+		new MatsimCountsReader(counts).readFile(config.counts().getCountsFileName());
 
 		System.out.println("  done.");
 		return counts;
@@ -211,7 +211,7 @@ public abstract class ScenarioConfig {
 
 	public static final Matrices readMatrices() {
 		System.out.println("  reading matrices xml file... ");
-		new MatsimMatricesReader(Matrices.getSingleton(), Gbl.getWorld()).readFile(Gbl.getConfig().matrices().getInputFile());
+		new MatsimMatricesReader(Matrices.getSingleton(), Gbl.getWorld()).readFile(config.matrices().getInputFile());
 		System.out.println("  done.");
 		return Matrices.getSingleton();
 	}
@@ -243,7 +243,7 @@ public abstract class ScenarioConfig {
 
 	public static final Events readEvents(final int i, final EventsMapStartEndTimes epp) {
 		System.out.println("  reading plans xml file... ");
-		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
+		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+config.events().getInputFile();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
 		Events events = new Events();
 		events.addHandler(epp);
@@ -323,7 +323,7 @@ public abstract class ScenarioConfig {
 
 	public static final void writeConfig() {
 		System.out.println("  writing config xml file... ");
-		new ConfigWriter(Gbl.getConfig()).write();
+		new ConfigWriter(config).write();
 		System.out.println("  done.");
 	}
 	public static Config getConfig(){

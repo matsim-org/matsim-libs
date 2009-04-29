@@ -42,7 +42,7 @@ public class GenerateChoiceSets {
 
 	//private static int idOffset = 20000000;
 	//private final static double epsilon = 0.01;
-	private Population choiceSetPopulation = new PopulationImpl(false);
+	private Population choiceSetPopulation = new PopulationImpl();
 
 	private final NetworkLayer network = new NetworkLayer();
 	//private TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink = new TreeMap<Id, ArrayList<ZHFacility>>();
@@ -269,7 +269,7 @@ public class GenerateChoiceSets {
 
 	private Population createChoiceSetPopulationFromMZ() {
 
-		Population temporaryPopulation = new PopulationImpl(false);
+		Population temporaryPopulation = new PopulationImpl();
 
 		try {
 			new PlansCreateFromMZ(this.choiceSetPopulationFile,this.outdir+"/output_wegeketten.dat",1,7).run(temporaryPopulation);

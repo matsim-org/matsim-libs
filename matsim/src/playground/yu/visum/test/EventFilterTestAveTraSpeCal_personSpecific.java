@@ -22,7 +22,6 @@ package playground.yu.visum.test;
 
 import java.io.IOException;
 
-import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
@@ -63,17 +62,12 @@ public class EventFilterTestAveTraSpeCal_personSpecific {
 	public static void main(final String[] args) throws Exception {
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(args);
-		testRunAveTraSpeCal();
+		Config config = Gbl.createConfig(args);
+		testRunAveTraSpeCal(config);
 		Gbl.printElapsedTime();
 	}
 
-	/**
-	 * @throws IOException
-	 */
-
-	public static void testRunAveTraSpeCal() throws IOException {
-		Config config = Gbl.getConfig();
+	public static void testRunAveTraSpeCal(Config config) throws IOException {
 
 		// network
 		System.out.println("  creating network object... ");
@@ -88,7 +82,8 @@ public class EventFilterTestAveTraSpeCal_personSpecific {
 
 		// plans
 		System.out.println("  creating plans object... ");
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		System.out.println("  done.");
 
 		System.out.println("  setting plans algorithms... ");
@@ -107,7 +102,7 @@ public class EventFilterTestAveTraSpeCal_personSpecific {
 		System.out.println("  reading plans xml file... ");
 		PopulationReader plansReader = new MatsimPopulationReader(plans,
 				network);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  running plans algos ... ");

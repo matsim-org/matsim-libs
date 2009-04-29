@@ -20,7 +20,7 @@
 
 package playground.balmermi;
 
-import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -30,6 +30,7 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.world.MatsimWorldReader;
+import org.matsim.world.World;
 
 public class NavtechRouting {
 
@@ -41,23 +42,24 @@ public class NavtechRouting {
 
 		System.out.println("RUN: xy2links");
 
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
+		World world = Gbl.getWorld();
 
 		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		new MatsimWorldReader(world).readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 
 		System.out.println("  adding plans algorithm... ");
@@ -69,7 +71,7 @@ public class NavtechRouting {
 
 		System.out.println("  reading, processing, writing plans...");
 		plans.addAlgorithm(plansWriter);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		plansWriter.write();
 		System.out.println("  done.");

@@ -20,7 +20,7 @@
 
 package playground.balmermi;
 
-import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -35,12 +35,13 @@ public class ActivityChainGrouping {
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
-	public static void calculateActivityChainGroups() {
+	public static void calculateActivityChainGroups(Config config) {
 
 		System.out.println("calculateActivitySpaces():");
 
 		System.out.println("  creating plans object... ");
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		System.out.println("  done.");
 
 		System.out.println("  adding person algorithms... ");
@@ -54,8 +55,8 @@ public class ActivityChainGrouping {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans, running person-algos and writing the xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		PopulationReader plansReader = new MatsimPopulationReader(plans, null);
+		plansReader.readFile(config.plans().getInputFile());
 		plans_writer.write();
 		System.out.println("  done.");
 
@@ -64,7 +65,7 @@ public class ActivityChainGrouping {
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
+		ConfigWriter config_writer = new ConfigWriter(config);
 		config_writer.write();
 		System.out.println("  done.");
 
@@ -84,9 +85,9 @@ public class ActivityChainGrouping {
 			 "ActivitySpaces_config.xml' input config file.");
 		}
 
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
 
-		calculateActivityChainGroups();
+		calculateActivityChainGroups(config);
 
 		Gbl.printElapsedTime();
 	}

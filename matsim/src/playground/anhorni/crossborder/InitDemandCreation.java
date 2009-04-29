@@ -86,8 +86,7 @@ public class InitDemandCreation {
 
 
 	private void readNetwork() {
-		this.network = null;
-		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(Config.networkFile);
 
 		// running Network adaptation algorithms

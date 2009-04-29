@@ -32,8 +32,8 @@ import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -49,23 +49,23 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 
 	private static final Logger log = Logger.getLogger(PopulationBuilderImpl.class);
 
-	private final Population population;
+//	private final Population population;
 	private final Network network;
 	private final Facilities facilities;
-	private final Scenario scenario;
+//	private final Scenario scenario;
 
 	@Deprecated
 	public PopulationBuilderImpl(NetworkLayer network, Population population, Facilities facilities) {
 		this.network = network;
-		this.population = population;
+//		this.population = population;
 		this.facilities = facilities;
-		this.scenario = null;
+//		this.scenario = null;
 	}
 	
 	public PopulationBuilderImpl(final Scenario scenario) {
-		this.scenario = scenario;
+//		this.scenario = scenario;
 		this.network = scenario.getNetwork();
-		this.population = scenario.getPopulation();
+//		this.population = scenario.getPopulation();
 		this.facilities = null; // TODO [MR]
 	}
 

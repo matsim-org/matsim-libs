@@ -164,7 +164,8 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans object... ");
-		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 //		plans.setRefLayer(world.getLayer(new IdImpl("tvz")));
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(plansWriter);
@@ -206,7 +207,8 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
-		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(plansWriter);
 		System.out.println("  done.");
@@ -246,7 +248,8 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
-		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(plansWriter);
 		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
@@ -327,7 +330,8 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
-		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		plans.addAlgorithm(new PersonFilterSelectedPlan());
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(plansWriter);
@@ -721,7 +725,8 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
-		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
@@ -1206,7 +1211,8 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
-		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 
@@ -1277,7 +1283,8 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
-		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		final CalcAverageTripLength catl = new CalcAverageTripLength();
 		plans.addAlgorithm(catl);
@@ -1358,7 +1365,8 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
-		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		final VisumWriteRoutes writer = new VisumWriteRoutes("routen.rim", tvz);
 		plans.addAlgorithm(writer);
 		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
@@ -1481,7 +1489,8 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  processing plans...");
-		final Population population = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final PopulationImpl population = new PopulationImpl();
+		population.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(population);
 		final PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		population.addAlgorithm(new ActLocationFalsifier(200));
@@ -1578,7 +1587,8 @@ public class MyRuns {
 		if (useVolumes) {
 
 			System.out.println("  reading plans...");
-			final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+			final PopulationImpl plans = new PopulationImpl();
+			plans.setIsStreaming(true);
 			final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 			plans.addAlgorithm(
 					new AbstractPersonAlgorithm() {

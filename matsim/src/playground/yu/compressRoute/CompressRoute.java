@@ -31,8 +31,8 @@ import java.util.Stack;
 import java.util.TreeMap;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -186,8 +186,8 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 		System.out.println("-->done.");
 
 		System.out.println("  setting up plans objects...");
-		final Population plans = new PopulationImpl(
-				PopulationImpl.USE_STREAMING);
+		final PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(plans,
 				network);
 		// compress routes

@@ -248,13 +248,11 @@ public class DailyDistanceModalSplit extends AbstractPersonAlgorithm implements
 
 		Population population = new PopulationImpl();
 
-		DailyDistanceModalSplit ddms = new DailyDistanceModalSplit();
-		population.addAlgorithm(ddms);
-
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		DailyDistanceModalSplit ddms = new DailyDistanceModalSplit();
+		ddms.run(population);
 
 		ddms.write(outputFilename);
 

@@ -233,7 +233,6 @@ public class ScenarioLoader {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			this.scenario.getPopulation().printPlansCount();
 		}
 		else {
 			log.info("no population file set in config, not able to load population");

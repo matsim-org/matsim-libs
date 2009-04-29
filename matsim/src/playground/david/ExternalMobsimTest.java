@@ -40,20 +40,16 @@ public class ExternalMobsimTest {
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("e:/Development/tmp/studies/equil//equil_netENG.xml");
-		Gbl.getWorld().setNetworkLayer ( network ) ;
-		Gbl.getWorld().complete();
-
 
 		System.out.println("[External MOBSIM called"  + "]");
 
 		Events events_ = new Events();
-		Population population_ = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population_ = new PopulationImpl();
 
 		//load pop from popfile
 		System.out.println("[External MOBSIM"  + "] loading plansfile: " + args[0]);
-		PopulationReader plansReader = new MatsimPopulationReader(population_);
+		PopulationReader plansReader = new MatsimPopulationReader(population_, network);
 		plansReader.readFile(args[0]);
-		population_.printPlansCount();
 		System.out.println("[External MOBSIM"  + "]...done");
 
 		System.out.println("[External MOBSIM"  + "] writing to eventsfile: " + args[1]);

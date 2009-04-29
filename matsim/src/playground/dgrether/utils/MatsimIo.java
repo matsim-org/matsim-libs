@@ -75,11 +75,10 @@ public class MatsimIo {
 
 
 	public static Population loadPlans(final String filename) {
-		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population plans = new PopulationImpl();
 		log.info("  reading plans xml file... ");
 		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		plansReader.readFile(filename);
-		plans.printPlansCount();
 		log.info("  done");
 		return plans;
 	}

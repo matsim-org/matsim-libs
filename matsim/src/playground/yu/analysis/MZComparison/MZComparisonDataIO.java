@@ -189,12 +189,11 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		MZComparisonData mzcd = new MZComparisonData(tollReader.getScheme());
-		population.addAlgorithm(mzcd);
 
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		MZComparisonData mzcd = new MZComparisonData(tollReader.getScheme());
+		mzcd.run(population);
 
 		mzcdi.setData2Compare(mzcd);
 		mzcdi.write(outputBase);

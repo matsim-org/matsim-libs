@@ -30,8 +30,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -130,7 +130,7 @@ public class RandomPlansGenerator {
 	}
 
 	public Population createPlans(final int numberOfAgents, final int startTime, final int endTime){
-		Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population pop = new PopulationImpl();
 		this.initDijkstra();
 
 		for(int i=1; i <= numberOfAgents; i++){

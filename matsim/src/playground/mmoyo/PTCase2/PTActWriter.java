@@ -13,22 +13,21 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.basic.v01.BasicActivityImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.network.NetworkLayer;
 
 import playground.mmoyo.Validators.PathValidator;
 
@@ -54,9 +53,8 @@ public class PTActWriter {
 		
 		Config config = new org.matsim.core.config.Config();
 		config = Gbl.createConfig(new String[]{conf, "http://www.matsim.org/files/dtd/plans_v4.dtd"});
-		Gbl.setConfig(config);
 		
-		population = new PopulationImpl(false);
+		population = new PopulationImpl();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(this.population,net);
 		plansReader.readFile(plansFile);
 	}
@@ -74,7 +72,7 @@ public class PTActWriter {
 	
 	public void writePTActsLegs(){
 		
-		Population newPopulation = new PopulationImpl(false);
+		Population newPopulation = new PopulationImpl();
 		int x=0;
 
 		PathValidator ptPathValidator = new PathValidator ();
@@ -187,9 +185,7 @@ public class PTActWriter {
 
 
 		System.out.println("writing output plan file...");
-		Gbl.getConfig().plans().setOutputFile(outputFile);
-		Gbl.getConfig().plans().setOutputVersion("v4");
-		new PopulationWriter(newPopulation).write();
+		new PopulationWriter(newPopulation, outputFile, "v4").write();
 		System.out.println("Done");
 		
 		/*

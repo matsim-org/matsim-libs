@@ -36,7 +36,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.world.World;
 
 class FilterPersonsNonCarMode extends AbstractPersonAlgorithm{
 
@@ -85,17 +84,13 @@ public class CopyOfFilterBerlinKutter {
 		Gbl.startMeasurement();
 		Gbl.createConfig(args);
 
-		World world = Gbl.getWorld();
-
 		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
-		world.setNetworkLayer(network);
-		world.complete();
 
-		relevantPopulation = new PopulationImpl(false);
+		relevantPopulation = new PopulationImpl();
 		Population population = new MyPopulation();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(population);
-		population.addAlgorithm(new FilterPersonsNonCarMode());
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, network);
+//		population.addAlgorithm(new FilterPersonsNonCarMode());
 		plansReader.readFile(popFileName);
 //		population.runAlgorithms();
 

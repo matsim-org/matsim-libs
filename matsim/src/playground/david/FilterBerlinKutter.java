@@ -26,8 +26,8 @@ import java.util.Set;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -39,7 +39,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.world.World;
 
 class FilterPersons extends AbstractPersonAlgorithm{
 
@@ -98,9 +97,6 @@ public class FilterBerlinKutter {
 	public static NetworkLayer network;
 
 
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
 		//String popFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\DSkutter010car_bln.router_wip.plans.v4.xml";
 		String netFileName = "..\\..\\tmp\\studies\\berlin-wip\\network\\wip_net.xml";
@@ -111,17 +107,13 @@ public class FilterBerlinKutter {
 		Gbl.startMeasurement();
 		Gbl.createConfig(args);
 
-		World world = Gbl.getWorld();
-
 		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
-		world.setNetworkLayer(network);
-		world.complete();
-
-		relevantPopulation = new PopulationImpl(false);
+		
+		relevantPopulation = new PopulationImpl();
 		Population population = new MyPopulation();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(population);
-		population.addAlgorithm(new FilterPersons());
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, network);
+//		population.addAlgorithm(new FilterPersons());
 		plansReader.readFile(popFileName);
 //		population.runAlgorithms();
 

@@ -162,7 +162,7 @@ public class CMCFScenarioGenerator {
 	}
 
 	private void createPlans() throws Exception {
-		this.plans = new PopulationImpl(false);
+		this.plans = new PopulationImpl();
 		int firstHomeEndTime = 0;//6 * 3600;
 		int homeEndTime = firstHomeEndTime;
 		Link l1 = this.network.getLink(IdFactory.get(1));

@@ -22,6 +22,7 @@ package playground.david;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -32,7 +33,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.vis.netvis.NetVis;
-import org.matsim.world.World;
 
 public class SimRunKreisverkehr {
 
@@ -46,17 +46,13 @@ public class SimRunKreisverkehr {
 
 		String[] args2 = {arg0, "E:/Development/tmp/dtd/config_v1.dtd"};
 		Gbl.startMeasurement();
-		Gbl.createConfig(null);
+		Config config = Gbl.createConfig(null);
 		String localDtdBase = "./dtd/";
-		Gbl.getConfig().global().setLocalDtdBase(localDtdBase);
+		config.global().setLocalDtdBase(localDtdBase);
 		
-
-		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		int cellcount = 0;
 		int cellcount2 = 0;
@@ -88,7 +84,7 @@ public class SimRunKreisverkehr {
 
 		Population population = new MyPopulation();
 		// Read plans file with special Reader Implementation
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(popFileName);
 
 		Events events = new Events() ;

@@ -20,13 +20,14 @@
 
 package playground.ciarif;
 
-import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
+import org.matsim.world.World;
 
 import playground.balmermi.census2000.data.Households;
 import playground.balmermi.census2000.data.Municipalities;
@@ -36,12 +37,14 @@ import playground.ciarif.models.subtours.PersonModeChoiceModel;
 
 public class PersonSubtoursStreaming {
 
-	public static void run() {
+	public static void run(Config config) {
 
 		System.out.println("Run...");
 
+		World world = Gbl.createWorld();
+		
 		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(Gbl.getWorld()).readFile(Gbl.getConfig().world().getInputFile());
+		new MatsimWorldReader(world).readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -64,9 +67,10 @@ public class PersonSubtoursStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, null);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -89,7 +93,7 @@ public class PersonSubtoursStreaming {
 
 		System.out.println("  reading, processing, writing plans...");
 		plans.addAlgorithm(plansWriter);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		plansWriter.write();
 		System.out.println("  done.");
@@ -112,8 +116,8 @@ public class PersonSubtoursStreaming {
 		Gbl.startMeasurement();
 		Gbl.printElapsedTime();
 
-		Gbl.createConfig(args);
-		run();
+		Config config = Gbl.createConfig(args);
+		run(config);
 
 		Gbl.printElapsedTime();
 	}

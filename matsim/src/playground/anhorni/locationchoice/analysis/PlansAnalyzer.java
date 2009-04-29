@@ -57,7 +57,7 @@ public class PlansAnalyzer {
 
 
 	/**
-	 * @param
+	 * @param args
 	 *  - path of the plans file
 	 */
 	public static void main(final String[] args) {
@@ -97,8 +97,8 @@ public class PlansAnalyzer {
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 		log.info("facilities reading done");
 
-		this.plans=new PopulationImpl(false);
-		final PopulationReader plansReader = new MatsimPopulationReader(this.plans);
+		this.plans=new PopulationImpl();
+		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, this.network);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");
 

@@ -20,6 +20,7 @@
 
 package playground.balmermi;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -37,12 +38,12 @@ public class AdaptLinkLength {
 
 		System.out.println("RUN: AdaptLinkLength");
 
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		network = (NetworkLayer)Gbl.createWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  running Network adaptation algorithms... ");

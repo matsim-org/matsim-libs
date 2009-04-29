@@ -96,7 +96,7 @@ public class PlanRemoveUnselected {
 		log.info("world checking done.");
 
 
-		this.plans=new PopulationImpl(false);
+		this.plans=new PopulationImpl();
 		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, this.network);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");

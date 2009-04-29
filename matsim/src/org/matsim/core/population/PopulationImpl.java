@@ -40,16 +40,13 @@ import org.matsim.core.utils.misc.Counter;
  */
 public class PopulationImpl extends BasicPopulationImpl<Person> implements Population {
 
-	public static final boolean USE_STREAMING = true;
-	public static final boolean NO_STREAMING = false;
-
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
 	private long counter = 0;
 	private long nextMsg = 1;
-	private final boolean isStreaming;
+	private boolean isStreaming = false;
 
 	// algorithms over plans
 	private final ArrayList<PersonAlgorithm> personAlgos = new ArrayList<PersonAlgorithm>();
@@ -57,28 +54,6 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 	private static final Logger log = Logger.getLogger(PopulationImpl.class);
 
 	private final PopulationBuilder pb = new PopulationBuilderImpl((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE), this, (Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
-	
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Creates a new population with streaming deactivated.
-	 * 
-	 * @see #PopulationImpl(boolean)
-	 */
-	public PopulationImpl() {
-		this(false);
-	}
-
-	/**
-	 * @param isStreaming if set to <code>true</code>, persons will not be really stored in
-	 * the population, but algorithms are run over the person when the person is added, and
-	 * the person is discarded again.
-	 */
-	public PopulationImpl(final boolean isStreaming) {
-		this.isStreaming = isStreaming;
-	}
 
 	//////////////////////////////////////////////////////////////////////
 	// add methods
@@ -179,14 +154,14 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 	public final Map<Id, Person> getPersons() {
 		return super.getPersons();
 	}
-	/**
-	 * @deprecated 
-	 * @see org.matsim.core.api.population.Population#isStreaming()
-	 */
-  @Deprecated
+
 	public final boolean isStreaming() {
 		return this.isStreaming;
 	}
+  
+  public final void setIsStreaming(final boolean isStreaming) {
+  	this.isStreaming = isStreaming;
+  }
 
 	//////////////////////////////////////////////////////////////////////
 	// print methods

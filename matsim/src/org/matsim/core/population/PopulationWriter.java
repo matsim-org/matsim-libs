@@ -33,7 +33,6 @@ import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
@@ -97,8 +96,8 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 		this.write_person_fraction = fraction;
 		createHandler(version);
 
-		if (this.population instanceof Population) {
-			if (((Population) this.population).isStreaming()) {
+		if (this.population instanceof PopulationImpl) {
+			if (((PopulationImpl) this.population).isStreaming()) {
 				// write the file head if it is used with streaming.
 				writeStartPlans();
 			}
@@ -224,7 +223,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 //					while (a_it.hasNext()) {
 //						Facility f = a_it.next().getFacility();
 //						this.handler.startLocation(f,this.out);
-//						/* TODO [balmermi] Here, usually capacity and opentimes
+//						/* TODOx [balmermi] Here, usually capacity and opentimes
 //						 * are also written. But since it is now already defined by the facilities
 //						 * there is no need to write it. the act type and the facilitiy id
 //						 * is enough. (well... i think) */
@@ -300,7 +299,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	 */
 	@Override
 	public void write() {
-		if ((this.population instanceof Population) && (((Population) this.population).isStreaming())) {
+		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
 			log.info("PlansStreaming is on -- plans already written, just closing file if it's open.");
 			if (this.fileOpened) {
 				writeEndPlans();

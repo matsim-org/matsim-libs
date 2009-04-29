@@ -20,7 +20,7 @@
 
 package playground.balmermi;
 
-import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -28,10 +28,14 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.world.World;
 
 public class PersonStreaming {
 
-	public static void run() {
+	public static void run(String[] args) {
+
+		Config config = Gbl.createConfig(args);
+		World world = Gbl.createWorld();
 
 		System.out.println("person streaming...");
 
@@ -42,9 +46,9 @@ public class PersonStreaming {
 //		System.out.println("  done.");
 
 		System.out.println("  reading the network xml file...");
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		Gbl.getWorld().complete();
+		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		world.complete();
 		System.out.println("  done.");
 
 //		new WorldCheck().run(Gbl.getWorld());
@@ -55,9 +59,10 @@ public class PersonStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -91,7 +96,7 @@ public class PersonStreaming {
 
 		System.out.println("  reading, processing, writing plans...");
 		plans.addAlgorithm(plansWriter);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		plansWriter.write();
 		System.out.println("  done.");
@@ -121,10 +126,7 @@ public class PersonStreaming {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		Gbl.createConfig(args);
-		Gbl.createWorld();
-
-		run();
+		run(args);
 
 		Gbl.printElapsedTime();
 	}

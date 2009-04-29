@@ -53,7 +53,7 @@ public class ActChainsPlansAnalyzer {
 
 
 	/**
-	 * @param
+	 * @param args
 	 *  - path of the plans file
 	 */
 	public static void main(final String[] args) {
@@ -74,12 +74,12 @@ public class ActChainsPlansAnalyzer {
 
 	private void init(final String plansfilePath, final String networkfilePath) {
 
-		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 		log.info("network reading done");
 
-		this.plans=new PopulationImpl(false);
-		final PopulationReader plansReader = new MatsimPopulationReader(this.plans);
+		this.plans=new PopulationImpl();
+		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, this.network);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");
 	}

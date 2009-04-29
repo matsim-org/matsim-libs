@@ -248,13 +248,11 @@ public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 
 		Population population = new PopulationImpl();
 
-		DailyEnRouteTimeModalSplit ddms = new DailyEnRouteTimeModalSplit();
-		population.addAlgorithm(ddms);
-
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		population.runAlgorithms();
+		DailyEnRouteTimeModalSplit ddms = new DailyEnRouteTimeModalSplit();
+		ddms.run(population);
 
 		ddms.write(outputFilename);
 

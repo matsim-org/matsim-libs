@@ -20,7 +20,7 @@
 
 package playground.meisterk.org.matsim.run.portland;
 
-import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
@@ -32,6 +32,7 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.world.World;
 
 public class GenerateDemand {
 
@@ -40,33 +41,34 @@ public class GenerateDemand {
 	 */
 	public static void main(final String[] args) {
 
-		Gbl.createConfig(args);
-		GenerateDemand.generateDemand();
+		Config config = Gbl.createConfig(args);
+		GenerateDemand.generateDemand(config);
 
 	}
 
-	private static void generateDemand() {
+	private static void generateDemand(Config config) {
 
-//		World world = Gbl.createWorld();
+		World world = Gbl.createWorld();
 
 		System.out.println("Reading network...");
 		NetworkLayer networkLayer = new NetworkLayer();
-		new MatsimNetworkReader(networkLayer).readFile(Gbl.getConfig().network().getInputFile());
-		Gbl.getWorld().setNetworkLayer(networkLayer);
+		new MatsimNetworkReader(networkLayer).readFile(config.network().getInputFile());
+		world.setNetworkLayer(networkLayer);
 		System.out.println("Reading network...done.");
 
 		System.out.println("Reading facilities...");
 		FacilitiesImpl facilityLayer = new FacilitiesImpl();
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilityLayer);
 		//facilities_reader.setValidating(false);
-		facilities_reader.readFile(Gbl.getConfig().facilities().getInputFile());
+		facilities_reader.readFile(config.facilities().getInputFile());
 		facilityLayer.printFacilitiesCount();
-		Gbl.getWorld().setFacilityLayer(facilityLayer);
-		Gbl.getWorld().complete();
+		world.setFacilityLayer(facilityLayer);
+		world.complete();
 		System.out.println("Reading facilities...done.");
 
 		System.out.println("Setting up plans objects...");
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		PopulationReader plansReader = new MatsimPopulationReader(plans, networkLayer);
 		System.out.println("Setting up plans objects...done.");
@@ -78,7 +80,7 @@ public class GenerateDemand {
 
 		System.out.println("Reading, processing and writing plans...");
 		plans.addAlgorithm(plansWriter);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		plansWriter.write();
 		System.out.println("Reading, processing and writing plans...done.");

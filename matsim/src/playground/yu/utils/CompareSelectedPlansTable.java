@@ -60,8 +60,8 @@ public class CompareSelectedPlansTable {
 	}
 
 	private void init(final String networkPath) {
-		this.plans0 = new PopulationImpl(false);
-		this.plans1 = new PopulationImpl(false);
+		this.plans0 = new PopulationImpl();
+		this.plans1 = new PopulationImpl();
 
 		System.out.println("  reading the network...");
 		this.network = new NetworkLayer();

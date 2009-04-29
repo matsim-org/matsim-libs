@@ -13,6 +13,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
@@ -29,13 +30,13 @@ public class CreatePlans {
 	 */
 	public static void main(String[] args) throws Exception {
 		// TODO: am schluss alle meiste pfade in config.xml reintun...
-		Population plans = new PopulationImpl(false);
+		Population plans = new PopulationImpl();
 		Gbl.reset();
 		args=new String[1];
 		args[0]="C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/config.xml";
-		Gbl.createConfig(args);
-		Gbl.getConfig().plans().setOutputFile("C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/5000plan/plans.xml");
-		final World world = Gbl.getWorld();
+		Config config = Gbl.createConfig(args);
+		config.plans().setOutputFile("C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/5000plan/plans.xml");
+		final World world = Gbl.createWorld();
 
 		// read facilities
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);

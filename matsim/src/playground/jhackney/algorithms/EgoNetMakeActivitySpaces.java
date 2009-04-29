@@ -26,6 +26,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
 import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
@@ -109,9 +110,9 @@ public class EgoNetMakeActivitySpaces {
 //		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 //		new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
 //		new PersonsRandomizeId(plans);
-		Person ego=plans.getPerson(new IdImpl("21924270"));
+		Person ego=plans.getPersons().get(new IdImpl("21924270"));
 
-		Population socialPlans = new PersonGetEgoNetGetPlans().extract(ego, plans);
+		PopulationImpl socialPlans = new PersonGetEgoNetGetPlans().extract(ego, plans);
 //		// make the set of plans to use as EgoNet
 		socialPlans.addAlgorithm(new PersonCalcActivitySpace("all"));
 //		plans.addAlgorithm(new PersonCalcActivitySpace("leisure"));

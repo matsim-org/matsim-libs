@@ -120,7 +120,8 @@ public class InitRoutes {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 
-		final PopulationImpl plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());

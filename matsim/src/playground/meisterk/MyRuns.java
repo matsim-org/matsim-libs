@@ -124,10 +124,11 @@ public class MyRuns {
 	
 	public static Population initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos) {
 
-		Population population = null;
+		PopulationImpl population = null;
 
 		System.out.println("  reading plans xml file... ");
-		population = new PopulationImpl(isStreaming);
+		population = new PopulationImpl();
+		population.setIsStreaming(isStreaming);
 
 		if (isStreaming) {
 			// add plans algos for streaming
@@ -178,7 +179,8 @@ public class MyRuns {
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
 		plansAlgos.add(pa);
 
-		Population matsimAgentPopulation = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl matsimAgentPopulation = new PopulationImpl();
+		matsimAgentPopulation.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(matsimAgentPopulation);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		matsimAgentPopulation.printPlansCount();

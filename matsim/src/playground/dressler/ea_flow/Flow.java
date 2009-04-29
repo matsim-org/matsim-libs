@@ -37,7 +37,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
@@ -279,7 +278,7 @@ public class Flow {
 			reduceDemand(timeExpandedPath);
 			this._TimeExpandedPaths.add(timeExpandedPath);
 		}
-		// TODO time des ausgew�hlten edges stimmt noch nicht!
+		// TODO time des ausgewaehlten edges stimmt noch nicht!
 		// backward links
 		else{
 			for(PathEdge edge : timeExpandedPath.getPathEdges()){
@@ -628,7 +627,7 @@ public class Flow {
 		}*/
 		
 		//construct Population
-		Population result =new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population result =new PopulationImpl();
 		int id =1;
 		for (TimeExpandedPath path : this._TimeExpandedPaths){
 			if(path.isforward()){

@@ -61,7 +61,7 @@ public class PlansGeneratorControler extends Controler {
 	private Population generate4wPersons(){
 
 		int numberOfPlans = 1;
-		Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population pop = new PopulationImpl();
 		log.info("  generating plans... ");
 
 		for (int i = 0; i < 314; i++) {
@@ -125,7 +125,7 @@ public class PlansGeneratorControler extends Controler {
 		final int agentsPerDest = 1;
 		int numberOfPlans = 1;
 
-		Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population pop = new PopulationImpl();
 		log.info("  generating plans... ");
 
 		LinkedList <Link> fromLinks = new LinkedList<Link>();

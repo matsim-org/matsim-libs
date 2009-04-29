@@ -6,6 +6,7 @@ import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.world.World;
 
 public class AnalyzePlansAndFacs {
 
@@ -28,8 +29,10 @@ public class AnalyzePlansAndFacs {
 	
 	public void run(String networkfilePath, String plansfilePath, String facilitiesAllfilePath, String facilitiesSLfilePath) {
 		
+		World world = Gbl.createWorld();
+		
 		log.info("reading the facilities ...");
-		this.facilitiesAll =(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		this.facilitiesAll =(Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilitiesAll).readFile(facilitiesAllfilePath);
 			
 		log.info("reading the network ...");
@@ -40,8 +43,8 @@ public class AnalyzePlansAndFacs {
 		AnalyzePlans plansAnalyzer = new AnalyzePlans();
 		plansAnalyzer.run(plansfilePath, this.facilitiesAll, this.network);
 		
-		Gbl.getWorld().getLayers().remove(Facilities.LAYER_TYPE);
-		this.facilitiesSL = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		world.getLayers().remove(Facilities.LAYER_TYPE);
+		this.facilitiesSL = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilitiesSL).readFile(facilitiesSLfilePath);
 		
 		log.info("analyze facilities ...");

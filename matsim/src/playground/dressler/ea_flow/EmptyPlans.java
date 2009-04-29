@@ -36,7 +36,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.world.World;
 
 /**
  * @author Manuel Schneider
@@ -95,8 +94,7 @@ public class EmptyPlans {
 		networkReader.readFile(networkfile);
 	//	Node sink = network.getNode(sinkid);
 		
-		//Population population = new Population(Population.NO_STREAMING);
-		PopulationImpl population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		PopulationImpl population = new PopulationImpl();
 			
 		new MatsimPopulationReader(population,network).readFile(plansfile);
 		network.connect();
@@ -111,9 +109,9 @@ public class EmptyPlans {
 
 		Config config = Gbl.createConfig(new String[] {});
 
-		World world = Gbl.getWorld();
-		world.setNetworkLayer(network);
-		world.complete();
+//		World world = Gbl.getWorld();
+//		world.setNetworkLayer(network);
+//		world.complete();
 
 		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
 		PlansCalcRoute router = new PlansCalcRoute(network, new FakeTravelTimeCost(), new FakeTravelTimeCost());

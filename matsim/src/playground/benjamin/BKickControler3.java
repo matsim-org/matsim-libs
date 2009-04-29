@@ -64,8 +64,7 @@ public class BKickControler3 extends Controler {
 	@Override
 	protected Population loadPopulation() {
 		Population pop = super.loadPopulation();
-		pop.addAlgorithm(new PlanCalcType());
-		pop.runAlgorithms();
+		new PlanCalcType().run(pop);
 		return pop;
 	}
 	

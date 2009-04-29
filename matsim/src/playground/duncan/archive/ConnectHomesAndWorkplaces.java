@@ -25,7 +25,6 @@ package playground.duncan.archive;
 import java.io.PrintWriter;
 
 import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
@@ -59,7 +58,7 @@ public class ConnectHomesAndWorkplaces {
 		configwriter.write();
 
 		// create the control(l)er:
-		final Controler controler = new Controler(Gbl.getConfig());
+		final Controler controler = new Controler(this.config);
 //		controler.loadData() ;
 		// (I think that the control(l)er is only needed to make the locationchoice module happy;
 		// there is no logical reason why it is necessary. Kai)
@@ -69,7 +68,7 @@ public class ConnectHomesAndWorkplaces {
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 
 		// create/read the world (probably empty input file)
-		final World world = Gbl.getWorld();
+		final World world = Gbl.createWorld();
 		if (this.config.world().getInputFile() != null) {
 			final MatsimWorldReader worldReader = new MatsimWorldReader(world);
 			worldReader.readFile(this.config.world().getInputFile());
@@ -84,7 +83,8 @@ public class ConnectHomesAndWorkplaces {
 		// create the locachoice object:
 		LocationMutator locachoice = new RandomLocationMutator( controler.getNetwork(),controler) ;
 
-		final Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		final PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(locachoice);

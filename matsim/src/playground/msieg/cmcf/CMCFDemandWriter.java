@@ -32,6 +32,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -59,9 +60,11 @@ public class CMCFDemandWriter{
 //	}
 
 	public CMCFDemandWriter(final String configPath){
-		this( 	Gbl.createConfig(new String[] { configPath, "config_v1.dtd" }).network().getInputFile(),
-				Gbl.getConfig().plans().getInputFile()
-			);
+		this( 	Gbl.createConfig(new String[] { configPath, "config_v1.dtd" }));
+	}
+	
+	private CMCFDemandWriter(final Config config) {
+		this(config.network().getInputFile(), config.plans().getInputFile());
 	}
 
 	public CMCFDemandWriter(final String networkPath, final String plansPath){
@@ -69,7 +72,7 @@ public class CMCFDemandWriter{
 		this.plansPath = plansPath == null ? Gbl.getConfig().plans().getInputFile(): plansPath;
 
 		this.network = new NetworkLayer();
-		this.plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		this.plans = new PopulationImpl();
 		this.popReader = new MatsimPopulationReader(this.plans, this.network);
 
 		this.init();
@@ -189,7 +192,7 @@ public class CMCFDemandWriter{
 		Activity act1, act2;
 		Leg leg;
 		for (Id id : this.plans.getPersons().keySet()) {
-			plan = this.plans.getPerson(id).getSelectedPlan();
+			plan = this.plans.getPersons().get(id).getSelectedPlan();
 			act1 = plan.getFirstActivity();
 			leg = plan.getNextLeg(act1);
 			act2 = plan.getNextActivity(leg);

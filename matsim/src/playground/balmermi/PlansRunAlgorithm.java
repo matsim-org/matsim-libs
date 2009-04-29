@@ -24,6 +24,7 @@ import java.util.Date;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -43,7 +44,7 @@ public class PlansRunAlgorithm {
 	// createPopulation()
 	//////////////////////////////////////////////////////////////////////
 
-	public static void filterByLegMode() {
+	public static void filterByLegMode(Config config) {
 
 		System.out.println("filterByLegMode...");
 
@@ -51,18 +52,17 @@ public class PlansRunAlgorithm {
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		network = (NetworkLayer)Gbl.createWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
-		final Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		final Population plans = new PopulationImpl();
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		plans.printPlansCount();
+		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done;");
 
 		//////////////////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ public class PlansRunAlgorithm {
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
+		ConfigWriter config_writer = new ConfigWriter(config);
 		config_writer.write();
 		System.out.println("  done.");
 
@@ -100,9 +100,9 @@ public class PlansRunAlgorithm {
 
 		Gbl.startMeasurement();
 
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
 
-		filterByLegMode();
+		filterByLegMode(config);
 
 		Gbl.printElapsedTime();
 

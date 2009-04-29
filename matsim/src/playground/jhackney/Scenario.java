@@ -36,12 +36,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scoring.EventsToScore;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsWriter;
-import org.matsim.counts.MatsimCountsReader;
-import org.matsim.matrices.Matrices;
-import org.matsim.matrices.MatricesWriter;
-import org.matsim.matrices.MatsimMatricesReader;
 import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
@@ -89,7 +83,7 @@ public abstract class Scenario {
 	// setup
 	//////////////////////////////////////////////////////////////////////
 
-	public static final void setUpScenarioConfig() {
+	public static final Config setUpScenarioConfig() {
 //		config = Gbl.createConfig(null);
 
 		config.config().setOutputFile(output_directory + "output_config.xml");
@@ -140,6 +134,7 @@ public abstract class Scenario {
 		config.getModule("kml21").addParam("outputKMLDemoColoredLinkFile", "egoNetLinkColorFile");
 		config.getModule("kml21").addParam("useCompression", "true");
 
+		return config;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -158,7 +153,7 @@ public abstract class Scenario {
 //	}
 	public static final World readWorld() {
 		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(Gbl.getWorld()).readFile(Gbl.getConfig().world().getInputFile());
+		new MatsimWorldReader(Gbl.getWorld()).readFile(config.world().getInputFile());
 		System.out.println("  done.");
 		return Gbl.getWorld();
 	}
@@ -166,7 +161,7 @@ public abstract class Scenario {
 	public static final Facilities readFacilities() {
 		System.out.println("  reading facilities xml file... ");
 		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 		return facilities;
 	}
@@ -175,31 +170,31 @@ public abstract class Scenario {
 		System.out.println("  reading the network xml file...");
 		System.out.println(Gbl.getConfig().network().getInputFile());
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 		return network;
 	}
-
-	public static final Counts readCounts() {
-		System.out.println("  reading the counts...");
-		final Counts counts = new Counts();
-		new MatsimCountsReader(counts).readFile(Gbl.getConfig().counts().getCountsFileName());
-		System.out.println("  done.");
-		return counts;
-	}
-
-	public static final Matrices readMatrices() {
-		System.out.println("  reading matrices xml file... ");
-		new MatsimMatricesReader(Matrices.getSingleton(), Gbl.getWorld()).readFile(Gbl.getConfig().matrices().getInputFile());
-		System.out.println("  done.");
-		return Matrices.getSingleton();
-	}
+//
+//	public static final Counts readCounts() {
+//		System.out.println("  reading the counts...");
+//		final Counts counts = new Counts();
+//		new MatsimCountsReader(counts).readFile(Gbl.getConfig().counts().getCountsFileName());
+//		System.out.println("  done.");
+//		return counts;
+//	}
+//
+//	public static final Matrices readMatrices() {
+//		System.out.println("  reading matrices xml file... ");
+//		new MatsimMatricesReader(Matrices.getSingleton(), Gbl.getWorld()).readFile(Gbl.getConfig().matrices().getInputFile());
+//		System.out.println("  done.");
+//		return Matrices.getSingleton();
+//	}
 
 	public static final Population readPlans() {
 		System.out.println("  reading plans xml file... ");
 		Population plans = new PopulationImpl();
 		System.out.println(Gbl.getConfig().plans().getInputFile());
-		new MatsimPopulationReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
+		new MatsimPopulationReader(plans).readFile(config.plans().getInputFile());
 
 		System.out.println("  done.");
 		return plans;
@@ -208,7 +203,7 @@ public abstract class Scenario {
 		System.out.println("  reading plans xml file... ");
 		Population plans = new PopulationImpl();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
-		String filename=input_directory +Gbl.getConfig().plans().getInputFile();
+		String filename=input_directory +config.plans().getInputFile();
 		System.out.println(filename);
 		new MatsimPopulationReader(plans).readFile(filename);
 
@@ -218,7 +213,7 @@ public abstract class Scenario {
 
 	public static final Events readEvents(final int i, final EventsMapStartEndTimes epp) {
 		System.out.println("  reading plans xml file... ");
-		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
+		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+config.events().getInputFile();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
 		Events events = new Events();
 		events.addHandler(epp);
@@ -252,18 +247,18 @@ public abstract class Scenario {
 		new PopulationWriter(plans).write();
 		System.out.println("  done.");
 	}
-
-	public static final void writeMatrices(final Matrices matrices) {
-		System.out.println("  writing matrices xml file... ");
-		new MatricesWriter(matrices).write();
-		System.out.println("  done.");
-	}
-
-	public static final void writeCounts(final Counts counts) {
-		System.out.println("  writing counts xml file... ");
-		new CountsWriter(counts).write();
-		System.out.println("  done.");
-	}
+//
+//	public static final void writeMatrices(final Matrices matrices) {
+//		System.out.println("  writing matrices xml file... ");
+//		new MatricesWriter(matrices).write();
+//		System.out.println("  done.");
+//	}
+//
+//	public static final void writeCounts(final Counts counts) {
+//		System.out.println("  writing counts xml file... ");
+//		new CountsWriter(counts).write();
+//		System.out.println("  done.");
+//	}
 
 	public static final void writeNetwork(final NetworkLayer network) {
 		System.out.println("  writing network xml file... ");
@@ -285,7 +280,7 @@ public abstract class Scenario {
 
 	public static final void writeConfig() {
 		System.out.println("  writing config xml file... ");
-		new ConfigWriter(Gbl.getConfig()).write();
+		new ConfigWriter(config).write();
 		System.out.println("  done.");
 	}
 	public static Config getConfig(){

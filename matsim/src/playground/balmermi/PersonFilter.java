@@ -27,7 +27,7 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -48,7 +48,7 @@ public class PersonFilter {
 
 		System.out.println("running dilZhFilter... " + (new Date()));
 
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
 //		Scenario.setUpScenarioConfig();
 //		World world = Scenario.readWorld();
 //		Facilities facilities = Scenario.readFacilities();
@@ -79,13 +79,14 @@ public class PersonFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, filtering and writing population... " + (new Date()));
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter,areaOfInterest);
 		filter.setAlternativeAOI(center,radius);
 		plans.addAlgorithm(filter);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile(config.plans().getInputFile());
 		plansWriter.writeEndPlans();
 		plans.printPlansCount();
 		System.out.println("  done. " + (new Date()));

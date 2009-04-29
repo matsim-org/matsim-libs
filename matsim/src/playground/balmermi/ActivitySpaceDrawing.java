@@ -21,17 +21,17 @@
 package playground.balmermi;
 
 import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
 import org.matsim.world.MatsimWorldReader;
+import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 
 public class ActivitySpaceDrawing {
@@ -40,22 +40,24 @@ public class ActivitySpaceDrawing {
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
-	public static void drawActivitySpace() {
+	public static void drawActivitySpace(Config config) {
 
 		System.out.println("calculateActivitySpaces():");
 
+		World world = Gbl.createWorld();
+		
 		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		new MatsimWorldReader(world).readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
+		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		System.out.println("  done.");
 
 		System.out.println("  adding person algorithms... ");
@@ -68,8 +70,7 @@ public class ActivitySpaceDrawing {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans, running person-algos and writing the xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		new MatsimPopulationReader(plans, null).readFile(config.plans().getInputFile());
 		plans_writer.write();
 		System.out.println("  done.");
 
@@ -85,12 +86,12 @@ public class ActivitySpaceDrawing {
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(Gbl.getWorld());
+		WorldWriter world_writer = new WorldWriter(world);
 		world_writer.write();
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
+		ConfigWriter config_writer = new ConfigWriter(config);
 		config_writer.write();
 		System.out.println("  done.");
 
@@ -106,9 +107,9 @@ public class ActivitySpaceDrawing {
 		Gbl.startMeasurement();
 		Gbl.printElapsedTime();
 
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
 
-		drawActivitySpace();
+		drawActivitySpace(config);
 
 		Gbl.printElapsedTime();
 	}

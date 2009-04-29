@@ -21,7 +21,7 @@
 package playground.balmermi;
 
 import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -31,9 +31,9 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
+import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 
 public class RohitTest {
@@ -47,27 +47,30 @@ public class RohitTest {
 		System.out.println("TEST RUN 01:");
 
 		// reading all available input
+		
+		Config config = Gbl.getConfig();
+		World world = Gbl.createWorld();
 
 		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		new MatsimWorldReader(world).readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  creating network layer... ");
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		System.out.println("  done.");
 
 		System.out.println("  creating plans writer object... ");
@@ -76,8 +79,7 @@ public class RohitTest {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		new MatsimPopulationReader(plans, network).readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 
 		// your algos
@@ -101,12 +103,12 @@ public class RohitTest {
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(Gbl.getWorld());
+		WorldWriter world_writer = new WorldWriter(world);
 		world_writer.write();
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
+		ConfigWriter config_writer = new ConfigWriter(config);
 		config_writer.write();
 		System.out.println("  done.");
 

@@ -22,6 +22,7 @@ package playground.jhackney;
 
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -31,6 +32,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.algorithms.PersonSetActToLinkWithNonNullFacility;
@@ -41,38 +43,40 @@ public class MakeScenario {
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
-	public static void run() {
+	public static void run(Config config) {
 
 		System.out.println("Make Scenario SAMPLE OF FACILITIES:");
 
+		World world = Gbl.createWorld();
+		
 		System.out.println("Uses output of a CUT. Samples 100x\"pct\"% of the facilities and moves Acts to take place at these");
 
 //		System.out.println("  reading world xml file... ");
-//		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-//		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+//		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+//		worldReader.readFile(config.world().getInputFile());
 //		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading the network xml file...");
 //		NetworkLayer network = null;
 //		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		//		System.out.println("  reading matrices xml file... ");
 //		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton());
-//		reader.readFile(Gbl.getConfig().matrices().getInputFile());
+//		reader.readFile(config.matrices().getInputFile());
 //		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
 		Population plans = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -88,7 +92,7 @@ public class MakeScenario {
 
 		//////////////////////////////////////////////////////////////////////
 		System.out.println("  Completing World ... ");
-		new WorldConnectLocations().run(Gbl.getWorld());
+		new WorldConnectLocations().run(world);
 		System.out.println("  done.");
 		//////////////////////////////////////////////////////////////////////
 
@@ -126,7 +130,7 @@ public class MakeScenario {
 		//////////////////////////////////////////////////////////////////////
 
 //		System.out.println("  running matrices algos... ");
-//		new MatricesCompleteBasedOnFacilities(facilities, (ZoneLayer)Gbl.getWorld().getLayer("municipality")).run(Matrices.getSingleton());
+//		new MatricesCompleteBasedOnFacilities(facilities, (ZoneLayer)world.getLayer("municipality")).run(Matrices.getSingleton());
 //		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -134,7 +138,7 @@ public class MakeScenario {
 		Scenario.writePlans(plans);
 		Scenario.writeNetwork(network);
 		Scenario.writeFacilities(facilities);
-		Scenario.writeWorld(Gbl.getWorld());
+		Scenario.writeWorld(world);
 		Scenario.writeConfig();
 
 		System.out.println("TEST SUCCEEDED.");
@@ -149,10 +153,9 @@ public class MakeScenario {
 
 		Gbl.startMeasurement();
 
-		Gbl.createConfig(args);
-		Gbl.createWorld();
+		Config config = Gbl.createConfig(args);
 
-		run();
+		run(config);
 
 		Gbl.printElapsedTime();
 	}

@@ -101,7 +101,7 @@ public abstract class CMCFRouter implements NetworkReader{
 	}
 
 	protected void loadPopulation(){
-		this.population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		this.population = new PopulationImpl();
 		new MatsimPopulationReader(this.population, this.network).readFile(this.plansFile);
 	}
 

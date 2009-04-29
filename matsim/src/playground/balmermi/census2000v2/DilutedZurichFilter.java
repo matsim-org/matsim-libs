@@ -29,7 +29,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -44,6 +44,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
+import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldMappingInfo;
@@ -60,20 +61,22 @@ public class DilutedZurichFilter {
 	// createPopulation()
 	//////////////////////////////////////////////////////////////////////
 
-	public static void filterDemand() {
+	public static void filterDemand(Config config) {
 
 		log.info("MATSim-DB: filterDemand...");
 
+		World world = Gbl.createWorld();
+		
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  extracting input directory... ");
-		String indir = Gbl.getConfig().facilities().getInputFile();
+		String indir = config.facilities().getInputFile();
 		indir = indir.substring(0,indir.lastIndexOf("/"));
 		log.info("    "+indir);
 		log.info("  done.");
 
 		log.info("  extracting output directory... ");
-		String outdir = Gbl.getConfig().facilities().getOutputFile();
+		String outdir = config.facilities().getOutputFile();
 		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
 		log.info("    "+outdir);
 		log.info("  done.");
@@ -81,24 +84,24 @@ public class DilutedZurichFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reading facilities xml file...");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
-		Gbl.getWorld().complete();
+		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		world.complete();
 		log.info("  done.");
 
 		System.out.println("  reading the network xml file...");
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		Gbl.getWorld().complete();
+		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		world.complete();
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  running world modules... ");
-		new WorldCheck().run(Gbl.getWorld());
-		new WorldConnectLocations().run(Gbl.getWorld());
-		new WorldMappingInfo().run(Gbl.getWorld());
-		new WorldCheck().run(Gbl.getWorld());
+		new WorldCheck().run(world);
+		new WorldConnectLocations().run(world);
+		new WorldMappingInfo().run(world);
+		new WorldCheck().run(world);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -124,9 +127,10 @@ public class DilutedZurichFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up population objects...");
-		Population pop = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl pop = new PopulationImpl();
+		pop.setIsStreaming(true);
 		PopulationWriter pop_writer = new PopulationWriter(pop);
-		PopulationReader pop_reader = new MatsimPopulationReader(pop);
+		PopulationReader pop_reader = new MatsimPopulationReader(pop, network);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -140,7 +144,7 @@ public class DilutedZurichFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
-		pop_reader.readFile(Gbl.getConfig().plans().getInputFile());
+		pop_reader.readFile(config.plans().getInputFile());
 		pop_writer.write();
 		pop.printPlansCount();
 		System.out.println("    => filtered persons: " + filter.getCount());
@@ -157,7 +161,7 @@ public class DilutedZurichFilter {
 		log.info("  done.");
 
 		log.info("  writing config xml file... ");
-		new ConfigWriter(Gbl.getConfig()).write();
+		new ConfigWriter(config).write();
 		log.info("  done.");
 
 		log.info("done.");
@@ -171,10 +175,9 @@ public class DilutedZurichFilter {
 
 		Gbl.startMeasurement();
 
-		Gbl.createConfig(args);
-		Gbl.createWorld();
+		Config config = Gbl.createConfig(args);
 
-		filterDemand();
+		filterDemand(config);
 
 		Gbl.printElapsedTime();
 	}

@@ -114,18 +114,16 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 		World world = Gbl.createWorld();
 
 		if (worldFileName != null) {
-			MatsimWorldReader world_parser = new MatsimWorldReader(Gbl.getWorld());
+			MatsimWorldReader world_parser = new MatsimWorldReader(world);
 			world_parser.readFile(worldFileName);
 		}
 
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
-		world.setNetworkLayer(net);
-		world.complete();
 
 		Population population = new PopulationImpl();
 		// Read plans file with special Reader Implementation
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, net);
 		plansReader.readFile(popFileName);
 
 		Events events = new Events();

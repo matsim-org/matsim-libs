@@ -78,7 +78,7 @@ public class PlanComparator {
 		Plan plan;
 		Activity act;
 		for (Id id : this.population.getPersons().keySet()) {
-			plan = this.population.getPerson(id).getSelectedPlan();
+			plan = this.population.getPersons().get(id).getSelectedPlan();
 			act = (Activity) plan.getIteratorAct().next();
 			this._result.addFirstPlansData(id, plan.getScoreAsPrimitiveType(), act);
 		}
@@ -88,7 +88,7 @@ public class PlanComparator {
 		// load second population
 		this.population = loadPlansFile(secondPlanPath);
 		for (Id id : this.population.getPersons().keySet()) {
-			plan = this.population.getPerson(id).getSelectedPlan();
+			plan = this.population.getPersons().get(id).getSelectedPlan();
 			this._result.addSecondPlansData(id, plan.getScoreAsPrimitiveType());
 		}
 
@@ -146,12 +146,11 @@ public class PlanComparator {
    * @return the Plans object containing the population
    */
 	protected Population loadPlansFile(final String filename) {
-		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population plans = new PopulationImpl();
 
 		printNote("", "  reading plans xml file... ");
 		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		plansReader.readFile(filename);
-		plans.printPlansCount();
 		printNote("", "  done");
 
 		return plans;

@@ -83,8 +83,6 @@ public class ActivityDurationAnalyser {
 		//set config
 		this.config = Gbl.createConfig(new String[] {configfile});
 //		config = Gbl.createConfig(null);
-		Gbl.getWorld().setNetworkLayer(net);
-		Gbl.getWorld().complete();
 
 
 		//reading road pricing scheme for filtering
@@ -102,8 +100,8 @@ public class ActivityDurationAnalyser {
 
 		//reading plans, filter and calculate activity durations
 		for (String file : plansFiles) {
-			Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
-			MatsimPopulationReader plansParser = new MatsimPopulationReader(plans);
+			Population plans = new PopulationImpl();
+			MatsimPopulationReader plansParser = new MatsimPopulationReader(plans, net);
 			plansParser.readFile(file);
 			ActivityDurationCounter adc = new ActivityDurationCounter();
 			System.out.println("Handling plans: " + file);
@@ -207,7 +205,7 @@ public class ActivityDurationAnalyser {
 		public Map<String, List<Activity>> getSimpleTypeActivityMap() {
 			return this.simpleTypeActivityMap;
 		}
-	};
+	}
 
 
 	/**

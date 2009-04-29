@@ -31,7 +31,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.world.World;
 
 public class StandaloneSimTest {
 
@@ -48,14 +47,11 @@ public class StandaloneSimTest {
 		Gbl.printElapsedTime();
 
 		String localDtdBase = "./dtd/";
-		Gbl.getConfig().global().setLocalDtdBase(localDtdBase);
+		config.global().setLocalDtdBase(localDtdBase);
 
-		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);

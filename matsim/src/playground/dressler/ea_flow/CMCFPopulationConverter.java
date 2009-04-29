@@ -56,7 +56,7 @@ public class CMCFPopulationConverter {
 
 	@SuppressWarnings("unchecked")
 	public static Population readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
-		Population result = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population result = new PopulationImpl();
 		SAXBuilder builder = new SAXBuilder();
 		Document cmcfdemands = builder.build(filename);
 		Element demandgraph = cmcfdemands.getRootElement();

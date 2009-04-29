@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -42,7 +43,7 @@ public class CalcRouteSets {
 
 	private static RouteSetGenerator gen;
 
-	private static FileWriter fw;;
+	private static FileWriter fw;
 	private static BufferedWriter out;
 
 	//////////////////////////////////////////////////////////////////////
@@ -95,9 +96,9 @@ public class CalcRouteSets {
 				String[] entries = curr_line.split("\t", -1);
 				// IDSEGMENT  StartNode  EndNode
 				// 0          1          2
-				Integer id = Integer.parseInt(entries[0].trim());
-				Integer orig = Integer.parseInt(entries[1].trim());
-				Integer dest = Integer.parseInt(entries[2].trim());
+				Integer id = Integer.valueOf(entries[0].trim());
+				Integer orig = Integer.valueOf(entries[1].trim());
+				Integer dest = Integer.valueOf(entries[2].trim());
 
 				ids.add(id);
 				origs.add(orig);
@@ -169,12 +170,12 @@ public class CalcRouteSets {
 		Gbl.startMeasurement();
 		Gbl.printElapsedTime();
 
-		Scenario.setUpScenarioConfig();
+		Config config = Scenario.setUpScenarioConfig();
 
 		System.out.println("reading the network...");
 		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		network = (NetworkLayer)Gbl.createWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("done.");
 
 		fw = new FileWriter("output/routesets.txt");

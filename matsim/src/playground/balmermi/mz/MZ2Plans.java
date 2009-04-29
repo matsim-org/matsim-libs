@@ -21,6 +21,7 @@
 package playground.balmermi.mz;
 
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -31,20 +32,20 @@ public class MZ2Plans {
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
-	public static void createMZ2Plans() throws Exception {
+	public static void createMZ2Plans(Config config) throws Exception {
 
 		System.out.println("MATSim-DB: create Population based on micro census 2005 data.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  extracting input directory... ");
-		String indir = Gbl.getConfig().plans().getInputFile();
+		String indir = config.plans().getInputFile();
 		indir = indir.substring(0,indir.lastIndexOf("/"));
 		System.out.println("    "+indir);
 		System.out.println("  done.");
 
 		System.out.println("  extracting output directory... ");
-		String outdir = Gbl.getConfig().plans().getOutputFile();
+		String outdir = config.plans().getOutputFile();
 		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
 		System.out.println("    "+outdir);
 		System.out.println("  done.");
@@ -52,7 +53,7 @@ public class MZ2Plans {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  creating plans object... ");
-		Population plans = new PopulationImpl(false);
+		Population plans = new PopulationImpl();
 		System.out.println("  done.");
 
 		System.out.println("  running plans modules... ");
@@ -86,10 +87,9 @@ public class MZ2Plans {
 	public static void main(final String[] args) throws Exception {
 		Gbl.startMeasurement();
 
-		Gbl.createConfig(args);
-		Gbl.createWorld();
+		Config config = Gbl.createConfig(args);
 
-		createMZ2Plans();
+		createMZ2Plans(config);
 
 		Gbl.printElapsedTime();
 	}

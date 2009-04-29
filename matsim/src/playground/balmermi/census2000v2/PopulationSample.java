@@ -22,7 +22,7 @@ package playground.balmermi.census2000v2;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -34,6 +34,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.world.World;
 
 public class PopulationSample {
 
@@ -47,21 +48,23 @@ public class PopulationSample {
 	// createPopulation()
 	//////////////////////////////////////////////////////////////////////
 
-	public static void samplePopulation() {
+	public static void samplePopulation(Config config) {
 
 		log.info("samplePopulation...");
 
+		World world = Gbl.createWorld();
+		
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  extracting input directory... ");
-		String indir = Gbl.getConfig().facilities().getInputFile();
+		String indir = config.facilities().getInputFile();
 		indir = indir.substring(0,indir.lastIndexOf("/"));
 		log.info("    "+indir);
 		Gbl.printMemoryUsage();
 		log.info("  done.");
 
 		log.info("  extracting output directory... ");
-		String outdir = Gbl.getConfig().facilities().getOutputFile();
+		String outdir = config.facilities().getOutputFile();
 		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
 		log.info("    "+outdir);
 		Gbl.printMemoryUsage();
@@ -70,26 +73,27 @@ public class PopulationSample {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reading facilities xml file...");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
-		Gbl.getWorld().complete();
+		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		world.complete();
 		Gbl.printMemoryUsage();
 		log.info("  done.");
 
 		System.out.println("  reading the network xml file...");
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		Gbl.getWorld().complete();
+		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		world.complete();
 		Gbl.printMemoryUsage();
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up population objects...");
-		Population pop = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl pop = new PopulationImpl();
+		pop.setIsStreaming(true);
 		PopulationWriter pop_writer = new PopulationWriter(pop);
 		pop.addAlgorithm(pop_writer);
-		PopulationReader pop_reader = new MatsimPopulationReader(pop);
+		PopulationReader pop_reader = new MatsimPopulationReader(pop, network);
 		Gbl.printMemoryUsage();
 		System.out.println("  done.");
 
@@ -97,7 +101,7 @@ public class PopulationSample {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
-		pop_reader.readFile(Gbl.getConfig().plans().getInputFile());
+		pop_reader.readFile(config.plans().getInputFile());
 		pop_writer.write();
 		pop.printPlansCount();
 		Gbl.printMemoryUsage();
@@ -116,7 +120,7 @@ public class PopulationSample {
 		log.info("  done.");
 
 		log.info("  writing config xml file... ");
-		new ConfigWriter(Gbl.getConfig()).write();
+		new ConfigWriter(config).write();
 		Gbl.printMemoryUsage();
 		log.info("  done.");
 
@@ -131,10 +135,9 @@ public class PopulationSample {
 
 		Gbl.startMeasurement();
 
-		Gbl.createConfig(args);
-		Gbl.createWorld();
+		Config config = Gbl.createConfig(args);
 
-		samplePopulation();
+		samplePopulation(config);
 
 		Gbl.printElapsedTime();
 	}

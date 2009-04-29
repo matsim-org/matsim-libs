@@ -19,6 +19,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.cppdeqsim.EventsReaderDEQv1;
@@ -137,9 +138,9 @@ public class CompareScenarios {
 
 	private void run(final String[] args) {
 
-		Gbl.createConfig(new String[]{});
-		Gbl.getConfig().global().setLocalDtdBase("dtd/");
-		System.out.println(Gbl.getConfig().global().getLocalDtdBase());
+		Config config = Gbl.createConfig(new String[]{});
+		config.global().setLocalDtdBase("dtd/");
+		System.out.println(config.global().getLocalDtdBase());
 
 		log.info("Processing command line parameters...");
 		this.processArgs(args);
@@ -332,7 +333,7 @@ public class CompareScenarios {
 			Gbl.getWorld().complete();
 
 			//Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(plansInputFilenames.get(scenarioName), false, null);
-			Population plans = new PopulationImpl(false);
+			PopulationImpl plans = new PopulationImpl();
 			PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 			plansReader.readFile(this.plansInputFilenames.get(scenarioName));
 			plans.printPlansCount();
@@ -403,7 +404,7 @@ public class CompareScenarios {
 				// choose right network
 				Gbl.getWorld().setNetworkLayer(scenarioNetworks.get(scenarioName));
 
-				Population plansSubPop = new PopulationImpl(false);
+				Population plansSubPop = new PopulationImpl();
 				switch(analysis.intValue()) {
 				case TRANSIT_AGENTS_ANALYSIS_NAME:
 					personIterator = transitAgentsIds.iterator();
@@ -423,7 +424,7 @@ public class CompareScenarios {
 
 				while(personIterator.hasNext()) {
 					try {
-						plansSubPop.addPerson(scenarioPlans.get(scenarioName).getPerson(personIterator.next()));
+						plansSubPop.addPerson(scenarioPlans.get(scenarioName).getPersons().get(personIterator.next()));
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -458,10 +459,9 @@ public class CompareScenarios {
 				}
 
 				PlanAverageScore planAverageScore = new PlanAverageScore();
-				plansSubPop.addAlgorithm(planAverageScore);
+				planAverageScore.run(plansSubPop);
 				CalcAverageTripLength calcAverageTripLength = new CalcAverageTripLength();
-				plansSubPop.addAlgorithm(calcAverageTripLength);
-				plansSubPop.runAlgorithms();
+				calcAverageTripLength.run(plansSubPop);
 
 				Events events = new Events();
 

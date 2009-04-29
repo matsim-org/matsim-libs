@@ -149,7 +149,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("\n");
 
 		log.info("  creating plans object... ");
-		Population plans = new PopulationImpl(false);
+		Population plans = new PopulationImpl();
 		log.info("  done.");
 
 		log.info("  running plans modules... ");

@@ -85,11 +85,11 @@ public class EventModeActivityDurationAnalyser {
 
 		this.config = Gbl.createConfig(new String[] {CONFIGFILE});
 //		config = Gbl.createConfig(null);
-		Gbl.getWorld().setNetworkLayer(net);
-		Gbl.getWorld().complete();
+//		Gbl.getWorld().setNetworkLayer(net);
+//		Gbl.getWorld().complete();
 
-		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
-		MatsimPopulationReader plansParser = new MatsimPopulationReader(plans);
+		Population plans = new PopulationImpl();
+		MatsimPopulationReader plansParser = new MatsimPopulationReader(plans, net);
 		plansParser.readFile(PLANSFILE);
 
 		Events events = new Events();
@@ -127,7 +127,7 @@ public class EventModeActivityDurationAnalyser {
 
 		public void handleEvent(final ActEndEvent event) {
 			ActStartEvent startEvent = this.eventMap.get(new IdImpl(event.getPersonId().toString()));
-			Plan p = this.plans.getPerson(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
+			Plan p = this.plans.getPersons().get(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
 			if (startEvent == null) { // must be the end of home_0
 				this.durTemp = event.getTime();
 			}
@@ -158,7 +158,7 @@ public class EventModeActivityDurationAnalyser {
 
 		public void handleEvent(final ActStartEvent event) {
 			this.eventMap.put(new IdImpl(event.getPersonId().toString()), event);
-			Plan p = this.plans.getPerson(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
+			Plan p = this.plans.getPersons().get(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
 			if (event.getActType().equalsIgnoreCase("w")) {
 				if (p.getType().equals(Plan.Type.PT)) {
 					this.ptStartTimeMap.incrementValue(event.getTime());
@@ -227,7 +227,7 @@ public class EventModeActivityDurationAnalyser {
 		}
 
 
-	};
+	}
 
 
 

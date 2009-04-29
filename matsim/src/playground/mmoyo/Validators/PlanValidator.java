@@ -1,16 +1,13 @@
 package playground.mmoyo.Validators;
 
-import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Leg;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.api.population.PlanElement;
 
 public class PlanValidator {
 	PathValidator pathValidator= new PathValidator (); 
@@ -20,7 +17,7 @@ public class PlanValidator {
 
 	public int PlanCounter(NetworkLayer net, String plansFile){
 		
-		Population population = new PopulationImpl(false);
+		Population population = new PopulationImpl();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, net );
 		plansReader.readFile(plansFile);
 		return population.getPersons().values().size();

@@ -44,7 +44,6 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -143,16 +142,16 @@ public class PlanScoreAnalysis {
 		NetworkLayer net = new NetworkLayer();
 		MatsimNetworkReader netReader = new MatsimNetworkReader(net);
 		netReader.readFile(NETWORK);
-		Gbl.getWorld().setNetworkLayer(net);
-		Gbl.getWorld().complete();
+//		Gbl.getWorld().setNetworkLayer(net);
+//		Gbl.getWorld().complete();
 
-		Population plans = new PopulationImpl(false);
-		MatsimPopulationReader reader = new MatsimPopulationReader(plans);
+		Population plans = new PopulationImpl();
+		MatsimPopulationReader reader = new MatsimPopulationReader(plans, net);
 		reader.readFile(PLANS);
 
 
-		Population plans2 = new PopulationImpl(false);
-		reader = new MatsimPopulationReader(plans2);
+		Population plans2 = new PopulationImpl();
+		reader = new MatsimPopulationReader(plans2, net);
 		reader.readFile(PLANS2);
 
 

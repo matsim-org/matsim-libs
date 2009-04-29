@@ -79,7 +79,7 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 	}
 
 	private void init(final String networkPath) {
-		this.plans = new PopulationImpl(false);
+		this.plans = new PopulationImpl();
 
 		System.out.println("  reading the network...");
 		this.network = new NetworkLayer();

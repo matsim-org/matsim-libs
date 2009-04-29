@@ -35,7 +35,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.NetVis;
-import org.matsim.world.World;
 
 public class IteratePopSimTest {
 
@@ -49,13 +48,10 @@ public class IteratePopSimTest {
 		if (s1 == s2) {
 			System.out.println("true");
 		}
-		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
 				// Read network file with special Reader Implementation
 		new MatsimNetworkReader(network).readFile(netFileName);
-		world.setNetworkLayer(network);
-		world.complete();
 		Population population = new PopulationImpl();
 		// Read plans file with special Reader Implementation
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);

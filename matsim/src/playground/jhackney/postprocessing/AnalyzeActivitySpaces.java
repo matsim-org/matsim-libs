@@ -19,34 +19,15 @@ package playground.jhackney.postprocessing;
  *                                                                         *
  * *********************************************************************** */
 
-import java.util.Iterator;
-
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.utils.charts.XYScatterChart;
-import org.matsim.population.algorithms.PersonCalcActivitySpace;
-import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
-import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
-import org.matsim.socialnetworks.io.PajekWriter;
-import org.matsim.socialnetworks.scoring.TrackActsOverlap;
-import org.matsim.socialnetworks.socialnet.SocialNetwork;
-import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
+import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
-import playground.jhackney.algorithms.InitializeKnowledge;
 import playground.jhackney.algorithms.PersonCalcASD2;
-import playground.jhackney.algorithms.PersonGetEgoNetGetPlans;
-import playground.jhackney.algorithms.PlansPlotScoreDistance;
-import playground.jhackney.kml.EgoNetPlansItersMakeKML;
-import playground.jhackney.kml.EgoNetPlansMakeKML;
 
 public class AnalyzeActivitySpaces {
 
@@ -59,13 +40,12 @@ public class AnalyzeActivitySpaces {
 		System.out.println("Make activity spaces for egoNet:");
 
 
-		Scenario.setUpScenarioConfig();
-		Config config =Gbl.getConfig();
+		Config config = Scenario.setUpScenarioConfig();
 
-		Scenario.readWorld();
+		World world = Scenario.readWorld();
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
-		new WorldConnectLocations().run(Gbl.getWorld());
+		new WorldConnectLocations().run(world);
 
 		Population plans = Scenario.readPlans();
 			//read in social network
@@ -176,7 +156,7 @@ public class AnalyzeActivitySpaces {
 //
 //			plans.addAlgorithm(new PersonCalcActivitySpace("all"));
 		PersonCalcASD2 pcalasd2=new PersonCalcASD2();
-			plans.addAlgorithm(pcalasd2);
+//			plans.addAlgorithm(pcalasd2);
 //
 //			System.out.println("  done.");
 
@@ -189,7 +169,7 @@ public class AnalyzeActivitySpaces {
 
 			//////////////////////////////////////////////////////////////////////
 //			System.out.println("  finishing person algorithms...");
-			plans.runAlgorithms();
+			pcalasd2.run(plans);
 			double xxx=pcalasd2.smASD2.average();
 			System.out.println("##Result "+xxx);
 //			pwast.close();

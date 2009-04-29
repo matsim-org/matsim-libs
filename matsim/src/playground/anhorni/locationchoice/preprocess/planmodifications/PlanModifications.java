@@ -11,6 +11,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldMappingInfo;
@@ -84,31 +85,31 @@ public class PlanModifications {
 
 
 		System.out.println("  create world ... ");
-		Gbl.createWorld();
+		World world = Gbl.createWorld();
 		//final MatsimWorldReader worldReader = new MatsimWorldReader(this.world);
 		//worldReader.readFile(worldfilePath);
 		System.out.println("  done.");
 
 
-		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		this.network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 		log.info("network reading done");
 
 		//this.facilities=new Facilities();
-		this.facilities=(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		this.facilities=(Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 		log.info("facilities reading done");
 
-		Gbl.getWorld().complete();
-		new WorldCheck().run(Gbl.getWorld());
-		new WorldConnectLocations().run(Gbl.getWorld());
-		new WorldMappingInfo().run(Gbl.getWorld());
-		new WorldCheck().run(Gbl.getWorld());
+		world.complete();
+		new WorldCheck().run(world);
+		new WorldConnectLocations().run(world);
+		new WorldMappingInfo().run(world);
+		new WorldCheck().run(world);
 		log.info("world checking done.");
 
 
-		this.plans=new PopulationImpl(false);
-		final PopulationReader plansReader = new MatsimPopulationReader(this.plans);
+		this.plans=new PopulationImpl();
+		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, this.network);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");
 		log.info(this.plans.getPersons().size() + " persons");

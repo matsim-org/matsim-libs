@@ -20,7 +20,7 @@
 
 package playground.balmermi.census2000;
 
-import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -30,29 +30,32 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.world.World;
 
 import playground.balmermi.census2000.modules.PersonVaryTimes;
 
 public class InitTimesVariation {
 
-	public static void varyInitTimes() {
+	public static void varyInitTimes(Config config) {
 
 		System.out.println("MATSim-IIDM: vary init times.");
 
+		World world = Gbl.createWorld();
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading network xml file...");
 		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -78,7 +81,7 @@ public class InitTimesVariation {
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
+		ConfigWriter config_writer = new ConfigWriter(config);
 		config_writer.write();
 		System.out.println("  done.");
 
@@ -93,9 +96,9 @@ public class InitTimesVariation {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
 
-		varyInitTimes();
+		varyInitTimes(config);
 
 		Gbl.printElapsedTime();
 	}

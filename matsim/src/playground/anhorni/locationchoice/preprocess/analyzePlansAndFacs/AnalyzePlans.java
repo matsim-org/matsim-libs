@@ -41,7 +41,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class AnalyzePlans {
 
-	private Population plans = new PopulationImpl(false);
+	private Population plans = new PopulationImpl();
 	String plansfilePath;
 	
 	private final static Logger log = Logger.getLogger(AnalyzePlans.class);

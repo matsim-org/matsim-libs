@@ -13,10 +13,10 @@ public PersonGetEgoNetGetPlans(){
 	super();
 }
 
-	public Population extract(final Person ego, final Population plans) throws Exception{
+	public PopulationImpl extract(final Person ego, final Population plans) throws Exception{
 
 
-		Population socialPlans=new PopulationImpl();
+		PopulationImpl socialPlans=new PopulationImpl();
 
 		socialPlans.addPerson(ego);
 		ArrayList<Person> alters = ego.getKnowledge().getEgoNet().getAlters();

@@ -20,7 +20,7 @@
 
 package playground.balmermi.census2000;
 
-import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -33,27 +33,31 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.population.algorithms.XY2Links;
+import org.matsim.world.World;
 
 public class InitRouteCreation {
 
-	public static void createInitRoutes() {
+	public static void createInitRoutes(Config config) {
 
 		System.out.println("MATSim-IIDM: create initial routes.");
 
+		World world = Gbl.createWorld();
+		
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading network xml file...");
 		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -68,7 +72,7 @@ public class InitRouteCreation {
 
 		System.out.println("  reading, processing, writing plans...");
 		plans.addAlgorithm(plansWriter);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		plansWriter.write();
 		System.out.println("  done.");
@@ -81,7 +85,7 @@ public class InitRouteCreation {
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
+		ConfigWriter config_writer = new ConfigWriter(config);
 		config_writer.write();
 		System.out.println("  done.");
 
@@ -96,9 +100,9 @@ public class InitRouteCreation {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
 
-		createInitRoutes();
+		createInitRoutes(config);
 
 		Gbl.printElapsedTime();
 	}

@@ -23,6 +23,7 @@ package playground.balmermi.census2000v2;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -31,6 +32,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
+import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldMappingInfo;
@@ -60,20 +62,23 @@ public class IIDMGeneration {
 	// createPopulation()
 	//////////////////////////////////////////////////////////////////////
 
-	public static void createIIDM() {
+	public static void createIIDM(String[] args) {
 
 		log.info("MATSim-DB: create iidm.");
 
+		Config config = Gbl.createConfig(args);
+		World world = Gbl.createWorld();
+		
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  extracting input directory... ");
-		String indir = Gbl.getConfig().facilities().getInputFile();
+		String indir = config.facilities().getInputFile();
 		indir = indir.substring(0,indir.lastIndexOf("/"));
 		log.info("    "+indir);
 		log.info("  done.");
 
 		log.info("  extracting output directory... ");
-		String outdir = Gbl.getConfig().facilities().getOutputFile();
+		String outdir = config.facilities().getOutputFile();
 		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
 		log.info("    "+outdir);
 		log.info("  done.");
@@ -81,14 +86,14 @@ public class IIDMGeneration {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reading world xml file...");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+		worldReader.readFile(config.world().getInputFile());
 		log.info("  done.");
 
 		log.info("  reading facilities xml file...");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
-		Gbl.getWorld().complete();
+		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		world.complete();
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -101,28 +106,28 @@ public class IIDMGeneration {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  running world modules... ");
-		new WorldCheck().run(Gbl.getWorld());
-		new WorldMappingInfo().run(Gbl.getWorld());
+		new WorldCheck().run(world);
+		new WorldMappingInfo().run(world);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  parsing f2z_mapping... ");
-		new WorldParseFacilityZoneMapping(indir+"/f2z_mapping.txt").run(Gbl.getWorld());
+		new WorldParseFacilityZoneMapping(indir+"/f2z_mapping.txt").run(world);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  running world modules... ");
-		new WorldCheck().run(Gbl.getWorld());
-		new WorldMappingInfo().run(Gbl.getWorld());
+		new WorldCheck().run(world);
+		new WorldMappingInfo().run(world);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reding plans xml file... ");
-		Population pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
-		new MatsimPopulationReader(pop).readFile(Gbl.getConfig().plans().getInputFile());
+		Population pop = new PopulationImpl();
+		new MatsimPopulationReader(pop, null).readFile(config.plans().getInputFile());
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -163,8 +168,8 @@ public class IIDMGeneration {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reding mz plans xml file... ");
-		Population mz_pop = new PopulationImpl(PopulationImpl.NO_STREAMING);
-		new MatsimPopulationReader(mz_pop).readFile(indir+"/mz.plans.xml.gz");
+		Population mz_pop = new PopulationImpl();
+		new MatsimPopulationReader(mz_pop, null).readFile(indir+"/mz.plans.xml.gz");
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -199,7 +204,7 @@ public class IIDMGeneration {
 		log.info("  done.");
 
 		log.info("  writing f2z_mapping... ");
-		new WorldWriteFacilityZoneMapping(outdir+"/output_f2z_mapping.txt").run(Gbl.getWorld());
+		new WorldWriteFacilityZoneMapping(outdir+"/output_f2z_mapping.txt").run(world);
 		log.info("  done.");
 
 		log.info("  writing facilities xml file... ");
@@ -208,12 +213,12 @@ public class IIDMGeneration {
 		log.info("  done.");
 
 		log.info("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(Gbl.getWorld());
+		WorldWriter world_writer = new WorldWriter(world);
 		world_writer.write();
 		log.info("  done.");
 
 		log.info("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
+		ConfigWriter config_writer = new ConfigWriter(config);
 		config_writer.write();
 		log.info("  done.");
 
@@ -228,10 +233,7 @@ public class IIDMGeneration {
 
 		Gbl.startMeasurement();
 
-		Gbl.createConfig(args);
-		Gbl.createWorld();
-
-		createIIDM();
+		createIIDM(args);
 
 		Gbl.printElapsedTime();
 	}

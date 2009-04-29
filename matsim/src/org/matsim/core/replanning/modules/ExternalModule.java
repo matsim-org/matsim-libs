@@ -102,7 +102,9 @@ public class ExternalModule implements PlanStrategyModule {
 	protected PopulationWriter getPlansWriterHandler() {
 		String filename = this.outFileRoot + this.moduleId + ExternalInFileName;
 		String version = "v4";
-		return new PopulationWriter(new PopulationImpl(PopulationImpl.USE_STREAMING), filename, version);
+		PopulationImpl pop = new PopulationImpl();
+		pop.setIsStreaming(true);
+		return new PopulationWriter(pop, filename, version);
 	}
 
 	public void handlePlan(final Plan plan) {

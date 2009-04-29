@@ -68,11 +68,11 @@ public class ModeActivityDurationAnalyser {
 
 		this.config = Gbl.createConfig(new String[] {CONFIGFILE});
 //		config = Gbl.createConfig(null);
-		Gbl.getWorld().setNetworkLayer(net);
-		Gbl.getWorld().complete();
+//		Gbl.getWorld().setNetworkLayer(net);
+//		Gbl.getWorld().complete();
 
-		Population plans = new PopulationImpl(PopulationImpl.NO_STREAMING);
-		MatsimPopulationReader plansParser = new MatsimPopulationReader(plans);
+		Population plans = new PopulationImpl();
+		MatsimPopulationReader plansParser = new MatsimPopulationReader(plans, net);
 		plansParser.readFile(PLANSFILE);
 
 		double homeActivityDurationsCar = 0.0;

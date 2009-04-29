@@ -24,8 +24,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -49,11 +49,11 @@ import org.matsim.core.utils.misc.NetworkUtils;
  */
 public class Plansgenerator {
 
-	private static final String network = "../matsimWithindayTesting/testdata/tests/withinday/network.xml";
+	private static final String networkFilename = "../matsimWithindayTesting/testdata/tests/withinday/network.xml";
 
 	private static final String plansOut = "../matsimWithindayTesting/testdata/tests/withinday/newPlans.xml";
 
-
+	private NetworkLayer network;
 	private Population plans;
 
 	private void init() {
@@ -63,16 +63,15 @@ public class Plansgenerator {
 		config.plans().setOutputVersion("v4");
 		config.plans().setOutputFile(plansOut);
 
-		this.loadNetwork(network);
+		this.network = this.loadNetwork(networkFilename);
 	}
 
 	private void createPlans() throws Exception {
 		init();
-		this.plans = new PopulationImpl(false);
+		this.plans = new PopulationImpl();
 		int homeEndtime = 6 * 3600;
-		NetworkLayer networkLayer = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
-		final Link link1 = networkLayer.getLink(new IdImpl("1"));
-		final Link link20 = networkLayer.getLink(new IdImpl("20"));
+		final Link link1 = network.getLink(new IdImpl("1"));
+		final Link link20 = network.getLink(new IdImpl("20"));
 		final Coord homeCoord = new CoordImpl(-25000, 0);
 		final Coord workCoord = new CoordImpl(10000, 0);
 		for (int i = 1; i <= 100; i++) {
@@ -87,7 +86,7 @@ public class Plansgenerator {
 			//leg to work
 			Leg leg = plan.createLeg(TransportMode.car);
 			NetworkRoute route = new NodeNetworkRoute(link1, link20);
-			route.setNodes(link1, NetworkUtils.getNodes(networkLayer, "2 4 5"), link20);
+			route.setNodes(link1, NetworkUtils.getNodes(network, "2 4 5"), link20);
 			leg.setRoute(route);
 			//work
 			a = plan.createActivity("w", workCoord);
@@ -96,7 +95,7 @@ public class Plansgenerator {
 			//leg to work
 			leg = plan.createLeg(TransportMode.car);
 			route = new NodeNetworkRoute(link20, link1);
-			route.setNodes(link20, NetworkUtils.getNodes(networkLayer, "13 14 15 1"), link1);
+			route.setNodes(link20, NetworkUtils.getNodes(network, "13 14 15 1"), link1);
 			leg.setRoute(route);
 			a = plan.createActivity("h", homeCoord);
 			a.setLink(link1);
@@ -120,10 +119,8 @@ public class Plansgenerator {
 	protected NetworkLayer loadNetwork(final String filename) {
 		// - read network: which buildertype??
 		NetworkLayer network = new NetworkLayer();
-		Gbl.getWorld().setNetworkLayer(network);
 
 		new MatsimNetworkReader(network).readFile(filename);
-		Gbl.getWorld().complete();
 
 		return network;
 	}

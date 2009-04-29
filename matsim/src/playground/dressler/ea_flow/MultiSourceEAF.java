@@ -30,23 +30,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.world.World;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
@@ -84,7 +78,7 @@ public class MultiSourceEAF {
 		while ((inline = in.readLine()) != null) {
 			String[] line = inline.split(";");
 			Node node = network.getNode(line[0].trim());
-			int d = Integer.valueOf(line[1].trim());
+			Integer d = Integer.valueOf(line[1].trim());
 			demands.put(node, d);
 		}
 		return demands;
@@ -99,7 +93,7 @@ public class MultiSourceEAF {
 	 * @return
 	 */
 	private static HashMap<Node,Integer> readPopulation(final NetworkLayer network, final String filename){
-		Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
+		Population population = new PopulationImpl();
 		new MatsimPopulationReader(population,network).readFile(filename);
 		network.connect();
 		HashMap<Node,Integer> allnodes = new HashMap<Node,Integer>();

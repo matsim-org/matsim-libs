@@ -20,13 +20,12 @@
 
 package playground.balmermi;
 
-import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonCalcTimes;
 
@@ -36,20 +35,21 @@ public class PlansParsing {
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
-	public static void theRun() {
+	public static void theRun(Config config) {
 
 		System.out.println("theRun():");
-
+		
 		System.out.println("  creating network layer... ");
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = (NetworkLayer)Gbl.createWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
-		Population plans = new PopulationImpl(PopulationImpl.USE_STREAMING);
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
 		System.out.println("  done.");
 
 		System.out.println("  adding person algorithms... ");
@@ -62,8 +62,7 @@ public class PlansParsing {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans, running person-algos and writing the xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		new MatsimPopulationReader(plans, network).readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 
 		// writing all available input
@@ -84,9 +83,9 @@ public class PlansParsing {
 		Gbl.startMeasurement();
 		Gbl.printElapsedTime();
 
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
 
-		theRun();
+		theRun(config);
 
 		Gbl.printElapsedTime();
 	}

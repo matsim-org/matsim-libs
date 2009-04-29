@@ -22,6 +22,7 @@ package playground.ciarif.modechoice_old;
 
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
@@ -47,14 +48,16 @@ public class Mode_choice_main {
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
-	public static void testRun01() {
+	public static void testRun01(Config config) {
 
+		World world = Gbl.createWorld();
+		
 		System.out.println("TEST RUN 01:");
-		final World world = Gbl.getWorld();
+
 		final Facilities facilities = new FacilitiesImpl();
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		worldReader.readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  creating network layer... ");
@@ -62,7 +65,7 @@ public class Mode_choice_main {
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println();
@@ -133,14 +136,13 @@ public class Mode_choice_main {
 		System.out.println();
 
 		System.out.println("  running plans algorithms... ");
-		plans.clearAlgorithms();
-		plans.addAlgorithm(new PersonCreatePlanFromKnowledge());
-		//plans.addAlgorithm(new FrancescoAlgo());
-		plans.addAlgorithm (new TicketAlgo ());
+		new PersonCreatePlanFromKnowledge().run(plans);
+		//new FrancescoAlgo().run(plans);
+		new TicketAlgo ().run(plans);
 
-		plans.addAlgorithm (new ModeChoiceAlgorithm ());
-		//plans.addAlgorithm (new ModeAlgo ());
-		plans.runAlgorithms();
+		new ModeChoiceAlgorithm().run(plans);
+		//new ModeAlgo().run(plans);
+
 		System.out.println("  done.");
 
 		System.out.println();
@@ -163,12 +165,12 @@ public class Mode_choice_main {
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(Gbl.getWorld());
+		WorldWriter world_writer = new WorldWriter(world);
 		world_writer.write();
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
+		ConfigWriter config_writer = new ConfigWriter(config);
 		config_writer.write();
 		System.out.println("  done.");
 		System.out.println("TEST SUCCEEDED.");
@@ -181,11 +183,9 @@ public class Mode_choice_main {
 
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
-		Gbl.createConfig(args);
-		Gbl.createWorld();
-		//Gbl.createFacilities();
+		Config config = Gbl.createConfig(args);
 
-		testRun01();
+		testRun01(config);
 		Gbl.printElapsedTime();
 	}
 

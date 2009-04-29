@@ -74,7 +74,8 @@ public class CarPlansExtractor extends NewPopulation implements PlanAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl(true);
+		PopulationImpl population = new PopulationImpl();
+		population.setIsStreaming(true);
 
 		CarPlansExtractor cpe = new CarPlansExtractor(population,
 				outputFilename);

@@ -47,17 +47,14 @@ public class OnTheFlyQueueSimSWISS {
 
 		String netFileName = "../../tmp/network.xml.gz";
 
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
 		Gbl.startMeasurement();
-		Config config = Gbl.getConfig();
 		config.setParam("global", "localDTDBase", "dtd/");
 
-		World world = Gbl.getWorld();
+		World world = Gbl.createWorld();
 
 		net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
-		world.setNetworkLayer(net);
-		world.complete();
 
 		Gbl.printElapsedTime();
 

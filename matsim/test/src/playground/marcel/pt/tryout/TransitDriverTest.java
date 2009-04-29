@@ -83,7 +83,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		Map<Id, Departure> departures = route1.getDepartures();
 
 		Events events = new Events();
-		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(false), events, facilities);
+		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(), events, facilities);
 
 		TransitDriver driver = new TransitDriver(route1, departures.values().iterator().next(), sim);
 		TransitVehicle bus = new TransitQueueVehicle(20, events);
@@ -149,7 +149,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		Map<Id, Departure> departures = route1.getDepartures();
 
 		Events events = new Events();
-		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(false), events, facilities);
+		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(), events, facilities);
 		
 		TransitDriver driver = new TransitDriver(route1, departures.values().iterator().next(), sim);
 		TransitVehicle bus = new TransitQueueVehicle(20, events);

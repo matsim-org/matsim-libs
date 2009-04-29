@@ -28,8 +28,8 @@ import java.io.PrintWriter;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -126,7 +126,9 @@ public class ExternalMobsim {
 	protected void writePlans(final String iterationPlansFile) throws FileNotFoundException, IOException {
 		log.info("writing plans for external mobsim");
 		String version = "v4";
-		PopulationWriter plansWriter = new PopulationWriter(new PopulationImpl(PopulationImpl.USE_STREAMING), iterationPlansFile, version);
+		PopulationImpl pop = new PopulationImpl();
+		pop.setIsStreaming(true);
+		PopulationWriter plansWriter = new PopulationWriter(pop, iterationPlansFile, version);
 		PopulationWriterHandler handler = plansWriter.getHandler();
 		plansWriter.writeStartPlans();
 		BufferedWriter writer = plansWriter.getWriter();
