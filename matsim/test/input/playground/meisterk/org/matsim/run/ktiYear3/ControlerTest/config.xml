@@ -2,6 +2,7 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
 		<!ENTITY STUDYBASE    "/home/konrad/sandbox00/ivt/studies/switzerland">
+	<!--	<!ENTITY STUDYBASE    "C:/data/SandboxCVS/ivt/studies/switzerland"> -->
 	]
 >
 <config>
@@ -12,6 +13,7 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="1" />
 		<param name="routingAlgorithmType" value="AStarLandmarks" />
+	<!--	<param name="outputDirectory" value="output/ktiTest" /> --> <!-- set the name of the output directory -->
 	</module>
 
 	<!-- ====================================================================== -->
@@ -53,7 +55,7 @@
 		<param name="usePlansCalcRouteKti" value="true" />
 		<param name="pt_traveltime_matrix_filename" value="&STUDYBASE;/externals/ptNationalModel/2005_OEV_Befoerderungszeit.mtx" />
 		<param name="pt_haltestellen_filename" value="&STUDYBASE;/externals/ptNationalModel/Haltestellen.txt" />
-		<param name="worldInputFilename" value="&STUDYBASE;/world/world.xml" />
+		<param name="worldInputFilename" value="&STUDYBASE;/world/world-natModell.xml" />
 	</module>
 
 	<!-- ====================================================================== -->
@@ -101,12 +103,12 @@
 
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="4" />
-		<param name="ModuleProbability_1" value="0.1" />
+		<param name="ModuleProbability_1" value="1.0" />
 		<param name="Module_1" value="ReRoute" />
-		<param name="ModuleProbability_2" value="0.1" />
+<!--		<param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="TimeAllocationMutator" />
 		<param name="ModuleProbability_3" value="0.8" />
-		<param name="Module_3" value="ChangeExpBeta" />
+		<param name="Module_3" value="ChangeExpBeta" /> -->
 	</module>
 
 	<!-- ====================================================================== -->
