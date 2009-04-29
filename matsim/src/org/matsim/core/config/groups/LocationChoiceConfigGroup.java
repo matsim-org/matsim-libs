@@ -41,6 +41,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String RECURSIONTRAVELSPEED = "recursionTravelSpeed";
 	private static final String MAX_RECURSIONS = "maxRecursions";
 	private static final String FIX_BY_ACTTYPE = "fixByActType";
+	private static final String SIMPLE_TG = "simple_tg";
 
 	//default values
 	private String constrained = "false";
@@ -51,6 +52,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private String recursionTravelSpeed = "8.5";
 	private String maxRecursions = "0";
 	private String fixByActType = "false";
+	private String simple_tg = "false";
 	
 	private final static Logger log = Logger.getLogger(LocationChoiceConfigGroup.class);
 	
@@ -84,6 +86,9 @@ public class LocationChoiceConfigGroup extends Module {
 		}
 		if (FIX_BY_ACTTYPE.equals(key)) {
 			return getFixByActType();
+		}
+		if (SIMPLE_TG.equals(key)) {
+			return getSimpleTG();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -157,7 +162,15 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setFixByActType(value);
 			}
-		} else		
+		} else if (SIMPLE_TG.equals(key)) {
+			if (!(value.equals("true") || value.equals("false"))) {
+				setSimpleTG("false");
+			}
+			else {
+				setSimpleTG(value);
+			}
+		}
+		else		
 		{
 			throw new IllegalArgumentException(key);
 		}
@@ -174,6 +187,7 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, RECURSIONTRAVELSPEED);
 		this.addParameterToMap(map, MAX_RECURSIONS);
 		this.addParameterToMap(map, FIX_BY_ACTTYPE);
+		this.addParameterToMap(map, SIMPLE_TG);
 		return map;
 	}
 
@@ -225,5 +239,11 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	public void setFixByActType(String fixByActType) {
 		this.fixByActType = fixByActType;
+	}
+	public void setSimpleTG(String simple_tg) {
+		this.simple_tg = simple_tg;
+	}
+	public String getSimpleTG() {
+		return this.simple_tg;
 	}
 }

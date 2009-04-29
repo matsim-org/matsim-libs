@@ -37,6 +37,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scoring.LocationChoiceScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.locationchoice.constrained.LocationMutatorTGSimple;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -122,8 +123,15 @@ public class LocationChoice extends AbstractMultithreadedModule {
 			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
 			while (planAlgo_it.hasNext()) {
 				PlanAlgorithm plan_algo = planAlgo_it.next();
-				unsuccessfull += ((LocationMutatorwChoiceSet)plan_algo).getNumberOfUnsuccessfull();
-				((LocationMutatorwChoiceSet)plan_algo).resetUnsuccsessfull();
+				
+				if (Gbl.getConfig().locationchoice().getSimpleTG().equals("true")) {				
+					unsuccessfull += ((LocationMutatorTGSimple)plan_algo).getNumberOfUnsuccessfull();
+					((LocationMutatorTGSimple)plan_algo).resetUnsuccsessfull();
+				}
+				else {
+					unsuccessfull += ((LocationMutatorwChoiceSet)plan_algo).getNumberOfUnsuccessfull();
+					((LocationMutatorwChoiceSet)plan_algo).resetUnsuccsessfull();
+				}
 			}		
 			log.info("Number of unsuccessfull LC in this iteration: "+ unsuccessfull);	
 				
@@ -139,8 +147,16 @@ public class LocationChoice extends AbstractMultithreadedModule {
 					this.quad_trees, this.facilities_of_type));
 		}
 		else {
-			this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  
+			// only moving one flexible activity
+			if (Gbl.getConfig().locationchoice().getSimpleTG().equals("true")) {	
+				this.planAlgoInstances.add(new LocationMutatorTGSimple(this.network, this.controler,  
 					this.quad_trees, this.facilities_of_type));
+			}
+			else {
+				// computing new chain of flexible activity
+				this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  
+				this.quad_trees, this.facilities_of_type));
+			}
 		}		
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
