@@ -41,9 +41,10 @@ import org.matsim.core.utils.misc.Time;
  */
 public class JDEQSimulation {
 
-	private static final Logger log = Logger.getLogger(Controler.class);
+	private static final Logger log = Logger.getLogger(JDEQSimulation.class);
 	Population population;
 	NetworkLayer network;
+	
 
 	public JDEQSimulation(final NetworkLayer network, final Population population, final Events events) {
 		// constructor
@@ -154,7 +155,6 @@ public class JDEQSimulation {
 		scheduler.startSimulation();
 
 		t.endTimer();
-		t.printMeasuredTime("Time needed for one iteration (only DES part): ");
-
+		log.info("Time needed for one iteration (only JDEQSimulation part): " + t.getMeasuredTime() + "[ms]");
 	}
 }
