@@ -32,11 +32,11 @@ public class IdImpl implements Id, Serializable {
 	private final String id;
 
 	public IdImpl(final String id) {
-		this.id = id;
+		this.id = id.intern();
 	}
 
 	public IdImpl(final long id) {
-		this.id = Long.toString(id);
+		this.id = Long.toString(id).intern();
 	}
 
 	@Override
