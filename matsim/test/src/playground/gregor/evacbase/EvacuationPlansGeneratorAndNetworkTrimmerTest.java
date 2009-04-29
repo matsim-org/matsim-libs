@@ -13,8 +13,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
@@ -37,7 +37,7 @@ public class EvacuationPlansGeneratorAndNetworkTrimmerTest extends MatsimTestCas
 		new MatsimNetworkReader(net).readFile(c.network().getInputFile());
 				
 		Population pop = new PopulationImpl();
-		new PopulationReaderMatsimV4(pop,net).readFile(c.plans().getInputFile());
+		new MatsimPopulationReader(pop,net).readFile(c.plans().getInputFile());
 		
 		Map<Id,EvacuationAreaLink> el1 = new HashMap<Id, EvacuationAreaLink>();
 		try {
