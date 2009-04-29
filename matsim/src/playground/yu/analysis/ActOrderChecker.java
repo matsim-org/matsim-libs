@@ -6,6 +6,7 @@ package playground.yu.analysis;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Person;
@@ -91,10 +92,11 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 			Map<Id, String> actsA = aocA.getActsMap();
 			Map<Id, String> actsB = aocB.getActsMap();
 			int c = 0, changed = 0;
-			for (Id personId : actsA.keySet()) {
+			for (Entry<Id, String> personEntry : actsA.entrySet()) {
 				c++;
-				String actChainA = actsA.get(personId);
-				String actChainB = actsB.get(personId);
+				String personId = personEntry.getKey().toString();
+				String actChainA = personEntry.getValue();
+				String actChainB = actsB.get(personEntry);
 				if (!actChainA.equals(actChainB)) {
 					writer.writeln(personId + "\t" + actChainA + "\t"
 							+ actChainB);

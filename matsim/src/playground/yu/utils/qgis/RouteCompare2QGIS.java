@@ -83,9 +83,9 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		Integer routeFlowsB = this.routeCountersB.get(routeLinkIds);
 		if (routeFlowsA != null || routeFlowsB != null) {
 			if (routeFlowsA == null)
-				routeFlowsA = new Integer(0);
+				routeFlowsA = 0;
 			if (routeFlowsB == null)
-				routeFlowsB = new Integer(0);
+				routeFlowsB = 0;
 			if ((routeFlowsA.intValue() > 1 || routeFlowsB.intValue() > 1)
 					&& (routeFlowsA.intValue() != routeFlowsB.intValue())) {
 				Coordinate[] coordinates = new Coordinate[(routeLinkIds.size() + 1) * 2 + 1];
@@ -106,11 +106,8 @@ public class RouteCompare2QGIS extends Route2QGIS {
 																			coordinates),
 															null, getGeofac()) },
 													this.getGeofac()),
-											new Double(routeFlowsA
-													.doubleValue()),
-											new Double(routeFlowsB
-													.doubleValue()), absDiff,
-											new Double(diff / absDiff) });
+											routeFlowsA, routeFlowsB, absDiff,
+											diff / absDiff });
 				} catch (IllegalAttributeException e) {
 					e.printStackTrace();
 				}

@@ -51,7 +51,7 @@ public class FifthFilter extends MyFilter {
 		String attFilePath = "test/yu/test/yalcin/";
 		String outputFilePath = "test/yu/test/yalcin/output/";
 		// to read time intervall file:
-		timeIntervalReader tir = readTimeInterval(timeIntervalFileName,
+		TimeIntervalReader tir = readTimeInterval(timeIntervalFileName,
 				attFilePath, outputFilePath);
 		Set<PrimLine> pls = new HashSet<PrimLine>();
 		// to read input-.att-files and config min- and max departure time:
@@ -62,8 +62,8 @@ public class FifthFilter extends MyFilter {
 			attTableFilename = tir.getInputFilename(i);
 			System.out.println("attTabelFilename :\t" + attTableFilename);
 			try {
-				minDepTime = sdf.parse(tir.getMinDepTime(i));
-				maxDepTime = sdf.parse(tir.getMaxDepTime(i));
+				minDepTime = SDF.parse(tir.getMinDepTime(i));
+				maxDepTime = SDF.parse(tir.getMaxDepTime(i));
 
 				outputFilename = tir.getOutputFilename(i);
 
@@ -115,7 +115,7 @@ public class FifthFilter extends MyFilter {
 								}
 							String[] primLines = ff.split(line);
 							if (primLines.length > 1) {
-								Date depDate = sdf.parse(primLines[12]);
+								Date depDate = SDF.parse(primLines[12]);
 								if ((minDepTime.before(depDate) || minDepTime
 										.equals(depDate))
 										&& (depDate.before(maxDepTime) || depDate

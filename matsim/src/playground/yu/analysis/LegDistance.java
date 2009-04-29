@@ -125,7 +125,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		String agentId = event.getPersonId().toString();
 		Double distance = this.distances.get(agentId);
 		if (distance == null) {
-			distance = new Double(0.0);
+			distance = 0.0;
 		}
 		if (l != null) {
 			distance += l.getLength();

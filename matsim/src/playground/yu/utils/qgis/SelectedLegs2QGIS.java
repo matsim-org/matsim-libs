@@ -25,7 +25,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author yu
  * 
  */
-public class SelectedLegs2QGIS extends SelectedPlans2ESRIShape {
+public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 
 	/**
 	 * @param population
@@ -74,7 +74,7 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShape {
 				.readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population,
+		SelectedPlans2ESRIShapeChanged sp = new SelectedPlans2ESRIShapeChanged(population,
 				crs, outputDir);
 		sp.setOutputSample(1);
 		sp.setActBlurFactor(100);

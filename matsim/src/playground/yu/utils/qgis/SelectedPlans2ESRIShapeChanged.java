@@ -37,8 +37,8 @@ import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
@@ -66,17 +66,17 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @author laemmel
  * 
- *         this a copy of
+ *         this a changed copy of
  *         org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape.java
  *         of Mr. Laemmel with some changes.
  */
-public class SelectedPlans2ESRIShape extends
+public class SelectedPlans2ESRIShapeChanged extends
 		org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape {
 
 	protected CoordinateReferenceSystem crs;
 	// private final Population population = null;
 	// private double outputSample = 1;
-	private double actBlurFactor = 0;
+	// private double actBlurFactor = 0;
 	private double legBlurFactor = 0;
 	protected String outputDir;
 	private ArrayList<Plan> outputSamplePlans;
@@ -92,7 +92,7 @@ public class SelectedPlans2ESRIShape extends
 	// this.geofac = null;
 	// }
 
-	public SelectedPlans2ESRIShape(Population population,
+	public SelectedPlans2ESRIShapeChanged(Population population,
 			CoordinateReferenceSystem crs, String outputDir) {
 		super(population, crs, outputDir);
 	}
@@ -169,8 +169,10 @@ public class SelectedPlans2ESRIShape extends
 		Coordinate[] coords = new Coordinate[links.size() + 1];
 		for (int i = 0; i < links.size(); i++) {
 			Coord c = links.get(i).getFromNode().getCoord();
-			double rx = MatsimRandom.getRandom().nextDouble() * this.legBlurFactor;
-			double ry = MatsimRandom.getRandom().nextDouble() * this.legBlurFactor;
+			double rx = MatsimRandom.getRandom().nextDouble()
+					* this.legBlurFactor;
+			double ry = MatsimRandom.getRandom().nextDouble()
+					* this.legBlurFactor;
 			Coordinate cc = new Coordinate(c.getX() + rx, c.getY() + ry);
 			coords[i] = cc;
 		}
@@ -259,8 +261,8 @@ public class SelectedPlans2ESRIShape extends
 				.readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population,
-				crs, outputDir);
+		SelectedPlans2ESRIShapeChanged sp = new SelectedPlans2ESRIShapeChanged(
+				population, crs, outputDir);
 		sp.setOutputSample(1);
 		sp.setActBlurFactor(100);
 		sp.setLegBlurFactor(100);

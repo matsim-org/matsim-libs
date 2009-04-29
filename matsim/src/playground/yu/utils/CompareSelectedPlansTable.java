@@ -31,7 +31,7 @@ public class CompareSelectedPlansTable {
 
 	private Population plans0;
 	private Population plans1;
-	private final String header = "personid;sex;age;license;caravail;employed;homex;homey;homelink;"
+	private static final String HEADER = "personid;sex;age;license;caravail;employed;homex;homey;homelink;"
 			+ "score0;score1;s1-s0;relativScoreDiff;"
 			+ "plantraveltime0;plantraveltime1;t1-t0;"
 			+ "plantraveldistance0;plantraveldistance1;d1-d0;"
@@ -86,7 +86,7 @@ public class CompareSelectedPlansTable {
 				"score0", "score1");
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outfile);
-			out.write(this.header);
+			out.write(this.HEADER);
 			out.newLine();
 			double[] score0s = new double[this.plans0.getPersons().size()];
 			double[] score1s = new double[this.plans0.getPersons().size()];

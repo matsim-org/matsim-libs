@@ -49,7 +49,7 @@ import playground.yu.analysis.PlanModeJudger;
  * @author ychen
  * 
  */
-public class NewAgentWalkPlan extends NewPopulation implements PersonAlgorithm {
+public class NewAgentWalkPlan extends NewPopulation{
 	/**
 	 * Constructor, writes file-head
 	 * 

@@ -27,7 +27,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
@@ -45,8 +44,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @author ychen
  * 
  */
-public class NewPtWalkPlan extends NewPopulation implements PersonAlgorithm,
-		PlanAlgorithm {
+public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 	private Person person;
 	private List<Plan> copyPlans = new ArrayList<Plan>();
 

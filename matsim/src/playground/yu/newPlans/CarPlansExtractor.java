@@ -23,7 +23,7 @@ import playground.yu.analysis.PlanModeJudger;
  * 
  */
 public class CarPlansExtractor extends NewPopulation implements PlanAlgorithm {
-	private Person person;
+	private Person person = null;
 	private List<Plan> tmpPersonPlans = new ArrayList<Plan>();
 
 	/**

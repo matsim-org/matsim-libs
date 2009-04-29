@@ -140,10 +140,10 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		 *            - number of bins.
 		 */
 		public SpeedCounter(final double[] freeSpeeds) {
-			int length = freeSpeeds.length;
+			this.freeSpeeds = freeSpeeds.clone();
+			int length = this.freeSpeeds.length;
 			lengthSum = new double[length];
 			timeSum = new double[length];
-			this.freeSpeeds = freeSpeeds;
 		}
 
 		public void lengthSumAppend(final int timeBin, final double length) {

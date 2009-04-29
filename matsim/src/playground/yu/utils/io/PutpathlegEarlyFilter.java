@@ -37,7 +37,7 @@ import java.util.Map;
  * 
  */
 public class PutpathlegEarlyFilter extends PutpathlegFilter {
-	public static SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+	public static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss");
 
 	private static class PutPathLeg {
 		private final String origZoneNo, destZoneNo;
@@ -50,7 +50,7 @@ public class PutpathlegEarlyFilter extends PutpathlegFilter {
 				throws ParseException {
 			this.origZoneNo = origZoneNo;
 			this.destZoneNo = destZoneNo;
-			this.depTime = sdf.parse(depTime);
+			this.depTime = SDF.parse(depTime);
 			this.firstLine = firstLine;
 		}
 
@@ -116,11 +116,11 @@ public class PutpathlegEarlyFilter extends PutpathlegFilter {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+		if (ifr != null)
+			for (int i = 0; i <= ifr.getCnt(); i++) {
 
-		for (int i = 0; i <= ifr.getCnt(); i++) {
+				String putpathlegTableFilename, minDepTime, maxDepTime, outputFilename;
 
-			String putpathlegTableFilename, minDepTime, maxDepTime, outputFilename;
-			if (ifr != null) {
 				putpathlegTableFilename = ifr.getInputFilename(i);
 				minDepTime = ifr.getMinDepTime(i);
 				maxDepTime = ifr.getMaxDepTime(i);
@@ -168,7 +168,7 @@ public class PutpathlegEarlyFilter extends PutpathlegFilter {
 										// TODO compare the depTime of old with
 										// new ppl
 										if (ppl.getDepTime().before(
-												sdf.parse(depTime)))
+												SDF.parse(depTime)))
 											refreshedPpl = false;
 										else {
 											ppl = new PutPathLeg(firstLines[0],
@@ -204,7 +204,7 @@ public class PutpathlegEarlyFilter extends PutpathlegFilter {
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
+
 			}
-		}
 	}
 }

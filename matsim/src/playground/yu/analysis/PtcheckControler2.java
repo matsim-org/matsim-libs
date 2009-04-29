@@ -59,22 +59,17 @@ public class PtcheckControler2 extends Controler {
 		/**
 		 * internal bufferedWriter
 		 */
-		private BufferedWriter ptRateWriter;
+		private BufferedWriter ptRateWriter = null;
 
 		private CalcAverageTripLength catl = null;
-
 		private CalcNetAvgSpeed cas = null;
-
 		private CalcTrafficPerformance ctpf = null;
 
 		private RoadPricing rp = null;
 
 		private EnRouteModalSplit orms = null;
-
 		private LegTravelTimeModalSplit ttms = null;
-
 		private LegDistance ld = null;
-
 		private CalcLinksAvgSpeed clas = null;
 
 		public void notifyStartup(StartupEvent event) {

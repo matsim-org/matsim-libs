@@ -21,7 +21,6 @@
 package playground.yu.newPlans;
 
 import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
@@ -39,12 +38,12 @@ import org.matsim.core.population.PopulationReader;
  * @author ychen
  * 
  */
-public class SelectedPlans extends NewPopulation implements PersonAlgorithm {
+public class SelectedPlans extends NewPopulation {
 	/**
 	 * Constructor, writes file-head
 	 * 
-	 * @param plans -
-	 *            a Plans Object, which derives from MATSim plansfile
+	 * @param plans
+	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
 	public SelectedPlans(Population plans) {
 		super(plans);
@@ -57,6 +56,7 @@ public class SelectedPlans extends NewPopulation implements PersonAlgorithm {
 		person.addPlan(selectedPlan);
 		pw.writePerson(person);
 	}
+
 	public static void main(final String[] args) {
 		final String netFilename = "../data/schweiz/input/ch.xml";
 		final String plansFilename = "../data/schweiz/input/459.100.plans.xml.gz";

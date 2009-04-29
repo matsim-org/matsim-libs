@@ -64,27 +64,27 @@ import playground.yu.utils.TollTools;
  */
 public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler, AgentStuckEventHandler {
-	private String scenario;
+	protected String scenario;
 
-	private final int binSize;
-	private Map<Id, Integer> legCounts = new HashMap<Id, Integer>();
+	protected final int binSize;
+	protected Map<Id, Integer> legCounts = new HashMap<Id, Integer>();
 
-	private final double[] dep, arr, stuck, enRoute;
+	protected final double[] dep, arr, stuck, enRoute;
 
-	private final double[] carDep, carArr, carStuck, carEnRoute;
+	protected final double[] carDep, carArr, carStuck, carEnRoute;
 
-	private final double[] ptDep, ptArr, ptEnRoute;
+	protected final double[] ptDep, ptArr, ptEnRoute;
 
-	private final double[] wlkDep, wlkArr, wlkEnRoute;
+	protected final double[] wlkDep, wlkArr, wlkEnRoute;
 
-	private final double[] bikeDep, bikeArr, bikeEnRoute;
+	protected final double[] bikeDep, bikeArr, bikeEnRoute;
 
-	private double[] othersDep = null, othersArr = null, othersStuck = null,
+	protected double[] othersDep = null, othersArr = null, othersStuck = null,
 			othersEnRoute = null;
 
-	private final Population plans;
+	protected final Population plans;
 
-	private RoadPricingScheme toll = null;
+	protected RoadPricingScheme toll = null;
 
 	/**
 	 * Creates a new LegHistogram with the specified binSize and the specified
@@ -176,7 +176,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 				this.othersStuck);
 	}
 
-	private void internalHandleEvent(AgentEvent ae, double[] allCount,
+	protected void internalHandleEvent(AgentEvent ae, double[] allCount,
 			double[] carCount, double[] ptCount, double[] wlkCount,
 			double[] bikeCount, double[] othersCount) {
 		int binIdx = getBinIndex(ae.getTime());
@@ -247,7 +247,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		}
 	}
 
-	private void calcOnRoute() {
+	protected void calcOnRoute() {
 		// *onRoute[0]
 		this.enRoute[0] = this.dep[0] - this.arr[0] - this.stuck[0];
 		this.carEnRoute[0] = this.carDep[0] - this.carArr[0] - this.carStuck[0];
@@ -352,7 +352,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 
 	/* private methods */
 
-	private int getBinIndex(final double time) {
+	protected int getBinIndex(final double time) {
 		int bin = (int) (time / this.binSize);
 		if (bin >= this.dep.length) {
 			return this.dep.length - 1;

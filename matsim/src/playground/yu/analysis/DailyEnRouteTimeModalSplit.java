@@ -35,7 +35,7 @@ public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 			notEmployedPtTime;
 	private double alwaysCarTime, alwaysPtTime, sometimesCarTime,
 			sometimesPtTime, neverCarTime, neverPtTime;
-	private Person person;
+	private Person person=null;
 
 	/**
 	 *

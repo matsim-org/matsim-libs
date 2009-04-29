@@ -200,9 +200,12 @@ public class AnalysisTest4Zrh {
 				+ cas.getNetAvgSpeed() + " [km/h]\n");
 		sw.close();
 
-		dd.write(outputBase);
-		dert.write(outputBase);
-		ms.write(outputBase);
+		if (dd != null)
+			dd.write(outputBase);
+		if (dert != null)
+			dert.write(outputBase);
+		if (ms != null)
+			ms.write(outputBase);
 		// otfvis
 		if (toll == null) {
 			SimpleReader sr = new SimpleReader(eventsFilename);

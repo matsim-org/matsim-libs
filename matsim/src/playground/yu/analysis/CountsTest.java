@@ -4,6 +4,7 @@
 package playground.yu.analysis;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.gbl.Gbl;
@@ -40,12 +41,12 @@ public class CountsTest {
 		for (Id linkId : counts.getCounts().keySet()) {
 			Map<Integer, Volume> volumes = counts.getCount(linkId).getVolumes();
 			int i = 0;
-			for (Integer itg : volumes.keySet()) {
+			for (Entry<Integer, Volume> itgEntry : volumes.entrySet()) {
 				i++;
-				double value = volumes.get(itg).getValue();
-				String output = "link_ID=" + linkId + "\th=" + itg
-						+ "\tvolume=" + value;
-				countsSummeValueofTime[itg - 1] += value;
+				double value = itgEntry.getValue().getValue();
+				String output = "link_ID=" + linkId + "\th="
+						+ itgEntry.getKey() + "\tvolume=" + value;
+				countsSummeValueofTime[itgEntry.getKey() - 1] += value;
 				// if (itg.intValue() != i)
 				// output += "\tfalse";
 				System.out.println(output);

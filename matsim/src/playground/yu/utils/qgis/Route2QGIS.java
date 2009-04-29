@@ -43,7 +43,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author ychen
  * 
  */
-public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
+public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements X2QGIS {
 	protected Map<List<Id>, Integer> routeCounters;
 	protected NetworkLayer network;
 	private FeatureType featureTypeRoute;

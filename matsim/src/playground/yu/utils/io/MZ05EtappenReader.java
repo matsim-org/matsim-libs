@@ -94,7 +94,7 @@ public class MZ05EtappenReader implements TabularFileHandler {
 		if (e_dist_obj != null) {
 			double tmpEtappeDist = Double.parseDouble(e_dist_obj);
 			if (tmpEtappeDist >= 0) {
-				tmpEtappenDists.add(new Double(tmpEtappeDist));
+				tmpEtappenDists.add(tmpEtappeDist);
 				int mode = Integer.parseInt(F510);
 				if (mode >= 1 && mode <= 3)
 					tmpELV++;

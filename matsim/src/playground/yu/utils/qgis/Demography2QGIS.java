@@ -53,7 +53,7 @@ import playground.yu.utils.CompareSelectedPlansTable;
  */
 public class Demography2QGIS extends CompareSelectedPlansTable {
 	private Population plans;
-	private final String header = "personId;sex;age;license;caravail;employed;homex;homey;homelink;"
+	private static final String HEADER = "personId;sex;age;license;caravail;employed;homex;homey;homelink;"
 			+ "planType;planScore;departureTime;"
 			+ "planTravelTime;planTravelDistance;numberOfTrips";
 	private NetworkLayer network;
@@ -96,7 +96,7 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 	private void writeSummaryFile(final String outfile) {
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outfile);
-			out.write(this.header);
+			out.write(this.HEADER);
 			out.newLine();
 
 			for (Id person_id : this.plans.getPersons().keySet()) {

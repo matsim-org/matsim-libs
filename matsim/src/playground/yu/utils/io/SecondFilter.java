@@ -48,7 +48,7 @@ public class SecondFilter extends MyFilter {
 		String attFilePath = "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code\\new\\Att22R24\\";
 		String outputFilePath = "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code\\new\\Att22R24\\output222\\";
 		// to read time intervall file:
-		timeIntervalReader tir = readTimeInterval(timeIntervalFileName,
+		TimeIntervalReader tir = readTimeInterval(timeIntervalFileName,
 				attFilePath, outputFilePath);
 		Set<PrimLine> pls = new HashSet<PrimLine>();
 		// to read input-.att-files and config min- and max departure time:
@@ -58,8 +58,8 @@ public class SecondFilter extends MyFilter {
 			Date minDepTime, maxDepTime;
 			attTableFilename = tir.getInputFilename(i);
 			try {
-				minDepTime = sdf.parse(tir.getMinDepTime(i));
-				maxDepTime = sdf.parse(tir.getMaxDepTime(i));
+				minDepTime = SDF.parse(tir.getMinDepTime(i));
+				maxDepTime = SDF.parse(tir.getMaxDepTime(i));
 
 				outputFilename = tir.getOutputFilename(i);
 
@@ -83,7 +83,7 @@ public class SecondFilter extends MyFilter {
 							// line of an OD-zone
 							String[] primLines = sf.split(line);
 							if (primLines.length > 1) {
-								Date depDate = sdf.parse(primLines[12]);
+								Date depDate = SDF.parse(primLines[12]);
 								if ((minDepTime.before(depDate) || minDepTime
 										.equals(depDate))
 										&& (depDate.before(maxDepTime) || depDate

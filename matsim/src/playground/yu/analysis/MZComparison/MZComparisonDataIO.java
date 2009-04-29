@@ -39,7 +39,7 @@ import playground.yu.utils.charts.StackedBarChart;
 public class MZComparisonDataIO implements TabularFileHandler {
 	private int lineCount = 0;
 
-	private String[] chartRows;
+	private String[] chartRows = null;
 
 	private Set<String> chartColumns = new HashSet<String>();
 

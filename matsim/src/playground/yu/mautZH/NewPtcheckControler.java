@@ -65,7 +65,7 @@ public class NewPtcheckControler extends Controler {
 		/**
 		 * internal bufferedWriter
 		 */
-		private BufferedWriter out;
+		private BufferedWriter out = null;
 
 		public void notifyStartup(StartupEvent event) {
 			Controler ctl = event.getControler();

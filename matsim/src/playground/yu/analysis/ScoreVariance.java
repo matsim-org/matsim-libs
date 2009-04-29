@@ -142,10 +142,12 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements
 
 	public static double getVariance(final double[] inputData) {
 		double average = getAverage(inputData);
+
 		if (average == -1) {
 			System.err.println("avg. = " + -1);
-			System.exit(0);
+			throw new RuntimeException("ERROR: avg. = -1, which is impossible!");
 		}
+
 		return getSquareSum(inputData) / getCount(inputData) - average
 				* average;
 	}

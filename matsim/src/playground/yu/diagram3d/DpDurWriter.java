@@ -44,24 +44,25 @@ import org.matsim.core.utils.io.IOUtils;
  * @author ychen
  * 
  */
-public class DpDurWriter implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class DpDurWriter implements AgentDepartureEventHandler,
+		AgentArrivalEventHandler {
 	private int maxDur = 0;
 
 	private BufferedWriter out = null;
 
 	/**
-	 * @param args0 -
-	 *            agentId;
-	 * @param i -
-	 *            departureTime;
+	 * @param args0
+	 *            - agentId;
+	 * @param i
+	 *            - departureTime;
 	 */
 	private HashMap<String, Integer> agentDepTimes;
 
 	/**
-	 * @param args0 -
-	 *            departureTime
-	 * @param list -
-	 *            a list of volume with certain travel- duration
+	 * @param args0
+	 *            - departureTime
+	 * @param list
+	 *            - a list of volume with certain travel- duration
 	 */
 	private HashMap<String, ArrayList<Integer>> dpDurVol;
 
@@ -92,11 +93,11 @@ public class DpDurWriter implements AgentDepartureEventHandler, AgentArrivalEven
 
 	public void writeMatrix() {
 		Set<String> dpTSet = dpDurVol.keySet();
-		String fileHead = "\t";
+		StringBuilder fileHead = new StringBuilder("\t");
 		for (int i = 0; i <= maxDur / 60; i += 5) {
-			fileHead += Integer.toString(i) + "\t";
+			fileHead.append(i + "\t");
 		}// "5" --> 5min ~ 9min59s
-		writeLine(fileHead);
+		writeLine(fileHead.toString());
 		String line = "";
 		for (String dpT : dpTSet) {
 			line = "";
@@ -133,12 +134,12 @@ public class DpDurWriter implements AgentDepartureEventHandler, AgentArrivalEven
 	}
 
 	public void handleEvent(AgentDepartureEvent event) {
-		String agentId=event.getPersonId().toString();
+		String agentId = event.getPersonId().toString();
 		agentDepTimes.put(agentId, (int) event.getTime());
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
-		String agentId=event.getPersonId().toString();
+		String agentId = event.getPersonId().toString();
 		if (agentDepTimes.containsKey(agentId)) {
 			int depT = agentDepTimes.remove(agentId);
 			int depH = depT / 3600;
@@ -164,15 +165,21 @@ public class DpDurWriter implements AgentDepartureEventHandler, AgentArrivalEven
 			al.set(dur / 300, al.get(dur / 300).intValue() + 1);
 		}
 	}
+
 	public static void main(String[] args) {
 		Config config = Gbl.createConfig(args);
 		DpDurWriter ddw = new DpDurWriter("DpDurMatrix.txt");
-		
+
 		Events events = new Events();
 		events.addHandler(ddw);// TODO ...
 
 		System.out.println("@reading the eventsfile (TXTv1) ...");
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());//One can also use readFile("..../...txt") hier
+		new MatsimEventsReader(events).readFile(config.events().getInputFile());// One
+																				// can
+																				// also
+																				// use
+																				// readFile("..../...txt")
+																				// hier
 		System.out.println("@done.");
 
 		ddw.writeMatrix();

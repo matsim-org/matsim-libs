@@ -45,7 +45,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author yu
- *
+ * 
  */
 public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 	private final Map<Double, Double> carLegs = new TreeMap<Double, Double>(),
@@ -139,18 +139,16 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 				if (l.getMode().equals(TransportMode.car)) {
 					Double carLegsCounter = this.carLegs.get(dist);
 					if (carLegsCounter == null) {
-						carLegsCounter = new Double(0.0);
+						carLegsCounter = 0.0;
 					}
-					carLegsCounter = new Double(
-							carLegsCounter.doubleValue() + 1.0);
+					carLegsCounter = carLegsCounter + 1.0;
 					this.carLegs.put(dist, carLegsCounter);
 				} else if (l.getMode().equals(TransportMode.pt)) {
 					Double ptLegsCounter = this.ptLegs.get(dist);
 					if (ptLegsCounter == null) {
-						ptLegsCounter = new Double(0.0);
+						ptLegsCounter = 0.0;
 					}
-					ptLegsCounter = new Double(
-							ptLegsCounter.doubleValue() + 1.0);
+					ptLegsCounter = ptLegsCounter + 1.0;
 					this.ptLegs.put(dist, ptLegsCounter);
 				}
 			}

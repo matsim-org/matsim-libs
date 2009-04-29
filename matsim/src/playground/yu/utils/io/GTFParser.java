@@ -45,13 +45,13 @@ public class GTFParser extends MatsimXmlParser {
 	private final static String GREENTIMEFRACTIONS = "greentimefractions",
 			LINKGTFS = "linkgtfs", GTF = "gtf";
 	/**
-	 * @param arg0 -
-	 *            String linkId;
-	 * @param arg1 -
-	 *            Double time [s];
-	 * @param arg2 -
-	 *            Double greentimefraction or the grenntime factor for capacity
-	 *            of a link.
+	 * @param arg0
+	 *            - String linkId;
+	 * @param arg1
+	 *            - Double time [s];
+	 * @param arg2
+	 *            - Double greentimefraction or the grenntime factor for
+	 *            capacity of a link.
 	 */
 	private Map<String, HashMap<Double, Double>> linkgtfsMap;
 	private String crtLinkId;
@@ -104,8 +104,8 @@ public class GTFParser extends MatsimXmlParser {
 	}
 
 	/**
-	 * @param filename-The
-	 *            name of the gtfs(greentimefractions)-file to parse.
+	 * @param filename
+	 *            -The name of the gtfs(greentimefractions)-file to parse.
 	 */
 	public void readFile(final String filename) {
 		try {
@@ -151,7 +151,7 @@ public class GTFParser extends MatsimXmlParser {
 		if (linkgtfsMap != null) {
 			HashMap<Double, Double> linkGtfs = linkgtfsMap.get(linkId);
 			if (linkGtfs != null)
-				gtfs = linkGtfs.get((int) time / 3600 * 3600.0);
+				gtfs = linkGtfs.get((((int) time) / 3600) * 3600.0);
 		}
 		return gtfs;
 	}

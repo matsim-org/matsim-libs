@@ -85,7 +85,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 	static double flowCapFactor = 0.1;
 	protected NetworkLayer network;
 	protected CoordinateReferenceSystem crs = null;
-	private Network2PolygonGraph n2g;
+	private Network2PolygonGraph n2g = null;
 
 	public void readNetwork(final String netFilename) {
 		Gbl.createConfig(null);
@@ -173,11 +173,11 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	public static void main(final String[] args) {
-		String netFilename = "../berlin data/v2/bb_osm_wip_cl.xml.gz";
+		String netFilename = "../berlin data/newOSM/bb_cl.xml.gz";
 
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
 		mn2q.readNetwork(netFilename);
 		mn2q.setCrs("DHDN_GK4");
-		mn2q.writeShapeFile("../berlin data/v2/bb_osm_wip_cl.polygon.shp");
+		mn2q.writeShapeFile("../berlin data/newOSM/bb_cl.polygon.shp");
 	}
 }

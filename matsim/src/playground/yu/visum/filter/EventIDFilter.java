@@ -11,7 +11,7 @@ public class EventIDFilter extends EventFilterA {
 	@Override
 	public boolean judge(BasicEventImpl event) {
 		if (event instanceof PersonEvent) {
-			return (((PersonEvent) event).getPersonId().toString().equals(criterion));
+			return (((PersonEvent) event).getPersonId().equals(criterion));
 		}
 		return false;
 	}

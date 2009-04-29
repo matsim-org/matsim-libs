@@ -48,18 +48,20 @@ public class AvgSpeed2QGIS implements X2QGIS {
 		}
 		for (int i = 0; i < 24; i++) {
 			Map<Id, Double> aSpeeds = speeds.get(i);
-			for (Link link : (net.getLinks()).values()) {
-				Id linkId = link.getId();
-				if (aSpeeds != null) {
+			if (aSpeeds != null)
+				for (Link link : (net.getLinks()).values()) {
+					Id linkId = link.getId();
 					aSpeeds.put(linkId, clas.getAvgSpeed(linkId,
 							(double) i * 3600.0));
-				} else if (aSpeeds == null) {
+				}
+			else
+				for (Link link : (net.getLinks()).values()) {
+					Id linkId = link.getId();
 					aSpeeds = new HashMap<Id, Double>();
 					aSpeeds.put(linkId, clas.getAvgSpeed(linkId,
 							(double) i * 3600.0));
 					speeds.add(i, aSpeeds);
 				}
-			}
 		}
 		return speeds;
 	}
@@ -74,8 +76,7 @@ public class AvgSpeed2QGIS implements X2QGIS {
 		 * Traffic Volumes and MATSim-network to Shp-file // *
 		 * ///////////////////////////////////////////////////////////////
 		 */
-		mn2q
-				.readNetwork("test/yu/test/equil_net.xml");
+		mn2q.readNetwork("test/yu/test/equil_net.xml");
 		mn2q.setCrs(ch1903);
 		NetworkLayer net = mn2q.getNetwork();
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(net);

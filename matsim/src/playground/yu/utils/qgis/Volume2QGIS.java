@@ -45,7 +45,7 @@ import org.xml.sax.SAXException;
  * @author yu
  * 
  */
-public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
+public class Volume2QGIS extends MATSimNet2QGIS{
 
 	public static List<Map<Id, Integer>> createVolumes(final NetworkLayer net,
 			final VolumesAnalyzer va) {

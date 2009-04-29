@@ -35,7 +35,7 @@ public class DailyDistanceModalSplit extends AbstractPersonAlgorithm implements
 			notEmployedPtDist;
 	private double alwaysCarDist, alwaysPtDist, sometimesCarDist,
 			sometimesPtDist, neverCarDist, neverPtDist;
-	private Person person;
+	private Person person = null;
 
 	/**
 	 *

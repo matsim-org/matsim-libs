@@ -38,7 +38,7 @@ import org.matsim.core.population.PopulationReader;
  * @author ychen
  * 
  */
-public class NewSmallPlan extends NewPopulation implements PersonAlgorithm {
+public class NewSmallPlan extends NewPopulation{
 	/**
 	 * Constructor, writes file-head
 	 * 

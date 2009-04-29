@@ -34,8 +34,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -100,14 +100,9 @@ public class RouteSummaryTest {
 									.get(linkIds);
 							Integer num_of_num_of_routes = this.numRoutesDistribution
 									.get(routeFlows);
-							this.numRoutesDistribution
-									.put(
-											routeFlows,
-											(num_of_num_of_routes == null) ? new Integer(
-													1)
-													: new Integer(
-															num_of_num_of_routes
-																	.intValue() + 1));
+							this.numRoutesDistribution.put(routeFlows,
+									(num_of_num_of_routes == null) ? 1
+											: num_of_num_of_routes + 1);
 							this.writer
 									.write(linkIds.toString()
 											+ "\tnum_of_routes :\t"
@@ -183,9 +178,8 @@ public class RouteSummaryTest {
 							aOdRouteSet.add(routeLinkIds);
 						// if (!illegalRoute) {
 						Integer itg = this.routeCounters.get(routeLinkIds);
-						this.routeCounters.put(routeLinkIds,
-								(itg == null) ? new Integer(1) : new Integer(
-										itg.intValue() + 1));
+						this.routeCounters.put(routeLinkIds, (itg == null) ? 1
+								: itg + 1);
 						// }
 						this.odRoutes.put(odPair, aOdRouteSet);
 					}

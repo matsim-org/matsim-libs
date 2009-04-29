@@ -35,7 +35,7 @@ import java.util.List;
  * 
  */
 public class PutpathlegFilter extends MyFilter {
-	public static SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+	public static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss");
 
 	static class IndexFileReader extends TableSplitter {
 		private final List<String> inputFileIndexs = new ArrayList<String>();
@@ -105,8 +105,8 @@ public class PutpathlegFilter extends MyFilter {
 			final String minDepTime, final String maxDepTime,
 			final String outputFilename) throws IOException, ParseException {
 		super(regex, tableFilename, outputFilename);
-		this.minDepTime = sdf.parse(minDepTime);
-		this.maxDepTime = sdf.parse(maxDepTime);
+		this.minDepTime = SDF.parse(minDepTime);
+		this.maxDepTime = SDF.parse(maxDepTime);
 	}
 
 	protected static boolean isHead(final String line) {
@@ -114,7 +114,7 @@ public class PutpathlegFilter extends MyFilter {
 	}
 
 	protected boolean rightDepTime(final String depTime) throws ParseException {
-		Date depDate = sdf.parse(depTime);
+		Date depDate = SDF.parse(depTime);
 		return (minDepTime.before(depDate) || minDepTime.equals(depDate))
 				&& (depDate.before(maxDepTime) || depDate.equals(maxDepTime));
 	}

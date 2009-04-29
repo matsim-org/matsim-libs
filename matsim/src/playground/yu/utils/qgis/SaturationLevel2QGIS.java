@@ -38,7 +38,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
  * @author yu
  * 
  */
-public class SaturationLevel2QGIS extends MATSimNet2QGIS implements X2QGIS {
+public class SaturationLevel2QGIS extends MATSimNet2QGIS{
 
 	public static List<Map<Id, Double>> createSaturationLevels(
 			NetworkLayer net, VolumesAnalyzer va) {

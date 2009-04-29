@@ -148,9 +148,12 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 
 		private boolean changeUnCar2UnCar(Plan plan, int legIdx,
 				TransportMode mode) {
-			Leg leg = (Leg) plan.getPlanElements().get(legIdx);
-			leg.setMode(mode);
-			return leg != null;
+			PlanElement pe = plan.getPlanElements().get(legIdx);
+			if (pe != null) {
+				((Leg) pe).setMode(mode);
+				return true;
+			}
+			return false;
 		}
 
 		private boolean changeCar2UnCar(Plan plan, int legIdx,
@@ -449,9 +452,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 				int rightActIdx, TransportMode mode) {
 			if (leftActIdx % 2 != 0 || rightActIdx % 2 != 0 || leftActIdx < 0
 					|| rightActIdx > plan.getPlanElements().size()) {
-				System.err
-						.println("----->ERROR: leftActIdx and rightActIdx should be 2 even number! Or actIdx out of Bound!");
-				System.exit(1);
+				throw new RuntimeException(
+						"----->ERROR: leftActIdx and rightActIdx should be 2 even number! Or actIdx out of Bound!");
 			}
 			for (int i = leftActIdx + 1; i < rightActIdx; i += 2)
 				setLegMode(plan, i, mode);
@@ -463,12 +465,11 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			List<PlanElement> pes = plan.getPlanElements();
 			int size = pes.size();
 			if (legIdx % 2 == 0 || legIdx < 0 || legIdx > size) {
-				System.err
-						.println("----->ERROR: legIdx should be an odd number! Or legIdx out of bound!");
-				System.exit(1);
+				throw new RuntimeException(
+						"----->ERROR: legIdx should be an odd number! Or legIdx out of bound!");
 			}
 			((Leg) pes.get(legIdx)).setMode(mode);
-			return legIdx % 2 == 1 && legIdx > 0 && legIdx < size;
+			return legIdx % 2 != 0 && legIdx > 0 && legIdx < size;
 		}
 		// reserve
 		/*
@@ -507,11 +508,11 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			// link=act.getLink();
 		}
 
-		public boolean equals(ParkLocation pl) {
-			Coord plCoord = pl.act.getCoord();
+		public boolean equals(Object pl) {
+			Coord plCoord = ((ParkLocation) pl).act.getCoord();
 			Coord thisCoord = this.act.getCoord();
 
-			Link plLink = pl.act.getLink();
+			Link plLink = ((ParkLocation) pl).act.getLink();
 			Link thisLink = this.act.getLink();
 
 			if (plCoord != null && thisCoord != null) {// they both have
@@ -531,6 +532,12 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 				return false;
 			}
 		}
+
+		public int hashCode() {
+			assert false : "hashCode not designed";
+			return 42; // any arbitrary constant will do
+		}
+
 		// reserve
 		// public Activity getAct() {
 		// return act;
@@ -601,6 +608,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 
 		protected StrategyManager loadStrategyManager() {
 			StrategyManager manager = new StrategyManager();
+
 			manager.setMaxPlansPerAgent(5);
 
 			// ChangeExpBeta
@@ -652,8 +660,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 						.getPlanElements())
 					if (pe instanceof Leg)
 						legChainModes.append(((Leg) pe).getMode() + "|");
-				writer.writeln(itr + "\t" + legChainModes.toString());
-				writer.flush();
+				// writer.writeln(itr + "\t" + legChainModes.toString());
+				// writer.flush();
 				patterns.add(legChainModes.toString());
 			}
 		}

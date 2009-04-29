@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
@@ -127,11 +128,13 @@ public class CountsSimCompareTest {
 						minusDiffSet.put(key, num + 1);
 					}
 				}
-				for (Integer itg : plusDiffSet.keySet()) {
-					writer.write(itg + "\t" + plusDiffSet.get(itg) + "\n");
+				for (Entry<Integer, Integer> itgEntry : plusDiffSet.entrySet()) {
+					writer.write(itgEntry.getKey() + "\t" + itgEntry.getValue()
+							+ "\n");
 				}
-				for (Integer itg : minusDiffSet.keySet()) {
-					writer.write(itg + "\t" + minusDiffSet.get(itg) + "\n");
+				for (Entry<Integer, Integer> itgEntry : minusDiffSet.entrySet()) {
+					writer.write(itgEntry.getKey() + "\t" + itgEntry.getValue()
+							+ "\n");
 				}
 				writer.close();
 			}

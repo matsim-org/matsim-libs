@@ -21,8 +21,7 @@ import playground.yu.visum.filter.finalFilters.FinalEventFilterA;
  * @author ychen
  * 
  */
-public class PrintStreamUDANET extends PrintStreamVisum9_3A implements
-		PrintStreamVisum9_3I {
+public class PrintStreamUDANET extends PrintStreamVisum9_3A {
 	/*---------------------------CONSTRUCTOR-----------------*/
 	public PrintStreamUDANET(final String fileName) {
 		if (fileName.endsWith(".net"))
@@ -62,10 +61,10 @@ public class PrintStreamUDANET extends PrintStreamVisum9_3A implements
 	 * under the tablehead in a .net-file of VISUM. e.g.
 	 * "LINK;ATTTEST;AttTest;AttTest;Timepoint;0;0;1;0.000;86399.000;0.000;;;0;0;0;4;1"
 	 * 
-	 * @param uda -
-	 *            an attribut defined by VISUM-user, which implements interface:
-	 *            org.matsim.playground.filters.writer.UserDefAttI and whose
-	 *            fundamental contents will be printed
+	 * @param uda
+	 *            - an attribut defined by VISUM-user, which implements
+	 *            interface: org.matsim.playground.filters.writer.UserDefAttI
+	 *            and whose fundamental contents will be printed
 	 */
 	public void printUserDefAtt(final UserDefAtt uda) {
 		try {

@@ -177,7 +177,7 @@ public class NetworkCutter {
 		if (args.length == 0) {
 			System.out.println("Too few arguments.");
 			printUsage();
-			System.exit(1);
+			throw new RuntimeException("Too few arguments.");
 		}
 		Iterator<String> argIter = new ArgumentParser(args).iterator();
 		String arg = argIter.next();
@@ -189,21 +189,21 @@ public class NetworkCutter {
 			if (!argIter.hasNext()) {
 				System.out.println("Too few arguments.");
 				printUsage();
-				System.exit(1);
+				throw new RuntimeException("Too few arguments.");
 			}
 
 			String plansFile = argIter.next();
 			if (!argIter.hasNext()) {
 				System.out.println("Too few arguments.");
 				printUsage();
-				System.exit(1);
+				throw new RuntimeException("Too few arguments.");
 			}
 
 			String outputFile = argIter.next();
 			if (argIter.hasNext()) {
 				System.out.println("Too many arguments.");
 				printUsage();
-				System.exit(1);
+				throw new RuntimeException("Too many arguments.");
 			}
 
 			run(inputFile, plansFile, outputFile);

@@ -39,7 +39,7 @@ import org.matsim.core.population.PopulationReader;
  */
 public class DoublePlan extends NewPopulation {
 	// private String newPersonId;
-	private Person tmpPerson;
+	private Person tmpPerson = null;
 
 	/**
 	 * Construcktor

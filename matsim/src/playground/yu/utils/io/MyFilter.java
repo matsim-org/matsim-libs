@@ -21,7 +21,7 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class MyFilter extends TableSplitter {
 	protected final BufferedWriter writer;
-	public static SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+	public static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss");
 
 	/**
 	 * @param regex
@@ -172,14 +172,14 @@ public class MyFilter extends TableSplitter {
 		return line.startsWith("$P");
 	}
 
-	static class timeIntervalReader extends TableSplitter {
+	static class TimeIntervalReader extends TableSplitter {
 		private final List<String> timeIntervalIndexs = new ArrayList<String>();
 		private final List<String> minDepTimes = new ArrayList<String>();
 		private final List<String> maxDepTimes = new ArrayList<String>();
 		private final String attFilepath, outputAttFilepath;
 		private int cnt = 0;
 
-		public timeIntervalReader(final String regex,
+		public TimeIntervalReader(final String regex,
 				final String tableFileName, final String attFilepath,
 				final String outputAttFilepath) throws IOException {
 			super(regex, tableFileName);
@@ -223,12 +223,12 @@ public class MyFilter extends TableSplitter {
 		}
 	}
 
-	public static timeIntervalReader readTimeInterval(
+	public static TimeIntervalReader readTimeInterval(
 			final String timeIntervalFileName, final String attFilePath,
 			final String outputFilePath) {
-		timeIntervalReader tir = null;
+		TimeIntervalReader tir = null;
 		try {
-			tir = new timeIntervalReader("\t", timeIntervalFileName,
+			tir = new TimeIntervalReader("\t", timeIntervalFileName,
 					attFilePath, outputFilePath);
 			String line = tir.readLine();
 			while (line != null) {

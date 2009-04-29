@@ -43,8 +43,8 @@ public class JamTest extends Controler {
 
 	public static class JamListener implements IterationEndsListener,
 			ShutdownListener, StartupListener {
-		private Controler c;
-		private BufferedWriter out;
+		private Controler c = null;
+		private BufferedWriter out = null;
 		private VolumesAnalyzer va = null;
 
 		public void notifyIterationEnds(IterationEndsEvent event) {
@@ -57,8 +57,14 @@ public class JamTest extends Controler {
 					for (int i = 6; i < 10; i++) {
 						sb.append("\t" + v[i]);
 					}
-					out.write(linkId + "\t" + n.getLink(linkId).getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
-							/ 100.0 + sb + "\n");
+					out
+							.write(linkId
+									+ "\t"
+									+ n
+											.getLink(linkId)
+											.getCapacity(
+													org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
+									/ 100.0 + sb + "\n");
 					out.flush();
 				}
 			} catch (IOException e) {

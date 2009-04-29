@@ -44,10 +44,10 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.yu.analysis.CalcLinksAvgSpeed;
 import playground.yu.analysis.CalcNetAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
-import playground.yu.analysis.LegDistance;
 import playground.yu.analysis.EnRouteModalSplit;
-import playground.yu.analysis.PtRate;
+import playground.yu.analysis.LegDistance;
 import playground.yu.analysis.LegTravelTimeModalSplit;
+import playground.yu.analysis.PtRate;
 
 /**
  * test of PtCheck and PtRate, outputs Public-Transit user fraction
@@ -66,7 +66,7 @@ public class PtcheckControlerTest extends Controler {
 		/**
 		 * internal bufferedWriter
 		 */
-		private BufferedWriter ptRateWriter;
+		private BufferedWriter ptRateWriter = null;
 		private CalcAverageTripLength catl = null;
 		private CalcNetAvgSpeed cas = null;
 		private CalcTrafficPerformance ctpf = null;

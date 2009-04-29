@@ -64,7 +64,7 @@ public class PtcheckControler extends Controler {
 		/**
 		 * internal bufferedWriter
 		 */
-		private BufferedWriter ptRateWriter;
+		private BufferedWriter ptRateWriter = null;
 		private String scenario;
 
 		private CalcAverageTripLength catl = null;

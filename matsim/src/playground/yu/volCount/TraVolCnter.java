@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.matsim.core.api.population.Population;
 import org.matsim.core.events.Events;
@@ -86,7 +87,8 @@ public class TraVolCnter implements LinkEnterEventHandler,
 	public void handleEvent(LinkLeaveEvent event) {
 		String agentId = event.getPersonId().toString();
 		if (agentTimer.containsKey(agentId)) {
-			for (int tbIdx = agentTimer.remove(agentId).intValue(); tbIdx <= event.getTime(); tbIdx++) {
+			for (int tbIdx = agentTimer.remove(agentId).intValue(); tbIdx <= event
+					.getTime(); tbIdx++) {
 				Integer vol = netVols.get(tbIdx);
 				if (vol == null)
 					vol = 0;
@@ -101,18 +103,24 @@ public class TraVolCnter implements LinkEnterEventHandler,
 	}
 
 	public void write(String fileName) {
+		DataOutputStream out = null;
 		try {
-			DataOutputStream out = new DataOutputStream(
-					new BufferedOutputStream(new FileOutputStream(new File(
-							fileName))));
+			out = new DataOutputStream(new BufferedOutputStream(
+					new FileOutputStream(new File(fileName))));
 			out.writeBytes("timeBin\tVolume of the network");
-			for (Integer tbIdx : netVols.keySet())
-				out.writeBytes(tbIdx.toString() + "\t"
-						+ netVols.get(tbIdx).toString());
-			out.close();
+			for (Entry<Integer, Integer> tbIdxEntry : netVols.entrySet())
+				out.writeBytes(tbIdxEntry.getKey() + "\t"
+						+ tbIdxEntry.getValue());
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+
 	}
 
 	public static void main(final String[] args) {

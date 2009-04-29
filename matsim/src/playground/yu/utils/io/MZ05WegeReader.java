@@ -85,7 +85,7 @@ public class MZ05WegeReader implements TabularFileHandler {
 		if (w_dist_obj1 != null) {
 			double tmpWegDist = Double.parseDouble(w_dist_obj1);
 			if (tmpWegDist >= 0) {
-				tmpWegeDists.add(new Double(tmpWegDist));
+				tmpWegeDists.add(tmpWegDist);
 				int mode = Integer.parseInt(row[44]);
 				// switch (mode) {
 				// case 1:

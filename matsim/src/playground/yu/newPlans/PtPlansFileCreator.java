@@ -10,8 +10,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -27,11 +27,11 @@ import org.matsim.core.utils.misc.Time;
 
 /**
  * @author yu
- *
+ * 
  */
 public class PtPlansFileCreator {
 	private int personCount = 0;
-	private Population pop;
+	private Population pop = null;
 
 	public void setPop(final Population pop) {
 		this.pop = pop;
@@ -45,7 +45,7 @@ public class PtPlansFileCreator {
 		return this.pop;
 	}
 
-	private NetworkLayer network;
+	private NetworkLayer network = null;
 
 	public NetworkLayer getNetwork() {
 		return this.network;
