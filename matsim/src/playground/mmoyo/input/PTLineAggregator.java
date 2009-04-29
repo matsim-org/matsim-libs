@@ -69,8 +69,6 @@ public class PTLineAggregator {
 		//-->and after creating the new nodes and links, we must create the transfers and detached again
 	}
 	
-	
-	
 	public void AddLines(){
 		PTNodeReader ptNodeReader = new PTNodeReader();
 		ptNodeReader.readFile (filePath);
@@ -110,10 +108,9 @@ public class PTLineAggregator {
 					ptnodeMap.put(originalId, ptnodeList);
 					charMap.put(originalId, 'a');
 				}else {
-					//generate new id
 					char sufix = charMap.get(originalId).charValue();
 					sufix++;
-					charMap.put(originalId, sufix); 
+					charMap.put(originalId, sufix);
 				
 					strNode1 = strNode1 + sufix;
 			    	strNode2 = strNode2 + sufix;
@@ -121,7 +118,6 @@ public class PTLineAggregator {
 				
 				Id newId1 = new IdImpl(strNode1);
 				Id newId2 = new IdImpl(strNode2);
-				
 				
 				PTNode ptNode1 = new PTNode(newId1, bNode.getCoord(), new IdImpl(originalId), new IdImpl(strIdPtLine), seqIndex1++);
 				ptnodeMap.get(originalId).add(ptNode1);
@@ -168,17 +164,16 @@ public class PTLineAggregator {
 				departures.add(String.valueOf(time));
 			}
 			PTLine ptLine = new PTLine(id1, lineType, direction1, route1, minute, departures);
-			PTLine ptLine2 = new PTLine(id2, lineType, direction1, route1, minute, departures);
+			PTLine ptLine2 = new PTLine(id2, lineType, direction2, route2, minute, departures);
 			ptLineList.add(ptLine);
 			ptLineList.add(ptLine2);
 		}
 		
-		//crear el PTtimetable
 		timeTable.setptLineList(ptLineList);
 		timeTable.setMaps(linkTravelTimeMap);
 		timeTable.calculateTravelTimes(net);
-		/*
 		
+		/*
 		int iniNodes= net.getNodes().size();
 		int iniLinks= net.getLinks().size();
 		System.out.println("creating new nodes and links...");

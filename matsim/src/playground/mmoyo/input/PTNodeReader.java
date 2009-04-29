@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 public class PTNodeReader extends MatsimXmlParser{
 	private final static String NODE = "node";
 	private final static String LINE = "ptLine";
-	String strPTLine;
+	String strIdPTLine;
 	List<BasicNode> nodeList;
 	Map <String, List<BasicNode>> lineMap = new TreeMap <String, List<BasicNode>>();
 	
@@ -78,17 +78,11 @@ public class PTNodeReader extends MatsimXmlParser{
 	
 	private void startLine(final Attributes atts){
 		nodeList = new ArrayList<BasicNode>();
-		strPTLine = atts.getValue("id");
+		strIdPTLine = atts.getValue("id");
 	}
 	
 	private void endLine(){
-		System.out.print("endLine: ");
-		lineMap.put(strPTLine, nodeList);
-		
-		System.out.println();
-		for (BasicNode basicNode: nodeList){
-			System.out.print(basicNode.getId().toString() + " ");
-		}
+		lineMap.put(strIdPTLine, nodeList);
 	}
 
 	

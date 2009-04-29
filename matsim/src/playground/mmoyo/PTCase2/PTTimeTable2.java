@@ -1,6 +1,5 @@
 package playground.mmoyo.PTCase2;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -96,7 +95,11 @@ public class PTTimeTable2{
 
 	//minutes
 	public double GetTransferTime(Link link, double time){
-		double nextDeparture = nextDepartureB(link.getToNode().getId(),time); 
+		return GetTransferTime(link.getToNode().getId(),time); 
+	}
+	
+	public double GetTransferTime(Id idPTNode, double time){
+		double nextDeparture = nextDepartureB(idPTNode,time); 
 		double transferTime= 0;
 		if (nextDeparture>=time){
 			transferTime= nextDeparture-time;
@@ -105,10 +108,6 @@ public class PTTimeTable2{
 			transferTime= 86400-time+ nextDeparture;
 		}
 		return transferTime;
-	}
-	
-	public List<PTLine> getPtLineList() {
-		return ptLineList;
 	}
 	
 	/*
@@ -128,6 +127,10 @@ public class PTTimeTable2{
 		return arrDep[index];
 	}
 
+	public List<PTLine> getPtLineList() {
+		return ptLineList;
+	}
+	
 	public Map<Id, Link> getNextLinkMap() {
 		return nextLinkMap;
 	}

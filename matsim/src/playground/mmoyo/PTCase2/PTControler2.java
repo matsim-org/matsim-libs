@@ -26,7 +26,10 @@ public class PTControler2 {
 	private static final String ZURICHPTTIMETABLE= path + "PTTimetable.xml";
 	private static final String INPTNETFILE= path + "inptnetfile.xml";
 	private static final String ZURICHPTPLANS= path + "plans.xml";
+	private static final String ALLPLANS= path + "@All_plans .xml";
 	private static final String OUTPUTPLANS= path + "output_plans.xml";
+	private static final String INPTNEWLINES= path + "/TestCase/InPTNewLines.xml";
+	
 	
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, INPTNETFILE, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
@@ -35,33 +38,24 @@ public class PTControler2 {
 		
 		if (option>0){pt.readPTNet(ZURICHPTN);}
 		switch (option){
-		
 			case -6:
-				String plansFile = path + "@All_plans .xml";
-				plansFile = path + "plans.xml";
-				
 				PlanValidator planValidator = new PlanValidator(); 
-				int num = planValidator.PlanCounter(pt.getPtNetworkLayer(), plansFile);
+				int num = planValidator.PlanCounter(pt.getPtNetworkLayer(), ZURICHPTPLANS);
 				System.out.println(num);
-				
 				break;
 			case -5:
-				//It works!
-				String newNodesfilePath="C://Users/manuel/Desktop/TU/ZH_Files/bus/Basic_Bus_Network.xml";
 				NetworkLayer net = new NetworkLayer();
 				pt.setPtNetworkLayer(net);
-				PTLineAggregator ptLineAggregator = new PTLineAggregator(newNodesfilePath, pt.getPtNetworkLayer(), pt.getPtTimeTable());
+				PTLineAggregator ptLineAggregator = new PTLineAggregator(INPTNEWLINES, pt.getPtNetworkLayer(), pt.getPtTimeTable());
 				ptLineAggregator.AddLines();
 				
 				pt.getPtNetworkFactory().createTransferLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
 				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300, pt.getPtTimeTable());
 				
-				
-				pt.writeNet(ZURICHPTN);				
+				pt.writeNet(ZURICHPTN);
 				pt.createRouter();
 				PTActWriter ptActWriter1 = new PTActWriter(pt);
 	    		ptActWriter1.writePTActsLegs();
-				
 				break;
 			case -4:
 			
@@ -70,8 +64,7 @@ public class PTControler2 {
 			case -3:
 				//pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
 	    		pt.readPTNet(INPTNETFILE);
-				newNodesfilePath="C://Users/manuel/Desktop/TU/ZH_Files/bus/Basic_Bus_Network.xml";
-				ptLineAggregator = new PTLineAggregator(newNodesfilePath, pt.getPtNetworkLayer(), pt.getPtTimeTable());
+				ptLineAggregator = new PTLineAggregator(INPTNEWLINES, pt.getPtNetworkLayer(), pt.getPtTimeTable());
 				ptLineAggregator.AddLine();
 	    		pt.writeNet(ZURICHPTN);
 				break;
@@ -87,8 +80,8 @@ public class PTControler2 {
 				//pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300, pt.getPtTimeTable());
 				pt.writeNet(ZURICHPTN);
 	    		pt.readPTNet(ZURICHPTN);
-	    		ptActWriter1 = new PTActWriter(pt);
-	    		ptActWriter1.writePTActsLegs();
+	    		PTActWriter ptActWriter2 = new PTActWriter(pt);
+	    		ptActWriter2.writePTActsLegs();
 	    		
 				break;
 			case 0: 
