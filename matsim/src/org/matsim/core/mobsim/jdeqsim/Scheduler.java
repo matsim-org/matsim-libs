@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 
 /**
@@ -27,6 +28,8 @@ import org.matsim.core.gbl.Gbl;
  * @author rashid_waraich
  */
 public class Scheduler {
+	
+	private static final Logger log = Logger.getLogger(Scheduler.class);
 	private double simTime = 0;
 	private MessageQueue queue = new MessageQueue();
 	private double simulationStartTime = System.currentTimeMillis();
@@ -62,8 +65,7 @@ public class Scheduler {
 		// print output each hour
 		if (simTime / hourlyLogTime > 1) {
 			hourlyLogTime = simTime + 3600;
-			System.out.print("Simulation at " + simTime / 3600 + "[h]; ");
-			System.out.println("s/r:" + simTime / (System.currentTimeMillis() - simulationStartTime) * 1000);
+			log.info("Simulation at " + simTime / 3600 + "[h]; s/r:" + simTime / (System.currentTimeMillis() - simulationStartTime) * 1000);
 			Gbl.printMemoryUsage();
 		}
 	}
