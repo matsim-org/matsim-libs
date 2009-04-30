@@ -108,7 +108,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 			String type = type_it.next();
 			
 			// do not construct tree for home act
-			if (type.startsWith("h")) continue;
+			if (type.startsWith("h") || type.startsWith("tta")) continue;
 			this.quad_trees.put(type, this.builFacQuadTree(type, tree_of_type));
 			this.facilities_of_type.put(type, tree_of_type.values().toArray(new Facility[tree_of_type.size()]));
 		}
@@ -182,7 +182,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		final List actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);
-			if (act.getType().startsWith("h")) continue;
+			if (act.getType().startsWith("h") || act.getType().startsWith("tta")) continue;
 			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
 			
 			if (isPrimary) {

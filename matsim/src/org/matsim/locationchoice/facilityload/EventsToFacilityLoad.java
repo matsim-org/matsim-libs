@@ -72,7 +72,7 @@ public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHa
 	 */
 	public void handleEvent(final ActStartEvent event) {
 		Facility facility = event.getAct().getFacility();
-		if (!event.getAct().getType().startsWith("h")) {
+		if (!(event.getAct().getType().startsWith("h") || event.getAct().getType().startsWith("tta"))) {
 			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addArrival(event.getTime());
 		}
 	}
@@ -83,7 +83,7 @@ public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHa
 	 */
 	public void handleEvent(final ActEndEvent event) {
 		Facility facility = event.getAct().getFacility();
-		if (!event.getAct().getType().startsWith("h")) {
+		if (!(event.getAct().getType().startsWith("h") || event.getAct().getType().startsWith("tta"))) {
 			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addDeparture(event.getTime());
 		}
 	}

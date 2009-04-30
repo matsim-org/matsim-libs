@@ -77,7 +77,7 @@ public class RandomLocationMutator extends LocationMutator {
 			}
 					
 			// if home is accidentally not defined as primary
-			if ((!isPrimary || movable) && !act.getType().startsWith("h")) {
+			if ((!isPrimary || movable) && !(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
 				int length = this.facilities_of_type.get(act.getType()).length;
 				// only one facility: do not need to do location choice
 				if (length > 1) {

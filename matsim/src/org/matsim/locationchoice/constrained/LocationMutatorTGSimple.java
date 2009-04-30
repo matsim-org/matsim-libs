@@ -57,7 +57,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);		
 			if (!plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId()) && 
-					!act.getType().startsWith("h")) {
+					!(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
 				flexibleActivities.add(act);
 			}
 		}
