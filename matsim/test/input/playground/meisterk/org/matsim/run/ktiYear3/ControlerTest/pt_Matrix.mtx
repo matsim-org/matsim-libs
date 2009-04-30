@@ -1,0 +1,13 @@
+$O0M;D2;Y4
+* Verkehrsmittelkennung
+   1
+*  
+*  Zeitintervall
+   0.00  24.00
+*  Faktor
+   1.000000
+*              Quell                Ziel         Anzahl  
+*               Bez                 Bez         Fahrten 
+                26111	                 26105	          3.60
+                26105	                 26105	          0.00
+                26105	                 26111	          3.60
