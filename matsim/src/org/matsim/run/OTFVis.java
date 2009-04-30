@@ -123,33 +123,22 @@ public class OTFVis {
 	public static final String[] chooseFile(final String[] args) {
 		JFileChooser fc = new JFileChooser();
 	    
-	    fc.setFileFilter( new FileFilter() 
-	    { 
-	      @Override public boolean accept( File f ) 
-	      { 
-	        return f.isDirectory() || 
-	          f.getName().toLowerCase().endsWith( ".xml" ); 
-	      } 
-	      @Override public String getDescription() 
-	      { 
-	        return "MATSim net or config file (*.xml)"; 
-	      } 
+	    fc.setFileFilter( new FileFilter() { 
+	      @Override public boolean accept( File f ) { 
+	        return f.isDirectory() || f.getName().toLowerCase().endsWith( ".xml" ); 
+	      }
+	      @Override public String getDescription() { return "MATSim net or config file (*.xml)"; } 
 	    } ); 
 
-	    fc.setFileFilter( new FileFilter() 
-	    { 
-	      @Override public boolean accept( File f ) 
-	      { 
-	        return f.isDirectory() || 
-	          f.getName().toLowerCase().endsWith( ".mvi" ); 
+	    fc.setFileFilter( new FileFilter() { 
+	      @Override public boolean accept( File f ) { 
+	        return f.isDirectory() || f.getName().toLowerCase().endsWith( ".mvi" ); 
 	      } 
-	      @Override public String getDescription() 
-	      { return "OTFVis movie file (*.mvi)"; } 
+	      @Override public String getDescription() { return "OTFVis movie file (*.mvi)"; } 
 	    } ); 
 
 	    int state = fc.showOpenDialog( null ); 
-	    if ( state == JFileChooser.APPROVE_OPTION ) 
-	    { 
+	    if ( state == JFileChooser.APPROVE_OPTION ) { 
 	    	String [] args_new = {fc.getSelectedFile().getAbsolutePath()};
 	    	return args_new;
 	    }
