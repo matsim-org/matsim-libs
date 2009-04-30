@@ -8,6 +8,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.world.World;
 
+import playground.anhorni.locationchoice.preprocess.AnalyzeFacilities.AnalyzeFacilities;
+
 public class AnalyzePlansAndFacs {
 
 	private final static Logger log = Logger.getLogger(AnalyzePlansAndFacs.class);
@@ -49,6 +51,6 @@ public class AnalyzePlansAndFacs {
 		
 		log.info("analyze facilities ...");
 		AnalyzeFacilities facilitiesAnalyzer = new AnalyzeFacilities();
-		facilitiesAnalyzer.run(this.facilitiesSL, network);				
+		facilitiesAnalyzer.run(this.facilitiesSL);				
 	}
 }
