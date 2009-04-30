@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -237,11 +237,12 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		double planTravelDistance=0.0;
 		int numberOfLegs=0;
 
-		final LegIterator leg_it = plan.getIteratorLeg();
-		while (leg_it.hasNext()) {
-			final Leg leg = (Leg)leg_it.next();
-			planTravelDistance+=leg.getRoute().getDistance();
-			numberOfLegs++;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				final Leg leg = (Leg) pe;
+				planTravelDistance+=leg.getRoute().getDistance();
+				numberOfLegs++;
+			}
 		}
 		if (numberOfLegs>0) {
 			return planTravelDistance/numberOfLegs;

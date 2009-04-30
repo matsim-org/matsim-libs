@@ -20,8 +20,6 @@
 
 package playground.balmermi.algos;
 
-import java.util.Iterator;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
@@ -30,6 +28,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
@@ -120,35 +119,31 @@ public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {
 
 	@Override
 	public void run(final Person person) {
-		Iterator<Plan> p_it = person.getPlans().iterator();
-		while (p_it.hasNext()) {
-			Plan p = p_it.next();
-			Iterator<?> l_it = p.getIteratorLeg();
-			while (l_it.hasNext()) {
-				Leg l = (Leg)l_it.next();
-				l.setRoute(null);
-			}
-
-			Iterator<?> a_it = p.getIteratorAct();
-			while (a_it.hasNext()) {
-				Activity a = (Activity)a_it.next();
-				Coord coord = a.getCoord();
-				if (coord == null) { Gbl.errorMsg("Something is wrong!"); }
-				char type = a.getType().charAt(0);
-				Facility f = null;
-				if (type == H) { f = this.hfacs.get(coord.getX(),coord.getY()); }
-				else if (type == W) { f = this.wfacs.get(coord.getX(),coord.getY()); }
-				else if (type == E) { f = this.efacs.get(coord.getX(),coord.getY()); }
-				else if (type == S) { f = this.sfacs.get(coord.getX(),coord.getY()); }
-				else if (type == L) { f = this.lfacs.get(coord.getX(),coord.getY()); }
-				else { Gbl.errorMsg("Something is wrong!"); }
-				if (f == null) { Gbl.errorMsg("Something is wrong!"); }
-
-				Link link = f.getLink();
-				if (link == null) { Gbl.errorMsg("Something is wrong!"); }
-
-				a.setLink(link);
-				a.setCoord(f.getCoord());
+		for (Plan p : person.getPlans()) {
+			for (PlanElement pe : p.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg l = (Leg) pe;
+					l.setRoute(null);
+				} else if (pe instanceof Activity) {
+					Activity a = (Activity) pe;
+					Coord coord = a.getCoord();
+					if (coord == null) { throw new RuntimeException("Something is wrong!"); }
+					char type = a.getType().charAt(0);
+					Facility f = null;
+					if (type == H) { f = this.hfacs.get(coord.getX(),coord.getY()); }
+					else if (type == W) { f = this.wfacs.get(coord.getX(),coord.getY()); }
+					else if (type == E) { f = this.efacs.get(coord.getX(),coord.getY()); }
+					else if (type == S) { f = this.sfacs.get(coord.getX(),coord.getY()); }
+					else if (type == L) { f = this.lfacs.get(coord.getX(),coord.getY()); }
+					else { throw new RuntimeException("Something is wrong!"); }
+					if (f == null) { throw new RuntimeException("Something is wrong!"); }
+					
+					Link link = f.getLink();
+					if (link == null) { throw new RuntimeException("Something is wrong!"); }
+					
+					a.setLink(link);
+					a.setCoord(f.getCoord());
+				}
 			}
 		}
 	}

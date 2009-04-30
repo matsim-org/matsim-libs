@@ -21,17 +21,17 @@
 package org.matsim.population.algorithms;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -65,15 +65,26 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 	public void run(final Plan plan) {
 		Plan beeline = getBeeline(plan);
 
-		LegIterator itPlanLegs = plan.getIteratorLeg();
-		LegIterator itBeelineLegs = beeline.getIteratorLeg();
+		Iterator<PlanElement> itPlan = plan.getPlanElements().iterator();
+		Iterator<PlanElement> itBeeline = beeline.getPlanElements().iterator();
 
-		while (itPlanLegs.hasNext()) {
-			Leg planLeg = (Leg) itPlanLegs.next();
-			Leg beelineLeg = (Leg) itBeelineLegs.next();
+		Leg planLeg = getNextLeg(itPlan);
+		while (planLeg != null) {
+			Leg beelineLeg = getNextLeg(itBeeline);
 			int type = 2 * intersectAOI(beelineLeg) + intersectAOI(planLeg);
 			this.count[type]++;
+			planLeg = getNextLeg(itPlan);
 		}
+	}
+	
+	private Leg getNextLeg(Iterator<PlanElement> iterator) {
+		while (iterator.hasNext()) {
+			PlanElement pe = iterator.next();
+			if (pe instanceof Leg) {
+				return (Leg) pe;
+			}
+		}
+		return null;
 	}
 
 	private int intersectAOI(final Leg leg) {
@@ -87,15 +98,16 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 
 	private Plan getBeeline(final Plan plan) {
 		Plan beeline = new PlanImpl(plan.getPerson());
-		ActIterator it = plan.getIteratorAct();
-		beeline.addActivity(it.next());
-		while (it.hasNext()) {
-			Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
-			leg.setDepartureTime(0.0);
-			leg.setTravelTime(0.0);
-			leg.setArrivalTime(0.0);
-			beeline.addLeg(leg);
-			beeline.addActivity(it.next());
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
+				leg.setDepartureTime(0.0);
+				leg.setTravelTime(0.0);
+				leg.setArrivalTime(0.0);
+				beeline.addLeg(leg);
+			} else {
+				beeline.getPlanElements().add(pe);
+			}
 		}
 		this.router.run(beeline);
 		return beeline;

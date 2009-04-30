@@ -13,9 +13,8 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActEndEvent;
 import org.matsim.core.events.ActStartEvent;
@@ -72,68 +71,68 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 			Plan plan = p.getSelectedPlan();
 			int index = 0;
 
-			ActIterator actIter = plan.getIteratorAct();
-			LegIterator legIter = plan.getIteratorLeg();
-
-			Activity act = (Activity) actIter.next();
-			while (legIter.hasNext()) {
-
-				Leg leg = (Leg) legIter.next();
-
-				// act end event
-				assertTrue(list.get(index) instanceof ActEndEvent);
-				assertEquals(act.getLinkId(), ((ActEndEvent) list.get(index)).getLinkId());
-				index++;
-
-				// each leg starts with departure on act link
-				assertTrue(list.get(index) instanceof AgentDepartureEvent);
-				assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-						((AgentDepartureEvent) list.get(index)).getLinkId().toString()));
-				index++;
-
-				// each CAR leg must enter/leave act link
-				if (leg.getMode().equals(TransportMode.car)) {
-					// the first LinkEnterEvent is a AgentWait2LinkEvent
-					assertTrue(list.get(index) instanceof AgentWait2LinkEvent);
-					assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-							((AgentWait2LinkEvent) list.get(index)).getLinkId().toString()));
-					index++;
-
-					assertTrue(list.get(index) instanceof LinkLeaveEvent);
-					assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-							((LinkLeaveEvent) list.get(index)).getLinkId().toString()));
-					index++;
-
-					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
-						// enter link and leave each link on route
-						assertTrue(list.get(index) instanceof LinkEnterEvent);
-						assertTrue(link.getId().toString().equalsIgnoreCase(
-								((LinkEnterEvent) list.get(index)).getLinkId().toString()));
+			Activity act = null;
+			Leg leg = null;
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					act = (Activity) pe;
+					
+					if (leg != null) {
+						// each leg ends with arrival on act link
+						assertTrue(list.get(index) instanceof AgentArrivalEvent);
+						assertTrue(act.getLinkId().toString().equalsIgnoreCase(
+								((AgentArrivalEvent) list.get(index)).getLinkId().toString()));
 						index++;
 
-						assertTrue(list.get(index) instanceof LinkLeaveEvent);
-						assertTrue(link.getId().toString().equalsIgnoreCase(
-								((LinkLeaveEvent) list.get(index)).getLinkId().toString()));
+						// each leg ends with arrival on act link
+						assertTrue(list.get(index) instanceof ActStartEvent);
+						assertEquals(act.getLinkId(), ((ActStartEvent) list.get(index)).getLinkId());
 						index++;
 					}
+				} else if (pe instanceof Leg) {
+					leg = (Leg) pe;
+
+					// act end event
+					assertTrue(list.get(index) instanceof ActEndEvent);
+					assertEquals(act.getLinkId(), ((ActEndEvent) list.get(index)).getLinkId());
+					index++;
+					
+					// each leg starts with departure on act link
+					assertTrue(list.get(index) instanceof AgentDepartureEvent);
+					assertTrue(act.getLinkId().toString().equalsIgnoreCase(
+							((AgentDepartureEvent) list.get(index)).getLinkId().toString()));
+					index++;
+					
+					// each CAR leg must enter/leave act link
+					if (leg.getMode().equals(TransportMode.car)) {
+						// the first LinkEnterEvent is a AgentWait2LinkEvent
+						assertTrue(list.get(index) instanceof AgentWait2LinkEvent);
+						assertTrue(act.getLinkId().toString().equalsIgnoreCase(
+								((AgentWait2LinkEvent) list.get(index)).getLinkId().toString()));
+						index++;
+						
+						assertTrue(list.get(index) instanceof LinkLeaveEvent);
+						assertTrue(act.getLinkId().toString().equalsIgnoreCase(
+								((LinkLeaveEvent) list.get(index)).getLinkId().toString()));
+						index++;
+						
+						for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+							// enter link and leave each link on route
+							assertTrue(list.get(index) instanceof LinkEnterEvent);
+							assertTrue(link.getId().toString().equalsIgnoreCase(
+									((LinkEnterEvent) list.get(index)).getLinkId().toString()));
+							index++;
+							
+							assertTrue(list.get(index) instanceof LinkLeaveEvent);
+							assertTrue(link.getId().toString().equalsIgnoreCase(
+									((LinkLeaveEvent) list.get(index)).getLinkId().toString()));
+							index++;
+						}
+					}
+					
 				}
-
-				// get next act
-				act = (Activity) actIter.next();
-
-				// each leg ends with arrival on act link
-				assertTrue(list.get(index) instanceof AgentArrivalEvent);
-				assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-						((AgentArrivalEvent) list.get(index)).getLinkId().toString()));
-				index++;
-
-				// each leg ends with arrival on act link
-				assertTrue(list.get(index) instanceof ActStartEvent);
-				assertEquals(act.getLinkId(), ((ActStartEvent) list.get(index)).getLinkId());
-				index++;
 			}
 		}
-
 	}
 
 	public void handleEvent(PersonEvent event) {

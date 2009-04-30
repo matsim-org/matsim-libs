@@ -29,9 +29,9 @@ package playground.ciarif.retailers;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
@@ -40,6 +40,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -83,7 +84,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		Controler controler = event.getControler();
 		preprocess.run(controler.getNetwork());
 		pcrl = new PlansCalcRoute(controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess));
-		String popOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
+		String popOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
 		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.pst = new PlansSummaryTable (popOutFile);
 		this.lrr = new LinksRetailerReader (controler);
@@ -91,10 +92,10 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		this.txf = new MakeATableFromXMLFacilities("output/facilities_table2.txt");
 		FacilitiesImpl facs = (FacilitiesImpl) controler.getFacilities();
 		txf.write(facs);
-		String retailersOutFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
+		String retailersOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
 		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.rs = new RetailersSummaryWriter (retailersOutFile);
-		this.facilityIdFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
+		this.facilityIdFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
 		if (this.facilityIdFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RETAILERS+" in module = "+CONFIG_GROUP+" not defined!");
 		}
 		else {
@@ -160,13 +161,13 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 				for (Plan plan : p.getPlans()) {
 					
 					boolean routeIt = false;
-					Iterator<?> actIter = plan.getIteratorAct();
-					while (actIter.hasNext()) {
-						
-						Activity act = (Activity)actIter.next();
-						if (movedFacilities.containsKey(act.getFacilityId())) {
-							act.setLink(act.getFacility().getLink());
-							routeIt = true;
+					for (PlanElement pe : plan.getPlanElements()) {
+						if (pe instanceof Activity) {
+							Activity act = (Activity) pe;
+							if (movedFacilities.containsKey(act.getFacilityId())) {
+								act.setLink(act.getFacility().getLink());
+								routeIt = true;
+							}
 						}
 					}
 					if (routeIt) {

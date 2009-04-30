@@ -30,6 +30,7 @@ import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.QuadTree;
@@ -251,14 +252,14 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 	public void run(final Person person) {
 		ArrayList<Activity> work_list = new ArrayList<Activity>();
 		ArrayList<Activity> educ_list = new ArrayList<Activity>();
-		Iterator<?> act_it = person.getSelectedPlan().getIteratorAct();
-		while (act_it.hasNext()) {
-			Activity act = (Activity)act_it.next();
-			if (W.equals(act.getType())) {
-				work_list.add(act);
-			}
-			else if (E.equals(act.getType())) {
-				educ_list.add(act);
+		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if (W.equals(act.getType())) {
+					work_list.add(act);
+				} else if (E.equals(act.getType())) {
+					educ_list.add(act);
+				}
 			}
 		}
 

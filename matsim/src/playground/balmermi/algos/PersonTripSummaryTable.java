@@ -27,7 +27,7 @@ import java.io.IOException;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -99,30 +99,31 @@ public class PersonTripSummaryTable extends AbstractPersonAlgorithm implements P
 		// plans
 		Plan plan = person.getSelectedPlan();
 		if (plan == null) { Gbl.errorMsg("Person id=" + person.getId() + "does not have a selected plan assigned!"); }
-		LegIterator l_it = plan.getIteratorLeg();
-		while (l_it.hasNext()) {
-			Leg leg = (Leg)l_it.next();
-			String mode = leg.getMode().toString();
-			double dist = leg.getRoute().getDistance();
-			dist = dist / 1000; // km
-			int ii = (int)dist;
-			if (ii > 200) { ii=200; }
-
-			int jj = -1;
-			if (mode.equals("miv")) { jj = 0; }
-			else if (mode.equals("car")) { jj = 1; }
-			else if (mode.equals("ride")) { jj = 2; }
-			else if (mode.equals("motorbike")) { jj = 3; }
-			else if (mode.equals("pt")) { jj = 4; }
-			else if (mode.equals("train")) { jj = 5; }
-			else if (mode.equals("bus")) { jj = 6; }
-			else if (mode.equals("tram")) { jj = 7; }
-			else if (mode.equals("bike")) { jj = 8; }
-			else if (mode.equals("walk")) { jj = 9; }
-			else if (mode.equals("undef")) { jj = 10; }
-			else { Gbl.errorMsg("Person id=" + person.getId() + ": mode=" + mode + " not known!"); }
-			
-			this.dist_cnt[ii][jj]++;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				String mode = leg.getMode().toString();
+				double dist = leg.getRoute().getDistance();
+				dist = dist / 1000; // km
+				int ii = (int)dist;
+				if (ii > 200) { ii=200; }
+				
+				int jj = -1;
+				if (mode.equals("miv")) { jj = 0; }
+				else if (mode.equals("car")) { jj = 1; }
+				else if (mode.equals("ride")) { jj = 2; }
+				else if (mode.equals("motorbike")) { jj = 3; }
+				else if (mode.equals("pt")) { jj = 4; }
+				else if (mode.equals("train")) { jj = 5; }
+				else if (mode.equals("bus")) { jj = 6; }
+				else if (mode.equals("tram")) { jj = 7; }
+				else if (mode.equals("bike")) { jj = 8; }
+				else if (mode.equals("walk")) { jj = 9; }
+				else if (mode.equals("undef")) { jj = 10; }
+				else { Gbl.errorMsg("Person id=" + person.getId() + ": mode=" + mode + " not known!"); }
+				
+				this.dist_cnt[ii][jj]++;
+			}
 		}
 	}
 

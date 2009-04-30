@@ -21,7 +21,6 @@
 package playground.ciarif.models.subtours;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -32,7 +31,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -94,16 +93,16 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 	
 	private final void setUpModeChoice(final Plan plan, final PersonSubtour personSubtour) {	
 		// setting subtour parameters
-		if (plan == null) { Gbl.errorMsg("Person id=" + plan.getPerson().getId() + "does not have a selected plan."); }
-		Iterator<BasicActivityImpl> act_it = plan.getIteratorAct();
+		if (plan == null) { throw new RuntimeException("a person does not have a selected plan."); }
 		Coord home_coord = null;
 		Coord work_coord = null;
-		act_it.hasNext();
 		double dist_h_w = 0.0;
-		while (act_it.hasNext()) {
-			Activity act = (Activity)act_it.next();
-			if (H.equals(act.getType().substring(0,1))) { home_coord = act.getCoord();}
-			else if (W.equals(act.getType().substring(0,1))) { work_coord = act.getCoord(); }
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if (H.equals(act.getType().substring(0,1))) { home_coord = act.getCoord();}
+				else if (W.equals(act.getType().substring(0,1))) { work_coord = act.getCoord(); }
+			}
 		}
 		if ((home_coord == null) || (home_coord.equals(ZERO))) { Gbl.errorMsg("No home coord defined!"); }
 		if ((work_coord != null) && (work_coord.equals(ZERO))) { Gbl.errorMsg("Weird work coord defined!!!"); }
@@ -137,19 +136,19 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			if (MatsimRandom.getRandom().nextDouble() < 0.56) { has_bike = true; }			
 
 			////////////////////////////////////////////////////////////////////////////////
-			// TODO [balmermi]: Check for antoher probability
+			// TODO [balmermi]: Check for another probability
 //			boolean ride_possible = true;
 			boolean ride_possible = false;
 			double rd2 = MatsimRandom.getRandom().nextDouble ();
 			if (plan.getPerson().hasLicense()) {}
 			else {
 				if (rd2 < 0.60) {ride_possible = true; System.out.println("random = " + rd2);} // should be substituted with car ownership 
-				// at the houshold level or something similar 
+				// at the household level or something similar 
 			}
 			////////////////////////////////////////////////////////////////////////////////
 			
 			////////////////////////////////////////////////////////////////////////////////
-			// TODO [balmermi]: Check for antoher probability
+			// TODO [balmermi]: Check for another probability
 			//boolean pt = true;			
 			boolean pt = false; // Should be substituted with actual access to pt;
 			double rd3 = MatsimRandom.getRandom().nextDouble (); 
@@ -195,7 +194,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			
 			ArrayList<Location> locs = municipalityLayer.getNearestLocations(sub.getStart_coord());
 			Location loc = locs.get(MatsimRandom.getRandom().nextInt(locs.size()));
-			Municipality m = municipalities.getMunicipality(new Integer(loc.getId().toString()));
+			Municipality m = municipalities.getMunicipality(loc.getId());
 			int udeg = m.getRegType();
 			//System.out.println ("udeg");
 			//Iterator<Location> l_it = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY).getLocations().values().iterator(); //TODO controllare se serve!!!!!

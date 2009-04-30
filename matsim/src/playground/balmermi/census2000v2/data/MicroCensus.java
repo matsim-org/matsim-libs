@@ -21,12 +21,12 @@
 package playground.balmermi.census2000v2.data;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -150,11 +150,12 @@ public class MicroCensus {
 			String lic = p.getLicense();
 			boolean has_work = false;
 			boolean has_educ = false;
-			Iterator<?> a_it = p.getSelectedPlan().getIteratorAct();
-			while (a_it.hasNext()) {
-				Activity a = (Activity)a_it.next();
-				if (a.getType().equals(WORK)) { has_work = true; }
-				if (a.getType().equals(EDUC)) { has_educ = true; }
+			for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity a = (Activity) pe;
+					if (a.getType().equals(WORK)) { has_work = true; }
+					if (a.getType().equals(EDUC)) { has_educ = true; }
+				}
 			}
 
 			int index = this.group2index(age,sex,lic,has_work,has_educ);

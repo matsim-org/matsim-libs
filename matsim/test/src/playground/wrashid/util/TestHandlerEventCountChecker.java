@@ -9,8 +9,8 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActEndEvent;
 import org.matsim.core.events.ActStartEvent;
@@ -87,10 +87,11 @@ LinkEnterEventHandler, LinkLeaveEventHandler  {
 			List<? extends BasicPlanElement> actsLegs =plan.getPlanElements();
 			expectedDepartureEvents+=actsLegs.size() / 2 ;
 			
-			LegIterator iter=plan.getIteratorLeg();
-			while (iter.hasNext()){
-				Leg leg=(Leg)iter.next();
-				expectedLinkEnterEvents+=((NetworkRoute) leg.getRoute()).getLinks().size()+1;
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg=(Leg) pe;
+					expectedLinkEnterEvents+=((NetworkRoute) leg.getRoute()).getLinks().size()+1;
+				}
 			}
 		}
 		

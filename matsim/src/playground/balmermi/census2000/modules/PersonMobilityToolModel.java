@@ -20,13 +20,11 @@
 
 package playground.balmermi.census2000.modules;
 
-import java.util.Iterator;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -70,13 +68,14 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 	@Override
 	public void run(Person person) {
 		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.valueOf(person.getId().toString()));
-		Iterator<BasicActivityImpl> act_it = person.getSelectedPlan().getIteratorAct();
 		Coord home_coord = null;
 		Coord work_coord = null;
-		while (act_it.hasNext()) {
-			Activity act = (Activity)act_it.next();
-			if (H.equals(act.getType())) { home_coord = act.getCoord(); }
-			else if (W.equals(act.getType())) { home_coord = act.getCoord(); }
+		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if (H.equals(act.getType())) { home_coord = act.getCoord(); }
+				else if (W.equals(act.getType())) { home_coord = act.getCoord(); }
+			}
 		}
 		double distance = 0.0;
 		if ((home_coord == null) || (home_coord.equals(ZERO))) { Gbl.errorMsg("No home coord defined!"); }

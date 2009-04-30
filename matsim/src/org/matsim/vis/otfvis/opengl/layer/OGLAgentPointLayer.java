@@ -62,7 +62,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	public static class AgentArrayDrawer extends OTFGLDrawableImpl {
 
 		private int count = 0;
-		private static int alpha =120;
+		private static int alpha =200;
 		
 		private ByteBuffer colorsIN = null;
 		private FloatBuffer vertexIN = null;

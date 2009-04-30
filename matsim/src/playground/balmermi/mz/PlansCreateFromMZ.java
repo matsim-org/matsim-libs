@@ -31,14 +31,13 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -197,7 +196,7 @@ public class PlansCreateFromMZ {
 				person_string_new = person_string_new + str;
 
 				// creating/getting the matsim person
-				Person person = plans.getPerson(pid);
+				Person person = plans.getPersons().get(pid);
 				if (person == null) {
 					person = new PersonImpl(pid);
 					plans.addPerson(person);
@@ -310,10 +309,11 @@ public class PlansCreateFromMZ {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
-			ActIterator act_it = plan.getIteratorAct();
-			while (act_it.hasNext()) {
-				Activity act = (Activity)act_it.next();
-				if (act.getType().equals(OTHR)) { ids.add(p.getId()); }
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
+					if (act.getType().equals(OTHR)) { ids.add(p.getId()); }
+				}
 			}
 		}
 		return ids;
@@ -325,10 +325,11 @@ public class PlansCreateFromMZ {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
-			LegIterator leg_it = plan.getIteratorLeg();
-			while (leg_it.hasNext()) {
-				Leg leg = (Leg)leg_it.next();
-				if (leg.getMode().equals(UNDF)) { ids.add(p.getId()); }
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					if (leg.getMode().equals(UNDF)) { ids.add(p.getId()); }
+				}
 			}
 		}
 		return ids;
@@ -340,14 +341,17 @@ public class PlansCreateFromMZ {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
-			ActIterator act_it = plan.getIteratorAct();
-			Activity prev_act = (Activity)act_it.next();
-			while (act_it.hasNext()) {
-				Activity curr_act = (Activity)act_it.next();
-				Coord prevc = prev_act.getCoord();
-				Coord currc = curr_act.getCoord();
-				if ((currc.getX()==prevc.getX())&& (currc.getY()==currc.getY())) { ids.add(p.getId()); }
-				prev_act = curr_act;
+			Activity prevAct = null;
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
+					if (prevAct != null) {
+						Coord prevc = prevAct.getCoord();
+						Coord currc = act.getCoord();
+						if ((currc.getX()==prevc.getX())&& (currc.getY()==currc.getY())) { ids.add(p.getId()); }
+					}
+					prevAct = act;
+				}
 			}
 		}
 		return ids;
@@ -364,7 +368,7 @@ public class PlansCreateFromMZ {
 			Plan plan = p.getSelectedPlan();
 			Plan plan2 = new org.matsim.core.population.PlanImpl(p);
 			plan2.setSelected(true);
-			plan2.setScore(plan.getScoreAsPrimitiveType());
+			plan2.setScore(plan.getScore());
 			plan2.addActivity((Activity)plan.getPlanElements().get(0));
 
 			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
@@ -430,10 +434,11 @@ public class PlansCreateFromMZ {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
-			LegIterator leg_it = plan.getIteratorLeg();
-			while (leg_it.hasNext()) {
-				Leg leg = (Leg)leg_it.next();
-				if (leg.getRoute().getDistance() < 0) { ids.add(p.getId()); }
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					if (leg.getRoute().getDistance() < 0) { ids.add(p.getId()); }
+				}
 			}
 		}
 		return ids;
@@ -445,10 +450,11 @@ public class PlansCreateFromMZ {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
-			ActIterator act_it = plan.getIteratorAct();
-			while (act_it.hasNext()) {
-				Activity act = (Activity)act_it.next();
-				if ((act.getCoord().getX()<0) || (act.getCoord().getY()<0)) { ids.add(p.getId()); }
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
+					if ((act.getCoord().getX()<0) || (act.getCoord().getY()<0)) { ids.add(p.getId()); }
+				}
 			}
 		}
 		return ids;
@@ -460,10 +466,11 @@ public class PlansCreateFromMZ {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
-			LegIterator leg_it = plan.getIteratorLeg();
-			while (leg_it.hasNext()) {
-				Leg leg = (Leg)leg_it.next();
-				if ((leg.getMode().equals(TransportMode.walk))&&(leg.getRoute().getDistance()>10000.0)) {ids.add(p.getId()); }
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					if ((leg.getMode().equals(TransportMode.walk))&&(leg.getRoute().getDistance()>10000.0)) {ids.add(p.getId()); }
+				}
 			}
 		}
 		return ids;

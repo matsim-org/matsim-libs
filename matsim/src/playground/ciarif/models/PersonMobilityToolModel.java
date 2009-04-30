@@ -20,13 +20,11 @@
 
 package playground.ciarif.models;
 
-import java.util.Iterator;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -34,8 +32,6 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.balmermi.census2000.data.Persons;
-//import playground.ciarif.models.ModelMobiliyTools;
-//import playground.balmermi.census2000.models.ModelMobiliyTools;
 import playground.balmermi.census2000v2.models.ModelMobilityTools;
 
 public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements PlanAlgorithm {
@@ -71,14 +67,15 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 
 	@Override
 	public void run(Person person) {
-		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
-		Iterator<BasicActivityImpl> act_it = person.getSelectedPlan().getIteratorAct();
+		playground.balmermi.census2000.data.Person p = this.persons.getPersons().get(person.getId());
 		Coord home_coord = null;
 		Coord work_coord = null;
-		while (act_it.hasNext()) {
-			Activity act = (Activity)act_it.next();
-			if (H.equals(act.getType())) { home_coord = act.getCoord(); }
-			else if (W.equals(act.getType())) { work_coord = act.getCoord(); }
+		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if (H.equals(act.getType())) { home_coord = act.getCoord(); }
+				else if (W.equals(act.getType())) { work_coord = act.getCoord(); }
+			}
 		}
 		double distance = 0.0;
 		if ((home_coord == null) || (home_coord.equals(ZERO))) { Gbl.errorMsg("No home coord defined!"); }

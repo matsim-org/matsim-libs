@@ -31,6 +31,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -161,15 +162,16 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 
 	private final int calcChainIndex(Plan plan, int offset) {
 		int w = 0; int e = 0; int s = 0; int l = 0;
-		Iterator<?> act_it = plan.getIteratorAct();
-		while (act_it.hasNext()) {
-			Activity act = (Activity)act_it.next();
-			if (H.equals(act.getType())) { ; }
-			else if (W.equals(act.getType())) { w = 1; }
-			else if (E.equals(act.getType())) { e = 1; }
-			else if (S.equals(act.getType())) { s = 1; }
-			else if (L.equals(act.getType())) { l = 1; }
-			else { Gbl.errorMsg("Act type=" + act.getType() + " not known!"); }
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if (H.equals(act.getType())) { ; }
+				else if (W.equals(act.getType())) { w = 1; }
+				else if (E.equals(act.getType())) { e = 1; }
+				else if (S.equals(act.getType())) { s = 1; }
+				else if (L.equals(act.getType())) { l = 1; }
+				else { Gbl.errorMsg("Act type=" + act.getType() + " not known!"); }
+			}
 		}
 		int index = w*2*2*2 + e*2*2 + s*2 + l;
 		return index + offset;
@@ -177,14 +179,16 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 
 	private final int calcPlanIndex(Plan plan, int offset) {
 		double dist = 0.0;
-		Iterator<?> act_it = plan.getIteratorAct();
-		act_it.hasNext();
-		Activity prev_act = (Activity)act_it.next();
-		while (act_it.hasNext()) {
-			Activity act = (Activity)act_it.next();
-			double curr_dist = CoordUtils.calcDistance(act.getCoord(), prev_act.getCoord());
-			dist += curr_dist;
-			prev_act = act;
+		Activity prevAct = null;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if (prevAct != null) {
+					double curr_dist = CoordUtils.calcDistance(act.getCoord(), prevAct.getCoord());
+					dist += curr_dist;
+				}
+				prevAct = act;
+			}
 		}
 		if (dist < 5000.0) { return 0 + offset; }
 		else if (dist < 20000.0) { return 1 + offset; }
@@ -195,28 +199,30 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 
 	private final int countActs(Plan plan) {
 		int cnt = 0;
-		Iterator<?> act_it = plan.getIteratorAct();
-		while (act_it.hasNext()) {
-			act_it.next();
-			cnt++;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				cnt++;
+			}
 		}
 		return cnt;
 	}
 
 	private final int[] countTrips(Plan plan) {
 		int[] cnts = {0,0,0,0,0};
-		Iterator<?> act_it = plan.getIteratorAct();
-		act_it.hasNext();
-		Activity prev_act = (Activity)act_it.next();
-		while (act_it.hasNext()) {
-			Activity act = (Activity)act_it.next();
-			double dist = CoordUtils.calcDistance(act.getCoord(), prev_act.getCoord());
-			if (dist < 1000.0) { cnts[0]++; }
-			else if (dist < 5000.0) { cnts[1]++; }
-			else if (dist < 20000.0) { cnts[2]++; }
-			else if (dist < 50000.0) { cnts[3]++; }
-			else { cnts[4]++; }
-			prev_act = act;
+		Activity prevAct = null;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if (prevAct != null) {
+					double dist = CoordUtils.calcDistance(act.getCoord(), prevAct.getCoord());
+					if (dist < 1000.0) { cnts[0]++; }
+					else if (dist < 5000.0) { cnts[1]++; }
+					else if (dist < 20000.0) { cnts[2]++; }
+					else if (dist < 50000.0) { cnts[3]++; }
+					else { cnts[4]++; }
+				}
+				prevAct = act;
+			}
 		}
 		return cnts;
 	}

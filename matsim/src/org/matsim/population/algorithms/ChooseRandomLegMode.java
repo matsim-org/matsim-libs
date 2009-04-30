@@ -24,8 +24,9 @@ import java.util.Random;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 
 /**
@@ -66,8 +67,10 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 				}
 			}
 			TransportMode newMode = this.possibleModes[newModeIdx];
-			for (LegIterator iter = plan.getIteratorLeg(); iter.hasNext(); ) {
-				iter.next().setMode(newMode);
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					((Leg) pe).setMode(newMode);
+				}
 			}
 		}
 	}

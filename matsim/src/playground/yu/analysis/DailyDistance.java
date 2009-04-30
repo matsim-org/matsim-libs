@@ -11,8 +11,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -148,161 +148,162 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		double wlkDayDist = 0.0;
 		double bikeDayDist = 0.0;
 		double othersDayDist = 0.0;
-		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
-			Leg bl = (Leg) li.next();
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg bl = (Leg) pe;
+				ActType at = null;
+				String tmpActTypeStartsWith = plan.getNextActivity(bl).getType()
+						.substring(0, 1);
+				for (ActType a : ActType.values()) {
+					if (tmpActTypeStartsWith.equals(a.getFirstLetter())) {
+						at = a;
+						break;
+					}
+				}
+				if (at == null)
+					at = ActType.others;
 
-			ActType at = null;
-			String tmpActTypeStartsWith = plan.getNextActivity(bl).getType()
-					.substring(0, 1);
-			for (ActType a : ActType.values()) {
-				if (tmpActTypeStartsWith.equals(a.getFirstLetter())) {
-					at = a;
+				double dist = bl.getRoute().getDistance() / 1000.0;
+				// if (bl.getDepartureTime() < 86400)
+				TransportMode mode = bl.getMode();
+				switch (mode) {
+				case car:
+					this.carDist += dist;
+					carDayDist += dist;
+					switch (at) {
+					case home:
+						this.carHomeDist += dist;
+						break;
+					case work:
+						this.carWorkDist += dist;
+						break;
+					case education:
+						this.carEducDist += dist;
+						break;
+					case shopping:
+						this.carShopDist += dist;
+						break;
+					case leisure:
+						this.carLeisDist += dist;
+						break;
+					default:
+						this.carOtherDist += dist;
+						break;
+					}
+					this.carLegDistanceCounts[Math.min(100, (int) dist)]++;
+					break;
+				case pt:
+					this.ptDist += dist;
+					ptDayDist += dist;
+					switch (at) {
+					case home:
+						this.ptHomeDist += dist;
+						break;
+					case work:
+						this.ptWorkDist += dist;
+						break;
+					case education:
+						this.ptEducDist += dist;
+						break;
+					case shopping:
+						this.ptShopDist += dist;
+						break;
+					case leisure:
+						this.ptLeisDist += dist;
+						break;
+					default:
+						this.ptOtherDist += dist;
+						break;
+					}
+					this.ptLegDistanceCounts[Math.min(100, (int) dist)]++;
+					break;
+				case walk:
+					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
+							.getLink().getCoord(), plan.getNextActivity(bl)
+							.getLink().getCoord()) * 1.5 / 1000.0;
+					this.wlkDist += dist;
+					wlkDayDist += dist;
+					switch (at) {
+					case home:
+						this.wlkHomeDist += dist;
+						break;
+					case work:
+						this.wlkWorkDist += dist;
+						break;
+					case education:
+						this.wlkEducDist += dist;
+						break;
+					case shopping:
+						this.wlkShopDist += dist;
+						break;
+					case leisure:
+						this.wlkLeisDist += dist;
+						break;
+					default:
+						this.wlkOtherDist += dist;
+						break;
+					}
+					this.wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
+					break;
+				case bike:
+					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
+							.getLink().getCoord(), plan.getNextActivity(bl)
+							.getLink().getCoord()) / 1000.0;
+					this.bikeDist += dist;
+					bikeDayDist += dist;
+					switch (at) {
+					case home:
+						this.bikeHomeDist += dist;
+						break;
+					case work:
+						this.bikeWorkDist += dist;
+						break;
+					case education:
+						this.bikeEducDist += dist;
+						break;
+					case shopping:
+						this.bikeShopDist += dist;
+						break;
+					case leisure:
+						this.bikeLeisDist += dist;
+						break;
+					default:
+						this.bikeOtherDist += dist;
+						break;
+					}
+					this.bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
+					break;
+				default:
+					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
+							.getLink().getCoord(), plan.getNextActivity(bl)
+							.getLink().getCoord()) / 1000.0;
+					this.othersDist += dist;
+					othersDayDist += dist;
+					switch (at) {
+					case home:
+						this.othersHomeDist += dist;
+						break;
+					case work:
+						this.othersWorkDist += dist;
+						break;
+					case education:
+						this.othersEducDist += dist;
+						break;
+					case shopping:
+						this.othersShopDist += dist;
+						break;
+					case leisure:
+						this.othersLeisDist += dist;
+						break;
+					default:
+						this.othersOtherDist += dist;
+						break;
+					}
+					this.othersLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				}
+				dayDist += dist;
 			}
-			if (at == null)
-				at = ActType.others;
-
-			double dist = bl.getRoute().getDistance() / 1000.0;
-			// if (bl.getDepartureTime() < 86400)
-			TransportMode mode = bl.getMode();
-			switch (mode) {
-			case car:
-				this.carDist += dist;
-				carDayDist += dist;
-				switch (at) {
-				case home:
-					this.carHomeDist += dist;
-					break;
-				case work:
-					this.carWorkDist += dist;
-					break;
-				case education:
-					this.carEducDist += dist;
-					break;
-				case shopping:
-					this.carShopDist += dist;
-					break;
-				case leisure:
-					this.carLeisDist += dist;
-					break;
-				default:
-					this.carOtherDist += dist;
-					break;
-				}
-				this.carLegDistanceCounts[Math.min(100, (int) dist)]++;
-				break;
-			case pt:
-				this.ptDist += dist;
-				ptDayDist += dist;
-				switch (at) {
-				case home:
-					this.ptHomeDist += dist;
-					break;
-				case work:
-					this.ptWorkDist += dist;
-					break;
-				case education:
-					this.ptEducDist += dist;
-					break;
-				case shopping:
-					this.ptShopDist += dist;
-					break;
-				case leisure:
-					this.ptLeisDist += dist;
-					break;
-				default:
-					this.ptOtherDist += dist;
-					break;
-				}
-				this.ptLegDistanceCounts[Math.min(100, (int) dist)]++;
-				break;
-			case walk:
-				dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
-						.getLink().getCoord(), plan.getNextActivity(bl)
-						.getLink().getCoord()) * 1.5 / 1000.0;
-				this.wlkDist += dist;
-				wlkDayDist += dist;
-				switch (at) {
-				case home:
-					this.wlkHomeDist += dist;
-					break;
-				case work:
-					this.wlkWorkDist += dist;
-					break;
-				case education:
-					this.wlkEducDist += dist;
-					break;
-				case shopping:
-					this.wlkShopDist += dist;
-					break;
-				case leisure:
-					this.wlkLeisDist += dist;
-					break;
-				default:
-					this.wlkOtherDist += dist;
-					break;
-				}
-				this.wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
-				break;
-			case bike:
-				dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
-						.getLink().getCoord(), plan.getNextActivity(bl)
-						.getLink().getCoord()) / 1000.0;
-				this.bikeDist += dist;
-				bikeDayDist += dist;
-				switch (at) {
-				case home:
-					this.bikeHomeDist += dist;
-					break;
-				case work:
-					this.bikeWorkDist += dist;
-					break;
-				case education:
-					this.bikeEducDist += dist;
-					break;
-				case shopping:
-					this.bikeShopDist += dist;
-					break;
-				case leisure:
-					this.bikeLeisDist += dist;
-					break;
-				default:
-					this.bikeOtherDist += dist;
-					break;
-				}
-				this.bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
-				break;
-			default:
-				dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
-						.getLink().getCoord(), plan.getNextActivity(bl)
-						.getLink().getCoord()) / 1000.0;
-				this.othersDist += dist;
-				othersDayDist += dist;
-				switch (at) {
-				case home:
-					this.othersHomeDist += dist;
-					break;
-				case work:
-					this.othersWorkDist += dist;
-					break;
-				case education:
-					this.othersEducDist += dist;
-					break;
-				case shopping:
-					this.othersShopDist += dist;
-					break;
-				case leisure:
-					this.othersLeisDist += dist;
-					break;
-				default:
-					this.othersOtherDist += dist;
-					break;
-				}
-				this.othersLegDistanceCounts[Math.min(100, (int) dist)]++;
-				break;
-			}
-			dayDist += dist;
 		}
 		for (int i = 0; i <= Math.min(100, (int) dayDist); i++)
 			this.totalDayDistanceCounts[i]++;
@@ -322,11 +323,11 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		double sum = this.carDist + this.ptDist + wlkDist + bikeDist
 				+ this.othersDist;
 
-		double avgCarDist = this.carDist / (double) this.count;
-		double avgPtDist = this.ptDist / (double) this.count;
-		double avgWlkDist = this.wlkDist / (double) this.count;
-		double avgBikeDist = this.bikeDist / (double) this.count;
-		double avgOthersDist = this.othersDist / (double) this.count;
+		double avgCarDist = this.carDist / this.count;
+		double avgPtDist = this.ptDist / this.count;
+		double avgWlkDist = this.wlkDist / this.count;
+		double avgBikeDist = this.bikeDist / this.count;
+		double avgOthersDist = this.othersDist / this.count;
 
 		SimpleWriter sw = new SimpleWriter(outputFilename + "dailyDistance.txt");
 		sw.writeln("\tDaily Distance\tn_agents\t" + count);
@@ -438,16 +439,12 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		double yBike[] = new double[101];
 		double yOthers[] = new double[101];
 		for (int i = 0; i < 101; i++) {
-			yTotal[i] = this.totalDayDistanceCounts[i] / (double) this.count
-					* 100.0;
-			yCar[i] = this.carDayDistanceCounts[i] / (double) this.count
-					* 100.0;
-			yPt[i] = this.ptDayDistanceCounts[i] / (double) this.count * 100.0;
-			yWlk[i] = this.wlkDayDistanceCounts[i] / (double) this.count
-					* 100.0;
-			yBike[i] = bikeDayDistanceCounts[i] / (double) count * 100.0;
-			yOthers[i] = this.othersDayDistanceCounts[i] / (double) this.count
-					* 100.0;
+			yTotal[i] = this.totalDayDistanceCounts[i] / this.count * 100.0;
+			yCar[i] = this.carDayDistanceCounts[i] / this.count * 100.0;
+			yPt[i] = this.ptDayDistanceCounts[i] / this.count * 100.0;
+			yWlk[i] = this.wlkDayDistanceCounts[i] / this.count * 100.0;
+			yBike[i] = bikeDayDistanceCounts[i] / count * 100.0;
+			yOthers[i] = this.othersDayDistanceCounts[i] / this.count * 100.0;
 		}
 
 		XYLineChart chart = new XYLineChart("Daily Distance Distribution",

@@ -25,10 +25,10 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class RouteLinkFilter extends AbstractPlanFilter {
@@ -46,12 +46,13 @@ public class RouteLinkFilter extends AbstractPlanFilter {
 
 	@Override
 	public boolean judge(final Plan plan) {
-		LegIterator iter = plan.getIteratorLeg();
-		while (iter.hasNext()) {
-			Leg leg = (Leg)iter.next();
-			for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
-				if (this.linkIds.contains(link.getId())) {
-					return true;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+					if (this.linkIds.contains(link.getId())) {
+						return true;
+					}
 				}
 			}
 		}

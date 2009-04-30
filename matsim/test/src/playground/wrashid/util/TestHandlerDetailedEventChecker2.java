@@ -11,8 +11,8 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.events.PersonEvent;
 import org.matsim.core.mobsim.jdeqsim.util.DummyPopulationModifier;
 import org.matsim.core.mobsim.jdeqsim.util.TestHandlerDetailedEventChecker;
@@ -88,10 +88,10 @@ public class TestHandlerDetailedEventChecker2 extends TestHandlerDetailedEventCh
 
 			expectedNumberOfMessages.put(p.getId().toString(), expected);
 
-			if (p.getId().toString().equalsIgnoreCase("225055")) {
+//			if (p.getId().toString().equalsIgnoreCase("225055")) {
 				//printPlanPDES2(plan);
 				//printPlanDES(plan);
-			}
+//			}
 
 		}
 	}
@@ -105,27 +105,29 @@ public class TestHandlerDetailedEventChecker2 extends TestHandlerDetailedEventCh
 
 	
 	private void printPlanPDES2(Plan plan) {
-		LegIterator iter = plan.getIteratorLeg();
-		while (iter.hasNext()) {
-			Leg leg = (Leg) iter.next();
-			for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
-				System.out.print(link.getId()
-						+ "("
-						+ Road.allRoads.get(link.getId().toString())
-								.getZoneId() + ")" + "-");
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+					System.out.print(link.getId()
+							+ "("
+							+ Road.allRoads.get(link.getId().toString())
+							.getZoneId() + ")" + "-");
+				}
+				System.out.println();
 			}
-			System.out.println();
 		}
 	}
 	
 	private void printPlanDES(Plan plan) {
-		LegIterator iter = plan.getIteratorLeg();
-		while (iter.hasNext()) {
-			Leg leg = (Leg) iter.next();
-			for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
-				System.out.print(link.getId()+ "-");
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+					System.out.print(link.getId()+ "-");
+				}
+				System.out.println();
 			}
-			System.out.println();
 		}
 	}
 

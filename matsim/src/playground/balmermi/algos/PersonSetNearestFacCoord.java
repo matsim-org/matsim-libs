@@ -28,6 +28,7 @@ import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -95,30 +96,31 @@ public class PersonSetNearestFacCoord extends AbstractPersonAlgorithm implements
 	//////////////////////////////////////////////////////////////////////
 
 	public void run(Plan plan) {
-		Iterator<?> act_it = plan.getIteratorAct();
-		while (act_it.hasNext()) {
-			Activity act = (Activity)act_it.next();
-			String type = this.getFacilityActType(act.getType());
-			Coord coord = act.getCoord();
-			if (coord == null) { Gbl.errorMsg("Each act must have a coord!"); }
-			double nearest_dist = Double.MAX_VALUE;
-			Facility nearest_f = null;
-			Iterator<? extends Facility> f_it = this.facilities.getFacilities().values().iterator();
-			while (f_it.hasNext()) {
-				Facility f = f_it.next();
-				if (f.getActivityOptions().containsKey(type)) {
-					double dist = f.calcDistance(coord);
-					if (dist < nearest_dist) {
-						nearest_dist = dist;
-						nearest_f = f;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				String type = this.getFacilityActType(act.getType());
+				Coord coord = act.getCoord();
+				if (coord == null) { throw new RuntimeException("Each act must have a coord!"); }
+				double nearest_dist = Double.MAX_VALUE;
+				Facility nearest_f = null;
+				Iterator<? extends Facility> f_it = this.facilities.getFacilities().values().iterator();
+				while (f_it.hasNext()) {
+					Facility f = f_it.next();
+					if (f.getActivityOptions().containsKey(type)) {
+						double dist = f.calcDistance(coord);
+						if (dist < nearest_dist) {
+							nearest_dist = dist;
+							nearest_f = f;
+						}
 					}
 				}
+				if (nearest_f == null) {
+					throw new RuntimeException("p_id=" + plan.getPerson().getId() + ": no facility found for act=" + act);
+				}
+				act.setCoord(nearest_f.getCoord());
+				System.out.println("  p_id=" + plan.getPerson().getId() + ", act=" + act.getType() + ": nearest dist=" + nearest_dist);
 			}
-			if (nearest_f == null) {
-				Gbl.errorMsg("p_id=" + plan.getPerson().getId() + ": no facility found for act=" + act);
-			}
-			act.setCoord(nearest_f.getCoord());
-			System.out.println("  p_id=" + plan.getPerson().getId() + ", act=" + act.getType() + ": nearest dist=" + nearest_dist);
 		}
 	}
 }

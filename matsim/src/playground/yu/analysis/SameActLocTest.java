@@ -27,10 +27,13 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -90,35 +93,38 @@ public class SameActLocTest {
 				Plan p = person.getSelectedPlan();
 				if (p != null) {
 					// Plan.Type planType = p.getType();
-					for (ActIterator ai = p.getIteratorAct(); ai.hasNext();) {
-						nextTmpLinkId = ai.next().getLinkId().toString();
-						if (tmpLinkId != null && nextTmpLinkId != null)
-							if (tmpLinkId.equals(nextTmpLinkId)) {
-								this.actLocCount++;
-								if (
-								// planType != null
-								// && Plan.Type.UNDEFINED != planType
-								!PlanModeJudger.useUndefined(p))
+					for (PlanElement pe : p.getPlanElements()) {
+						if (pe instanceof Activity) {
+							Activity act = (Activity) pe;
+							nextTmpLinkId = act.getLinkId().toString();
+							if (tmpLinkId != null && nextTmpLinkId != null)
+								if (tmpLinkId.equals(nextTmpLinkId)) {
+									this.actLocCount++;
 									if (
-									// planType.equals(Plan.Type.CAR)
-									PlanModeJudger.useCar(p))
-										this.carActLocCount++;
-									else if (
-									// planType.equals(Plan.Type.PT)
-									PlanModeJudger.usePt(p))
-										this.ptActLocCount++;
-								this.actsAtSameLink = true;
-								try {
-									this.writer.write(person.getId().toString()
-											+ "\t" + tmpLinkId + "\t" + i
-											+ "\n");
-									this.writer.flush();
-								} catch (IOException e) {
-									e.printStackTrace();
+									// planType != null
+									// && Plan.Type.UNDEFINED != planType
+									!PlanModeJudger.useUndefined(p))
+										if (
+										// planType.equals(Plan.Type.CAR)
+										PlanModeJudger.useCar(p))
+											this.carActLocCount++;
+										else if (
+										// planType.equals(Plan.Type.PT)
+										PlanModeJudger.usePt(p))
+											this.ptActLocCount++;
+									this.actsAtSameLink = true;
+									try {
+										this.writer.write(person.getId().toString()
+												+ "\t" + tmpLinkId + "\t" + i
+												+ "\n");
+										this.writer.flush();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
 								}
-							}
-						tmpLinkId = nextTmpLinkId;
-						i++;
+							tmpLinkId = nextTmpLinkId;
+							i++;
+						}
 					}
 					if (this.actsAtSameLink)
 						this.personCount++;
@@ -142,7 +148,7 @@ public class SameActLocTest {
 		final String outFilename = "../data/ivtch/carPt_opt_run266/actLoc.txt";
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(null);
+		Scenario scenario = new ScenarioImpl();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
@@ -152,7 +158,7 @@ public class SameActLocTest {
 		SameActLoc alt = new SameActLoc(outFilename);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		alt.run(population);
 

@@ -44,9 +44,8 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -135,10 +134,11 @@ public class SelectedPlans2ESRIShape {
 		ArrayList<Feature> fts = new ArrayList<Feature>();
 		for (Plan plan : this.outputSamplePlans) {
 			String id = plan.getPerson().getId().toString();
-			ActIterator iter = plan.getIteratorAct();
-			while (iter.hasNext()) {
-				Activity act = (Activity) iter.next();
-				fts.add(getActFeature(id, act));
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
+					fts.add(getActFeature(id, act));
+				}
 			}
 		}
 
@@ -150,11 +150,12 @@ public class SelectedPlans2ESRIShape {
 		ArrayList<Feature> fts = new ArrayList<Feature>();
 		for (Plan plan : this.outputSamplePlans) {
 			String id = plan.getPerson().getId().toString();
-			LegIterator iter = plan.getIteratorLeg();
-			while (iter.hasNext()) {
-				Leg leg = (Leg) iter.next();
-				if (leg.getRoute().getDistance() > 0) {
-					fts.add(getLegFeature(leg, id));
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					if (leg.getRoute().getDistance() > 0) {
+						fts.add(getLegFeature(leg, id));
+					}
 				}
 			}
 		}

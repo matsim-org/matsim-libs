@@ -113,6 +113,7 @@ public class InitRoutes {
 		ScenarioLoader sl = new ScenarioLoader(this.configfile);
 		sl.loadNetwork();
 		Network network = sl.getScenario().getNetwork();
+		this.config = sl.getScenario().getConfig();
 
 		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);

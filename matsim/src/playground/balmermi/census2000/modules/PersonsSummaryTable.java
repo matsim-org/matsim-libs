@@ -23,12 +23,11 @@ package playground.balmermi.census2000.modules;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Iterator;
 
-import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -127,13 +126,14 @@ public class PersonsSummaryTable extends AbstractPersonAlgorithm implements Plan
 		int s = 0;
 		int e = 0;
 		int w = 0;
-		Iterator<BasicActivityImpl> act_it = plan.getIteratorAct();
-		while (act_it.hasNext()) {
-			BasicActivity act = act_it.next();
-			if (L.equals(act.getType())) { l = 1; }
-			if (S.equals(act.getType())) { s = 1; }
-			if (E.equals(act.getType())) { e = 1; }
-			if (W.equals(act.getType())) { w = 1; }
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if (L.equals(act.getType())) { l = 1; }
+				if (S.equals(act.getType())) { s = 1; }
+				if (E.equals(act.getType())) { e = 1; }
+				if (W.equals(act.getType())) { w = 1; }
+			}
 		}
 		int j = w*2*2*2 + e*2*2 + s*2 + l;
 

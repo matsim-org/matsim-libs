@@ -11,8 +11,8 @@ import java.util.Map;
 
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -68,28 +68,29 @@ public class ActTimeEstimator extends AbstractPersonAlgorithm {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void run(final Person person) {
-		for (ActIterator ai = person.getSelectedPlan().getIteratorAct(); ai
-				.hasNext();) {
-			Activity a = (Activity) ai.next();
-			String actType = a.getType();
-			ActDurCounter adc = this.actDurs.get(actType);
-			if (adc == null) {
-				adc = new ActDurCounter();
-				this.actDurs.put(actType, adc);
+		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity a = (Activity) pe;
+				String actType = a.getType();
+				ActDurCounter adc = this.actDurs.get(actType);
+				if (adc == null) {
+					adc = new ActDurCounter();
+					this.actDurs.put(actType, adc);
+				}
+				adc.add(a.getDuration());
+				ActStartTimeCounter astc = this.actStarts.get(actType);
+				if (astc == null) {
+					astc = new ActStartTimeCounter();
+					this.actStarts.put(actType, astc);
+				}
+				astc.add(a.getStartTime());
+				ActEndTimeCounter aetc = this.actEnds.get(actType);
+				if (aetc == null) {
+					aetc = new ActEndTimeCounter();
+					this.actEnds.put(actType, aetc);
+				}
+				aetc.add(a.getEndTime());
 			}
-			adc.add(a.getDuration());
-			ActStartTimeCounter astc = this.actStarts.get(actType);
-			if (astc == null) {
-				astc = new ActStartTimeCounter();
-				this.actStarts.put(actType, astc);
-			}
-			astc.add(a.getStartTime());
-			ActEndTimeCounter aetc = this.actEnds.get(actType);
-			if (aetc == null) {
-				aetc = new ActEndTimeCounter();
-				this.actEnds.put(actType, aetc);
-			}
-			aetc.add(a.getEndTime());
 		}
 	}
 
@@ -130,7 +131,7 @@ public class ActTimeEstimator extends AbstractPersonAlgorithm {
 		final String plansFilename = "input/Toronto/fout_chains210.xml.gz";
 		final String outputFilename = "output/Toronto/fout_chains210_actDur.txt";
 
-		Gbl.createConfig(null);
+//		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

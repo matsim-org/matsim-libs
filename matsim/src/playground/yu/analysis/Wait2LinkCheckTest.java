@@ -27,10 +27,13 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -73,20 +76,23 @@ public class Wait2LinkCheckTest {
 			String nextTmpLinkId = null;
 			if (person != null) {
 				Plan p = person.getSelectedPlan();
-				if (p != null)
-					for (ActIterator ai = p.getIteratorAct(); ai.hasNext();) {
-						nextTmpLinkId = ai.next().getLinkId().toString();
-						if (tmpLinkId != null && nextTmpLinkId != null)
-							if (!tmpLinkId.equals(nextTmpLinkId))
-								try {
-									this.writer.write(person.getId().toString()
-											+ "\t" + tmpLinkId + "\n");
-									this.writer.flush();
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
-						tmpLinkId = nextTmpLinkId;
+				if (p != null) {
+					for (PlanElement pe : p.getPlanElements()) {
+						if (pe instanceof Activity) {
+							nextTmpLinkId = ((Activity) pe).getLinkId().toString();
+							if (tmpLinkId != null && nextTmpLinkId != null)
+								if (!tmpLinkId.equals(nextTmpLinkId))
+									try {
+										this.writer.write(person.getId().toString()
+												+ "\t" + tmpLinkId + "\n");
+										this.writer.flush();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+									tmpLinkId = nextTmpLinkId;
+						}
 					}
+				}
 			}
 		}
 	}
@@ -106,7 +112,7 @@ public class Wait2LinkCheckTest {
 		final String outFilename = "../data/ivtch/carPt_opt_run266/wait2linkTest.txt.gz";
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(null);
+		Scenario scenario = new ScenarioImpl();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
@@ -116,7 +122,7 @@ public class Wait2LinkCheckTest {
 		Wait2LinkCheck alt = new Wait2LinkCheck(outFilename);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		alt.run(population);
 

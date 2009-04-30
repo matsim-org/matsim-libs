@@ -14,9 +14,9 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -154,8 +154,10 @@ public class Converter {
 					// make a copy of the just finished plan and set it to use public transit mode
 					Plan nonCarPlan = new org.matsim.core.population.PlanImpl(p);
 					nonCarPlan.copyPlan(tmpPl);
-					for (LegIterator li = nonCarPlan.getIteratorLeg(); li.hasNext();) {
-						li.next().setMode(TransportMode.pt);
+					for (PlanElement pe : nonCarPlan.getPlanElements()) {
+						if (pe instanceof Leg) {
+							((Leg) pe).setMode(TransportMode.pt);
+						}
 					}
 					p.addPlan(nonCarPlan);
 				}

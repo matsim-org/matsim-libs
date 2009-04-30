@@ -26,12 +26,12 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
@@ -73,10 +73,12 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		Population population = controler.getPopulation();
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				for (LegIterator iter = plan.getIteratorLeg(); iter.hasNext(); ) {
-					BasicLeg leg = iter.next();
-					BasicRoute route = leg.getRoute();
-					assertTrue(route instanceof NodeNetworkRoute); // that must be different from the class used below
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof BasicLeg) {
+						BasicLeg leg = (BasicLeg) pe;
+						BasicRoute route = leg.getRoute();
+						assertTrue(route instanceof NodeNetworkRoute); // that must be different from the class used below
+					}
 				}
 			}
 		}
@@ -99,10 +101,12 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 			int planCounter = 0;
 			for (Plan plan : person.getPlans()) {
 				planCounter++;
-				for (LegIterator iter = plan.getIteratorLeg(); iter.hasNext(); ) {
-					BasicLeg leg = iter.next();
-					BasicRoute route = leg.getRoute();
-					assertTrue("person: " + person.getId() + "; plan: " + planCounter, route instanceof CompressedNetworkRoute);
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof BasicLeg) {
+						BasicLeg leg = (BasicLeg) pe;
+						BasicRoute route = leg.getRoute();
+						assertTrue("person: " + person.getId() + "; plan: " + planCounter, route instanceof CompressedNetworkRoute);
+					}
 				}
 			}
 		}

@@ -29,7 +29,7 @@ import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.QuadTree;
@@ -254,16 +254,16 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 		Coord home_coord = null;
 		Coord prim_coord = null;
 		Plan plan = person.getSelectedPlan();
-		Iterator<BasicActivityImpl> act_it = plan.getIteratorAct();
-		while (act_it.hasNext()) {
-			Activity act = (Activity)act_it.next();
-			if (H.equals(act.getType())) {
-				if (act.getCoord() == null) { Gbl.errorMsg("Person id=" + person.getId() + " has no home coord!"); }
-				if (act.getCoord().equals(ZERO)) { Gbl.errorMsg("Person id=" + person.getId() + " has a ZERO home coord!"); }
-				home_coord = act.getCoord();
-			}
-			else {
-				if ((act.getCoord() != null) && (!act.getCoord().equals(ZERO))) { prim_coord = act.getCoord(); }
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if (H.equals(act.getType())) {
+					if (act.getCoord() == null) { Gbl.errorMsg("Person id=" + person.getId() + " has no home coord!"); }
+					if (act.getCoord().equals(ZERO)) { Gbl.errorMsg("Person id=" + person.getId() + " has a ZERO home coord!"); }
+					home_coord = act.getCoord();
+				} else {
+					if ((act.getCoord() != null) && (!act.getCoord().equals(ZERO))) { prim_coord = act.getCoord(); }
+				}
 			}
 		}
 		if ((prim_coord == null) || (home_coord.equals(prim_coord))) {
@@ -271,12 +271,13 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 			playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
 			Zone z = p.getHousehold().getMunicipality().getZone();
 			double radius = 0.5*Math.sqrt((z.getMax().getX()-z.getMin().getX())*(z.getMax().getY()-z.getMin().getY()));
-			act_it = plan.getIteratorAct();
-			while (act_it.hasNext()) {
-				Activity act = (Activity)act_it.next();
-				if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
-					Facility f = this.getFacility(home_coord,radius,act.getType());
-					act.setCoord(f.getCoord());
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
+					if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
+						Facility f = this.getFacility(home_coord,radius,act.getType());
+						act.setCoord(f.getCoord());
+					}
 				}
 			}
 		}
@@ -296,12 +297,13 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 			dy = dy/6.0;
 			CoordImpl coord1 = new CoordImpl(home_coord.getX()+dx,home_coord.getY()+dy);
 			CoordImpl coord2 = new CoordImpl(prim_coord.getX()-dx,prim_coord.getY()+dy);
-			act_it = plan.getIteratorAct();
-			while (act_it.hasNext()) {
-				Activity act = (Activity)act_it.next();
-				if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
-					Facility f = this.getFacility(coord1,coord2,radius,act.getType());
-					act.setCoord(f.getCoord());
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
+					if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
+						Facility f = this.getFacility(coord1,coord2,radius,act.getType());
+						act.setCoord(f.getCoord());
+					}
 				}
 			}
 		}

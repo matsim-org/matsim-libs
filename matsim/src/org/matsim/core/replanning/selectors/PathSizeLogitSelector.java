@@ -31,7 +31,6 @@ import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
-import org.matsim.core.basic.v01.BasicPlanImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -126,22 +125,22 @@ public class PathSizeLogitSelector implements PlanSelector {
 		for (Plan plan : plans){
 
 			double tmp = 0;
-			BasicPlanImpl.LegIterator it = plan.getIteratorLeg();
-			while(it.hasNext()){
-				Leg leg = (Leg) it.next();
-				double currentTime = leg.getDepartureTime();
-				NetworkRoute route = (NetworkRoute) leg.getRoute();
-				for (Link link : route.getLinks()){
-					double denominator = 0;
-					for (double dbl : linksInTime.get(link.getId())){
-						//TODO this is just for testing (those legs where the depature time differs more then 3600 seconds will not compared to each other) - need a
-						//little bit to brood on it - gl
-						if (Math.abs(dbl - currentTime) <= 3600)
-							denominator++;
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					double currentTime = leg.getDepartureTime();
+					NetworkRoute route = (NetworkRoute) leg.getRoute();
+					for (Link link : route.getLinks()){
+						double denominator = 0;
+						for (double dbl : linksInTime.get(link.getId())){
+							//TODO this is just for testing (those legs where the depature time differs more then 3600 seconds will not compared to each other) - need a
+							//little bit to brood on it - gl
+							if (Math.abs(dbl - currentTime) <= 3600)
+								denominator++;
+						}
+						tmp += link.getLength() / denominator;
 					}
-					tmp += link.getLength() / denominator;
 				}
-
 			}
 			double PSi = Math.pow(tmp/planLength.get(plan.hashCode()), this.beta);
 			double weight;

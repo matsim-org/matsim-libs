@@ -20,13 +20,12 @@
 
 package playground.balmermi.algos;
 
-import java.util.Iterator;
-
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PersonPrintLinks extends AbstractPersonAlgorithm {
@@ -50,15 +49,16 @@ public class PersonPrintLinks extends AbstractPersonAlgorithm {
 	@Override
 	public void run(Person person) {
 		Plan plan = person.getPlans().get(0);
-		Iterator leg_it = plan.getIteratorLeg();
 		int counter = 0;
-		while (leg_it.hasNext()) {
-			Leg leg = (Leg)leg_it.next();
-			System.out.println("Person id=" + person.getId() + "; Leg nr=" + counter);
-			counter++;
-			NetworkRoute route = (NetworkRoute) leg.getRoute();
-			for (Link link : route.getLinks()) {
-				System.out.println(link.getOrigId());
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				System.out.println("Person id=" + person.getId() + "; Leg nr=" + counter);
+				counter++;
+				NetworkRoute route = (NetworkRoute) leg.getRoute();
+				for (Link link : route.getLinks()) {
+					System.out.println(link.getOrigId());
+				}
 			}
 		}
 	}

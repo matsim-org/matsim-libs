@@ -77,6 +77,7 @@ public class ScenarioLoader {
 	public ScenarioLoader(String configFilename) {
 		this.config = new Config();
 		this.config.addCoreModules();
+		Gbl.setConfig(this.config);
 		MatsimConfigReader reader = new MatsimConfigReader(this.config);
 		reader.readFile(configFilename);
 		MatsimRandom.reset(config.global().getRandomSeed());

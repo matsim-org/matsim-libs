@@ -20,14 +20,13 @@
 
 package playground.balmermi.census2000v2.modules;
 
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 
@@ -103,29 +102,31 @@ public class PlansAnalyse {
 			// act types
 			if (p.getPlans().size() != 1) { Gbl.errorMsg("pid="+p.getId()+": There must be exactly one plan per person!"); }
 			Plan plan = p.getPlans().get(0);
-			Iterator<?> a_it = plan.getIteratorAct();
-			while (a_it.hasNext()) {
-				Activity a = (Activity)a_it.next();
-				if (a.getType().substring(0,1).equals(H))      { at_cnt[0]++; }
-				else if (a.getType().substring(0,1).equals(W)) { at_cnt[1]++; }
-				else if (a.getType().substring(0,1).equals(E)) { at_cnt[2]++; }
-				else if (a.getType().substring(0,1).equals(S)) { at_cnt[3]++; }
-				else if (a.getType().substring(0,1).equals(L)) { at_cnt[4]++; }
-				else { Gbl.errorMsg("pid="+p.getId()+": Haeh?"); }
-				a_cnt++;
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity a = (Activity) pe;
+					if (a.getType().substring(0,1).equals(H))      { at_cnt[0]++; }
+					else if (a.getType().substring(0,1).equals(W)) { at_cnt[1]++; }
+					else if (a.getType().substring(0,1).equals(E)) { at_cnt[2]++; }
+					else if (a.getType().substring(0,1).equals(S)) { at_cnt[3]++; }
+					else if (a.getType().substring(0,1).equals(L)) { at_cnt[4]++; }
+					else { Gbl.errorMsg("pid="+p.getId()+": Haeh?"); }
+					a_cnt++;
+				}
 			}
 			// mode types
-			Iterator<?> l_it = plan.getIteratorLeg();
 			int cnt = 0;
-			while (l_it.hasNext()) {
-				Leg l = (Leg)l_it.next();
-				cnt++;
-				if (l.getMode().equals(TransportMode.car))       { mtype_cnt[0]++; }
-				else if (l.getMode().equals(TransportMode.pt))   { mtype_cnt[1]++; }
-				else if (l.getMode().equals(TransportMode.bike)) { mtype_cnt[2]++; }
-				else if (l.getMode().equals(TransportMode.walk)) { mtype_cnt[3]++; }
-				else { Gbl.errorMsg("pid="+p.getId()+": Haeh?"); }
-				leg_cnt++;
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg l = (Leg) pe;
+					cnt++;
+					if (l.getMode().equals(TransportMode.car))       { mtype_cnt[0]++; }
+					else if (l.getMode().equals(TransportMode.pt))   { mtype_cnt[1]++; }
+					else if (l.getMode().equals(TransportMode.bike)) { mtype_cnt[2]++; }
+					else if (l.getMode().equals(TransportMode.walk)) { mtype_cnt[3]++; }
+					else { Gbl.errorMsg("pid="+p.getId()+": Haeh?"); }
+					leg_cnt++;
+				}
 			}
 			trip_dist[cnt]++;
 		}

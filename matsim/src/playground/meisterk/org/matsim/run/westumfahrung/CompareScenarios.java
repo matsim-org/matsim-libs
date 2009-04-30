@@ -16,9 +16,9 @@ import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
@@ -437,11 +437,12 @@ public class CompareScenarios {
 					if (scenarioName.equals(this.scenarioNames[0])) {
 						this.routeSwitchersLines.add("person\thome_link\thome_x\thome_y");
 						for (Person person : plansSubPop.getPersons().values()) {
-							ActIterator actIterator = person.getSelectedPlan().getIteratorAct();
-							while (actIterator.hasNext()) {
-								homeActivity = (Activity) actIterator.next();
-								if (Pattern.matches(".*h.*", homeActivity.getType())) {
-									continue;
+							for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+								if (pe instanceof Activity) {
+									homeActivity = (Activity) pe;
+									if (Pattern.matches(".*h.*", homeActivity.getType())) {
+										continue;
+									}
 								}
 							}
 							this.routeSwitchersLines.add(

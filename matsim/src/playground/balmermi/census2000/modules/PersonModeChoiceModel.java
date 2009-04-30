@@ -20,14 +20,12 @@
 
 package playground.balmermi.census2000.modules;
 
-import java.util.Iterator;
-
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -78,21 +76,28 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		// calc plan distance and main purpose
 		double plan_dist = 0.0;
 		int mainpurpose = 2; // 0 := w; 1 := e; 2 := s|l
-		Iterator<BasicActivityImpl> act_it = person.getSelectedPlan().getIteratorAct();
-		act_it.hasNext(); // first act is always 'home'
-		Activity prev_act = (Activity)act_it.next();
-		while (act_it.hasNext()) {
-			Activity act = (Activity)act_it.next();
-			plan_dist += CoordUtils.calcDistance(act.getCoord(), prev_act.getCoord());
-			String type = act.getType();
-			if (mainpurpose == 1){
-				if (type == W) { mainpurpose = 0; break; }
+		boolean isFirst = true;
+		Activity prevAct = null;
+		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Activity) {
+				if (isFirst) {
+					isFirst = false; // first act is always 'home', ignore it
+				} else {
+					Activity act = (Activity) pe;
+					if (prevAct != null) {
+						plan_dist += CoordUtils.calcDistance(act.getCoord(), prevAct.getCoord());
+						String type = act.getType();
+						if (mainpurpose == 1){
+							if (type == W) { mainpurpose = 0; break; }
+						}
+						else if (mainpurpose == 2) {
+							if (type == W) { mainpurpose = 0; break; }
+							else if (type == E) { mainpurpose = 1; }
+						}
+					}
+					prevAct = act;
+				}
 			}
-			else if (mainpurpose == 2) {
-				if (type == W) { mainpurpose = 0; break; }
-				else if (type == E) { mainpurpose = 1; }
-			}
-			prev_act = act;
 		}
 
 		// choose mode choice model based on main purpose
@@ -128,10 +133,11 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		else { Gbl.errorMsg("Mode choice returns undefined value!"); }
 
 		// setting mode to plan
-		Iterator<Leg> leg_it = person.getSelectedPlan().getIteratorLeg();
-		while (leg_it.hasNext()) {
-			Leg leg = leg_it.next();
-			leg.setMode(mode);
+		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				leg.setMode(mode);
+			}
 		}
 	}
 
