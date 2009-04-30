@@ -42,3 +42,4 @@
 <!ATTLIST departure
           id               CDATA   #REQUIRED
           departureTime    CDATA   #REQUIRED>
+<!-- the departure.id must be unique within a transitLine only -->
