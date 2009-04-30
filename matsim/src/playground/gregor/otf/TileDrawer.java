@@ -5,6 +5,7 @@ import static javax.media.opengl.GL.GL_PROJECTION_MATRIX;
 import static javax.media.opengl.GL.GL_QUADS;
 import static javax.media.opengl.GL.GL_VIEWPORT;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,7 +18,6 @@ import javax.media.opengl.glu.GLU;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 
-import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
 import com.sun.opengl.util.texture.TextureIO;
 
@@ -27,17 +27,16 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 	double[] projection = new double[16];
 	int[] viewport = new int[4];
 	
-	Texture pic = null;
 	
+	double [] powerLookUp;
 	
 	Map<String,Tile> tilesMap = Collections.synchronizedMap(new HashMap<String,Tile>());
 	
-	int numX = 0;
-	int numY = 0;
+//	int numX = 0;
+//	int numY = 0;
 	private double zoom;
 	private final TileLoader loader;
 	private final double initZoom = 32;
-	private float ratio;
 	private final TreeSet<Tile> currentView = new TreeSet<Tile>(new Comper());
 	private boolean viewLocked;
 	private float oTy;
@@ -47,6 +46,11 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 	public TileDrawer() {
 		this.loader = new TileLoader(this.tilesMap);
 		this.loader.start();
+		this.powerLookUp = new double [16];
+		double z = 0.125;
+		for (int i = 0; i < 16; i++) {
+			this.powerLookUp[i] = (z *= 2);
+		}
 	}
 	
 	public void onDraw(GL gl) {
@@ -71,8 +75,8 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 		}
 		this.viewLocked = true;
 		this.currentView.clear();
-		for (int x = this.viewport[0]; x < this.viewport[2] + Tile.LENGTH/2; x += Tile.LENGTH*0.75) {
-			for (int y = this.viewport[1]; y < this.viewport[3] +Tile.LENGTH/2 ; y += Tile.LENGTH*0.75) {
+		for (int x = this.viewport[0]; x < this.viewport[2] + Tile.LENGTH/2; x += Tile.LENGTH*0.33) {
+			for (int y = this.viewport[1]; y < this.viewport[3] +Tile.LENGTH/2 ; y += Tile.LENGTH*0.33) {
 				double zoom = this.zoom;
 				
 				
@@ -98,15 +102,15 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 		float [] top = getOGLPos(this.viewport[0], this.viewport[1]);
 		float [] bottom = getOGLPos(this.viewport[2], this.viewport[3]);
 		float glWidth = Math.abs(top[0]-bottom[0]);
-		this.ratio = glWidth/scrWidth;
-		//TODO optimize this
-		double zoom = 0.25;
-		while (zoom < this.ratio*0.75) {
-			zoom *= 2;
-		}
+		double ratio = glWidth/scrWidth;
+		
+		int idx = -Arrays.binarySearch(this.powerLookUp, ratio);
+		double zoom = this.powerLookUp[idx-1];
+		
+		
 		if (zoom != this.zoom){
 			this.viewLocked = false;
-			System.out.println("ratio:" + this.ratio + " zoom:" + zoom);
+			System.out.println("ratio:" + ratio + " zoom:" + zoom);
 		}
 		if (this.oTx != top[0] || this.oTy != top[1]){
 			this.viewLocked = false;
@@ -131,29 +135,19 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 		final float tx2 = tc.right();
 		final float ty2 = tc.bottom();
 
-		//		System.out.println("tx1:" + tx1 + " this.offsetEast" + this.offsetEast);
-
-
 		final float z = 1.1f;
 		t.tex.enable();
 		t.tex.bind();
 		
-		
-
 		gl.glColor4f(1,1,1,1);
 
-
 		gl.glBegin(GL_QUADS);
-		
 		gl.glTexCoord2f(tx2, ty2); gl.glVertex3f(t.tX+t.sX, t.tY, z);
 		gl.glTexCoord2f(tx2, ty1); gl.glVertex3f(t.tX+t.sX,t.tY+t.sY, z);
 		gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(t.tX, t.tY+t.sY, z);
 		gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(t.tX, t.tY, z);
-		
 		gl.glEnd();
-
 		t.tex.disable();
-//		t.tex = null;
 		
 
 	}
@@ -197,7 +191,7 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 
 
 
-	public void updateMatrices(GL gl) {
+	public void updateMatrices(GL gl) { //TODO give me the drawer!!
 		// update matrices for mouse position calculation
 		gl.glGetDoublev( GL_MODELVIEW_MATRIX, this.modelview,0);
 		gl.glGetDoublev( GL_PROJECTION_MATRIX, this.projection,0);

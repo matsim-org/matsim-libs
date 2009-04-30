@@ -7,16 +7,12 @@ public class Tile implements Comparable<Tile> {
 
 	public static final int LENGTH = 256;
 	
-	int zoomLevel;
+//	int zoomLevel;
 	TextureData tx;
 	Texture tex;
 	
 	public float tX;
 	public float tY;
-//	public float bX;
-//	public float bY;
-//	public float cX;
-//	public float cY;
 
 	public float sX;
 

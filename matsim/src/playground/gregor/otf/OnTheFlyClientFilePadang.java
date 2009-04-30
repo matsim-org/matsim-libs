@@ -1,9 +1,6 @@
 package playground.gregor.otf;
 
 import java.awt.Color;
-import java.awt.geom.Rectangle2D;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 
 import javax.swing.JFrame;
@@ -79,61 +76,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		return drawer;
 	}
 
-	private void loadSlicedBackgroundLayer(final int ux, final int uy, final int num_x, final int num_y, final int size, final String dir) {
-		int x=ux;
-		int y=uy;
-		
-		for (int xc = 0; xc < num_x; xc++) {
-			y=uy;
-			for (int yc = 0; yc < num_y; yc++) {
-				final String slice =  BG_IMG_ROOT + dir + "/slice_"+ xc + "_" + yc + ".png";
-				System.out.println(slice);
-				OGLSimpleBackgroundLayer.addPersistentItem(new SimpleBackgroundDrawer(slice, new Rectangle2D.Float(x,y,-size,-size)));
-				
-				y-=size;
-				
-			}
-			x-=size;
-			
-		}
-		
-		
-	}
 	
-	private void loadTilesFromServer() {
-		
-		
-		
-		InetAddress addr = null;
-		try {
-			addr = InetAddress.getByName("localhost");
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-		BGLoader bgl = new BGLoader(addr,8080);
-		bgl.start();
-		double centerX = 651190.2;
-		double centerY = 9893337.5;
-		double z = 0.01;
-		double pz = z / 0.3;
-		
-		double sizeX = 300;
-		double sizeY = 300;
-		
-		int pxSize = (int) Math.round(sizeX * z/0.3);
-		int pySize = (int) Math.round(sizeY * z/0.3);
-		double currentX = 648931-1000;
-		while (currentX < 654026+5000){
-			double currentY = 9893264-5000;
-			while (currentY < 9900963+8000){
-				OGLSimpleBackgroundLayer.addPersistentItem(new BackgroundFromStreamDrawer(bgl,currentX,currentY,sizeX,sizeY,pxSize,pySize));
-				currentY += sizeY;
-			}
-			currentX += sizeX;
-		}
-//		OGLSimpleBackgroundLayer.addPersistentItem(new BackgroundFromStreamDrawer(addr,8080,centerX+400/pz,centerY+400/pz,z,400,400));
-		
-	}
 	
 	private void loadTileDrawer() {
 		OGLSimpleBackgroundLayer.addPersistentItem(new TileDrawer());
@@ -183,7 +126,11 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 
 
 	public static void main(final String[] args) {
-//		String filename = "../MatsimJ/output/OTFQuadfileSCHWEIZ2.3.mvi.gz";
+		String filename;
+		if (args.length == 1) {
+			filename = args[0];
+		} else {
+ //		String filename = "../MatsimJ/output/OTFQuadfileSCHWEIZ2.3.mvi.gz";
 //		String filename = "../MatsimJ/output/testSWI2.mvi.gz";
 //		String filename = "test/padang.mvi";
 
@@ -193,9 +140,10 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		final String filename =  CVSROOT + "/runs/run314/output/ITERS/it.100/100.movie.mvi";
 //		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
 //		final String filename =  "../../outputs/output_100m_so/ITERS/it.0/0.movie.mvi";
-//		final String filename =  "../../outputs/output_shelter_noWave/ITERS/it.100/100.movie.mvi";
-		final String filename =  "../../outputs/output/ITERS/it.200/200.movie.mvi";
-//		final String filename =  "./output/ITERS/it.0/0.otfvis.mvi";
+//		final String filename =  "../../outputs/output_shelter_noWave/ITERS/it.200/200.movie.mvi";
+			filename =  "../../outputs/output/ITERS/it.0/0.movie.mvi";
+//		final String filename =  "/home/laemmel/arbeit/svn/runs-svn/run316/stage2/output/ITERS/it.201/201.movie.mvi";
+		}
 		
 //		String filename = "./jam/jam.mvi";
 		
