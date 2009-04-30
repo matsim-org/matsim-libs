@@ -25,6 +25,7 @@ import java.io.LineNumberReader;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 
 public class CumulativeDistribution {
@@ -95,8 +96,8 @@ public class CumulativeDistribution {
 			System.out.println( xs[i]+"\t"+ys[i]);
 	}
 	
-	static CumulativeDistribution readDistributionFromFile( String filename ){
-		// Read a cumulative distribution in the folowing format
+	public static CumulativeDistribution readDistributionFromFile( String filename ){
+		// Read a cumulative distribution in the following format
 		// x[i] \t y[i]
 		//
 		// x0	0.0
@@ -131,4 +132,26 @@ public class CumulativeDistribution {
 		}
 		return new CumulativeDistribution( xs, ys );
 	}
+	
+	/**
+	 * Draws a single sample from the cumulative distribution function.
+	 * 
+	 * @return the mid-value of the bin from which the sampled value originates.
+	 */
+	public double sampleFromCDF(){
+		Double d = null;
+		double rnd = MatsimRandom.getRandom().nextDouble();
+		
+		int index = 1;
+		while(d == null & index <= this.getNumBins() ){
+			if( this.ys[index] > rnd){
+				d = this.xs[index-1] + (this.xs[index] - this.xs[index-1]) / 2;
+			} else{
+				index++;
+			}
+		}
+		assert(d != null) : "Could not draw from the cumulative distribution function";
+		return d;
+	}
+	
 }
