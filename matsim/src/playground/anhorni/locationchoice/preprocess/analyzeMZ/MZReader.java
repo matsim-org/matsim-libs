@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
+
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -49,6 +51,9 @@ public class MZReader {
 				}	
 				MZTrip mzTrip = new MZTrip(id, coordStart, coordEnd, startTime, endTime);
 				
+				// only looking at car trips at the moment
+				if (!this.plausible(coordStart, coordEnd) || coordStart.calcDistance(coordEnd) < 1.0) continue;
+				
 				mzTrip.setWmittel(entries[53].trim());
 				mzTrip.setWzweck2(entries[55].trim());
 			
@@ -85,5 +90,13 @@ public class MZReader {
 	}
 	public void setMzTrips(List<MZTrip> mzTrips) {
 		this.mzTrips = mzTrips;
+	}
+	
+	private boolean plausible(Coord coordStart, Coord coordEnd) {
+		if (coordStart.getX() > 1000 && coordStart.getY() > 1000 
+				&& coordEnd.getX() > 1000 && coordEnd.getY() > 1000) {
+			return true;
+		}
+		else return false;
 	}
 }

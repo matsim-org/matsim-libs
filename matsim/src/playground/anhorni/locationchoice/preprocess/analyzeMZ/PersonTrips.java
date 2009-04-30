@@ -47,31 +47,7 @@ public class PersonTrips {
 		}
 		return false;
 	}
-	
-	public boolean containsImplausibleCoordinates() {
-		Iterator<MZTrip> mzTrips_it = mzTrips.iterator();
-		while (mzTrips_it.hasNext()) {
-			MZTrip mzTrip = mzTrips_it.next();
-			if (mzTrip.getCoordEnd().getX() < 1000 || mzTrip.getCoordEnd().getY() < 1000) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean containsImplausibleDistances() {
-		Iterator<MZTrip> mzTrips_it = mzTrips.iterator();
-		while (mzTrips_it.hasNext()) {
-			MZTrip mzTrip = mzTrips_it.next();
-			if (mzTrip.getCoordStart().calcDistance(mzTrip.getCoordEnd()) < 1.0) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	
-		
+				
 	public boolean intersectZH() {	
 		
 		final double radius = 30000.0;

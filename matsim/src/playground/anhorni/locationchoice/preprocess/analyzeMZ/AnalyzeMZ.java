@@ -1,7 +1,6 @@
 package playground.anhorni.locationchoice.preprocess.analyzeMZ;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
@@ -19,7 +18,7 @@ public class AnalyzeMZ {
 	private final static Logger log = Logger.getLogger(AnalyzeMZ.class);
 	private String analyzeTrips = "false";
 	private String analyzeActs = "false";
-	private List<MZTrip> mzTrips = new Vector<MZTrip>();
+	
 	
 	public static void main(String[] args) {	
 		AnalyzeMZ analyzer = new AnalyzeMZ();
@@ -33,7 +32,7 @@ public class AnalyzeMZ {
 		log.info("Reading MZ ...");
 		MZReader mzReader = new MZReader();
 		mzReader.read("input/MZ/MZ2005_Wege.dat");
-		log.info("Number of MZ trips: " + mzTrips.size());		
+		log.info("Number of MZ trips: " + mzReader.getMzTrips().size());		
 		
 		if (this.analyzeTrips.equals("true")) {
 			this.analyzeTrips(mzReader);
@@ -45,30 +44,11 @@ public class AnalyzeMZ {
 		
 	public void analyzeActs(MZReader mzReader) {
 		log.info("Starting analyze acts");
-		
-		// Count acts by counting trips having wzweck2==Hinweg
-		int countShopActs = 0;
-		int countLeisureActs = 0;
-		Iterator<MZTrip> mzTrips_it = mzReader.getMzTrips().iterator();
-		while (mzTrips_it.hasNext()) {
-			MZTrip mzTrip = mzTrips_it.next();
-			//Hinweg == 1
-			if (mzTrip.getShopOrLeisure().equals("shop") && mzTrip.getWzweck2().equals("1")) {
-				countShopActs++;
-			}
-			if (mzTrip.getShopOrLeisure().equals("leisure") && mzTrip.getWzweck2().equals("1")) {
-				countLeisureActs++;
-			}
-		}
-		log.info("Number of shop trips HINWEG: " + countShopActs);
-		log.info("Number of leisure trips HINWEG: " + countLeisureActs);
-		
+			
+		List<MZTrip> mzTrips = new Vector<MZTrip>();
 		GroceryFilter groceryfilter = new GroceryFilter();
 		mzTrips = groceryfilter.filterTrips(mzTrips);
-		
-		GeographicalFilter geographicalfilter = new GeographicalFilter();
-		mzTrips = geographicalfilter.filterTrips(mzTrips);
-		
+				
 		log.info("Reading BZ");
 		BZReader bzReader = new BZReader();
 		List<Hectare> hectares = bzReader.readBZGrocery("input/BZ/BZ01_UNT_P_DSVIEW.TXT");
@@ -83,21 +63,46 @@ public class AnalyzeMZ {
 		log.info("Finished analyzeActs ----------------------------------------------");
 	}
 	
-	public void analyzeTrips(MZReader mzReader) {	
+	public void analyzeTrips(MZReader mzReader) {
+				
+		// Count acts by counting trips having wzweck2==Hinweg
+		int countShopTripsHinweg = 0;
+		int countLeisureTripsHinweg = 0;
+		int countShopTrips = 0;
+		int countLeisureTrips = 0;
+		
+		Iterator<MZTrip> mzTrips_it = mzReader.getMzTrips().iterator();
+		while (mzTrips_it.hasNext()) {
+			MZTrip mzTrip = mzTrips_it.next();
+			//Hinweg == 1
+			if (mzTrip.getShopOrLeisure().equals("shop")) {
+				if (mzTrip.getWzweck2().equals("1")) {
+					countShopTripsHinweg++;
+				}
+				countShopTrips++;
+			}
+			if (mzTrip.getShopOrLeisure().equals("leisure")) {
+				if (mzTrip.getWzweck2().equals("1")) {
+					countLeisureTripsHinweg++;
+				}
+				countLeisureTrips++;
+			}
+		}
+		log.info("Number of shop trips: " + countShopTrips);
+		log.info("Number of leisure trips: " + countLeisureTrips);
+		log.info("Number of shop trips HINWEG: " + countShopTripsHinweg);
+		log.info("Number of leisure trips HINWEG: " + countLeisureTripsHinweg);
+		
+		
 		TreeMap<Id, PersonTrips>  personTrips = mzReader.getPersonTrips();
 		log.info("Number of persons: " + personTrips.size());
-		
-		GeographicalFilter geographicalFilter = new GeographicalFilter();
-		personTrips = geographicalFilter.filterPersons(personTrips);		
-		log.info("Number of persons after plausiblity check: " + personTrips.size());		
 		
 		log.info("Writting ch trips file ...");
 		String outpath = "./output/valid/trips/";
 		
 		TripWriter writer = new TripWriter();
 		writer.write(personTrips, "ch", outpath);
-		
-		
+			
 		TreeMap<Id, PersonTrips>  personTripsFiltered = new TreeMap<Id, PersonTrips>();
 		Iterator<PersonTrips> personTrips_it = personTrips.values().iterator();
 		while (personTrips_it.hasNext()) {
