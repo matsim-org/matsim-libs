@@ -28,6 +28,11 @@ import java.util.Vector;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 
+/**
+ * 
+ * @author fabrice and jjoubert
+ *
+ */
 public class CumulativeDistribution {
 
 	double[] xs;

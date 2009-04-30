@@ -49,7 +49,7 @@ public class MyNetworkGenerator {
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, UTM35S);
 		
 		OsmNetworkReader onr = new OsmNetworkReader(net,ct);
-		onr.setHierarchyLayer(-25.6857, 28.125, -25.7334, 28.194, 6);
+		onr.setHierarchyLayer(-25.8875, 28.1204, -25.9366, 28.1612, 6);
 		try {
 			onr.parse(osm);
 		} catch (SAXException e) {
