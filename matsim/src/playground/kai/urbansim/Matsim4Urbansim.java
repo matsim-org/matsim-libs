@@ -69,7 +69,7 @@ public class Matsim4Urbansim {
 		// parse the config arguments so we have a config.  generate scenario data from this
 		Config config = Gbl.createConfig(args);
 		ScenarioLoader loader = new ScenarioLoader(config);
-		loader.loadPopulation();
+		loader.loadScenario();
 		Scenario scenarioData = loader.getScenario();
 		
 		

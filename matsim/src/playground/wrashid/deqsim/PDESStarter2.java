@@ -41,7 +41,7 @@ public class PDESStarter2 {
 		
 		// prepare data
 		ScenarioLoader loader = new ScenarioLoader(config);
-		loader.loadPopulation();
+		loader.loadScenario();
 		Scenario data = loader.getScenario();
 		NetworkLayer network = (NetworkLayer) data.getNetwork();
 		Population population = data.getPopulation();

@@ -50,7 +50,7 @@ public class PopDensityGrid {
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		Config config = Gbl.createConfig(new String[]{args[0]});
 		ScenarioLoader loader = new ScenarioLoader(config);
-		loader.loadPopulation();
+		loader.loadScenario();
 		Scenario data = loader.getScenario();
 
 		/*

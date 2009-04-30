@@ -107,7 +107,7 @@ public class MyRuns {
 
 	public static void setPlansToSameDepTime(Config config) {
 		ScenarioLoader loader = new ScenarioLoader(config);
-		loader.loadPopulation();
+		loader.loadScenario();
 		
 		Scenario scenario = loader.getScenario();
 		Population population = scenario.getPopulation();

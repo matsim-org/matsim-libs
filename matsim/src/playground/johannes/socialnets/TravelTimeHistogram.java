@@ -81,7 +81,7 @@ public class TravelTimeHistogram {
 //		new MatsimNetworkReader(network).readFile(networkfile);
 		Config config = Gbl.createConfig(new String[]{configfile});
 		ScenarioLoader loader = new ScenarioLoader(config);
-		loader.loadPopulation();
+		loader.loadScenario();
 		Scenario data = loader.getScenario();
 		Population population = data.getPopulation();
 		NetworkLayer network = (NetworkLayer) data.getNetwork();

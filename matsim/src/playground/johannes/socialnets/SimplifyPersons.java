@@ -49,7 +49,7 @@ public class SimplifyPersons {
 		Config config = Gbl.createConfig(new String[]{args[0]});
 		
 		ScenarioLoader loader = new ScenarioLoader(config);
-		loader.loadPopulation();
+		loader.loadScenario();
 		Scenario data = loader.getScenario();
 		
 		double centerX = 683000;

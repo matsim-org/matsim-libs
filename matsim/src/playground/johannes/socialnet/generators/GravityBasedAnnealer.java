@@ -70,7 +70,7 @@ public class GravityBasedAnnealer {
 	public static void main(String[] args) throws IOException {
 		Config config = Gbl.createConfig(new String[]{args[0]});
 		ScenarioLoader loader = new ScenarioLoader(config);
-		loader.loadPopulation();
+		loader.loadScenario();
 		Scenario data = loader.getScenario();
 		Population population = data.getPopulation();
 		

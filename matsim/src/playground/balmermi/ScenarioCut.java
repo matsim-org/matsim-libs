@@ -73,7 +73,7 @@ public class ScenarioCut {
 		
 		System.out.println("read scenario data... " + (new Date()));
 		ScenarioLoader loader = new ScenarioLoader(Gbl.getConfig());
-		loader.loadPopulation();
+		loader.loadScenario();
 		Scenario sd = loader.getScenario();
 //		ScenarioImpl sd = new ScenarioImpl(Gbl.getConfig());
 		Facilities facilities = sd.getFacilities();
