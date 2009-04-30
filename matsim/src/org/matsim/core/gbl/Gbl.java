@@ -62,11 +62,14 @@ public abstract class Gbl {
 	//////////////////////////////////////////////////////////////////////
 	// config creation
 	//////////////////////////////////////////////////////////////////////
-//	/**
-//	 * @param args
-//	 * @return
-//	 * @deprecated use "ScenarioLoader(filename).loadScenario(); scenario.getConfig();"
-//	 */
+	/**
+	 * @param args
+	 * @return
+	 * @deprecated use "ScenarioLoader(filename).loadScenario() to read 
+	 * a complete Scenario from file. If a Config instance with already created core modules
+	 * is needed use BasicScenario sc = new BasicScenarioImpl(); sc.getConfig();"
+	 */
+	@Deprecated
 	public static final Config createConfig(final String[] args) {
 		if (Gbl.config != null) {
 			Gbl.errorMsg("config exists already! Cannot create a 2nd global config.");
