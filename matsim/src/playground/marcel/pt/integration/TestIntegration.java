@@ -37,18 +37,36 @@ import org.matsim.run.OTFVis;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.TransitScheduleReaderBerta;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
+import playground.marcel.pt.tryout.CreatePseudoNetwork;
 
 
 public class TestIntegration {
 
 	public static void main(final String[] args) {
+		try {
+			TransitScheduleReaderBerta.main(null);
+		} catch (SAXException e1) {
+			// TODO [MR] Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ParserConfigurationException e1) {
+			// TODO [MR] Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO [MR] Auto-generated catch block
+			e1.printStackTrace();
+		}
+		new CreatePseudoNetwork().run();
+		
 		final Config config = Gbl.createConfig(new String[] {"test/input/playground/marcel/pt/config.xml"});
 		
 		config.network().setInputFile("../thesis-data/examples/berta/pseudoNetwork.xml");
 		config.facilities().setInputFile("../thesis-data/examples/berta/facilities.xml");
-		config.plans().setInputFile(null);
-		
+		config.plans().setInputFile("../thesis-data/examples/berta/pseudoPerson.xml");
+		config.simulation().setSnapshotPeriod(60);
+		config.simulation().setEndTime(12.0*3600);
+
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		ScenarioLoader loader = new ScenarioLoader(scenario);
 		NetworkLayer network = (NetworkLayer) scenario.getNetwork();

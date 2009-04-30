@@ -101,7 +101,7 @@ public class CreatePseudoNetwork {
 
 				if (routeLinks.size() > 0) {
 					Link startLink = routeLinks.get(0);
-					List<Link> linksBetween = (routeLinks.size() > 2) ? routeLinks.subList(1, routeLinks.size() - 2) : new ArrayList<Link>(0);
+					List<Link> linksBetween = (routeLinks.size() > 2) ? routeLinks.subList(1, routeLinks.size() - 1) : new ArrayList<Link>(0);
 					Link endLink = routeLinks.get(routeLinks.size() - 1);
 					NetworkRoute route = new LinkNetworkRoute(startLink, endLink);
 					route.setLinks(startLink, linksBetween, endLink);
@@ -140,7 +140,7 @@ public class CreatePseudoNetwork {
 				toNode = network.createNode(new IdImpl(nodeIdCounter++), toStop.getCoord());
 				nodes.put(toStop, toNode);
 			}
-			link = network.createLink(new IdImpl(linkIdCounter++), fromNode, toNode, CoordUtils.calcDistance(fromStop.getCoord(), toStop.getCoord()), 50.0 / 3.6, 1600, 1);
+			link = network.createLink(new IdImpl(linkIdCounter++), fromNode, toNode, CoordUtils.calcDistance(fromStop.getCoord(), toStop.getCoord()), 30.0 / 3.6, 500, 1);
 			links.put(new Tuple<Facility, Facility>(fromStop, toStop), link);
 		}
 		return link;
