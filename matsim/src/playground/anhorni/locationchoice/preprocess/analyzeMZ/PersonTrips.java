@@ -122,8 +122,14 @@ public class PersonTrips {
 			}
 			else if (this.mzTrips.get(i).getShopOrLeisure().equals("leisure")) {
 				if (i < this.mzTrips.size()-1) {
-					this.leisureShoppingTrips.add(this.mzTrips.get(i));
-					this.leisureShoppingTrips.add(this.mzTrips.get(i+1));
+					
+					// if MIV as described above ...
+					if (Integer.parseInt(this.mzTrips.get(i).getWmittel()) >= 9 &&
+							Integer.parseInt(this.mzTrips.get(i).getWmittel()) <= 13) {
+					
+							this.leisureShoppingTrips.add(this.mzTrips.get(i));
+							this.leisureShoppingTrips.add(this.mzTrips.get(i+1));
+					}
 				}
 			}
 		}		
