@@ -52,7 +52,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import playground.marcel.SoldnerBerlinToWGS84;
-import playground.marcel.pt.router.TransitRouter;
+import playground.marcel.pt.tryout.CreatePseudoNetwork;
 
 public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
@@ -60,6 +60,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	
 	private static final String LINIENFAHRPLAN = "Linienfahrplan";
 	private static final String BETRIEBSZWEIGNAME = "Betriebszweigname";
+	private static final String BETRIEBSZWEIGNUMMER = "Betriebszweignummer";
 	
 	// Linie
 	private static final String LINIE = "Linie";
@@ -158,9 +159,9 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (HALTEPUNKTNUMMER.equals(name) && HALTEPUNKT.equals(context.peek())) {
-			this.tmpHaltepunkt.id = new IdImpl(content);
+			this.tmpHaltepunkt.id = new IdImpl(this.tmpLinie.betriebszweignummer + "_" + content);
 		} else if (HALTEPUNKTNUMMER.equals(name) && ROUTENPUNKT.equals(context.peek())) {
-			this.tmpRoutenpunkt.haltepunkt = this.haltepunkte.get(new IdImpl(content));
+			this.tmpRoutenpunkt.haltepunkt = this.haltepunkte.get(new IdImpl(this.tmpLinie.betriebszweignummer + "_" + content));
 		} else if (XKOORDINATE.equals(name)) {
 			if (content.length() > 0) {
 				this.tmpHaltepunkt.x = Double.parseDouble(content);
@@ -192,14 +193,16 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 			this.tmpLinie.id = content;
 		} else if (BETRIEBSZWEIGNAME.equals(name)) {
 			this.tmpLinie.betriebszweig = content;
+		} else if (BETRIEBSZWEIGNUMMER.equals(name)) {
+			this.tmpLinie.betriebszweignummer = content;
 		} else if (LINIE.equals(name)) {
 			this.currentTransitLine = new TransitLine(new IdImpl(this.tmpLinie.betriebszweig + " " + this.tmpLinie.id));
-			this.tmpLinie = null;
 		} else if (LINIENFAHRPLAN.equals(name)) {
 			if (this.currentTransitLine.getRoutes().size() > 0) {
 				this.schedule.addTransitLine(this.currentTransitLine);
 			}
 			this.currentTransitLine = null;
+			this.tmpLinie = null;
 			this.departureCounter = 0;
 		} else if (FAHRZEITPROFIL.equals(name)) {
 			this.tmpRoute.fahrzeitprofile.put(this.tmpFahrzeitprofil.id, this.tmpFahrzeitprofil);
@@ -273,6 +276,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		/*package*/ String id = null;
 		/*package*/ String publicId = null;
 		/*package*/ String betriebszweig = null;
+		/*package*/ String betriebszweignummer = null;
 	}
 	
 	protected static class BHaltepunkt {
@@ -328,7 +332,8 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		new FacilitiesWriter(facilities, "../thesis-data/examples/berta/facilities.xml").write();
 
 		log.info("creating routing network.xml");
-		new TransitRouter(schedule); // writes out "wrappedNetwork.xml" for debugging
+//		new TransitRouter(schedule); // writes out "wrappedNetwork.xml" for debugging
+		new CreatePseudoNetwork().run();// writes out "pseudoNetwork.xml" for debugging
 	}
 
 }

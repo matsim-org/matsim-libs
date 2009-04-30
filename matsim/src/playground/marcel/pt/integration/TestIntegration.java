@@ -44,6 +44,11 @@ public class TestIntegration {
 
 	public static void main(final String[] args) {
 		final Config config = Gbl.createConfig(new String[] {"test/input/playground/marcel/pt/config.xml"});
+		
+		config.network().setInputFile("../thesis-data/examples/berta/pseudoNetwork.xml");
+		config.facilities().setInputFile("../thesis-data/examples/berta/facilities.xml");
+		config.plans().setInputFile(null);
+		
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		ScenarioLoader loader = new ScenarioLoader(scenario);
 		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
@@ -60,7 +65,8 @@ public class TestIntegration {
 //		System.out.println(facilities.getFacilities().size());
 		
 		try {
-			new TransitScheduleReaderV1(schedule, network, facilities).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
+//			new TransitScheduleReaderV1(schedule, network, facilities).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
+			new TransitScheduleReaderV1(schedule, network, facilities).parse("../thesis-data/examples/berta/pseudoSchedule.xml");
 			final TransitQueueSimulation sim = new TransitQueueSimulation((NetworkLayer) scenario.getNetwork(), scenario.getPopulation(), events, facilities);
 			sim.setTransitSchedule(schedule);
 			sim.run();

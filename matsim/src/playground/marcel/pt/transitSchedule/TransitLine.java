@@ -51,4 +51,8 @@ public class TransitLine {
 		return Collections.unmodifiableMap(this.transitRoutes);
 	}
 
+	public void removeRoute(final TransitRoute route) {
+		this.transitRoutes.remove(route.getId());
+	}
+
 }

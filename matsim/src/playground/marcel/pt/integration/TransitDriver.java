@@ -69,17 +69,16 @@ public class TransitDriver implements DriverAgent {
 			for (TransitRouteStop stop : route.getStops()) {
 				this.stops.add(stop.getStopFacility());
 			}
+			this.sim = sim;
+			this.departureTime = departure.getDepartureTime();
 			this.carRoute = route.getRoute();
 			List<Link> links = carRoute.getLinks();
 			this.linkRoute = new ArrayList<Link>(2 + links.size());
 			this.linkRoute.add(carRoute.getStartLink());
 			this.linkRoute.addAll(links);
 			this.linkRoute.add(carRoute.getEndLink());
-			this.departureTime = departure.getDepartureTime();
-			this.sim = sim;
 			
 			this.currentLeg.setRoute(this.carRoute);
-//			this.moveOverNode();// why is this needed?
 		}
 
 		public void setVehicle(final TransitVehicle vehicle) {

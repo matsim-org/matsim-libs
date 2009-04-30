@@ -102,7 +102,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 			Id id = new IdImpl(atts.getValue(REF_ID));
 			Facility facility = this.facilities.getFacilities().get(id);
 			if (facility == null) {
-				throw new RuntimeException("no stop/facility with id " + atts.getValue(ID));
+				throw new RuntimeException("no stop/facility with id " + atts.getValue(REF_ID));
 			}
 			TempStop stop = new TempStop(facility);
 			String arrival = atts.getValue(ARRIVAL_OFFSET);
@@ -121,6 +121,8 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (DESCRIPTION.equals(name) && TRANSIT_ROUTE.equals(context.peek())) {
 			this.currentTransitRoute.description = content;
+		} else if (TRANSPORT_MODE.equals(name)) {
+			this.currentTransitRoute.mode = TransportMode.valueOf(content);
 		} else if (TRANSIT_ROUTE.equals(name)) {
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(this.currentTransitRoute.stops.size());
 			for (TempStop tStop : this.currentTransitRoute.stops) {

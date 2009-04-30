@@ -34,7 +34,7 @@ import org.matsim.core.api.population.NetworkRoute;
 public class TransitRoute {
 
 	private final Id routeId;
-	private final NetworkRoute route;
+	private NetworkRoute route;
 	private final List<TransitRouteStop> stops;
 	private String description = null;
 	private final Map<Id, Departure> departures = new HashMap<Id, Departure>();
@@ -87,6 +87,10 @@ public class TransitRoute {
 
 	public NetworkRoute getRoute() {
 		return this.route;
+	}
+	
+	public void setRoute(NetworkRoute route) {
+		this.route = route;
 	}
 
 	public List<TransitRouteStop> getStops() {
