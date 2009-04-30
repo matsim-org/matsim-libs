@@ -6,7 +6,7 @@ import java.util.Vector;
 
 import org.matsim.api.basic.v01.Coord;
 
-import playground.anhorni.locationchoice.assemblefacilities.Hectare;
+import playground.anhorni.locationchoice.preprocess.facilities.assembleFacilitiesVariousSources.Hectare;
 
 public class CreateTripHectareRelation {
 	

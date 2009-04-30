@@ -1,6 +1,6 @@
 package playground.anhorni.locationchoice.preprocess.analyzeMZ;
 
-import playground.anhorni.locationchoice.assemblefacilities.Hectare;
+import playground.anhorni.locationchoice.preprocess.facilities.assembleFacilitiesVariousSources.Hectare;
 
 public class MZTripHectare {
 	

@@ -12,8 +12,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.anhorni.locationchoice.assemblefacilities.BZReader;
-import playground.anhorni.locationchoice.assemblefacilities.Hectare;
+import playground.anhorni.locationchoice.preprocess.facilities.assembleFacilitiesVariousSources.BZReader;
+import playground.anhorni.locationchoice.preprocess.facilities.assembleFacilitiesVariousSources.Hectare;
 
 public class AnalyzeMZ {	
 	private final static Logger log = Logger.getLogger(AnalyzeMZ.class);
