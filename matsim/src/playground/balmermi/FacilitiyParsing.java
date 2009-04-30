@@ -20,10 +20,13 @@
 
 package playground.balmermi;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.world.World;
 
 import playground.balmermi.census2000.modules.FacilitiesSetCapacity;
 
@@ -33,13 +36,15 @@ public class FacilitiyParsing {
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
-	public static void testRun01() {
+	public static void testRun01(Config config) {
 
 		System.out.println("TEST RUN 01:");
 
+		World world = Gbl.createWorld();
+		
 		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  running facilities algorithms... ");
@@ -66,10 +71,9 @@ public class FacilitiyParsing {
 
 		Gbl.startMeasurement();
 
-		Gbl.createConfig(args);
-		Gbl.createWorld();
+		Config config = new ScenarioLoader(args[0]).getScenario().getConfig();
 
-		testRun01();
+		testRun01(config);
 
 		Gbl.printElapsedTime();
 	}

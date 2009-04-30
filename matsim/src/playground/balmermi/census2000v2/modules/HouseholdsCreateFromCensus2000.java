@@ -30,6 +30,7 @@ import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
 import playground.balmermi.census2000.data.Municipalities;
@@ -78,7 +79,7 @@ public class HouseholdsCreateFromCensus2000 {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Households households) {
+	public void run(Households households, Layer municipalityLayer) {
 		log.info("    running " + this.getClass().getName() + " module...");
 
 		try {
@@ -98,7 +99,7 @@ public class HouseholdsCreateFromCensus2000 {
 
 				// check for existing zone
 				Id zone_id = new IdImpl(entries[CAtts.I_ZGDE]);
-				Location zone = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY).getLocation(zone_id);
+				Location zone = municipalityLayer.getLocation(zone_id);
 				if (zone == null) { throw new RuntimeException("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
 				
 				// check for existing facility

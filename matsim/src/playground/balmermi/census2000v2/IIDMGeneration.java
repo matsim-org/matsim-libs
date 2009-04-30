@@ -23,6 +23,7 @@ package playground.balmermi.census2000v2;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -100,7 +101,7 @@ public class IIDMGeneration {
 
 		log.info("  parsing additional municipality information... ");
 		Municipalities municipalities = new Municipalities(indir+"/gg25_2001_infos.txt");
-		municipalities.parse();
+		municipalities.parse(world.getLayer(new IdImpl("municipality")));
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -138,7 +139,7 @@ public class IIDMGeneration {
 
 		log.info("  parsing households... ");
 		Households households = new Households(municipalities);
-		households.parse(indir+"/households.txt",pop);
+		households.parse(indir+"/households.txt",pop, facilities);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

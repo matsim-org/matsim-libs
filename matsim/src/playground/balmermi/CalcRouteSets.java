@@ -50,14 +50,12 @@ public class CalcRouteSets {
 	//
 	//////////////////////////////////////////////////////////////////////
 
-	public static void runRouteSetAlgo(Integer id,Integer orig,Integer dest) {
+	public static void runRouteSetAlgo(NetworkLayer network, Integer id,Integer orig,Integer dest) {
 
 		System.out.println("RUN: runRouteSetAlgo...");
 
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
-
-		Node o = network.getNode("" + orig);
-		Node d = network.getNode("" + dest);
+		Node o = network.getNode(orig.toString());
+		Node d = network.getNode(dest.toString());
 		int time = 0;
 		int nof_routes = 20;
 		int var_factor = 3;
@@ -78,7 +76,7 @@ public class CalcRouteSets {
 		System.out.println();
 	}
 
-	public static void parseODPairs(final String inputfile) {
+	public static void parseODPairs(NetworkLayer network, final String inputfile) {
 
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		ArrayList<Integer> origs = new ArrayList<Integer>();
@@ -120,7 +118,7 @@ public class CalcRouteSets {
 		System.out.println("    # dests = " + dests.size());
 
 		for (int i=0; i< ids.size(); i++) {
-			runRouteSetAlgo(ids.get(i),origs.get(i),dests.get(i));
+			runRouteSetAlgo(network, ids.get(i),origs.get(i),dests.get(i));
 		}
 	}
 
@@ -186,7 +184,7 @@ public class CalcRouteSets {
 		out.write("# SEG_ID\tFROM_NODE\tTO_NODE\tROUTE(linklist)...\t-1\tLEASTCOSTROUTE(0,1)\t-1\n");
 		out.flush();
 
-		parseODPairs("input/routen_start_ende.txt");
+		parseODPairs(network, "input/routen_start_ende.txt");
 
 		out.close();
 		fw.close();

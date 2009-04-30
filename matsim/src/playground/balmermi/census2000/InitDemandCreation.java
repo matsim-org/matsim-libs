@@ -20,12 +20,13 @@
 
 package playground.balmermi.census2000;
 
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -63,19 +64,21 @@ public class InitDemandCreation {
 	// createInitDemand()
 	//////////////////////////////////////////////////////////////////////
 
-	public static void createInitDemand(Config config) {
+	public static void createInitDemand(String[] args) {
 
 		System.out.println("MATSim-IIDM: create initial demand based on census2000 data.");
 
-		World world = Gbl.createWorld();
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		Config config = sl.getScenario().getConfig();
+		World world = ((ScenarioImpl) sl.getScenario()).getWorld();
 		
 		System.out.println("  reading world xml file... ");
 		new MatsimWorldReader(world).readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		sl.loadFacilities();
+		Facilities facilities = sl.getScenario().getFacilities();
 		System.out.println("  done.");
 
 		System.out.println("  reading matrices xml file... ");
@@ -87,7 +90,7 @@ public class InitDemandCreation {
 
 		System.out.println("  parsing additional municipality information... ");
 		Municipalities municipalities = new Municipalities("input/gg25_2001_infos.txt");
-		municipalities.parse();
+		municipalities.parse(world.getLayer(new IdImpl("municipality")));
 		System.out.println("  done.");
 
 		System.out.println("  parsing household information... ");
@@ -122,7 +125,7 @@ public class InitDemandCreation {
 		plans.addAlgorithm(new PersonLicenseModel(persons));
 		plans.addAlgorithm(new PersonDistributeActChains(actchains));
 		plans.addAlgorithm(new PersonSetHomeLoc(facilities, persons));
-		plans.addAlgorithm(new PersonSetPrimLoc(facilities, Matrices.getSingleton(),persons));
+		plans.addAlgorithm(new PersonSetPrimLoc(facilities, Matrices.getSingleton(),persons, (ZoneLayer)world.getLayer(new IdImpl("municipality"))));
 		plans.addAlgorithm(new PersonSetSecLoc(facilities, persons));
 		plans.addAlgorithm(new PersonMobilityToolModel(persons));
 		plans.addAlgorithm(new PersonModeChoiceModel(persons));
@@ -207,9 +210,9 @@ public class InitDemandCreation {
 
 		Gbl.startMeasurement();
 
-		Config config = Gbl.createConfig(args);
+		Config config = new ScenarioLoader(args[0]).getScenario().getConfig();
 
-		createInitDemand(config);
+		createInitDemand(args);
 
 		Gbl.printElapsedTime();
 	}

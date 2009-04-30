@@ -35,7 +35,6 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.world.Layer;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Municipality;
@@ -92,8 +91,7 @@ public class Households {
 	// public methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public final void parse(String infile, Population plans) {
-		Layer fl = Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
+	public final void parse(String infile, Population plans, Facilities facilities) {
 		int line_cnt = 0;
 		try {
 			FileReader fr = new FileReader(infile);
@@ -115,7 +113,7 @@ public class Households {
 				int hhtpz = Integer.parseInt(entries[4]);
 				
 				Municipality m = this.municipalities.getMunicipality(mid);
-				Facility f = (Facility)fl.getLocation(fid);
+				Facility f = facilities.getFacilities().get(fid);
 				
 				Household hh = new Household(hhid,m,f);
 				if (hhtpw != Integer.MIN_VALUE) { hh.setHHTPW(hhtpw); }
@@ -127,7 +125,7 @@ public class Households {
 				entries = p_w_list.split(";",-1);
 				for (int i=0; i<entries.length-1; i++) {
 					Id pid = new IdImpl(entries[i]);
-					Person p = plans.getPerson(pid);
+					Person p = plans.getPersons().get(pid);
 					if (p == null) { Gbl.errorMsg("that should not happen!"); }
 					if (hh.getPersonsW().put(p.getId(),p) !=  null) { Gbl.errorMsg("that should not happen!"); }
 					if (p.getCustomAttributes().put(CAtts.HH_W,hh) != null) {
@@ -137,7 +135,7 @@ public class Households {
 				entries = p_z_list.split(";",-1);
 				for (int i=0; i<entries.length-1; i++) {
 					Id pid = new IdImpl(entries[i]);
-					Person p = plans.getPerson(pid);
+					Person p = plans.getPersons().get(pid);
 					if (p == null) { Gbl.errorMsg("that should not happen!"); }
 					if (hh.getPersonsZ().put(p.getId(),p) != null) { Gbl.errorMsg("that should not happen!"); }
 					if (p.getCustomAttributes().put(CAtts.HH_Z,hh) != null) {

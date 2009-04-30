@@ -43,7 +43,7 @@ public class NavtechRouting {
 		System.out.println("RUN: xy2links");
 
 		Config config = Gbl.createConfig(args);
-		World world = Gbl.getWorld();
+		World world = Gbl.createWorld();
 
 		System.out.println("  reading world xml file... ");
 		new MatsimWorldReader(world).readFile(config.world().getInputFile());

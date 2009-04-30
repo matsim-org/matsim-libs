@@ -30,6 +30,7 @@ import java.util.LinkedList;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -46,10 +47,10 @@ public class RoutesForGianluca {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public RoutesForGianluca() {
+	public RoutesForGianluca(Config config) {
 		System.out.println("  reading the network xml file...");
-		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(this.network).readFile(Gbl.getConfig().network().getInputFile());
+		this.network = (NetworkLayer)Gbl.createWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(this.network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		this.readRoutes("input/gewaehlte_routen.txt");
@@ -153,9 +154,9 @@ public class RoutesForGianluca {
 
 		Gbl.startMeasurement();
 
-		Scenario.setUpScenarioConfig();
+		Config config = Scenario.setUpScenarioConfig();
 
-		new RoutesForGianluca();
+		new RoutesForGianluca(config);
 
 		Gbl.printElapsedTime();
 	}

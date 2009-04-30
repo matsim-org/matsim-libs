@@ -20,10 +20,9 @@
 
 package playground.balmermi;
 
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkSummary;
 
 import playground.balmermi.algos.NetworkWriteVolumesAsTable;
@@ -38,13 +37,9 @@ public class WriteNetworkAsTable {
 
 		System.out.println("RUN: cleanNetwork");
 
-		Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		sl.loadNetwork();
+		Network network = sl.getScenario().getNetwork();
 
 		System.out.println("  running Network Validation and cleaning algorithms... ");
 		new NetworkSummary().run(network);

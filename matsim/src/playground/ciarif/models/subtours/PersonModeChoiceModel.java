@@ -61,16 +61,17 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 	private final Municipalities municipalities; // Da cambiare per PersonStreaming
 	private ModelModeChoice model;
 	private List<PersonSubtour> personSubtours = new Vector<PersonSubtour>();
-	 
+	private final Layer municipalityLayer;
 		
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 	//public PersonModeChoiceModel(final Persons persons) {// Da mettere per PersonStreaming
-	public PersonModeChoiceModel(final Persons persons, Municipalities municipalities) {// Da mettere per SubtourPersonStreaming
+	public PersonModeChoiceModel(final Persons persons, Municipalities municipalities, Layer municipalityLayer) {// Da mettere per SubtourPersonStreaming
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.persons = persons;
 		this.municipalities = municipalities;// Da togliere per PersonStreaming
+		this.municipalityLayer = municipalityLayer;
 		System.out.println("    done.");
 	}
 	
@@ -192,8 +193,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 //			if (rd4<.30) {udeg=5;}
 					
 			
-			Layer muni_layer = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY);
-			ArrayList<Location> locs = muni_layer.getNearestLocations(sub.getStart_coord());
+			ArrayList<Location> locs = municipalityLayer.getNearestLocations(sub.getStart_coord());
 			Location loc = locs.get(MatsimRandom.getRandom().nextInt(locs.size()));
 			Municipality m = municipalities.getMunicipality(new Integer(loc.getId().toString()));
 			int udeg = m.getRegType();

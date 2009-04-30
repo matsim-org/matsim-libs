@@ -22,6 +22,7 @@ package playground.balmermi.census2000;
 
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -72,7 +73,7 @@ public class PopulationCreation {
 
 		System.out.println("  parsing additional municipality information... ");
 		Municipalities municipalities = new Municipalities("input/gg25_2001_infos.txt");
-		municipalities.parse();
+		municipalities.parse(world.getLayer(new IdImpl("municipality")));
 		System.out.println("  done.");
 
 		System.out.println("  parsing household information... ");

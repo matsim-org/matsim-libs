@@ -36,6 +36,7 @@ import org.matsim.population.filters.PersonFilter;
 import org.matsim.population.filters.PersonIdFilter;
 import org.matsim.population.filters.RouteLinkFilter;
 import org.matsim.population.filters.SelectedPlanFilter;
+import org.matsim.world.World;
 
 import playground.meisterk.org.matsim.run.facilities.ShopsOf2005ToFacilities;
 
@@ -139,6 +140,7 @@ public class CompareScenarios {
 	private void run(final String[] args) {
 
 		Config config = Gbl.createConfig(new String[]{});
+		World world = Gbl.createWorld();
 		config.global().setLocalDtdBase("dtd/");
 		System.out.println(config.global().getLocalDtdBase());
 
@@ -151,7 +153,7 @@ public class CompareScenarios {
 		log.info("Init...done.");
 		System.out.flush();
 		log.info("Performing analyses...");
-		this.doAnalyses();
+		this.doAnalyses(world);
 		log.info("Performing analyses...done.");
 		System.out.flush();
 		log.info("Writing out results...");
@@ -311,7 +313,7 @@ public class CompareScenarios {
 	 *
 	 * Summarize their average trip travel times, the scores of their selected plans, and their home locations.
 	 */
-	private void doAnalyses() {
+	private void doAnalyses(World world) {
 
 		TreeMap<Integer, TreeMap<String, PersonIdRecorder>> personIdRecorders = new TreeMap<Integer, TreeMap<String, PersonIdRecorder>>();
 
@@ -329,8 +331,8 @@ public class CompareScenarios {
 			NetworkLayer network = new NetworkLayer();
 			new MatsimNetworkReader(network).readFile(this.networkInputFilenames.get(scenarioName));
 			scenarioNetworks.put(scenarioName, network);
-			Gbl.getWorld().setNetworkLayer(network);
-			Gbl.getWorld().complete();
+			world.setNetworkLayer(network);
+			world.complete();
 
 			//Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(plansInputFilenames.get(scenarioName), false, null);
 			PopulationImpl plans = new PopulationImpl();
@@ -402,7 +404,7 @@ public class CompareScenarios {
 			for (String scenarioName : this.scenarioNames) {
 
 				// choose right network
-				Gbl.getWorld().setNetworkLayer(scenarioNetworks.get(scenarioName));
+				world.setNetworkLayer(scenarioNetworks.get(scenarioName));
 
 				Population plansSubPop = new PopulationImpl();
 				switch(analysis.intValue()) {

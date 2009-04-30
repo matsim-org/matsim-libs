@@ -30,6 +30,7 @@ import java.util.Random;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 
@@ -75,7 +76,7 @@ public class Municipalities {
 	// methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void parse() {
+	public final void parse(Layer municipalityLayer) {
 		int line_cnt = 0;
 		try {
 			FileReader file_reader = new FileReader(inputfile);
@@ -89,8 +90,8 @@ public class Municipalities {
 				// Kanton	Kt_Name	Gem_Nr	Gem_Name	Bev_total	Eink_2000	RG_verk	Benzin_95
 				// 0        1       2       3           4           5           6       7
 
-				Integer m_id = Integer.parseInt(entries[2].trim());
-				Location l = Gbl.getWorld().getLayer(MUNICIPALITY).getLocation(new IdImpl(m_id));
+				int m_id = Integer.parseInt(entries[2].trim());
+				Location l = municipalityLayer.getLocation(new IdImpl(m_id));
 				if (l == null) {
 					System.out.println("    Municipality id=" + m_id + " ignored. (Does not exist in the world layer.)");
 				} else {
@@ -109,7 +110,7 @@ public class Municipalities {
 			Gbl.errorMsg(e);
 		}
 		System.out.println("    # municipalities     = " + this.municipalities.size());
-		System.out.println("    # municipality zones = " + Gbl.getWorld().getLayer(MUNICIPALITY).getLocations().size());
+		System.out.println("    # municipality zones = " + municipalityLayer.getLocations().size());
 		System.out.println("    # lines = " + line_cnt);
 	}
 

@@ -22,6 +22,7 @@ package playground.balmermi.census2000v2;
 
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -29,6 +30,7 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.world.Layer;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
@@ -85,7 +87,8 @@ public class PopulationCreation {
 
 		System.out.println("  parsing additional municipality information... ");
 		Municipalities municipalities = new Municipalities(indir+"/gg25_2001_infos.txt");
-		municipalities.parse();
+		Layer municipalityLayer = world.getLayer(new IdImpl(Municipalities.MUNICIPALITY));
+		municipalities.parse(municipalityLayer);
 		System.out.println("  done.");
 
 		System.out.println("  creating Households object... ");
@@ -106,7 +109,7 @@ public class PopulationCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running household modules... ");
-		new HouseholdsCreateFromCensus2000(indir+"/ETHZ_Pers.tab",facilities,municipalities).run(households);
+		new HouseholdsCreateFromCensus2000(indir+"/ETHZ_Pers.tab",facilities,municipalities).run(households, municipalityLayer);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -121,7 +124,7 @@ public class PopulationCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running plans modules... ");
-		new PlansCreateFromCensus2000(indir+"/ETHZ_Pers.tab",households,facilities).run(plans);
+		new PlansCreateFromCensus2000(indir+"/ETHZ_Pers.tab",households,facilities).run(plans, municipalityLayer);
 //		new PlansWriteCustomAttributes(outdir+"/output_persons.txt").run(plans);
 		System.out.println("  done.");
 

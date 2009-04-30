@@ -30,7 +30,6 @@ import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.QuadTree;
@@ -53,7 +52,6 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 
 	private static final String E = "e";
 	private static final String W = "w";
-	private static final Id MUNICIPALITY = new IdImpl("municipality");
 	private static final String EDUCATION = "education";
 	private static final String WORK = "work";
 
@@ -70,7 +68,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonSetPrimLoc(final Facilities facilities, final Matrices matrices, final Persons persons) {
+	public PersonSetPrimLoc(final Facilities facilities, final Matrices matrices, final Persons persons, final ZoneLayer municipalities) {
 		super();
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
@@ -78,7 +76,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		this.matrices = matrices;
 		this.buildWorkFacQuadTree();
 		this.buildEducFacQuadTree();
-		this.buildZoneFacilityMapping();
+		this.buildZoneFacilityMapping(municipalities);
 		System.out.println("    done.");
 	}
 
@@ -146,8 +144,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		Gbl.printRoundTime();
 	}
 
-	public final void buildZoneFacilityMapping() {
-		ZoneLayer layer = (ZoneLayer)Gbl.getWorld().getLayer(MUNICIPALITY);
+	public final void buildZoneFacilityMapping(ZoneLayer layer) {
 		for (Facility f : this.facilities.getFacilities().values()) {
 			ArrayList<Zone> zones = new ArrayList<Zone>();
 			Iterator<? extends Location> z_it = layer.getLocations().values().iterator();

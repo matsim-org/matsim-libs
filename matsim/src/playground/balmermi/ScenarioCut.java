@@ -38,6 +38,7 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -69,10 +70,10 @@ public class ScenarioCut {
 	// run
 	//////////////////////////////////////////////////////////////////////
 
-	public static void run() {
+	public static void run(Config config) {
 		
 		System.out.println("read scenario data... " + (new Date()));
-		ScenarioLoader loader = new ScenarioLoader(Gbl.getConfig());
+		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
 		Scenario sd = loader.getScenario();
 //		ScenarioImpl sd = new ScenarioImpl(Gbl.getConfig());
@@ -154,7 +155,7 @@ public class ScenarioCut {
 		
 		System.out.println("completing world... " + (new Date()));
 		network.reconnect();
-		Gbl.getWorld().complete();
+//		Gbl.getWorld().complete();
 		System.out.println("done. " + (new Date()));
 
 		System.out.println("setting links in plan act... " + (new Date()));
@@ -189,10 +190,9 @@ public class ScenarioCut {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		Gbl.createConfig(args);
-		Gbl.createWorld();
+		Config config = new ScenarioLoader(args[0]).getScenario().getConfig();
 
-		run();
+		run(config);
 
 		Gbl.printElapsedTime();
 	}

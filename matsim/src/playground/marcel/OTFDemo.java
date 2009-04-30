@@ -54,7 +54,8 @@ public class OTFDemo {
 //		org.matsim.run.OTFVis.main(new String[] {"output/0.otfvis.mvi"});
 //		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/talks/20081002_BVG/zurich/config.xml"});
 //		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/talks/20081002_BVG/berlin/config.xml"});
-		org.matsim.run.OTFVis.main(new String[] {"../mystudies/osmnet/switzerland-20090313.xml"});
+//		org.matsim.run.OTFVis.main(new String[] {"../mystudies/osmnet/switzerland-20090313.xml"});
+		org.matsim.run.OTFVis.main(new String[] {"otfvis3.mvi"});
 //		org.matsim.run.OTFVis.main(new String[] {"../mystudies/osmnet/zueri-20080410.xml"});
 //		org.matsim.run.OTFVis.main(new String[] {"../mystudies/osmnet/zueri-20080410-full.xml"});
 

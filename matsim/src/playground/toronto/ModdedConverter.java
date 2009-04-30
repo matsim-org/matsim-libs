@@ -16,7 +16,6 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -287,7 +286,7 @@ public class ModdedConverter {
 		ModdedConverter c = new ModdedConverter();
 
 		Gbl.createConfig(null);
-		c.setZones((ZoneLayer) Gbl.getWorld().createLayer(new IdImpl("zones"),
+		c.setZones((ZoneLayer) Gbl.createWorld().createLayer(new IdImpl("zones"),
 				"toronto_test"));
 
 		c.setZoneXYs(new HashMap<String, ZoneXY>());

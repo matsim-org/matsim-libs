@@ -20,6 +20,7 @@
 
 package playground.ciarif;
 
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -51,7 +52,7 @@ public class PersonSubtoursStreaming {
 
 		System.out.println("  parsing additional municipality information... ");
 		Municipalities municipalities = new Municipalities("input/ gg25_2001_infos.txt");
-		municipalities.parse();
+		municipalities.parse(world.getLayer(new IdImpl("municipality")));
 		System.out.println("  done.");
 
 		System.out.println("  parsing household information... ");
@@ -85,7 +86,7 @@ public class PersonSubtoursStreaming {
 //		persons.persons.put(person.p_id,person);
 
 		System.out.println("  adding mode choice module...");
-		PersonModeChoiceModel pmcm= new PersonModeChoiceModel(persons, municipalities);
+		PersonModeChoiceModel pmcm= new PersonModeChoiceModel(persons, municipalities, world.getLayer(new IdImpl(Municipalities.MUNICIPALITY)));
 		plans.addAlgorithm(pmcm);
 		System.out.println("  done.");
 

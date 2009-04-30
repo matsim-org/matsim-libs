@@ -206,7 +206,7 @@ public class Converter {
 		Converter c = new Converter();
 
 		Gbl.createConfig(null);
-		c.setZones((ZoneLayer) Gbl.getWorld().createLayer(new IdImpl("zones"),
+		c.setZones((ZoneLayer) Gbl.createWorld().createLayer(new IdImpl("zones"),
 				"toronto_test"));
 
 		c.setZoneXYs(new HashMap<String, ZoneXY>());
