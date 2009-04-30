@@ -14,14 +14,14 @@ import org.matsim.world.World;
 
 import playground.marcel.kti.router.PlansCalcRouteKti;
 import playground.meisterk.org.matsim.controler.listeners.CalcLegTimesKTIListener;
-import playground.meisterk.org.matsim.controler.listeners.KtiRouterListener;
 import playground.meisterk.org.matsim.controler.listeners.ScoreElements;
+import playground.meisterk.org.matsim.run.ptRouting.PTRoutingInfo;
 import playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory;
 
 public class KTIControler extends Controler {
 
 	private PreProcessLandmarks commonRoutingData = null;
-	private KtiRouterListener ktiRouterListener=null;
+	private PTRoutingInfo ptRoutingInfo=null;
 	private static boolean firstTime=true;
 
 	public KTIControler(String[] args) {
@@ -38,20 +38,12 @@ public class KTIControler extends Controler {
 				.charyparNagelScoring(), this.getFacilityPenalties());
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
-		this.ktiRouterListener = new KtiRouterListener();
+		this.ptRoutingInfo = new PTRoutingInfo();
 		// the scoring function processes facility loads independent of whether
 		// a location choice module is used or not
 		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));
 		this.addControlerListener(new CalcLegTimesKTIListener("calcLegTimesKTI.txt"));
-
-		// unfortunately, the startup method of the config is launched after the 'getRoutingAlgorithm', for this reason it will not work to put the
-		// ktiRouterListener here (it has been inserted in the getRoutingAlgorithm implementation
-		//ktiRouterListener.prepareKTIRouter(this);
-		//this.addControlerListener(ktiRouterListener);
-		// TODO: remove the ktiRouterListener when during refactoring.
-		// ATTENTION, remove this line for the runs!!!!!!!!!!!!!!!!
-//		this.setOverwriteFiles(true);
 
 		super.run();
 
@@ -81,13 +73,15 @@ public class KTIControler extends Controler {
 				}
 			}
 
-			// at this position, we need to read the information about pt routing once
+			// at this position, we need to read the information about pt routing (only the first time)
+			// the problem is, that this method is invoked before the startup listeners, and therefore we need
+			// information about pt routing here.
 			if (firstTime){
+				ptRoutingInfo.prepareKTIRouter(this);
 				firstTime=false;
-				ktiRouterListener.prepareKTIRouter(this);
 			}
 
-			World localWorld = ktiRouterListener.getLocalWorld();
+			World localWorld = ptRoutingInfo.getLocalWorld();
 			Layer municipalityLayer = localWorld.getLayer("municipality");
 			
 			router = new PlansCalcRouteKti(
@@ -95,8 +89,8 @@ public class KTIControler extends Controler {
 					this.commonRoutingData, 
 					travelCosts, 
 					travelTimes, 
-					ktiRouterListener.getPtTravelTimes(), 
-					ktiRouterListener.getHaltestellen(),
+					ptRoutingInfo.getPtTravelTimes(), 
+					ptRoutingInfo.getHaltestellen(),
 					municipalityLayer);
 
 		}
