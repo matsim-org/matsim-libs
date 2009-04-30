@@ -20,6 +20,8 @@
 
 package org.matsim.core.utils.charts;
 
+import org.apache.log4j.Logger;
+
 /**
  * A simple demonstration how to use classes in this package to quickly create charts.
  *
@@ -27,6 +29,8 @@ package org.matsim.core.utils.charts;
  */
 public class Demo {
 
+	private static final Logger log = Logger.getLogger(Demo.class);
+	
 	public void createBarChart(final String filename) {
 		BarChart chart = new BarChart("TITLE", "x-axis", "y-axis", new String[] {"A", "B", "C"});
 		chart.addSeries("serie 1", new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
@@ -48,6 +52,14 @@ public class Demo {
 		chart.addSeries("serie 2", new double[] {1.0, 5.0, 2.0, 4.0, 3.0}, new double[] {2.0, 3.0, 3.0, 1.5, 4.5});
 		chart.saveAsPng(filename, 800, 600);
 	}
+	
+	public void createXYLogLogLineChart(final String filename) {
+		XYLineChart chart = new XYLineChart("TITLE", "x-axis", "y-axis", true);
+		chart.addSeries("serie 1", new double[] {1.0, 2.0, 3.0, 4.0, 5.0}, new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
+		chart.addSeries("serie 2", new double[] {1.0, 5.0, 2.0, 4.0, 3.0}, new double[] {2.0, 3.0, 3.0, 1.5, 4.5});
+		chart.saveAsPng(filename, 800, 600);
+	}
+
 
 	public void createXYScatterChart(final String filename) {
 		XYScatterChart chart = new XYScatterChart("TITLE", "x-axis", "y-axis");
@@ -57,10 +69,13 @@ public class Demo {
 	}
 
 	public static void main(final String[] args) {
+		log.info("start to write demo charts...");
 		Demo demo = new Demo();
 		demo.createBarChart("./output/barchart.png");
 		demo.createLineChart("./output/linechart.png");
 		demo.createXYLineChart("./output/xylinechart.png");
+		demo.createXYLogLogLineChart("./output/xylineloglogchart.png");
 		demo.createXYScatterChart("./output/xyscatterchart.png");
+		log.info("charts written to output directory at ./output/!");
 	}
 }

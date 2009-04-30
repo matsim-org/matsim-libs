@@ -22,7 +22,9 @@ package org.matsim.core.utils.charts;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.LogarithmicAxis;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -34,9 +36,16 @@ import org.jfree.data.xy.XYSeriesCollection;
 public class XYLineChart extends ChartUtil {
 
 	private final XYSeriesCollection dataset;
+	private boolean isLogarithmicAxis;
 
 	public XYLineChart(final String title, final String xAxisLabel, final String yAxisLabel) {
+		this(title, xAxisLabel, yAxisLabel, false);
+	}
+	
+	public XYLineChart(final String title, final String xAxisLabel, 
+			final String yAxisLabel, boolean isLogarithmicAxis) {
 		super(title, xAxisLabel, yAxisLabel);
+		this.isLogarithmicAxis = isLogarithmicAxis;
 		this.dataset = new XYSeriesCollection();
 		this.chart = createChart(title, xAxisLabel, yAxisLabel, this.dataset);
 		addDefaultFormatting();
@@ -49,11 +58,21 @@ public class XYLineChart extends ChartUtil {
 
 	private JFreeChart createChart(final String title, final String categoryAxisLabel,
 			final String valueAxisLabel, final XYSeriesCollection dataset) {
-		return ChartFactory.createXYLineChart(title, categoryAxisLabel, valueAxisLabel,
+		JFreeChart c = ChartFactory.createXYLineChart(title, categoryAxisLabel, valueAxisLabel,
 				dataset, PlotOrientation.VERTICAL, true, // legend?
 				false, // tooltips?
 				false // URLs?
 				);
+		if (this.isLogarithmicAxis){
+			XYPlot p = (XYPlot) c.getPlot();
+			LogarithmicAxis axis_x = new LogarithmicAxis(this.xAxisLabel);
+			LogarithmicAxis axis_y = new LogarithmicAxis(this.yAxisLabel);
+			axis_x.setAllowNegativesFlag(false);
+			axis_y.setAllowNegativesFlag(false);
+			p.setDomainAxis(axis_x);
+			p.setRangeAxis(axis_y);
+		}
+		return c;
 	}
 
 	/**
