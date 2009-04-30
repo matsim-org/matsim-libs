@@ -116,18 +116,18 @@ public class NetworkRounder {
 //			System.out.println("USAGE: NetworkRounder <inputfile> <outputfile> <cap> OR JUST: NetworkRounder <cap>");
 //			return;
 //		}
-		int cap = 5;
-		double flowCapacityFactor = 0.1d; // 12*3600.0d / 60.0d;
-		double lengthFactor = 1.0d;
-		String inputfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";
+		int cap = 60;
+		double flowCapacityFactor = 1.; // 12*3600.0d / 60.0d;
+		double lengthFactor = 1.0;
+		String inputfile  = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network.xml";
 		//String inputfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_network_evac.xml";
 		//String inputfile = "./examples/meine_EA/siouxfalls_network.xml";
 		
 		String outputfile_forEAF = null;
 		String outputfile_forMatsim = null;
 		//String outputfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
-		outputfile_forEAF  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618_10p_5s_EAF.xml";
-		outputfile_forMatsim  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618_10p_5s_MATSIM.xml";
+		outputfile_forEAF  = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network_60s_EAF.xml";
+		outputfile_forMatsim  = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network_60s_MATSIM.xml";
 		//String outputfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_100p_flow_2s_cap.xml";
 		//String outputfile = "./examples/meine_EA/swissold_network_5s.xml";
 		

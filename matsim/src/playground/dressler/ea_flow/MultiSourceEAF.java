@@ -144,7 +144,7 @@ public class MultiSourceEAF {
 		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618_10p_5s.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
 		//networkfile = "./examples/meine_EA/swissold_network_5s.xml";
-		networkfile = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network.xml";
+		networkfile = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network_60s_EAF.xml";
 
 
 		//networkfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
@@ -266,7 +266,7 @@ public class MultiSourceEAF {
 
 					timeAugment += timer3 - timer2;
 					if (_debug) {
-						if (i % 100 == 0) {
+						if (i % 10 == 0) {
 							System.out.println("Iteration " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
 							System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
 							System.out.println("last " + tempstr);
