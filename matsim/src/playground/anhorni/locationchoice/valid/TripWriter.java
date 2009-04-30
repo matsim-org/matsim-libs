@@ -16,17 +16,14 @@ public class TripWriter {
 	private final static Logger log = Logger.getLogger(TripWriter.class);
 	
 	public void write(TreeMap<Id, PersonTrips> personTrips, String region) {	
-		String header = "Person_id\tStart_X\tStart_Y\tShop_X\tShop_Y\tEnd_X\tEnd_Y\tDist_0\tDist_1\n";
+		String header = "Person_id\tStart_X\tStart_Y\tEnd_X\tEnd_Y\tDist\texact_type\n";
 		try {
-			BufferedWriter outShoppingIntermediate = 
-				IOUtils.getBufferedWriter("output/valid/"+ region + "_shoppingIntermediate.txt");
-			BufferedWriter outShoppingRoundTrip = 
-				IOUtils.getBufferedWriter("output/valid/" + region + "_shoppingRoundTrip.txt");
+			BufferedWriter outShopping = 
+				IOUtils.getBufferedWriter("output/valid/"+ region + "_shoppingTrips.txt");
 			BufferedWriter outLeisure = 
 				IOUtils.getBufferedWriter("output/valid/" + region + "_leisure.txt");
 			
-			outShoppingIntermediate.write(header);
-			outShoppingRoundTrip.write(header);
+			outShopping.write(header);
 			outLeisure.write(header);
 			
 			Iterator<PersonTrips> personTrips_it = personTrips.values().iterator();
@@ -34,43 +31,30 @@ public class TripWriter {
 				PersonTrips pt = personTrips_it.next();
 				pt.finish();			
 				String out = pt.getPersonId().toString() + "\t";
-				for (int i = 0; i < pt.getIntermediateShoppingTrips().size(); i=i+2) {
-					CoordImpl coordStart = pt.getIntermediateShoppingTrips().get(i).getCoordStart();
-					CoordImpl coordShop = pt.getIntermediateShoppingTrips().get(i).getCoordEnd();
-					CoordImpl coordEnd = pt.getIntermediateShoppingTrips().get(i+1).getCoordEnd();
+				for (int i = 0; i < pt.getShoppingTrips().size(); i++) {
+					CoordImpl coordStart = pt.getShoppingTrips().get(i).getCoordStart();
+					CoordImpl coordEnd = pt.getShoppingTrips().get(i).getCoordEnd();
 					
-					outShoppingIntermediate.write(out + coordStart.getX() + "\t"+ coordStart.getY() + "\t" 
-							+ coordShop.getX() + "\t" +  coordShop.getY() + "\t" 
+					outShopping.write(out + coordStart.getX() + "\t"+ coordStart.getY() + "\t" 
 							+ coordEnd.getX() + "\t" + coordEnd.getY() + "\t" +
-							coordStart.calcDistance(coordShop) + "\t" + coordShop.calcDistance(coordEnd) +"\n");
+							coordStart.calcDistance(coordEnd) +  "\t" +
+							pt.getShoppingTrips().get(i).getPurposeCode() + "\n");
 				}
-				for (int i = 0; i < pt.getRoundTripShoppingTrips().size(); i=i+2) {
-					CoordImpl coordStart = pt.getRoundTripShoppingTrips().get(i).getCoordStart();
-					CoordImpl coordShop = pt.getRoundTripShoppingTrips().get(i).getCoordEnd();
-					CoordImpl coordEnd = pt.getRoundTripShoppingTrips().get(i+1).getCoordEnd();
-					
-					outShoppingRoundTrip.write(out + coordStart.getX() + "\t" + coordStart.getY() + "\t" + 
-							coordShop.getX() + "\t" + coordShop.getY() + "\t" +
-							coordEnd.getX() + "\t" + coordEnd.getY() + "\t" +
-							coordStart.calcDistance(coordShop) + "\t" + coordShop.calcDistance(coordEnd) +"\n");
-				}
-				for (int i = 0; i < pt.getLeisureShoppingTrips().size(); i=i+2) {
-					CoordImpl coordStart = pt.getLeisureShoppingTrips().get(i).getCoordStart();
-					CoordImpl coordShop = pt.getLeisureShoppingTrips().get(i).getCoordEnd();
-					CoordImpl coordEnd = pt.getLeisureShoppingTrips().get(i+1).getCoordEnd();
+
+				for (int i = 0; i < pt.getLeisureTrips().size(); i++) {
+					CoordImpl coordStart = pt.getLeisureTrips().get(i).getCoordStart();
+					CoordImpl coordEnd = pt.getLeisureTrips().get(i).getCoordEnd();
 					
 					outLeisure.write(out + coordStart.getX() + "\t" +  coordStart.getY() + "\t" + 
-							coordShop.getX() + "\t" +  coordShop.getY() + "\t" + 
 							coordEnd.getX() +"\t" + coordEnd.getY() +"\t" + 
-							coordStart.calcDistance(coordShop) + "\t" + coordShop.calcDistance(coordEnd) +"\n");
+							coordStart.calcDistance(coordEnd)  + "\t" +
+							pt.getLeisureTrips().get(i).getPurposeCode() + "\n");
 				}			
 			}
-			outShoppingIntermediate.flush();
-			outShoppingRoundTrip.flush();
+			outShopping.flush();
 			outLeisure.flush();
 			
-			outShoppingIntermediate.close();	
-			outShoppingRoundTrip.close();
+			outShopping.close();	
 			outLeisure.close();
 		} catch (IOException e) {
 			e.printStackTrace();

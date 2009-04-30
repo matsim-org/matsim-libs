@@ -14,9 +14,8 @@ public class PersonTrips {
 	
 	private Id personId;
 	private ArrayList<MZTrip> mzTrips = new ArrayList<MZTrip>();
-	private ArrayList<MZTrip> intermediateShoppingTrips = new ArrayList<MZTrip>();
-	private ArrayList<MZTrip> roundTripShoppingTrips = new ArrayList<MZTrip>();
-	private ArrayList<MZTrip> leisureShoppingTrips = new ArrayList<MZTrip>();
+	private ArrayList<MZTrip> shoppingTrips = new ArrayList<MZTrip>();
+	private ArrayList<MZTrip> leisureTrips = new ArrayList<MZTrip>();
 	
 	
 	public PersonTrips(Id personId, ArrayList<MZTrip> mzTrips) {
@@ -102,57 +101,33 @@ public class PersonTrips {
 		
 		for (int i = 0; i < this.mzTrips.size(); i++) {
 			if (this.mzTrips.get(i).getShopOrLeisure().equals("shop")) {
-				if (i < this.mzTrips.size()-1) {
-					
 					// if MIV as described above ...
-					if (Integer.parseInt(this.mzTrips.get(i).getWmittel()) >= 9 &&
-							Integer.parseInt(this.mzTrips.get(i).getWmittel()) <= 13) {
-						if (checkCoordinates(
-								new CoordImpl(this.mzTrips.get(i).getCoordStart().getX(), this.mzTrips.get(i).getCoordStart().getY()),
-								new CoordImpl(this.mzTrips.get(i+1).getCoordEnd().getX(), this.mzTrips.get(i+1).getCoordEnd().getY()))) {
-							this.intermediateShoppingTrips.add(this.mzTrips.get(i));
-							this.intermediateShoppingTrips.add(this.mzTrips.get(i+1));
-						}
-						else {
-							this.roundTripShoppingTrips.add(this.mzTrips.get(i));
-							this.roundTripShoppingTrips.add(this.mzTrips.get(i+1));
-						}
-					}
+				if (Integer.parseInt(this.mzTrips.get(i).getWmittel()) >= 9 &&
+						Integer.parseInt(this.mzTrips.get(i).getWmittel()) <= 13) {
+						this.shoppingTrips.add(this.mzTrips.get(i));
 				}
 			}
-			else if (this.mzTrips.get(i).getShopOrLeisure().equals("leisure")) {
-				if (i < this.mzTrips.size()-1) {
-					
-					// if MIV as described above ...
-					if (Integer.parseInt(this.mzTrips.get(i).getWmittel()) >= 9 &&
-							Integer.parseInt(this.mzTrips.get(i).getWmittel()) <= 13) {
-					
-							this.leisureShoppingTrips.add(this.mzTrips.get(i));
-							this.leisureShoppingTrips.add(this.mzTrips.get(i+1));
-					}
+			else if (this.mzTrips.get(i).getShopOrLeisure().equals("leisure")) {	
+				// if MIV as described above ...
+				if (Integer.parseInt(this.mzTrips.get(i).getWmittel()) >= 9 &&
+						Integer.parseInt(this.mzTrips.get(i).getWmittel()) <= 13) {					
+						this.leisureTrips.add(this.mzTrips.get(i));
 				}
 			}
 		}		
 	}
 	
-	private boolean checkCoordinates(CoordImpl coordPre, CoordImpl coordPost) {
-		if (coordPre.calcDistance(coordPost) <= 0.01) {
-			return true;
-		}
-		return false;
-	}
-	public List<MZTrip> getIntermediateShoppingTrips() {
-		return intermediateShoppingTrips;
-	}
-	public List<MZTrip> getRoundTripShoppingTrips() {
-		return roundTripShoppingTrips;
+	public List<MZTrip> getShoppingTrips() {
+		return shoppingTrips;
 	}
 
-	public ArrayList<MZTrip> getLeisureShoppingTrips() {
-		return leisureShoppingTrips;
+	public ArrayList<MZTrip> getLeisureTrips() {
+		return leisureTrips;
 	}
 	
 	public void finish() {
+		this.shoppingTrips.clear();
+		this.leisureTrips.clear();
 		this.mivShoppingType();
 	}
 }

@@ -56,16 +56,16 @@ public class MZReader {
 				
 				mzTrip.setWmittel(entries[53].trim());
 			
-				if (!entries[45].trim().equals("-99")) {
+				if (entries[56].trim().equals("4")) {
 					mzTrip.setPurposeCode(entries[45].trim());
 					mzTrip.setShopOrLeisure("shop");
 				}
-				else if (!entries[44].trim().equals("-99")) {
+				else if (entries[56].trim().equals("8")) {
 					mzTrip.setPurposeCode(entries[44].trim());
 					mzTrip.setShopOrLeisure("leisure");
 				}
 				else {
-					mzTrip.setPurposeCode("-99");
+					mzTrip.setPurposeCode(entries[56].trim());
 					mzTrip.setShopOrLeisure("null");	
 				}
 				
