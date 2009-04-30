@@ -2,20 +2,17 @@ package playground.anhorni.locationchoice.preprocess.analyzeMZ;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class TripWriter {
-	
-	private final static Logger log = Logger.getLogger(TripWriter.class);
-	
+		
 	public void write(TreeMap<Id, PersonTrips> personTrips, String region, String outpath) {	
-		String header = "Person_id\tStart_X\tStart_Y\tEnd_X\tEnd_Y\tDist\texact_type\n";
+		String header = "Person_id\tStart_X\tStart_Y\tEnd_X\tEnd_Y\tDist(km)\texact_type\n";
 		try {
 			BufferedWriter outShopping = 
 				IOUtils.getBufferedWriter(outpath + region + "_shoppingTrips.txt");
@@ -24,6 +21,8 @@ public class TripWriter {
 			
 			outShopping.write(header);
 			outLeisure.write(header);
+			
+			DecimalFormat formatter = new DecimalFormat("0.000");
 			
 			Iterator<PersonTrips> personTrips_it = personTrips.values().iterator();
 			while (personTrips_it.hasNext()) {
@@ -36,7 +35,7 @@ public class TripWriter {
 					
 					outShopping.write(out + coordStart.getX() + "\t"+ coordStart.getY() + "\t" 
 							+ coordEnd.getX() + "\t" + coordEnd.getY() + "\t" +
-							coordStart.calcDistance(coordEnd) +  "\t" +
+							formatter.format(coordStart.calcDistance(coordEnd)/1000.0) +  "\t" +
 							pt.getShoppingTrips().get(i).getPurposeCode() + "\n");
 				}
 
@@ -46,7 +45,7 @@ public class TripWriter {
 					
 					outLeisure.write(out + coordStart.getX() + "\t" +  coordStart.getY() + "\t" + 
 							coordEnd.getX() +"\t" + coordEnd.getY() +"\t" + 
-							coordStart.calcDistance(coordEnd)  + "\t" +
+							formatter.format(coordStart.calcDistance(coordEnd)/1000.0) + "\t" +
 							pt.getLeisureTrips().get(i).getPurposeCode() + "\n");
 				}			
 			}

@@ -1,15 +1,16 @@
 package playground.anhorni.locationchoice.preprocess.analyzeMZ;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.anhorni.locationchoice.assemblefacilities.BZReader;
 import playground.anhorni.locationchoice.assemblefacilities.Hectare;
@@ -45,17 +46,18 @@ public class AnalyzeMZ {
 	public void analyzeActs(MZReader mzReader) {
 		log.info("Starting analyze acts");
 			
-		List<MZTrip> mzTrips = new Vector<MZTrip>();
 		GroceryFilter groceryfilter = new GroceryFilter();
-		mzTrips = groceryfilter.filterTrips(mzTrips);
+		List<MZTrip> mzTrips = groceryfilter.filterTrips(mzReader.getMzTrips());
 				
 		log.info("Reading BZ");
 		BZReader bzReader = new BZReader();
 		List<Hectare> hectares = bzReader.readBZGrocery("input/BZ/BZ01_UNT_P_DSVIEW.TXT");
+		log.info("Number of hectares: " + hectares.size());
 		
 		log.info("Create hectare relations");
 		CreateTripHectareRelation relationCreator = new CreateTripHectareRelation();
 		List<MZTripHectare> relations = relationCreator.createRelations(mzTrips, hectares);
+		log.info("Number of trip-hectare relations: " + relations.size());
 		
 		ActWriter writer = new ActWriter();
 		String outpath = "output/valid/acts/";
@@ -88,17 +90,27 @@ public class AnalyzeMZ {
 				countLeisureTrips++;
 			}
 		}
-		log.info("Number of shop trips: " + countShopTrips);
-		log.info("Number of leisure trips: " + countLeisureTrips);
-		log.info("Number of shop trips HINWEG: " + countShopTripsHinweg);
-		log.info("Number of leisure trips HINWEG: " + countLeisureTripsHinweg);
+		
+		String outpath = "./output/valid/trips/";
+		try {
+			BufferedWriter out = IOUtils.getBufferedWriter(outpath +"summary.txt");
+			out.write("Number of trips : " + mzReader.getMzTrips().size() + "\n" +
+					"Number of shop trips: " + countShopTrips + "\n" +  
+					"Number of leisure trips: " + countLeisureTrips + "\n" +
+					"Number of shop trips HINWEG: " + countShopTripsHinweg + "\n" +
+					"Number of leisure trips HINWEG: " + countLeisureTripsHinweg);
+			out.flush();
+			out.close();			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		
 		TreeMap<Id, PersonTrips>  personTrips = mzReader.getPersonTrips();
 		log.info("Number of persons: " + personTrips.size());
 		
 		log.info("Writting ch trips file ...");
-		String outpath = "./output/valid/trips/";
+		
 		
 		TripWriter writer = new TripWriter();
 		writer.write(personTrips, "ch", outpath);

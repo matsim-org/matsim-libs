@@ -2,6 +2,7 @@ package playground.anhorni.locationchoice.preprocess.analyzeMZ;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.List;
 
@@ -78,15 +79,17 @@ public class ActWriter {
 			}
 			out.flush();
 			
+			DecimalFormat formatter = new DecimalFormat("0.00");
+			
 			for (int i = 0; i < 13; i++) {
-				out.write(+ activitiesCount[i] + "\t" +  
-						100.0 * activitiesCount[i]/totalActCount + " per cent" + "\t" +  NOGA[i] + "\n");
+				out.write(formatter.format(activitiesCount[i]) + "\t" +  
+						formatter.format(100.0 * activitiesCount[i]/totalActCount) + " per cent" + "\t" +  NOGA[i] + "\n");
 			}
 			out.newLine();
 			out.write("Only one store per hectare: \n");
 			for (int i = 0; i < 13; i++) {
-				out.write(+ activitiesCountSingle[i] + "\t " +  
-						100.0 * activitiesCountSingle[i]/totalActCountSingle + " per cent" + "\t" + NOGA[i] + "\n");
+				out.write(formatter.format(activitiesCountSingle[i]) + "\t" +  
+						formatter.format(100.0 * activitiesCountSingle[i]/totalActCountSingle) + " per cent" + "\t" + NOGA[i] + "\n");
 			}
 			out.flush();
 			out.close();			
