@@ -52,7 +52,6 @@ import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
-import playground.marcel.pt.transitSchedule.modules.CreateTimetableForStop;
 
 public class TransitDriverTest extends MatsimTestCase {
 
@@ -78,7 +77,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		new TransitScheduleReaderV1(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
-		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
+//		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
 		assertNotNull("could not get transit line.", lineT1);
 
 		TransitRoute route1 = lineT1.getRoutes().get(new IdImpl("1"));

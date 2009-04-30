@@ -256,6 +256,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		}
 		Id routeId = getTransitRouteId(route, fahrzeitprofil);
 		TransitRoute transitRoute = new TransitRoute(routeId, null, stops, TransportMode.bus); // TODO find correct transport mode
+		transitRoute.setDescription("Linie " + this.tmpLinie.publicId);
 		return transitRoute;
 	}
 

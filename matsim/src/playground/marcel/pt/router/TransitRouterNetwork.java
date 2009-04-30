@@ -42,7 +42,7 @@ import playground.marcel.pt.transitSchedule.TransitRouteStop;
 		
 	}
 	
-	/*package*/ class TransitRouterNetworkNode {
+	/*package*/ static class TransitRouterNetworkNode {
 		final TransitRouteStop stop;
 		final TransitRoute route;
 		final TransitLine line;
@@ -59,7 +59,7 @@ import playground.marcel.pt.transitSchedule.TransitRouteStop;
 		}
 	}
 	
-	/*package*/ class TransitRouterNetworkLink {
+	/*package*/ static class TransitRouterNetworkLink {
 		final TransitRouterNetworkNode fromNode;
 		final TransitRouterNetworkNode toNode;
 		final TransitRoute route;

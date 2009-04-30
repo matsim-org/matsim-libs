@@ -33,7 +33,6 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.Time;
 
-import playground.marcel.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import playground.marcel.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
@@ -88,7 +87,7 @@ public class TransitRouter {
 				for (TransitRouteStop stop : route.getStops()) {
 					TransitRouterNetworkNode node = network.createNode(stop, route, line);
 					if (prevNode != null) {
-						TransitRouterNetworkLink link = network.createLink(prevNode, node, route, line);
+						/*TransitRouterNetworkLink link = */network.createLink(prevNode, node, route, line);
 					}
 					prevNode = node;
 				}
