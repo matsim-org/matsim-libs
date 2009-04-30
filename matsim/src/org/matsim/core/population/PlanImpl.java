@@ -58,14 +58,14 @@ public class PlanImpl implements Plan {
 	}
 
 	public final Activity createActivity(final String type, final Coord coord) {
-		verifyCreateAct(Time.UNDEFINED_TIME);
+		verifyCreateAct();
 		Activity a = new ActivityImpl(type, coord);
 		getPlanElements().add(a);
 		return a;
 	}
 
 	public final Activity createActivity(final String type, final Facility fac) {
-		verifyCreateAct(Time.UNDEFINED_TIME);
+		verifyCreateAct();
 		Activity a = new ActivityImpl(type, fac);
 		getPlanElements().add(a);
 		return a;
@@ -73,7 +73,7 @@ public class PlanImpl implements Plan {
 
 
 	public final Activity createActivity(final String type, final Link link) {
-		verifyCreateAct(Time.UNDEFINED_TIME);
+		verifyCreateAct();
 		Activity a = new ActivityImpl(type, link);
 		getPlanElements().add(a);
 		return a;
@@ -97,17 +97,9 @@ public class PlanImpl implements Plan {
 		}
 	}
 
-	private static long noEndTimeCnt = 0 ;
-	private final void verifyCreateAct(final double endTime) throws IllegalStateException {
+	private final void verifyCreateAct() throws IllegalStateException {
 		if (getPlanElements().size() % 2 != 0) {
 			throw new IllegalStateException(ACT_ERROR);
-		}
-		if ((getPlanElements().size() == 0) && (endTime == Time.UNDEFINED_TIME)) {
-			if ( noEndTimeCnt < 1 ) {
-				noEndTimeCnt++ ;
-			log.warn( "First 'act' has no end time.  Some people think that the first 'act' should have an end time.  This is, however, not true, since someone can stay at the first act all day.  Future occurences of this warning will be suppressed." ) ;
-//			throw new IllegalStateException("The first 'act' has to have an end time.");
-			}
 		}
 	}
 
