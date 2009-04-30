@@ -25,7 +25,10 @@ public class KtiRouterListener implements StartupListener {
 	private SwissHaltestellen haltestellen = null;
 	private World localWorld=null;
 
-	private static final Logger log = Logger.getLogger(playground.meisterk.org.matsim.run.ktiYear3.Controler.class);
+	private static final Logger log = Logger.getLogger(KtiRouterListener.class);
+
+	public KtiRouterListener() {
+	}
 
 	public void notifyStartup(StartupEvent event) {
 

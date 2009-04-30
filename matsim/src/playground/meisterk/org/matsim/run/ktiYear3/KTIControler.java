@@ -8,11 +8,11 @@ import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
-import org.matsim.matrices.Matrix;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.world.Layer;
+import org.matsim.world.World;
 
 import playground.marcel.kti.router.PlansCalcRouteKti;
-import playground.marcel.kti.router.SwissHaltestellen;
 import playground.meisterk.org.matsim.controler.listeners.CalcLegTimesKTIListener;
 import playground.meisterk.org.matsim.controler.listeners.KtiRouterListener;
 import playground.meisterk.org.matsim.controler.listeners.ScoreElements;
@@ -38,20 +38,20 @@ public class KTIControler extends Controler {
 				.charyparNagelScoring(), this.getFacilityPenalties());
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
+		this.ktiRouterListener = new KtiRouterListener();
 		// the scoring function processes facility loads independent of whether
 		// a location choice module is used or not
-		this.ktiRouterListener=new KtiRouterListener();
 		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));
 		this.addControlerListener(new CalcLegTimesKTIListener("calcLegTimesKTI.txt"));
-		
-		// unfortunatly, the startup method of the config is launched after the 'getRoutingAlgorithm', for this reason it will not work to put the
+
+		// unfortunately, the startup method of the config is launched after the 'getRoutingAlgorithm', for this reason it will not work to put the
 		// ktiRouterListener here (it has been inserted in the getRoutingAlgorithm implementation
 		//ktiRouterListener.prepareKTIRouter(this);
 		//this.addControlerListener(ktiRouterListener);
 		// TODO: remove the ktiRouterListener when during refactoring.
 		// ATTENTION, remove this line for the runs!!!!!!!!!!!!!!!!
-		this.setOverwriteFiles(true);
+//		this.setOverwriteFiles(true);
 
 		super.run();
 
@@ -67,21 +67,41 @@ public class KTIControler extends Controler {
 	@Override
 	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
 
-		synchronized (this) {
-			if (this.commonRoutingData == null) {
-				this.commonRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
-				this.commonRoutingData.run(this.network);
+		PlanAlgorithm router = null;
+
+		boolean usePlansCalcRouteKti = Boolean.parseBoolean(Gbl.getConfig().getModule("kti").getValue("usePlansCalcRouteKti"));
+		if (!usePlansCalcRouteKti) {
+			router = super.getRoutingAlgorithm(travelCosts, travelTimes);
+		} else {
+
+			synchronized (this) {
+				if (this.commonRoutingData == null) {
+					this.commonRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
+					this.commonRoutingData.run(this.network);
+				}
 			}
-		}
-		
-		// at this position, we need to read the information about pt routing once
-		if (firstTime){
-			firstTime=false;
-			this.ktiRouterListener.prepareKTIRouter(this);
+
+			// at this position, we need to read the information about pt routing once
+			if (firstTime){
+				firstTime=false;
+				ktiRouterListener.prepareKTIRouter(this);
+			}
+
+			World localWorld = ktiRouterListener.getLocalWorld();
+			Layer municipalityLayer = localWorld.getLayer("municipality");
+			
+			router = new PlansCalcRouteKti(
+					this.network, 
+					this.commonRoutingData, 
+					travelCosts, 
+					travelTimes, 
+					ktiRouterListener.getPtTravelTimes(), 
+					ktiRouterListener.getHaltestellen(),
+					municipalityLayer);
+
 		}
 
-		return new PlansCalcRouteKti(this.network, this.commonRoutingData, travelCosts, travelTimes, this.ktiRouterListener.getPtTravelTimes(), this.ktiRouterListener.getHaltestellen(),
-				this.ktiRouterListener.getLocalWorld().getLayer("municipality"));
+		return router;
 	}
 
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY STUDYBASE    "/home/konrad/sandbox00/ivt/studies/switzerland">
+		<!ENTITY STUDYBASE    "/home/meisterk/sandbox00/ivt/studies/switzerland">
 	<!--	<!ENTITY STUDYBASE    "C:/data/SandboxCVS/ivt/studies/switzerland"> -->
 	]
 >
@@ -11,7 +11,7 @@
 
 	<module name="controler">
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="1" />
+		<param name="lastIteration" value="10" />
 		<param name="routingAlgorithmType" value="AStarLandmarks" />
 	<!--	<param name="outputDirectory" value="output/ktiTest" /> --> <!-- set the name of the output directory -->
 	</module>
