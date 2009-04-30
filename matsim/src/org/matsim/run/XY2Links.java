@@ -22,9 +22,9 @@ package org.matsim.run;
 
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -43,7 +43,6 @@ public class XY2Links {
 
 	private Config config;
 	private String configfile = null;
-	private String dtdfile = null;
 
 	/**
 	 * Parses all arguments and sets the corresponding members.
@@ -64,12 +63,9 @@ public class XY2Links {
 		} else {
 			this.configfile = arg;
 			if (argIter.hasNext()) {
-				this.dtdfile = argIter.next();
-				if (argIter.hasNext()) {
-					System.out.println("Too many arguments.");
-					printUsage();
-					System.exit(1);
-				}
+				System.out.println("Too many arguments.");
+				printUsage();
+				System.exit(1);
 			}
 		}
 	}
@@ -81,7 +77,7 @@ public class XY2Links {
 		System.out.println("a link based on the coordinates given in the activity. The modified plans/");
 		System.out.println("persons are then written out to file again.");
 		System.out.println();
-		System.out.println("usage: XY2Links [OPTIONS] configfile [config-dtdfile]");
+		System.out.println("usage: XY2Links [OPTIONS] configfile");
 		System.out.println("       The following parameters must be given in the config-file:");
 		System.out.println("       - network.inputNetworkFile");
 		System.out.println("       - plans.inputPlansFile");
@@ -101,16 +97,14 @@ public class XY2Links {
 	 */
 	public void run(final String[] args) {
 		parseArguments(args);
-		this.config = Gbl.createConfig(new String[]{this.configfile, this.dtdfile});
+		ScenarioLoader sl = new ScenarioLoader(this.configfile);
+		sl.loadNetwork();
+		Network network = sl.getScenario().getNetwork();
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
-
-		final PopulationImpl plans = new PopulationImpl();
-		plans.setIsStreaming(true);
+		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
+		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links((NetworkLayer) network));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();

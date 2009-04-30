@@ -25,17 +25,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -57,18 +55,10 @@ public class PlanFilter {
 		double[] smallRadiuses = {5000, 7000, 9000};
 		double[] bigRadiuses = {10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000, 25000, 30000, 40000, 50000};
 
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network... " + (new Date()));
-		NetworkLayer network = null;
-		network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading population... " + (new Date()));
-		final Population population = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
-		plansReader.readFile(config.plans().getInputFile());
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		Scenario sc = sl.loadScenario();
+		final Network network = sc.getNetwork();
+		final Population population = sc.getPopulation();
 
 		System.out.println("  finding sub-networks... " + (new Date()));
 		System.out.println("smallRadius\tbigRadius\t#linksSmall\t#linksBig\t#peopleSmall\t#peopleLeavingBig");
@@ -123,18 +113,12 @@ public class PlanFilter {
 		double smallRadius = 7000;
 		double bigRadius = 14000;
 
-		final Config config = Gbl.createConfig(args);
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		Scenario sc = sl.loadScenario();
+		final Config config = sc.getConfig();
+		final Network network = sc.getNetwork();
+		final Population population = sc.getPopulation();
 
-		System.out.println("  reading the network... " + (new Date()));
-		NetworkLayer network = null;
-		network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading population... " + (new Date()));
-		final Population population = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
-		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  finding AOI links");
 
 		final Map<Id, Link> smallAOI = new HashMap<Id, Link>();

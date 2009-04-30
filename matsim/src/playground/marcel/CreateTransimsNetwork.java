@@ -26,11 +26,12 @@ import java.io.File;
 import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriterHandlerImplTLinks;
 import org.matsim.core.network.NetworkWriterHandlerImplTNodes;
 
@@ -63,16 +64,15 @@ public class CreateTransimsNetwork {
 			return;
 		}
 
-		final Config config = Gbl.createConfig(null);
-		config.addCoreModules();
+		Scenario scenario = new ScenarioImpl();
+		Config config = scenario.getConfig();
 		config.global().setLocalDtdBase("dtd/");
 
 		System.out.println("reading network from " + this.networkFileName);
-		NetworkLayer network = null;
-		network = new NetworkLayer();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(this.networkFileName);
 
-		if (network.getNode("0") != null) {
+		if (network.getNode(new IdImpl("0")) != null) {
 			Logger.getLogger(CreateTransimsNetwork.class).error("The network contains a node with id 0. Transims is likely to have problems with that!");
 		}
 		if (network.getLink(new IdImpl(0)) != null) {

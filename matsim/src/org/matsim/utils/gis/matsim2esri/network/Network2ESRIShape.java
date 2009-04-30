@@ -26,9 +26,10 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -83,8 +84,9 @@ public class Network2ESRIShape {
 
 		String outputFileLs = "./plans/networkLs.shp";
 		String outputFileP = "./plans/networkP.shp";
-		Gbl.createConfig(null);
-		Gbl.getConfig().global().setCoordinateSystem("DHDN_GK4");
+		
+		Scenario scenario = new ScenarioImpl();
+		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		log.info("loading network from " + netfile);
 		final NetworkLayer network = new NetworkLayer();

@@ -22,10 +22,9 @@ package org.matsim.run;
 
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -49,7 +48,6 @@ public class InitRoutes {
 
 	private Config config;
 	private String configfile = null;
-	private String dtdfile = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// parse methods
@@ -74,12 +72,9 @@ public class InitRoutes {
 		} else {
 			this.configfile = arg;
 			if (argIter.hasNext()) {
-				this.dtdfile = argIter.next();
-				if (argIter.hasNext()) {
-					System.out.println("Too many arguments.");
-					printUsage();
-					System.exit(1);
-				}
+				System.out.println("Too many arguments.");
+				printUsage();
+				System.exit(1);
 			}
 		}
 	}
@@ -95,7 +90,7 @@ public class InitRoutes {
 		System.out.println("a an initial route (freespeed) based on the given netowrk. The modified plans/");
 		System.out.println("persons are then written out to file again.");
 		System.out.println();
-		System.out.println("usage: InitRoutes [OPTIONS] configfile [config-dtdfile]");
+		System.out.println("usage: InitRoutes [OPTIONS] configfile");
 		System.out.println("       The following parameters must be given in the config-file:");
 		System.out.println("       - network.inputNetworkFile");
 		System.out.println("       - plans.inputPlansFile");
@@ -115,14 +110,13 @@ public class InitRoutes {
 
 	public void run(final String[] args) {
 		parseArguments(args);
-		this.config = Gbl.createConfig(new String[]{this.configfile, this.dtdfile});
+		ScenarioLoader sl = new ScenarioLoader(this.configfile);
+		sl.loadNetwork();
+		Network network = sl.getScenario().getNetwork();
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
-
-		final PopulationImpl plans = new PopulationImpl();
+		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
+		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		plans.addAlgorithm(new PlansCalcRoute(network, timeCostCalc, timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc)));

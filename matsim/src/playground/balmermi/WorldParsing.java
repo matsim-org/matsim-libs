@@ -20,6 +20,7 @@
 
 package playground.balmermi;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.world.MatsimWorldReader;
@@ -34,14 +35,14 @@ public class WorldParsing {
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
-	public static void testRun01() {
+	public static void testRun01(Config config) {
 
 		System.out.println("TEST RUN 01:");
 
 		System.out.println("  reading world xml file... ");
-		World world = Gbl.getWorld();
+		World world = Gbl.createWorld();
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		worldReader.readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println();
@@ -59,7 +60,7 @@ public class WorldParsing {
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
+		ConfigWriter config_writer = new ConfigWriter(config);
 		config_writer.write();
 		System.out.println("  done.");
 
@@ -75,10 +76,9 @@ public class WorldParsing {
 
 		Gbl.startMeasurement();
 
-		Gbl.createConfig(args);
-		Gbl.createWorld();
+		Config config = Gbl.createConfig(args);
 
-		testRun01();
+		testRun01(config);
 
 		Gbl.printElapsedTime();
 	}

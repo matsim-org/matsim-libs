@@ -24,8 +24,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
@@ -45,15 +45,15 @@ import playground.marcel.kti.router.SwissHaltestellen;
 public class KtiPtTester {
 
 	private Config config;
-//	final private World world;
 	private Scenario data;
 	private Matrix ptTravelTimes = null;
 
 	public KtiPtTester(final String[] args) {
-		this.config = Gbl.createConfig(args);
-		ScenarioLoader loader = new ScenarioLoader(config);
+		
+		ScenarioLoader loader = new ScenarioLoader(args[0]);
 		loader.loadNetwork();
 		this.data = loader.getScenario();
+		this.config = this.data.getConfig();
 	}
 
 	@SuppressWarnings("deprecation")
@@ -65,7 +65,6 @@ public class KtiPtTester {
 		System.out.println("  done.");
 	}
 
-	@SuppressWarnings("deprecation")
 	public void run() {
 		Gbl.startMeasurement();
 //		this.data.getWorld();

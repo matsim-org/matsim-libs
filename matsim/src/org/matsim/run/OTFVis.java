@@ -27,16 +27,15 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
@@ -165,40 +164,20 @@ public class OTFVis {
 	}
 
 	public static final void playConfig(final String[] args) {
-		Config config = Gbl.createConfig(null);
-		if ((args.length > 1) && args[1].toLowerCase().endsWith(".dtd")) {
-			try {
-				new MatsimConfigReader(config).readFile(args[0], args[1]);
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
-			}
-		} else {
-			new MatsimConfigReader(config).readFile(args[0]);
-		}
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoader loader = new ScenarioLoader(args[0]);
 		loader.loadScenario();
-		Scenario data = loader.getScenario();
+		Scenario scenario = loader.getScenario();
 		Events events = new Events();
 
-		Population pop;
-		try {
-			pop = data.getPopulation();
-		} catch (RuntimeException e) {
-			// if this population can not be found start showing network with empty population
-			System.out.println("OTFVis: Population file not found or corrupted! Starting empty network");
-			pop = new PopulationImpl();
-		}
-
-		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad((NetworkLayer)data.getNetwork(), pop, events);
+		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(scenario.getNetwork(), scenario.getPopulation(), events);
 		client.run();
 	}
 	
 	public static final void playNetwork(final String[] args) {
-		Gbl.createConfig(null);
-		NetworkLayer network = new NetworkLayer();
+		Scenario scenario = new ScenarioImpl();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(args[0]);
-		Population population = new PopulationImpl();
+		Population population = scenario.getPopulation();
 		Events events = new Events();
 		
 		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(network, population, events);

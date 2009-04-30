@@ -23,14 +23,12 @@ package org.matsim.run;
 import java.io.File;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.vis.netvis.VisConfig;
@@ -52,7 +50,6 @@ public class Events2Snapshot {
 	private Events events = null;
 	private SnapshotGenerator visualizer = null;
 	private String configfile = null;
-	private String dtdfile = null;
 	private String eventsfile;
 	private SnapshotWriter writer = null;
 
@@ -76,8 +73,6 @@ public class Events2Snapshot {
 			} else {
 				if (arg.contains(".xml"))
 					this.configfile = arg;
-				else if (arg.endsWith(".dtd"))
-					this.dtdfile = arg;
 				else if (arg.contains("events"))
 					this.eventsfile = arg;
 				else {
@@ -94,7 +89,7 @@ public class Events2Snapshot {
 		System.out.println("Events2Snapshot");
 		System.out.println("Converts an events file to a snapshot file.");
 		System.out.println();
-		System.out.println("usage: Events2Snapshot [OPTIONS] configfile [config-dtdfile] [eventsfile]");
+		System.out.println("usage: Events2Snapshot [OPTIONS] configfile [eventsfile]");
 		System.out.println("       If no eventsfile is given, the in-events-file specified in the config-");
 		System.out.println("       file will be used.");
 		System.out.println("       The snapshots are generated according to the snapshot-settings in the");
@@ -114,13 +109,16 @@ public class Events2Snapshot {
 	 */
 	public void run(final String[] args) {
 		parseArguments(args);
-		this.config = Gbl.createConfig(new String[]{this.configfile, this.dtdfile});
+		ScenarioLoader sl = new ScenarioLoader(this.configfile);
+		this.config = sl.getScenario().getConfig();
 
 		if (this.config.simulation().getSnapshotPeriod() <= 0.0) {
 			System.out.println("The snapshotPeriod must be larger than 0 seconds.");
 			return;
 		}
 
+		this.network = sl.getScenario().getNetwork();
+		sl.loadNetwork();
 		prepare();
 
 		if (this.eventsfile == null) {
@@ -174,12 +172,6 @@ public class Events2Snapshot {
 
 
 	private void prepare() {
-		if (this.network == null) {
-			// read network
-			this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-			new MatsimNetworkReader(this.network).readFile(this.config.network().getInputFile());
-		}
-
 		// create events
 		this.events = new Events();
 
@@ -230,14 +222,8 @@ public class Events2Snapshot {
 		}
 	}
 
-	/**
-	 * description
-	 *
-	 * @param args
-	 */
 	public static void main(final String[] args) {
-		Events2Snapshot app = new Events2Snapshot();
-		app.run(args);
+		new Events2Snapshot().run(args);
 	}
 
 }

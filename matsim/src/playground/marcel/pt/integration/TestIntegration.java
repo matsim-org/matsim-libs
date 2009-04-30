@@ -25,13 +25,12 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.run.OTFVis;
 import org.xml.sax.SAXException;
@@ -59,19 +58,20 @@ public class TestIntegration {
 		}
 		new CreatePseudoNetwork().run();
 		
-		final Config config = Gbl.createConfig(new String[] {"test/input/playground/marcel/pt/config.xml"});
+		ScenarioLoader sl = new ScenarioLoader("test/input/playground/marcel/pt/config.xml");
+		Scenario scenario = sl.getScenario();
+		final Config config = scenario.getConfig();
 		
 		config.network().setInputFile("../thesis-data/examples/berta/pseudoNetwork.xml");
 		config.facilities().setInputFile("../thesis-data/examples/berta/facilities.xml");
 		config.plans().setInputFile("../thesis-data/examples/berta/pseudoPerson.xml");
 		config.simulation().setSnapshotPeriod(60);
 		config.simulation().setEndTime(12.0*3600);
-
-		ScenarioImpl scenario = new ScenarioImpl(config);
-		ScenarioLoader loader = new ScenarioLoader(scenario);
+		
 		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
-		loader.loadScenario();	
+
+		sl.loadScenario();	
 
 		final TransitSchedule schedule = new TransitSchedule();
 		final Events events = new Events();

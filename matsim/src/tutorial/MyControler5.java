@@ -21,11 +21,10 @@
 package tutorial;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -48,11 +47,11 @@ public class MyControler5 {
 		final String netFilename = "./examples/equil/network.xml";
 		final String plansFilename = "./examples/equil/plans100.xml";
 
-		Config config = Gbl.createConfig(new String[] {"./examples/tutorial/myConfigScoring.xml"});
+		ScenarioLoader loader = new ScenarioLoader("./examples/tutorial/myConfig.xml");
+		Scenario scenario = loader.getScenario();
+		Config config = scenario.getConfig();
 
-		Scenario scenario = new ScenarioImpl(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
-
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		Events events = new Events();

@@ -23,16 +23,12 @@ package playground.marcel;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.FolderType;
@@ -43,270 +39,58 @@ import net.opengis.kml._2.MultiGeometryType;
 import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.PlacemarkType;
 import net.opengis.kml._2.PolyStyleType;
-import net.opengis.kml._2.ScreenOverlayType;
 import net.opengis.kml._2.StyleType;
 import net.opengis.kml._2.TimeSpanType;
 
-import org.apache.log4j.Logger;
-import org.matsim.analysis.CalcAverageTolledTripLength;
-import org.matsim.analysis.CalcAverageTripLength;
-import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.CalcLinkStats;
-import org.matsim.analysis.LegHistogram;
-import org.matsim.analysis.StuckVehStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioLoader;
-import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.algorithms.CalcODMatrices;
-import org.matsim.core.events.algorithms.EventWriterTXT;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcLanes;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkFalsifier;
-import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.PreProcessLandmarks;
-import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
-import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.counts.Counts;
-import org.matsim.counts.MatsimCountsReader;
-import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
-import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import org.matsim.matrices.Matrices;
-import org.matsim.matrices.MatricesWriter;
-import org.matsim.matrices.Matrix;
-import org.matsim.matrices.MatsimMatricesReader;
-import org.matsim.population.PopulationReaderKutter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ActLocationFalsifier;
 import org.matsim.population.algorithms.PersonFilterSelectedPlan;
 import org.matsim.population.algorithms.PersonRemoveCertainActs;
 import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.population.algorithms.PersonRemovePlansWithoutLegs;
-import org.matsim.population.algorithms.PlanAverageScore;
-import org.matsim.population.algorithms.PlanCalcType;
 import org.matsim.population.algorithms.PlanFilterActTypes;
-import org.matsim.population.algorithms.PlanSimplifyForDebug;
-import org.matsim.population.algorithms.PlanSummary;
-import org.matsim.population.algorithms.PlansCreateTripsFromODMatrix;
-import org.matsim.population.algorithms.PlansFilterArea;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterPersonHasPlans;
 import org.matsim.population.algorithms.XY2Links;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vis.kml.KMZWriter;
-import org.matsim.vis.kml.MatsimKMLLogo;
-import org.matsim.visum.VisumAnbindungstabelleWriter;
-import org.matsim.visum.VisumMatrixReader;
-import org.matsim.visum.VisumMatrixWriter;
-import org.matsim.visum.VisumWriteRoutes;
-import org.matsim.world.Location;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
-import org.matsim.world.ZoneLayer;
 
 public class MyRuns {
-
-	private final static Logger log = Logger.getLogger(MyRuns.class);
-
-	//////////////////////////////////////////////////////////////////////
-	// createKutterPlans
-	//////////////////////////////////////////////////////////////////////
-
-	public static void createKutterPlans(final String[] args) {
-
-		System.out.println("RUN: createKutterPlans");
-		System.out.println("---   create plans from data from kutter-model");
-		final Config config = Gbl.createConfig(args);
-
-		final World world = new World();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  setting up plans object... ");
-		final PopulationImpl plans = new PopulationImpl();
-		plans.setIsStreaming(true);
-//		plans.setRefLayer(world.getLayer(new IdImpl("tvz")));
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		plans.addAlgorithm(plansWriter);
-		System.out.println("  done.");
-
-		System.out.println("  reading kutter data, creating plans... ");
-		final PopulationReaderKutter plansReader = new PopulationReaderKutter(plans, world.getLayer(new IdImpl("tvz")));
-		plansReader.readFile(config.getParam("kutter", "inputDirectory"));
-		System.out.println("  done.");
-
-		System.out.println("  writing plans xml file... ");
-		plansWriter.write();
-		System.out.println("  done.");
-
-		System.out.println("  writing config xml file... ");
-		final ConfigWriter config_writer = new ConfigWriter(config);
-		config_writer.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: createKutterPlans finished.");
-		System.out.println();
-	}
-
-
-	//////////////////////////////////////////////////////////////////////
-	// fmaToTrips
-	//////////////////////////////////////////////////////////////////////
-
-	public static void fmaToTrips(final String[] args) {
-
-		System.out.println("RUN: fmaToTrips");
-
-		final Config config = Gbl.createConfig(args);
-		final World world = new World();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  setting up plans objects...");
-		final PopulationImpl plans = new PopulationImpl();
-		plans.setIsStreaming(true);
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		plans.addAlgorithm(plansWriter);
-		System.out.println("  done.");
-
-		System.out.println("  reading matrices file... ");
-		final Matrix matrix = new VisumMatrixReader("test", world.getLayer(new IdImpl("tvz"))).readFile(config.matrices().getInputFile());
-		System.out.println("  done.");
-
-		final ArrayList<Double> timeDistro = new TimeDistributionReader().readFile(config.getParam("plans", "timeDistributionInputFile"));
-
-		System.out.println("  writing plans (trips) based on matrix...");
-		new PlansCreateTripsFromODMatrix(matrix, timeDistro).run(plans);
-		plans.printPlansCount();
-		plansWriter.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: fmaToTrips finished.");
-		System.out.println();
-	}
-
-
-	//////////////////////////////////////////////////////////////////////
-	// convertPlans
-	//////////////////////////////////////////////////////////////////////
-	// reads and writes plans, without running any algorithms
-
-	public static void convertPlans(final String[] args) {
-
-		System.out.println("RUN: convertPlans");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  setting up plans objects...");
-		final PopulationImpl plans = new PopulationImpl();
-		plans.setIsStreaming(true);
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		plans.addAlgorithm(plansWriter);
-		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
-		System.out.println("  done.");
-
-		System.out.println("  reading and writing plans...");
-		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
-		plansWriter.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: convertPlans finished.");
-		System.out.println();
-	}
-
-	public static void readPlans(final String[] args) {
-
-		log.info("RUN: readPlans");
-
-		Gbl.printSystemInfo();
-
-		final Config config = Gbl.createConfig(new String[] {"../mystudies/navteq-config.xml"}); // overwrite args
-		log.info("reading world, facilities and network ... ");
-		ScenarioImpl data = new ScenarioImpl(config);
-		ScenarioLoader loader = new ScenarioLoader(data);
-		loader.loadScenario();
-		log.info("done.");
-
-//		log.info("analyzing subsequent links");
-//		Subsequent subsequent = new Subsequent(data.getNetwork());
-//		Leg.subsequentLinks = subsequent.getSubsequentLinks();
-//		log.info("done");
-
-		log.info("setting up plans objects...");
-		final Population plans = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(plans, data.getNetwork());
-		log.info("done.");
-
-		System.gc();System.gc();System.gc();
-		log.info("memory used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024.0);
-		Gbl.printMemoryUsage();
-
-		log.info("reading plans...");
-		System.out.flush();
-		final long startTime = System.currentTimeMillis();
-		plansReader.readFile(config.plans().getInputFile());
-		final long stopTime = System.currentTimeMillis();
-		log.info("done.");
-
-		System.gc();System.gc();System.gc();
-		log.info("memory used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024.0);
-		log.info("time used: " + (stopTime - startTime));
-		Gbl.printMemoryUsage();
-
-		log.info("RUN: readPlans finished.");
-	}
-
 
 	//////////////////////////////////////////////////////////////////////
 	// filterSelectedPlans
@@ -316,76 +100,24 @@ public class MyRuns {
 
 		System.out.println("RUN: filterSelectedPlans");
 
-		final Config config = Gbl.createConfig(args);
-		final World world = new World();
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		sl.loadNetwork();
+		Scenario scenario = sl.getScenario();		
 
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  setting up plans objects...");
-		final PopulationImpl plans = new PopulationImpl();
+		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		plans.addAlgorithm(new PersonFilterSelectedPlan());
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(plansWriter);
-		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
-		System.out.println("  done.");
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 
 		System.out.println("  reading and writing plans...");
-		plansReader.readFile(config.plans().getInputFile());
+		plansReader.readFile(scenario.getConfig().plans().getInputFile());
 		plans.printPlansCount();
 		plansWriter.write();
 		System.out.println("  done.");
 
 		System.out.println("RUN: filterSelectedPlans finished.");
-		System.out.println();
-	}
-
-
-	//////////////////////////////////////////////////////////////////////
-	// filterPlansInArea
-	//////////////////////////////////////////////////////////////////////
-
-	public static void filterPlansInArea(final String[] args, final double x1, final double y1, final double x2, final double y2) {
-
-		System.out.println("RUN: filterPlansInArea");
-
-		final Config config = Gbl.createConfig(args);
-		final World world = new World();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		final Population plans = new PopulationImpl();
-
-		System.out.println("  reading plans...");
-		new MatsimPopulationReader(plans, network).readFile(config.plans().getInputFile());
-		System.out.println("  done.");
-
-		final CoordImpl minCoord = new CoordImpl(Math.min(x1, x2), Math.min(y1, y2));
-		final CoordImpl maxCoord = new CoordImpl(Math.max(x1, x2), Math.max(y1, y2));
-		new PlansFilterArea(minCoord, maxCoord).run(plans); // requires PLANS.NO_STREAMING
-
-		System.out.println("  writing plans...");
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		plansWriter.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: filterPlansInArea finished.");
 		System.out.println();
 	}
 
@@ -398,13 +130,10 @@ public class MyRuns {
 		final CoordImpl center = new CoordImpl(x, y);
 		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network..." + (new Date()));
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		sl.loadNetwork();
+		Network network = sl.getScenario().getNetwork();
+		
 		System.out.println("  extracting aoi... at " + (new Date()));
 		for (Link link : network.getLinks().values()) {
 			final Node from = link.getFromNode();
@@ -417,125 +146,7 @@ public class MyRuns {
 		System.out.println("  done. ");
 		System.out.println("  aoi contains: " + areaOfInterest.size() + " links.");
 
-//		System.out.println("  reading, filtering and writing population... at " + (new Date()));
-//		final Plans population = new Plans(Plans.USE_STREAMING);
-//
-//		PlansReaderI plansReader = new MatsimPopulationReader(population, network);
-//		final PlansWriter plansWriter = new PlansWriter(population);
-//		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter, areaOfInterest);
-//		filter.setAlternativeAOI(center, radius);
-//		population.addAlgorithm(filter);
-//
-//		plansReader.readFile(config.plans().getInputFile());
-//
-//		plansWriter.writeEndPlans();
-//		population.printPlansCount();
-//		System.out.println("  done. " + (new Date()));
-//		System.out.println("  filtered persons: " + filter.getCount());
-
 		System.out.println("RUN: filterPlansWithRouteInArea finished");
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// filterPlansInNetworkArea
-	//////////////////////////////////////////////////////////////////////
-
-	public static void filterPlansInNetworkArea(final String[] args) {
-
-		System.out.println("RUN: filterPlansInNetworkArea");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		final NetworkSummary summary = new NetworkSummary();
-		summary.run(network);
-
-		final Population plans = new PopulationImpl();
-
-		System.out.println("  reading plans...");
-		new MatsimPopulationReader(plans, network).readFile(config.plans().getInputFile());
-		System.out.println("  done.");
-
-		final Coord minCoord = summary.getMinCoord();
-		final Coord maxCoord = summary.getMaxCoord();
-		new PlansFilterArea(minCoord, maxCoord).run(plans);
-
-		System.out.println("  writing plans...");
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		plansWriter.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: filterPlansInNetworkArea finished.");
-		System.out.println();
-	}
-
-
-	public static void filterPlansPassingLink(final String[] args, final int linkId) {
-
-		System.out.println("RUN: filterPlansPassingLink");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading plans...");
-		final Population plans = new PopulationImpl();
-		new MatsimPopulationReader(plans, network).readFile(config.plans().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  searching link...");
-		final Link link = network.getLinks().get(Integer.toString(linkId));
-		final Node fromNode = link.getFromNode();
-		final Node toNode = link.getToNode();
-		System.out.println("  done.");
-		System.out.println("  link " + link.getId()
-				+ " starts at node " + fromNode.getId()
-				+ " and ends at node " + toNode.getId());
-
-		System.out.println("  filtering plans...");
-		final ArrayList<Person> removeAfterwards = new ArrayList<Person>();
-		for (final Person person : plans.getPersons().values()) {
-			boolean passesLink = false;
-			for (final Plan plan : person.getPlans()) {
-				for (int i = 1, max = plan.getPlanElements().size(); i < max; i +=2) {
-					final Leg leg = (Leg)plan.getPlanElements().get(i);
-					final NetworkRoute route = (NetworkRoute) leg.getRoute();
-					final List<Node> nodes = route.getNodes();
-					final int fromNodeIdx = nodes.indexOf(fromNode);
-					final int toNodeIdx = nodes.indexOf(toNode);
-					if (toNodeIdx == fromNodeIdx + 1) {
-						passesLink = true;
-						break;
-					}
-				}
-				if (passesLink) {
-					break;
-				}
-			}
-			if (!passesLink) {
-				removeAfterwards.add(person);
-			}
-		}
-		for (final Person person : removeAfterwards) {
-			plans.getPersons().remove(person.getId());
-		}
-		System.out.println("  done.");
-		System.out.println(removeAfterwards.size() + " persons removed.");
-
-		System.out.println("  writing plans...");
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		plansWriter.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: filterPlansPassingLink finished.");
-		System.out.println();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -546,24 +157,14 @@ public class MyRuns {
 
 		System.out.println("RUN: filterCars");
 
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-
-		System.out.println("  setting up plans objects...");
-		final Population plans = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
-
-		System.out.println("  reading plans...");
-		plansReader.readFile(config.plans().getInputFile());
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		Scenario scenario = sl.loadScenario();
 
 		System.out.println("  processing plans...");
-		new PlansFilterByLegMode(TransportMode.car, false).run(plans);
+		new PlansFilterByLegMode(TransportMode.car, false).run(scenario.getPopulation());
 
 		System.out.println("  writing plans...");
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		final PopulationWriter plansWriter = new PopulationWriter(scenario.getPopulation());
 		plansWriter.write();
 
 		System.out.println("RUN: filterCars finished.");
@@ -579,18 +180,9 @@ public class MyRuns {
 
 		System.out.println("RUN: filterPt");
 
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-
-		System.out.println("  setting up plans objects...");
-		final Population plans = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
-
-		System.out.println("  reading plans...");
-		plansReader.readFile(config.plans().getInputFile());
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		Scenario scenario = sl.loadScenario();
+		final Population plans = scenario.getPopulation();
 
 		System.out.println("  processing plans...");
 		new PlansFilterByLegMode(TransportMode.pt, true).run(plans);
@@ -612,26 +204,14 @@ public class MyRuns {
 
 		System.out.println("RUN: filterWork");
 
-		final Config config = Gbl.createConfig(args);
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		Scenario scenario = sl.loadScenario();
 
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
+		new PersonRemoveCertainActs().run(scenario.getPopulation());
+		new PersonRemovePlansWithoutLegs().run(scenario.getPopulation());
+		new PlansFilterPersonHasPlans().run(scenario.getPopulation());
 
-		System.out.println("  setting up plans objects...");
-		final Population plans = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
-		System.out.println("  done.");
-
-		System.out.println("  reading, processing, writing plans...");
-		plansReader.readFile(config.plans().getInputFile());
-
-		new PersonRemoveCertainActs().run(plans);
-		new PersonRemovePlansWithoutLegs().run(plans);
-		new PlansFilterPersonHasPlans().run(plans);
-
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		final PopulationWriter plansWriter = new PopulationWriter(scenario.getPopulation());
 		plansWriter.write();
 		System.out.println("  done.");
 
@@ -642,72 +222,19 @@ public class MyRuns {
 	public static void filterWorkEdu(final String[] args) {
 		System.out.println("RUN: filterWorkEdu");
 
-		final Config config = Gbl.createConfig(args);
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		Scenario scenario = sl.loadScenario();
 
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
+		new PlanFilterActTypes(new String[] {"work1", "work2", "work3", "edu", "uni"}).run(scenario.getPopulation());
+		new PlansFilterPersonHasPlans().run(scenario.getPopulation());
 
-		System.out.println("  setting up plans objects...");
-		final Population plans = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
-		System.out.println("  done.");
-
-		System.out.println("  reading, processing, writing plans...");
-		plansReader.readFile(config.plans().getInputFile());
-
-		new PlanFilterActTypes(new String[] {"work1", "work2", "work3", "edu", "uni"}).run(plans);
-		new PlansFilterPersonHasPlans().run(plans);
-
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		final PopulationWriter plansWriter = new PopulationWriter(scenario.getPopulation());
 		plansWriter.write();
 		System.out.println("  done.");
 
 		System.out.println("RUN: filterWorkEdu finished.");
 		System.out.println();
 	}
-
-	/**
-	 * reads in a population, removes all non-work and non-edu/non-uni activities
-	 * ensures that at most one work or edu activity exists in a plan, and removes
-	 * all plans from a person not having one work or edu activity. All person
-	 * with at least one plan remaining are written out again. This means: in the
-	 * output population, all plans are simple hwh or heh plans, no hwwh or
-	 * similar; all plans will have exactly three activities, and every activity
-	 * takes exactly 8 hours. All output plans have valid routes.
-	 */
-	public static void createDebugPlans(final String[] args) {
-		System.out.println("RUN: createDebugPlans");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  setting up plans objects...");
-		final Population population = new PopulationImpl();
-		final PopulationReader plansReader = new MatsimPopulationReader(population, network);
-		System.out.println("  done.");
-
-		System.out.println("  reading plans...");
-		plansReader.readFile(config.plans().getInputFile());
-
-		System.out.println("  processing plans...");
-		new PlanSimplifyForDebug(network).run(population);
-		new PlansFilterPersonHasPlans().run(population);
-
-		System.out.println("  writing plans...");
-		final PopulationWriter plansWriter = new PopulationWriter(population);
-		plansWriter.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: createDebugPlans finished.");
-		System.out.println();
-	}
-
 
 	//////////////////////////////////////////////////////////////////////
 	// removeLinkAndRoute
@@ -717,18 +244,15 @@ public class MyRuns {
 
 		System.out.println("RUN: removeLinkAndRoute");
 
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		sl.loadNetwork();
+		final Config config = sl.getScenario().getConfig();
 
 		System.out.println("  setting up plans objects...");
-		final PopulationImpl plans = new PopulationImpl();
+		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
+		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		System.out.println("  done.");
 
 		System.out.println("  adding plans algorithm... ");
@@ -746,260 +270,6 @@ public class MyRuns {
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// calcRoute
-	//////////////////////////////////////////////////////////////////////
-
-	public static void calcRoute(final String[] args) {
-
-		System.out.println("RUN: calcRoute");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)new World().createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  setting up plans objects...");
-		final Population population = new PopulationImpl();
-		final PopulationReader plansReader = new MatsimPopulationReader(population, network);
-		System.out.println("  done.");
-
-		System.out.println("  adding plans algorithm... ");
-		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
-		preprocess.run(network);
-		System.out.println("  done.");
-
-		System.out.println("  reading plans...");
-		plansReader.readFile(config.plans().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  processing plans..." + (new Date()));
-		new PlansCalcRoute(network, timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess)).run(population);
-		System.out.println("  done. " + (new Date()));
-
-		System.out.println("  writing plans...");
-		final PopulationWriter plansWriter = new PopulationWriter(population);
-		plansWriter.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: calcRoute finished.");
-		System.out.println();
-	}
-
-	/**
-	 * Calculate routes, multithreaded! This requires all plans to be read into
-	 * memory, so beware!
-	 *
-	 * @param args arguments for the program, mainly config-file and dtd
-	 */
-	public static void calcRouteMTwithTimes(final String[] args) {
-
-		System.out.println("RUN: calcRouteMTwithTimes");
-
-		Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  setting up plans objects...");
-		final Population population = new PopulationImpl();
-		System.out.println("  done.");
-
-		System.out.println("  reading plans...");
-		final PopulationReader plansReader = new MatsimPopulationReader(population, network);
-		plansReader.readFile(config.plans().getInputFile());
-		System.out.println("  done.");
-
-		Gbl.startMeasurement();
-		System.out.println("  reading events, calculating travel times...");
-		final Events events = new Events();
-		final TravelTimeCalculator ttime = new TravelTimeCalculator(network, 15*60);
-		events.addHandler(ttime);
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		events.printEventsCount();
-		System.out.println("  done.");
-		Gbl.printElapsedTime();
-
-		Gbl.startMeasurement();
-		System.out.println("  processing plans, calculating routes...");
-		PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
-		preProcessRoutingData.run(network);
-		final ReRouteLandmarks reroute = new ReRouteLandmarks(network, new TravelTimeDistanceCostCalculator(ttime), ttime, preProcessRoutingData);
-		reroute.prepareReplanning();
-		for (final Person person : population.getPersons().values()) {
-			for (final Plan plan : person.getPlans()) {
-				reroute.handlePlan(plan);
-			}
-		}
-		reroute.finishReplanning();
-		System.out.println("  done.");
-		Gbl.printElapsedTime();
-
-		System.out.println("  writing plans...");
-		final PopulationWriter plansWriter = new PopulationWriter(population);
-		plansWriter.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: calcRouteMTwithTimes finished.");
-		System.out.println();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// calcScoreFromEvents
-	//////////////////////////////////////////////////////////////////////
-
-	public static void calcScoreFromEvents_old(final String[] args) {
-
-		System.out.println("RUN: calcScoreFromEvents_old");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading plans...");
-		final Population population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(config.plans().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  creating events object... ");
-		final Events events = new Events();
-		final EventsToScore scoring = new EventsToScore(population, new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring()));
-		events.addHandler(scoring);
-		System.out.println("  done.");
-
-		System.out.println("  reading events..." + (new Date()));
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		events.printEventsCount();
-		System.out.println("  done.");
-
-		System.out.println("  calculating score... " + (new Date()));
-		scoring.finish();
-		final PlanAverageScore average = new PlanAverageScore();
-		average.run(population);
-		System.out.println("    average score = " + average.getAverage());
-		System.out.println("  done. " + (new Date()));
-
-		System.out.println("  writing plans...");
-		final PopulationWriter plansWriter = new PopulationWriter(population);
-		plansWriter.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: calcScoreFromEvents_old finished.");
-		System.out.println();
-	}
-
-	public static void calcScoreFromEvents_new(final String[] args) {
-
-		System.out.println("RUN: calcScoreFromEvents_new");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading plans...");
-		final Population population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(config.plans().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  creating events object... ");
-		final EventsToScore calcscore = new EventsToScore(population, new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring()));
-		final Events events = new Events();
-		events.addHandler(calcscore);
-		System.out.println("  done.");
-
-		System.out.println("  reading events..." + (new Date()));
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		events.printEventsCount();
-		System.out.println("  done.");
-
-		System.out.println("  calculating score... " + (new Date()));
-		final PlanAverageScore average = new PlanAverageScore();
-		calcscore.finish();
-		average.run(population);
-		System.out.println("    average score = " + average.getAverage());
-		System.out.println("  done."  + (new Date()));
-
-		System.out.println("  writing plans...");
-		final PopulationWriter plansWriter = new PopulationWriter(population);
-		plansWriter.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: calcScoreFromEvents_new finished.");
-		System.out.println();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// convertNetwork
-	//////////////////////////////////////////////////////////////////////
-
-	public static void convertNetwork(final String[] args) {
-
-		System.out.println("RUN: convertNetwork");
-
-		Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-//		NetworkCleaner cleaner = new NetworkCleaner(true);
-//		cleaner.run(network);
-
-		System.out.println("  writing the network...");
-		final NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: convertNetwork finished.");
-		System.out.println();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// cleanNetwork
-	//////////////////////////////////////////////////////////////////////
-
-	public static void cleanNetwork(final String[] args) {
-
-		System.out.println("RUN: cleanNetwork");
-
-		Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  running NetworkCleaner... ");
-		new NetworkCleaner().run(network);
-		System.out.println("  done.");
-
-		System.out.println("  writing the network...");
-		final NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: cleanNetwork finished.");
-		System.out.println();
-	}
-
-	//////////////////////////////////////////////////////////////////////
 	// calcNofLanes
 	//////////////////////////////////////////////////////////////////////
 
@@ -1007,12 +277,10 @@ public class MyRuns {
 
 		System.out.println("RUN: calcNofLanes");
 
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		sl.loadNetwork();
+		
+		Network network = sl.getScenario().getNetwork();
 
 		System.out.println("  calculating number of lanes... ");
 		new NetworkCalcLanes().run(network);
@@ -1027,30 +295,6 @@ public class MyRuns {
 		System.out.println();
 	}
 
-
-	public static void falsifyNetwork(final String[] args) {
-
-		System.out.println("RUN: falsifyNetwork");
-
-		Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		(new NetworkFalsifier(50)).run(network);
-
-		System.out.println("  writing the network...");
-		final NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: falsifyNetwork finished.");
-		System.out.println();
-	}
-
-
 	//////////////////////////////////////////////////////////////////////
 	// subNetwork
 	//////////////////////////////////////////////////////////////////////
@@ -1060,12 +304,10 @@ public class MyRuns {
 		final CoordImpl center = new CoordImpl(x, y);
 		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 
-		final Config config = Gbl.createConfig(args);
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		sl.loadNetwork();
 
-		System.out.println("  reading the network... " + (new Date()));
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
+		Network network = sl.getScenario().getNetwork();
 
 //		System.out.println("  reading population... " + (new Date()));
 //		final Plans population = new Plans(Plans.NO_STREAMING);
@@ -1099,386 +341,14 @@ public class MyRuns {
 		System.out.println("RUN: subNetwork finished");
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// calcODMatrices
-	//////////////////////////////////////////////////////////////////////
-
-	public static void calc1hODMatrices(final String[] args) {
-
-		System.out.println("RUN: calc1hODMatrices");
-
-		Config config = Gbl.createConfig(args);
-
-		final World world = new World();
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		// events
-		System.out.println("  creating events object... ");
-		final Events events = new Events();
-		System.out.println("  done.");
-
-		System.out.println("  adding events algorithms...");
-		final ZoneLayer tvz = (ZoneLayer)world.getLayer(new IdImpl("tvz"));
-		final ArrayList<CalcODMatrices> odcalcs = new ArrayList<CalcODMatrices>();
-		for (int i = 0; i < 30; i++) {
-			final CalcODMatrices odcalc = new CalcODMatrices(network, tvz, "od_" + i + "-" + (i + 1));
-			odcalc.setTimeRange(i*3600, (i+1)*3600);
-			events.addHandler(odcalc);
-			odcalcs.add(odcalc);
-		}
-		System.out.println("  done");
-
-		// read file, run algorithms if streaming is on
-		System.out.println("  reading events file and analyzing volumes...");
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  writing matrices files... ");
-		final MatricesWriter matrices_writer = new MatricesWriter(Matrices.getSingleton());
-		matrices_writer.write();
-		final Set<Id> ids = new TreeSet<Id>();
-		for (final Iterator<? extends Location> iter = tvz.getLocations().values().iterator(); iter.hasNext(); ) {
-			final Location loc = iter.next();
-			if (Integer.parseInt(loc.getId().toString()) < 24) {
-				ids.add(loc.getId());
-			}
-		}
-		for (final CalcODMatrices odcalc : odcalcs) {
-			final String filename = odcalc.getMatrix().getId() + ".fma";
-			System.out.println("    writing file: " + filename + "   (" + odcalc.counter + ")");
-			final VisumMatrixWriter writer = new VisumMatrixWriter(odcalc.getMatrix());
-			writer.setIds(ids);
-			writer.writeFile(filename);
-		}
-		System.out.println("  done.");
-
-		System.out.println("RUN: calc1hODMatrices finished.");
-		System.out.println();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// convertMatrices
-	//////////////////////////////////////////////////////////////////////
-
-	public static void convertMatrices(final String[] args) {
-		System.out.println("RUN: convertMatrices");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading matrices xml file... ");
-		World world = new World();
-		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton(), world);
-		reader.readFile(config.matrices().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  writing matrices file... ");
-		MatricesWriter matrices_writer = new MatricesWriter(Matrices.getSingleton());
-		matrices_writer.write();
-
-		final TreeSet<Id> ids = new TreeSet<Id>();
-		for (int i = 1; i < 882; i++) {
-			ids.add(new IdImpl(i));
-		}
-		for (final String name : Matrices.getSingleton().getMatrices().keySet()) {
-			final Matrix matrix = Matrices.getSingleton().getMatrices().get(name);
-			final VisumMatrixWriter writer = new VisumMatrixWriter(matrix);
-			writer.setIds(ids);
-			writer.writeFile(name + ".fma");
-		}
-		System.out.println("  done.");
-
-		System.out.println("RUN: convertMatrices finished.");
-		System.out.println();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// calcPlanStatistics
-	//////////////////////////////////////////////////////////////////////
-
-	public static void calcPlanStatistics(final String[] args) {
-
-		System.out.println("RUN: calcPlanStatistics");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  setting up plans objects...");
-		final PopulationImpl plans = new PopulationImpl();
-		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
-		System.out.println("  done.");
-
-		System.out.println("  adding plans algorithm... ");
-
-		plans.addAlgorithm(new PlanCalcType());
-		final String[] activities = {null, "home", "edu", "uni", "work1", "work2", "work3", "shop1", "shop2", "home2", "leisure1", "leisure2"};
-		final TransportMode[] legModes = {TransportMode.undefined, TransportMode.walk, TransportMode.bike, TransportMode.car, TransportMode.pt, TransportMode.ride};
-		final PlanSummary summary = new PlanSummary(activities, legModes);
-		plans.addAlgorithm(summary);
-		System.out.println("  done.");
-
-		System.out.println("  reading, analyzing plans...");
-		plansReader.readFile(config.plans().getInputFile());
-		System.out.println("  done.");
-
-		summary.print();
-
-		System.out.println("RUN: calcPlanStatistics finished.");
-		System.out.println();
-	}
-
-	public static void analyzeLegTimes_events(final String[] args, final int binSize) {
-		System.out.println("RUN: analyzeLegTimes");
-		final Config config = Gbl.createConfig(args);
-
-/*		System.out.println("  reading world xml file... ");
-		final WorldParser world_parser = new WorldParser(Gbl.getWorld());
-		world_parser.parse();
-		System.out.println("  done.");
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		final NetworkParser network_parser = new NetworkParser(network);
-		network_parser.parse();
-		System.out.println("  done.");
-
-		System.out.println("  reading plans...");
-		final Plans plans = new Plans(Plans.NO_STREAMING);
-		final PlansReaderI plansReader = new MatsimPopulationReader(plans);
-		plansReader.readfile(Gbl.getConfig().plans().getInputFile());
-		plans.printPlansCount();
-		System.out.println("  done.");
-*/
-		System.out.println("  reading events and analyzing departure times... ");
-		final Events events = new Events();
-		final LegHistogram analysis = new LegHistogram(binSize);
-		events.addHandler(analysis);
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		System.out.println("  done.");
-		analysis.write(System.out);
-		System.out.println("RUN: analyzeLegTimes finished.");
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// calcTripLength
-	//////////////////////////////////////////////////////////////////////
-
-	public static void calcTripLength(final String[] args) {
-		System.out.println("RUN: calcTripLength");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading plans...");
-		final PopulationImpl plans = new PopulationImpl();
-		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
-		final CalcAverageTripLength catl = new CalcAverageTripLength();
-		plans.addAlgorithm(catl);
-		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
-		System.out.println("  done.");
-
-		System.out.println("Average trip length: " + catl.getAverageTripLength());
-
-		System.out.println("RUN: calcTripLength finished.");
-		System.out.println();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// calcTolledTripLength
-	//////////////////////////////////////////////////////////////////////
-
-	public static void calcTolledTripLength(final String[] args) {
-		System.out.println("RUN: calcTolledTripLength");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading toll links...");
-//		CalcVehicleToll tollCalc = new CalcVehicleToll(network);
-//		new LinkTollReaderTXTv1(tollCalc).readfile(Gbl.getConfig().getParam("roadpricing", "tollLinksFile"));
-		final RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1(network);
-		try {
-			reader1.parse(config.roadpricing().getTollLinksFile());
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
-		final RoadPricingScheme scheme = reader1.getScheme();
-		System.out.println("  done.");
-
-		System.out.println("  reading events... ");
-		final Events events = new Events();
-		final CalcAverageTolledTripLength catl = new CalcAverageTolledTripLength(network, scheme);
-		events.addHandler(catl);
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		events.printEventsCount();
-		System.out.println("  done.");
-
-		System.out.println("Average tolled trip length: " + catl.getAverageTripLength());
-
-		System.out.println("RUN: calcTolledTripLength finished.");
-		System.out.println();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// writeVisumRouten
-	//////////////////////////////////////////////////////////////////////
-
-	public static void writeVisumRouten_plans(final String[] args) {
-		System.out.println("RUN: writeVisumRouten_plans");
-
-		final Config config = Gbl.createConfig(args);
-		final World world = new World();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		ZoneLayer tvz = (ZoneLayer)world.getLayer(new IdImpl("tvz"));
-		System.out.println("  done.");
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  create Anbindungs-tabelle for VISUM...");
-		final VisumAnbindungstabelleWriter anbindung = new VisumAnbindungstabelleWriter();
-		anbindung.write("anbindungen.net", network, tvz);
-		System.out.println("  done.");
-
-		System.out.println("  setting up plans objects...");
-		final PopulationImpl plans = new PopulationImpl();
-		plans.setIsStreaming(true);
-		final VisumWriteRoutes writer = new VisumWriteRoutes("routen.rim", tvz);
-		plans.addAlgorithm(writer);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
-		System.out.println("  done.");
-
-		System.out.println("  reading plans and running algorithms...");
-		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
-		System.out.println("  done.");
-
-		writer.close();
-
-		System.out.println("RUN: writeVisumRouten_plans finished.");
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// calcLegTimes
-	//////////////////////////////////////////////////////////////////////
-
-	public static void calcLegTimes(final String[] args) {
-		System.out.println("RUN: calcLegTimes");
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		final NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading plans...");
-		final Population population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(config.plans().getInputFile());
-		System.out.println("  done.");
-
-		// events
-		System.out.println("  creating events object... ");
-		final Events events = new Events();
-		System.out.println("  done.");
-
-		System.out.println("  adding events algorithms...");
-		final CalcLegTimes calcLegTimes = new CalcLegTimes(population);
-		events.addHandler(calcLegTimes);
-		System.out.println("  done");
-
-		System.out.println("  reading events...");
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  writing stats...");
-		System.out.println("---------------------------------------------------");
-		final TreeMap<String, int[]> legStats = calcLegTimes.getLegStats();
-		for (final String key : legStats.keySet()) {
-			final int[] counts = legStats.get(key);
-			System.out.print(key);
-			for (int i = 0; i < counts.length; i++) {
-				System.out.print("\t" + counts[i]);
-			}
-			System.out.println();
-		}
-		System.out.println("---------------------------------------------------");
-		System.out.println("  done.");
-
-		System.out.println("RUN: calcLegTimes finished.");
-		System.out.println();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// calcStuckVehStats
-	//////////////////////////////////////////////////////////////////////
-
-	public static void calcStuckVehStats(final String[] args) {
-
-		System.out.println("RUN: calcStuckVehStats");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		// events
-		System.out.println("  creating events object... ");
-		final Events events = new Events();
-		System.out.println("  done.");
-
-		System.out.println("  adding events algorithms...");
-		final StuckVehStats stuckStats = new StuckVehStats(network);
-		events.addHandler(stuckStats);
-		System.out.println("  done");
-
-		System.out.println("  reading events...");
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  writing stats...");
-		System.out.println("---------------------------------------------------");
-		stuckStats.printResults();
-		System.out.println("---------------------------------------------------");
-
-		System.out.println("RUN: calcStuckVehStats finished.");
-		System.out.println();
-	}
-
-
 	public static void falsifyNetAndPlans(final String[] args) {
 		System.out.println("RUN: falsifyNetAndPlans");
 
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		sl.loadNetwork();
+		Scenario scenario = sl.getScenario();
+		
+		Network network = scenario.getNetwork();
 
 		System.out.println("  falsifying the network...");
 		(new NetworkFalsifier(50)).run(network);
@@ -1489,16 +359,16 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  processing plans...");
-		final PopulationImpl population = new PopulationImpl();
+		final PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 		population.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(population);
 		final PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		population.addAlgorithm(new ActLocationFalsifier(200));
-		population.addAlgorithm(new XY2Links(network));
+		population.addAlgorithm(new XY2Links((NetworkLayer) network));
 		final FreespeedTravelTimeCost timeCostFunction = new FreespeedTravelTimeCost();
 		population.addAlgorithm(new PlansCalcRoute(network, timeCostFunction, timeCostFunction));
 		population.addAlgorithm(plansWriter);
-		plansReader.readFile(config.plans().getInputFile());
+		plansReader.readFile(scenario.getConfig().plans().getInputFile());
 		population.printPlansCount();
 		plansWriter.write();
 		System.out.println("  done.");
@@ -1506,52 +376,16 @@ public class MyRuns {
 		System.out.println("RUN: falsifyNetAndPlans finished.");
 		System.out.println();
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// visumMatrixTest
-	//////////////////////////////////////////////////////////////////////
-
-	public static void visumMatrixTest(final String[] args) {
-
-		System.out.println("RUN: visumMatrixTest");
-
-		final Config config = Gbl.createConfig(args);
-		final World world = new World();
-
-		Runtime.getRuntime().gc();
-		Gbl.printMemoryUsage();
-
-		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(world).readFile(config.world().getInputFile());
-		System.out.println("  done.");
-
-		Runtime.getRuntime().gc();
-		Gbl.printMemoryUsage();
-		System.out.println("  reading matrices file... " + (new Date()));
-		new VisumMatrixReader("oev_reisezeiten", world.getLayer(new IdImpl("municipality"))).readFile(config.matrices().getInputFile());
-		System.out.println("  done." + (new Date()));
-
-		Runtime.getRuntime().gc();
-		Gbl.printMemoryUsage();
-		System.out.println("  writing matrices file... " + (new Date()));
-		new MatricesWriter(Matrices.getSingleton()).writeFile(config.matrices().getOutputFile());
-		System.out.println("  done." + (new Date()));
-
-		Runtime.getRuntime().gc();
-		Gbl.printMemoryUsage();
-		System.out.println("RUN: visumMatrixTest finished.");
-		System.out.println();
-	}
-
+	
 	//////////////////////////////////////////////////////////////////////
 	// buildKML2
 	//////////////////////////////////////////////////////////////////////
 
-	private static MultiGeometryType getNetworkAsKml(final NetworkLayer network, final CoordinateTransformation coordTransform) {
+	private static MultiGeometryType getNetworkAsKml(final Network network, final CoordinateTransformation coordTransform) {
 		return getNetworkAsKml(network, new TreeMap<Id, Integer>(), coordTransform);
 	}
 
-	private static MultiGeometryType getNetworkAsKml(final NetworkLayer network, final TreeMap<Id, Integer> linkVolumes, final CoordinateTransformation coordTransform) {
+	private static MultiGeometryType getNetworkAsKml(final Network network, final TreeMap<Id, Integer> linkVolumes, final CoordinateTransformation coordTransform) {
 
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
 
@@ -1577,19 +411,16 @@ public class MyRuns {
 
 		final TreeMap<Integer, TreeMap<Id, Integer>> linkValues = new TreeMap<Integer, TreeMap<Id, Integer>>();
 
-		Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		sl.loadNetwork();
+		Config config = sl.getScenario().getConfig();
+		Network network = sl.getScenario().getNetwork();
 
 		if (useVolumes) {
-
 			System.out.println("  reading plans...");
-			final PopulationImpl plans = new PopulationImpl();
+			final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 			plans.setIsStreaming(true);
-			final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
+			final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 			plans.addAlgorithm(
 					new AbstractPersonAlgorithm() {
 
@@ -1708,64 +539,7 @@ public class MyRuns {
 		System.out.println();
 	}
 
-	public static void network2kml(final String[] args) {
-
-		System.out.println("RUN: network2kml");
-
-		Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-
-		System.out.println("  writing the network...");
-
-		final ObjectFactory kmlObjectFactory = new ObjectFactory();
-
-		final KmlType kml = kmlObjectFactory.createKmlType();
-
-		final DocumentType kmlDoc = kmlObjectFactory.createDocumentType();
-		kmlDoc.setId("the root document");
-		kml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(kmlDoc));
-
-		final StyleType style = kmlObjectFactory.createStyleType();
-		style.setId("redWallStyle");
-		LineStyleType lst = kmlObjectFactory.createLineStyleType();
-		lst.setColor(new byte[]{(byte) 0xaf, (byte) 0x00, (byte) 0x00, (byte) 0xff});
-		lst.setWidth(3.0);
-		style.setLineStyle(lst);
-		PolyStyleType pst = kmlObjectFactory.createPolyStyleType();
-		pst.setColor(new byte[]{(byte) 0x7f, (byte) 0x00, (byte) 0x00, (byte) 0xff});
-		style.setPolyStyle(pst);
-		kmlDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(style));
-
-		final FolderType networksFolder = kmlObjectFactory.createFolderType();
-		networksFolder.setId("networks");
-		kmlDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(networksFolder));
-
-		final PlacemarkType placemark = kmlObjectFactory.createPlacemarkType();
-		placemark.setId("network");
-		placemark.setName("Network");
-		placemark.setDescription("the road network");
-		placemark.setStyleUrl(style.getId());
-		placemark.setAbstractGeometryGroup(kmlObjectFactory.createMultiGeometry(getNetworkAsKml(network, new GK4toWGS84())));
-
-		networksFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(placemark));
-
-		final KMZWriter kmzWriter = new KMZWriter("test.kml");
-		kmzWriter.writeMainKml(kml);
-		kmzWriter.close();
-
-		System.out.println("  done.");
-
-		System.out.println("RUN: network2kml finished.");
-		System.out.println();
-	}
-
 	public static void readPlansDat(final String[] args) {
-		Gbl.createConfig(null);
 		try {
 			final DataInputStream in = new DataInputStream(new FileInputStream(args[0]));
 			final int nofAgents = in.readInt();
@@ -1793,7 +567,6 @@ public class MyRuns {
 	}
 
 	public static void readEventsDat(final String[] args) {
-		Gbl.createConfig(args);
 		try {
 			final DataInputStream in = new DataInputStream(new FileInputStream("output/equil1/ITERS/it.0/deq_events.deq"));
 			while (in.available() > 0) {
@@ -1808,49 +581,6 @@ public class MyRuns {
 		catch (final IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public static void readMatrices(final String[] args) {
-		/* only used for performance testing */
-		System.out.println("RUN: readMatrices");
-
-		final Config config = Gbl.createConfig(args);
-		final World world = new World();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
-		Gbl.printRoundTime();
-
-		System.out.println("  reading matrices xml file... ");
-		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton(), world);
-		reader.readFile(config.matrices().getInputFile());
-		System.out.println("  done.");
-		Gbl.printRoundTime();
-
-		System.out.println("RUN: readMatrices finished.");
-		System.out.println();
-	}
-
-	public static void readWriteLinkStats(final String[] args) {
-		System.out.println("RUN: readWriteLinkStats");
-
-		Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-
-		System.out.println("  reading linkstats...");
-		CalcLinkStats linkStats = new CalcLinkStats(network);
-		linkStats.readFile("210.linkstats.att");
-
-		System.out.println("  writing linkstats...");
-		linkStats.writeFile("210.out.linkstats.att");
-
-		System.out.println("RUN: readWriteLinkStats finished.");
-		System.out.println();
 	}
 
 	public static void someTests(final String[] args) {
@@ -1924,75 +654,16 @@ public class MyRuns {
 		}
 	}
 
-	public static void readCounts(final String[] args) {
-		System.out.println("RUN: readCounts");
-		final Config config = Gbl.createConfig(args);
-		final Counts counts = new Counts();
-
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-
-		new MatsimCountsReader(counts).readFile(config.counts().getCountsFileName());
-
-		CalcLinkStats linkStats = new CalcLinkStats(network);
-		linkStats.readFile("/Volumes/Data/VSP/cvs/vsp-cvs/runs/run628/it.500/500.linkstats.txt");
-
-		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(linkStats, counts, network);
-		cca.setDistanceFilter(30000.0, "2531");
-		cca.setCountsScaleFactor(10);
-		cca.run();
-		new CountSimComparisonTableWriter(cca.getComparison(), null).writeFile("counts.txt");
-
-//		new CountsWriter(counts).writeFile("test_counts.xml");
-
-		System.out.println("RUN: readCounts finished.");
-		System.out.println();
-	}
-
-	public static void readEvents(final String[] args) {
-		System.out.println("RUN: readEvents");
-
-		final Events events = new Events();
-		EventWriterTXT writer = new EventWriterTXT("/Volumes/Data/VSP/cvs/vsp-cvs/runs/run212/events_fixed.txt.gz");
-		events.addHandler(writer);
-		new MatsimEventsReader(events).readFile("/Volumes/Data/VSP/cvs/vsp-cvs/runs/run212/events.txt");
-		writer.closeFile();
-
-		System.out.println("RUN: readEvents finished.");
-		System.out.println();
-	}
-
-	public static void writeKml() {
-		ObjectFactory kmlObjectFactory = new ObjectFactory();
-		KmlType mainKml = kmlObjectFactory.createKmlType();
-		DocumentType mainDoc = kmlObjectFactory.createDocumentType();
-		mainDoc.setId("test.kmz");
-		mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));
-
-		KMZWriter writer = new KMZWriter("test.kmz");
-
-		ScreenOverlayType logo;
-		try {
-			logo = MatsimKMLLogo.writeMatsimKMLLogo(writer);
-			mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(logo));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		writer.writeMainKml(mainKml);
-		writer.close();
-	}
-
 	public static void createQVDiagramm(final String[] args) {
 
 		String[] links = { "101207", "101208", "105683", "105684", "105651", "106505", "106506", "106427", "106428", "110579", "110580", "111609" };
 //		String[] links = { "106505" };
 		QVDiagramm qvds[] = new QVDiagramm[links.length];
 
-		Config config = Gbl.createConfig(args);
-		ScenarioImpl data = new ScenarioImpl(config);
-		ScenarioLoader loader = new ScenarioLoader(data);
+		ScenarioLoader loader = new ScenarioLoader(args[0]);
+		Scenario data = loader.getScenario();
+		Config config = data.getConfig();
 		loader.loadNetwork();
-		
 		
 		Events events = new Events();
 		NetworkLayer network = (NetworkLayer) data.getNetwork();
@@ -2006,39 +677,6 @@ public class MyRuns {
 		for (int i = 0; i < links.length; i++) {
 			qvds[i].writeGraph("link" + links[i] + "_qv.png");
 		}
-	}
-
-	public static void runSimulation() {
-		Config config = Gbl.createConfig(null);
-		String netFileName = "test/scenarios/berlin/network.xml";
-		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-
-		// this needs to be done before reading the network
-		// because QueueLinks timeCap dependents on SIM_TICK_TIME_S
-		config.simulation().setFlowCapFactor(0.01);
-		config.simulation().setStorageCapFactor(0.04);
-		config.charyparNagelScoring().setLearningRate(1.0);
-
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFileName);
-
-		PopulationImpl population = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
-		plansReader.readFile(popFileName);
-		population.printPlansCount();
-
-		Events events = new Events();
-//		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
-//		events.addHandler(writer);
-
-		QueueSimulation sim = new QueueSimulation(network, population, events);
-		sim.run();
-
-//		writer.closeFile();
-
-//		final long checksum1 = CRCChecksum.getCRCFromFile(referenceFileName);
-//		final long checksum2 = CRCChecksum.getCRCFromFile(eventsFileName);
-//		assertEquals("different event files", checksum1, checksum2);
 	}
 
 	public static void someTest(final String[] args) {

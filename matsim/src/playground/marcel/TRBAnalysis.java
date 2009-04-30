@@ -36,7 +36,6 @@ import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 
 public class TRBAnalysis implements AgentDepartureEventHandler, AgentArrivalEventHandler {
@@ -48,11 +47,11 @@ public class TRBAnalysis implements AgentDepartureEventHandler, AgentArrivalEven
 	final private HashMap<String, Double> agentDepartures = new HashMap<String, Double>();
 
 	public TRBAnalysis(final String[] args) {
-		this.config = Gbl.createConfig(args);
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoader loader = new ScenarioLoader(args[0]);
 		loader.loadScenario();
 		final Scenario data = loader.getScenario();
 		this.population = data.getPopulation();
+		this.config = data.getConfig();
 	}
 
 	public void run() {
