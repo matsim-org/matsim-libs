@@ -34,7 +34,7 @@ public class GeographicalFilter {
 		Iterator<PersonTrips> personTrips_it = personTrips.values().iterator();
 		while (personTrips_it.hasNext()) {
 			PersonTrips pt = personTrips_it.next();
-			if (!pt.containsImplausibleCoordinates()) {
+			if (!(pt.containsImplausibleCoordinates() || pt.containsImplausibleDistances())) {
 				filteredPersons.put(pt.getPersonId(), pt);
 			}
 		}

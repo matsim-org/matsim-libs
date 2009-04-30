@@ -29,9 +29,12 @@ public class ValidationMZ {
 		
 		GeographicalFilter geographicalFilter = new GeographicalFilter();
 		personTrips = geographicalFilter.filterPersons(personTrips);		
-		log.info("Number of persons after geographical filtering: " + personTrips.size());		
+		log.info("Number of persons after plausiblity check: " + personTrips.size());		
 		
-		log.info("Writting trips file ...");
+		log.info("Writting ch trips file ...");
+		TripWriter writer = new TripWriter();
+		writer.write(personTrips, "ch");
+		log.info("Finished");
 		
 		TreeMap<Id, PersonTrips>  personTripsFiltered = new TreeMap<Id, PersonTrips>();
 		Iterator<PersonTrips> personTrips_it = personTrips.values().iterator();
@@ -43,8 +46,9 @@ public class ValidationMZ {
 		}
 		log.info("Number of persons after ZH filtering: " + personTripsFiltered.size());
 		
-		TripWriter writer = new TripWriter();
-		writer.write(personTripsFiltered);
+		log.info("Writting zh trips file ...");
+		writer = new TripWriter();
+		writer.write(personTripsFiltered, "zh");
 		log.info("Finished");
 	}
 }

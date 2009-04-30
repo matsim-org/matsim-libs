@@ -15,12 +15,15 @@ public class TripWriter {
 	
 	private final static Logger log = Logger.getLogger(TripWriter.class);
 	
-	public void write(TreeMap<Id, PersonTrips> personTrips) {	
+	public void write(TreeMap<Id, PersonTrips> personTrips, String region) {	
 		String header = "Person_id\tStart_X\tStart_Y\tShop_X\tShop_Y\tEnd_X\tEnd_Y\tDist_0\tDist_1\n";
 		try {
-			BufferedWriter outShoppingIntermediate = IOUtils.getBufferedWriter("output/valid/shoppingIntermediate.txt");
-			BufferedWriter outShoppingRoundTrip = IOUtils.getBufferedWriter("output/valid/shoppingRoundTrip.txt");
-			BufferedWriter outLeisure = IOUtils.getBufferedWriter("output/valid/leisure.txt");
+			BufferedWriter outShoppingIntermediate = 
+				IOUtils.getBufferedWriter("output/valid/"+ region + "_shoppingIntermediate.txt");
+			BufferedWriter outShoppingRoundTrip = 
+				IOUtils.getBufferedWriter("output/valid/" + region + "_shoppingRoundTrip.txt");
+			BufferedWriter outLeisure = 
+				IOUtils.getBufferedWriter("output/valid/" + region + "_leisure.txt");
 			
 			outShoppingIntermediate.write(header);
 			outShoppingRoundTrip.write(header);
