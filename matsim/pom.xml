@@ -50,9 +50,9 @@
           </compilerArguments>
           <!-- Uncommenting the following lines can be used to in- or exclude
           sources from compilation -->
-<!--          <includes>-->
-<!--            <include></include>-->
-<!--          </includes>-->
+          <includes>
+            <include>de/schlichtherle/**/*.java</include>
+          </includes>
 <!--          <excludes>-->
 <!--            <exclude></exclude>-->
 <!--          </excludes>-->
