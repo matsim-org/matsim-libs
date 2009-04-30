@@ -358,10 +358,11 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		this.curract.setStartTime(Time.parseTime(atts.getValue("start_time")));
 		this.curract.setDuration(Time.parseTime(atts.getValue("dur")));
 		this.curract.setEndTime(Time.parseTime(atts.getValue("end_time")));
-		if (atts.getValue("facility") != null) {
-			Facility f = this.facilities.getFacilities().get(new IdImpl(atts.getValue("facility")));
+		String fId = atts.getValue("facility");
+		if (fId != null) {
+			Facility f = this.facilities.getFacilities().get(new IdImpl(fId));
 			if (f == null) {
-				Gbl.errorMsg("facility id=" + atts.getValue("facility)") + " does not exist!");
+				Gbl.errorMsg("facility id=" + fId + " does not exist!");
 			}
 			this.curract.setFacility(f);
 		}
