@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
@@ -39,6 +40,7 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
+import playground.marcel.pt.integration.ExperimentalTransitRouteFactory;
 import playground.marcel.pt.integration.TransitDriver;
 import playground.marcel.pt.integration.TransitQueueSimulation;
 import playground.marcel.pt.integration.TransitQueueVehicle;
@@ -129,6 +131,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		final String inputDir = "test/input/" + TransitScheduleReaderTest.class.getPackage().getName().replace('.', '/') + "/";
 
 		NetworkLayer network = new NetworkLayer();
+		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 		FacilitiesImpl facilities = new FacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(inputDir + INPUT_TEST_FILE_FACILITIES);

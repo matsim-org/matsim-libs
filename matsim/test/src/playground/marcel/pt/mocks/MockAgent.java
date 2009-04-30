@@ -30,8 +30,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
 
+import playground.marcel.pt.integration.ExperimentalTransitRoute;
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.transitSchedule.TransitLine;
 
@@ -44,8 +44,8 @@ public class MockAgent implements DriverAgent, PassengerAgent {
 	public MockAgent(final Facility enterStop, final Facility exitStop) {
 		this.exitStop = exitStop;
 		this.dummyLeg = new LegImpl(TransportMode.pt);
-		GenericRoute route = new GenericRouteImpl(enterStop.getLink(), exitStop.getLink());
-		route.setRouteDescription(enterStop.getLink(), enterStop.getId().toString() + " " + exitStop.getId().toString(), exitStop.getLink());
+		GenericRoute route = new ExperimentalTransitRoute(enterStop.getLink(), exitStop.getLink());
+		route.setRouteDescription(enterStop.getLink(), "PT1 " + enterStop.getId().toString() + " T1 " + exitStop.getId().toString(), exitStop.getLink());
 		this.dummyLeg.setRoute(route);
 	}
 	
