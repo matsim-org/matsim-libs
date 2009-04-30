@@ -33,6 +33,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
+import playground.marcel.pt.transitSchedule.TransitLine;
 
 public class MockAgent implements DriverAgent, PassengerAgent {
 
@@ -48,7 +49,7 @@ public class MockAgent implements DriverAgent, PassengerAgent {
 		this.dummyLeg.setRoute(route);
 	}
 	
-	public void activityEnds(double now) {
+	public void activityEnds(final double now) {
 	}
 
 	public Link chooseNextLink() {
@@ -71,7 +72,7 @@ public class MockAgent implements DriverAgent, PassengerAgent {
 		return this.dummyPerson;
 	}
 
-	public void legEnds(double now) {
+	public void legEnds(final double now) {
 	}
 
 	public void moveOverNode() {
@@ -80,11 +81,11 @@ public class MockAgent implements DriverAgent, PassengerAgent {
 	public void teleportToLink(Link link) {
 	}
 
-	public boolean arriveAtStop(Facility stop) {
+	public boolean arriveAtStop(final Facility stop) {
 		return stop == exitStop;
 	}
 
-	public boolean ptLineAvailable() {
+	public boolean ptLineAvailable(final TransitLine line) {
 		return true;
 	}
 

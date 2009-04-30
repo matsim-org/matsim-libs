@@ -26,11 +26,9 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
@@ -39,7 +37,6 @@ import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
 import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.misc.StringUtils;
 
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
@@ -79,7 +76,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 			for (TransitLine line : this.schedule.getTransitLines().values()) {
 				for (TransitRoute route : line.getRoutes().values()) {
 					for (Departure departure : route.getDepartures().values()) {
-						TransitDriver driver = new TransitDriver(route, departure, this);
+						TransitDriver driver = new TransitDriver(line, route, departure, this);
 
 						QueueVehicle veh = new QueueVehicleImpl(driver.getPerson().getId());
 						veh.setDriver(driver);
@@ -99,8 +96,8 @@ public class TransitQueueSimulation extends QueueSimulation {
 	public void agentDeparts(final DriverAgent agent, final Link link) {
 		Leg leg = agent.getCurrentLeg();
 		if (leg.getMode() == TransportMode.pt) {
-			String fId = (StringUtils.explode(((GenericRoute) leg.getRoute()).getRouteDescription(), ' '))[0];
-			Facility stop = this.facilities.getFacilities().get(new IdImpl(fId));
+			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+			Facility stop = this.facilities.getFacilities().get(route.getAccessStopId());
 			this.agentTracker.addAgentToStop(agent, stop);
 		} else {
 			super.agentDeparts(agent, link);

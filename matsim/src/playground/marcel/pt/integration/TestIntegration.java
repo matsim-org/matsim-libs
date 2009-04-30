@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.facilities.Facilities;
@@ -45,13 +46,14 @@ public class TestIntegration {
 		final Config config = Gbl.createConfig(new String[] {"test/input/playground/marcel/pt/config.xml"});
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		ScenarioLoader loader = new ScenarioLoader(scenario);
+		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
+		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		loader.loadScenario();	
 
 		final TransitSchedule schedule = new TransitSchedule();
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
-		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
 		Facilities facilities = scenario.getFacilities();
 //		FacilityNetworkMatching.loadMapping(facilities, network, scenario.getWorld(), "../thesis-data/examples/minibln/facilityMatching.txt");
 //		System.out.println(network.getLinks().size());
@@ -63,7 +65,6 @@ public class TestIntegration {
 			sim.setTransitSchedule(schedule);
 			sim.run();
 			OTFVis.playMVI(new String[] {"./otfvis.mvi"});
-
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -73,5 +74,5 @@ public class TestIntegration {
 		}
 		writer.closeFile();
 	}
-	
+
 }

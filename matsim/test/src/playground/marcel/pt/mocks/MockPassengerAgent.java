@@ -23,6 +23,7 @@ package playground.marcel.pt.mocks;
 import org.matsim.core.api.facilities.Facility;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
+import playground.marcel.pt.transitSchedule.TransitLine;
 
 public class MockPassengerAgent implements PassengerAgent {
 
@@ -36,7 +37,7 @@ public class MockPassengerAgent implements PassengerAgent {
 		return stop == exitStop;
 	}
 
-	public boolean ptLineAvailable() {
+	public boolean ptLineAvailable(final TransitLine line) {
 		return true;
 	}
 

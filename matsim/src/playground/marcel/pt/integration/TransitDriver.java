@@ -40,6 +40,7 @@ import org.matsim.core.population.PersonImpl;
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.interfaces.TransitVehicle;
 import playground.marcel.pt.transitSchedule.Departure;
+import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
 
@@ -59,7 +60,10 @@ public class TransitDriver implements DriverAgent {
 		private final Leg currentLeg = new LegImpl(TransportMode.car);
 		private final Person dummyPerson;
 		
-		public TransitDriver(final TransitRoute route, final Departure departure, final TransitQueueSimulation sim) {
+		private final TransitLine transitLine;
+		
+		public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitQueueSimulation sim) {
+			this.transitLine = line;
 			this.dummyPerson = new PersonImpl(new IdImpl("ptDrvr_" + departure.getId().toString()));
 			this.stops = new ArrayList<Facility>(route.getStops().size());
 			for (TransitRouteStop stop : route.getStops()) {
@@ -119,7 +123,7 @@ public class TransitDriver implements DriverAgent {
 			for (Iterator<DriverAgent> iter = this.sim.agentTracker.getAgentsAtStop(stop).iterator(); iter.hasNext(); ) {
 				DriverAgent agent = iter.next();
 				PassengerAgent passenger = (PassengerAgent) agent;
-				if (passenger.ptLineAvailable()) {
+				if (passenger.ptLineAvailable(this.transitLine)) {
 					this.vehicle.addPassenger(passenger);
 					System.out.println("passenger enter: agent=" + agent.getPerson().getId() + " facility=" + stop.getId());
 					iter.remove();

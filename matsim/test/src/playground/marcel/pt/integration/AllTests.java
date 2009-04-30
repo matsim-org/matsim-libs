@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PassengerAgent.java
+ * AllTests.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,38 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.interfaces;
+package playground.marcel.pt.integration;
 
-import org.matsim.core.api.facilities.Facility;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-import playground.marcel.pt.transitSchedule.TransitLine;
+public class AllTests {
 
-/**
- * @author mrieser
- */
-public interface PassengerAgent {
+	public static Test suite() {
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
-	/**
-	 * Informs a passenger waiting at a stop that a transit line
-	 * has arrived and is ready to be boarded.
-	 *
-	 * @param line the line that is available
-	 *
-	 * TODO [MR] find better name for method
-	 *
-	 * @return <code>true<code> if the passenger wants to board the line, <code>false</code> otherwise
-	 */
-	public boolean ptLineAvailable(final TransitLine line);
+		suite.addTestSuite(ExperimentalTransitRouteTest.class);
 
-	/**
-	 * Informs a passenger in a transit vehicle that the vehicle has
-	 * arrived at the specified stop.
-	 *
-	 * TODO [MR] find better name for method
-	 * @param stop the stop the vehicle arrived
-	 *
-	 * @return <code>true</code> if the passenger wants to exit the vehicle, <code>false</code> otherwise
-	 */
-	public boolean arriveAtStop(final Facility stop);
+		return suite;
+	}
 
 }

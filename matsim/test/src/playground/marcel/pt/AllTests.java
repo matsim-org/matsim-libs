@@ -31,6 +31,7 @@ public class AllTests {
 		suite.addTestSuite(VehicleImplTest.class);
 		suite.addTest(playground.marcel.pt.events.AllTests.suite());
 		suite.addTest(playground.marcel.pt.fares.AllTests.suite());
+		suite.addTest(playground.marcel.pt.integration.AllTests.suite());
 		suite.addTest(playground.marcel.pt.router.AllTests.suite());
 		suite.addTest(playground.marcel.pt.transitSchedule.AllTests.suite());
 		suite.addTest(playground.marcel.pt.tryout.AllTests.suite());
