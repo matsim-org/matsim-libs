@@ -51,6 +51,9 @@
           <!-- Uncommenting the following lines can be used to in- or exclude
           sources from compilation -->
           <includes>
+            <include>org/matsim/**/*.java</include>
+            <include>tutorial/**/*.java</include>
+            <include>playground/**/*.java</include>
             <include>de/schlichtherle/**/*.java</include>
           </includes>
 <!--          <excludes>-->
