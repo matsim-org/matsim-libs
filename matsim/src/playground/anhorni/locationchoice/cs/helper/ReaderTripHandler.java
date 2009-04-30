@@ -9,6 +9,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.anhorni.locationchoice.preprocess.analyzeMZ.MZTrip;
+
 public class ReaderTripHandler {
 	
 	private final static Logger log = Logger.getLogger(ReaderTripHandler.class);

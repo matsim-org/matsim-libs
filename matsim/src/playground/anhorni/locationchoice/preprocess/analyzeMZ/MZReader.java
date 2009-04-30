@@ -7,23 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
-
-import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.anhorni.locationchoice.cs.helper.MZTrip;
-
 public class MZReader {
 	
 	private TreeMap<Id, PersonTrips> personTrips = new TreeMap<Id, PersonTrips>();
+	private List<MZTrip> mzTrips = new Vector<MZTrip>();
 	
 	public List<MZTrip> read(String file) {
-		
-		List<MZTrip> mzTrips = new Vector<MZTrip>();
-				
+						
 		try {
 			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -55,6 +50,7 @@ public class MZReader {
 				MZTrip mzTrip = new MZTrip(id, coordStart, coordEnd, startTime, endTime);
 				
 				mzTrip.setWmittel(entries[53].trim());
+				mzTrip.setWzweck2(entries[55].trim());
 			
 				if (entries[56].trim().equals("4")) {
 					mzTrip.setPurposeCode(entries[45].trim());
@@ -73,15 +69,21 @@ public class MZReader {
 					personTrips.put(personId, new PersonTrips(personId, new ArrayList<MZTrip>()));
 				}
 				personTrips.get(personId).addMZTrip(mzTrip);
-				mzTrips.add(mzTrip);	
+				this.mzTrips.add(mzTrip);	
 			}
 		} catch (IOException e) {
 				Gbl.errorMsg(e);
 		}
-		return mzTrips;
+		return this.mzTrips;
 	}
-
+	
 	public TreeMap<Id, PersonTrips> getPersonTrips() {
 		return personTrips;
+	}
+	public List<MZTrip> getMzTrips() {
+		return mzTrips;
+	}
+	public void setMzTrips(List<MZTrip> mzTrips) {
+		this.mzTrips = mzTrips;
 	}
 }

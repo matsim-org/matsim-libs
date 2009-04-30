@@ -14,7 +14,6 @@ import org.matsim.core.gbl.Gbl;
 
 import playground.anhorni.locationchoice.assemblefacilities.BZReader;
 import playground.anhorni.locationchoice.assemblefacilities.Hectare;
-import playground.anhorni.locationchoice.cs.helper.MZTrip;
 
 public class AnalyzeMZ {	
 	private final static Logger log = Logger.getLogger(AnalyzeMZ.class);
@@ -46,6 +45,24 @@ public class AnalyzeMZ {
 		
 	public void analyzeActs(MZReader mzReader) {
 		log.info("Starting analyze acts");
+		
+		// Count acts by counting trips having wzweck2==Hinweg
+		int countShopActs = 0;
+		int countLeisureActs = 0;
+		Iterator<MZTrip> mzTrips_it = mzReader.getMzTrips().iterator();
+		while (mzTrips_it.hasNext()) {
+			MZTrip mzTrip = mzTrips_it.next();
+			//Hinweg == 1
+			if (mzTrip.getShopOrLeisure().equals("shop") && mzTrip.getWzweck2().equals("1")) {
+				countShopActs++;
+			}
+			if (mzTrip.getShopOrLeisure().equals("leisure") && mzTrip.getWzweck2().equals("1")) {
+				countLeisureActs++;
+			}
+		}
+		log.info("Number of shop trips HINWEG: " + countShopActs);
+		log.info("Number of leisure trips HINWEG: " + countLeisureActs);
+		
 		GroceryFilter groceryfilter = new GroceryFilter();
 		mzTrips = groceryfilter.filterTrips(mzTrips);
 		

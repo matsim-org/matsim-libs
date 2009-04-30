@@ -7,7 +7,6 @@ import java.util.Vector;
 
 import org.matsim.api.basic.v01.Id;
 
-import playground.anhorni.locationchoice.cs.helper.MZTrip;
 
 public class GeographicalFilter {
 		

@@ -17,7 +17,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
-import playground.anhorni.locationchoice.cs.helper.MZTrip;
+import playground.anhorni.locationchoice.preprocess.analyzeMZ.MZTrip;
 
 
 public class CompareTrips {

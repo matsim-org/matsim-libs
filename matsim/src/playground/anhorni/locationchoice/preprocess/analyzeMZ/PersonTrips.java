@@ -7,7 +7,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.world.WorldUtils;
 
-import playground.anhorni.locationchoice.cs.helper.MZTrip;
 
 public class PersonTrips {
 	
