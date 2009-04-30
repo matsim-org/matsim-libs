@@ -45,6 +45,14 @@ import org.matsim.world.MatsimWorldReader;
 import org.xml.sax.SAXException;
 
 /**
+ * Loads elements of Scenario from file. Non standardized elements
+ * can also be loaded however they require a specific instance of
+ * Scenario. 
+ * loadScenario() reads the complete scenario from files while the
+ * other load...() methods are only loading the specific part
+ * of the scenario assuming that required parts are already 
+ * loaded or created by the user.
+ * @see org.matsim.api.core.v01.Scenario
  * @author dgrether
  * 
  */
@@ -75,10 +83,17 @@ public class ScenarioLoader {
 		this.scenario = new ScenarioImpl(this.config);
 	}
 
+	
 	public Scenario getScenario() {
 		return this.scenario;
 	}
 
+	/**
+	 * Loads all mandatory Scenario elements and
+	 * if activated in config's scenario module/group 
+	 * optional elements.
+	 * @return
+	 */
 	public Scenario loadScenario() {
 		this.loadWorld();
 		this.loadNetwork();
