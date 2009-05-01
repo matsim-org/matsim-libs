@@ -40,13 +40,8 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.network.NetworkLayer;
 
 public class GetAllNodes {
@@ -83,8 +78,8 @@ public class GetAllNodes {
 	
 	
 	
-	// Liefert eine ArrayList aller Nodes, welche Teil der �bergebenen Links sind.
-	// Da keine ArrayList mit bereits selektieren Nodes �bergeben wurde, wird diese neu erstellt. 
+	// Liefert eine ArrayList aller Nodes, welche Teil der uebergebenen Links sind.
+	// Da keine ArrayList mit bereits selektieren Nodes uebergeben wurde, wird diese neu erstellt. 
 	protected Map<Id, Node> getNodes(ArrayList<Link> links)
 	{
 		Map <Id, Node> nodesMap = new TreeMap<Id, Node>();
@@ -95,7 +90,7 @@ public class GetAllNodes {
 	} // getNodes(ArrayList<Link>)
 	
 	
-	// Liefert eine ArrayList aller Nodes, welche Teil der �bergebenen Links sind.
+	// Liefert eine ArrayList aller Nodes, welche Teil der uebergebenen Links sind.
 	protected void getNodes(ArrayList<Link> links, Map<Id, Node> nodesMap)
 	{
 		Iterator<Link> linksIterator = links.iterator();

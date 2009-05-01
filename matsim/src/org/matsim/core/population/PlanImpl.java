@@ -39,7 +39,6 @@ import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicPlanImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -342,10 +341,6 @@ public class PlanImpl implements Plan {
 
 	public ActIterator getIteratorAct() {
 		return delegate.getIteratorAct();
-	}
-
-	public LegIterator getIteratorLeg() {
-		return delegate.getIteratorLeg();
 	}
 
 	public final Double getScore() {

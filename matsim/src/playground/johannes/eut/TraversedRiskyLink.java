@@ -35,10 +35,11 @@ import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.functors.OrPredicate;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -135,16 +136,16 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 		
 		public boolean evaluate(Object arg0) {
 			Plan plan = (Plan)arg0;
-			for(Iterator it = plan.getIteratorLeg(); it.hasNext();) {
-				Leg leg = (Leg)it.next();
-				for(Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
-					if(link.equals(predicateLink))
-						return true;
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					for(Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+						if(link.equals(predicateLink))
+							return true;
+					}
+					return false; // doesn't make sense, only first Leg will ever be evaluated
 				}
-				
-				return false;
 			}
-			
 			return false;
 		}
 		

@@ -31,7 +31,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 
@@ -58,18 +58,18 @@ public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
 	@Override
 	public void run(Person person) {
 		Plan plan = person.getSelectedPlan();
-		BasicPlanImpl.LegIterator legIt = plan.getIteratorLeg();
-		
-		while (legIt.hasNext()) {
-			BasicLeg leg = legIt.next();
-			TransportMode mode = leg.getMode();
-			int modeCount = 0;
-			
-			if (modeStatistics.containsKey(mode)) {
-				modeCount = modeStatistics.get(mode);
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof BasicLeg) {
+				BasicLeg leg = (BasicLeg) pe;
+				TransportMode mode = leg.getMode();
+				int modeCount = 0;
+				
+				if (modeStatistics.containsKey(mode)) {
+					modeCount = modeStatistics.get(mode);
+				}
+				modeCount++;
+				modeStatistics.put(mode, modeCount);
 			}
-			modeCount++;
-			modeStatistics.put(mode, modeCount);
 		}
 	}
 	

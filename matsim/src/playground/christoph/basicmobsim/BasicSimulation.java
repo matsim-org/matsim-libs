@@ -38,10 +38,11 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -82,85 +83,74 @@ public class BasicSimulation {
 		Plan plan = person.getSelectedPlan();
 	
 		// Zufallsgenerator eindeutig mit der Id der Person initialisieren -> reproduzierbare Ergebnisse!
-		Random random = new Random( Long.valueOf(person.getId().toString()) );
+		Random random = new Random( Long.valueOf(person.getId().toString()) ); // better use MatsimRandom
 		
-		Iterator actIterator = plan.getIteratorAct();
-		Iterator legIterator = plan.getIteratorLeg();
-		
-		//while(actIterator.hasNext())
-		while(legIterator.hasNext())
-		{
-			ArrayList<Node> routeNodes = new ArrayList<Node>();
-			
-			Activity act = (Activity)actIterator.next();
-			
-			Leg leg = (Leg)legIterator.next();
-			
-			if (leg == null)
-			{
-				log.error("Leg is null!");
-				System.exit(0);
-			}
-			
-			Activity nextAct = plan.getNextActivity(leg);
-			
-			// Ziellink holen
-			Link destinationLink = nextAct.getLink();
-			
-			Link currentLink = act.getLink();
-			Node currentNode = currentLink.getToNode();
-			
-			// solange wir das Ziel nicht erreicht habenMap		
-			while(!currentLink.equals(destinationLink))
-			{				
-				// gewaehlten Link speichern, um ihn spaeter im Plan hinterlegen zu koennen
-				routeNodes.add(currentLink.getToNode());
-
-				log.info("Current Link: " + currentLink.getId() + " Destination Link: " + destinationLink.getId());
+		Activity act = null;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				act = (Activity) pe;
+			} else if (pe instanceof Leg) {
+				ArrayList<Node> routeNodes = new ArrayList<Node>();
+				Leg leg = (Leg) pe;
+				Activity nextAct = plan.getNextActivity(leg);
 				
-				Object[] links = currentNode.getOutLinks().values().toArray();
-				int linkCount = links.length;
-							
-				if (linkCount == 0)
-				{
-					log.error("Node has no outgoing links - Stopped search!");
-					break;
-				}
+				// Ziellink holen
+				Link destinationLink = nextAct.getLink();
 				
-				/* Hier nicht noetig - alle Links sind gleich wahscheinlich. Die Verteilung
-				 * erfolgt ueber die Random Funktion - diese sollte gleichverteile Zufallswerte
-				 * generieren.
-				 * 
+				Link currentLink = act.getLink();
+				Node currentNode = currentLink.getToNode();
+				
+				// solange wir das Ziel nicht erreicht habenMap		
+				while(!currentLink.equals(destinationLink))
+				{				
+					// gewaehlten Link speichern, um ihn spaeter im Plan hinterlegen zu koennen
+					routeNodes.add(currentLink.getToNode());
+					
+					log.info("Current Link: " + currentLink.getId() + " Destination Link: " + destinationLink.getId());
+					
+					Object[] links = currentNode.getOutLinks().values().toArray();
+					int linkCount = links.length;
+					
+					if (linkCount == 0)
+					{
+						log.error("Node has no outgoing links - Stopped search!");
+						break;
+					}
+					
+					/* Hier nicht noetig - alle Links sind gleich wahscheinlich. Die Verteilung
+					 * erfolgt ueber die Random Funktion - diese sollte gleichverteile Zufallswerte
+					 * generieren.
+					 * 
 				// Wahrscheinlichkeit fuer die ausgehenden Links berechnen
 				double probabilty = 1/linkCount;
-				*/
+					 */
+					
+					// Link waehlen
+					int nextLink = random.nextInt(linkCount);
+					
+					// den gewaehlten Link zum neuen CurrentLink machen
+					if(links[nextLink] instanceof Link)
+					{
+						currentLink = (Link)links[nextLink];
+						currentNode = currentLink.getToNode();
+					}
+					else
+					{
+						log.error("Return object was not from type Link! Class " + links[nextLink] + " was returned!");
+						break;
+					}
+					
+					
+				}	// while(!currentLink.equals(destinationLink))
 				
-				// Link waehlen
-				int nextLink = random.nextInt(linkCount);
-				
-				// den gewaehlten Link zum neuen CurrentLink machen
-				if(links[nextLink] instanceof Link)
-				{
-					currentLink = (Link)links[nextLink];
-					currentNode = currentLink.getToNode();
-				}
-				else
-				{
-					log.error("Return object was not from type Link! Class " + links[nextLink] + " was returned!");
-					break;
-				}
-				
-				
-			}	// while(!currentLink.equals(destinationLink))
-			
-			// gefahrene Route im aktuellen Leg des Agenten hinterlegen
-			((NetworkRoute) leg.getRoute()).setNodes(routeNodes);
-			//Route newRoute = new Route();
-			//newRoute.setRoute(routeNodes);
-			//leg.setRoute(newRoute);
-						
-		}	// while(legIterator.hasNext())
-		
+				// gefahrene Route im aktuellen Leg des Agenten hinterlegen
+				((NetworkRoute) leg.getRoute()).setNodes(routeNodes);
+				//Route newRoute = new Route();
+				//newRoute.setRoute(routeNodes);
+				//leg.setRoute(newRoute);
+
+			}
+		}	
 	}
 	
 	

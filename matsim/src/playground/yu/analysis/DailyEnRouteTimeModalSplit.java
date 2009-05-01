@@ -7,8 +7,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -78,67 +78,69 @@ public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 	public void run(final Plan plan) {
 		int age = this.person.getAge();
 		String carAvail = this.person.getCarAvail();
-		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
-			Leg leg = (Leg) li.next();
-			double legTime = leg.getRoute().getTravelTime() / 60.0;
-			if (Integer.parseInt(this.person.getId().toString()) < 1000000000
-					&& leg.getDepartureTime() < 86400)
-				if (leg.getMode().equals(TransportMode.car)) {
-					if (this.person.getSex().equals("m"))
-						this.maleCarTime += legTime;
-					else
-						this.femaleCarTime += legTime;
-					if (age < 30)
-						this.ageACarTime += legTime;
-					else if (age >= 30 && age < 50)
-						this.ageBCarTime += legTime;
-					else if (age >= 50 && age < 70)
-						this.ageCCarTime += legTime;
-					else
-						this.ageDCarTime += legTime;
-					if (this.person.getLicense().equals("yes"))
-						this.withLicenseCarTime += legTime;
-					else
-						this.withoutLicenseCarTime += legTime;
-					if (carAvail.equals("always"))
-						this.alwaysCarTime += legTime;
-					else if (carAvail.equals("sometimes"))
-						this.sometimesCarTime += legTime;
-					else
-						this.neverCarTime += legTime;
-					if (this.person.isEmployed())
-						this.isEmployedCarTime += legTime;
-					else
-						this.notEmployedCarTime += legTime;
-				} else if (leg.getMode().equals(TransportMode.pt)) {
-					if (this.person.getSex().equals("m"))
-						this.malePtTime += legTime;
-					else
-						this.femalePtTime += legTime;
-					if (age < 30)
-						this.ageAPtTime += legTime;
-					else if (age >= 30 && age < 50)
-						this.ageBPtTime += legTime;
-					else if (age >= 50 && age < 70)
-						this.ageCPtTime += legTime;
-					else
-						this.ageDPtTime += legTime;
-					if (this.person.getLicense().equals("yes"))
-						this.withLicensePtTime += legTime;
-					else
-						this.withoutLicensePtTime += legTime;
-					if (carAvail.equals("always"))
-						this.alwaysPtTime += legTime;
-					else if (carAvail.equals("sometimes"))
-						this.sometimesPtTime += legTime;
-					else
-						this.neverPtTime += legTime;
-					if (this.person.isEmployed())
-						this.isEmployedPtTime += legTime;
-					else
-						this.notEmployedPtTime += legTime;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				double legTime = leg.getRoute().getTravelTime() / 60.0;
+				if (Integer.parseInt(this.person.getId().toString()) < 1000000000
+						&& leg.getDepartureTime() < 86400) {
+					if (leg.getMode().equals(TransportMode.car)) {
+						if (this.person.getSex().equals("m"))
+							this.maleCarTime += legTime;
+						else
+							this.femaleCarTime += legTime;
+						if (age < 30)
+							this.ageACarTime += legTime;
+						else if (age >= 30 && age < 50)
+							this.ageBCarTime += legTime;
+						else if (age >= 50 && age < 70)
+							this.ageCCarTime += legTime;
+						else
+							this.ageDCarTime += legTime;
+						if (this.person.getLicense().equals("yes"))
+							this.withLicenseCarTime += legTime;
+						else
+							this.withoutLicenseCarTime += legTime;
+						if (carAvail.equals("always"))
+							this.alwaysCarTime += legTime;
+						else if (carAvail.equals("sometimes"))
+							this.sometimesCarTime += legTime;
+						else
+							this.neverCarTime += legTime;
+						if (this.person.isEmployed())
+							this.isEmployedCarTime += legTime;
+						else
+							this.notEmployedCarTime += legTime;
+					} else if (leg.getMode().equals(TransportMode.pt)) {
+						if (this.person.getSex().equals("m"))
+							this.malePtTime += legTime;
+						else
+							this.femalePtTime += legTime;
+						if (age < 30)
+							this.ageAPtTime += legTime;
+						else if (age >= 30 && age < 50)
+							this.ageBPtTime += legTime;
+						else if (age >= 50 && age < 70)
+							this.ageCPtTime += legTime;
+						else
+							this.ageDPtTime += legTime;
+						if (this.person.getLicense().equals("yes"))
+							this.withLicensePtTime += legTime;
+						else
+							this.withoutLicensePtTime += legTime;
+						if (carAvail.equals("always"))
+							this.alwaysPtTime += legTime;
+						else if (carAvail.equals("sometimes"))
+							this.sometimesPtTime += legTime;
+						else
+							this.neverPtTime += legTime;
+						if (this.person.isEmployed())
+							this.isEmployedPtTime += legTime;
+						else
+							this.notEmployedPtTime += legTime;
+					}
 				}
-
+			}
 		}
 	}
 

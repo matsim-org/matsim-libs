@@ -7,8 +7,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -78,67 +78,70 @@ public class DailyDistanceModalSplit extends AbstractPersonAlgorithm implements
 	public void run(final Plan plan) {
 		int age = this.person.getAge();
 		String carAvail = this.person.getCarAvail();
-		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
-			Leg leg = (Leg) li.next();
-			double legDist = leg.getRoute().getDistance() / 1000.0;
-			if (Integer.parseInt(this.person.getId().toString()) < 1000000000
-					&& leg.getDepartureTime() < 86400)
-				if (leg.getMode().equals(TransportMode.car)) {
-					if (this.person.getSex().equals("m"))
-						this.maleCarDist += legDist;
-					else
-						this.femaleCarDist += legDist;
-					if (age < 30)
-						this.ageACarDist += legDist;
-					else if (age >= 30 && age < 50)
-						this.ageBCarDist += legDist;
-					else if (age >= 50 && age < 70)
-						this.ageCCarDist += legDist;
-					else
-						this.ageDCarDist += legDist;
-					if (this.person.getLicense().equals("yes"))
-						this.withLicenseCarDist += legDist;
-					else
-						this.withoutLicenseCarDist += legDist;
-					if (carAvail.equals("always"))
-						this.alwaysCarDist += legDist;
-					else if (carAvail.equals("sometimes"))
-						this.sometimesCarDist += legDist;
-					else
-						this.neverCarDist += legDist;
-					if (this.person.isEmployed())
-						this.isEmployedCarDist += legDist;
-					else
-						this.notEmployedCarDist += legDist;
-				} else if (leg.getMode().equals(TransportMode.pt)) {
-					if (this.person.getSex().equals("m"))
-						this.malePtDist += legDist;
-					else
-						this.femalePtDist += legDist;
-					if (age < 30)
-						this.ageAPtDist += legDist;
-					else if (age >= 30 && age < 50)
-						this.ageBPtDist += legDist;
-					else if (age >= 50 && age < 70)
-						this.ageCPtDist += legDist;
-					else
-						this.ageDPtDist += legDist;
-					if (this.person.getLicense().equals("yes"))
-						this.withLicensePtDist += legDist;
-					else
-						this.withoutLicensePtDist += legDist;
-					if (carAvail.equals("always"))
-						this.alwaysPtDist += legDist;
-					else if (carAvail.equals("sometimes"))
-						this.sometimesPtDist += legDist;
-					else
-						this.neverPtDist += legDist;
-					if (this.person.isEmployed())
-						this.isEmployedPtDist += legDist;
-					else
-						this.notEmployedPtDist += legDist;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				
+				Leg leg = (Leg) pe;
+				double legDist = leg.getRoute().getDistance() / 1000.0;
+				if (Integer.parseInt(this.person.getId().toString()) < 1000000000
+						&& leg.getDepartureTime() < 86400) {
+					if (leg.getMode().equals(TransportMode.car)) {
+						if (this.person.getSex().equals("m"))
+							this.maleCarDist += legDist;
+						else
+							this.femaleCarDist += legDist;
+						if (age < 30)
+							this.ageACarDist += legDist;
+						else if (age >= 30 && age < 50)
+							this.ageBCarDist += legDist;
+						else if (age >= 50 && age < 70)
+							this.ageCCarDist += legDist;
+						else
+							this.ageDCarDist += legDist;
+						if (this.person.getLicense().equals("yes"))
+							this.withLicenseCarDist += legDist;
+						else
+							this.withoutLicenseCarDist += legDist;
+						if (carAvail.equals("always"))
+							this.alwaysCarDist += legDist;
+						else if (carAvail.equals("sometimes"))
+							this.sometimesCarDist += legDist;
+						else
+							this.neverCarDist += legDist;
+						if (this.person.isEmployed())
+							this.isEmployedCarDist += legDist;
+						else
+							this.notEmployedCarDist += legDist;
+					} else if (leg.getMode().equals(TransportMode.pt)) {
+						if (this.person.getSex().equals("m"))
+							this.malePtDist += legDist;
+						else
+							this.femalePtDist += legDist;
+						if (age < 30)
+							this.ageAPtDist += legDist;
+						else if (age >= 30 && age < 50)
+							this.ageBPtDist += legDist;
+						else if (age >= 50 && age < 70)
+							this.ageCPtDist += legDist;
+						else
+							this.ageDPtDist += legDist;
+						if (this.person.getLicense().equals("yes"))
+							this.withLicensePtDist += legDist;
+						else
+							this.withoutLicensePtDist += legDist;
+						if (carAvail.equals("always"))
+							this.alwaysPtDist += legDist;
+						else if (carAvail.equals("sometimes"))
+							this.sometimesPtDist += legDist;
+						else
+							this.neverPtDist += legDist;
+						if (this.person.isEmployed())
+							this.isEmployedPtDist += legDist;
+						else
+							this.notEmployedPtDist += legDist;
+					}
 				}
-
+			}
 		}
 	}
 

@@ -25,16 +25,16 @@ package playground.johannes.eut;
 
 import java.io.BufferedWriter;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -92,39 +92,41 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 			double cesum = 0;
 			double expTTSum = 0;
 			int tripcounts = 0;
-			for(Iterator it = plan.getIteratorLeg(); it.hasNext();) {
-				tripcounts++;
-				Leg leg = ((Leg)it.next());
-				NetworkRoute route = (NetworkRoute) leg.getRoute();
-				double totaltravelcosts = 0;
-				double totaltraveltime = 0;
-				
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					tripcounts++;
+					Leg leg = ((Leg) pe);
+					NetworkRoute route = (NetworkRoute) leg.getRoute();
+					double totaltravelcosts = 0;
+					double totaltraveltime = 0;
+					
 //				for (TravelTime traveltimes : ttKnowledge.getTravelTimes()) {
 //					double traveltime = calcTravTime(traveltimes, route, leg.getDepTime());
 //					totaltraveltime += traveltime;
 //					double travelcosts = utilFunc.evaluate(traveltime);
 //					totaltravelcosts += travelcosts;
 //				}
-				for (int i = 0; i < ttKnowledge.getTravelTimes().size(); i++) {
-					double traveltime = calcTravTime(ttKnowledge.getTravelTimes(i), route, leg.getDepartureTime());
-					double travelcosts = utilFunc.evaluate(traveltime);
-					totaltravelcosts += travelcosts * ttKnowledge.getWeigth(i);
-					totaltraveltime += traveltime * ttKnowledge.getWeigth(i);
-				}
-				double avrcosts =totaltravelcosts;
+					for (int i = 0; i < ttKnowledge.getTravelTimes().size(); i++) {
+						double traveltime = calcTravTime(ttKnowledge.getTravelTimes(i), route, leg.getDepartureTime());
+						double travelcosts = utilFunc.evaluate(traveltime);
+						totaltravelcosts += travelcosts * ttKnowledge.getWeigth(i);
+						totaltraveltime += traveltime * ttKnowledge.getWeigth(i);
+					}
+					double avrcosts =totaltravelcosts;
 //				double avrcosts = totaltravelcosts
 //						/ (double) ttKnowledge.getTravelTimes().size();
 //				double avttime = totaltraveltime/ (double) ttKnowledge.getTravelTimes().size();
-				double avttime = totaltraveltime;
-				
-				cesum += utilFunc.getTravelTime(avrcosts);
-				expTTSum += avttime;
+					double avttime = totaltraveltime;
+					
+					cesum += utilFunc.getTravelTime(avrcosts);
+					expTTSum += avttime;
+				}
 			}
 			
-			double ceavr = cesum/(double)tripcounts;
+			double ceavr = cesum/tripcounts;
 			ceMap.put(p, ceavr);
 			
-			expTTMap.put(p, expTTSum/(double)tripcounts);
+			expTTMap.put(p, expTTSum/tripcounts);
 	}
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
@@ -169,11 +171,11 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 			for(Double d : samplesExpTT)
 				sumExpTT += d;
 			
-			double avrCE = sumCE/(double)samplesCE.size();
+			double avrCE = sumCE/samplesCE.size();
 			summaryWriter.setTt_benefitPerIter(avrCE);
 			writer.write(String.valueOf(avrCE));
 			writer.write("\t");
-			writer.write(String.valueOf(sumExpTT/(double)samplesExpTT.size()));
+			writer.write(String.valueOf(sumExpTT/samplesExpTT.size()));
 			writer.newLine();
 			writer.close();
 		} catch (Exception e) {

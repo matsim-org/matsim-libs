@@ -24,13 +24,13 @@
 package playground.johannes.mobsim;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 
 /**
@@ -119,14 +119,16 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 	 */
 	protected boolean validatePerson(Person p) {
 		Plan plan = p.getSelectedPlan();
-		if(plan == null)
+		if(plan == null) {
 			return false;
-		else {
-			for(Iterator it = plan.getIteratorLeg(); it.hasNext();) {
-				if(((Leg)it.next()).getRoute() == null)
-					return false;
-			}
-			return true;
 		}
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				if (((Leg) pe).getRoute() == null) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 }

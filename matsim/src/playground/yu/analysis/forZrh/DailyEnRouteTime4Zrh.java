@@ -26,7 +26,7 @@ package playground.yu.analysis.forZrh;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -68,123 +68,125 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 		double ptDayTime = 0.0;
 		double wlkDayTime = 0.0;
 		double otherDayTime = 0.0;
-		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
-			Leg bl = (Leg) li.next();
-			ActType ats = null;
-			String tmpActType = plan.getNextActivity(bl).getType();
-			if (tmpActType.startsWith("h"))
-				ats = ActType.home;
-			else if (tmpActType.startsWith("w"))
-				ats = ActType.work;
-			else if (tmpActType.startsWith("e"))
-				ats = ActType.education;
-			else if (tmpActType.startsWith("s"))
-				ats = ActType.shopping;
-			else if (tmpActType.startsWith("l"))
-				ats = ActType.leisure;
-			else
-				ats = ActType.others;
-			double time = bl.getTravelTime() / 60.0;
-			if (time < 0)
-				time = 0;
-			if (bl.getDepartureTime() < 86400) {
-				dayTime += time;
-				if (Long.parseLong(this.person.getId().toString()) > 1000000000) {
-					this.othersTime += time;
-					otherDayTime += time;
-					switch (ats) {
-					case home:
-						this.throughHomeTime += time;
-						break;
-					case work:
-						this.throughWorkTime += time;
-						break;
-					case education:
-						this.throughEducTime += time;
-						break;
-					case shopping:
-						this.throughShopTime += time;
-						break;
-					case leisure:
-						this.throughLeisTime += time;
-						break;
-					default:
-						this.throughOtherTime += time;
-						break;
-					}
-				} else {
-					if (bl.getMode().equals(TransportMode.car)) {
-						this.carTime += time;
-						carDayTime += time;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg bl = (Leg) pe;
+				ActType ats = null;
+				String tmpActType = plan.getNextActivity(bl).getType();
+				if (tmpActType.startsWith("h"))
+					ats = ActType.home;
+				else if (tmpActType.startsWith("w"))
+					ats = ActType.work;
+				else if (tmpActType.startsWith("e"))
+					ats = ActType.education;
+				else if (tmpActType.startsWith("s"))
+					ats = ActType.shopping;
+				else if (tmpActType.startsWith("l"))
+					ats = ActType.leisure;
+				else
+					ats = ActType.others;
+				double time = bl.getTravelTime() / 60.0;
+				if (time < 0)
+					time = 0;
+				if (bl.getDepartureTime() < 86400) {
+					dayTime += time;
+					if (Long.parseLong(this.person.getId().toString()) > 1000000000) {
+						this.othersTime += time;
+						otherDayTime += time;
 						switch (ats) {
 						case home:
-							this.carHomeTime += time;
+							this.throughHomeTime += time;
 							break;
 						case work:
-							this.carWorkTime += time;
+							this.throughWorkTime += time;
 							break;
 						case education:
-							this.carEducTime += time;
+							this.throughEducTime += time;
 							break;
 						case shopping:
-							this.carShopTime += time;
+							this.throughShopTime += time;
 							break;
 						case leisure:
-							this.carLeisTime += time;
+							this.throughLeisTime += time;
 							break;
 						default:
-							this.carOtherTime += time;
+							this.throughOtherTime += time;
 							break;
 						}
-						this.carLegTimeCounts[Math.min(100, (int) time / 2)]++;
-					} else if (bl.getMode().equals(TransportMode.pt)) {
-						this.ptTime += time;
-						ptDayTime += time;
-						switch (ats) {
-						case home:
-							this.ptHomeTime += time;
-							break;
-						case work:
-							this.ptWorkTime += time;
-							break;
-						case education:
-							this.ptEducTime += time;
-							break;
-						case shopping:
-							this.ptShopTime += time;
-							break;
-						case leisure:
-							this.ptLeisTime += time;
-							break;
-						default:
-							this.ptOtherTime += time;
-							break;
+					} else {
+						if (bl.getMode().equals(TransportMode.car)) {
+							this.carTime += time;
+							carDayTime += time;
+							switch (ats) {
+							case home:
+								this.carHomeTime += time;
+								break;
+							case work:
+								this.carWorkTime += time;
+								break;
+							case education:
+								this.carEducTime += time;
+								break;
+							case shopping:
+								this.carShopTime += time;
+								break;
+							case leisure:
+								this.carLeisTime += time;
+								break;
+							default:
+								this.carOtherTime += time;
+								break;
+							}
+							this.carLegTimeCounts[Math.min(100, (int) time / 2)]++;
+						} else if (bl.getMode().equals(TransportMode.pt)) {
+							this.ptTime += time;
+							ptDayTime += time;
+							switch (ats) {
+							case home:
+								this.ptHomeTime += time;
+								break;
+							case work:
+								this.ptWorkTime += time;
+								break;
+							case education:
+								this.ptEducTime += time;
+								break;
+							case shopping:
+								this.ptShopTime += time;
+								break;
+							case leisure:
+								this.ptLeisTime += time;
+								break;
+							default:
+								this.ptOtherTime += time;
+								break;
+							}
+							this.ptLegTimeCounts[Math.min(100, (int) time / 2)]++;
+						} else if (bl.getMode().equals(TransportMode.walk)) {
+							this.wlkTime += time;
+							wlkDayTime += time;
+							switch (ats) {
+							case home:
+								this.wlkHomeTime += time;
+								break;
+							case work:
+								this.wlkWorkTime += time;
+								break;
+							case education:
+								this.wlkEducTime += time;
+								break;
+							case shopping:
+								this.wlkShopTime += time;
+								break;
+							case leisure:
+								this.wlkLeisTime += time;
+								break;
+							default:
+								this.wlkOtherTime += time;
+								break;
+							}
+							this.wlkLegTimeCounts[Math.min(100, (int) time / 2)]++;
 						}
-						this.ptLegTimeCounts[Math.min(100, (int) time / 2)]++;
-					} else if (bl.getMode().equals(TransportMode.walk)) {
-						this.wlkTime += time;
-						wlkDayTime += time;
-						switch (ats) {
-						case home:
-							this.wlkHomeTime += time;
-							break;
-						case work:
-							this.wlkWorkTime += time;
-							break;
-						case education:
-							this.wlkEducTime += time;
-							break;
-						case shopping:
-							this.wlkShopTime += time;
-							break;
-						case leisure:
-							this.wlkLeisTime += time;
-							break;
-						default:
-							this.wlkOtherTime += time;
-							break;
-						}
-						this.wlkLegTimeCounts[Math.min(100, (int) time / 2)]++;
 					}
 				}
 			}

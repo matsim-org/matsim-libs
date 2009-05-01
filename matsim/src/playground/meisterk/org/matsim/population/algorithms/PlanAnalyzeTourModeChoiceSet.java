@@ -29,7 +29,7 @@ import java.util.Iterator;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -106,39 +106,41 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 			while (modeIndices.length() < numLegs) {
 				modeIndices = "0".concat(modeIndices);
 			}
-			LegIterator legIterator = plan.getIteratorLeg();
 			boolean modeChainIsFeasible = true;
 			int legNum = 0;
-			while (modeChainIsFeasible && legIterator.hasNext()) {
-
-				Leg currentLeg = (Leg) legIterator.next();
-
-				TransportMode legMode = (TransportMode) this.modeSet.toArray()[Integer.parseInt(modeIndices.substring(legNum, legNum + 1))];
-				if (meisterk.getChainBasedModes().contains(legMode)) {
-					currentLocation = modeTracker.get(legMode);
-					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
-						requiredLocation = plan.getPreviousActivity(currentLeg).getFacility();
-					} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(subtourAnalysisLocationType)) {
-						requiredLocation = plan.getPreviousActivity(currentLeg).getLink();
-					}
-					if (currentLocation.equals(requiredLocation)) {
-						candidate[legNum] = legMode;
+			Iterator<PlanElement> peIterator = plan.getPlanElements().iterator();
+			while (modeChainIsFeasible && peIterator.hasNext()) {
+				PlanElement pe = peIterator.next();
+				if (pe instanceof Leg) {
+					Leg currentLeg = (Leg) pe;
+	
+					TransportMode legMode = (TransportMode) this.modeSet.toArray()[Integer.parseInt(modeIndices.substring(legNum, legNum + 1))];
+					if (meisterk.getChainBasedModes().contains(legMode)) {
+						currentLocation = modeTracker.get(legMode);
 						if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
-							nextLocation = plan.getNextActivity(currentLeg).getFacility();
+							requiredLocation = plan.getPreviousActivity(currentLeg).getFacility();
 						} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(subtourAnalysisLocationType)) {
-							nextLocation = plan.getNextActivity(currentLeg).getLink();
+							requiredLocation = plan.getPreviousActivity(currentLeg).getLink();
 						}
-						modeTracker.put(legMode, nextLocation);
+						if (currentLocation.equals(requiredLocation)) {
+							candidate[legNum] = legMode;
+							if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
+								nextLocation = plan.getNextActivity(currentLeg).getFacility();
+							} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(subtourAnalysisLocationType)) {
+								nextLocation = plan.getNextActivity(currentLeg).getLink();
+							}
+							modeTracker.put(legMode, nextLocation);
+						} else {
+							modeChainIsFeasible = false;
+							// compute number of next candidate for a feasible combination, that is, omit the detected branch of infeasible combinations
+							numCombination += ((int) Math.pow(this.modeSet.size(), (numLegs - legNum - 1))) - 1;
+						}
+	
 					} else {
-						modeChainIsFeasible = false;
-						// compute number of next candidate for a feasible combination, that is, omit the detected branch of infeasible combinations
-						numCombination += ((int) Math.pow(this.modeSet.size(), (numLegs - legNum - 1))) - 1;
+						candidate[legNum] = legMode;
 					}
-
-				} else {
-					candidate[legNum] = legMode;
+					legNum++;
 				}
-				legNum++;
 			}
 			// chain-based modes must finish at the location of the last activity of the plan
 			HashSet<Location> allowedLocations = new HashSet<Location>();

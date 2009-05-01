@@ -39,12 +39,11 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.network.NetworkLayer;
 
 public class GetAllLinks {
@@ -105,33 +104,29 @@ public class GetAllLinks {
 	}
 	
 	protected void getLinks(Plan plan, ArrayList<Link> links)
-	{		
+	{
+		// koennte kombiniert werden in eine for-schleife statt zwei
+
 		// Links holen, an denen Acts stattfinden
-		ActIterator actIterator = plan.getIteratorAct();
-		while (actIterator.hasNext())
-		{
-			Activity act = (Activity)actIterator.next();
-			
-			// Hinzufuegen, falls neues Element
-			if(!links.contains(act.getLink())) links.add(act.getLink());
-			
-		}	// while actIterator.hasNext()
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity)pe;
+				// Hinzufuegen, falls neues Element
+				if(!links.contains(act.getLink())) links.add(act.getLink());
+			}
+		}
 
 		// Routen holen, die die Acts verbinden
-		LegIterator legIterator = plan.getIteratorLeg();
-		while (legIterator.hasNext())
-		{
-			Leg leg = (Leg)legIterator.next();
-
-			NetworkRoute route = (NetworkRoute) leg.getRoute();
-
-			for (Link link : route.getLinks()) {
-				// Hinzufuegen, falls neues Element
-				if(!links.contains(link)) links.add(link);
-				
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg)pe;
+				NetworkRoute route = (NetworkRoute) leg.getRoute();
+				for (Link link : route.getLinks()) {
+					// Hinzufuegen, falls neues Element
+					if(!links.contains(link)) links.add(link);
+				}
 			}
-		}	// while legIterator.hasNext()
-
+		}
 	} // getLinks(Plan, ArrayList<Link>)
 		
 	
@@ -148,12 +143,12 @@ public class GetAllLinks {
 		// Alle Links des Netzwerks holen
 		TreeMap<Id, Link> linkMap = (TreeMap<Id, Link>)n.getLinks();
 		
-		Iterator linkIterator = linkMap.entrySet().iterator();
+		Iterator<Map.Entry<Id, Link>> linkIterator = linkMap.entrySet().iterator();
 		
 		while(linkIterator.hasNext())
 		{
 			// Wir wissen ja, was fuer Elemente zurueckgegeben werden :)
-			Map.Entry<Id, Link> nextLink = (Map.Entry<Id, Link>)linkIterator.next();
+			Map.Entry<Id, Link> nextLink = linkIterator.next();
 
 			Link link = nextLink.getValue();
 						

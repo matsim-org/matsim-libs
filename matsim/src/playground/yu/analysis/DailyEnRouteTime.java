@@ -11,8 +11,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -144,155 +144,156 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		double wlkDayTime = 0.0;
 		double bikeDayTime = 0.0;
 		double othersDayTime = 0.0;
-		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
-			Leg bl = (Leg) li.next();
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg bl = (Leg) pe;
 
-			ActType at = null;
-			String tmpActTypeStartsWith = plan.getNextActivity(bl).getType()
-					.substring(0, 1);
-			for (ActType a : ActType.values()) {
-				if (tmpActTypeStartsWith.equals(a.getFirstLetter())) {
-					at = a;
+				ActType at = null;
+				String tmpActTypeStartsWith = plan.getNextActivity(bl).getType()
+						.substring(0, 1);
+				for (ActType a : ActType.values()) {
+					if (tmpActTypeStartsWith.equals(a.getFirstLetter())) {
+						at = a;
+						break;
+					}
+				}
+				if (at == null)
+					at = ActType.others;
+	
+				double time = bl.getTravelTime() / 60.0;
+				if (time < 0)
+					time = 0;
+				// if (bl.getDepartureTime() < 86400) {
+				dayTime += time;
+				TransportMode mode = bl.getMode();
+				switch (mode) {
+				case car:
+					this.carTime += time;
+					carDayTime += time;
+					switch (at) {
+					case home:
+						this.carHomeTime += time;
+						break;
+					case work:
+						this.carWorkTime += time;
+						break;
+					case education:
+						this.carEducTime += time;
+						break;
+					case shopping:
+						this.carShopTime += time;
+						break;
+					case leisure:
+						this.carLeisTime += time;
+						break;
+					default:
+						this.carOtherTime += time;
+						break;
+					}
+					this.carLegTimeCounts[Math.min(100, (int) time / 2)]++;
+					break;
+				case pt:
+					this.ptTime += time;
+					ptDayTime += time;
+					switch (at) {
+					case home:
+						this.ptHomeTime += time;
+						break;
+					case work:
+						this.ptWorkTime += time;
+						break;
+					case education:
+						this.ptEducTime += time;
+						break;
+					case shopping:
+						this.ptShopTime += time;
+						break;
+					case leisure:
+						this.ptLeisTime += time;
+						break;
+					default:
+						this.ptOtherTime += time;
+						break;
+					}
+					this.ptLegTimeCounts[Math.min(100, (int) time / 2)]++;
+					break;
+				case walk:
+					this.wlkTime += time;
+					wlkDayTime += time;
+					switch (at) {
+					case home:
+						this.wlkHomeTime += time;
+						break;
+					case work:
+						this.wlkWorkTime += time;
+						break;
+					case education:
+						this.wlkEducTime += time;
+						break;
+					case shopping:
+						this.wlkShopTime += time;
+						break;
+					case leisure:
+						this.wlkLeisTime += time;
+						break;
+					default:
+						this.wlkOtherTime += time;
+						break;
+					}
+					this.wlkLegTimeCounts[Math.min(100, (int) time / 2)]++;
+					break;
+				case bike:
+					bikeTime += time;
+					bikeDayTime += time;
+					switch (at) {
+					case home:
+						this.bikeHomeTime += time;
+						break;
+					case work:
+						this.bikeWorkTime += time;
+						break;
+					case education:
+						this.bikeEducTime += time;
+						break;
+					case shopping:
+						this.bikeShopTime += time;
+						break;
+					case leisure:
+						this.bikeLeisTime += time;
+						break;
+					default:
+						this.bikeOtherTime += time;
+						break;
+					}
+					this.bikeLegTimeCounts[Math.min(100, (int) time / 2)]++;
+					break;
+				default:
+					this.othersTime += time;
+					othersDayTime += time;
+					switch (at) {
+					case home:
+						this.othersHomeTime += time;
+						break;
+					case work:
+						this.othersWorkTime += time;
+						break;
+					case education:
+						this.othersEducTime += time;
+						break;
+					case shopping:
+						this.othersShopTime += time;
+						break;
+					case leisure:
+						this.othersLeisTime += time;
+						break;
+					default:
+						this.othersOtherTime += time;
+						break;
+					}
+					this.othersLegTimeCounts[Math.min(100, (int) time / 2)]++;
 					break;
 				}
 			}
-			if (at == null)
-				at = ActType.others;
-
-			double time = bl.getTravelTime() / 60.0;
-			if (time < 0)
-				time = 0;
-			// if (bl.getDepartureTime() < 86400) {
-			dayTime += time;
-			TransportMode mode = bl.getMode();
-			switch (mode) {
-			case car:
-				this.carTime += time;
-				carDayTime += time;
-				switch (at) {
-				case home:
-					this.carHomeTime += time;
-					break;
-				case work:
-					this.carWorkTime += time;
-					break;
-				case education:
-					this.carEducTime += time;
-					break;
-				case shopping:
-					this.carShopTime += time;
-					break;
-				case leisure:
-					this.carLeisTime += time;
-					break;
-				default:
-					this.carOtherTime += time;
-					break;
-				}
-				this.carLegTimeCounts[Math.min(100, (int) time / 2)]++;
-				break;
-			case pt:
-				this.ptTime += time;
-				ptDayTime += time;
-				switch (at) {
-				case home:
-					this.ptHomeTime += time;
-					break;
-				case work:
-					this.ptWorkTime += time;
-					break;
-				case education:
-					this.ptEducTime += time;
-					break;
-				case shopping:
-					this.ptShopTime += time;
-					break;
-				case leisure:
-					this.ptLeisTime += time;
-					break;
-				default:
-					this.ptOtherTime += time;
-					break;
-				}
-				this.ptLegTimeCounts[Math.min(100, (int) time / 2)]++;
-				break;
-			case walk:
-				this.wlkTime += time;
-				wlkDayTime += time;
-				switch (at) {
-				case home:
-					this.wlkHomeTime += time;
-					break;
-				case work:
-					this.wlkWorkTime += time;
-					break;
-				case education:
-					this.wlkEducTime += time;
-					break;
-				case shopping:
-					this.wlkShopTime += time;
-					break;
-				case leisure:
-					this.wlkLeisTime += time;
-					break;
-				default:
-					this.wlkOtherTime += time;
-					break;
-				}
-				this.wlkLegTimeCounts[Math.min(100, (int) time / 2)]++;
-				break;
-			case bike:
-				bikeTime += time;
-				bikeDayTime += time;
-				switch (at) {
-				case home:
-					this.bikeHomeTime += time;
-					break;
-				case work:
-					this.bikeWorkTime += time;
-					break;
-				case education:
-					this.bikeEducTime += time;
-					break;
-				case shopping:
-					this.bikeShopTime += time;
-					break;
-				case leisure:
-					this.bikeLeisTime += time;
-					break;
-				default:
-					this.bikeOtherTime += time;
-					break;
-				}
-				this.bikeLegTimeCounts[Math.min(100, (int) time / 2)]++;
-				break;
-			default:
-				this.othersTime += time;
-				othersDayTime += time;
-				switch (at) {
-				case home:
-					this.othersHomeTime += time;
-					break;
-				case work:
-					this.othersWorkTime += time;
-					break;
-				case education:
-					this.othersEducTime += time;
-					break;
-				case shopping:
-					this.othersShopTime += time;
-					break;
-				case leisure:
-					this.othersLeisTime += time;
-					break;
-				default:
-					this.othersOtherTime += time;
-					break;
-				}
-				this.othersLegTimeCounts[Math.min(100, (int) time / 2)]++;
-				break;
-			}
-
 		}
 		for (int i = 0; i <= Math.min(100, (int) dayTime); i++)
 			this.totalDayEnRouteTimeCounts[i]++;
@@ -317,11 +318,11 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		sw.writeln("\tDaily En Route Time\tn_agents\t" + count);
 		sw.writeln("\tavg.[min]\t%\tsum.[min]");
 
-		double avgCarTime = carTime / (double) this.count;
-		double avgPtTime = ptTime / (double) count;
-		double avgWlkTime = wlkTime / (double) count;
-		double avgBikeTime = bikeTime / (double) count;
-		double avgOtherTime = othersTime / (double) count;
+		double avgCarTime = carTime / this.count;
+		double avgPtTime = ptTime / count;
+		double avgWlkTime = wlkTime / count;
+		double avgBikeTime = bikeTime / count;
+		double avgOtherTime = othersTime / count;
 
 		sw.writeln("car\t" + avgCarTime + "\t" + this.carTime / sum * 100.0
 				+ "\t" + carTime);

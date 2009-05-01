@@ -27,10 +27,9 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -111,10 +110,12 @@ public class NewAgentWalkPlan extends NewPopulation{
 	}
 
 	private boolean hasLongLegs(Plan plan) {
-		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
-			Leg leg = (Leg) li.next();
-			if (CoordUtils.calcDistance(plan.getPreviousActivity(leg).getLink().getCoord(), plan.getNextActivity(leg).getLink().getCoord()) / 1000.0 > 3.0)
-				return true;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				if (CoordUtils.calcDistance(plan.getPreviousActivity(leg).getLink().getCoord(), plan.getNextActivity(leg).getLink().getCoord()) / 1000.0 > 3.0)
+					return true;
+			}
 		}
 		return false;
 	}

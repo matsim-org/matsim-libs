@@ -4,10 +4,11 @@
 package playground.yu.analysis;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -30,9 +31,6 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 	private SimpleWriter sw = null;
 	private Id personId = null;
 
-	/**
-	 *
-	 */
 	public LegDepartureTimeChecker(final String outputFilename) {
 		this.sw = new SimpleWriter(outputFilename);
 		this.sw.writeln("personId\ttime[s]\ttime[hh:mm:ss]\tlegNo.");
@@ -46,15 +44,16 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 
 	public void run(final Plan plan) {
 		int c = 0;
-		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
-			double legDepTime = li.next().getDepartureTime();
-			if (legDepTime >= 86400.0) {
-				this.sw.writeln(this.personId + "\t" + legDepTime + "\t"
-						+ Time.writeTime(legDepTime) + "\t" + c);
-
-				this.sw.flush();
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				double legDepTime = ((Leg) pe).getDepartureTime();
+				if (legDepTime >= 86400.0) {
+					this.sw.writeln(this.personId + "\t" + legDepTime + "\t"
+							+ Time.writeTime(legDepTime) + "\t" + c);
+					this.sw.flush();
+				}
+				c++;
 			}
-			c++;
 		}
 	}
 
@@ -62,9 +61,6 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 		this.sw.close();
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 

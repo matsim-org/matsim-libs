@@ -30,8 +30,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -86,8 +86,9 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		double othersDayDist = 0.0;
 		double throughDayDist = 0.0;
 
-		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
-			Leg bl = (Leg) li.next();
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+			Leg bl = (Leg) pe;
 			ActType ats = null;
 			String tmpActType = plan.getNextActivity(bl).getType();
 			if (tmpActType.startsWith("h"))
@@ -231,7 +232,7 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 				this.othersLegDistanceCounts[Math.min(100, (int) dist)]++;
 			}
 			dayDist += dist;
-
+			}
 		}
 		for (int i = 0; i <= Math.min(100, (int) dayDist); i++)
 			this.totalDayDistanceCounts[i]++;
@@ -256,11 +257,11 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 				+ count);
 		sw.writeln("mode\tavg.[km]\t%\tsum.[km]");
 
-		double avgCarDist = this.carDist / (double) this.count;
-		double avgPtDist = this.ptDist / (double) this.count;
-		double avgWlkDist = this.wlkDist / (double) this.count;
-		double avgOthersDist = this.othersDist / (double) this.count;
-		double avgThroughDist = throughDist / (double) count;
+		double avgCarDist = this.carDist / this.count;
+		double avgPtDist = this.ptDist / this.count;
+		double avgWlkDist = this.wlkDist / this.count;
+		double avgOthersDist = this.othersDist / this.count;
+		double avgThroughDist = throughDist / count;
 
 		sw.writeln("car\t" + avgCarDist + "\t" + this.carDist / sum * 100.0
 				+ "\t" + carDist);
@@ -369,16 +370,12 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		double yThrough[] = new double[101];
 
 		for (int i = 0; i < 101; i++) {
-			yTotal[i] = this.totalDayDistanceCounts[i] / (double) this.count
-					* 100.0;
-			yCar[i] = this.carDayDistanceCounts[i] / (double) this.count
-					* 100.0;
-			yPt[i] = this.ptDayDistanceCounts[i] / (double) this.count * 100.0;
-			yWlk[i] = this.wlkDayDistanceCounts[i] / (double) this.count
-					* 100.0;
-			yOthers[i] = this.othersDayDistanceCounts[i] / (double) this.count
-					* 100.0;
-			yThrough[i] = throughDayDistanceCounts[i] / (double) count * 100.0;
+			yTotal[i] = this.totalDayDistanceCounts[i] / this.count * 100.0;
+			yCar[i] = this.carDayDistanceCounts[i] / this.count * 100.0;
+			yPt[i] = this.ptDayDistanceCounts[i] / this.count * 100.0;
+			yWlk[i] = this.wlkDayDistanceCounts[i] / this.count * 100.0;
+			yOthers[i] = this.othersDayDistanceCounts[i] / this.count * 100.0;
+			yThrough[i] = throughDayDistanceCounts[i] / count * 100.0;
 		}
 
 		XYLineChart chart = new XYLineChart("Daily Distance Distribution",

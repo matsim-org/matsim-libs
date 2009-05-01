@@ -9,8 +9,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -202,10 +202,11 @@ public class CompareSelectedPlansTable {
 	protected static double getTravelTime(final Person person) {
 
 		double travelTime = 0.0;
-		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
-		while (leg_it.hasNext()) {
-			Leg leg = (Leg) leg_it.next();
-			travelTime += leg.getTravelTime();
+		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				travelTime += leg.getTravelTime();
+			}
 		}
 		return travelTime;
 	}
@@ -213,11 +214,11 @@ public class CompareSelectedPlansTable {
 	protected static double getTravelDist(final Person person) {
 
 		double travelDist = 0.0;
-		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
-
-		while (leg_it.hasNext()) {
-			Leg leg = (Leg) leg_it.next();
-			travelDist += leg.getRoute().getDistance();
+		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				travelDist += leg.getRoute().getDistance();
+			}
 		}
 		return travelDist;
 	}
@@ -225,10 +226,11 @@ public class CompareSelectedPlansTable {
 	protected static int getNumberOfTrips(final Person person) {
 
 		int numberOfLegs = 0;
-		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
-		while (leg_it.hasNext()) {
-			leg_it.next();
-			numberOfLegs++;
+		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				numberOfLegs++;
+			}
 		}
 		return numberOfLegs;
 	}

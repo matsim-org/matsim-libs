@@ -22,9 +22,9 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -57,29 +57,29 @@ public class CMCFPlanSplitter {
 		for (Person p : plans.getPersons().values()) {
 			Plan pl = p.getSelectedPlan();
 		  int i = 0;
-			for (LegIterator legIter = pl.getIteratorLeg(); legIter.hasNext(); i++) {
-				StringBuffer idStringBuffer = new StringBuffer(p.getId().toString());
-				idStringBuffer.append("leg");
-				idStringBuffer.append(Integer.toString(i));
-
-				Person pNew = new PersonImpl(new IdImpl(idStringBuffer.toString()));
-				Plan planNew = new org.matsim.core.population.PlanImpl(pNew);
-				Leg leg = (Leg) legIter.next();
-
-				planNew.addActivity(pl.getPreviousActivity(leg));
-				planNew.addLeg(leg);
-				planNew.addActivity(pl.getNextActivity(leg));
-
-				pNew.addPlan(planNew);
-
-				try {
-					plansOne.addPerson(pNew);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-
-			}
+		  for (PlanElement pe : pl.getPlanElements()) {
+		  	if (pe instanceof Leg) {
+		  		StringBuffer idStringBuffer = new StringBuffer(p.getId().toString());
+		  		idStringBuffer.append("leg");
+		  		idStringBuffer.append(Integer.toString(i));
+		  		
+		  		Person pNew = new PersonImpl(new IdImpl(idStringBuffer.toString()));
+		  		Plan planNew = new org.matsim.core.population.PlanImpl(pNew);
+		  		Leg leg = (Leg) pe;
+		  		
+		  		planNew.addActivity(pl.getPreviousActivity(leg));
+		  		planNew.addLeg(leg);
+		  		planNew.addActivity(pl.getNextActivity(leg));
+		  		
+		  		pNew.addPlan(planNew);
+		  		
+		  		try {
+		  			plansOne.addPerson(pNew);
+		  		} catch (Exception e) {
+		  			e.printStackTrace();
+		  		}
+		  	}
+		  }
 
 //			Leg l = pl.getNextLeg(pl.getFirstActivity());
 //			Plan plcmcf = plansCmcf.getPerson(p.getId()).getSelectedPlan();

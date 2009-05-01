@@ -11,8 +11,8 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -68,259 +68,261 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		double wlkDayTime = 0.0;
 		double bikeDayTime = 0.0;
 		double othersDayTime = 0.0;
-		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
-			Leg bl = (Leg) li.next();
-
-			ActType at = null;
-			String tmpActType = plan.getNextActivity(bl).getType();
-			for (ActType a : ActType.values()) {
-				if (tmpActType.equals(a.getActTypeName())) {
-					at = a;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+	
+				Leg bl = (Leg) pe;
+	
+				ActType at = null;
+				String tmpActType = plan.getNextActivity(bl).getType();
+				for (ActType a : ActType.values()) {
+					if (tmpActType.equals(a.getActTypeName())) {
+						at = a;
+						break;
+					}
+				}
+				if (at == null)
+					at = ActType.other;
+	
+				double time = bl.getTravelTime() / 60.0;
+				if (time < 0)
+					time = 0;
+				// if (bl.getDepartureTime() < 86400) {
+				dayTime += time;
+				TransportMode mode = bl.getMode();
+				switch (mode) {
+				case car:
+					this.carTime += time;
+					carDayTime += time;
+					switch (at) {
+					case home:
+						this.carHomeTime += time;
+						break;
+					case work:
+						this.carWorkTime += time;
+						break;
+					case education:
+						this.carEducTime += time;
+						break;
+					case shopping:
+						this.carShopTime += time;
+						break;
+					case leisure:
+						this.carLeisTime += time;
+						break;
+					case business:
+						carBusinessTime += time;
+						break;
+					case Einkauf_sonstiges:
+						carEinkaufSonstigesTime += time;
+						break;
+					case Freizeit_sonstiges_incl_Sport:
+						carFreizeitSonstSportTime += time;
+						break;
+					case holiday_journey:
+						carHolidayJourneyTime += time;
+						break;
+					case multiple:
+						carMultipleTime += time;
+						break;
+					case not_specified:
+						carNotSpecifiedTime += time;
+						break;
+					case see_a_doctor:
+						carSeeADoctorTime += time;
+						break;
+					default:
+						this.carOtherTime += time;
+						break;
+					}
+					this.carLegTimeCounts[Math.min(100, (int) time / 2)]++;
+					break;
+				case pt:
+					this.ptTime += time;
+					ptDayTime += time;
+					switch (at) {
+					case home:
+						this.ptHomeTime += time;
+						break;
+					case work:
+						this.ptWorkTime += time;
+						break;
+					case education:
+						this.ptEducTime += time;
+						break;
+					case shopping:
+						this.ptShopTime += time;
+						break;
+					case leisure:
+						this.ptLeisTime += time;
+						break;
+					case business:
+						ptBusinessTime += time;
+						break;
+					case Einkauf_sonstiges:
+						ptEinkaufSonstigesTime += time;
+						break;
+					case Freizeit_sonstiges_incl_Sport:
+						ptFreizeitSonstSportTime += time;
+						break;
+					case holiday_journey:
+						ptHolidayJourneyTime += time;
+						break;
+					case multiple:
+						ptMultipleTime += time;
+						break;
+					case not_specified:
+						ptNotSpecifiedTime += time;
+						break;
+					case see_a_doctor:
+						ptSeeADoctorTime += time;
+						break;
+					default:
+						this.ptOtherTime += time;
+						break;
+					}
+					this.ptLegTimeCounts[Math.min(100, (int) time / 2)]++;
+					break;
+				case walk:
+					this.wlkTime += time;
+					wlkDayTime += time;
+					switch (at) {
+					case home:
+						this.wlkHomeTime += time;
+						break;
+					case work:
+						this.wlkWorkTime += time;
+						break;
+					case education:
+						this.wlkEducTime += time;
+						break;
+					case shopping:
+						this.wlkShopTime += time;
+						break;
+					case leisure:
+						this.wlkLeisTime += time;
+						break;
+					case business:
+						wlkBusinessTime += time;
+						break;
+					case Einkauf_sonstiges:
+						wlkEinkaufSonstigesTime += time;
+						break;
+					case Freizeit_sonstiges_incl_Sport:
+						wlkFreizeitSonstSportTime += time;
+						break;
+					case holiday_journey:
+						wlkHolidayJourneyTime += time;
+						break;
+					case multiple:
+						wlkMultipleTime += time;
+						break;
+					case not_specified:
+						wlkNotSpecifiedTime += time;
+						break;
+					case see_a_doctor:
+						wlkSeeADoctorTime += time;
+						break;
+					default:
+						this.wlkOtherTime += time;
+						break;
+					}
+					this.wlkLegTimeCounts[Math.min(100, (int) time / 2)]++;
+					break;
+				case bike:
+					bikeTime += time;
+					bikeDayTime += time;
+					switch (at) {
+					case home:
+						this.bikeHomeTime += time;
+						break;
+					case work:
+						this.bikeWorkTime += time;
+						break;
+					case education:
+						this.bikeEducTime += time;
+						break;
+					case shopping:
+						this.bikeShopTime += time;
+						break;
+					case leisure:
+						this.bikeLeisTime += time;
+						break;
+					case business:
+						bikeBusinessTime += time;
+						break;
+					case Einkauf_sonstiges:
+						bikeEinkaufSonstigesTime += time;
+						break;
+					case Freizeit_sonstiges_incl_Sport:
+						bikeFreizeitSonstSportTime += time;
+						break;
+					case holiday_journey:
+						bikeHolidayJourneyTime += time;
+						break;
+					case multiple:
+						bikeMultipleTime += time;
+						break;
+					case not_specified:
+						bikeNotSpecifiedTime += time;
+						break;
+					case see_a_doctor:
+						bikeSeeADoctorTime += time;
+						break;
+					default:
+						this.bikeOtherTime += time;
+						break;
+					}
+					this.bikeLegTimeCounts[Math.min(100, (int) time / 2)]++;
+					break;
+				default:
+					this.othersTime += time;
+					othersDayTime += time;
+					switch (at) {
+					case home:
+						this.othersHomeTime += time;
+						break;
+					case work:
+						this.othersWorkTime += time;
+						break;
+					case education:
+						this.othersEducTime += time;
+						break;
+					case shopping:
+						this.othersShopTime += time;
+						break;
+					case leisure:
+						this.othersLeisTime += time;
+						break;
+					case business:
+						othersBusinessTime += time;
+						break;
+					case Einkauf_sonstiges:
+						othersEinkaufSonstigesTime += time;
+						break;
+					case Freizeit_sonstiges_incl_Sport:
+						othersFreizeitSonstSportTime += time;
+						break;
+					case holiday_journey:
+						othersHolidayJourneyTime += time;
+						break;
+					case multiple:
+						othersMultipleTime += time;
+						break;
+					case not_specified:
+						othersNotSpecifiedTime += time;
+						break;
+					case see_a_doctor:
+						othersSeeADoctorTime += time;
+						break;
+					default:
+						this.othersOtherTime += time;
+						break;
+					}
+					this.othersLegTimeCounts[Math.min(100, (int) time / 2)]++;
 					break;
 				}
 			}
-			if (at == null)
-				at = ActType.other;
-
-			double time = bl.getTravelTime() / 60.0;
-			if (time < 0)
-				time = 0;
-			// if (bl.getDepartureTime() < 86400) {
-			dayTime += time;
-			TransportMode mode = bl.getMode();
-			switch (mode) {
-			case car:
-				this.carTime += time;
-				carDayTime += time;
-				switch (at) {
-				case home:
-					this.carHomeTime += time;
-					break;
-				case work:
-					this.carWorkTime += time;
-					break;
-				case education:
-					this.carEducTime += time;
-					break;
-				case shopping:
-					this.carShopTime += time;
-					break;
-				case leisure:
-					this.carLeisTime += time;
-					break;
-				case business:
-					carBusinessTime += time;
-					break;
-				case Einkauf_sonstiges:
-					carEinkaufSonstigesTime += time;
-					break;
-				case Freizeit_sonstiges_incl_Sport:
-					carFreizeitSonstSportTime += time;
-					break;
-				case holiday_journey:
-					carHolidayJourneyTime += time;
-					break;
-				case multiple:
-					carMultipleTime += time;
-					break;
-				case not_specified:
-					carNotSpecifiedTime += time;
-					break;
-				case see_a_doctor:
-					carSeeADoctorTime += time;
-					break;
-				default:
-					this.carOtherTime += time;
-					break;
-				}
-				this.carLegTimeCounts[Math.min(100, (int) time / 2)]++;
-				break;
-			case pt:
-				this.ptTime += time;
-				ptDayTime += time;
-				switch (at) {
-				case home:
-					this.ptHomeTime += time;
-					break;
-				case work:
-					this.ptWorkTime += time;
-					break;
-				case education:
-					this.ptEducTime += time;
-					break;
-				case shopping:
-					this.ptShopTime += time;
-					break;
-				case leisure:
-					this.ptLeisTime += time;
-					break;
-				case business:
-					ptBusinessTime += time;
-					break;
-				case Einkauf_sonstiges:
-					ptEinkaufSonstigesTime += time;
-					break;
-				case Freizeit_sonstiges_incl_Sport:
-					ptFreizeitSonstSportTime += time;
-					break;
-				case holiday_journey:
-					ptHolidayJourneyTime += time;
-					break;
-				case multiple:
-					ptMultipleTime += time;
-					break;
-				case not_specified:
-					ptNotSpecifiedTime += time;
-					break;
-				case see_a_doctor:
-					ptSeeADoctorTime += time;
-					break;
-				default:
-					this.ptOtherTime += time;
-					break;
-				}
-				this.ptLegTimeCounts[Math.min(100, (int) time / 2)]++;
-				break;
-			case walk:
-				this.wlkTime += time;
-				wlkDayTime += time;
-				switch (at) {
-				case home:
-					this.wlkHomeTime += time;
-					break;
-				case work:
-					this.wlkWorkTime += time;
-					break;
-				case education:
-					this.wlkEducTime += time;
-					break;
-				case shopping:
-					this.wlkShopTime += time;
-					break;
-				case leisure:
-					this.wlkLeisTime += time;
-					break;
-				case business:
-					wlkBusinessTime += time;
-					break;
-				case Einkauf_sonstiges:
-					wlkEinkaufSonstigesTime += time;
-					break;
-				case Freizeit_sonstiges_incl_Sport:
-					wlkFreizeitSonstSportTime += time;
-					break;
-				case holiday_journey:
-					wlkHolidayJourneyTime += time;
-					break;
-				case multiple:
-					wlkMultipleTime += time;
-					break;
-				case not_specified:
-					wlkNotSpecifiedTime += time;
-					break;
-				case see_a_doctor:
-					wlkSeeADoctorTime += time;
-					break;
-				default:
-					this.wlkOtherTime += time;
-					break;
-				}
-				this.wlkLegTimeCounts[Math.min(100, (int) time / 2)]++;
-				break;
-			case bike:
-				bikeTime += time;
-				bikeDayTime += time;
-				switch (at) {
-				case home:
-					this.bikeHomeTime += time;
-					break;
-				case work:
-					this.bikeWorkTime += time;
-					break;
-				case education:
-					this.bikeEducTime += time;
-					break;
-				case shopping:
-					this.bikeShopTime += time;
-					break;
-				case leisure:
-					this.bikeLeisTime += time;
-					break;
-				case business:
-					bikeBusinessTime += time;
-					break;
-				case Einkauf_sonstiges:
-					bikeEinkaufSonstigesTime += time;
-					break;
-				case Freizeit_sonstiges_incl_Sport:
-					bikeFreizeitSonstSportTime += time;
-					break;
-				case holiday_journey:
-					bikeHolidayJourneyTime += time;
-					break;
-				case multiple:
-					bikeMultipleTime += time;
-					break;
-				case not_specified:
-					bikeNotSpecifiedTime += time;
-					break;
-				case see_a_doctor:
-					bikeSeeADoctorTime += time;
-					break;
-				default:
-					this.bikeOtherTime += time;
-					break;
-				}
-				this.bikeLegTimeCounts[Math.min(100, (int) time / 2)]++;
-				break;
-			default:
-				this.othersTime += time;
-				othersDayTime += time;
-				switch (at) {
-				case home:
-					this.othersHomeTime += time;
-					break;
-				case work:
-					this.othersWorkTime += time;
-					break;
-				case education:
-					this.othersEducTime += time;
-					break;
-				case shopping:
-					this.othersShopTime += time;
-					break;
-				case leisure:
-					this.othersLeisTime += time;
-					break;
-				case business:
-					othersBusinessTime += time;
-					break;
-				case Einkauf_sonstiges:
-					othersEinkaufSonstigesTime += time;
-					break;
-				case Freizeit_sonstiges_incl_Sport:
-					othersFreizeitSonstSportTime += time;
-					break;
-				case holiday_journey:
-					othersHolidayJourneyTime += time;
-					break;
-				case multiple:
-					othersMultipleTime += time;
-					break;
-				case not_specified:
-					othersNotSpecifiedTime += time;
-					break;
-				case see_a_doctor:
-					othersSeeADoctorTime += time;
-					break;
-				default:
-					this.othersOtherTime += time;
-					break;
-				}
-				this.othersLegTimeCounts[Math.min(100, (int) time / 2)]++;
-				break;
-			}
-
 		}
 		for (int i = 0; i <= Math.min(100, (int) dayTime); i++)
 			this.totalDayEnRouteTimeCounts[i]++;

@@ -29,8 +29,8 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -64,22 +64,24 @@ public class AvoidOldNodes extends NewPopulation {
 	@Override
 	public void run(final Person person) {
 		for (Plan p : person.getPlans()) {
-			for (LegIterator i = p.getIteratorLeg(); i.hasNext();) {
-				BasicLeg bl = i.next();
-				NetworkRoute br = (NetworkRoute) bl.getRoute();
-				if (br != null) {
-					tag: for (final Node n : br.getNodes()) {
-						final String nId = n.getId().toString();
-						for (String nodeId : this.nodeIds) {
-							if (nId.equals(nodeId)) {
-								this.nullRoute = true;
-								break tag;
+			for (PlanElement pe : p.getPlanElements()) {
+				if (pe instanceof BasicLeg) {
+					BasicLeg bl = (BasicLeg) pe;
+					NetworkRoute br = (NetworkRoute) bl.getRoute();
+					if (br != null) {
+						tag: for (final Node n : br.getNodes()) {
+							final String nId = n.getId().toString();
+							for (String nodeId : this.nodeIds) {
+								if (nId.equals(nodeId)) {
+									this.nullRoute = true;
+									break tag;
+								}
 							}
 						}
-					}
-					if (this.nullRoute) {
-						bl.setRoute(null);
-						this.nullRoute = false;
+						if (this.nullRoute) {
+							bl.setRoute(null);
+							this.nullRoute = false;
+						}
 					}
 				}
 			}

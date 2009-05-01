@@ -7,8 +7,8 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -63,265 +63,268 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 		double wlkDayDist = 0.0;
 		double bikeDayDist = 0.0;
 		double othersDayDist = 0.0;
-		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
-			Leg bl = (Leg) li.next();
-
-			ActType at = null;
-			String tmpActType = plan.getNextActivity(bl).getType();
-			for (ActType a : ActType.values()) {
-				if (tmpActType.equals(a.getActTypeName())) {
-					at = a;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+					
+				Leg bl = (Leg) pe;
+	
+				ActType at = null;
+				String tmpActType = plan.getNextActivity(bl).getType();
+				for (ActType a : ActType.values()) {
+					if (tmpActType.equals(a.getActTypeName())) {
+						at = a;
+						break;
+					}
+				}
+				if (at == null)
+					at = ActType.other;
+	
+				double dist = bl.getRoute().getDistance() / 1000.0;
+				// if (bl.getDepartureTime() < 86400)
+				TransportMode mode = bl.getMode();
+				switch (mode) {
+				case car:
+					this.carDist += dist;
+					carDayDist += dist;
+					switch (at) {
+					case home:
+						this.carHomeDist += dist;
+						break;
+					case work:
+						this.carWorkDist += dist;
+						break;
+					case education:
+						this.carEducDist += dist;
+						break;
+					case shopping:
+						this.carShopDist += dist;
+						break;
+					case leisure:
+						this.carLeisDist += dist;
+						break;
+					case business:
+						carBusinessDist += dist;
+						break;
+					case Einkauf_sonstiges:
+						carEinkaufSonstigesDist += dist;
+						break;
+					case Freizeit_sonstiges_incl_Sport:
+						carFreizeitSonstSportDist += dist;
+						break;
+					case holiday_journey:
+						carHolidayJourneyDist += dist;
+						break;
+					case multiple:
+						carMultipleDist += dist;
+						break;
+					case not_specified:
+						carNotSpecifiedDist += dist;
+						break;
+					case see_a_doctor:
+						carSeeADoctorDist += dist;
+						break;
+					default:
+						this.carOtherDist += dist;
+						break;
+					}
+					this.carLegDistanceCounts[Math.min(100, (int) dist)]++;
+					break;
+				case pt:
+					this.ptDist += dist;
+					ptDayDist += dist;
+					switch (at) {
+					case home:
+						this.ptHomeDist += dist;
+						break;
+					case work:
+						this.ptWorkDist += dist;
+						break;
+					case education:
+						this.ptEducDist += dist;
+						break;
+					case shopping:
+						this.ptShopDist += dist;
+						break;
+					case leisure:
+						this.ptLeisDist += dist;
+						break;
+					case business:
+						ptBusinessDist += dist;
+						break;
+					case Einkauf_sonstiges:
+						ptEinkaufSonstigesDist += dist;
+						break;
+					case Freizeit_sonstiges_incl_Sport:
+						ptFreizeitSonstSportDist += dist;
+						break;
+					case holiday_journey:
+						ptHolidayJourneyDist += dist;
+						break;
+					case multiple:
+						ptMultipleDist += dist;
+						break;
+					case not_specified:
+						ptNotSpecifiedDist += dist;
+						break;
+					case see_a_doctor:
+						ptSeeADoctorDist += dist;
+						break;
+					default:
+						this.ptOtherDist += dist;
+						break;
+					}
+					this.ptLegDistanceCounts[Math.min(100, (int) dist)]++;
+					break;
+				case walk:
+					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
+							.getLink().getCoord(), plan.getNextActivity(bl)
+							.getLink().getCoord()) * 1.5 / 1000.0;
+					this.wlkDist += dist;
+					wlkDayDist += dist;
+					switch (at) {
+					case home:
+						this.wlkHomeDist += dist;
+						break;
+					case work:
+						this.wlkWorkDist += dist;
+						break;
+					case education:
+						this.wlkEducDist += dist;
+						break;
+					case shopping:
+						this.wlkShopDist += dist;
+						break;
+					case leisure:
+						this.wlkLeisDist += dist;
+						break;
+					case business:
+						wlkBusinessDist += dist;
+						break;
+					case Einkauf_sonstiges:
+						wlkEinkaufSonstigesDist += dist;
+						break;
+					case Freizeit_sonstiges_incl_Sport:
+						wlkFreizeitSonstSportDist += dist;
+						break;
+					case holiday_journey:
+						wlkHolidayJourneyDist += dist;
+						break;
+					case multiple:
+						wlkMultipleDist += dist;
+						break;
+					case not_specified:
+						wlkNotSpecifiedDist += dist;
+						break;
+					case see_a_doctor:
+						wlkSeeADoctorDist += dist;
+						break;
+					default:
+						this.wlkOtherDist += dist;
+						break;
+					}
+					this.wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
+					break;
+				case bike:
+					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
+							.getLink().getCoord(), plan.getNextActivity(bl)
+							.getLink().getCoord()) / 1000.0;
+					this.bikeDist += dist;
+					bikeDayDist += dist;
+					switch (at) {
+					case home:
+						this.bikeHomeDist += dist;
+						break;
+					case work:
+						this.bikeWorkDist += dist;
+						break;
+					case education:
+						this.bikeEducDist += dist;
+						break;
+					case shopping:
+						this.bikeShopDist += dist;
+						break;
+					case leisure:
+						this.bikeLeisDist += dist;
+						break;
+					case business:
+						bikeBusinessDist += dist;
+						break;
+					case Einkauf_sonstiges:
+						bikeEinkaufSonstigesDist += dist;
+						break;
+					case Freizeit_sonstiges_incl_Sport:
+						bikeFreizeitSonstSportDist += dist;
+						break;
+					case holiday_journey:
+						bikeHolidayJourneyDist += dist;
+						break;
+					case multiple:
+						bikeMultipleDist += dist;
+						break;
+					case not_specified:
+						bikeNotSpecifiedDist += dist;
+						break;
+					case see_a_doctor:
+						bikeSeeADoctorDist += dist;
+						break;
+					default:
+						this.bikeOtherDist += dist;
+						break;
+					}
+					this.bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
+					break;
+				default:
+					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
+							.getLink().getCoord(), plan.getNextActivity(bl)
+							.getLink().getCoord()) / 1000.0;
+					this.othersDist += dist;
+					othersDayDist += dist;
+					switch (at) {
+					case home:
+						this.othersHomeDist += dist;
+						break;
+					case work:
+						this.othersWorkDist += dist;
+						break;
+					case education:
+						this.othersEducDist += dist;
+						break;
+					case shopping:
+						this.othersShopDist += dist;
+						break;
+					case leisure:
+						this.othersLeisDist += dist;
+						break;
+					case business:
+						othersBusinessDist += dist;
+						break;
+					case Einkauf_sonstiges:
+						othersEinkaufSonstigesDist += dist;
+						break;
+					case Freizeit_sonstiges_incl_Sport:
+						othersFreizeitSonstSportDist += dist;
+						break;
+					case holiday_journey:
+						othersHolidayJourneyDist += dist;
+						break;
+					case multiple:
+						othersMultipleDist += dist;
+						break;
+					case not_specified:
+						othersNotSpecifiedDist += dist;
+						break;
+					case see_a_doctor:
+						othersSeeADoctorDist += dist;
+						break;
+					default:
+						this.othersOtherDist += dist;
+						break;
+					}
+					this.othersLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				}
+				dayDist += dist;
 			}
-			if (at == null)
-				at = ActType.other;
-
-			double dist = bl.getRoute().getDistance() / 1000.0;
-			// if (bl.getDepartureTime() < 86400)
-			TransportMode mode = bl.getMode();
-			switch (mode) {
-			case car:
-				this.carDist += dist;
-				carDayDist += dist;
-				switch (at) {
-				case home:
-					this.carHomeDist += dist;
-					break;
-				case work:
-					this.carWorkDist += dist;
-					break;
-				case education:
-					this.carEducDist += dist;
-					break;
-				case shopping:
-					this.carShopDist += dist;
-					break;
-				case leisure:
-					this.carLeisDist += dist;
-					break;
-				case business:
-					carBusinessDist += dist;
-					break;
-				case Einkauf_sonstiges:
-					carEinkaufSonstigesDist += dist;
-					break;
-				case Freizeit_sonstiges_incl_Sport:
-					carFreizeitSonstSportDist += dist;
-					break;
-				case holiday_journey:
-					carHolidayJourneyDist += dist;
-					break;
-				case multiple:
-					carMultipleDist += dist;
-					break;
-				case not_specified:
-					carNotSpecifiedDist += dist;
-					break;
-				case see_a_doctor:
-					carSeeADoctorDist += dist;
-					break;
-				default:
-					this.carOtherDist += dist;
-					break;
-				}
-				this.carLegDistanceCounts[Math.min(100, (int) dist)]++;
-				break;
-			case pt:
-				this.ptDist += dist;
-				ptDayDist += dist;
-				switch (at) {
-				case home:
-					this.ptHomeDist += dist;
-					break;
-				case work:
-					this.ptWorkDist += dist;
-					break;
-				case education:
-					this.ptEducDist += dist;
-					break;
-				case shopping:
-					this.ptShopDist += dist;
-					break;
-				case leisure:
-					this.ptLeisDist += dist;
-					break;
-				case business:
-					ptBusinessDist += dist;
-					break;
-				case Einkauf_sonstiges:
-					ptEinkaufSonstigesDist += dist;
-					break;
-				case Freizeit_sonstiges_incl_Sport:
-					ptFreizeitSonstSportDist += dist;
-					break;
-				case holiday_journey:
-					ptHolidayJourneyDist += dist;
-					break;
-				case multiple:
-					ptMultipleDist += dist;
-					break;
-				case not_specified:
-					ptNotSpecifiedDist += dist;
-					break;
-				case see_a_doctor:
-					ptSeeADoctorDist += dist;
-					break;
-				default:
-					this.ptOtherDist += dist;
-					break;
-				}
-				this.ptLegDistanceCounts[Math.min(100, (int) dist)]++;
-				break;
-			case walk:
-				dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
-						.getLink().getCoord(), plan.getNextActivity(bl)
-						.getLink().getCoord()) * 1.5 / 1000.0;
-				this.wlkDist += dist;
-				wlkDayDist += dist;
-				switch (at) {
-				case home:
-					this.wlkHomeDist += dist;
-					break;
-				case work:
-					this.wlkWorkDist += dist;
-					break;
-				case education:
-					this.wlkEducDist += dist;
-					break;
-				case shopping:
-					this.wlkShopDist += dist;
-					break;
-				case leisure:
-					this.wlkLeisDist += dist;
-					break;
-				case business:
-					wlkBusinessDist += dist;
-					break;
-				case Einkauf_sonstiges:
-					wlkEinkaufSonstigesDist += dist;
-					break;
-				case Freizeit_sonstiges_incl_Sport:
-					wlkFreizeitSonstSportDist += dist;
-					break;
-				case holiday_journey:
-					wlkHolidayJourneyDist += dist;
-					break;
-				case multiple:
-					wlkMultipleDist += dist;
-					break;
-				case not_specified:
-					wlkNotSpecifiedDist += dist;
-					break;
-				case see_a_doctor:
-					wlkSeeADoctorDist += dist;
-					break;
-				default:
-					this.wlkOtherDist += dist;
-					break;
-				}
-				this.wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
-				break;
-			case bike:
-				dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
-						.getLink().getCoord(), plan.getNextActivity(bl)
-						.getLink().getCoord()) / 1000.0;
-				this.bikeDist += dist;
-				bikeDayDist += dist;
-				switch (at) {
-				case home:
-					this.bikeHomeDist += dist;
-					break;
-				case work:
-					this.bikeWorkDist += dist;
-					break;
-				case education:
-					this.bikeEducDist += dist;
-					break;
-				case shopping:
-					this.bikeShopDist += dist;
-					break;
-				case leisure:
-					this.bikeLeisDist += dist;
-					break;
-				case business:
-					bikeBusinessDist += dist;
-					break;
-				case Einkauf_sonstiges:
-					bikeEinkaufSonstigesDist += dist;
-					break;
-				case Freizeit_sonstiges_incl_Sport:
-					bikeFreizeitSonstSportDist += dist;
-					break;
-				case holiday_journey:
-					bikeHolidayJourneyDist += dist;
-					break;
-				case multiple:
-					bikeMultipleDist += dist;
-					break;
-				case not_specified:
-					bikeNotSpecifiedDist += dist;
-					break;
-				case see_a_doctor:
-					bikeSeeADoctorDist += dist;
-					break;
-				default:
-					this.bikeOtherDist += dist;
-					break;
-				}
-				this.bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
-				break;
-			default:
-				dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
-						.getLink().getCoord(), plan.getNextActivity(bl)
-						.getLink().getCoord()) / 1000.0;
-				this.othersDist += dist;
-				othersDayDist += dist;
-				switch (at) {
-				case home:
-					this.othersHomeDist += dist;
-					break;
-				case work:
-					this.othersWorkDist += dist;
-					break;
-				case education:
-					this.othersEducDist += dist;
-					break;
-				case shopping:
-					this.othersShopDist += dist;
-					break;
-				case leisure:
-					this.othersLeisDist += dist;
-					break;
-				case business:
-					othersBusinessDist += dist;
-					break;
-				case Einkauf_sonstiges:
-					othersEinkaufSonstigesDist += dist;
-					break;
-				case Freizeit_sonstiges_incl_Sport:
-					othersFreizeitSonstSportDist += dist;
-					break;
-				case holiday_journey:
-					othersHolidayJourneyDist += dist;
-					break;
-				case multiple:
-					othersMultipleDist += dist;
-					break;
-				case not_specified:
-					othersNotSpecifiedDist += dist;
-					break;
-				case see_a_doctor:
-					othersSeeADoctorDist += dist;
-					break;
-				default:
-					this.othersOtherDist += dist;
-					break;
-				}
-				this.othersLegDistanceCounts[Math.min(100, (int) dist)]++;
-				break;
-			}
-			dayDist += dist;
 		}
 		for (int i = 0; i <= Math.min(100, (int) dayDist); i++)
 			this.totalDayDistanceCounts[i]++;

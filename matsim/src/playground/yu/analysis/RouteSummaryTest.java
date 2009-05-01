@@ -38,8 +38,8 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -140,49 +140,52 @@ public class RouteSummaryTest {
 		public void run(final Person person) {
 			Plan p = person.getSelectedPlan();
 			if (p != null)
-				if (PlanModeJudger.useCar(p))
-					for (LegIterator li = p.getIteratorLeg(); li.hasNext();) {
-						Leg l = (Leg) li.next();
-
-						Id previousActLinkId = p.getPreviousActivity(l)
-								.getLinkId();
-						Id nextActLinkId = p.getNextActivity(l).getLinkId();
-
-						String odPair = previousActLinkId.toString() + "->"
-								+ nextActLinkId.toString();
-
-						Set<List<Id>> aOdRouteSet = this.odRoutes.get(odPair);
-						if (aOdRouteSet == null)
-							aOdRouteSet = new HashSet<List<Id>>();
-
-						List<Id> routeLinkIds = new LinkedList<Id>();
-						NetworkRoute r = (NetworkRoute) l.getRoute();
-						// boolean illegalRoute = false;
-
-						if (r.getNodes().size() > 0) {
-							LinkedList<Id> tmpRouteLinkList = new LinkedList<Id>();
-							tmpRouteLinkList.addFirst(previousActLinkId);
-							List<Id> origRouteLinkIds = r.getLinkIds();
-							for (int i = 0; i < origRouteLinkIds.size(); i++) {
-								tmpRouteLinkList.add(origRouteLinkIds.get(i));
-							}
-							tmpRouteLinkList.addLast(nextActLinkId);
-							routeLinkIds = tmpRouteLinkList;
-						} else if (r.getNodes().size() == 0
-								&& previousActLinkId.equals(nextActLinkId))
-							routeLinkIds.add(previousActLinkId);
-						// else
-						// illegalRoute = true;
-
-						if (!aOdRouteSet.contains(routeLinkIds))
-							aOdRouteSet.add(routeLinkIds);
-						// if (!illegalRoute) {
-						Integer itg = this.routeCounters.get(routeLinkIds);
-						this.routeCounters.put(routeLinkIds, (itg == null) ? 1
-								: itg + 1);
-						// }
-						this.odRoutes.put(odPair, aOdRouteSet);
+				if (PlanModeJudger.useCar(p)) {
+					for (PlanElement pe : p.getPlanElements()) {
+						if (pe instanceof Leg) {
+							
+							Leg l = (Leg) pe;
+	
+							Id previousActLinkId = p.getPreviousActivity(l)
+									.getLinkId();
+							Id nextActLinkId = p.getNextActivity(l).getLinkId();
+	
+							String odPair = previousActLinkId.toString() + "->"
+									+ nextActLinkId.toString();
+	
+							Set<List<Id>> aOdRouteSet = this.odRoutes.get(odPair);
+							if (aOdRouteSet == null)
+								aOdRouteSet = new HashSet<List<Id>>();
+	
+							List<Id> routeLinkIds = new LinkedList<Id>();
+							NetworkRoute r = (NetworkRoute) l.getRoute();
+							// boolean illegalRoute = false;
+	
+							if (r.getNodes().size() > 0) {
+								LinkedList<Id> tmpRouteLinkList = new LinkedList<Id>();
+								tmpRouteLinkList.addFirst(previousActLinkId);
+								List<Id> origRouteLinkIds = r.getLinkIds();
+								for (int i = 0; i < origRouteLinkIds.size(); i++) {
+									tmpRouteLinkList.add(origRouteLinkIds.get(i));
+								}
+								tmpRouteLinkList.addLast(nextActLinkId);
+								routeLinkIds = tmpRouteLinkList;
+							} else if (r.getNodes().size() == 0
+									&& previousActLinkId.equals(nextActLinkId))
+								routeLinkIds.add(previousActLinkId);
+							// else
+							// illegalRoute = true;
+	
+							if (!aOdRouteSet.contains(routeLinkIds))
+								aOdRouteSet.add(routeLinkIds);
+							// if (!illegalRoute) {
+							Integer itg = this.routeCounters.get(routeLinkIds);
+							this.routeCounters.put(routeLinkIds, (itg == null) ? 1 : itg + 1);
+							// }
+							this.odRoutes.put(odPair, aOdRouteSet);
+						}
 					}
+				}
 		}
 	}
 

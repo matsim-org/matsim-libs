@@ -4,8 +4,8 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -26,10 +26,11 @@ public class PlansPlotScoreDistance extends AbstractPersonAlgorithm implements P
 		Plan p = person.getSelectedPlan();
 		dist[i]=0;
 		score[i]= p.getScoreAsPrimitiveType();
-		LegIterator ai=p.getIteratorLeg();
-		while(ai.hasNext()){
-			Leg l = (Leg) ai.next();
-			dist[i]+=l.getRoute().getDistance();
+		for (PlanElement pe : p.getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg l = (Leg) pe;
+				dist[i]+=l.getRoute().getDistance();
+			}
 		}
 		i++;
 	}

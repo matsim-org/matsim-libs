@@ -42,8 +42,7 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -295,25 +294,23 @@ public class KMLPersonWriter {
 			Plan selectedPlan = this.person.getSelectedPlan();
 			if (selectedPlan != null)
 			{
-				LegIterator iterator = selectedPlan.getIteratorLeg();
-				
-				while(iterator.hasNext())
-				{
-					BasicLeg leg = iterator.next();
-					
-					if (leg.getRoute() instanceof NetworkRoute)
-					{
-						NetworkRoute route = (NetworkRoute)leg.getRoute();
-						for(Node node : route.getNodes())
+				for (PlanElement pe : selectedPlan.getPlanElements()) {
+					if (pe instanceof BasicLeg) {
+						BasicLeg leg = (BasicLeg) pe;
+						
+						if (leg.getRoute() instanceof NetworkRoute)
 						{
-							routeNodes.add(node);
+							NetworkRoute route = (NetworkRoute)leg.getRoute();
+							for(Node node : route.getNodes())
+							{
+								routeNodes.add(node);
+							}
+						}
+						else
+						{
+							log.error("Unknown Route Type found!");
 						}
 					}
-					else
-					{
-						log.error("Unknown Route Type found!");
-					}
-					
 				}
 								
 			}
@@ -330,13 +327,11 @@ public class KMLPersonWriter {
 			Plan selectedPlan = this.person.getSelectedPlan();
 			if (selectedPlan != null)
 			{
-				ActIterator iterator = selectedPlan.getIteratorAct();
-				
-				while(iterator.hasNext())
-				{
-					BasicActivity act = iterator.next();
-									
-					activityLinks.add(network.getLink(act.getLinkId()));
+				for (PlanElement pe : selectedPlan.getPlanElements()) {
+					if (pe instanceof BasicActivity) {
+						BasicActivity act = (BasicActivity) pe;
+						activityLinks.add(network.getLink(act.getLinkId()));
+					}
 				}
 								
 			}

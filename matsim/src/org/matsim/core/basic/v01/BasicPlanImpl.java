@@ -108,31 +108,6 @@ public class BasicPlanImpl implements BasicPlan {
 		}
 	}
 
-	/**
-	 * Iterator that steps through all Legs ignoring Activities
-	 */
-	public class LegIterator implements Iterator {
-		private int index = 1;
-
-		public boolean hasNext() {
-			return BasicPlanImpl.this.actsLegs.size() > this.index;
-		}
-
-		public BasicLeg next() {
-			this.index+=2;
-			return (BasicLeg)BasicPlanImpl.this.actsLegs.get(this.index-2);
-		}
-
-		public void remove() {
-			// not supported?
-			throw new UnsupportedOperationException("Remove is not supported with this iterator");
-		}
-	}
-
-	public LegIterator getIteratorLeg () {
-		return new LegIterator();
-	}
-
 	public ActIterator getIteratorAct () {
 		return new ActIterator();
 	}

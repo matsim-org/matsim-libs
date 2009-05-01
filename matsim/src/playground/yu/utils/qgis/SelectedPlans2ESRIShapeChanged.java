@@ -40,8 +40,8 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -126,11 +126,12 @@ public class SelectedPlans2ESRIShapeChanged extends
 		ArrayList<Feature> fts = new ArrayList<Feature>();
 		for (Plan plan : this.getOutputSamplePlans()) {
 			String id = plan.getPerson().getId().toString();
-			LegIterator iter = plan.getIteratorLeg();
-			while (iter.hasNext()) {
-				Leg leg = (Leg) iter.next();
-				if (leg.getRoute().getDistance() > 0) {
-					fts.add(getLegFeature(leg, id));
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					if (leg.getRoute().getDistance() > 0) {
+						fts.add(getLegFeature(leg, id));
+					}
 				}
 			}
 		}

@@ -32,8 +32,8 @@ import java.util.Map.Entry;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -131,25 +131,26 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 
 	@Override
 	public void run(final Person person) {
-		for (LegIterator li = person.getSelectedPlan().getIteratorLeg(); li
-				.hasNext();) {
-			Leg l = (Leg) li.next();
-			double dist = (((int) l.getRoute().getDistance()) / 1000 * 1000);
-			if (dist < 320000) {
-				if (l.getMode().equals(TransportMode.car)) {
-					Double carLegsCounter = this.carLegs.get(dist);
-					if (carLegsCounter == null) {
-						carLegsCounter = 0.0;
+		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg l = (Leg) pe;
+				double dist = (((int) l.getRoute().getDistance()) / 1000 * 1000);
+				if (dist < 320000) {
+					if (l.getMode().equals(TransportMode.car)) {
+						Double carLegsCounter = this.carLegs.get(dist);
+						if (carLegsCounter == null) {
+							carLegsCounter = 0.0;
+						}
+						carLegsCounter = carLegsCounter + 1.0;
+						this.carLegs.put(dist, carLegsCounter);
+					} else if (l.getMode().equals(TransportMode.pt)) {
+						Double ptLegsCounter = this.ptLegs.get(dist);
+						if (ptLegsCounter == null) {
+							ptLegsCounter = 0.0;
+						}
+						ptLegsCounter = ptLegsCounter + 1.0;
+						this.ptLegs.put(dist, ptLegsCounter);
 					}
-					carLegsCounter = carLegsCounter + 1.0;
-					this.carLegs.put(dist, carLegsCounter);
-				} else if (l.getMode().equals(TransportMode.pt)) {
-					Double ptLegsCounter = this.ptLegs.get(dist);
-					if (ptLegsCounter == null) {
-						ptLegsCounter = 0.0;
-					}
-					ptLegsCounter = ptLegsCounter + 1.0;
-					this.ptLegs.put(dist, ptLegsCounter);
 				}
 			}
 		}
