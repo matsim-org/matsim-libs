@@ -21,16 +21,16 @@
 package playground.christoph.analysis;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicActivityImpl;
 import org.matsim.core.network.NetworkLayer;
 
 public class Wardrop {
@@ -67,19 +67,18 @@ public class Wardrop {
 		{
 			Plan plan = person.getSelectedPlan();
 			
-			ArrayList<BasicActivityImpl> acts = new ArrayList<BasicActivityImpl>();
-			
-			Iterator<BasicActivityImpl> actIter = plan.getIteratorAct();
-			while (actIter.hasNext())
-			{
-				acts.add(actIter.next());				
+			ArrayList<BasicActivity> acts = new ArrayList<BasicActivity>();
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof BasicActivity) {
+					acts.add((BasicActivity) pe);
+				}
 			}
 			
 			// The last Act is only the end of a leg and not the beginning of a new one!
 			for(int i = 0; i < acts.size() - 1; i++)
 			{
-				BasicActivityImpl startAct = acts.get(i);
-				BasicActivityImpl endAct = acts.get(i + 1);
+				BasicActivity startAct = acts.get(i);
+				BasicActivity endAct = acts.get(i + 1);
 				
 				Coord startCoord = startAct.getCoord();
 				Coord endCoord = endAct.getCoord();

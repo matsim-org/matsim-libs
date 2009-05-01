@@ -37,8 +37,8 @@ import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.socialnetworks.algorithms.PersonCalculateActivitySpaces;
@@ -203,7 +203,7 @@ public class SocialNetworkStatistics {
 		double dyadDist = 0.;
 		Iterator<SocialNetEdge> eIter = edges.iterator();
 		while (eIter.hasNext()) {
-			SocialNetEdge myEdge = (SocialNetEdge) eIter.next();
+			SocialNetEdge myEdge = eIter.next();
 			// Distance separating home addresses of two acquaintances
 			dyadDist = getDyadDistance(myEdge);
 			// Average distance separating acquaintances
@@ -291,9 +291,9 @@ public class SocialNetworkStatistics {
 	private Vector<Person> getEdgePersons(Edge e, Population plans) {
 		Vector<Person> persons = new Vector<Person>(2);
 		Vertex v1 = (Vertex) e.getEndpoints().getFirst();
-		Person p1 = plans.getPerson((Id) v1.getUserDatum("personId"));
+		Person p1 = plans.getPersons().get((Id) v1.getUserDatum("personId"));
 		Vertex v2 = (Vertex) e.getEndpoints().getSecond();
-		Person p2 = plans.getPerson((Id) v2.getUserDatum("personId"));
+		Person p2 = plans.getPersons().get((Id) v2.getUserDatum("personId"));
 		persons.add(p1);
 		persons.add(p2);
 		return persons;
@@ -313,11 +313,11 @@ public class SocialNetworkStatistics {
 	private double getDyadDistance(Edge myEdge, Population plans) {
 		double dist = 0.;
 		Vertex vFrom = (Vertex) myEdge.getEndpoints().getFirst();
-		Person pFrom = plans.getPerson((Id) vFrom.getUserDatum("personId"));
+		Person pFrom = plans.getPersons().get((Id) vFrom.getUserDatum("personId"));
 		Coord fromCoord = ((Activity) pFrom.getSelectedPlan().getPlanElements().get(
 				0)).getCoord();
 		Vertex vTo = (Vertex) myEdge.getEndpoints().getSecond();
-		Person pTo = plans.getPerson((Id) vTo.getUserDatum("personId"));
+		Person pTo = plans.getPersons().get((Id) vTo.getUserDatum("personId"));
 		Coord toCoord = ((Activity) pTo.getSelectedPlan().getPlanElements().get(0))
 		.getCoord();
 		dist = CoordUtils.calcDistance(fromCoord, toCoord);
@@ -364,14 +364,14 @@ public class SocialNetworkStatistics {
 		while (ivert.hasNext()) {
 
 			Vertex myVert = ivert.next();
-			Person myPerson = plans.getPerson((Id) myVert.getUserDatum("personId"));
+			Person myPerson = plans.getPersons().get((Id) myVert.getUserDatum("personId"));
 			int id = Integer.parseInt(myVert.getUserDatum("personId").toString());
 			// Agent's Home Location ID
 			Activity myAct = (Activity) myPerson.getSelectedPlan().getPlanElements().get(0);
 			String homeId = myAct.getLinkId().toString();
 			// Agent's approx activity space diameter (radius to all alters)
 			double aSd1 = pcasd1.getPersonASD1(plans, myPerson);
-			// Agent's approx activity space diamter (radius to all activities)
+			// Agent's approx activity space diameter (radius to all activities)
 			double aSd2 = pcasd1.getPersonASD2(myPerson.getSelectedPlan());
 			// Agent's approx activity space 2, length of plan
 			//TODO access the TravelDistanceStats object and get the plan's length including routes
@@ -405,10 +405,11 @@ public class SocialNetworkStatistics {
 			Plan.Type planType = thisPlan.getType();
 			if ((planType == null) || (planType == Plan.Type.UNDEFINED)) {
 				planTypeString = new StringBuilder();
-				ActIterator a_it = thisPlan.getIteratorAct();
-				while (a_it.hasNext()) {
-					Activity nextAct = (Activity) a_it.next();
-					planTypeString.append(nextAct.getType().charAt(0));
+				for (PlanElement pe : thisPlan.getPlanElements()) {
+					if (pe instanceof Activity) {
+						Activity nextAct = (Activity) pe;
+						planTypeString.append(nextAct.getType().charAt(0));
+					}
 				}
 			}
 			else {

@@ -30,8 +30,8 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 
 import playground.christoph.router.util.DeadEndRemover;
 
@@ -53,10 +53,9 @@ public class CreateKnownNodesMap {
 	{		
 		if(person.getKnowledge() == null) person.createKnowledge("activityroom");
 			
-		Plan plan = person.getSelectedPlan();
-					
-		Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
-			
+//		Plan plan = person.getSelectedPlan();
+//		Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
+
 		ArrayList<SelectNodes> personNodeSelectors = (ArrayList<SelectNodes>)person.getCustomAttributes().get("NodeSelectors");
 		
 		// for all node selectors of the person
@@ -91,12 +90,14 @@ public class CreateKnownNodesMap {
 		}
 		
 		if(nodeSelector instanceof SelectNodesDijkstra)
-		{			
-			ActIterator actIterator = plan.getIteratorAct();
-				
+		{
 			// get all acts of the selected plan
 			ArrayList<Activity> acts = new ArrayList<Activity>();					
-			while(actIterator.hasNext()) acts.add((Activity)actIterator.next());
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					acts.add((Activity) pe);
+				}
+			}
 			
 			for(int j = 1; j < acts.size(); j++)
 			{						

@@ -30,7 +30,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
@@ -110,12 +110,13 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 
 //		Get all instances of this facility type in the plan
 
-		ActIterator planIter= newPlan.getIteratorAct();
 		ArrayList<Activity> actsOfFacType= new ArrayList<Activity>();
-		while(planIter.hasNext()){
-			Activity nextAct=(Activity) planIter.next();
-			if(nextAct.getType()== factype){
-				actsOfFacType.add(nextAct);
+		for (PlanElement pe : newPlan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity nextAct=(Activity) pe;
+				if(nextAct.getType().equals(factype)){
+					actsOfFacType.add(nextAct);
+				}
 			}
 		}
 

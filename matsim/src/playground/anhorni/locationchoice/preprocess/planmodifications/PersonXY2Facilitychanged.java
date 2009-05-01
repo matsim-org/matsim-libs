@@ -21,7 +21,6 @@
 package playground.anhorni.locationchoice.preprocess.planmodifications;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -32,6 +31,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -150,29 +150,30 @@ public class PersonXY2Facilitychanged extends AbstractPersonAlgorithm implements
 	//////////////////////////////////////////////////////////////////////
 
 	public void run(Plan plan) {
-		Iterator<?> act_it = plan.getIteratorAct();
-		while (act_it.hasNext()) {
-			Activity act = (Activity)act_it.next();
-			Coord coord = act.getCoord();
-			QuadTree<Facility> qt = null;
-			if (act.getType().startsWith(H)) { qt = this.fqts.get(H); }
-			else if (act.getType().startsWith(W)) { qt = this.fqts.get(W); }
-			else if (act.getType().startsWith(E)) { qt = this.fqts.get(E); }
-			else if (act.getType().startsWith(S)) { qt = this.fqts.get(S); }
-			else if (act.getType().startsWith(L)) { qt = this.fqts.get(L); }
-			else if (act.getType().startsWith(T)) { qt = this.fqts.get(T); }
-			else { Gbl.errorMsg("act type ="+act.getType()+"not known!"); }
-
-			Facility f = qt.get(coord.getX(),coord.getY());
-			if (f == null) { Gbl.errorMsg("Coordinates == null; something is wrong!"); }
-
-			Link l = f.getLink();
-			if (l == null) { Gbl.errorMsg("Link == null; something is wrong!"); }
-
-			act.setFacility(f);
-			act.setLink(l);
-			Coord coord_f = f.getCoord();
-			act.setCoord(coord_f);
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				Coord coord = act.getCoord();
+				QuadTree<Facility> qt = null;
+				if (act.getType().startsWith(H)) { qt = this.fqts.get(H); }
+				else if (act.getType().startsWith(W)) { qt = this.fqts.get(W); }
+				else if (act.getType().startsWith(E)) { qt = this.fqts.get(E); }
+				else if (act.getType().startsWith(S)) { qt = this.fqts.get(S); }
+				else if (act.getType().startsWith(L)) { qt = this.fqts.get(L); }
+				else if (act.getType().startsWith(T)) { qt = this.fqts.get(T); }
+				else { throw new RuntimeException("act type ="+act.getType()+"not known!"); }
+				
+				Facility f = qt.get(coord.getX(),coord.getY());
+				if (f == null) { throw new RuntimeException("Coordinates == null; something is wrong!"); }
+				
+				Link l = f.getLink();
+				if (l == null) { Gbl.errorMsg("Link == null; something is wrong!"); }
+				
+				act.setFacility(f);
+				act.setLink(l);
+				Coord coord_f = f.getCoord();
+				act.setCoord(coord_f);
+			}
 		}
 	}
 }

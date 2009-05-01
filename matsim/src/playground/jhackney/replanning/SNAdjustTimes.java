@@ -8,7 +8,7 @@ import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
@@ -33,26 +33,25 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		//COPY THE SELECTED PLAN		    
 		Plan newPlan = person.copySelectedPlan();
 
-		ActIterator planIter= newPlan.getIteratorAct();
-
-		while(planIter.hasNext()){
-			Activity thisAct=(Activity) planIter.next();
-			// Ideally,
-			// last Act new departure time =
-			// last Act current departure time +
-			// average arrival time of friends at thisAct -
-			// this Act current arrival time
-
-			// Might be easier to set start time of thisAct to the
-			// average arrival time of friends at thisAct
-
+		for (PlanElement pe : newPlan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity thisAct=(Activity) pe;
+				// Ideally,
+				// last Act new departure time =
+				// last Act current departure time +
+				// average arrival time of friends at thisAct -
+				// this Act current arrival time
+				
+				// Might be easier to set start time of thisAct to the
+				// average arrival time of friends at thisAct
+				
 //			this.log.info("old "+thisAct.getStartTime());
-			thisAct.setStartTime(getAvgFriendArrTime(thisAct));
+				thisAct.setStartTime(getAvgFriendArrTime(thisAct));
 //			this.log.info("new "+thisAct.getStartTime());
-
+			}
 		}
 
-		newPlan.setScore(Plan.UNDEF_SCORE);
+		newPlan.setScore(null);
 		person.setSelectedPlan(newPlan);
 	}
 	private double getAvgFriendArrTime(Activity act) {

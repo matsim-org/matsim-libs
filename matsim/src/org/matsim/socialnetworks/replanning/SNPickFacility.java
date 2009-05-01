@@ -13,7 +13,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
@@ -43,13 +43,13 @@ import org.matsim.socialnetworks.socialnet.EgoNet;
  * information about facilities.<br><br>
  * If there are no Alters defined in the SocialNetwork, the Ego decides on a new location
  * based on his own Knowledge, and the module reduces to
- * {@link org.matsim.src.socialnetworks.replanning.RandomFacilitySwitcherK.java}.
+ * {@link org.matsim.socialnetworks.replanning.RandomFacilitySwitcherK}.
  * The difference between the two modules is that this one REQUIRES a social network
  * to be defined (it can be empty) and the other does not require a social network.<br><br>  
  * 
  * Required objects:<br>
  * <li>Facilities: as a "location choice" strategy, the module works explicitly with facilities</li>
- * <li>SocialNetwork: {@link org.matsim.src.socialnetworks.socialnet.SocialNetwork.java} must be non-null</li>
+ * <li>SocialNetwork: {@link org.matsim.socialnetworks.socialnet.SocialNetwork} must be non-null</li>
  * <li>weights: string of weights from [0,1] indicating the probability of
  * switching location of each type of facility that exists in the model.<br><br>  
  *
@@ -107,12 +107,13 @@ public class SNPickFacility implements PlanAlgorithm {
 
 //		Get all instances of this facility type in the plan
 
-		ActIterator planIter= newPlan.getIteratorAct();
 		ArrayList<Activity> actsOfFacType= new ArrayList<Activity>();
-		while(planIter.hasNext()){
-			Activity nextAct=(Activity) planIter.next();
-			if(nextAct.getType()== factype){
-				actsOfFacType.add(nextAct);
+		for (PlanElement pe : newPlan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity nextAct=(Activity) pe;
+				if(nextAct.getType().equals(factype)){
+					actsOfFacType.add(nextAct);
+				}
 			}
 		}
 
@@ -124,7 +125,7 @@ public class SNPickFacility implements PlanAlgorithm {
 
 		}else{
 
-			Activity newAct = (Activity)(actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
+			Activity newAct = (actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
 
 //			Get agent's knowledge
 			Knowledge k = person.getKnowledge();
@@ -144,9 +145,6 @@ public class SNPickFacility implements PlanAlgorithm {
 			
 //			Pick a new facility for it from the knowledge of alters and ego (LOGIT)
 //For each alter append its facList to existing facList
-			if(k.getEgoNet()==null){
-				this.log.error("The replanning module "+this.getClass()+" requires a non-null social network.");
-			}
 			EgoNet egoNet = k.getEgoNet();
 			ArrayList<Person> alters=egoNet.getAlters();
 			Iterator<Person> aIt=alters.iterator();
@@ -183,7 +181,7 @@ public class SNPickFacility implements PlanAlgorithm {
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
 				if(newAct.getType() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType() && newAct.getLink() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink()){
-					Activity firstAct = (Activity) newPlan.getFirstActivity();
+					Activity firstAct = newPlan.getFirstActivity();
 					firstAct.setLink(f.getLink());
 					firstAct.setCoord(f.getCoord());
 					firstAct.setFacility(f);
@@ -206,7 +204,7 @@ public class SNPickFacility implements PlanAlgorithm {
 					leg.setRoute(null);
 				}
 //				Reset the score.
-//				newPlan.setScore(Plan.UNDEF_SCORE);
+//				newPlan.setScore(null);
 
 				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), network).run(newPlan.getPerson());
 //				new PlansCalcRoute(network, tcost, ttime).run(newPlan);

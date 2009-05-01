@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -140,33 +140,31 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 	 */
 	public void finish() {
 		super.finish();
-		ActIterator ait = this.plan.getIteratorAct();
-
-		while(ait.hasNext()){
-			double temp=0;
-			double dtemp=0;
-			Activity act = (Activity)ait.next();
-			if(act.getType().equals(factype)){
+		for (PlanElement pe : this.plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				double temp=0;
+				double dtemp=0;
+				if(act.getType().equals(factype)){
 //				this.friendFoeRatio+=actStats.get(act).get(0);
 //				this.nFriends+=actStats.get(act).get(1);
 //				this.timeWithFriends+=actStats.get(act).get(2);
 //				
-				temp=betaFriendFoe*actStats.get(act).get(0)+
-				betaNFriends *actStats.get(act).get(1)+
-				betaLogNFriends * Math.log(actStats.get(act).get(1)+1)+
-				betaTimeWithFriends * Math.log(actStats.get(act).get(2)/3600.+1);
-				
-				dtemp=betaFriendFoe+
-				betaNFriends+
-				betaLogNFriends/(actStats.get(act).get(1)+1)+
-				betaTimeWithFriends/(actStats.get(act).get(2)/3600.+1);
-			}
+					temp=betaFriendFoe*actStats.get(act).get(0)+
+					betaNFriends *actStats.get(act).get(1)+
+					betaLogNFriends * Math.log(actStats.get(act).get(1)+1)+
+					betaTimeWithFriends * Math.log(actStats.get(act).get(2)/3600.+1);
+					
+					dtemp=betaFriendFoe+
+					betaNFriends+
+					betaLogNFriends/(actStats.get(act).get(1)+1)+
+					betaTimeWithFriends/(actStats.get(act).get(2)/3600.+1);
+				}
 				this.score+=temp;
 				usoc.put(act,temp);
 				dusoc.put(act,dtemp);
 			}
-		
-		
+		}
 	}
 
 

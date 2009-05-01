@@ -5,7 +5,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 
 public interface Plan extends BasicPlan<PlanElement> {
 
@@ -108,9 +107,6 @@ public interface Plan extends BasicPlan<PlanElement> {
 	public Activity getFirstActivity();
 
 	public Activity getLastActivity();
-
-	@Deprecated
-	public ActIterator getIteratorAct();
 
 	@Deprecated // use getScore()
 	public double getScoreAsPrimitiveType();

@@ -38,7 +38,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.Knowledge;
@@ -90,37 +90,37 @@ public class MentalMap {
 
 //		Associate each act in the plan with a random facility on the link
 
-		ActIterator planActIter = myPlan.getIteratorAct();
-
-		while(planActIter.hasNext()){
-			Activity myAct = (Activity) planActIter.next();
-			if(myAct.getFacility()==null){ // new Acts are assigned a facility in the Plans file
-				ActivityOption myActivity = null;
-				// If there is already knowledge in the initial plans file, use it
-				if(this.knowledge.getActivities(myAct.getType()).size()>0){
-					myActivity=this.knowledge.getActivities(myAct.getType()).get(MatsimRandom.getRandom().nextInt(this.knowledge.getActivities(myAct.getType()).size()));
-					myAct.setFacility(myActivity.getFacility());
-					//TODO JH add logic to label this activity primary or secondary
-					this.knowledge.addActivity(myActivity, false);
-//					learnActsActivities(myAct,myActivity);
-				}
-
-				// Else the activity is null and we choose an activity to assign to the act
-				Link myLink = myAct.getLink();
-				// These Locations are facilities by the new convention
-				Collection<Location> locations = myLink.getUpMapping().values();
-				// These Objects are facilities by convention
-				Object[] facs =  locations.toArray();
-				// Assign a random activity (a facility) on the link to the act
-				// thus giving it in effect a street address
-				while(myActivity==null){
-					int k = MatsimRandom.getRandom().nextInt(facs.length);
-					Facility f = (Facility) facs[k];
-					myActivity = f.getActivityOption(myAct.getType());
-					if(myActivity!=null){
+		for (PlanElement pe : myPlan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity myAct = (Activity) pe;
+				if(myAct.getFacility()==null){ // new Acts are assigned a facility in the Plans file
+					ActivityOption myActivity = null;
+					// If there is already knowledge in the initial plans file, use it
+					if(this.knowledge.getActivities(myAct.getType()).size()>0){
+						myActivity=this.knowledge.getActivities(myAct.getType()).get(MatsimRandom.getRandom().nextInt(this.knowledge.getActivities(myAct.getType()).size()));
 						myAct.setFacility(myActivity.getFacility());
 						//TODO JH add logic to label this activity primary or secondary
-						this.knowledge.addActivity(myActivity,false);
+						this.knowledge.addActivity(myActivity, false);
+//					learnActsActivities(myAct,myActivity);
+					}
+					
+					// Else the activity is null and we choose an activity to assign to the act
+					Link myLink = myAct.getLink();
+					// These Locations are facilities by the new convention
+					Collection<Location> locations = myLink.getUpMapping().values();
+					// These Objects are facilities by convention
+					Object[] facs =  locations.toArray();
+					// Assign a random activity (a facility) on the link to the act
+					// thus giving it in effect a street address
+					while(myActivity==null){
+						int k = MatsimRandom.getRandom().nextInt(facs.length);
+						Facility f = (Facility) facs[k];
+						myActivity = f.getActivityOption(myAct.getType());
+						if(myActivity!=null){
+							myAct.setFacility(myActivity.getFacility());
+							//TODO JH add logic to label this activity primary or secondary
+							this.knowledge.addActivity(myActivity,false);
+						}
 					}
 				}
 			}
@@ -132,23 +132,23 @@ public class MentalMap {
 
 		if(aar==null) return;
 //		this.log.info("READING ACT-ACTIVITY MAP FROM FILE PERSON "+myPlan.getPerson().getId());
-		ActIterator planActIter = myPlan.getIteratorAct();
-		while(planActIter.hasNext()){
-			Activity myAct = (Activity) planActIter.next();
-
-			TreeMap<Id,String> nextFac = aar.getNextPoint();
-			Id myFacilityId = nextFac.firstKey();
+		for (PlanElement pe : myPlan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity myAct = (Activity) pe;
+				
+				TreeMap<Id,String> nextFac = aar.getNextPoint();
+				Id myFacilityId = nextFac.firstKey();
 //			String myActivityType=nextFac.get(myFacilityId);
-			String myActivityType=myAct.getType();
-
-			Facility fac = facilities.getFacilities().get(myFacilityId);
+				String myActivityType=myAct.getType();
+				
+				Facility fac = facilities.getFacilities().get(myFacilityId);
 //			myAct.setFacility(fac);
 //			this.knowledge.addActivity(fac.getActivity(myActivityType));
-			//TODO JH apply some logic to label this a primary or secondary location
-			ActivityOption myActivity=fac.getActivityOption(myActivityType);
-			this.knowledge.addActivity(myActivity,false);
+				//TODO JH apply some logic to label this a primary or secondary location
+				ActivityOption myActivity=fac.getActivityOption(myActivityType);
+				this.knowledge.addActivity(myActivity,false);
+			}
 		}
-
 	}
 
 	public void prepareActs(Plan myPlan){
@@ -158,26 +158,26 @@ public class MentalMap {
 //		Should not have to be done: adapt SocialNetworks code to use only the first letter
 //		or else a standard MATSim "type" when this becomes established
 
-		ActIterator planActIter = myPlan.getIteratorAct();
-
-		while(planActIter.hasNext()){
-			Activity myAct = (Activity) planActIter.next();
-
-			String type="none";
-			char typechar=myAct.getType().charAt(0);
-			if(typechar=='h'){
-				type="home";
-			}else if(typechar=='w'){
-				type="work";
-			}else if(typechar=='l'){
-				type="leisure";
-			}else if(typechar=='s'){
-				type="shop";
-			}else if(typechar=='e'){
-				type="education";
-			}else
-				Gbl.errorMsg("Activity type "+ typechar +" not known");
-			myAct.setType(type);
+		for (PlanElement pe : myPlan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity myAct = (Activity) pe;
+				
+				String type="none";
+				char typechar=myAct.getType().charAt(0);
+				if(typechar=='h'){
+					type="home";
+				}else if(typechar=='w'){
+					type="work";
+				}else if(typechar=='l'){
+					type="leisure";
+				}else if(typechar=='s'){
+					type="shop";
+				}else if(typechar=='e'){
+					type="education";
+				}else
+					Gbl.errorMsg("Activity type "+ typechar +" not known");
+				myAct.setType(type);
+			}
 		}
 	}
 
@@ -211,13 +211,12 @@ public class MentalMap {
 			// so that they won't be deleted
 
 			ArrayList<Id> currentActivities = new ArrayList<Id>();
-			Iterator<Plan> planIter = myPlans.iterator();
-			while(planIter.hasNext()){
-				Plan myPlan = (Plan) planIter.next();
-				ActIterator actIter = myPlan.getIteratorAct();
-				while( actIter.hasNext() ){
-					Activity act = (Activity) actIter.next();
-					currentActivities.add(act.getFacility().getId());
+			for (Plan myPlan : myPlans) {
+				for (PlanElement pe : myPlan.getPlanElements()) {
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
+						currentActivities.add(act.getFacility().getId());
+					}
 				}
 			}
 
@@ -287,14 +286,13 @@ public class MentalMap {
 
 	public Activity getActFromActivity (Person person, ActivityOption myActivity){
 		Activity myAct=null;
-		Iterator<Plan> planIter = person.getPlans().iterator();
-		while(planIter.hasNext()){
-			Plan myPlan = (Plan) planIter.next();
-			ActIterator actIter = myPlan.getIteratorAct();
-			while( actIter.hasNext() ){
-				Activity act = (Activity) actIter.next();
-				if(act.getFacility()==myActivity.getFacility()){
-					myAct=act;
+		for (Plan myPlan : person.getPlans()) {
+			for (PlanElement pe : myPlan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
+					if(act.getFacility()==myActivity.getFacility()){
+						myAct=act;
+					}
 				}
 			}
 		}

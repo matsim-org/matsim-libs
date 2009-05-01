@@ -21,7 +21,6 @@
 package org.matsim.core.basic.v01;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicActivity;
@@ -86,32 +85,6 @@ public class BasicPlanImpl implements BasicPlan {
 	public List<? extends BasicPlanElement> getPlanElements() {
 		return this.actsLegs;
 	}
-
-	/**
-	 * Iterator that steps through all Activities ignoring the Legs
-	 */
-	public class ActIterator implements Iterator<BasicActivityImpl> {
-		private int index = 0;
-
-		public boolean hasNext() {
-			return BasicPlanImpl.this.actsLegs.size() > this.index;
-		}
-
-		public BasicActivityImpl next() {
-			this.index+=2;
-			return (BasicActivityImpl)BasicPlanImpl.this.actsLegs.get(this.index-2);
-		}
-
-		public void remove() {
-			// not supported?
-			throw new UnsupportedOperationException("Remove is not supported with this iterator");
-		}
-	}
-
-	public ActIterator getIteratorAct () {
-		return new ActIterator();
-	}
-
 
 	public void addLeg(final BasicLeg leg) {
 		if (this.actsLegs.size() %2 == 0 ) throw (new IndexOutOfBoundsException("Error: Tried to insert leg at non-leg position"));

@@ -29,7 +29,7 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.api.population.PlanElement;
 
 /*
  * Removes Dead Ends from the Activity Maps in the Knowledge of a Person.
@@ -144,16 +144,16 @@ public class DeadEndRemover {
 		
 		Plan plan = person.getSelectedPlan();
 		
-		ActIterator iterator = plan.getIteratorAct();
-		while(iterator.hasNext())
-		{
-			Activity act = (Activity)iterator.next();
-			
-			Node fromNode = act.getLink().getFromNode();
-			Node toNode = act.getLink().getToNode();
-			
-			if(!activityNodesMap.containsKey(fromNode.getId())) activityNodesMap.put(fromNode.getId(), fromNode);
-			if(!activityNodesMap.containsKey(toNode.getId())) activityNodesMap.put(toNode.getId(), toNode);
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				
+				Node fromNode = act.getLink().getFromNode();
+				Node toNode = act.getLink().getToNode();
+				
+				if(!activityNodesMap.containsKey(fromNode.getId())) activityNodesMap.put(fromNode.getId(), fromNode);
+				if(!activityNodesMap.containsKey(toNode.getId())) activityNodesMap.put(toNode.getId(), toNode);
+			}
 		}
 			
 		return activityNodesMap;

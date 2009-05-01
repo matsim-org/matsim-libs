@@ -18,25 +18,24 @@
  * *********************************************************************** */
 package playground.dgrether.roadpricing;
 
-import java.util.Iterator;
-
+import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.roadpricing.RoadPricingScheme;
-
 
 /**
  * @author dgrether
- *
  */
 public class RoadPricingUtilities {
 
 	public static boolean hasActInTollArea(Plan plan1,
 			RoadPricingScheme roadPricingScheme) {
-		for (Iterator<BasicActivityImpl> it = plan1.getIteratorAct(); it.hasNext(); ) {
-			BasicActivityImpl act = it.next();
-			if (roadPricingScheme.getLinkIds().contains(act.getLinkId())){
-				return true;
+		for (PlanElement pe : plan1.getPlanElements()) {
+			if (pe instanceof BasicActivity) {
+				BasicActivity act = (BasicActivity) pe;
+				if (roadPricingScheme.getLinkIds().contains(act.getLinkId())){
+					return true;
+				}
 			}
 		}
 		return false;

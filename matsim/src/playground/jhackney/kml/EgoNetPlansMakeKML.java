@@ -51,11 +51,11 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -362,47 +362,45 @@ public class EgoNetPlansMakeKML {
 
 		// Fill the facilities folder
 
-		ActIterator aIter = myPlan.getIteratorAct();
-		while(aIter.hasNext()){
-			Activity myAct = (Activity) aIter.next();
-			StyleType myStyle=facStyle.get(myAct.getType());
-
-			PlacemarkType aFacility = kmlObjectFactory.createPlacemarkType();
-			aFacility.setName(myAct.getType()+" facility");
-			aFacility.setDescription(myAct.getFacility().getActivityOption(myAct.getType()).toString());
-			aFacility.setAddress("address");
-			aFacility.setStyleUrl(myStyle.getId());
-
-			// Get the coordinates of the facility associated with the Act and transform
-			// to WGS84 for GoogleEarth
-
-			Coord geometryCoord = trafo.transform(myAct.getCoord());
-			PointType myPoint = kmlObjectFactory.createPointType();
-			myPoint.getCoordinates().add(Double.toString(geometryCoord.getX()) + "," + Double.toString(geometryCoord.getY()) + ",0.0");
-			aFacility.setAbstractGeometryGroup(kmlObjectFactory.createPoint(myPoint));
-
-			LookAtType lookAt = kmlObjectFactory.createLookAtType();
-			lookAt.setLongitude(geometryCoord.getX());
-			lookAt.setLatitude(geometryCoord.getY());
-			aFacility.setAbstractViewGroup(kmlObjectFactory.createLookAt(lookAt));
-
-			boolean facilityExists = false;
-			ListIterator<JAXBElement<? extends AbstractFeatureType>> li = agentFolder.getAbstractFeatureGroup().listIterator();
-			while (li.hasNext() && (facilityExists == false)) {
-
-				JAXBElement<? extends AbstractFeatureType> abstractFeature = li.next();
-				if (abstractFeature.getName().equals(aFacility.getName())) {
-					facilityExists = true;
+		for (PlanElement pe : myPlan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity myAct = (Activity) pe;
+				StyleType myStyle=facStyle.get(myAct.getType());
+				
+				PlacemarkType aFacility = kmlObjectFactory.createPlacemarkType();
+				aFacility.setName(myAct.getType()+" facility");
+				aFacility.setDescription(myAct.getFacility().getActivityOption(myAct.getType()).toString());
+				aFacility.setAddress("address");
+				aFacility.setStyleUrl(myStyle.getId());
+				
+				// Get the coordinates of the facility associated with the Act and transform
+				// to WGS84 for GoogleEarth
+				
+				Coord geometryCoord = trafo.transform(myAct.getCoord());
+				PointType myPoint = kmlObjectFactory.createPointType();
+				myPoint.getCoordinates().add(Double.toString(geometryCoord.getX()) + "," + Double.toString(geometryCoord.getY()) + ",0.0");
+				aFacility.setAbstractGeometryGroup(kmlObjectFactory.createPoint(myPoint));
+				
+				LookAtType lookAt = kmlObjectFactory.createLookAtType();
+				lookAt.setLongitude(geometryCoord.getX());
+				lookAt.setLatitude(geometryCoord.getY());
+				aFacility.setAbstractViewGroup(kmlObjectFactory.createLookAt(lookAt));
+				
+				boolean facilityExists = false;
+				ListIterator<JAXBElement<? extends AbstractFeatureType>> li = agentFolder.getAbstractFeatureGroup().listIterator();
+				while (li.hasNext() && (facilityExists == false)) {
+					
+					JAXBElement<? extends AbstractFeatureType> abstractFeature = li.next();
+					if (abstractFeature.getName().equals(aFacility.getName())) {
+						facilityExists = true;
+					}
+					
 				}
-
+				if (!facilityExists) {
+					agentFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(aFacility));
+				}
 			}
-			if (!facilityExists) {
-				agentFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(aFacility));
-			}
-
 		}
-
-
 
 //		Folder networkLinksFolder = new Folder("networkLinks");
 //		myKMLDocument.addFeature(networkLinksFolder);

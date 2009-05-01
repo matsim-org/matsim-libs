@@ -1,7 +1,6 @@
 package playground.mmoyo.PTCase2;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
@@ -13,8 +12,8 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicActivityImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -106,38 +105,39 @@ public class PTActWriter {
 			
 			Plan newPlan = new PlanImpl(person);
 			
-			for (Iterator<BasicActivityImpl> iter= plan.getIteratorAct(); iter.hasNext();){
-				thisAct= (Activity)iter.next();
-				
-				if (!first) {
-					Coord lastActCoord = lastAct.getCoord();
-		    		Coord actCoord = thisAct.getCoord();
-
-					trips++;
-		    		double distanceToDestination = CoordUtils.calcDistance(lastActCoord, actCoord);
-		    		double distToWalk= walk.distToWalk(person.getAge());
-		    		if (distanceToDestination<= distToWalk){
-		    			newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
-		    			inWalkRange++;
-		    		
-		    		}else{
-			    		startTime = System.currentTimeMillis();
-			    		Path path = ptRouter.findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
-			    		duration= System.currentTimeMillis()-startTime;
-			    		if(path!=null){
-				    					    			
-				    		//travelTime=travelTime+ path.travelTime;
-				    		
-				    		if (path.nodes.size()>1){
-				    			createWlinks(lastActCoord, path, actCoord);
-			    				double dw1 = net.getLink("linkW1").getLength();
-			    				double dw2 = net.getLink("linkW2").getLength();
-			    				if ((dw1+dw2)>=(distanceToDestination)){
-			    					newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
-			    					inWalkRange++;
-			    				}else{
-			    					
-			    					/*
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					thisAct= (Activity) pe;
+					
+					if (!first) {
+						Coord lastActCoord = lastAct.getCoord();
+						Coord actCoord = thisAct.getCoord();
+						
+						trips++;
+						double distanceToDestination = CoordUtils.calcDistance(lastActCoord, actCoord);
+						double distToWalk= walk.distToWalk(person.getAge());
+						if (distanceToDestination<= distToWalk){
+							newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+							inWalkRange++;
+							
+						}else{
+							startTime = System.currentTimeMillis();
+							Path path = ptRouter.findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
+							duration= System.currentTimeMillis()-startTime;
+							if(path!=null){
+								
+								//travelTime=travelTime+ path.travelTime;
+								
+								if (path.nodes.size()>1){
+									createWlinks(lastActCoord, path, actCoord);
+									double dw1 = net.getLink("linkW1").getLength();
+									double dw2 = net.getLink("linkW2").getLength();
+									if ((dw1+dw2)>=(distanceToDestination)){
+										newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+										inWalkRange++;
+									}else{
+										
+										/*
 			    					if (ptPathValidator.isValid(path)){
 			    						legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
 			    						valid++;
@@ -148,31 +148,32 @@ public class PTActWriter {
 			    						addPerson=false;
 			    						paths.add(path);
 			    					}
-			    					*/
-			    					
-			    					legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
-			    				}//if dw1+dw2
-			   				removeWlinks();
-			    			}else{
-			    				newPlan.addLeg(walkLeg(legNum++, lastAct, thisAct));
-			    				addPerson=false;
-			    				lessThan2Node++;
-			    			}//if path.nodes
-			    		}else{
-			    			newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
-			    			addPerson=false;
-			    			nulls++;
-			    		}//path=null
-					}//distanceToDestination<= distToWalk
-				}//if !First
-				
-		    	//-->Attention: this should be read from the city network not from pt network!!! 
-		    	thisAct.setLink(net.getNearestLink(thisAct.getCoord()));
-
-		    	newPlan.addActivity(thisAct);
-				lastAct = thisAct;
-				first=false;
-			}//Iterator<BasicActImpl>
+										 */
+										
+										legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
+									}//if dw1+dw2
+									removeWlinks();
+								}else{
+									newPlan.addLeg(walkLeg(legNum++, lastAct, thisAct));
+									addPerson=false;
+									lessThan2Node++;
+								}//if path.nodes
+							}else{
+								newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+								addPerson=false;
+								nulls++;
+							}//path=null
+						}//distanceToDestination<= distToWalk
+					}//if !First
+					
+					//-->Attention: this should be read from the city network not from pt network!!! 
+					thisAct.setLink(net.getNearestLink(thisAct.getCoord()));
+					
+					newPlan.addActivity(thisAct);
+					lastAct = thisAct;
+					first=false;
+				}
+			}
 
 			if (addPerson){
 				person.exchangeSelectedPlan(newPlan, true);

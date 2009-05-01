@@ -30,7 +30,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
@@ -102,12 +102,13 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 
 //		Get all instances of this facility type in the plan
 
-		ActIterator planIter= newPlan.getIteratorAct();
 		ArrayList<Activity> actsOfFacType= new ArrayList<Activity>();
-		while(planIter.hasNext()){
-			Activity nextAct=(Activity) planIter.next();
-			if(nextAct.getType()== factype){
-				actsOfFacType.add(nextAct);
+		for (PlanElement pe : newPlan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity nextAct=(Activity) pe;
+				if(nextAct.getType().equals(factype)){
+					actsOfFacType.add(nextAct);
+				}
 			}
 		}
 
@@ -117,7 +118,7 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 			person.getPlans().remove(newPlan);
 			return;
 		}else{
-			Activity newAct = (Activity)(actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
+			Activity newAct = (actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
 
 //			Get agent's knowledge
 			Knowledge k = person.getKnowledge();
@@ -141,7 +142,7 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
 				if(newAct.getType() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType() && newAct.getLink() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink()){
-					Activity firstAct = (Activity) newPlan.getFirstActivity();
+					Activity firstAct = newPlan.getFirstActivity();
 					firstAct.setLink(fFromKnowledge.getLink());
 					firstAct.setCoord(fFromKnowledge.getCoord());
 					firstAct.setFacility(fFromKnowledge);
@@ -168,7 +169,7 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 					leg.setRoute(null);
 				}
 //				Reset the score to -9999. Helps to see if the plan was really changed
-				newPlan.setScore(Plan.UNDEF_SCORE);
+				newPlan.setScore(null);
 
 				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), network).run(newPlan.getPerson());
 //				new PlansCalcRoute(network, tcost, ttime).run(newPlan);

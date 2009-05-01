@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -80,14 +80,14 @@ public class EventSocScoringFunction implements ScoringFunction{
 	public void finish() {
 		this.scoringFunction.finish();
 
-		ActIterator ait = this.plan.getIteratorAct();
-
-		while(ait.hasNext()){
-			Activity act = (Activity)ait.next();
-			if(act.getType().equals(factype)){
-				this.friendFoeRatio+=actStats.get(act).get(0);
-				this.nFriends+=actStats.get(act).get(1);
-				this.timeWithFriends+=actStats.get(act).get(2);
+		for (PlanElement pe : this.plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if(act.getType().equals(factype)){
+					this.friendFoeRatio+=actStats.get(act).get(0);
+					this.nFriends+=actStats.get(act).get(1);
+					this.timeWithFriends+=actStats.get(act).get(2);
+				}
 			}
 		}
 	}

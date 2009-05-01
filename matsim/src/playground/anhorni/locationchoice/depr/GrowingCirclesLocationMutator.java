@@ -34,7 +34,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
@@ -279,16 +279,17 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		Coord home_coord = null;
 		Coord prim_coord = null;
 		final Plan plan = person.getSelectedPlan();
-		Iterator<BasicActivityImpl> act_it = plan.getIteratorAct();
-		while (act_it.hasNext()) {
-			final Activity act = (Activity)act_it.next();
-			if (act.getType().startsWith(H)) {
-				if (act.getCoord() == null) { Gbl.errorMsg("Person id=" + person.getId() + " has no home coord!"); }
-				if (act.getCoord().equals(ZERO)) { Gbl.errorMsg("Person id=" + person.getId() + " has a ZERO home coord!"); }
-				home_coord = act.getCoord();
-			}
-			else {
-				if ((act.getCoord() != null) && (!act.getCoord().equals(ZERO))) { prim_coord = act.getCoord(); }
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				final Activity act = (Activity) pe;
+				if (act.getType().startsWith(H)) {
+					if (act.getCoord() == null) { Gbl.errorMsg("Person id=" + person.getId() + " has no home coord!"); }
+					if (act.getCoord().equals(ZERO)) { Gbl.errorMsg("Person id=" + person.getId() + " has a ZERO home coord!"); }
+					home_coord = act.getCoord();
+				}
+				else {
+					if ((act.getCoord() != null) && (!act.getCoord().equals(ZERO))) { prim_coord = act.getCoord(); }
+				}
 			}
 		}
 		if ((prim_coord == null) || (home_coord.equals(prim_coord))) {
@@ -296,13 +297,14 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 
 			final double radius=10000.0;
 
-			act_it = plan.getIteratorAct();
-			while (act_it.hasNext()) {
-				final Activity act = (Activity)act_it.next();
-				if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
-					final Facility f = this.getFacility(home_coord,radius,act.getType());
-					act.setLink(this.network.getNearestLink(f.getCoord()));
-					act.setCoord(f.getCoord());
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					final Activity act = (Activity) pe;
+					if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
+						final Facility f = this.getFacility(home_coord,radius,act.getType());
+						act.setLink(this.network.getNearestLink(f.getCoord()));
+						act.setCoord(f.getCoord());
+					}
 				}
 			}
 		}
@@ -322,13 +324,14 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 			dy = dy/6.0;
 			final CoordImpl coord1 = new CoordImpl(home_coord.getX()+dx,home_coord.getY()+dy);
 			final CoordImpl coord2 = new CoordImpl(prim_coord.getX()-dx,prim_coord.getY()+dy);
-			act_it = plan.getIteratorAct();
-			while (act_it.hasNext()) {
-				final Activity act = (Activity)act_it.next();
-				if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
-					final Facility f = this.getFacility(coord1,coord2,radius,act.getType());
-					act.setLink(this.network.getNearestLink(f.getCoord()));
-					act.setCoord(f.getCoord());
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					final Activity act = (Activity) pe;
+					if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
+						final Facility f = this.getFacility(coord1,coord2,radius,act.getType());
+						act.setLink(this.network.getNearestLink(f.getCoord()));
+						act.setCoord(f.getCoord());
+					}
 				}
 			}
 

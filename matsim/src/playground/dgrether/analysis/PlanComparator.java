@@ -79,7 +79,7 @@ public class PlanComparator {
 		Activity act;
 		for (Id id : this.population.getPersons().keySet()) {
 			plan = this.population.getPersons().get(id).getSelectedPlan();
-			act = (Activity) plan.getIteratorAct().next();
+			act = plan.getFirstActivity();
 			this._result.addFirstPlansData(id, plan.getScoreAsPrimitiveType(), act);
 		}
 		// many people can be in one pop -> care about memory

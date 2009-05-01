@@ -1,7 +1,6 @@
 package playground.mmoyo.PTTest;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
@@ -9,8 +8,8 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicActivityImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -95,16 +94,17 @@ public class PTconnectionfinder {
 			
 			Plan newPlan = new PlanImpl(person);
 			
-			for (Iterator<BasicActivityImpl> iter= plan.getIteratorAct(); iter.hasNext();){
-				thisAct= (Activity)iter.next();
-				
-				if (!first) {
-					Coord lastActCoord = lastAct.getCoord();
-		    		Coord actCoord = thisAct.getCoord();
-					trips++;
-		    		//if( ptPathValidator.isValid(path)){valid++;}else{invalid++;}
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					thisAct= (Activity) pe;
+					if (!first) {
+						Coord lastActCoord = lastAct.getCoord();
+						Coord actCoord = thisAct.getCoord();
+						trips++;
+						//if( ptPathValidator.isValid(path)){valid++;}else{invalid++;}
+					}
 				}
-			}//for 
+			}
 			lastAct = thisAct;
 			first=false;
 			x++;

@@ -20,13 +20,13 @@ package playground.dgrether.analysis.activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
@@ -180,21 +180,23 @@ public class ActivityDurationAnalyser {
 
 		public void handlePlan(final Plan plan) {
 //			System.out.println("handling plan " + typeActivityMap);
-			for (Iterator it =  plan.getIteratorAct(); it.hasNext();) {
-				Activity activity = (Activity) it.next();
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity activity = (Activity) pe;
 //				System.out.println("handling act: " + activity.getType());
-				List<Activity> acts = this.typeActivityMap.get(activity.getType());
-				List<Activity> acts2 = this.simpleTypeActivityMap.get(activity.getType().substring(0,1));
-				if (acts == null) {
-					acts = new ArrayList<Activity>();
-					this.typeActivityMap.put(activity.getType(), acts);
+					List<Activity> acts = this.typeActivityMap.get(activity.getType());
+					List<Activity> acts2 = this.simpleTypeActivityMap.get(activity.getType().substring(0,1));
+					if (acts == null) {
+						acts = new ArrayList<Activity>();
+						this.typeActivityMap.put(activity.getType(), acts);
+					}
+					if (acts2 == null) {
+						acts2 = new ArrayList<Activity>();
+						this.simpleTypeActivityMap.put(activity.getType().substring(0,1), acts2);
+					}
+					acts.add(activity);
+					acts2.add(activity);
 				}
-				if (acts2 == null) {
-					acts2 = new ArrayList<Activity>();
-					this.simpleTypeActivityMap.put(activity.getType().substring(0,1), acts2);
-				}
-				acts.add(activity);
-				acts2.add(activity);
 			}
 		}
 

@@ -23,8 +23,8 @@ import java.io.File;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -87,33 +87,35 @@ public class ModeActivityDurationAnalyser {
 
 		for (Person pers : plans.getPersons().values()){
 			Plan p = pers.getSelectedPlan();
-			for (ActIterator it = p.getIteratorAct(); it.hasNext(); ) {
-				Activity act = (Activity) it.next();
-				try {
-				  durTemp = act.calculateDuration();
-				if (act.getType().equalsIgnoreCase("h")) {
-					if (p.getType().equals(Plan.Type.CAR)) {
-						homeActivityDurationsCar += durTemp;
-						homeActivityCarCount++;
+			for (PlanElement pe : p.getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
+					try {
+						durTemp = act.calculateDuration();
+						if (act.getType().equalsIgnoreCase("h")) {
+							if (p.getType().equals(Plan.Type.CAR)) {
+								homeActivityDurationsCar += durTemp;
+								homeActivityCarCount++;
+							}
+							else if (p.getType().equals(Plan.Type.PT)){
+								homeActivityDurationsNonCar += durTemp;
+								homeActivityNonCarCount++;
+							}
+						}
+						else if (act.getType().equalsIgnoreCase("w")) {
+							if (p.getType().equals(Plan.Type.CAR)) {
+								workActivityDurationsCar += durTemp;
+								workActivityCarCount++;
+							}
+							else if (p.getType().equals(Plan.Type.PT)){
+								workActivityDurationsNonCar += durTemp;
+								workActivityNonCarCount++;
+							}
+						}
+					} catch (Exception e) {
+						System.err.println(e.getMessage());
+						System.out.println("No duration for plan: " + p + " of person " + pers.getId());
 					}
-					else if (p.getType().equals(Plan.Type.PT)){
-						homeActivityDurationsNonCar += durTemp;
-						homeActivityNonCarCount++;
-					}
-				}
-				else if (act.getType().equalsIgnoreCase("w")) {
-					if (p.getType().equals(Plan.Type.CAR)) {
-						workActivityDurationsCar += durTemp;
-						workActivityCarCount++;
-					}
-					else if (p.getType().equals(Plan.Type.PT)){
-						workActivityDurationsNonCar += durTemp;
-						workActivityNonCarCount++;
-					}
-				}
-				} catch (Exception e) {
-					System.err.println(e.getMessage());
-					System.out.println("No duration for plan: " + p + " of person " + pers.getId());
 				}
 			}
 		}

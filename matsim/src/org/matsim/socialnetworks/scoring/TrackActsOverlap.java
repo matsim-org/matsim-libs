@@ -1,5 +1,3 @@
-package org.matsim.socialnetworks.scoring;
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * SpatialScorer.java
@@ -20,8 +18,9 @@ package org.matsim.socialnetworks.scoring;
  *                                                                         *
  * *********************************************************************** */
 
+package org.matsim.socialnetworks.scoring;
+
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
@@ -29,13 +28,12 @@ import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.socialnetworks.algorithms.CompareActs;
 import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
-
 
 public class TrackActsOverlap {
 
@@ -93,24 +91,22 @@ public class TrackActsOverlap {
 	private LinkedHashMap<ActivityOption,ArrayList<Person>> makeActivityMap(Population plans){
 		log.info("Making a new activity map for spatial scores");
 //		LinkedHashMap<Activity,ArrayList<Person>> activityMap=new LinkedHashMap<Activity,ArrayList<Person>>();
-		Iterator<Person> p1Iter=plans.getPersons().values().iterator();
-		while(p1Iter.hasNext()){
-			Plan plan1= ((Person) p1Iter.next()).getSelectedPlan();
-			Person p1=plan1.getPerson();
-			ActIterator a1Iter =plan1.getIteratorAct();
-			while(a1Iter.hasNext()){
-				Activity act1 = (Activity) a1Iter.next();
-				ActivityOption activity1=act1.getFacility().getActivityOption(act1.getType());
-				ArrayList<Person> actList=new ArrayList<Person>();
-
-				if(!activityMap.keySet().contains(activity1)){
-					actList.add(p1);
-					activityMap.put(activity1,actList);	
+		for (Person p1 : plans.getPersons().values()) {
+			for (PlanElement pe : p1.getSelectedPlan().getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity act1 = (Activity) pe;
+					ActivityOption activity1=act1.getFacility().getActivityOption(act1.getType());
+					ArrayList<Person> actList=new ArrayList<Person>();
+					
+					if(!activityMap.keySet().contains(activity1)){
+						actList.add(p1);
+						activityMap.put(activity1,actList);	
+					}
+					if(activityMap.keySet().contains(activity1)){
+						ArrayList<Person> myList=activityMap.get(activity1);
+						myList.add(p1);
+					}	
 				}
-				if(activityMap.keySet().contains(activity1)){
-					ArrayList<Person> myList=activityMap.get(activity1);
-					myList.add(p1);
-				}	
 			}
 		}
 		return activityMap;
@@ -133,25 +129,22 @@ public class TrackActsOverlap {
 	 * and performed the same activity there, regardless of when, there is a score
 	 * <br><br>
 	 * 
-	 * @param plans
-	 * @param iteration
+	 * @param plan
 	 * @return score
 	 */
 	public double scoreAllFriendsInAct(Plan plan) {
 		double score = 0;
-		ActIterator ait=plan.getIteratorAct();
-		while(ait.hasNext()){
-			Activity act = (Activity) ait.next();
-			ActivityOption myActivity=act.getFacility().getActivityOption(act.getType());
-			ArrayList<Person> visitors=activityMap.get(myActivity);
-			// Go through the list of Persons and for each one pick one friend randomly
-			// Must be double loop
-			Iterator<Person> vIt=visitors.iterator();
-			while(vIt.hasNext()){
-				Person p2= vIt.next();
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				ActivityOption myActivity=act.getFacility().getActivityOption(act.getType());
+				ArrayList<Person> visitors=activityMap.get(myActivity);
+				// Go through the list of Persons and for each one pick one friend randomly
+				// Must be double loop
+//				for (Person p2 : visitors) {
 //				TODO do something to score JH
-				// Person p1=plan.getPerson(); EgoNet net = p1.getMap().getEgoNet(); if(net.getAlters().contains(p2){friend++}else{foe++}; etc.
-
+					// Person p1=plan.getPerson(); EgoNet net = p1.getMap().getEgoNet(); if(net.getAlters().contains(p2){friend++}else{foe++}; etc.
+//				}
 			}
 		}
 		return score;
@@ -164,40 +157,37 @@ public class TrackActsOverlap {
 	 * <br><br>
 	 * 
 	 * 
-	 * @param plans
-	 * @param rndEncounterProbability
-	 * @param iteration
+	 * @param plan
 	 */
 	public double calculateFriendtoFoeInTimeWindow(Plan plan) {
 
 		double friend=0.;
 		double foe=0.;
-		ActIterator ait=plan.getIteratorAct();
 		Person p1=plan.getPerson();
-		while(ait.hasNext()){
-			Activity act1 = (Activity) ait.next();
-			ActivityOption myActivity=act1.getFacility().getActivityOption(act1.getType());
-			ArrayList<Person> visitors=activityMap.get(myActivity);
-			if(!activityMap.keySet().contains(myActivity)){
-				Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
-			}
-			if(!(visitors.size()>0)){
-				Gbl.errorMsg(this.getClass()+" number of visitors not >0");
-			}
-			// Go through the list of Persons and for each one pick one friend randomly
-			Iterator<Person> vIt=visitors.iterator();
-			while(vIt.hasNext()){
-				Person p2= vIt.next();
-				Plan plan2=p2.getSelectedPlan();
-				ActIterator act2It=plan2.getIteratorAct();
-				while(act2It.hasNext()){
-					Activity act2 = (Activity) act2It.next();
-					if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
-						EgoNet net = p1.getKnowledge().getEgoNet();
-						if(net.getAlters().contains(p2)){
-							friend++;
-						}else{
-							foe++;
+		for (PlanElement pe1 : plan.getPlanElements()) {
+			if (pe1 instanceof Activity) {
+				Activity act1 = (Activity) pe1;
+				ActivityOption myActivity=act1.getFacility().getActivityOption(act1.getType());
+				ArrayList<Person> visitors=activityMap.get(myActivity);
+				if(!activityMap.keySet().contains(myActivity)){
+					Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
+				}
+				if(!(visitors.size()>0)){
+					Gbl.errorMsg(this.getClass()+" number of visitors not >0");
+				}
+				// Go through the list of Persons and for each one pick one friend randomly
+				for (Person p2 : visitors) {
+					for (PlanElement pe2 : p2.getSelectedPlan().getPlanElements()) {
+						if (pe2 instanceof Activity) {
+							Activity act2 = (Activity) pe2;
+							if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
+								EgoNet net = p1.getKnowledge().getEgoNet();
+								if(net.getAlters().contains(p2)){
+									friend++;
+								}else{
+									foe++;
+								}
+							}
 						}
 					}
 				}
@@ -224,40 +214,39 @@ public class TrackActsOverlap {
 		double foe=0.;
 		double totalTimeWithFriends=0;
 
-		ActIterator ait=plan.getIteratorAct();
 		Person p1=plan.getPerson();
-		while(ait.hasNext()){
-			Activity act1 = (Activity) ait.next();
-			ActivityOption myActivity=act1.getFacility().getActivityOption(act1.getType());
-			ArrayList<Person> visitors=activityMap.get(myActivity);
-			if(!activityMap.keySet().contains(myActivity)){
-				Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
-			}
-			if(!(visitors.size()>0)){
-				Gbl.errorMsg(this.getClass()+" number of visitors not >0");
-			}
-			// Go through the list of Persons
-			Iterator<Person> vIt=visitors.iterator();
-			while(vIt.hasNext()){
-				Person p2= vIt.next();
-				Plan plan2=p2.getSelectedPlan();
-				ActIterator act2It=plan2.getIteratorAct();
-				while(act2It.hasNext()){
-					Activity act2 = (Activity) act2It.next();
-					if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
-						EgoNet net = p1.getKnowledge().getEgoNet();
-						if(net.getAlters().contains(p2)){
-							friend++;
-							totalTimeWithFriends+=getTimeWindowDuration(act1,act2);
-						}else{
-							foe++;
+		for (PlanElement pe1 : plan.getPlanElements()) {
+			if (pe1 instanceof Activity) {
+				Activity act1 = (Activity) pe1;
+				ActivityOption myActivity=act1.getFacility().getActivityOption(act1.getType());
+				ArrayList<Person> visitors=activityMap.get(myActivity);
+				if(!activityMap.keySet().contains(myActivity)){
+					Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
+				}
+				if(!(visitors.size()>0)){
+					Gbl.errorMsg(this.getClass()+" number of visitors not >0");
+				}
+				// Go through the list of Persons
+				for (Person p2 : visitors) {
+					for (PlanElement pe2 : p2.getSelectedPlan().getPlanElements()) {
+						if (pe2 instanceof Activity) {
+							Activity act2 = (Activity) pe2;
+							if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
+								EgoNet net = p1.getKnowledge().getEgoNet();
+								if(net.getAlters().contains(p2)){
+									friend++;
+									totalTimeWithFriends+=getTimeWindowDuration(act1,act2);
+								}else{
+									foe++;
+								}
+							}
 						}
 					}
 				}
 			}
 		}
 		if((friend+foe)==0){
-			stats.add((double) 0);
+			stats.add(Double.valueOf(0.0));
 		}else{
 			stats.add(friend/(foe+.1*(friend+foe)));
 		}
@@ -279,63 +268,63 @@ public class TrackActsOverlap {
 		// stats(0)=friendFoeRatio
 		// stats(1)=nFriends
 		// stats(2)=totalTimeWithFriends
-		ActIterator ait=plan.getIteratorAct();
 		Person p1=plan.getPerson();
-		while(ait.hasNext()){
-			double friend=0.;
-			double foe=0.;
-			double totalTimeWithFriends=0;
-			
-			Activity act1 = (Activity) ait.next();
-			ActivityOption myActivity=act1.getFacility().getActivityOption(act1.getType());
-			ArrayList<Person> visitors=activityMap.get(myActivity);
-			if(!activityMap.keySet().contains(myActivity)){
-				Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
-			}
-			if(!(visitors.size()>0)){
-				Gbl.errorMsg(this.getClass()+" number of visitors not >0");
-			}
-			// Go through the list of Persons
-			Iterator<Person> vIt=visitors.iterator();
-			while(vIt.hasNext()){
-				Person p2= vIt.next();
-				Plan plan2=p2.getSelectedPlan();
-				ActIterator act2It=plan2.getIteratorAct();
-				while(act2It.hasNext()){
-					Activity act2 = (Activity) act2It.next();
-					if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
-						EgoNet net = p1.getKnowledge().getEgoNet();
-						if(net.getAlters().contains(p2)){
-							friend++;
-							totalTimeWithFriends+=getTimeWindowDuration(act1,act2);
-						}else{
-							foe++;
+		for (PlanElement pe1 : plan.getPlanElements()) {
+			if (pe1 instanceof Activity) {
+				Activity act1 = (Activity) pe1;
+				
+				double friend=0.;
+				double foe=0.;
+				double totalTimeWithFriends=0;
+				
+				ActivityOption myActivity=act1.getFacility().getActivityOption(act1.getType());
+				ArrayList<Person> visitors=activityMap.get(myActivity);
+				if(!activityMap.keySet().contains(myActivity)){
+					Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
+				}
+				if(!(visitors.size()>0)){
+					Gbl.errorMsg(this.getClass()+" number of visitors not >0");
+				}
+				// Go through the list of Persons
+				for (Person p2 : visitors) {
+					for (PlanElement pe2 : p2.getSelectedPlan().getPlanElements()) {
+						if (pe2 instanceof Activity) {
+							Activity act2 = (Activity) pe2;
+							if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
+								EgoNet net = p1.getKnowledge().getEgoNet();
+								if(net.getAlters().contains(p2)){
+									friend++;
+									totalTimeWithFriends+=getTimeWindowDuration(act1,act2);
+								}else{
+									foe++;
+								}
+							}
 						}
 					}
 				}
-			}
-			if(!actStats.keySet().contains(act1)){
-				ArrayList<Double> stats=new ArrayList<Double>();
-				if((friend+foe)==0){
-					stats.add((double) 0);
-				}else{
-					stats.add(friend/(foe+.1*(friend+foe)));
+				if(!actStats.keySet().contains(act1)){
+					ArrayList<Double> stats=new ArrayList<Double>();
+					if((friend+foe)==0){
+						stats.add(Double.valueOf(0.0));
+					}else{
+						stats.add(friend/(foe+.1*(friend+foe)));
+					}
+					stats.add(friend);
+					stats.add(totalTimeWithFriends);
+					
+					actStats.put(act1,stats);	
 				}
-				stats.add(friend);
-				stats.add(totalTimeWithFriends);
-
-				actStats.put(act1,stats);	
+				if(actStats.keySet().contains(act1)){
+					ArrayList<Double> stats=actStats.get(act1);
+					if((friend+foe)==0){
+						stats.add((double) 0);
+					}else{
+						stats.add(friend/(foe+.1*(friend+foe)));
+					}
+					stats.add(friend);
+					stats.add(totalTimeWithFriends);
+				}	
 			}
-			if(actStats.keySet().contains(act1)){
-				ArrayList<Double> stats=actStats.get(act1);
-				if((friend+foe)==0){
-					stats.add((double) 0);
-				}else{
-					stats.add(friend/(foe+.1*(friend+foe)));
-				}
-				stats.add(friend);
-				stats.add(totalTimeWithFriends);
-			}	
 		}
 
 		return actStats;

@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -76,21 +76,23 @@ public class PlanSocScoringFunction implements ScoringFunction{
 	public void finish() {
 		this.scoringFunction.finish();
 
-		ActIterator ait = this.plan.getIteratorAct();
 
 		LinkedHashMap<Activity,ArrayList<Double>> actStats = this.spatialScorer.calculateTimeWindowActStats(plan);
 //		ArrayList<Double> stats = this.spatialScorer.calculateTimeWindowStats(plan);
-		while(ait.hasNext()){
-			Activity act = (Activity)ait.next();
-			if(act.getType().equals(factype)){
+		for (PlanElement pe : this.plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if(act.getType().equals(factype)){
 //				this.friendFoeRatio+=stats.get(0);
 //				this.nFriends+=stats.get(1);
 //				this.timeWithFriends+=stats.get(2);
-				this.friendFoeRatio+=actStats.get(act).get(0);
-				this.nFriends+=actStats.get(act).get(1);
-				this.timeWithFriends+=actStats.get(act).get(2);
+					this.friendFoeRatio+=actStats.get(act).get(0);
+					this.nFriends+=actStats.get(act).get(1);
+					this.timeWithFriends+=actStats.get(act).get(2);
+				}
 			}
 		}
+			
 //		log.info("Person "+plan.getPerson().getId()+" meets nFriends "+this.nFriends+" for "+this.timeWithFriends+" at activity "+ factype);
 	}
 
