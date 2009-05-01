@@ -23,15 +23,11 @@ package org.matsim.core.mobsim.queuesim;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.Leg;
-import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.PlanElement;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
+
+import org.matsim.core.api.network.*;
+import org.matsim.core.api.population.*;
+import org.matsim.core.events.*;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -182,8 +178,25 @@ public class PersonAgent implements DriverAgent {
 		this.currentLink = link;
 	}
 
+	static boolean aLastActHadAnEndTime = false ;
 	private void advancePlanElement(final double now) {
 		this.currentPlanElementIndex++;
+		
+		if ( this.currentPlanElementIndex >= this.getPlanElements().size() ) {
+			if ( !aLastActHadAnEndTime ) {
+				aLastActHadAnEndTime = true ;
+				log.warn("Encountered an activity which has an end time, but is not followed by a leg.  Assuming it is the last activity." + Gbl.ONLYONCE );
+			}
+			return ;
+		}
+		/*
+		 * My Seattle plans do not run any more without this condition. The problem, presumably, is that some plans have only a
+		 * single activity (e.g. "stay at home all day"). Initially, these activities do not have an end time, and there should be
+		 * no problem. However, the strategy modules (presumably the time allocation mutator) introduces activity end times.
+		 * Ironically, there used to be a condition that activities MUST have an end time, which I disabled. I hope we can afford to
+		 * make MATSim more forgiving here. kai, may/01
+		 */
+		
 		PlanElement pe = this.getPlanElements().get(this.currentPlanElementIndex);
 		if (pe instanceof Activity) {
 			reachActivity(now, (Activity) pe);
