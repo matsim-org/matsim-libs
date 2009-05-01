@@ -10,8 +10,8 @@ import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.gbl.Gbl;
 
 public class ReadKonradFacilities {
 	
@@ -21,7 +21,7 @@ public class ReadKonradFacilities {
 		
 		List<ZHFacilityComposed> zhfacilities = new Vector<ZHFacilityComposed>();
 		
-		Facilities facilities=(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		Facilities facilities=new FacilitiesImpl();//(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(facilities).readFile(file);
 		
 		Iterator<? extends Facility> facilities_it = facilities.getFacilities().values().iterator();

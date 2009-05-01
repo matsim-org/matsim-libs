@@ -44,6 +44,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -53,14 +54,15 @@ public class SheltersReader {
 
 	private final NetworkLayer network;
 	private final Facilities facilities;
+	private final World world;
 
 	private final static double saveBX = 662440;
 	private final static double saveBY = 9898860;
 	
-	public SheltersReader(final NetworkLayer network, final Facilities facilities) {
+	public SheltersReader(final NetworkLayer network, final Facilities facilities, final World world) {
 		this.network = network;
 		this.facilities = facilities;
-		
+		this.world = world;
 	}
 	
 	public void read(final String filename) {
@@ -121,7 +123,7 @@ public class SheltersReader {
 		}
 
 		
-		new WorldConnectLocations().run(Gbl.getWorld());
+		new WorldConnectLocations().run(this.world);
 //		System.out.println("s     " + (superFac.getLink() == null) + " " + superFac.getId());
 //		throw new RuntimeException("s     " + (superFac.getLink() == null) + " " + superFac.getId());
 	}
@@ -130,13 +132,13 @@ public class SheltersReader {
 		String shelters = "../inputs/padang/network_v20080618/shelters.shp";
 		String netfile = "../inputs/networks/padang_net_v20080618.xml";
 		
-		Gbl.createWorld();
+		World world = Gbl.createWorld();
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
-		Gbl.getWorld().setNetworkLayer(network);
-		Facilities fac = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		Gbl.getWorld().complete();
-		new SheltersReader(network,fac).read(shelters);
+		world.setNetworkLayer(network);
+		Facilities fac = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		world.complete();
+		new SheltersReader(network,fac,world).read(shelters);
 		
 	}
 }

@@ -71,7 +71,7 @@ import playground.jhackney.kml.EgoNetPlansItersMakeKML;
  * Thus the social network replanning occurs in parallel to the normal replanning and not
  * serial to it. <p>
  *
- * Contrast this functionality to <a href= <a> playground/jhackney/controler/SNControllerListenerSecLoc.java</a>, which replans outside the
+ * Contrast this functionality to {@link playground/jhackney/controler/SNControllerListenerSecLoc}, which replans outside the
  * MobSim loop and generates new initial demand (100% of agents replan with social network
  * and a portion of the plans are optimized subsequently in MobSim).<p>
  *
@@ -155,7 +155,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 //		new WorldCreateRasterLayer2(gridSpacing).run(Gbl.getWorld());
 
 		// Complete the world to make sure that the layers all have relevant mapping rules
-		new WorldConnectLocations().run(Gbl.getWorld());
+		new WorldConnectLocations().run(event.getControler().getWorld());
 
 		this.log.info(" Initializing agent knowledge about geography ...");
 
@@ -258,7 +258,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 //				Write out the KML for the EgoNet of a chosen agent
 				this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
-				Person testP=this.controler.getPopulation().getPerson(new IdImpl("21924270"));//1pct
+				Person testP=this.controler.getPopulation().getPersons().get(new IdImpl("21924270"));//1pct
 //				Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
 				EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
 				this.log.info(" ... done");
@@ -279,7 +279,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	}
 
 	public void notifyIterationStarts(final IterationStartsEvent event) {
-		Controler controler = event.getControler();
+//		Controler controler = event.getControler();
 
 		/* code previously in setupIteration() */
 
@@ -360,9 +360,9 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 //		If the user has an existing file that maps activities to acts, open it and read it in
 //		Attempt to open file of mental maps and read it in
 		System.out.println("  Opening the file to read in the map of Acts to Facilities");
-		aar = new ActivityActReader(Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue());
+		aar = new ActivityActReader(Integer.valueOf(controler.getConfig().socnetmodule().getInitIter()).intValue());
 
-		String fileName = Gbl.getConfig().socnetmodule().getInDirName()+ "ActivityActMap"+Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue()+".txt";
+		String fileName = controler.getConfig().socnetmodule().getInDirName()+ "ActivityActMap"+Integer.parseInt(controler.getConfig().socnetmodule().getInitIter())+".txt";
 		aar.openFile(fileName);
 		System.out.println(" ... done");
 
@@ -406,7 +406,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
 
 		this.log.info(" Instantiating the Pajek writer ...");
-		this.pjw = new PajekWriter(SOCNET_OUT_DIR, (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
+		this.pjw = new PajekWriter(SOCNET_OUT_DIR, controler.getFacilities());
 		this.log.info("... done");
 
 		this.log.info(" Initializing the social network ...");

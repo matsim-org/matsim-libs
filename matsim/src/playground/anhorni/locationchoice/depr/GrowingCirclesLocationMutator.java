@@ -83,15 +83,15 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public GrowingCirclesLocationMutator(final NetworkLayer network) {
+	public GrowingCirclesLocationMutator(final NetworkLayer network, final Facilities facilities) {
 		super();
-		this.init(network);
+		this.init(network, facilities);
 	}
 
 
-	private void init(final NetworkLayer network) {
+	private void init(final NetworkLayer network, final Facilities facilities) {
 		System.out.println("    init " + this.getClass().getName() + " module...");
-		this.facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
+		this.facilities = facilities;//(Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 		this.network=network;
 		this.buildShopFacQuadTree();
 		this.buildLeisFacQuadTree();

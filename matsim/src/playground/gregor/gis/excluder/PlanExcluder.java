@@ -31,6 +31,7 @@ import org.geotools.feature.FeatureIterator;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -39,6 +40,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.world.World;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
@@ -47,7 +49,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class PlanExcluder {
 
 	private static final Logger log = Logger.getLogger(PlanExcluder.class);
-	private final NetworkLayer network;
+//	private final NetworkLayer network;
 	private final Population plans;
 	private final Collection<Polygon> ps;
 
@@ -60,7 +62,7 @@ public class PlanExcluder {
 
 	public PlanExcluder(final NetworkLayer network, final Population population,
 			final Collection<Polygon> ps) {
-		this.network = network;
+//		this.network = network;
 		this.plans = population;
 		this.ps = ps;
 	}
@@ -102,7 +104,7 @@ public class PlanExcluder {
 
 
 		final String links = "./output/analysis/excludes.shp";
-		final String config = "./configs/timeVariantEvac.xml";
+		final String configFile = "./configs/timeVariantEvac.xml";
 
 		FeatureSource l = null;
 		try {
@@ -112,18 +114,18 @@ public class PlanExcluder {
 		}
 		final Collection<Polygon> ls = getPolygons(l);
 
-		Gbl.createConfig(new String [] {config});
-		Gbl.createWorld();
+		Config config = Gbl.createConfig(new String [] {configFile});
+		World world = Gbl.createWorld();
 
 
 		final NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		world.setNetworkLayer(network);
+		world.complete();
 
 
 		final Population population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(Gbl.getConfig().plans().getInputFile());
+		new MatsimPopulationReader(population, network).readFile(config.plans().getInputFile());
 
 
 		Population toSave = new PlanExcluder(network,population,ls).run();

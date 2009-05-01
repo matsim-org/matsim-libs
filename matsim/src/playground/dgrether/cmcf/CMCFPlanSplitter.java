@@ -52,7 +52,7 @@ public class CMCFPlanSplitter {
 	public static void main(final String[] args) {
 		NetworkLayer net = MatsimIo.loadNetwork(DgPaths.IVTCHNET);
 //		Plans plansCmcf = MatsimIo.loadPlans(cmcfPlansFile);
-		Population plans = MatsimIo.loadPlans(plansFile);
+		Population plans = MatsimIo.loadPlans(plansFile, net);
 		Population plansOne = new PopulationImpl();
 		for (Person p : plans.getPersons().values()) {
 			Plan pl = p.getSelectedPlan();

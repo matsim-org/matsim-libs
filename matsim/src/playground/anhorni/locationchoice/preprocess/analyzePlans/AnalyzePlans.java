@@ -64,12 +64,12 @@ public class AnalyzePlans {
 		Gbl.printElapsedTime();
 	}
 	
-	public void init(String networkfilePath, String plansfilePath, String facilitiesfilePath) {
+	private void init(String networkfilePath, String plansfilePath, String facilitiesfilePath) {
 		
-		//World world = Gbl.createWorld();
+		World world = Gbl.createWorld();
 				
 		log.info("reading the facilities ...");
-		this.facilities =(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		this.facilities =(Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 			
 		log.info("reading the network ...");

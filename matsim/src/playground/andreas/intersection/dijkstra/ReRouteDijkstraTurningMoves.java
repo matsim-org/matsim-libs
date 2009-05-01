@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.andreas.intersection.dijkstra;
 
+import org.matsim.core.api.network.Network;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.TravelCost;
@@ -34,11 +35,14 @@ public class ReRouteDijkstraTurningMoves extends AbstractMultithreadedModule {
 
 	TravelTime timeCalculator = null;
 
-	NetworkLayer network = null;
+	NetworkLayer wrappedNetwork = null;
+	
+	Network originalNetwork = null;
 
 	public ReRouteDijkstraTurningMoves(final NetworkLayer network, final TravelCost costCalculator,
 			final TravelTime timeCalculator) {
-		this.network = NetworkWrapper.wrapNetwork(network);
+		this.originalNetwork = network;
+		this.wrappedNetwork = NetworkWrapper.wrapNetwork(network);
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
 	}
@@ -48,7 +52,7 @@ public class ReRouteDijkstraTurningMoves extends AbstractMultithreadedModule {
 	 */
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new PlansCalcRouteDijkstra(this.network, this.costCalculator, this.timeCalculator);
+		return new PlansCalcRouteDijkstra(this.originalNetwork, this.wrappedNetwork, this.costCalculator, this.timeCalculator);
 	}
 
 }

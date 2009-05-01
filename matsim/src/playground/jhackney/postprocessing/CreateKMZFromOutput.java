@@ -26,6 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
+import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
@@ -43,14 +44,14 @@ public class CreateKMZFromOutput {
 
 
 		Scenario.setUpScenarioConfig();
-		Config config =Gbl.getConfig();
+		Config config = Scenario.getConfig();
 
 //		config.plans().setInputFile(Scenario.getSNInDir() + "output_plans"+i+".xml");
 
-		Scenario.readWorld();
+		World world = Scenario.readWorld();
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
-		new WorldConnectLocations().run(Gbl.getWorld());
+		new WorldConnectLocations().run(world);
 
 		
 //		Write out the KML for the EgoNet of a chosen agent
@@ -135,7 +136,7 @@ public class CreateKMZFromOutput {
 
 
 //			System.out.println(" Writing out KMZ activity spaces and day plans for agent's egoNet");
-			Person testP=plans.getPerson(new IdImpl("21924270"));//1pct
+			Person testP=plans.getPersons().get(new IdImpl("21924270"));//1pct
 //			Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
 			EgoNetPlansItersMakeKML.loadData(testP,i);
 			System.out.println(" ... done");

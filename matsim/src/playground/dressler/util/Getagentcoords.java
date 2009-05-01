@@ -33,19 +33,18 @@ import javax.imageio.ImageIO;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.world.World;
 
 
 public class Getagentcoords {
@@ -67,22 +66,17 @@ public class Getagentcoords {
 		
 		final float alpha = 0.01f; // transparency factor. depends on maximum demands.
 
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Scenario scenario = new ScenarioImpl();
 
-		World world = Gbl.getWorld();
-
-		NetworkLayer network = new NetworkLayer();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
-		Population population = new PopulationImpl();
-		new MatsimPopulationReader(population).readFile(plansFilename);
+		Population population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 
 		// get evac links
-		Node evac1node = network.getNode("en1");
+		Node evac1node = network.getNodes().get(new IdImpl("en1"));
 		Map<Id,? extends Link> evaclinks = null;		
 		if (evac1node != null) {
 			evaclinks = evac1node.getInLinks();

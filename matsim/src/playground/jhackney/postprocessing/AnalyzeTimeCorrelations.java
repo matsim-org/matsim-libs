@@ -28,6 +28,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
+import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
@@ -44,12 +45,12 @@ public class AnalyzeTimeCorrelations {
 		System.out.println("Make friend face to face scores each 10 iters:");
 
 		Scenario.setUpScenarioConfig();
-		Config config =Gbl.getConfig();
+		Config config = Scenario.getConfig();
 
-		Scenario.readWorld();
+		World world = Scenario.readWorld();
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
-		new WorldConnectLocations().run(Gbl.getWorld());
+		new WorldConnectLocations().run(world);
 
 		int i=500;
 //		read in plans

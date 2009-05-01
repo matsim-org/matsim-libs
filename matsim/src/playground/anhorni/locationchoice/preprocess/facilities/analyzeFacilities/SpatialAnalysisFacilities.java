@@ -10,15 +10,15 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.gbl.Gbl;
+
+import playground.anhorni.locationchoice.cs.depr.filters.AreaReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-
-import playground.anhorni.locationchoice.cs.depr.filters.AreaReader;
 
 public class SpatialAnalysisFacilities {
 
@@ -60,7 +60,7 @@ public class SpatialAnalysisFacilities {
 	}
 	
 	private TreeMap<Id,Facility> readAndFilterFacilities(String facilitiesFile) {
-		Facilities facilities  =(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		Facilities facilities  = new FacilitiesImpl();//(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(facilities).readFile(facilitiesFile);
 		
 		TreeMap<Id,Facility> shop_facilities = new TreeMap<Id,Facility>();

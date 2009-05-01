@@ -76,6 +76,7 @@ import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
+import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
@@ -169,19 +170,19 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		}
 	}
 
-	public void setup( Population population ){
+	public void setup( World world, Population population ){
 
 		random = new Random(this.cfg.global().getRandomSeed());
 		
 		setupParameters();
 		
-		setupAggregationLayer();
+		setupAggregationLayer(world);
 
 		setupTravelCosts();
 			
 		setupNumberHomesPerZone( population );
 
-		setupNumberJobsPerZone();
+		setupNumberJobsPerZone((Facilities) world.getLayer(Facilities.LAYER_TYPE));
 
 		normalizeJobHomeVectors();
 		
@@ -229,13 +230,13 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		
 	}
 	
-	private void setupAggregationLayer(){
+	private void setupAggregationLayer(World world){
 		// Check / load the aggregation layer
 		if( zoneLayer == null ){	
 			String layerName = cfg.findParam( module_name, "aggregation layer");
 			if( layerName == null )
 				Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs an aggregation layer" ) );
-			zoneLayer = Gbl.getWorld().getLayer( layerName );
+			zoneLayer = world.getLayer( layerName );
 			if( ! (zoneLayer instanceof ZoneLayer) )
 				Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs a Zone Layer") );
 		}
@@ -313,12 +314,11 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		return false;
 	}
 	
-	private void setupNumberJobsPerZone(){
+	private void setupNumberJobsPerZone(Facilities facilities){
 		// Setup the number of available facilities at the destination of the trips
 		// In this case we take the capacities of the existing Facilities
 		// and maintain a list of Facilities per Zone
 		core.J = new double[ core.numZ ];
-		Facilities facilities = ((Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
 		for( Facility facility : facilities.getFacilities().values() ){
 			ActivityOption act = facility.getActivityOption( primaryActivityName );
 			if( act != null ){

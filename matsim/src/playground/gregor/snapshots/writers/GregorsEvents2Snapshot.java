@@ -181,7 +181,7 @@ public class GregorsEvents2Snapshot {
 	private void prepare() {
 		if (this.network == null) {
 			// read network
-			this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+			this.network = new NetworkLayer();
 			new MatsimNetworkReader(this.network).readFile(this.config.network().getInputFile());
 		}
 

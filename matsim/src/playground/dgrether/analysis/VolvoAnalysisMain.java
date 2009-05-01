@@ -52,9 +52,7 @@ public class VolvoAnalysisMain {
 		Config config = Gbl.createConfig(args);
 		System.out.println("  reading the network...");
 		NetworkLayer network = new NetworkLayer();
-		Gbl.getWorld().setNetworkLayer(network);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		Gbl.getWorld().complete();
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 		System.out.println("  reading tolls...");
 		RoadPricingScheme hundekopf;
@@ -90,7 +88,7 @@ public class VolvoAnalysisMain {
 		events.addHandler(analysis);
 		new MatsimEventsReader(events).readFile(config.events().getInputFile());
 		events.printEventsCount();
-		String outfilename = Gbl.getConfig().getParam("roadpricing", "outputFile");
+		String outfilename = config.getParam("roadpricing", "outputFile");
 		new VolvoAnalysisWriter(analysis, Locale.GERMAN).write(outfilename);
 		Gbl.printElapsedTime();
 		System.out.println("RUN: volvoAnalaysis finished.");

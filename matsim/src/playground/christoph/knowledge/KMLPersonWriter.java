@@ -402,7 +402,7 @@ public class KMLPersonWriter {
 	
 	public void loadNetwork(String netFileName)
 	{
-		this.network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		this.network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 	}
 	

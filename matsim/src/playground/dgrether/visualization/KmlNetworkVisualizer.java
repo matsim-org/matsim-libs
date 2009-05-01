@@ -104,8 +104,8 @@ public class KmlNetworkVisualizer {
 	protected NetworkLayer loadNetwork(final String networkFile) {
 		// - read network: which buildertype??
 		printNote("", "  creating network layer... ");
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
-				NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer(); //(NetworkLayer) Gbl.getWorld().createLayer(
+//				NetworkLayer.LAYER_TYPE, null);
 		printNote("", "  done");
 
 		printNote("", "  reading network xml file... ");

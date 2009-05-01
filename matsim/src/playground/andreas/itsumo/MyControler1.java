@@ -277,7 +277,7 @@ public class MyControler1 extends Controler {
 	protected NetworkLayer loadNetwork() {
 
 		log.info("  creating network layer... ");
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = (NetworkLayer) super.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		log.info("  done");
 
 		log.info("  reading network xml file... ");

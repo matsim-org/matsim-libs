@@ -228,8 +228,7 @@ public class CountsAnalyser {
 	protected NetworkLayer loadNetwork() {
 		// - read network: which buildertype??
 		printNote("", "  creating network layer... ");
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
-				NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		printNote("", "  done");
 
 		printNote("", "  reading network xml file... ");

@@ -20,21 +20,17 @@
 
 package playground.dgrether.analysis;
 
-import java.io.PrintWriter;
 import java.util.Date;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.world.MatsimWorldReader;
 
 /**
  * This Class is able to compare two plan files of different iterations. In a
@@ -67,13 +63,12 @@ public class PlanComparator {
    */
 	public PlanComparator(final String configPath, final String firstPlanPath,
 			final String secondPlanPath, final String outpath) {
-		// create config
-		initConfig(configPath);
-		loadWorld();
-		loadNetwork();
+
+		ScenarioLoader sl = new ScenarioLoader(configPath);
+		sl.loadNetwork();
 
 		// load first plans file
-		this.population = loadPlansFile(firstPlanPath);
+		this.population = loadPlansFile(firstPlanPath, sl.getScenario().getNetwork());
 		this._result = new PlanComparison(this.population.getPersons().keySet().size());
 		Plan plan;
 		Activity act;
@@ -86,7 +81,7 @@ public class PlanComparator {
 		this.population = null;
 		System.gc();
 		// load second population
-		this.population = loadPlansFile(secondPlanPath);
+		this.population = loadPlansFile(secondPlanPath, sl.getScenario().getNetwork());
 		for (Id id : this.population.getPersons().keySet()) {
 			plan = this.population.getPersons().get(id).getSelectedPlan();
 			this._result.addSecondPlansData(id, plan.getScoreAsPrimitiveType());
@@ -104,78 +99,21 @@ public class PlanComparator {
 	}
 
 	/**
-   * load the world
-   *
-   */
-	protected void loadWorld() {
-		if (Gbl.getConfig().world().getInputFile() != null) {
-			printNote("", "  reading world xml file... ");
-			final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-			worldReader.readFile(Gbl.getConfig().world().getInputFile());
-			printNote("", "  done");
-		}
-		else {
-			printNote("", "  No World input file given in config.xml!");
-		}
-	}
-
-	/**
-   * load the network
-   *
-   * @return the network layer
-   */
-	protected NetworkLayer loadNetwork() {
-		// - read network: which buildertype??
-		printNote("", "  creating network layer... ");
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
-				NetworkLayer.LAYER_TYPE, null);
-		printNote("", "  done");
-
-		printNote("", "  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		printNote("", "  done");
-
-		return network;
-	}
-
-	/**
    * Load the plan file with the given path.
    *
    * @param filename
    *          the path to the filename
    * @return the Plans object containing the population
    */
-	protected Population loadPlansFile(final String filename) {
+	protected Population loadPlansFile(final String filename, Network network) {
 		Population plans = new PopulationImpl();
 
 		printNote("", "  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		plansReader.readFile(filename);
 		printNote("", "  done");
 
 		return plans;
-	}
-
-	/**
-   * Reads the configuration file
-   *
-   * @param configPath
-   */
-	private void initConfig(final String configPath) {
-		if (Gbl.getConfig() == null) {
-			Gbl.createConfig(new String[] { configPath, "config_v1.dtd" });
-		}
-		else {
-			Gbl.errorMsg("config exists already! Cannot create a 2nd global config from args: "
-							+ configPath);
-		}
-
-
-		printNote("", "Complete config dump:...");
-		ConfigWriter configwriter = new ConfigWriter(Gbl.getConfig(),
-				new PrintWriter(System.out));
-		configwriter.write();
-		printNote("", "Complete config dump: done...");
 	}
 
 	/**

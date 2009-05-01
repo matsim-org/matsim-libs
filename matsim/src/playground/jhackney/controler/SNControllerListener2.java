@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.controler.Controler;
@@ -116,7 +115,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 		this.controler = event.getControler();
 
 		// Complete the world to make sure that the layers all have relevant mapping rules
-		new WorldConnectLocations().run(Gbl.getWorld());
+		new WorldConnectLocations().run(controler.getWorld());
 
 		this.log.info(" Initializing agent knowledge about geography ...");
 		initializeKnowledge();
@@ -260,7 +259,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 	 * Clear these results here, after RePlanning, rather than in
 	 * notifyIterationStarts, in case they are needed in RePlanning.<p>
 	 * 
-	 * See {@link org.matsim.controler.Controler.doIterations()}
+	 * See {@link org.matsim.controler.Controler#doIterations()}
 	 */
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 
@@ -288,7 +287,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 		this.rndEncounterProbs = new ParamStringsToStringDoubleMap(this.controler.getConfig().socnetmodule().getActTypes(), this.controler.getConfig().socnetmodule().getFacWt()).getMap();
 
 		this.log.info(" Instantiating the Pajek writer ...");
-		this.pjw = new PajekWriter(SOCNET_OUT_DIR, (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
+		this.pjw = new PajekWriter(SOCNET_OUT_DIR, controler.getFacilities());
 		this.log.info("... done");
 
 		if(this.controler.getConfig().socnetmodule().getSocNetAlgo()==(null)){

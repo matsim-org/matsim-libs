@@ -84,6 +84,7 @@ public abstract class ScenarioConfig {
 	private static String popFileName=null;
 
 	private static final Config config= Gbl.createConfig(null);
+	private static final World world= Gbl.createWorld();
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -171,19 +172,19 @@ public abstract class ScenarioConfig {
 			e.printStackTrace();
 		}
 		System.out.println("  Done");
-		return Gbl.getConfig();
+		return config;
 	}
 	public static final World readWorld() {
 		System.out.println("  reading world xml file... ");
 //		new MatsimWorldReader(Gbl.getWorld()).readFile(Gbl.getConfig().world().getInputFile());
-		new MatsimWorldReader(Gbl.getWorld()).readFile(worldFileName);
+		new MatsimWorldReader(world).readFile(worldFileName);
 		System.out.println("  done.");
-		return Gbl.getWorld();
+		return world;
 	}
 
 	public static final Facilities readFacilities() {
 		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
 //		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
 		new MatsimFacilitiesReader(facilities).readFile(facsFileName);
 		System.out.println("  done.");
@@ -193,7 +194,7 @@ public abstract class ScenarioConfig {
 	public static final NetworkLayer readNetwork() {
 		System.out.println("  reading the network xml file...");
 		System.out.println(config.network().getInputFile());
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 //		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		new MatsimNetworkReader(network).readFile(netFileName);
 		System.out.println("  done.");
@@ -211,7 +212,7 @@ public abstract class ScenarioConfig {
 
 	public static final Matrices readMatrices() {
 		System.out.println("  reading matrices xml file... ");
-		new MatsimMatricesReader(Matrices.getSingleton(), Gbl.getWorld()).readFile(config.matrices().getInputFile());
+		new MatsimMatricesReader(Matrices.getSingleton(), world).readFile(config.matrices().getInputFile());
 		System.out.println("  done.");
 		return Matrices.getSingleton();
 	}

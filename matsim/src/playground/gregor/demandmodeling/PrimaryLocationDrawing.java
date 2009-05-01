@@ -57,6 +57,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.world.World;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -85,8 +86,8 @@ public class PrimaryLocationDrawing {
 
 	private static final Logger log = Logger.getLogger(PrimaryLocationDrawing.class);
 
-	public PrimaryLocationDrawing(final String zonesFile, final String demandFilename, final String districts) {
-		this.network = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
+	public PrimaryLocationDrawing(final NetworkLayer network, final String zonesFile, final String demandFilename, final String districts) {
+		this.network = network;
 		this.zonesFilename = zonesFile;
 		this.demandFilename = demandFilename;
 		this.districts = districts;
@@ -346,15 +347,15 @@ public class PrimaryLocationDrawing {
 
 
 		Gbl.createConfig(null);
-		Gbl.createWorld();
+		World world = Gbl.createWorld();
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
+		world.setNetworkLayer(network);
+		world.complete();
 
 
 
-		new PrimaryLocationDrawing(zonesFilename,demandFilename,districts).run();
+		new PrimaryLocationDrawing(network,zonesFilename,demandFilename,districts).run();
 
 
 

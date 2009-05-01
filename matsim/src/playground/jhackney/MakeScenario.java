@@ -47,7 +47,7 @@ public class MakeScenario {
 
 		System.out.println("Make Scenario SAMPLE OF FACILITIES:");
 
-		World world = Gbl.createWorld();
+		World world = Scenario.getWorld();
 		
 		System.out.println("Uses output of a CUT. Samples 100x\"pct\"% of the facilities and moves Acts to take place at these");
 

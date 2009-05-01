@@ -49,8 +49,8 @@ public class CMCFFirstActPlansMerger {
 	 */
 	public static void main(String[] args) {
 		NetworkLayer net = MatsimIo.loadNetwork(DgPaths.IVTCHNET);
-		Population plansCmcf = MatsimIo.loadPlans(cmcfPlansFile);
-		Population plans = MatsimIo.loadPlans(plansFile);
+		Population plansCmcf = MatsimIo.loadPlans(cmcfPlansFile, net);
+		Population plans = MatsimIo.loadPlans(plansFile, net);
 		for (Person p : plans.getPersons().values()) {
 			Plan pl = p.getSelectedPlan();
 			Leg l = pl.getNextLeg(pl.getFirstActivity());

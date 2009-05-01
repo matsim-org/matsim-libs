@@ -24,6 +24,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -55,9 +56,9 @@ public class CountsCreator {
 	 */
 
 	public CountsCreator(String networkPath) {
-		Gbl.createConfig(null);
-		Gbl.getConfig().simulation().setFlowCapFactor(0.13);
-		Gbl.getConfig().simulation().setStorageCapFactor(0.13);
+		Config config = Gbl.createConfig(null);
+		config.simulation().setFlowCapFactor(0.13);
+		config.simulation().setStorageCapFactor(0.13);
 		this.network = loadNetwork(networkPath);
 		log.info("  creating routes...");
 		NetworkRoute r1 = new NodeNetworkRoute();
@@ -124,8 +125,7 @@ public class CountsCreator {
 	protected NetworkLayer loadNetwork(final String networkFile) {
 		// - read network: which buildertype??
 		log.info("  creating network layer... ");
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
-				NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		log.info("   done");
 
 		log.info("    reading network xml file... ");

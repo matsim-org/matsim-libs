@@ -2,16 +2,15 @@ package playground.ciarif.retailers;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.BasicLinkImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.world.World;
 
 public abstract class Utils {
 	private final static double EPSILON = 0.0001;
-	public static final void moveFacility(Facility f, BasicLinkImpl link) {
+	public static final void moveFacility(Facility f, BasicLinkImpl link, World world) {
 		double [] vector = new double[2];
 		vector[0] = link.getToNode().getCoord().getY()-link.getFromNode().getCoord().getY();
 		vector[1] = -(link.getToNode().getCoord().getX()-link.getFromNode().getCoord().getX());
@@ -19,12 +18,12 @@ public abstract class Utils {
 //		System.out.println("length = " + length);
 		Coord coord = new CoordImpl(link.getCoord().getX()+vector[0]*EPSILON,link.getCoord().getY()+vector[1]*EPSILON);
 		f.moveTo(coord);
-		
+
 		BasicLinkImpl oldL = (BasicLinkImpl)f.getLink();
 		if (oldL != null) {
-			Gbl.getWorld().removeMapping(f, oldL);
+			world.removeMapping(f, oldL);
 		}
-		Gbl.getWorld().addMapping(f, link);
+		world.addMapping(f, link);
 
 	}
 	

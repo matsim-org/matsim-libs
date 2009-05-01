@@ -67,11 +67,14 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 	private TravelCost tcost;
 	private TravelTime ttime;
 	private String[] factypes;
+	
+	private final Facilities facilities;
 
-	public PlanRandomReplaceSecLoc(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime) {
+	public PlanRandomReplaceSecLoc(String[] factypes, NetworkLayer network, Facilities facilities, TravelCost tcost, TravelTime ttime) {
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;
+		this.facilities=facilities;
 		this.tcost=tcost;
 		this.ttime=ttime;
 		this.factypes=factypes;
@@ -143,10 +146,9 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 
 //			Pick a random ACTIVITY of this type from Facilities
 
-			Facilities facs = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 //			Id facId=new Id(Gbl.random.nextInt(facs.getFacilities().size()));
-			int facId=MatsimRandom.getRandom().nextInt(facs.getFacilities(factype).size());
-			Facility f= (Facility) facs.getFacilities(factype).values().toArray()[facId];
+			int facId=MatsimRandom.getRandom().nextInt(facilities.getFacilities(factype).size());
+			Facility f= (Facility) facilities.getFacilities(factype).values().toArray()[facId];
 			
 //			Facility f = facs.getFacilities().get(new Id(Gbl.random.nextInt(facs.getFacilities().size())));
 //			And replace the activity in the chain with it (only changes the facility)

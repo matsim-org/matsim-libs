@@ -430,11 +430,11 @@ public class Controler {
 			//dump network
 			new NetworkWriter(this.network, getOutputFilename("output_network.xml.gz")).write();
 			// dump world
-			new WorldWriter(Gbl.getWorld(), getOutputFilename("output_world.xml.gz")).write();
+			new WorldWriter(this.getWorld(), getOutputFilename("output_world.xml.gz")).write();
   		// dump config
 			new ConfigWriter(this.config, getOutputFilename("output_config.xml.gz")).write();
 			// dump facilities
-			Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
+			Facilities facilities = this.getFacilities();
 			if (facilities != null) {
 				new FacilitiesWriter(facilities, getOutputFilename("output_facilities.xml.gz")).write();
 			}

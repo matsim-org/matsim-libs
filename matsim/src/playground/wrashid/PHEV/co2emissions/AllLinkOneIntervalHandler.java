@@ -2,11 +2,10 @@ package playground.wrashid.PHEV.co2emissions;
 
 import java.util.HashMap;
 
-
-import org.matsim.core.api.network.Link;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.network.NetworkLayer;
 
 /**
  * This class computes the summary of co2 emissions per link for a specified interval.
@@ -14,9 +13,9 @@ import org.matsim.core.network.NetworkLayer;
 public class AllLinkOneIntervalHandler implements LinkLeaveEventHandler {
 
 	// key: linkId, value: emissions
-	private HashMap<String, Double> co2EmissionsWholeDay=new HashMap<String, Double>();
+	private HashMap<Id, Double> co2EmissionsWholeDay=new HashMap<Id, Double>();
 	private double CO2EmissionsGrammPerkm;
-	private NetworkLayer network;
+	private Network network;
 	private int intervalStart;
 	private int intervalEnd;
 
@@ -28,7 +27,7 @@ public class AllLinkOneIntervalHandler implements LinkLeaveEventHandler {
 	 * @param intervalStart (in seconds)
 	 * @param intervalEnd (in seconds)
 	 */
-	public AllLinkOneIntervalHandler(double CO2EmissionsGrammPerkm, NetworkLayer network, int intervalStart, int intervalEnd) {
+	public AllLinkOneIntervalHandler(double CO2EmissionsGrammPerkm, Network network, int intervalStart, int intervalEnd) {
 		// initialize 
 		this.CO2EmissionsGrammPerkm =CO2EmissionsGrammPerkm;
 		this.network=network;
@@ -41,13 +40,12 @@ public class AllLinkOneIntervalHandler implements LinkLeaveEventHandler {
 		if (event.getTime()<intervalStart  || event.getTime()>intervalEnd){
 			return;
 		}
-		
-
-		
-		if (!co2EmissionsWholeDay.containsKey(event.getLinkId().toString())){
-			co2EmissionsWholeDay.put(event.getLinkId().toString(), 0.0);
+		Id linkId = event.getLinkId();
+				
+		if (!co2EmissionsWholeDay.containsKey(linkId)){
+			co2EmissionsWholeDay.put(linkId, 0.0);
 		}
-		co2EmissionsWholeDay.put(event.getLinkId().toString(), co2EmissionsWholeDay.get(event.getLinkId().toString())+ network.getLink(event.getLinkId().toString()).getLength()/1000*CO2EmissionsGrammPerkm);
+		co2EmissionsWholeDay.put(linkId, co2EmissionsWholeDay.get(linkId)+ network.getLink(linkId).getLength()/1000*CO2EmissionsGrammPerkm);
 	}
 
 	public void reset(int iteration) {
@@ -58,7 +56,7 @@ public class AllLinkOneIntervalHandler implements LinkLeaveEventHandler {
 	public void printCO2EmissionsSpecifiedInterval() {
 		System.out.println("interal start: " + intervalStart + "; interval end: " + intervalEnd);
 		System.out.println("linkId\temissions [g CO2]");
-		for (String linkId:co2EmissionsWholeDay.keySet()){
+		for (Id linkId:co2EmissionsWholeDay.keySet()){
 			System.out.println(linkId + "\t" + co2EmissionsWholeDay.get(linkId));
 		}
 		

@@ -135,7 +135,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 //		this.controler = event.getControler();
 
 		// Complete the world to make sure that the layers all have relevant mapping rules
-		new WorldConnectLocations().run(Gbl.getWorld());
+		new WorldConnectLocations().run(event.getControler().getWorld());
 
 		this.log.info(" Initializing agent knowledge about geography ...");
 
@@ -337,9 +337,10 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 
 //		Attempt to open file of mental maps and read it in
 		System.out.println("  Opening the file to read in the map of Acts to Facilities");
-		aar = new ActivityActReader(Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue());
+		int initIter = Integer.parseInt(controler.getConfig().socnetmodule().getInitIter());
+		aar = new ActivityActReader(initIter);
 
-		String fileName = Gbl.getConfig().socnetmodule().getInDirName()+ "ActivityActMap"+Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue()+".txt";
+		String fileName = controler.getConfig().socnetmodule().getInDirName()+ "ActivityActMap"+initIter+".txt";
 		aar.openFile(fileName);
 		System.out.println(" ... done");
 
@@ -386,7 +387,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		this.rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
 
 		this.log.info(" Instantiating the Pajek writer ...");
-		this.pjw = new PajekWriter(SOCNET_OUT_DIR, (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
+		this.pjw = new PajekWriter(SOCNET_OUT_DIR, controler.getFacilities());
 		this.log.info("... done");
 
 		this.log.info(" Initializing the social network ...");

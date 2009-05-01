@@ -27,6 +27,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -49,7 +50,6 @@ import org.matsim.core.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -60,15 +60,15 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 	protected Population population;
 	private ScoringFunctionFactory sfFactory;
 	protected final double learningRate;
-	private final NetworkLayer network;
+	private final Network network;
 	HashMap<Id,ArrayList<String>> mappings = new HashMap<Id, ArrayList<String>>();
 	protected final TreeMap<String, ScoringFunction> agentScorers = new TreeMap<String, ScoringFunction>();
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
 	private double stuckPenalty;
 	
-	public SelectedPlansScoring() {
-		this.network = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
+	public SelectedPlansScoring(final Network network) {
+		this.network = network;
 		this.learningRate = Gbl.getConfig().charyparNagelScoring().getLearningRate();	
 	}
 
@@ -121,12 +121,12 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 				
 				scoreSum += sf.getScore();
 				
-				final Plan plan = this.population.getPerson(new IdImpl(id)).getSelectedPlan();
+				final Plan plan = this.population.getPersons().get(new IdImpl(id)).getSelectedPlan();
 				plan.setScore(sf.getScore());
 				
 			}
 			
-			final Plan plan = this.population.getPerson(new IdImpl(guideId)).getSelectedPlan();
+			final Plan plan = this.population.getPersons().get(new IdImpl(guideId)).getSelectedPlan();
 			final double oldScore = plan.getScoreAsPrimitiveType();
 //			if (Double.isNaN(oldScore)) {
 //				plan.setScore(scoreSum);
@@ -163,8 +163,7 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 	
 
 	public void handleEvent(final LinkEnterEvent event) {
-		final String linkId = event.getLinkId().toString();
-		Link link = this.network.getLink(linkId);
+		Link link = this.network.getLinks().get(event.getLinkId());
 		Node node = link.getFromNode();
 		ArrayList<String> list = this.mappings.get(node.getId());
 		if (list == null) {

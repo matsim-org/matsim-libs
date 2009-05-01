@@ -33,7 +33,6 @@ import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
 import playground.christoph.knowledge.utils.GetAllIncludedLinks;
-import playground.christoph.knowledge.utils.GetAllNodes;
 
 public class TestNodeSelection {
 	
@@ -51,7 +50,7 @@ public class TestNodeSelection {
 	
 	protected void loadNetwork()
 	{
-		network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFile);
 	}
 	

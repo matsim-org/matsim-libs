@@ -20,6 +20,9 @@
 
 package playground.dressler.util;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -27,20 +30,15 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.Route;
-import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.run.OTFVis;
 import org.matsim.vis.netvis.NetVis;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
-import org.matsim.world.World;
 
 
 public class DDcontroller {
@@ -68,18 +66,13 @@ public class DDcontroller {
 		boolean otfvis = true;
 		boolean netvis = false & (!otfvis);
 
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Scenario scenario = new ScenarioImpl();
 
-		World world = Gbl.getWorld();
-
-		NetworkLayer network = new NetworkLayer();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
-		Population population = new PopulationImpl();
-		new MatsimPopulationReader(population).readFile(plansFilename);
+		Population population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		if (testplans) {
 			for (Person person : population.getPersons().values()) {

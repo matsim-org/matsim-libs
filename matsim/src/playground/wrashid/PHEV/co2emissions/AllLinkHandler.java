@@ -2,11 +2,10 @@ package playground.wrashid.PHEV.co2emissions;
 
 import java.util.HashMap;
 
-
-import org.matsim.core.api.network.Link;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.network.NetworkLayer;
 
 /**
  * This class computes the summary of co2 emissions per link over the day.
@@ -14,33 +13,32 @@ import org.matsim.core.network.NetworkLayer;
 public class AllLinkHandler implements LinkLeaveEventHandler {
 
 	// key: linkId, value: emissions
-	private HashMap<String, Double> co2EmissionsWholeDay=new HashMap<String, Double>();
+	private HashMap<Id, Double> co2EmissionsWholeDay=new HashMap<Id, Double>();
 	private double CO2EmissionsGrammPerkm;
-	private NetworkLayer network;
+	private Network network;
 
 	
 	
-	public AllLinkHandler(double CO2EmissionsGrammPerkm, NetworkLayer network) {
+	public AllLinkHandler(double CO2EmissionsGrammPerkm, Network network) {
 		// initialize 
 		this.CO2EmissionsGrammPerkm =CO2EmissionsGrammPerkm;
 		this.network=network;
 	}
 	
 	public void handleEvent(LinkLeaveEvent event) {
-		if (!co2EmissionsWholeDay.containsKey(event.getLinkId().toString())){
-			co2EmissionsWholeDay.put(event.getLinkId().toString(), 0.0);
+		if (!co2EmissionsWholeDay.containsKey(event.getLinkId())){
+			co2EmissionsWholeDay.put(event.getLinkId(), 0.0);
 		}
-		co2EmissionsWholeDay.put(event.getLinkId().toString(), co2EmissionsWholeDay.get(event.getLinkId().toString())+ network.getLink(event.getLinkId().toString()).getLength()/1000*CO2EmissionsGrammPerkm);
+		co2EmissionsWholeDay.put(event.getLinkId(), co2EmissionsWholeDay.get(event.getLinkId()) + network.getLinks().get(event.getLinkId()).getLength()/1000*CO2EmissionsGrammPerkm);
 	}
 
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public void printCO2EmissionsWholeDay() {
 		System.out.println("linkId\temissins [g CO2]");
-		for (String linkId:co2EmissionsWholeDay.keySet()){
+		for (Id linkId:co2EmissionsWholeDay.keySet()){
 			System.out.println(linkId + "\t" + co2EmissionsWholeDay.get(linkId));
 		}
 		

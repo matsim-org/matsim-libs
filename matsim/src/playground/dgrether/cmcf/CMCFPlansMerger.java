@@ -56,8 +56,8 @@ public class CMCFPlansMerger {
 	 */
 	public static void main(String[] args) {
 		NetworkLayer net = MatsimIo.loadNetwork(DgPaths.IVTCHNET);
-		Population plansCmcf = MatsimIo.loadPlans(cmcfPlansFile);
-		Population plans = MatsimIo.loadPlans(plansFile);
+		Population plansCmcf = MatsimIo.loadPlans(cmcfPlansFile, net);
+		Population plans = MatsimIo.loadPlans(plansFile, net);
 		
 		for (Person person : plansCmcf.getPersons().values()) {
 			String idstring = person.getId().toString();

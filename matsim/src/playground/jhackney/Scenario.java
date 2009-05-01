@@ -68,6 +68,7 @@ public abstract class Scenario {
 	private static final String out1 = "AgentsAtActivities"+thisrun+".out";
 
 	private static final Config config= Gbl.createConfig(null);
+	private static final World world= Gbl.createWorld();
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -153,14 +154,14 @@ public abstract class Scenario {
 //	}
 	public static final World readWorld() {
 		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(Gbl.getWorld()).readFile(config.world().getInputFile());
+		new MatsimWorldReader(world).readFile(config.world().getInputFile());
 		System.out.println("  done.");
-		return Gbl.getWorld();
+		return world;
 	}
 
 	public static final Facilities readFacilities() {
 		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 		return facilities;
@@ -169,7 +170,7 @@ public abstract class Scenario {
 	public static final NetworkLayer readNetwork() {
 		System.out.println("  reading the network xml file...");
 		System.out.println(Gbl.getConfig().network().getInputFile());
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 		return network;
@@ -193,7 +194,7 @@ public abstract class Scenario {
 	public static final Population readPlans() {
 		System.out.println("  reading plans xml file... ");
 		Population plans = new PopulationImpl();
-		System.out.println(Gbl.getConfig().plans().getInputFile());
+		System.out.println(config.plans().getInputFile());
 		new MatsimPopulationReader(plans).readFile(config.plans().getInputFile());
 
 		System.out.println("  done.");
@@ -285,6 +286,9 @@ public abstract class Scenario {
 	}
 	public static Config getConfig(){
 		return config;
+	}
+	public static World getWorld() {
+		return world;
 	}
 	public static String getSNOutDir(){
 		return output_directory;

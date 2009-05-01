@@ -1,11 +1,9 @@
 package playground.wrashid.PHEV.co2emissions;
 
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 
 public class SimpleEvaluator {
 
@@ -14,17 +12,9 @@ public class SimpleEvaluator {
 		args=new String[1];
 		args[0]="C:\\data\\SandboxCVS\\ivt\\studies\\triangle\\config\\config.xml";
 		
-		
-		Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer) Gbl.getWorld().createLayer(
-				NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(config.network()
-				.getInputFile());
-		System.out.println("  done.");
-		
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		sl.loadNetwork();
+		Network network = sl.getScenario().getNetwork();
 		
 		Events events = new Events();
 

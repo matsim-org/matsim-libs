@@ -37,10 +37,10 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.gregor.sims.evacbase.EvacuationPlansGeneratorAndNetworkTrimmer;
@@ -48,10 +48,10 @@ import playground.gregor.sims.evacbase.EvacuationPlansGeneratorAndNetworkTrimmer
 public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTrimmer {
 	private final String shelters = "../inputs/padang/network_v20080618/shelters.shp";
 	Logger log = Logger.getLogger(EvacPlansAndNetworkGen.class);
-	public void createEvacuationPlans(final Population plans, final NetworkLayer network) {
+	public void createEvacuationPlans(final Population plans, final NetworkLayer network, final Facilities facilities, final World world) {
 		
 		
-		setUpFacilities();
+		setUpFacilities(world, facilities);
 		
 		PlansCalcRoute router = new PlansCalcRoute(network, new FreespeedTravelTimeCost(), new FreespeedTravelTimeCost());
 		/* all persons that want to start on an already deleted link will be excluded from the
@@ -67,9 +67,7 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 			}
 		}
 
-		Facilities facs = (Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
-		
-		Facility fac = facs.getFacilities().get(new IdImpl("shelter0"));
+		Facility fac = facilities.getFacilities().get(new IdImpl("shelter0"));
 		// the remaining persons plans will be routed
 		for (Person person : plans.getPersons().values()) {
 			if (person.getPlans().size() != 1 ) {
@@ -84,7 +82,7 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 			
 			person.createKnowledge("evac location");
 			Activity fact = plan.getFirstActivity();
-			Facility f = facs.getFacilities().get(fact.getLinkId());
+			Facility f = facilities.getFacilities().get(fact.getLinkId());
 			fact.setFacility(f);
 			ActivityOption a = f.getActivityOption("h");
 			person.getKnowledge().addActivity(a, true);
@@ -102,19 +100,18 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 			router.run(plan);
 		}
 	}
-	private void setUpFacilities() {
-		Facilities facs = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
-		NetworkLayer n = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
-		new SheltersReader(n,facs).read(this.shelters);
+	private void setUpFacilities(World world, Facilities facilities) {
+		NetworkLayer n = (NetworkLayer)world.getLayer(NetworkLayer.LAYER_TYPE);
+		new SheltersReader(n,facilities,world).read(this.shelters);
 		for (Link link : n.getLinks().values()) {
 			if (link.getId().toString().contains("shelter")) {
 				continue;
 			}
-			Facility fac = facs.createFacility(new IdImpl(link.getId().toString()), link.getCoord());
+			Facility fac = facilities.createFacility(new IdImpl(link.getId().toString()), link.getCoord());
 			ActivityOption act = fac.createActivityOption("h");
 			act.addOpeningTime(new OpeningTimeImpl(DayType.wk,0,3600*30));
 		}
-		new WorldConnectLocations().run(Gbl.getWorld());
+		new WorldConnectLocations().run(world);
 	}
 
 

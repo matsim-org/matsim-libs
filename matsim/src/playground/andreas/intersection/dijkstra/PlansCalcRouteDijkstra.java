@@ -3,11 +3,11 @@ package playground.andreas.intersection.dijkstra;
 import java.util.ArrayList;
 
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.Dijkstra;
@@ -24,18 +24,20 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
  */
 public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 	
-	NetworkLayer network;
+	NetworkLayer wrappedNetwork;
+	Network originalNetwork;
 
-	public PlansCalcRouteDijkstra(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
-		this(network, costCalculator, timeCalculator, new FreespeedTravelTimeCost());
+	public PlansCalcRouteDijkstra(final Network originalNetwork, final NetworkLayer wrappedNetwork, final TravelCost costCalculator, final TravelTime timeCalculator) {
+		this(originalNetwork, wrappedNetwork, costCalculator, timeCalculator, new FreespeedTravelTimeCost());
 	}
 
 	@SuppressWarnings("deprecation")
-	private PlansCalcRouteDijkstra(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator,
+	private PlansCalcRouteDijkstra(final Network originalNetwork, final NetworkLayer wrappedNetwork, final TravelCost costCalculator, final TravelTime timeCalculator,
 			final FreespeedTravelTimeCost freespeedTimeCost) {
-		super(new Dijkstra(network, costCalculator, timeCalculator),
-				new Dijkstra(network, freespeedTimeCost, freespeedTimeCost));
-		this.network = network;
+		super(new Dijkstra(wrappedNetwork, costCalculator, timeCalculator),
+				new Dijkstra(wrappedNetwork, freespeedTimeCost, freespeedTimeCost));
+		this.originalNetwork = originalNetwork;
+		this.wrappedNetwork = wrappedNetwork;
 	}	
 	
 	/*
@@ -55,8 +57,8 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
 		if (toLink == null) throw new RuntimeException("toLink missing.");
 
-		Node startNode = this.network.getNode(fromLink.getId().toString());	// start at the end of the "current" link
-		Node endNode = this.network.getNode(toLink.getId().toString()); // the target is the start of the link
+		Node startNode = this.wrappedNetwork.getNode(fromLink.getId().toString());	// start at the end of the "current" link
+		Node endNode = this.wrappedNetwork.getNode(toLink.getId().toString()); // the target is the start of the link
 
 		Path path = null;
 		if (toLink != fromLink) {
@@ -64,11 +66,10 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			path = this.getLeastCostPathCalculator().calcLeastCostPath(startNode, endNode, depTime);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			
-			NetworkLayer realNetwork = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 			ArrayList<Node> realRouteNodeList = new ArrayList<Node>();
 			
 			for (Node node : path.nodes) {
-				realRouteNodeList.add(realNetwork.getLink(node.getId().toString()).getToNode());
+				realRouteNodeList.add(originalNetwork.getLinks().get(node.getId()).getToNode());
 			}
 			
 			realRouteNodeList.remove(realRouteNodeList.size() - 1);

@@ -53,14 +53,16 @@ public class WorldCreateRasterLayer2 {
 
 	private final Id layerid = new IdImpl("raster");
 	private final int cellsize;
+	private final Facilities facilities;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public WorldCreateRasterLayer2(final int cellsize) {
+	public WorldCreateRasterLayer2(final int cellsize, final Facilities facilities) {
 		super();
 		this.cellsize = cellsize;
+		this.facilities = facilities;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -87,7 +89,6 @@ public class WorldCreateRasterLayer2 {
 		Coord min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
 		Coord max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
 
-		Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 		FacilitiesFindScenarioMinMaxCoords fff= new FacilitiesFindScenarioMinMaxCoords();
 		fff.run(facilities);
 		min = fff.getMinCoord();

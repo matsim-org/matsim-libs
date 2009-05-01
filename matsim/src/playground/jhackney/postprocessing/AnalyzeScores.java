@@ -34,6 +34,7 @@ import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
+import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.ScenarioConfig;
@@ -56,13 +57,12 @@ public class AnalyzeScores {
 
 
 		ScenarioConfig.setUpScenarioConfig();
-		ScenarioConfig.readConfig();
-		Config config =Gbl.getConfig();
+		Config config = ScenarioConfig.readConfig();
 
-		ScenarioConfig.readWorld();
+		World world = ScenarioConfig.readWorld();
 		ScenarioConfig.readFacilities();
 		NetworkLayer network =ScenarioConfig.readNetwork();
-		new WorldConnectLocations().run(Gbl.getWorld());
+		new WorldConnectLocations().run(world);
 		int i=500;
 		Population plans = ScenarioConfig.readPlans(i);
 		System.out.println(" Initializing the social network ...");
