@@ -148,7 +148,7 @@ public class CumulativeDistribution {
 		double rnd = MatsimRandom.getRandom().nextDouble();
 		
 		int index = 1;
-		while(d == null & index <= this.getNumBins() ){
+		while(d == null && index <= this.getNumBins() ){
 			if( this.ys[index] > rnd){
 				d = this.xs[index-1] + (this.xs[index] - this.xs[index-1]) / 2;
 			} else{
