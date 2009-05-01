@@ -55,6 +55,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
@@ -253,7 +254,6 @@ public class QueueSimulationTest extends MatsimTestCase {
 	public void testAgentWithoutLeg() {
 		Fixture f = new Fixture();
 
-		
 		Person person = new PersonImpl(new IdImpl(1));
 		Plan plan = person.createPlan(true);
 		plan.createActivity("home", f.link1);
@@ -268,6 +268,60 @@ public class QueueSimulationTest extends MatsimTestCase {
 		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
 		sim.run();
 
+		/* finish */
+		assertEquals("wrong number of link enter events.", 0, collector.events.size());
+	}
+	
+	/**
+	 * Tests that no Exception occurs if an agent has no leg at all, but the only activity has an end time set.
+	 */
+	public void testAgentWithoutLegWithEndtime() {
+		Fixture f = new Fixture();
+		
+		Person person = new PersonImpl(new IdImpl(1));
+		Plan plan = person.createPlan(true);
+		Activity act = plan.createActivity("home", f.link1);
+		act.setEndTime(6.0 * 3600);
+		f.plans.addPerson(person);
+		
+		/* build events */
+		Events events = new Events();
+		LinkEnterEventCollector collector = new LinkEnterEventCollector();
+		events.addHandler(collector);
+		
+		/* run sim */
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		sim.run();
+		
+		/* finish */
+		assertEquals("wrong number of link enter events.", 0, collector.events.size());
+	}
+	
+	/**
+	 * Tests that no Exception occurs if the last activity of an agent has an end time set (which is wrong).
+	 */
+	public void testAgentWithLastActWithEndtime() {
+		Fixture f = new Fixture();
+		
+		Person person = new PersonImpl(new IdImpl(1));
+		Plan plan = person.createPlan(true);
+		Activity act = plan.createActivity("home", f.link1);
+		act.setEndTime(6.0 * 3600);
+		Leg leg = plan.createLeg(TransportMode.walk);
+		leg.setRoute(new GenericRouteImpl(f.link1, f.link2));
+		act = plan.createActivity("work", f.link2);
+		act.setEndTime(6.0 * 3600 + 60);
+		f.plans.addPerson(person);
+		
+		/* build events */
+		Events events = new Events();
+		LinkEnterEventCollector collector = new LinkEnterEventCollector();
+		events.addHandler(collector);
+		
+		/* run sim */
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		sim.run();
+		
 		/* finish */
 		assertEquals("wrong number of link enter events.", 0, collector.events.size());
 	}
