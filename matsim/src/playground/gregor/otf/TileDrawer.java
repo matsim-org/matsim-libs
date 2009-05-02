@@ -21,6 +21,7 @@ import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 import com.sun.opengl.util.texture.TextureCoords;
 import com.sun.opengl.util.texture.TextureIO;
 
+
 public class TileDrawer extends AbstractBackgroundDrawer{
 
 	double[] modelview = new double[16];
@@ -28,22 +29,24 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 	int[] viewport = new int[4];
 	
 	
+	
 	double [] powerLookUp;
 	
-	Map<String,Tile> tilesMap = Collections.synchronizedMap(new HashMap<String,Tile>());
+	Map<String,Tile> tilesMap = Collections.synchronizedMap(new HashMap<String,Tile>(769,0.75f));
+	private final TreeSet<Tile> currentView = new TreeSet<Tile>(new Comper());
 	
 //	int numX = 0;
 //	int numY = 0;
 	private double zoom;
 	private final TileLoader loader;
 	private final double initZoom = 32;
-	private final TreeSet<Tile> currentView = new TreeSet<Tile>(new Comper());
 	private boolean viewLocked;
 	private float oTy;
 	private float oTx;
 	
 	
 	public TileDrawer() {
+
 		this.loader = new TileLoader(this.tilesMap);
 		this.loader.start();
 		this.powerLookUp = new double [16];
@@ -54,6 +57,7 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 	}
 	
 	public void onDraw(GL gl) {
+		
 		updateMatrices(gl);
 		calcCurrentZoom();
 				
@@ -75,6 +79,34 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 		}
 		this.viewLocked = true;
 		this.currentView.clear();
+//		System.out.println("==============================");
+//		for (int r =1; r < Math.max(this.viewport[2], this.viewport[3]); r += Tile.LENGTH/2) {
+//			for (double i = 0; i < 2*Math.PI; i += Math.PI/(4*r/(Tile.LENGTH/2))) {
+//				double c = Math.cos(i);
+//				double s = Math.sin(i);
+//				int x = (int) (this.viewport[2]/2 + r * c);
+//				int y = (int) (this.viewport[3]/2 + r * s);
+//				System.out.println("x:" + x + " y:" + y + " r:" +r + " c:" + c + " s:" + s);
+//				drawPED(x,y,gl);
+//				double zoom = this.zoom;
+//				
+//				
+//				Tile t = getTile(x, y, this.zoom);
+//				while (t == null && zoom  <= this.initZoom ) {
+//					zoom *= 2;
+//					t = getTile(x,y,zoom);
+//					this.viewLocked = false;
+//				}
+//				if (t == null) {
+//					continue;
+//				}
+//				this.currentView.add(t);
+//			
+//			}
+//			
+//		}
+//		System.out.println("==============================");
+//		
 		for (int x = this.viewport[0]; x < this.viewport[2] + Tile.LENGTH/2; x += Tile.LENGTH*0.33) {
 			for (int y = this.viewport[1]; y < this.viewport[3] +Tile.LENGTH/2 ; y += Tile.LENGTH*0.33) {
 				double zoom = this.zoom;
@@ -94,6 +126,7 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 		}
 		
 	}
+
 
 
 
@@ -148,7 +181,7 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 		gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(t.tX, t.tY, z);
 		gl.glEnd();
 		t.tex.disable();
-		
+	
 
 	}
 

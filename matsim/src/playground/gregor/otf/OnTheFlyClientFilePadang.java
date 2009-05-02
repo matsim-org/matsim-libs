@@ -140,7 +140,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		final String filename =  CVSROOT + "/runs/run314/output/ITERS/it.100/100.movie.mvi";
 //		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
 //		final String filename =  "../../outputs/output_100m_so/ITERS/it.0/0.movie.mvi";
-//		final String filename =  "../../outputs/output_shelter_noWave/ITERS/it.200/200.movie.mvi";
+//		filename =  "../../outputs/output_shelter_noWave/ITERS/it.200/200.movie.mvi";
 			filename =  "../../outputs/output/ITERS/it.0/0.movie.mvi";
 //		final String filename =  "/home/laemmel/arbeit/svn/runs-svn/run316/stage2/output/ITERS/it.201/201.movie.mvi";
 		}

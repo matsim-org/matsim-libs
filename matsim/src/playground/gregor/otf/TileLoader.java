@@ -17,7 +17,7 @@ public class TileLoader extends Thread {
 	private final Map<String, Tile> tiles;
 	private final Queue<Tile> tilesQueue;
 	private long oldTime;
-	private static final int MAX_CACHE = 2048;
+	private static final int MAX_CACHE = 512;
 	public TileLoader(Map<String,Tile> tiles) {
 //		this.tiles = Collections.synchronizedMap(tiles);
 		this.tiles = tiles;
@@ -42,7 +42,7 @@ public class TileLoader extends Thread {
 
 			TileRequest tr =this.requests.poll();
 			handleRequest(tr);
-			if (this.requests.size() > 2048) {
+			if (this.requests.size() > 8192) {
 				this.requests.clear();
 			}
 
@@ -74,15 +74,15 @@ public class TileLoader extends Thread {
 //			e.printStackTrace();
 //		}
 		this.tiles.put(tr.tile.id, tr.tile);
-		if (tr.tile.zoom < 4){
-			this.tilesQueue.add(tr.tile);
-		}
+		this.tilesQueue.add(tr.tile);
+		
 		
 
 		if (this.tilesQueue.size() > MAX_CACHE ) {
 
 			while (this.tilesQueue.size() > MAX_CACHE*0.75) {
 				Tile tile = this.tilesQueue.poll();
+				tile.tex = null;
 				this.tiles.remove(tile.id);
 				
 			}

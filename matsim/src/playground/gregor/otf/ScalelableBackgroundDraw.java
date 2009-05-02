@@ -69,6 +69,8 @@ public class ScalelableBackgroundDraw extends OTFGLDrawableImpl {
 
 		final float z = 1.1f;
 
+		float width2 = (float) this.textRenderer.getBounds("METERS").getWidth() * fl[8];
+		
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 		this.back.enable();
@@ -79,14 +81,13 @@ public class ScalelableBackgroundDraw extends OTFGLDrawableImpl {
 		gl.glBegin(GL_QUADS);
 		gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(fl[4], fl[5], z);
 		gl.glTexCoord2f(tx2, ty1); gl.glVertex3f(fl[4], fl[7], z);
-		gl.glTexCoord2f(tx2, ty2); gl.glVertex3f(fl[6], fl[7], z);
-		gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(fl[6], fl[5], z);
+		gl.glTexCoord2f(tx2, ty2); gl.glVertex3f(fl[2]+width2 + width2/3.f, fl[7], z);
+		gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(fl[2]+width2 + width2/3.f, fl[5], z);
 		gl.glEnd();
 		this.back.disable();
 
 		gl.glDisable(GL.GL_BLEND);
 
-		
 
 		this.sc.enable();
 		this.sc.bind();
@@ -95,7 +96,7 @@ public class ScalelableBackgroundDraw extends OTFGLDrawableImpl {
 		
 		gl.glColor4f(1,1,1,1);
 //		final Rectangle2D.Float koords = new Rectangle2D.Float((float)(this.offsetEast), (float)(this.offsetNorth), 1000, 1000);
-
+		
 		gl.glBegin(GL_QUADS);
 		gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(fl[0], fl[1], z);
 		gl.glTexCoord2f(tx2, ty1); gl.glVertex3f(fl[0], fl[3], z);
@@ -116,7 +117,7 @@ public class ScalelableBackgroundDraw extends OTFGLDrawableImpl {
 		// Render the text
 		this.textRenderer.setColor(c, c, c, 1.f);
         this.textRenderer.draw3D(text, fl[2] - width/2.f,fl[9],1.1f,fl[8]);
-        float width2 = (float) this.textRenderer.getBounds("METERS").getWidth() * fl[8];
+        
         this.textRenderer.draw3D("METERS", fl[2] + width2/4.f,fl[3],1.1f,fl[8]);
         this.textRenderer.end3DRendering();
 		
@@ -128,7 +129,11 @@ public class ScalelableBackgroundDraw extends OTFGLDrawableImpl {
 		int scrBX = this.viewport[2];
 		int scrBY = this.viewport[3];
 		
+		
+		
 		int scrWidth = scrBX -scrTX;
+		int diagonal = (int) Math.sqrt(scrBX*scrBX + scrBY * scrBY);
+		
 		
 		float[] tmp = getOGLPos(scrTX,scrTY);
 		float glTX = tmp[0];
@@ -166,26 +171,33 @@ public class ScalelableBackgroundDraw extends OTFGLDrawableImpl {
 		
 		float ret[]  = new float [11];
 		
-		int scTXTX = (int) (0.02 * scrBX);
-		int scTXTY = (int) (scrBY - (0.04 * scrBX));
-		tmp = getOGLPos(scTXTX,scTXTY);
-		ret[0] = tmp[0];
-		ret[1] = tmp[1];
+//		int scTXTX = (int) (0.01 * scrBX);
+//		int scTXTY = (int) (scrBY - (0.04 * scrBY));
+//		tmp = getOGLPos(scTXTX,scTXTY);
+//		ret[0] = tmp[0];
+//		ret[1] = tmp[1];
 		
-		int scTXBX = (int) (0.4 * scrBX);
-		int scTXBY = (int) (scrBY - (0.02 * scrBY));
+		int scTXBX = (int) (0.4 * diagonal);
+		int scTXBY = scrBY - 20; //(int) (scrBY - (0.01 * diagonal));
 		tmp = getOGLPos(scTXBX,scTXBY);
 //		System.out.println(width + " glWidth:" + glWidth);
 		
-		ret[2] = ret[0]+width;
 		ret[3] = tmp[1];
+		
+		int scTXTX = (int) (0.01 * diagonal);
+		int scTXTY = (int) (scTXBY - (0.01 * diagonal));
+		tmp = getOGLPos(scTXTX,scTXTY);
+		ret[0] = tmp[0];
+		ret[1] = tmp[1];
+		ret[2] = ret[0]+width;
+		
 		float txWidth = width;
 		float txHeight = ret[3] - ret[1];
-		ret[4] = ret[0] - 0.01f * scrWidth * xFactor;
-		ret[5] = ret[1] - 0.8f * txHeight;
-		ret[6] = ret[2] + 0.15f * scrWidth * xFactor;
-		ret[7] = ret[3] + 0.1f * txHeight;
-		ret[8] = xFactor;
+		ret[4] = ret[0] - 3 * xFactor; //bg tx
+		ret[5] = ret[1] - 0.99f * txHeight; //bg ty
+		ret[6] = ret[2] + 0.15f * scrWidth * xFactor; //bg bx
+		ret[7] = ret[3] - 3 * xFactor; //bg by
+		ret[8] = (float) (xFactor * diagonal *0.0004);
 		ret[9] = ret[1] - 0.05f * txHeight;
 		ret[10] = width;
 		return ret;
