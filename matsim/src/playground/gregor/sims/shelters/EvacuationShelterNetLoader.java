@@ -52,7 +52,7 @@ public class EvacuationShelterNetLoader {
 
 		createEvacuationNet();
 		
-//		generateShelterLinks();
+		generateShelterLinks();
 		
 		
 		return this.network;

@@ -72,7 +72,7 @@ public class EvacuationPopulationLoader {
 			endTime = 3 * 3600;
 		}
 		
-		double sample = this.config.plans().getOutputSample();
+		double sample = this.config.simulation().getFlowCapFactor();
 		
 		int count = 0;
 		for (Building building : this.buildings) {
