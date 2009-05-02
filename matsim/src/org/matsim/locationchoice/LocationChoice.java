@@ -31,15 +31,15 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.scoring.LocationChoiceScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.locationchoice.constrained.LocationMutatorTGSimple;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
-import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 
@@ -196,11 +196,25 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	 */
 	private void initTrees(Facilities facilities) {
 		
-		TreeMap<String, TreeMap<Id, Facility>> trees = new TreeMap<String, TreeMap<Id, Facility>>();
+		boolean regionalScenario = false;
+		double radius = 0.0;
+		Node centerNode = null; 
 		
+		if (!Gbl.getConfig().locationchoice().getCenterNode().equals("null") &&
+				!Gbl.getConfig().locationchoice().getRadius().equals("null")) {
+			regionalScenario = true;
+			centerNode = this.network.getNode(new IdImpl(Gbl.getConfig().locationchoice().getCenterNode()));
+			radius = Double.parseDouble(Gbl.getConfig().locationchoice().getRadius());
+		}
+		
+
+		TreeMap<String, TreeMap<Id, Facility>> trees = new TreeMap<String, TreeMap<Id, Facility>>();
 		// get all types of activities
 		for (Facility f : facilities.getFacilities().values()) {
 			Map<String, ActivityOption> activities = f.getActivityOptions();
+			
+			// do not add facility if it is not in region of interest
+			if (regionalScenario && f.calcDistance(centerNode.getCoord()) > radius) continue;
 			
 			Iterator<ActivityOption> act_it = activities.values().iterator();
 			while (act_it.hasNext()) {

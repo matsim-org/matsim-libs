@@ -42,6 +42,8 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String MAX_RECURSIONS = "maxRecursions";
 	private static final String FIX_BY_ACTTYPE = "fixByActType";
 	private static final String SIMPLE_TG = "simple_tg";
+	private static final String CENTER_NODE = "centerNode";
+	private static final String RADIUS = "radius";
 
 	//default values
 	private String constrained = "false";
@@ -53,6 +55,8 @@ public class LocationChoiceConfigGroup extends Module {
 	private String maxRecursions = "0";
 	private String fixByActType = "false";
 	private String simple_tg = "false";
+	private String centerNode = "null";
+	private String radius = "null";
 	
 	private final static Logger log = Logger.getLogger(LocationChoiceConfigGroup.class);
 	
@@ -89,6 +93,12 @@ public class LocationChoiceConfigGroup extends Module {
 		}
 		if (SIMPLE_TG.equals(key)) {
 			return getSimpleTG();
+		}
+		if (CENTER_NODE.equals(key)) {
+			return getCenterNode();
+		}
+		if (RADIUS.equals(key)) {
+			return getRadius();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -169,6 +179,11 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setSimpleTG(value);
 			}
+		} else if (CENTER_NODE.equals(key)) {
+			setCenterNode(value);
+		
+		} else if (RADIUS.equals(key)) {
+			setRadius(value);
 		}
 		else		
 		{
@@ -188,6 +203,8 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, MAX_RECURSIONS);
 		this.addParameterToMap(map, FIX_BY_ACTTYPE);
 		this.addParameterToMap(map, SIMPLE_TG);
+		this.addParameterToMap(map, CENTER_NODE);
+		this.addParameterToMap(map, RADIUS);
 		return map;
 	}
 
@@ -245,5 +262,17 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	public String getSimpleTG() {
 		return this.simple_tg;
+	}
+	public String getCenterNode() {
+		return centerNode;
+	}
+	public void setCenterNode(String centerNode) {
+		this.centerNode = centerNode;
+	}
+	public String getRadius() {
+		return radius;
+	}
+	public void setRadius(String radius) {
+		this.radius = radius;
 	}
 }

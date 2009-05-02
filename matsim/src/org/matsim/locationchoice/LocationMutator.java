@@ -33,9 +33,11 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
@@ -82,12 +84,26 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	 */
 	private void initTrees(Facilities facilities) {
 		
+		boolean regionalScenario = false;
+		double radius = 0.0;
+		Node centerNode = null; 
+		
+		if (!Gbl.getConfig().locationchoice().getCenterNode().equals("null") &&
+				!Gbl.getConfig().locationchoice().getRadius().equals("null")) {
+			regionalScenario = true;
+			centerNode = this.network.getNode(new IdImpl(Gbl.getConfig().locationchoice().getCenterNode()));
+			radius = Double.parseDouble(Gbl.getConfig().locationchoice().getRadius());
+		}
+		
 		TreeMap<String, TreeMap<Id, Facility>> trees = new TreeMap<String, TreeMap<Id, Facility>>();
 		
 		// get all types of activities
 		for (Facility f : facilities.getFacilities().values()) {
-			Map<String, ActivityOption> activities = f.getActivityOptions();
 			
+			// do not add facility if it is not in region of interest
+			if (regionalScenario && f.calcDistance(centerNode.getCoord()) > radius) continue;
+			
+			Map<String, ActivityOption> activities = f.getActivityOptions();
 			Iterator<ActivityOption> act_it = activities.values().iterator();
 			while (act_it.hasNext()) {
 				ActivityOption act = act_it.next();
