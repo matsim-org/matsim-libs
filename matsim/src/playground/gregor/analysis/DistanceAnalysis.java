@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.gis.analysis;
+package playground.gregor.analysis;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,12 +78,12 @@ import com.vividsolutions.jts.geom.Polygon;
  * - dann werden alle Personen mit den Koordinaten der home location in einen
  *   QuadTree gepackt. (DistanceAnalysis.handlePlans())
  *
- * - nun kann man �ber die Polygons des Rasters iterieren
+ * - nun kann man ???ber die Polygons des Rasters iterieren
  *   (DistanceAnalysis.iteratePolygons()). Die Personen werden in zwei Schritten
- *   gefiltert (dieses Vorgehen ist wesentlich effizienter als immer �ber alle
+ *   gefiltert (dieses Vorgehen ist wesentlich effizienter als immer ???ber alle
  *   Personen zu iterieren):
  *
- * - Aus dem QuadTree holt man sich zun�chst alle Personen im Umkreis von  min
+ * - Aus dem QuadTree holt man sich zun???chst alle Personen im Umkreis von  min
  *   d/2 des Mittelpunkts eines Polygons.  (DistanceAnalysis.iteratePolygons -
  *   Zeile 158)
  *

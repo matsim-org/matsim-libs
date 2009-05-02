@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.gis.analysis;
+package playground.gregor.analysis;
 
 import java.io.IOException;
 import java.util.ArrayList;
