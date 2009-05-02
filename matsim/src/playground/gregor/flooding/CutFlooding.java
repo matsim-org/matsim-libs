@@ -1,4 +1,4 @@
-package playground.gregor.gis.networkcutter;
+package playground.gregor.flooding;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,28 +26,29 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class CutFlooding {
 
 
-	private static final Logger log = Logger.getLogger(CutFlooding.class);
+	protected static final Logger log = Logger.getLogger(CutFlooding.class);
 
-	private final static double MAX_X = 652088.;
-	private final static double MAX_Y = 9894785.;
-	private final static double MIN_X = 650473.;
-	private final static double MIN_Y = 9892816.;
-
-	private static final double DISTANCE = 10.;
+	private final static double MAX_X = 658541.;
+	private final static double MAX_Y = 9902564.;
+	private final static double MIN_X = 648520.;
+	private final static double MIN_Y = 988294.;
+	private static final double DISTANCE = 5.;
+	private static final int TIME_RES_DOWNSCALE = 2;
+	private static final int MAX_TIME = 120; 
 	private NetcdfFile in;
-	private NetcdfFileWriteable out;
+	protected NetcdfFileWriteable out;
 
-	private Array aX;
+	protected Array aX;
 
-	private Array aY;
+	protected Array aY;
 
-	private Array aZ;
+	protected Array aZ;
 
-	private Array aStage;
+	protected Array aStage;
 
-	private Index2D idxStage;
+	protected Index2D idxStage;
 
-	private Index1D idx;
+	protected Index1D idx;
 
 
 	public CutFlooding(String netcdf, String out) {
@@ -64,7 +65,7 @@ public class CutFlooding {
 		}
 	}
 
-	private void run()  {
+	protected void run()  {
 
 		try {
 			init();
@@ -111,9 +112,9 @@ public class CutFlooding {
 		log.info("finished init.");
 	}
 
-	private void createNetcdf(List<Integer> indexes) {
+	protected void createNetcdf(List<Integer> indexes) {
 		Dimension number_of_points = this.out.addDimension("number_of_points", indexes.size());
-		Dimension number_of_timesteps = this.out.addDimension("number_of_timesteps", this.idxStage.getShape()[0]);
+		Dimension number_of_timesteps = this.out.addDimension("number_of_timesteps", MAX_TIME);
 		Dimension [] count = {number_of_points}; 
 		Dimension [] stages = {number_of_timesteps,number_of_points};
 		
@@ -124,22 +125,27 @@ public class CutFlooding {
 		ArrayDouble.D1 aY = new ArrayDouble.D1(indexes.size());
 		ArrayDouble.D1 aZ = new ArrayDouble.D1(indexes.size());
 		
-		ArrayDouble.D2 aStage = new ArrayDouble.D2(this.idxStage.getShape()[0],indexes.size());
+		ArrayDouble.D2 aStage = new ArrayDouble.D2(MAX_TIME,indexes.size());
 		
 		for (int i : indexes) {
 			this.idx.set(i);
 			this.idxStage.set(0,i);
-			for (int j = 0 ; j < this.idxStage.getShape()[0]; j++) {
+			for (int j = 0 ; j < MAX_TIME * TIME_RES_DOWNSCALE; j += TIME_RES_DOWNSCALE) {
 				this.idxStage.set0(j);
 				double s = this.aStage.getFloat(this.idxStage);
-				aStage.set(j,pos, s);
+				if (s != 0) {
+					System.out.println("s:" + s);
+				}
+				aStage.set((j/TIME_RES_DOWNSCALE),pos, s);
 			}
-			
 			double x = this.aX.getDouble(this.idx);
 			double y = this.aY.getDouble(this.idx);
 			double z = this.aZ.getDouble(this.idx);
 			aX.setDouble(pos, x);
 			aY.setDouble(pos, y);
+			if (z != 0 ) {
+				System.out.println("z:" + z);
+			}
 			aZ.setDouble(pos++, z);
 
 
@@ -168,10 +174,10 @@ public class CutFlooding {
 	}
 
 
-	private List<Integer> getIndexesToInclude() {
+	protected List<Integer> getIndexesToInclude() {
 		QuadTree<Coordinate> coords = new QuadTree<Coordinate>(MIN_X,MIN_Y,MAX_X,MAX_Y);
 
-		log.info("found " + this.idx.getSize() + " coordinates");
+		log.info("found " + this.idx.getSize() + " coordinates and " + this.idxStage.getShape()[0] + " time steps");
 
 		int next = 0;
 		List<Integer> indexes = new ArrayList<Integer>();
@@ -206,8 +212,8 @@ public class CutFlooding {
 	}
 
 	public static void main(String [] args) {
-		String in = "../../inputs/padang/Model_result_Houses_kst20.sww";
-		String out = "tmp2/flooding.sww";
+		String in = "../../inputs/flooding/SZ_r018M_m003_095_11_mw9.00_03h__P0_8.sww";
+		String out = "../../inputs/flooding/flooding01.sww";
 
 		new CutFlooding(in,out).run();
 

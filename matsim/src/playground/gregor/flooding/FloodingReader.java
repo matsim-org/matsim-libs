@@ -139,7 +139,7 @@ public class FloodingReader {
 		for (int i = 0 ; i < idxStage.getShape()[0]; i++) {
 			idxStage.set0(i);
 			double tmp = stage.getFloat(idxStage);
-			stages.add((tmp - c.z));
+//			stages.add((tmp - c.z));
 			if ((tmp - c.z) > FLOODING_TRESHOLD) {
 				if (time == -1) {
 					time = i;
@@ -149,9 +149,9 @@ public class FloodingReader {
 				stages.add(0.);
 			}
 		}
-		if (time != -1) {
+//		if (time != -1) {
 			flooding = new FloodingInfo(c,stages,time);
-		}
+//		}
 		return flooding;
 	}
 
