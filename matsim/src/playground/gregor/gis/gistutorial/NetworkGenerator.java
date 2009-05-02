@@ -25,12 +25,14 @@ public class NetworkGenerator {
 	public static void main(String [] args) {
 		String osm = "./inputs/map.osm";
 				
-		NetworkLayer net = new NetworkLayer();
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, UTM33N);
+		NetworkLayer net = new NetworkLayer(); //constructs a new empty network layer
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S); //the coordinate transformation is needed to get a projected  coordinate system
+		// for this basic example UTM zone 33 North is the right coordinate system. This may differ depending on your scenario. See also http://en.wikipedia.org/wiki/Universal_Transverse_Mercator
+			
 		
-		OsmNetworkReader onr = new OsmNetworkReader(net,ct);
+		OsmNetworkReader onr = new OsmNetworkReader(net,ct); //constructs a new openstreetmap reader
 		try {
-			onr.parse(osm);
+			onr.parse(osm); //starts the conversion from osm to matsim
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -38,9 +40,13 @@ public class NetworkGenerator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		new NetworkCleaner().run(net);
-		new NetworkWriter(net,"./inputs/network.xml").write();
+		//at this point we already have a matsim network...
+		new NetworkCleaner().run(net); //but may be there are isolated not connected links. The network cleaner removes those links
+		
+		new NetworkWriter(net,"./inputs/network.xml").write();//here we write the network to a xml file
 
+		
+		//the remaining lines of code are necessary to create a ESRI shape file of the matsim network
 		Config c = Gbl.createConfig(null);
 		c.global().setCoordinateSystem(UTM33N);
 		
