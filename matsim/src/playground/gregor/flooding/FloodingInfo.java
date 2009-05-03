@@ -7,9 +7,9 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class FloodingInfo {
 
 	
-	private Coordinate c;
-	private List<Double> stages;
-	private double floodingTime;
+	private final Coordinate c;
+	private final List<Double> stages;
+	private final double floodingTime;
 	
 	
 	public FloodingInfo(Coordinate c, List<Double> floodingSeries, double time) {

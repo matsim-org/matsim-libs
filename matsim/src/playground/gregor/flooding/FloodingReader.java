@@ -149,9 +149,9 @@ public class FloodingReader {
 				stages.add(0.);
 			}
 		}
-//		if (time != -1) {
+		if (time != -1) {
 			flooding = new FloodingInfo(c,stages,time);
-//		}
+		}
 		return flooding;
 	}
 
