@@ -36,6 +36,7 @@ import org.matsim.core.basic.network.BasicLane;
 import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.signalsystems.CalculateAngle;
@@ -497,13 +498,25 @@ public class QueueLink {
 		public Collection<PositionInfo> getVehiclePositions(final Collection<PositionInfo> positions) {
 			originalLane.visdata.getVehiclePositions(positions);
 
-			// add the parked vehicles
+			String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
 			int cnt = parkedVehicles.size();
 			if (cnt > 0) {
 				int nLanes = getLink().getLanesAsInt(Time.UNDEFINED_TIME);
 				int lane = nLanes + 4;
-				double cellSize = Math.min(7.5, getLink().getLength() / cnt);
-				double distFromFromNode = getLink().getLength() - cellSize / 2.0;
+	
+				double cellSize = 7.5;
+				double distFromFromNode = getLink().getLength();
+				if ("queue".equals(snapshotStyle)) {
+					cellSize = Math.min(7.5, getLink().getLength() / cnt);
+					distFromFromNode = getLink().getLength() - cellSize / 2.0;
+				} else if ("equiDist".equals(snapshotStyle)) {
+					cellSize = link.getLength() / cnt;
+					distFromFromNode = link.getLength() - cellSize / 2.0;
+				} else {
+					log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
+				}
+	
+				// add the parked vehicles
 				for (QueueVehicle veh : parkedVehicles.values()) {
 					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(),
 							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
@@ -511,7 +524,6 @@ public class QueueLink {
 					distFromFromNode -= cellSize;
 				}
 			}
-
 			return positions;
 		}
 
