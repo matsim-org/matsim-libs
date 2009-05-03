@@ -498,9 +498,9 @@ public class QueueLink {
 		public Collection<PositionInfo> getVehiclePositions(final Collection<PositionInfo> positions) {
 			originalLane.visdata.getVehiclePositions(positions);
 
-			String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
 			int cnt = parkedVehicles.size();
 			if (cnt > 0) {
+				String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
 				int nLanes = getLink().getLanesAsInt(Time.UNDEFINED_TIME);
 				int lane = nLanes + 4;
 	
