@@ -252,7 +252,7 @@ public class SocialNetwork {
 				if(met==false){
 					pick=(pick+1)%coreSize;
 					pJ=core.get(pick);
-					pIJ=(pJ.getKnowledge().getEgoNet().getOutDegree()+A)/(2*E + coreSize*A);
+//					pIJ=(pJ.getKnowledge().getEgoNet().getOutDegree()+A)/(2*E + coreSize*A);
 				}
 			}
 			core.add(pI);// add pI to core
@@ -688,7 +688,7 @@ public class SocialNetwork {
 		// symmetrically. "linksList" is the list of directed links.
 //		log.info("Removing link "+ myLink.person1.getId()+myLink.person2.getId());
 		linksList.remove(myLink);
-		if(myLink.equals(null)){
+		if (myLink == null) {
 			log.info("DEBUG STOP");
 		}
 		myLink.getPersonFrom().getKnowledge().getEgoNet().removeEgoLink(myLink);
