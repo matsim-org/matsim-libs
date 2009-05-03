@@ -67,9 +67,6 @@ public class QueueNetwork{
 	 * when vehicles are parking on a link but no other traffic occurs on that link. */
 //	private final PriorityQueue<LinkActivation> activationQueue = new PriorityQueue<LinkActivation>();
 
-	// set to true to move vehicles from waitingList before vehQueue
-	private boolean moveWaitFirst = false;
-
 	private final Map<Id, QueueLink> links;
 
 	private final Map<Id, QueueNode> nodes;
@@ -205,14 +202,6 @@ public class QueueNetwork{
 				this.simActivateThis.clear();
 			}
 		}
-	}
-
-	public void setMoveWaitFirst(final boolean moveWaitFirst){
-		this.moveWaitFirst = moveWaitFirst;
-	}
-	
-	protected boolean isMoveWaitFirst() {
-		return this.moveWaitFirst;
 	}
 
 	public Map<Id, QueueLink> getLinks() {

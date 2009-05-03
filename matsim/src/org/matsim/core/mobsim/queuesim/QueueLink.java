@@ -350,26 +350,14 @@ public class QueueLink {
 
 	protected boolean moveLink(double now) {
 		boolean ret = false;	
-		if (this.queueNetwork.isMoveWaitFirst()){
-			if (this.hasLanes) { // performance optimization: "if" is faster then "for(queueLanes)" with only one lane
-				for (QueueLane lane : this.queueLanes){
-					if (lane.moveLaneWaitFirst(now)){
-						ret = true;
-					}
+		if (this.hasLanes) { // performance optimization: "if" is faster then "for(queueLanes)" with only one lane
+			for (QueueLane lane : this.queueLanes){
+				if (lane.moveLane(now)){
+					ret = true;
 				}
-			} else {
-				ret = this.originalLane.moveLaneWaitFirst(now);
 			}
 		} else {
-			if (this.hasLanes) { // performance optimization: "if" is faster then "for(queueLanes)" with only one lane
-				for (QueueLane lane : this.queueLanes){
-					if (lane.moveLane(now)){
-						ret = true;
-					}
-				}
-			} else {
-				ret = this.originalLane.moveLane(now);
-			}
+			ret = this.originalLane.moveLane(now);
 		}
 		this.active = ret;
 		return ret;

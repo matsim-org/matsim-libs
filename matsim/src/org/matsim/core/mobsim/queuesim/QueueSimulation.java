@@ -382,7 +382,6 @@ public class QueueSimulation {
 	}
 
 	protected void prepareNetwork() {
-		this.network.setMoveWaitFirst(this.config.simulation().moveWaitFirst());
 		this.network.beforeSim();
 	}
 

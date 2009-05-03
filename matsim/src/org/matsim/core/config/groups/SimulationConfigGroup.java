@@ -30,6 +30,8 @@ public class SimulationConfigGroup extends Module {
 
 	private static final long serialVersionUID = 1L;
 
+	private final static Logger log = Logger.getLogger(SimulationConfigGroup.class);
+	
 	public static final String GROUP_NAME = "simulation";
 
 	private static final String START_TIME = "startTime";
@@ -70,7 +72,6 @@ public class SimulationConfigGroup extends Module {
 	private boolean removeStuckVehicles = true;
 	private String externalExe = null;
 	private int timeOut = 3600;
-	private boolean moveWaitFirst = false;
 
 	public SimulationConfigGroup() {
 		super(GROUP_NAME);
@@ -107,10 +108,10 @@ public class SimulationConfigGroup extends Module {
 		} else if (TIMEOUT.equals(key)) {
 			setExternalTimeOut(Integer.parseInt(value));
 		} else if (MOVE_WAIT_FIRST.equals(key)) {
-			moveWaitFirst("true".equals(value) || "yes".equals(value));
+			log.warn("The config option " + key + " is no longer supported and should be removed from the configuration file.");
 		} else if (SHELLTYPE.equals(key) || JAVACLASSPATH.equals(key) || JVMOPTIONS.equals(key)
 				|| CLIENTLIST.equals(key) || LOCALCONFIG.equals(key) || LOCALCONFIGDTD.equals(key) || EXE_PATH.equals(key)) {
-			System.err.println("WARNING: The config options for the parallel mobsim are no longer supported.");
+			log.warn("The config options for the parallel mobsim are no longer supported.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -147,8 +148,6 @@ public class SimulationConfigGroup extends Module {
 			return getExternalExe();
 		} else if (TIMEOUT.equals(key)) {
 			return Integer.toString(getExternalTimeOut());
-		}else if (MOVE_WAIT_FIRST.equals(key)) {
-			return (moveWaitFirst() ? "true" : "false");
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -173,10 +172,8 @@ public class SimulationConfigGroup extends Module {
 			map.put(EXTERNAL_EXE, getValue(EXTERNAL_EXE));
 		}
 		map.put(TIMEOUT, getValue(TIMEOUT));
-		map.put(MOVE_WAIT_FIRST, getValue(MOVE_WAIT_FIRST));
 		return map;
 	}
-
 
 	/* direct access */
 
@@ -292,15 +289,6 @@ public class SimulationConfigGroup extends Module {
 
 	public int getExternalTimeOut() {
 		return this.timeOut;
-	}
-
-
-	public void moveWaitFirst(final boolean moveWaitFirst) {
-		this.moveWaitFirst = moveWaitFirst;
-	}
-
-	public boolean moveWaitFirst() {
-		return this.moveWaitFirst;
 	}
 
 	/** Sets the way the vehicles should be positioned on the links. Currently known and supported styles are

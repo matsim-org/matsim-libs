@@ -419,21 +419,6 @@ public class QueueLane {
 		return this.isActive();
 	}
 
-	protected boolean moveLaneWaitFirst(final double now) {
-		updateBufferCapacity();
-
-		if (this.originalLane) {
-			// move vehicles from waitingQueue into buffer if possible
-			moveWaitToBuffer(now);
-		}
-		// move vehicles from link to buffer
-		moveLaneToBuffer(now);
-
-		moveBufferToNextLane(now);
-		return this.isActive();
-	}
-
-
 	private void moveBufferToNextLane(final double now) {
 		boolean moveOn = true;
 		while (moveOn && !this.bufferIsEmpty() && (this.toLanes != null)) {
@@ -456,8 +441,6 @@ public class QueueLane {
 			}
 		}
 	}
-
-
 
 	private void updateBufferCapacity() {
 		this.bufferCap = this.simulatedFlowCapacity;
