@@ -26,6 +26,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.population.routes.GenericRouteFactory;
@@ -53,7 +54,7 @@ public class NetworkFactory {
 	}
 
 	public Link createLink(final Id id, final Node from, final Node to,
-			final NetworkLayer network, final double length, final double freespeedTT, final double capacity,
+			final Network network, final double length, final double freespeedTT, final double capacity,
 			final double lanes) {
 		return this.linkFactory.createLink(id, from, to, network, length, freespeedTT, capacity, lanes);
 	}
@@ -64,7 +65,7 @@ public class NetworkFactory {
 	 * @param endLink the link where the route ends
 	 * @return a new Route for the specified mode
 	 *
-	 * @see #setRouteFactory(org.matsim.api.basic.v01.population.BasicLeg.TransportMode, RouteFactory)
+	 * @see #setRouteFactory(TransportMode, RouteFactory)
 	 */
 	public Route createRoute(final TransportMode mode, final Link startLink, final Link endLink) {
 		RouteFactory factory = this.routeFactories.get(mode);

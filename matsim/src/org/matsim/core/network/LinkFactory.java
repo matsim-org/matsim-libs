@@ -22,10 +22,11 @@ package org.matsim.core.network;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 
 public interface LinkFactory {
 	
-	public Link createLink(Id id, Node from, Node to, NetworkLayer network, double length, double freespeedTravelTime, double capacity, double nOfLanes);
+	public Link createLink(Id id, Node from, Node to, Network network, double length, double freespeedTravelTime, double capacity, double nOfLanes);
 
 }
