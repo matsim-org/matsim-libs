@@ -50,6 +50,7 @@ public class DaganzoRunner {
 		else {
 			Controler controler = new Controler(scenarioGenerator.configOut);
 			controler.setOverwriteFiles(true);
+			config = controler.getConfig();
 			controler.run();
 		}
 		

@@ -24,8 +24,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
@@ -109,11 +109,11 @@ public class DaganzoScenarioGenerator {
 
 	private static final boolean isAlternativeRouteEnabled = true;
 
-	private static final int iterations = 500;
+	private static final int iterations = 1;
 
 	private static final int iterations2 = 0;
 
-	private static final String controlerClass = AdaptiveController.class.getCanonicalName();
+	private static final String controllerClass = AdaptiveController.class.getCanonicalName();
 
 	private Id id1, id2, id4, id5, id6;
 	
@@ -143,22 +143,23 @@ public class DaganzoScenarioGenerator {
 	}
 
 	private void createScenario() {
-		//create a config
-		Config config = new Config();
-		config.addCoreModules();
-		//set the network
+		//create a scenario
+		ScenarioImpl scenario = new ScenarioImpl();
+		//get the config
+		Config config = scenario.getConfig();
+		//set the network input file to the config and load it
 		config.network().setInputFile(NETWORKFILE);
-		//create a scenario instance (we have to work on the implemenation not on the interface
-		//because some methods are not standardized yet)
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoader loader = new ScenarioLoader(scenario);
 		loader.loadNetwork();
-		ScenarioImpl scenario = (ScenarioImpl) loader.getScenario();
 		//create some ids as members of the class for convenience reasons
 		createIds(scenario);
 		//create the plans and write them
 		createPlans(scenario);
 		PopulationWriter pwriter = new PopulationWriter(scenario.getPopulation(), plansOut);
 		pwriter.write();
+		//enable lanes and signal system feature in config
+//		config.scenario().setUseLanes(true);
+//		config.scenario().setUseSignalSystems(true);
 		//create the lanes and write them
 		BasicLaneDefinitions lanes = createLanes(scenario);
 		MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(lanes);
@@ -292,7 +293,7 @@ public class DaganzoScenarioGenerator {
 	private BasicSignalSystems createSignalSystems(ScenarioImpl scenario) {
 		BasicSignalSystems systems = scenario.getSignalSystems();
 		BasicSignalSystemsBuilder builder = systems.getSignalSystemsBuilder();
-		//create the signal system
+		//create the signal system no 1
 		BasicSignalSystemDefinition definition = builder.createSignalSystemDefinition(id1);
 		systems.addSignalSystemDefinition(definition);
 		
@@ -300,12 +301,19 @@ public class DaganzoScenarioGenerator {
 		BasicSignalGroupDefinition groupLink4 = builder.createSignalGroupDefinition(id4, id1);
 		groupLink4.addLaneId(id1);
 		groupLink4.addToLinkId(id6);
+		//assing the group to the system
+		groupLink4.setLightSignalSystemDefinitionId(id1);
+		//add the signalGroupDefinition to the container
 		systems.addSignalGroupDefinition(groupLink4);
 		
-		//create signal group for traffic on link 5 on lane 1 with toLink 6
+		//create signal group  with id no 2 for traffic on link 5 on lane 1 with toLink 6
 		BasicSignalGroupDefinition groupLink5 = builder.createSignalGroupDefinition(id5, id2);
 		groupLink5.addLaneId(id1);
 		groupLink5.addToLinkId(id6);
+		//assing the group to the system
+		groupLink5.setLightSignalSystemDefinitionId(id1);
+		
+		//add the signalGroupDefinition to the container
 		systems.addSignalGroupDefinition(groupLink5);
 		
 		return systems;
@@ -320,7 +328,7 @@ public class DaganzoScenarioGenerator {
 		BasicAdaptiveSignalSystemControlInfo controlInfo = builder.createAdaptiveSignalSystemControlInfo();
 		controlInfo.addSignalGroupId(id1);
 		controlInfo.addSignalGroupId(id2);
-		controlInfo.setAdaptiveControlerClass(controlerClass);
+		controlInfo.setAdaptiveControlerClass(controllerClass);
 		systemConfig.setSignalSystemControlInfo(controlInfo);
 		
 		configs.getSignalSystemConfigurations().put(systemConfig.getSignalSystemId(), systemConfig);
