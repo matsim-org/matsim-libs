@@ -393,11 +393,10 @@ public class Dijkstra implements LeastCostPathCalculator {
 	private void augmentIterationID() {
 		if (getIterationID() == Integer.MAX_VALUE) {
 			this.iterationID = Integer.MIN_VALUE + 1;
+			resetNetworkVisited();
 		} else {
 			this.iterationID++;
 		}
-
-		checkToResetNetworkVisited();
 	}
 
 	/**
@@ -405,20 +404,6 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 */
 	int getIterationID() {
 		return this.iterationID;
-	}
-
-	/**
-	 * Resets all nodes in the network as if they have not been visited yet if
-	 * the iterationID is equal to Integer.MIN_VALUE + 1.
-	 */
-	private void checkToResetNetworkVisited() {
-		// If the re-planning id passed the maximal possible value
-		// and has the same value as at the 'beginning', we reset all nodes of
-		// the network to avoid identifying a node falsely as visited for the
-		// current iteration
-		if (getIterationID() == Integer.MIN_VALUE + 1) {
-			resetNetworkVisited();
-		}
 	}
 
 	/**
