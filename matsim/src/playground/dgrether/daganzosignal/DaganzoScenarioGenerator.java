@@ -158,8 +158,8 @@ public class DaganzoScenarioGenerator {
 		PopulationWriter pwriter = new PopulationWriter(scenario.getPopulation(), plansOut);
 		pwriter.write();
 		//enable lanes and signal system feature in config
-//		config.scenario().setUseLanes(true);
-//		config.scenario().setUseSignalSystems(true);
+		config.scenario().setUseLanes(true);
+		config.scenario().setUseSignalSystems(true);
 		//create the lanes and write them
 		BasicLaneDefinitions lanes = createLanes(scenario);
 		MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(lanes);
