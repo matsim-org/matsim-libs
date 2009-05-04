@@ -33,6 +33,8 @@ public interface QueueVehicle extends Identifiable {
 	
 	public void setCurrentLink(final Link link);
 	
+	public double getSizeInEquivalents();
+	
 	// unclear about the methods below...
 
 	public double getEarliestLinkExitTime();

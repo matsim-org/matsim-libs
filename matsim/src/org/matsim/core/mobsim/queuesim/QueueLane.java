@@ -83,6 +83,8 @@ public class QueueLane {
 	/*package*/ final Queue<QueueVehicle> buffer = new LinkedList<QueueVehicle>();
 
 	private double storageCapacity;
+	
+	private double usedStorageCapacity;
 
 	/**
 	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
@@ -110,7 +112,7 @@ public class QueueLane {
 
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
 	/*package*/ double bufferLastMovedTime = Time.UNDEFINED_TIME;
-	
+
 	/*package*/ QueueLink queueLink;
 	/**
 	 * This collection contains all Lanes downstream, if null it is the last lane
@@ -373,6 +375,7 @@ public class QueueLane {
 				this.queueLink.processVehicleArrival(now, veh);
 				// remove _after_ processing the arrival to keep link active
 				this.vehQueue.poll();
+				this.usedStorageCapacity -= veh.getSizeInEquivalents();
 				continue;
 			}
 
@@ -384,6 +387,7 @@ public class QueueLane {
 
 			addToBuffer(veh, now);
 			this.vehQueue.poll();
+			this.usedStorageCapacity -= veh.getSizeInEquivalents();
 		} // end while
 	}
 
@@ -457,6 +461,7 @@ public class QueueLane {
 	 */
 	/*package*/ void add(final QueueVehicle veh, final double now) {
 		this.vehQueue.add(veh);
+		this.usedStorageCapacity += veh.getSizeInEquivalents();
 		if (this.isFireLaneEvents()){
 			QueueSimulation.getEvents().processEvent(new LaneEnterEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), this.getLaneId()));
 		}
@@ -542,7 +547,7 @@ public class QueueLane {
 	 *         the whole link), than there is space for vehicles.
 	 */
 	public boolean hasSpace() {
-		return this.vehQueue.size() < getSpaceCap();
+		return this.usedStorageCapacity < getStorageCapacity();
 	}
 
 	protected int vehOnLinkCount() {
@@ -553,7 +558,7 @@ public class QueueLane {
 	 * @return Returns the maximum number of vehicles that can be placed on the
 	 *         link at a time.
 	 */
-	public double getSpaceCap() {
+	/*package*/ double getStorageCapacity() {
 		return this.storageCapacity;
 	}
 

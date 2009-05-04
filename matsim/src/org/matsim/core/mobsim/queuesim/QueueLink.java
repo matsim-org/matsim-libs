@@ -420,7 +420,7 @@ public class QueueLink {
 	}
 
 	public double getSpaceCap() {
-		return this.originalLane.getSpaceCap();
+		return this.originalLane.getStorageCapacity();
 	}
 
 	public Queue<QueueVehicle> getVehiclesInBuffer() {

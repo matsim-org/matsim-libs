@@ -32,9 +32,16 @@ public class QueueVehicleImpl implements QueueVehicle {
 	private final Id id;
 	
 	private Link currentLink = null;
+	
+	private final double sizeInEquivalents;
 
 	public QueueVehicleImpl(final Id id) {
+		this(id, 1.0);
+	}
+	
+	public QueueVehicleImpl(final Id id, final double sizeInEquivalents) {
 		this.id = id;
+		this.sizeInEquivalents = sizeInEquivalents;
 	}
 
 	public double getEarliestLinkExitTime() {
@@ -64,11 +71,15 @@ public class QueueVehicleImpl implements QueueVehicle {
 	public Id getId() {
 		return this.id;
 	}
+	
+	public double getSizeInEquivalents() {
+		return this.sizeInEquivalents;
+	}
 
 	@Override
 	public String toString() {
 		return "Vehicle Id " + getId() + ", driven by (personId) " + this.driver.getPerson().getId()
 				+ ", on link " + this.currentLink.getId();
 	}
-
+	
 }
