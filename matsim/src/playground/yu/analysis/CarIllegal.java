@@ -51,11 +51,10 @@ public class CarIllegal extends AbstractPersonAlgorithm {
 	public void run(final Person person) {
 		if (person != null) {
 			Plan selectedPlan = person.getSelectedPlan();
-			if (
-			// planType != null && planType != Plan.Type.CAR
-			PlanModeJudger.useCar(selectedPlan))
-				if (person.getAge() < 18 || person.getLicense().equals("no"))
-					this.count++;
+			if ((PlanModeJudger.useCar(selectedPlan))
+					&& (person.getAge() < 18 || person.getLicense()
+							.equals("no")))
+				this.count++;
 		}
 	}
 

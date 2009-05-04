@@ -75,15 +75,16 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 
 	public void handleEvent(LinkEnterEvent enter) {
 		if (toll == null)
-			this.enterTimes.put(enter.getPersonId().toString(), enter.getTime());
+			this.enterTimes
+					.put(enter.getPersonId().toString(), enter.getTime());
 		else {
 			Link link = enter.getLink();
 			if (link == null)
 				link = network.getLink(enter.getLinkId().toString());
-			if (link != null) {
+			if (link != null)
 				if (TollTools.isInRange(link, toll))
-					this.enterTimes.put(enter.getPersonId().toString(), enter.getTime());
-			}
+					this.enterTimes.put(enter.getPersonId().toString(), enter
+							.getTime());
 		}
 	}
 
@@ -94,7 +95,8 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 	}
 
 	public void handleEvent(LinkLeaveEvent leave) {
-		Double enterTime = this.enterTimes.remove(leave.getPersonId().toString());
+		Double enterTime = this.enterTimes.remove(leave.getPersonId()
+				.toString());
 		if (enterTime != null) {
 			Link l = leave.getLink();
 			if (l == null) {

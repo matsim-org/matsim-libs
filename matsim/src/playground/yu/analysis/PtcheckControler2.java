@@ -71,6 +71,7 @@ public class PtcheckControler2 extends Controler {
 		private LegTravelTimeModalSplit ttms = null;
 		private LegDistance ld = null;
 		private CalcLinksAvgSpeed clas = null;
+		private static final String PLANCALCSCORE = "planCalcScore";
 
 		public void notifyStartup(StartupEvent event) {
 			Controler ctl = event.getControler();
@@ -78,8 +79,8 @@ public class PtcheckControler2 extends Controler {
 			try {
 				ctl.addControlerListener(new PtRate2(ctl.getPopulation(),
 						getOutputFilename("PtRate.txt"),
-						ctl.getLastIteration(), cf.getParam("planCalcScore",
-								"traveling"), cf.getParam("planCalcScore",
+						ctl.getLastIteration(), cf.getParam(PLANCALCSCORE,
+								"traveling"), cf.getParam(PLANCALCSCORE,
 								"travelingPt")));
 				ptRateWriter = IOUtils
 						.getBufferedWriter(getOutputFilename("tollPaid.txt"));
@@ -111,10 +112,9 @@ public class PtcheckControler2 extends Controler {
 					ptRateWriter
 							.write(it
 									+ "\t"
-									+ cf.getParam("planCalcScore", "traveling")
+									+ cf.getParam(PLANCALCSCORE, "traveling")
 									+ "\t"
-									+ cf.getParam("planCalcScore",
-											"travelingPt")
+									+ cf.getParam(PLANCALCSCORE, "travelingPt")
 									+ "\t"
 									+ ctl.getScoreStats().getHistory()[3][it]
 									+ "\t"

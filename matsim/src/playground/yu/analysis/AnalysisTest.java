@@ -51,7 +51,7 @@ import playground.yu.utils.io.SimpleWriter;
  */
 public class AnalysisTest {
 	private static boolean withToll = false;
-
+	private static String ZURICH="Zurich";
 	private static void printUsage() {
 		System.out.println();
 		System.out.println("AnalysisTest:");
@@ -150,7 +150,7 @@ public class AnalysisTest {
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network, toll);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network, toll);
 		CalcLinksAvgSpeed clas = null;
-		if (scenario.equals("Zurich")) {
+		if (scenario.equals(ZURICH)) {
 			clas = new CalcLinksAvgSpeed(network, 682845.0, 247388.0, 2000.0);
 		} else if (withToll) {
 			clas = new CalcLinksAvgSpeed(network, toll);
@@ -234,7 +234,7 @@ public class AnalysisTest {
 	}
 
 	public static void runZurich(final String[] args) {
-		runIntern(args, "Zurich");
+		runIntern(args, ZURICH);
 	}
 
 	public static void runTollScenario(String[] args, String scenario) {
@@ -249,7 +249,7 @@ public class AnalysisTest {
 		if (args.length < 3) {
 			printUsage();
 			System.exit(0);
-		} else if (args[3].equals("Zurich") || args[4].equals("Zurich")) {
+		} else if (args[3].equals(ZURICH) || args[4].equals(ZURICH)) {
 			runZurich(args);
 		} else if (args[3].equals("Kanton_Zurich")
 				|| args[4].equals("Kanton_Zurich")) {

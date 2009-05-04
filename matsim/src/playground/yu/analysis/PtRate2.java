@@ -28,6 +28,7 @@ import java.io.IOException;
 
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -50,45 +51,49 @@ public class PtRate2 implements IterationEndsListener, ShutdownListener {
 	private final String BetaTraveling;
 	private final String BetaTravelingPt;
 	/**
-	 * @param yLicensedPtRate -
-	 *            an array, in which the fraction of persons, who use public
+	 * @param yLicensedPtRate
+	 *            - an array, in which the fraction of persons, who use public
 	 *            transit, will be saved.
 	 */
 	private double[] yLicensedPtRate = null;
 	private double[] yLicensedCarRate = null;
 	/**
-	 * @param yLicensedPtUser -
-	 *            an array, in which the amount of persons, who use public
+	 * @param yLicensedPtUser
+	 *            - an array, in which the amount of persons, who use public
 	 *            transit, will be saved.
 	 */
 	private double[] yLicensedPtUser = null;
 	private double[] yLicensedCarUser = null;
 	/**
-	 * @param yPersons -
-	 *            an array, in which the amount of all
+	 * @param yPersons
+	 *            - an array, in which the amount of all
 	 */
 	private double[] yPersons = null;
 	private double[] yLicensed = null;
+
+	private static final String SIMULATION = "simulation",
+			STRATEGY = "strategy";
 
 	// persons in the simulation will be
 	// saved.
 	// -------------------------------CONSTRUCTOR---------------------------
 	/**
-	 * @param population -
-	 *            the object of Plans in the simulation
-	 * @param filename -
-	 *            filename of .txt-file
-	 * @param maxIters -
-	 *            maximum number of iterations
-	 * @param BetaTraveling -
-	 *            parameter of marginal Utility of Traveling
-	 * @param BetaTravelingPt -
-	 *            parameter of marginal Utility of Traveling with public transit
+	 * @param population
+	 *            - the object of Plans in the simulation
+	 * @param filename
+	 *            - filename of .txt-file
+	 * @param maxIters
+	 *            - maximum number of iterations
+	 * @param BetaTraveling
+	 *            - parameter of marginal Utility of Traveling
+	 * @param BetaTravelingPt
+	 *            - parameter of marginal Utility of Traveling with public
+	 *            transit
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public PtRate2(final Population population, final String filename, int maxIters,
-			String BetaTraveling, String BetaTravelingPt)
+	public PtRate2(final Population population, final String filename,
+			int maxIters, String BetaTraveling, String BetaTravelingPt)
 			throws FileNotFoundException, IOException {
 		this.population = population;
 		this.maxIters = maxIters;
@@ -128,21 +133,24 @@ public class PtRate2 implements IterationEndsListener, ShutdownListener {
 				for (int i = 0; i < maxIters / 10 + 1; i++) {
 					x[i] = i * 10;
 				}
+				StringBuffer sb = new StringBuffer();
+				for (StrategySettings ss : cf.strategy().getStrategySettings()) {
+					sb.append(ss.getModuleName());
+					sb.append('-');
+					sb.append(ss.getProbability());
+					sb.append(',');
+					sb.append(' ');
+				}
 				XYLineChart ptRateChart = new XYLineChart("Schweiz: PtRate, "
 						+ maxIters + "ITERs, BetaTraveling=" + BetaTraveling
 						+ ", BetaTravelingPt=" + BetaTravelingPt
 						+ ", BetaPerforming="
 						+ cf.getParam("planCalcScore", "performing")
 						+ ", flowCapacityFactor="
-						+ cf.getParam("simulation", "flowCapacityFactor")
+						+ cf.getParam(SIMULATION, "flowCapacityFactor")
 						+ ", storageCapacityFactor="
-						+ cf.getParam("simulation", "storageCapacityFactor")
-						+ ", " + cf.getParam("strategy", "ModuleProbability_2")
-						+ "-ReRoute_Landmarks, "
-						+ cf.getParam("strategy", "ModuleProbability_3")
-						+ "-TimeAllocationMutator, "
-						+ cf.getParam("strategy", "ModuleProbability_1")
-						+ "-SelectExpBeta", "Iterations", "Pt-Rate");
+						+ cf.getParam(SIMULATION, "storageCapacityFactor")
+						+ ", " + sb, "Iterations", "Pt-Rate");
 				ptRateChart.addSeries("licensedPtRate", x, yLicensedPtRate);
 				ptRateChart.addSeries("licensedCarRate", x, yLicensedCarRate);
 				ptRateChart.saveAsPng(
@@ -157,28 +165,18 @@ public class PtRate2 implements IterationEndsListener, ShutdownListener {
 								+ ", BetaPerforming="
 								+ cf.getParam("planCalcScore", "performing")
 								+ ", flowCapacityFactor="
-								+ cf.getParam("simulation",
-										"flowCapacityFactor")
+								+ cf.getParam(SIMULATION, "flowCapacityFactor")
 								+ ", storageCapacityFactor="
-								+ cf.getParam("simulation",
-										"storageCapacityFactor")
+								+ cf.getParam(SIMULATION,
+										"storageCapacityFactor") + ", "
+								+ cf.getParam(STRATEGY, "ModuleProbability_2")
+								+ "-" + cf.getParam(STRATEGY, "Module_2")
 								+ ", "
-								+ cf
-										.getParam("strategy",
-												"ModuleProbability_2")
-								+ "-"
-								+ cf.getParam("strategy", "Module_2")
+								+ cf.getParam(STRATEGY, "ModuleProbability_3")
+								+ "-" + cf.getParam(STRATEGY, "Module_3")
 								+ ", "
-								+ cf
-										.getParam("strategy",
-												"ModuleProbability_3")
-								+ "-"
-								+ cf.getParam("strategy", "Module_3")
-								+ ", "
-								+ cf
-										.getParam("strategy",
-												"ModuleProbability_1") + "-"
-								+ cf.getParam("strategy", "Module_1"),
+								+ cf.getParam(STRATEGY, "ModuleProbability_1")
+								+ "-" + cf.getParam(STRATEGY, "Module_1"),
 						"Iterations", "Persons");
 				personsChart.addSeries("licensedPtUser", x, yLicensedPtUser);
 				personsChart.addSeries("licensedCarUser", x, yLicensedCarUser);

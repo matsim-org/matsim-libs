@@ -50,26 +50,28 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 	private final String BetaTraveling;
 	private final String BetaTravelingPt;
 	private double[] yPtRate = null;// an array, in which the fraction of
-	// persons, who use public transit, will be
-	// saved.
+									// persons, who use public transit, will be
+									// saved.
 	private double[] yPtUser = null;// an array, in which the amount of persons,
-	// who use public transit, will be saved.
+									// who use public transit, will be saved.
 	private double[] yPersons = null;// an array, in which the amount of all
+										// persons in the simulation will be
+										// saved.
+	private static final String SIMULATION = "simulation";
 
-	// persons in the simulation will be
-	// saved.
 	// -------------------------------CONSTRUCTOR---------------------------
 	/**
-	 * @param population -
-	 *            the object of Plans in the simulation
-	 * @param filename -
-	 *            filename of .txt-file
-	 * @param maxIters -
-	 *            maximum number of iterations
-	 * @param BetaTraveling -
-	 *            parameter of marginal Utility of Traveling
-	 * @param BetaTravelingPt -
-	 *            parameter of marginal Utility of Traveling with public transit
+	 * @param population
+	 *            - the object of Plans in the simulation
+	 * @param filename
+	 *            - filename of .txt-file
+	 * @param maxIters
+	 *            - maximum number of iterations
+	 * @param BetaTraveling
+	 *            - parameter of marginal Utility of Traveling
+	 * @param BetaTravelingPt
+	 *            - parameter of marginal Utility of Traveling with public
+	 *            transit
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
@@ -114,9 +116,9 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 						+ ", BetaPerforming="
 						+ cf.getParam("planCalcScore", "performing")
 						+ ", flowCapacityFactor="
-						+ cf.getParam("simulation", "flowCapacityFactor")
+						+ cf.getParam(SIMULATION, "flowCapacityFactor")
 						+ ", storageCapacityFactor="
-						+ cf.getParam("simulation", "storageCapacityFactor"),
+						+ cf.getParam(SIMULATION, "storageCapacityFactor"),
 						"Iterations", "Pt-Rate");
 				ptRateChart.addSeries("PtRate", x, yPtRate);
 				ptRateChart.saveAsPng(
@@ -131,10 +133,9 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 								+ ", BetaPerforming="
 								+ cf.getParam("planCalcScore", "performing")
 								+ ", flowCapacityFactor="
-								+ cf.getParam("simulation",
-										"flowCapacityFactor")
+								+ cf.getParam(SIMULATION, "flowCapacityFactor")
 								+ ", storageCapacityFactor="
-								+ cf.getParam("simulation",
+								+ cf.getParam(SIMULATION,
 										"storageCapacityFactor"), "Iterations",
 						"PtUser/Persons");
 				personsChart.addSeries("PtUser", x, yPtUser);

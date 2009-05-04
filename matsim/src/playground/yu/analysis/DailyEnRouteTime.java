@@ -60,6 +60,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 			othersLeisTime, othersOtherTime, othersHomeTime;
 	protected Person person;
 	protected RoadPricingScheme toll = null;
+	private static final String CAR = "car", BIKE = "bike", OTHERS = "others";
 
 	public DailyEnRouteTime(RoadPricingScheme toll) {
 		this();
@@ -337,8 +338,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 
 		PieChart pieChart = new PieChart(
 				"Avg. Daily En Route Time -- Modal Split");
-		pieChart.addSeries(
-				new String[] { "car", "pt", "wlk", "bike", "others" },
+		pieChart.addSeries(new String[] { CAR, "pt", "wlk", BIKE, OTHERS },
 				new double[] { avgCarTime, avgPtTime, avgWlkTime, avgBikeTime,
 						avgOtherTime });
 		pieChart.saveAsPng(
@@ -386,8 +386,8 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 				"travel destination and modal split--daily En Route Time",
 				"travel destination", "daily En Route Time [min]",
 				new String[] { "work", "education", "shopping", "leisure",
-						"home", "others" });
-		barChart.addSeries("car", new double[] { this.carWorkTime,
+						"home", OTHERS });
+		barChart.addSeries(CAR, new double[] { this.carWorkTime,
 				this.carEducTime, this.carShopTime, this.carLeisTime,
 				this.carHomeTime, this.carOtherTime });
 
@@ -407,13 +407,13 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 				this.bikeEducTime, this.bikeShopTime, this.bikeLeisTime,
 				this.bikeHomeTime, this.bikeOtherTime };
 		if (CollectionSum.getSum(bikeDestinationTime) > 0)
-			barChart.addSeries("bike", bikeDestinationTime);
+			barChart.addSeries(BIKE, bikeDestinationTime);
 
 		double[] othersDestinationTime = new double[] { this.othersWorkTime,
 				this.othersEducTime, this.othersShopTime, this.othersLeisTime,
 				this.othersHomeTime, this.othersOtherTime };
 		if (CollectionSum.getSum(othersDestinationTime) > 0)
-			barChart.addSeries("others", othersDestinationTime);
+			barChart.addSeries(OTHERS, othersDestinationTime);
 
 		barChart.addMatsimLogo();
 		barChart.saveAsPng(outputFilename
@@ -440,15 +440,15 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		XYLineChart chart = new XYLineChart("Daily En Route Time Distribution",
 				"Daily En Route Time in min",
 				"fraction of persons with daily en route time longer than x... in %");
-		chart.addSeries("car", x, yCar);
+		chart.addSeries(CAR, x, yCar);
 		if (CollectionSum.getSum(yPt) > 0)
 			chart.addSeries("pt", x, yPt);
 		if (CollectionSum.getSum(yWlk) > 0)
 			chart.addSeries("walk", x, yWlk);
 		if (CollectionSum.getSum(yBike) > 0)
-			chart.addSeries("bike", x, yBike);
+			chart.addSeries(BIKE, x, yBike);
 		if (CollectionSum.getSum(yOthers) > 0)
-			chart.addSeries("others", x, yOthers);
+			chart.addSeries(OTHERS, x, yOthers);
 		chart.addSeries("total", x, yTotal);
 		chart.saveAsPng(outputFilename + "dailyEnRouteTimeDistribution.png",
 				800, 600);
@@ -496,15 +496,15 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		}
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Duration",
 				"leg Duration [min]", "mode fraction [%]");
-		chart2.addSeries("car", xs, yCarFracs);
+		chart2.addSeries(CAR, xs, yCarFracs);
 		if (CollectionSum.getSum(yPtFracs) > 0)
 			chart2.addSeries("pt", xs, yPtFracs);
 		if (CollectionSum.getSum(yWlkFracs) > 0)
 			chart2.addSeries("walk", xs, yWlkFracs);
 		if (CollectionSum.getSum(yBikeFracs) > 0)
-			chart2.addSeries("bike", xs, yBikeFracs);
+			chart2.addSeries(BIKE, xs, yBikeFracs);
 		if (CollectionSum.getSum(yOthersFracs) > 0)
-			chart2.addSeries("others", xs, yOthersFracs);
+			chart2.addSeries(OTHERS, xs, yOthersFracs);
 		chart2.saveAsPng(outputFilename + "legTimeModalSplit2.png", 800, 600);
 		sw.close();
 	}

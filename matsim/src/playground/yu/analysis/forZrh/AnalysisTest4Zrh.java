@@ -55,6 +55,9 @@ import playground.yu.utils.io.SimpleWriter;
  * 
  */
 public class AnalysisTest4Zrh {
+	private static final String KANTON_ZURICH = "Kanton_Zurich",
+			ZURICH = "Zurich";
+
 	private static void printUsage() {
 		System.out.println();
 		System.out.println("AnalysisTest:");
@@ -92,7 +95,7 @@ public class AnalysisTest4Zrh {
 			if (args[3].endsWith("xml") || args[3].endsWith("xml.gz"))
 				plansFilename = args[3];
 		}
-		String tollFilename = (!scenario.equals("Kanton_Zurich")) ? null
+		String tollFilename = (!scenario.equals(KANTON_ZURICH)) ? null
 				: args[args.length - 3];
 
 		Gbl.createConfig(null);
@@ -101,7 +104,7 @@ public class AnalysisTest4Zrh {
 
 		// toll
 		RoadPricingScheme toll = null;
-		if (scenario.equals("Kanton_Zurich")) {
+		if (scenario.equals(KANTON_ZURICH)) {
 			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
 					network);
 			try {
@@ -154,9 +157,9 @@ public class AnalysisTest4Zrh {
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network, toll);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network, toll);
 		CalcLinksAvgSpeed clas = null;
-		if (scenario.equals("Zurich")) {
+		if (scenario.equals(ZURICH)) {
 			clas = new CalcLinksAvgSpeed(network, 682845.0, 247388.0, 2000.0);
-		} else if (scenario.equals("Kanton_Zurich")) {
+		} else if (scenario.equals(KANTON_ZURICH)) {
 			clas = new CalcLinksAvgSpeed(network, toll);
 		} else {
 			clas = new CalcLinksAvgSpeed(network);
@@ -239,11 +242,11 @@ public class AnalysisTest4Zrh {
 	}
 
 	public static void runZurich(final String[] args) {
-		runIntern(args, "Zurich");
+		runIntern(args, ZURICH);
 	}
 
 	public static void runKantonZurich(String[] args) {
-		runIntern(args, "Kanton_Zurich");
+		runIntern(args, KANTON_ZURICH);
 	}
 
 	/**
@@ -253,10 +256,10 @@ public class AnalysisTest4Zrh {
 		if (args.length < 3) {
 			printUsage();
 			System.exit(0);
-		} else if (args[3].equals("Zurich") || args[4].equals("Zurich")) {
+		} else if (args[3].equals(ZURICH) || args[4].equals(ZURICH)) {
 			runZurich(args);
-		} else if (args[3].equals("Kanton_Zurich")
-				|| args[4].equals("Kanton_Zurich")) {
+		} else if (args[3].equals(KANTON_ZURICH)
+				|| args[4].equals(KANTON_ZURICH)) {
 			runKantonZurich(args);
 		} else {
 			run(args);

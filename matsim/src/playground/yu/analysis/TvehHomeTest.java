@@ -44,7 +44,8 @@ public class TvehHomeTest {
 		String[] heads = reader.readLine();
 		StringBuffer head = new StringBuffer();
 		for (int i = 0; i < heads.length; i++) {
-			head.append(heads[i] + "\t");
+			head.append(heads[i]);
+			head.append('\t');
 		}
 		String s1_8 = "\t0\t0\t0\t1\t0\t0\t1\t0\t";
 		String s10 = "\t0\t";

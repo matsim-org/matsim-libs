@@ -168,6 +168,7 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 		try {
 			this.out.close();
 		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

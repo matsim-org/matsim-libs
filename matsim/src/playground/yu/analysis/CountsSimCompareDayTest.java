@@ -69,20 +69,18 @@ public class CountsSimCompareDayTest {
 					Coord fromCoord = link.getFromNode().getCoord();
 					double x = 0.7 * toCoord.getX() + 0.3 * fromCoord.getX();
 					double y = 0.7 * toCoord.getY() + 0.3 * fromCoord.getY();
-					if (x != 0 && y != 0) {
-						if (va.getVolumesForLink(linkId.toString()) != null) {
-							double countVal = 0.0;
-							double simVal = 0.0;
-							for (int h = 0; h < 24; h++) {
-								countVal += count.getVolume(h + 1).getValue();
-								simVal += va.getVolumesForLink(linkId
-										.toString())[h]
-										* countsScaleFactor;
-							}
-							writer.write(linkId + "\t" + x + "\t" + y + "\t"
-									+ countVal + "\t" + simVal + "\t"
-									+ (simVal - countVal) / countVal + "\n");
+					if ((x != 0 && y != 0)
+							&& (va.getVolumesForLink(linkId.toString()) != null)) {
+						double countVal = 0.0;
+						double simVal = 0.0;
+						for (int h = 0; h < 24; h++) {
+							countVal += count.getVolume(h + 1).getValue();
+							simVal += va.getVolumesForLink(linkId.toString())[h]
+									* countsScaleFactor;
 						}
+						writer.write(linkId + "\t" + x + "\t" + y + "\t"
+								+ countVal + "\t" + simVal + "\t"
+								+ (simVal - countVal) / countVal + "\n");
 					}
 				}
 			}

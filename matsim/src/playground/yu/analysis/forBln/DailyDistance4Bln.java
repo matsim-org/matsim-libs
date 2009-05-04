@@ -31,15 +31,7 @@ import playground.yu.utils.io.SimpleWriter;
  * 
  */
 public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
-
-	public DailyDistance4Bln() {
-		super();
-	}
-
-	public DailyDistance4Bln(RoadPricingScheme toll) {
-		super(toll);
-	}
-
+	private static final String CAR = "car", BIKE = "bike", WALK = "walk";
 	private double carBusinessDist, carEinkaufSonstigesDist,
 			carFreizeitSonstSportDist, carHolidayJourneyDist, carMultipleDist,
 			carSeeADoctorDist, carNotSpecifiedDist;
@@ -55,6 +47,14 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 	private double othersBusinessDist, othersEinkaufSonstigesDist,
 			othersFreizeitSonstSportDist, othersHolidayJourneyDist,
 			othersMultipleDist, othersSeeADoctorDist, othersNotSpecifiedDist;
+
+	public DailyDistance4Bln() {
+		super();
+	}
+
+	public DailyDistance4Bln(RoadPricingScheme toll) {
+		super(toll);
+	}
 
 	public void run(final Plan plan) {
 		double dayDist = 0.0;
@@ -366,8 +366,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 				* 100.0 + "\t" + othersDist);
 
 		PieChart pieChart = new PieChart("Avg. Daily Distance -- Modal Split");
-		pieChart.addSeries(
-				new String[] { "car", "pt", "walk", "bike", "others" },
+		pieChart.addSeries(new String[] { CAR, "pt", WALK, BIKE, "others" },
 				new double[] { avgCarDist, avgPtDist, avgWlkDist, avgBikeDist,
 						avgOthersDist });
 		pieChart.addMatsimLogo();
@@ -462,7 +461,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 				"travel destination and modal split--daily distance",
 				"travel destinations", "daily distances [km]",
 				PlotOrientation.VERTICAL);
-		stackedBarChart.addSeries(new String[] { "car", "pt", "walk", "bike",
+		stackedBarChart.addSeries(new String[] { CAR, "pt", WALK, BIKE,
 				"others" }, new String[] { "home", "work", "shopping",
 				"education", "leisure", "other", "not specified", "business",
 				"Einkauf sonstiges", "Freizeit (sonstiges incl.Sport)",
@@ -525,13 +524,13 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 		XYLineChart chart = new XYLineChart("Daily Distance Distribution",
 				"Daily Distance in km",
 				"fraction of persons with daily distance bigger than x... in %");
-		chart.addSeries("car", x, yCar);
+		chart.addSeries(CAR, x, yCar);
 		if (CollectionSum.getSum(yPt) > 0)
 			chart.addSeries("pt", x, yPt);
 		if (CollectionSum.getSum(yWlk) > 0)
-			chart.addSeries("walk", x, yWlk);
+			chart.addSeries(WALK, x, yWlk);
 		if (CollectionSum.getSum(yBike) > 0)
-			chart.addSeries("bike", x, yBike);
+			chart.addSeries(BIKE, x, yBike);
 		if (CollectionSum.getSum(yOthers) > 0)
 			chart.addSeries("other", x, yOthers);
 		chart.addSeries("total", x, yTotal);
@@ -584,13 +583,13 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 		}
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
 				"leg Distance [km]", "mode fraction [%]");
-		chart2.addSeries("car", xs, yCarFracs);
+		chart2.addSeries(CAR, xs, yCarFracs);
 		if (CollectionSum.getSum(yPtFracs) > 0)
 			chart2.addSeries("pt", xs, yPtFracs);
 		if (CollectionSum.getSum(yWlkFracs) > 0)
-			chart2.addSeries("walk", xs, yWlkFracs);
+			chart2.addSeries(WALK, xs, yWlkFracs);
 		if (CollectionSum.getSum(yBikeFracs) > 0)
-			chart2.addSeries("bike", xs, yBikeFracs);
+			chart2.addSeries(BIKE, xs, yBikeFracs);
 		if (CollectionSum.getSum(yOthersFracs) > 0)
 			chart2.addSeries("others", xs, yOthersFracs);
 		chart2.addMatsimLogo();

@@ -41,6 +41,7 @@ import playground.yu.utils.io.SimpleWriter;
  */
 public class DailyDistance extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
+	private static final String CAR = "car";
 	protected double carDist, ptDist, wlkDist, bikeDist// TODO
 			, othersDist;
 	protected final double totalDayDistanceCounts[], carDayDistanceCounts[],
@@ -346,7 +347,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 
 		PieChart pieChart = new PieChart("Avg. Daily Distance -- Modal Split");
 		pieChart.addSeries(
-				new String[] { "car", "pt", "walk", "bike", "others" },
+				new String[] { CAR, "pt", "walk", "bike", "others" },
 				new double[] { avgCarDist, avgPtDist, avgWlkDist, avgBikeDist,
 						avgOthersDist });
 		pieChart.saveAsPng(outputFilename + "dailyDistanceModalSplitPie.png",
@@ -394,7 +395,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				"travel destination", "daily distance [km]", new String[] {
 						"work", "education", "shopping", "leisure", "home",
 						"others" });
-		barChart.addSeries("car", new double[] { this.carWorkDist,
+		barChart.addSeries(CAR, new double[] { this.carWorkDist,
 				this.carEducDist, this.carShopDist, this.carLeisDist,
 				this.carHomeDist, this.carOtherDist });
 
@@ -450,7 +451,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		XYLineChart chart = new XYLineChart("Daily Distance Distribution",
 				"Daily Distance in km",
 				"fraction of persons with daily distance bigger than x... in %");
-		chart.addSeries("car", x, yCar);
+		chart.addSeries(CAR, x, yCar);
 		if (CollectionSum.getSum(yPt) > 0)
 			chart.addSeries("pt", x, yPt);
 		if (CollectionSum.getSum(yWlk) > 0)
@@ -508,7 +509,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		}
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
 				"leg Distance [km]", "mode fraction [%]");
-		chart2.addSeries("car", xs, yCarFracs);
+		chart2.addSeries(CAR, xs, yCarFracs);
 		if (CollectionSum.getSum(yPtFracs) > 0)
 			chart2.addSeries("pt", xs, yPtFracs);
 		if (CollectionSum.getSum(yWlkFracs) > 0)

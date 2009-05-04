@@ -44,6 +44,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
@@ -246,27 +247,27 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 			for (int i = 0; i < nofBins - 1; i++)
 				head.append("\tH" + Integer.toString(i) + "-"
 						+ Integer.toString(i + 1));
-			head.append("\n");
+			head.append('\n');
 			out.write(head.toString());
 			out.flush();
 
 			for (Link l : interestLinks == null ? network.getLinks().values()
 					: interestLinks) {
 				Id linkId = l.getId();
-				StringBuffer line = new StringBuffer(
-						linkId.toString()
-								+ "\t"
-								+ l
-										.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
+				StringBuffer line = new StringBuffer(linkId.toString());
+				line.append('\t');
+				line.append(l.getCapacity(Time.UNDEFINED_TIME));
+
 				for (int j = 0; j < nofBins - 1; j++) {
 					double speed = getAvgSpeed(linkId, (double) j * binSize);
-					line.append("\t" + speed);
+					line.append('\t');
+					line.append(speed);
 					if (speed > 0) {
 						speeds[j] += speed;
 						speedsCount[j]++;
 					}
 				}
-				line.append("\n");
+				line.append('\n');
 				out.write(line.toString());
 				out.flush();
 			}

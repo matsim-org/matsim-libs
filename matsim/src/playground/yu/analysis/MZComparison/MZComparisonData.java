@@ -28,7 +28,7 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 
 	private double carDist, ptDist, wlkDist,
 			otherDist,
-			count,// counts all persons in population
+			// count,// counts all persons in population
 			carDist_toll, ptDist_toll, wlkDist_toll,
 			otherDist_toll,
 			count_toll,// counts all inhabitants in toll area
@@ -46,7 +46,7 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 
 	@Override
 	public void run(Person person) {
-		count++;
+		// count++;
 		Plan pl = person.getSelectedPlan();
 		inTollRange = isInRange(pl.getFirstActivity().getLink(), toll);
 		if (inTollRange)
@@ -111,7 +111,7 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 		ptDist = 0;
 		wlkDist = 0;
 		otherDist = 0;
-		count = 0;
+		// count = 0;
 		carDist_toll = 0;
 		ptDist_toll = 0;
 		wlkDist_toll = 0;

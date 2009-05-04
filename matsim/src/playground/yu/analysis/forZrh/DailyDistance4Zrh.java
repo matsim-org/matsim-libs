@@ -57,6 +57,8 @@ import playground.yu.utils.io.SimpleWriter;
  * 
  */
 public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
+	private static final String CAR = "car", OTHERS = "others",
+			THROUGH = "through";
 	private double throughWorkDist, throughEducDist, throughShopDist,
 			throughLeisDist, throughHomeDist, throughOtherDist, throughDist;
 	private double[] throughLegDistanceCounts;
@@ -275,9 +277,9 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 				* 100.0 + "\t" + throughDist);
 
 		PieChart pieChart = new PieChart("Avg. Daily Distance -- Modal Split");
-		pieChart.addSeries(new String[] { "car", "pt", "wlk", "others",
-				"through" }, new double[] { avgCarDist, avgPtDist, avgWlkDist,
-				avgOthersDist, avgThroughDist });
+		pieChart.addSeries(new String[] { CAR, "pt", "wlk", OTHERS, THROUGH },
+				new double[] { avgCarDist, avgPtDist, avgWlkDist,
+						avgOthersDist, avgThroughDist });
 		pieChart.saveAsPng(outputFilename + "dailyDistanceModalSplitPie.png",
 				800, 600);
 
@@ -338,8 +340,8 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 				"travel destination and modal split--daily distance",
 				"travel destination", "daily distance [km]", new String[] {
 						"work", "education", "shopping", "leisure", "home",
-						"others" });
-		barChart.addSeries("car", new double[] { this.carWorkDist,
+						OTHERS });
+		barChart.addSeries(CAR, new double[] { this.carWorkDist,
 				this.carEducDist, this.carShopDist, this.carLeisDist,
 				this.carHomeDist, this.carOtherDist });
 		barChart.addSeries("pt", new double[] { this.ptWorkDist,
@@ -348,10 +350,10 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		barChart.addSeries("walk", new double[] { this.wlkWorkDist,
 				this.wlkEducDist, this.wlkShopDist, this.wlkLeisDist,
 				this.wlkHomeDist, this.wlkOtherDist });
-		barChart.addSeries("others", new double[] { this.othersWorkDist,
+		barChart.addSeries(OTHERS, new double[] { this.othersWorkDist,
 				this.othersEducDist, this.othersShopDist, this.othersLeisDist,
 				this.othersHomeDist, this.othersOtherDist });
-		barChart.addSeries("through", new double[] { this.throughWorkDist,
+		barChart.addSeries(THROUGH, new double[] { this.throughWorkDist,
 				this.throughEducDist, this.throughShopDist,
 				this.throughLeisDist, this.throughHomeDist,
 				this.throughOtherDist });
@@ -381,15 +383,15 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		XYLineChart chart = new XYLineChart("Daily Distance Distribution",
 				"Daily Distance in km",
 				"fraction of persons with daily distance bigger than x... in %");
-		chart.addSeries("car", x, yCar);
+		chart.addSeries(CAR, x, yCar);
 		if (CollectionSum.getSum(yPt) > 0)
 			chart.addSeries("pt", x, yPt);
 		if (CollectionSum.getSum(yWlk) > 0)
 			chart.addSeries("walk", x, yWlk);
 		if (CollectionSum.getSum(yOthers) > 0)
-			chart.addSeries("others", x, yOthers);
+			chart.addSeries(OTHERS, x, yOthers);
 		if (CollectionSum.getSum(yThrough) > 0)
-			chart.addSeries("through", x, yThrough);
+			chart.addSeries(THROUGH, x, yThrough);
 		chart.addSeries("total", x, yTotal);
 		chart.saveAsPng(outputFilename + "dailyDistance.png", 800, 600);
 
@@ -439,15 +441,15 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
 				"leg Distance [km]", "mode fraction [%]");
-		chart2.addSeries("car", xs, yCarFracs);
+		chart2.addSeries(CAR, xs, yCarFracs);
 		if (CollectionSum.getSum(yPtFracs) > 0)
 			chart2.addSeries("pt", xs, yPtFracs);
 		if (CollectionSum.getSum(yWlkFracs) > 0)
 			chart2.addSeries("walk", xs, yWlkFracs);
 		if (CollectionSum.getSum(yOthersFracs) > 0)
-			chart2.addSeries("others", xs, yOthersFracs);
+			chart2.addSeries(OTHERS, xs, yOthersFracs);
 		if (CollectionSum.getSum(yThroughFracs) > 0)
-			chart2.addSeries("through", xs, yThroughFracs);
+			chart2.addSeries(THROUGH, xs, yThroughFracs);
 		chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png", 800,
 				600);
 		sw.close();

@@ -509,6 +509,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		}
 
 		public boolean equals(Object pl) {
+			if (pl == null || !(pl instanceof ParkLocation))
+				return false;
 			Coord plCoord = ((ParkLocation) pl).act.getCoord();
 			Coord thisCoord = this.act.getCoord();
 

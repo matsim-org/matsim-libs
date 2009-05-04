@@ -37,14 +37,8 @@ import playground.yu.utils.io.SimpleWriter;
  */
 public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		Analysis4Bln {
-	public DailyEnRouteTime4Bln() {
-		super();
-	}
-
-	public DailyEnRouteTime4Bln(RoadPricingScheme toll) {
-		super(toll);
-	}
-
+	private static final String CAR = "car", BIKE = "bike", WALK = "walk",
+			OTHERS = "others";
 	private double carBusinessTime, carEinkaufSonstigesTime,
 			carFreizeitSonstSportTime, carHolidayJourneyTime, carMultipleTime,
 			carSeeADoctorTime, carNotSpecifiedTime;
@@ -60,6 +54,14 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 	private double othersBusinessTime, othersEinkaufSonstigesTime,
 			othersFreizeitSonstSportTime, othersHolidayJourneyTime,
 			othersMultipleTime, othersSeeADoctorTime, othersNotSpecifiedTime;
+
+	public DailyEnRouteTime4Bln() {
+		super();
+	}
+
+	public DailyEnRouteTime4Bln(RoadPricingScheme toll) {
+		super(toll);
+	}
 
 	public void run(final Plan plan) {
 		double dayTime = 0.0;
@@ -366,8 +368,7 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 
 		PieChart pieChart = new PieChart(
 				"Avg. Daily En Route Time -- Modal Split");
-		pieChart.addSeries(
-				new String[] { "car", "pt", "wlk", "bike", "others" },
+		pieChart.addSeries(new String[] { CAR, "pt", "wlk", BIKE, OTHERS },
 				new double[] { avgCarTime, avgPtTime, avgWlkTime, avgBikeTime,
 						avgOtherTime });
 		pieChart.addMatsimLogo();
@@ -461,11 +462,12 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 				"travel destination and modal split--daily En Route Time",
 				"travel destinations", "daily En Route Time [min]",
 				PlotOrientation.VERTICAL);
-		stackedBarChart.addSeries(new String[] { "car", "pt", "walk", "bike",
-				"others" }, new String[] { "home", "work", "shopping",
-				"education", "leisure", "other", "not specified", "business",
-				"Einkauf sonstiges", "Freizeit (sonstiges incl.Sport)",
-				"see a doctor", "holiday / journey", "multiple" },
+		stackedBarChart.addSeries(
+				new String[] { CAR, "pt", WALK, BIKE, OTHERS }, new String[] {
+						"home", "work", "shopping", "education", "leisure",
+						"other", "not specified", "business",
+						"Einkauf sonstiges", "Freizeit (sonstiges incl.Sport)",
+						"see a doctor", "holiday / journey", "multiple" },
 				new double[][] {
 						{ carHomeTime, carWorkTime, carShopTime, carEducTime,
 								carLeisTime, carOtherTime, carNotSpecifiedTime,
@@ -520,15 +522,15 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		XYLineChart chart = new XYLineChart("Daily En Route Time Distribution",
 				"Daily En Route Time in min",
 				"fraction of persons with daily en route time longer than x... in %");
-		chart.addSeries("car", x, yCar);
+		chart.addSeries(CAR, x, yCar);
 		if (CollectionSum.getSum(yPt) > 0)
 			chart.addSeries("pt", x, yPt);
 		if (CollectionSum.getSum(yWlk) > 0)
-			chart.addSeries("walk", x, yWlk);
+			chart.addSeries(WALK, x, yWlk);
 		if (CollectionSum.getSum(yBike) > 0)
-			chart.addSeries("bike", x, yBike);
+			chart.addSeries(BIKE, x, yBike);
 		if (CollectionSum.getSum(yOthers) > 0)
-			chart.addSeries("others", x, yOthers);
+			chart.addSeries(OTHERS, x, yOthers);
 		chart.addSeries("total", x, yTotal);
 		chart.addMatsimLogo();
 		chart.saveAsPng(outputFilename + "dailyEnRouteTimeDistribution.png",
@@ -577,15 +579,15 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		}
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Duration",
 				"leg Duration [min]", "mode fraction [%]");
-		chart2.addSeries("car", xs, yCarFracs);
+		chart2.addSeries(CAR, xs, yCarFracs);
 		if (CollectionSum.getSum(yPtFracs) > 0)
 			chart2.addSeries("pt", xs, yPtFracs);
 		if (CollectionSum.getSum(yWlkFracs) > 0)
-			chart2.addSeries("walk", xs, yWlkFracs);
+			chart2.addSeries(WALK, xs, yWlkFracs);
 		if (CollectionSum.getSum(yBikeFracs) > 0)
-			chart2.addSeries("bike", xs, yBikeFracs);
+			chart2.addSeries(BIKE, xs, yBikeFracs);
 		if (CollectionSum.getSum(yOthersFracs) > 0)
-			chart2.addSeries("others", xs, yOthersFracs);
+			chart2.addSeries(OTHERS, xs, yOthersFracs);
 		chart2.addMatsimLogo();
 		chart2.saveAsPng(outputFilename + "legTimeModalSplit2.png", 800, 600);
 		sw.close();
