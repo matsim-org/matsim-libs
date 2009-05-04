@@ -47,7 +47,7 @@ public class AdaptiveController extends
 	public boolean givenSignalGroupIsGreen(BasicSignalGroupDefinition signalGroup) {
 		log.info("isGreen?");
 		
-		return false;
+		return true;
 	}
 
 }

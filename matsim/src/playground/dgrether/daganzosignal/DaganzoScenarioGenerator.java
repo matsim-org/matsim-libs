@@ -108,8 +108,10 @@ public class DaganzoScenarioGenerator {
 	public String configOut, plansOut, outputDirectory;
 
 	private static final boolean isAlternativeRouteEnabled = true;
+	
+	private static final boolean isUseSignalSystems = true;
 
-	private static final int iterations = 1;
+	private static final int iterations = 0;
 
 	private static final int iterations2 = 0;
 
@@ -157,21 +159,23 @@ public class DaganzoScenarioGenerator {
 		createPlans(scenario);
 		PopulationWriter pwriter = new PopulationWriter(scenario.getPopulation(), plansOut);
 		pwriter.write();
-		//enable lanes and signal system feature in config
-		config.scenario().setUseLanes(true);
-		config.scenario().setUseSignalSystems(true);
-		//create the lanes and write them
-		BasicLaneDefinitions lanes = createLanes(scenario);
-		MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(lanes);
-		laneWriter.writeFile(LANESOUTPUTFILE);
-		//create the signal systems and write them
-		BasicSignalSystems signalSystems = createSignalSystems(scenario);
-		MatsimSignalSystemsWriter ssWriter = new MatsimSignalSystemsWriter(signalSystems);
-		ssWriter.writeFile(SIGNALSYSTEMSOUTPUTFILE);
-		//create the signal system's configurations and write them
-		BasicSignalSystemConfigurations ssConfigs = createSignalSystemsConfig(scenario);
-		MatsimSignalSystemConfigurationsWriter ssConfigsWriter = new MatsimSignalSystemConfigurationsWriter(ssConfigs);	
-		ssConfigsWriter.writeFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
+		if (isUseSignalSystems) {
+			//enable lanes and signal system feature in config
+			config.scenario().setUseLanes(true);
+			config.scenario().setUseSignalSystems(true);
+			//create the lanes and write them
+			BasicLaneDefinitions lanes = createLanes(scenario);
+			MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(lanes);
+			laneWriter.writeFile(LANESOUTPUTFILE);
+			//create the signal systems and write them
+			BasicSignalSystems signalSystems = createSignalSystems(scenario);
+			MatsimSignalSystemsWriter ssWriter = new MatsimSignalSystemsWriter(signalSystems);
+			ssWriter.writeFile(SIGNALSYSTEMSOUTPUTFILE);
+			//create the signal system's configurations and write them
+			BasicSignalSystemConfigurations ssConfigs = createSignalSystemsConfig(scenario);
+			MatsimSignalSystemConfigurationsWriter ssConfigsWriter = new MatsimSignalSystemConfigurationsWriter(ssConfigs);	
+			ssConfigsWriter.writeFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
+		}
 		
 		//create and write the config with the correct paths to the files created above
 		createConfig(config);
@@ -218,8 +222,11 @@ public class DaganzoScenarioGenerator {
 			}
 			leg.setRoute(route);
 
+			plan.addLeg(leg);
+			
 			Activity act2 = builder.createActivityFromLinkId("h", l7.getId());
 			act2.setLink(l7);
+			plan.addActivity(act2);
 			population.addPerson(p);
 		}
 	}
