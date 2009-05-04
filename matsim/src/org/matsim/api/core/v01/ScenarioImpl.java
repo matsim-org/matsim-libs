@@ -79,17 +79,28 @@ public class ScenarioImpl implements Scenario {
 		this.facilities = new FacilitiesImpl();
 		this.getWorld().setFacilityLayer((FacilitiesImpl) this.facilities);
 		if (this.config.scenario().isUseLanes()){
-			this.laneDefinitions = new BasicLaneDefinitionsImpl();
+			this.createLaneDefinitionsContainer();
 		}
 		if (this.config.scenario().isUseSignalSystems()){
-			this.signalSystems = new BasicSignalSystemsImpl();
-			this.signalSystemConfigurations = new BasicSignalSystemConfigurationsImpl();
+			this.createSignalSystemsContainers();
 		}
 		if (this.config.scenario().isUseRoadpricing()){
-			this.roadPricingScheme = new RoadPricingScheme(this.getNetwork());
+			this.createRoadPricingScheme();
 		}
 	}
 	
+	protected void createRoadPricingScheme(){
+		this.roadPricingScheme = new RoadPricingScheme(this.getNetwork());		
+	}
+	
+	protected void createLaneDefinitionsContainer(){
+		this.laneDefinitions = new BasicLaneDefinitionsImpl();
+	}
+	
+	protected void createSignalSystemsContainers(){
+		this.signalSystems = new BasicSignalSystemsImpl();
+		this.signalSystemConfigurations = new BasicSignalSystemConfigurationsImpl();
+	}
 	
 	@Deprecated
 	public World getWorld(){
@@ -142,21 +153,33 @@ public class ScenarioImpl implements Scenario {
 
 	
 	public BasicLaneDefinitions getLaneDefinitions() {
+		if ((this.laneDefinitions == null) && this.config.scenario().isUseLanes()){
+			this.createLaneDefinitionsContainer();
+		}
 		return laneDefinitions;
 	}
 
 	
 	public BasicSignalSystems getSignalSystems() {
+		if ((this.signalSystems == null) && this.config.scenario().isUseSignalSystems()){
+			this.createSignalSystemsContainers();
+		}
 		return signalSystems;
 	}
 
 	
 	public BasicSignalSystemConfigurations getSignalSystemConfigurations() {
+		if ((this.signalSystemConfigurations == null) && this.config.scenario().isUseSignalSystems()){
+			this.createSignalSystemsContainers();
+		}
 		return signalSystemConfigurations;
 	}
 
 	
 	public RoadPricingScheme getRoadPricingScheme() {
+		if ((this.roadPricingScheme == null) && this.config.scenario().isUseRoadpricing()){
+			this.createRoadPricingScheme();
+		}
 		return roadPricingScheme;
 	}
 
