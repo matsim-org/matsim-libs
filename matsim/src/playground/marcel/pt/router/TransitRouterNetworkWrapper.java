@@ -21,9 +21,11 @@
 package playground.marcel.pt.router;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
@@ -41,7 +43,7 @@ import org.matsim.world.Location;
 
 public class TransitRouterNetworkWrapper implements Network {
 
-	/*package*/static final TransportMode[] allowedModes = new TransportMode[] { TransportMode.pt };
+	/*package*/static final Set<TransportMode> allowedModes = EnumSet.of(TransportMode.pt);
 
 	private final TransitRouterNetwork transitNetwork;
 	private final Map<TransitRouterNetwork.TransitRouterNetworkNode, NodeWrapper> nodesLookup =
@@ -378,11 +380,11 @@ public class TransitRouterNetworkWrapper implements Network {
 			throw new UnsupportedOperationException();
 		}
 
-		public TransportMode[] getAllowedModes() {
+		public Set<TransportMode> getAllowedModes() {
 			return allowedModes;
 		}
 
-		public void setAllowedModes(final TransportMode[] modes) {
+		public void setAllowedModes(final Set<TransportMode> modes) {
 			throw new UnsupportedOperationException();
 		}
 	}

@@ -20,6 +20,9 @@
 
 package org.matsim.core.basic.v01;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
@@ -39,25 +42,24 @@ public class BasicLinkImplTest extends MatsimTestCase {
 		BasicNode n1 = new BasicNodeImpl(new IdImpl(1), new CoordImpl(0, 0));
 		BasicNode n2 = new BasicNodeImpl(new IdImpl(1), new CoordImpl(1000, 0));
 		BasicLink l = new BasicLinkImpl(network, new IdImpl(1), n1, n2);
-		
-		// test default
-		TransportMode[] modes = l.getAllowedModes();
-		assertEquals("wrong number of default entries.", 1, modes.length);
-		assertEquals("wrong default.", TransportMode.car, modes[0]);
-		
-		// test set/get empty list
-		l.setAllowedModes(new TransportMode[] {});
-		modes = l.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", 0, modes.length);
-		
-		// test set/get list with entries
-		l.setAllowedModes(new TransportMode[] {TransportMode.bus, TransportMode.car, TransportMode.bike});
-		modes = l.getAllowedModes();
-		assertEquals("wrong number of allowed modes", 3, modes.length);
-		assertEquals(TransportMode.bus, modes[0]);
-		assertEquals(TransportMode.car, modes[1]);
-		assertEquals(TransportMode.bike, modes[2]);
 
+		// test default
+		Set<TransportMode> modes = l.getAllowedModes();
+		assertEquals("wrong number of default entries.", 1, modes.size());
+		assertTrue("wrong default.", modes.contains(TransportMode.car));
+
+		// test set/get empty list
+		l.setAllowedModes(EnumSet.noneOf(TransportMode.class));
+		modes = l.getAllowedModes();
+		assertEquals("wrong number of allowed modes.", 0, modes.size());
+
+		// test set/get list with entries
+		l.setAllowedModes(EnumSet.of(TransportMode.bus, TransportMode.car, TransportMode.bike));
+		modes = l.getAllowedModes();
+		assertEquals("wrong number of allowed modes", 3, modes.size());
+		assertTrue(modes.contains(TransportMode.bus));
+		assertTrue(modes.contains(TransportMode.car));
+		assertTrue(modes.contains(TransportMode.bike));
 	}
 
 }

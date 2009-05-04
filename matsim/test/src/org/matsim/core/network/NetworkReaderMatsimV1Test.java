@@ -20,6 +20,7 @@
 
 package org.matsim.core.network;
 
+import java.util.Set;
 import java.util.Stack;
 
 import org.matsim.api.basic.v01.TransportMode;
@@ -36,15 +37,15 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	 */
 	public void testAllowedModes_singleMode() {
 		Link link = prepareTestAllowedModes("car");
-		TransportMode[] modes = link.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", 1, modes.length);
-		assertEquals("wrong mode.", TransportMode.car, modes[0]);
+		Set<TransportMode> modes = link.getAllowedModes();
+		assertEquals("wrong number of allowed modes.", 1, modes.size());
+		assertTrue("wrong mode.", modes.contains(TransportMode.car));
 
 		// make sure we do not just get some default-value back...
 		link = prepareTestAllowedModes("bike");
 		modes = link.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", 1, modes.length);
-		assertEquals("wrong mode.", TransportMode.bike, modes[0]);
+		assertEquals("wrong number of allowed modes.", 1, modes.size());
+		assertTrue("wrong mode.", modes.contains(TransportMode.bike));
 	}
 
 	/**
@@ -52,8 +53,8 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	 */
 	public void testAllowedModes_emptyMode() {
 		Link link = prepareTestAllowedModes("");
-		TransportMode[] modes = link.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", 0, modes.length);
+		Set<TransportMode> modes = link.getAllowedModes();
+		assertEquals("wrong number of allowed modes.", 0, modes.size());
 	}
 	
 	/**
@@ -61,23 +62,23 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	 */
 	public void testAllowedModes_multipleModes() {
 		Link link = prepareTestAllowedModes("car,bus");
-		TransportMode[] modes = link.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", 2, modes.length);
-		assertEquals("wrong mode.", TransportMode.car, modes[0]);
-		assertEquals("wrong mode.", TransportMode.bus, modes[1]);
+		Set<TransportMode> modes = link.getAllowedModes();
+		assertEquals("wrong number of allowed modes.", 2, modes.size());
+		assertTrue("wrong mode.", modes.contains(TransportMode.car));
+		assertTrue("wrong mode.", modes.contains(TransportMode.bus));
 
 		link = prepareTestAllowedModes("bike,bus,walk");
 		modes = link.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", 3, modes.length);
-		assertEquals("wrong mode.", TransportMode.bike, modes[0]);
-		assertEquals("wrong mode.", TransportMode.bus, modes[1]);
-		assertEquals("wrong mode.", TransportMode.walk, modes[2]);
+		assertEquals("wrong number of allowed modes.", 3, modes.size());
+		assertTrue("wrong mode.", modes.contains(TransportMode.bike));
+		assertTrue("wrong mode.", modes.contains(TransportMode.bus));
+		assertTrue("wrong mode.", modes.contains(TransportMode.walk));
 
 		link = prepareTestAllowedModes("pt, train"); // test with space after comma
 		modes = link.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", 2, modes.length);
-		assertEquals("wrong mode.", TransportMode.pt, modes[0]);
-		assertEquals("wrong mode.", TransportMode.train, modes[1]);
+		assertEquals("wrong number of allowed modes.", 2, modes.size());
+		assertTrue("wrong mode.", modes.contains(TransportMode.pt));
+		assertTrue("wrong mode.", modes.contains(TransportMode.train));
 	}
 
 	/**

@@ -21,6 +21,8 @@
 package org.matsim.core.network;
 
 import java.io.File;
+import java.util.EnumSet;
+import java.util.Set;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
@@ -55,21 +57,21 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	 */
 	protected abstract void readNetwork(final NetworkLayer network, final String filename);	
 	public void testAllowedModes_multipleModes() {
-		doTestAllowedModes(new TransportMode[] {TransportMode.bus, TransportMode.train}, 
+		doTestAllowedModes(EnumSet.of(TransportMode.bus, TransportMode.train), 
 				getOutputDirectory() + "network.xml");
 	}
 
 	public void testAllowedModes_singleMode() {
-		doTestAllowedModes(new TransportMode[] {TransportMode.miv}, 
+		doTestAllowedModes(EnumSet.of(TransportMode.miv), 
 				getOutputDirectory() + "network.xml");
 	}
 
 	public void testAllowedModes_noMode() {
-		doTestAllowedModes(new TransportMode[] {}, 
+		doTestAllowedModes(EnumSet.noneOf(TransportMode.class), 
 				getOutputDirectory() + "network.xml");
 	}
 
-	private void doTestAllowedModes(final TransportMode[] modes, final String filename) {
+	private void doTestAllowedModes(final Set<TransportMode> modes, final String filename) {
 		NetworkLayer network1 = new NetworkLayer();
 		Node n1 = network1.createNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node n2 = network1.createNode(new IdImpl("2"), new CoordImpl(1000, 0));
@@ -88,10 +90,8 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 		Link link1 = network2.getLinks().get(new IdImpl("1"));
 		assertNotNull("link not found in read-in network.", link1);
 		
-		TransportMode[] modes2 = link1.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", modes.length, modes2.length);
-		for (int i = 0, n = modes.length; i < n; i++) {
-			assertEquals("wrong mode.", modes[i], modes2[i]);
-		}
+		Set<TransportMode> modes2 = link1.getAllowedModes();
+		assertEquals("wrong number of allowed modes.", modes.size(), modes2.size());
+		assertTrue("wrong mode.", modes2.containsAll(modes));
 	}
 }

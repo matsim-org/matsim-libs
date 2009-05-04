@@ -20,6 +20,8 @@
 
 package org.matsim.api.basic.v01.network;
 
+import java.util.Set;
+
 import org.matsim.api.basic.v01.Identifiable;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Network;
@@ -98,8 +100,8 @@ public interface BasicLink extends Identifiable {
 
 	public void setCapacity(double capacity);
 
-	public void setAllowedModes(TransportMode[] modes);
+	public void setAllowedModes(Set<TransportMode> modes);
 	
-	public TransportMode[] getAllowedModes();
+	public Set<TransportMode> getAllowedModes();
 	
 }

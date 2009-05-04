@@ -20,6 +20,9 @@
 
 package org.matsim.core.basic.v01;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
@@ -43,7 +46,7 @@ implements BasicLink
 	protected double capacity = Double.NaN;
 	protected double nofLanes = Double.NaN;
 	
-	protected TransportMode allowedModes[] = new TransportMode[] {TransportMode.car};
+	protected EnumSet<TransportMode> allowedModes = EnumSet.of(TransportMode.car);
 
 	// TODO [balmermi] A link exists only iff a to- and a from node is defined.
 	// Furthermore: Since a BasicLink is a location, and a location is a geographic
@@ -134,11 +137,12 @@ implements BasicLink
 		this.nofLanes = lanes;
 	}
 	
-	public void setAllowedModes(final TransportMode[] modes) {
-		this.allowedModes = modes.clone();
+	public void setAllowedModes(final Set<TransportMode> modes) {
+		this.allowedModes.clear();
+		this.allowedModes.addAll(modes);
 	}
 	
-	public TransportMode[] getAllowedModes() {
+	public Set<TransportMode> getAllowedModes() {
 		return this.allowedModes.clone();
 	}
 }

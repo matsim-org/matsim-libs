@@ -24,6 +24,7 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
@@ -193,11 +194,11 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLink {
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
 	
-	public TransportMode[] getAllowedModes() {
+	public Set<TransportMode> getAllowedModes() {
 		throw new UnsupportedOperationException();
 	}
 	
-	public void setAllowedModes(TransportMode[] modes) {
+	public void setAllowedModes(Set<TransportMode> modes) {
 		throw new UnsupportedOperationException();
 	}
 	
