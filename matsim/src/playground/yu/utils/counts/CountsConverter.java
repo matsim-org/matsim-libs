@@ -1,16 +1,15 @@
 /**
  * 
  */
-package playground.yu.utils;
+package playground.yu.utils.counts;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -29,12 +28,13 @@ public class CountsConverter {
 	public static void main(String[] args) {
 		// ------------READ MATSIM NETWORK-----------------
 		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile("../berlin data/wip_net.xml");
+		new MatsimNetworkReader(network)
+				.readFile("../berlin data/old_wip/wip_net.xml");
 		// ------------READ .ATT COUNTSFILE----------------
 		SimpleReader sr = new SimpleReader(
-				"../berlin data/link_counts_PKW_hrs0-24.att");
-		Map<String, String> NO_TONODENOs = new HashMap<String, String>();
-		Map<String, List<Double>> NO_CVs = new HashMap<String, List<Double>>();
+				"../berlin data/old_wip/link_counts_PKW_hrs0-24.att");
+		List<Tuple<String, String>> NO_TONODENOs = new ArrayList<Tuple<String, String>>();
+		List<List<Double>> NO_CVs = new ArrayList<List<Double>>();
 		// filehead
 		String line = sr.readLine();
 		// after filehead
@@ -42,12 +42,12 @@ public class CountsConverter {
 			line = sr.readLine();
 			if (line != null) {
 				String[] cells = line.split(";");
-				NO_TONODENOs.put(cells[0], cells[1]);
+				NO_TONODENOs.add(new Tuple<String, String>(cells[0], cells[1]));
 				List<Double> cvs = new ArrayList<Double>(24);
 				for (int i = 2; i < 26; i++) {
 					cvs.add(Double.parseDouble(cells[i]));
 				}
-				NO_CVs.put(cells[0], cvs);
+				NO_CVs.add(cvs);
 			}
 		}
 		try {
@@ -64,35 +64,44 @@ public class CountsConverter {
 				.setDescription("extracted from vsp-cvs/studies/berlin-wip/external-data/counts/senstadt-hand/link_counts_PKW_hrs0-24.att");
 		for (Link link : network.getLinks().values()) {
 			String origLinkId = link.getOrigId();
-			if (NO_TONODENOs.keySet().contains(origLinkId)) {
-				System.out.println("A:\torigId:\t" + origLinkId + "\tlinkId:\t"
-						+ link.getId().toString());
-				System.out.println("B:\tlinkToNodeId:\t"
-						+ link.getToNode().getId().toString() + "\tTONODENO:\t"
-						+ NO_TONODENOs.get(origLinkId));
-				if (link.getToNode().getId().toString().equals(
-						NO_TONODENOs.get(origLinkId))) {
-					System.out.println("C:\tlinkToNodeId:\t"
-							+ link.getToNode().getId().toString()
-							+ "\tTONODENO:\t" + NO_TONODENOs.get(origLinkId));
-					List<Double> cvs = NO_CVs.get(origLinkId);
-					boolean hasValidVolume = false;
-					for (Double value : cvs)
-						if (value.doubleValue() >= 0) {
-							hasValidVolume = true;
-							break;
-						}
+			for (int i = 0; i < NO_TONODENOs.size(); i++) {
+				Tuple<String, String> tuple = NO_TONODENOs.get(i);
+				if (tuple.getFirst().equals(origLinkId)) {
 
-					if (hasValidVolume) {
-						Count count = counts.createCount(link.getId(), null);
-						for (int i = 0; i < cvs.size(); i++) {
-							double volume = cvs.get(i).doubleValue();
-							if (volume >= 0)
-								count.createVolume(i + 1, volume);
+					System.out.println("A:\torigId:\t" + origLinkId
+							+ "\tlinkId:\t" + link.getId().toString());
+					System.out.println("B:\tlinkToNodeId:\t"
+							+ link.getToNode().getId().toString()
+							+ "\tTONODENO:\t" + tuple.getSecond());
+
+					if (link.getToNode().getId().toString().equals(
+							tuple.getSecond())) {
+
+						System.out.println("C:\tlinkToNodeId:\t"
+								+ link.getToNode().getId().toString()
+								+ "\tTONODENO:\t" + tuple.getSecond());
+
+						List<Double> cvs = NO_CVs.get(i);
+						boolean hasValidVolume = false;
+						for (Double value : cvs)
+							if (value.doubleValue() >= 0) {
+								hasValidVolume = true;
+								break;
+							}
+
+						if (hasValidVolume) {
+							Count count = counts
+									.createCount(link.getId(), null);
+							count.setCoord(link.getCoord());
+							for (int j = 0; j < cvs.size(); j++) {
+								double volume = cvs.get(j).doubleValue();
+								if (volume >= 0)
+									count.createVolume(j + 1, volume);
+							}
 						}
 					}
+					System.out.println("-------------------------");
 				}
-				System.out.println("-------------------------");
 			}
 		}
 		// ------------------WRITE COUNTSFILE----------------

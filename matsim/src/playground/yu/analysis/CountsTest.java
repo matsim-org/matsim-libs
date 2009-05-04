@@ -8,8 +8,6 @@ import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.Volume;
@@ -25,14 +23,15 @@ public class CountsTest {
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
 
-		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+		// final String netFilename =
+		// "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String countsFilename = "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.xml";
 		// final String outputFilename = "output/counts.txt";
 
-		Gbl.createConfig(null);
-
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		// Gbl.createConfig(null);
+		//
+		// NetworkLayer network = new NetworkLayer();
+		// new MatsimNetworkReader(network).readFile(netFilename);
 
 		Counts counts = new Counts();
 		new MatsimCountsReader(counts).readFile(countsFilename);

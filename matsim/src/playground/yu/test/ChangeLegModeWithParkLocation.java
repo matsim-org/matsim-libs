@@ -553,7 +553,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 	 * @author ychen
 	 * 
 	 */
-	private static class CarLegChain {
+	public static class CarLegChain {
 
 		private List<Tuple<Integer, Integer>> actIdxs4CarLegs = new ArrayList<Tuple<Integer, Integer>>();
 
