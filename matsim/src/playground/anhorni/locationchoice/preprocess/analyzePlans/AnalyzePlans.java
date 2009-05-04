@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.List;
 
@@ -54,6 +55,8 @@ public class AnalyzePlans {
 	private String plansfilePath;
 	private String facilitiesfilePath;
 	private String networkfilePath;
+	
+	private DecimalFormat formatter = new DecimalFormat("0.0");
 	
 	private final static Logger log = Logger.getLogger(AnalyzePlans.class);
 	
@@ -157,14 +160,17 @@ public class AnalyzePlans {
 					totalDesiredLeisureDuration += (desiredLeisurePerPerson / numberOfLeisureActsPerPerson);
 				}				
 			}
-			out.write("Plans file: " + this.plansfilePath);
+			out.write("Plans file: " + this.plansfilePath +"\n");
 			out.write("Number of shopping activities: \t" + numberOfShoppingActs + "\n");
-			out.write("Total desired duration of shopping activities: \t" + 1/3600.0 * totalDesiredShoppingDuration + " [h] \n");
+			out.write("Total desired duration of shopping activities: \t" + 
+					formatter.format(1/3600.0 * totalDesiredShoppingDuration) + " [h] \n");
 			out.write("Avg. desired shopping duration: \t" + 1/3600.0 * (totalDesiredShoppingDuration / numberOfShoppingActs) + " [h] \n");
 			out.newLine();
 			out.write("Number of leisure activities: \t" + numberOfLeisureActs + "\n");
-			out.write("Total desired duration of leisure activities: \t" + 1/3600.0 * totalDesiredLeisureDuration + " [h] \n");
-			out.write("Avg. desired leisure duration: \t" + 1/3600.0 * (totalDesiredLeisureDuration / numberOfLeisureActs) + " [h] \n");
+			out.write("Total desired duration of leisure activities: \t" + 
+					formatter.format(1/3600.0 * totalDesiredLeisureDuration) + " [h] \n");
+			out.write("Avg. desired leisure duration: \t" + 
+					formatter.format(1/3600.0 * (totalDesiredLeisureDuration / numberOfLeisureActs)) + " [h] \n");
 			out.flush();
 			out.close();
 		}
@@ -300,6 +306,7 @@ public class AnalyzePlans {
 			out.write("Total number of Primary Activities: \t"+ countPrim + "\n");
 			out.write("Number of Persons Doing Shop or Leisure: \t"+ numberOfPersonsDoingSL + "\n");
 			double avgNumberOfTrips = (double)numberOfTrips/(double)this.plans.getPersons().size();
+			out.write("Number of persons: \t" + this.plans.getPersons().size());
 			out.write("Avg number of trips per person: \t" + avgNumberOfTrips);
 			out.flush();
 			out.close();
