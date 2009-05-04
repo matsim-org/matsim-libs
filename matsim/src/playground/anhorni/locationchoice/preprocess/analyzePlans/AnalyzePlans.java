@@ -164,7 +164,8 @@ public class AnalyzePlans {
 			out.write("Number of shopping activities: \t" + numberOfShoppingActs + "\n");
 			out.write("Total desired duration of shopping activities: \t" + 
 					formatter.format(1/3600.0 * totalDesiredShoppingDuration) + " [h] \n");
-			out.write("Avg. desired shopping duration: \t" + 1/3600.0 * (totalDesiredShoppingDuration / numberOfShoppingActs) + " [h] \n");
+			out.write("Avg. desired shopping duration: \t" + 
+					formatter.format(1/3600.0 * (totalDesiredShoppingDuration / numberOfShoppingActs)) + " [h] \n");
 			out.newLine();
 			out.write("Number of leisure activities: \t" + numberOfLeisureActs + "\n");
 			out.write("Total desired duration of leisure activities: \t" + 
