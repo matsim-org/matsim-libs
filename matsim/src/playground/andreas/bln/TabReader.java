@@ -23,7 +23,7 @@ public class TabReader implements TabularFileHandler {
 
 	public void startRow(String[] row) throws IllegalArgumentException {
 				
-		if(row[0].contains("ORDNRPER") || row[0].contains("STARTZEIT")){
+		if(row[0].contains("ORDNRPER") || row[0].contains("STARTZEIT") || row[0].contains("Ordnr2")){
 			StringBuffer tempBuffer = new StringBuffer();
 			for (String string : row) {
 				tempBuffer.append(string);
