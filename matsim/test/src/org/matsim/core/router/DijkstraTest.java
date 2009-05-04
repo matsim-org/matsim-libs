@@ -20,8 +20,7 @@
 
 package org.matsim.core.router;
 
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
@@ -30,7 +29,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
  */
 public class DijkstraTest extends AbstractLeastCostPathCalculatorTest {
 	
-	protected LeastCostPathCalculator getLeastCostPathCalculator(final NetworkLayer network) {
+	protected LeastCostPathCalculator getLeastCostPathCalculator(final Network network) {
 		FreespeedTravelTimeCost travelTimeCostCalculator = new FreespeedTravelTimeCost();
 		return new Dijkstra(network, travelTimeCostCalculator, travelTimeCostCalculator);
 	}

@@ -26,9 +26,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
@@ -121,6 +124,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 	protected ComparatorDijkstraCost comparator;
 
 	private final PreProcessDijkstra preProcessData;
+	
+	private TransportMode[] modeRestriction = null;
 
 	/**
 	 * Default constructor.
@@ -169,6 +174,22 @@ public class Dijkstra implements LeastCostPathCalculator {
 			}
 		} else {
 			this.pruneDeadEnds = false;
+		}
+	}
+	
+	/**
+	 * Restricts the router to only use links that have at least on of the given modes set as allowed.
+	 * Set to <code>null</code> to disable any restrictions, i.e. to use all available modes.
+	 * 
+	 * @param modeRestriction {@link TransportMode}s that can be used to find a route
+	 * 
+	 * @see BasicLink#setAllowedModes(Set)
+	 */
+	public void setModeRestriction(final Set<TransportMode> modeRestriction) {
+		if (modeRestriction == null) {
+			this.modeRestriction = null;
+		} else {
+			this.modeRestriction = modeRestriction.toArray(new TransportMode[modeRestriction.size()]);
 		}
 	}
 
@@ -233,7 +254,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 		}
 
 		DijkstraNodeData toNodeData = getData(toNode);
-		Path path = new Path(nodes, links, arrivalTime - startTime, toNodeData.cost);
+		Path path = new Path(nodes, links, arrivalTime - startTime, toNodeData.getCost());
 
 		return path;
 	}
@@ -276,27 +297,31 @@ public class Dijkstra implements LeastCostPathCalculator {
 		if (this.pruneDeadEnds) {
 			ddOutData = getPreProcessData(outNode);
 			for (Link l : outNode.getOutLinks().values()) {
-				Node n = l.getToNode();
-				PreProcessDijkstra.DeadEndData ddData = getPreProcessData(n);
-
-				/* IF the current node n is not in a dead end
-				 * OR it is in the same dead end as the fromNode
-				 * OR it is in the same dead end as the toNode
-				 * THEN we add the current node to the pending nodes */
-				if ((ddData.getDeadEndEntryNode() == null)
-						|| (ddOutData.getDeadEndEntryNode() != null)
-						|| ((this.deadEndEntryNode != null)
-								&& (this.deadEndEntryNode.getId() == ddData.getDeadEndEntryNode().getId()))) {
-					addToPendingNodes(l, n, pendingNodes, currTime, currCost, toNode);
+				if (canPassLink(l)) {
+					Node n = l.getToNode();
+					PreProcessDijkstra.DeadEndData ddData = getPreProcessData(n);
+	
+					/* IF the current node n is not in a dead end
+					 * OR it is in the same dead end as the fromNode
+					 * OR it is in the same dead end as the toNode
+					 * THEN we add the current node to the pending nodes */
+					if ((ddData.getDeadEndEntryNode() == null)
+							|| (ddOutData.getDeadEndEntryNode() != null)
+							|| ((this.deadEndEntryNode != null)
+									&& (this.deadEndEntryNode.getId() == ddData.getDeadEndEntryNode().getId()))) {
+						addToPendingNodes(l, n, pendingNodes, currTime, currCost, toNode);
+					}
 				}
 			}
 		} else { // this.pruneDeadEnds == false
 			for (Link l : outNode.getOutLinks().values()) {
-				addToPendingNodes(l, l.getToNode(), pendingNodes, currTime, currCost, toNode);
+				if (canPassLink(l)) {
+					addToPendingNodes(l, l.getToNode(), pendingNodes, currTime, currCost, toNode);
+				}
 			}
 		}
 	}
-
+	
 	/**
 	 * Adds some parameters to the given Node then adds it to the set of pending
 	 * nodes.
@@ -319,6 +344,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	protected boolean addToPendingNodes(final Link l, final Node n,
 			final PriorityQueue<Node> pendingNodes, final double currTime,
 			final double currCost, final Node toNode) {
+		
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
 		double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
 		DijkstraNodeData data = getData(n);
@@ -333,6 +359,24 @@ public class Dijkstra implements LeastCostPathCalculator {
 			return true;
 		}
 
+		return false;
+	}
+	
+	/**
+	 * @param link
+	 * @return <code>true</code> if the link can be passed with respect to a possible mode restriction set
+	 * 
+	 * @see #setModeRestriction(Set)
+	 */
+	protected boolean canPassLink(final Link link) {
+		if (this.modeRestriction == null) {
+			return true;
+		}
+		for (TransportMode mode : this.modeRestriction) {
+			if (link.getAllowedModes().contains(mode)) {
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -445,14 +489,13 @@ public class Dijkstra implements LeastCostPathCalculator {
 
 		private Link prev = null;
 
-		/*default */ double cost = 0;
+		private double cost = 0;
 
 		private double time = 0;
 
 		private int iterationID = Integer.MIN_VALUE;
 
 		public void resetVisited() {
-			this.prev = null;
 			this.iterationID = Integer.MIN_VALUE;
 		}
 
