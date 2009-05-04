@@ -42,6 +42,7 @@ import org.matsim.core.gbl.Gbl;
 
 import playground.johannes.graph.GraphAnalyser;
 import playground.johannes.graph.GraphStatistics;
+import playground.johannes.graph.generators.ErdosRenyiGenerator;
 import playground.johannes.graph.io.PajekClusteringColorizer;
 import playground.johannes.graph.io.PajekDegreeColorizer;
 import playground.johannes.graph.mcmc.AdjacencyMatrix;
@@ -53,11 +54,12 @@ import playground.johannes.graph.mcmc.GibbsSampler;
 import playground.johannes.graph.mcmc.MCMCSampleDelegate;
 import playground.johannes.socialnet.Ego;
 import playground.johannes.socialnet.SocialNetwork;
+import playground.johannes.socialnet.SocialNetworkFactory;
 import playground.johannes.socialnet.SocialNetworkStatistics;
 import playground.johannes.socialnet.SocialTie;
 import playground.johannes.socialnet.io.SNGraphMLWriter;
 import playground.johannes.socialnet.io.SNPajekWriter;
-import playground.johannes.socialnet.mcmc.ErgmDistance;
+import playground.johannes.socialnet.mcmc.ErgmDistanceLocal;
 import playground.johannes.socialnet.mcmc.SNAdjacencyMatrix;
 import playground.johannes.statistics.WeightedStatistics;
 
@@ -87,6 +89,9 @@ public class GravityBasedGenerator {
 		/*
 		 * Setup social network and adjacency matrix.
 		 */
+		SocialNetworkFactory<Person> factory = new SocialNetworkFactory<Person>(population);
+		ErdosRenyiGenerator<SocialNetwork<Person>, Ego<Person>, SocialTie> generator = new ErdosRenyiGenerator<SocialNetwork<Person>, Ego<Person>, SocialTie>(factory);
+//		SocialNetwork<Person> socialnet = generator.generate(population.getPersons().size(), 0.00001, config.global().getRandomSeed());
 		SocialNetwork<Person> socialnet = new SocialNetwork<Person>(population);
 		SNAdjacencyMatrix<Person> matrix = new SNAdjacencyMatrix<Person>(socialnet);
 		/*
@@ -99,8 +104,9 @@ public class GravityBasedGenerator {
 		ErgmTerm[] terms = new ErgmTerm[2];
 		terms[0] = new ErgmDensity();
 		terms[0].setTheta(theta_density);
-		terms[1] = new ErgmDistance(matrix);
+		terms[1] = new ErgmDistanceLocal(matrix);
 		terms[1].setTheta(theta_distance);
+		
 		ergm.setErgmTerms(terms);
 		/*
 		 * Setup gibbs sampler.

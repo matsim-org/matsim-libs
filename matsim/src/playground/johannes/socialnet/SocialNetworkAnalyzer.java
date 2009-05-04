@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialNetworkFactory.java
+ * SocialNetworkAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,43 +23,42 @@
  */
 package playground.johannes.socialnet;
 
-import java.util.Iterator;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.api.basic.v01.population.BasicPopulation;
+import gnu.trove.TDoubleDoubleHashMap;
 
-import playground.johannes.graph.generators.GraphFactory;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
+
+import playground.johannes.socialnet.io.SNGraphMLReader;
+import playground.johannes.statistics.WeightedStatistics;
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetworkFactory<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> implements GraphFactory<SocialNetwork<P>, Ego<P>, SocialTie> {
+public class SocialNetworkAnalyzer {
 
-	private BasicPopulation<P> population;
-	
-	private Iterator<P> popIterator;
-	
-	public SocialNetworkFactory(BasicPopulation<P> population) {
-		this.population = population;
-	}
-	
-	public SocialTie addEdge(SocialNetwork<P> g, Ego<P> v1, Ego<P> v2) {
-		return g.addEdge(v1, v2);
-	}
+	/**
+	 * @param args
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
+	 */
+	public static void main(String[] args) throws FileNotFoundException, IOException {
+		Config config = Gbl.createConfig(new String[]{args[0]});
+		ScenarioImpl data = new ScenarioImpl(config);
+		Population population = data.getPopulation();
+		SNGraphMLReader<Person> reader = new SNGraphMLReader<Person>(population);
+		SocialNetwork<Person> socialnet = reader.readGraph(args[1]);
+		
+		String outputDir = args[2];
+		
+		WeightedStatistics.writeHistogram(SocialNetworkStatistics.getEdgeLengthDegreeCorrelation(socialnet), args[2]+"/d_k.hist.txt");
 
-	public Ego<P> addVertex(SocialNetwork<P> g) {
-		if(popIterator.hasNext())
-			return g.addEgo(popIterator.next());
-		else
-			return null;
-	}
-
-	public SocialNetwork<P> createGraph() {
-		popIterator = population.getPersons().values().iterator();
-		return new SocialNetwork<P>();
 	}
 
 }

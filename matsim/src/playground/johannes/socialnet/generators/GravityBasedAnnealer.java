@@ -51,6 +51,7 @@ import playground.johannes.socialnet.io.SNGraphMLReader;
 import playground.johannes.socialnet.io.SNGraphMLWriter;
 import playground.johannes.socialnet.io.SNPajekWriter;
 import playground.johannes.socialnet.mcmc.ErgmDistance;
+import playground.johannes.socialnet.mcmc.ErgmDistanceLocal;
 import playground.johannes.socialnet.mcmc.SNAdjacencyMatrix;
 import playground.johannes.statistics.WeightedStatistics;
 
@@ -92,7 +93,7 @@ public class GravityBasedAnnealer {
 		ErgmTerm[] terms = new ErgmTerm[3];
 		terms[0] = new ErgmDensity();
 		terms[0].setTheta(theta_density);
-		terms[1] = new ErgmDistance(matrix);
+		terms[1] = new ErgmDistanceLocal(matrix);
 		terms[1].setTheta(theta_distance);
 		terms[2] = new ErgmTriangles();
 		terms[2].setTheta(theta_triangle);

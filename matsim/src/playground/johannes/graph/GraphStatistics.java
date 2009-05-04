@@ -24,6 +24,8 @@
 package playground.johannes.graph;
 
 
+import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TIntIntHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.ArrayList;
@@ -92,12 +94,9 @@ public class GraphStatistics {
 	 * @return the degree distribution.
 	 */
 	public static WeightedStatistics getDegreeDistribution(Graph g) {
-//		Frequency freq = new Frequency();
 		WeightedStatistics stats = new WeightedStatistics();
 		for(Vertex v : g.getVertices())
-//			freq.addValue(v.getEdges().size());
 			stats.add(v.getEdges().size());
-//		return freq;
 		return stats;
 	}
 	
@@ -169,14 +168,16 @@ public class GraphStatistics {
 			for(int i = 0; i < n1s.size(); i++) {
 				List<? extends Vertex> n2s = n1s.get(i).getNeighbours();
 				for(int k = 0; k < n2s.size(); k++) {
+					if(!n2s.get(k).equals(v)) {
 					n_tripples++;
 					if(n2s.get(k).getNeighbours().contains(v))
 						n_triangles++;
+					}
 				}
 			}
 		}
 		
-		return 3 * n_triangles / (double)n_tripples;
+		return n_triangles / (double)n_tripples;
 	}
 	
 	public static int getNumTwoStars(Graph g) {
@@ -432,6 +433,29 @@ public class GraphStatistics {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	public static TDoubleDoubleHashMap getClusteringDegreeCorrelation(Graph g) {
+		return getValueDegreeCorrelation((TObjectDoubleHashMap<Vertex>) getClustringCoefficients(g));
+	}
+	
+	public static <V extends Vertex> TDoubleDoubleHashMap getValueDegreeCorrelation(TObjectDoubleHashMap<V> values) {
+		TIntIntHashMap k_distr = new TIntIntHashMap();
+		TDoubleDoubleHashMap val_k = new TDoubleDoubleHashMap();
+		for(Object v : values.keys()) {
+			double val = values.get((V)v);
+			int k = ((Vertex)v).getNeighbours().size();
+			val_k.adjustOrPutValue(k, val, val);
+			k_distr.adjustOrPutValue(k, 1, 1);
+		}
+		
+		TDoubleDoubleHashMap mean_k = new TDoubleDoubleHashMap();
+		for(int k : k_distr.keys()) {
+			double sum = val_k.get(k);
+			mean_k.put(k, sum/(double)k_distr.get(k));
+		}
+		return mean_k;
+	}
+	
 	private static class CentralityGraph<V extends Vertex> extends GraphProjection<Graph, V, Edge> {
 
 		public CentralityGraph(Graph delegate) {
@@ -442,10 +466,6 @@ public class GraphStatistics {
 		@Override
 		public VertexDecorator<V> addVertex(V delegate) {
 			VertexDecorator<V> v = new CentralityVertex<V>(delegate);
-//			if(insertVertex(v))
-//				return v;
-//			else
-//				return null;
 			return addVertex(v);
 		}
 
@@ -521,7 +541,7 @@ public class GraphStatistics {
 				time = System.currentTimeMillis();
 				int aplsum = 0;
 				int numPaths;
-				int eccentricity = 0;
+				int eccentricity = Integer.MAX_VALUE;
 				List<CentralityVertex<Vertex>> passedVertices = new ArrayList<CentralityVertex<Vertex>>();
 				int size2 = vertices.size();
 				for(int k = 0; k < size2; k++) {

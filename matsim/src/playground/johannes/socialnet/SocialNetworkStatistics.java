@@ -24,12 +24,17 @@
 package playground.johannes.socialnet;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TObjectDoubleHashMap;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.johannes.graph.GraphStatistics;
 import playground.johannes.statistics.WeightedStatistics;
 
 /**
@@ -97,5 +102,34 @@ public class SocialNetworkStatistics {
 		
 		double norm = 1 / (double)g.getEdges().size();
 		return ((norm * product) - Math.pow(norm * sum, 2)) / ((norm * squareSum) - Math.pow(norm * sum, 2));
+	}
+	
+	public static TDoubleDoubleHashMap getEdgeLengthDegreeCorrelation(SocialNetwork<?> network) {
+		TObjectDoubleHashMap<Ego<?>> d_distr = new TObjectDoubleHashMap<Ego<?>>();
+		for(Ego<?> e : network.getVertices()) {
+			double sum = 0;
+			for(Ego<?> e2 : e.getNeighbours()) {
+				sum += CoordUtils.calcDistance(e.getCoord(), e2.getCoord());
+			}
+			d_distr.put(e, sum/(double)e.getNeighbours().size());
+		}
+		
+		return GraphStatistics.getValueDegreeCorrelation(d_distr);
+	}
+	
+	public static <P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> TObjectDoubleHashMap<Ego<P>> getMeanEdgeLength(SocialNetwork<P> g) {
+		TObjectDoubleHashMap<Ego<P>> values = new TObjectDoubleHashMap<Ego<P>>();
+		for (Ego<P> i : g.getVertices()) {
+			if (i.getNeighbours().size() > 0) {
+				double sum_d = 0;
+				for (Ego<P> j : i.getNeighbours()) {
+					sum_d += CoordUtils
+							.calcDistance(i.getCoord(), j.getCoord());
+				}
+				double d_mean = sum_d / (double) i.getNeighbours().size();
+				values.put(i, d_mean);
+			}
+		}
+		return values;
 	}
 }

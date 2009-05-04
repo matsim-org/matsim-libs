@@ -58,27 +58,11 @@ public class GraphAnalyser {
 		double meanDegree = GraphStatistics.getDegreeStatistics(g).getMean();
 		logger.info(String.format("Mean degree is %1$s.", meanDegree));
 		
-//		long time = System.currentTimeMillis();
 		double c_local = GraphStatistics.getClusteringStatistics(g).getMean();
 		logger.info(String.format("Mean local clustering coefficient is %1$s.", c_local));
-		
+
 		double c_global = GraphStatistics.getGlobalClusteringCoefficient(g);
 		logger.info(String.format("Global clustering coefficient is %1$s.", c_global));
-//		System.out.println(System.currentTimeMillis() - time);
-		
-//		TObjectDoubleHashMap<Vertex> cc = (TObjectDoubleHashMap<Vertex>) GraphStatistics.getClustringCoefficients(g);
-//		TDoubleDoubleHashMap map = new TDoubleDoubleHashMap();
-//		TIntIntHashMap degrees = new TIntIntHashMap();
-//		for(Vertex v : g.getVertices()) {
-//			double c = cc.get(v);
-//			map.adjustOrPutValue(v.getNeighbours().size(), c, c);
-//			degrees.adjustOrPutValue(v.getNeighbours().size(), 1, 1);
-//		}
-//		for(int k : degrees.keys()) {
-//			double sum = map.get(k);
-//			map.put(k, sum/(double)degrees.get(k));
-//		}
-//		WeightedStatistics.writeHistogram(map, "/Volumes/hertz:ils-raid/socialnets/cluster.hist.txt");
 		
 		double mutuality = GraphStatistics.getMutuality(g);
 		logger.info(String.format("Mutuality is %1$s.", mutuality));
@@ -89,9 +73,6 @@ public class GraphAnalyser {
 		double numComponents = GraphStatistics.getComponents(g).size();
 		logger.info(String.format("Number of disconnected components is %1$s.", numComponents));
 		
-//		time = System.currentTimeMillis();
-		
-//		System.out.println(System.currentTimeMillis() - time);
 		
 		boolean extended = false;
 		for(String arg : args) {
