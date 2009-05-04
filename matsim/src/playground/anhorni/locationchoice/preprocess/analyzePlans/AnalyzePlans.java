@@ -20,7 +20,9 @@
 
 package playground.anhorni.locationchoice.preprocess.analyzePlans;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +42,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.world.World;
 
 public class AnalyzePlans {
@@ -48,6 +51,10 @@ public class AnalyzePlans {
 	private Facilities facilities;
 	private NetworkLayer network;
 	
+	private String plansfilePath;
+	private String facilitiesfilePath;
+	private String networkfilePath;
+	
 	private final static Logger log = Logger.getLogger(AnalyzePlans.class);
 	
 	
@@ -55,18 +62,45 @@ public class AnalyzePlans {
 
 		Gbl.startMeasurement();
 		final AnalyzePlans analyzer = new AnalyzePlans();
-		if (args.length < 1) {
-			log.info("Too few arguments!");
-			System.exit(0);
-		}
-		analyzer.init("input/networks/ivtch.xml", args[0], "input/facilities/facilities.xml.gz");
-		analyzer.write("./output/valid/plans/plan_activities_summary.txt", args[0]);
+		
+		String pathsFile = "./input/trb/valid/paths.txt";
+		analyzer.readInputFile(pathsFile);
+		
+		String outpath = "output/valid/plans/";
+		
+		analyzer.init();
+		analyzer.analyze1(outpath);
+		
+		analyzer.analyze2("shop", outpath);
+		analyzer.analyze2("leisure", outpath);
+		
+		analyzer.analyze3(outpath);
+		analyzer.analyze4(outpath);
+		
 		Gbl.printElapsedTime();
 	}
 	
-	private void init(String networkfilePath, String plansfilePath, String facilitiesfilePath) {
+	private void readInputFile(final String inputFile) {
+		try {
+			FileReader fileReader = new FileReader(inputFile);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+			this.networkfilePath = bufferedReader.readLine();
+			this.facilitiesfilePath = bufferedReader.readLine();
+			this.plansfilePath = bufferedReader.readLine();
+
+			bufferedReader.close();
+			fileReader.close();
+
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+	}
+	
+	
+	private void init() {
 		
-		World world = Gbl.createWorld();
+		World world = Gbl.getWorld();
 				
 		log.info("reading the facilities ...");
 		this.facilities =(Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
@@ -82,10 +116,10 @@ public class AnalyzePlans {
 	}
 	
 
-	private void write(String outfile, String infile) {
+	private void analyze1(String outpath) {
 
 		try {
-			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
+			final BufferedWriter out = IOUtils.getBufferedWriter(outpath + "plan_activities_summary.txt");
 			
 			int numberOfShoppingActs = 0;
 			double totalDesiredShoppingDuration = 0.0;
@@ -123,7 +157,7 @@ public class AnalyzePlans {
 					totalDesiredLeisureDuration += (desiredLeisurePerPerson / numberOfLeisureActsPerPerson);
 				}				
 			}
-			out.write("Plans file: " + infile);
+			out.write("Plans file: " + this.plansfilePath);
 			out.write("Number of shopping activities: \t" + numberOfShoppingActs + "\n");
 			out.write("Total desired duration of shopping activities: \t" + 1/3600.0 * totalDesiredShoppingDuration + " [h] \n");
 			out.write("Avg. desired shopping duration: \t" + 1/3600.0 * (totalDesiredShoppingDuration / numberOfShoppingActs) + " [h] \n");
@@ -138,4 +172,140 @@ public class AnalyzePlans {
 			Gbl.errorMsg(e);
 		}
 	}
+	
+	private void analyze2(final String type, String outpath) {
+		try {
+			final String header="Person_id\tActDuration\tDesiredDuration";
+			final BufferedWriter out = IOUtils.getBufferedWriter(outpath + "personActDurations_" + type + ".txt");
+			final BufferedWriter outSummary = IOUtils.getBufferedWriter(outpath + "/summary_"+type+".txt");
+			out.write(header);
+			out.newLine();
+			int numberOfPersonsDoingType = 0;
+
+			Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+			Counter counter = new Counter(" person # ");
+			while (person_iter.hasNext()) {
+				Person person = person_iter.next();
+				counter.incCounter();
+				boolean personSet = false;
+
+				Plan selectedPlan = person.getSelectedPlan();
+
+				final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
+				for (int j = 0; j < actslegs.size(); j=j+2) {
+					final Activity act = (Activity)actslegs.get(j);
+					if (act.getType().startsWith(type)) {
+						out.write(person.getId().toString()+"\t"+
+								String.valueOf(act.getDuration())+"\t"+
+								person.getDesires().getActivityDuration(type));
+						out.newLine();
+
+						if (!personSet) {
+							numberOfPersonsDoingType++;
+							personSet = true;
+						}
+					}
+				}
+				out.flush();
+			}
+			out.close();
+			
+			outSummary.write("Number of persons doing " + type + " :\t" + numberOfPersonsDoingType + "\n");
+			outSummary.flush();
+			outSummary.close();
+			}
+			catch (final IOException e) {
+				Gbl.errorMsg(e);
+			}
+		}
+	
+	private void analyze3(String outpath) {
+
+		try {
+			final String header="Person_id\tnumberOfIntermediateShopandLeisureActs";
+			final BufferedWriter out = IOUtils.getBufferedWriter(outpath + "actchainsplananalysis.txt");
+			out.write(header);
+			out.newLine();
+
+
+			Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+			Counter counter = new Counter(" person # ");
+			while (person_iter.hasNext()) {
+				Person person = person_iter.next();
+				counter.incCounter();
+				Plan selectedPlan = person.getSelectedPlan();
+				final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
+
+				int countSL = 0;
+				for (int j = 0; j < actslegs.size(); j=j+2) {
+					final Activity act = (Activity)actslegs.get(j);
+					if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
+						countSL++;
+					}
+					else if (act.getType().startsWith("h") || act.getType().startsWith("w")||
+							act.getType().startsWith("e")) {
+						if (countSL > 0) {
+							out.write(person.getId().toString()+"\t"+String.valueOf(countSL)+"\n");
+							countSL = 0;
+						}
+					}
+				}
+			}
+			out.flush();
+			out.close();
+		}
+		catch (final IOException e) {
+			Gbl.errorMsg(e);
+		}
+	}
+	
+	private void analyze4(String outpath) {
+		int countPrim = 0;
+		int numberOfPersonsDoingSL = 0;
+		int numberOfTrips = 0;
+
+		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+		Counter counter = new Counter(" person # ");
+		while (person_iter.hasNext()) {
+			Person person = person_iter.next();
+			counter.incCounter();
+			boolean personSet = false;
+
+			Plan selectedPlan = person.getSelectedPlan();
+			List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
+			for (int j = 0; j < actslegs.size(); j=j+2) {
+				final Activity act = (Activity)actslegs.get(j);
+				if (act.getType().startsWith("s")) {
+					if (!personSet) {
+						numberOfPersonsDoingSL++;
+						personSet = true;
+					}
+				}
+				else if (act.getType().startsWith("l")) {
+					if (!personSet) {
+						numberOfPersonsDoingSL++;
+						personSet = true;
+					}
+				}
+				else if (act.getType().startsWith("h") || act.getType().startsWith("w")||
+						act.getType().startsWith("e")) {
+					countPrim++;
+				}
+			}
+			numberOfTrips += (actslegs.size()-1)/2;
+		}
+		
+		try {
+			final BufferedWriter out = IOUtils.getBufferedWriter(outpath + "summary2.txt");
+			out.write("Total number of Primary Activities: \t"+ countPrim + "\n");
+			out.write("Number of Persons Doing Shop or Leisure: \t"+ numberOfPersonsDoingSL + "\n");
+			double avgNumberOfTrips = (double)numberOfTrips/(double)this.plans.getPersons().size();
+			out.write("Avg number of trips per person: \t" + avgNumberOfTrips);
+			out.flush();
+			out.close();
+		}
+		catch (final IOException e) {
+			Gbl.errorMsg(e);
+		}	
+	}	
 }
