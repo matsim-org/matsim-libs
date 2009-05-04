@@ -48,13 +48,14 @@ import org.xml.sax.SAXException;
  * Loads elements of Scenario from file. Non standardized elements
  * can also be loaded however they require a specific instance of
  * Scenario. 
- * loadScenario() reads the complete scenario from files while the
- * other load...() methods are only loading the specific part
+ * {@link #loadScenario()} reads the complete scenario from files while the
+ * other load...() methods only load specific parts
  * of the scenario assuming that required parts are already 
  * loaded or created by the user.
- * @see org.matsim.api.core.v01.Scenario
- * @author dgrether
  * 
+ * @see org.matsim.api.core.v01.Scenario
+ * 
+ * @author dgrether
  */
 public class ScenarioLoader {
 
@@ -93,7 +94,7 @@ public class ScenarioLoader {
 	 * Loads all mandatory Scenario elements and
 	 * if activated in config's scenario module/group 
 	 * optional elements.
-	 * @return
+	 * @return the Scenario
 	 */
 	public Scenario loadScenario() {
 		this.loadWorld();
@@ -140,7 +141,6 @@ public class ScenarioLoader {
 				log.info("no signal system definition file set in config or feature disabled, not able to load anything");
 			}
 		}
-
 	}
 
 	private void loadLanes() {
@@ -191,17 +191,20 @@ public class ScenarioLoader {
 				log.info("use TimeVariantLinks in NetworkFactory.");
 				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
 			}
-			try {
 				if (network instanceof NetworkLayer) {
-					new MatsimNetworkReader((NetworkLayer) network).parse(networkFileName);
-				}
-				else {
+					try {
+						new MatsimNetworkReader(network).parse(networkFileName);
+					} catch (SAXException e) {
+						throw new RuntimeException(e);
+					} catch (ParserConfigurationException e) {
+						throw new RuntimeException(e);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				} else {
 					throw new IllegalStateException(
 							"Implementation of Network interface not supported, a specific parser is needed for this implementation of Network interface!");
 				}
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
 			if ((config.network().getChangeEventsInputFile() != null) && config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + config.network().getChangeEventsInputFile());
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser((NetworkLayer) network);
@@ -238,7 +241,6 @@ public class ScenarioLoader {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	public void loadPopulation() {
 		// make sure that world, facilities and network are loaded as well
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
@@ -246,7 +248,11 @@ public class ScenarioLoader {
 			log.info("loading population from " + populationFileName);
 			try {
 				new MatsimPopulationReader(this.scenario).parse(populationFileName);
-			} catch (Exception e) {
+			} catch (SAXException e) {
+				throw new RuntimeException(e);
+			} catch (ParserConfigurationException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
