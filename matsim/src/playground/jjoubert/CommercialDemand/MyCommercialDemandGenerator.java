@@ -45,7 +45,8 @@ import com.vividsolutions.jts.geom.Point;
 
 public class MyCommercialDemandGenerator {
 	
-	private static final int populationSize = 1000;
+	private static final int populationSize = 100;
+	private static final int firstIndex = 10000;
 	private static final String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/CommercialDemand/";
 
 	@SuppressWarnings("unchecked")
@@ -77,7 +78,7 @@ public class MyCommercialDemandGenerator {
 		
 		for(int i = 0; i < populationSize; i++ ){
 			// Create a truck agent
-			Id id = sc.createId(Long.toString(i));
+			Id id = sc.createId(Long.toString(firstIndex + i));
 			BasicPerson truck = pb.createPerson(id);
 			population.getPersons().put(id, truck);
 			
