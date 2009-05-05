@@ -55,7 +55,7 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 		int max = plan.getPlanElements().size();
 
-		int now = 0;
+		double now = 0;
 
 		// apply mutation to all activities except the last home activity
 		for (int i = 0; i < max; i++ ) {
@@ -79,11 +79,16 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
-					// mutate the durations of all 'middle' activities
-					act.setDuration(mutateTime(act.getDuration()));
-					now += act.getDuration();
-					// set end time accordingly
-					act.setEndTime(now);
+					if (act.getDuration() != Time.UNDEFINED_TIME) {
+						// mutate the durations of all 'middle' activities
+						act.setDuration(mutateTime(act.getDuration()));
+						now += act.getDuration();
+						// set end time accordingly
+						act.setEndTime(now);
+					} else {
+						act.setEndTime(mutateTime(act.getEndTime()));
+						now = act.getEndTime();
+					}
 
 				// handle last activity
 				} else {
