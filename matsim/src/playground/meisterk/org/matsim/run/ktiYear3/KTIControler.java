@@ -14,6 +14,7 @@ import org.matsim.world.World;
 
 import playground.marcel.kti.router.PlansCalcRouteKti;
 import playground.meisterk.org.matsim.controler.listeners.CalcLegTimesKTIListener;
+import playground.meisterk.org.matsim.controler.listeners.SaveRevisionInfo;
 import playground.meisterk.org.matsim.controler.listeners.ScoreElements;
 import playground.meisterk.org.matsim.run.ptRouting.PTRoutingInfo;
 import playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory;
@@ -44,6 +45,7 @@ public class KTIControler extends Controler {
 		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));
 		this.addControlerListener(new CalcLegTimesKTIListener("calcLegTimesKTI.txt"));
+		this.addControlerListener(new SaveRevisionInfo("svninfo.txt"));
 
 		super.run();
 
