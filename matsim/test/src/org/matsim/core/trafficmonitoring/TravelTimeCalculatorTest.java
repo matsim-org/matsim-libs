@@ -29,13 +29,8 @@ import java.io.IOException;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
-import org.matsim.core.trafficmonitoring.TravelTimeAggregatorFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -49,10 +44,10 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		// if new comparison data is generated, the test will fail with an Exception
 		// to ensure this option isn't enabled for real tests!
 
-	public final void testLinkTravelTimeArrayOptimistic() throws Exception {
+	public final void testLinkTravelTimeArrayOptimistic() throws IOException {
 
-		String className =  "/" + this.getClass().getSimpleName();
-		String  inputDir = "test/input/" + (this.getClass().getCanonicalName().replace('.', '/')).replace(className, "")	+ "/TravelTimeCalculator/";
+//		String className =  "/" + this.getClass().getSimpleName();
+		String  inputDir = getPackageInputDirectory()	+ "TravelTimeCalculator/";
 		String networkFile = inputDir + "link10_network.xml";
 		String eventsFile = inputDir + "link10_events.txt";
 		String compareFile = inputDir + "link10_ttimes.txt";
@@ -60,7 +55,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		int timeBinSize = 15*60;
 
 		// setup global stuff
-		Gbl.createConfig(new String[] {});
+		loadConfig(null);
 
 		// setup network
 		NetworkLayer network = new NetworkLayer();
@@ -90,9 +85,6 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 				compareData[i] = line;
 			}
 		}
-		catch (IOException e) {
-			throw e;
-		}
 		finally {
 			try {
 				infile.close();
@@ -111,9 +103,6 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 					outfile.write(Double.toString(ttime) + "\n");
 				}
 			}
-			catch (IOException e) {
-				throw e;
-			}
 			finally {
 				if (outfile != null) {
 					try {
@@ -121,7 +110,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 					} catch (IOException ignored) {}
 				}
 			}
-			throw new Exception("A new file containg data for comparison was created. No comparison was made.");
+			fail("A new file containg data for comparison was created. No comparison was made.");
 		}
 
 		// do comparison
@@ -131,10 +120,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		}
 	}
 
-	public final void testLinkTravelTimeHashMapOptimistic() throws Exception {
+	public final void testLinkTravelTimeHashMapOptimistic() throws IOException {
 
-		String className =  "/" + this.getClass().getSimpleName();
-		String  inputDir = "test/input/" + (this.getClass().getCanonicalName().replace('.', '/')).replace(className, "")	+ "/TravelTimeCalculator/";
+		String  inputDir = getPackageInputDirectory()	+ "TravelTimeCalculator/";
 		String networkFile = inputDir + "link10_network.xml";
 		String eventsFile = inputDir + "link10_events.txt";
 		String compareFile = inputDir + "link10_ttimes.txt";
@@ -142,7 +130,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		int timeBinSize = 15*60;
 
 		// setup global stuff
-		Gbl.createConfig(new String[] {});
+		loadConfig(null);
 
 		// setup network
 		NetworkLayer network = new NetworkLayer();
@@ -173,9 +161,6 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 				compareData[i] = line;
 			}
 		}
-		catch (IOException e) {
-			throw e;
-		}
 		finally {
 			try {
 				infile.close();
@@ -194,9 +179,6 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 					outfile.write(Double.toString(ttime) + "\n");
 				}
 			}
-			catch (IOException e) {
-				throw e;
-			}
 			finally {
 				if (outfile != null) {
 					try {
@@ -204,7 +186,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 					} catch (IOException ignored) {}
 				}
 			}
-			throw new Exception("A new file containg data for comparison was created. No comparison was made.");
+			fail("A new file containg data for comparison was created. No comparison was made.");
 		}
 
 		// do comparison
@@ -214,10 +196,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		}
 	}
 	
-	public final void testLinkTravelTimeHashMapPessimistic() throws Exception {
+	public final void testLinkTravelTimeHashMapPessimistic() throws IOException {
 
-		String className =  "/" + this.getClass().getSimpleName();
-		String  inputDir = "test/input/" + (this.getClass().getCanonicalName().replace('.', '/')).replace(className, "")	+ "/TravelTimeCalculator/";
+		String  inputDir = getPackageInputDirectory()	+ "TravelTimeCalculator/";
 		String networkFile = inputDir + "link10_network.xml";
 		String eventsFile = inputDir + "link10_events.txt";
 		String compareFile = inputDir + "link10_ttimes_pessimistic.txt";
@@ -225,7 +206,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		int timeBinSize = 1*60;
 
 		// setup global stuff
-		Gbl.createConfig(new String[] {});
+		loadConfig(null);
 
 		// setup network
 		NetworkLayer network = new NetworkLayer();
@@ -257,9 +238,6 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 				compareData[i] = line;
 			}
 		}
-		catch (IOException e) {
-			throw e;
-		}
 		finally {
 			try {
 				infile.close();
@@ -278,9 +256,6 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 					outfile.write(Double.toString(ttime) + "\n");
 				}
 			}
-			catch (IOException e) {
-				throw e;
-			}
 			finally {
 				if (outfile != null) {
 					try {
@@ -288,7 +263,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 					} catch (IOException ignored) {}
 				}
 			}
-			throw new Exception("A new file containg data for comparison was created. No comparison was made.");
+			fail("A new file containg data for comparison was created. No comparison was made.");
 		}
 
 		// do comparison
