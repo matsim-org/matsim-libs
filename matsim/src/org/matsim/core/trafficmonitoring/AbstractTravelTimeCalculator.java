@@ -27,8 +27,8 @@ import org.matsim.core.router.util.TravelTime;
 public abstract class AbstractTravelTimeCalculator implements TravelTime, EventHandler{
 
 	private final Network network;
-	private final int timeslice;
-	private final int numSlots;
+	protected final int timeslice;
+	protected final int numSlots;
 	private final TravelTimeAggregatorFactory factory;
 	private  final AbstractTravelTimeAggregator aggregator;
 

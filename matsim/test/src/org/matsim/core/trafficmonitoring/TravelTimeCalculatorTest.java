@@ -30,10 +30,17 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.Node;
+import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -126,6 +133,43 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 			double ttime = ttcalc.getLinkTravelTime(link10, i*timeBinSize);
 			assertEquals(compareData[i], Double.toString(ttime));
 		}
+	}
+	
+	/**
+	 * @author mrieser
+	 */
+	public void testLongTravelTimeInEmptySlot() {
+		Scenario scenario = new ScenarioImpl(loadConfig(null));
+
+		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
+		network.setCapacityPeriod(3600.0);
+		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		Link link1 = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
+
+		int timeBinSize = 15*60;
+		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
+		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, factory);
+
+		Person person = new PersonImpl(new IdImpl(1));
+		
+		// generate some events that suggest a really long travel time
+		double linkEnterTime1 = 7.0 * 3600 + 10;
+		double linkTravelTime1 = 50.0 * 60; // 50minutes!
+		double linkEnterTime2 = 7.75 * 3600 + 10;
+		double linkTravelTime2 = 10.0 * 60; // 10minutes!
+		
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime1, person, link1));
+		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime1 + linkTravelTime1, person, link1));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime2, person, link1));
+		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime2 + linkTravelTime2, person, link1));
+
+		assertEquals(50 * 60, ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60), EPSILON); // linkTravelTime1
+		assertEquals(35 * 60, ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 1*timeBinSize), EPSILON);  // linkTravelTime1 - 1*timeBinSize
+		assertEquals(20 * 60, ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 2*timeBinSize), EPSILON);  // linkTravelTime1 - 2*timeBinSize
+		assertEquals(10 * 60, ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 3*timeBinSize), EPSILON);  // linkTravelTime2 > linkTravelTime1 - 3*timeBinSize !
+		assertEquals(10     , ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 4*timeBinSize), EPSILON);  // freespeedTravelTime > linkTravelTime2 - 1*timeBinSize
+		assertEquals(10     , ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 5*timeBinSize), EPSILON);  // freespeedTravelTime > linkTravelTime2 - 2*timeBinSize
 	}
 
 }
