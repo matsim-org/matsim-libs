@@ -47,12 +47,11 @@ public class LinkToLinkTravelTimeCalculator extends AbstractTravelTimeCalculator
 	
 	private final static String WARNING_NEED_LINK_REFERENCE = "This class only works with LinkEvents where the full reference to the link is set!";
 	
-	private static final Logger log = Logger
-			.getLogger(LinkToLinkTravelTimeCalculator.class);
+	private static final Logger log = Logger.getLogger(LinkToLinkTravelTimeCalculator.class);
 	
-	private HashMap<Link, TravelTimeData> linkData;
+	private HashMap<Link, DataContainer> linkData;
 	
-	private HashMap<Tuple<Link, Link>, TravelTimeData> linkToLinkData;
+	private HashMap<Tuple<Link, Link>, DataContainer> linkToLinkData;
 	
 	private HashMap<Id, LinkEnterEvent> linkEnterEvents;
 
@@ -62,10 +61,10 @@ public class LinkToLinkTravelTimeCalculator extends AbstractTravelTimeCalculator
 		super(network, timeslice, maxTime, factory);
 		this.calculateLinkTravelTimes = calcLinkTravelTimes;
 		if (this.calculateLinkTravelTimes){
-			this.linkData = new HashMap<Link, TravelTimeData>((int) (network.getLinks().size() * 1.4));
+			this.linkData = new HashMap<Link, DataContainer>((int) (network.getLinks().size() * 1.4));
 		}
-		//assume that every link has 2 outgoing links 
-		this.linkToLinkData = new HashMap<Tuple<Link, Link>, TravelTimeData>((int) (network.getLinks().size() * 1.4 * 2));
+		// assume that every link has 2 outgoing links 
+		this.linkToLinkData = new HashMap<Tuple<Link, Link>, DataContainer>((int) (network.getLinks().size() * 1.4 * 2));
 		this.linkEnterEvents = new HashMap<Id, LinkEnterEvent>();
 		
 		this.resetTravelTimes();
@@ -74,12 +73,13 @@ public class LinkToLinkTravelTimeCalculator extends AbstractTravelTimeCalculator
 	@Override
 	public void resetTravelTimes(){
 		if (this.calculateLinkTravelTimes) {
-			for (TravelTimeData data : this.linkData.values()){
-				data.resetTravelTimes();
+			for (DataContainer data : this.linkData.values()){
+				data.ttData.resetTravelTimes();
 			}
 		}
-		for (TravelTimeData data : this.linkToLinkData.values()){
-			data.resetTravelTimes();
+		for (DataContainer data : this.linkToLinkData.values()){
+			data.ttData.resetTravelTimes();
+			data.needsConsolidation = false;
 		}
 		this.linkEnterEvents.clear();
 	}
@@ -91,8 +91,9 @@ public class LinkToLinkTravelTimeCalculator extends AbstractTravelTimeCalculator
 		LinkEnterEvent oldEvent = this.linkEnterEvents.remove(e.getPerson().getId());
 		if (oldEvent != null) {
 			Tuple<Link, Link> fromToLink = new Tuple<Link, Link>(oldEvent.getLink(), e.getLink());
-			TravelTimeData timeData = getLinkToLinkTravelTimeData(fromToLink, true);
-			this.getTravelTimeAggregator().addTravelTime(timeData, oldEvent.getTime(), e.getTime());
+			DataContainer data = getLinkToLinkTravelTimeData(fromToLink, true);
+			this.getTravelTimeAggregator().addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
+			data.needsConsolidation = true;
 		}
 		this.linkEnterEvents.put(e.getPerson().getId(), e);
 	}
@@ -104,8 +105,9 @@ public class LinkToLinkTravelTimeCalculator extends AbstractTravelTimeCalculator
 		if (this.calculateLinkTravelTimes) {
 			LinkEnterEvent oldEvent = this.linkEnterEvents.get(e.getPerson().getId());
   		if (oldEvent != null) {
-  			TravelTimeData timeData = getTravelTimeData(e.getLink(), true);
-  			this.getTravelTimeAggregator().addTravelTime(timeData, oldEvent.getTime(), e.getTime());
+  			DataContainer data = getTravelTimeData(e.getLink(), true);
+  			this.getTravelTimeAggregator().addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
+  			data.needsConsolidation = true;
   		}
 		}
 	}
@@ -125,44 +127,51 @@ public class LinkToLinkTravelTimeCalculator extends AbstractTravelTimeCalculator
 			if (link == null) {
 				throw new IllegalArgumentException(WARNING_NEED_LINK_REFERENCE);
 			}
-			this.getTravelTimeAggregator().addStuckEventTravelTime(getTravelTimeData(link, true),e.getTime(), event.getTime());
+			DataContainer data = getTravelTimeData(link, true);
+			data.needsConsolidation = true;
+			this.getTravelTimeAggregator().addStuckEventTravelTime(data.ttData, e.getTime(), event.getTime());
 			log.error("Using the stuck feature with turning move travel times is discouraged. As the next link of a stucked" +
 			"agent is not known the turning move travel time cannot be calculated!");
 		}
 	}
 	
-	private TravelTimeData getLinkToLinkTravelTimeData(Tuple<Link, Link> fromLinkToLink, final boolean createIfMissing) {
-		TravelTimeData data = this.linkToLinkData.get(fromLinkToLink);
+	private DataContainer getLinkToLinkTravelTimeData(Tuple<Link, Link> fromLinkToLink, final boolean createIfMissing) {
+		DataContainer data = this.linkToLinkData.get(fromLinkToLink);
 		if ((null == data) && createIfMissing) {
-			data = this.getTravelTimeAggregatorFactory().createTravelTimeData(fromLinkToLink.getFirst(), this.getNumSlots());
+			data = new DataContainer(this.getTravelTimeAggregatorFactory().createTravelTimeData(fromLinkToLink.getFirst(), this.getNumSlots()));
 			this.linkToLinkData.put(fromLinkToLink, data);
 		}
 		return data;
 	}
 
-	private TravelTimeData getTravelTimeData(final Link link, final boolean createIfMissing) {
-		TravelTimeData r = this.linkData.get(link);
-		if ((null == r) && createIfMissing) {
-			r = this.getTravelTimeAggregatorFactory().createTravelTimeData(link, this.getNumSlots());
-			this.linkData.put(link, r);
+	private DataContainer getTravelTimeData(final Link link, final boolean createIfMissing) {
+		DataContainer data = this.linkData.get(link);
+		if ((null == data) && createIfMissing) {
+			data = new DataContainer(this.getTravelTimeAggregatorFactory().createTravelTimeData(link, this.getNumSlots()));
+			this.linkData.put(link, data);
 		}
-		return r;
+		return data;
 	}
 
 	@Override
 	public double getLinkTravelTime(final Link link, final double time) {
 		if (this.calculateLinkTravelTimes) {
-			return this.getTravelTimeAggregator().getTravelTime(getTravelTimeData(link, true), time); 
+			DataContainer data = getTravelTimeData(link, true);
+			if (data.needsConsolidation) {
+				consolidateData(data);
+			}
+			return this.getTravelTimeAggregator().getTravelTime(data.ttData, time); 
 		}
 		throw new IllegalStateException("No link travel time is available " +
 				"if calculation is switched off by config option!");
 	}
 	
-	/**
-	 * @see org.matsim.core.router.util.LinkToLinkTravelTime#getLinkToLinkTravelTime(org.matsim.core.api.network.Link, org.matsim.core.api.network.Link, double)
-	 */
 	public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
-		return this.getTravelTimeAggregator().getTravelTime(this.getLinkToLinkTravelTimeData(new Tuple<Link, Link>(fromLink, toLink), true), time);
+		DataContainer data = this.getLinkToLinkTravelTimeData(new Tuple<Link, Link>(fromLink, toLink), true);
+		if (data.needsConsolidation) {
+			consolidateData(data);
+		}
+		return this.getTravelTimeAggregator().getTravelTime(data.ttData, time);
 	}
 
 	public void reset(int iteration) {
@@ -172,5 +181,48 @@ public class LinkToLinkTravelTimeCalculator extends AbstractTravelTimeCalculator
 		 * That's why there is a separat method resetTravelTimes() which can
 		 * be called after the replanning.      -marcel/20jan2008
 		 */
+	}
+	
+	/**
+	 * Makes sure that the travel times returned "make sense".
+	 * 
+	 * Image short bin sizes (e.g. 5min), small links (e.g. 300 veh/hour)
+	 * and small sample sizes (e.g. 2%). This would mean, that effectively
+	 * in the simulation only 6 vehicles can pass the link in one hour,
+	 * every 10min one. So, the travel time in one time slot could be 
+	 * >= 10min if two cars enter the link at the same time. If no car
+	 * enters in the next time bin, the travel time in that time bin should
+	 * still be >=5 minutes (10min - binSize), and not freespeedTraveltime,
+	 * because actually every car entering the link in this bin will be behind
+	 * the car entered before, which still needs >=5min until it can leave.
+	 * This method ensures exactly that, that the travel time in a time bin
+	 * cannot be smaller than the travel time in the bin before minus the
+	 * bin size.
+	 * 
+	 * @param data
+	 */
+	private void consolidateData(final DataContainer data) {
+		TravelTimeData r = data.ttData;
+		double prevTravelTime = r.getTravelTime(1, 0.0);
+		for (int i = 1; i < this.numSlots; i++) {
+			double time = r.getTravelTime(i, i * this.timeslice);
+			double minTime = prevTravelTime - this.timeslice;
+			if (time < minTime) {
+				r.addTravelTime(i, minTime);
+				prevTravelTime = minTime;
+			} else {
+				prevTravelTime = time;
+			}
+		}
+		data.needsConsolidation = false;
+	}
+
+	private static class DataContainer {
+		/*package*/ final TravelTimeData ttData;
+		/*package*/ boolean needsConsolidation = false;
+		
+		/*package*/ DataContainer(final TravelTimeData data) {
+			this.ttData = data;
+		}
 	}
 }

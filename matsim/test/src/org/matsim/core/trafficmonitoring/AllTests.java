@@ -31,6 +31,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(LinkSensorManagerTest.class);
 		suite.addTestSuite(TravelTimeCalculatorTest.class);
+		suite.addTestSuite(LinkToLinkTravelTimeCalculatorTest.class);
 		//$JUnit-END$
 		return suite;
 	}
