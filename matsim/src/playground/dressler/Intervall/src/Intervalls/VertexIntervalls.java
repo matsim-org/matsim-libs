@@ -52,6 +52,8 @@ public class VertexIntervalls {
 	 */
 	private static boolean _debug = false;
 	
+	public static int rem;
+	
 	
 	
 //-----------------------METHODS----------------------------------//
@@ -274,11 +276,36 @@ public class VertexIntervalls {
 	 */
 	public boolean setTrue(ArrayList<Intervall> arrive,Link link) {
 		boolean changed = false;
-		for(int i=0; i< arrive.size(); i++){
-			boolean temp=setTrue(arrive.get(i),link);
-			if(temp){
-				changed=true;
+		ArrayList<Intervall> arrivecondensed = new ArrayList<Intervall>();
+		if(!arrive.isEmpty()){
+			Intervall last= arrive.get(0);
+			for(int j=1; j< arrive.size(); j++){
+				Intervall present = arrive.get(j);
+				if(last.getHighBound()==present.getLowBound() ){
+					last.setHighBound(present.getHighBound());
+					//System.out.println("blub---------------------------------------------");
+				}else{
+					arrivecondensed.add(last);
+					last=present;
+				}
+			}	
+			arrivecondensed.add(last);	
+			if(arrivecondensed.size()!=arrive.size()){
+				//System.out.println("new: "+arrivecondensed.size()+" old: "+arrive.size());
 			}
+			rem+=arrive.size()-arrivecondensed.size();
+			for(int i=0; i< arrivecondensed.size(); i++){
+				boolean temp=setTrue(arrivecondensed.get(i),link);
+				if(temp){
+					changed=true;
+				}
+			}
+			/*for(int i=0; i< arrive.size(); i++){
+				boolean temp=setTrue(arrive.get(i),link);
+				if(temp){
+					changed=true;
+				}
+			}*/
 		}
 		return changed;
 	}
