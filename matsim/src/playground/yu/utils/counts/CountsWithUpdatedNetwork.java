@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -49,8 +50,8 @@ public class CountsWithUpdatedNetwork {
 		String oldCountsFilename = "../berlin data/link_counts_PKW_hrs0-24.xml";
 		String newCountsFilename = "../berlin data/counts4bb_cl.xml";
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(newNetFilename);
+		NetworkLayer newNetwork = new NetworkLayer();
+		new MatsimNetworkReader(newNetwork).readFile(newNetFilename);
 
 		Counts counts = new Counts();
 		new MatsimCountsReader(counts).readFile(oldCountsFilename);
@@ -59,13 +60,13 @@ public class CountsWithUpdatedNetwork {
 		Map<Id, Count> countsMapCopy = new HashMap<Id, Count>(countsMap);
 		for (Count oldCount : countsMapCopy.values()) {
 			Id linkId = oldCount.getLocId();
-			Link link = network.getLink(linkId);
+			Link link = newNetwork.getLink(linkId);
 			if (link == null) {// linkId doesn't exist in the new network --> to
 				// look for new linkId manually or with XY2links
 				System.err.println("----->link " + linkId
 						+ " doesn't exist in the new network.");
 
-				Link newLink = network.getNearestLink(oldCount.getCoord());
+				Link newLink = newNetwork.getNearestLink(oldCount.getCoord());
 				Count newCount = counts.createCount(newLink.getId(), null);
 				newCount.setCoord(oldCount.getCoord());
 				for (Volume oldV : oldCount.getVolumes().values())
@@ -73,7 +74,7 @@ public class CountsWithUpdatedNetwork {
 
 				countsMap.remove(linkId);
 			} else if (CoordUtils.calcDistance(oldCount.getCoord(), link
-					.getCoord()) < 500) {// linkId exists in the new network,
+					.getCoord()) < 200.0) {// linkId exists in the new network,
 				// the new
 				// coordinate lies nearby
 
@@ -85,10 +86,12 @@ public class CountsWithUpdatedNetwork {
 								+ " exists in the new network, but the new coordinate doesn't lie nearby.");
 				countsMap.remove(linkId);
 
-				Link newLink = network.getNearestLink(oldCount.getCoord());
+				Link newLink = newNetwork.getNearestLink(oldCount.getCoord());
 				Id newLinkId = newLink.getId();
-				if (counts.getCount(newLinkId) != null)
-					countsMap.remove(newLinkId);
+				if (counts.getCount(newLinkId) != null) {
+					countsMap.put(new IdImpl("n" + newLinkId.toString()),
+							countsMap.remove(newLinkId));
+				}
 				Count newCount = counts.createCount(newLinkId, null);
 				newCount.setCoord(oldCount.getCoord());
 				for (Volume v : oldCount.getVolumes().values())
