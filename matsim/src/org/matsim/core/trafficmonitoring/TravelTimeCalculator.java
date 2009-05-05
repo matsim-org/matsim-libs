@@ -39,7 +39,7 @@ AbstractTravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEventHan
 AgentArrivalEventHandler, AgentStuckEventHandler {
 
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
-	private final HashMap<String, EnterEvent> enterEvents = new HashMap<String, EnterEvent>();
+	private final HashMap<Id, LinkEnterEvent> enterEvents = new HashMap<Id, LinkEnterEvent>();
 	private final HashMap<Link, TravelTimeData> linkData;
 	public TravelTimeCalculator(final Network network) {
 		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
@@ -61,11 +61,8 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	}
 
 	public void resetTravelTimes() {
-		for (Link link : this.getNetwork().getLinks().values()) {
-			TravelTimeData r = getTravelTimeData(link, false);
-			if (r != null) {
-				r.resetTravelTimes();
-			}
+		for (TravelTimeData data : this.linkData.values()) {
+			data.resetTravelTimes();
 		}
 		this.enterEvents.clear();
 	}
@@ -80,16 +77,15 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
-		EnterEvent e = new EnterEvent(event.getLinkId(), event.getTime());
-		this.enterEvents.put(event.getPersonId().toString(), e);
+		this.enterEvents.put(event.getPersonId(), event);
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
-		EnterEvent e = this.enterEvents.remove(event.getPersonId().toString());
-		if ((e != null) && e.linkId.equals(event.getLinkId())) {
+		LinkEnterEvent e = this.enterEvents.remove(event.getPersonId());
+		if ((e != null) && e.getLinkId().equals(event.getLinkId())) {
 			if (event.getLink() == null) event.setLink(this.getNetwork().getLink(event.getLinkId()));
 			if (event.getLink() != null) {
-				this.getTravelTimeAggregator().addTravelTime(getTravelTimeData(event.getLink(), true),e.time,event.getTime());
+				this.getTravelTimeAggregator().addTravelTime(getTravelTimeData(event.getLink(), true),e.getTime(),event.getTime());
 			}
 		}
 	}
@@ -98,18 +94,18 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 		// remove EnterEvents from list when an agent arrives.
 		// otherwise, the activity duration would counted as travel time, when the
 		// agent departs again and leaves the link!
-		this.enterEvents.remove(event.getPersonId().toString());
+		this.enterEvents.remove(event.getPersonId());
 	}
 
 	public void handleEvent(AgentStuckEvent event) {
-		EnterEvent e = this.enterEvents.remove(event.getPersonId().toString());
-		if ((e != null) && e.linkId.equals(event.getLinkId())) {
+		LinkEnterEvent e = this.enterEvents.remove(event.getPersonId());
+		if ((e != null) && e.getLinkId().equals(event.getLinkId())) {
 			Link link = event.getLink();
 			if (link == null) {
 				link = this.getNetwork().getLink(event.getLinkId());
 			}
 			if (link != null) {
-				this.getTravelTimeAggregator().addStuckEventTravelTime(getTravelTimeData(link, true),e.time,event.getTime());
+				this.getTravelTimeAggregator().addStuckEventTravelTime(getTravelTimeData(link, true),e.getTime(),event.getTime());
 			}
 		}
 	}
@@ -127,15 +123,4 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 		return this.getTravelTimeAggregator().getTravelTime(getTravelTimeData(link, true), time); 
 	}
 
-	private static class EnterEvent {
-
-		protected final Id linkId;
-		protected final double time;
-
-		protected EnterEvent(final Id linkId, final double time) {
-			this.linkId = linkId;
-			this.time = time;
-		}
-
-	}
 }
