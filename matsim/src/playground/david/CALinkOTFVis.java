@@ -30,6 +30,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.executables.OTFVisController;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
@@ -396,6 +397,14 @@ class CALiveServer implements OTFLiveServerRemote{
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public int getControllerStatus() throws RemoteException {
+		return OTFVisController.NOCONTROL;
+	}
+
+	public boolean requestControllerStatus(int status) throws RemoteException {
+		return false;
+	}
 }
 
 public class CALinkOTFVis extends Thread { 
@@ -446,7 +455,7 @@ public class CALinkOTFVis extends Thread {
 		@Override
 		protected void openAddress(String address) throws RemoteException, InterruptedException, NotBoundException {
 			this.host = new CALiveServer();
-			if (host != null) liveHost = host.isLive();
+			if (host != null && host.isLive()) liveHost = (OTFLiveServerRemote)host;
 		}
 
 		private static final long serialVersionUID = 1L;

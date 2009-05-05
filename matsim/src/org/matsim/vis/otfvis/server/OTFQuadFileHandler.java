@@ -108,7 +108,7 @@ public class OTFQuadFileHandler {
 			this.zos.closeEntry();
 		}
 
-		protected void onAdditionalQuadData() {
+		protected void onAdditionalQuadData(OTFConnectionManager connect) {
 			// intentionally left blank for inheriting classes to overwrite
 		}
 
@@ -119,13 +119,14 @@ public class OTFQuadFileHandler {
 			System.out.print("build Quad on Server: ");
 			Gbl.printElapsedTime();
 
-			onAdditionalQuadData();
-
 			Gbl.startMeasurement();
 			OTFConnectionManager connect = new OTFConnectionManager();
 			connect.add(QueueLink.class,
 					OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 			connect.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
+
+			onAdditionalQuadData(connect);
+			
 			this.quad.fillQuadTree(connect);
 			System.out.print("fill writer Quad on Server: ");
 			Gbl.printElapsedTime();

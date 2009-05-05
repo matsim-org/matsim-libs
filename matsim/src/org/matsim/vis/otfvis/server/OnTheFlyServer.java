@@ -46,9 +46,11 @@ import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.executables.OTFVisController;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
+import org.matsim.vis.otfvis.interfaces.OTFServerRemote.TimePreference;
 
 public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServerRemote{
 
@@ -76,14 +78,14 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private final String userReadableName;
 	private int status = UNCONNECTED;
 
-	private final Object paused = new Object();
-	private final Object stepDone = new Object();
-	private final Object updateFinished = new Object();
-	private int localTime = 0;
+	protected final Object paused = new Object();
+	protected final Object stepDone = new Object();
+	protected final Object updateFinished = new Object();
+	protected int localTime = 0;
 
 	private final Map<String, QuadStorage> quads = new HashMap<String, QuadStorage>();
-	private final Set<String> updateThis = new HashSet<String>();
-	private final Set<OTFQuery> queryThis = new HashSet<OTFQuery>();
+	protected final Set<String> updateThis = new HashSet<String>();
+	protected final Set<OTFQuery> queryThis = new HashSet<OTFQuery>();
 
 //	private final OTFNetHandler handler = null;
 	private transient Population pop = null;
@@ -197,6 +199,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 //		lastTime = time;
 	}
 
+
 	public int updateStatus(double time) {
 		localTime = (int)time;
 
@@ -208,8 +211,8 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 
 		if (status == STEP) {
-			stepToTime--;
-			if( stepToTime <= 0) {
+			// Time and Iteration reached?
+			if( (stepToIteration <= controllerIteration) && (stepToTime <= localTime) ) {
 				synchronized (stepDone) {
 					stepDone.notifyAll();
 					status = PAUSE;
@@ -230,6 +233,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		return status;
 	}
 
+
 	public void doStep(int stepcounter) {
 		// leave Status on pause but let one step run (if one is waiting)
 		synchronized(paused) {
@@ -249,17 +253,16 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	double stepToTime = 0;
 	
-	public boolean requestNewTime(final int time, final TimePreference searchDirection) throws RemoteException {
+	public boolean requestNewTime(int time, final TimePreference searchDirection) throws RemoteException {
 		// if requested time lies in the past, sorry we cannot do that right now
-		if (time < localTime) {
+		if ((stepToIteration < controllerIteration) || ((stepToIteration == controllerIteration) && (time < localTime))) {
 			// time = localTime;
 			stepToTime = 0;
 			// if forward search is OK, then the actual timestep is the BEST fit
 			return (searchDirection != TimePreference.EARLIER);
 		}
-		if (time == localTime) return true;
-
-		doStep(time - localTime);
+		if ((stepToIteration == controllerIteration) && (time == localTime)) return true;
+		doStep(time);
 		return true;
 	}
 
@@ -385,4 +388,36 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	protected int controllerStatus = OTFVisController.NOCONTROL;
+	protected int controllerIteration = 0;
+	protected int stepToIteration = 0;
+
+	public boolean requestControllerStatus(int status) throws RemoteException {
+		stepToIteration = status & 0xffffff;
+		return true;
+	}
+
+	public int getControllerStatus() {
+		return controllerStatus;
+	}
+
+	public void setControllerStatus(int controllerStatus) {
+		this.controllerStatus = controllerStatus;
+		switch(OTFVisController.getStatus(controllerStatus)) {
+		case OTFVisController.STARTUP:
+			// controller is starting up
+			localTime = -1;
+			break;
+		case OTFVisController.RUNNING:
+			// sim is running
+			controllerIteration = OTFVisController.getIteration(controllerStatus);
+			break;
+		case OTFVisController.REPLANNING:
+			// controller is replanning
+			localTime = -1;
+			break;
+		}
+	}
+	
 }

@@ -55,8 +55,10 @@ public class OnTheFlyClientQuadSwing{
 
 	public static void main(String[] args) {
 		// FIXME hard-coded filenames
-		String arg0 = "file:../OnTheFlyVis-test/test/OTFQuadfileNoParking10p_wip.mvi";
-
+		String arg0;
+		if(args.length == 0)arg0 = "file:./otfvis.mvi";
+		else arg0 = args[0];
+		
 		connect2.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect2.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect2.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);

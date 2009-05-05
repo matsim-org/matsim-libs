@@ -26,6 +26,7 @@ import java.io.IOException;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.run.Events2Snapshot;
+import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -41,7 +42,7 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 	}
 
 	@Override
-	protected void onAdditionalQuadData() {
+	protected void onAdditionalQuadData(OTFConnectionManager connect) {
 		this.quad.addAdditionalElement(this.writer);
 	}
 

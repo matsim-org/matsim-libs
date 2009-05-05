@@ -504,7 +504,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		GLCanvas canvas = null;
 		if (motherContext == null) {
 			canvas = new GLCanvas(caps);
-			//set later in init() motherContext = this.canvas.getContext();
+			motherContext = canvas.getContext();
 		} else {
 			canvas = new GLCanvas(caps, null, motherContext, null);
 		}

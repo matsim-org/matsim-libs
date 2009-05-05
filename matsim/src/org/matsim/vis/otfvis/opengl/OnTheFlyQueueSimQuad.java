@@ -25,8 +25,16 @@ import java.util.UUID;
 
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
@@ -38,31 +46,43 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
  */
 public class OnTheFlyQueueSimQuad extends QueueSimulation{
 	private OnTheFlyServer myOTFServer = null;
+	private boolean ownServer = true;
 
+	public void setServer(OnTheFlyServer server) {
+		this.myOTFServer = server;
+		ownServer = false;
+	}
 	@Override
 	protected void prepareSim() {
-		UUID idOne = UUID.randomUUID();
-
-		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.network, this.plans, getEvents(), false);
-
 		super.prepareSim();
 
-		// FOR TESTING ONLY!
-		PreferencesDialog.preDialogClass = PreferencesDialog2.class;
-		OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString());
-		client.start();
-		try {
-			this.myOTFServer.pause();
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if(ownServer) {
+			UUID idOne = UUID.randomUUID();
+			this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.network, this.plans, getEvents(), false);
+
+			// FOR TESTING ONLY!
+			PreferencesDialog.preDialogClass = PreferencesDialog2.class;
+			OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString());
+			client.start();
+
+			try {
+				this.myOTFServer.pause();
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+
+
 	}
 
 	@Override
 	protected void cleanupSim() {
-//		if (myOTFServer != null) myOTFServer.stop();
-		this.myOTFServer.cleanup();
+
+		if(ownServer) {
+			this.myOTFServer.cleanup();
+		}
+
 		this.myOTFServer = null;
 		super.cleanupSim();
 	}
@@ -71,7 +91,6 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 	protected void afterSimStep(final double time) {
 		super.afterSimStep(time);
 		this.myOTFServer.updateStatus(time);
-
 	}
 
 	public OnTheFlyQueueSimQuad(final Network net, final Population plans, final Events events) {
@@ -83,6 +102,10 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 		}
 	}
 
+	public void setQueueNetwork(QueueNetwork net) {
+		this.network = net;
+	}
+	
 	public static void main(final String[] args) {
 
 		// if you really think you need this method, please speak to me. marcel/29.apr2009 TODO [MR] delete main method

@@ -30,6 +30,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
+import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
@@ -52,7 +53,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 	}
 
 	@Override
-	protected void onAdditionalQuadData() {
+	protected void onAdditionalQuadData(OTFConnectionManager connect) {
 		this.quad.addAdditionalElement(this.writer);
 	}
 

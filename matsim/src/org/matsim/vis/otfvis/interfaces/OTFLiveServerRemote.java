@@ -31,5 +31,6 @@ public interface OTFLiveServerRemote extends OTFServerRemote {
 	public boolean replace(String id, double x, double y, int index, Class clazz) throws RemoteException;
 	
 	public OTFQuery answerQuery(OTFQuery query) throws RemoteException;
-	
+	public int getControllerStatus() throws RemoteException;
+	public boolean requestControllerStatus(int status) throws RemoteException;
 }

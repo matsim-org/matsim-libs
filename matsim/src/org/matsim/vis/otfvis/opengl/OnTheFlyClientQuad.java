@@ -153,8 +153,8 @@ public class OnTheFlyClientQuad extends Thread {
 //			hostControl2.countto(3600);
 //			Gbl.printElapsedTime();
 			//new Thread(){public void run(){ hostControl2.countto(7200);};}.start();
-			drawer.invalidate((int)hostControl.getTime());
 			frame.setVisible(true);
+			drawer.invalidate((int)hostControl.getTime());
 			hostControl.addHandler(id1, drawer);
 
 		} catch (RemoteException e) {
