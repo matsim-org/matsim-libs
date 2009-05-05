@@ -110,19 +110,22 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		}
 
 		public void run(Plan plan) {
-			int peSize = plan.getPlanElements().size();
+			List<PlanElement> pes = plan.getPlanElements();
+			int peSize = pes.size();
+			for (int i = 0; i < peSize; i += 2)
+				if (((Activity) pes.get(i)).getType().equals("tta"))
+					return;
+
 			Plan copyPlan = new PlanImpl(plan.getPerson());
 			if (peSize > 1) {
 				boolean done = false;
 				while (!done) {
 					copyPlan.getPlanElements().clear();
 					copyPlan.copyPlan(plan);
-					// Idx for leg in PlanElements, whose TransportMode would be
+					// Idx for leg in PlanElements, whose TransportMode
+					// would be
 					// changed.
 					int legIdx = rnd.nextInt(peSize / 2) * 2 + 1;
-
-					// System.out.println(done + "\tpersonId:\t"
-					// + plan.getPerson().getId() + "\tlegIdx:" + legIdx);
 
 					TransportMode crtMode = ((Leg) copyPlan.getPlanElements()
 							.get(legIdx)).getMode();
@@ -141,9 +144,10 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 							done = changeUnCar2UnCar(copyPlan, legIdx, newMode);
 					}
 				}
-				plan.getPlanElements().clear();
+				pes.clear();
 				plan.copyPlan(copyPlan);
 			}
+
 		}
 
 		private boolean changeUnCar2UnCar(Plan plan, int legIdx,
