@@ -18,11 +18,11 @@
 	<module name="controler">
 		<param name="outputDirectory" value="/home/jjoubert/Commercial/Output/" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="10" />
+		<param name="lastIteration" value="100" />
 	</module>
 
     <module name="counts">
-        <param name="inputCountsFile" value="./home/jjoubert/Commercial/Input/2001_counts_1000m+.xml" />
+        <param name="inputCountsFile" value="/home/jjoubert/Commercial/Input/2001_counts_1000m+.xml" />
         <param name="outputformat" value="kml" />
         <!-- these parameters are used in case you dont want to use the entire counting
         station file
@@ -57,7 +57,7 @@
 		
 		<param name="activityType_0"            value="major" /> <!-- major -->
 		<param name="activityPriority_0"        value="1" />
-		<param name="activityTypicalDuration_0" value="05:00:00" />
+		<param name="activityTypicalDuration_0" value="06:00:00" />
 		<param name="activityMinimalDuration_0" value="00:00:00" />
 	
 		<param name="activityType_1"            value="minor" /> <!-- minor -->
