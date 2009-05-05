@@ -21,6 +21,7 @@
 package org.matsim.counts;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 public class CountsWriterHandlerImplV1 implements CountsWriterHandler {
 	// interface implementation
 	//////////////////////////////////////////////////////////////////////
@@ -67,9 +68,12 @@ public class CountsWriterHandlerImplV1 implements CountsWriterHandler {
 	// <volume ... />
 	//////////////////////////////////////////////////////////////////////
 	public void startVolume(final Volume volume, final BufferedWriter out) throws IOException {
+		
+		DecimalFormat formatter = new DecimalFormat("0.00");
+		
 		out.write("\t\t<volume");
 		out.write(" h=\"" + volume.getHour() + "\"");
-		out.write(" val=\"" + volume.getValue() + "\"");
+		out.write(" val=\"" + formatter.format(volume.getValue()) + "\"");
 		out.write(" />\n");
 	}
 	public void endVolume(final BufferedWriter out) throws IOException {
