@@ -32,9 +32,9 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(EquilTest.class);
 		suite.addTestSuite(TriangleTest.class);
-		suite.addTestSuite(PlanomatRunTest.class);
 
 		if (TestDepth.getDepth() == TestDepth.extended) {
+			suite.addTestSuite(PlanomatRunTest.class);
 			suite.addTestSuite(BetaTravelTest.class);
 			suite.addTestSuite(OnePercentBerlin10sTest.class);
 		}
