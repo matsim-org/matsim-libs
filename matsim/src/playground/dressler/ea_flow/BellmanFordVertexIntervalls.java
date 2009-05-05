@@ -83,6 +83,7 @@ public class BellmanFordVertexIntervalls {
 	 */
 	private static int _debug=0;
 
+	int gain = 0;
 	//--------------------CONSTRUCTORS-------------------------------------//
 	
 	/**
@@ -257,7 +258,7 @@ public class BellmanFordVertexIntervalls {
 		// dist is the distance from the source to w over v
 
 		// main loop
-		int gain = 0;
+		//int gain = 0;
 		while (!queue.isEmpty()) {
 			// gets the first vertex in the queue
 			v = queue.poll();

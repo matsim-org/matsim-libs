@@ -141,18 +141,18 @@ public class MultiSourceEAF {
 
 		String networkfile = null;
 		//networkfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_100p_flow_2s_cap.xml";
-		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618_10p_5s.xml";
+		networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618_10p_5s.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
 		//networkfile = "./examples/meine_EA/swissold_network_5s.xml";
-		networkfile = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network_60s_EAF.xml";
+		//networkfile = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network_60s_EAF.xml";
 
 
 		//networkfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
 
 
 		String plansfile = null;		
-		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
-		plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans.xml";
+		plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
+		//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans.xml";
 		//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
 
@@ -177,7 +177,8 @@ public class MultiSourceEAF {
 		//set parameters
 		int timeHorizon = 200000;
 		int rounds = 100000;
-		String sinkid = "supersink";
+		//String sinkid = "supersink";
+		String sinkid = "en2";
 		//boolean emptylegs = false; // really bad! use EmptyPlans.class instead 		
 
 		//read network
@@ -279,6 +280,8 @@ public class MultiSourceEAF {
 					System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
 					System.out.println("last " + tempstr);
 				}
+				System.out.println("Removed " + routingAlgo.gain + " intervals.");
+				System.out.println("removed on the fly:" + VertexIntervalls.rem);
 			}
 			else{ // use the other algo
 				FakeTravelTimeCost length = new FakeTravelTimeCost();
