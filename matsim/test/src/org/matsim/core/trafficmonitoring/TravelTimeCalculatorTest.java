@@ -26,11 +26,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -38,202 +41,54 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class TravelTimeCalculatorTest extends MatsimTestCase {
 
-	private static final boolean generateNewCompareData = false;
-	private static final boolean generateNewCompareDataPessimistic = false;
-		// set generateNewComparedata to true to generate new comparison data
-		// if new comparison data is generated, the test will fail with an Exception
-		// to ensure this option isn't enabled for real tests!
+	public final void testTravelTimeCalculator_Array_Optimistic() throws IOException {
+		String compareFile = getClassInputDirectory() + "link10_ttimes.txt";
 
-	public final void testLinkTravelTimeArrayOptimistic() throws IOException {
-
-//		String className =  "/" + this.getClass().getSimpleName();
-		String  inputDir = getPackageInputDirectory()	+ "TravelTimeCalculator/";
-		String networkFile = inputDir + "link10_network.xml";
-		String eventsFile = inputDir + "link10_events.txt";
-		String compareFile = inputDir + "link10_ttimes.txt";
-
-		int timeBinSize = 15*60;
-
-		// setup global stuff
-		loadConfig(null);
-
-		// setup network
-		NetworkLayer network = new NetworkLayer();
-
-		// read network
-		new MatsimNetworkReader(network).readFile(networkFile);
-		// setup events
-		Events events = new Events();
-		MatsimEventsReader eventsReader = new MatsimEventsReader(events);
-
-		// setup traveltime calculator
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 30*3600, factory);
-		events.addHandler(ttcalc);
 
-		// read events
-		eventsReader.readFile(eventsFile);
-		events.printEventsCount();
-
-		// read comparison data
-		BufferedReader infile = new BufferedReader(new FileReader(compareFile));
-		String line;
-		String[] compareData = new String[4*24];
-		try {
-			for (int i = 0; i < 4*24; i++) {
-				line = infile.readLine();
-				compareData[i] = line;
-			}
-		}
-		finally {
-			try {
-				infile.close();
-			} catch (IOException ignored) {}
-		}
-
-		// prepare comparison
-		Link link10 = network.getLink("10");
-
-		if (generateNewCompareData) {
-			BufferedWriter outfile = null;
-			try {
-				outfile = new BufferedWriter(new FileWriter(compareFile));
-				for (int i = 0; i < 4*24; i++) {
-					double ttime = ttcalc.getLinkTravelTime(link10, i*timeBinSize);
-					outfile.write(Double.toString(ttime) + "\n");
-				}
-			}
-			finally {
-				if (outfile != null) {
-					try {
-						outfile.close();
-					} catch (IOException ignored) {}
-				}
-			}
-			fail("A new file containg data for comparison was created. No comparison was made.");
-		}
-
-		// do comparison
-		for (int i = 0; i < 4*24; i++) {
-			double ttime = ttcalc.getLinkTravelTime(link10, i*timeBinSize);
-			assertEquals(compareData[i], Double.toString(ttime));
-		}
+		doTravelTimeCalculatorTest(factory, 15*60, compareFile, false);
 	}
 
-	public final void testLinkTravelTimeHashMapOptimistic() throws IOException {
-
-		String  inputDir = getPackageInputDirectory()	+ "TravelTimeCalculator/";
-		String networkFile = inputDir + "link10_network.xml";
-		String eventsFile = inputDir + "link10_events.txt";
-		String compareFile = inputDir + "link10_ttimes.txt";
-
-		int timeBinSize = 15*60;
-
-		// setup global stuff
-		loadConfig(null);
-
-		// setup network
-		NetworkLayer network = new NetworkLayer();
-
-		// read network
-		new MatsimNetworkReader(network).readFile(networkFile);
-		// setup events
-		Events events = new Events();
-		MatsimEventsReader eventsReader = new MatsimEventsReader(events);
-
-		// setup traveltime calculator
+	public final void testTravelTimeCalculator_HashMap_Optimistic() throws IOException {
+		String compareFile = getClassInputDirectory() + "link10_ttimes.txt";
+	
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
-		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 30*3600, factory);
-		events.addHandler(ttcalc);
-
-		// read events
-		eventsReader.readFile(eventsFile);
-		events.printEventsCount();
-
-		// read comparison data
-		BufferedReader infile = new BufferedReader(new FileReader(compareFile));
-		String line;
-		String[] compareData = new String[4*24];
-		try {
-			for (int i = 0; i < 4*24; i++) {
-				line = infile.readLine();
-				compareData[i] = line;
-			}
-		}
-		finally {
-			try {
-				infile.close();
-			} catch (IOException ignored) {}
-		}
-
-		// prepare comparison
-		Link link10 = network.getLink("10");
-
-		if (generateNewCompareData) {
-			BufferedWriter outfile = null;
-			try {
-				outfile = new BufferedWriter(new FileWriter(compareFile));
-				for (int i = 0; i < 4*24; i++) {
-					double ttime = ttcalc.getLinkTravelTime(link10, i*timeBinSize);
-					outfile.write(Double.toString(ttime) + "\n");
-				}
-			}
-			finally {
-				if (outfile != null) {
-					try {
-						outfile.close();
-					} catch (IOException ignored) {}
-				}
-			}
-			fail("A new file containg data for comparison was created. No comparison was made.");
-		}
-
-		// do comparison
-		for (int i = 0; i < 4*24; i++) {
-			double ttime = ttcalc.getLinkTravelTime(link10, i*timeBinSize);
-			assertEquals(compareData[i], Double.toString(ttime));
-		}
+		
+		doTravelTimeCalculatorTest(factory, 15*60, compareFile, false);
 	}
 	
-	public final void testLinkTravelTimeHashMapPessimistic() throws IOException {
+	public final void testTravelTimeCalculator_HashMap_Pessimistic() throws IOException {
+		String compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic.txt";
 
-		String  inputDir = getPackageInputDirectory()	+ "TravelTimeCalculator/";
-		String networkFile = inputDir + "link10_network.xml";
-		String eventsFile = inputDir + "link10_events.txt";
-		String compareFile = inputDir + "link10_ttimes_pessimistic.txt";
-
-		int timeBinSize = 1*60;
-
-		// setup global stuff
-		loadConfig(null);
-
-		// setup network
-		NetworkLayer network = new NetworkLayer();
-
-		// read network
-		new MatsimNetworkReader(network).readFile(networkFile);
-		// setup events
-		Events events = new Events();
-		MatsimEventsReader eventsReader = new MatsimEventsReader(events);
-
-		// setup traveltime calculator
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
+		
+		doTravelTimeCalculatorTest(factory, 1*60, compareFile, false);
+	}
+
+	private final void doTravelTimeCalculatorTest(final TravelTimeAggregatorFactory factory, final int timeBinSize,
+			final String compareFile, final boolean generateNewData) throws IOException {
+		String networkFile = getClassInputDirectory() + "link10_network.xml";
+		String eventsFile = getClassInputDirectory() + "link10_events.txt";
+
+		Scenario scenario = new ScenarioImpl(loadConfig(null));
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(network).readFile(networkFile);
+
+		Events events = new Events();
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 30*3600, factory);
 		events.addHandler(ttcalc);
-
-		// read events
-		eventsReader.readFile(eventsFile);
+		new MatsimEventsReader(events).readFile(eventsFile);
 		events.printEventsCount();
 
 		// read comparison data
 		BufferedReader infile = new BufferedReader(new FileReader(compareFile));
 		String line;
-		String[] compareData = new String[60*24];
+		String[] compareData = new String[4*24];
 		try {
-			for (int i = 0; i < 60*24; i++) {
+			for (int i = 0; i < 4*24; i++) {
 				line = infile.readLine();
 				compareData[i] = line;
 			}
@@ -245,13 +100,13 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		}
 
 		// prepare comparison
-		Link link10 = network.getLink("10");
+		Link link10 = network.getLinks().get(new IdImpl("10"));
 
-		if (generateNewCompareDataPessimistic) {
+		if (generateNewData) {
 			BufferedWriter outfile = null;
 			try {
 				outfile = new BufferedWriter(new FileWriter(compareFile));
-				for (int i = 0; i < 60*24; i++) {
+				for (int i = 0; i < 4*24; i++) {
 					double ttime = ttcalc.getLinkTravelTime(link10, i*timeBinSize);
 					outfile.write(Double.toString(ttime) + "\n");
 				}
@@ -267,10 +122,10 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		}
 
 		// do comparison
-		for (int i = 0; i < 60*24; i++) {
+		for (int i = 0; i < 4*24; i++) {
 			double ttime = ttcalc.getLinkTravelTime(link10, i*timeBinSize);
 			assertEquals(compareData[i], Double.toString(ttime));
 		}
 	}
-	
+
 }
