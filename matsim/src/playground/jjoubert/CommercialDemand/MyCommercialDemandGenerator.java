@@ -45,8 +45,8 @@ import com.vividsolutions.jts.geom.Point;
 
 public class MyCommercialDemandGenerator {
 	
-	private static final int populationSize = 100;
-	private static final int firstIndex = 10000;
+	private static final int populationSize = 5000;
+	private static final int firstIndex = 100000;
 	private static final String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/CommercialDemand/";
 
 	@SuppressWarnings("unchecked")
