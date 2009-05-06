@@ -14,27 +14,29 @@ import org.matsim.core.network.NetworkLayer;
 //import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-
+import playground.mmoyo.PTRouter.PTNode;
+import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.MatsimNetworkReader;
 
 public class PTControler2 {
     private static String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
     //private static String path = "C://Users/manuel/Desktop/TU/scenarios/Zuerich/";
     //private static String path = "C://Users/manuel/Desktop/TU/scenarios/5x5";
     
-	private static final String CONFIG= "../shared-svn/studies/schweiz-ivtch/pt-experimental/config.xml";
+	private static final String CONFIG=  path  + "config.xml";
 	private static final String ZURICHPTN= path + "network.xml";
 	private static final String ZURICHPTTIMETABLE= path + "PTTimetable.xml";
 	private static final String INPTNETFILE= path + "inptnetfile.xml";
 	private static final String ZURICHPTPLANS= path + "plans.xml";
 	private static final String ALLPLANS= path + "@All_plans .xml";
 	private static final String OUTPUTPLANS= path + "output_plans.xml";
-	private static final String INPTNEWLINES= path + "/TestCase/InPTNewLines.xml";
-	
+	private static final String INPTNEWLINES= path + "TestCase/InPTNewLines.xml";
+	private static final String DIVNODES= path + "TestCase/DivNodes.xml";
 	
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, INPTNETFILE, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
 		
-		int option =-5;
+		int option =8;
 		
 		if (option>0){pt.readPTNet(ZURICHPTN);}
 		switch (option){
@@ -43,7 +45,7 @@ public class PTControler2 {
 				int num = planValidator.PlanCounter(pt.getPtNetworkLayer(), ZURICHPTPLANS);
 				System.out.println(num);
 				break;
-			case -5:
+			case -5:  //create net from diva and route agents
 				NetworkLayer net = new NetworkLayer();
 				pt.setPtNetworkLayer(net);
 				PTLineAggregator ptLineAggregator = new PTLineAggregator(INPTNEWLINES, pt.getPtNetworkLayer(), pt.getPtTimeTable());
@@ -58,8 +60,13 @@ public class PTControler2 {
 	    		ptActWriter1.writePTActsLegs();
 				break;
 			case -4:
-			
-
+				NetworkLayer net3 = pt.getPtNetworkFactory().readNetFile(ZURICHPTN);
+					
+				Node node = net3.getNode("~100799");
+				Node node2 = net3.getNode("~100114d");
+							System.out.println(
+									node.getOutNodes().containsValue(node2)
+							);
 				break;
 			case -3:
 				//pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
@@ -77,7 +84,7 @@ public class PTControler2 {
 				break;
 			case -1:
 				pt.createPTNetWithTLinks(INPTNETFILE);
-				//pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300, pt.getPtTimeTable());
+				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300, pt.getPtTimeTable());
 				pt.writeNet(ZURICHPTN);
 	    		pt.readPTNet(ZURICHPTN);
 	    		PTActWriter ptActWriter2 = new PTActWriter(pt);
@@ -92,21 +99,13 @@ public class PTControler2 {
 	    	
 			case 1:
 				pt.createPTNetWithTLinks(INPTNETFILE);
+				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300, pt.getPtTimeTable());
 				pt.writeNet(ZURICHPTN);
+	    		pt.readPTNet(ZURICHPTN);
+	    		PTActWriter ptActWriter3 = new PTActWriter(pt);
+	    		ptActWriter3.writePTActsLegs();
 				break;
 
-			case 11:
-	    		Coord coord1= new CoordImpl(708146,243607);
-    			Coord coord2= new CoordImpl(709915,244793);
-	    		Path path = pt.getPtRouter2().findRoute(coord1, coord2, 24060,400);
-	    		//ptNetworkFactory.printLinks(ptNetworkLayer);
-	    		pt.getPtRouter2().PrintRoute(path);
-	    		break;
-	    	case 2:
-	    		Node ptNode = pt.getPtNetworkLayer().getNode("100048");
-	    		Node ptNode2 = pt.getPtNetworkLayer().getNode("101456");
-	    		pt.getPtRouter2().PrintRoute(pt.getPtRouter2().findRoute(ptNode, ptNode2, 391));
-	    		break;
 	    	case 3:
 	    		//pt.getPtNetworkFactory().setDetNextLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
 	    		PTActWriter ptActWriter = new PTActWriter(pt);
@@ -120,32 +119,19 @@ public class PTControler2 {
 	    		PTTester pttester= new PTTester(pt);
 	    		pttester.countRoutes();
 	    		break;
-	    	case 5:
-	
-	    		Coord coord6= new CoordImpl(708146,243607);
-	    		double distance= 4500;
-	    		Collection <Node> nearNodes = pt.getPtNetworkLayer().getNearestNodes(coord6, distance);
-	    		
-	    		System.out.println ("Nodes near " + coord6.toString());
-	    		for (Node nearNode : nearNodes){
-	    			System.out.println (nearNode.getId());
-	    		}
-	    		break;
-	    	case 6:
-	    		pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 200, pt.getPtTimeTable());
-	    		pt.getPtNetworkFactory().writeNet(pt.getPtNetworkLayer(), ZURICHPTN);
-	    		break;
 	    	case 7:
-	    		Node nodeA= pt.getPtNetworkLayer().getNode("~101220");     
-	    		Node nodeB=pt.getPtNetworkLayer().getNode("~8587652");
-	    		System.out.println(nodeA==null);
-	    		System.out.println(nodeB==null);
-	    		boolean connected= pt.getPtNetworkFactory().areConected(nodeA, nodeB);
-	    		System.out.println(connected);
+	    		NetworkLayer netDiv= new NetworkLayer(new NetworkFactory());
+	    		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(netDiv);
+	    		matsimNetworkReader.readFile(DIVNODES);
+	    		
+	    		playground.mmoyo.Validators.StationValidator sv = new playground.mmoyo.Validators.StationValidator(pt.getPtNetworkLayer());
+	    		sv.validateIds(netDiv);
 	    		break;
 	    	case 8:
-	    		
-	    	break;
+	    		playground.mmoyo.input.ToTransitScheduleConverter converter = new playground.mmoyo.input.ToTransitScheduleConverter();	    		
+
+	    		//converter.createFacilities("../shared-svn/studies/schweiz-ivtch/pt-experimental/PtFacilities.xml");
+	    		break;
 		}//switch
 	}//main
 

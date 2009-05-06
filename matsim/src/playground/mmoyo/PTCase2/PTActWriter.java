@@ -104,74 +104,67 @@ public class PTActWriter {
 			double duration=0;
 			
 			Plan newPlan = new PlanImpl(person);
-			
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					thisAct= (Activity) pe;
-					
-					if (!first) {
-						Coord lastActCoord = lastAct.getCoord();
-						Coord actCoord = thisAct.getCoord();
-						
-						trips++;
-						double distanceToDestination = CoordUtils.calcDistance(lastActCoord, actCoord);
-						double distToWalk= walk.distToWalk(person.getAge());
-						if (distanceToDestination<= distToWalk){
-							newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
-							inWalkRange++;
-							
-						}else{
-							startTime = System.currentTimeMillis();
-							Path path = ptRouter.findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
-							duration= System.currentTimeMillis()-startTime;
-							if(path!=null){
-								
-								//travelTime=travelTime+ path.travelTime;
-								
-								if (path.nodes.size()>1){
-									createWlinks(lastActCoord, path, actCoord);
-									double dw1 = net.getLink("linkW1").getLength();
-									double dw2 = net.getLink("linkW2").getLength();
-									if ((dw1+dw2)>=(distanceToDestination)){
-										newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
-										inWalkRange++;
-									}else{
-										
-										/*
+				if (!first) {
+					Coord lastActCoord = lastAct.getCoord();
+		    		Coord actCoord = thisAct.getCoord();
+
+					trips++;
+		    		double distanceToDestination = CoordUtils.calcDistance(lastActCoord, actCoord);
+		    		double distToWalk= walk.distToWalk(person.getAge());
+		    		if (distanceToDestination<= distToWalk){
+		    			newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+		    			inWalkRange++;
+		    		
+		    		}else{
+			    		startTime = System.currentTimeMillis();
+			    		Path path = ptRouter.findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
+			    		duration= System.currentTimeMillis()-startTime;
+			    		durations.add(duration);
+			    		if(path!=null){
+				    		//travelTime=travelTime+ path.travelTime;
+				    		if (path.nodes.size()>1){
+				    			createWlinks(lastActCoord, path, actCoord);
+			    				double dw1 = net.getLink("linkW1").getLength();
+			    				double dw2 = net.getLink("linkW2").getLength();
+			    				if ((dw1+dw2)>=(distanceToDestination)){
+			    					newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+			    					inWalkRange++;
+			    				}else{
 			    					if (ptPathValidator.isValid(path)){
 			    						legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
 			    						valid++;
-			    						durations.add(duration);
 			    					}else{
 			    						newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
 			    						invalid++;
 			    						addPerson=false;
 			    						paths.add(path);
 			    					}
-										 */
-										
-										legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
-									}//if dw1+dw2
-									removeWlinks();
-								}else{
-									newPlan.addLeg(walkLeg(legNum++, lastAct, thisAct));
-									addPerson=false;
-									lessThan2Node++;
-								}//if path.nodes
-							}else{
-								newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
-								addPerson=false;
-								nulls++;
-							}//path=null
-						}//distanceToDestination<= distToWalk
-					}//if !First
-					
-					//-->Attention: this should be read from the city network not from pt network!!! 
-					thisAct.setLink(net.getNearestLink(thisAct.getCoord()));
-					
-					newPlan.addActivity(thisAct);
-					lastAct = thisAct;
-					first=false;
+			    					
+			    					//legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
+			    				}
+			   				removeWlinks();
+			    			}else{
+			    				newPlan.addLeg(walkLeg(legNum++, lastAct, thisAct));
+			    				addPerson=false;
+			    				lessThan2Node++;
+			    			}
+			    		}else{
+			    			newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+			    			addPerson=false;
+			    			nulls++;
+			    		}
+					}//distanceToDestination<= distToWalk
+				}//if !First
+				
+		    	//-->Attention: this should be read from the city network not from pt network!!! 
+		    	thisAct.setLink(net.getNearestLink(thisAct.getCoord()));
+		    	
+		    	newPlan.addActivity(newPTAct(thisAct.getType(), thisAct.getCoord(), thisAct.getLink(), thisAct.getStartTime(), thisAct.getEndTime()));
+				lastAct = thisAct;
+				first=false;
 				}
 			}
 
@@ -189,20 +182,18 @@ public class PTActWriter {
 		new PopulationWriter(newPopulation, outputFile, "v4").write();
 		System.out.println("Done");
 		
-		/*
+		
 		System.out.println("valid:        " + valid +  "\ninvalid:      " + invalid + "\ninWalkRange:  "+ inWalkRange + "\nnulls:        " + nulls + "\nlessThan2Node:" + lessThan2Node);
 		System.out.println("--------------\nTrips:" + trips);
-		*/
+			
 		
-		/*
 		System.out.println("===Printing routing durations");
 		double total=0;
 		for (double d : durations ){
-			System.out.println(d);
 			total=total+d;
 		}
-		System.out.println("average: " + (total/durations.size()));
-		*/
+		System.out.println("total " + total + " average: " + (total/durations.size()));
+		
 		
 		/*
 		//for(Path path: paths){
@@ -262,7 +253,7 @@ public class PTActWriter {
 
 			if (link.getType().equals("Standard")){
 				if (first){ //first PTAct: getting on
-					newPlan.addActivity(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime , linkTravelTime, accumulatedTime + linkTravelTime));
+					newPlan.addActivity(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime , accumulatedTime + linkTravelTime));
 					accumulatedTime =accumulatedTime+ linkTravelTime;
 					first=false;
 				}
@@ -283,7 +274,7 @@ public class PTActWriter {
 										
 					//test: Check what method describes the location more exactly
 					//newPlan.addAct(newPTAct("exit pt veh", link.getFromNode().getCoord(), link, arrTime, 0, arrTime));
-					newPlan.addActivity(newPTAct("exit pt veh", link.getToNode().getCoord(), link, arrTime, 0, arrTime));
+					newPlan.addActivity(newPTAct("exit pt veh", link.getToNode().getCoord(), link, arrTime, arrTime));
 				}
 
 			}else if(link.getType().equals("Transfer") || link.getType().equals("DetTransfer") ){  //add the PTleg and a Transfer Act
@@ -293,7 +284,7 @@ public class PTActWriter {
 					//-->: The legMode car is temporal only for visualization purposes
 					newPlan.addLeg(newPTLeg(legNum++, TransportMode.car, legRouteLinks, legDistance, depTime, legTravelTime, arrTime));
 					//newPlan.addAct(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
-					newPlan.addActivity(newPTAct("Wait pt veh", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
+					newPlan.addActivity(newPTAct("Wait pt veh", link.getFromNode().getCoord(), link, accumulatedTime, accumulatedTime + linkTravelTime));
 					first=false;
 				}
 
@@ -322,10 +313,8 @@ public class PTActWriter {
 
 				//like a transfer link
 				if (lastLinkType.equals("Standard")){  //-> how can be validated that the next link must be a standard link?
-					double startWaitingTime = arrTime;
-					double waitingTime = linkTravelTime -walkTime;  // The ptTravelTime must calculated it like this: travelTime = walk + transferTime;
-					double endActTime= startWaitingTime + waitingTime;
-					newPlan.addActivity(newPTAct("Change ptv", link.getFromNode().getCoord(), link, startWaitingTime, waitingTime, endActTime));
+					double endActTime= arrTime + linkTravelTime -walkTime; // The ptTravelTime must be calculated it like this: travelTime = walk + transferTime;
+					newPlan.addActivity(newPTAct("Change ptv", link.getFromNode().getCoord(), link, arrTime, endActTime));
 					first=false;
 				}
 			}
@@ -345,18 +334,17 @@ public class PTActWriter {
 		return legNum;
 	}//insert
 
-	private Activity newPTAct(final String type, final Coord coord, final Link link, final double startTime, final double dur, final double endTime){
+	private Activity newPTAct(final String type, final Coord coord, final Link link, final double startTime, final double endTime){
 		Activity ptAct= new ActivityImpl(type, coord);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
-		ptAct.calculateDuration();
+		//ptAct.calculateDuration();
 		ptAct.setLink(link);
 		return ptAct;
 	}
 
 	private Leg newPTLeg(final int num, TransportMode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
 		NetworkRoute legRoute = new LinkNetworkRoute(null, null); 
-		//CarRoute legRoute = new NodeCarRoute();  25 feb
 		
 		if (mode!=TransportMode.walk){
 			legRoute.setLinks(null, routeLinks, null);

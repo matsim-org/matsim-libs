@@ -39,7 +39,7 @@ public class PTNetworkFactory2 {
 		return ptNetworkLayer;
 	}
 	
-	private NetworkLayer readNetFile(String inFileName){
+	public NetworkLayer readNetFile(String inFileName){
 		NetworkFactory networkFactory = new NetworkFactory();
 	
 		NetworkLayer tempNet= new NetworkLayer(networkFactory);
@@ -105,15 +105,13 @@ public class PTNetworkFactory2 {
 			for (String strIdNode : ptLine.getRoute()) {
 				PTNode ptNode = ((PTNode)ptNetworkLayer.getNode(strIdNode));
 				if (ptNode==null){
-					//23 april-> temporarly commented 
-					//throw new java.lang.NullPointerException("Node does not exist:" + strIdNode); 
+					throw new java.lang.NullPointerException("Node does not exist:" + strIdNode); 
 				}
-				//23 april->ptNode.setIdPTLine(ptLine.getId());
-				//23 april->double min = ptLine.getMinutes().get(indexMin);
+				ptNode.setIdPTLine(ptLine.getId());
+				double min = ptLine.getMinutes().get(indexMin);
 				
-				travelTime = 1;	//23 april->travelTime=min-lastTravelTime;
+				travelTime=min-lastTravelTime;
 				if (!first){
-					System.out.println(( ptNode==null) + " " + strIdNode);
 					for (Link link : (ptNode.getInLinks().values())) {
 						if (link.getFromNode().equals(ptLastNode)){
 							linkTravelTimeMap.put(link.getId(), travelTime);
@@ -123,7 +121,7 @@ public class PTNetworkFactory2 {
 					}
 				}
 				ptLastNode= ((PTNode)ptNetworkLayer.getNode(strIdNode));
-				//23 april-> lastTravelTime= min;
+				lastTravelTime= min;
 				first=false;
 				indexMin++;
 			}//for interator String
@@ -135,21 +133,11 @@ public class PTNetworkFactory2 {
 		return ptTimeTable;
 	}
 	
-	/*
-	//-Move to Class PtNode
-	public String getNodeBaseId999(String strId){
-		String baseID = strId;
-		if (baseID.charAt(0)=='_' || baseID.charAt(0)=='~')
-			baseID= baseID.substring(1,baseID.length());
-		if(Character.isLetter(baseID.charAt(baseID.length()-1))) 	//example of possible node values at intersection:   999, _999, 999b, _999b
-			baseID= baseID.substring(0,baseID.length()-1);
-		return baseID;
-	}
-	*/
+	
 	public void createTransferLinks(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable) {
 		PTStation stationMap = new PTStation(ptTimeTable);
 		
-		stationMap.print();
+		//stationMap.print();
 		
 		int maxLinkKey=0;
 		for (List<Id> chList : stationMap.getIntersecionMap().values()) {
@@ -180,7 +168,7 @@ public class PTNetworkFactory2 {
 
 		Id idLink = new IdImpl(strIdLink);
 		double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
-		//Values for nFor the time being these values are irrelevant 
+		//For the time being these values are irrelevant 
 		double freespeed= 1;
 		double capacity = 1;
 		double numLanes = 1;
@@ -200,21 +188,21 @@ public class PTNetworkFactory2 {
 		
 		for (Node node: net.getNodes().values()){
 			for (Node nearNode : net.getNearestNodes(node.getCoord(), distance)){
-				if(!node.getCoord().equals(nearNode.getCoord())){
-					if (!areConected(node, nearNode)){
-						PTNode ptn1 = (PTNode) node;
-						PTNode ptn2 = (PTNode) nearNode;
+				PTNode ptn1 = (PTNode) node;
+				PTNode ptn2 = (PTNode) nearNode;
 
-						strId= "DT" + ++x;
-						createPTLink(net, strId, ptn1, ptn2, "DetTransfer");
-						
-						strId= "DT" + ++x;
-						createPTLink(net, strId, ptn2, ptn1, "DetTransfer");
-					}
+				//if(!ptn1.getIdStation().equals(ptn2.getIdStation())){   
+					if (!node.getCoord().equals(nearNode.getCoord())){  //Validate this in the station validator!      
+						if (!node.getOutNodes().containsValue(nearNode)){
+							strId= "DT" + ++x;
+							createPTLink(net, strId, ptn1, ptn2, "DetTransfer");
+							//strId= "DT" + ++x;
+							//createPTLink(net, strId, ptn2, ptn1, "DetTransfer");
+						}
+					//}
 				}
-			}
-		} 
-	
+			}	
+		}
 	}
 
 	public void setDetNextLinks (NetworkLayer net, PTTimeTable2 ptTimeTable){
@@ -248,16 +236,6 @@ public class PTNetworkFactory2 {
 	
 	}
 
-	//Returns true if a link exists between two nodes
-	public boolean areConected(Node n1, Node n2 ){
-		//--> find out what kind of links join the nodes
-		for (Id id : n1.getOutNodes().keySet()){
-			if (n2.getId().equals(id))
-				return true;
-		}
-		return false;
-	}
-	
 	public static void printLinks(NetworkLayer ptNetworkLayer) {
 		//Displays a quick visualization of links with from- and to- nodes
 		for (Link l : ptNetworkLayer.getLinks().values()) {

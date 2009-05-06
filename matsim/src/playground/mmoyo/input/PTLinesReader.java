@@ -14,7 +14,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import playground.mmoyo.PTRouter.PTLine;
 
-
 /** 
  * Parses the xml file of PTLines
  *

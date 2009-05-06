@@ -3,6 +3,7 @@ package playground.mmoyo.PTCase2;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.TravelTime;
 import playground.mmoyo.Validators.CostValidator;
+import playground.mmoyo.PTRouter.PTNode;
 
 public class PTTravelTime implements TravelTime {
 	double walkSpeed =  Walk.walkingSpeed();
@@ -25,8 +26,8 @@ public class PTTravelTime implements TravelTime {
 	
 	public double getLinkTravelTime(Link link, double time) {
 		double travelTime=0;
-		String type = link.getType();
 		
+		String type = link.getType();
 		if (type.equals("Transfer")){
 			travelTime= transferTime(link,time); 
 		}else if (type.equals("Walking")){
@@ -38,31 +39,10 @@ public class PTTravelTime implements TravelTime {
 		}else if (type.equals("DetTransfer")){
 			double walkTime=link.getLength()* walkSpeed;
 			double waitingTime= ptTimeTable.GetTransferTime(link.getToNode().getId(), time+walkTime);
-			travelTime= walkTime + waitingTime ; 
-
+			travelTime= walkTime + waitingTime; 
 			
-			
-			//double waitingTime= transferTime(link, (time+walkTime));			
-			//Fix this
-			//Link nextLink= getNextLink(link);  this was moved to ptlink
-			//double waitingTime= transferTime(nextLink, (time+walkTime)); 
-			//travelTime= walkTime + waitingTime;
-			
-			//-> pre-process this before and save it somewhere
-			/*
-			int numStandards =0;
-			for (Link outLink : link.getToNode().getOutLinks().values()) {
-				if (outLink.getType().equals("Standard")){
-					numStandards++;
-					double waitingTime= transferTime(outLink, (time+walkTime));
-					travelTime= walkTime + waitingTime;
-				}
-			}
-			
-			if (numStandards>1)
-				throw new java.lang.NullPointerException(link.getId() + "DetLink has no valid outLinks");
-			travelTime= walkTime+ 600;
-		*/
+			//--> decide if the departures will be saved in map or in Node
+		
 
 		}
 		return travelTime;

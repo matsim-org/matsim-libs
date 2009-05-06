@@ -2,6 +2,7 @@ package playground.mmoyo.PTCase2;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
@@ -15,7 +16,7 @@ import playground.mmoyo.PTRouter.*;
 
 public class PTTimeTable2{
 	private PTLinesReader2 ptLinesReader = new PTLinesReader2();
-	private List<PTLine> ptLineList; //= new ArrayList<PTLine>();
+	private List<PTLine> ptLineList; // = new ArrayList<PTLine>();
 	private Map<Id,Double> linkTravelTimeMap = new TreeMap<Id,Double>();
 	private Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
 	private Map <Id, Link> nextLinkMap = new TreeMap <Id, Link>();
@@ -50,7 +51,7 @@ public class PTTimeTable2{
 				minuteMap.put(idNode, minAfterDep);
 
 				//Fills the map with arrivals for every node
-				//Double[] departuresArray =ptLine.getDepartures().toArray(new Double[ptLine.getDepartures().size()]);
+				//double[] departuresArray =ptLine.getDepartures().toArray(new double[ptLine.getDepartures().size()]);
 				double[] departuresArray =new double[ptLine.getDepartures().size()];					
 				int y=0;
 				
@@ -142,24 +143,7 @@ public class PTTimeTable2{
 		
 }
 
-/*
- * 
- * //
-	public double nextDeparture999(Id idPTNode,  double dblTime){//,
-		//return dblTime +1;
-		
-		double[]arrDep= nodeDeparturesMap.get(idPTNode);
-		int x=0;
-		while (arrDep[x]<dblTime){
-			x++;
-			if (x==arrDep.length){ //
-				return arrDep[0];
-			}
-		}
-		return arrDep[x];
-	}
- * 
- */
+
 /* ******************************
  * Time Methods
 

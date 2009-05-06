@@ -34,4 +34,36 @@ public class StationValidator {
 		return true;
 	}
 	
+	
+	public void validateIds(final NetworkLayer netDiv){
+		int x=0;
+		int diferent = 0;
+		for (Node node: net.getNodes().values()){
+			
+			String idStation = ((playground.mmoyo.PTRouter.PTNode)node).getStrIdStation();
+			int intId = Integer.valueOf(idStation);
+
+			if (intId< 106699 || intId > 106699){
+				diferent++;
+				for (Node divNode: netDiv.getNodes().values()){
+					if (node.getCoord().equals(divNode.getCoord())){
+						System.out.println("Corregible " + x++);
+					}
+				}
+			}
+			System.out.println("diferent " + diferent);
+			
+			
+			//Coord coord = node.getCoord();
+			
+			//find the correct id database;
+			//correct it
+			
+			//print the changes in screen or log file
+		}
+	}
+
+	
+	
+	
 }

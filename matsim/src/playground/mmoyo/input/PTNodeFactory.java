@@ -48,11 +48,11 @@ public class PTNodeFactory {
 		BasicNode[] pair = new BasicNode[2];
 		
 		Coord newCoord = basicNode.getCoord();	    		
-		String strBaseId = basicNode.getId().toString();
-		String strNode1 = "~" + strBaseId;
-		String strNode2 = "_" + strBaseId;
+		String strIdStation = basicNode.getId().toString();
+		String strNode1 = "~" + strIdStation;
+		String strNode2 = "_" + strIdStation;
 		
-		List <Id> list = this.ptStation.getIntersecionMap().get(strBaseId);
+		List <Id> list = this.ptStation.getIntersecionMap().get(strIdStation);
 		if(list != null){
     		Id firstId= list.get(0);
     		Coord coord = net.getNode(firstId).getCoord();
@@ -80,16 +80,17 @@ public class PTNodeFactory {
     		strNode2 = strNode2 + nextChar;
 		}
 
-		pair[0]= insertNode(strNode1, newCoord);
-		pair[1]=  insertNode(strNode2, newCoord);
+		pair[0]= insertNode(strIdStation, strNode1, newCoord);
+		pair[1]=  insertNode(strIdStation, strNode2, newCoord);
 		//System.out.println(pair[0].getId() + ", "  + pair[1].getId());
 
 		return pair;
 	}
 
-	private BasicNode insertNode(String strId, Coord coord){
+	private BasicNode insertNode(String strIdStation, String strId, Coord coord){
 		Id idPTNode = new IdImpl(strId);
 		PTNode ptNode = new PTNode(idPTNode, coord, "");
+		ptNode.setIdStation(new IdImpl(strIdStation));
 		net.getNodes().put(idPTNode, ptNode);
 		return ptNode;
 	}
