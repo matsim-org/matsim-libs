@@ -81,4 +81,10 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 			return probs;
 		}
 
+		public void moveRetailersFacilities(
+				Map<Id, FacilityRetailersImpl> facilities) {
+			// TODO Auto-generated method stub
+			
+		}
+
 }

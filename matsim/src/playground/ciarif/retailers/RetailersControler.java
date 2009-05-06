@@ -20,14 +20,14 @@
 package playground.ciarif.retailers;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 
 public class RetailersControler {
 	
     public static void main (final String[] args) { 
     	Controler controler = new Controler(args);
     	controler.addControlerListener(new RetailersLocationListener());
+    	controler.addControlerListener(new FacilitiesLoadCalculator(controler.getFacilityPenalties()));
     	controler.run();
-    	
-    	
     }
 }

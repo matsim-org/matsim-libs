@@ -26,4 +26,10 @@ public class RandomRetailerStrategy implements RetailerStrategy {
 			Utils.moveFacility(f,link,this.world);
 		}
 	}
+
+	public void moveRetailersFacilities(
+			Map<Id, FacilityRetailersImpl> facilities) {
+		// TODO Auto-generated method stub
+		
+	}
 }

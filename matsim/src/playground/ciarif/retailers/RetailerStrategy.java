@@ -8,4 +8,5 @@ import org.matsim.core.api.facilities.Facility;
 public interface RetailerStrategy {
 	
 	public void moveFacilities(Map<Id, Facility> facilities);
+	public void moveRetailersFacilities(Map<Id, FacilityRetailersImpl> facilities);
 }

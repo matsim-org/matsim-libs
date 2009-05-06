@@ -75,4 +75,10 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 		for (int i=0; i<utils.length; i++) { probs[i] = Math.exp(utils[i])/exp_sum;}
 		return probs;
 	}
+
+	public void moveRetailersFacilities(
+			Map<Id, FacilityRetailersImpl> facilities) {
+		// TODO Auto-generated method stub
+		
+	}
 }

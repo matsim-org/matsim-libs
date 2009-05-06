@@ -9,6 +9,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.world.World;
 
 public abstract class Utils {
+	
+	
 	private final static double EPSILON = 0.0001;
 	public static final void moveFacility(Facility f, BasicLinkImpl link, World world) {
 		double [] vector = new double[2];

@@ -145,11 +145,12 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 			Utils.setFacilityQuadTree(this.createFacilityQuadTree(controler));
 			
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
-			
+			int retailers_count = 0;
 			for (Retailer r : this.retailers.getRetailers().values()) {
+				log.info("The retailer " + r.getId() + " will try to relocate its facilities");
 				Map<Id,Facility> facs = r.runStrategy();
 				movedFacilities.putAll(facs); //fc TODO this is not true!!!! Only some of this facilities will really be moved!!!!!!!!!!! 
-				// probably is only slower and not incorrect but should be changed
+				// probably is not incorrect but slower and should be changed
 				System.out.println("moved facilities =" + facs);
 			}
 			
