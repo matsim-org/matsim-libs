@@ -202,24 +202,28 @@ public class LinkToLinkTravelTimeCalculator extends AbstractTravelTimeCalculator
 	 * @param data
 	 */
 	private void consolidateData(final DataContainer data) {
-		TravelTimeData r = data.ttData;
-		double prevTravelTime = r.getTravelTime(1, 0.0);
-		for (int i = 1; i < this.numSlots; i++) {
-			double time = r.getTravelTime(i, i * this.timeslice);
-			double minTime = prevTravelTime - this.timeslice;
-			if (time < minTime) {
-				r.addTravelTime(i, minTime);
-				prevTravelTime = minTime;
-			} else {
-				prevTravelTime = time;
+		synchronized(data) {
+			if (data.needsConsolidation) {
+				TravelTimeData r = data.ttData;
+				double prevTravelTime = r.getTravelTime(1, 0.0);
+				for (int i = 1; i < this.numSlots; i++) {
+					double time = r.getTravelTime(i, i * this.timeslice);
+					double minTime = prevTravelTime - this.timeslice;
+					if (time < minTime) {
+						r.addTravelTime(i, minTime);
+						prevTravelTime = minTime;
+					} else {
+						prevTravelTime = time;
+					}
+				}
+				data.needsConsolidation = false;
 			}
 		}
-		data.needsConsolidation = false;
 	}
 
 	private static class DataContainer {
 		/*package*/ final TravelTimeData ttData;
-		/*package*/ boolean needsConsolidation = false;
+		/*package*/ volatile boolean needsConsolidation = false;
 		
 		/*package*/ DataContainer(final TravelTimeData data) {
 			this.ttData = data;
