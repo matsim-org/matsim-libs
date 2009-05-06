@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgent;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -77,9 +78,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 		public void writeAgent(ExtendedPositionInfo pos, ByteBuffer out) {
 			String id = pos.getAgentId().toString();
-			out.putInt(id.length());
-			for (int i=0; i<id.length(); i++) out.putChar(id.charAt(i));
-			out.asCharBuffer().put(pos.getAgentId().toString());
+			ByteBufferUtils.putString(out, id);
 			out.putFloat((float)(pos.getEasting() - OTFServerQuad.offsetEast));
 			out.putFloat((float)(pos.getNorthing()- OTFServerQuad.offsetNorth));
 			out.putInt(pos.type);
@@ -100,12 +99,8 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 	}
 
-	protected char[] idBuffer = new char[100];
-
 	public void readAgent(ByteBuffer in, SceneGraph graph) {
-		int length = in.getInt();
-		idBuffer = new char[length];
-		for(int i=0;i<length;i++) idBuffer[i] = in.getChar();
+		String id = ByteBufferUtils.getString(in);
 		float x = in.getFloat();
 		float y = in.getFloat();
 		int type = in.getInt();
@@ -115,14 +110,12 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 			OTFDataSimpleAgent.Receiver drawer = null;
 			try {
-				drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgent.Receiver) graph.newInstance(agentReceiverClass);
-				drawer.setAgent(idBuffer, x, y, type, user, speed);
+				drawer = (OTFDataSimpleAgent.Receiver) graph.newInstance(agentReceiverClass);
+				drawer.setAgent(id.toCharArray(), x, y, type, user, speed);
 				agents.add(drawer);
 			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} //factoryAgent.getOne();
 
@@ -169,9 +162,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 		@Override
 		public void readAgent(ByteBuffer in, SceneGraph graph) {
-			int length = in.getInt();
-			idBuffer = new char[length];
-			for(int i=0;i<length;i++) idBuffer[i] = in.getChar();
+			String id = ByteBufferUtils.getString(in);
 			float x = in.getFloat();
 			float y = in.getFloat();
 			int state = in.getInt();
@@ -181,13 +172,11 @@ public class OTFAgentsListHandler extends OTFDataReader {
 				OTFDataSimpleAgent.Receiver drawer = null;
 				try {
 					drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgent.Receiver) graph.newInstance(agentReceiverClass);
-					drawer.setAgent(idBuffer, x, y, 0, state, color);
+					drawer.setAgent(id.toCharArray(), x, y, 0, state, color);
 					agents.add(drawer);
 				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} //factoryAgent.getOne();
 				// at this version, only userdata was defined... aka state

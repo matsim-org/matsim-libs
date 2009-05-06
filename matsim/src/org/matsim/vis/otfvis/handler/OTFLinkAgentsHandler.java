@@ -33,6 +33,7 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgent;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -64,8 +65,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 		public void writeAgent(PositionInfo pos, ByteBuffer out) {
 			String id = pos.getAgentId().toString();
-			out.putInt(id.length());
-			for (int i=0; i<id.length(); i++) out.putChar(id.charAt(i));
+			ByteBufferUtils.putString(out, id);
 			out.putFloat((float)(pos.getEasting() - OTFServerQuad.offsetEast));
 			out.putFloat((float)(pos.getNorthing()- OTFServerQuad.offsetNorth));
 			if (pos.getVehicleState()== VehicleState.Parking) {
@@ -136,14 +136,15 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	
 	
 	public void readAgent(ByteBuffer in, SceneGraph graph) {
-		int length = in.getInt();
-		if(length > 100) {
-			log.warn("Agent could not be read fully from stream");
-			return;
-		}
-		
-		char[] idBuffer = new char[length];
-		for(int i=0;i<length;i++) idBuffer[i] = in.getChar();
+		String id = ByteBufferUtils.getString(in);
+//		int length = in.getInt();
+//		if(length > 100) {
+//			log.warn("Agent could not be read fully from stream");
+//			return;
+//		}
+//		
+//		char[] idBuffer = new char[length];
+//		for(int i=0;i<length;i++) idBuffer[i] = in.getChar();
 		float x = in.getFloat();
 		float y = in.getFloat();
 		int state = in.getInt();
@@ -155,7 +156,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		OTFDataSimpleAgent.Receiver drawer = null;
 		try {
 			drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgent.Receiver) graph.newInstance(agentReceiverClass);
-			drawer.setAgent(idBuffer, x, y, 0, state, color);
+			drawer.setAgent(id.toCharArray(), x, y, 0, state, color);
 			agents.add(drawer);
 		} catch (InstantiationException e) {
 			log.warn("Agent drawer could not be instanciated");

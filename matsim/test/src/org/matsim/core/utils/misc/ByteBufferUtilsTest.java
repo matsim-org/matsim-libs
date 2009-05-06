@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * ByteBufferUtilsTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,21 +20,35 @@
 
 package org.matsim.core.utils.misc;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.nio.ByteBuffer;
 
-public class AllTests {
+import org.matsim.testcases.MatsimTestCase;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
-		//$JUnit-BEGIN$
-		suite.addTestSuite(ArgumentParserTest.class);
-		suite.addTestSuite(ByteBufferUtilsTest.class);
-		suite.addTestSuite(NetworkUtilsTest.class);
-		suite.addTestSuite(StringUtilsTest.class);
-		suite.addTestSuite(TimeTest.class);
-		//$JUnit-END$
-		return suite;
+/**
+ * @author mrieser
+ */
+public class ByteBufferUtilsTest extends MatsimTestCase {
+
+	/**
+	 * Tests {@link ByteBufferUtils#putString(java.nio.ByteBuffer, String)} and
+	 * {@link ByteBufferUtils#getString(java.nio.ByteBuffer)}. 
+	 */
+	public void testPutGetString() {
+		final ByteBuffer buffer = ByteBuffer.allocate(100);
+		buffer.putInt(5);
+		ByteBufferUtils.putString(buffer, "foo bar");
+		buffer.putChar('?');
+		ByteBufferUtils.putString(buffer, "Hello World");
+		buffer.putChar('!');
+		
+		buffer.flip();
+		
+		assertEquals(5, buffer.getInt());
+		assertEquals("foo bar", ByteBufferUtils.getString(buffer));
+		assertEquals('?', buffer.getChar());
+		assertEquals("Hello World", ByteBufferUtils.getString(buffer));
+		assertEquals('!', buffer.getChar());
+		assertFalse(buffer.hasRemaining());
 	}
-
+	
 }
