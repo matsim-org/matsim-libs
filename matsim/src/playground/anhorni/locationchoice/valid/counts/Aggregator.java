@@ -76,13 +76,26 @@ public class Aggregator {
 			List<Double> filteredVolumes = new Vector<Double>();		
 			List<Double> volumesTemp = volumes.get(hour);
 			Collections.sort(volumesTemp);
-						
+			
+			//	This exactly reproduces the former PERL script
+			//			
+			//			int numberOfElements = volumesTemp.size();
+			//			int numberOfElements2Remove = (int)Math.ceil(numberOfElements * 0.05);
+			//
+			//			if (volumesTemp.size() > 0) {			
+			//				filteredVolumes.addAll(volumesTemp.subList(
+			//						(int)Math.ceil(numberOfElements2Remove/2.0), (int)Math.floor(numberOfElements - numberOfElements2Remove/2.0)));	
+			//				
+			//				volumes.get(hour).clear();
+			//				volumes.get(hour).addAll(filteredVolumes);
+			//			}
+			
 			int numberOfElements = volumesTemp.size();
-			int numberOfElements2RemovePerSide = (int)Math.ceil(numberOfElements * 0.05 /2.0);
+			int numberOfElements2RemovePerSide = (int)Math.round(numberOfElements * 0.05 / 2.0);
 
 			if (volumesTemp.size() > 0) {			
 				filteredVolumes.addAll(volumesTemp.subList(
-						numberOfElements2RemovePerSide, (int)Math.floor(numberOfElements - 1 - numberOfElements2RemovePerSide)));	
+						numberOfElements2RemovePerSide, (int)Math.round(numberOfElements - 1 - numberOfElements2RemovePerSide)));	
 				
 				volumes.get(hour).clear();
 				volumes.get(hour).addAll(filteredVolumes);
