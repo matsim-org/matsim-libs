@@ -30,6 +30,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,13 +45,10 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.executables.OTFVisController;
-import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
-import org.matsim.vis.otfvis.interfaces.OTFServerRemote.TimePreference;
 
 public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServerRemote{
 
@@ -86,6 +84,8 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private final Map<String, QuadStorage> quads = new HashMap<String, QuadStorage>();
 	protected final Set<String> updateThis = new HashSet<String>();
 	protected final Set<OTFQuery> queryThis = new HashSet<OTFQuery>();
+	private final List<OTFDataWriter> additionalElements= new LinkedList<OTFDataWriter>();
+
 
 //	private final OTFNetHandler handler = null;
 	private transient Population pop = null;
@@ -302,6 +302,9 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		OTFDataWriter.setServer(this);
 
 		quad.fillQuadTree(connect);
+		
+		for(OTFDataWriter writer : additionalElements) quad.addAdditionalElement(writer);
+		
 		return quad;
 	}
 
@@ -419,5 +422,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			break;
 		}
 	}
+	
+	public void addAdditionalElement(OTFDataWriter element) {
+		this.additionalElements.add(element);
+	}
+
 	
 }
