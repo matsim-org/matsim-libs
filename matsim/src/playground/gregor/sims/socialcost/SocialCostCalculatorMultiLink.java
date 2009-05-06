@@ -209,7 +209,9 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 				double tmp = tauAk + k * this.binSize;
 				Integer slot = getTimeBin(tmp);
 				LinkTimeCostInfo ltc2 = li.getLinkTimeCostInfo(slot);
-				ltc.c2 /= ltc2.out; 
+				if (ltc2 != null && ltc2.out > 0){
+					ltc.c2 /= ltc2.out; 
+				}
 			}
 		}
 	}
