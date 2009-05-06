@@ -91,7 +91,7 @@ public class Template implements MatsimModule {
 		// *** ConfigGroup *********************
 		
 		Module templateModule = new Module("Template");
-		c.getConfig().addModule("Template", templateModule); // problem: must be called before Controler is fully initialized
+		c.getConfig().addModule("Template", templateModule); // problem: must be called before Controler is fully initialized, but cannot because than its not yet clear which modules need to be laoded. so, could be fixed in Config.java.
 		
 		
 		
