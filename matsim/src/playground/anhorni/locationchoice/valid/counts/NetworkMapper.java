@@ -60,7 +60,14 @@ public class NetworkMapper {
 				
 				String[] entries = curr_line.split("\t", -1);											
 				String dataset = entries[0].trim();
-				int nr = Integer.parseInt(entries[1].trim());
+							
+				String nr = entries[1].trim();
+				if (nr.length() == 1) {
+					nr = "00" + nr;
+				}
+				else if (nr.length()==2) {
+					nr = "0" + nr;
+				}
 				
 				String direction = entries[2].trim();
 				String linkidTeleatlas = entries[4].trim();

@@ -48,7 +48,7 @@ public class CountsReaderYear {
 					
 					String[] entries = curr_line.split("\t", -1);											
 					String dataset = entries[0].trim();
-					int nr = Integer.parseInt(entries[1].trim());
+					String nr = entries[1].trim();
 					String year = entries[3].trim();
 					String month = entries[4].trim();
 					String day = entries[5].trim();

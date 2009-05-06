@@ -78,11 +78,11 @@ public class Aggregator {
 			Collections.sort(volumesTemp);
 						
 			int numberOfElements = volumesTemp.size();
-			int numberOfElements2RemovePerSide = (int)Math.round(numberOfElements * 0.05 /2.0);
+			int numberOfElements2RemovePerSide = (int)Math.ceil(numberOfElements * 0.05 /2.0);
 
 			if (volumesTemp.size() > 0) {			
 				filteredVolumes.addAll(volumesTemp.subList(
-						numberOfElements2RemovePerSide, (int)Math.round(numberOfElements - 1 - numberOfElements2RemovePerSide)));	
+						numberOfElements2RemovePerSide, (int)Math.floor(numberOfElements - 1 - numberOfElements2RemovePerSide)));	
 				
 				volumes.get(hour).clear();
 				volumes.get(hour).addAll(filteredVolumes);
