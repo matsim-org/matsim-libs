@@ -288,7 +288,7 @@ implements MouseWheelListener{
 
 	public void updateBounds() {
 		Point3f p1 = getOGLPos(viewport[0], viewport[1]);
-		Point3f p2 = getOGLPos(viewport[2], viewport[3]);
+		Point3f p2 = getOGLPos(viewport[0]+viewport[2], viewport[1]+viewport[3]);
 		viewBounds =  new QuadTree.Rect(p1.x, p1.y, p2.x, p2.y);
 	}
 
