@@ -47,7 +47,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 	private final double discount;
 	
 
-	private final static int MSA_OFFSET = 0;
+	private final static int MSA_OFFSET = 20;
 	
 	public SocialCostCalculatorMultiLink(NetworkLayer network, int binSize,AbstractTravelTimeCalculator travelTimeCalculator, Population population) {
 		this.network = network;
@@ -202,6 +202,15 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 				ltc.c2 =  last + delay;  
 				ltc.c1 = Math.max(0, (kE-k)*this.binSize - tauAFree);
 			}
+			for (int k = 0; k <= this.maxK; k++) {
+				Integer kInteger = IntegerCache.getInteger(k);
+				LinkTimeCostInfo ltc = li.getLinkTimeCostInfo(kInteger);
+				double tauAk = this.travelTimeCalculator.getLinkTravelTime(link, k*this.binSize);
+				double tmp = tauAk + k * this.binSize;
+				Integer slot = getTimeBin(tmp);
+				LinkTimeCostInfo ltc2 = li.getLinkTimeCostInfo(slot);
+				ltc.c2 /= ltc2.out; 
+			}
 		}
 	}
 
@@ -209,6 +218,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 		double agentDelay = 0;
 		for (int i = links.size()-1; i >= 0; i--) {
 			Id linkId = links.get(i);
+			Link link = this.network.getLink(linkId);
 			LinkInfo li = this.linkInfos.get(linkId); //Direct access
 			Double enterTime = li.getAgentEnterTime(agentId);
 			if (enterTime == null) {
@@ -219,13 +229,15 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 			LinkTimeCostInfo ltc = li.getLinkTimeCostInfo(timeBin);
 			ltc.linkDelay += agentDelay;
 			double tau = this.travelTimeCalculator.getLinkTravelTime(this.network.getLink(linkId),enterTime);
+			double tauAFree = Math.ceil(link.getFreespeedTravelTime(enterTime));
 			
-			Integer timeBin2 = getTimeBin(this.binSize*timeBin + tau);
-			LinkTimeCostInfo ltc2 = li.getLinkTimeCostInfo(timeBin2);
-			
-			if (ltc2 != null && ltc2.out > 0){
-				agentDelay = this.discount * agentDelay + ((double)ltc.in/this.binSize - (double)ltc.out/this.binSize) / ((double)ltc2.out/this.binSize);
-			} 
+			if (tau > tauAFree){			
+				Integer timeBin2 = getTimeBin(this.binSize*timeBin + tau);
+				LinkTimeCostInfo ltc2 = li.getLinkTimeCostInfo(timeBin2);
+				if (ltc2 != null && ltc2.out > 0){
+					agentDelay = this.discount * agentDelay + ((double)ltc.in/this.binSize - (double)ltc.out/this.binSize) / ((double)ltc2.out/this.binSize);
+				} 
+			}
 		}
 		AgentMoneyEvent e = new AgentMoneyEvent(this.maxK * this.binSize,agentId,agentDelay/-600);
 		QueueSimulation.getEvents().processEvent(e);
