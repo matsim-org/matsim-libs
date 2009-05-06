@@ -585,6 +585,7 @@ public class QueueSimulation {
 		if (time >= this.snapshotPeriod) {
 			doSnapshot(time);
 		}
+		this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
 	}
 
 	private void doSnapshot(final double time) {

@@ -17,11 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.mobsim.queuesim.listener;
 
 import javax.swing.event.EventListenerList;
 
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEventImpl;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEventImpl;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
@@ -30,20 +33,18 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEventImp
 /**
  * Helper for the QueueSimulation to manage their listeners and fire
  * QueueSimulationEvents.
- * @author dgrether
  *
+ * @author dgrether
  */
 public class QueueSimListenerManager {
 	
-	private QueueSimulation queuesim;
-	
+	private final QueueSimulation queuesim;
+
 	private final EventListenerList listenerList = new EventListenerList();
-	
-	
+
 	public QueueSimListenerManager(QueueSimulation qsim){
 		this.queuesim = qsim;
 	}
-	
 	
 	@SuppressWarnings("unchecked")
 	public void addQueueSimulationListener(final QueueSimulationListener l) {
@@ -64,7 +65,7 @@ public class QueueSimListenerManager {
 			}
 		}
 	}
-	
+
 	/**
 	 * Creates the event and notifies all listeners
 	 */
@@ -75,8 +76,20 @@ public class QueueSimListenerManager {
     	listener[i].notifySimulationInitialized(event);
     }
 	}
-	
-	
+
+	/**
+	 * Creates the event and notifies all listeners
+	 * 
+	 * @param simTime the current time in the simulation
+	 */
+	public void fireQueueSimulationAfterSimStepEvent(final double simTime) {
+		QueueSimulationAfterSimStepEvent event = new QueueSimulationAfterSimStepEventImpl(queuesim, simTime);
+		QueueSimulationAfterSimStepListener[] listener = this.listenerList.getListeners(QueueSimulationAfterSimStepListener.class);
+		for (int i = 0; i < listener.length; i++) {
+			listener[i].notifySimulationAfterSimStep(event);
+		}
+	}
+
 	/**
 	 * Creates the event and notifies all listeners
 	 */
@@ -87,6 +100,5 @@ public class QueueSimListenerManager {
 			listener[i].notifySimulationBeforeCleanup(event);
 		}
 	}
-	
 
 }

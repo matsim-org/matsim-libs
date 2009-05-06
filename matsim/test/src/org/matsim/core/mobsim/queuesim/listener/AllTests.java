@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.core.mobsim.queuesim.listener;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -28,11 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
-		suite.addTestSuite(QueueLinkTest.class);
-		suite.addTestSuite(QueueSimulationTest.class);
-		suite.addTestSuite(TravelTimeTest.class);
-		
-		suite.addTest(org.matsim.core.mobsim.queuesim.listener.AllTests.suite());
+		suite.addTestSuite(QueueSimulationAfterSimStepListenerTest.class);
 		//$JUnit-END$
 		return suite;
 	}

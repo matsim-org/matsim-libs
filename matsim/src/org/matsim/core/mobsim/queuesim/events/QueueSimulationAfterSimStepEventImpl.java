@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * QueueSimulationBeforeCleanupEventImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.mobsim.queuesim.events;
 
-package org.matsim.core.mobsim.queuesim;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
-public class AllTests {
+/**
+ * Default implementation of {@link QueueSimulationAfterSimStepEvent}.
+ * 
+ * @author mrieser
+ */
+public class QueueSimulationAfterSimStepEventImpl
+		extends AbstractQueueSimulationEvent implements QueueSimulationAfterSimStepEvent {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
-		//$JUnit-BEGIN$
-		suite.addTestSuite(QueueLinkTest.class);
-		suite.addTestSuite(QueueSimulationTest.class);
-		suite.addTestSuite(TravelTimeTest.class);
-		
-		suite.addTest(org.matsim.core.mobsim.queuesim.listener.AllTests.suite());
-		//$JUnit-END$
-		return suite;
+	private final double simTime;
+	
+	public QueueSimulationAfterSimStepEventImpl(final QueueSimulation queuesim, final double simTime) {
+		super(queuesim);
+		this.simTime = simTime;
+	}
+
+	public double getSimulationTime() {
+		return this.simTime;
 	}
 
 }

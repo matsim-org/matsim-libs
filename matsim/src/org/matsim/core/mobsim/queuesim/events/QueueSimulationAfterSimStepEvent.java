@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * QueueSimulationBeforeCleanupEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.mobsim.queuesim.events;
 
-package org.matsim.core.mobsim.queuesim;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+/**
+ * A simple interface for QueueSimulationEvents that are fired for every time step.
+ * 
+ * @author mrieser
+ */
+public interface QueueSimulationAfterSimStepEvent extends QueueSimulationEvent {
 
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
-		//$JUnit-BEGIN$
-		suite.addTestSuite(QueueLinkTest.class);
-		suite.addTestSuite(QueueSimulationTest.class);
-		suite.addTestSuite(TravelTimeTest.class);
-		
-		suite.addTest(org.matsim.core.mobsim.queuesim.listener.AllTests.suite());
-		//$JUnit-END$
-		return suite;
-	}
+	public double getSimulationTime();
 
 }
