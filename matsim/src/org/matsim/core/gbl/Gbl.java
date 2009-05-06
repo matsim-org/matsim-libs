@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReaderMatsimV1;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.matrices.Matrices;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
@@ -151,6 +152,7 @@ public abstract class Gbl {
 		Gbl.world = null;
 		Matrices.reset();
 		MatsimRandom.reset();
+		SimulationTimer.reset();
 	}
 
 	public static final void printMemoryUsage() {
