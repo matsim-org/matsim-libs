@@ -46,6 +46,9 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.ArgumentParser;
 
 /**
+ * ensures only links in a rectangle that could be passed over by the plans can
+ * be retained in the network.
+ * 
  * @author yu
  * 
  */
