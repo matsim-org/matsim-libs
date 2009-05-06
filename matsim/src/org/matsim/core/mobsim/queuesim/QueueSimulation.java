@@ -112,7 +112,7 @@ public class QueueSimulation {
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
-	private static PriorityQueue<Tuple<Double, DriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, DriverAgent>>(30, new TeleportationArrivalTimeComparator());
+	private final PriorityQueue<Tuple<Double, DriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, DriverAgent>>(30, new TeleportationArrivalTimeComparator());
 	
 	private final Date starttime = new Date();
 
@@ -528,7 +528,7 @@ public class QueueSimulation {
 			DriverAgent agent = entry.getSecond();
 			events.processEvent(new AgentStuckEvent(now, agent.getPerson(), agent.getDestinationLink(), agent.getCurrentLeg()));
 		}
-		QueueSimulation.teleportationList.clear();
+		this.teleportationList.clear();
 
 		for (DriverAgent agent : this.activityEndsList) {
 			events.processEvent(new AgentStuckEvent(now, agent.getPerson(), agent.getDestinationLink(), agent.getCurrentLeg()));
@@ -617,9 +617,9 @@ public class QueueSimulation {
 		QueueSimulation.events = events;
 	}
 
-	private static final void handleUnknownLegMode(final DriverAgent agent) {
+	private final void handleUnknownLegMode(final DriverAgent agent) {
 		double arrivalTime = SimulationTimer.getTime() + agent.getCurrentLeg().getTravelTime();
-		teleportationList.add(new Tuple<Double, DriverAgent>(arrivalTime, agent));
+		this.teleportationList.add(new Tuple<Double, DriverAgent>(arrivalTime, agent));
 	}
 
 	private final void moveVehiclesWithUnknownLegMode(final double now) {
@@ -716,7 +716,7 @@ public class QueueSimulation {
 			}
 		} else {
 			// unknown leg mode
-			QueueSimulation.handleUnknownLegMode(agent);
+			this.handleUnknownLegMode(agent);
 		}
 	}
 
