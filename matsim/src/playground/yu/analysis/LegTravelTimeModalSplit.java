@@ -67,7 +67,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 
 	protected final Population plans;
 
-	private RoadPricingScheme toll = null;
+	protected RoadPricingScheme toll = null;
 
 	protected final int binSize;
 

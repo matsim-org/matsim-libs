@@ -90,7 +90,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		Controler ctl = new ChangeLegModeWithParkLocationControler(args);
 		ctl.addControlerListener(new LegChainModesListener());
 		ctl.setCreateGraphs(false);
-		ctl.setWriteEventsInterval(0);
+//		ctl.setWriteEventsInterval(0);
 		ctl
 				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
 						config.charyparNagelScoring()));

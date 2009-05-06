@@ -6,6 +6,13 @@ package playground.yu.analysis.forZrh;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingScheme;
 
@@ -33,15 +40,16 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 	}
 
 	public LegTravelTimeModalSplit4Zrh(int binSize, Population plans) {
-		super(binSize, plans);
+		this(binSize, 30 * 3600 / binSize + 1, plans);
 	}
 
 	public LegTravelTimeModalSplit4Zrh(Population ppl, RoadPricingScheme toll) {
-		super(ppl, toll);
+		this(ppl);
+		this.toll = toll;
 	}
 
 	public LegTravelTimeModalSplit4Zrh(Population plans) {
-		super(plans);
+		this(300, plans);
 	}
 
 	@Override
@@ -145,6 +153,55 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 						+ "the number of all the through-traffic Trips: "
 						+ nOtherTrips);
 		sw.close();
+	}
+
+	public static void main(final String[] args) {
+		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+		final String eventsFilename = "../matsimTests/changeLegModeTests/500.events.txt.gz";
+		final String plansFilename = "../matsimTests/changeLegModeTests/500.plans.xml.gz";
+		String outputFilename = "../matsimTests/changeLegModeTests/500.legTravelTime.txt";
+		String chartFilename = "../matsimTests/changeLegModeTests/";
+		// String tollFilename =
+		// "../schweiz-ivtch-SVN/baseCase/roadpricing/KantonZurich/KantonZurich.xml";
+
+		Gbl.startMeasurement();
+		// Gbl.createConfig(null);
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFilename);
+
+		Population population = new PopulationImpl();
+		System.out.println("-->reading plansfile: " + plansFilename);
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
+
+		// RoadPricingReaderXMLv1 tollReader = new
+		// RoadPricingReaderXMLv1(network);
+		// try {
+		// tollReader.parse(tollFilename);
+		// } catch (SAXException e) {
+		// e.printStackTrace();
+		// } catch (ParserConfigurationException e) {
+		// e.printStackTrace();
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
+
+		Events events = new Events();
+
+		LegTravelTimeModalSplit lttms = new LegTravelTimeModalSplit(population
+		// ,tollReader.getScheme()
+				, null);
+		events.addHandler(lttms);
+
+		System.out.println("-->reading evetsfile: " + eventsFilename);
+		new MatsimEventsReader(events).readFile(eventsFilename);
+
+		lttms.write(outputFilename);
+		lttms.writeCharts(chartFilename);
+
+		System.out.println("--> Done!");
+		Gbl.printElapsedTime();
+		System.exit(0);
 	}
 
 }
