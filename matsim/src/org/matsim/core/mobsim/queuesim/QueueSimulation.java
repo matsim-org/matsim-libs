@@ -578,7 +578,7 @@ public class QueueSimulation {
 			Gbl.printMemoryUsage();
 		}
 
-		return Simulation.isLiving() && (this.stopTime >= time);
+		return Simulation.isLiving() && (this.stopTime > time);
 	}
 
 	protected void afterSimStep(final double time) {
