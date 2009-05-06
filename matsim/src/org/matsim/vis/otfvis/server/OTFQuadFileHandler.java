@@ -449,6 +449,7 @@ public class OTFQuadFileHandler {
 			// );
 			if (this.id == null)
 				readQuad();
+				readConnect(connect);
 			if ((id != null) && !id.equals(this.id))
 				throw new RemoteException(
 						"id does not match, set id to NULL will match ALL!");
