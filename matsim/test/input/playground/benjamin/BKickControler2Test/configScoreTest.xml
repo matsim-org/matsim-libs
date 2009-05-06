@@ -12,7 +12,7 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="../studies/bkickhoefer/scoreTest/plansScoreTest.xml" />
+		<param name="inputPlansFile" value="../studies/bkickhoefer/scoreTest/plansScoreTestV4.xml" />
 	</module>
 
 	<module name="controler">

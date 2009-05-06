@@ -44,7 +44,7 @@ public class BKickControler2Test extends MatsimTestCase {
 		Config config = this.loadConfig(this.getClassInputDirectory() + "configScoreTest.xml");
 		String netFileName = this.getClassInputDirectory() + "network.xml";
 		config.network().setInputFile(netFileName);
-		config.plans().setInputFile(this.getClassInputDirectory() + "plansScoreTest.xml");
+		config.plans().setInputFile(this.getClassInputDirectory() + "plansScoreTestV4.xml");
 
 		final BKickControler2 controler = new BKickControler2(config);
 		controler.setCreateGraphs(false);

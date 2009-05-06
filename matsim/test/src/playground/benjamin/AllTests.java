@@ -26,7 +26,7 @@ public class AllTests {
 
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for playground.benjamin...");
-//		suite.addTestSuite(BKickControler2Test.class);
+		suite.addTestSuite(BKickControler2Test.class);
 		return suite;
 	}
 
