@@ -20,6 +20,7 @@
 
 package org.matsim.examples;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -36,6 +37,9 @@ public class PlanomatRunTest extends MatsimTestCase {
 	}
 
 	private void runControlerTest(final Config config) {
+		
+		final Logger logger = Logger.getLogger(PlanomatRunTest.class);
+		
 		config.controler().setOutputDirectory(this.getOutputDirectory());
 		Controler testee = new Controler(config);
 		testee.setCreateGraphs(false);
@@ -45,6 +49,7 @@ public class PlanomatRunTest extends MatsimTestCase {
 		// actual test: compare checksums of the files
 		final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + "plans.xml.gz");
 		final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + "output_plans.xml.gz");
+		logger.info("Actual checksum: " + Long.toString(actualChecksum));
 		assertEquals("different plans files.", expectedChecksum, actualChecksum);
 	}
 	
