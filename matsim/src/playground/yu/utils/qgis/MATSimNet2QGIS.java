@@ -173,11 +173,11 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	public static void main(final String[] args) {
-		String netFilename = "../berlin data/newOSM/bb_cl.xml.gz";
+		String netFilename = "test/input/playground/yu/test/ChangeLegModeWithParkLocationTest/network.xml.gz";
 
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
 		mn2q.readNetwork(netFilename);
-		mn2q.setCrs("DHDN_GK4");
-		mn2q.writeShapeFile("../berlin data/newOSM/bb_cl.polygon.shp");
+		mn2q.setCrs(ch1903);
+		mn2q.writeShapeFile("../matsimTests/changeLegModeTests/network.shp");
 	}
 }
