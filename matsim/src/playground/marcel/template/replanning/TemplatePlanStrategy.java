@@ -20,12 +20,13 @@
 
 package playground.marcel.template.replanning;
 
+import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 public class TemplatePlanStrategy extends PlanStrategy {
 
-	public TemplatePlanStrategy() {
+	public TemplatePlanStrategy(BasicScenario scenario) {
 		super(new RandomPlanSelector());
 		this.addStrategyModule(new TemplateStrategyModule());
 	}
