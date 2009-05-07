@@ -20,19 +20,20 @@
 
 package org.matsim.core.trafficmonitoring;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.utils.misc.IntegerCache;
 
 public class TravelTimeDataHashMap implements TravelTimeData {
-	private final HashMap<Integer,TimeStruct> travelTimes;
+	private final Map<Integer,TimeStruct> travelTimes;
 	
 	private final Link link;
 
 	public TravelTimeDataHashMap(final Link link, final int unused) {
 		// unused, must be there because of Prototype-Constructor
-		this.travelTimes =  new HashMap<Integer,TimeStruct>();
+		this.travelTimes =  new ConcurrentHashMap<Integer,TimeStruct>();
 		this.link = link;
 		resetTravelTimes();
 	}
@@ -49,7 +50,6 @@ public class TravelTimeDataHashMap implements TravelTimeData {
 		} else {
 			this.travelTimes.put(IntegerCache.getInteger(timeSlice), new TimeStruct(traveltime,1));
 		}
-		
 	}
 
 	public double getTravelTime(final int timeSlice, final double now) {
@@ -60,7 +60,6 @@ public class TravelTimeDataHashMap implements TravelTimeData {
 		}
 
 		return ts.timeSum / ts.cnt;
-
 	}
 
 	private static class TimeStruct {

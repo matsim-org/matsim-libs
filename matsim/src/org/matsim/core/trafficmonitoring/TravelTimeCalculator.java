@@ -113,22 +113,20 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	 * @param data
 	 */
 	private void consolidateData(final DataContainer data) {
-		synchronized(data) {
-			if (data.needsConsolidation) {
-				TravelTimeData r = data.ttData;
-				double prevTravelTime = r.getTravelTime(1, 0.0);
-				for (int i = 1; i < this.numSlots; i++) {
-					double time = r.getTravelTime(i, i * this.timeslice);
-					double minTime = prevTravelTime - this.timeslice;
-					if (time < minTime) {
-						r.addTravelTime(i, minTime);
-						prevTravelTime = minTime;
-					} else {
-						prevTravelTime = time;
-					}
+		if (data.needsConsolidation) {
+			TravelTimeData r = data.ttData;
+			double prevTravelTime = r.getTravelTime(1, 0.0);
+			for (int i = 1; i < this.numSlots; i++) {
+				double time = r.getTravelTime(i, i * this.timeslice);
+				double minTime = prevTravelTime - this.timeslice;
+				if (time < minTime) {
+					r.addTravelTime(i, minTime);
+					prevTravelTime = minTime;
+				} else {
+					prevTravelTime = time;
 				}
-				data.needsConsolidation = false;
 			}
+			data.needsConsolidation = false;
 		}
 	}
 
