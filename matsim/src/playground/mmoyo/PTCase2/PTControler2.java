@@ -129,7 +129,7 @@ public class PTControler2 {
 	    		break;
 	    	case 8:
 	    		playground.mmoyo.input.ToTransitScheduleConverter converter = new playground.mmoyo.input.ToTransitScheduleConverter();	    		
-
+	    		converter.createTransitSchedule(pt.getPtTimeTable(), path + "PtFacilities.xml", path + "transitSchedule.xml");
 	    		//converter.createFacilities("../shared-svn/studies/schweiz-ivtch/pt-experimental/PtFacilities.xml");
 	    		break;
 		}//switch
