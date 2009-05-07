@@ -53,6 +53,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.johannes.socialnet.spatial.SpatialGrid;
 import playground.johannes.statistics.WeightedStatistics;
 
 /**

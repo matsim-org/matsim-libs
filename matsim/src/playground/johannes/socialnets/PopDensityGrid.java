@@ -36,6 +36,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.johannes.socialnet.spatial.SpatialGrid;
+
 /**
  * @author illenberger
  *

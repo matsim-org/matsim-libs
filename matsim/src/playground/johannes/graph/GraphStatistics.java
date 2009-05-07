@@ -77,6 +77,7 @@ public class GraphStatistics {
 	 *            the graph to retrieve the degree statistics from.
 	 * @return A DescriptiveStatistics object containing the degree of each
 	 *         vertex in the graph.
+	 * @deprecated
 	 */
 	public static DescriptiveStatistics getDegreeStatistics(Graph g) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
@@ -94,30 +95,58 @@ public class GraphStatistics {
 	 * @return the degree distribution.
 	 */
 	public static WeightedStatistics getDegreeDistribution(Graph g) {
+		return getDegreeDistribution(g.getVertices());
+	}
+	
+	/**
+	 * Retrieves the degree distribution of vertices in <tt>vertices</tt>. The
+	 * graph is treated as undirected.
+	 * 
+	 * @param vertices
+	 *            a collection of vertices to retrieve the degree distribution
+	 *            from.
+	 * @return the degree distribution.
+	 */
+	public static WeightedStatistics getDegreeDistribution(Collection<? extends Vertex> vertices) {
 		WeightedStatistics stats = new WeightedStatistics();
-		for(Vertex v : g.getVertices())
+		for(Vertex v : vertices)
 			stats.add(v.getEdges().size());
 		return stats;
 	}
 	
 	/**
 	 * Calculates the local clustering coefficient of each vertex in graph
-	 * <tt>g</tt>. The local clustering coefficient is defined as:
-	 * <ul>
-	 * <li>C = 0 if k = 0 or k = 1,
-	 * <li>C = 2y/k*(k-1) if k > 1, where y is the number of edges connecting
-	 * neighbors of the vertex.
-	 * </ul>
+	 * <tt>g</tt>.
 	 * 
+	 * @see {@link #getLocalClusteringCoefficients(Collection)}
 	 * @param g
 	 *            the graph the local clustering coefficients are to be
 	 *            calculated.
 	 * @return an object-double map containing the vertex as key and the
 	 *         clustering coefficient as value.
 	 */
-	public static TObjectDoubleHashMap<? extends Vertex> getClustringCoefficients(Graph g) {
+	public static TObjectDoubleHashMap<? extends Vertex> getLocalClusteringCoefficients(Graph g) {
+		return getLocalClusteringCoefficients(g.getVertices());
+	}
+	
+	/**
+	 * Calculates the local clustering coefficient of each vertex in
+	 * <tt>vertices</tt>. The local clustering coefficient is defined as:
+	 * <ul>
+	 * <li>C = 0 if k = 0 or k = 1,
+	 * <li>C = 2y/k*(k-1) if k > 1, where y is the number of edges connecting
+	 * neighbors of the vertex.
+	 * </ul>
+	 * 
+	 * @param vertices
+	 *            a collection of vertices the local clustering coefficients are
+	 *            to be calculated.
+	 * @return an object-double map containing the vertex as key and the
+	 *         clustering coefficient as value.
+	 */
+	public static TObjectDoubleHashMap<? extends Vertex> getLocalClusteringCoefficients(Collection<? extends Vertex> vertices) {
 		TObjectDoubleHashMap<Vertex> cc = new TObjectDoubleHashMap<Vertex>();
-		for(Vertex v : g.getVertices()) {
+		for(Vertex v : vertices) {
 			int k = v.getEdges().size();
 			if(k == 0 || k == 1) {
 				cc.put(v, 0.0);
@@ -148,18 +177,55 @@ public class GraphStatistics {
 	 * Retrieves the clustering statistic of graph <tt>g</tt>.
 	 * 
 	 * @param g
-	 *            the grpah the clustering statistics are to be retrieved.
+	 *            the graph the clustering statistics are to be retrieved.
 	 * @return a DescriptiveStatistics object containing the local clustering
 	 *         coefficient for each vertex.
+	 * @deprecated
+	 * 
 	 */
 	public static DescriptiveStatistics getClusteringStatistics(Graph g) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
-		TObjectDoubleHashMap<? extends Vertex> cc = getClustringCoefficients(g);
+		TObjectDoubleHashMap<? extends Vertex> cc = getLocalClusteringCoefficients(g);
 		for(double d : cc.getValues())
 			stats.addValue(d);
 		return stats;
 	}
 	
+	/**
+	 * Retrieves the distribution of local clustering coefficients.
+	 * 
+	 * @param g
+	 *            the graph of which the local clustering distribution is
+	 *            obtained.
+	 * @return the distribution of local clustering coefficients.
+	 */
+	public static WeightedStatistics getLocalClusteringDistribution(Graph g) {
+		return getLocalClusteringDistribution(g.getVertices());
+	}
+	
+	/**
+	 * Retrieves the distribution of local clustering coefficients.
+	 * 
+	 * @param vertices
+	 *            a collection of vertices of which the local clustering distribution is
+	 *            obtained.
+	 * @return the distribution of local clustering coefficients.
+	 */
+	public static WeightedStatistics getLocalClusteringDistribution(Collection<? extends Vertex> vertices) {
+		WeightedStatistics stats = new WeightedStatistics();
+		stats.addAll(getLocalClusteringCoefficients(vertices).getValues());
+		return stats;
+	}
+	
+	/**
+	 * Calculates the global clustering coefficient, which is defined as the
+	 * three times the number of triangles over the number of connected
+	 * tripples.
+	 * 
+	 * @param g
+	 *            the graph the global clustering coefficient is calculated for.
+	 * @return the global clustering coefficient.
+	 */
 	public static double getGlobalClusteringCoefficient(Graph g) {
 		int n_tripples = 0;
 		int n_triangles = 0;
@@ -180,6 +246,13 @@ public class GraphStatistics {
 		return n_triangles / (double)n_tripples;
 	}
 	
+	/**
+	 * Counts the number of 2-stars.
+	 * 
+	 * @param g
+	 *            the graph the number of 2-stars is counted for.
+	 * @return the number of 2-stars.
+	 */
 	public static int getNumTwoStars(Graph g) {
 		int n_tripples = 0;
 		for(Vertex v : g.getVertices()) {
@@ -340,7 +413,7 @@ public class GraphStatistics {
 		
 		return subGraphs;
 	}
-	
+
 	/**
 	 * Calculates closeness centrality, betweenness centrality, diameter and
 	 * radius of graph <tt>g</tt>.
@@ -349,7 +422,9 @@ public class GraphStatistics {
 	 *            the graph the centrality statistics are to be calculated.
 	 * @return a GraphDistance object storing information about closeness
 	 *         centrality, betweenness centrality, diameter and radius of graph
-	 *         <tt>g</tt>.
+	 *         <tt>g</tt>. If a graph has disconnected components the diameter
+	 *         will be the greatest diameter found in all components and radius
+	 *         will equal zero.
 	 */
 	public static GraphDistance getCentrality(Graph g) {
 		logger.info("Initializing graph for centrality calculation...");
@@ -435,7 +510,7 @@ public class GraphStatistics {
 	
 	@SuppressWarnings("unchecked")
 	public static TDoubleDoubleHashMap getClusteringDegreeCorrelation(Graph g) {
-		return getValueDegreeCorrelation((TObjectDoubleHashMap<Vertex>) getClustringCoefficients(g));
+		return getValueDegreeCorrelation((TObjectDoubleHashMap<Vertex>) getLocalClusteringCoefficients(g));
 	}
 	
 	public static <V extends Vertex> TDoubleDoubleHashMap getValueDegreeCorrelation(TObjectDoubleHashMap<V> values) {
@@ -541,7 +616,7 @@ public class GraphStatistics {
 				time = System.currentTimeMillis();
 				int aplsum = 0;
 				int numPaths;
-				int eccentricity = Integer.MAX_VALUE;
+				int eccentricity = 0;//Integer.MAX_VALUE;
 				List<CentralityVertex<Vertex>> passedVertices = new ArrayList<CentralityVertex<Vertex>>();
 				int size2 = vertices.size();
 				for(int k = 0; k < size2; k++) {

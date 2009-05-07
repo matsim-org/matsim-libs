@@ -46,7 +46,7 @@ public class PajekClusteringColorizer<V extends Vertex, E extends Edge> extends 
 	
 	public PajekClusteringColorizer(Graph g) {
 		super();
-		clustering = (TObjectDoubleHashMap<V>) GraphStatistics.getClustringCoefficients(g);		
+		clustering = (TObjectDoubleHashMap<V>) GraphStatistics.getLocalClusteringCoefficients(g);		
 		c_min = StatUtils.min(clustering.getValues());
 		c_max = StatUtils.max(clustering.getValues());
 	}

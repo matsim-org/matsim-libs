@@ -31,6 +31,8 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.johannes.socialnet.spatial.SpatialGrid;
+
 /**
  * @author illenberger
  *

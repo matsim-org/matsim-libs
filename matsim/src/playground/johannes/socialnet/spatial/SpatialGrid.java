@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.johannes.socialnets;
+package playground.johannes.socialnet.spatial;
 
 import java.io.IOException;
 import java.util.Stack;
@@ -31,6 +31,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.xml.sax.Attributes;
+
+import playground.johannes.socialnets.StringSerializer;
 
 /**
  * @author illenberger

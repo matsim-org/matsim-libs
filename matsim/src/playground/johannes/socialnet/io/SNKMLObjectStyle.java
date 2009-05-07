@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Ego.java
+ * SNKMLStyles.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,41 +21,27 @@
 /**
  * 
  */
-package playground.johannes.socialnet;
+package playground.johannes.socialnet.io;
 
 import java.util.List;
 
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicActivity;
+import net.opengis.kml._2.LinkType;
+import net.opengis.kml._2.StyleType;
+
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 
-import playground.johannes.graph.SparseVertex;
+import playground.johannes.socialnet.SocialNetwork;
 
 /**
  * @author illenberger
  *
  */
-public class Ego<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> extends SparseVertex {
+public interface SNKMLObjectStyle<T, P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>>{
 
-	private P person;
+	public List<StyleType> getObjectStyle(SocialNetwork<P> socialnet, LinkType iconLinkType);
 	
-	protected Ego(P person) {
-		this.person = person;
-	}
+	public String getObjectSytleId(T object);
 	
-	public P getPerson() {
-		return person;
-	}
-	
-	public Coord getCoord() {
-		return ((BasicActivity) person.getPlans().get(0).getPlanElements().get(0)).getCoord();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<? extends Ego<P>> getNeighbours() {
-		return (List<? extends Ego<P>>) super.getNeighbours();
-	}
 }

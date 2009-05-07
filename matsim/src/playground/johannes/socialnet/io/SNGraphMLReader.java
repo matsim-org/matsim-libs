@@ -23,14 +23,26 @@
  */
 package playground.johannes.socialnet.io;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
 import org.xml.sax.Attributes;
 
-import playground.johannes.graph.AbstractSparseGraph;
 import playground.johannes.graph.SparseVertex;
 import playground.johannes.graph.io.AbstractGraphMLReader;
 import playground.johannes.socialnet.Ego;
@@ -85,4 +97,44 @@ public class SNGraphMLReader<P extends BasicPerson<? extends BasicPlan<? extends
 		return new SocialNetwork<P>();
 	}
 
+	@SuppressWarnings("deprecation")
+	public static SocialNetwork<Person> loadFromConfig(String configFile, String socialnetFile) {
+		Config config = Gbl.createConfig(new String[]{configFile});
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadPopulation();
+		Scenario scenario = loader.getScenario();
+		Population population = scenario.getPopulation();
+		SNGraphMLReader<Person> reader = new SNGraphMLReader<Person>(population);
+		SocialNetwork<Person> g = reader.readGraph(socialnetFile);
+		
+		return g;
+	}
+	
+	public static <P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> Set<Ego<P>> readAnonymousVertices(SocialNetwork<P> socialnet, String filename) {
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(filename));
+			Set<Ego<P>> egos = new HashSet<Ego<P>>();
+			String line = null;
+			while((line = reader.readLine()) != null) {
+				boolean found = false;
+				for(Ego<P> e : socialnet.getVertices()) {
+					if(e.getPerson().getId().toString().equals(line)) {
+						egos.add(e);
+						found = true;
+						break;
+					}
+				}
+				if(!found)
+					System.err.println("Person with id " + line + " not found!");
+			}
+			
+			return egos;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

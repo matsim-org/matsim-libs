@@ -26,13 +26,15 @@ package playground.johannes.graph;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Set;
+import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.graph.GraphStatistics.GraphDistance;
 import playground.johannes.graph.io.PlainGraphMLReader;
+import playground.johannes.statistics.WeightedStatistics;
 
 /**
  * @author illenberger
@@ -47,41 +49,75 @@ public class GraphAnalyser {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		logger.info("Loading graph " + args[0] + "...");
+		String graphfile = args[0];
+		String output = null;
+		boolean extended = false;
+		if(args.length > 1) {
+			if(args[1].equals("-e"))
+				extended = true;
+			else
+				output = args[1];
+			if(args.length > 2) {
+				if(args[2].equals("-e"))
+					extended = true;
+			}
+		}
+		logger.info(String.format("Loading graph %1$s...", graphfile));
 		Graph g = new PlainGraphMLReader().readGraph(args[0]);
-		Gbl.printMemoryUsage();
 		
+		if(!output.endsWith("/"))
+			output = output + "/";
+		analyze(g, output, extended);
+	}
+	
+	public static void analyze(Graph g, String output, boolean extended) throws FileNotFoundException, IOException {	
 		int numEdges = g.getEdges().size();
 		int numVertices = g.getVertices().size();
 		logger.info(String.format("Loaded graph: %1$s vertices, %2$s edges.", numVertices, numEdges));
-
-		double meanDegree = GraphStatistics.getDegreeStatistics(g).getMean();
+		/*
+		 * degree
+		 */
+		WeightedStatistics degreeStats = GraphStatistics.getDegreeDistribution(g);
+		double meanDegree = degreeStats.mean();
 		logger.info(String.format("Mean degree is %1$s.", meanDegree));
-		
-		double c_local = GraphStatistics.getClusteringStatistics(g).getMean();
+		if(output != null)
+			WeightedStatistics.writeHistogram(degreeStats.absoluteDistribution(), output + "degree.hist.txt");
+		/*
+		 * clustering - local
+		 */
+		WeightedStatistics clusteringStats = GraphStatistics.getLocalClusteringDistribution(g.getVertices());
+		double c_local = clusteringStats.mean();
 		logger.info(String.format("Mean local clustering coefficient is %1$s.", c_local));
-
+		if(output != null)
+			WeightedStatistics.writeHistogram(clusteringStats.absoluteDistribution(0.05), output + "clustering.hist.txt");
+		/*
+		 * clustering - global
+		 */
 		double c_global = GraphStatistics.getGlobalClusteringCoefficient(g);
 		logger.info(String.format("Global clustering coefficient is %1$s.", c_global));
-		
+		/*
+		 * mutuality
+		 */
 		double mutuality = GraphStatistics.getMutuality(g);
 		logger.info(String.format("Mutuality is %1$s.", mutuality));
-		
+		/*
+		 * degree correlation
+		 */
 		double dcorrelation = GraphStatistics.getDegreeCorrelation(g);
 		logger.info(String.format("Degree correlation is %1$s.", dcorrelation));
-		
-		double numComponents = GraphStatistics.getComponents(g).size();
+		/*
+		 * components
+		 */
+		SortedSet<Set<Vertex>> components = GraphStatistics.getComponents(g); 
+		double numComponents = components.size();
 		logger.info(String.format("Number of disconnected components is %1$s.", numComponents));
-		
-		
-		boolean extended = false;
-		for(String arg : args) {
-			if(arg.equalsIgnoreCase("-e")) {
-				extended = true;
-				break;
-			}
+		if(output != null) {
+			WeightedStatistics stats = new WeightedStatistics();
+			for(Set<Vertex> component : components)
+				stats.add(component.size());
+			WeightedStatistics.writeHistogram(stats.absoluteDistribution(), output + "components.hist.txt");
 		}
-		
+				
 		GraphDistance gDistance = new GraphStatistics.GraphDistance();
 		if(extended) {
 			gDistance = GraphStatistics.getCentrality(g);
@@ -92,8 +128,8 @@ public class GraphAnalyser {
 			logger.info(String.format("Radius is %1$s.", gDistance.getRadius()));
 		}
 		
-		if(args.length > 1) {
-			BufferedWriter writer = IOUtils.getBufferedWriter(args[1]);
+		if(output != null) {
+			BufferedWriter writer = IOUtils.getBufferedWriter(output + "summary.txt");
 			
 			writer.write("numVertices=");
 			writer.write(String.valueOf(numVertices));

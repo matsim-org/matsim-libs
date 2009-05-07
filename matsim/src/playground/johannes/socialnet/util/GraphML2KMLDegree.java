@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Ego.java
+ * GraphML2KML.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,41 +21,33 @@
 /**
  * 
  */
-package playground.johannes.socialnet;
+package playground.johannes.socialnet.util;
 
-import java.util.List;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
-
-import playground.johannes.graph.SparseVertex;
+import playground.johannes.socialnet.Ego;
+import playground.johannes.socialnet.SocialNetwork;
+import playground.johannes.socialnet.io.SNGraphMLReader;
+import playground.johannes.socialnet.io.SNKMLDegreeStyle;
+import playground.johannes.socialnet.io.SNKMLObjectStyle;
+import playground.johannes.socialnet.io.SNKMLWriter;
 
 /**
  * @author illenberger
  *
  */
-public class Ego<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> extends SparseVertex {
+public class GraphML2KMLDegree {
 
-	private P person;
-	
-	protected Ego(P person) {
-		this.person = person;
-	}
-	
-	public P getPerson() {
-		return person;
-	}
-	
-	public Coord getCoord() {
-		return ((BasicActivity) person.getPlans().get(0).getPlanElements().get(0)).getCoord();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<? extends Ego<P>> getNeighbours() {
-		return (List<? extends Ego<P>>) super.getNeighbours();
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		SocialNetwork<Person> socialnet = SNGraphMLReader.loadFromConfig(args[0], args[1]);
+		
+		SNKMLObjectStyle<Ego<Person>, Person> vertexStyle = new SNKMLDegreeStyle<Person>();
+		SNKMLWriter<Person> writer = new SNKMLWriter<Person>();
+		writer.setCoordinateTransformation(new CH1903LV03toWGS84());
+		writer.write(socialnet, vertexStyle, null, args[2]);
 	}
 }

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Ego.java
+ * SN2PajekDegree.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,41 +21,38 @@
 /**
  * 
  */
-package playground.johannes.socialnet;
+package playground.johannes.socialnet.util;
 
-import java.util.List;
+import java.io.IOException;
 
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.core.api.population.Person;
 
-import playground.johannes.graph.SparseVertex;
+import playground.johannes.graph.io.PajekClusteringColorizer;
+import playground.johannes.graph.io.PajekDegreeColorizer;
+import playground.johannes.socialnet.Ego;
+import playground.johannes.socialnet.SocialNetwork;
+import playground.johannes.socialnet.SocialTie;
+import playground.johannes.socialnet.io.SNGraphMLReader;
+import playground.johannes.socialnet.io.SNPajekWriter;
 
 /**
  * @author illenberger
  *
  */
-public class Ego<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> extends SparseVertex {
+public class GraphML2PajekDegree {
 
-	private P person;
-	
-	protected Ego(P person) {
-		this.person = person;
-	}
-	
-	public P getPerson() {
-		return person;
-	}
-	
-	public Coord getCoord() {
-		return ((BasicActivity) person.getPlans().get(0).getPlanElements().get(0)).getCoord();
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		SocialNetwork<Person> socialNet = SNGraphMLReader.loadFromConfig(args[0], args[1]);
+		
+		PajekDegreeColorizer<Ego<Person>, SocialTie> colorizer1 = new PajekDegreeColorizer<Ego<Person>, SocialTie>(socialNet, false);
+		PajekClusteringColorizer<Ego<Person>, SocialTie> colorizer2 = new PajekClusteringColorizer<Ego<Person>, SocialTie>(socialNet);
+		SNPajekWriter<Person> pwriter = new SNPajekWriter<Person>();
+		pwriter.write(socialNet, colorizer1, args[2] + "socialnet.degree.net");
+		pwriter.write(socialNet, colorizer2, args[2] + "socialnet.clustering.net");
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<? extends Ego<P>> getNeighbours() {
-		return (List<? extends Ego<P>>) super.getNeighbours();
-	}
 }

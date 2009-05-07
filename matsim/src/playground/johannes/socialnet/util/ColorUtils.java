@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Ego.java
+ * ColorUtils.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,41 +21,43 @@
 /**
  * 
  */
-package playground.johannes.socialnet;
+package playground.johannes.socialnet.util;
 
-import java.util.List;
-
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
-
-import playground.johannes.graph.SparseVertex;
+import java.awt.Color;
 
 /**
  * @author illenberger
  *
  */
-public class Ego<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> extends SparseVertex {
+public class ColorUtils {
 
-	private P person;
-	
-	protected Ego(P person) {
-		this.person = person;
-	}
-	
-	public P getPerson() {
-		return person;
-	}
-	
-	public Coord getCoord() {
-		return ((BasicActivity) person.getPlans().get(0).getPlanElements().get(0)).getCoord();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<? extends Ego<P>> getNeighbours() {
-		return (List<? extends Ego<P>>) super.getNeighbours();
+	public static Color getHeatmapColor(double value) {
+		float red = 1;
+		float green = 1;
+		float blue = 1;
+		
+		if(value < 0) {
+			red = 0;
+			green = 0;
+			blue = 0;
+		} else if(value > 0 && value <= 0.25) {
+			red = (float) (value/0.25);
+			green = 1;
+			blue = 0;
+		} else if (value > 0.25 && value <= 0.5) {
+			red = 1;
+			green = (float) (1 - (value-0.25)/0.25);
+			blue = 0;
+		} else if (value > 0.5 && value <= 0.75) {
+			red = 1;
+			green = 0;
+			blue = (float) ((value - 0.5)/0.25);
+		} else if (value > 0.75 && value <= 1) {
+			red = 0;
+			green = 0;
+			blue = 1;
+		}
+		
+		return new Color(red, green, blue);
 	}
 }

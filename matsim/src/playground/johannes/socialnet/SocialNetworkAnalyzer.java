@@ -23,17 +23,19 @@
  */
 package playground.johannes.socialnet;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 
-import gnu.trove.TDoubleDoubleHashMap;
-
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 
+import playground.johannes.graph.GraphStatistics;
 import playground.johannes.socialnet.io.SNGraphMLReader;
 import playground.johannes.statistics.WeightedStatistics;
 
@@ -50,15 +52,46 @@ public class SocialNetworkAnalyzer {
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		Config config = Gbl.createConfig(new String[]{args[0]});
-		ScenarioImpl data = new ScenarioImpl(config);
-		Population population = data.getPopulation();
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadPopulation();
+		Scenario scenario = loader.getScenario();
+		Population population = scenario.getPopulation();
 		SNGraphMLReader<Person> reader = new SNGraphMLReader<Person>(population);
-		SocialNetwork<Person> socialnet = reader.readGraph(args[1]);
+		SocialNetwork<Person> g = reader.readGraph(args[1]);
 		
 		String outputDir = args[2];
 		
-		WeightedStatistics.writeHistogram(SocialNetworkStatistics.getEdgeLengthDegreeCorrelation(socialnet), args[2]+"/d_k.hist.txt");
-
+		/*
+		 * Degree
+		 */
+		double k_mean = GraphStatistics.getDegreeStatistics(g).getMean();
+		WeightedStatistics.writeHistogram(GraphStatistics.getDegreeDistribution(g).absoluteDistribution(), outputDir + "degree.hist.txt");
+		/*
+		 * Clustering
+		 */
+		double c_mean = GraphStatistics.getClusteringStatistics(g).getMean();
+		WeightedStatistics.writeHistogram(GraphStatistics.getClusteringDegreeCorrelation(g), outputDir + "c_k.hist.txt");
+		/*
+		 * Edgelength distribution
+		 */
+		double d_mean = SocialNetworkStatistics.getEdgeLengthDistribution(g).mean();
+		WeightedStatistics.writeHistogram(SocialNetworkStatistics.getEdgeLengthDistribution(g).absoluteDistribution(1000), outputDir + "dist.hist.txt");
+		WeightedStatistics.writeHistogram(SocialNetworkStatistics.getEdgeLengthDistribution(g, true, 1000).absoluteDistribution(1000), outputDir + "dist.norm.hist.txt");
+		WeightedStatistics.writeHistogram(SocialNetworkStatistics.getEdgeLengthDegreeCorrelation(g), outputDir + "d_k.hist.txt");
+		/*
+		 * Summary
+		 */
+		BufferedWriter writer = new BufferedWriter(new FileWriter(outputDir + "summary.txt"));
+		writer.write("Mean Degree=");
+		writer.write(String.valueOf(k_mean));
+		writer.newLine();
+		writer.write("Mean Lokal Clustering=");
+		writer.write(String.valueOf(c_mean));
+		writer.newLine();
+		writer.write("Mean Edgelength=");
+		writer.write(String.valueOf(d_mean));
+		writer.newLine();
+		writer.close();
 	}
 
 }

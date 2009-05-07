@@ -23,8 +23,11 @@
  */
 package playground.johannes.socialnet.io;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.core.utils.collections.Tuple;
 
@@ -83,4 +86,19 @@ public class SNGraphMLWriter extends GraphMLWriter {
 		return attrs;
 	}
 
+	/*
+	 * FIXME: Think about that! 
+	 */
+	public static void writeAnonymousVertices(Set<?> vertices, String filename) {
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+			for(Object e : vertices) {
+				writer.write(((Ego<?>) e).getPerson().getId().toString());
+				writer.newLine();
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
