@@ -47,7 +47,7 @@ public class OTFInundationDrawer extends AbstractBackgroundDrawer {
 	}
 
 	public void onDraw(GL gl) {
-		onDraw(gl,this.drawer2.now);
+//		onDraw(gl,this.drawer2.now);
 		
 	}
 
@@ -102,12 +102,12 @@ public class OTFInundationDrawer extends AbstractBackgroundDrawer {
 			} else {
 				ccol = this.data.getColor(this.timeSlotIdx,t.cwalsh);
 			}
-			float [] dcol = null;
-			if (this.timeSlotIdx < t.dwalsh[InundationData.RES]) {
-				dcol = InundationData.empty;
-			} else {
-				dcol = this.data.getColor(this.timeSlotIdx,t.dwalsh);
-			}			
+//			float [] dcol = null;
+//			if (this.timeSlotIdx < t.dwalsh[InundationData.RES]) {
+//				dcol = InundationData.empty;
+//			} else {
+//				dcol = this.data.getColor(this.timeSlotIdx,t.dwalsh);
+//			}			
 			
 //			float [] col = ;
 //			if (col == null) {
@@ -155,20 +155,31 @@ public class OTFInundationDrawer extends AbstractBackgroundDrawer {
 //			gl.glTexCoord2f(co.left(),co.bottom()); gl.glVertex3f(t.x - t.diff,t.y + t.diff,1.f);
 //			gl.glEnd();		
 
-			gl.glBegin(GL.GL_QUADS);
+//			gl.glBegin(GL.GL_QUADS);
+//
+//			//			System.out.println("quad:" + t.a.x + "  " + t.a.y + "---"+ t.b.x + "  " + t.b.y + "---"+ t.c.x + "  " + t.c.y + "---"+ t.d.x + "  " + t.d.y + "---");
+//			gl.glColor4f(acol[0],acol[1],acol[2],acol[3]);
+//			gl.glTexCoord2f(co.right(),co.bottom()); gl.glVertex3f(t.x + t.diff,t.y + t.diff,1.f);
+////			gl.glColor4f(col[0],col[1],col[2],1);
+//			gl.glColor4f(bcol[0],bcol[1],bcol[2],bcol[3]);
+//			gl.glTexCoord2f(co.right(),co.top()); gl.glVertex3f(t.x + t.diff,t.y - t.diff,1.f);
+////			gl.glColor4f(col[0],col[1],col[2],1);
+//			gl.glColor4f(ccol[0],ccol[1],ccol[2],ccol[3]);
+//			gl.glTexCoord2f(co.left(), co.top()); gl.glVertex3f(t.x - t.diff,t.y - t.diff,1.f);
+////			gl.glColor4f(col[0],col[1],col[2],1);
+//			gl.glColor4f(dcol[0],dcol[1],dcol[2],dcol[3]);
+//			gl.glTexCoord2f(co.left(),co.bottom()); gl.glVertex3f(t.x - t.diff,t.y + t.diff,1.f);
+//			gl.glEnd();		
+			
+			gl.glBegin(GL.GL_TRIANGLES);
 
 			//			System.out.println("quad:" + t.a.x + "  " + t.a.y + "---"+ t.b.x + "  " + t.b.y + "---"+ t.c.x + "  " + t.c.y + "---"+ t.d.x + "  " + t.d.y + "---");
 			gl.glColor4f(acol[0],acol[1],acol[2],acol[3]);
-			gl.glTexCoord2f(co.right(),co.bottom()); gl.glVertex3f(t.x + t.diff,t.y + t.diff,1.f);
-//			gl.glColor4f(col[0],col[1],col[2],1);
+			gl.glTexCoord2f(co.right(),co.bottom()); gl.glVertex3f(t.xa,t.ya,1.f);
 			gl.glColor4f(bcol[0],bcol[1],bcol[2],bcol[3]);
-			gl.glTexCoord2f(co.right(),co.top()); gl.glVertex3f(t.x + t.diff,t.y - t.diff,1.f);
-//			gl.glColor4f(col[0],col[1],col[2],1);
+			gl.glTexCoord2f(co.right(),co.top()); gl.glVertex3f(t.xb,t.yb,1.f);
 			gl.glColor4f(ccol[0],ccol[1],ccol[2],ccol[3]);
-			gl.glTexCoord2f(co.left(), co.top()); gl.glVertex3f(t.x - t.diff,t.y - t.diff,1.f);
-//			gl.glColor4f(col[0],col[1],col[2],1);
-			gl.glColor4f(dcol[0],dcol[1],dcol[2],dcol[3]);
-			gl.glTexCoord2f(co.left(),co.bottom()); gl.glVertex3f(t.x - t.diff,t.y + t.diff,1.f);
+			gl.glTexCoord2f(co.left(), co.top()); gl.glVertex3f(t.xc,t.yc,1.f);
 			gl.glEnd();		
 			
 

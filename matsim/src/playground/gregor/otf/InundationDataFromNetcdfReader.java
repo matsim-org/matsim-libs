@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -20,9 +21,8 @@ import com.vividsolutions.jts.geom.Envelope;
 public class InundationDataFromNetcdfReader {
 
 	// private final String file = "../../inputs/networks/flooding.sww";
-	private final String file = "test/input/playground/gregor/data/flooding.sww";
-	// private final String file =
-	// "/home/laemmel/devel/inputs/flooding/flooding01.sww";
+//	private final String file = "test/input/playground/gregor/data/flooding.sww";
+	private final String file = "/home/laemmel/devel/inputs/flooding/SZ_r018M_m003_092_12_mw9.00_03h__P0_8.sww";
 
 	public static final float[] cvdeep = new float[] { 0.f, 0.f, 1.f };
 	public static final float[] cdeep = new float[] { 0.f, 0.1f, 0.9f };
@@ -30,7 +30,7 @@ public class InundationDataFromNetcdfReader {
 	public static final float[] clmid = new float[] { 0.f, 0.3f, 0.7f };
 	public static final float[] clow = new float[] { 0.f, 0.4f, 0.6f };
 	public static final float[] cvlow = new float[] { 0.f, 0.9f, 0.7f };
-
+	
 	private static final String BASE = "/home/laemmel/devel/inputs/flooding/flooding0";
 
 //	private final HashMap<Integer, byte[]> tableMapping = new HashMap<Integer, byte[]>(100000);
@@ -103,7 +103,8 @@ public class InundationDataFromNetcdfReader {
 		// this.envelope = this.fr.getEnvelope();
 
 //		Collection<CompressedFloodingInfo> infos = getFloodingInfos();
-		Collection<CompressedFloodingInfo> infos = getWalshFloodingInfos();
+//		Collection<CompressedFloodingInfo> infos = getWalshFloodingInfos();
+		Collection<Triangle> infos = getTriangles();
 		double minX = -2000
 		* (Math.abs(this.envelope.getMaxX()) - this.offsetEast);
 		double maxX = 2000 * (Math.abs(this.envelope.getMaxX()) - this.offsetEast);
@@ -114,7 +115,7 @@ public class InundationDataFromNetcdfReader {
 		
 		System.out.println(this.envelope);
 
-		QuadTree<CompressedFloodingInfo> infoTree = new QuadTree<CompressedFloodingInfo>(minX, minY, maxX, maxY);
+		QuadTree<Triangle> infoTree = new QuadTree<Triangle>(minX, minY, maxX, maxY);
 
 		double baseRes = 1.;
 		fillInfoTree(infoTree, infos, baseRes);
@@ -124,7 +125,7 @@ public class InundationDataFromNetcdfReader {
 //		baseRes = 2.;
 		for (int i = 1; i < this.inundationData.powerLookUp.length; i++) {
 			double zoom = this.inundationData.powerLookUp[i];
-			QuadTree<CompressedFloodingInfo> tmp = new QuadTree<CompressedFloodingInfo>(minX, minY, maxX, maxY);
+			QuadTree<Triangle> tmp = new QuadTree<Triangle>(minX, minY, maxX, maxY);
 			QuadTree<Quad> quads = new QuadTree<Quad>(minX, minY, maxX, maxY);
 			fillInfoTree(tmp, infoTree.values(), Math.max(6,baseRes * zoom));
 			System.out.println(tmp.size());
@@ -140,37 +141,98 @@ public class InundationDataFromNetcdfReader {
 
 	}
 
-	private Collection<CompressedFloodingInfo> getWalshFloodingInfos() {
-		Collection<CompressedFloodingInfo> info = new ArrayList<CompressedFloodingInfo>(
-				550000);
+//	private Collection<CompressedFloodingInfo> getWalshFloodingInfos() {
+//		Collection<CompressedFloodingInfo> info = new ArrayList<CompressedFloodingInfo>(
+//				550000);
+//		double maxX = 0;
+//		double maxY = 0;
+//		double minX = Double.POSITIVE_INFINITY;
+//		double minY = Double.POSITIVE_INFINITY;
+//		for (int i = 1; i < 2; i++) {
+//			String file = BASE + i + ".sww";
+////			 file = this.file;
+//			FloodingReader r = new FloodingReader(file);
+//			
+//			Envelope e = r.getEnvelope();
+//			maxX = maxX > e.getMaxX() ? maxX : e.getMaxX();
+//			maxY = maxY > e.getMaxY() ? maxY : e.getMaxY();
+//			minX = minX < e.getMinX() ? minX : e.getMinX();
+//			minY = minY < e.getMinY() ? minY : e.getMinY();
+//			for (FloodingInfo fi : r.getFloodingInfos()) {
+//
+//				float[] coeffs = getWalshCoefs(fi.getFloodingSeries());
+//				//				int colorKey = createTableMapping(colors);
+//				if (coeffs[InundationData.RES] >= fi.getFloodingSeries().size()-1) {
+//					continue;
+//				}
+//				CompressedFloodingInfo ci = new CompressedFloodingInfo();
+//				//				ci.colorTableKey = colorKey;
+//				ci.walshCoeffs = coeffs;
+//				ci.x = (float) (fi.getCoordinate().x - this.offsetEast);
+//				ci.y = (float) (fi.getCoordinate().y - this.offsetNorth);
+//				info.add(ci);
+//			}
+//			r = null;
+//		}
+//		this.envelope = new Envelope(maxX, minX, maxY, minY);
+//		return info;
+//	}
+	
+	private Collection<Triangle> getTriangles() {
+		Collection<Triangle> info = new ArrayList<Triangle>();
 		double maxX = 0;
 		double maxY = 0;
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		for (int i = 1; i < 2; i++) {
-			String file = BASE + i + ".sww";
-//			 file = this.file;
+//			String file = BASE + i + ".sww";
+			 String file = this.file;
 			FloodingReader r = new FloodingReader(file);
+			List<int []> triangles = r.getTriangles();
+			Map<Integer,Integer> mapping = r.getIdxMapping();
+			List<FloodingInfo> infos = r.getFloodingInfos();
 			Envelope e = r.getEnvelope();
+			r = null;
 			maxX = maxX > e.getMaxX() ? maxX : e.getMaxX();
 			maxY = maxY > e.getMaxY() ? maxY : e.getMaxY();
 			minX = minX < e.getMinX() ? minX : e.getMinX();
 			minY = minY < e.getMinY() ? minY : e.getMinY();
-			for (FloodingInfo fi : r.getFloodingInfos()) {
-
-				float[] coeffs = getWalshCoefs(fi.getFloodingSeries());
-				//				int colorKey = createTableMapping(colors);
-				if (coeffs[InundationData.RES] >= fi.getFloodingSeries().size()-1) {
-					continue;
+			int count = triangles.size();
+			for (int [] tri : triangles) {
+				if (count-- % 1000 == 0) {
+					System.out.println(count);
 				}
-				CompressedFloodingInfo ci = new CompressedFloodingInfo();
-				//				ci.colorTableKey = colorKey;
-				ci.walshCoeffs = coeffs;
-				ci.x = (float) (fi.getCoordinate().x - this.offsetEast);
-				ci.y = (float) (fi.getCoordinate().y - this.offsetNorth);
-				info.add(ci);
+				
+				Triangle t = new Triangle();
+				for (int j = 0; j < 3; j++) {
+					Integer idx = mapping.get(tri[j]);
+					if (idx == null) {
+						t = null;
+						break;
+					}
+					
+					FloodingInfo fi = infos.get(idx);
+					float[] coeffs = getWalshCoefs(fi.getFloodingSeries());
+					switch (j) {
+					case 0:
+						t.awalsh = coeffs;
+						t.xa = (float) fi.getCoordinate().x;
+						t.ya = (float) fi.getCoordinate().y;
+					case 1 :
+						t.bwalsh = coeffs;
+						t.xb = (float) fi.getCoordinate().x;
+						t.yb = (float) fi.getCoordinate().y;
+					case 2 :
+						t.cwalsh = coeffs;
+						t.xc = (float) fi.getCoordinate().x;
+						t.yc = (float) fi.getCoordinate().y;
+					}
+					
+					
+				}	
+				info.add(t);
 			}
-			r = null;
+			
 		}
 		this.envelope = new Envelope(maxX, minX, maxY, minY);
 		return info;
@@ -298,12 +360,12 @@ public class InundationDataFromNetcdfReader {
 	}
 
 	private void fillQuadsTree(QuadTree<Quad> quadsTree,
-			QuadTree<CompressedFloodingInfo> infoTree) {
+			QuadTree<Triangle> infoTree) {
 
 		System.out.println("processing:" + infoTree.values().size()
 				+ " FloodingInfos");
 
-		for (CompressedFloodingInfo fi : infoTree.values()) {
+		for (Triangle fi : infoTree.values()) {
 			// short [] colors = new short[fi.getFloodingSeries().size()];
 			// short idx = 0;
 			// for (Double d : fi.getFloodingSeries()) {
@@ -313,22 +375,28 @@ public class InundationDataFromNetcdfReader {
 			// }
 			// createTableMapping(colors);
 
-			Coordinate nearest = getNearestCoord(new Coordinate(fi.x, fi.y),
-					infoTree);
-			if (nearest == null) {
-				continue;
-			}
-			double distA = nearest.distance(new Coordinate(fi.x, fi.y));
+//			Coordinate nearest = getNearestCoord(new Coordinate(fi.xa, fi.ya),
+//					infoTree);
+//			if (nearest == null) {
+//				continue;
+//			}
+//			double distA = nearest.distance(new Coordinate(fi.x, fi.y));
 			// Coordinate tmp = getNearestCoord(nearest,infoTree);
 			// double distB = nearest.distance(tmp);
-			double diff = distA + 1; // - distB/2;
+//			double diff = distA + 1; // - distB/2;
 
 			Quad q = new Quad();
 //			q.col = fi.colorTableKey;
-			q.walsh = fi.walshCoeffs;
-			q.x = fi.x;
-			q.y = fi.y;
-			q.diff = (float) diff;
+			q.awalsh = fi.awalsh;
+			q.bwalsh = fi.bwalsh;
+			q.cwalsh = fi.cwalsh;
+			q.xa = fi.xa;
+			q.ya = fi.ya;
+			q.xb = fi.xb;
+			q.yb = fi.yb;
+			q.xc = fi.xc;
+			q.yc = fi.yc;
+//			q.diff = (float) diff;
 			// q.a = new Coordinate(fi.getCoordinate().x +
 			// diff,fi.getCoordinate().y + diff,0);
 			// q.b = new Coordinate(fi.getCoordinate().x -
@@ -337,32 +405,32 @@ public class InundationDataFromNetcdfReader {
 			// diff,fi.getCoordinate().y - diff,0);
 			// q.d = new Coordinate(fi.getCoordinate().x +
 			// diff,fi.getCoordinate().y - diff,0);
-			quadsTree.put(fi.x, fi.y, q);
+			quadsTree.put(fi.xa, fi.ya, q);
 		}
 		System.out.println("Quads:" + quadsTree.size());
-		int toGo = quadsTree.size();
-
-		for (Quad quad : quadsTree.values()) {
-			if (toGo-- % 1000 == 0) {
-				System.out.println("toGo:" + toGo);
-			}
-//			quad.acol = quadsTree.get(quad.x + quad.diff, quad.y + quad.diff).col;
-//			quad.bcol = quadsTree.get(quad.x + quad.diff, quad.y - quad.diff).col;
-//			quad.ccol = quadsTree.get(quad.x - quad.diff, quad.y - quad.diff).col;
-//			quad.dcol = quadsTree.get(quad.x - quad.diff, quad.y + quad.diff).col;
-			
-			quad.awalsh = quadsTree.get(quad.x + quad.diff, quad.y + quad.diff).walsh;
-			quad.bwalsh = quadsTree.get(quad.x + quad.diff, quad.y - quad.diff).walsh;
-			quad.cwalsh = quadsTree.get(quad.x - quad.diff, quad.y - quad.diff).walsh;
-			quad.dwalsh = quadsTree.get(quad.x - quad.diff, quad.y + quad.diff).walsh;
-			// quad.acol = quad.col;
-			// quad.bcol = quad.col;
-			// quad.ccol = quad.col;
-			// quad.dcol = quad.col;
-		}
-		for (Quad quad : quadsTree.values()) {
-			quad.walsh = null;
-		}
+//		int toGo = quadsTree.size();
+//
+//		for (Quad quad : quadsTree.values()) {
+//			if (toGo-- % 1000 == 0) {
+//				System.out.println("toGo:" + toGo);
+//			}
+////			quad.acol = quadsTree.get(quad.x + quad.diff, quad.y + quad.diff).col;
+////			quad.bcol = quadsTree.get(quad.x + quad.diff, quad.y - quad.diff).col;
+////			quad.ccol = quadsTree.get(quad.x - quad.diff, quad.y - quad.diff).col;
+////			quad.dcol = quadsTree.get(quad.x - quad.diff, quad.y + quad.diff).col;
+//			
+//			quad.awalsh = quadsTree.get(quad.x + quad.diff, quad.y + quad.diff).walsh;
+//			quad.bwalsh = quadsTree.get(quad.x + quad.diff, quad.y - quad.diff).walsh;
+//			quad.cwalsh = quadsTree.get(quad.x - quad.diff, quad.y - quad.diff).walsh;
+//			quad.dwalsh = quadsTree.get(quad.x - quad.diff, quad.y + quad.diff).walsh;
+//			// quad.acol = quad.col;
+//			// quad.bcol = quad.col;
+//			// quad.ccol = quad.col;
+//			// quad.dcol = quad.col;
+//		}
+//		for (Quad quad : quadsTree.values()) {
+//			quad.walsh = null;
+//		}
 	}
 
 //	private int createTableMapping(byte[] colors) {
@@ -431,14 +499,16 @@ public class InundationDataFromNetcdfReader {
 //
 //	}
 
-	private void fillInfoTree(QuadTree<CompressedFloodingInfo> infoTree,
-			Collection<CompressedFloodingInfo> infos, double d) {
-		for (CompressedFloodingInfo fi : infos) {
+	private void fillInfoTree(QuadTree<Triangle> infoTree,
+			Collection<Triangle> infos, double d) {
+		System.out.println(infoTree.size());
+		
+		for (Triangle fi : infos) {
 
-			if (infoTree.get(fi.x, fi.y, d).size() != 0) {
+			if (infoTree.get(fi.xa, fi.ya, d).size() != 0) {
 				continue;
 			}
-			infoTree.put(fi.x, fi.y, fi);
+			infoTree.put(fi.xa, fi.ya, fi);
 		}
 
 	}
@@ -467,5 +537,17 @@ public class InundationDataFromNetcdfReader {
 		float x;
 		float y;
 		int colorTableKey;
+	}
+	
+	private static class Triangle {
+		float xa;
+		float xb;
+		float xc;
+		float ya;
+		float yb;
+		float yc;
+		public float[] awalsh;
+		public float[] bwalsh;
+		public float[] cwalsh;
 	}
 }

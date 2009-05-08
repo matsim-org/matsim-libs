@@ -124,12 +124,12 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		clientQ2.addAdditionalElement(new InundationDataReader(x));
 //		OGLSimpleBackgroundLayer.addPersistentItem(new ScalelableBackgroundDraw("test.png","scalebar2.png","scalebar3.png"));
 		
-//		InundationDataFromNetcdfReader n = new InundationDataFromNetcdfReader(clientQ2.offsetNorth,clientQ2.offsetEast);
+		InundationDataFromNetcdfReader n = new InundationDataFromNetcdfReader(clientQ2.offsetNorth,clientQ2.offsetEast);
 //		InundationDataFromBinaryFileReader n = new InundationDataFromBinaryFileReader();
-//		OTFInundationDrawer x = new OTFInundationDrawer(drawer2);
-//		x.setData(n.createData());
+		OTFInundationDrawer x = new OTFInundationDrawer(drawer2);
+		x.setData(n.createData());
 		
-//		OGLSimpleBackgroundLayer.addPersistentItem(x);
+		OGLSimpleBackgroundLayer.addPersistentItem(x);
 		drawer2.addOverlay(new OTFScaleBarDrawer("./res/sb_background.png","./res/scalebar.png"));
 		return drawer2;
 	}
@@ -154,8 +154,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		final String filename =  CVSROOT + "/runs/run314/output/ITERS/it.100/100.movie.mvi";
 //		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
 //		final String filename =  "../../outputs/output_100m_so/ITERS/it.0/0.movie.mvi";
-//		filename =  "../../outputs/output_shelter_noWave/ITERS/it.200/200.movie.mvi";
-			filename =  "../../outputs/output/ITERS/it.0/0.movie.mvi";
+		filename =  "../../outputs/output_shelter_noWave/ITERS/it.200/200.movie.mvi";
+//			filename =  "../../outputs/output/ITERS/it.0/0.movie.mvi";
 //		final String filename =  "/home/laemmel/arbeit/svn/runs-svn/run316/stage2/output/ITERS/it.201/201.movie.mvi";
 		}
 		

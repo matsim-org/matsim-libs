@@ -106,6 +106,36 @@ public class InundationData implements Serializable{
 		float [] bwalsh;
 		float [] cwalsh;
 		float [] dwalsh;
+
+
+
+
+		public float xa;
+
+
+
+
+		public float ya;
+
+
+
+
+		public float xb;
+
+
+
+
+		public float yb;
+
+
+
+
+		public float xc;
+
+
+
+
+		public float yc;
 		
 		//		public String getId() {
 		//			ArrayList<Double> list = new ArrayList<Double>();
