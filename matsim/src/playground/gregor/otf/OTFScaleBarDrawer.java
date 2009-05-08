@@ -18,7 +18,7 @@ import com.sun.opengl.util.j2d.TextRenderer;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
 
-public class ScalelableBackgroundDraw extends OTFGLDrawableImpl {
+public class OTFScaleBarDrawer extends OTFGLDrawableImpl {
 
 	
 	private TextRenderer textRenderer = null;
@@ -33,7 +33,7 @@ public class ScalelableBackgroundDraw extends OTFGLDrawableImpl {
 	private final String sb;
 
 
-	public ScalelableBackgroundDraw(String picturePath, String sb) {
+	public OTFScaleBarDrawer(String picturePath, String sb) {
 		this.bg = picturePath;
 		this.sb = sb;
 		initTextRenderer();

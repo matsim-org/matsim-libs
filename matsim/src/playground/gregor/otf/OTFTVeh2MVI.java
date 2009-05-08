@@ -52,9 +52,13 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 		//this.outFileName = outFileName;
 	}
 
+	
 	@Override
 	protected void onAdditionalQuadData(OTFConnectionManager connect) {
 		this.quad.addAdditionalElement(this.writer);
+		this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromBinaryFileReader().readData()));
+		connect.add(InundationDataWriter.class,InundationDataReader.class);
+		connect.add(InundationDataReader.class,Dummy.class);
 	}
 
 //	public static double myParseDouble(String rep) {

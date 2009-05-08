@@ -98,7 +98,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	@Override
 	public OTFDrawer getRightDrawerComponent(final JFrame frame) throws RemoteException {
 		final OTFClientQuad clientQ2 = this.hostControl.createNewView(null, connect1);
-
+		
 		final OTFOGLDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
 //		drawer2.createTexture(filename)
 //		OTFGLOverlay overlay = new OTFGLOverlay();
@@ -115,8 +115,22 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
+//		FloodingReader fr = new FloodingReader("../../inputs/networks/flooding.sww");
+		
+//		OTFInundationDrawer x = new OTFInundationDrawer(fr,clientQ2.offsetEast,clientQ2.offsetNorth);
+//		Dummy.myDrawer = x;
+//		OGLSimpleBackgroundLayer.addPersistentItem(x);
+		
+//		clientQ2.addAdditionalElement(new InundationDataReader(x));
 //		OGLSimpleBackgroundLayer.addPersistentItem(new ScalelableBackgroundDraw("test.png","scalebar2.png","scalebar3.png"));
-		drawer2.addOverlay(new ScalelableBackgroundDraw("./res/sb_background.png","./res/scalebar.png"));
+		
+//		InundationDataFromNetcdfReader n = new InundationDataFromNetcdfReader(clientQ2.offsetNorth,clientQ2.offsetEast);
+//		InundationDataFromBinaryFileReader n = new InundationDataFromBinaryFileReader();
+//		OTFInundationDrawer x = new OTFInundationDrawer(drawer2);
+//		x.setData(n.createData());
+		
+//		OGLSimpleBackgroundLayer.addPersistentItem(x);
+		drawer2.addOverlay(new OTFScaleBarDrawer("./res/sb_background.png","./res/scalebar.png"));
 		return drawer2;
 	}
 	
@@ -159,6 +173,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		connect1.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		connect1.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect1.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.NoQuadDrawer.class);
+//		connect1.add(InundationDataWriter.class,InundationDataReader.class);
+//		connect1.add(InundationDataReader.class,Dummy.class);
 		//connect1.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
 		
 		

@@ -16,7 +16,7 @@ public class TileLoader extends Thread {
 	PriorityBlockingQueue<TileRequest> requests = new PriorityBlockingQueue<TileRequest>();
 	private final Map<String, Tile> tiles;
 	private final Queue<Tile> tilesQueue;
-	private long oldTime;
+//	private long oldTime;
 	private static final int MAX_CACHE = 512;
 	public TileLoader(Map<String,Tile> tiles) {
 //		this.tiles = Collections.synchronizedMap(tiles);
@@ -27,10 +27,10 @@ public class TileLoader extends Thread {
 	@Override
 	public void run(){
 		while (true) {
-			if (System.currentTimeMillis() > this.oldTime + 2000){
-				this.oldTime = System.currentTimeMillis();
-				System.out.println("dynamic cache:" + this.tilesQueue.size()  + " static cache:" + this.tiles.size() + " requests:" + this.requests.size());
-			}
+//			if (System.currentTimeMillis() > this.oldTime + 2000){
+//				this.oldTime = System.currentTimeMillis();
+//				System.out.println("dynamic cache:" + this.tilesQueue.size()  + " static cache:" + this.tiles.size() + " requests:" + this.requests.size());
+//			}
 			if (this.requests.size() == 0) {
 				try {
 					sleep(100);
