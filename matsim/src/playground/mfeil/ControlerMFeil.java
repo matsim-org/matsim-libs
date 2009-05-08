@@ -98,6 +98,12 @@ public class ControlerMFeil extends Controler {
 				PlanStrategyModule module = new RecyclingModule1(this);
 				strategy.addStrategyModule(module);
 			}
+			
+			else if (classname.equals("TimeModeChoicer")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				PlanStrategyModule module = new TmcInitialiser(this, this.getScoringFunctionFactory());
+				strategy.addStrategyModule(module);
+			}
 		
 			manager.addStrategy(strategy, rate);
 		}
