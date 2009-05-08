@@ -462,10 +462,10 @@ public class ActivityLocations {
 		return saved;
 	}
 	
-	public static String readVehicleStringFromFile(int vehID){
+	public static String readVehicleStringFromFile(int vehID, String vehicleFile){
 		BufferedReader br = null;
 		StringBuilder sb = new StringBuilder();
-		String vehicleFile = VEH_FOLDER + "/" + vehID + ".xml";
+//		String vehicleFile = VEH_FOLDER + "/" + vehID + ".xml";
 		
 		try{
 			br = new BufferedReader( new FileReader(vehicleFile) );

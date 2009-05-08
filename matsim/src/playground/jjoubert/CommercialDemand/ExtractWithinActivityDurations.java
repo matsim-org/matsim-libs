@@ -36,33 +36,18 @@ public class ExtractWithinActivityDurations {
 	/**
 	 * @param args
 	 */
-	private static double WITHIN_THRESHOLD = 0.90;
 	private static final String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 
 	public static void main(String[] args) {
+		final double withinThreshold = 0.90;
 		
 		ArrayList<Integer> withinVehicles = new ArrayList<Integer>();
 		ArrayList<Integer> withinDurations = new ArrayList<Integer>();
 		
 		// build ArrayList of 'within' vehicles
-		System.out.print("Building an ArrayList of 'within' vehicle IDs... ");
-		try {
-			Scanner withinScan = new Scanner(new BufferedReader(new FileReader(new File(ROOT + "Gauteng/Activities/GautengVehiclestats.txt"))));
-			
-			@SuppressWarnings("unused")
-			String header = withinScan.nextLine();
-			while(withinScan.hasNextLine()){
-				String [] line = withinScan.nextLine().split(",");
-				int vehicleId = Integer.parseInt(line[0]);
-				double percentage = Double.parseDouble(line[8]);
-				if(percentage >= WITHIN_THRESHOLD){
-					withinVehicles.add(vehicleId);
-				}
-			}		
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		System.out.printf("Done (%d vehicles)\n", withinVehicles.size());
+		String fileToRead = ROOT + "Gauteng/Activities/GautengVehiclestats.txt";
+		
+		withinVehicles = buildWithinVehicleIdList(fileToRead, withinThreshold);
 		
 		System.out.print("Building ArrayList of 'within' activity durations... ");
 		
@@ -103,6 +88,29 @@ public class ExtractWithinActivityDurations {
 			e.printStackTrace();
 		}
 		System.out.printf("Done.\n\nCompleted successfully!");
+	}
+
+	public static ArrayList<Integer> buildWithinVehicleIdList(String fileToRead, double thresHold) {
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		try {
+			System.out.print("Building an ArrayList of 'within' vehicle IDs... ");
+			Scanner withinScan = new Scanner(new BufferedReader(new FileReader(new File(fileToRead))));
+			
+			@SuppressWarnings("unused")
+			String header = withinScan.nextLine();
+			while(withinScan.hasNextLine()){
+				String [] line = withinScan.nextLine().split(",");
+				int vehicleId = Integer.parseInt(line[0]);
+				double percentage = Double.parseDouble(line[8]);
+				if(percentage >= thresHold){
+					list.add(vehicleId);
+				}
+			}		
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		System.out.printf("Done (%d vehicles)\n", list.size());
+		return list;
 	}
 
 }
