@@ -2,8 +2,9 @@ package playground.gregor.flooding;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -28,13 +29,28 @@ public class FloodingReader {
 	
 	private NetcdfFile ncfile;
 
-	private Collection<FloodingInfo> fis;
+	private List<FloodingInfo> fis;
 
 	private Envelope envelope;
 	
 	private boolean initialized = false;
 	
+	private boolean readTriangles = false;
+
+	private List<int[]> triangles;
+	private Map<Integer,Integer> idxMapping;
+	
 	public FloodingReader(String netcdf) {
+		try {
+			this.ncfile = NetcdfFile.open(netcdf);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		
+	}
+
+	public FloodingReader(String netcdf, boolean readTriangles) {
+		this.readTriangles = true;
 		try {
 			this.ncfile = NetcdfFile.open(netcdf);
 		} catch (IOException e) {
@@ -72,6 +88,26 @@ public class FloodingReader {
 		sStage.appendRange(varStage.getRanges().get(1));
 		Array aStage = ios.readData(varStage, sStage);
 		
+		if (this.readTriangles) {
+			this.triangles = new ArrayList<int []>();
+			this.idxMapping = new HashMap<Integer, Integer>();
+			Section tri = new Section();
+			Variable varTri = this.ncfile.findVariable("volumes");
+			tri.appendRange(varTri.getRanges().get(0));
+			tri.appendRange(varTri.getRanges().get(1));
+			Array aTri = ios.readData(varTri, tri);	
+			Index idxTri = new Index2D(tri.getShape());
+			for (int i = 0; i < idxTri.getShape()[0]; i++) {
+				int [] tripple = new int [3];
+				idxTri.set(i, 0);
+				for (int j = 0; j < idxTri.getShape()[1]; j++) {
+					idxTri.set1(j);
+					tripple[j] = aTri.getInt(idxTri);
+				}
+				this.triangles.add(tripple);
+			}
+		}
+		
 		Index idxStage = new Index2D(aStage.getShape());
 		Index idx = new Index1D(aX.getShape());
 		
@@ -100,12 +136,15 @@ public class FloodingReader {
 			FloodingInfo flooding = processCoord(idxStage,aStage,c);
 			if (flooding != null) {
 				this.fis.add(flooding);
+				if (this.readTriangles) {
+					this.idxMapping.put(i, this.fis.size()-1);
+				}
 			}
 		}
 		this.initialized = true;
 	}
 	
-	public Collection<FloodingInfo> getFloodingInfos() {
+	public List<FloodingInfo> getFloodingInfos() {
 		if(!this.initialized) {
 			try {
 				readFile();
@@ -129,6 +168,40 @@ public class FloodingReader {
 			}
 		}
 		return this.envelope;
+	}
+	
+	public List<int[]> getTriangles() {
+		if (!this.readTriangles && this.initialized) {
+			throw new RuntimeException("Netcdf already initialized, could not read triangle. To initialize netcdf with triangles reading enabled, " +
+					"please use the corresponding contructor (FLoodingReader(file,true)!");
+		} else if (!this.initialized) {
+			this.readTriangles = true;
+			try {
+				readFile();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			} catch (InvalidRangeException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return this.triangles;
+	}
+
+	public Map<Integer,Integer> getIdxMapping() {
+		if (!this.readTriangles && this.initialized) {
+			throw new RuntimeException("Netcdf already initialized, could not read triangle. To initialize netcdf with triangles reading enabled, " +
+					"please use the corresponding contructor (FLoodingReader(file,true)!");
+		} else if (!this.initialized) {
+			this.readTriangles = true;
+			try {
+				readFile();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			} catch (InvalidRangeException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return this.idxMapping;
 	}
 	
 	private FloodingInfo processCoord(Index idxStage, Array stage, Coordinate c) {

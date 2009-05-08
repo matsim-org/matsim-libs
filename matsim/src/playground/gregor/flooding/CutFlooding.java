@@ -27,13 +27,15 @@ public class CutFlooding {
 
 
 	protected static final Logger log = Logger.getLogger(CutFlooding.class);
-
+	 private final static double xoff = 632968.529;
+	 private final static double yoff = 9880201.726;
 	private final static double MAX_X = 658541.;
 	private final static double MAX_Y = 9902564.;
 	private final static double MIN_X = 648520.;
 	private final static double MIN_Y = 988294.;
-	private static final double DISTANCE = 5.;
-	private static final int TIME_RES_DOWNSCALE = 2;
+	private static final double DISTANCE = 1.;
+	private static final int TIME_RES_DOWNSCALE1 = 2;
+	private static final int TIME_RES_DOWNSCALE2 = 6;
 	private static final int MAX_TIME = 120; 
 	private NetcdfFile in;
 	protected NetcdfFileWriteable out;
@@ -130,22 +132,30 @@ public class CutFlooding {
 		for (int i : indexes) {
 			this.idx.set(i);
 			this.idxStage.set(0,i);
-			for (int j = 0 ; j < MAX_TIME * TIME_RES_DOWNSCALE; j += TIME_RES_DOWNSCALE) {
+			int j = 0;
+			for (int time = 0 ; time < MAX_TIME; time++) {
+				double scale;
+				if (time < 33) {
+					scale = TIME_RES_DOWNSCALE1;
+				} else {
+					scale = TIME_RES_DOWNSCALE2;
+				}
+				j += scale;
 				this.idxStage.set0(j);
 				double s = this.aStage.getFloat(this.idxStage);
 				if (s != 0) {
-					System.out.println("s:" + s);
+//					System.out.println("s:" + s);
 				}
-				aStage.set((j/TIME_RES_DOWNSCALE),pos, s);
+				aStage.set(time,pos, s);
 			}
-			double x = this.aX.getDouble(this.idx);
-			double y = this.aY.getDouble(this.idx);
+			double x = this.aX.getDouble(this.idx) + xoff;
+			double y = this.aY.getDouble(this.idx) + yoff;
 			double z = this.aZ.getDouble(this.idx);
 			aX.setDouble(pos, x);
 			aY.setDouble(pos, y);
-			if (z != 0 ) {
-				System.out.println("z:" + z);
-			}
+//			if (z != 0 ) {
+//				System.out.println("z:" + z);
+//			}
 			aZ.setDouble(pos++, z);
 
 
@@ -189,8 +199,8 @@ public class CutFlooding {
 			}
 			this.idx.set(i);
 			this.idxStage.set(0,i);
-			double x = this.aX.getDouble(this.idx);
-			double y = this.aY.getDouble(this.idx);
+			double x = this.aX.getDouble(this.idx) + xoff;
+			double y = this.aY.getDouble(this.idx) + yoff;
 			double z = this.aZ.getDouble(this.idx);
 
 			if (x > MAX_X || x < MIN_X || y > MAX_Y || y < MIN_Y) {
@@ -212,9 +222,9 @@ public class CutFlooding {
 	}
 
 	public static void main(String [] args) {
-		String in = "../../inputs/flooding/SZ_r018M_m003_095_11_mw9.00_03h__P0_8.sww";
-		String out = "../../inputs/flooding/flooding01.sww";
-
+		String in = "../../inputs/flooding/SZ_r018M_m003_092_12_mw9.00_03h__P7_8.sww";
+		String out = "../../inputs/flooding/flooding08.sww";
+		
 		new CutFlooding(in,out).run();
 
 

@@ -218,19 +218,24 @@ public class InundationDataFromNetcdfReader {
 						t.awalsh = coeffs;
 						t.xa = (float) fi.getCoordinate().x;
 						t.ya = (float) fi.getCoordinate().y;
+						break;
 					case 1 :
 						t.bwalsh = coeffs;
 						t.xb = (float) fi.getCoordinate().x;
 						t.yb = (float) fi.getCoordinate().y;
+						break;
 					case 2 :
 						t.cwalsh = coeffs;
 						t.xc = (float) fi.getCoordinate().x;
 						t.yc = (float) fi.getCoordinate().y;
+						break;
 					}
 					
 					
 				}	
-				info.add(t);
+				if (t != null){
+					info.add(t);
+				}
 			}
 			
 		}
