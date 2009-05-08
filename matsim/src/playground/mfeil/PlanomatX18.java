@@ -152,7 +152,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			
 		/* Instantiate all necessary lists and arrays*/
 		PlanomatXPlan [] neighbourhood 					= new PlanomatXPlan [NEIGHBOURHOOD_SIZE+1];
-		int [][] infoOnNeighbourhood 					= new int [NEIGHBOURHOOD_SIZE][3];
+		int [][] infoOnNeighbourhood 					= new int [NEIGHBOURHOOD_SIZE][3];//{0 = "new solution" vs. 1 = "no new solution"; -1 = act removed vs. x>0 = position first act inserted/swapped; -1 = act removed vs. x>0 = position second act swapped}
 		int [] tabuInNeighbourhood 						= new int [NEIGHBOURHOOD_SIZE];
 		int [] scoredInNeighbourhood					= new int [NEIGHBOURHOOD_SIZE];
 		ArrayList<PlanomatXPlan> nonTabuNeighbourhood 	= new ArrayList<PlanomatXPlan>();
@@ -466,7 +466,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			int[] numberPositions = {0,0,1,1};		// "where to add activity, where to remove activity, number of adding cycles, number of removing cycles"
 			int[] actsToBeAdded = new int [(int)(neighbourhood[0].getPlanElements().size()/2)+1];
 			for (neighbourPos = (int) (NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos<(int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos++){
-				infoOnNeighbourhood[neighbourPos] = this.changeNumber(neighbourhood[neighbourPos], WEIGHT_INC_NUMBER, numberPositions, actsToBeAdded, actTypes, primActs);
+				infoOnNeighbourhood[neighbourPos] = this.changeNumber(neighbourhood[neighbourPos], numberPositions, actsToBeAdded, actTypes, primActs);
 			}
 			int [] typePosition = {(int)(MatsimRandom.getRandom().nextDouble()*((int)(neighbourhood[0].getPlanElements().size()/2)-1))+1,1};
 			
@@ -527,10 +527,11 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		}
 	}
 	
-	public int[] changeNumber (PlanomatXPlan basePlan, double weight, int [] positions, int [] actsToBeAdded, 
+	public int[] changeNumber (PlanomatXPlan basePlan, int [] positions, int [] actsToBeAdded, 
 			ArrayList<ActivityOption> actTypes, ArrayList<ActivityOption> primActs){
 				
-		if(MatsimRandom.getRandom().nextDouble()>=weight){
+		//if(MatsimRandom.getRandom().nextDouble()>=weight){
+		if(MatsimRandom.getRandom().nextDouble()>=WEIGHT_INC_NUMBER){
 			
 			/* Removing an activity, "cycling"*/
 			if (basePlan.getPlanElements().size()==5){
@@ -702,7 +703,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			else {
 				boolean warningTabu = false;
 				for (int i = 0; i<tabuList.size();i++){		//compare each neighbourhood solution with all tabu solutions
-					if (checkForEquality(tabuList.get(tabuList.size()-1-i), neighbourhood[x])) {
+					if (checkForEquality(tabuList.get(tabuList.size()-1-i), neighbourhood[x])){ //TODO Check whether enough to start from .size()-2-i?
 						warningTabu = true;
 						break;
 					}
