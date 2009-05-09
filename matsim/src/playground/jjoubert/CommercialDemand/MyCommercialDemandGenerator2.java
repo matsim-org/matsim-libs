@@ -43,20 +43,24 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.demandmodeling.primloc.CumulativeDistribution;
 
+import playground.jjoubert.CommercialTraffic.ActivityLocations;
 import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.Vehicle;
-import playground.jjoubert.CommercialTraffic.ActivityLocations;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 public class MyCommercialDemandGenerator2 {
+	// String value that must be set
+	final static String PROVINCE = "SouthAfrica";
+	// Mac
+//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	// IVT-Sim0
+	final static String ROOT = "/home/jjoubert/";
 	
-	private static final int populationSize = 10;
+	private static final int populationSize = 50;
 	private static final int firstIndex = 100000;
-	private static final String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	private static double WITHIN_THRESHOLD = 0.90;
-	private static final String PROVINCE = "Gauteng";
 
 	private final static int dimensionStart = 24; 		// vales 00h00m00 - 23h59m59
 	private final static int dimensionActivities = 21; 	// index '0' should never be used
@@ -69,6 +73,22 @@ public class MyCommercialDemandGenerator2 {
 		ArrayList<ArrayList<ArrayList<Integer>>> matrix = extractChainProperties();
 		// Build CDF for chain start times		
 		CumulativeDistribution cdfStartTime = convertMatrixToStartTimeCDF(matrix);
+		// Build empty CDF for number of activities
+		ArrayList<CumulativeDistribution> cdfNumberOfActivities = new ArrayList<CumulativeDistribution>();
+		for(int a = 0; a < matrix.size(); a++){
+			CumulativeDistribution cdf = null;
+			cdfNumberOfActivities.add(cdf);
+		}
+		// Build an empty CDF for chain duration
+		ArrayList<ArrayList<CumulativeDistribution>> cdfDuration = new ArrayList<ArrayList<CumulativeDistribution>>();
+		for(int a = 0; a < matrix.size(); a++){
+			ArrayList<CumulativeDistribution> cdfDurationn = new ArrayList<CumulativeDistribution>();
+			for(int b = 0; b < matrix.get(a).size(); b++){
+				CumulativeDistribution cdf = null;
+				cdfDurationn.add(cdf);
+			}
+			cdfDuration.add(cdfDurationn);
+		}
 		
 		
 		// Read major locations
@@ -90,17 +110,16 @@ public class MyCommercialDemandGenerator2 {
 		//TODO Check if it is 'better' to create 'i' truck agents, and split them into dummy agents
 		// if the duration is greater than 24 hours - thus probably ending with more than 'i' agents;
 		// or create agents UNTIL you have 'i' - including the dummies.
+		System.out.println("Building population plans... ");
+		int populationComplete = 0;
+		int populationLimit = 1;
+		int agentId  = firstIndex;
 		for(int i = 0; i < populationSize; i++ ){
 			// Sample start time
-			int startTime = (int) cdfStartTime.sampleFromCDF() * 3600; // Convert hours to minutes
+			int startTimeBin = (int) cdfStartTime.sampleFromCDF();
+			int startTime = startTimeBin * 3600; // Convert hours to minutes
 			
-			// Create a truck agent
-			Id id = sc.createId(Long.toString(firstIndex + i));
-			BasicPerson truck = pb.createPerson(id);
-			population.getPersons().put(id, truck);
-			
-			BasicPlan plan = pb.createPlan(truck);
-			truck.getPlans().add(plan);
+			BasicPlan plan = pb.createPlan(null);
 						
 			// Sample major location and add as first activity
 			Point major = majorPoints.get(MatsimRandom.getRandom().nextInt(majorPoints.size()));
@@ -112,23 +131,42 @@ public class MyCommercialDemandGenerator2 {
 			BasicLeg leg = pb.createLeg(TransportMode.car);
 			plan.addLeg(leg);
 
-			//TODO Sample number of activities, given start time
+			// Sample number of activities, given start time
 			int activitiesPerChain = 0;
-			//TODO Sample duration, given start time AND number of activities
+			if(cdfNumberOfActivities.get(startTimeBin) == null){
+				// Build new CDF
+				CumulativeDistribution cdfNew = convertMatrixToNumberOfActivitiesCDF(matrix, startTimeBin);
+				cdfNumberOfActivities.set(startTimeBin, cdfNew);
+			} 
+			// Sample from cdfNumberOfActivities
+			int numberOfActivitiesBin = (int) cdfNumberOfActivities.get(startTimeBin).sampleFromCDF();
+			activitiesPerChain = numberOfActivitiesBin;
+			
+			
+			// Sample duration, given start time AND number of activities
 			int endTime = 0;
+			if(cdfDuration.get(startTimeBin).get(numberOfActivitiesBin) == null){
+				// Build new CDF
+				CumulativeDistribution cdfNew = convertMatrixToDurationCDF(matrix, startTimeBin, numberOfActivitiesBin);
+				cdfDuration.get(startTimeBin).set(numberOfActivitiesBin, cdfNew);
+			}
+			// Sample from cdfDuration. Limit the end time to 48:00:00 i.e. end of second day
+			int durationBin = (int) cdfDuration.get(startTimeBin).get(numberOfActivitiesBin).sampleFromCDF();
+			endTime = Math.min(startTime + (Math.max(1, durationBin) * 3600), 172800);
 			
 			// Establish time 'gaps' based on the number of activities
 			double gap = (endTime - startTime) / (activitiesPerChain + 1); // (Duration) / (n+1)
+			double activityEndTime = startTime + gap;
 			
 			for(int activity = 0; activity < activitiesPerChain; activity++){
 				// Sample minor point
 				Point minor = minorPoints.get(MatsimRandom.getRandom().nextInt(minorPoints.size()));
 				BasicActivity minorActivity = pb.createActivityFromCoord("minor", 
 						sc.createCoord(minor.getCoordinate().x, minor.getCoordinate().y));
-				minorActivity.setEndTime(endTime);
+				minorActivity.setEndTime(activityEndTime);
 				
 				plan.getPlanElements().add(minorActivity);	
-				endTime += gap;	
+				activityEndTime += gap;	
 				
 				plan.addLeg(leg);				
 			}
@@ -141,11 +179,206 @@ public class MyCommercialDemandGenerator2 {
 			// activity for that day; duplicate it as the first home activity ending at 00:00:00 for a new dummy
 			// agent, and add the remaining activities to the new dummy agent. Note: the activity end times must be 
 			// adjusted for the remaining activities, and the new dummy agent must be checked to see if the new end 
-			// chain end time is before 24:00:00.		
+			// chain end time is before 24:00:00.
 			
+			ArrayList<BasicPlan> planList = chopPlan(plan, pb);
+
+			for (int p = 0; p < planList.size(); p++) {
+				// Create a truck agent
+				Id id = sc.createId(Long.toString(agentId));
+				BasicPerson truck = pb.createPerson(id);
+				truck.getPlans().add(planList.get(p));
+				population.getPersons().put(id, truck);
+				agentId++;
+				//TODO This is where I may want to include a ++populationComplete command if I only want a total of
+				// populationSize commercial vehicle agents.
+			}
+			
+			// Report progress
+			if(++populationComplete == populationLimit){
+				System.out.printf("   ... Agents built: %6d\n", populationComplete);
+				populationLimit *= 2;
+			}
 		}
+		System.out.printf("   ... Done (%d agents)\n", populationComplete);
 		
 		// Write plans.xml file
+		System.out.print("Writing plans to XML file... ");
+		PopulationWriter pw = new PopulationWriter(population, ROOT + "Commercial/plans.xml");
+		pw.write();
+		System.out.println("Done!");
+		System.out.printf("\nPlans generation: Complete");
+	}
+
+
+	@SuppressWarnings("unchecked")
+	private static ArrayList<BasicPlan> chopPlan(BasicPlan plan, BasicPopulationBuilder pb) {
+		
+		ArrayList<BasicPlan> result = new ArrayList<BasicPlan>();
+		Object lastActivity = plan.getPlanElements().get(plan.getPlanElements().size() - 1);
+		
+		// I shouldn't have to test if the lastActivitiy is an instance of BasicActivity
+		if( ((BasicActivity) lastActivity).getStartTime() > 86400 ){// 24h00m00
+			// Add the first activity
+			BasicPlan dummyPlan = pb.createPlan(null);
+			BasicActivity firstActivity = (BasicActivity) plan.getPlanElements().get(0);
+			dummyPlan.getPlanElements().add(firstActivity);
+			BasicLeg firstLeg = (BasicLeg) plan.getPlanElements().get(1);
+			dummyPlan.addLeg(firstLeg);
+			
+//			boolean found = false;
+			int index = 2;
+			while(index < plan.getPlanElements().size()){
+				BasicActivity ba = (BasicActivity) plan.getPlanElements().get(index);
+				if(ba.getType() == "minor"){ //TODO This must be generalized to ANY activity type
+					if(ba.getEndTime() > 86400){
+//						found = true;
+						// Create a new dummy activity, and add to end of current plan
+						BasicActivity baDummy1 = pb.createActivityFromCoord("major", ba.getCoord() );
+						baDummy1.setStartTime(86399); // 23:59:59
+						dummyPlan.getPlanElements().add(baDummy1);
+						result.add(dummyPlan);
+						
+						// Create a new dummy plan, and add the dummy activity as the first activity
+						dummyPlan = pb.createPlan(null);
+						BasicActivity baDummy2 = pb.createActivityFromCoord("major", ba.getCoord() );
+						// Make it the start time of the first activity of the new day. This is fine since
+						// it already has the same location as the first activity of the new day.
+						baDummy2.setEndTime(1); // 00:00:01
+						dummyPlan.getPlanElements().add(baDummy2);
+						BasicLeg leg = (BasicLeg) plan.getPlanElements().get(index - 1);
+						dummyPlan.getPlanElements().add(leg);
+						
+						// Add the remaining activities, adjusting the times
+						while(index < plan.getPlanElements().size()){
+							BasicActivity ba3 = (BasicActivity) plan.getPlanElements().get(index);
+							if(ba3.getStartTime() > 0){
+								double st = ba3.getStartTime();
+								ba3.setStartTime(st - 86400);
+							}
+							if(ba3.getEndTime() > 0){
+								double st = ba3.getEndTime();
+								ba3.setEndTime(st - 86400);
+							}
+							dummyPlan.getPlanElements().add(ba3);
+							if(ba3.getType() == "minor"){
+								BasicLeg bl = (BasicLeg) plan.getPlanElements().get(index + 1);
+								dummyPlan.getPlanElements().add(bl);
+							}
+							index += 2;
+						}
+						// Recursively check the new dummy plan
+						ArrayList<BasicPlan> recursivePlans = chopPlan(dummyPlan, pb);
+						for (BasicPlan bp : recursivePlans) {
+							result.add(bp);
+						}
+						
+					} else{
+						dummyPlan.getPlanElements().add(ba);
+						BasicLeg leg = (BasicLeg) plan.getPlanElements().get(index+1);
+						dummyPlan.getPlanElements().add(leg);
+						index += 2;
+					}			
+				} else {
+					dummyPlan.getPlanElements().add(ba);
+					result.add(dummyPlan);
+					dummyPlan = pb.createPlan(null);
+					index += 2;
+				}
+			}
+			
+			
+			// Get all plan entries
+			
+
+			// Find first activity past 24:00:00
+
+			// Copy all remaining entries to dummy agent
+
+			// Change activity type to major
+
+			// Create new agent
+
+			// Add major activity to new agent
+
+			// Add dummy agent's plans to new agent
+
+			// Adjust all activity end times
+		} else{
+			// The plan only spans one day.
+			result.add(plan);
+		}
+		return result;
+	}
+
+
+	private static CumulativeDistribution convertMatrixToDurationCDF(
+			ArrayList<ArrayList<ArrayList<Integer>>> matrix, int bin1,
+			int bin2) {
+		CumulativeDistribution result = null;
+		int total = 0;
+		ArrayList<Integer> observations = new ArrayList<Integer>(dimensionDuration);
+		ArrayList<Double> probs = new ArrayList<Double>(dimensionDuration);
+		for(int a = 0; a < matrix.get(bin1).get(bin2).size(); a++){
+			int points = (int) matrix.get(bin1).get(bin2).get(a);
+			total += points;
+			observations.add(points);
+		}
+		for(int a = 0; a < matrix.get(bin1).get(bin2).size(); a++){
+			double prob = (double)observations.get(a) / (double)total;
+			probs.add(prob);
+		}
+		double [] xs = new double[dimensionDuration+1];
+		xs[0] = -0.5;
+		for(int a = 1; a < xs.length; a++){
+			xs[a] = a - 0.5;
+		}
+		double [] ys = new double[dimensionDuration+1];
+		ys[0] = 0.0;
+		for(int b = 1; b < ys.length; b++){
+			ys[b] = ys[b-1] + probs.get(b-1);
+		}
+		ys[ys.length-1] = 1;
+		
+		result = new CumulativeDistribution(xs,ys);		
+		
+		return result;
+	}
+
+
+	private static CumulativeDistribution convertMatrixToNumberOfActivitiesCDF(
+			ArrayList<ArrayList<ArrayList<Integer>>> matrix, int bin) {
+		CumulativeDistribution result = null;
+		int total = 0;
+		ArrayList<Integer> observations = new ArrayList<Integer>(dimensionActivities);
+		ArrayList<Double> probs = new ArrayList<Double>(dimensionActivities);
+		for(int a = 0; a < matrix.get(bin).size(); a++){
+			int points = 0;
+			for(int b = 0; b < dimensionDuration; b++){
+				points += matrix.get(bin).get(a).get(b);				
+			}
+			total += points;
+			observations.add(points);
+		}
+		for(int a = 0; a < matrix.get(bin).size(); a++){
+			double prob = (double)observations.get(a) / (double)total;
+			probs.add(prob);
+		}
+		double [] xs = new double[dimensionActivities+1];
+		xs[0] = -0.5;
+		for(int a = 1; a < xs.length; a++){
+			xs[a] = a - 0.5;
+		}
+		double [] ys = new double[dimensionActivities+1];
+		ys[0] = 0.0;
+		for(int b = 1; b < ys.length; b++){
+			ys[b] = ys[b-1] + probs.get(b-1);
+		}
+		ys[ys.length-1] = 1;
+		
+		result = new CumulativeDistribution(xs,ys);		
+		
+		return result;
 	}
 
 
@@ -167,7 +400,7 @@ public class MyCommercialDemandGenerator2 {
 			observations.add(points);
 		}
 		for(int a = 0; a < matrix.size(); a++){
-			double prob = observations.get(a) / total;
+			double prob = (double)observations.get(a) / (double)total;
 			probs.add(prob);
 		}
 		double [] xs = new double[dimensionStart+1];
@@ -180,6 +413,7 @@ public class MyCommercialDemandGenerator2 {
 		for(int b = 1; b < ys.length; b++){
 			ys[b] = ys[b-1] + probs.get(b-1);
 		}
+		ys[ys.length-1] = 1;
 		
 		result = new CumulativeDistribution(xs,ys);		
 		
@@ -224,6 +458,7 @@ public class MyCommercialDemandGenerator2 {
 
 		// Build ArrayList with 'within' vehicles
 		String vehicleSource = ROOT + PROVINCE + "/Activities/" + PROVINCE + "VehicleStats.txt";
+//		String vehicleSource = ROOT + "/Temp/TempVehicleStats.txt";
 		ArrayList<Integer> withinVehicles = 
 			ExtractWithinActivityDurations.buildWithinVehicleIdList(vehicleSource, WITHIN_THRESHOLD);
 		
@@ -244,6 +479,7 @@ public class MyCommercialDemandGenerator2 {
 		
 		// Process XML files
 		String xmlSource = ROOT + PROVINCE + "/XML/";
+//		String xmlSource = ROOT + "Temp/XML/";
 		File xmlFolder = new File(xmlSource);
 		assert( xmlFolder.isDirectory() ) : "The XML source is not a valid folder!";
 		
@@ -285,13 +521,12 @@ public class MyCommercialDemandGenerator2 {
 				// Update progress
 				if(++filesProcessed == processLimit){
 					System.out.printf("   ... Files processed: %6d\n", filesProcessed);
-					processLimit*=2;
+					processLimit *= 2;
 				}
 			}
 		}
 		System.out.printf("   ... Done (%d files)\n", filesProcessed);
 		return matrix;
 	}
-
 
 }
