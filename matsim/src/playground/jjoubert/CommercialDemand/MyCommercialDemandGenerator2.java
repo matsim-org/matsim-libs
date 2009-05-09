@@ -70,7 +70,7 @@ public class MyCommercialDemandGenerator2 {
 	public static void main(String[] args){
 		System.out.println();
 		System.out.println("*********************************************************************************");
-		System.out.printf("  Generating a 'plans.xml' file for %s for %d agents.", PROVINCE, populationSize);
+		System.out.printf("  Generating a 'plans.xml' file for %s for %d agents.\n", PROVINCE, populationSize);
 		System.out.println("*********************************************************************************");
 		System.out.println();
 		
