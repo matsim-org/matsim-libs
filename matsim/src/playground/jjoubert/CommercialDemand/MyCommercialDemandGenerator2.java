@@ -212,7 +212,7 @@ public class MyCommercialDemandGenerator2 {
 		PopulationWriter pw = new PopulationWriter(population, ROOT + "Commercial/plans.xml");
 		pw.write();
 		System.out.println("Done!");
-		System.out.printf("\nPlans generation: Complete");
+		System.out.printf("\nPlans generation: Complete\n");
 	}
 
 	/**
