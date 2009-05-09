@@ -21,6 +21,7 @@ package playground.mfeil;
 
 
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -45,9 +46,9 @@ public class TimeOptimizerWIGIC extends TimeOptimizer implements PlanAlgorithm {
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TimeOptimizerWIGIC (LegTravelTimeEstimator estimator, PlanScorer scorer){
+	public TimeOptimizerWIGIC (Controler controler, LegTravelTimeEstimator estimator, PlanScorer scorer){
 		
-		super(estimator, scorer);
+		super(controler, estimator, scorer);
 	
 		this.OFFSET					= 900;
 		this.MAX_ITERATIONS 		= 30;

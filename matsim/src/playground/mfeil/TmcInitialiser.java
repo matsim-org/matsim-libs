@@ -37,26 +37,19 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 public class TmcInitialiser extends AbstractMultithreadedModule{
 	
 	private final PlanScorer 				scorer;
-	private final LegTravelTimeEstimator	estimator;
+	private final Controler					controler;
 
 	
 	public TmcInitialiser (Controler controler, ScoringFunctionFactory factory) {
 		this.scorer = new PlanScorer(factory);
-		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
-				controler.getNetwork(), 
-				controler.getTraveltimeBinSize());
-		this.estimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
-				controler.getTravelTimeCalculator(), 
-				controler.getTravelCostCalculator(), 
-				tDepDelayCalc, 
-				controler.getNetwork());
+		this.controler = controler;
 	}
 
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {		
 
-		PlanAlgorithm timeOptAlgorithm = new TimeModeChoicer1 (this.estimator, this.scorer);
+		PlanAlgorithm timeOptAlgorithm = new TimeModeChoicer1 (this.controler, this.scorer);
 		return timeOptAlgorithm;
 	}
 }

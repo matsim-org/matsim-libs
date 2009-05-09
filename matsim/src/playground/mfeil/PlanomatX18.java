@@ -88,7 +88,8 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	public PlanomatX18 (Controler controler, PreProcessLandmarks preProcessRoutingData, LocationMutatorwChoiceSet locator){
 		this.preProcessRoutingData 	= preProcessRoutingData;
 		this.factory				= controler.getScoringFunctionFactory();
-		this.router 				= new PlansCalcRoute (controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), new AStarLandmarksFactory(this.preProcessRoutingData));
+		//this.router 				= new PlansCalcRoute (controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), new AStarLandmarksFactory(this.preProcessRoutingData));
+		this.router 				= new PlansCalcRoute (controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer					= new PlanScorer (this.factory);
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
 				controler.getNetwork(), 
@@ -112,20 +113,20 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		this.finalOpt				= PlanomatXConfigGroup.getFinalTimer();
 		
 		if (PlanomatXConfigGroup.getTimer().equals("TimeModeChoicer")){
-			this.timer				= new TimeModeChoicer1(legTravelTimeEstimator, this.scorer);
+			this.timer				= new TimeModeChoicer1(controler, legTravelTimeEstimator, this.scorer);
 		}
 		else if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
 			this.timer				= new Planomat (legTravelTimeEstimator, this.factory); 
 		}
-		else this.timer				= new TimeOptimizer(legTravelTimeEstimator, this.scorer);
+		else this.timer				= new TimeOptimizer(controler, legTravelTimeEstimator, this.scorer);
 		
 		if (this.finalOpt.equals("TimeModeChoicer")){
-			this.finalTimer			= new TimeModeChoicer1(legTravelTimeEstimator, this.scorer);
+			this.finalTimer			= new TimeModeChoicer1(controler, legTravelTimeEstimator, this.scorer);
 		}
 		else if (this.finalOpt.equals("Planomat")){
 			this.finalTimer			= new Planomat(legTravelTimeEstimator, this.factory); 
 		}
-		else this.finalTimer		= new TimeOptimizerWIGIC(legTravelTimeEstimator, this.scorer);		
+		else this.finalTimer		= new TimeOptimizerWIGIC(controler, legTravelTimeEstimator, this.scorer);		
 		
 		this.locator				= locator;		
 	}
@@ -204,9 +205,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
 	//	if (Gbl.getConfig().planomat().getPossibleModes().length>0){
-			for (int z=1;z<plan.getPlanElements().size();z+=2){
-				((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
-			}
+	//		for (int z=1;z<plan.getPlanElements().size();z+=2){
+	//			((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
+	//		}
 	//	}
 		this.router.run(plan);
 		this.timer.run(plan);
@@ -228,9 +229,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			
 			/* Routing*/
 		//	if (Gbl.getConfig().planomat().getPossibleModes().length>0){
-				for (int z=1;z<plan.getPlanElements().size();z+=2){
-					((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
-				}
+		//		for (int z=1;z<plan.getPlanElements().size();z+=2){
+		//			((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
+		//		}
 		//	}
 			this.router.run(plan);
 			this.timer.run(plan);
@@ -294,9 +295,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					
 					/* Routing*/
 				//	if (Gbl.getConfig().planomat().getPossibleModes().length>0){
-						for (int z=1;z<neighbourhood[x].getPlanElements().size();z+=2){
-							((Leg)(neighbourhood[x].getPlanElements().get(z))).setMode(TransportMode.car);
-						}
+				//		for (int z=1;z<neighbourhood[x].getPlanElements().size();z+=2){
+				//			((Leg)(neighbourhood[x].getPlanElements().get(z))).setMode(TransportMode.car);
+				//		}
 				//	}
 					this.router.run(neighbourhood[x]);
 										

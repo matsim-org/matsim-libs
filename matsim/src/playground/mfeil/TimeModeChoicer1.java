@@ -30,11 +30,16 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicLegImpl;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
@@ -51,6 +56,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	private final int						MAX_ITERATIONS, STOP_CRITERION, NEIGHBOURHOOD_SIZE;
 	private final double					OFFSET;
 	protected final double					minimumTime;
+	private final PlansCalcRoute		 	router;
 	protected final PlanScorer 				scorer;
 	protected final LegTravelTimeEstimator	estimator;
 	private static final Logger 			log = Logger.getLogger(TimeModeChoicer1.class);
@@ -63,8 +69,9 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TimeModeChoicer1 (LegTravelTimeEstimator estimator, PlanScorer scorer){
+	public TimeModeChoicer1 (Controler controler, LegTravelTimeEstimator estimator, PlanScorer scorer){
 		
+		this.router 				= new PlansCalcRoute (controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer 				= scorer;
 		this.estimator				= estimator;
 		this.OFFSET					= Double.parseDouble(TimeModeChoicerConfigGroup.getOffset());
@@ -77,8 +84,30 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.possibleModes			= TimeModeChoicerConfigGroup.getPossibleModes();
 		this.modeChoice				= TimeModeChoicerConfigGroup.getModeChoice();
 		this.routes					= null;
+	}
+	
+	public TimeModeChoicer1 (Controler controler, PlanScorer scorer){
 		
-		//TODO @MF: constants to be configured externally
+		this.router 				= new PlansCalcRoute (controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
+		this.scorer 				= scorer;
+		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
+				controler.getNetwork(), 
+				controler.getTraveltimeBinSize());
+		this.estimator				= Gbl.getConfig().planomat().getLegTravelTimeEstimator(
+				controler.getTravelTimeCalculator(), 
+				controler.getTravelCostCalculator(), 
+				tDepDelayCalc, 
+				controler.getNetwork());
+		this.OFFSET					= Double.parseDouble(TimeModeChoicerConfigGroup.getOffset());
+		this.MAX_ITERATIONS 		= Integer.parseInt(TimeModeChoicerConfigGroup.getMaxIterations());
+		this.STOP_CRITERION			= Integer.parseInt(TimeModeChoicerConfigGroup.getStopCriterion());
+		this.minimumTime			= Double.parseDouble(TimeModeChoicerConfigGroup.getMinimumTime());
+		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(TimeModeChoicerConfigGroup.getNeighbourhoodSize());
+		this.maxWalkingDistance		= Double.parseDouble(TimeModeChoicerConfigGroup.getMaximumWalkingDistance());
+		//this.possibleModes			= Gbl.getConfig().planomat().getPossibleModes(); //faster call at runtime
+		this.possibleModes			= TimeModeChoicerConfigGroup.getPossibleModes();
+		this.modeChoice				= TimeModeChoicerConfigGroup.getModeChoice();
+		this.routes					= null;
 	}
 	
 		
@@ -89,8 +118,16 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	
 	public void run (Plan basePlan){
 		
+		/*Do nothing if the plan has only one activity (=24h home)*/
 		if (basePlan.getPlanElements().size()==1) return;
 		
+		/*Set all leg modes to car*/
+		for (int z=1;z<basePlan.getPlanElements().size();z+=2){
+			((Leg)(basePlan.getPlanElements().get(z))).setMode(TransportMode.car);
+		}
+		this.router.run(basePlan);
+		
+		/*
 		boolean carIsIn = false;
 		for (int i=0;i<this.possibleModes.length;i++){
 			if (this.possibleModes[i]==TransportMode.car){
@@ -98,6 +135,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				break;
 			}
 		}
+		*/
 		
 		/* Memorize the initial car routes.
 		 * Do this in any case as the car routes are required in the setTimes() method. */
@@ -114,13 +152,15 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		}
 		this.routes = routes;
 		
-		if (!carIsIn && this.possibleModes.length>0) {
-			/* Set all legs to an - at least - valid mode.
-			 * If the mode is score-wise crap the initial cleaning of the schedule will relieve this. */
-			for (int i=1;i<basePlan.getPlanElements().size();i=i+2){
-				((Leg)(basePlan.getPlanElements().get(i))).setMode(this.possibleModes[0]);
-			}
-		}
+		
+	//	if (!carIsIn && this.possibleModes.length>0) {
+	//		/* Set all legs to an - at least - valid mode.
+	//		 * If the mode is score-wise crap the initial cleaning of the schedule will relieve this. */
+	//		for (int i=1;i<basePlan.getPlanElements().size();i=i+2){
+	//			((Leg)(basePlan.getPlanElements().get(i))).setMode(this.possibleModes[0]);
+	//		}
+	//	}
+		
 		
 		/* Analysis of subtours */
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();

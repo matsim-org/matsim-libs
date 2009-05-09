@@ -27,6 +27,7 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -48,9 +49,9 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TimeOptimizer (LegTravelTimeEstimator estimator, PlanScorer scorer){
+	public TimeOptimizer (Controler controler, LegTravelTimeEstimator estimator, PlanScorer scorer){
 		
-		super(estimator, scorer);
+		super(controler, estimator, scorer);
 		
 		this.OFFSET					= 1800;
 		this.MAX_ITERATIONS 		= 30;
