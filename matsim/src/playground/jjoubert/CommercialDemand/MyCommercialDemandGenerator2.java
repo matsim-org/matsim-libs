@@ -58,7 +58,7 @@ public class MyCommercialDemandGenerator2 {
 	// IVT-Sim0
 	final static String ROOT = "/home/jjoubert/";
 	
-	private static final int populationSize = 50;
+	private static final int populationSize = 5000;
 	private static final int firstIndex = 100000;
 	private static double WITHIN_THRESHOLD = 0.90;
 
