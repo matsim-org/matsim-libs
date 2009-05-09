@@ -8,22 +8,22 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="/Users/johanwjoubert/MATSim/worksapce/MATSimData/Commercial/Input/networkSA.xml" />
+		<param name="inputNetworkFile" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Input/networkSA.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="/Users/johanwjoubert/MATSim/worksapce/MATSimData/Commercial/Input/plans.xml" />
-		<param name="outputPlansFile" value="/Users/johanwjoubert/MATSim/worksapce/MATSimData/Commercial/Input/plansLinks.xml" />
+		<param name="inputPlansFile" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Input/plans.xml" />
+		<param name="outputPlansFile" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Input/plansLinks.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="/Users/johanwjoubert/MATSim/worksapce/MATSimData/Commercial/Output/" />
+		<param name="outputDirectory" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Output/" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="100" />
 	</module>
 
     <module name="counts">
-        <param name="inputCountsFile" value="/Users/johanwjoubert/MATSim/worksapce/MATSimData/Commercial/Input/2001_counts_1000m+.xml" />
+        <param name="inputCountsFile" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Input/2001_counts_1000m+.xml" />
         <param name="outputformat" value="kml" />
         <!-- these parameters are used in case you dont want to use the entire counting
         station file
