@@ -179,14 +179,14 @@ public class MyCommercialDemandGenerator2 {
 			majorActivityEnd.setStartTime(endTime);
 			plan.getPlanElements().add(majorActivityEnd);
 			
-			//TODO Now I have a nice long chain. If the chain ends before 24:00:00, no problem. If, on the other
+			// Now I have a nice long chain. If the chain ends before 24:00:00, no problem. If, on the other
 			// hand, the chain ends after 24:00:00, I need to find the last activity of the day, make it the "major"
 			// activity for that day; duplicate it as the first home activity ending at 00:00:00 for a new dummy
 			// agent, and add the remaining activities to the new dummy agent. Note: the activity end times must be 
 			// adjusted for the remaining activities, and the new dummy agent must be checked to see if the new end 
 			// chain end time is before 24:00:00.
 			
-			ArrayList<BasicPlan> planList = chopPlan(plan, pb);
+			ArrayList<BasicPlan> planList = chopPlan(plan, pb);			
 
 			for (int p = 0; p < planList.size(); p++) {
 				// Create a truck agent
@@ -215,7 +215,14 @@ public class MyCommercialDemandGenerator2 {
 		System.out.printf("\nPlans generation: Complete");
 	}
 
-
+	/**
+	 * The class receives an activity plan, that may or may not end after 24h00m00, and returns
+	 * an ArrayList of activity plans, each ending before or at 24h00m00.
+	 * 
+	 * @param plan of type {@code BasicPlan}
+	 * @param pb a population builder of type {@code BasicPopulationBuilder}
+	 * @return an {@code ArrayList} of {@code BasicPlan}s
+	 */
 	@SuppressWarnings("unchecked")
 	private static ArrayList<BasicPlan> chopPlan(BasicPlan plan, BasicPopulationBuilder pb) {
 		
