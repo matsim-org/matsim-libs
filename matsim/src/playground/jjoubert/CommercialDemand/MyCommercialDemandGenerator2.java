@@ -68,6 +68,11 @@ public class MyCommercialDemandGenerator2 {
 
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args){
+		System.out.println();
+		System.out.println("*********************************************************************************");
+		System.out.printf("  Generating a 'plans.xml' file for %s for %d agents.", PROVINCE, populationSize);
+		System.out.println("*********************************************************************************");
+		System.out.println();
 		
 		// Analyze vehicle chains
 		ArrayList<ArrayList<ArrayList<Integer>>> matrix = extractChainProperties();
