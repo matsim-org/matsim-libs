@@ -52,7 +52,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class MyCommercialDemandGenerator2 {
 	// String value that must be set
-	final static String PROVINCE = "SouthAfrica";
+	final static String PROVINCE = "Gauteng";
 	// Mac
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
@@ -91,16 +91,16 @@ public class MyCommercialDemandGenerator2 {
 		}
 		
 		
-		// Read major locations
-		ArrayList<Point> majorPoints = readLocations(ROOT + "CommercialDemand/InputData/CommercialMajor10000.shp");
 		/**
 		 * TODO Currently I create points in ArcGIS based on the Kernel Density Estimation (KDE), 10000 in this
 		 * case. To pick a location, I simply draw a random point from the sample. In future, it might be better
 		 * to read the KDE raster into MATSim, and sample directly from it.
 		 */
 		
+		// Read major locations
+		ArrayList<Point> majorPoints = readLocations(ROOT + "Commercial/Input/CommercialMajor10000.shp");
 		// Read minor locations
-		ArrayList<Point> minorPoints = readLocations(ROOT + "CommercialDemand/InputData/CommercialMinor10000.shp");
+		ArrayList<Point> minorPoints = readLocations(ROOT + "Commercial/Input/CommercialMinor10000.shp");
 
 		// Initiate the population builder
 		BasicScenario sc = new BasicScenarioImpl();		
