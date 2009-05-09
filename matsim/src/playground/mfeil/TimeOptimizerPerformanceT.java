@@ -15,7 +15,8 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.planomat.costestimators.*;
+import org.matsim.planomat.*;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 
@@ -27,12 +28,9 @@ public class TimeOptimizerPerformanceT implements org.matsim.population.algorith
 	private final PreProcessLandmarks		preProcessRoutingData;
 	
 	public TimeOptimizerPerformanceT (Controler controler, LegTravelTimeEstimator estimator, PlanScorer scorer, ScoringFunctionFactory factory){
-		System.out.println("disabled code as it doesn't compile. mrieser/16feb2009");
-		System.exit(-1);
-		// TimeOptimizer11 cannot be found
-		this.timeOptAlgorithm 		= null;// = new TimeOptimizer11 (estimator, scorer);
-		
-		//this.timeOptAlgorithm 	= new Planomat (estimator, factory);
+
+		//this.timeOptAlgorithm 		= new TimeOptimizer (controler, estimator, scorer);
+		this.timeOptAlgorithm 	= new Planomat (estimator, factory);
 		this.scorer			  		= scorer;
 		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		this.preProcessRoutingData.run(controler.getNetwork());

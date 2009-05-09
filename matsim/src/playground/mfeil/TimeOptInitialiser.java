@@ -51,8 +51,8 @@ public class TimeOptInitialiser extends AbstractMultithreadedModule{
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {		
 
-		PlanAlgorithm timeOptAlgorithm = new TimeOptimizerPerformanceT (this.controler, this.estimator, this.scorer, this.factory);
-		//PlanAlgorithm timeOptAlgorithm = new TimeOptimizer14 (this.estimator, this.scorer);
+		//PlanAlgorithm timeOptAlgorithm = new TimeOptimizerPerformanceT (this.controler, this.estimator, this.scorer, this.factory);
+		PlanAlgorithm timeOptAlgorithm = new TimeOptimizer (this.controler, this.estimator, this.scorer);
 
 		return timeOptAlgorithm;
 	}
