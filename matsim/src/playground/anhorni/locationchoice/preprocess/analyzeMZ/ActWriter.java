@@ -57,7 +57,7 @@ public class ActWriter {
 		
 		
 		try {
-			BufferedWriter out = IOUtils.getBufferedWriter(outpath +"acts.txt");
+			BufferedWriter out = IOUtils.getBufferedWriter(outpath +"grocery_acts_mapping-MZ_BZ.txt");
 			
 			Iterator<MZTripHectare> relations_it = relations.iterator();
 			while (relations_it.hasNext()) {
@@ -85,12 +85,14 @@ public class ActWriter {
 				out.write(formatter.format(activitiesCount[i]) + "\t" +  
 						formatter.format(100.0 * activitiesCount[i]/totalActCount) + " per cent" + "\t" +  NOGA[i] + "\n");
 			}
+			out.write("Total number of activities: " + formatter.format(totalActCount) +"\n");
 			out.newLine();
 			out.write("Only one store per hectare: \n");
 			for (int i = 0; i < 13; i++) {
 				out.write(formatter.format(activitiesCountSingle[i]) + "\t" +  
 						formatter.format(100.0 * activitiesCountSingle[i]/totalActCountSingle) + " per cent" + "\t" + NOGA[i] + "\n");
 			}
+			out.write("Total number of activities: " + formatter.format(totalActCountSingle));
 			out.flush();
 			out.close();			
 		} catch (IOException e) {
