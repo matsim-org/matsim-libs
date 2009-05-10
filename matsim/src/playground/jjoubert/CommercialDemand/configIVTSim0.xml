@@ -57,7 +57,7 @@
 		
 		<param name="activityType_0"            value="major" /> <!-- major -->
 		<param name="activityPriority_0"        value="1" />
-		<param name="activityTypicalDuration_0" value="06:00:00" />
+		<param name="activityTypicalDuration_0" value="03:00:00" />
 		<param name="activityMinimalDuration_0" value="00:00:00" />
 	
 		<param name="activityType_1"            value="minor" /> <!-- minor -->
