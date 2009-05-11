@@ -20,9 +20,9 @@ public class SummaryWriter {
 	}
 	
 	public void writeRelative(Stations stations, String outpath) {	
-		String header = "Hour\trel_COUNT_SIM_avg\trel_StandardDev\n";
+		String header = "Hour\tAVG(|COUNT_i-SIM_i/COUNT_i|)\tAVG(StandardDev_i/COUNT_i)\n";
 		try {
-			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "COUNTS_relative_timevariant.txt");
+			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "AVG_relative.txt");
 			out.write(header);			
 			DecimalFormat formatter = new DecimalFormat("0.0");
 			
@@ -54,21 +54,18 @@ public class SummaryWriter {
 			
 			for (int hour = 0; hour < 24; hour++) {		
 				rel_COUNT_SIM_avg[hour] /= numberOfStations;
-			}
-			
-			for (int hour = 0; hour < 24; hour++) {		
 				rel_StandardDev[hour] /= numberOfStations;
 			}
-			
+						
 			for (int hour = 0; hour < 24; hour++) {
 				out.write(hour + "\t");
 				out.write(formatter.format(rel_COUNT_SIM_avg[hour]) + "\t");
 				out.write(formatter.format(rel_StandardDev[hour]) + "\n");	
 			}
-			LineChart chart = new LineChart("Validation", "hour", "%");
-			chart.addSeries("re_COUNT_SIM_Avg", rel_COUNT_SIM_avg);
-			chart.addSeries("reStandardDev", rel_StandardDev);
-			chart.saveAsPng(outpath + "COUNTS_relative_timevariant.png", 1000, 800);
+			LineChart chart = new LineChart("Relative Measures", "hour", "%");
+			chart.addSeries("AVG(|COUNT_i-SIM_i/COUNT_i|)", rel_COUNT_SIM_avg);
+			chart.addSeries("AVG(StandardDev_i/COUNT_i)", rel_StandardDev);
+			chart.saveAsPng(outpath + "AVG_relative.png", 1000, 800);
 			
 			out.flush();		
 			out.close();	
@@ -78,45 +75,52 @@ public class SummaryWriter {
 	}
 	
 	public void writeAbsoluteDifference(Stations stations, String outpath) {	
-		String header = "Hour\tabs_COUNT_SIM_avg\tabs_StandardDev\n";
+		String header = "Hour\tAVG(|COUNT_i-SIM_i|)\tAVG(|StandardDev_i|\n";
 		try {
-			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "COUNTS_absolutedifference_timevariant.txt");
+			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "AVG_difference.txt");
 			out.write(header);			
 			DecimalFormat formatter = new DecimalFormat("0.0");
 			
-			double [] abs_COUNT_SIM_avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+			double [] count_sim = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
 					0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-			double [] abs_StandardDev = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+			double [] standarddev = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
 					0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-						
+			
+			int numberOfStations = 0;
 			Iterator<CountStation> stations_it = stations.getCountStations().iterator();
 			while (stations_it.hasNext()) {
 				CountStation station = stations_it.next();
 				
 				// if station is not in region -> no sim vals
 				if (station.getLink1().getSimVals().size() == 0) continue;
+				numberOfStations++;
 				
 				for (int hour = 0; hour < 24; hour++) {		
-					abs_COUNT_SIM_avg[hour] += 
+					count_sim[hour] += 
 						(station.getLink1().getAbsoluteDifference_TimeAvg(hour) + 
 								station.getLink2().getAbsoluteDifference_TimeAvg(hour));
 				
-					abs_StandardDev[hour] +=
+					standarddev[hour] +=
 						(station.getLink1().getAbsoluteStandardDev_TimeAvg(hour) + 
 								station.getLink2().getAbsoluteStandardDev_TimeAvg(hour));
 				}
 			}
 			
+			for (int hour = 0; hour < 24; hour++) {		
+				count_sim[hour] /= numberOfStations;
+				standarddev[hour] /= numberOfStations;
+			}
+			
 			for (int hour = 0; hour < 24; hour++) {
 				out.write(hour + "\t");
-				out.write(formatter.format(abs_COUNT_SIM_avg[hour]) + "\t");
-				out.write(formatter.format(abs_StandardDev[hour]) + "\n");	
+				out.write(formatter.format(count_sim[hour]) + "\t");
+				out.write(formatter.format(standarddev[hour]) + "\n");	
 			}
 			LineChart chart = new LineChart("Validation", "hour", "# vehicles");
-			chart.addSeries("abs_COUNT_SIM_avg", abs_COUNT_SIM_avg);
-			chart.addSeries("abs_StandardDev", abs_StandardDev);
-			chart.saveAsPng(outpath + "COUNTS_absolutedifference_timevariant.png", 1000, 800);
+			chart.addSeries("AVG(|COUNT_i-SIM_i|)", count_sim);
+			chart.addSeries("AVG(|StandardDev_i|)", standarddev);
+			chart.saveAsPng(outpath + "AVG_difference.png", 1000, 800);
 			
 			out.flush();		
 			out.close();	
@@ -127,71 +131,99 @@ public class SummaryWriter {
 	
 	
 	public void writeAbsolute(Stations stations, String outpath) {	
-		String header = "Hour\tabs_SIM_avg\tabs_COUNT_avg\tabs_StandardDevUpper\tabs_StandardDevLower\n";
+		String header = "Hour\tAVG(SIM)\tAVG(COUNT)\tAVG(StandardDevUpper)\tAVG(StandardDevLower)\t(|AVG(SIM_i) - AVG(COUNT_i)|) / AVG(COUNT_i)\n";
 		try {
-			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "COUNTS_absolute_timevariant.txt");
+			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "AVG_values.txt");
 			out.write(header);			
 			DecimalFormat formatter = new DecimalFormat("0.0");
 			
-			double [] abs_SIM_avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+			double [] sim = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
 					0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 			
-			double [] abs_COUNT_avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+			double [] count = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
 					0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 			
-			double [] abs_StandardDev = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+			double [] standarddev = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
 					0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-			double [] abs_StandardDevUpper = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+			double [] standarddevUpper = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
 					0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 			
-			double [] abs_StandardDevLower = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+			double [] standarddevLower = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
 					0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-						
+			
+			double [] rel_Error = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+					0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+			
+			int numberOfStations = 0;
 			Iterator<CountStation> stations_it = stations.getCountStations().iterator();
 			while (stations_it.hasNext()) {
 				CountStation station = stations_it.next();
 				
 				// if station is not in region -> no sim vals
 				if (station.getLink1().getSimVals().size() == 0) continue;
+				numberOfStations++;
 				
 				for (int hour = 0; hour < 24; hour++) {		
-					abs_SIM_avg[hour] += 
+					sim[hour] += 
 						station.getLink1().getSimVal(hour) + station.getLink2().getSimVal(hour);
 					
-					abs_COUNT_avg[hour] += 
+					count[hour] += 
 						station.getLink1().getAggregator().getAvg()[hour] + station.getLink2().getAggregator().getAvg()[hour];
 				
-					abs_StandardDev[hour] +=
+					standarddev[hour] +=
 						(station.getLink1().getAggregator().getStandarddev()[hour] + 
 								station.getLink2().getAggregator().getStandarddev()[hour]);
 				}
 			}
+			for (int hour = 0; hour < 24; hour++) {		
+				sim[hour] /= numberOfStations;
+				count[hour] /= numberOfStations;
+				standarddev[hour] /= numberOfStations;
+			}
 			
 			for (int hour = 0; hour < 24; hour++) {
-				abs_StandardDevUpper[hour] = abs_COUNT_avg[hour] + abs_StandardDev[hour];
-				abs_StandardDevLower[hour] = abs_COUNT_avg[hour] - abs_StandardDev[hour];
+				standarddevUpper[hour] = count[hour] + standarddev[hour];
+				standarddevLower[hour] = count[hour] - standarddev[hour];
 			}
+			
+			for (int hour = 0; hour < 24; hour++) {		
+				rel_Error[hour] = 100* Math.abs(sim[hour] - count[hour] ) / count[hour];
+			}
+			
+			double [] standarddevRel = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+					0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+			
+			for (int hour = 0; hour < 24; hour++) {		
+				standarddevRel[hour] = 100* Math.abs(standarddevRel[hour] - count[hour] ) / count[hour];
+			}
+			
 			
 			for (int hour = 0; hour < 24; hour++) {
 				out.write(hour + "\t");
-				out.write(formatter.format(abs_SIM_avg[hour]) + "\t");
-				out.write(formatter.format(abs_COUNT_avg[hour]) + "\t");
-				out.write(formatter.format(abs_StandardDevUpper[hour]) + "\t");
-				out.write(formatter.format(abs_StandardDevLower[hour]) + "\t");
+				out.write(formatter.format(sim[hour]) + "\t");
+				out.write(formatter.format(count[hour]) + "\t");
+				out.write(formatter.format(standarddevUpper[hour]) + "\t");
+				out.write(formatter.format(standarddevLower[hour]) + "\t");
+				out.write(formatter.format(rel_Error[hour]) + "\n");
 			}
 			LineChart chart = new LineChart("Validation", "hour", "# vehicles");
-			chart.addSeries("abs_SIM_avg", abs_SIM_avg);
-			chart.addSeries("abs_COUNT_avg", abs_COUNT_avg);
-			chart.addSeries("abs_StandardDevUpper", abs_StandardDevUpper);
-			chart.addSeries("abs_StandardDevLower", abs_StandardDevLower);
-			chart.saveAsPng(outpath + "COUNTS_absolute_timevariant.png", 1000, 800);
+			chart.addSeries("AVG(SIM)", sim);
+			chart.addSeries("AVG(COUNT)", count);
+			chart.addSeries("AVG(StandardDevUpper)", standarddevUpper);
+			chart.addSeries("AVG(StandardDevLower)", standarddevLower);
+			chart.saveAsPng(outpath + "AVG_values.png", 1000, 800);
+			
+			LineChart chart2 = new LineChart("Validation", "hour", "%");
+			chart2.addSeries("100*(|AVG(SIM_i) - AVG(COUNT_i)|) / AVG(COUNT_i)", rel_Error);
+			chart2.addSeries("100*(|AVG(StandardDev_i) - AVG(COUNT_i)|) / AVG(COUNT_i)", standarddevRel);
+			chart2.saveAsPng(outpath + "AVG_rel_Error.png", 1000, 800);
 			
 			out.flush();		
 			out.close();	
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
+	}	
 }
 	
