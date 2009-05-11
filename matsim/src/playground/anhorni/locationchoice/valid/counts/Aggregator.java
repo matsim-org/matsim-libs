@@ -37,7 +37,7 @@ public class Aggregator {
 		
 		for (int i = 0; i < 2; i++) {
 			this.removeOutliers(i);
-			this.sum(i);
+			this.avg(i);
 			this.standarddev(i);
 		}
 		this.median();	
@@ -103,7 +103,7 @@ public class Aggregator {
 		}
 	}
 	
-	private void sum(int direction) {	
+	private void avg(int direction) {	
 		TreeMap<Integer, List<Double>> volumes;
 		if (direction == 0) {
 			volumes = volumes1;

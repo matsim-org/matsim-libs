@@ -54,6 +54,16 @@ public class CountsCreation {
 		writer = new CountsWriter(converter.getCountsNavteq(), "output/counts/countsNAVTEQ.xml");
 		writer.write();
 		writer = new CountsWriter(converter.getCountsIVTCH(), "output/counts/countsIVTCH.xml");
-		writer.write();		
+		writer.write();	
+		
+		// Summary:
+		CountsCompareReader countsCompareReader = new CountsCompareReader();
+		countsCompareReader.read();
+		
+		SummaryWriter summaryWriter = new SummaryWriter();
+		summaryWriter.write(countStations, "output/counts/", countsCompareReader);
+		
+		
+		
 	}
 }
