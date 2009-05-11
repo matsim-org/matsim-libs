@@ -1,4 +1,4 @@
-package playground.gregor.sims.shelters;
+package playground.gregor.sims.evacbase;
 
 import org.matsim.api.basic.v01.Id;
 

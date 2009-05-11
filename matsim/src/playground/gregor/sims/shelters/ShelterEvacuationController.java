@@ -14,6 +14,9 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
 
 import playground.gregor.flooding.FloodingReader;
 import playground.gregor.flooding.RiskCostFromFloodingData;
+import playground.gregor.sims.evacbase.Building;
+import playground.gregor.sims.evacbase.BuildingsShapeReader;
+import playground.gregor.sims.evacbase.EvacuationPopulationFromShapeFileLoader;
 import playground.gregor.sims.riskaversion.RiskAverseTravelCostCalculator;
 import playground.gregor.sims.riskaversion.RiskCostCalculator;
 import playground.gregor.sims.shelters.signalsystems.ShelterDoorBlockerSetup;
@@ -114,7 +117,7 @@ public class ShelterEvacuationController extends Controler {
 		if (this.buildings == null) {
 			this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile());
 		}
-		EvacuationPopulationLoader epl = new EvacuationPopulationLoader(this.buildings,this.network,this.shelterLinks,this.config);
+		EvacuationPopulationFromShapeFileLoader epl = new EvacuationPopulationFromShapeFileLoader(this.buildings,this.network,this.config);
 		Population pop = epl.getPopulation();
 //		this.esnl.generateShelterLinks();
 		return pop;

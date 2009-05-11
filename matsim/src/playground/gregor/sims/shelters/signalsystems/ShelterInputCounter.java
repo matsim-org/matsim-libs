@@ -15,7 +15,7 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListen
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.signalsystems.control.SignalSystemControler;
 
-import playground.gregor.sims.shelters.Building;
+import playground.gregor.sims.evacbase.Building;
 
 public class ShelterInputCounter implements LinkLeaveEventHandler, AfterMobsimListener, QueueSimulationInitializedListener {
 

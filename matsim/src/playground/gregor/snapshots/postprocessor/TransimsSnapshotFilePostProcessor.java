@@ -106,8 +106,8 @@ public class TransimsSnapshotFilePostProcessor {
 			if (this.floodlineGenerator != null && time > old_time) {
 				old_time = time;
 				
-				
-				Collection<FloodEvent> events = this.floodlineGenerator.getFlooded(time);	
+				double floodTime = time - (time % 60);
+				Collection<FloodEvent> events = this.floodlineGenerator.getFlooded(floodTime);	
 				
 				
 				

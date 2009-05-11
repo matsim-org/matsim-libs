@@ -23,6 +23,7 @@ import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.xml.sax.SAXException;
 
+import playground.gregor.sims.evacbase.Building;
 import playground.gregor.sims.evacbase.EvacuationNetGenerator;
 
 public class EvacuationShelterNetLoader {

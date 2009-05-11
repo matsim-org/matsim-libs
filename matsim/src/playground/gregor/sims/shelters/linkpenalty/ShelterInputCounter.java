@@ -16,7 +16,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.signalsystems.control.SignalSystemControler;
 
 import playground.gregor.collections.gnuclasspath.TreeMap;
-import playground.gregor.sims.shelters.Building;
+import playground.gregor.sims.evacbase.Building;
 
 public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimListener {
 

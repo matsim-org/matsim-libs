@@ -23,7 +23,7 @@ package playground.gregor.snapshots.postprocessor.processors;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.PriorityQueue;
+import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -33,11 +33,14 @@ import org.matsim.core.utils.misc.StringUtils;
 public class FloodlineGenerator {
 
 	
-	PriorityQueue<FloodEvent> events;
+	int idx = 0;
+	List<FloodEvent> events;
+	private double oldTime;
+	private int oldIdx;
 	
 	public FloodlineGenerator(String filename) {
 //		this.flooded = new ArrayList<CoordI>();
-		this.events = new PriorityQueue<FloodEvent>();
+		this.events = new ArrayList<FloodEvent>();
 		try {
 			parse(filename);
 		} catch (Exception e) {
@@ -69,16 +72,22 @@ public class FloodlineGenerator {
 
 
 	public Collection<FloodEvent> getFlooded(double time) {
+		
 		Collection<FloodEvent> flooded = new ArrayList<FloodEvent>();
+		if (this.oldTime == time){
+			this.idx = this.oldIdx;
+		} else {
+			this.oldIdx = this.idx;
+		}
+		
 		if (this.events.size() > 0) {
-
-			while (this.events.size() > 0 && this.events.peek().time <= time) {
-					FloodEvent e = this.events.poll();
+			while (this.idx < this.events.size() && this.events.get(this.idx).time <= time) {
+					FloodEvent e = this.events.get(this.idx++);
 					flooded.add(e);
 			}
 		}
-		
-		
+
+		this.oldTime = time;
 		return flooded;
 	}
 	
@@ -98,9 +107,9 @@ public class FloodlineGenerator {
 	
 	public class FloodEvent implements Comparable {
 
-		private double time;
-		private Coord coord;
-		private double flooding;
+		private final double time;
+		private final Coord coord;
+		private final double flooding;
 		
 		public FloodEvent(double flooding, double time, Coord c) {
 			this.time = time;

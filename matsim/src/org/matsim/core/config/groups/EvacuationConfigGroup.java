@@ -51,6 +51,11 @@ public class EvacuationConfigGroup  extends Module{
 	 * name of the buildings shape file in config
 	 */
 	private static final String BUILDINGS_FILE = "buildingsFile";
+
+	/**
+	 * name of the shoreline shape file in config
+	 */
+	private static final String SHORELINE_FILE = "shorelineFile";
 	
 	/**
 	 * type of the scenario 
@@ -66,6 +71,11 @@ public class EvacuationConfigGroup  extends Module{
 	 * file name of the buildings shape file
 	 */
 	private String buildingsFile;
+
+	/**
+	 * file name of the shoreline shape file
+	 */
+	private String shorelineFile;
 	
 	/**
 	 * the scenario type
@@ -85,6 +95,8 @@ public class EvacuationConfigGroup  extends Module{
 			return getFloodingDataFile();
 		}else if (BUILDINGS_FILE.equals(key)) {
 			return getBuildingsFile();
+		}else if (SHORELINE_FILE.equals(key)) {
+			return getShorelineFile();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -97,6 +109,8 @@ public class EvacuationConfigGroup  extends Module{
 			setFloodingDataFile(value.replace('\\', '/'));
 		}else if(BUILDINGS_FILE.equals(key)){
 			setBuildingsFile(value.replace('\\', '/'));
+		}else if(SHORELINE_FILE.equals(key)){
+			setShorelineFile(value.replace('\\', '/'));
 		}else if(SCENARIO.equals(key)){
 			setScenario(value);
 		}else {
@@ -154,6 +168,24 @@ public class EvacuationConfigGroup  extends Module{
 	 */
 	public void setBuildingsFile(String buildingsFile) {
 		this.buildingsFile = buildingsFile;
+	}
+
+	
+	/**
+	 * 
+	 * @return the shapes of the shoreline
+	 */
+	public String getShorelineFile() {
+		return this.shorelineFile;
+	}
+	
+	/**
+	 * 
+	 * @param shorelineFile
+	 * the shapes of the shoreline
+	 */
+	public void setShorelineFile(String shorelineFile) {
+		this.shorelineFile = shorelineFile;
 	}
 	
 	/**

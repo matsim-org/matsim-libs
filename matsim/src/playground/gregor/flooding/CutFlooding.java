@@ -10,6 +10,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import ucar.ma2.Array;
 import ucar.ma2.ArrayDouble;
+import ucar.ma2.ArrayInt;
 import ucar.ma2.DataType;
 import ucar.ma2.Index1D;
 import ucar.ma2.Index2D;
@@ -51,6 +52,9 @@ public class CutFlooding {
 	protected Index2D idxStage;
 
 	protected Index1D idx;
+	
+	protected Index2D idxTri;
+	private Array aTri;
 
 
 	public CutFlooding(String netcdf, String out) {
@@ -107,7 +111,14 @@ public class CutFlooding {
 		sStage.appendRange(varStage.getRanges().get(0));
 		sStage.appendRange(varStage.getRanges().get(1));
 		this.aStage = ios.readData(varStage, sStage);
-
+		
+		Section tri = new Section();
+		Variable varTri = this.in.findVariable("volumes");
+		tri.appendRange(varTri.getRanges().get(0));
+		tri.appendRange(varTri.getRanges().get(1));
+		this.aTri = ios.readData(varTri, tri);	
+		
+		this.idxTri = new Index2D(tri.getShape());
 		this.idxStage = new Index2D(this.aStage.getShape());
 		this.idx = new Index1D(this.aX.getShape());
 
@@ -117,8 +128,12 @@ public class CutFlooding {
 	protected void createNetcdf(List<Integer> indexes) {
 		Dimension number_of_points = this.out.addDimension("number_of_points", indexes.size());
 		Dimension number_of_timesteps = this.out.addDimension("number_of_timesteps", MAX_TIME);
+		Dimension number_of_volumes = this.out.addDimension("number_of_volumes", this.idxTri.getShape()[0]);
+		Dimension number_of_vertices = this.out.addDimension("number_of_vertices", this.idxTri.getShape()[1]);
+		
 		Dimension [] count = {number_of_points}; 
 		Dimension [] stages = {number_of_timesteps,number_of_points};
+		Dimension [] volumes = {number_of_volumes,number_of_vertices};
 		
 		
 		int pos = 0;
@@ -128,6 +143,17 @@ public class CutFlooding {
 		ArrayDouble.D1 aZ = new ArrayDouble.D1(indexes.size());
 		
 		ArrayDouble.D2 aStage = new ArrayDouble.D2(MAX_TIME,indexes.size());
+		
+		ArrayInt.D2 vol = new ArrayInt.D2(this.idxTri.getShape()[0],this.idxTri.getShape()[1]);
+		for (int i = 0; i < this.idxTri.getShape()[0]; i++) {
+			this.idxTri.set0(i);
+			for (int j = 0; j < this.idxTri.getShape()[1]; j++) {
+				this.idxTri.set1(j);
+				vol.set(this.idxTri, this.aTri.getInt(this.idxTri));
+			}
+			
+		}
+		
 		
 		for (int i : indexes) {
 			this.idx.set(i);
@@ -165,7 +191,7 @@ public class CutFlooding {
 		this.out.addVariable("y", DataType.DOUBLE,count);
 		this.out.addVariable("elevation", DataType.DOUBLE,count);
 		this.out.addVariable("stage", DataType.DOUBLE,stages);
-		
+		this.out.addVariable("volumes", DataType.DOUBLE, volumes);
 
 		// create the file
 		try {
@@ -174,6 +200,7 @@ public class CutFlooding {
 			this.out.write("y",new int[] {0},aY);
 			this.out.write("elevation",new int[] {0},aZ);
 			this.out.write("stage",new int[] {0,0},aStage);
+			this.out.write("volumes",new int[] {0,0},vol);
 			this.out.close();
 		} catch (IOException e) {
 			System.err.println("ERROR creating file "+this.out.getLocation()+"\n"+e);
@@ -203,15 +230,15 @@ public class CutFlooding {
 			double y = this.aY.getDouble(this.idx) + yoff;
 			double z = this.aZ.getDouble(this.idx);
 
-			if (x > MAX_X || x < MIN_X || y > MAX_Y || y < MIN_Y) {
-				continue;
-			}
+//			if (x > MAX_X || x < MIN_X || y > MAX_Y || y < MIN_Y) {
+//				continue;
+//			}
 			Collection<Coordinate> coll = coords.get(x, y, DISTANCE);
 			if (coll.size() > 0) {
 				continue;
 			}
 			Coordinate c = new Coordinate(x,y,z);
-			coords.put(x, y,c);
+//			coords.put(x, y,c);
 			
 			indexes.add(i);
 		}
@@ -222,10 +249,16 @@ public class CutFlooding {
 	}
 
 	public static void main(String [] args) {
-		String in = "../../inputs/flooding/SZ_r018M_m003_092_12_mw9.00_03h__P7_8.sww";
-		String out = "../../inputs/flooding/flooding08.sww";
 		
-		new CutFlooding(in,out).run();
+		for (int i = 0 ; i <= 8; i++) {
+			String in = "../../inputs/flooding/SZ_r018M_m003_092_12_mw9.00_03h__P" + i + "_8.sww";
+			String out = "../../inputs/flooding/flooding0"+ i + ".sww";
+			new CutFlooding(in,out).run();
+		}
+		
+		
+		
+		
 
 
 

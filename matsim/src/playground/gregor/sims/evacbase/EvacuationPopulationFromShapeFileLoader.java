@@ -1,7 +1,6 @@
-package playground.gregor.sims.shelters;
+package playground.gregor.sims.evacbase;
 
 import java.util.List;
-import java.util.Set;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
@@ -26,22 +25,20 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class EvacuationPopulationLoader {
+public class EvacuationPopulationFromShapeFileLoader {
 
 	
 	private final List<Building> buildings;
 	private final NetworkLayer network;
-	private final Set<Link> shelterLinks;
-	private final Config config;
+	protected final Config config;
 	private TravelCost tc;
 	
 	private Population pop = null;
 	private QuadTree<Link> quadTree;
 
-	public EvacuationPopulationLoader(List<Building> buildings,	NetworkLayer network, Set<Link> shelterLinks, Config config) {
+	public EvacuationPopulationFromShapeFileLoader(List<Building> buildings,	NetworkLayer network, Config config) {
 		this.buildings = buildings;
 		this.network = network;
-		this.shelterLinks = shelterLinks;
 		this.config = config;
 	}
 	
@@ -64,13 +61,9 @@ public class EvacuationPopulationLoader {
 		Population pop = new PopulationImpl();
 		
 		Link saveLink = this.network.getLink("el1");
+		EvacuationStartTimeCalculator time = getEndCalculatorTime(scenario);
 		
-		double endTime = Double.NaN;
-		if (scenario == Scenario.day) {
-			endTime = 12 * 3600;
-		} else if (scenario == Scenario.night) {
-			endTime = 3 * 3600;
-		}
+
 		
 		double sample = this.config.simulation().getFlowCapFactor();
 		
@@ -106,7 +99,7 @@ public class EvacuationPopulationLoader {
 				Plan plan = new PlanImpl(pers);
 				
 				Activity act = new ActivityImpl("h",link);
-				act.setEndTime(endTime);
+				act.setEndTime(time.getEvacuationStartTime(act));
 				plan.addActivity(act);
 				Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 				plan.addLeg(leg);
@@ -124,6 +117,16 @@ public class EvacuationPopulationLoader {
 		new PopulationWriter(pop,"pop.xml").write();
 		return pop;
 		
+	}
+
+	protected EvacuationStartTimeCalculator getEndCalculatorTime(Scenario scenario) {
+		double endTime = Double.NaN;
+		if (scenario == Scenario.day) {
+			endTime = 12 * 3600;
+		} else if (scenario == Scenario.night) {
+			endTime = 3 * 3600;
+		}
+		return new StaticEvacuationStartTimeCalculator(endTime);
 	}
 
 	private void buildQuadTree() {

@@ -1,4 +1,4 @@
-package playground.gregor.sims.shelters;
+package playground.gregor.sims.evacbase;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+
 
 import com.vividsolutions.jts.geom.Geometry;
 
