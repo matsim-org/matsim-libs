@@ -22,7 +22,6 @@ package playground.balmermi;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
@@ -33,15 +32,14 @@ import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
-import org.matsim.core.config.Config;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
@@ -50,74 +48,95 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class ScenarioCut {
 
 	//////////////////////////////////////////////////////////////////////
-	// variables
-	//////////////////////////////////////////////////////////////////////
-
-	// ch.cut.640000.200000.740000.310000.xml
-	static Coord min = new CoordImpl(640000.0,200000.0);
-	static Coord max = new CoordImpl(740000.0,310000.0);
 	
-	private static boolean isInside(Facility f) {
-		if (f == null) { return false; }
-		Coord c = f.getCoord();
-		if (c.getX() < min.getX()) { return false; }
-		if (c.getX() > max.getX()) { return false; }
-		if (c.getY() < min.getY()) { return false; }
-		if (c.getY() > max.getY()) { return false; }
-		return true;
-	}
-	//////////////////////////////////////////////////////////////////////
-	// run
-	//////////////////////////////////////////////////////////////////////
-
-	public static void run(Config config) {
-		
-		System.out.println("read scenario data... " + (new Date()));
-		ScenarioLoader loader = new ScenarioLoader(config);
-		loader.loadScenario();
-		Scenario sd = loader.getScenario();
-//		ScenarioImpl sd = new ScenarioImpl(Gbl.getConfig());
-		Facilities facilities = sd.getFacilities();
-		NetworkLayer network = (NetworkLayer) sd.getNetwork();
-		Population population = sd.getPopulation();
-		System.out.println("done. " + (new Date()));
-		
-		System.out.println("remove persons... " + (new Date()));
-		Set<Id> toRemove = new HashSet<Id>();
-		for (Person person : population.getPersons().values()) {
-			if (person.getKnowledge() != null) {
-				for (ActivityOption a : person.getKnowledge().getActivities()) {
-					Facility f = a.getFacility();
-					if (!isInside(f)) { toRemove.add(person.getId()); break; }
-				}
-			}
-			List<Plan> plans = person.getPlans();
-			for (Plan plan : plans) {
-				for (int i=0, n=plan.getPlanElements().size(); i<n; i+=2) {
-					Activity act = (Activity)plan.getPlanElements().get(i);
-					Facility f = act.getFacility();
-					if (!isInside(f)) { toRemove.add(person.getId()); break; }
-				}
-			}
+	private static void calcExtent(Scenario scenario) {
+		Coord min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
+		Coord max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
+		for (Facility f : scenario.getFacilities().getFacilities().values()) {
+			if (f.getCoord().getX() < min.getX()) { min.setX(f.getCoord().getX()); }
+			if (f.getCoord().getY() < min.getY()) { min.setY(f.getCoord().getY()); }
+			if (f.getCoord().getX() > max.getX()) { max.setX(f.getCoord().getX()); }
+			if (f.getCoord().getY() > max.getY()) { max.setY(f.getCoord().getY()); }
 		}
-		System.out.println("=> "+toRemove.size()+" persons to remove.");
-		for (Id id : toRemove) { population.getPersons().remove(id); }
-		System.out.println("=> "+population.getPersons().size()+" persons left.");
-		System.out.println("done. " + (new Date()));
-		
-		System.out.println("remove all routes and links... " + (new Date()));
-		for (Person p : population.getPersons().values()) {
+		System.out.println("Spatial extent facilities: min:"+min+"; max:"+max);
+
+		min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
+		max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
+		for (Node n : scenario.getNetwork().getNodes().values()) {
+			if (n.getCoord().getX() < min.getX()) { min.setX(n.getCoord().getX()); }
+			if (n.getCoord().getY() < min.getY()) { min.setY(n.getCoord().getY()); }
+			if (n.getCoord().getX() > max.getX()) { max.setX(n.getCoord().getX()); }
+			if (n.getCoord().getY() > max.getY()) { max.setY(n.getCoord().getY()); }
+		}
+		System.out.println("Spatial extent network: min:"+min+"; max:"+max);
+
+		min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
+		max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
+		for (Person p : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : p.getPlans()) {
-				for (int i=0, n=plan.getPlanElements().size(); i<n; i++) {
-					if (i%2 == 1) { ((Leg)plan.getPlanElements().get(i)).setRoute(null); }
-					else { ((Activity)plan.getPlanElements().get(i)).setLink(null); }
+				for (PlanElement e : plan.getPlanElements()) {
+					if (e instanceof Activity) {
+						Activity a = (Activity)e;
+						if (a.getCoord() != null) {
+							if (a.getCoord().getX() < min.getX()) { min.setX(a.getCoord().getX()); }
+							if (a.getCoord().getY() < min.getY()) { min.setY(a.getCoord().getY()); }
+							if (a.getCoord().getX() > max.getX()) { max.setX(a.getCoord().getX()); }
+							if (a.getCoord().getY() > max.getY()) { max.setY(a.getCoord().getY()); }
+						}
+						if (a.getLinkId() != null) {
+							Node n = a.getLink().getFromNode();
+							if (n.getCoord().getX() < min.getX()) { min.setX(n.getCoord().getX()); }
+							if (n.getCoord().getY() < min.getY()) { min.setY(n.getCoord().getY()); }
+							if (n.getCoord().getX() > max.getX()) { max.setX(n.getCoord().getX()); }
+							if (n.getCoord().getY() > max.getY()) { max.setY(n.getCoord().getY()); }
+							n = a.getLink().getToNode();
+							if (n.getCoord().getX() < min.getX()) { min.setX(n.getCoord().getX()); }
+							if (n.getCoord().getY() < min.getY()) { min.setY(n.getCoord().getY()); }
+							if (n.getCoord().getX() > max.getX()) { max.setX(n.getCoord().getX()); }
+							if (n.getCoord().getY() > max.getY()) { max.setY(n.getCoord().getY()); }
+						}
+						if (a.getFacilityId() != null) {
+							Facility f = a.getFacility();
+							if (f.getCoord().getX() < min.getX()) { min.setX(f.getCoord().getX()); }
+							if (f.getCoord().getY() < min.getY()) { min.setY(f.getCoord().getY()); }
+							if (f.getCoord().getX() > max.getX()) { max.setX(f.getCoord().getX()); }
+							if (f.getCoord().getY() > max.getY()) { max.setY(f.getCoord().getY()); }
+						}
+					}
+				}
+			}
+			if (p.getKnowledge() != null) {
+				for (ActivityOption ao : p.getKnowledge().getActivities()) {
+					Facility f = ao.getFacility();
+					if (f.getCoord().getX() < min.getX()) { min.setX(f.getCoord().getX()); }
+					if (f.getCoord().getY() < min.getY()) { min.setY(f.getCoord().getY()); }
+					if (f.getCoord().getX() > max.getX()) { max.setX(f.getCoord().getX()); }
+					if (f.getCoord().getY() > max.getY()) { max.setY(f.getCoord().getY()); }
 				}
 			}
 		}
-		System.out.println("done. " + (new Date()));
+		System.out.println("Spatial extent population: min:"+min+"; max:"+max);
+	}
 
-		System.out.println("remove facilities... " + (new Date()));
-		toRemove.clear();
+	//////////////////////////////////////////////////////////////////////
+
+	private static void reduceFacilities(Facilities facilities, Coord center, double radius) {
+		System.out.println("removing facilities outside of circle ("+center.toString()+";"+radius+""+")... " + (new Date()));
+		Set<Id> toRemove = new HashSet<Id>();
+		for (Facility f : facilities.getFacilities().values()) {
+			if (f.calcDistance(center) > radius) { toRemove.add(f.getId()); }
+		}
+		System.out.println("=> "+toRemove.size()+" facilities to remove.");
+		for (Id id : toRemove) { facilities.getFacilities().remove(id); }
+		System.out.println("=> "+facilities.getFacilities().size()+" facilities left.");
+		System.out.println("done. " + (new Date()));
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+
+	private static void reduceFacilities(Facilities facilities, Coord min, Coord max) {
+		System.out.println("removing facilities outside of rectangle ("+min.toString()+";"+max.toString()+""+")... " + (new Date()));
+		Set<Id> toRemove = new HashSet<Id>();
 		for (Facility f : facilities.getFacilities().values()) {
 			Coord c = f.getCoord();
 			if (c.getX() < min.getX()) { toRemove.add(f.getId()); continue; }
@@ -129,9 +148,34 @@ public class ScenarioCut {
 		for (Id id : toRemove) { facilities.getFacilities().remove(id); }
 		System.out.println("=> "+facilities.getFacilities().size()+" facilities left.");
 		System.out.println("done. " + (new Date()));
+	}
+	
+	//////////////////////////////////////////////////////////////////////
 
-		System.out.println("remove links... " + (new Date()));
-		toRemove.clear();
+	private static void reduceNetwork(Network network, Coord center, double radius) {
+		System.out.println("removing links outside of circle ("+center.toString()+";"+radius+""+")... " + (new Date()));
+		Set<Id> toRemove = new HashSet<Id>();
+		for (Link l : network.getLinks().values()) {
+			CoordImpl fc = (CoordImpl)l.getFromNode().getCoord();
+			CoordImpl tc = (CoordImpl)l.getToNode().getCoord();
+			if (fc.calcDistance(center) > radius) { toRemove.add(l.getId()); }
+			else if (tc.calcDistance(center) > radius) { toRemove.add(l.getId()); }
+		}
+		System.out.println("=> "+toRemove.size()+" links to remove.");
+		for (Id id : toRemove) { network.removeLink(network.getLink(id)); }
+		System.out.println("=> "+network.getLinks().size()+" links left.");
+		System.out.println("done. " + (new Date()));
+		
+		System.out.println("cleaning network... " + (new Date()));
+		new NetworkCleaner().run(network);
+		System.out.println("done. " + (new Date()));
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+
+	private static void reduceNetwork(Network network, Coord min, Coord max) {
+		System.out.println("removing links outside of rectangle ("+min.toString()+";"+max.toString()+""+")... " + (new Date()));
+		Set<Id> toRemove = new HashSet<Id>();
 		for (Link l : network.getLinks().values()) {
 			Coord fc = l.getFromNode().getCoord();
 			if (fc.getX() < min.getX()) { toRemove.add(l.getId()); continue; }
@@ -152,35 +196,104 @@ public class ScenarioCut {
 		System.out.println("cleaning network... " + (new Date()));
 		new NetworkCleaner().run(network);
 		System.out.println("done. " + (new Date()));
-		
-		System.out.println("completing world... " + (new Date()));
-		network.reconnect();
-//		Gbl.getWorld().complete();
-		System.out.println("done. " + (new Date()));
+	}
+	
+	//////////////////////////////////////////////////////////////////////
 
-		System.out.println("setting links in plan act... " + (new Date()));
-		for (Person p : population.getPersons().values()) {
+	private static void reducePopulation(Scenario scenario) {
+		System.out.println("removing persons containing links and/or facilities that are removed..." + (new Date()));
+		Set<Id> linkIds = scenario.getNetwork().getLinks().keySet();
+		Set<Id> facIds = scenario.getFacilities().getFacilities().keySet();
+		Set<Id> toRemove = new HashSet<Id>();
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			boolean removeIt = false;
 			for (Plan plan : p.getPlans()) {
-				for (int i=0, n=plan.getPlanElements().size(); i<n; i+=2) {
-					Activity act = (Activity)plan.getPlanElements().get(i);
-					act.setLink(act.getFacility().getLink());
+				for (PlanElement e : plan.getPlanElements()) {
+					if (e instanceof Activity) {
+						Activity a = (Activity)e;
+						if ((a.getLinkId() != null) && (!linkIds.contains(a.getLinkId()))) { removeIt = true; }
+						if ((a.getFacilityId() != null) && (!facIds.contains(a.getFacilityId()))) { removeIt = true; }
+					}
+					else if (e instanceof Leg) {
+						Leg l = (Leg)e;
+						l.setRoute(null);
+					}
 				}
 			}
+			if (p.getKnowledge() != null) {
+				for (ActivityOption ao : p.getKnowledge().getActivities()) {
+					if (!facIds.contains(ao.getFacility().getId())) { removeIt = true; }
+				}
+			}
+			if (removeIt) { toRemove.add(p.getId()); }
 		}
+		System.out.println("=> "+toRemove.size()+" persons to remove.");
+		for (Id id : toRemove) { scenario.getPopulation().getPersons().remove(id); }
+		System.out.println("=> "+scenario.getPopulation().getPersons().size()+" persons left.");
 		System.out.println("done. " + (new Date()));
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+	
+	private static void reduceScenario(String[] args) {
+		if (args.length == 4) {
+			Scenario scenario = new ScenarioLoader(args[0]).loadScenario();
+			calcExtent(scenario);
+			Coord center = new CoordImpl(args[1],args[2]);
+			double radius = Double.parseDouble(args[3]);
+			
+			reduceFacilities(scenario.getFacilities(),center,radius);
+			reduceNetwork(scenario.getNetwork(),center,radius);
+			reducePopulation(scenario);
+			
+			new NetworkWriter(scenario.getNetwork()).write();
+			new FacilitiesWriter(scenario.getFacilities()).write();
+			new PopulationWriter(scenario.getPopulation()).write();
+		}
+		else { // args.length == 5
+			Scenario scenario = new ScenarioLoader(args[0]).loadScenario();
+			calcExtent(scenario);
+			Coord min = new CoordImpl(args[1],args[2]);
+			Coord max = new CoordImpl(args[3],args[4]);
+			
+			reduceFacilities(scenario.getFacilities(),min,max);
+			reduceNetwork(scenario.getNetwork(),min,max);
+			reducePopulation(scenario);
+			
+			new NetworkWriter(scenario.getNetwork()).write();
+			new FacilitiesWriter(scenario.getFacilities()).write();
+			new PopulationWriter(scenario.getPopulation()).write();
+		}
+	}
+	
+	//////////////////////////////////////////////////////////////////////
 
-		System.out.println("writing population... " + (new Date()));
-		new PopulationWriter(population).write();
-		System.out.println("done. " + (new Date()));
-
-		System.out.println("writing network... " + (new Date()));
-		new NetworkWriter(network).write();
-		System.out.println("done. " + (new Date()));
-
-		System.out.println("write facilities... " + (new Date()));
-		new FacilitiesWriter(facilities).write();
-		System.out.println("done. " + (new Date()));
-		
+	private static void printUsage() {
+		System.out.println();
+		System.out.println("ScenarioCut");
+		System.out.println();
+		System.out.println("Usage1: ScenarioCut configfile centerX centerY radius");
+		System.out.println("        Reduces a given Scenario according to a given circular area.");
+		System.out.println("Usage2: ScenarioCut configfile minX minY maxX maxY");
+		System.out.println("        Reduces a given Scenario according to a given rectangular area.");
+		System.out.println("Usage3: ScenarioCut configfile [zrhCutC|zrhCutR]");
+		System.out.println("        Reduces a given Scenario according to predefined cuts:");
+		System.out.println("        zrhCutC := ScenarioCut configfile 683518 246836 30000 (30km radius around Bellevue)");
+		System.out.println("        zrhCutR := ScenarioCut configfile 640000 200000 740000 310000 (Zurich greater region)");
+		System.out.println();
+		System.out.println("Note: config file should contain the following parameter:");
+		System.out.println("      inputNetworkFile");
+		System.out.println("      outputNetworkFile");
+		System.out.println("      inputFacilitiesFile");
+		System.out.println("      outputFacilitiesFile");
+		System.out.println("      inputPlansFile");
+		System.out.println("      outputPlansFile");
+		System.out.println();
+		System.out.println("Note: Eucledian coordinate system expected for the input scenario");
+		System.out.println();
+		System.out.println("---------------------");
+		System.out.println("2009, matsim.org");
+		System.out.println();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -188,12 +301,24 @@ public class ScenarioCut {
 	//////////////////////////////////////////////////////////////////////
 
 	public static void main(final String[] args) {
-		Gbl.startMeasurement();
-
-		Config config = new ScenarioLoader(args[0]).getScenario().getConfig();
-
-		run(config);
-
-		Gbl.printElapsedTime();
+		if (args.length < 2) { printUsage(); return; }
+		else if (args.length > 5) { printUsage(); return; }
+		else if (args.length == 2) {
+			if (args[1].trim().equals("zrhCutC")) {
+				String [] args2 = {args[0],"683518","246836","30000"};
+				reduceScenario(args2);
+			}
+			else if (args[1].trim().equals("zrhCutR")) {
+				String [] args2 = {args[0],"640000","200000","740000","310000"};
+				reduceScenario(args2);
+			}
+		}
+		else if (args.length == 3) { printUsage(); return; }
+		else if (args.length == 4) {
+			reduceScenario(args);
+		}
+		else { // args.length == 5
+			reduceScenario(args);
+		}
 	}
 }
