@@ -37,7 +37,7 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.gregor.sims.riskaversion.RiskCostFromNetworkChangeEvents;
-import playground.gregor.sims.riskaversion.RiskCostController;
+import playground.gregor.sims.run.RiskCostController;
 
 
 public class RiskCostControllerTest extends MatsimTestCase{

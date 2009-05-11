@@ -25,7 +25,7 @@ package playground.kai.evacTest;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.netvis.NetVis;
 
-import playground.gregor.sims.evacbase.EvacuationQSimControler;
+import playground.gregor.sims.run.EvacuationQSimControler;
 
 
 public class MyControler1 extends EvacuationQSimControler {

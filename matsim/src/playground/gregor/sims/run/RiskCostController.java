@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sims.riskaversion;
+package playground.gregor.sims.run;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -37,6 +37,8 @@ import playground.gregor.flooding.RiskCostFromFloodingData;
 import playground.gregor.sims.evacbase.EvacuationAreaFileReader;
 import playground.gregor.sims.evacbase.EvacuationAreaLink;
 import playground.gregor.sims.evacbase.EvacuationPlansGeneratorAndNetworkTrimmer;
+import playground.gregor.sims.riskaversion.RiskAverseTravelCostCalculator;
+import playground.gregor.sims.riskaversion.RiskCostCalculator;
 
 public class RiskCostController extends Controler{
 

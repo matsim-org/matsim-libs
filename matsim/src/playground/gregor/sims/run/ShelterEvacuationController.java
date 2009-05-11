@@ -1,4 +1,4 @@
-package playground.gregor.sims.shelters;
+package playground.gregor.sims.run;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +19,7 @@ import playground.gregor.sims.evacbase.BuildingsShapeReader;
 import playground.gregor.sims.evacbase.EvacuationPopulationFromShapeFileLoader;
 import playground.gregor.sims.riskaversion.RiskAverseTravelCostCalculator;
 import playground.gregor.sims.riskaversion.RiskCostCalculator;
+import playground.gregor.sims.shelters.EvacuationShelterNetLoader;
 import playground.gregor.sims.shelters.signalsystems.ShelterDoorBlockerSetup;
 import playground.gregor.sims.shelters.signalsystems.ShelterInputCounter;
 

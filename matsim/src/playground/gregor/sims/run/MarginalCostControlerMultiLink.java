@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EvacuationQSimControler.java
+ * MarginalCostControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,61 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sims.evacbase;
+package playground.gregor.sims.run;
 
-import java.io.IOException;
-import java.util.HashMap;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkWriter;
-import org.xml.sax.SAXException;
+import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
+import org.matsim.core.trafficmonitoring.TravelTimeAggregatorFactory;
+import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
 
-/**
- * @author glaemmel
- */
-public class EvacuationQSimControler extends Controler {
+import playground.gregor.sims.socialcost.MarginalTravelCostCalculatorII;
+import playground.gregor.sims.socialcost.SocialCostCalculator;
+import playground.gregor.sims.socialcost.SocialCostCalculatorMultiLink;
 
-	private final HashMap<Id, EvacuationAreaLink> evacuationAreaLinks = new HashMap<Id, EvacuationAreaLink>();
-	final private static Logger log = Logger.getLogger(EvacuationQSimControler.class);
+public class MarginalCostControlerMultiLink extends Controler{
 
-	public EvacuationQSimControler(final String[] args) {
+	public static double QUICKnDIRTY;
+
+	public MarginalCostControlerMultiLink(final String[] args) {
 		super(args);
 	}
 
 	@Override
 	protected void setUp() {
-
-		// first modify network and plans
-
-		try {
-			String evacuationAreaLinksFile = this.config.evacuation().getEvacuationAreaFile();
-			new EvacuationAreaFileReader(this.evacuationAreaLinks).readFile(evacuationAreaLinksFile);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		log.info("generating initial evacuation plans... ");
-		new EvacuationPlansGeneratorAndNetworkTrimmer().generatePlans(this.population, this.network, this.evacuationAreaLinks);
-		log.info("done");
-
-		log.info("writing network xml file... ");
-		new NetworkWriter(this.network, getOutputFilename("evacuation_net.xml")).write();
-		log.info("done");
-
-		// then do the regular setup with the modified data
-
 		super.setUp();
+		
+		
+		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
+		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
+		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
+		SocialCostCalculator sc = new SocialCostCalculatorMultiLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), this.travelTimeCalculator, this.population);
+		
+		this.events.addHandler(sc);
+		this.getQueueSimulationListener().add(sc);
+		this.travelCostCalculator = new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc);
+		this.strategyManager = loadStrategyManager();
+		this.addControlerListener(sc);
 	}
 
 	public static void main(final String[] args) {
-		final Controler controler = new EvacuationQSimControler(args);
+		QUICKnDIRTY = Double.parseDouble(args[1]);
+		System.out.println("DISCOUNT:" + QUICKnDIRTY);
+		String [] args2 = {args[0]}; 
+		final Controler controler = new MarginalCostControlerMultiLink(args2);
 		controler.run();
 		System.exit(0);
 	}

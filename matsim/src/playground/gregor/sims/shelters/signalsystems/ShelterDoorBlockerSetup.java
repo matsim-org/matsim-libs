@@ -25,7 +25,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.signalsystems.SignalSystemConfigurationsWriter11;
 import org.matsim.signalsystems.SignalSystemsWriter11;
 
-import playground.gregor.sims.shelters.ShelterEvacuationController;
+import playground.gregor.sims.run.ShelterEvacuationController;
 
 public class ShelterDoorBlockerSetup implements StartupListener{
 
