@@ -2,7 +2,6 @@ package playground.mmoyo.PTCase2;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
@@ -11,7 +10,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import playground.mmoyo.input.PTLinesReader2;
-
 import playground.mmoyo.PTRouter.*;
 
 public class PTTimeTable2{

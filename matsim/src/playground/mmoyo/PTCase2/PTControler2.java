@@ -1,22 +1,13 @@
 package playground.mmoyo.PTCase2;
 
-import java.util.Collection;
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Node;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkLayer;
+
+import playground.mmoyo.TransitSimulation.ToTransitScheduleConverter;
 import playground.mmoyo.Validators.NetValidator;
 import playground.mmoyo.Validators.PlanValidator;
 import playground.mmoyo.input.PTLineAggregator;
-import org.matsim.core.network.NetworkLayer;
-//import org.matsim.core.api.network.Link;
-//import org.matsim.api.basic.v01.Id;
-//import java.util.Map;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import playground.mmoyo.PTRouter.PTNode;
-import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.MatsimNetworkReader;
 
 public class PTControler2 {
     private static String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
@@ -36,7 +27,7 @@ public class PTControler2 {
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, INPTNETFILE, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
 		
-		int option =8;
+		int option =3;
 		
 		if (option>0){pt.readPTNet(ZURICHPTN);}
 		switch (option){
@@ -60,13 +51,7 @@ public class PTControler2 {
 	    		ptActWriter1.writePTActsLegs();
 				break;
 			case -4:
-				NetworkLayer net3 = pt.getPtNetworkFactory().readNetFile(ZURICHPTN);
-					
-				Node node = net3.getNode("~100799");
-				Node node2 = net3.getNode("~100114d");
-							System.out.println(
-									node.getOutNodes().containsValue(node2)
-							);
+			
 				break;
 			case -3:
 				//pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
@@ -128,7 +113,7 @@ public class PTControler2 {
 	    		sv.validateIds(netDiv);
 	    		break;
 	    	case 8:
-	    		playground.mmoyo.input.ToTransitScheduleConverter converter = new playground.mmoyo.input.ToTransitScheduleConverter();	    		
+	    		ToTransitScheduleConverter converter = new ToTransitScheduleConverter();	    		
 	    		converter.createTransitSchedule(pt.getPtTimeTable(), path + "PtFacilities.xml", path + "transitSchedule.xml");
 	    		//converter.createFacilities("../shared-svn/studies/schweiz-ivtch/pt-experimental/PtFacilities.xml");
 	    		break;

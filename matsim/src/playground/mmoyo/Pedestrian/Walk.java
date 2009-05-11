@@ -1,4 +1,4 @@
-package playground.mmoyo.PTCase2;
+package playground.mmoyo.Pedestrian;
 
 public class Walk {
 	private final static double AV_WALKING_SPEED = 0.836;  //   0.836 m/s [Al-Azzawi2007]?      1.34 m/s [Antonini2004]?

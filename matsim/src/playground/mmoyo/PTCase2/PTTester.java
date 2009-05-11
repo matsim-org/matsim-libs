@@ -9,6 +9,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import playground.mmoyo.Pedestrian.Walk;
 
 public class PTTester {
 	private Walk walk = new Walk();

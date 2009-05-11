@@ -1,10 +1,13 @@
-package playground.mmoyo.PTCase2;
+package playground.mmoyo.TransitSimulation;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -23,6 +26,12 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.marcel.pt.integration.ExperimentalTransitRoute;
+import playground.marcel.pt.transitSchedule.TransitLine;
+import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.mmoyo.PTCase2.PTRouter2;
+import playground.mmoyo.PTRouter.PTNode;
+import playground.mmoyo.Pedestrian.Walk;
 import playground.mmoyo.Validators.PathValidator;
 
 public class SimplifyPtLegs implements PlanAlgorithm{
@@ -55,7 +64,11 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 	private int nodeIndex=0;
 	private int linkIndex=0;
 	///
-	
+
+	//////////Simulation variables////////
+	private Facilities facilities;;
+	private TransitSchedule transitSchedule;
+	public List<ExperimentalTransitRoute> PlanExpTransRoute;
 	
 	public SimplifyPtLegs(NetworkLayer net, PTRouter2 ptRouter){
 		this.ptRouter= ptRouter;
@@ -71,13 +84,13 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 		boolean addPerson= true;
 		Activity lastAct = null;
 		Activity thisAct= null;
-		int legNum=0;
 		double travelTime=0;
 		
 		double startTime=0;
 		double duration=0;
 		
 		Plan newPlan = new PlanImpl(person);
+		PlanExpTransRoute = new ArrayList<ExperimentalTransitRoute>();
 		
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
@@ -90,7 +103,7 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 					double distanceToDestination = CoordUtils.calcDistance(lastActCoord, actCoord);
 					double distToWalk= walk.distToWalk(person.getAge());
 					if (distanceToDestination<= distToWalk){
-						newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+						newPlan.addLeg(walkLeg(lastAct,thisAct));
 						inWalkRange++;
 					}else{
 						startTime = System.currentTimeMillis();
@@ -98,61 +111,59 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 						duration= System.currentTimeMillis()-startTime;
 						pathSearchDuration += duration;
 						if(path!=null){
-							
 							//travelTime=travelTime+ path.travelTime;
-							
 							if (path.nodes.size()>1){
 								createWlinks(lastActCoord, path, actCoord);
 								double dw1 = walkLink1.getLength();
 								double dw2 = walkLink2.getLength();
 								if ((dw1+dw2)>=(distanceToDestination)){
-									newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+									newPlan.addLeg(walkLeg(lastAct,thisAct));
 									inWalkRange++;
 								}else{
-									
 									if (pathValidator.isValid(path)){
-										legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
+										insertLegActs(path, lastAct.getEndTime(), newPlan);
 										valid++;
 									}else{
-										newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+										newPlan.addLeg(walkLeg(lastAct,thisAct));
 										invalid++;
 										addPerson=false;
 										invalidPaths.add(path);
 									}
-									
 									//legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
 								}//if dw1+dw2
-								///removeWlinks();   //-> 16 april
+								removeWlinks();   //-> 16 april
 							}else{
-								newPlan.addLeg(walkLeg(legNum++, lastAct, thisAct));
+								newPlan.addLeg(walkLeg(lastAct, thisAct));
 								addPerson=false;
 								lessThan2Node++;
-							}//if path.nodes
+							}
 						}else{
-							newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+							newPlan.addLeg(walkLeg(lastAct,thisAct));
 							addPerson=false;
 							nulls++;
-						}//path=null
-					}//distanceToDestination<= distToWalk
-				}//if !First
+						}
+					}
+				}
 				
 				//-->Attention: this should be read from the city network not from pt network!!! 
 				thisAct.setLink(net.getNearestLink(thisAct.getCoord()));
 				
-				newPlan.addActivity(thisAct);
+		    	newPlan.addActivity(newPTAct(thisAct.getType(), thisAct.getCoord(), thisAct.getLink(), thisAct.getStartTime(), thisAct.getEndTime()));
 				lastAct = thisAct;
 				first=false;
 			}
 		}
 		
-		person.exchangeSelectedPlan(newPlan, true);
-		person.removeUnselectedPlans();
+		if (addPerson){
+			person.exchangeSelectedPlan(newPlan, addPerson);
+			person.removeUnselectedPlans();
+		}
 		
 		totalTimePTLeg += (System.currentTimeMillis()- iniTime);
 		numPlans++;
 	}
 
-	private int insertLegActs(final Path path, double depTime, int legNum, final Plan newPlan){
+	private void insertLegActs(final Path path, double depTime, final Plan newPlan){
 		List<Link> routeLinks = path.links;
 		List<Link> legRouteLinks = new ArrayList<Link>();
 		double accumulatedTime=depTime;
@@ -171,7 +182,7 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 
 			if (link.getType().equals("Standard")){
 				if (first){ //first PTAct: getting on
-					newPlan.addActivity(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime , linkTravelTime, accumulatedTime + linkTravelTime));
+					newPlan.addActivity(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime , accumulatedTime + linkTravelTime));
 					accumulatedTime =accumulatedTime+ linkTravelTime;
 					first=false;
 				}
@@ -188,11 +199,13 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 					legDistance=legDistance + linkDistance;
 
 					//Attention: The legMode car is temporal only for visualization purposes
-					newPlan.addLeg(newPTLeg(legNum++, TransportMode.car, legRouteLinks, legDistance, arrTime-legTravelTime, legTravelTime, arrTime));
+					newPlan.addLeg(newPTLeg(TransportMode.car, legRouteLinks, legDistance, arrTime-legTravelTime, legTravelTime, arrTime));
 										
+					PlanExpTransRoute.add(InsertExperimentalTransitRoute(legRouteLinks));   // 8 May
+					
 					//test: Check what method describes the location more exactly
-					//newPlan.addAct(newPTAct("exit pt veh", link.getFromNode().getCoord(), link, arrTime, 0, arrTime));
-					newPlan.addActivity(newPTAct("exit pt veh", link.getToNode().getCoord(), link, arrTime, 0, arrTime));
+					//newPlan.addAct(newPTAct("exit pt veh", link.getFromNode().getCoord(), link, arrTime, arrTime));
+					newPlan.addActivity(newPTAct("exit pt veh", link.getToNode().getCoord(), link, arrTime, arrTime));
 				}
 
 			}else if(link.getType().equals("Transfer") || link.getType().equals("DetTransfer") ){  //add the PTleg and a Transfer Act
@@ -200,9 +213,9 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 					arrTime= depTime+ legTravelTime;
 					legDistance= legDistance+ linkDistance;
 					//-->: The legMode car is temporal only for visualization purposes
-					newPlan.addLeg(newPTLeg(legNum++, TransportMode.car, legRouteLinks, legDistance, depTime, legTravelTime, arrTime));
+					newPlan.addLeg(newPTLeg(TransportMode.car, legRouteLinks, legDistance, depTime, legTravelTime, arrTime));
 					//newPlan.addAct(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
-					newPlan.addActivity(newPTAct("Wait pt veh", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
+					newPlan.addActivity(newPTAct("Wait pt veh", link.getFromNode().getCoord(), link, accumulatedTime, accumulatedTime + linkTravelTime));
 					first=false;
 				}
 
@@ -215,14 +228,12 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 				legRouteLinks.clear();
 				legRouteLinks.add(link);
 				arrTime= accumulatedTime+ walkTime;
-				newPlan.addLeg(newPTLeg(legNum++, TransportMode.walk, legRouteLinks, linkDistance, accumulatedTime, walkTime, arrTime));
+				newPlan.addLeg(newPTLeg( TransportMode.walk, legRouteLinks, linkDistance, accumulatedTime, walkTime, arrTime));
 
 				//like a transfer link
 				if (lastLinkType.equals("Standard")){  //-> how can be validated that the next link must be a standard link?
-					double startWaitingTime = arrTime;
-					double waitingTime = linkTravelTime -walkTime;  // The ptTravelTime must calculated it like this: travelTime = walk + transferTime;
-					double endActTime= startWaitingTime + waitingTime;
-					newPlan.addActivity(newPTAct("Change ptv", link.getFromNode().getCoord(), link, startWaitingTime, waitingTime, endActTime));
+					double endActTime= arrTime + linkTravelTime -walkTime; // The ptTravelTime must be calculated it like this: travelTime = walk + transferTime;
+					newPlan.addActivity(newPTAct("Change ptv", link.getFromNode().getCoord(), link, arrTime, endActTime));
 					first=false;
 				}
 			}
@@ -232,31 +243,34 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 				legRouteLinks.add(link);
 				linkTravelTime= linkTravelTime/60;
 				arrTime= accumulatedTime+ linkTravelTime;
-				newPlan.addLeg(newPTLeg(legNum++, TransportMode.walk, legRouteLinks, linkDistance, accumulatedTime, linkTravelTime, arrTime));
+				newPlan.addLeg(newPTLeg(TransportMode.walk, legRouteLinks, linkDistance, accumulatedTime, linkTravelTime, arrTime));
 			}
 
 			accumulatedTime =accumulatedTime+ linkTravelTime;
 			lastLinkType = link.getType();
 			linkCounter++;
 		}//for Link
-		return legNum;
+
 	}//insert
-	
-	private void removeWlinks(){
-		net.removeLink(walkLink1);
-		net.removeLink(walkLink2);
-		net.removeNode(originNode);
-		net.removeNode(destinationNode);
+		
+	private Activity newPTAct(final String type, final Coord coord, final Link link, final double startTime, final double endTime){
+		Activity ptAct= new ActivityImpl(type, coord);
+		ptAct.setStartTime(startTime);
+		ptAct.setEndTime(endTime);
+		//ptAct.calculateDuration();
+		ptAct.setLink(link);
+		return ptAct;
 	}
 	
-	private Leg newPTLeg(final int num, TransportMode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
+	private Leg newPTLeg(TransportMode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
 		NetworkRoute legRoute = new LinkNetworkRoute(null, null); 
 		
-		if (mode!=TransportMode.walk)
+		if (mode!=TransportMode.walk){
 			legRoute.setLinks(null, routeLinks, null);
-		else
-			mode= TransportMode.car;  //-> temporarly
-			
+		}else{
+			mode= TransportMode.car;  //-> temporarly for Visualizer
+		}
+		
 		legRoute.setTravelTime(travTime);
 		legRoute.setDistance(distance);
 		Leg leg = new LegImpl(mode);
@@ -267,33 +281,28 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 		return leg;
 	}
 	
-	private Leg walkLeg(final int legNum, final Activity act1, final Activity act2){
+	private Leg walkLeg(final Activity act1, final Activity act2){
 		double distance= CoordUtils.calcDistance(act1.getCoord(), act2.getCoord());
 		double walkTravelTime = walk.walkTravelTime(distance); 
 		double depTime = act1.getEndTime();
 		double arrTime = depTime + walkTravelTime;
-		return newPTLeg(legNum, TransportMode.walk, new ArrayList<Link>(), distance, depTime, walkTravelTime, arrTime);
+		return newPTLeg(TransportMode.walk, new ArrayList<Link>(), distance, depTime, walkTravelTime, arrTime);
 	}
-	
+		
 	private void createWlinks(final Coord coord1, final Path path, final Coord coord2){
-		//private int nodeIndex=0;
-		//private int linkIndex=0;
-
-		originNode= ptRouter.CreateWalkingNode(new IdImpl("w" + nodeIndex++), coord1);
-		destinationNode= ptRouter.CreateWalkingNode(new IdImpl("w" + nodeIndex++), coord2);
+		originNode= ptRouter.CreateWalkingNode(new IdImpl("w1"), coord1);
+		destinationNode= ptRouter.CreateWalkingNode(new IdImpl("w2"), coord2);
 		path.nodes.add(0, originNode);
 		path.nodes.add(destinationNode);
-		walkLink1 = ptRouter.createPTLink("linkW" + linkIndex++, originNode , path.nodes.get(1), "Walking");
-		walkLink2 = ptRouter.createPTLink("linkW" + linkIndex++, path.nodes.get(path.nodes.size()-2) , destinationNode, "Walking");
+		walkLink1 = ptRouter.createPTLink("linkW1", originNode , path.nodes.get(1), "Walking");
+		walkLink2 = ptRouter.createPTLink("linkW2", path.nodes.get(path.nodes.size()-2) , destinationNode, "Walking");
 	}
 	
-	private Activity newPTAct(final String type, final Coord coord, final Link link, final double startTime, final double dur, final double endTime){
-		Activity ptAct= new ActivityImpl(type, coord);
-		ptAct.setStartTime(startTime);
-		ptAct.setEndTime(endTime);
-		ptAct.calculateDuration();
-		ptAct.setLink(link);
-		return ptAct;
+	private void removeWlinks(){
+		net.removeLink(walkLink1);
+		net.removeLink(walkLink2);
+		net.removeNode(originNode);
+		net.removeNode(destinationNode);
 	}
 	
 	public void showPerformance(){
@@ -306,5 +315,20 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 				"\nnull paths: " + nulls +
 				"\nless than 2 node paths: " + lessThan2Node);
 	}
+	
+	public void setFacilities(Facilities facilities, TransitSchedule transitSchedule){
+		this.facilities = facilities;
+		this.transitSchedule = transitSchedule;
+	}
+	
+	private ExperimentalTransitRoute InsertExperimentalTransitRoute(List<Link> legRouteLinks ){
+		Node node = legRouteLinks.get(0).getFromNode();
+		Id idEgressFacility = legRouteLinks.get(legRouteLinks.size()-1).getToNode().getId();
+		
+		Facility accessFacility = facilities.getFacilities().get(node.getId());
+		TransitLine line = this.transitSchedule.getTransitLines().get(((PTNode)node).getIdPTLine()); 
+		Facility egressFacility = facilities.getFacilities().get(idEgressFacility);
+		return new ExperimentalTransitRoute(accessFacility, line, egressFacility);
+	}  
 	
 }

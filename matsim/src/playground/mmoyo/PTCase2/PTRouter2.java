@@ -99,7 +99,7 @@ public class PTRouter2 {
 				idLink= "WLD" + x++;
 			}
 			Link link= createPTLink(idLink, fromNode, toNode, "Walking");
-			//-->30 m�rz check if this temporary stuff improves the performance
+			//-->30 march check if this temporary stuff improves the performance
 			//link.setFreespeed(link.getLength()* WALKING_SPEED);
 			NewWalkLinks.add(link);
 		}

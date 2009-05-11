@@ -3,25 +3,19 @@ package playground.mmoyo.PTCase2;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.TravelTime;
 import playground.mmoyo.Validators.CostValidator;
-import playground.mmoyo.PTRouter.PTNode;
+import playground.mmoyo.Pedestrian.Walk;
 
 public class PTTravelTime implements TravelTime {
 	double walkSpeed =  Walk.walkingSpeed();
 	private PTTimeTable2 ptTimeTable = new PTTimeTable2();
 	public CostValidator costValidator = new CostValidator();
 	
-	
+	public PTTravelTime() {
+		 
+	}
+
 	public PTTravelTime(PTTimeTable2 ptTimeTable) {
 		this.ptTimeTable = ptTimeTable; 
-	}
-	
-	private double transferTime(Link link, double t){
-		double transTime= ptTimeTable.GetTransferTime(link, t);
-		if (transTime<0) {
-			costValidator.pushNegativeValue(link.getId(), t, transTime);
-			transTime = 600;
-		}
-		return transTime;  //->> Transfer factor
 	}
 	
 	public double getLinkTravelTime(Link link, double time) {
@@ -40,11 +34,17 @@ public class PTTravelTime implements TravelTime {
 			double walkTime=link.getLength()* walkSpeed;
 			double waitingTime= ptTimeTable.GetTransferTime(link.getToNode().getId(), time+walkTime);
 			travelTime= walkTime + waitingTime; 
-			
 			//--> decide if the departures will be saved in map or in Node
-		
-
 		}
 		return travelTime;
+	}
+
+	private double transferTime(Link link, double t){
+		double transTime= ptTimeTable.GetTransferTime(link, t);
+		if (transTime<0) {
+			costValidator.pushNegativeValue(link.getId(), t, transTime);
+			transTime = 600;
+		}
+		return transTime;  //->> Transfer factor
 	}
 }
