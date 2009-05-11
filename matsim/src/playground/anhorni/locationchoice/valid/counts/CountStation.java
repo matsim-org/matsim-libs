@@ -1,5 +1,6 @@
 package playground.anhorni.locationchoice.valid.counts;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import org.apache.log4j.Logger;
@@ -10,15 +11,31 @@ public class CountStation {
 	private final static Logger log = Logger.getLogger(CountStation.class);
 	
 	private String csId;
-	private LinkInfo link0;
 	private LinkInfo link1;
+	private LinkInfo link2;
 	private CoordImpl coord;
 	private List<RawCount> counts = new Vector<RawCount>();
-	private Aggregator aggregator = new Aggregator();
 	
 	public CountStation(String id, CoordImpl coord) {
 		this.csId = id;
 		this.coord = coord;
+	}
+	
+	public void mapCounts() {
+		Iterator<RawCount> count_it = counts.iterator();
+		while (count_it.hasNext()) {
+			RawCount rawCount = count_it.next();	
+			link1.addYearCountVal(rawCount.getHour(), rawCount.getVol1());
+			link2.addYearCountVal(rawCount.getHour(), rawCount.getVol2());
+		}
+	}
+	
+	public boolean addSimValforLinkId(String networkName, String linkId, int hour, double simVal) {
+		if (this.link1.addSimValforLinkId(networkName, linkId, hour, simVal) || 
+				this.link2.addSimValforLinkId(networkName, linkId, hour, simVal)) {
+			return true;
+		}
+		return false;
 	}
 	
 	public void filter(DateFilter filter) {
@@ -29,7 +46,8 @@ public class CountStation {
 	}		
 	// aggregate 0..24
 	public void aggregate() {
-		aggregator.aggregate(this.counts);		
+		this.link1.aggregate();
+		this.link2.aggregate();	
 	}	
 	public List<RawCount> getCounts() {
 		return counts;
@@ -46,23 +64,17 @@ public class CountStation {
 	public void setCoord(CoordImpl coord) {
 		this.coord = coord;
 	}
-	public LinkInfo getLink0() {
-		return link0;
-	}
-	public void setLink0(LinkInfo link0) {
-		this.link0 = link0;
-	}
 	public LinkInfo getLink1() {
 		return link1;
 	}
 	public void setLink1(LinkInfo link1) {
 		this.link1 = link1;
 	}
-	public Aggregator getAggregator() {
-		return aggregator;
+	public LinkInfo getLink2() {
+		return link2;
 	}
-	public void setAggregator(Aggregator aggregator) {
-		this.aggregator = aggregator;
+	public void setLink2(LinkInfo link2) {
+		this.link2 = link2;
 	}
 	
 	

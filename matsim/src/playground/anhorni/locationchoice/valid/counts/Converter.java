@@ -20,20 +20,20 @@ public class Converter {
 			CountStation countStation = countStation_it.next();
 						
 			this.createCounts(countStation, countsAre, 
-					new IdImpl(countStation.getLink0().getLinkidAre()),
-					new IdImpl(countStation.getLink1().getLinkidAre()));
+					new IdImpl(countStation.getLink1().getLinkidAre()),
+					new IdImpl(countStation.getLink2().getLinkidAre()));
 			
 			this.createCounts(countStation, countsIVTCH, 
-					new IdImpl(countStation.getLink0().getLinkidIVTCH()),
-					new IdImpl(countStation.getLink1().getLinkidIVTCH()));
+					new IdImpl(countStation.getLink1().getLinkidIVTCH()),
+					new IdImpl(countStation.getLink2().getLinkidIVTCH()));
 			
 			this.createCounts(countStation, countsNavteq, 
-					new IdImpl(countStation.getLink0().getLinkidNavteq()),
-					new IdImpl(countStation.getLink1().getLinkidNavteq()));
+					new IdImpl(countStation.getLink1().getLinkidNavteq()),
+					new IdImpl(countStation.getLink2().getLinkidNavteq()));
 			
 			this.createCounts(countStation, countsTeleatlas, 
-					new IdImpl(countStation.getLink0().getLinkidTeleatlas()),
-					new IdImpl(countStation.getLink1().getLinkidTeleatlas()));				
+					new IdImpl(countStation.getLink1().getLinkidTeleatlas()),
+					new IdImpl(countStation.getLink2().getLinkidTeleatlas()));				
 		}		
 	}
 	
@@ -42,13 +42,13 @@ public class Converter {
 		counts.createCount(locId1, String.valueOf(countStation.getId()));
 		Count count0 = counts.getCount(locId1);	
 		for (int i = 0; i < 24; i++) {
-			count0.createVolume(i+1, countStation.getAggregator().getAvg()[0][i]);
+			count0.createVolume(i+1, countStation.getLink1().getAggregator().getAvg()[i]);
 		}
 		
 		counts.createCount(locId2, String.valueOf(countStation.getId()));
 		Count count1 = counts.getCount(locId2);		
 		for (int i = 0; i < 24; i++) {
-			count1.createVolume(i+1, countStation.getAggregator().getAvg()[1][i]);
+			count1.createVolume(i+1, countStation.getLink2().getAggregator().getAvg()[i]);
 		}
 	}
 

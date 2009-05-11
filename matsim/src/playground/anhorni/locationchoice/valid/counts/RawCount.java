@@ -27,7 +27,7 @@ public class RawCount {
 		this.year = Integer.parseInt(year);
 		this.month = Integer.parseInt(month);
 		this.day = Integer.parseInt(day);
-		this.hour = Integer.parseInt(hour);
+		this.hour = Integer.parseInt(hour) -1;
 		this.vol1 = Double.parseDouble(vol1);
 		this.vol2 = Double.parseDouble(vol2);
 	}

@@ -1,12 +1,11 @@
 package playground.anhorni.locationchoice.valid.counts;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
-import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.counts.CountsWriter;
+ import org.apache.log4j.Logger;
 
 public class CountsCreation {
 	
@@ -32,20 +31,23 @@ public class CountsCreation {
 		
 		NetworkMapper mapper = new NetworkMapper();
 		mapper.map(rawCounts, this.networkMappingFile);
+
 		
-		List<CountStation> countStations = new Vector<CountStation>();
-		countStations = mapper.getCountStations();
+		Stations stations = new Stations();
+		stations.setCountStations(mapper.getCountStations());
+		log.info("Number of stations: " + stations.getCountStations().size());
 			
 		DateFilter filter = new DateFilter();
-		Iterator<CountStation> station_it = countStations.iterator();
+		Iterator<CountStation> station_it = stations.getCountStations().iterator();
 		while (station_it.hasNext()) {
 			CountStation station = station_it.next();
-			station.filter(filter);		
+			station.filter(filter);	
+			station.mapCounts();
 			station.aggregate();
 		}		
 		
 		Converter converter = new Converter();
-		converter.convert(countStations);
+		converter.convert(stations.getCountStations());
 				
 		CountsWriter writer = new CountsWriter(converter.getCountsAre(), "output/counts/countsAre.xml");
 		writer.write();
@@ -57,13 +59,11 @@ public class CountsCreation {
 		writer.write();	
 		
 		// Summary:
-		CountsCompareReader countsCompareReader = new CountsCompareReader();
+		CountsCompareReader countsCompareReader = new CountsCompareReader(stations);
 		countsCompareReader.read();
 		
 		SummaryWriter summaryWriter = new SummaryWriter();
-		summaryWriter.write(countStations, "output/counts/", countsCompareReader);
-		
-		
+		summaryWriter.write(stations, "output/counts/");
 		
 	}
 }

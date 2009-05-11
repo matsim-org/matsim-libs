@@ -86,11 +86,11 @@ public class NetworkMapper {
 
 				if (!stationsTree.containsKey(dataset + nr)) {
 					CountStation station = new CountStation(dataset + nr, coord);
-					station.setLink0(link);
+					station.setLink1(link);
 					stationsTree.put(dataset + nr, station);
 				}
 				else {
-					stationsTree.get(dataset + nr).setLink1(link);
+					stationsTree.get(dataset + nr).setLink2(link);
 				}
 				
 			}	

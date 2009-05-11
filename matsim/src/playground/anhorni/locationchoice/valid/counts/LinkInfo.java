@@ -1,54 +1,100 @@
 package playground.anhorni.locationchoice.valid.counts;
 
+import java.util.List;
+import java.util.TreeMap;
+import java.util.Vector;
+import org.apache.log4j.Logger;
+
 public class LinkInfo {
 	
-	private String direction;
-	private String linkidTeleatlas;
-	private String linkidNavteq;
-	private String linkidAre;
-	private String linkidIVTCH;
+	private final static Logger log = Logger.getLogger(LinkInfo.class);
 	
+	private TreeMap<String, String> ids = new TreeMap<String, String>();
+	private TreeMap<Integer, List<Double>> yearCountVals = new TreeMap<Integer, List<Double>>();
+	private TreeMap<Integer, Double> simVals =  new TreeMap<Integer, Double>();
 	
+	private Aggregator aggregator = new Aggregator();
 	
 	public LinkInfo(String direction, String linkidTeleatlas,
-			String linkidNavteq, String linkidAre, String linkidIVTCH) {
-		this.direction = direction;
-		this.linkidTeleatlas = linkidTeleatlas;
-		this.linkidNavteq = linkidNavteq;
-		this.linkidAre = linkidAre;
-		this.linkidIVTCH = linkidIVTCH;
+			String linkidNavteq, String linkidAre, String linkidIVTCH) {	
+		this.ids.put("teleatlas", linkidTeleatlas);
+		this.ids.put("are", linkidNavteq);
+		this.ids.put("navteq", linkidNavteq);
+		this.ids.put("ivtch", linkidIVTCH);
 	}
 	
+	public double getAbsoluteDifference_TimeAvg(int hour) {
+		return Math.abs(this.getSimVal(hour) - this.aggregator.getAvg()[hour]);
+	}
 	
-	public String getDirection() {
-		return direction;
+	public double getAbsoluteStandardDev_TimeAvg(int hour) {
+		return this.aggregator.getStandarddev()[hour];
 	}
-	public void setDirection(String direction) {
-		this.direction = direction;
+	
+	public double getRelativeError_TimeAvg(int hour) {
+		return Math.abs((this.getSimVal(hour) - this.aggregator.getAvg()[hour]) / this.aggregator.getAvg()[hour]);
 	}
+	
+	public double getRelativeStandardDeviation(int hour) {
+		return Math.abs(this.aggregator.getStandarddev()[hour] / this.aggregator.getAvg()[hour]); 
+	}
+	
+	public boolean addSimValforLinkId(String networkName, String linkId, int hour, double simVal) {
+		if (ids.get(networkName).equals(linkId)) {
+			this.addSimVal(hour, simVal);
+			return true;
+		}
+		return false;
+	}
+	
+	public void addYearCountVal(int hour, double count) {
+		if (this.yearCountVals.get(hour) == null) {
+			this.yearCountVals.put(hour, new Vector<Double>());
+		}
+		this.yearCountVals.get(hour).add(count);
+	}
+	
+	public void aggregate() {
+		this.aggregator.aggregate(this.yearCountVals);
+	}
+	
 	public String getLinkidTeleatlas() {
-		return linkidTeleatlas;
-	}
-	public void setLinkidTeleatlas(String linkidTeleatlas) {
-		this.linkidTeleatlas = linkidTeleatlas;
-	}
-	public String getLinkidNavteq() {
-		return linkidNavteq;
-	}
-	public void setLinkidNavteq(String linkidNavteq) {
-		this.linkidNavteq = linkidNavteq;
-	}
-	public String getLinkidAre() {
-		return linkidAre;
-	}
-	public void setLinkidAre(String linkidAre) {
-		this.linkidAre = linkidAre;
-	}
-	public String getLinkidIVTCH() {
-		return linkidIVTCH;
-	}
-	public void setLinkidIVTCH(String linkidIVTCH) {
-		this.linkidIVTCH = linkidIVTCH;
+		return this.ids.get("teleatlas");
 	}
 
+	public String getLinkidNavteq() {
+		return this.ids.get("navteq");
+	}
+
+	public String getLinkidAre() {
+		return this.ids.get("are");
+	}
+
+	public String getLinkidIVTCH() {
+		return this.ids.get("ivtch");
+	}
+	
+	public void addSimVal(int hour, double simVal) {
+		this.simVals.put(hour, simVal);
+	}
+
+	public Aggregator getAggregator() {
+		return aggregator;
+	}
+
+	public void setAggregator(Aggregator aggreagtor) {
+		this.aggregator = aggreagtor;
+	}
+	
+	public double getSimVal(int hour) {
+		return this.simVals.get(hour);
+	}
+
+	public TreeMap<Integer, Double> getSimVals() {
+		return simVals;
+	}
+
+	public void setSimVals(TreeMap<Integer, Double> simVals) {
+		this.simVals = simVals;
+	}
 }
