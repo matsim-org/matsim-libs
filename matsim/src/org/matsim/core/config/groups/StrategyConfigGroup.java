@@ -78,6 +78,7 @@ public class StrategyConfigGroup extends Module {
 			}
 			return Double.toString(settings.getProbability());
 		}
+		// TODO typo in MODULE_DISABALE_AFTER_ITERATION ?
 		if (key != null && key.startsWith(MODULE_DISABALE_AFTER_ITERATION)) {
 			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_PROBABILITY.length())), false);
 			if (settings == null || settings.getDisableAfter() == -1) {
