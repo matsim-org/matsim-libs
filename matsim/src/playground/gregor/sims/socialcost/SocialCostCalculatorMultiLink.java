@@ -47,7 +47,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 	private final double discount;
 	
 
-	private final static int MSA_OFFSET = 20;
+	private final static int MSA_OFFSET = 0;
 	
 	public SocialCostCalculatorMultiLink(NetworkLayer network, int binSize,AbstractTravelTimeCalculator travelTimeCalculator, Population population) {
 		this.network = network;
@@ -117,7 +117,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 			double newCoef = 1 /(n+1);
 			for (LinkInfo li : this.linkInfos.values()) {
 				for (LinkTimeCostInfo lci : li.linkTimeCosts.values()) {
-					lci.cost = newCoef * (lci.c1 + lci.c2) + oldCoef * lci.cost;
+					lci.cost = newCoef * Math.max(-1., Math.min(10.,lci.c1 + lci.c2)) + oldCoef * lci.cost;
 					if (lci.cost > maxCost) {
 						maxCost = lci.cost;
 					}
