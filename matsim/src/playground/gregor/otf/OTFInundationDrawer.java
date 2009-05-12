@@ -35,14 +35,14 @@ public class OTFInundationDrawer extends AbstractBackgroundDrawer {
 	private OTFOGLDrawer drawer2;
 
 
-	public OTFInundationDrawer(OTFOGLDrawer drawer2) {
-		this.drawer2 = drawer2;
-	}
+//	public OTFInundationDrawer(OTFOGLDrawer drawer2) {
+//		this.drawer2 = drawer2;
+//	}
 
-	public OTFInundationDrawer() {
-		int wtf = 0;
-		wtf++;
-	}
+//	public OTFInundationDrawer() {
+//		int wtf = 0;
+//		wtf++;
+//	}
 
 	public void onDraw(GL gl) {
 //		onDraw(gl,this.drawer2.now);
@@ -52,7 +52,7 @@ public class OTFInundationDrawer extends AbstractBackgroundDrawer {
 	public void onDraw(GL gl, int time) {
 
 		
-		this.timeSlotIdx = (short) (((short) ((time - 3*3600)/60))+30);
+		this.timeSlotIdx = (short) (((short) ((time - 3*3600)/60)));
 		
 		if (this.timeSlotIdx < 0) {
 			return;

@@ -24,4 +24,9 @@ public class Dummy extends OTFGLDrawableImpl {
 		
 	}
 
+	public void setTime(double time2) {
+		this.time = (int) time2;
+		
+	}
+
 }

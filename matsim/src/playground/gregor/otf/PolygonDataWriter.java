@@ -5,40 +5,46 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 
+import org.geotools.data.FeatureSource;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
+import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundFeatureDrawer;
 
-public class InundationDataWriter extends OTFDataWriter {
+public class PolygonDataWriter extends OTFDataWriter {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6693752092591508527L;
+
 	
-	private final InundationData data;
+	
+	private SimpleBackgroundFeatureDrawer data;
 
-	public InundationDataWriter(InundationData data) {
-		this.data = data;
+
+
+	public PolygonDataWriter(FeatureSource fs, float [] color ) {
+		try {
+			this.data = new SimpleBackgroundFeatureDrawer(fs,color);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
-
+	
+	
 	@Override
 	public void writeConstData(ByteBuffer out) throws IOException {
 		
-		
-		ByteArrayOutputStream a = new ByteArrayOutputStream();
+	ByteArrayOutputStream a = new ByteArrayOutputStream();
 		
 		ObjectOutputStream o = new ObjectOutputStream(a);
 		o.writeObject(this.data);
 		
 		out.putInt(a.toByteArray().length);
-		
 		out.put(a.toByteArray());
-		
 	}
 
+	
+	
 	@Override
 	public void writeDynData(ByteBuffer out) throws IOException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

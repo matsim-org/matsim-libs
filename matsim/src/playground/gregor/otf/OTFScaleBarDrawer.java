@@ -32,6 +32,9 @@ public class OTFScaleBarDrawer extends OTFGLDrawableImpl {
 	private final String bg;
 	private final String sb;
 
+	public OTFScaleBarDrawer() {
+		this("./res/sb_background.png","./res/scalebar.png");
+	}
 
 	public OTFScaleBarDrawer(String picturePath, String sb) {
 		this.bg = picturePath;

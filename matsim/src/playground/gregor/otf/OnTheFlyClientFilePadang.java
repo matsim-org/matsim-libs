@@ -78,7 +78,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 
 	
 	
-	private void loadTileDrawer() {
+	private static void loadTileDrawer() {
 		OGLSimpleBackgroundLayer.addPersistentItem(new TileDrawer());
 		
 	}
@@ -106,15 +106,15 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
 //		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
 //		loadTilesFromServer();
-		loadTileDrawer();
 		
-		try {
-			loadFeatureLayer(this.BUILDINGS_FILE,buildingsColor);
-			loadFeatureLayer(this.NODES_FILE,linksColor);
-			loadFeatureLayer(this.LINKS_FILE,nodesColor);
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
+		
+//		try {
+//			loadFeatureLayer(this.BUILDINGS_FILE,buildingsColor);
+//			loadFeatureLayer(this.NODES_FILE,linksColor);
+//			loadFeatureLayer(this.LINKS_FILE,nodesColor);
+//		} catch (final Exception e) {
+//			e.printStackTrace();
+//		}
 //		FloodingReader fr = new FloodingReader("../../inputs/networks/flooding.sww");
 		
 //		OTFInundationDrawer x = new OTFInundationDrawer(fr,clientQ2.offsetEast,clientQ2.offsetNorth);
@@ -125,12 +125,12 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		OGLSimpleBackgroundLayer.addPersistentItem(new ScalelableBackgroundDraw("test.png","scalebar2.png","scalebar3.png"));
 		
 //		InundationDataFromNetcdfReader n = new InundationDataFromNetcdfReader(clientQ2.offsetNorth,clientQ2.offsetEast);
-		InundationDataFromBinaryFileReader n = new InundationDataFromBinaryFileReader();
-		OTFInundationDrawer x = new OTFInundationDrawer(drawer2);
-		x.setData(n.readData());
+//		InundationDataFromBinaryFileReader n = new InundationDataFromBinaryFileReader();
+//		OTFInundationDrawer x = new OTFInundationDrawer(drawer2);
+//		x.setData(n.readData());
 		
-		OGLSimpleBackgroundLayer.addPersistentItem(x);
-		n = null;
+//		OGLSimpleBackgroundLayer.addPersistentItem(x);
+//		n = null;
 		drawer2.addOverlay(new OTFScaleBarDrawer("./res/sb_background.png","./res/scalebar.png"));
 		return drawer2;
 	}
@@ -154,8 +154,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
 //		final String filename =  CVSROOT + "/runs/run314/output/ITERS/it.100/100.movie.mvi";
 //		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
-//		final String filename =  "../../outputs/output_100m_so/ITERS/it.0/0.movie.mvi";
-		filename =  "../../outputs/output_shelter_noWave/ITERS/it.200/200.movie.mvi";
+		filename =  "../../outputs/output/ITERS/it.0/0.movie.mvi";
+//		filename =  "../../outputs/output_shelter_noWave/ITERS/it.200/200.movie.mvi";
 //			filename =  "../../outputs/output/ITERS/it.0/0.movie.mvi";
 //		final String filename =  "/home/laemmel/arbeit/svn/runs-svn/run316/stage2/output/ITERS/it.201/201.movie.mvi";
 		}
@@ -163,22 +163,23 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		String filename = "./jam/jam.mvi";
 		
 
-		connect1.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-		connect1.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
-		connect1.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect1.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.NoQuadDrawer.class);
-		connect1.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		connect1.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangTimeDrawer.class);
-		connect1.add(OGLAgentPointLayer.AgentPadangTimeDrawer.class, OGLAgentPointLayer.class);
-		connect1.add(SimpleStaticNetLayer.NoQuadDrawer.class, SimpleStaticNetLayer.class);
-		connect1.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		connect1.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect1.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.NoQuadDrawer.class);
+//		connect1.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
+//		connect1.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
+////		connect1.add(SimpleBackgroundDrawer.class, OTFScaleBarDrawer.class);
+//		connect1.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
+//		connect1.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.NoQuadDrawer.class);
+//		connect1.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
+//		connect1.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangTimeDrawer.class);
+//		connect1.add(OGLAgentPointLayer.AgentPadangTimeDrawer.class, OGLAgentPointLayer.class);
+//		connect1.add(SimpleStaticNetLayer.NoQuadDrawer.class, SimpleStaticNetLayer.class);
+//		connect1.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+//		connect1.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
+//		connect1.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.NoQuadDrawer.class);
 //		connect1.add(InundationDataWriter.class,InundationDataReader.class);
 //		connect1.add(InundationDataReader.class,Dummy.class);
 		//connect1.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
 		
-		
+		loadTileDrawer();
 		connect2.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect2.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
 		connect2.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
@@ -196,16 +197,16 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 //		OTFOGLDrawer.linkWidth =2;
 		
-		Gbl.createConfig(null);
-		final OTFVisConfig conf = new OTFVisConfig();
-//		conf.setLinkWidth(10);
-		Gbl.getConfig().addModule("otfvis", conf);
-		
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(0); 
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50,255));
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setAgentSize(100.f);
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawTime(true);
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawOverlays(true);
+//		Gbl.createConfig(null);
+//		final OTFVisConfig conf = new OTFVisConfig();
+////		conf.setLinkWidth(10);
+//		Gbl.getConfig().addModule("otfvis", conf);
+//		
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(0); 
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50,255));
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setAgentSize(100.f);
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawTime(true);
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawOverlays(true);
 		
 		
 		final OnTheFlyClientFileQuad client = new OnTheFlyClientFilePadang(filename, null, false);
