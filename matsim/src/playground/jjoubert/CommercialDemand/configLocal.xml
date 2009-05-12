@@ -13,7 +13,7 @@
 
 	<module name="plans">
 		<param name="inputPlansFile" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Input/plans.xml" />
-		<param name="outputPlansFile" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Input/plansLinks.xml" />
+		<param name="outputPlansFile" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Input/plansAll.xml" />
 	</module>
 
 	<module name="controler">
