@@ -20,6 +20,7 @@
 
 package playground.marcel.pt.integration;
 
+import java.rmi.RemoteException;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.TransportMode;
@@ -37,13 +38,18 @@ import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
 import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
+import playground.marcel.pt.otfvis.FacilityDrawer;
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 
 public class TransitQueueSimulation extends QueueSimulation {
+	
+	private final OnTheFlyServer otfServer;
+	
 
 	private final Facilities facilities;
 	private TransitSchedule schedule = null;
@@ -57,6 +63,26 @@ public class TransitQueueSimulation extends QueueSimulation {
 		this.setAgentFactory(new TransitAgentFactory(this, this.agents));
 
 		this.agentTracker = new TransitStopAgentTracker();
+		
+		this.otfServer = OnTheFlyServer.createInstance("OTFServer_Transit", this.network, this.plans, getEvents(), false);
+		try {
+			this.otfServer.pause();
+			this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(this.facilities, this.agentTracker));
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	protected void cleanupSim() {
+		this.otfServer.cleanup();
+		super.cleanupSim();
+	}
+	
+	@Override
+	protected void afterSimStep(final double time) {
+		super.afterSimStep(time);
+		this.otfServer.updateStatus(time);
 	}
 
 	public void setTransitSchedule(final TransitSchedule schedule) {
