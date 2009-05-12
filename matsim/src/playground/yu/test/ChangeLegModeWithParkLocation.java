@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -27,7 +28,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
@@ -86,14 +86,14 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 	}
 
 	public static void main(String[] args) {
-		Config config = Gbl.createConfig(args);
 		Controler ctl = new ChangeLegModeWithParkLocationControler(args);
 		ctl.addControlerListener(new LegChainModesListener());
 		ctl.setCreateGraphs(false);
-//		ctl.setWriteEventsInterval(0);
+		ctl.setWriteEventsInterval(100);
 		ctl
 				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring()));
+						new ScenarioLoader(args[0]).loadScenario().getConfig()
+								.charyparNagelScoring()));
 		ctl.run();
 	}
 
@@ -615,7 +615,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		protected StrategyManager loadStrategyManager() {
 			StrategyManager manager = new StrategyManager();
 
-			manager.setMaxPlansPerAgent(5);
+			manager.setMaxPlansPerAgent(4);
 
 			// ChangeExpBeta
 			PlanStrategy strategy1 = new PlanStrategy(new ExpBetaPlanChanger());
@@ -656,7 +656,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			Controler ctl = event.getControler();
-			int itr = event.getIteration();
+//			int itr = event.getIteration();
 
 			// get the leg modes of the selected plan of the first Person
 			for (Iterator<Person> pIt = ctl.getPopulation().getPersons()

@@ -3,14 +3,13 @@
  */
 package playground.yu.test;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -198,42 +197,42 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 	public void testLegChainModes1() {
 		// the agent in the initial plan has only "walk" legs.
 		String[] args = new String[] { getInputDirectory() + "config1.xml" };
-		Config config = Gbl.createConfig(args);
 		Controler ctl = new ChangeLegModeWithParkLocationControler(args);
 		ctl.addControlerListener(new LegChainModesListener1());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
 		ctl
 				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring()));
+						new ScenarioLoader(args[0]).loadScenario().getConfig()
+								.charyparNagelScoring()));
 		ctl.run();
 	}
 
 	public void testLegChainModes2() {
 		// the agent in the initial plan has only "car" legs.
 		String[] args = new String[] { getInputDirectory() + "config2.xml" };
-		Config config = Gbl.createConfig(args);
 		Controler ctl = new ChangeLegModeWithParkLocationControler(args);
 		ctl.addControlerListener(new LegChainModesListener2());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
 		ctl
 				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring()));
+						new ScenarioLoader(args[0]).loadScenario().getConfig()
+								.charyparNagelScoring()));
 		ctl.run();
 	}
 
 	public void testLegChainModes3() {
 		// the agent in the initial plan has only "pt" legs.
 		String[] args = new String[] { getInputDirectory() + "config3.xml" };
-		Config config = Gbl.createConfig(args);
 		Controler ctl = new ChangeLegModeWithParkLocationControler(args);
 		ctl.addControlerListener(new LegChainModesListener3());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
 		ctl
 				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring()));
+						new ScenarioLoader(args[0]).loadScenario().getConfig()
+								.charyparNagelScoring()));
 		ctl.run();
 	}
 
