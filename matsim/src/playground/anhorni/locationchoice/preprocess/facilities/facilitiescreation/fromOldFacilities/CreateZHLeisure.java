@@ -27,7 +27,7 @@ public class CreateZHLeisure {
 	public void run() {
 		log.info("reading facilities ...");
 				
-		new FacilitiesReaderMatsimV1(facilities).readFile("input/facilities/facilities.xml");
+		new FacilitiesReaderMatsimV1(facilities).readFile("input/facilities/facilities.xml.gz");
 		this.createNewFacilities();
 		this.writeFacilities();
 		log.info("finished");
