@@ -236,34 +236,28 @@ public class ScenarioCut {
 	//////////////////////////////////////////////////////////////////////
 	
 	private static void reduceScenario(String[] args) {
+		Scenario scenario = new ScenarioLoader(args[0]).loadScenario();
+		calcExtent(scenario);
 		if (args.length == 4) {
-			Scenario scenario = new ScenarioLoader(args[0]).loadScenario();
-			calcExtent(scenario);
 			Coord center = new CoordImpl(args[1],args[2]);
 			double radius = Double.parseDouble(args[3]);
 			
 			reduceFacilities(scenario.getFacilities(),center,radius);
 			reduceNetwork(scenario.getNetwork(),center,radius);
 			reducePopulation(scenario);
-			
-			new NetworkWriter(scenario.getNetwork()).write();
-			new FacilitiesWriter(scenario.getFacilities()).write();
-			new PopulationWriter(scenario.getPopulation()).write();
 		}
 		else { // args.length == 5
-			Scenario scenario = new ScenarioLoader(args[0]).loadScenario();
-			calcExtent(scenario);
 			Coord min = new CoordImpl(args[1],args[2]);
 			Coord max = new CoordImpl(args[3],args[4]);
 			
 			reduceFacilities(scenario.getFacilities(),min,max);
 			reduceNetwork(scenario.getNetwork(),min,max);
 			reducePopulation(scenario);
-			
-			new NetworkWriter(scenario.getNetwork()).write();
-			new FacilitiesWriter(scenario.getFacilities()).write();
-			new PopulationWriter(scenario.getPopulation()).write();
 		}
+		calcExtent(scenario);
+		new NetworkWriter(scenario.getNetwork()).write();
+		new FacilitiesWriter(scenario.getFacilities()).write();
+		new PopulationWriter(scenario.getPopulation()).write();
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -312,6 +306,7 @@ public class ScenarioCut {
 				String [] args2 = {args[0],"640000","200000","740000","310000"};
 				reduceScenario(args2);
 			}
+			else { printUsage(); return; }
 		}
 		else if (args.length == 3) { printUsage(); return; }
 		else if (args.length == 4) {
