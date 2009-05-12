@@ -88,15 +88,28 @@
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
-		<param name="ModuleProbability_1" value="0.8" />
+		<param name="ModuleProbability_1" value="0.75" />
 		<param name="Module_1" value="SelectExpBeta" />
 
 		<param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="ReRoute" />
 		
-		<param name="ModuleProbability_3" value="0.1" />
-		<param name="Module_3" value="TimeAllocationMutator" />
+		<param name="ModuleProbability_3" value="0.15" />
+		<param name="Module_3" value="planomat" />
 		
 	</module>
+	
+		<module name="planomat">
+
+		<param name="populationSize" value="10" />
+		<param name="legTravelTimeEstimator" value="org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator" />
+		<param name="possibleModes" value="car" />
+		<param name="jgapMaxGenerations" value="10" />
+		<param name="levelOfTimeResolution" value="6" />
+		<param name="doLogging" value="true" />
+		<param name="tripStructureAnalysisLayer" value="link" />
+
+	</module>
+	
 
 </config>
