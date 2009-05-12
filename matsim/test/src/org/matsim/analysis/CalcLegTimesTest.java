@@ -92,43 +92,6 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		this.runTest(testee);
 	}
 
-//	public void testSomeModes() {
-//		
-//		CalcLegTimes testee = new CalcLegTimes(this.population);
-//		
-//		Events events = new Events();
-//		events.addHandler(testee);
-//		
-//		Person defaultPerson = this.population.getPersons().get(DEFAULT_PERSON_ID);
-//		Link defaultLink = this.network.getLinks().get(DEFAULT_LINK_ID);
-//		
-//		Leg leg = new LegImpl(TransportMode.car);
-//		leg.setDepartureTime(Time.parseTime("07:10:00"));
-//		leg.setArrivalTime(Time.parseTime("07:30:00"));
-//		testee.handleEvent(new AgentDepartureEvent(leg.getDepartureTime(), defaultPerson, defaultLink, leg));
-//		testee.handleEvent(new AgentArrivalEvent(leg.getArrivalTime(), defaultPerson, defaultLink, leg));
-//
-//		leg = new LegImpl(TransportMode.pt);
-//		leg.setDepartureTime(Time.parseTime("12:00:00"));
-//		leg.setArrivalTime(Time.parseTime("15:45:00"));
-//		testee.handleEvent(new AgentDepartureEvent(leg.getDepartureTime(), defaultPerson, defaultLink, leg));
-//		testee.handleEvent(new AgentArrivalEvent(leg.getArrivalTime(), defaultPerson, defaultLink, leg));
-//		
-//		leg = new LegImpl(TransportMode.bike);
-//		leg.setDepartureTime(Time.parseTime("30:05:00"));
-//		leg.setArrivalTime(Time.parseTime("30:08:00"));
-//		testee.handleEvent(new AgentDepartureEvent(leg.getDepartureTime(), defaultPerson, defaultLink, leg));
-//		testee.handleEvent(new AgentArrivalEvent(leg.getArrivalTime(), defaultPerson, defaultLink, leg));
-//		
-//		leg = new LegImpl(TransportMode.walk);
-//		leg.setDepartureTime(Time.parseTime("31:00:00"));
-//		leg.setArrivalTime(Time.parseTime("32:00:00"));
-//		testee.handleEvent(new AgentDepartureEvent(leg.getDepartureTime(), defaultPerson, defaultLink, leg));
-//		testee.handleEvent(new AgentArrivalEvent(leg.getArrivalTime(), defaultPerson, defaultLink, leg));
-//		
-//		this.runTest(testee);
-//	}
-
 	public void testAveraging() {
 		
 		CalcLegTimes testee = new CalcLegTimes(this.population);
