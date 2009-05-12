@@ -38,6 +38,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -52,6 +53,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -75,6 +78,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 	private transient FloatBuffer vert;
 //	private transient FloatBuffer cnt;
 	private transient ByteBuffer colors =  null;
+	private transient OTFOGLDrawer.FastColorizer colorizer3;
 
 	public void itemStateChanged(ItemEvent e) {
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
@@ -135,7 +139,9 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 				} else {
 					// handle leg
 					Leg leg = (Leg)actslegs.get(i);
-					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+					// just look at car routes right now
+					if(leg.getMode() != TransportMode.car) continue;
+					for (Link link : ((NodeNetworkRoute) leg.getRoute()).getLinks()) {
 						Id id2 = link.getId();
 						if(id2.equals(this.linkId) ) {
 							actPersons.add(plan);
@@ -248,15 +254,15 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 			float north = (float)drawer.getQuad().offsetNorth;
 
 			this.calcOffset = false;
-			int maxCount = 0;
 			for(int i = 0; i < this.vertex.length; i+=2) {
 				this.vertex[i] -=east;
 				this.vertex[i+1] -= north;
 			}
 
+			int maxCount = 0;
 			for(int i= 0;i< this.count.length; i++) if (this.count[i] > maxCount) maxCount = this.count[i];
 
-			OTFOGLDrawer.FastColorizer colorizer3 = new OTFOGLDrawer.FastColorizer(
+			colorizer3 = new OTFOGLDrawer.FastColorizer(
 					new double[] { 0.0, maxCount}, new Color[] {
 							Color.YELLOW, Color.RED});
 
@@ -284,6 +290,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		GL gl = drawer.getGL();
 		Color color = Color.ORANGE;
 		gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.3);
+		gl.glColor4d(1., 1.,1.,.3);
 		gl.glEnable(GL.GL_BLEND);
 		gl.glEnable(GL.GL_LINE_SMOOTH);
 		gl.glEnableClientState (GL.GL_COLOR_ARRAY);
@@ -296,9 +303,52 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		gl.glDisableClientState (GL.GL_COLOR_ARRAY);
 		gl.glDisable(GL.GL_LINE_SMOOTH);
 		gl.glDisable(GL.GL_BLEND);
-
+		
+		drawCaption(drawer);
 	}
 
+	private void drawQuad(GL gl, double xs, double xe, double ys, double ye, Color color) {
+		gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,color.getAlpha()/255.);
+		double z = 0;
+		gl.glBegin(GL.GL_QUADS);
+		gl.glVertex3d(xs, ys, z);
+		gl.glVertex3d(xe, ys, z);
+		gl.glVertex3d(xe, ye, z);
+		gl.glVertex3d(xs, ye, z);
+		gl.glEnd();
+		
+	}
+	private void drawCaption(OTFOGLDrawer drawer) {
+		QuadTree.Rect bounds = drawer.getViewBounds();
+		
+		double maxX = bounds.minX + (bounds.maxX -bounds.minX)*0.12;
+		double minX = bounds.minX + (bounds.maxX -bounds.minX)*0.01;
+		double maxY = bounds.minY + (bounds.maxY -bounds.minY)*0.15;
+		double minY = bounds.minY + (bounds.maxY -bounds.minY)*0.01;
+		GL gl = drawer.getGL();
+		Color color = new Color(255,255,255,200);
+		gl.glEnable(GL.GL_BLEND);
+		drawQuad(gl, minX, maxX, minY, maxY, color);
+		double horOf = (maxY-minY)/12;
+		double verOf = (maxX-minX)/12;
+
+		int maxCount = 0;
+		for(int i= 0;i< this.count.length; i++) if (this.count[i] > maxCount) maxCount = this.count[i];
+
+		Color c1 = colorizer3.getColor(0.0);
+		Color c2 = colorizer3.getColor(maxCount/2.);
+		Color c3 = colorizer3.getColor(maxCount);
+
+		double a=1,b=4,c=1,d=3;
+		drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c1);
+		InfoText.showTextOnce ("Count: 0" , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
+		a=1;b=4;c=5;d=7;
+		drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c2);
+		InfoText.showTextOnce ("Count: " + (maxCount/2) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
+		a=1;b=4;c=9;d=11;
+		drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c3);
+		InfoText.showTextOnce ("Count: " + (maxCount) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
+	}
 	public void remove() {
 		if (this.agentText != null) InfoText.removeTextPermanent(this.agentText);
 	}
