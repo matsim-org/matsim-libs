@@ -104,7 +104,7 @@
 		<param name="populationSize" value="10" />
 		<param name="legTravelTimeEstimator" value="org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator" />
 		<param name="possibleModes" value="car" />
-		<param name="jgapMaxGenerations" value="10" />
+		<param name="jgapMaxGenerations" value="50" />
 		<param name="levelOfTimeResolution" value="6" />
 		<param name="doLogging" value="true" />
 		<param name="tripStructureAnalysisLayer" value="link" />
