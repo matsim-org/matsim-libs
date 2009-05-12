@@ -18,7 +18,7 @@ public class LinkInfo {
 	public LinkInfo(String direction, String linkidTeleatlas,
 			String linkidNavteq, String linkidAre, String linkidIVTCH) {	
 		this.ids.put("teleatlas", linkidTeleatlas);
-		this.ids.put("are", linkidNavteq);
+		this.ids.put("are", linkidAre);
 		this.ids.put("navteq", linkidNavteq);
 		this.ids.put("ivtch", linkidIVTCH);
 	}

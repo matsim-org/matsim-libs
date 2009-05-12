@@ -16,7 +16,7 @@ public class CountsReaderYear {
 	TreeMap<String, Vector<RawCount>> rawCounts = new TreeMap<String, Vector<RawCount>>();
 	
 	public void read(String datasetsfile) {
-		List<String> datasets = new Vector<String>();
+		List<String> paths = new Vector<String>();
 		try {
 			FileReader fileReader = new FileReader(datasetsfile);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);	
@@ -24,16 +24,14 @@ public class CountsReaderYear {
 			String curr_line;			
 			while ((curr_line = bufferedReader.readLine()) != null) {
 				String dataset = curr_line;
-				log.info("Reading: " + dataset);
-				
-				datasets.add(dataset);
+				paths.add(dataset);
 			}	
 			bufferedReader.close();
 			fileReader.close();
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-		this.readFiles(datasets);
+		this.readFiles(paths);
 	}
 	
 	private void readFiles(final List<String> paths) {
@@ -42,6 +40,8 @@ public class CountsReaderYear {
 			for (int i = 0; i < paths.size(); i++) {
 				FileReader fileReader = new FileReader(paths.get(i));
 				BufferedReader bufferedReader = new BufferedReader(fileReader);
+				
+				log.info("Reading: " + paths.get(i));
 				
 				String curr_line = bufferedReader.readLine(); // Skip header
 				while ((curr_line = bufferedReader.readLine()) != null) {
@@ -58,10 +58,12 @@ public class CountsReaderYear {
 												
 					RawCount rawCount = new RawCount(dataset+nr, year, month, day, hour, vol1, vol2);
 					
-					if (rawCounts.get(dataset + nr) == null) {
-						rawCounts.put(dataset + nr, new Vector<RawCount>());
+					if (Integer.parseInt(vol1) > -1 && Integer.parseInt(vol2) > -1) {
+						if (rawCounts.get(dataset + nr) == null) {
+							rawCounts.put(dataset + nr, new Vector<RawCount>());
+						}
+						rawCounts.get(dataset + nr).add(rawCount);	
 					}
-					rawCounts.get(dataset + nr).add(rawCount);					
 				}	
 				bufferedReader.close();
 				fileReader.close();

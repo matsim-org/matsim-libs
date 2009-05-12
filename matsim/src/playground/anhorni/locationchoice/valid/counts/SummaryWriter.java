@@ -38,7 +38,7 @@ public class SummaryWriter {
 				CountStation station = stations_it.next();
 				
 				// if station is not in region -> no sim vals
-				if (station.getLink1().getSimVals().size() == 0) continue;
+				if (station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) continue;
 				numberOfStations++;
 				
 				for (int hour = 0; hour < 24; hour++) {		
@@ -93,7 +93,7 @@ public class SummaryWriter {
 				CountStation station = stations_it.next();
 				
 				// if station is not in region -> no sim vals
-				if (station.getLink1().getSimVals().size() == 0) continue;
+				if (station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) continue;
 				numberOfStations++;
 				
 				for (int hour = 0; hour < 24; hour++) {		
@@ -117,7 +117,7 @@ public class SummaryWriter {
 				out.write(formatter.format(count_sim[hour]) + "\t");
 				out.write(formatter.format(standarddev[hour]) + "\n");	
 			}
-			LineChart chart = new LineChart("Validation", "hour", "# vehicles");
+			LineChart chart = new LineChart("Difference values", "hour", "# vehicles");
 			chart.addSeries("AVG(|COUNT_i-SIM_i|)", count_sim);
 			chart.addSeries("AVG(|StandardDev_i|)", standarddev);
 			chart.saveAsPng(outpath + "AVG_difference.png", 1000, 800);
@@ -161,7 +161,7 @@ public class SummaryWriter {
 				CountStation station = stations_it.next();
 				
 				// if station is not in region -> no sim vals
-				if (station.getLink1().getSimVals().size() == 0) continue;
+				if (station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) continue;
 				numberOfStations++;
 				
 				for (int hour = 0; hour < 24; hour++) {		
@@ -195,7 +195,7 @@ public class SummaryWriter {
 					0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 			
 			for (int hour = 0; hour < 24; hour++) {		
-				standarddevRel[hour] = 100* Math.abs(standarddevRel[hour] - count[hour] ) / count[hour];
+				standarddevRel[hour] = 100* Math.abs(standarddev[hour] - count[hour] ) / count[hour];
 			}
 			
 			
@@ -207,7 +207,7 @@ public class SummaryWriter {
 				out.write(formatter.format(standarddevLower[hour]) + "\t");
 				out.write(formatter.format(rel_Error[hour]) + "\n");
 			}
-			LineChart chart = new LineChart("Validation", "hour", "# vehicles");
+			LineChart chart = new LineChart("Overview", "hour", "# vehicles");
 			chart.addSeries("AVG(SIM)", sim);
 			chart.addSeries("AVG(COUNT)", count);
 			chart.addSeries("AVG(StandardDevUpper)", standarddevUpper);

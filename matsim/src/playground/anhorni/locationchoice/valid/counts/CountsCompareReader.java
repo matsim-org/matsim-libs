@@ -16,7 +16,29 @@ public class CountsCompareReader {
 		this.stations = stations;
 	}
 	
+	private String readNetworkName() {
+		String networkName = null;
+		try {
+			FileReader fileReader = new FileReader("input/counts/networkName.txt");
+			BufferedReader bufferedReader = new BufferedReader(fileReader);	
+			
+			String curr_line;
+			while ((curr_line = bufferedReader.readLine()) != null) {
+				String[] entries = curr_line.split("\t", -1); 
+				networkName = entries[0].trim();
+			}	
+			bufferedReader.close();
+			fileReader.close();
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+		return networkName;
+	}
+	
 	public void read() {
+		
+		String networkName = this.readNetworkName();
+		
 		try {
 			FileReader fileReader = new FileReader(countsCompareFile);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);	
@@ -29,7 +51,7 @@ public class CountsCompareReader {
 				int hour = Integer.parseInt(entries[1].trim()) - 1;
 				double matsimVol = Double.parseDouble( entries[2].trim());
 				
-				if (!stations.addSimValforLinkId("ivtch", linkId, hour, matsimVol)) {
+				if (!stations.addSimValforLinkId(networkName, linkId, hour, matsimVol)) {
 					log.error("Error with: " + linkId + "\thour:" + hour);
 				}
 			}	

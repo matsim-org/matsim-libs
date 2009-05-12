@@ -4,8 +4,11 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.Vector;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.counts.Counts;
+import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.CountsWriter;
- import org.apache.log4j.Logger;
+import org.matsim.counts.MatsimCountsReader;
+import org.apache.log4j.Logger;
 
 public class CountsCreation {
 	
@@ -65,5 +68,17 @@ public class CountsCreation {
 		SummaryWriter summaryWriter = new SummaryWriter();
 		summaryWriter.write(stations, "output/counts/");
 		
+		// comparison with old files
+		Counts countsTele = new Counts();
+		MatsimCountsReader countsReaderTele = new MatsimCountsReader(countsTele);
+		countsReaderTele.readFile("input/counts/original/countsTele.xml");
+		CountsWriter countsWriterTele = new CountsWriter(countsTele, "output/counts/original/countsTele_original.xml");
+		countsWriterTele.write();
+		
+		Counts countsIVTCH = new Counts();
+		MatsimCountsReader countsReaderIVTCH = new MatsimCountsReader(countsIVTCH);
+		countsReaderIVTCH.readFile("input/counts/original/countsIVTCH.xml");
+		CountsWriter countsWriterIVTCH = new CountsWriter(countsIVTCH, "output/counts/original/countsIVTCH_original.xml");
+		countsWriterIVTCH.write();	
 	}
 }
