@@ -152,7 +152,6 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 		final String outFilename = args[3];
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

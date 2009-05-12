@@ -82,8 +82,6 @@ public class CarIllegal extends AbstractPersonAlgorithm {
 
 		Gbl.startMeasurement();
 
-		Gbl.createConfig(null);
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 

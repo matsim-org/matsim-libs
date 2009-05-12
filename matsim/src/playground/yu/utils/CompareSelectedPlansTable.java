@@ -86,7 +86,7 @@ public class CompareSelectedPlansTable {
 				"score0", "score1");
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outfile);
-			out.write(this.HEADER);
+			out.write(CompareSelectedPlansTable.HEADER);
 			out.newLine();
 			double[] score0s = new double[this.plans0.getPersons().size()];
 			double[] score1s = new double[this.plans0.getPersons().size()];
@@ -228,7 +228,6 @@ public class CompareSelectedPlansTable {
 		int numberOfLegs = 0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
 				numberOfLegs++;
 			}
 		}

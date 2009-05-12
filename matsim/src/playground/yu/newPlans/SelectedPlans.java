@@ -20,10 +20,10 @@
 
 package playground.yu.newPlans;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -60,7 +60,8 @@ public class SelectedPlans extends NewPopulation {
 	public static void main(final String[] args) {
 		final String netFilename = "../data/schweiz/input/ch.xml";
 		final String plansFilename = "../data/schweiz/input/459.100.plans.xml.gz";
-		Gbl.createConfig(new String[] { "../data/schweiz/selectedPlans.xml" });
+		new ScenarioLoader("../data/schweiz/selectedPlans.xml").loadScenario()
+				.getConfig();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

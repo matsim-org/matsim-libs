@@ -35,7 +35,7 @@ public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 			notEmployedPtTime;
 	private double alwaysCarTime, alwaysPtTime, sometimesCarTime,
 			sometimesPtTime, neverCarTime, neverPtTime;
-	private Person person=null;
+	private Person person = null;
 
 	/**
 	 *
@@ -242,8 +242,6 @@ public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String plansFilename = "../runs_SVN/run669/it.1000/1000.plans.xml.gz";
 		final String outputFilename = "../runs_SVN/run669/it.1000/ModalSplitDailyTime";
-
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

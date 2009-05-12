@@ -21,7 +21,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author yu
- *
+ * 
  */
 public class LinkTrafficVolumeExtractor {
 	/**
@@ -35,7 +35,6 @@ public class LinkTrafficVolumeExtractor {
 		final String outFilename = "../runs/run668/it.1500/1500.analysis/6760.volume.";
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

@@ -153,8 +153,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 			if (pe instanceof Leg) {
 				Leg bl = (Leg) pe;
 				ActType at = null;
-				String tmpActTypeStartsWith = plan.getNextActivity(bl).getType()
-						.substring(0, 1);
+				String tmpActTypeStartsWith = plan.getNextActivity(bl)
+						.getType().substring(0, 1);
 				for (ActType a : ActType.values()) {
 					if (tmpActTypeStartsWith.equals(a.getFirstLetter())) {
 						at = a;
@@ -533,8 +533,6 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		final String plansFilename = "../runs-svn/run684/it.1000/1000.plans.xml.gz";
 		String outputFilename = "../matsimTests/run684/dailyDistance/";
 		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
-
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

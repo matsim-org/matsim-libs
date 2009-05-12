@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -44,7 +43,7 @@ public class GTFNetCreator {
 	 */
 	public static void main(final String[] args) {
 		final String netFilename = "../schweiz-ivtch/network/ivtch-changed.xml";
-		Gbl.createConfig(null);
+
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
@@ -63,14 +62,18 @@ public class GTFNetCreator {
 										.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
 				System.out.println("greentimefraction:\t"
 						+ g.getAvgGtfs(linkId));
-				l.setCapacity(l
-						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
-						* g.getAvgGtfs(linkId));
-				System.out.println("#b-->linkId:\t"
-						+ linkId
-						+ "\tcapacity:\t"
-						+ network.getLink(linkId).getCapacity(
-								org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
+				l
+						.setCapacity(l
+								.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
+								* g.getAvgGtfs(linkId));
+				System.out
+						.println("#b-->linkId:\t"
+								+ linkId
+								+ "\tcapacity:\t"
+								+ network
+										.getLink(linkId)
+										.getCapacity(
+												org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
 				System.out.println("-------------------------");
 			}
 		}

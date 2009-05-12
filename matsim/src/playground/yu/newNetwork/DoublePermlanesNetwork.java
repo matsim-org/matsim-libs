@@ -23,7 +23,6 @@
  */
 package playground.yu.newNetwork;
 
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -57,7 +56,7 @@ public class DoublePermlanesNetwork {
 	public static void main(final String[] args) {
 		final String inputNetFilename = "../schweiz-ivtch/network/ivtch-changed-wu.xml";
 		final String outputNetFilename = "../schweiz-ivtch/tmp/ivtch-changed-wu.xml";
-		Gbl.createConfig(null);
+
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputNetFilename);
 		new NetworkWriter(network, outputNetFilename).write();

@@ -162,7 +162,6 @@ public class LegCountTest2 {
 		final String outFilename = "../data/ivtch/run271/legsCount.txt";
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

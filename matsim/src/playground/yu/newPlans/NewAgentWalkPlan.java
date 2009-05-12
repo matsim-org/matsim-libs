@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -31,7 +32,6 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -48,7 +48,7 @@ import playground.yu.analysis.PlanModeJudger;
  * @author ychen
  * 
  */
-public class NewAgentWalkPlan extends NewPopulation{
+public class NewAgentWalkPlan extends NewPopulation {
 	/**
 	 * Constructor, writes file-head
 	 * 
@@ -74,7 +74,8 @@ public class NewAgentWalkPlan extends NewPopulation{
 					break;
 				// set plan type for car, pt, walk
 				if (PlanModeJudger.usePt(pl)) {
-					Plan walkPlan = new org.matsim.core.population.PlanImpl(person);
+					Plan walkPlan = new org.matsim.core.population.PlanImpl(
+							person);
 					walkPlan.setType(Plan.Type.WALK);
 					List actsLegs = pl.getPlanElements();
 					for (int i = 0; i < actsLegs.size(); i++) {
@@ -113,7 +114,9 @@ public class NewAgentWalkPlan extends NewPopulation{
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;
-				if (CoordUtils.calcDistance(plan.getPreviousActivity(leg).getLink().getCoord(), plan.getNextActivity(leg).getLink().getCoord()) / 1000.0 > 3.0)
+				if (CoordUtils.calcDistance(plan.getPreviousActivity(leg)
+						.getLink().getCoord(), plan.getNextActivity(leg)
+						.getLink().getCoord()) / 1000.0 > 3.0)
 					return true;
 			}
 		}
@@ -121,7 +124,7 @@ public class NewAgentWalkPlan extends NewPopulation{
 	}
 
 	public static void main(final String[] args) {
-		Config config = Gbl.createConfig(args);
+		Config config = new ScenarioLoader(args[0]).loadScenario().getConfig();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network()

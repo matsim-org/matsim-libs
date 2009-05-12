@@ -26,7 +26,6 @@ package playground.yu.testcases;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.yu.analysis.PtCheck;
@@ -44,9 +43,9 @@ import playground.yu.analysis.PtCheck;
 public class PtTest extends MatsimTestCase {
 
 	/**
-	 * Responsible for the verification of the tests. It adds a AbstractPersonAlgorithm
-	 * (PtCheck) and checks their result (number of ptUsers) in some specific
-	 * iterations.
+	 * Responsible for the verification of the tests. It adds a
+	 * AbstractPersonAlgorithm (PtCheck) and checks their result (number of
+	 * ptUsers) in some specific iterations.
 	 * 
 	 * @author ychen
 	 */
@@ -58,8 +57,8 @@ public class PtTest extends MatsimTestCase {
 		}
 
 		public void notifyIterationEnds(final IterationEndsEvent event) {
-			double betaPt = Double.parseDouble(Gbl.getConfig().getParam(
-					"planCalcScore", "travelingPt"));
+			double betaPt = Double.parseDouble(event.getControler().getConfig()
+					.getParam("planCalcScore", "travelingPt"));
 			int idx = event.getIteration();
 			if (idx % 10 == 0) {
 				pc.resetCnt();

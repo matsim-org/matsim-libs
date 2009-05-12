@@ -72,8 +72,6 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		final String eventsFilename = "../runs/run628/it.500/500.events.txt.gz";
 		final String outputFilename = "../runs/run628/it.500/500.carDeparture.txt";
 
-		Gbl.createConfig(null);
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		Population ppl = new PopulationImpl();

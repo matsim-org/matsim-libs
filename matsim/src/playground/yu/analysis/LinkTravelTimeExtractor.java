@@ -21,7 +21,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author yu
- *
+ * 
  */
 public class LinkTravelTimeExtractor {
 	/**
@@ -35,7 +35,6 @@ public class LinkTravelTimeExtractor {
 		final String outFilename = "../runs/run668/it.2000/2000.analysis/6760.travelTime.";
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
@@ -62,8 +61,7 @@ public class LinkTravelTimeExtractor {
 					.write("TimeBin\tLinkTravelTime\t[s]\tLinkTravelTime\t[m]\tLinkTravelTime\t[h]\n");
 			for (int anI = 0; anI < 24 * 3600; anI = anI + timeBin) {
 				index = (anI) / timeBin;
-				ys[index] = ttc.getLinkTravelTime(network.getLink("6760"),
-						anI);
+				ys[index] = ttc.getLinkTravelTime(network.getLink("6760"), anI);
 				writer.write(anI + "\t" + ys[index] + "\t[s]\t" + ys[index]
 						/ 60.0 + "\t[m]\t" + ys[index] / 3600.0 + "\t[h]\n");
 				ys[index] /= 60.0;

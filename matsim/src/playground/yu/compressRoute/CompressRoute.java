@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
@@ -37,7 +38,6 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -49,9 +49,9 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
  * this Class counts and writes the amount of "new" filtered links as well as
  * that of "old" links by reading "old" plansfile, gets compression ratio of the
  * sparely new network with sparely linkroute.
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class CompressRoute extends AbstractPersonAlgorithm {
 	/**
@@ -68,8 +68,8 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 	/** Counter of "new" filtered links */
 	private int newLinksNr;
 
-	public CompressRoute(Map<String, String> ssLinks, Population plans, String fileName)
-			throws IOException {
+	public CompressRoute(Map<String, String> ssLinks, Population plans,
+			String fileName) throws IOException {
 		this.ssLinks = ssLinks;
 		this.out = new DataOutputStream(new BufferedOutputStream(
 				new FileOutputStream(new File(fileName))));
@@ -82,7 +82,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 	/**
 	 * counts and writes the amount of "old" links and that of "new" filtered
 	 * links
-	 *
+	 * 
 	 * @see org.matsim.population.algorithms.AbstractPersonAlgorithm#run(org.matsim.core.api.population.Person)
 	 */
 	@SuppressWarnings("unchecked")
@@ -162,16 +162,17 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 
 	/**
 	 * writes the count of "old" links and "new" links
-	 *
+	 * 
 	 * @throws IOException
 	 */
 	public void writeEnd() throws IOException {
-		this.out.writeBytes("old links : " + this.oldLinksNr + ";\nnew links : "
-				+ this.newLinksNr + ";");
+		this.out.writeBytes("old links : " + this.oldLinksNr
+				+ ";\nnew links : " + this.newLinksNr + ";");
 		this.out.close();
 	}
+
 	public static void main(final String[] args) throws IOException {
-		Config config = Gbl.createConfig(args);
+		Config config = new ScenarioLoader(args[0]).loadScenario().getConfig();
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = new NetworkLayer();

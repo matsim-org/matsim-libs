@@ -49,7 +49,7 @@ public class MyOTFEvents2Mvi {
 			printUsage();
 			System.exit(0);
 		}
-		Gbl.createConfig(null);
+
 		Gbl.startMeasurement();
 
 		NetworkLayer net = new NetworkLayer();

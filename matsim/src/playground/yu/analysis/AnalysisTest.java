@@ -31,7 +31,6 @@ import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -51,7 +50,8 @@ import playground.yu.utils.io.SimpleWriter;
  */
 public class AnalysisTest {
 	private static boolean withToll = false;
-	private static String ZURICH="Zurich";
+	private static String ZURICH = "Zurich";
+
 	private static void printUsage() {
 		System.out.println();
 		System.out.println("AnalysisTest:");
@@ -91,7 +91,6 @@ public class AnalysisTest {
 		}
 		String tollFilename = (withToll) ? args[args.length - 3] : null;
 
-		Gbl.createConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 

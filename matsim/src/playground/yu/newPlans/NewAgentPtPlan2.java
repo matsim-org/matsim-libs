@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -71,12 +71,14 @@ public class NewAgentPtPlan2 extends NewPopulation {
 				// pl.setType(getPlanType(legMode));//????????????
 
 				if (!legMode.equals(TransportMode.car)) {
-					Plan copyPlan = new org.matsim.core.population.PlanImpl(person);
+					Plan copyPlan = new org.matsim.core.population.PlanImpl(
+							person);
 					// copyPlan.setType(Plan.Type.CAR);//????????????
 					this.copyPlans.add(copyPlan);
 					this.copyPlansModes.add(TransportMode.car);
 				} else if (!legMode.equals(TransportMode.pt)) {
-					Plan copyPlan = new org.matsim.core.population.PlanImpl(person);
+					Plan copyPlan = new org.matsim.core.population.PlanImpl(
+							person);
 					// copyPlan.setType(Plan.Type.PT);//??????????????
 					this.copyPlans.add(copyPlan);
 					this.copyPlansModes.add(TransportMode.pt);
@@ -94,7 +96,8 @@ public class NewAgentPtPlan2 extends NewPopulation {
 							copyPlan.addActivity((Activity) o);
 						} else {
 							Leg leg = (Leg) o;
-							Leg copyLeg = new org.matsim.core.population.LegImpl(leg);
+							Leg copyLeg = new org.matsim.core.population.LegImpl(
+									leg);
 							copyLeg.setRoute(null);
 							copyLeg.setMode(this.copyPlansModes.get(j));
 							// -----------------------------------------------
@@ -114,6 +117,7 @@ public class NewAgentPtPlan2 extends NewPopulation {
 		}
 		this.pw.writePerson(person);
 	}
+
 	// static Plan.Type getPlanType(String mode) {
 	// if (BasicLeg.MIVMODE.equalsIgnoreCase(mode))
 	// return Plan.Type.CAR;
@@ -138,8 +142,8 @@ public class NewAgentPtPlan2 extends NewPopulation {
 	public static void main(final String[] args) {
 		final String netFilename = "../data/ivtch/input/network.xml";
 		final String plansFilename = "../data/ivtch/newPlans/all10pctZrh_plans.xml.gz";
-		Gbl
-				.createConfig(new String[] { "../data/ivtch/cfgNewPlansCarPtLicense.xml" });
+		new ScenarioLoader("../data/ivtch/cfgNewPlansCarPtLicense.xml")
+				.loadScenario().getConfig();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

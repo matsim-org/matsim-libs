@@ -72,9 +72,9 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		double othersDayTime = 0.0;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
-	
+
 				Leg bl = (Leg) pe;
-	
+
 				ActType at = null;
 				String tmpActType = plan.getNextActivity(bl).getType();
 				for (ActType a : ActType.values()) {
@@ -85,7 +85,7 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 				}
 				if (at == null)
 					at = ActType.other;
-	
+
 				double time = bl.getTravelTime() / 60.0;
 				if (time < 0)
 					time = 0;
@@ -603,8 +603,6 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		final String plansFilename = "../runs-svn/run756/it.1000/1000.plans.xml.gz";
 		String outputFilename = "../matsimTests/run756/dailyEnRouteTime/";
 		String tollFilename = "../berlin data/Hundekopf/osm/tollBerlinHundekopf.xml";
-
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

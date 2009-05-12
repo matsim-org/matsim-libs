@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.core.api.network.Node;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -52,7 +51,7 @@ public class NetworkCleaner {
 		final String inputNetFilename = "input/Toronto/toronto_m.xml";
 		final String outputNetFilename = "output/Toronto/toronto_c.xml.gz";
 		String logFilename = "output/Toronto/netCleaner.log";
-		Gbl.createConfig(null);
+
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputNetFilename);
 		Set<Node> nodesToRemove = new TreeSet<Node>();

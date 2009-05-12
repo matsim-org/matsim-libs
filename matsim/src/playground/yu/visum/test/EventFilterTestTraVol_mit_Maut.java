@@ -22,6 +22,7 @@ package playground.yu.visum.test;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
@@ -42,15 +43,17 @@ import playground.yu.visum.writer.PrintStreamUDANET;
  */
 public class EventFilterTestTraVol_mit_Maut {
 
-	public static void testRunTraVolCal_mit_Maut(Config config) throws IOException {
+	public static void testRunTraVolCal_mit_Maut(Config config)
+			throws IOException {
 
 		// network
 		System.out.println("  creating network object... ");
-		NetworkLayer network =new NetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		System.out.println("  done.");
 
 		System.out.println("  reading network file... ");
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(network).readFile(config.network()
+				.getInputFile());
 		System.out.println("  done.");
 		// plans
 		System.out.println("  creating plans object... ");
@@ -63,7 +66,8 @@ public class EventFilterTestTraVol_mit_Maut {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans,network);
+		PopulationReader plansReader = new MatsimPopulationReader(plans,
+				network);
 		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 
@@ -79,19 +83,20 @@ public class EventFilterTestTraVol_mit_Maut {
 		new MatsimEventsReader(events).readFile(config.events().getInputFile());
 		// System.out.println("we have " + attcetf.getCount()
 		// + " events at last -- LinkAveCalEventTimeFilter.");
-		 System.out.println("we have " + tvc.getCount()
-		 + " events at last -- TraVolCal.");
+		System.out.println("we have " + tvc.getCount()
+				+ " events at last -- TraVolCal.");
 		System.out.println("  done.");
 
 		System.out.println("\tprinting additiv netFile of Visum...");
-		PrintStreamUDANET psUdaNet = new PrintStreamUDANET(config.getParam("attribut_TraVol", "outputAttNetFile"));
+		PrintStreamUDANET psUdaNet = new PrintStreamUDANET(config.getParam(
+				"attribut_TraVol", "outputAttNetFile"));
 		psUdaNet.output(tvc);
 		psUdaNet.close();
 		System.out.println("\tdone.");
 
 		System.out.println("\tprinting attributsFile of link...");
-		PrintStreamLinkATT psLinkAtt = new PrintStreamLinkATT(config.getParam("attribut_TraVol", "outputAttFile"),
-				network);
+		PrintStreamLinkATT psLinkAtt = new PrintStreamLinkATT(config.getParam(
+				"attribut_TraVol", "outputAttFile"), network);
 		psLinkAtt.output(tvc);
 		psLinkAtt.close();
 		System.out.println("\tdone.");
@@ -107,7 +112,7 @@ public class EventFilterTestTraVol_mit_Maut {
 	public static void main(final String[] args) throws Exception {
 
 		Gbl.startMeasurement();
-		Config config = Gbl.createConfig(args);
+		Config config = new ScenarioLoader(args[0]).loadScenario().getConfig();
 		testRunTraVolCal_mit_Maut(config);
 		Gbl.printElapsedTime();
 	}

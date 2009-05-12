@@ -41,7 +41,6 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -88,7 +87,6 @@ public class MATSimNet2QGIS implements X2QGIS {
 	private Network2PolygonGraph n2g = null;
 
 	public void readNetwork(final String netFilename) {
-		Gbl.createConfig(null);
 		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(netFilename);
 	}

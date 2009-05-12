@@ -80,8 +80,6 @@ public class DoublePlan extends NewPopulation {
 		String plansFilename = "../berlin data/v2/bln_car_c.xml.gz";
 		String outputPlansFilename = "../berlin data/v2/bln_car_c_5x.xml.gz";
 
-		Gbl.createConfig(null);
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 

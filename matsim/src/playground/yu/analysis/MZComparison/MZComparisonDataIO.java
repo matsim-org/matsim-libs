@@ -18,7 +18,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -171,8 +170,6 @@ public class MZComparisonDataIO implements TabularFileHandler {
 
 		MZComparisonDataIO mzcdi = new MZComparisonDataIO();
 		mzcdi.readMZData(inputFilename);
-
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);

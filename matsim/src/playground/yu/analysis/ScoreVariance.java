@@ -79,7 +79,6 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements
 		final String outputFilename = "../data/schweiz/variance/Run410variance.txt";
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

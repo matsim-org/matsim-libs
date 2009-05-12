@@ -29,7 +29,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -53,9 +52,6 @@ public class VolumefromEventsOfIters {
 		final String eventsFilename = args[1];
 		String countsFilename = args[2];
 		String picPath = args[3];
-		Gbl.createConfig(null
-		// new String[] { "./test/yu/test/configTest.xml" }
-				);
 
 		System.out.println(">>>>>reading the network...");
 		NetworkLayer network = new NetworkLayer();

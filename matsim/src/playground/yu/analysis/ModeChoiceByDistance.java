@@ -72,8 +72,6 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 		final String plansFilename = args[1];
 		final String outputFilePath = args[2];
 
-		Gbl.createConfig(null);
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 

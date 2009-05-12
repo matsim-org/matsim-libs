@@ -51,7 +51,8 @@ public class EventsWait2LinkTest {
 
 		public void handleEvent(final AgentWait2LinkEvent event) {
 			try {
-				writer.write(event.getPersonId().toString() + "\t" + event.getLinkId().toString() + "\n");
+				writer.write(event.getPersonId().toString() + "\t"
+						+ event.getLinkId().toString() + "\n");
 				writer.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -82,8 +83,6 @@ public class EventsWait2LinkTest {
 		// "./test/yu/test/input/run265opt100.events.txt.gz";
 		final String eventsFilename = "../runs/run266/100.events.txt.gz";
 		final String outputFilename = "../runs/run266/Wait2Link.events.txt.gz";
-
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

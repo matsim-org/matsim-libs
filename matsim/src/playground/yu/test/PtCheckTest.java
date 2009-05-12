@@ -22,8 +22,8 @@ package playground.yu.test;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -37,8 +37,8 @@ public class PtCheckTest {
 		final String netFilename = "./test/yu/test/input/network.xml";
 		final String plansFilename = "./test/yu/test/input/10pctZrhCarPt100.plans.xml.gz";
 		final String ptcheckFilename = "./test/yu/test/output/ptCheck100.10pctZrhCarPt.txt";
-		Gbl
-				.createConfig(new String[] { "./test/yu/test/configPtcheckTest.xml" });
+		new ScenarioLoader("./test/yu/test/configPtcheckTest.xml")
+				.loadScenario().getConfig();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

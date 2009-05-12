@@ -130,8 +130,6 @@ public class CarAvail extends AbstractPersonAlgorithm {
 		final String plansFilename = "../runs_SVN/run669/it.1000/1000.plans.xml.gz";
 		final String outputFilename = "../runs_SVN/run669/it.1000/CarAvail.txt";
 
-		Gbl.createConfig(null);
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 

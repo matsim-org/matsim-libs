@@ -97,7 +97,6 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 		final String netFilename = "../matsimTests/timeAllocationMutatorTest/network.xml";
 		final String plansFilename = "../matsimTests/timeAllocationMutatorTest/it.100/100.plans.xml.gz";
 		final String textFilename = "../matsimTests/timeAllocationMutatorTest/it.100/mode_1.endTime.txt";
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

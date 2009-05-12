@@ -16,7 +16,6 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
@@ -173,8 +172,6 @@ public class PtPlansFileCreator {
 		String netFilename = "test/scenarios/berlin/network.xml.gz";
 
 		PtPlansFileCreator pfc = new PtPlansFileCreator();
-
-		Gbl.createConfig(null);
 		pfc.setNetwork(new NetworkLayer());
 		new MatsimNetworkReader(pfc.getNetwork()).readFile(netFilename);
 

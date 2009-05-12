@@ -324,8 +324,6 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		final String eventsFilename = args[1];
 		final String outputPath = args[2];
 
-		Gbl.createConfig(null);
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
@@ -364,8 +362,6 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		final String eventsFilename = args[1];
 		final String roadPricingFilename = args[2];
 		final String outputPath = args[3];
-
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

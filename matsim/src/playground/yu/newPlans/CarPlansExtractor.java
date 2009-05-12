@@ -69,8 +69,6 @@ public class CarPlansExtractor extends NewPopulation implements PlanAlgorithm {
 		final String plansFilename = args[1];
 		final String outputFilename = args[2];
 
-		Gbl.createConfig(null);
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 

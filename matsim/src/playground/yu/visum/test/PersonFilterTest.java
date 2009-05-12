@@ -1,5 +1,6 @@
 package playground.yu.visum.test;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -79,7 +80,7 @@ public class PersonFilterTest {
 	 */
 	public static void main(final String[] args) throws Exception {
 		Gbl.startMeasurement();
-		Config config = Gbl.createConfig(args);
+		Config config = new ScenarioLoader(args[0]).loadScenario().getConfig();
 		testRunIDandActTypeundDepTimeFilter(config);
 		Gbl.printElapsedTime();
 	}

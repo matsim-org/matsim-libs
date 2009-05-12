@@ -39,7 +39,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -427,8 +426,6 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		String outputFilename = "../matsimTests/analysis/enRoute.txt";
 		String chartFilename = "../matsimTests/analysis/";
 		// String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
-
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

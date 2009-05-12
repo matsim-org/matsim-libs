@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
@@ -38,7 +37,6 @@ public class CapacityTest {
 	public static void main(final String[] args) {
 		final String netFilename = "../schweiz-ivtch/network/ivtch-osm-wu.xml";
 		final String outputFilename = "test/yu/test/captest.txt";
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

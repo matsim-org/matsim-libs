@@ -7,7 +7,6 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.charts.XYScatterChart;
@@ -22,9 +21,6 @@ public class QvDiagram {
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String eventsFilename = "../runs/run628/it.500/500.events.txt.gz";
 		final String picFilename = "../runs/run628/it.500/500.qv/";
-
-		Gbl.createConfig(null// new String[] { "./test/yu/test/configTest.xml" }
-				);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

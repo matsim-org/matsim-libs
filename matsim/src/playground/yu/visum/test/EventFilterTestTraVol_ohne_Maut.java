@@ -22,6 +22,7 @@ package playground.yu.visum.test;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
@@ -42,7 +43,8 @@ import playground.yu.visum.writer.PrintStreamUDANET;
  */
 public class EventFilterTestTraVol_ohne_Maut {
 
-	public static void testRunTraVolCal_ohne_Maut(Config config) throws IOException {
+	public static void testRunTraVolCal_ohne_Maut(Config config)
+			throws IOException {
 
 		// network
 		System.out.println("  creating network object... ");
@@ -119,7 +121,7 @@ public class EventFilterTestTraVol_ohne_Maut {
 	public static void main(final String[] args) throws Exception {
 
 		Gbl.startMeasurement();
-		Config config = Gbl.createConfig(args);
+		Config config = new ScenarioLoader(args[0]).loadScenario().getConfig();
 		testRunTraVolCal_ohne_Maut(config);
 		Gbl.printElapsedTime();
 	}

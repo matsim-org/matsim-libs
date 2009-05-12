@@ -65,9 +65,9 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 		double othersDayDist = 0.0;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
-					
+
 				Leg bl = (Leg) pe;
-	
+
 				ActType at = null;
 				String tmpActType = plan.getNextActivity(bl).getType();
 				for (ActType a : ActType.values()) {
@@ -78,7 +78,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 				}
 				if (at == null)
 					at = ActType.other;
-	
+
 				double dist = bl.getRoute().getDistance() / 1000.0;
 				// if (bl.getDepartureTime() < 86400)
 				TransportMode mode = bl.getMode();
@@ -604,12 +604,12 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		final String netFilename = "../berlin data/osm/bb_osm_wip_cl.xml.gz";
+		final String netFilename = "../berlin/network/bb_osm_wip_cl.xml.gz";
 		final String plansFilename = "../runs-svn/run756/it.1000/1000.plans.xml.gz";
 		String outputFilename = "../matsimTests/run756/dailyDistance/";
 		// String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
 
-		Gbl.createConfig(null);
+		// Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

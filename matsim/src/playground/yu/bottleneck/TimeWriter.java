@@ -62,7 +62,10 @@ public class TimeWriter implements AgentDepartureEventHandler,
 	 * (agentDepTimes).
 	 */
 	public void handleEvent(final AgentDepartureEvent event) {
-		if (!this.agentDepTimes.containsKey(event.getPersonId().toString())) { // only store first departure
+		if (!this.agentDepTimes.containsKey(event.getPersonId().toString())) { // only
+																				// store
+																				// first
+																				// departure
 			agentDepTimes.put(event.getPersonId().toString(), event.getTime());
 		}
 	}
@@ -152,8 +155,6 @@ public class TimeWriter implements AgentDepartureEventHandler,
 		final String eventsFilename = "./test/yu/test/input/7-9-6.100.events.txt.gz";
 		final String outputFilename = "./test/yu/test/output/7-9-6.times.txt.gz";
 		final String chartFilename = "./test/yu/test/output/7-9-6.times.png";
-
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

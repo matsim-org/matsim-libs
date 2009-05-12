@@ -71,7 +71,6 @@ public class License extends AbstractPersonAlgorithm {
 		final String plansFilename = "../data/ivtch/input/_10pctZrhCarPtPlans_opt.xml.gz";
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

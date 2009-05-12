@@ -23,9 +23,9 @@
  */
 package playground.yu.test;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -68,7 +68,8 @@ public class PersonCounter extends AbstractPersonAlgorithm {
 	public static void main(final String[] args) {
 		final String netFilename = "./test/yu/test/input/network.xml";
 		final String plansFilename = "./test/yu/test/input/10pctZrhCarPtPlans.xml.gz";
-		Gbl.createConfig(new String[] { "./test/yu/test/configTest.xml" });
+		new ScenarioLoader("./test/yu/test/configTest.xml").loadScenario()
+				.getConfig();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

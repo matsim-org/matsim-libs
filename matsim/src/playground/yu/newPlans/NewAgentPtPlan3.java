@@ -24,13 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -47,7 +46,7 @@ import playground.yu.analysis.PlanModeJudger;
  * @author ychen
  * 
  */
-public class NewAgentPtPlan3 extends NewPopulation{
+public class NewAgentPtPlan3 extends NewPopulation {
 
 	private final List<Plan> copyPlans = new ArrayList<Plan>();
 
@@ -70,12 +69,13 @@ public class NewAgentPtPlan3 extends NewPopulation{
 		for (Plan pl : person.getPlans()) {
 			Leg firstLeg = (Leg) pl.getPlanElements().get(1);
 			TransportMode legMode = firstLeg.getMode();
-			//pl.setType(NewAgentPtPlan2.getPlanType(legMode));//???????????????
+			// pl.setType(NewAgentPtPlan2.getPlanType(legMode));//???????????????
 
 			if (!legMode.equals(TransportMode.car)) {
 				if (person.getLicense().equals("yes")) {
-					Plan copyPlan = new org.matsim.core.population.PlanImpl(person);
-					//copyPlan.setType(Plan.Type.CAR);//????????????????????????
+					Plan copyPlan = new org.matsim.core.population.PlanImpl(
+							person);
+					// copyPlan.setType(Plan.Type.CAR);//????????????????????????
 					// ??
 					copyPlans.add(copyPlan);
 				}
@@ -94,7 +94,8 @@ public class NewAgentPtPlan3 extends NewPopulation{
 						copyPlan.addActivity((Activity) o);
 					else {
 						Leg leg = (Leg) o;
-						Leg copyLeg = new org.matsim.core.population.LegImpl(leg);
+						Leg copyLeg = new org.matsim.core.population.LegImpl(
+								leg);
 						copyLeg.setRoute(null);
 						copyLeg.setMode(
 						// copyPlan.getType().toString()
@@ -124,11 +125,12 @@ public class NewAgentPtPlan3 extends NewPopulation{
 
 		pw.writePerson(person);
 	}
+
 	public static void main(final String[] args) {
 		final String netFilename = "../data/ivtch/input/network.xml";
 		final String plansFilename = "../data/ivtch/input/10pctZrhPlans.xml.gz";
-		Gbl
-				.createConfig(new String[] { "../data/ivtch/newAllPlansWithLicense.xml" });
+		new ScenarioLoader("../data/ivtch/newAllPlansWithLicense.xml")
+				.loadScenario().getConfig();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

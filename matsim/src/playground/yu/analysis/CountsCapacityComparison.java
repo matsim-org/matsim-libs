@@ -41,8 +41,6 @@ public class CountsCapacityComparison {
 		final String countsFilename = "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.xml";
 		final String outputFilename = "../matsimTests/countsCapacityComparison/output_zurich.txt";
 
-		Gbl.createConfig(null);
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 

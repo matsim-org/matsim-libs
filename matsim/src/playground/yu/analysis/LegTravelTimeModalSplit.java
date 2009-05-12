@@ -335,7 +335,6 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

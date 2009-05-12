@@ -22,6 +22,7 @@ package playground.yu.visum.test;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
@@ -117,7 +118,7 @@ public class EventFilterTestAveTraTimeCalOrWithToll {
 	public static void main(final String[] args) throws Exception {
 
 		Gbl.startMeasurement();
-		Config config = Gbl.createConfig(args);
+		Config config =new ScenarioLoader(args[0]).loadScenario().getConfig();
 		testRunAveTraTimeCal(config);
 		Gbl.printElapsedTime();
 	}

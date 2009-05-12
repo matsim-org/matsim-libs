@@ -31,13 +31,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -121,7 +121,8 @@ public class PlanChecker extends AbstractPersonAlgorithm {
 				if (pe instanceof Leg) {
 					Leg l = (Leg) pe;
 					NetworkRoute r = (NetworkRoute) l.getRoute();
-					text.append(r.getDistance() + "\t" + r.getTravelTime() + "\t");
+					text.append(r.getDistance() + "\t" + r.getTravelTime()
+							+ "\t");
 				}
 			}
 			try {
@@ -153,11 +154,13 @@ public class PlanChecker extends AbstractPersonAlgorithm {
 			e.printStackTrace();
 		}
 	}
+
 	public static void main(final String[] args) {
 		final String netFilename = "./test/yu/schweiz/input/ch.xml";
 		final String plansFilename = "./test/yu/schweiz/input/100ITERs_pt-6t-6output_plans.xml";
 		final String planCheckFilename = "./test/yu/schweiz/output/planCheck.txt";
-		Gbl.createConfig(new String[] { "./test/yu/schweiz/multipleIterations_.xml" });
+		new ScenarioLoader("./test/yu/schweiz/multipleIterations_.xml")
+				.loadScenario().getConfig();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

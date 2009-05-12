@@ -70,8 +70,6 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 		final String plansFilename = "../runs/run669/it.1000/1000.plans.xml.gz";
 		final String outputFilename = "output/legDepTime_669.1000.txt";
 
-		Gbl.createConfig(null);
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 

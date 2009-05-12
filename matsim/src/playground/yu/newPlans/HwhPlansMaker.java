@@ -25,10 +25,10 @@ package playground.yu.newPlans;
 
 import java.util.Set;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -80,11 +80,13 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 			pw.writePerson(person);
 		}
 	}
+
 	public static void main(final String[] args) {
 		final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String plansFilename = "./test/yu/ivtch/input/allPlansZuerich.xml.gz";
-		Config config = Gbl
-				.createConfig(new String[] { "./test/yu/ivtch/config_for_make_hwhPlans.xml" });
+		Config config = new ScenarioLoader(
+				"./test/yu/ivtch/config_for_make_hwhPlans.xml").loadScenario()
+				.getConfig();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

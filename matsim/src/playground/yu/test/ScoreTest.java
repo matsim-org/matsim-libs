@@ -39,7 +39,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class ScoreTest extends AbstractPersonAlgorithm {
 	private double sumScoreWorst = 0.0, sumScoreBest = 0.0, sumAvgScores = 0.0,
@@ -110,11 +110,13 @@ public class ScoreTest extends AbstractPersonAlgorithm {
 			this.writer.write("executed: " + "\t"
 					+ this.sumExecutedScores / this.nofExecutedScores + "\t"
 					+ this.sumExecutedScores + "\t" + this.nofExecutedScores
-					+ "\nworst: \t" + this.sumScoreWorst / this.nofScoreWorst + "\t"
-					+ this.sumScoreWorst + "\t" + this.nofScoreWorst + "\navg.: \t"
-					+ this.sumAvgScores / this.nofAvgScores + "\t" + this.sumAvgScores + "\t"
-					+ this.nofAvgScores + "\nbest: \t" + this.sumScoreBest / this.nofScoreBest
-					+ "\t" + this.sumScoreBest + "\t" + this.nofScoreBest + "\n");
+					+ "\nworst: \t" + this.sumScoreWorst / this.nofScoreWorst
+					+ "\t" + this.sumScoreWorst + "\t" + this.nofScoreWorst
+					+ "\navg.: \t" + this.sumAvgScores / this.nofAvgScores
+					+ "\t" + this.sumAvgScores + "\t" + this.nofAvgScores
+					+ "\nbest: \t" + this.sumScoreBest / this.nofScoreBest
+					+ "\t" + this.sumScoreBest + "\t" + this.nofScoreBest
+					+ "\n");
 			this.writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -140,7 +142,6 @@ public class ScoreTest extends AbstractPersonAlgorithm {
 		final String outputFilename = "test/yu/equil_test/equil269/90.scoreTest.txt";
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

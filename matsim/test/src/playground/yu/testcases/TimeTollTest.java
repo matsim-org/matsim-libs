@@ -29,7 +29,6 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -44,8 +43,8 @@ public class TimeTollTest extends MatsimTestCase {
 		public void notifyIterationEnds(final IterationEndsEvent event) {
 			if (event.getIteration() == event.getControler().getLastIteration()
 					&& clt != null) {
-				double traveling = Double.parseDouble(Gbl.getConfig().getParam(
-						"planCalcScore", "traveling"));
+				double traveling = Double.parseDouble(event.getControler()
+						.getConfig().getParam("planCalcScore", "traveling"));
 				double criterion = 0;
 				if (traveling == -30.0) {
 					criterion = 1800.0;

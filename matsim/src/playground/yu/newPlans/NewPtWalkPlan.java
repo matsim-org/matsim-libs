@@ -80,11 +80,8 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 
 	@SuppressWarnings("unchecked")
 	public void run(Plan plan) {
-		plan.setType(Plan.Type.CAR);
 		Plan ptPlan = new org.matsim.core.population.PlanImpl(person);
-		ptPlan.setType(Plan.Type.PT);
 		Plan walkPlan = new org.matsim.core.population.PlanImpl(person);
-		walkPlan.setType(Plan.Type.WALK);
 		List actsLegs = plan.getPlanElements();
 		for (int i = 0; i < actsLegs.size(); i++) {
 			Object o = actsLegs.get(i);
@@ -122,8 +119,6 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 		final String netFilename = "../matsimTests/scoringTest/network.xml";
 		final String plansFilename = "../matsimTests/scoringTest/plans100.xml";
 		final String outputFilename = "../matsimTests/scoringTest/plans100_pt_walk.xml";
-
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

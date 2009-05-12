@@ -90,150 +90,150 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
-			Leg bl = (Leg) pe;
-			ActType ats = null;
-			String tmpActType = plan.getNextActivity(bl).getType();
-			if (tmpActType.startsWith("h"))
-				ats = ActType.home;
-			else if (tmpActType.startsWith("w"))
-				ats = ActType.work;
-			else if (tmpActType.startsWith("e"))
-				ats = ActType.education;
-			else if (tmpActType.startsWith("s"))
-				ats = ActType.shopping;
-			else if (tmpActType.startsWith("l"))
-				ats = ActType.leisure;
-			else
-				ats = ActType.others;
-			double dist = bl.getRoute().getDistance() / 1000.0;
-			// if (bl.getDepartureTime() < 86400)
+				Leg bl = (Leg) pe;
+				ActType ats = null;
+				String tmpActType = plan.getNextActivity(bl).getType();
+				if (tmpActType.startsWith("h"))
+					ats = ActType.home;
+				else if (tmpActType.startsWith("w"))
+					ats = ActType.work;
+				else if (tmpActType.startsWith("e"))
+					ats = ActType.education;
+				else if (tmpActType.startsWith("s"))
+					ats = ActType.shopping;
+				else if (tmpActType.startsWith("l"))
+					ats = ActType.leisure;
+				else
+					ats = ActType.others;
+				double dist = bl.getRoute().getDistance() / 1000.0;
+				// if (bl.getDepartureTime() < 86400)
 
-			if (Long.parseLong(this.person.getId().toString()) > 1000000000) {
-				this.throughDist += dist;
-				throughDayDist += dist;
-				switch (ats) {
-				case home:
-					this.throughHomeDist += dist;
-					break;
-				case work:
-					this.throughWorkDist += dist;
-					break;
-				case education:
-					this.throughEducDist += dist;
-					break;
-				case shopping:
-					this.throughShopDist += dist;
-					break;
-				case leisure:
-					this.throughLeisDist += dist;
-					break;
-				default:
-					this.throughOtherDist += dist;
-					break;
-				}
-				throughLegDistanceCounts[Math.min(100, (int) dist)]++;
-			} else if (bl.getMode().equals(TransportMode.car)) {
-				this.carDist += dist;
-				carDayDist += dist;
-				switch (ats) {
-				case home:
-					this.carHomeDist += dist;
-					break;
-				case work:
-					this.carWorkDist += dist;
-					break;
-				case education:
-					this.carEducDist += dist;
-					break;
-				case shopping:
-					this.carShopDist += dist;
-					break;
-				case leisure:
-					this.carLeisDist += dist;
-					break;
-				default:
-					this.carOtherDist += dist;
-					break;
-				}
-				this.carLegDistanceCounts[Math.min(100, (int) dist)]++;
-			} else if (bl.getMode().equals(TransportMode.pt)) {
-				this.ptDist += dist;
-				ptDayDist += dist;
-				switch (ats) {
-				case home:
-					this.ptHomeDist += dist;
-					break;
-				case work:
-					this.ptWorkDist += dist;
-					break;
-				case education:
-					this.ptEducDist += dist;
-					break;
-				case shopping:
-					this.ptShopDist += dist;
-					break;
-				case leisure:
-					this.ptLeisDist += dist;
-					break;
-				default:
-					this.ptOtherDist += dist;
-					break;
-				}
-				this.ptLegDistanceCounts[Math.min(100, (int) dist)]++;
-			} else if (bl.getMode().equals(TransportMode.walk)) {
-				dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
-						.getLink().getCoord(), plan.getNextActivity(bl)
-						.getLink().getCoord()) * 1.5 / 1000.0;
-				this.wlkDist += dist;
-				wlkDayDist += dist;
-				switch (ats) {
-				case home:
-					this.wlkHomeDist += dist;
-					break;
-				case work:
-					this.wlkWorkDist += dist;
-					break;
-				case education:
-					this.wlkEducDist += dist;
-					break;
-				case shopping:
-					this.wlkShopDist += dist;
-					break;
-				case leisure:
-					this.wlkLeisDist += dist;
-					break;
-				default:
-					this.wlkOtherDist += dist;
-					break;
-				}
-				this.wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
+				if (Long.parseLong(this.person.getId().toString()) > 1000000000) {
+					this.throughDist += dist;
+					throughDayDist += dist;
+					switch (ats) {
+					case home:
+						this.throughHomeDist += dist;
+						break;
+					case work:
+						this.throughWorkDist += dist;
+						break;
+					case education:
+						this.throughEducDist += dist;
+						break;
+					case shopping:
+						this.throughShopDist += dist;
+						break;
+					case leisure:
+						this.throughLeisDist += dist;
+						break;
+					default:
+						this.throughOtherDist += dist;
+						break;
+					}
+					throughLegDistanceCounts[Math.min(100, (int) dist)]++;
+				} else if (bl.getMode().equals(TransportMode.car)) {
+					this.carDist += dist;
+					carDayDist += dist;
+					switch (ats) {
+					case home:
+						this.carHomeDist += dist;
+						break;
+					case work:
+						this.carWorkDist += dist;
+						break;
+					case education:
+						this.carEducDist += dist;
+						break;
+					case shopping:
+						this.carShopDist += dist;
+						break;
+					case leisure:
+						this.carLeisDist += dist;
+						break;
+					default:
+						this.carOtherDist += dist;
+						break;
+					}
+					this.carLegDistanceCounts[Math.min(100, (int) dist)]++;
+				} else if (bl.getMode().equals(TransportMode.pt)) {
+					this.ptDist += dist;
+					ptDayDist += dist;
+					switch (ats) {
+					case home:
+						this.ptHomeDist += dist;
+						break;
+					case work:
+						this.ptWorkDist += dist;
+						break;
+					case education:
+						this.ptEducDist += dist;
+						break;
+					case shopping:
+						this.ptShopDist += dist;
+						break;
+					case leisure:
+						this.ptLeisDist += dist;
+						break;
+					default:
+						this.ptOtherDist += dist;
+						break;
+					}
+					this.ptLegDistanceCounts[Math.min(100, (int) dist)]++;
+				} else if (bl.getMode().equals(TransportMode.walk)) {
+					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
+							.getLink().getCoord(), plan.getNextActivity(bl)
+							.getLink().getCoord()) * 1.5 / 1000.0;
+					this.wlkDist += dist;
+					wlkDayDist += dist;
+					switch (ats) {
+					case home:
+						this.wlkHomeDist += dist;
+						break;
+					case work:
+						this.wlkWorkDist += dist;
+						break;
+					case education:
+						this.wlkEducDist += dist;
+						break;
+					case shopping:
+						this.wlkShopDist += dist;
+						break;
+					case leisure:
+						this.wlkLeisDist += dist;
+						break;
+					default:
+						this.wlkOtherDist += dist;
+						break;
+					}
+					this.wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
 
-			} else {
-				othersDist += dist;
-				othersDayDist += dist;
-				switch (ats) {
-				case home:
-					othersHomeDist += dist;
-					break;
-				case work:
-					othersWorkDist += dist;
-					break;
-				case education:
-					othersEducDist += dist;
-					break;
-				case shopping:
-					othersShopDist += dist;
-					break;
-				case leisure:
-					othersLeisDist += dist;
-					break;
-				default:
-					othersOtherDist += dist;
-					break;
+				} else {
+					othersDist += dist;
+					othersDayDist += dist;
+					switch (ats) {
+					case home:
+						othersHomeDist += dist;
+						break;
+					case work:
+						othersWorkDist += dist;
+						break;
+					case education:
+						othersEducDist += dist;
+						break;
+					case shopping:
+						othersShopDist += dist;
+						break;
+					case leisure:
+						othersLeisDist += dist;
+						break;
+					default:
+						othersOtherDist += dist;
+						break;
+					}
+					this.othersLegDistanceCounts[Math.min(100, (int) dist)]++;
 				}
-				this.othersLegDistanceCounts[Math.min(100, (int) dist)]++;
-			}
-			dayDist += dist;
+				dayDist += dist;
 			}
 		}
 		for (int i = 0; i <= Math.min(100, (int) dayDist); i++)
@@ -465,8 +465,6 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		final String plansFilename = "../runs-svn/run684/it.1000/1000.plans.xml.gz";
 		String outputFilename = "../matsimTests/run684/dailyDistance/";
 		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
-
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

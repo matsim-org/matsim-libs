@@ -42,7 +42,6 @@ import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -253,7 +252,6 @@ public class SelectedPlans2ESRIShapeChanged extends
 
 		final String outputDir = "./plans/";
 
-		Gbl.createConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 

@@ -12,7 +12,6 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -65,8 +64,6 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 		final String populationFilename = "../runs_SVN/run674/it.1000/1000.plans.xml.gz";
 		final String networkFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String outputDir = "../runs_SVN/run674/it.1000/1000.analysis/";
-
-		Gbl.createConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
@@ -75,8 +72,8 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 				.readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-		SelectedPlans2ESRIShapeChanged sp = new SelectedPlans2ESRIShapeChanged(population,
-				crs, outputDir);
+		SelectedPlans2ESRIShapeChanged sp = new SelectedPlans2ESRIShapeChanged(
+				population, crs, outputDir);
 		sp.setOutputSample(1);
 		sp.setActBlurFactor(100);
 		sp.setLegBlurFactor(100);

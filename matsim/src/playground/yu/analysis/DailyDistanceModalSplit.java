@@ -80,7 +80,7 @@ public class DailyDistanceModalSplit extends AbstractPersonAlgorithm implements
 		String carAvail = this.person.getCarAvail();
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
-				
+
 				Leg leg = (Leg) pe;
 				double legDist = leg.getRoute().getDistance() / 1000.0;
 				if (Integer.parseInt(this.person.getId().toString()) < 1000000000
@@ -243,8 +243,6 @@ public class DailyDistanceModalSplit extends AbstractPersonAlgorithm implements
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String plansFilename = "../runs_SVN/run669/it.1000/1000.plans.xml.gz";
 		final String outputFilename = "../runs_SVN/run669/it.1000/ModalSplitDailyDistance";
-
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

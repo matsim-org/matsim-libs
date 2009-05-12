@@ -197,8 +197,6 @@ public class Wait2Link_2Acts1LinkTest {
 		final String eventsFilename = "../data/ivtch/carPt_opt_run266/ITERS/it.100/100.events.txt.gz";
 		final String outputFilename = "../data/ivtch/Wait2Links_2Acts1Link.txt.gz";
 
-		Gbl.createConfig(null);
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		Population population = new PopulationImpl();

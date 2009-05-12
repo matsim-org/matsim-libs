@@ -23,7 +23,6 @@ package playground.yu.newNetwork;
 import java.util.Set;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -36,7 +35,8 @@ public class OSMNetCreator {
 
 	private void resetCapacity(final Link link) {
 		if (link.getType().equals("80")) {
-			if (link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
+			if (link
+					.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 					/ capperiod < 2000.0) {
 				System.out
 						.print("link "
@@ -46,12 +46,14 @@ public class OSMNetCreator {
 										.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 								/ capperiod + " to ");
 				link.setCapacity(2000.0 * capperiod);
-				System.out.println(link
-						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
-						/ capperiod);
+				System.out
+						.println(link
+								.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
+								/ capperiod);
 			}
 		} else if (link.getType().equals("81"))
-			if (link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
+			if (link
+					.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 					/ capperiod > 600.0) {
 				System.out
 						.print("link "
@@ -61,9 +63,10 @@ public class OSMNetCreator {
 										.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 								/ capperiod + " to ");
 				link.setCapacity(600.0 * capperiod);
-				System.out.println(link
-						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
-						/ capperiod);
+				System.out
+						.println(link
+								.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
+								/ capperiod);
 			}
 	}
 
@@ -76,7 +79,7 @@ public class OSMNetCreator {
 		final String OSMPatchFilename = "test/yu/utils/osmpatch.xml";
 		final String outputNetFilename = "../schweiz-ivtch/network/ivtch-osm.xml";
 		// final String outputNetFilename = "test/yu/utils/ivtch-osm.1.3.xml";
-		Gbl.createConfig(null);
+
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		// (1) -----------links in Circle---------------------------
@@ -99,7 +102,8 @@ public class OSMNetCreator {
 			upgraded++;
 			Link l = network.getLink(linkId);
 			if (l != null)
-				if (l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
+				if (l
+						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 						/ osmNC.capperiod < 2000.0) {
 					System.out
 							.print("link "
@@ -123,7 +127,8 @@ public class OSMNetCreator {
 			degraded++;
 			Link l = network.getLink(linkId);
 			if (l != null)
-				if (l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
+				if (l
+						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 						/ osmNC.capperiod > 600.0) {
 					System.out
 							.print("link "

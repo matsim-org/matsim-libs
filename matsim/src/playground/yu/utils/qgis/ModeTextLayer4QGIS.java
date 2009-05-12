@@ -75,7 +75,6 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 		// "../matsimTests/scoringTest/output/ITERS/it.100/100.plans.xml.gz";
 		// final String textFilename =
 		// "../matsimTests/scoringTest/output/ITERS/it.100/mode.txt";
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -157,7 +158,7 @@ public class NewPlansTest {
 	 */
 	public static void main(final String[] args) throws Exception {
 		Gbl.startMeasurement();
-		Config config = Gbl.createConfig(args);
+		Config config = new ScenarioLoader(args[0]).loadScenario().getConfig();
 		testRun(config);
 		Gbl.printElapsedTime();
 	}

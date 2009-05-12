@@ -232,7 +232,6 @@ public class LegDistance implements LinkEnterEventHandler,
 		// final String outFilename = "./test/yu/test/output/3klegDist.txt.gz";
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

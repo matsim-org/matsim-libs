@@ -27,7 +27,6 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 
@@ -37,9 +36,6 @@ public class VolumefromEventsTest {
 		final String netFilename = "./test/yu/test/input/network.xml";
 		// final String plansFilename = "./examples/equil/plans100.xml";
 		final String eventsFilename = "./test/yu/test/input/miv_zrh30km_10pct100.events.txt.gz";
-		Gbl.createConfig(null
-		// new String[] { "./test/yu/test/configTest.xml" }
-				);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		Events events = new Events();

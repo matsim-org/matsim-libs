@@ -20,10 +20,9 @@
 
 package playground.yu.newPlans;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -38,12 +37,12 @@ import org.matsim.core.population.PopulationReader;
  * @author ychen
  * 
  */
-public class NewSmallPlan extends NewPopulation{
+public class NewSmallPlan extends NewPopulation {
 	/**
 	 * Constructor, writes file-head
 	 * 
-	 * @param plans -
-	 *            a Plans Object, which derives from MATSim plansfile
+	 * @param plans
+	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
 	public NewSmallPlan(Population plans) {
 		super(plans);
@@ -55,15 +54,16 @@ public class NewSmallPlan extends NewPopulation{
 		pw.writePerson(person);
 		// }
 	}
+
 	public static void main(final String[] args) {
 		// final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String plansFilename = "../schweiz-ivtch-SVN/baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
 
-		Gbl.createConfig(new String[] {
+		new ScenarioLoader(
 		// "./test/yu/ivtch/config_for_10pctZuerich_car_pt_smallPlansl.xml"
 				// "../data/ivtch/make10pctPlans.xml"
-				"input/make10pctPlans.xml" });
+				"input/make10pctPlans.xml").loadScenario().getConfig();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

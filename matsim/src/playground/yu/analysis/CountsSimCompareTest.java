@@ -17,7 +17,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
@@ -51,8 +50,6 @@ public class CountsSimCompareTest {
 		String eventsFilename = "../runs-svn/run669/it.500/500.events.txt.gz";
 		String outputPath = "../matsimTests/compareCountsSim/";
 		double countsScaleFactor = 10.0;
-
-		Gbl.createConfig(null);
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = new NetworkLayer();

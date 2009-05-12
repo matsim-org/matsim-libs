@@ -20,7 +20,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -43,7 +42,8 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author ychen
  * 
  */
-public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements X2QGIS {
+public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
+		X2QGIS {
 	protected Map<List<Id>, Integer> routeCounters;
 	protected NetworkLayer network;
 	private FeatureType featureTypeRoute;
@@ -165,8 +165,6 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements X2QGIS
 		final String networkFilename = args[0];
 		final String populationFilename = args[1];
 		final String outputDir = args[2];
-
-		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
