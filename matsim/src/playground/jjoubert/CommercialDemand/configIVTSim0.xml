@@ -18,7 +18,7 @@
 	<module name="controler">
 		<param name="outputDirectory" value="/home/jjoubert/Commercial/Output/" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="100" />
+		<param name="lastIteration" value="20" />
 	</module>
 
     <module name="counts">
