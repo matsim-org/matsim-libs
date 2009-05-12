@@ -21,6 +21,7 @@
 package org.matsim.vis.otfvis.opengl.drawer;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -41,7 +42,12 @@ import com.vividsolutions.jts.geom.Polygon;
 
 
 
-public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer {
+public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3686886023386144106L;
 
 	final List<OTFFeature> featureList = new ArrayList<OTFFeature>();
 	
@@ -123,8 +129,12 @@ public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer {
 	}
 
 	
-	private static class OTFFeature {
+	private static class OTFFeature implements Serializable{
 		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 5647675629518893490L;
 		boolean converted = false;
 		final int npoints;
 		float [] xpoints;
