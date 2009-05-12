@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatsimCommonWriter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,46 +16,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.basic.v01;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
+package org.matsim.core.basic.v01.vehicles;
 
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.basic.v01.vehicles.BasicEngineInformation.FuelType;
 
 /**
  * @author dgrether
- * @deprecated due to march refactorings however will be recovered in the future
  */
-@Deprecated
-public class MatsimCommonWriter extends MatsimXmlWriter {
+public class BasicVehicleBuilderImpl implements VehicleBuilder {
 
-	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
-	
-	public MatsimCommonWriter(Writer writer) {
-		this.writer = writer;
+
+	public BasicVehicleBuilderImpl() {
+	}
+
+	public BasicVehicle createVehicle(Id id, BasicVehicleType type) {
+		BasicVehicle veh = new BasicVehicleImpl(id, type);
+		return veh;
 	}
 	
-	public void writeCoordinate(Coord coord, int indentationLevel) throws IOException {
-		this.setIndentationLevel(indentationLevel);
-		this.writeCoordinate(coord);
+	public BasicVehicleType createVehicleType(String typeId) {
+			BasicVehicleType veh = new BasicVehicleTypeImpl(typeId);
+			return veh;
 	}
-	
-	private void writeCoordinate(Coord coord) throws IOException {
-		this.writeStartTag(PopulationSchemaV5Names.COORDINATE, null);
-		this.writeStartTag(PopulationSchemaV5Names.XCOORD, null);
-		this.writeContent(Double.toString(coord.getX()), false);
-		this.writeEndTag(PopulationSchemaV5Names.XCOORD);
-		this.writeStartTag(PopulationSchemaV5Names.YCOORD, null);
-		this.writeContent(Double.toString(coord.getY()), false);
-		this.writeEndTag(PopulationSchemaV5Names.YCOORD);
-		this.writeEndTag(PopulationSchemaV5Names.COORDINATE);
+
+
+	public BasicVehicleCapacity createVehicleCapacity() {
+		return new BasicVehicleCapacityImpl();
 	}
-	
-	
+
+
+	public BasicFreightCapacity createFreigthCapacity() {
+		return new BasicFreightCapacityImpl();
+	}
+
+
+	public BasicEngineInformation createEngineInformation(FuelType fuelType,
+			double gasConsumption) {
+			return new BasicEngineInformationImpl(fuelType, gasConsumption);
+	}
 }

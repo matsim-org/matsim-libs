@@ -37,9 +37,4 @@ public interface Population extends BasicPopulation<Person> {
 	public Map<Id, Person> getPersons();
 	
 
-	// all the rest is deprecated
-	
-//	@Deprecated
-//	public void printPlansCount();
-
 }

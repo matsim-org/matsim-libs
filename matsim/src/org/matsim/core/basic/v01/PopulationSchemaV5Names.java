@@ -21,7 +21,10 @@ package org.matsim.core.basic.v01;
 
 /**
  * @author dgrether
+ * @deprecated after march refactorings. however the v5 format will be recovered
+ * in the future and reappear as v6 thus this interface might be useful
  */
+@Deprecated
 public interface PopulationSchemaV5Names {
 
 	public static String PERSON = "person";

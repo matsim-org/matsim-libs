@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicVehiclesImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,34 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.basic.v01.vehicles;
 
-package org.matsim.households;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.households.BasicHouseholdBuilder;
-import org.matsim.core.basic.v01.households.BasicIncome;
-import org.matsim.core.basic.v01.households.HouseholdBuilder;
-import org.matsim.core.basic.v01.households.BasicIncome.IncomePeriod;
+
 
 /**
  * @author dgrether
+ *
  */
-public class HouseholdBuilderImpl implements HouseholdBuilder {
+public class BasicVehiclesImpl implements BasicVehicles {
+	
+	private Map<String, BasicVehicleType> vehicleTypes;
+	private LinkedHashMap<Id, BasicVehicle> vehicles;
+	private BasicVehicleBuilderImpl builder;
 
-	private BasicHouseholdBuilder delegate;
-
-	public HouseholdBuilderImpl() {
-		this.delegate = new BasicHouseholdBuilder();
+	public BasicVehiclesImpl(){
+		this.vehicleTypes = new LinkedHashMap<String, BasicVehicleType>();
+		this.builder = new BasicVehicleBuilderImpl();
+		this.vehicles = new LinkedHashMap<Id, BasicVehicle>();
+	}
+	
+	
+	public VehicleBuilder getBuilder() {
+		return this.builder;
 	}
 
-	public Household createHousehold(Id householdId) {
-		Household h = new HouseholdImpl(householdId);
-		return h;
+	public Map<Id, BasicVehicle> getVehicles() {
+		return this.vehicles;
 	}
 
 
-	public BasicIncome createIncome(double income, IncomePeriod period) {
-		return this.delegate.createIncome(income, period);
+	public Map<String, BasicVehicleType> getVehicleTypes() {
+		return this.vehicleTypes;
 	}
 
 }

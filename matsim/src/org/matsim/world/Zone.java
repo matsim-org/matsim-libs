@@ -22,7 +22,6 @@ package org.matsim.world;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.LocationType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -230,7 +229,4 @@ public class Zone extends AbstractLocation {
 				"[name=" + this.name + "]";
 	}
 
-	public LocationType getLocationType() {
-		return LocationType.ZONE;
-	}
 }

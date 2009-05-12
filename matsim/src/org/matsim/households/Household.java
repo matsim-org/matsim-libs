@@ -23,20 +23,17 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.basic.v01.BasicHousehold;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.core.basic.v01.households.BasicHousehold;
+import org.matsim.core.basic.v01.vehicles.BasicVehicle;
 
 /**
  * @author dgrether
  */
 public interface Household extends BasicHousehold {
 	
-	public void addMember(Person member);
-	
 	public Map<Id, Person> getMembers();
 	
-	public Map<Id, Vehicle> getVehicles();
+	public Map<Id, BasicVehicle> getVehicles();
 	
-	public void addVehicle(Vehicle v);
 	
 }

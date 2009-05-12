@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatsimCommonWriter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,46 +16,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.basic.v01;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-
+package org.matsim.core.basic.v01.households;
 
 /**
+ * Simple interface to represent an income including a time period and a currency.
  * @author dgrether
- * @deprecated due to march refactorings however will be recovered in the future
  */
-@Deprecated
-public class MatsimCommonWriter extends MatsimXmlWriter {
+public interface BasicIncome {
+	
+	public enum IncomePeriod {year, week, month, day, hour, second};
 
-	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+	public String getCurrency();
 	
-	public MatsimCommonWriter(Writer writer) {
-		this.writer = writer;
-	}
+	public IncomePeriod getIncomePeriod();
 	
-	public void writeCoordinate(Coord coord, int indentationLevel) throws IOException {
-		this.setIndentationLevel(indentationLevel);
-		this.writeCoordinate(coord);
-	}
-	
-	private void writeCoordinate(Coord coord) throws IOException {
-		this.writeStartTag(PopulationSchemaV5Names.COORDINATE, null);
-		this.writeStartTag(PopulationSchemaV5Names.XCOORD, null);
-		this.writeContent(Double.toString(coord.getX()), false);
-		this.writeEndTag(PopulationSchemaV5Names.XCOORD);
-		this.writeStartTag(PopulationSchemaV5Names.YCOORD, null);
-		this.writeContent(Double.toString(coord.getY()), false);
-		this.writeEndTag(PopulationSchemaV5Names.YCOORD);
-		this.writeEndTag(PopulationSchemaV5Names.COORDINATE);
-	}
-	
-	
+  public double getIncome();
+
+	public void setCurrency(String currency);	
+
 }

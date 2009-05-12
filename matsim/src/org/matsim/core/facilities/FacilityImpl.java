@@ -31,7 +31,6 @@ import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.LocationType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -184,7 +183,4 @@ public class FacilityImpl extends AbstractLocation implements Facility {
 		       "[nof_activities=" + this.activities.size() + "]";
 	}
 
-	public LocationType getLocationType() {
-		return LocationType.FACILITY;
-	}
 }

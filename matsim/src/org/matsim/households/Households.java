@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Households
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,34 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.households;
 
+import java.util.Map;
+
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.households.BasicHouseholdBuilder;
-import org.matsim.core.basic.v01.households.BasicIncome;
-import org.matsim.core.basic.v01.households.HouseholdBuilder;
-import org.matsim.core.basic.v01.households.BasicIncome.IncomePeriod;
+import org.matsim.core.basic.v01.households.BasicHouseholds;
+
 
 /**
  * @author dgrether
+ *
  */
-public class HouseholdBuilderImpl implements HouseholdBuilder {
+public interface Households extends BasicHouseholds<Household>{
 
-	private BasicHouseholdBuilder delegate;
-
-	public HouseholdBuilderImpl() {
-		this.delegate = new BasicHouseholdBuilder();
-	}
-
-	public Household createHousehold(Id householdId) {
-		Household h = new HouseholdImpl(householdId);
-		return h;
-	}
-
-
-	public BasicIncome createIncome(double income, IncomePeriod period) {
-		return this.delegate.createIncome(income, period);
-	}
-
+	public Map<Id, Household> getHouseholds();
+	
+	
 }

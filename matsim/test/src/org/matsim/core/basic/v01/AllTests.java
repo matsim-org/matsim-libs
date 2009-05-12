@@ -28,9 +28,9 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
-		suite.addTestSuite(BasicHouseholdsReaderV1Test.class);
 		suite.addTestSuite(BasicLinkImplTest.class);
-		suite.addTestSuite(VehicleReaderWriterV1Test.class);
+		suite.addTest(org.matsim.core.basic.v01.vehicles.AllTests.suite());
+		suite.addTest(org.matsim.core.basic.v01.households.AllTests.suite());
 		//$JUnit-END$
 		return suite;
 	}

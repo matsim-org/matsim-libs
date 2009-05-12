@@ -26,8 +26,8 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.basic.v01.BasicHouseholdImpl;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.core.basic.v01.households.BasicHouseholdImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicle;
 
 /**
  * @author dgrether
@@ -36,19 +36,14 @@ public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 
 	private Map<Id, Person> members;
 
-	private Map<Id, Vehicle> vehicles;
+	private Map<Id, BasicVehicle> vehicles;
 
 	public HouseholdImpl(final Id id) {
 		super(id);
+		this.members = new LinkedHashMap<Id, Person>();
+		this.vehicles = new LinkedHashMap<Id, BasicVehicle>();
 	}
 
-	public void addMember(final Person member) {
-		if (this.members == null) {
-			this.members = new LinkedHashMap<Id, Person>();
-		}
-		this.members.put(member.getId(), member);
-		member.setHousehold(this);
-	}
 
 	@Override
 	public List<Id> getMemberIds() {
@@ -82,15 +77,8 @@ public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 		return new ArrayList<Id>(this.vehicles.keySet());
 	}
 
-	public Map<Id, Vehicle> getVehicles() {
+	public Map<Id, BasicVehicle> getVehicles() {
 		return this.vehicles;
-	}
-
-	public void addVehicle(final Vehicle v) {
-		if (this.vehicles == null) {
-			this.vehicles = new LinkedHashMap<Id, Vehicle>();
-		}
-		this.vehicles.put(v.getId(), v);
 	}
 
 }

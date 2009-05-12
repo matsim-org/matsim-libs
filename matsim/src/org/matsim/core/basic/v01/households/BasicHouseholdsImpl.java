@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicHouseholdsImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,34 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.basic.v01.households;
 
-package org.matsim.households;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.households.BasicHouseholdBuilder;
-import org.matsim.core.basic.v01.households.BasicIncome;
-import org.matsim.core.basic.v01.households.HouseholdBuilder;
-import org.matsim.core.basic.v01.households.BasicIncome.IncomePeriod;
+
 
 /**
+ * Basic implementation of the BasicHousehold container
  * @author dgrether
+ *
  */
-public class HouseholdBuilderImpl implements HouseholdBuilder {
+public class BasicHouseholdsImpl implements BasicHouseholds<BasicHousehold> {
 
-	private BasicHouseholdBuilder delegate;
+	private BasicHouseholdBuilder builder;
 
-	public HouseholdBuilderImpl() {
-		this.delegate = new BasicHouseholdBuilder();
+	private Map<Id, BasicHousehold> households;
+	
+	public BasicHouseholdsImpl(){
+		this.households = new HashMap<Id, BasicHousehold>();
+		this.builder = new BasicHouseholdBuilder();
+	}
+	
+	public HouseholdBuilder getHouseholdBuilder() {
+		return this.builder;
 	}
 
-	public Household createHousehold(Id householdId) {
-		Household h = new HouseholdImpl(householdId);
-		return h;
+	public Map<Id, BasicHousehold> getHouseholds() {
+		return this.households;
 	}
-
-
-	public BasicIncome createIncome(double income, IncomePeriod period) {
-		return this.delegate.createIncome(income, period);
-	}
+	
+	
 
 }

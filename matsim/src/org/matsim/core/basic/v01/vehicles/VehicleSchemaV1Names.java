@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatsimCommonWriter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,46 +16,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.basic.v01;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-
+package org.matsim.core.basic.v01.vehicles;
 
 /**
  * @author dgrether
- * @deprecated due to march refactorings however will be recovered in the future
  */
-@Deprecated
-public class MatsimCommonWriter extends MatsimXmlWriter {
+public interface VehicleSchemaV1Names {
 
-	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
-	
-	public MatsimCommonWriter(Writer writer) {
-		this.writer = writer;
-	}
-	
-	public void writeCoordinate(Coord coord, int indentationLevel) throws IOException {
-		this.setIndentationLevel(indentationLevel);
-		this.writeCoordinate(coord);
-	}
-	
-	private void writeCoordinate(Coord coord) throws IOException {
-		this.writeStartTag(PopulationSchemaV5Names.COORDINATE, null);
-		this.writeStartTag(PopulationSchemaV5Names.XCOORD, null);
-		this.writeContent(Double.toString(coord.getX()), false);
-		this.writeEndTag(PopulationSchemaV5Names.XCOORD);
-		this.writeStartTag(PopulationSchemaV5Names.YCOORD, null);
-		this.writeContent(Double.toString(coord.getY()), false);
-		this.writeEndTag(PopulationSchemaV5Names.YCOORD);
-		this.writeEndTag(PopulationSchemaV5Names.COORDINATE);
-	}
-	
+	public static final String VEHICLEDEFINITIONS = "vehicleDefinitions";
+	public static final String VEHICLETYPE = "vehicleType";
+	public static final String TYPEID = "typeId";
+	public static final String DESCRIPTION = "description";
+	public static final String CAPACITY = "capacity";
+	public static final String SEATS = "seats";
+	public static final String PERSONS = "persons";
+	public static final String STANDINGROOM = "standingRoom";
+	public static final String FREIGHTCAPACITY = "freightCapacity";
+	public static final String VOLUME = "volume";
+	public static final String CUBICMETERS = "cubicMeters";
+	public static final String LENGTH = "length";
+	public static final String METER = "meter";
+	public static final String WIDTH = "width";
+	public static final String MAXIMUMVELOCITY = "maximumVelocity";
+	public static final String METERPERSECOND = "meterPerSecond";
+	public static final String ENGINEINFORMATION = "engineInformation";
+	public static final String FUELTYPE = "fuelType";
+	public static final String GASCONSUMPTION = "gasConsumption";
+	public static final String LITERPERMETER = "literPerMeter";
+	public static final String VEHICLE = "vehicle";
+	public static final String ID = "id";
+	public static final String TYPE = "type";
 	
 }

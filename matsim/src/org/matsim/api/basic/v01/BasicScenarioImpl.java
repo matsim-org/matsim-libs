@@ -25,6 +25,11 @@ import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.basic.v01.BasicPopulationImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.households.BasicHousehold;
+import org.matsim.core.basic.v01.households.BasicHouseholds;
+import org.matsim.core.basic.v01.households.BasicHouseholdsImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicles;
+import org.matsim.core.basic.v01.vehicles.BasicVehiclesImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -33,9 +38,11 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class BasicScenarioImpl implements BasicScenario {
 
 	private final Config config;
-	private final BasicNetwork network;
+	private final BasicNetwork<?, ?> network;
 	private final BasicFacilities facilities;
-	private final BasicPopulation population;
+	private final BasicPopulation<?> population;
+	private BasicHouseholds<BasicHousehold> households;
+	private BasicVehiclesImpl vehicles;
 	
 	public BasicScenarioImpl() {
 		this.config = new Config();
@@ -43,9 +50,11 @@ public class BasicScenarioImpl implements BasicScenario {
 		this.network = new NetworkLayer();  // TODO shoul be changed to a basic implementation
 		this.facilities = new FacilitiesImpl(); // TODO shoul be changed to a basic implementation
 		this.population = new BasicPopulationImpl();
+		this.households = new BasicHouseholdsImpl();
+		this.vehicles = new BasicVehiclesImpl();
 	}
 	
-	public BasicNetwork getNetwork() {
+	public BasicNetwork<?, ?> getNetwork() {
 		return this.network;
 	}
 
@@ -53,7 +62,7 @@ public class BasicScenarioImpl implements BasicScenario {
 		return this.facilities;
 	}
 
-	public BasicPopulation getPopulation() {
+	public BasicPopulation<?> getPopulation() {
 		return this.population;
 	}
 
@@ -69,4 +78,12 @@ public class BasicScenarioImpl implements BasicScenario {
 		return new CoordImpl(x, y);
 	}
 
+	public BasicHouseholds<BasicHousehold> getHouseholds() {
+		return this.households;
+	}
+
+	public BasicVehicles getVehicles(){
+		return this.vehicles;
+	}
+	
 }

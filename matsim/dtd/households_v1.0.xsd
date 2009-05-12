@@ -32,21 +32,21 @@ xml:lang="en">
   <xs:complexContent>
     <xs:extension base="matsimObjectType">
     <xs:sequence>
-      <xs:element name="members" minOccurs="1" maxOccurs="1">
+      <xs:element name="members" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
             <xs:element name="personId" type="idRefType" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element ref="location" minOccurs="1" maxOccurs="1"/>
-      <xs:element ref="vehicleDefinitionId" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="income" type="incomeType" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="language" minOccurs="0" maxOccurs="unbounded">
-				<xs:complexType>
-				  <xs:attribute name="name" type="xs:string" use="required"/>
-				</xs:complexType>
-			</xs:element>
+      <xs:element name="vehicles" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="vehicleDefinitionId" minOccurs="1" maxOccurs="unbounded" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+			<xs:element name="income" type="incomeType" minOccurs="0" maxOccurs="1"/>
     </xs:sequence>
     </xs:extension>
   </xs:complexContent>
@@ -66,6 +66,7 @@ xml:lang="en">
 	<xs:restriction base="xs:string">
 	  <xs:enumeration value="year" />
 	  <xs:enumeration value="month" />
+    <xs:enumeration value="week" />
 	  <xs:enumeration value="day" />
 	  <xs:enumeration value="hour" />
 	  <xs:enumeration value="second" />

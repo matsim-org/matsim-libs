@@ -31,12 +31,16 @@ import org.matsim.core.basic.signalsystems.BasicSignalSystemsImpl;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicles;
+import org.matsim.core.basic.v01.vehicles.BasicVehiclesImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.households.Households;
+import org.matsim.households.HouseholdsImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.world.World;
 
@@ -52,11 +56,15 @@ public class ScenarioImpl implements Scenario {
 	private Network network;
 	private Population population;
 	private Facilities facilities;
+	
 	//non-mandatory attributes
 	private BasicLaneDefinitions laneDefinitions;
 	private BasicSignalSystems signalSystems;
 	private BasicSignalSystemConfigurations signalSystemConfigurations;
 	private RoadPricingScheme roadPricingScheme;
+	
+	private Households households;
+  private BasicVehicles vehicles;
 	
 	public ScenarioImpl(){
 		this.config = new Config();
@@ -78,6 +86,10 @@ public class ScenarioImpl implements Scenario {
 		this.population = new PopulationImpl();
 		this.facilities = new FacilitiesImpl();
 		this.getWorld().setFacilityLayer((FacilitiesImpl) this.facilities);
+	
+		this.households = new HouseholdsImpl();
+		this.vehicles = new BasicVehiclesImpl();
+		
 		if (this.config.scenario().isUseLanes()){
 			this.createLaneDefinitionsContainer();
 		}
@@ -191,6 +203,14 @@ public class ScenarioImpl implements Scenario {
 	@Deprecated
 	public void setPopulation(Population population2) {
 		this.population = population2;
+	}
+
+	public Households getHouseholds() {
+		return this.households;
+	}
+	
+	public BasicVehicles getVehicles(){
+		return this.vehicles;
 	}
 
 }
