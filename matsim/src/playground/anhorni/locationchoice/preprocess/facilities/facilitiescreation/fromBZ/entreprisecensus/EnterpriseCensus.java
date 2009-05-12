@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreationFromBZ.entreprisecensus;
+package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.entreprisecensus;
 
 import java.util.ArrayList;
 import java.util.HashSet;

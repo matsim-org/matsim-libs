@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreationFromBZ;
+package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ;
 
 import java.util.List;
 import java.util.Map;
@@ -38,7 +38,7 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.world.Location;
 
-import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreationFromBZ.FacilitiesProductionKTI;
+import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.FacilitiesProductionKTI;
 
 /**
  * Assign every shop an opening time based on shopsOf2005 survey.

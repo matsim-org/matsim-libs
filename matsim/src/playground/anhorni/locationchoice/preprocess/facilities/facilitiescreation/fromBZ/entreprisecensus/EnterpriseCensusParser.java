@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreationFromBZ.entreprisecensus;
+package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.entreprisecensus;
 
 import java.io.File;
 import java.io.IOException;

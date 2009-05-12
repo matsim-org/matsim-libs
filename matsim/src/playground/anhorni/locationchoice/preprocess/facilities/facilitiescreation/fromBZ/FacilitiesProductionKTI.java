@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreationFromBZ;
+package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.facilities.FacilitiesImpl;
@@ -90,7 +90,7 @@ public class FacilitiesProductionKTI {
 		log.info("Adding and running facilities algorithms...done.");
 
 		System.out.println("  writing facilities file... ");
-		new FacilitiesWriter(facilities, "output/facilities.xml.gz").write();
+		new FacilitiesWriter(facilities, "output/facilitiesgeneration/facilities.xml.gz").write();
 		System.out.println("  done.");
 		
 	}

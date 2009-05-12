@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreationFromBZ;
+package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,11 +34,11 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreationFromBZ.FacilitiesProductionKTI;
-import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreationFromBZ.FacilitiesProductionKTI.KTIYear;
-import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreationFromBZ.entreprisecensus.EnterpriseCensus;
-import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreationFromBZ.entreprisecensus.EnterpriseCensusParser;
-import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreationFromBZ.entreprisecensus.EnterpriseCensus.ProductionSector;
+import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.FacilitiesProductionKTI;
+import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.FacilitiesProductionKTI.KTIYear;
+import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.entreprisecensus.EnterpriseCensus;
+import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.entreprisecensus.EnterpriseCensusParser;
+import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.entreprisecensus.EnterpriseCensus.ProductionSector;
 
 public class FacilitiesAllActivitiesFTE {
 
