@@ -42,7 +42,7 @@ public class StrategyConfigGroup extends Module {
 	private static final String MAX_AGENT_PLAN_MEMORY_SIZE = "maxAgentPlanMemorySize";
 	private static final String MODULE = "Module_";
 	private static final String MODULE_PROBABILITY = "ModuleProbability_";
-	private static final String MODULE_DISABALE_AFTER_ITERATION = "ModuleDisableAfterIteration_";
+	private static final String MODULE_DISABLE_AFTER_ITERATION = "ModuleDisableAfterIteration_";
 	private static final String MODULE_EXE_PATH = "ModuleExePath_";
 	private static final String EXTERNAL_EXE_CONFIG_TEMPLATE = "ExternalExeConfigTemplate";
 	private static final String EXTERNAL_EXE_TMP_FILE_ROOT_DIR = "ExternalExeTmpFileRootDir";
@@ -78,8 +78,7 @@ public class StrategyConfigGroup extends Module {
 			}
 			return Double.toString(settings.getProbability());
 		}
-		// TODO typo in MODULE_DISABALE_AFTER_ITERATION ?
-		if (key != null && key.startsWith(MODULE_DISABALE_AFTER_ITERATION)) {
+		if (key != null && key.startsWith(MODULE_DISABLE_AFTER_ITERATION)) {
 			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_PROBABILITY.length())), false);
 			if (settings == null || settings.getDisableAfter() == -1) {
 				return null;
@@ -115,8 +114,8 @@ public class StrategyConfigGroup extends Module {
 		} else if (key != null && key.startsWith(MODULE_PROBABILITY)) {
 			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_PROBABILITY.length())), true);
 			settings.setProbability(Double.parseDouble(value));
-		} else if (key != null && key.startsWith(MODULE_DISABALE_AFTER_ITERATION)) {
-			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_DISABALE_AFTER_ITERATION.length())), true);
+		} else if (key != null && key.startsWith(MODULE_DISABLE_AFTER_ITERATION)) {
+			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_DISABLE_AFTER_ITERATION.length())), true);
 			settings.setDisableAfter(Integer.parseInt(value));
 		} else if (key != null && key.startsWith(MODULE_EXE_PATH)) {
 			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_EXE_PATH.length())), true);
@@ -140,9 +139,9 @@ public class StrategyConfigGroup extends Module {
 			map.put(MODULE + entry.getKey().toString(), entry.getValue().getModuleName());
 			map.put(MODULE_PROBABILITY + entry.getKey().toString(), Double.toString(entry.getValue().getProbability()));
 			if (entry.getValue().getDisableAfter() == -1) {
-				map.put(MODULE_DISABALE_AFTER_ITERATION + entry.getKey().toString(), "null");
+				map.put(MODULE_DISABLE_AFTER_ITERATION + entry.getKey().toString(), "null");
 			} else {
-				map.put(MODULE_DISABALE_AFTER_ITERATION + entry.getKey().toString(), Integer.toString(entry.getValue().getDisableAfter()));
+				map.put(MODULE_DISABLE_AFTER_ITERATION + entry.getKey().toString(), Integer.toString(entry.getValue().getDisableAfter()));
 			}
 			this.addParameterToMap(map, MODULE_EXE_PATH + entry.getKey());
 		}
