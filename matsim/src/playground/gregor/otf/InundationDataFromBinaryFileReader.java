@@ -11,8 +11,8 @@ public class InundationDataFromBinaryFileReader {
 	public InundationData readData(){
 		ObjectInputStream o;
 		try {
-			o = new ObjectInputStream(new FileInputStream("../../inputs/flooding/flooding.dat"));
-//			o = new ObjectInputStream(new FileInputStream(this.file));
+//			o = new ObjectInputStream(new FileInputStream("../../inputs/flooding/flooding_high_res.dat"));
+			o = new ObjectInputStream(new FileInputStream(this.file));
 			InundationData data = (InundationData) o.readObject();
 			o.close();
 			return data;

@@ -124,12 +124,13 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		clientQ2.addAdditionalElement(new InundationDataReader(x));
 //		OGLSimpleBackgroundLayer.addPersistentItem(new ScalelableBackgroundDraw("test.png","scalebar2.png","scalebar3.png"));
 		
-		InundationDataFromNetcdfReader n = new InundationDataFromNetcdfReader(clientQ2.offsetNorth,clientQ2.offsetEast);
-//		InundationDataFromBinaryFileReader n = new InundationDataFromBinaryFileReader();
+//		InundationDataFromNetcdfReader n = new InundationDataFromNetcdfReader(clientQ2.offsetNorth,clientQ2.offsetEast);
+		InundationDataFromBinaryFileReader n = new InundationDataFromBinaryFileReader();
 		OTFInundationDrawer x = new OTFInundationDrawer(drawer2);
-		x.setData(n.createData());
+		x.setData(n.readData());
 		
 		OGLSimpleBackgroundLayer.addPersistentItem(x);
+		n = null;
 		drawer2.addOverlay(new OTFScaleBarDrawer("./res/sb_background.png","./res/scalebar.png"));
 		return drawer2;
 	}

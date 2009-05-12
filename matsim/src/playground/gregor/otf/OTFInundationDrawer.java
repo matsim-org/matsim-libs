@@ -14,9 +14,7 @@ import javax.media.opengl.glu.GLU;
 import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
-import playground.gregor.otf.InundationData.Quad;
-
-import com.sun.opengl.util.texture.TextureCoords;
+import playground.gregor.otf.InundationData.InundationGeometry;
 
 public class OTFInundationDrawer extends AbstractBackgroundDrawer {
 
@@ -66,7 +64,7 @@ public class OTFInundationDrawer extends AbstractBackgroundDrawer {
 
 		float [] top = getOGLPos(-20,-20);
 		float [] bot = getOGLPos(this.viewport[2]+20, this.viewport[3]+20);
-		Collection<Quad> fic = new ArrayList<Quad>(); 
+		Collection<InundationGeometry> fic = new ArrayList<InundationGeometry>(); 
 		double mxX = top[0] > bot[0] ? top[0] : bot[0];
 		double miX = top[0] < bot[0] ? top[0] : bot[0];
 		double mxY = top[1] > bot[1] ? top[1] : bot[1];
@@ -75,33 +73,31 @@ public class OTFInundationDrawer extends AbstractBackgroundDrawer {
 
 		//		System.out.println("floodingzoom:" + this.zoom);
 		//		this.triangleTree.get(miX,miY,mxX,mxY,fic);
-		this.data.floodingData.get(this.zoom).get(miX,miY,mxX,mxY,fic);
+		double zoom = this.zoom;
+//		if (zoom > 1) {
+//			zoom /= 2;
+//		}
+		this.data.floodingData.get(zoom).get(miX,miY,mxX,mxY,fic);
+		while (fic.size() > 30000) {
+			fic.clear();
+			zoom *= 4;
+			this.data.floodingData.get(zoom).get(miX,miY,mxX,mxY,fic);	
+		}
 		
-		System.out.println("Num Quads:" + fic.size());
-		
-		for (Quad t : fic) {
+//		System.out.println("Num Geos:" + fic.size());
+		int empty = 0;
+		for (InundationGeometry t : fic) {
+				
+			t.draw(gl, this.timeSlotIdx);
+			
+			
+			
+			
 //			byte aidx = this.data.tableMapping.get(t.acol)[this.timeSlotIdx];
 //			byte bidx = this.data.tableMapping.get(t.bcol)[this.timeSlotIdx];
 //			byte cidx = this.data.tableMapping.get(t.ccol)[this.timeSlotIdx];
 //			byte didx = this.data.tableMapping.get(t.dcol)[this.timeSlotIdx];
-			float [] acol = null;
-			if (this.timeSlotIdx < t.awalsh[InundationData.RES]) {
-				acol = InundationData.empty;
-			} else {
-				acol = this.data.getColor(this.timeSlotIdx,t.awalsh);
-			}
-			float [] bcol = null;
-			if (this.timeSlotIdx < t.bwalsh[InundationData.RES]) {
-				bcol = InundationData.empty;
-			} else {
-				bcol = this.data.getColor(this.timeSlotIdx,t.bwalsh);
-			}
-			float [] ccol = null;
-			if (this.timeSlotIdx < t.cwalsh[InundationData.RES]) {
-				ccol = InundationData.empty;
-			} else {
-				ccol = this.data.getColor(this.timeSlotIdx,t.cwalsh);
-			}
+
 //			float [] dcol = null;
 //			if (this.timeSlotIdx < t.dwalsh[InundationData.RES]) {
 //				dcol = InundationData.empty;
@@ -131,7 +127,7 @@ public class OTFInundationDrawer extends AbstractBackgroundDrawer {
 			//				dcol = color;
 			//			}
 
-			TextureCoords co = new TextureCoords(0,0,1,1);
+			
 			//			if(this.tx != null) co =  this.tx.getImageTexCoords();
 
 			//			this.tx.enable();
@@ -171,16 +167,8 @@ public class OTFInundationDrawer extends AbstractBackgroundDrawer {
 //			gl.glTexCoord2f(co.left(),co.bottom()); gl.glVertex3f(t.x - t.diff,t.y + t.diff,1.f);
 //			gl.glEnd();		
 			
-			gl.glBegin(GL.GL_TRIANGLES);
-
-			//			System.out.println("quad:" + t.a.x + "  " + t.a.y + "---"+ t.b.x + "  " + t.b.y + "---"+ t.c.x + "  " + t.c.y + "---"+ t.d.x + "  " + t.d.y + "---");
-			gl.glColor4f(acol[0],acol[1],acol[2],acol[3]);
-			gl.glTexCoord2f(co.right(),co.bottom()); gl.glVertex3f(t.xa,t.ya,1.f);
-			gl.glColor4f(bcol[0],bcol[1],bcol[2],bcol[3]);
-			gl.glTexCoord2f(co.right(),co.top()); gl.glVertex3f(t.xb,t.yb,1.f);
-			gl.glColor4f(ccol[0],ccol[1],ccol[2],ccol[3]);
-			gl.glTexCoord2f(co.left(), co.top()); gl.glVertex3f(t.xc,t.yc,1.f);
-			gl.glEnd();		
+			
+		
 			
 
 			//			this.tx.disable();
@@ -191,7 +179,7 @@ public class OTFInundationDrawer extends AbstractBackgroundDrawer {
 		// Bottom Left
 		// Bottom Right
 		// Finished Drawing The Triangle
-
+//		System.out.println("Empty:" + empty);
 
 	}
 
