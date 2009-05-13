@@ -23,10 +23,10 @@ package org.matsim.core.api.facilities;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.facilities.BasicFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.basic.v01.facilities.BasicFacility;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;

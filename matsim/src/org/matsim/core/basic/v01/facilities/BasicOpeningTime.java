@@ -17,25 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.api.basic.v01.facilities;
-
-import java.util.SortedSet;
-
-import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
+package org.matsim.core.basic.v01.facilities;
 
 /**
  * @author dgrether
  */
-public interface BasicActivityOption {
+public interface BasicOpeningTime extends Comparable<BasicOpeningTime> {
 	
-	public Double getCapacity();
+	public enum DayType {mon, tue, wed, thu, fri, sat, sun, wkday, wkend, wk}
 	
-	public void setCapacity(Double cap);
-
-	public void addOpeningTime(BasicOpeningTime openingTime);
-
-	public SortedSet<BasicOpeningTime> getOpeningTimes(DayType day);
+	public DayType getDay();
 	
-	public String getType();
-
+	public void setDay(DayType day);
+	
+	public double getStartTime();
+	
+	public void setStartTime(double starttime);
+	
+	public double getEndTime();
+	
+	public void setEndTime(double endtime);
 }

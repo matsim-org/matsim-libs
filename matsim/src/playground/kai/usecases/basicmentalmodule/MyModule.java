@@ -1,28 +1,14 @@
 package playground.kai.usecases.basicmentalmodule;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.api.basic.v01.BasicScenario;
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.*;
 import org.matsim.api.basic.v01.events.BasicActEndEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActEndEventHandler;
-import org.matsim.api.basic.v01.facilities.BasicFacilities;
-import org.matsim.api.basic.v01.facilities.BasicFacility;
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
-import org.matsim.api.basic.v01.population.BasicRoute;
+import org.matsim.api.basic.v01.network.*;
+import org.matsim.api.basic.v01.population.*;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
 
 
@@ -36,13 +22,13 @@ BasicActEndEventHandler
 	BasicScenario sc ; 
 	BasicNetwork<BasicNode,BasicLink> net ;
 	BasicPopulation<BasicPerson<BasicPlan>> pop ;
-	BasicFacilities facs ; // TODO: nicht konsequenterweise BasicFacilities<BasicFacility> ??  Maybe low prio.
+//	BasicFacilities facs ; // TODO: nicht konsequenterweise BasicFacilities<BasicFacility> ??  Maybe low prio.
 	
 	public MyModule(BasicScenario sc) {
 		
 		net = sc.getNetwork() ;
 		pop = sc.getPopulation() ;
-		facs = sc.getFacilities() ;
+//		facs = sc.getFacilities() ;
 		
 	}
 	
@@ -87,10 +73,10 @@ BasicActEndEventHandler
 						act.getStartTime();
 						act.getType();
 						
-						BasicFacility fac = facs.getFacilities().get( facId ) ;
-						fac.getCoord();
-						fac.getActivityOptions();
-						fac.getLinkId();
+//						BasicFacility fac = facs.getFacilities().get( facId ) ;
+//						fac.getCoord();
+//						fac.getActivityOptions();
+//						fac.getLinkId();
 						
 					} else if ( oo instanceof BasicLeg ) {
 						BasicLeg leg = (BasicLeg) oo ;

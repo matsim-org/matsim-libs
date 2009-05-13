@@ -20,7 +20,7 @@
 
 package org.matsim.core.api.facilities;
 
-import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
+import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 
 public interface OpeningTime extends BasicOpeningTime {
 

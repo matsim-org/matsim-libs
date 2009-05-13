@@ -6,10 +6,10 @@ import java.util.SortedSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
-import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
+import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 

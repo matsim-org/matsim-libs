@@ -1,8 +1,8 @@
 package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromOldFacilities;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;

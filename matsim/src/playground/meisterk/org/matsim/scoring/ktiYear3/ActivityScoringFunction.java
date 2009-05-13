@@ -31,11 +31,11 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
-import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
+import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;

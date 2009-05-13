@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.api.basic.v01.facilities;
+package org.matsim.core.basic.v01.facilities;
 
 import java.util.Map;
 

@@ -23,11 +23,11 @@ package org.matsim.core.scoring;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
-import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
+import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 

@@ -25,10 +25,10 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.SortedSet;
 
-import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.Facilities;
 import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.Writer;

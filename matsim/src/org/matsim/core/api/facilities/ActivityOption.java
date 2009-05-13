@@ -23,9 +23,8 @@ package org.matsim.core.api.facilities;
 import java.util.Map;
 import java.util.SortedSet;
 
-import org.matsim.api.basic.v01.facilities.BasicActivityOption;
-import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
-import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
+import org.matsim.core.basic.v01.facilities.*;
+import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 
 public interface ActivityOption extends BasicActivityOption {
 

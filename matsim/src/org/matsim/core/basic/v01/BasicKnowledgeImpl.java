@@ -3,7 +3,7 @@ package org.matsim.core.basic.v01;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.facilities.BasicActivityOption;
+import org.matsim.core.basic.v01.facilities.BasicActivityOption;
 
 
 public class BasicKnowledgeImpl implements BasicKnowledge<BasicActivityOption> {

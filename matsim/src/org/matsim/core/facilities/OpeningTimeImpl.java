@@ -20,8 +20,8 @@
 
 package org.matsim.core.facilities;
 
-import org.matsim.api.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.api.facilities.OpeningTime;
+import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 
