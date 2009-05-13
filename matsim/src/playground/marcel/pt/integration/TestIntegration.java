@@ -74,7 +74,7 @@ public class TestIntegration {
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
-		ActivityFacilities facilities = scenario.getFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 //		FacilityNetworkMatching.loadMapping(facilities, network, scenario.getWorld(), "../thesis-data/examples/minibln/facilityMatching.txt");
 //		System.out.println(network.getLinks().size());
 //		System.out.println(facilities.getFacilities().size());
@@ -116,7 +116,7 @@ public class TestIntegration {
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
-		ActivityFacilities facilities = scenario.getFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 //		FacilityNetworkMatching.loadMapping(facilities, network, scenario.getWorld(), "../thesis-data/examples/minibln/facilityMatching.txt");
 //		System.out.println(network.getLinks().size());
 //		System.out.println(facilities.getFacilities().size());

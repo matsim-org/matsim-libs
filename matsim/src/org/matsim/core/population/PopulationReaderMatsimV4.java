@@ -118,7 +118,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	public PopulationReaderMatsimV4(final Scenario scenario) {
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
-		this.facilities = scenario.getFacilities();
+		this.facilities = scenario.getActivityFacilities();
 	}
 
 	@Override

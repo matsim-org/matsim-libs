@@ -20,7 +20,7 @@ public interface Scenario extends BasicScenario {
 
 	public Network getNetwork() ;
 
-	public ActivityFacilities getFacilities() ;
+	public ActivityFacilities getActivityFacilities() ;
 
 	public Population getPopulation() ;
 

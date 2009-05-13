@@ -77,8 +77,8 @@ public class InitDemandCreation {
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
-		sl.loadFacilities();
-		ActivityFacilities facilities = sl.getScenario().getFacilities();
+		sl.loadActivityFacilities();
+		ActivityFacilities facilities = sl.getScenario().getActivityFacilities();
 		System.out.println("  done.");
 
 		System.out.println("  reading matrices xml file... ");

@@ -84,7 +84,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	public MatsimPopulationReader(final Scenario scenario) {
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
-		this.facilities = scenario.getFacilities();
+		this.facilities = scenario.getActivityFacilities();
 	}
 
 	@Override

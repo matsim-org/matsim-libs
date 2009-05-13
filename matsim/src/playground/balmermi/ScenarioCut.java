@@ -52,7 +52,7 @@ public class ScenarioCut {
 	private static void calcExtent(Scenario scenario) {
 		Coord min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
 		Coord max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
-		for (ActivityFacility f : scenario.getFacilities().getFacilities().values()) {
+		for (ActivityFacility f : scenario.getActivityFacilities().getFacilities().values()) {
 			if (f.getCoord().getX() < min.getX()) { min.setX(f.getCoord().getX()); }
 			if (f.getCoord().getY() < min.getY()) { min.setY(f.getCoord().getY()); }
 			if (f.getCoord().getX() > max.getX()) { max.setX(f.getCoord().getX()); }
@@ -203,7 +203,7 @@ public class ScenarioCut {
 	private static void reducePopulation(Scenario scenario) {
 		System.out.println("removing persons containing links and/or facilities that are removed..." + (new Date()));
 		Set<Id> linkIds = scenario.getNetwork().getLinks().keySet();
-		Set<Id> facIds = scenario.getFacilities().getFacilities().keySet();
+		Set<Id> facIds = scenario.getActivityFacilities().getFacilities().keySet();
 		Set<Id> toRemove = new HashSet<Id>();
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			boolean removeIt = false;
@@ -242,7 +242,7 @@ public class ScenarioCut {
 			Coord center = new CoordImpl(args[1],args[2]);
 			double radius = Double.parseDouble(args[3]);
 			
-			reduceFacilities(scenario.getFacilities(),center,radius);
+			reduceFacilities(scenario.getActivityFacilities(),center,radius);
 			reduceNetwork(scenario.getNetwork(),center,radius);
 			reducePopulation(scenario);
 		}
@@ -250,13 +250,13 @@ public class ScenarioCut {
 			Coord min = new CoordImpl(args[1],args[2]);
 			Coord max = new CoordImpl(args[3],args[4]);
 			
-			reduceFacilities(scenario.getFacilities(),min,max);
+			reduceFacilities(scenario.getActivityFacilities(),min,max);
 			reduceNetwork(scenario.getNetwork(),min,max);
 			reducePopulation(scenario);
 		}
 		calcExtent(scenario);
 		new NetworkWriter(scenario.getNetwork()).write();
-		new FacilitiesWriter(scenario.getFacilities()).write();
+		new FacilitiesWriter(scenario.getActivityFacilities()).write();
 		new PopulationWriter(scenario.getPopulation()).write();
 	}
 	

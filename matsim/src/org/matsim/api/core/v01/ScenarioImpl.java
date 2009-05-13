@@ -121,9 +121,9 @@ public class ScenarioImpl implements Scenario {
 	
 	
 	/**
-	 * @see org.matsim.api.core.v01.Scenario#getFacilities()
+	 * @see org.matsim.api.core.v01.Scenario#getActivityFacilities()
 	 */
-	public ActivityFacilities getFacilities() {
+	public ActivityFacilities getActivityFacilities() {
 		return this.facilities;
 	}
 

@@ -99,7 +99,7 @@ public class ScenarioLoader {
 	public Scenario loadScenario() {
 		this.loadWorld();
 		this.loadNetwork();
-		this.loadFacilities();
+		this.loadActivityFacilities();
 		this.loadPopulation();
 		if (this.config.scenario().isUseLanes()) {
 			this.loadLanes();
@@ -223,12 +223,12 @@ public class ScenarioLoader {
 	}
 
 	@SuppressWarnings("deprecation")
-	public void loadFacilities() {
+	public void loadActivityFacilities() {
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFile() != null)) {
 			String facilitiesFileName = this.config.facilities().getInputFile();
 			log.info("loading facilities from " + facilitiesFileName);
 			try {
-				new MatsimFacilitiesReader(this.scenario.getFacilities()).parse(facilitiesFileName);
+				new MatsimFacilitiesReader(this.scenario.getActivityFacilities()).parse(facilitiesFileName);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

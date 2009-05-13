@@ -998,7 +998,7 @@ public class Controler {
 		if (this.scenarioData == null) {
 			return null;
 		}
-		return this.scenarioData.getFacilities();
+		return this.scenarioData.getActivityFacilities();
 	}
 
 	public final NetworkLayer getNetwork() {
