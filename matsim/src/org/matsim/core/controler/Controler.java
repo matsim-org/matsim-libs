@@ -528,6 +528,8 @@ public class Controler {
 				throw new RuntimeException(e);
 			}
 		}
+		log.info("Checking consistency of config...");
+		this.config.checkConsistency();
 		log.info("Complete config dump:");
 		StringWriter writer = new StringWriter();
 		ConfigWriter configwriter = new ConfigWriter(this.config, new PrintWriter(writer));

@@ -72,7 +72,6 @@ public class MatsimConfigReader extends MatsimXmlParser {
 	@Override
 	public void parse(final String filename) throws SAXException, ParserConfigurationException, IOException {
 		super.parse(filename);
-		this.config.checkConsistency();
 	}
 
 	/**
