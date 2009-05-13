@@ -60,8 +60,8 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -93,8 +93,8 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 	private Zone[] zones;
 	private Layer zoneLayer;
 	private HashMap<Zone,Integer> zoneids = new HashMap<Zone,Integer>();
-	private HashMap<Zone, ArrayList<Facility>> primActFacilitiesPerZone =
-		new HashMap<Zone, ArrayList<Facility>>();
+	private HashMap<Zone, ArrayList<ActivityFacility>> primActFacilitiesPerZone =
+		new HashMap<Zone, ArrayList<ActivityFacility>>();
 	
 	// Class responsible for the computation of Travel_cost(Zone #i, Zone #j)
 	private PrimlocTravelCostAggregator travelCostAggregator;
@@ -134,7 +134,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			return;
 				
 		Knowledge knowledge = guy.getKnowledge();
-		Facility home = knowledge.getActivities("home").get(0).getFacility();
+		ActivityFacility home = knowledge.getActivities("home").get(0).getFacility();
 		Zone homezone = (Zone) zoneLayer.getNearestLocations( home.getCoord(), null).get(0);
 		if( homezone == null )
 			log.warn("Homeless person (poor guy)" );
@@ -152,7 +152,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			}
 			
 			// Assign a link location corresponding to the workplace
-			ArrayList<Facility> workplaces = primActFacilitiesPerZone.get( zones[workZoneID] );
+			ArrayList<ActivityFacility> workplaces = primActFacilitiesPerZone.get( zones[workZoneID] );
 			while( workplaces.size() == 0 ){
 				// This can happen if a person has a job in a zone without
 				// any job facility because of the hack in normalizeJobHomeVectors().
@@ -161,7 +161,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 				workplaces = primActFacilitiesPerZone.get( zones[zid] );
 			}
 			int wid = (int)(random.nextDouble()*workplaces.size());
-			Facility workplace = workplaces.get(wid);
+			ActivityFacility workplace = workplaces.get(wid);
 
 			// Change the knowledge of the person
 			if( overwriteKnowledge )
@@ -182,7 +182,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			
 		setupNumberHomesPerZone( population );
 
-		setupNumberJobsPerZone((Facilities) world.getLayer(Facilities.LAYER_TYPE));
+		setupNumberJobsPerZone((ActivityFacilities) world.getLayer(ActivityFacilities.LAYER_TYPE));
 
 		normalizeJobHomeVectors();
 		
@@ -251,7 +251,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			Zone zone = (Zone) obj;
 			zoneids.put( zone, internalID );
 			zones[ internalID ] = zone;
-			primActFacilitiesPerZone.put( zone, new ArrayList<Facility>() );
+			primActFacilitiesPerZone.put( zone, new ArrayList<ActivityFacility>() );
 			internalID++;
 		}
 	}
@@ -291,7 +291,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		// Determine how many employed persons live in each zone
 		for (Person guy : population.getPersons().values()) 
 			if( agentHasPrimaryActivityInPlan( guy ) ){
-				Facility homeOfGuy = guy.getKnowledge().getActivities("home").get(0).getFacility();
+				ActivityFacility homeOfGuy = guy.getKnowledge().getActivities("home").get(0).getFacility();
 				ArrayList<Location> list = zoneLayer.getNearestLocations(homeOfGuy.getCoord(), null);
 				Zone homezone = (Zone) list.get(0);
 				if( homezone == null )
@@ -314,12 +314,12 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		return false;
 	}
 	
-	private void setupNumberJobsPerZone(Facilities facilities){
+	private void setupNumberJobsPerZone(ActivityFacilities facilities){
 		// Setup the number of available facilities at the destination of the trips
 		// In this case we take the capacities of the existing Facilities
 		// and maintain a list of Facilities per Zone
 		core.J = new double[ core.numZ ];
-		for( Facility facility : facilities.getFacilities().values() ){
+		for( ActivityFacility facility : facilities.getFacilities().values() ){
 			ActivityOption act = facility.getActivityOption( primaryActivityName );
 			if( act != null ){
 				ArrayList<Location> list = zoneLayer.getNearestLocations( facility.getCoord(), null);

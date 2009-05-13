@@ -9,8 +9,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -25,30 +25,30 @@ import org.matsim.core.utils.misc.Counter;
 
 public class LocationModifier extends Modifier {
 
-	private TreeMap<Id,Facility> shop_facilities=new TreeMap<Id,Facility>();
-	private TreeMap<Id,Facility> leisure_facilities=new TreeMap<Id,Facility>();
-	private QuadTree<Facility> shopFacQuadTree = null;
-	private QuadTree<Facility> leisFacQuadTree = null;
+	private TreeMap<Id,ActivityFacility> shop_facilities=new TreeMap<Id,ActivityFacility>();
+	private TreeMap<Id,ActivityFacility> leisure_facilities=new TreeMap<Id,ActivityFacility>();
+	private QuadTree<ActivityFacility> shopFacQuadTree = null;
+	private QuadTree<ActivityFacility> leisFacQuadTree = null;
 
 	private final static Logger log = Logger.getLogger(LocationModifier.class);
 
-	public LocationModifier(Population plans, NetworkLayer network, Facilities  facilities) {
+	public LocationModifier(Population plans, NetworkLayer network, ActivityFacilities  facilities) {
 		super(plans, network, facilities);
 		this.initShopLeisure();
 	}
 
 	private void initShopLeisure(){
 		
-		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_gt2500sqm"));
-		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get1000sqm"));
-		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get400sqm"));
-		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get100sqm"));
-		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_lt100sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_gt2500sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_get1000sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_get400sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_get100sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_lt100sqm"));
 		//this.shop_facilities.putAll(this.facilities.getFacilities("shop_other"));
 
-		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_gastro"));
-		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_culture"));
-		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_sports"));
+		this.leisure_facilities.putAll(this.facilities.getFacilitiesForActivityType("leisure_gastro"));
+		this.leisure_facilities.putAll(this.facilities.getFacilitiesForActivityType("leisure_culture"));
+		this.leisure_facilities.putAll(this.facilities.getFacilitiesForActivityType("leisure_sports"));
 
 		this.shopFacQuadTree=this.builFacQuadTree(this.shop_facilities);
 		this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities);
@@ -72,8 +72,8 @@ public class LocationModifier extends Modifier {
 		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
 
-		ArrayList<Facility> zhShopFacilities = (ArrayList<Facility>)this.shopFacQuadTree.get(coords.getX(), coords.getY(), radius);
-		ArrayList<Facility> zhLeisureFacilities = (ArrayList<Facility>)this.leisFacQuadTree.get(coords.getX(), coords.getY(), radius);
+		ArrayList<ActivityFacility> zhShopFacilities = (ArrayList<ActivityFacility>)this.shopFacQuadTree.get(coords.getX(), coords.getY(), radius);
+		ArrayList<ActivityFacility> zhLeisureFacilities = (ArrayList<ActivityFacility>)this.leisFacQuadTree.get(coords.getX(), coords.getY(), radius);
 		log.info("Total number of zh shop facilities:" + zhShopFacilities.size());
 		log.info("Total number of zh leisure facilities:" + zhLeisureFacilities.size());
 		
@@ -99,7 +99,7 @@ public class LocationModifier extends Modifier {
 		log.info("assignRandomLocation done.");
 	}
 
-	private void exchangeFacilities(final String type, ArrayList<Facility>  exchange_facilities,
+	private void exchangeFacilities(final String type, ArrayList<ActivityFacility>  exchange_facilities,
 			final Plan plan) {
 
 			final List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
@@ -107,7 +107,7 @@ public class LocationModifier extends Modifier {
 				final Activity act = (Activity)actslegs.get(j);
 				if (act.getType().startsWith(type)) {
 
-					Facility facility=exchange_facilities.get(
+					ActivityFacility facility=exchange_facilities.get(
 							MatsimRandom.getRandom().nextInt(exchange_facilities.size()));
 
 					act.setFacility(facility);
@@ -123,14 +123,14 @@ public class LocationModifier extends Modifier {
 			}
 		}
 
-	private QuadTree<Facility> builFacQuadTree(TreeMap<Id,Facility> facilities_of_type) {
+	private QuadTree<ActivityFacility> builFacQuadTree(TreeMap<Id,ActivityFacility> facilities_of_type) {
 		Gbl.startMeasurement();
 		System.out.println("      building facility quad tree...");
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (final Facility f : facilities_of_type.values()) {
+		for (final ActivityFacility f : facilities_of_type.values()) {
 			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -141,8 +141,8 @@ public class LocationModifier extends Modifier {
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTree<Facility> quadtree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		for (final Facility f : facilities_of_type.values()) {
+		QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		for (final ActivityFacility f : facilities_of_type.values()) {
 			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 		}
 		System.out.println("      done.");

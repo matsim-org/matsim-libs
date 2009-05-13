@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.QuadTree;
@@ -65,7 +65,7 @@ public class MatricesCompleteBasedOnFacilities {
 	private static final String EDUCATION = "education";
 	private static final String WORK = "work";
 
-	private final Facilities facilities;
+	private final ActivityFacilities facilities;
 	private final ZoneLayer layer;
 
 	/**
@@ -76,23 +76,23 @@ public class MatricesCompleteBasedOnFacilities {
 	/**
 	 * The mapping between each <i>zone</i> id and the <i>facilities</i> which belongs to that zone.
 	 */
-	private final HashMap<Id, ArrayList<Facility>> zone_fac_map = new HashMap<Id, ArrayList<Facility>>();
+	private final HashMap<Id, ArrayList<ActivityFacility>> zone_fac_map = new HashMap<Id, ArrayList<ActivityFacility>>();
 
 	/**
 	 * Fast access data structure for all <i>facilities</i> containing <code>work</code> <i>activities</i>.
 	 */
-	private QuadTree<Facility> workFacQuadTree = null;
+	private QuadTree<ActivityFacility> workFacQuadTree = null;
 
 	/**
 	 * Fast access data structure for all <i>facilities</i> containing <code>education</code> <i>activities</i>.
 	 */
-	private QuadTree<Facility> educFacQuadTree = null;
+	private QuadTree<ActivityFacility> educFacQuadTree = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public MatricesCompleteBasedOnFacilities(final Facilities facilities, final ZoneLayer layer) {
+	public MatricesCompleteBasedOnFacilities(final ActivityFacilities facilities, final ZoneLayer layer) {
 		super();
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
@@ -114,7 +114,7 @@ public class MatricesCompleteBasedOnFacilities {
 	private final void initMaps() {
 		System.out.println("      init fac<=>zone mapping...");
 		int f_cnt = 0;
-		for (Facility f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			ArrayList<Zone> zones = new ArrayList<Zone>();
 			Iterator<? extends Location> z_it = this.layer.getLocations().values().iterator();
 			while (z_it.hasNext()) {
@@ -136,8 +136,8 @@ public class MatricesCompleteBasedOnFacilities {
 				Gbl.errorMsg("Fac id=" + f.getId() + " is already added to the map!");
 			}
 			// adding zone => fac mapping
-			ArrayList<Facility> fs = this.zone_fac_map.get(zone.getId());
-			if (fs == null) { fs = new ArrayList<Facility>(); }
+			ArrayList<ActivityFacility> fs = this.zone_fac_map.get(zone.getId());
+			if (fs == null) { fs = new ArrayList<ActivityFacility>(); }
 			fs.add(f);
 			this.zone_fac_map.put(zone.getId(),fs);
 
@@ -176,7 +176,7 @@ public class MatricesCompleteBasedOnFacilities {
 		int[] f_cnt = new int[zones.size()];
 		for (int i=0; i<zones.size(); i++) {
 			Zone z = zones.get(i);
-			ArrayList<Facility> facs = this.zone_fac_map.get(z.getId());
+			ArrayList<ActivityFacility> facs = this.zone_fac_map.get(z.getId());
 			if (facs == null) { f_cnt[i] = 0; }
 			else { f_cnt[i] = facs.size(); }
 		}
@@ -199,7 +199,7 @@ public class MatricesCompleteBasedOnFacilities {
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (Facility f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(WORK) != null) {
 				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
@@ -212,8 +212,8 @@ public class MatricesCompleteBasedOnFacilities {
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("building quad tree: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		this.workFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		for (Facility f : this.facilities.getFacilities().values()) {
+		this.workFacQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(WORK) != null) {
 				this.workFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
@@ -229,7 +229,7 @@ public class MatricesCompleteBasedOnFacilities {
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (Facility f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(EDUCATION) != null) {
 				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
@@ -242,8 +242,8 @@ public class MatricesCompleteBasedOnFacilities {
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("building quad tree: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		this.educFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		for (Facility f : this.facilities.getFacilities().values()) {
+		this.educFacQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(EDUCATION) != null) {
 				this.educFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
@@ -276,11 +276,11 @@ public class MatricesCompleteBasedOnFacilities {
 				educ_m.removeToLocEntries(z);
 			}
 			else {
-				ArrayList<Facility> facs = this.zone_fac_map.get(z.getId());
+				ArrayList<ActivityFacility> facs = this.zone_fac_map.get(z.getId());
 				boolean has_work = false;
 				boolean has_educ = false;
 				for (int i=0; i<facs.size(); i++) {
-					Facility f = facs.get(i);
+					ActivityFacility f = facs.get(i);
 					if (f.getActivityOption(WORK) != null) { has_work = true; }
 					if (f.getActivityOption(EDUCATION) != null) { has_educ = true; }
 				}
@@ -301,13 +301,13 @@ public class MatricesCompleteBasedOnFacilities {
 			Zone z = (Zone)z_it.next();
 
 			if (!work_m.getFromLocations().containsKey(z.getId())) {
-				Facility f = this.workFacQuadTree.get(z.getCoord().getX(),z.getCoord().getY());
+				ActivityFacility f = this.workFacQuadTree.get(z.getCoord().getX(),z.getCoord().getY());
 				Zone to_zone = this.fac_zone_map.get(f.getId());
 				work_m.setEntry(z,to_zone, 1);
 				System.out.println("      zone id=" + z.getId() + ": added a WORK entry to zone id=" + to_zone.getId() + " (fac id=" + f.getId() + ").");
 			}
 			if (!educ_m.getFromLocations().containsKey(z.getId())) {
-				Facility f = this.educFacQuadTree.get(z.getCoord().getX(),z.getCoord().getY());
+				ActivityFacility f = this.educFacQuadTree.get(z.getCoord().getX(),z.getCoord().getY());
 				Zone to_zone = this.fac_zone_map.get(f.getId());
 				educ_m.setEntry(z,to_zone, 1);
 				System.out.println("      zone id=" + z.getId() + ": added a EDUC entry to zone id=" + to_zone.getId() + " (fac id=" + f.getId() + ").");

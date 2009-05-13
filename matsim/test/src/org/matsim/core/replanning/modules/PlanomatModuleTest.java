@@ -21,7 +21,7 @@
 package org.matsim.core.replanning.modules;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -47,7 +47,7 @@ public class PlanomatModuleTest extends MatsimTestCase {
 
 	private Config config = null;
 	private NetworkLayer network = null;
-	private Facilities facilities = null;
+	private ActivityFacilities facilities = null;
 	private Population population = null;
 	
 	private static final Logger log = Logger.getLogger(PlanomatModuleTest.class);
@@ -59,7 +59,7 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		this.config = super.loadConfig(this.getClassInputDirectory() + "config.xml");
 
 		log.info("Reading facilities xml file...");
-		this.facilities = (Facilities)Gbl.createWorld().createLayer(Facilities.LAYER_TYPE,null);
+		this.facilities = (ActivityFacilities)Gbl.createWorld().createLayer(ActivityFacilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(this.facilities).readFile(config.facilities().getInputFile());
 		log.info("Reading facilities xml file...done.");
 

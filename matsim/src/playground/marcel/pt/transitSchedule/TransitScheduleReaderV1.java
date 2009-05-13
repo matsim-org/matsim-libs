@@ -31,8 +31,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
@@ -60,13 +60,13 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
 	private final TransitSchedule schedule;
 	private final NetworkLayer network;
-	private final Facilities facilities;
+	private final ActivityFacilities facilities;
 
 	private TransitLine currentTransitLine = null;
 	private TempTransitRoute currentTransitRoute = null;
 	private TempRoute currentRouteProfile = null;
 
-	public TransitScheduleReaderV1(final TransitSchedule schedule, final NetworkLayer network, final Facilities facilities) {
+	public TransitScheduleReaderV1(final TransitSchedule schedule, final NetworkLayer network, final ActivityFacilities facilities) {
 		this.schedule = schedule;
 		this.network = network;
 		this.facilities = facilities;
@@ -100,7 +100,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 			this.currentRouteProfile.addLink(link);
 		} else if (STOP.equals(name)) {
 			Id id = new IdImpl(atts.getValue(REF_ID));
-			Facility facility = this.facilities.getFacilities().get(id);
+			ActivityFacility facility = this.facilities.getFacilities().get(id);
 			if (facility == null) {
 				throw new RuntimeException("no stop/facility with id " + atts.getValue(REF_ID));
 			}
@@ -155,11 +155,11 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	}
 
 	private static class TempStop {
-		protected final Facility stop;
+		protected final ActivityFacility stop;
 		protected double departure = Time.UNDEFINED_TIME;
 		protected double arrival = Time.UNDEFINED_TIME;
 
-		protected TempStop(final Facility stop) {
+		protected TempStop(final ActivityFacility stop) {
 			this.stop = stop;
 		}
 	}

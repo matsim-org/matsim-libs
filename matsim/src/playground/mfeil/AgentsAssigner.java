@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -157,7 +157,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			if (!primActs.isEmpty()){
 				for (int j=0;j<primActs.size();j++){
 					if (((Activity)(bestPlan.getPlanElements().get(i))).getType().equals(primActs.get(j).getType())){
-						Facility fac = this.controler.getFacilities().getFacilities().get(primActs.get(j).getFacility().getId());
+						ActivityFacility fac = this.controler.getFacilities().getFacilities().get(primActs.get(j).getFacility().getId());
 						((Activity)(bestPlan.getPlanElements().get(i))).setFacility(fac);
 						// not only update of fac required but also coord and link; data inconsistencies otherwise
 						((Activity)(bestPlan.getPlanElements().get(i))).setCoord(fac.getCoord());

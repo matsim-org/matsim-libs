@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -98,7 +98,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 	private EventsMapStartEndTimes epp=null;//static? I just need one
 	private MakeTimeWindowsFromEvents teo=null;// static? I just need one
 	private LinkedHashMap<Activity,ArrayList<Double>> actStats=null;// static? I just need one
-	private LinkedHashMap<Facility,ArrayList<TimeWindow>> twm=null;// static? I just need one
+	private LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm=null;// static? I just need one
 	//
 	private LinkedHashMap<String,Double> rndEncounterProbs= new LinkedHashMap<String,Double>();// static? I just need one
 	//

@@ -23,8 +23,8 @@ package playground.marcel.pt.fares;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.utils.collections.Tuple;
@@ -34,22 +34,22 @@ import org.matsim.testcases.MatsimTestCase;
 public class MultipleFareSystemsTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost() {
-		final Facilities facilities = new FacilitiesImpl();
-		final Facility stop1 = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
-		final Facility stop2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
-		final Facility stop3 = facilities.createFacility(new IdImpl(3), new CoordImpl(1100, 1200));
-		final Facility stop4 = facilities.createFacility(new IdImpl(4), new CoordImpl(2100, 1200));
-		final Facility stop5 = facilities.createFacility(new IdImpl(5), new CoordImpl(100, 1200));
-		final Facility stop6 = facilities.createFacility(new IdImpl(6), new CoordImpl(2100, 2200));
+		final ActivityFacilities facilities = new FacilitiesImpl();
+		final ActivityFacility stop1 = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
+		final ActivityFacility stop2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
+		final ActivityFacility stop3 = facilities.createFacility(new IdImpl(3), new CoordImpl(1100, 1200));
+		final ActivityFacility stop4 = facilities.createFacility(new IdImpl(4), new CoordImpl(2100, 1200));
+		final ActivityFacility stop5 = facilities.createFacility(new IdImpl(5), new CoordImpl(100, 1200));
+		final ActivityFacility stop6 = facilities.createFacility(new IdImpl(6), new CoordImpl(2100, 2200));
 
 		// first TableLookupFares, connecting Stops 1-3
-		final Map<Tuple<Facility, Facility>, Double> fares1 = new HashMap<Tuple<Facility, Facility>, Double>();
-		fares1.put(new Tuple<Facility, Facility>(stop1, stop2), 2.0);
-		fares1.put(new Tuple<Facility, Facility>(stop2, stop3), 3.0);
+		final Map<Tuple<ActivityFacility, ActivityFacility>, Double> fares1 = new HashMap<Tuple<ActivityFacility, ActivityFacility>, Double>();
+		fares1.put(new Tuple<ActivityFacility, ActivityFacility>(stop1, stop2), 2.0);
+		fares1.put(new Tuple<ActivityFacility, ActivityFacility>(stop2, stop3), 3.0);
 
 		// second TableLookupFares, connecting Stops 5-6
-		final Map<Tuple<Facility, Facility>, Double> fares2 = new HashMap<Tuple<Facility, Facility>, Double>();
-		fares2.put(new Tuple<Facility, Facility>(stop5, stop6), 1.5);
+		final Map<Tuple<ActivityFacility, ActivityFacility>, Double> fares2 = new HashMap<Tuple<ActivityFacility, ActivityFacility>, Double>();
+		fares2.put(new Tuple<ActivityFacility, ActivityFacility>(stop5, stop6), 1.5);
 
 		MultipleFareSystems combiFares = new MultipleFareSystems();
 		combiFares.addFares(new TableLookupFares(fares1));

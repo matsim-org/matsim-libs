@@ -25,15 +25,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 
 public class TransitStopAgentTracker {
 
-	private final Map<Facility, List<DriverAgent>> agentsAtStops = new HashMap<Facility, List<DriverAgent>>();
+	private final Map<ActivityFacility, List<DriverAgent>> agentsAtStops = new HashMap<ActivityFacility, List<DriverAgent>>();
 	private final List<DriverAgent> emptyList = new LinkedList<DriverAgent>();
 	
-	public void addAgentToStop(final DriverAgent agent, final Facility stop) {
+	public void addAgentToStop(final DriverAgent agent, final ActivityFacility stop) {
 		List<DriverAgent> agents = this.agentsAtStops.get(stop);
 		if (agents == null) {
 			agents = new LinkedList<DriverAgent>();
@@ -42,7 +42,7 @@ public class TransitStopAgentTracker {
 		agents.add(agent);
 	}
 	
-	public List<DriverAgent> getAgentsAtStop(final Facility stop) {
+	public List<DriverAgent> getAgentsAtStop(final ActivityFacility stop) {
 		List<DriverAgent> agents = this.agentsAtStops.get(stop);
 		if (agents == null) {
 			return this.emptyList;

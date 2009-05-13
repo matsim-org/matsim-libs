@@ -3,7 +3,7 @@ package playground.anhorni.locationchoice.preprocess.planmodifications;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -24,7 +24,7 @@ public class PlanRemoveUnselected {
 
 	private Population plans=null;
 	private NetworkLayer network=null;
-	private Facilities  facilities =null;
+	private ActivityFacilities  facilities =null;
 	private String outputpath="";
 
 	private final static Logger log = Logger.getLogger(PlanRemoveUnselected.class);
@@ -84,7 +84,7 @@ public class PlanRemoveUnselected {
 		log.info("network reading done");
 
 		//this.facilities=new Facilities();
-		this.facilities=(Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		this.facilities=(ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 		log.info("facilities reading done");
 

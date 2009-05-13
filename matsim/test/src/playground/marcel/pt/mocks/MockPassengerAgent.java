@@ -20,20 +20,20 @@
 
 package playground.marcel.pt.mocks;
 
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.transitSchedule.TransitLine;
 
 public class MockPassengerAgent implements PassengerAgent {
 
-	private final Facility exitStop;
+	private final ActivityFacility exitStop;
 	
-	public MockPassengerAgent(final Facility exitStop) {
+	public MockPassengerAgent(final ActivityFacility exitStop) {
 		this.exitStop = exitStop;
 	}
 	
-	public boolean arriveAtStop(final Facility stop) {
+	public boolean arriveAtStop(final ActivityFacility stop) {
 		return stop == exitStop;
 	}
 

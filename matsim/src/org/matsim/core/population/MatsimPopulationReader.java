@@ -28,7 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
@@ -52,7 +52,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	
 	private final BasicPopulation plans;
 	private final Network network;
-	private final Facilities facilities;
+	private final ActivityFacilities facilities;
 	private MatsimXmlParser delegate = null;
 
 	private static final Logger log = Logger.getLogger(MatsimPopulationReader.class);
@@ -78,7 +78,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	public MatsimPopulationReader(final BasicPopulation plans, final Network network) {
 		this.plans = plans;
 		this.network = network;
-		this.facilities = (Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
+		this.facilities = (ActivityFacilities) Gbl.getWorld().getLayer(ActivityFacilities.LAYER_TYPE);
 	}
 	
 	public MatsimPopulationReader(final Scenario scenario) {

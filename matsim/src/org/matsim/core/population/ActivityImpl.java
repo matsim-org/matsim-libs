@@ -23,7 +23,7 @@ package org.matsim.core.population;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.basic.v01.BasicActivityImpl;
@@ -33,7 +33,7 @@ import org.matsim.core.utils.misc.Time;
 public class ActivityImpl extends BasicActivityImpl implements Activity {
 
 	private BasicLink link = null;
-	private Facility facility = null;
+	private ActivityFacility facility = null;
 	private double dur = Time.UNDEFINED_TIME;
 
 	//////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 		this.setCoord(coord);
 	}
 
-	public ActivityImpl(final String type, final Facility fac) {
+	public ActivityImpl(final String type, final ActivityFacility fac) {
 		super(type.intern());
 		this.setFacility(fac);
 	}
@@ -76,7 +76,7 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void setFacility(final Facility facility) {
+	public void setFacility(final ActivityFacility facility) {
 		this.facility = facility;
 	}
 
@@ -99,7 +99,7 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 		return (Link)this.link;
 	}
 
-	public Facility getFacility() {
+	public ActivityFacility getFacility() {
 		return this.facility;
 	}
 

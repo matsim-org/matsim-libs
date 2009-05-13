@@ -27,8 +27,8 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.world.Location;
 import org.matsim.world.World;
@@ -69,9 +69,9 @@ public class WorldWriteFacilityZoneMapping {
 			BufferedWriter out = new BufferedWriter(fw);
 			out.write("f_id\tz_id\n");
 			out.flush();
-			for (Location f : world.getLayer(Facilities.LAYER_TYPE).getLocations().values()) {
+			for (Location f : world.getLayer(ActivityFacilities.LAYER_TYPE).getLocations().values()) {
 				if (f.getUpMapping().size() == 0) {
-					Collection<ActivityOption> acts = ((Facility)f).getActivityOptions().values();
+					Collection<ActivityOption> acts = ((ActivityFacility)f).getActivityOptions().values();
 					if (acts.size() != 1) { Gbl.errorMsg("f_id="+f.getId()+": That must never happen!"); }
 					else if (!acts.iterator().next().getType().equals("tta")) { Gbl.errorMsg("f_id="+f.getId()+": That must never happen either!"); }
 					else { log.info("      f_id="+f.getId()+" has no zone mapping (outside CH, act_type='tta')"); }

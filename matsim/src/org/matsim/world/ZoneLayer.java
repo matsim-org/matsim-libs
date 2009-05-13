@@ -22,7 +22,7 @@ package org.matsim.world;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -32,7 +32,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
  * The collection of zone objects in MATSim.
  * @see Layer
  * @see NetworkLayer
- * @see Facilities
+ * @see ActivityFacilities
  * @author Michael Balmer
  */
 public class ZoneLayer extends Layer {

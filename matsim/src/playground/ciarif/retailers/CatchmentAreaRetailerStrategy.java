@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.controler.Controler;
@@ -28,9 +28,9 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 		this.alternatives = alternatives;
 	}
 
-		public void moveFacilities(Map<Id, Facility> facilities) {
+		public void moveFacilities(Map<Id, ActivityFacility> facilities) {
 
-			for (Facility f : facilities.values()) {
+			for (ActivityFacility f : facilities.values()) {
 				
 				// example of the use of a bad code style, but works anyway....
 				QuadTree<Person> personQuadTree = Utils.getPersonQuadTree();

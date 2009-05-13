@@ -8,8 +8,8 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 
@@ -35,18 +35,18 @@ public class SpatialAnalysisFacilities {
 	
 	public void run(String facilitiesFile, String areaShapeFile) {
 
-		TreeMap<Id,Facility> shop_facilities = this.readAndFilterFacilities(facilitiesFile);
+		TreeMap<Id,ActivityFacility> shop_facilities = this.readAndFilterFacilities(facilitiesFile);
 		
 		// Read area
 		AreaReader areaReader = new AreaReader();
 		areaReader.readShapeFile(areaShapeFile);
 		this.area = areaReader.getAreaPolygons();
 		
-		List<Facility> zhShopFacilities = this.filterStores(shop_facilities);
+		List<ActivityFacility> zhShopFacilities = this.filterStores(shop_facilities);
 		this.print(zhShopFacilities);
 	}
 	
-	private void print(List<Facility> facilities) {
+	private void print(List<ActivityFacility> facilities) {
 		log.info(facilities.size());
 		FacilitiesWriter writer = new FacilitiesWriter();
 		int [] numberOfFacilities = writer.write(facilities);
@@ -59,28 +59,28 @@ public class SpatialAnalysisFacilities {
 		log.info("Number of shop_other: " + numberOfFacilities[5]);	
 	}
 	
-	private TreeMap<Id,Facility> readAndFilterFacilities(String facilitiesFile) {
-		Facilities facilities  = new FacilitiesImpl();//(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+	private TreeMap<Id,ActivityFacility> readAndFilterFacilities(String facilitiesFile) {
+		ActivityFacilities facilities  = new FacilitiesImpl();//(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(facilities).readFile(facilitiesFile);
 		
-		TreeMap<Id,Facility> shop_facilities = new TreeMap<Id,Facility>();
-		shop_facilities.putAll(facilities.getFacilities("shop_retail_gt2500sqm"));
-		shop_facilities.putAll(facilities.getFacilities("shop_retail_get1000sqm"));
-		shop_facilities.putAll(facilities.getFacilities("shop_retail_get400sqm"));
-		shop_facilities.putAll(facilities.getFacilities("shop_retail_get100sqm"));
-		shop_facilities.putAll(facilities.getFacilities("shop_retail_lt100sqm"));
-		shop_facilities.putAll(facilities.getFacilities("shop_other"));
+		TreeMap<Id,ActivityFacility> shop_facilities = new TreeMap<Id,ActivityFacility>();
+		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_retail_gt2500sqm"));
+		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_retail_get1000sqm"));
+		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_retail_get400sqm"));
+		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_retail_get100sqm"));
+		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_retail_lt100sqm"));
+		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_other"));
 
 		return shop_facilities;
 	}
 	
-	private List<Facility> filterStores(TreeMap<Id,Facility> shop_facilities) {
+	private List<ActivityFacility> filterStores(TreeMap<Id,ActivityFacility> shop_facilities) {
 		
-		List<Facility> zhShopFacilities = new Vector<Facility>();
+		List<ActivityFacility> zhShopFacilities = new Vector<ActivityFacility>();
 		
-		Iterator<Facility> shop_iter = shop_facilities.values().iterator();
+		Iterator<ActivityFacility> shop_iter = shop_facilities.values().iterator();
 		while (shop_iter.hasNext()) {
-			Facility facility = shop_iter.next();
+			ActivityFacility facility = shop_iter.next();
 			
 			if (this.insideArea(facility.getCoord())) {
 				zhShopFacilities.add(facility);

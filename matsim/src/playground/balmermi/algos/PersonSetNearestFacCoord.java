@@ -23,8 +23,8 @@ package playground.balmermi.algos;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -50,13 +50,13 @@ public class PersonSetNearestFacCoord extends AbstractPersonAlgorithm implements
 	private static final String LEISURE = "leisure";
 	private static final String SHOP = "shop";
 
-	private final Facilities facilities;
+	private final ActivityFacilities facilities;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonSetNearestFacCoord(final Facilities facilities) {
+	public PersonSetNearestFacCoord(final ActivityFacilities facilities) {
 		super();
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
@@ -103,10 +103,10 @@ public class PersonSetNearestFacCoord extends AbstractPersonAlgorithm implements
 				Coord coord = act.getCoord();
 				if (coord == null) { throw new RuntimeException("Each act must have a coord!"); }
 				double nearest_dist = Double.MAX_VALUE;
-				Facility nearest_f = null;
-				Iterator<? extends Facility> f_it = this.facilities.getFacilities().values().iterator();
+				ActivityFacility nearest_f = null;
+				Iterator<? extends ActivityFacility> f_it = this.facilities.getFacilities().values().iterator();
 				while (f_it.hasNext()) {
-					Facility f = f_it.next();
+					ActivityFacility f = f_it.next();
 					if (f.getActivityOptions().containsKey(type)) {
 						double dist = f.calcDistance(coord);
 						if (dist < nearest_dist) {

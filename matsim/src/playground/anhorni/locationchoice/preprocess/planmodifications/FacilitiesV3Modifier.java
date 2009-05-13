@@ -3,7 +3,7 @@ package playground.anhorni.locationchoice.preprocess.planmodifications;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -14,7 +14,7 @@ public class FacilitiesV3Modifier extends Modifier {
 
 	private final static Logger log = Logger.getLogger(FacilitiesV3Modifier.class);
 
-	public FacilitiesV3Modifier(Population plans, NetworkLayer network, Facilities  facilities){
+	public FacilitiesV3Modifier(Population plans, NetworkLayer network, ActivityFacilities  facilities){
 		super(plans, network, facilities);
 	}
 

@@ -33,7 +33,7 @@ public interface ActivityOption extends BasicActivityOption {
 
 	public void setOpeningTimes(Map<DayType, SortedSet<BasicOpeningTime>> openingTimes);
 
-	public Facility getFacility();
+	public ActivityFacility getFacility();
 
 	public Map<DayType, SortedSet<BasicOpeningTime>> getOpeningTimes();
 	

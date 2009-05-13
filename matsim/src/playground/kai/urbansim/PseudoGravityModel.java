@@ -11,7 +11,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -46,7 +46,7 @@ public class PseudoGravityModel {
 	private static final Logger log = Logger.getLogger(PseudoGravityModel.class);
 
 	private Population population ;
-	private Facilities facilities ;
+	private ActivityFacilities facilities ;
 	private Map<Id,Id> locationFromJob ;
 	
 	private Coord minCoord = new CoordImpl( Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY ) ;
@@ -90,7 +90,7 @@ public class PseudoGravityModel {
 	}
 	
 	// TODO: there should actually a ctor that constructs this w/o coords (i.e. computes them internally)
-	public PseudoGravityModel ( Population population, Facilities facilities, Map<Id,Id> locationFromJob ) {
+	public PseudoGravityModel ( Population population, ActivityFacilities facilities, Map<Id,Id> locationFromJob ) {
 		this.population = population ;
 		this.facilities = facilities ;
 		this.locationFromJob = locationFromJob ;

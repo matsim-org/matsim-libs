@@ -12,8 +12,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -48,7 +48,7 @@ import playground.kai.urbansim.ids.LocationIdFactory;
 public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 	private static final Logger log = Logger.getLogger(ReadFromUrbansimCellModel.class);
 
-	public void readFacilities(Facilities facilities) {
+	public void readFacilities(ActivityFacilities facilities) {
 		log.fatal("does not work; see javadoc of class.  Aborting ..." + this) ;
 		System.exit(-1) ;
 		
@@ -71,7 +71,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 				int idx_y = idxFromKey.get("relative_y:i4") ;
 				Coord coord = new CoordImpl( parts[idx_x], parts[idx_y] ) ;
 
-				Facility facility = facilities.createFacility(id,coord) ;
+				ActivityFacility facility = facilities.createFacility(id,coord) ;
 				facility.setDesc("urbansim location") ;
 				
 				line = reader.readLine() ;
@@ -84,7 +84,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 		}
 	}
 
-	public void readPersons( Population population, Facilities facilities, double fraction) {
+	public void readPersons( Population population, ActivityFacilities facilities, double fraction) {
 		log.fatal("does not work; see javadoc of class.  Aborting ..." + this) ;
 		System.exit(-1) ;
 		Map<Id,Id> gridcellFromJob = new HashMap<Id,Id>() ;
@@ -96,7 +96,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 	}
 
 	public long personCnt = 0 ;
-	void readPersonsFromHouseholds ( Population population, Facilities facilities, double fraction ) {
+	void readPersonsFromHouseholds ( Population population, ActivityFacilities facilities, double fraction ) {
 		log.fatal("does not work; see javadoc of class.  Aborting ..." + this) ;
 		System.exit(-1) ;
 		try {
@@ -165,7 +165,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 		}
 	}
 
-	public void readZones(Facilities zones, Layer parcels) {
+	public void readZones(ActivityFacilities zones, Layer parcels) {
 		log.fatal("not implemented; aborting ...") ;
 		System.exit(-1);
 	}

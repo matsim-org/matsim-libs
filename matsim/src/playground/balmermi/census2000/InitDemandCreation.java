@@ -22,7 +22,7 @@ package playground.balmermi.census2000;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.ScenarioLoader;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -78,7 +78,7 @@ public class InitDemandCreation {
 
 		System.out.println("  reading facilities xml file... ");
 		sl.loadFacilities();
-		Facilities facilities = sl.getScenario().getFacilities();
+		ActivityFacilities facilities = sl.getScenario().getFacilities();
 		System.out.println("  done.");
 
 		System.out.println("  reading matrices xml file... ");

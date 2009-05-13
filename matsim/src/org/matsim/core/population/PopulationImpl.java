@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Population;
@@ -53,7 +53,7 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 
 	private static final Logger log = Logger.getLogger(PopulationImpl.class);
 
-	private final PopulationBuilder pb = new PopulationBuilderImpl((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE), this, (Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
+	private final PopulationBuilder pb = new PopulationBuilderImpl((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE), this, (ActivityFacilities) Gbl.getWorld().getLayer(ActivityFacilities.LAYER_TYPE));
 
 	//////////////////////////////////////////////////////////////////////
 	// add methods

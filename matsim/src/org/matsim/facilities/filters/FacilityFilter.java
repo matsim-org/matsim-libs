@@ -20,7 +20,7 @@
 
 package org.matsim.facilities.filters;
 
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.population.filters.Filter;
 
@@ -36,12 +36,12 @@ public interface FacilityFilter extends FacilityAlgorithm, Filter {
 	 * @param facility
 	 * @return true if the facility meets the criterion of the filter.
 	 */
-	boolean judge(Facility facility);
+	boolean judge(ActivityFacility facility);
 
 	/**
 	 * Sends the facility to the next algorithm
 	 *
 	 * @param facility
 	 */
-	void run(Facility facility);
+	void run(ActivityFacility facility);
 }

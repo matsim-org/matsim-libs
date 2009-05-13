@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.integration;
 
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -34,7 +34,7 @@ public class TransitAgent extends PersonAgent implements PassengerAgent {
 		super(p, simulation);
 	}
 
-	public boolean arriveAtStop(final Facility stop) {
+	public boolean arriveAtStop(final ActivityFacility stop) {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
 		return route.getEgressStopId().equals(stop.getId());
 	}

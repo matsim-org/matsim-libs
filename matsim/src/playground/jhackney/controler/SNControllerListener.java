@@ -27,8 +27,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -122,7 +122,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	private EventsMapStartEndTimes epp=null;
 	private MakeTimeWindowsFromEvents teo=null;
 	private LinkedHashMap<Activity,ArrayList<Double>> actStats=null;
-	private LinkedHashMap<Facility,ArrayList<TimeWindow>> twm=null;
+	private LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm=null;
 	private EventsToScore scoring =null;
 
 	private final Logger log = Logger.getLogger(SNControllerListener.class);
@@ -351,7 +351,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	 * private methods
 	 * =================================================================== */
 
-	void initializeKnowledge(final Population plans, Facilities facilities ) {
+	void initializeKnowledge(final Population plans, ActivityFacilities facilities ) {
 
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)

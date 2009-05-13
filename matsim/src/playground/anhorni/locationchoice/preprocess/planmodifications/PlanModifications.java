@@ -1,7 +1,7 @@
 package playground.anhorni.locationchoice.preprocess.planmodifications;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
@@ -20,7 +20,7 @@ public class PlanModifications {
 
 	private Population plans=null;
 	private NetworkLayer network=null;
-	private Facilities  facilities =null;
+	private ActivityFacilities  facilities =null;
 	private String outputpath="";
 	private Modifier modifier=null;
 
@@ -96,7 +96,7 @@ public class PlanModifications {
 		log.info("network reading done");
 
 		//this.facilities=new Facilities();
-		this.facilities=(Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		this.facilities=(ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 		log.info("facilities reading done");
 

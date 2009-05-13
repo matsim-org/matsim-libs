@@ -24,8 +24,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.utils.misc.Time;
 
@@ -45,7 +45,7 @@ public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
 	// <facilities ... > ... </facilities>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startFacilities(final Facilities facilities, final BufferedWriter out) throws IOException {
+	public void startFacilities(final ActivityFacilities facilities, final BufferedWriter out) throws IOException {
 		out.write("<facilities");
 		if (facilities.getName() != null) {
 			out.write(" name=\"" + facilities.getName() + "\"");
@@ -62,7 +62,7 @@ public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
 	// <facility ... > ... </facility>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startFacility(final Facility facility, final BufferedWriter out) throws IOException {
+	public void startFacility(final ActivityFacility facility, final BufferedWriter out) throws IOException {
 		out.write("\t<facility");
 		out.write(" id=\"" + facility.getId() + "\"");
 		out.write(" x=\"" + facility.getCoord().getX() + "\"");

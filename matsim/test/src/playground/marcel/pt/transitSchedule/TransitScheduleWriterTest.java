@@ -27,8 +27,8 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
@@ -55,12 +55,12 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		Link l2 = network.createLink(new IdImpl("2"), n2, n3, 1000, 10, 3600, 1.0);
 		Link l3 = network.createLink(new IdImpl("3"), n3, n4, 1000, 10, 3600, 1.0);
 		Link l4 = network.createLink(new IdImpl("4"), n4, n5, 1000, 10, 3600, 1.0);
-		Facilities facilities = new FacilitiesImpl();
+		ActivityFacilities facilities = new FacilitiesImpl();
 
-		Facility stop1 = facilities.createFacility(new IdImpl("stop1"), new CoordImpl(0, 0));
-		Facility stop2 = facilities.createFacility(new IdImpl("stop2"), new CoordImpl(1000, 0));
-		Facility stop3 = facilities.createFacility(new IdImpl("stop3"), new CoordImpl(1000, 1000));
-		Facility stop4 = facilities.createFacility(new IdImpl("stop4"), new CoordImpl(0, 1000));
+		ActivityFacility stop1 = facilities.createFacility(new IdImpl("stop1"), new CoordImpl(0, 0));
+		ActivityFacility stop2 = facilities.createFacility(new IdImpl("stop2"), new CoordImpl(1000, 0));
+		ActivityFacility stop3 = facilities.createFacility(new IdImpl("stop3"), new CoordImpl(1000, 1000));
+		ActivityFacility stop4 = facilities.createFacility(new IdImpl("stop4"), new CoordImpl(0, 1000));
 
 		// prepare some schedule, without network-route
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(4);

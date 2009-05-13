@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
@@ -31,7 +31,7 @@ public class SpatialInteractorEvents {
 
 //	LinkedHashMap<Activity,ArrayList<Person>> activityMap;
 //	LinkedHashMap<Act,ArrayList<Person>> actMap=new LinkedHashMap<Act,ArrayList<Person>>();
-	LinkedHashMap<Facility,ArrayList<TimeWindow>> timeWindowMap;
+	LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap;
 //	TrackEventsOverlap teo;
 	MakeTimeWindowsFromEvents teo;
 	private final Logger log = Logger.getLogger(SpatialInteractorEvents.class);
@@ -44,7 +44,7 @@ public class SpatialInteractorEvents {
 	}
 
 	public void interact(Population plans, LinkedHashMap<String, Double> rndEncounterProb, int iteration,
-			LinkedHashMap<Facility,ArrayList<TimeWindow>> twm) {
+			LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm) {
 
 		this.log.info(" Looking through plans and tracking which Persons could interact "+iteration);
 

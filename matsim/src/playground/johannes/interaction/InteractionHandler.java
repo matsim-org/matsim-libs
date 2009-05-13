@@ -32,8 +32,8 @@ import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.events.ActEndEvent;
@@ -53,20 +53,20 @@ public class InteractionHandler implements ActStartEventHandler,
 	
 	private Interactor interactor;
 	
-	private Map<Facility, PhysicalFacility> pfacilities;
+	private Map<ActivityFacility, PhysicalFacility> pfacilities;
 	
-	public InteractionHandler(InteractionSelector selector, Interactor interactor, Facilities facilities) {
+	public InteractionHandler(InteractionSelector selector, Interactor interactor, ActivityFacilities facilities) {
 		this.selector = selector;
 		this.interactor = interactor;
-		this.pfacilities = new HashMap<Facility, PhysicalFacility>();
+		this.pfacilities = new HashMap<ActivityFacility, PhysicalFacility>();
 		
-		for(Facility f : facilities.getFacilities().values()) {
+		for(ActivityFacility f : facilities.getFacilities().values()) {
 			this.pfacilities.put(f, new PhysicalFacility());
 		}
 	}
 	
 	public void handleEvent(ActStartEvent event) {
-		Facility f = event.getAct().getFacility();
+		ActivityFacility f = event.getAct().getFacility();
 		PhysicalFacility pf = pfacilities.get(f);
 //		if(pf == null) {
 //			pf = new PhysicalFacility();
@@ -84,7 +84,7 @@ public class InteractionHandler implements ActStartEventHandler,
 
 	public void handleEvent(ActEndEvent event) {
 		if(!event.getAct().getType().equalsIgnoreCase("home")) {
-		Facility f = event.getAct().getFacility();
+		ActivityFacility f = event.getAct().getFacility();
 		PhysicalFacility pf = pfacilities.get(f);
 		
 		if(pf == null)
@@ -103,7 +103,7 @@ public class InteractionHandler implements ActStartEventHandler,
 		
 		final String TAB = "\t"; 
 		final String WSPACE = " "; 
-		for(Facility f : pfacilities.keySet()) {
+		for(ActivityFacility f : pfacilities.keySet()) {
 			PhysicalFacility pf = pfacilities.get(f);
 			writer.write(f.getId().toString());
 			writer.write(TAB);

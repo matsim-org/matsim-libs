@@ -3,7 +3,7 @@ package playground.ciarif.retailers;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 
 
 public class RetailersSummaryWriter {
@@ -62,7 +62,7 @@ public class RetailersSummaryWriter {
 			
 			out.write("ITERATION N." + iter +"\n");
 			for (Retailer r : this.retailers.getRetailers().values()) {
-				for (Facility f : r.getFacilities().values()) {
+				for (ActivityFacility f : r.getFacilities().values()) {
 					System.out.println("fac Id = "+ f.getId());
 					out.write(f.getId()+"\t");
 					out.write(f.getCoord().getX()+ "\t");

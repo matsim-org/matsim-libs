@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
@@ -20,7 +20,7 @@ import org.matsim.socialnetworks.replanning.SNPickFacilityFromAlter;
 public class SNController4 extends Controler {
 
 	private final Logger log = Logger.getLogger(SNController4.class);
-	protected LinkedHashMap<Facility,ArrayList<TimeWindow>> twm;
+	protected LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm;
 	protected SNControllerListener4 snControllerListener;
 		
 	public SNController4(String args[]){
@@ -70,10 +70,10 @@ public class SNController4 extends Controler {
 		return manager;
 	}
 	
-	public LinkedHashMap<Facility,ArrayList<TimeWindow>> getTwm() {
+	public LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> getTwm() {
 		return this.twm;
 	}
-	public void setTwm(LinkedHashMap<Facility,ArrayList<TimeWindow>> twm){
+	public void setTwm(LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm){
 		this.twm=twm;
 	}
 }

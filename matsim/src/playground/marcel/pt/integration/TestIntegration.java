@@ -27,7 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioLoader;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -74,7 +74,7 @@ public class TestIntegration {
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
-		Facilities facilities = scenario.getFacilities();
+		ActivityFacilities facilities = scenario.getFacilities();
 //		FacilityNetworkMatching.loadMapping(facilities, network, scenario.getWorld(), "../thesis-data/examples/minibln/facilityMatching.txt");
 //		System.out.println(network.getLinks().size());
 //		System.out.println(facilities.getFacilities().size());
@@ -116,7 +116,7 @@ public class TestIntegration {
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
-		Facilities facilities = scenario.getFacilities();
+		ActivityFacilities facilities = scenario.getFacilities();
 //		FacilityNetworkMatching.loadMapping(facilities, network, scenario.getWorld(), "../thesis-data/examples/minibln/facilityMatching.txt");
 //		System.out.println(network.getLinks().size());
 //		System.out.println(facilities.getFacilities().size());

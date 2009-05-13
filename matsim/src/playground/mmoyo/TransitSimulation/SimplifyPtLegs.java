@@ -6,8 +6,8 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -66,7 +66,7 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 	///
 
 	//////////Simulation variables////////
-	private Facilities facilities;;
+	private ActivityFacilities facilities;;
 	private TransitSchedule transitSchedule;
 	public List<ExperimentalTransitRoute> PlanExpTransRoute;
 	
@@ -316,7 +316,7 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 				"\nless than 2 node paths: " + lessThan2Node);
 	}
 	
-	public void setFacilities(Facilities facilities, TransitSchedule transitSchedule){
+	public void setFacilities(ActivityFacilities facilities, TransitSchedule transitSchedule){
 		this.facilities = facilities;
 		this.transitSchedule = transitSchedule;
 	}
@@ -325,9 +325,9 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 		Node node = legRouteLinks.get(0).getFromNode();
 		Id idEgressFacility = legRouteLinks.get(legRouteLinks.size()-1).getToNode().getId();
 		
-		Facility accessFacility = facilities.getFacilities().get(node.getId());
+		ActivityFacility accessFacility = facilities.getFacilities().get(node.getId());
 		TransitLine line = this.transitSchedule.getTransitLines().get(((PTNode)node).getIdPTLine()); 
-		Facility egressFacility = facilities.getFacilities().get(idEgressFacility);
+		ActivityFacility egressFacility = facilities.getFacilities().get(idEgressFacility);
 		return new ExperimentalTransitRoute(accessFacility, line, egressFacility);
 	}  
 	

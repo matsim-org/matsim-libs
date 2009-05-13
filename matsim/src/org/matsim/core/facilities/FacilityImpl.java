@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -40,7 +40,7 @@ import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
-public class FacilityImpl extends AbstractLocation implements Facility {
+public class FacilityImpl extends AbstractLocation implements ActivityFacility {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

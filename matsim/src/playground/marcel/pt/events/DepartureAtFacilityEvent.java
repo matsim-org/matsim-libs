@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.events;
 
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 
 import playground.marcel.pt.interfaces.TransitVehicle;
 
@@ -28,9 +28,9 @@ public class DepartureAtFacilityEvent extends VehicleEvent {
 
 	public static final String EVENT_TYPE = "departureAtFacility";
 
-	public final Facility facility;
+	public final ActivityFacility facility;
 
-	public DepartureAtFacilityEvent(final double time, final TransitVehicle vehicle, final Facility facility) {
+	public DepartureAtFacilityEvent(final double time, final TransitVehicle vehicle, final ActivityFacility facility) {
 		super(time, vehicle);
 		this.facility = facility;
 	}

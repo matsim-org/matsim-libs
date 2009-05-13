@@ -26,8 +26,8 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.world.Layer;
@@ -48,14 +48,14 @@ public class HouseholdsCreateFromCensus2000 {
 	private final static Logger log = Logger.getLogger(HouseholdsCreateFromCensus2000.class);
 
 	private final String infile;
-	private final Facilities facilities;
+	private final ActivityFacilities facilities;
 	private final Municipalities municipalities;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public HouseholdsCreateFromCensus2000(final String infile, final Facilities facilities, final Municipalities municipalities) {
+	public HouseholdsCreateFromCensus2000(final String infile, final ActivityFacilities facilities, final Municipalities municipalities) {
 		super();
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.infile = infile;
@@ -104,7 +104,7 @@ public class HouseholdsCreateFromCensus2000 {
 				
 				// check for existing facility
 				Id f_id = new IdImpl(entries[CAtts.I_GEBAEUDE_ID]);
-				Facility f = this.facilities.getFacilities().get(f_id);
+				ActivityFacility f = this.facilities.getFacilities().get(f_id);
 				if (f == null) { throw new RuntimeException("Line "+line_cnt+": Facility id="+f_id+" does not exist!"); }
 				if (f.getActivityOption(CAtts.ACT_HOME) == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" exists but does not have 'home' activity type assigned!"); }
 				

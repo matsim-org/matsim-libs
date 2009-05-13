@@ -4,12 +4,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 
 public class Retailer {
 	private final Id id;
-	private final Map<Id,Facility> facilities = new LinkedHashMap<Id,Facility>();
+	private final Map<Id,ActivityFacility> facilities = new LinkedHashMap<Id,ActivityFacility>();
 	private RetailerStrategy strategy;
 		
 	protected Retailer(final Id id, RetailerStrategy rs) { 
@@ -21,7 +21,7 @@ public class Retailer {
 		return this.id;
 	}
 
-	public final boolean addFacility(Facility f) {
+	public final boolean addFacility(ActivityFacility f) {
 		if (f == null) { return false; }
 		if (this.facilities.containsKey(f.getId())) { return false; }
 		this.facilities.put(f.getId(),f);
@@ -49,15 +49,15 @@ public class Retailer {
 		else { throw new RuntimeException("The strategy has been not added!"); }
 	}
 	
-	public final Facility getFacility(final Id facId) {
+	public final ActivityFacility getFacility(final Id facId) {
 		return this.facilities.get(facId);
 	}
 
-	public final Map<Id,Facility> getFacilities() {
+	public final Map<Id,ActivityFacility> getFacilities() {
 		return this.facilities;
 	}
 
-	public final Map<Id,Facility> runStrategy() {
+	public final Map<Id,ActivityFacility> runStrategy() {
 		strategy.moveFacilities(this.facilities);
 		return this.facilities;
 	}

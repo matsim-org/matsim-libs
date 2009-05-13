@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
@@ -27,7 +27,7 @@ import playground.mmoyo.PTCase2.PTTimeTable2;
 import playground.mmoyo.PTRouter.PTLine;
 
 public class ToTransitScheduleConverter {
-	Facilities facilities = new FacilitiesImpl();
+	ActivityFacilities facilities = new FacilitiesImpl();
 	private static Time time;
 	
 	public ToTransitScheduleConverter (){
@@ -54,7 +54,7 @@ public class ToTransitScheduleConverter {
 					throw new NullPointerException(this + "facility [id=" + idNode + " does not exist]");
 				}*/
 			
-				Facility stop = facilities.getFacilities().get(idNode);
+				ActivityFacility stop = facilities.getFacilities().get(idNode);
 				
 				double min = ((Double)ptLine.getMinutes().get(x)).doubleValue();
 				double arrivalDelay = min*60;
@@ -92,7 +92,7 @@ public class ToTransitScheduleConverter {
 	
 	
 	public void createFacilities(NetworkLayer net, String outFile){
-		Facilities facilities = new FacilitiesImpl();
+		ActivityFacilities facilities = new FacilitiesImpl();
 		
 		for (Node node:  net.getNodes().values()){
 			facilities.createFacility(node.getId(), node.getCoord());

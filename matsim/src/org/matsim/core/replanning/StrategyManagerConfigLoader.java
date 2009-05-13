@@ -25,7 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.BasicScenario;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -77,7 +77,7 @@ public class StrategyManagerConfigLoader {
 		NetworkLayer network = controler.getNetwork();
 		TravelCost travelCostCalc = controler.getTravelCostCalculator();
 		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
-		Facilities facilities = controler.getFacilities();
+		ActivityFacilities facilities = controler.getFacilities();
 
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 

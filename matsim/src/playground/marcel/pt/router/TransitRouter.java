@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.router.Dijkstra;
@@ -107,7 +107,7 @@ public class TransitRouter {
 		return network;
 	}
 
-	/*package*/ void getNextDeparturesAtStop(final Facility stop, final double time) {
+	/*package*/ void getNextDeparturesAtStop(final ActivityFacility stop, final double time) {
 		Collection<TransitRouterNetworkNode> nodes = this.transitNetwork.getNearestNodes(stop.getCoord(), 0);
 		for (TransitRouterNetworkNode node : nodes) {
 			double depDelay = node.stop.getDepartureDelay();

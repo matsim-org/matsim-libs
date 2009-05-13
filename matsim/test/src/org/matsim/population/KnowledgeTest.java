@@ -25,8 +25,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicActivityOption;
 import org.matsim.core.facilities.FacilitiesImpl;
@@ -96,7 +96,7 @@ public class KnowledgeTest extends MatsimTestCase {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private final void check(Knowledge k, Facility f1, Facility f2) {
+	private final void check(Knowledge k, ActivityFacility f1, ActivityFacility f2) {
 		assertTrue(k.getActivities(f1.getId()).containsAll(actsF1));
 		assertTrue(k.getActivities(f2.getId()).containsAll(actsF2));
 		assertTrue(k.getActivities(true).containsAll(actsPrim));
@@ -130,14 +130,14 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("running testKnowledge()...");
 		
 		log.info("  creating test facilities...");
-		Facilities facilities = new FacilitiesImpl();
-		Facility f1 = facilities.createFacility(new IdImpl(1),new CoordImpl(1,1));
+		ActivityFacilities facilities = new FacilitiesImpl();
+		ActivityFacility f1 = facilities.createFacility(new IdImpl(1),new CoordImpl(1,1));
 		f1.createActivityOption(H);
 		f1.createActivityOption(W);
 		f1.createActivityOption(E);
 		f1.createActivityOption(S);
 		f1.createActivityOption(L);
-		Facility f2 = facilities.createFacility(new IdImpl(2),new CoordImpl(2,2));
+		ActivityFacility f2 = facilities.createFacility(new IdImpl(2),new CoordImpl(2,2));
 		f2.createActivityOption(H);
 		f2.createActivityOption(W);
 		log.info("  done.");

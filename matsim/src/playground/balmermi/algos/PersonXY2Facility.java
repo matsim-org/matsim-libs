@@ -25,8 +25,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
@@ -61,14 +61,14 @@ public class PersonXY2Facility extends AbstractPersonAlgorithm implements PlanAl
 	private static final String[] SHOPS = { CAtts.ACT_S1, CAtts.ACT_S2, CAtts.ACT_S3, CAtts.ACT_S4, CAtts.ACT_S5, CAtts.ACT_SOTHR };
 	private static final String[] TTAS = { "tta" };
 
-	private final Facilities facilities;
-	private final Map<String,QuadTree<Facility>> fqts = new HashMap<String, QuadTree<Facility>>();
+	private final ActivityFacilities facilities;
+	private final Map<String,QuadTree<ActivityFacility>> fqts = new HashMap<String, QuadTree<ActivityFacility>>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonXY2Facility(final Facilities facilities) {
+	public PersonXY2Facility(final ActivityFacilities facilities) {
 		super();
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
@@ -89,7 +89,7 @@ public class PersonXY2Facility extends AbstractPersonAlgorithm implements PlanAl
 			double miny = Double.POSITIVE_INFINITY;
 			double maxx = Double.NEGATIVE_INFINITY;
 			double maxy = Double.NEGATIVE_INFINITY;
-			for (Facility f : this.facilities.getFacilities().values()) {
+			for (ActivityFacility f : this.facilities.getFacilities().values()) {
 				String[] type_set = this.getFacilityActTypes(types[i]);
 				boolean ok = false;
 				for (int j=0; j<type_set.length; j++) {
@@ -104,8 +104,8 @@ public class PersonXY2Facility extends AbstractPersonAlgorithm implements PlanAl
 			}
 			minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 			log.info("        type="+types[i]+": xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-			QuadTree<Facility> qt = new QuadTree<Facility>(minx,miny,maxx,maxy);
-			for (Facility f : this.facilities.getFacilities().values()) {
+			QuadTree<ActivityFacility> qt = new QuadTree<ActivityFacility>(minx,miny,maxx,maxy);
+			for (ActivityFacility f : this.facilities.getFacilities().values()) {
 				String[] type_set = this.getFacilityActTypes(types[i]);
 				boolean ok = false;
 				for (int j=0; j<type_set.length; j++) {
@@ -153,7 +153,7 @@ public class PersonXY2Facility extends AbstractPersonAlgorithm implements PlanAl
 			if (pe instanceof Activity) {
 				Activity act = (Activity) pe;
 				Coord coord = act.getCoord();
-				QuadTree<Facility> qt = null;
+				QuadTree<ActivityFacility> qt = null;
 				if (act.getType().startsWith(H)) { qt = this.fqts.get(H); }
 				else if (act.getType().startsWith(W)) { qt = this.fqts.get(W); }
 				else if (act.getType().startsWith(E)) { qt = this.fqts.get(E); }
@@ -162,7 +162,7 @@ public class PersonXY2Facility extends AbstractPersonAlgorithm implements PlanAl
 				else if (act.getType().startsWith(T)) { qt = this.fqts.get(T); }
 				else { throw new RuntimeException("act type ="+act.getType()+"not known!"); }
 				
-				Facility f = qt.get(coord.getX(),coord.getY());
+				ActivityFacility f = qt.get(coord.getX(),coord.getY());
 				if (f == null) { throw new RuntimeException("Coordinates == null; something is wrong!"); }
 				
 				Link l = f.getLink();

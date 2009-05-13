@@ -8,7 +8,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -164,7 +164,7 @@ public class SNPickFacility implements PlanAlgorithm {
 					}
 				}
 			}
-			Facility f = getFacByLogit(facMap);
+			ActivityFacility f = getFacByLogit(facMap);
 			
 			
 //----------
@@ -222,8 +222,8 @@ public class SNPickFacility implements PlanAlgorithm {
 		}
 	}
 
-	private Facility getFacByLogit(LinkedHashMap<ActivityOption, Integer> facMap) {
-		Facility fac=null;
+	private ActivityFacility getFacByLogit(LinkedHashMap<ActivityOption, Integer> facMap) {
+		ActivityFacility fac=null;
 		Object[] nums=facMap.values().toArray();
 		Double[] p= new Double[nums.length];
 		for(int i=0;i<nums.length;i++){

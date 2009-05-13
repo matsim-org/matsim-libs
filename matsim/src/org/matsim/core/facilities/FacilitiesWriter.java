@@ -26,8 +26,8 @@ import java.util.Iterator;
 import java.util.SortedSet;
 
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
@@ -36,7 +36,7 @@ import org.matsim.core.utils.io.Writer;
 public class FacilitiesWriter extends Writer {
 
 	private FacilitiesWriterHandler handler = null;
-	private final Facilities facilities;
+	private final ActivityFacilities facilities;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -48,7 +48,7 @@ public class FacilitiesWriter extends Writer {
 	 *
 	 * @param facilities
 	 */
-	public FacilitiesWriter(final Facilities facilities) {
+	public FacilitiesWriter(final ActivityFacilities facilities) {
 		this(facilities, Gbl.getConfig().facilities().getOutputFile());
 	}
 
@@ -58,7 +58,7 @@ public class FacilitiesWriter extends Writer {
 	 * @param facilities
 	 * @param filename
 	 */
-	public FacilitiesWriter(final Facilities facilities, final String filename) {
+	public FacilitiesWriter(final ActivityFacilities facilities, final String filename) {
 		super();
 		this.facilities = facilities;
 		this.outfile = filename;
@@ -74,7 +74,7 @@ public class FacilitiesWriter extends Writer {
 	@Override
 	public final void write() {
 		this.writeOpenAndInit();
-		for (Facility f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			this.writeFacility(f);
 		}
 		this.writeFinish();
@@ -93,7 +93,7 @@ public class FacilitiesWriter extends Writer {
 		}
 	}
 
-	public final void writeFacility(final Facility f) {
+	public final void writeFacility(final ActivityFacility f) {
 		try {
 			this.handler.startFacility(f, this.out);
 			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();

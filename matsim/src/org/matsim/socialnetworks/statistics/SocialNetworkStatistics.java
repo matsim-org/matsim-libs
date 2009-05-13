@@ -33,7 +33,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -395,7 +395,7 @@ public class SocialNetworkStatistics {
 //			myPerson.getKnowledge().clearActivitySpaces();
 
 			//Geographical aggregation
-			Facility myHome=((Activity)(myPerson.getSelectedPlan().getPlanElements().get(0))).getFacility();
+			ActivityFacility myHome=((Activity)(myPerson.getSelectedPlan().getPlanElements().get(0))).getFacility();
 			Location myLoc=myHome.getUpMapping().get(myHome.getUpMapping().firstKey());
 			Vertex myVertex=gstat.getLocVertex().get(myLoc);
 			double pop=(Integer) myVertex.getUserDatum("population");

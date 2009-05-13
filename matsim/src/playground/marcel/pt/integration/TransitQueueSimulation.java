@@ -24,8 +24,8 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -51,12 +51,12 @@ public class TransitQueueSimulation extends QueueSimulation {
 	private final OnTheFlyServer otfServer;
 	
 
-	private final Facilities facilities;
+	private final ActivityFacilities facilities;
 	private TransitSchedule schedule = null;
 	/*package*/ final TransitStopAgentTracker agentTracker;
 	private final HashMap<Person, DriverAgent> agents = new HashMap<Person, DriverAgent>(100);
 
-	public TransitQueueSimulation(final NetworkLayer network, final Population population, final Events events, final Facilities facilities) {
+	public TransitQueueSimulation(final NetworkLayer network, final Population population, final Events events, final ActivityFacilities facilities) {
 		super(network, population, events);
 		this.facilities = facilities;
 
@@ -123,7 +123,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 		Leg leg = agent.getCurrentLeg();
 		if (leg.getMode() == TransportMode.pt) {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
-			Facility stop = this.facilities.getFacilities().get(route.getAccessStopId());
+			ActivityFacility stop = this.facilities.getFacilities().get(route.getAccessStopId());
 			this.agentTracker.addAgentToStop(agent, stop);
 		} else {
 			super.agentDeparts(agent, link);

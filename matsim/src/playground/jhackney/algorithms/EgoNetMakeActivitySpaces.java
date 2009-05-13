@@ -20,7 +20,7 @@
 
 package playground.jhackney.algorithms;
 
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -51,7 +51,7 @@ public class EgoNetMakeActivitySpaces {
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
 		Population plans = Scenario.readPlans();
-		Facilities facilities = Scenario.readFacilities();
+		ActivityFacilities facilities = Scenario.readFacilities();
 		//read in social network
 		System.out.println(" Initializing the social network ...");
 		new SocialNetwork(plans);

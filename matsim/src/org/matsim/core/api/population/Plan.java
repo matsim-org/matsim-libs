@@ -3,7 +3,7 @@ package org.matsim.core.api.population;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 
 public interface Plan extends BasicPlan<PlanElement> {
@@ -24,7 +24,7 @@ public interface Plan extends BasicPlan<PlanElement> {
 
 	public Activity createActivity(final String type, final Coord coord);
 
-	public Activity createActivity(final String type, final Facility fac);
+	public Activity createActivity(final String type, final ActivityFacility fac);
 
 	public Activity createActivity(final String type, final Link link);
 

@@ -23,7 +23,7 @@ package playground.balmermi.census2000v2.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -78,13 +78,13 @@ public class WorldFacilityZoneMapping {
 		// add mapping as given in the census2000
 		for (Household h : this.households.getHouseholds().values()) {
 			Zone z = h.getMunicipality().getZone();
-			Facility f = h.getFacility();
+			ActivityFacility f = h.getFacility();
 			world.addMapping(z,f);
 			if (!z.contains(f.getCoord())) { log.warn("      mapping via census info produces dist(f["+f.getId()+"]->z["+z.getId()+"])="+z.calcDistance(f.getCoord())); }
 		}
 		
 		// add mapping for the remaining facilities (non home facilities)
-		for (Facility f : fs.getFacilities().values()) {
+		for (ActivityFacility f : fs.getFacilities().values()) {
 			if (f.getUpMapping().size() == 0) {
 				if (f.getActivityOption(CAtts.ACT_HOME) != null) { Gbl.errorMsg("That should not happen!"); }
 				ArrayList<Location> locs = new ArrayList<Location>();

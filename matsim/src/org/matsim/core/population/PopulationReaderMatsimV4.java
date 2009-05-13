@@ -32,8 +32,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
@@ -82,14 +82,14 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 
 	private final BasicPopulation plans;
 	private final Network network;
-	private final Facilities facilities;
+	private final ActivityFacilities facilities;
 
 	private Person currperson = null;
 	private Desires currdesires = null;
 	private Knowledge currknowledge = null;
 	private ActivitySpace curractspace = null;
 	private String curracttype = null;
-	private Facility currfacility = null;
+	private ActivityFacility currfacility = null;
 	private ActivityOption curractivity = null;
 	private Plan currplan = null;
 	private Activity curract = null;
@@ -109,7 +109,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	 * @param facilities
 	 * @deprecated use PoopulationReaderMatsimV4(Scenario)
 	 */
-	public PopulationReaderMatsimV4(final BasicPopulation pop, final Network network, final Facilities facilities) {
+	public PopulationReaderMatsimV4(final BasicPopulation pop, final Network network, final ActivityFacilities facilities) {
 		this.plans = pop;
 		this.network = network;
 		this.facilities = facilities;
@@ -360,7 +360,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		this.curract.setEndTime(Time.parseTime(atts.getValue("end_time")));
 		String fId = atts.getValue("facility");
 		if (fId != null) {
-			Facility f = this.facilities.getFacilities().get(new IdImpl(fId));
+			ActivityFacility f = this.facilities.getFacilities().get(new IdImpl(fId));
 			if (f == null) {
 				Gbl.errorMsg("facility id=" + fId + " does not exist!");
 			}

@@ -20,7 +20,7 @@
 
 package playground.zhang.test;
 
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;

@@ -23,8 +23,8 @@ package playground.marcel.pt.fares;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.utils.collections.Tuple;
@@ -34,14 +34,14 @@ import org.matsim.testcases.MatsimTestCase;
 public class TableLookupFaresTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost_SameFromAsTo() {
-		final Facilities facilities = new FacilitiesImpl();
-		final Facility stop1 = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
-		final Facility stop2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
-		final Facility stop3 = facilities.createFacility(new IdImpl(3), new CoordImpl(1100, 1200));
+		final ActivityFacilities facilities = new FacilitiesImpl();
+		final ActivityFacility stop1 = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
+		final ActivityFacility stop2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
+		final ActivityFacility stop3 = facilities.createFacility(new IdImpl(3), new CoordImpl(1100, 1200));
 
-		final Map<Tuple<Facility, Facility>, Double> fares = new HashMap<Tuple<Facility, Facility>, Double>();
-		fares.put(new Tuple<Facility, Facility>(stop1, stop2), 2.0);
-		fares.put(new Tuple<Facility, Facility>(stop2, stop3), 3.0);
+		final Map<Tuple<ActivityFacility, ActivityFacility>, Double> fares = new HashMap<Tuple<ActivityFacility, ActivityFacility>, Double>();
+		fares.put(new Tuple<ActivityFacility, ActivityFacility>(stop1, stop2), 2.0);
+		fares.put(new Tuple<ActivityFacility, ActivityFacility>(stop2, stop3), 3.0);
 
 		assertEquals(0.0, new TableLookupFares(fares).getSingleTripCost(stop1, stop1), EPSILON);
 		assertEquals(0.0, new TableLookupFares(fares).getSingleTripCost(stop2, stop2), EPSILON);
@@ -49,14 +49,14 @@ public class TableLookupFaresTest extends MatsimTestCase {
 	}
 
 	public void testGetSingleTripCost_BasicQueries() {
-		final Facilities facilities = new FacilitiesImpl();
-		final Facility stop1 = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
-		final Facility stop2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
-		final Facility stop3 = facilities.createFacility(new IdImpl(3), new CoordImpl(1100, 1200));
+		final ActivityFacilities facilities = new FacilitiesImpl();
+		final ActivityFacility stop1 = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
+		final ActivityFacility stop2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
+		final ActivityFacility stop3 = facilities.createFacility(new IdImpl(3), new CoordImpl(1100, 1200));
 
-		final Map<Tuple<Facility, Facility>, Double> fares = new HashMap<Tuple<Facility, Facility>, Double>();
-		fares.put(new Tuple<Facility, Facility>(stop1, stop2), 2.0);
-		fares.put(new Tuple<Facility, Facility>(stop2, stop3), 3.0);
+		final Map<Tuple<ActivityFacility, ActivityFacility>, Double> fares = new HashMap<Tuple<ActivityFacility, ActivityFacility>, Double>();
+		fares.put(new Tuple<ActivityFacility, ActivityFacility>(stop1, stop2), 2.0);
+		fares.put(new Tuple<ActivityFacility, ActivityFacility>(stop2, stop3), 3.0);
 
 		assertEquals(2.0, new TableLookupFares(fares).getSingleTripCost(stop1, stop2), EPSILON);
 		assertEquals(3.0, new TableLookupFares(fares).getSingleTripCost(stop2, stop3), EPSILON);
@@ -65,14 +65,14 @@ public class TableLookupFaresTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost_ReverseQueries() {
 		// not clear if this is a feature or a bug...
-		final Facilities facilities = new FacilitiesImpl();
-		final Facility stop1 = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
-		final Facility stop2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
-		final Facility stop3 = facilities.createFacility(new IdImpl(3), new CoordImpl(1100, 1200));
+		final ActivityFacilities facilities = new FacilitiesImpl();
+		final ActivityFacility stop1 = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
+		final ActivityFacility stop2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
+		final ActivityFacility stop3 = facilities.createFacility(new IdImpl(3), new CoordImpl(1100, 1200));
 
-		final Map<Tuple<Facility, Facility>, Double> fares = new HashMap<Tuple<Facility, Facility>, Double>();
-		fares.put(new Tuple<Facility, Facility>(stop1, stop2), 2.0);
-		fares.put(new Tuple<Facility, Facility>(stop2, stop3), 3.0);
+		final Map<Tuple<ActivityFacility, ActivityFacility>, Double> fares = new HashMap<Tuple<ActivityFacility, ActivityFacility>, Double>();
+		fares.put(new Tuple<ActivityFacility, ActivityFacility>(stop1, stop2), 2.0);
+		fares.put(new Tuple<ActivityFacility, ActivityFacility>(stop2, stop3), 3.0);
 
 		assertEquals(2.0, new TableLookupFares(fares).getSingleTripCost(stop2, stop1), EPSILON);
 		assertEquals(3.0, new TableLookupFares(fares).getSingleTripCost(stop3, stop2), EPSILON);

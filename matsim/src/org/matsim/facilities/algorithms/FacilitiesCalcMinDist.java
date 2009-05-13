@@ -21,8 +21,8 @@
 package org.matsim.facilities.algorithms;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class FacilitiesCalcMinDist {
@@ -31,16 +31,16 @@ public class FacilitiesCalcMinDist {
 		super();
 	}
 
-	public void run(Facilities facilities) {
+	public void run(ActivityFacilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		double min_dist = Double.MAX_VALUE;
 
-		for (Facility f : facilities.getFacilities().values()) {
+		for (ActivityFacility f : facilities.getFacilities().values()) {
 			Coord c = f.getCoord();
 			System.out.println("      Facility id = " + f.getId());
 
-			for (Facility f2 : facilities.getFacilities().values()) {
+			for (ActivityFacility f2 : facilities.getFacilities().values()) {
 				if (!f2.equals(f)) {
 					Coord c2 = f2.getCoord();
 					double dist = CoordUtils.calcDistance(c2, c);

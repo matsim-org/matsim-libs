@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * FacilitiesI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,21 +18,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01.facilities;
+package org.matsim.core.api.facilities;
 
 import java.util.Map;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.world.Location;
+import org.matsim.api.basic.v01.*;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.facilities.BasicActivityFacilities;
 
-public interface BasicFacility extends Location {
-	// FIXME [kn] In my unterstanding, it is really not so great that this extends from Location and not from
-	// BasicLocation.  kai, apr'09
+public interface ActivityFacilities extends BasicActivityFacilities, Facilities {
 
-	public Map<String, ? extends BasicActivityOption> getActivityOptions();
+	public Map<Id, ? extends ActivityFacility> getFacilities();
+	
+	public ActivityFacility createFacility(final Id id, final Coord center);
+	// TODO move create to Builder
+	
+	// all the rest ist deprecated... 
 
-	public BasicActivityOption getActivityOption(final String type);
+	//Added 27.03.08 JH for random secondary location changes
+	/** @deprecated filtering should be done outside of API */
+	public Map<Id, ActivityFacility> getFacilitiesForActivityType(final String act_type);
+	
+	@Deprecated
+	public static final Id LAYER_TYPE = new IdImpl("facility");
 
-	public Id getLinkId();
+	@Deprecated // to be clarified
+	public String getName();
+	
+	@Deprecated // to be clarified
+	public void setName(String name);
+
+	@Deprecated
+	public void finishFacility(final ActivityFacility f);
 
 }

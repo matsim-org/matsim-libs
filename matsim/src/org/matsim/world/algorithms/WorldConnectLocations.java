@@ -26,8 +26,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.network.NetworkLayer;
@@ -121,13 +121,13 @@ public class WorldConnectLocations {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Sets the mapping between each {@link Facility facility} of the given {@link Facilities facility layer} and
+	 * Sets the mapping between each {@link ActivityFacility facility} of the given {@link ActivityFacilities facility layer} and
 	 * the {@link Link links} of the {@link NetworkLayer network layer}. The facilities layer should be part of the
 	 * given {@link World world}, but the {@link NetworkLayer network} does not have to be necessarily part of the
 	 * world. It could also be a sub-network of the network of the {@link World world} as created by the method {@link #extractSubNetwork(NetworkLayer)}.
 	 * In both cases the facility layer will be connected with the network in the same world.
 	 * 
-	 * <p><b>Mapping rule:</b> each {@link Facility facility} of the {@link Facilities facilities layer} will be
+	 * <p><b>Mapping rule:</b> each {@link ActivityFacility facility} of the {@link ActivityFacilities facilities layer} will be
 	 * connected with <em>exactly</em> one link of the {@link NetworkLayer network layer}. the links of the network will get zero, one or many mappings to
 	 * facilities of the facilities layer. (facilities[*]-[1]links)</p>
 	 * 
@@ -135,9 +135,9 @@ public class WorldConnectLocations {
 	 * @param network either a layer of the world or a network created with {@link #extractSubNetwork(NetworkLayer)} from a network layer of the world.
 	 * @param world the world in which the facility and the network layer will be mapped
 	 */
-	private final void connect(Facilities facilities, NetworkLayer network, World world) {
+	private final void connect(ActivityFacilities facilities, NetworkLayer network, World world) {
 		log.info("  connecting facilities with links...");
-		for (Facility f : facilities.getFacilities().values()) {
+		for (ActivityFacility f : facilities.getFacilities().values()) {
 			// remove previous mappings for facility f
 			if (!f.removeAllDownMappings()) { throw new RuntimeException("could not remove old factivity<-->link mappings"); }
 			// add the nearest right entry link mapping to the facility f
@@ -151,9 +151,9 @@ public class WorldConnectLocations {
 	
 	/**
 	 * Sets the mapping between each {@link Zone zone} of the given {@link ZoneLayer zone layer} and
-	 * the {@link Facility facilities} of the {@link Facilities facility layer} as part of a {@link World world}.
+	 * the {@link ActivityFacility facilities} of the {@link ActivityFacilities facility layer} as part of a {@link World world}.
 	 * 
-	 * <p><b>Mapping rule:</b> each {@link Facility facility} of the {@link Facilities facilities layer} will be
+	 * <p><b>Mapping rule:</b> each {@link ActivityFacility facility} of the {@link ActivityFacilities facilities layer} will be
 	 * connected with zero or one zone. A zone will only be assigned if the facility is located within the zone.
 	 * If more than one zone exists for which the facility is located in, the first one (smallest zone {@link Id id})
 	 * will be chosen. (zones[?]-[*]facilities)</p>
@@ -162,9 +162,9 @@ public class WorldConnectLocations {
 	 * @param facilities a layer of the world
 	 * @param world the world in which the zone and the facility layer will be mapped
 	 */
-	private final void connect(ZoneLayer zones, Facilities facilities, World world) {
+	private final void connect(ZoneLayer zones, ActivityFacilities facilities, World world) {
 		log.info("  connecting zones with facilities...");
-		for (Facility f : facilities.getFacilities().values()) {
+		for (ActivityFacility f : facilities.getFacilities().values()) {
 			// remove previous mappings for facility f
 			if (!f.removeAllUpMappings()) { throw new RuntimeException("could not remove old zone<-->facility mappings"); }
 			// add the zone mapping to facility f
@@ -233,20 +233,20 @@ public class WorldConnectLocations {
 					         ": mapping cannot be set since at least one of the layers does not contain any locations. (this may not be fatal)");
 				}
 				else {
-					if ((downLayer instanceof NetworkLayer) && (upLayer instanceof Facilities)) {
+					if ((downLayer instanceof NetworkLayer) && (upLayer instanceof ActivityFacilities)) {
 						if (excludingLinkTypes.isEmpty()) {
-							connect((Facilities)upLayer,(NetworkLayer)downLayer,world);
+							connect((ActivityFacilities)upLayer,(NetworkLayer)downLayer,world);
 						}
 						else {
 							NetworkLayer subNetwork = extractSubNetwork((NetworkLayer)downLayer);
-							connect((Facilities)upLayer,subNetwork,world);
+							connect((ActivityFacilities)upLayer,subNetwork,world);
 						}
 					}
 					else if ((downLayer instanceof NetworkLayer) && (upLayer instanceof ZoneLayer)) {
 						connect((ZoneLayer)upLayer,(NetworkLayer)downLayer,world);
 					}
-					else if ((downLayer instanceof Facilities) && (upLayer instanceof ZoneLayer)) {
-						connect((ZoneLayer)upLayer,(Facilities)downLayer,world);
+					else if ((downLayer instanceof ActivityFacilities) && (upLayer instanceof ZoneLayer)) {
+						connect((ZoneLayer)upLayer,(ActivityFacilities)downLayer,world);
 					}
 					else { /* zone<-->zone: nothing to do (keep it as it is) */ }
 				}

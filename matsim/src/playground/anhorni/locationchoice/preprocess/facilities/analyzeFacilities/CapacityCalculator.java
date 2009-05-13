@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 
 public class CapacityCalculator {
 	
@@ -136,18 +136,18 @@ public class CapacityCalculator {
 	private TreeMap<String, CapacityPerNOGAType> nogaLeisureFacilities = new TreeMap<String, CapacityPerNOGAType>();
 	
 	
-	public void calcCapacities(Facilities facilities) {
+	public void calcCapacities(ActivityFacilities facilities) {
 		this.calculateCapacitiesPerType(facilities, nogaShopFacilities, NOGA_shop, "shop");
 		this.calculateCapacitiesPerType(facilities, nogaGroceryShopFacilities, NOGA_Grocery, "shop");
 		this.calculateCapacitiesPerType(facilities, nogaLeisureFacilities, NOGA_leisure, "leisure");
 	}
 	
 	
-	private void calculateCapacitiesPerType(Facilities facilities, TreeMap<String, CapacityPerNOGAType> nogaFacilities,
+	private void calculateCapacitiesPerType(ActivityFacilities facilities, TreeMap<String, CapacityPerNOGAType> nogaFacilities,
 			String[] nogaTypes, String type) {
-		Iterator< ? extends Facility> facility_it = facilities.getFacilities().values().iterator();
+		Iterator< ? extends ActivityFacility> facility_it = facilities.getFacilities().values().iterator();
 		while (facility_it.hasNext()) {
-			Facility facility = facility_it.next();	
+			ActivityFacility facility = facility_it.next();	
 			
 			for (int i = 0; i < nogaTypes.length; i++) {						
 				if (facility.getActivityOption(nogaTypes[i]) != null) {

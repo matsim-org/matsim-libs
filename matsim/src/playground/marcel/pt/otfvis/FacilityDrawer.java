@@ -27,8 +27,8 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -45,10 +45,10 @@ public class FacilityDrawer {
 	public static class DataWriter_v1_0 extends OTFDataWriter {
 
 		private static final long serialVersionUID = 1L;
-		private final transient Facilities facilites;
+		private final transient ActivityFacilities facilites;
 		private final transient TransitStopAgentTracker agentTracker;
 		
-		public DataWriter_v1_0(final Facilities facilities, final TransitStopAgentTracker agentTracker) {
+		public DataWriter_v1_0(final ActivityFacilities facilities, final TransitStopAgentTracker agentTracker) {
 			this.facilites = facilities;
 			this.agentTracker = agentTracker;
 		}
@@ -56,7 +56,7 @@ public class FacilityDrawer {
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
 			out.putInt(this.facilites.getFacilities().size());
-			for (Facility facility : this.facilites.getFacilities().values()) {
+			for (ActivityFacility facility : this.facilites.getFacilities().values()) {
 				ByteBufferUtils.putString(out, facility.getId().toString());
 				out.putDouble(facility.getCoord().getX());
 				out.putDouble(facility.getCoord().getY());
@@ -66,7 +66,7 @@ public class FacilityDrawer {
 
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
-			for (Facility facility : this.facilites.getFacilities().values()) {
+			for (ActivityFacility facility : this.facilites.getFacilities().values()) {
 				out.putInt(this.agentTracker.getAgentsAtStop(facility).size());
 			}
 		}

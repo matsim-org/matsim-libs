@@ -22,7 +22,7 @@ package playground.duncan.archive;
  * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
  */
 
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -34,7 +34,7 @@ public class ConnectHomesAndWorkplacesSimple {
 
 	public void run(final String[] args) {
 
-		Facilities facilities = new FacilitiesImpl() ;
+		ActivityFacilities facilities = new FacilitiesImpl() ;
 		MatsimFacilitiesReader fr = new MatsimFacilitiesReader( facilities ) ;
 		fr.readFile( "lsfd" ) ;
 

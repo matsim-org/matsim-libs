@@ -28,7 +28,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.NetworkRoute;
 
 public class TransitRoute {
@@ -100,7 +100,7 @@ public class TransitRoute {
 		return Collections.unmodifiableList(this.stops);
 	}
 
-	public TransitRouteStop getStop(final Facility stop) {
+	public TransitRouteStop getStop(final ActivityFacility stop) {
 		for (TransitRouteStop trStop : this.stops) {
 			if (stop == trStop.getStopFacility()) {
 				return trStop;

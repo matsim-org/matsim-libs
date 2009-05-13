@@ -20,8 +20,8 @@
 
 package playground.marcel;
 
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -32,8 +32,8 @@ import playground.marcel.pt.utils.FacilityNetworkMatching;
 
 public class PrintFacilityNetworkMatching {
 
-	public static void printMatching(final Facilities facilities) {
-		for (Facility f : facilities.getFacilities().values()) {
+	public static void printMatching(final ActivityFacilities facilities) {
+		for (ActivityFacility f : facilities.getFacilities().values()) {
 			System.out.println("Facility " + f.getId().toString() + " --> Link " + f.getLink().getId().toString());
 		}
 	}

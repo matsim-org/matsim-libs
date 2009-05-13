@@ -6,8 +6,8 @@ import java.util.SortedSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.FacilitiesImpl;
@@ -21,12 +21,12 @@ public class ReadKonradFacilities {
 		
 		List<ZHFacilityComposed> zhfacilities = new Vector<ZHFacilityComposed>();
 		
-		Facilities facilities=new FacilitiesImpl();//(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		ActivityFacilities facilities=new FacilitiesImpl();//(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(facilities).readFile(file);
 		
-		Iterator<? extends Facility> facilities_it = facilities.getFacilities().values().iterator();
+		Iterator<? extends ActivityFacility> facilities_it = facilities.getFacilities().values().iterator();
 		while (facilities_it.hasNext()) {
-			Facility facility = facilities_it.next();
+			ActivityFacility facility = facilities_it.next();
 		
 			String [] entries = facility.getId().toString().trim().split("_", -1);
 			String retailerCategory = entries[0].trim();

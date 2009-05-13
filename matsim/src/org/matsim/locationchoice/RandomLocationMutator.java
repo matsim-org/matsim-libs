@@ -23,7 +23,7 @@ package org.matsim.locationchoice;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
@@ -41,8 +41,8 @@ public class RandomLocationMutator extends LocationMutator {
 	}
 	
 	public RandomLocationMutator(final NetworkLayer network, Controler controler,
-			TreeMap<String, QuadTree<Facility>> quad_trees,
-			TreeMap<String, Facility []> facilities_of_type) {
+			TreeMap<String, QuadTree<ActivityFacility>> quad_trees,
+			TreeMap<String, ActivityFacility []> facilities_of_type) {
 		super(network, controler, quad_trees, facilities_of_type);
 	}
 
@@ -83,7 +83,7 @@ public class RandomLocationMutator extends LocationMutator {
 				if (length > 1) {
 				//	Facility facility = (Facility)this.quad_trees.get(act.getType()).values().toArray()[
 				//	                       MatsimRandom.random.nextInt(size)];
-					Facility facility = this.facilities_of_type.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];
+					ActivityFacility facility = this.facilities_of_type.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];
 					
 					act.setFacility(facility);
 					act.setLink(this.network.getNearestLink(facility.getCoord()));

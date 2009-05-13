@@ -6,8 +6,8 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -27,9 +27,9 @@ import playground.toronto.ttimematrix.SpanningTree;
 public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownListener {
 	private static final Logger log = Logger.getLogger(MyControlerListener.class);
 	
-	Facilities zones ;
+	ActivityFacilities zones ;
 	
-	public MyControlerListener( Facilities zones ) {
+	public MyControlerListener( ActivityFacilities zones ) {
 		this.zones = zones ;
 	}
 
@@ -57,7 +57,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 			
 			System.out.println("|--------------------------------------------------------------------------------------------------|") ;
 			long cnt = 0 ; long percentDone = 0 ;
-			for ( Facility fromZone : zones.getFacilities().values() ) {
+			for ( ActivityFacility fromZone : zones.getFacilities().values() ) {
 				if ( (int) (100.*cnt/zones.getFacilities().size()) > percentDone ) { 
 					percentDone++ ; System.out.print('.') ; 
 				}  
@@ -68,7 +68,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 				assert( fromNode != null ) ;
 				st.setOrigin( fromNode ) ;
 				st.run(network) ;
-				for ( Facility toZone : zones.getFacilities().values() ) {
+				for ( ActivityFacility toZone : zones.getFacilities().values() ) {
 					Coord toCoord = toZone.getCoord() ;
 					Node toNode = network.getNearestNode( toCoord ) ;
 					double arrTime = st.getTree().get(toNode.getId()).getTime();

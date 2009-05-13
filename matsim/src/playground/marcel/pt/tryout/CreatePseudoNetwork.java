@@ -29,7 +29,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
@@ -57,8 +57,8 @@ public class CreatePseudoNetwork {
 	public static final String OUTPUT_SCHEDULE = "../thesis-data/examples/berta/pseudoSchedule.xml";
 	public static final String OUTPUT_NETWORK = "../thesis-data/examples/berta/pseudoNetwork.xml";
 	
-	private Map<Tuple<Facility, Facility>, Link> links = null;
-	private Map<Facility, Node> nodes = null;
+	private Map<Tuple<ActivityFacility, ActivityFacility>, Link> links = null;
+	private Map<ActivityFacility, Node> nodes = null;
 	private NetworkLayer network = null;
 	private long linkIdCounter = 0;
 	private long nodeIdCounter = 0;
@@ -80,17 +80,17 @@ public class CreatePseudoNetwork {
 			e.printStackTrace();
 		}
 		
-		this.links = new HashMap<Tuple<Facility, Facility>, Link>();
-		this.nodes = new HashMap<Facility, Node>();
+		this.links = new HashMap<Tuple<ActivityFacility, ActivityFacility>, Link>();
+		this.nodes = new HashMap<ActivityFacility, Node>();
 		
 		List<Tuple<TransitLine, TransitRoute>> toBeRemoved = new LinkedList<Tuple<TransitLine, TransitRoute>>();
 		
 		for (TransitLine tLine : schedule.getTransitLines().values()) {
 			for (TransitRoute tRoute : tLine.getRoutes().values()) {
 				ArrayList<Link> routeLinks = new ArrayList<Link>();
-				Facility prevFacility = null;
+				ActivityFacility prevFacility = null;
 				for (TransitRouteStop stop : tRoute.getStops()) {
-					Facility facility = stop.getStopFacility();
+					ActivityFacility facility = stop.getStopFacility();
 					if (prevFacility != null) {
 						Link link = getNetworkLink(prevFacility, facility);
 						// add link to route
@@ -126,8 +126,8 @@ public class CreatePseudoNetwork {
 		
 	}
 	
-	private Link getNetworkLink(final Facility fromStop, final Facility toStop) {
-		Tuple<Facility, Facility> connection = new Tuple<Facility, Facility>(fromStop, toStop);
+	private Link getNetworkLink(final ActivityFacility fromStop, final ActivityFacility toStop) {
+		Tuple<ActivityFacility, ActivityFacility> connection = new Tuple<ActivityFacility, ActivityFacility>(fromStop, toStop);
 		Link link = links.get(connection);
 		if (link == null) {
 			Node fromNode = nodes.get(fromStop);
@@ -141,7 +141,7 @@ public class CreatePseudoNetwork {
 				nodes.put(toStop, toNode);
 			}
 			link = network.createLink(new IdImpl(linkIdCounter++), fromNode, toNode, CoordUtils.calcDistance(fromStop.getCoord(), toStop.getCoord()), 30.0 / 3.6, 500, 1);
-			links.put(new Tuple<Facility, Facility>(fromStop, toStop), link);
+			links.put(new Tuple<ActivityFacility, ActivityFacility>(fromStop, toStop), link);
 		}
 		return link;
 	}

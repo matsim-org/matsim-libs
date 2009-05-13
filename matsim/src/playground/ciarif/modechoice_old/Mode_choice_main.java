@@ -20,7 +20,7 @@
 
 package playground.ciarif.modechoice_old;
 
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -54,7 +54,7 @@ public class Mode_choice_main {
 		
 		System.out.println("TEST RUN 01:");
 
-		final Facilities facilities = new FacilitiesImpl();
+		final ActivityFacilities facilities = new FacilitiesImpl();
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
 		worldReader.readFile(config.world().getInputFile());

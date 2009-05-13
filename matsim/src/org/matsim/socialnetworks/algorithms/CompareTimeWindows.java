@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
@@ -28,14 +28,14 @@ public class CompareTimeWindows {
 	 * @param plan
 	 * @return
 	 */
-	public static LinkedHashMap<Activity,ArrayList<Double>> calculateTimeWindowEventActStats(LinkedHashMap<Facility,ArrayList<TimeWindow>> timeWindowMap) {
+	public static LinkedHashMap<Activity,ArrayList<Double>> calculateTimeWindowEventActStats(LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap) {
 
 		LinkedHashMap<Activity,ArrayList<Double>> actStats = new LinkedHashMap<Activity,ArrayList<Double>>();
 		int count=0;
 		// stats(0)=friendFoeRatio
 		// stats(1)=nFriends
 		// stats(2)=totalTimeWithFriends
-		Iterator<Facility> fit=timeWindowMap.keySet().iterator();
+		Iterator<ActivityFacility> fit=timeWindowMap.keySet().iterator();
 		while(fit.hasNext()){
 			double friend=0.;
 			double foe=0.;
@@ -45,7 +45,7 @@ public class CompareTimeWindows {
 			Person p1 = null;
 			Person p2 = null;
 
-			Facility myFacility=(Facility) fit.next();
+			ActivityFacility myFacility=(ActivityFacility) fit.next();
 			ArrayList<TimeWindow> visits=timeWindowMap.get(myFacility);
 			if(!timeWindowMap.keySet().contains(myFacility)){
 				log.error(" activityMap does not contain myActivity");

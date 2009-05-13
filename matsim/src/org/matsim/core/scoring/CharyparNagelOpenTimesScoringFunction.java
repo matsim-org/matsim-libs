@@ -23,7 +23,7 @@ package org.matsim.core.scoring;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
@@ -55,7 +55,7 @@ public class CharyparNagelOpenTimesScoringFunction extends
 
 		boolean foundAct = false;
 
-		Facility facility = act.getFacility();
+		ActivityFacility facility = act.getFacility();
 		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
 		String facilityActType = null;
 		Set<BasicOpeningTime> opentimes = null;

@@ -22,8 +22,8 @@ package org.matsim.matrices.algorithms;
 
 import java.util.Iterator;
 
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
@@ -38,14 +38,14 @@ public class MatricesValidateWithFacilities {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final Facilities facilities;
+	private final ActivityFacilities facilities;
 	private final World world;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public MatricesValidateWithFacilities(final Facilities facilities, final World world) {
+	public MatricesValidateWithFacilities(final ActivityFacilities facilities, final World world) {
 		super();
 		this.facilities = facilities;
 		this.world = world;
@@ -60,7 +60,7 @@ public class MatricesValidateWithFacilities {
 		Iterator<Location> dl_it = loc.getDownMapping().values().iterator();
 		while (dl_it.hasNext()) {
 			Location dl = dl_it.next();
-			Facility f = this.facilities.getFacilities().get(dl.getId());
+			ActivityFacility f = this.facilities.getFacilities().get(dl.getId());
 			if (f == null) { 
 				throw new RuntimeException("SOMETHING IS WRONG!!!");
 			}
@@ -72,9 +72,9 @@ public class MatricesValidateWithFacilities {
 	}
 
 	private final Location findNearestLocation(final Location location, final String act_type) {
-		Facility nearest_facility = null;
+		ActivityFacility nearest_facility = null;
 		double distance = Double.MAX_VALUE;
-		for (Facility f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOptions().containsKey(act_type)) {
 				double d = location.calcDistance(f.getCoord());
 				if (d < distance) {
@@ -86,7 +86,7 @@ public class MatricesValidateWithFacilities {
 		if (nearest_facility == null) {
 			throw new RuntimeException("No facility with act_type = " + act_type + "exists");
 		}
-		Location dl = this.world.getLayer(Facilities.LAYER_TYPE).getLocation(nearest_facility.getId());
+		Location dl = this.world.getLayer(ActivityFacilities.LAYER_TYPE).getLocation(nearest_facility.getId());
 		if (dl.getUpMapping().size() != 1) {
 			Gbl.errorMsg("down location id=" + dl.getId() + " has " + dl.getUpMapping().size() + "up mappings");
 		}

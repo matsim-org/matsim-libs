@@ -35,7 +35,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
@@ -112,7 +112,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 					Id rId = new IdImpl(entries[0]);
 					if (this.retailers.getRetailers().containsKey(rId)) { // retailer exists already
 						Id fId = new IdImpl (entries[1]);
-						Facility f = controler.getFacilities().getFacilities().get(fId);
+						ActivityFacility f = controler.getFacilities().getFacilities().get(fId);
 						this.retailers.getRetailers().get(rId).addFacility(f);
 					}
 					else { // retailer does not exists yet
@@ -120,7 +120,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 						System.out.println("The strategy " + entries[2] + " will be added to the retailer = " + rId);
 						r.addStrategy(controler, entries[2], this.links);
 						Id fId = new IdImpl (entries[1]);
-						Facility f = controler.getFacilities().getFacilities().get(fId);
+						ActivityFacility f = controler.getFacilities().getFacilities().get(fId);
 						r.addFacility(f);
 						this.retailers.addRetailer(r);
 					}
@@ -137,7 +137,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		Controler controler = event.getControler();
 		//System.out.println("Veryfing if the retailers need to be relocated " + controler.getIteration()%5);
 		if (controler.getIteration()%1==0){ // & controler.getLastIteration()-controler.getIteration()>=50) {
-			Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
+			Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
 			
 			// works, but it is not nicely programmed. shouldn't be a global container, should be
 			// controlled by the controler (or actually added to the population)
@@ -148,7 +148,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 			int retailers_count = 0;
 			for (Retailer r : this.retailers.getRetailers().values()) {
 				log.info("The retailer " + r.getId() + " will try to relocate its facilities");
-				Map<Id,Facility> facs = r.runStrategy();
+				Map<Id,ActivityFacility> facs = r.runStrategy();
 				movedFacilities.putAll(facs); //fc TODO this is not true!!!! Only some of this facilities will really be moved!!!!!!!!!!! 
 				// probably is not incorrect but slower and should be changed
 				System.out.println("moved facilities =" + facs);
@@ -185,7 +185,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		//ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
-		for (Facility f : controler.getFacilities().getFacilities().values()) {
+		for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
 			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -201,7 +201,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		return personQuadTree;
 	}
 	
-	private final QuadTree<Facility> createFacilityQuadTree(Controler controler) {
+	private final QuadTree<ActivityFacility> createFacilityQuadTree(Controler controler) {
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -215,8 +215,8 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		}
 		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 		
-		QuadTree<Facility> facilityQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		for (Facility f : controler.getFacilities().getFacilities().values()) {
+		QuadTree<ActivityFacility> facilityQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
 			Coord c = f.getCoord();
 			facilityQuadTree.put(c.getX(),c.getY(),f);
 		}

@@ -20,7 +20,7 @@
 
 package playground.balmermi.census2000v2;
 
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -78,7 +78,7 @@ public class PopulationCreation {
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file...");
-		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		world.complete();
 		System.out.println("  done.");

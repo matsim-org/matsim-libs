@@ -3,7 +3,7 @@ package org.matsim.socialnetworks.statistics;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
@@ -51,7 +51,7 @@ public class GeoStatistics {
 			Person aPerson = iperson.next();
 //			Choose the first location in the plan and assume it's where the person lives
 
-			Facility aHome = aPerson.getSelectedPlan().getFirstActivity().getFacility();
+			ActivityFacility aHome = aPerson.getSelectedPlan().getFirstActivity().getFacility();
 			//			Each facility should only have one location but UpMapping is a TreeMap so pick the first entry
 			Location aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
 			if(this.locVertex.containsKey(aLoc)){
@@ -80,8 +80,8 @@ public class GeoStatistics {
 			Person personA = link.getPersonFrom();
 			Person personB = link.getPersonTo();
 
-			Facility aHome=personA.getSelectedPlan().getFirstActivity().getFacility();
-			Facility bHome=personB.getSelectedPlan().getFirstActivity().getFacility();
+			ActivityFacility aHome=personA.getSelectedPlan().getFirstActivity().getFacility();
+			ActivityFacility bHome=personB.getSelectedPlan().getFirstActivity().getFacility();
 			Location aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
 			Location bLoc = bHome.getUpMapping().get(bHome.getUpMapping().firstKey());
 

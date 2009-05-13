@@ -3,19 +3,19 @@ package org.matsim.core.api.population;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 
 public interface Activity extends BasicActivity, PlanElement {
 
-	public void setFacility(final Facility facility);
+	public void setFacility(final ActivityFacility facility);
 
 	public void setLink(final BasicLink link);
 
 	// here to return correct link type
 	public Link getLink();
 
-	public Facility getFacility();
+	public ActivityFacility getFacility();
 	
 //	public Id getLinkId(); // already in BasicAct
 

@@ -3,7 +3,7 @@ package playground.jhackney.algorithms;
 import java.io.File;
 import java.util.Iterator;
 
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -12,7 +12,7 @@ import org.matsim.population.Knowledge;
 import org.matsim.socialnetworks.io.ActivityActReader;
 
 public class InitializeKnowledge {
-	public InitializeKnowledge(final Population plans, final Facilities facilities){
+	public InitializeKnowledge(final Population plans, final ActivityFacilities facilities){
 
 		ActivityActReader aar = null;
 

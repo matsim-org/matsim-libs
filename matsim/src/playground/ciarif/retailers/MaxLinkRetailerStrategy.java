@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.BasicLinkImpl;
 import org.matsim.core.controler.Controler;
@@ -29,9 +29,9 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 	}
 	
 	
-	public void moveFacilities(Map<Id, Facility> facilities) {
+	public void moveFacilities(Map<Id, ActivityFacility> facilities) {
 
-		for (Facility f : facilities.values()) {
+		for (ActivityFacility f : facilities.values()) {
 			
 			//Object[] links = controler.getNetwork().getLinks().values().toArray();
 			//double rd1 = MatsimRandom.getRandom().nextDouble();
@@ -57,11 +57,11 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 			}
 			Collection<Person> persons_actual = Utils.getPersonQuadTree().get(f.getLink().getCoord().getX(),f.getLink().getCoord().getY(),150);
 			Collection<Person> persons_new = Utils.getPersonQuadTree().get(link.getCoord().getX(),link.getCoord().getY(),150);
-			Collection<Facility> facilities_actual = Utils.getFacilityQuadTree().get(f.getCoord().getX(),f.getCoord().getY(),150);
-			Collection<Facility> facilities_new = Utils.getFacilityQuadTree().get(link.getCoord().getX(),link.getCoord().getY(),150);
+			Collection<ActivityFacility> facilities_actual = Utils.getFacilityQuadTree().get(f.getCoord().getX(),f.getCoord().getY(),150);
+			Collection<ActivityFacility> facilities_new = Utils.getFacilityQuadTree().get(link.getCoord().getX(),link.getCoord().getY(),150);
 			boolean move_facilities = false;
 			
-			for (Facility f1:facilities_new) {
+			for (ActivityFacility f1:facilities_new) {
 				if (facilities.values().contains(f1)){
 					log.info("Around the proposed new link a facility of this retailer already exists ");
 					break;

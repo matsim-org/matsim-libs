@@ -20,7 +20,7 @@
 
 package playground.jhackney;
 
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -159,9 +159,9 @@ public abstract class Scenario {
 		return world;
 	}
 
-	public static final Facilities readFacilities() {
+	public static final ActivityFacilities readFacilities() {
 		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 		return facilities;
@@ -267,7 +267,7 @@ public abstract class Scenario {
 		System.out.println("  done.");
 	}
 
-	public static final void writeFacilities(final Facilities facilities) {
+	public static final void writeFacilities(final ActivityFacilities facilities) {
 		System.out.println("  writing facilities xml file... ");
 		new FacilitiesWriter(facilities).write();
 		System.out.println("  done.");

@@ -24,8 +24,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
@@ -35,10 +35,10 @@ import org.matsim.world.World;
 
 public class FacilityNetworkMatching {
 
-	public static void dumpMapping(final Facilities facilities, final String filename) {
+	public static void dumpMapping(final ActivityFacilities facilities, final String filename) {
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-			for (Facility f : facilities.getFacilities().values()) {
+			for (ActivityFacility f : facilities.getFacilities().values()) {
 				if (f.getLink() != null) {
 					writer.write(f.getId().toString());
 					writer.write('\t');
@@ -52,13 +52,13 @@ public class FacilityNetworkMatching {
 		}
 	}
 
-	public static void loadMapping(final Facilities facilities, final Network network, final World world, final String filename) {
+	public static void loadMapping(final ActivityFacilities facilities, final Network network, final World world, final String filename) {
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(filename);
 			String line;
 			while ((line = reader.readLine()) != null) {
 				String[] parts = StringUtils.explode(line, '\t');
-				Facility f = facilities.getFacilities().get(new IdImpl(parts[0]));
+				ActivityFacility f = facilities.getFacilities().get(new IdImpl(parts[0]));
 				Link l = network.getLinks().get(new IdImpl(parts[1]));
 				if (f == null || l == null) {
 					System.err.println("Could not load facility of link: " + line);
@@ -71,7 +71,7 @@ public class FacilityNetworkMatching {
 		}
 	}
 	
-	public static void facilitySetLink(final Facility f, final Link l, final World world) {
+	public static void facilitySetLink(final ActivityFacility f, final Link l, final World world) {
 		Link oldL = f.getLink();
 		if (oldL != null) {
 			world.removeMapping(f, oldL);

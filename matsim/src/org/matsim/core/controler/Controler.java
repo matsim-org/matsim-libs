@@ -47,7 +47,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.ScenarioLoader;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -434,7 +434,7 @@ public class Controler {
   		// dump config
 			new ConfigWriter(this.config, getOutputFilename("output_config.xml.gz")).write();
 			// dump facilities
-			Facilities facilities = this.getFacilities();
+			ActivityFacilities facilities = this.getFacilities();
 			if (facilities != null) {
 				new FacilitiesWriter(facilities, getOutputFilename("output_facilities.xml.gz")).write();
 			}
@@ -993,7 +993,7 @@ public class Controler {
 		return this.scenarioData.getWorld();
 	}
 
-	public final Facilities getFacilities() {
+	public final ActivityFacilities getFacilities() {
 		//TODO dg
 		if (this.scenarioData == null) {
 			return null;

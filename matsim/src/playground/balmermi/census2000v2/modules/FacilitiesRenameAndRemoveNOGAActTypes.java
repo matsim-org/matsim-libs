@@ -23,8 +23,8 @@ package playground.balmermi.census2000v2.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 
 public class FacilitiesRenameAndRemoveNOGAActTypes {
@@ -49,20 +49,20 @@ public class FacilitiesRenameAndRemoveNOGAActTypes {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Facilities facilities) {
+	public void run(final ActivityFacilities facilities) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		log.info("      # facilities = " + facilities.getFacilities().size());
 
-		ArrayList<Facility> facs = new ArrayList<Facility>(facilities.getFacilities().values());
+		ArrayList<ActivityFacility> facs = new ArrayList<ActivityFacility>(facilities.getFacilities().values());
 		facilities.getFacilities().clear();
-		for (Facility f : facs) {
+		for (ActivityFacility f : facs) {
 			f.setId(new IdImpl(Integer.parseInt(f.getId().toString())+10000000));
 			ArrayList<String> types = new ArrayList<String>();
 			for (String type : f.getActivityOptions().keySet()) { types.add(type); }
 			for (int i=0; i<types.size(); i++) {
 				if (types.get(i).startsWith("B")) { f.getActivityOptions().remove(types.get(i)); }
 			}
-			Facility ff = facilities.createFacility(f.getId(),f.getCoord());
+			ActivityFacility ff = facilities.createFacility(f.getId(),f.getCoord());
 			ff.getActivityOptions().putAll(f.getActivityOptions());
 		}
 

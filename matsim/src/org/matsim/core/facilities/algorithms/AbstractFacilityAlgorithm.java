@@ -20,13 +20,13 @@
 
 package org.matsim.core.facilities.algorithms;
 
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 
 public abstract class AbstractFacilityAlgorithm implements FacilityAlgorithm {
 
-	public void run(final Facilities facilities) {
-		for (Facility f : facilities.getFacilities().values()) {
+	public void run(final ActivityFacilities facilities) {
+		for (ActivityFacility f : facilities.getFacilities().values()) {
 			run(f);
 		}
 	}

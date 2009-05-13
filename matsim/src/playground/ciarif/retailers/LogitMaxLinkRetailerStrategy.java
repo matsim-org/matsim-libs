@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
@@ -26,13 +26,13 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 		this.alternatives = alternatives;
 	}
 
-	public void moveFacilities(Map<Id, Facility> facilities) {
+	public void moveFacilities(Map<Id, ActivityFacility> facilities) {
 		
 		// example to get the facilities (locations) of a link 
 //		controler.getNetwork().getLink("").getUpMapping();
 		
 
-		for (Facility f : facilities.values()) { //francesco: TODO check again this loop (or one of the internal one), it seems that too many 
+		for (ActivityFacility f : facilities.values()) { //francesco: TODO check again this loop (or one of the internal one), it seems that too many 
 			// facility relocations are performed, if this might not influence the results it is certainly a waste of memory
 			
 			double[] utils = new double[alternatives];

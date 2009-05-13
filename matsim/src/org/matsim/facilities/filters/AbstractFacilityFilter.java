@@ -20,7 +20,7 @@
 
 package org.matsim.facilities.filters;
 
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 
 public abstract class AbstractFacilityFilter implements FacilityAlgorithm, FacilityFilter {
@@ -28,7 +28,7 @@ public abstract class AbstractFacilityFilter implements FacilityAlgorithm, Facil
 	protected FacilityAlgorithm nextAlgorithm = null;
 	private int count = 0;
 
-	public void run(final Facility facility) {
+	public void run(final ActivityFacility facility) {
 		if (judge(facility)) {
 			count();
 			this.nextAlgorithm.run(facility);

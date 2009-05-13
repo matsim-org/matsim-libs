@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -329,7 +329,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 	 * private methods
 	 * =================================================================== */
 
-	void initializeKnowledge(final Population plans, Facilities facilities ) {
+	void initializeKnowledge(final Population plans, ActivityFacilities facilities ) {
 
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)

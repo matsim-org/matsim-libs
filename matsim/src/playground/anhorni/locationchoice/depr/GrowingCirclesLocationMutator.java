@@ -28,8 +28,8 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -71,25 +71,25 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 	private NetworkLayer network;
 	//private final Persons persons;
 
-	private QuadTree<Facility> shopFacQuadTree = null;
-	private QuadTree<Facility> leisFacQuadTree = null;
-	private QuadTree<Facility> educFacQuadTree = null;
+	private QuadTree<ActivityFacility> shopFacQuadTree = null;
+	private QuadTree<ActivityFacility> leisFacQuadTree = null;
+	private QuadTree<ActivityFacility> educFacQuadTree = null;
 	
-	private Facilities facilities = null;  
-	private final TreeMap<Id,Facility> shop_facilities=new TreeMap<Id,Facility>();
-	private final TreeMap<Id,Facility> leisure_facilities=new TreeMap<Id,Facility>();
+	private ActivityFacilities facilities = null;  
+	private final TreeMap<Id,ActivityFacility> shop_facilities=new TreeMap<Id,ActivityFacility>();
+	private final TreeMap<Id,ActivityFacility> leisure_facilities=new TreeMap<Id,ActivityFacility>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public GrowingCirclesLocationMutator(final NetworkLayer network, final Facilities facilities) {
+	public GrowingCirclesLocationMutator(final NetworkLayer network, final ActivityFacilities facilities) {
 		super();
 		this.init(network, facilities);
 	}
 
 
-	private void init(final NetworkLayer network, final Facilities facilities) {
+	private void init(final NetworkLayer network, final ActivityFacilities facilities) {
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;//(Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 		this.network=network;
@@ -97,15 +97,15 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		this.buildLeisFacQuadTree();
 		this.buildEducFacQuadTree();
 		
-		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_gt2500sqm"));
-		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get1000sqm"));
-		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get400sqm"));
-		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get100sqm"));
-		this.shop_facilities.putAll(this.facilities.getFacilities("shop_other"));
+		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_gt2500sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_get1000sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_get400sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_get100sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_other"));
 
-		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_gastro"));
-		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_culture"));
-		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_sports"));
+		this.leisure_facilities.putAll(this.facilities.getFacilitiesForActivityType("leisure_gastro"));
+		this.leisure_facilities.putAll(this.facilities.getFacilitiesForActivityType("leisure_culture"));
+		this.leisure_facilities.putAll(this.facilities.getFacilitiesForActivityType("leisure_sports"));
 		
 		System.out.println("    done.");
 	}
@@ -121,7 +121,7 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (final Facility f : this.shop_facilities.values()) {
+		for (final ActivityFacility f : this.shop_facilities.values()) {
 			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -132,8 +132,8 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		this.shopFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		for (final Facility f : this.shop_facilities.values()) {
+		this.shopFacQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		for (final ActivityFacility f : this.shop_facilities.values()) {
 			this.shopFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 		}
 		System.out.println("      done.");
@@ -147,7 +147,7 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (final Facility f : this.leisure_facilities.values()) {
+		for (final ActivityFacility f : this.leisure_facilities.values()) {
 			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -158,8 +158,8 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		this.leisFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		for (final Facility f : this.leisure_facilities.values()) {
+		this.leisFacQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		for (final ActivityFacility f : this.leisure_facilities.values()) {
 			this.leisFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 		}
 		System.out.println("      done.");
@@ -173,7 +173,7 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (final Facility f : this.facilities.getFacilities().values()) {
+		for (final ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(EDUCATION) != null) {
 				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
@@ -186,8 +186,8 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		this.educFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		for (final Facility f : this.facilities.getFacilities().values()) {
+		this.educFacQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		for (final ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(EDUCATION) != null) {
 				this.educFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
@@ -200,7 +200,7 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final QuadTree<Facility> getFacilities(final String act_type) {
+	private final QuadTree<ActivityFacility> getFacilities(final String act_type) {
 		if (E.equals(act_type)) { return this.educFacQuadTree; }
 		else if (S.equals(act_type)) { return this.shopFacQuadTree; }
 		else if (L.equals(act_type)) { return this.leisFacQuadTree; }
@@ -214,12 +214,12 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		else { Gbl.errorMsg("act_type=" + act_type + " not allowed!"); return null; }
 	}
 
-	private final Facility getFacility(final Collection<Facility> fs, String act_type) {
+	private final ActivityFacility getFacility(final Collection<ActivityFacility> fs, String act_type) {
 		act_type = this.getFacilityActType(act_type);
 		int i = 0;
 		final int[] dist_sum = new int[fs.size()];
-		Iterator<Facility> f_it = fs.iterator();
-		Facility f = f_it.next();
+		Iterator<ActivityFacility> f_it = fs.iterator();
+		ActivityFacility f = f_it.next();
 		dist_sum[i] = f.getActivityOption(act_type).getCapacity().intValue();
 		if ((dist_sum[i] == 0) || (dist_sum[i] == Integer.MAX_VALUE)) {
 			dist_sum[i] = 1;
@@ -251,8 +251,8 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		return null;
 	}
 
-	private final Facility getFacility(final Coord coord, final double radius, final String act_type) {
-		final Collection<Facility> fs = this.getFacilities(act_type).get(coord.getX(),coord.getY(),radius);
+	private final ActivityFacility getFacility(final Coord coord, final double radius, final String act_type) {
+		final Collection<ActivityFacility> fs = this.getFacilities(act_type).get(coord.getX(),coord.getY(),radius);
 		if (fs.isEmpty()) {
 			if (radius > 200000) { Gbl.errorMsg("radius>200'000 meters and still no facility found!"); }
 			return this.getFacility(coord,2.0*radius,act_type);
@@ -260,8 +260,8 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		return this.getFacility(fs,act_type);
 	}
 
-	private final Facility getFacility(final CoordImpl coord1, final CoordImpl coord2, final double radius, final String act_type) {
-		final Collection<Facility> fs = this.getFacilities(act_type).get(coord1.getX(),coord1.getY(),radius);
+	private final ActivityFacility getFacility(final CoordImpl coord1, final CoordImpl coord2, final double radius, final String act_type) {
+		final Collection<ActivityFacility> fs = this.getFacilities(act_type).get(coord1.getX(),coord1.getY(),radius);
 		fs.addAll(this.getFacilities(act_type).get(coord2.getX(),coord2.getY(),radius));
 		if (fs.isEmpty()) {
 			if (radius > 200000) { Gbl.errorMsg("radius>200'000 meters and still no facility found!"); }
@@ -301,7 +301,7 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 				if (pe instanceof Activity) {
 					final Activity act = (Activity) pe;
 					if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
-						final Facility f = this.getFacility(home_coord,radius,act.getType());
+						final ActivityFacility f = this.getFacility(home_coord,radius,act.getType());
 						act.setLink(this.network.getNearestLink(f.getCoord()));
 						act.setCoord(f.getCoord());
 					}
@@ -328,7 +328,7 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 				if (pe instanceof Activity) {
 					final Activity act = (Activity) pe;
 					if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
-						final Facility f = this.getFacility(coord1,coord2,radius,act.getType());
+						final ActivityFacility f = this.getFacility(coord1,coord2,radius,act.getType());
 						act.setLink(this.network.getNearestLink(f.getCoord()));
 						act.setCoord(f.getCoord());
 					}

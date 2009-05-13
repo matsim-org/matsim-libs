@@ -3,7 +3,7 @@ package playground.ciarif.retailers;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.BasicLinkImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
@@ -19,8 +19,8 @@ public class RandomRetailerStrategy implements RetailerStrategy {
 		this.world = world;
 	}
 	
-	final public void moveFacilities(Map<Id, Facility> facilities) {
-		for (Facility f : facilities.values()) {
+	final public void moveFacilities(Map<Id, ActivityFacility> facilities) {
+		for (ActivityFacility f : facilities.values()) {
 			int rd = MatsimRandom.getRandom().nextInt(links.length);
 			BasicLinkImpl link =(BasicLinkImpl)links[rd];
 			Utils.moveFacility(f,link,this.world);

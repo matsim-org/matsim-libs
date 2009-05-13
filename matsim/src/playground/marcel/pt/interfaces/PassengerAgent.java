@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.interfaces;
 
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 
 import playground.marcel.pt.transitSchedule.TransitLine;
 
@@ -50,6 +50,6 @@ public interface PassengerAgent {
 	 *
 	 * @return <code>true</code> if the passenger wants to exit the vehicle, <code>false</code> otherwise
 	 */
-	public boolean arriveAtStop(final Facility stop);
+	public boolean arriveAtStop(final ActivityFacility stop);
 
 }

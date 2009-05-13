@@ -28,7 +28,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -66,7 +66,7 @@ public class World {
 	@Deprecated
 	public final void complete(Set<String> excludingLinkTypes) {
 		// 1. remove rules and mappings containing network and/or facility layers
-		Layer f_layer = this.layers.get(Facilities.LAYER_TYPE);
+		Layer f_layer = this.layers.get(ActivityFacilities.LAYER_TYPE);
 		Layer n_layer = this.layers.get(NetworkLayer.LAYER_TYPE);
 		for (Layer l : layers.values()) {
 			if (f_layer != null) {
@@ -84,7 +84,7 @@ public class World {
 		Iterator<Id> lid_it = this.layers.keySet().iterator();
 		while (lid_it.hasNext()) {
 			Id lid = lid_it.next();
-			if ((lid != NetworkLayer.LAYER_TYPE) && (lid != Facilities.LAYER_TYPE)) {
+			if ((lid != NetworkLayer.LAYER_TYPE) && (lid != ActivityFacilities.LAYER_TYPE)) {
 				zlayers.add((ZoneLayer)this.layers.get(lid));
 			}
 		}
@@ -207,7 +207,7 @@ public class World {
 		if (this.layers.containsKey(type)) {
 			throw new IllegalArgumentException("Layer type=" + type + " already exixts.");
 		}
-		if (type.equals(Facilities.LAYER_TYPE)) { return (FacilitiesImpl) this.createFacilityLayer(); }
+		if (type.equals(ActivityFacilities.LAYER_TYPE)) { return (FacilitiesImpl) this.createFacilityLayer(); }
 		if (type.equals(NetworkLayer.LAYER_TYPE)) { return this.createNetworkLayer(); }
 		return this.createZoneLayer(type,name);
 	}
@@ -227,7 +227,7 @@ public class World {
 	}
 
 	@Deprecated
-	private final Facilities createFacilityLayer() {
+	private final ActivityFacilities createFacilityLayer() {
 		FacilitiesImpl f = new FacilitiesImpl();
 		this.setFacilityLayer(f);
 		return f;
@@ -249,7 +249,7 @@ public class World {
 		if (facilityLayer == null) { 
 			throw new IllegalArgumentException("facilityLayer=null not allowed!");
 		}
-		this.layers.put(Facilities.LAYER_TYPE, facilityLayer);
+		this.layers.put(ActivityFacilities.LAYER_TYPE, facilityLayer);
 	}
 
 	@Deprecated

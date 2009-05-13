@@ -37,8 +37,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -96,7 +96,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
 
 	private final TransitSchedule schedule;
-	private final Facilities facilities;
+	private final ActivityFacilities facilities;
 	private TransitLine currentTransitLine = null;
 	private BLinie tmpLinie = null;
 	private BHaltepunkt tmpHaltepunkt = null;
@@ -112,7 +112,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	private final SoldnerBerlinToWGS84 soldnerToWgs84 = new SoldnerBerlinToWGS84();
 	private final CoordinateTransformation wgs84ToRBS;
 	
-	public TransitScheduleReaderBerta(final TransitSchedule schedule, final Facilities facilities, final CoordinateTransformation coordTransformation) {
+	public TransitScheduleReaderBerta(final TransitSchedule schedule, final ActivityFacilities facilities, final CoordinateTransformation coordTransformation) {
 		this.schedule = schedule;
 		this.facilities = facilities;
 		this.wgs84ToRBS = coordTransformation;
@@ -264,8 +264,8 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		return new IdImpl(route.id.toString() + "-" + fahrzeitprofil.id.toString());
 	}
 
-	private Facility getStopFacility(final BHaltepunkt hp) {
-		Facility facility = this.facilities.getFacilities().get(hp.id);
+	private ActivityFacility getStopFacility(final BHaltepunkt hp) {
+		ActivityFacility facility = this.facilities.getFacilities().get(hp.id);
 		if (facility == null) {
 			Coord coord = this.wgs84ToRBS.transform(this.soldnerToWgs84.transform(new CoordImpl(hp.x/1000.0, hp.y/1000.0)));
 			facility = this.facilities.createFacility(hp.id, coord);
@@ -320,7 +320,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
 		// TODO [MR] remove after testing
 		TransitSchedule schedule = new TransitSchedule();
-		Facilities facilities = new FacilitiesImpl();
+		ActivityFacilities facilities = new FacilitiesImpl();
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
 		TransitScheduleReaderBerta reader = new TransitScheduleReaderBerta(schedule, facilities, transformation);
 		reader.setLocalDtdDirectory("../thesis-data/examples/berta/");

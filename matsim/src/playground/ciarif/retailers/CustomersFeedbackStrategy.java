@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.BasicLinkImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
@@ -31,7 +31,7 @@ public class CustomersFeedbackStrategy implements RetailerStrategy {
 		}		
 	}
 
-	public void moveFacilities(Map<Id, Facility> facilities) {
+	public void moveFacilities(Map<Id, ActivityFacility> facilities) {
 		// TODO Auto-generated method stub
 		
 	}

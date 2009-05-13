@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Person;
 
 import playground.balmermi.census2000.data.Municipality;
@@ -40,7 +40,7 @@ public class Household {
 
 	private final Id id;
 	private final Municipality municipality;
-	private final Facility facility;
+	private final ActivityFacility facility;
 	private final Map<Id,Person> persons_w = new HashMap<Id,Person>();
 	private final Map<Id,Person> persons_z = new HashMap<Id,Person>();
 	private int hhtpz = Integer.MIN_VALUE;
@@ -50,7 +50,7 @@ public class Household {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public Household(final Id id, final Municipality municipality, final Facility facility) {
+	public Household(final Id id, final Municipality municipality, final ActivityFacility facility) {
 		this.id = id;
 		this.municipality = municipality;
 		this.facility = facility;
@@ -100,7 +100,7 @@ public class Household {
 		return this.municipality;
 	}
 	
-	public final Facility getFacility() {
+	public final ActivityFacility getFacility() {
 		return this.facility;
 	}
 	

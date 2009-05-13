@@ -33,8 +33,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -62,14 +62,14 @@ public class PlansCreateFromCensus2000 {
 
 	private final String infile;
 	private final Households households;
-	private final Facilities facilities;
-	private final Map<String,QuadTree<Facility>> fqts = new HashMap<String, QuadTree<Facility>>();
+	private final ActivityFacilities facilities;
+	private final Map<String,QuadTree<ActivityFacility>> fqts = new HashMap<String, QuadTree<ActivityFacility>>();
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansCreateFromCensus2000(final String infile, final Households households, final Facilities facilities) {
+	public PlansCreateFromCensus2000(final String infile, final Households households, final ActivityFacilities facilities) {
 		super();
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.infile = infile;
@@ -95,7 +95,7 @@ public class PlansCreateFromCensus2000 {
 			double miny = Double.POSITIVE_INFINITY;
 			double maxx = Double.NEGATIVE_INFINITY;
 			double maxy = Double.NEGATIVE_INFINITY;
-			for (Facility f : this.facilities.getFacilities().values()) {
+			for (ActivityFacility f : this.facilities.getFacilities().values()) {
 				if (f.getActivityOption(types[i]) != null) {
 					if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 					if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
@@ -105,8 +105,8 @@ public class PlansCreateFromCensus2000 {
 			}
 			minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 			log.info("        type="+types[i]+": xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-			QuadTree<Facility> qt = new QuadTree<Facility>(minx,miny,maxx,maxy);
-			for (Facility f : this.facilities.getFacilities().values()) {
+			QuadTree<ActivityFacility> qt = new QuadTree<ActivityFacility>(minx,miny,maxx,maxy);
+			for (ActivityFacility f : this.facilities.getFacilities().values()) {
 				if (f.getActivityOption(types[i]) != null) { qt.put(f.getCoord().getX(),f.getCoord().getY(),f); }
 			}
 			log.info("        "+qt.size()+" facilities of type="+types[i]+" added.");
@@ -122,23 +122,23 @@ public class PlansCreateFromCensus2000 {
 	
 	private ActivityOption chooseEducActBasedOnSchoolType(final Person p, String act_type) {
 		if (act_type.equals(CAtts.ACT_EKIGA) || act_type.equals(CAtts.ACT_EPRIM)) { // assign nearest act
-			QuadTree<Facility> qt = this.fqts.get(act_type);
-			Facility home_f = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
-			Facility educ_f = qt.get(home_f.getCoord().getX(),home_f.getCoord().getY());
+			QuadTree<ActivityFacility> qt = this.fqts.get(act_type);
+			ActivityFacility home_f = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
+			ActivityFacility educ_f = qt.get(home_f.getCoord().getX(),home_f.getCoord().getY());
 			return educ_f.getActivityOption(act_type);
 		}
 		else if (act_type.equals(CAtts.ACT_ESECO)) { // search in home zone and expanding
 			List<ActivityOption> acts = new ArrayList<ActivityOption>();
-			Facility home_f = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
+			ActivityFacility home_f = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
 			Zone zone = (Zone)home_f.getUpMapping().values().iterator().next();
 			Coord max = new CoordImpl(((Zone)zone).getMax());
 			Coord min = new CoordImpl(((Zone)zone).getMin());
 			while (acts.isEmpty()) {
-				QuadTree<Facility> qt = this.fqts.get(act_type);
-				List<Facility> fs = new ArrayList<Facility>();
+				QuadTree<ActivityFacility> qt = this.fqts.get(act_type);
+				List<ActivityFacility> fs = new ArrayList<ActivityFacility>();
 				qt.get(min.getX(),min.getY(),max.getX(),max.getY(),fs);
 				if (!fs.isEmpty()) {
-					for (Facility f : fs) {
+					for (ActivityFacility f : fs) {
 						ActivityOption a = f.getActivityOption(act_type);
 						for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 					}
@@ -155,11 +155,11 @@ public class PlansCreateFromCensus2000 {
 			return null;
 		}
 		else if (act_type.equals(CAtts.ACT_EOTHR) || act_type.equals(CAtts.ACT_EHIGH)) { // assigning weighted
-			QuadTree<Facility> qt = this.fqts.get(act_type);
-			List<Facility> fs = new ArrayList<Facility>();
+			QuadTree<ActivityFacility> qt = this.fqts.get(act_type);
+			List<ActivityFacility> fs = new ArrayList<ActivityFacility>();
 			qt.get(qt.getMinEasting()-1.0,qt.getMinNorthing()-1.0,qt.getMaxEasting()+1.0,qt.getMaxNorthing()+1.0,fs);
 			List<ActivityOption> acts = new ArrayList<ActivityOption>();
-			for (Facility f : fs) {
+			for (ActivityFacility f : fs) {
 				ActivityOption a = f.getActivityOption(act_type);
 				for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 			}
@@ -206,7 +206,7 @@ public class PlansCreateFromCensus2000 {
 		if (zone != null) {
 			List<ActivityOption> acts = new ArrayList<ActivityOption>();
 			for (Location l : zone.getDownMapping().values()) {
-				ActivityOption a = ((Facility)l).getActivityOption(act_type);
+				ActivityOption a = ((ActivityFacility)l).getActivityOption(act_type);
 				if (a != null) { acts.add(a); }
 			}
 			if (!acts.isEmpty()) {
@@ -226,11 +226,11 @@ public class PlansCreateFromCensus2000 {
 					min.setX(min.getX()-1000.0);
 					min.setY(min.getY()-1000.0);
 					log.debug("          searching for educ facilities in area: min="+min+", max="+max+"...");
-					QuadTree<Facility> qt = this.fqts.get(act_type);
-					List<Facility> fs = new ArrayList<Facility>();
+					QuadTree<ActivityFacility> qt = this.fqts.get(act_type);
+					List<ActivityFacility> fs = new ArrayList<ActivityFacility>();
 					qt.get(min.getX(),min.getY(),max.getX(),max.getY(),fs);
 					if (!fs.isEmpty()) {
-						for (Facility f : fs) {
+						for (ActivityFacility f : fs) {
 							ActivityOption a = f.getActivityOption(act_type);
 							for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 						}
@@ -296,7 +296,7 @@ public class PlansCreateFromCensus2000 {
 		if (zone == null) {
 			if ((i_agde == -7) || (i_agde > 8100)) {
 				log.info("        pid="+p.getId()+", jobnr="+job+": no work muni defined");
-				Facility home_f = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
+				ActivityFacility home_f = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
 				zone = (Zone)home_f.getUpMapping().values().iterator().next();
 				log.info("        => work muni = home muni (zid="+agde+") assigned.");
 				p.getKnowledge().setDescription(p.getKnowledge().getDescription()+"("+CAtts.P_AGDE+":"+agde+")");
@@ -305,9 +305,9 @@ public class PlansCreateFromCensus2000 {
 		}
 
 		// 4. try to get work facilities in the given zone with other suitable activity types (i.e. teacher --> work & education facility)
-		List<Facility> facs = new ArrayList<Facility>();
+		List<ActivityFacility> facs = new ArrayList<ActivityFacility>();
 		for (Location l : zone.getDownMapping().values()) {
-			Facility f = (Facility)l;
+			ActivityFacility f = (ActivityFacility)l;
 			Set<String> f_acts = f.getActivityOptions().keySet();
 			boolean has_work = false; for (String w_act : w_acts) { if (f_acts.contains(w_act)) { has_work = true; } }
 			boolean has_othr = false; for (String o_act : o_acts) { if (f_acts.contains(o_act)) { has_othr = true; } }
@@ -319,7 +319,7 @@ public class PlansCreateFromCensus2000 {
 			log.trace("        pid="+p.getId()+", jobnr="+job+": no facilities for work with additional acts found!");
 			// getting all possible work facilities with additional other act type
 			for (Location l : zone.getDownMapping().values()) {
-				Facility f = (Facility)l;
+				ActivityFacility f = (ActivityFacility)l;
 				Set<String> f_acts = f.getActivityOptions().keySet();
 				boolean has_work = false; for (String w_act : w_acts) { if (f_acts.contains(w_act)) { has_work = true; } }
 				if (has_work) { facs.add(f); }
@@ -337,25 +337,25 @@ public class PlansCreateFromCensus2000 {
 			min.setY(min.getY()-1000.0);
 			log.trace("          searching for facilities in area: min="+min+", max="+max+"...");
 			// gathering all work facilities of the given types
-			List<Facility> tmp_w_fs = new ArrayList<Facility>();
+			List<ActivityFacility> tmp_w_fs = new ArrayList<ActivityFacility>();
 			for (String act : w_acts) {
-				QuadTree<Facility> w_qt = this.fqts.get(act);
-				List<Facility> w_fs = new ArrayList<Facility>();
+				QuadTree<ActivityFacility> w_qt = this.fqts.get(act);
+				List<ActivityFacility> w_fs = new ArrayList<ActivityFacility>();
 				w_qt.get(min.getX(),min.getY(),max.getX(),max.getY(),w_fs);
 				tmp_w_fs.addAll(w_fs);
 			}
 			if (!tmp_w_fs.isEmpty()) {
 				// work facilities found. Gathering all facilities of appropriate additional activities
-				List<Facility> tmp_o_fs = new ArrayList<Facility>();
+				List<ActivityFacility> tmp_o_fs = new ArrayList<ActivityFacility>();
 				for (String act : o_acts) {
-					QuadTree<Facility> o_qt = this.fqts.get(act);
-					List<Facility> o_fs = new ArrayList<Facility>();
+					QuadTree<ActivityFacility> o_qt = this.fqts.get(act);
+					List<ActivityFacility> o_fs = new ArrayList<ActivityFacility>();
 					o_qt.get(min.getX(),min.getY(),max.getX(),max.getY(),o_fs);
 					tmp_o_fs.addAll(o_fs);
 				}
 				// intersect the two lists (facilities with work and appropriate additional acts)
-				List<Facility> tmp_wo_fs = new ArrayList<Facility>();
-				for (Facility f : tmp_w_fs) { if (tmp_o_fs.contains(f)) { tmp_wo_fs.add(f); } }
+				List<ActivityFacility> tmp_wo_fs = new ArrayList<ActivityFacility>();
+				for (ActivityFacility f : tmp_w_fs) { if (tmp_o_fs.contains(f)) { tmp_wo_fs.add(f); } }
 				if (tmp_wo_fs.isEmpty()) {
 					// intersect is empty. use the work list for work facility choice
 					facs.addAll(tmp_w_fs);
@@ -374,7 +374,7 @@ public class PlansCreateFromCensus2000 {
 		
 		// 7. choose an activity at a facility (weighted for capacity)
 		List<ActivityOption> acts_weighted = new ArrayList<ActivityOption>();
-		for (Facility f : facs) {
+		for (ActivityFacility f : facs) {
 			for (String a : w_acts) {
 				ActivityOption act = f.getActivityOption(a);
 				if (act != null) { for (int i=0; i<act.getCapacity(); i++) { acts_weighted.add(act); } }
@@ -590,8 +590,8 @@ public class PlansCreateFromCensus2000 {
 					if (p_atts.get(CAtts.HH_W).equals(p_atts.get(CAtts.HH_Z))) { same_cnt++; }
 					else {
 						diff_cnt++;
-						Facility f1 = ((Household)p_atts.get(CAtts.HH_W)).getFacility();
-						Facility f2 = ((Household)p_atts.get(CAtts.HH_Z)).getFacility();
+						ActivityFacility f1 = ((Household)p_atts.get(CAtts.HH_W)).getFacility();
+						ActivityFacility f2 = ((Household)p_atts.get(CAtts.HH_Z)).getFacility();
 						if (!f1.equals(f2)) { diff_f_cnt++; }
 					}
 				}

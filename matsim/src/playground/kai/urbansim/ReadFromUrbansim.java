@@ -4,7 +4,7 @@
 package playground.kai.urbansim;
 
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.world.Layer;
 
@@ -19,9 +19,9 @@ import org.matsim.world.Layer;
 public interface ReadFromUrbansim {
 	
 
-	public void readFacilities ( Facilities facilities ) ;
+	public void readFacilities ( ActivityFacilities facilities ) ;
 
-	public void readPersons( Population population, Facilities facilities, double fraction ) ;
+	public void readPersons( Population population, ActivityFacilities facilities, double fraction ) ;
 	
-	public void readZones( Facilities zones, Layer parcels ) ;
+	public void readZones( ActivityFacilities zones, Layer parcels ) ;
 }

@@ -26,7 +26,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.world.Layer;
@@ -61,7 +61,7 @@ public class WorldParseFacilityZoneMapping {
 
 	public void run(World world) {
 		log.info("    running " + this.getClass().getName() + " module...");
-		Layer fl = world.getLayer(Facilities.LAYER_TYPE);
+		Layer fl = world.getLayer(ActivityFacilities.LAYER_TYPE);
 		Layer zl = world.getLayer(Municipalities.MUNICIPALITY);
 		int line_cnt = 0;
 		try {

@@ -29,8 +29,8 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
@@ -52,9 +52,9 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	private boolean constrained = false;
 	
-	protected TreeMap<String, QuadTree<Facility>> quad_trees = new TreeMap<String, QuadTree<Facility>>();
+	protected TreeMap<String, QuadTree<ActivityFacility>> quad_trees = new TreeMap<String, QuadTree<ActivityFacility>>();
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
-	protected TreeMap<String, Facility []> facilities_of_type = new TreeMap<String, Facility []>();
+	protected TreeMap<String, ActivityFacility []> facilities_of_type = new TreeMap<String, ActivityFacility []>();
 	
 	
 	public LocationChoice() {
@@ -194,7 +194,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	/*
 	 * Initialize the quadtrees of all available activity types
 	 */
-	private void initTrees(Facilities facilities) {
+	private void initTrees(ActivityFacilities facilities) {
 		
 		boolean regionalScenario = false;
 		double radius = 0.0;
@@ -208,9 +208,9 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		}
 		
 
-		TreeMap<String, TreeMap<Id, Facility>> trees = new TreeMap<String, TreeMap<Id, Facility>>();
+		TreeMap<String, TreeMap<Id, ActivityFacility>> trees = new TreeMap<String, TreeMap<Id, ActivityFacility>>();
 		// get all types of activities
-		for (Facility f : facilities.getFacilities().values()) {
+		for (ActivityFacility f : facilities.getFacilities().values()) {
 			Map<String, ActivityOption> activities = f.getActivityOptions();
 			
 			// do not add facility if it is not in region of interest
@@ -221,28 +221,28 @@ public class LocationChoice extends AbstractMultithreadedModule {
 				ActivityOption act = act_it.next();
 				
 				if (!trees.containsKey(act.getType())) {
-					trees.put(act.getType(), new TreeMap<Id, Facility>());
+					trees.put(act.getType(), new TreeMap<Id, ActivityFacility>());
 				}
 				trees.get(act.getType()).put(f.getId(), f);
 			}	
 		}
 		
 		// create the quadtrees and the arrays
-		Iterator<TreeMap<Id, Facility>> tree_it = trees.values().iterator();
+		Iterator<TreeMap<Id, ActivityFacility>> tree_it = trees.values().iterator();
 		Iterator<String> type_it = trees.keySet().iterator();
 			
 		while (tree_it.hasNext()) {
-			TreeMap<Id, Facility> tree_of_type = tree_it.next();
+			TreeMap<Id, ActivityFacility> tree_of_type = tree_it.next();
 			String type = type_it.next();
 			
 			// do not construct tree for home act
 			if (type.startsWith("h") || type.startsWith("tta")) continue;
 			this.quad_trees.put(type, this.builFacQuadTree(type, tree_of_type));
-			this.facilities_of_type.put(type, tree_of_type.values().toArray(new Facility[tree_of_type.size()]));
+			this.facilities_of_type.put(type, tree_of_type.values().toArray(new ActivityFacility[tree_of_type.size()]));
 		}
 	}
 	
-	private QuadTree<Facility> builFacQuadTree(String type, TreeMap<Id,Facility> facilities_of_type) {
+	private QuadTree<ActivityFacility> builFacQuadTree(String type, TreeMap<Id,ActivityFacility> facilities_of_type) {
 		Gbl.startMeasurement();
 		log.info(" building " + type + " facility quad tree");
 		double minx = Double.POSITIVE_INFINITY;
@@ -250,7 +250,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 
-		for (final Facility f : facilities_of_type.values()) {
+		for (final ActivityFacility f : facilities_of_type.values()) {
 			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -261,8 +261,8 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTree<Facility> quadtree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		for (final Facility f : facilities_of_type.values()) {
+		QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		for (final ActivityFacility f : facilities_of_type.values()) {
 			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 		}
 		log.info("    done");

@@ -20,7 +20,7 @@
 
 package org.matsim.demandmodeling.primloc;
 
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -103,7 +103,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 

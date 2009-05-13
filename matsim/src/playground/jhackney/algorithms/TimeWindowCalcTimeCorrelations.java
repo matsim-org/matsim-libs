@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Vector;
 
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
@@ -31,7 +31,7 @@ public class TimeWindowCalcTimeCorrelations {
 	 * @param out1name
 	 * @author jhackney
 	 */
-	public TimeWindowCalcTimeCorrelations(LinkedHashMap<Facility,ArrayList<TimeWindow>> timeWindowMap, String out2name, String out1name){ 
+	public TimeWindowCalcTimeCorrelations(LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap, String out2name, String out1name){ 
 		// First identify the overlapping Acts and the Persons involved
 		Object[] facs = timeWindowMap.keySet().toArray();
 		Vector<Double> tbins=new Vector<Double>();

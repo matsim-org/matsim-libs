@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
@@ -63,7 +63,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		log.info("Reading shops Of 2005 xml file...done.");
 	}
 
-	public void run(final Facility facility) {
+	public void run(final ActivityFacility facility) {
 		
 		DayType[] days = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri, DayType.sat, DayType.sun };
 		DayType[] weekDays = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri };
@@ -73,7 +73,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		Map<DayType, SortedSet<BasicOpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<BasicOpeningTime>>();
 
 		List<Location> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
-		ActivityOption shopsOf2005ShopAct = ((Facility) closestShops.get(0)).getActivityOption(FacilitiesProductionKTI.ACT_TYPE_SHOP);
+		ActivityOption shopsOf2005ShopAct = ((ActivityFacility) closestShops.get(0)).getActivityOption(FacilitiesProductionKTI.ACT_TYPE_SHOP);
 		if (shopsOf2005ShopAct != null) {
 			closestShopOpentimes = shopsOf2005ShopAct.getOpeningTimes();
 		} else {

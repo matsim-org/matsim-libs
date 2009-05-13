@@ -27,7 +27,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
@@ -47,8 +47,8 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	protected int maxRecursions = 10;
 	
 	public LocationMutatorwChoiceSet(final NetworkLayer network, Controler controler,
-			TreeMap<String, QuadTree<Facility>> quad_trees,
-			TreeMap<String, Facility []> facilities_of_type) {
+			TreeMap<String, QuadTree<ActivityFacility>> quad_trees,
+			TreeMap<String, ActivityFacility []> facilities_of_type) {
 		super(network, controler, quad_trees, facilities_of_type);
 		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
 		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
@@ -164,13 +164,13 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	
 	protected boolean modifyLocation(Activity act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
 		
-		ArrayList<Facility> choiceSet = this.computeChoiceSetCircle
+		ArrayList<ActivityFacility> choiceSet = this.computeChoiceSetCircle
 		(startCoord, endCoord, radius, act.getType());
 		
 		if (choiceSet.size()>1) {
 			//final Facility facility=(Facility)choiceSet.toArray()[
            	//		           MatsimRandom.random.nextInt(choiceSet.size())];
-			final Facility facility = choiceSet.get(MatsimRandom.getRandom().nextInt(choiceSet.size()));
+			final ActivityFacility facility = choiceSet.get(MatsimRandom.getRandom().nextInt(choiceSet.size()));
 			
 			act.setFacility(facility);
        		act.setLink(this.network.getNearestLink(facility.getCoord()));
@@ -264,11 +264,11 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	}
 	
 	
-	public ArrayList<Facility>  computeChoiceSetCircle(Coord coordStart, Coord coordEnd, 
+	public ArrayList<ActivityFacility>  computeChoiceSetCircle(Coord coordStart, Coord coordEnd, 
 			double radius, String type) {
 		double midPointX = (coordStart.getX()+coordEnd.getX())/2.0;
 		double midPointY = (coordStart.getY()+coordEnd.getY())/2.0;
-		return (ArrayList<Facility>) this.quad_trees.get(type).get(midPointX, midPointY, radius);
+		return (ArrayList<ActivityFacility>) this.quad_trees.get(type).get(midPointX, midPointY, radius);
 	}
 	
 	// for test cases:

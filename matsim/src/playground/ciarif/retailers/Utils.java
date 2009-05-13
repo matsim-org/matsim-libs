@@ -1,7 +1,7 @@
 package playground.ciarif.retailers;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.BasicLinkImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -12,7 +12,7 @@ public abstract class Utils {
 	
 	
 	private final static double EPSILON = 0.0001;
-	public static final void moveFacility(Facility f, BasicLinkImpl link, World world) {
+	public static final void moveFacility(ActivityFacility f, BasicLinkImpl link, World world) {
 		double [] vector = new double[2];
 		vector[0] = link.getToNode().getCoord().getY()-link.getFromNode().getCoord().getY();
 		vector[1] = -(link.getToNode().getCoord().getX()-link.getFromNode().getCoord().getX());
@@ -31,7 +31,7 @@ public abstract class Utils {
 	
 	// BAD CODE STYLE but keep that anyway for the moment
 	private static QuadTree<Person> personQuadTree = null;
-	private static QuadTree<Facility> facilityQuadTree = null;
+	private static QuadTree<ActivityFacility> facilityQuadTree = null;
 	
 	public static final void setPersonQuadTree(QuadTree<Person> personQuadTree) {
 		Utils.personQuadTree = personQuadTree;
@@ -41,11 +41,11 @@ public abstract class Utils {
 		return Utils.personQuadTree;
 	}
 	
-	public static final void setFacilityQuadTree(QuadTree<Facility> facilityQuadTree) {
+	public static final void setFacilityQuadTree(QuadTree<ActivityFacility> facilityQuadTree) {
 		Utils.facilityQuadTree  = facilityQuadTree;
 	}
 	
-	public static final QuadTree<Facility> getFacilityQuadTree() {
+	public static final QuadTree<ActivityFacility> getFacilityQuadTree() {
 		return Utils.facilityQuadTree;
 	}
 }

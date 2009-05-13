@@ -21,7 +21,7 @@
 package playground.marcel.pt.integration;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -40,7 +40,7 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 		super(startLink, endLink);
 	}
 	
-	public ExperimentalTransitRoute(Facility accessFacility, TransitLine line, Facility egressFacility) {
+	public ExperimentalTransitRoute(ActivityFacility accessFacility, TransitLine line, ActivityFacility egressFacility) {
 		this(accessFacility.getLink(), egressFacility.getLink());
 		this.accessStopId = accessFacility.getId();
 		this.lineId = line.getId();

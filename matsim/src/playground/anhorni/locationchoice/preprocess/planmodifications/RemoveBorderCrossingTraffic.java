@@ -6,7 +6,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.network.NetworkLayer;
@@ -15,7 +15,7 @@ public class RemoveBorderCrossingTraffic extends Modifier {
 
 	private final static Logger log = Logger.getLogger(RemoveBorderCrossingTraffic.class);
 
-	public RemoveBorderCrossingTraffic(Population plans, NetworkLayer network, Facilities  facilities){
+	public RemoveBorderCrossingTraffic(Population plans, NetworkLayer network, ActivityFacilities  facilities){
 		super(plans, network, facilities);
 	}
 

@@ -28,7 +28,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
@@ -386,7 +386,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			for (int aa=0; aa < locationIdSequence.length; aa++) {
 				location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
 				if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
-					act = plan.createActivity("actAtFacility" + locationIdSequence[aa], (Facility) location);
+					act = plan.createActivity("actAtFacility" + locationIdSequence[aa], (ActivityFacility) location);
 				} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(subtourAnalysisLocationType)) {
 					act = plan.createActivity("actOnLink" + locationIdSequence[aa], (Link) location);
 				}

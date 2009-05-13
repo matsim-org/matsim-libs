@@ -25,8 +25,8 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -56,20 +56,20 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 	private static final String EDUCATION = "education";
 	private static final String WORK = "work";
 
-	private final Facilities facilities;
+	private final ActivityFacilities facilities;
 	private final Persons persons;
 	private final Matrices matrices;
-	private final TreeMap<Id, ArrayList<Facility>> zone_work_fac_mapping = new TreeMap<Id, ArrayList<Facility>>();
-	private final TreeMap<Id, ArrayList<Facility>> zone_educ_fac_mapping = new TreeMap<Id, ArrayList<Facility>>();
+	private final TreeMap<Id, ArrayList<ActivityFacility>> zone_work_fac_mapping = new TreeMap<Id, ArrayList<ActivityFacility>>();
+	private final TreeMap<Id, ArrayList<ActivityFacility>> zone_educ_fac_mapping = new TreeMap<Id, ArrayList<ActivityFacility>>();
 
-	private QuadTree<Facility> workFacQuadTree = null;
-	private QuadTree<Facility> educFacQuadTree = null;
+	private QuadTree<ActivityFacility> workFacQuadTree = null;
+	private QuadTree<ActivityFacility> educFacQuadTree = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonSetPrimLoc(final Facilities facilities, final Matrices matrices, final Persons persons, final ZoneLayer municipalities) {
+	public PersonSetPrimLoc(final ActivityFacilities facilities, final Matrices matrices, final Persons persons, final ZoneLayer municipalities) {
 		super();
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
@@ -92,7 +92,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (Facility f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(WORK) != null) {
 				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
@@ -105,8 +105,8 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		this.workFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		for (Facility f : this.facilities.getFacilities().values()) {
+		this.workFacQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(WORK) != null) {
 				this.workFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
@@ -122,7 +122,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (Facility f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(EDUCATION) != null) {
 				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
@@ -135,8 +135,8 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		this.educFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		for (Facility f : this.facilities.getFacilities().values()) {
+		this.educFacQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(EDUCATION) != null) {
 				this.educFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
@@ -146,7 +146,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 	}
 
 	public final void buildZoneFacilityMapping(ZoneLayer layer) {
-		for (Facility f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			ArrayList<Zone> zones = new ArrayList<Zone>();
 			Iterator<? extends Location> z_it = layer.getLocations().values().iterator();
 			while (z_it.hasNext()) {
@@ -163,14 +163,14 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 
 			Zone z = zones.get(MatsimRandom.getRandom().nextInt(zones.size()));
 			if (f.getActivityOption(WORK) != null) {
-				ArrayList<Facility> facs = this.zone_work_fac_mapping.get(z.getId());
-				if (facs == null) { facs = new ArrayList<Facility>(); }
+				ArrayList<ActivityFacility> facs = this.zone_work_fac_mapping.get(z.getId());
+				if (facs == null) { facs = new ArrayList<ActivityFacility>(); }
 				facs.add(f);
 				this.zone_work_fac_mapping.put(z.getId(),facs);
 			}
 			if (f.getActivityOption(EDUCATION) != null) {
-				ArrayList<Facility> facs = this.zone_educ_fac_mapping.get(z.getId());
-				if (facs == null) { facs = new ArrayList<Facility>(); }
+				ArrayList<ActivityFacility> facs = this.zone_educ_fac_mapping.get(z.getId());
+				if (facs == null) { facs = new ArrayList<ActivityFacility>(); }
 				facs.add(f);
 				this.zone_educ_fac_mapping.put(z.getId(),facs);
 			}
@@ -180,14 +180,14 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		Iterator<Id> z_it = this.zone_work_fac_mapping.keySet().iterator();
 		while (z_it.hasNext()) {
 			Zone z = (Zone)layer.getLocation(z_it.next());
-			ArrayList<Facility> facs = this.zone_work_fac_mapping.get(z.getId());
+			ArrayList<ActivityFacility> facs = this.zone_work_fac_mapping.get(z.getId());
 			System.out.println("        Zone id=" + z.getId() + " ==> #facs=" + facs.size());
 		}
 		System.out.println("      Zone to educ-facility mapping:");
 		z_it = this.zone_educ_fac_mapping.keySet().iterator();
 		while (z_it.hasNext()) {
 			Zone z = (Zone)layer.getLocation(z_it.next());
-			ArrayList<Facility> facs = this.zone_educ_fac_mapping.get(z.getId());
+			ArrayList<ActivityFacility> facs = this.zone_educ_fac_mapping.get(z.getId());
 			System.out.println("        Zone id=" + z.getId() + " ==> #facs=" + facs.size());
 		}
 	}
@@ -216,7 +216,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		return null;
 	}
 
-	private final Facility getPrimActFacility(final ArrayList<Facility> facs, final String act_type) {
+	private final ActivityFacility getPrimActFacility(final ArrayList<ActivityFacility> facs, final String act_type) {
 		if (facs.isEmpty()) { Gbl.errorMsg("facs are empty! This should not happen!"); }
 
 		int[] dist_sum = new int[facs.size()];
@@ -267,8 +267,8 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			Integer p_id = Integer.valueOf(person.getId().toString());
 			Zone home_zone = this.persons.getPerson(p_id).getHousehold().getMunicipality().getZone();
 			Zone to_zone = this.getPrimActZone(this.matrices.getMatrix(WORK).getFromLocEntries(home_zone));
-			ArrayList<Facility> to_facs = this.zone_work_fac_mapping.get(to_zone.getId());
-			Facility to_fac = null;
+			ArrayList<ActivityFacility> to_facs = this.zone_work_fac_mapping.get(to_zone.getId());
+			ActivityFacility to_fac = null;
 			if (to_facs == null) {
 				System.out.println("      Person id=" + person.getId() + ": no work fac in to_zone id=" +
 				                   to_zone.getId() + ". Getting a close one...");
@@ -288,9 +288,9 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			Integer p_id = Integer.valueOf(person.getId().toString());
 			Zone home_zone = this.persons.getPerson(p_id).getHousehold().getMunicipality().getZone();
 			Zone to_zone = this.getPrimActZone(this.matrices.getMatrix(EDUCATION).getFromLocEntries(home_zone));
-			ArrayList<Facility> to_facs = this.zone_educ_fac_mapping.get(to_zone.getId());
+			ArrayList<ActivityFacility> to_facs = this.zone_educ_fac_mapping.get(to_zone.getId());
 
-			Facility to_fac = null;
+			ActivityFacility to_fac = null;
 			if (to_facs == null) {
 				System.out.println("      Person id=" + person.getId() + ": no educ fac in to_zone id=" +
 				                   to_zone.getId() + ". Getting a close one...");

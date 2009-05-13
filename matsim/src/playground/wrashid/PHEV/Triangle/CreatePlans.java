@@ -5,8 +5,8 @@ import java.util.Iterator;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -39,14 +39,14 @@ public class CreatePlans {
 		final World world = Gbl.createWorld();
 
 		// read facilities
-		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
+		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile("C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/facilities/facilities.xml");
 
 
 		// get home and work activity
 		ActivityOption home=null;
 		ActivityOption work=null;
-		for (Facility f : facilities.getFacilities().values()) {
+		for (ActivityFacility f : facilities.getFacilities().values()) {
 			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
 				ActivityOption a = a_it.next();
@@ -75,8 +75,8 @@ public class CreatePlans {
 			k.addActivity(work, false);
 
 			Plan plan = person.createPlan(true);
-			Facility home_facility = person.getKnowledge().getActivities("home").get(0).getFacility();
-			Facility work_facility = person.getKnowledge().getActivities("work").get(0).getFacility();
+			ActivityFacility home_facility = person.getKnowledge().getActivities("home").get(0).getFacility();
+			ActivityFacility work_facility = person.getKnowledge().getActivities("work").get(0).getFacility();
 			ArrayList<ActivityOption> acts = person.getKnowledge().getActivities();
 
 			double depTime=3600*8;

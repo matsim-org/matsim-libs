@@ -27,7 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
@@ -90,11 +90,11 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitVehicle bus = new TransitQueueVehicle(20, events);
 		driver.setVehicle(bus);
 
-		Facility home = facilities.getFacilities().get(new IdImpl("home"));
-		Facility stop2 = facilities.getFacilities().get(new IdImpl("stop2"));
-		Facility stop3 = facilities.getFacilities().get(new IdImpl("stop3"));
-		Facility stop4 = facilities.getFacilities().get(new IdImpl("stop4"));
-		Facility stop6 = facilities.getFacilities().get(new IdImpl("stop6"));
+		ActivityFacility home = facilities.getFacilities().get(new IdImpl("home"));
+		ActivityFacility stop2 = facilities.getFacilities().get(new IdImpl("stop2"));
+		ActivityFacility stop3 = facilities.getFacilities().get(new IdImpl("stop3"));
+		ActivityFacility stop4 = facilities.getFacilities().get(new IdImpl("stop4"));
+		ActivityFacility stop6 = facilities.getFacilities().get(new IdImpl("stop6"));
 
 		MockAgent agent1 = new MockAgent(home, stop2);
 		MockAgent agent2 = new MockAgent(home, stop3);
@@ -157,11 +157,11 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitVehicle bus = new TransitQueueVehicle(20, events);
 		driver.setVehicle(bus);
 
-		Facility work = facilities.getFacilities().get(new IdImpl("work"));
-		Facility stop2 = facilities.getFacilities().get(new IdImpl("stop2"));
-		Facility stop3 = facilities.getFacilities().get(new IdImpl("stop3"));
-		Facility stop4 = facilities.getFacilities().get(new IdImpl("stop4"));
-		Facility stop6 = facilities.getFacilities().get(new IdImpl("stop6"));
+		ActivityFacility work = facilities.getFacilities().get(new IdImpl("work"));
+		ActivityFacility stop2 = facilities.getFacilities().get(new IdImpl("stop2"));
+		ActivityFacility stop3 = facilities.getFacilities().get(new IdImpl("stop3"));
+		ActivityFacility stop4 = facilities.getFacilities().get(new IdImpl("stop4"));
+		ActivityFacility stop6 = facilities.getFacilities().get(new IdImpl("stop6"));
 
 		MockAgent agent1 = new MockAgent(stop2, work);
 		MockAgent agent2 = new MockAgent(stop3, work);

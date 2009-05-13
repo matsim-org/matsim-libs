@@ -20,7 +20,7 @@
 
 package org.matsim.examples;
 
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -96,7 +96,7 @@ public abstract class TriangleScenario {
 		System.out.println("  done.");
 	}
 
-	public static final void writeFacilities(Facilities facilities) {
+	public static final void writeFacilities(ActivityFacilities facilities) {
 		System.out.println("  writing facilities xml file... ");
 		FacilitiesWriter facilities_writer = new FacilitiesWriter(facilities);
 		facilities_writer.write();

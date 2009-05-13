@@ -27,8 +27,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -96,7 +96,7 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 	 */
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Controler controler = event.getControler();
-		Facilities facilities = controler.getFacilities();
+		ActivityFacilities facilities = controler.getFacilities();
 				
 		if (event.getIteration() % 10 == 0) {
 			this.printStatistics(facilities, Controler.getIterationPath(), event.getIteration(), 
@@ -107,7 +107,7 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 	/*
 	 * Print daily load of every facility and aggregated hourly load 
 	 */	
-	private void printStatistics(Facilities facilities, String iterationPath, int iteration, 
+	private void printStatistics(ActivityFacilities facilities, String iterationPath, int iteration, 
 			TreeMap<Id, FacilityPenalty> facilityPenalties) {
 
 		try {
@@ -122,9 +122,9 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 							
 				double loadPerHourSum[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	
-				Iterator<? extends Facility> iter = facilities.getFacilities().values().iterator();
+				Iterator<? extends ActivityFacility> iter = facilities.getFacilities().values().iterator();
 				while (iter.hasNext()){
-					Facility facility = iter.next();
+					ActivityFacility facility = iter.next();
 					FacilityPenalty facilityPenalty = facilityPenalties.get(facility.getId());
 												
 					out.write(facility.getId().toString() + "\t"+

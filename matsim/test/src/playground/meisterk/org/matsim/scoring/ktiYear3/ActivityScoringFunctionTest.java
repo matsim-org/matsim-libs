@@ -26,8 +26,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -55,7 +55,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 	private Person person;
 	private Plan plan;
 	private Config config;
-	private Facilities facilities;
+	private ActivityFacilities facilities;
 	private NetworkLayer network;
 	
 	/*package*/ static final Logger logger = Logger.getLogger(ActivityScoringFunctionTest.class);
@@ -80,9 +80,9 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		// generate facilities
 		this.facilities = new FacilitiesImpl();
-		Facility facility1 = this.facilities.createFacility(new IdImpl("1"), new CoordImpl(0.0, 0.0));
-		Facility facility3 = this.facilities.createFacility(new IdImpl("3"), new CoordImpl(1000.0, 1000.0));
-		Facility facility5 = this.facilities.createFacility(new IdImpl("5"), new CoordImpl(1000.0, 1010.0));
+		ActivityFacility facility1 = this.facilities.createFacility(new IdImpl("1"), new CoordImpl(0.0, 0.0));
+		ActivityFacility facility3 = this.facilities.createFacility(new IdImpl("3"), new CoordImpl(1000.0, 1000.0));
+		ActivityFacility facility5 = this.facilities.createFacility(new IdImpl("5"), new CoordImpl(1000.0, 1010.0));
 		
 		// generate network
 		this.network = new NetworkLayer();
@@ -146,7 +146,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 	public void testAlwaysOpen() {
 		
-		Facility facility = this.facilities.getFacilities().get(new IdImpl("1"));
+		ActivityFacility facility = this.facilities.getFacilities().get(new IdImpl("1"));
 		ActivityOption actOpt = facility.createActivityOption("home");
 		actOpt.setCapacity(1.0);
 
@@ -162,7 +162,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 	public void testOpenLongEnough() {
 		
-		Facility facility = this.facilities.getFacilities().get(new IdImpl("1"));
+		ActivityFacility facility = this.facilities.getFacilities().get(new IdImpl("1"));
 		ActivityOption actOpt = facility.createActivityOption("home");
 		actOpt.setCapacity(1.0);
 		
@@ -187,7 +187,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 	
 	public void testWaiting() {
 	
-		Facility facility = this.facilities.getFacilities().get(new IdImpl("1"));
+		ActivityFacility facility = this.facilities.getFacilities().get(new IdImpl("1"));
 		ActivityOption actOpt = facility.createActivityOption("home");
 		actOpt.setCapacity(1.0);
 
@@ -213,7 +213,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 	
 	public void testOverlapping() {
 		
-		Facility facility = this.facilities.getFacilities().get(new IdImpl("1"));
+		ActivityFacility facility = this.facilities.getFacilities().get(new IdImpl("1"));
 		ActivityOption actOpt = facility.createActivityOption("home");
 		actOpt.setCapacity(1.0);
 

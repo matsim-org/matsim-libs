@@ -21,7 +21,7 @@ package org.matsim.api.core.v01;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.network.BasicLaneDefinitions;
@@ -55,7 +55,7 @@ public class ScenarioImpl implements Scenario {
 	private Config config;
 	private Network network;
 	private Population population;
-	private Facilities facilities;
+	private ActivityFacilities facilities;
 	
 	//non-mandatory attributes
 	private BasicLaneDefinitions laneDefinitions;
@@ -123,7 +123,7 @@ public class ScenarioImpl implements Scenario {
 	/**
 	 * @see org.matsim.api.core.v01.Scenario#getFacilities()
 	 */
-	public Facilities getFacilities() {
+	public ActivityFacilities getFacilities() {
 		return this.facilities;
 	}
 

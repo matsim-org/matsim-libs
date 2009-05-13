@@ -32,8 +32,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
@@ -114,7 +114,7 @@ public class MentalMap {
 					// thus giving it in effect a street address
 					while(myActivity==null){
 						int k = MatsimRandom.getRandom().nextInt(facs.length);
-						Facility f = (Facility) facs[k];
+						ActivityFacility f = (ActivityFacility) facs[k];
 						myActivity = f.getActivityOption(myAct.getType());
 						if(myActivity!=null){
 							myAct.setFacility(myActivity.getFacility());
@@ -127,7 +127,7 @@ public class MentalMap {
 		}
 	}
 
-	public void initializeActActivityMapFromFile(Plan myPlan, Facilities facilities, ActivityActReader aar){
+	public void initializeActActivityMapFromFile(Plan myPlan, ActivityFacilities facilities, ActivityActReader aar){
 
 
 		if(aar==null) return;
@@ -141,7 +141,7 @@ public class MentalMap {
 //			String myActivityType=nextFac.get(myFacilityId);
 				String myActivityType=myAct.getType();
 				
-				Facility fac = facilities.getFacilities().get(myFacilityId);
+				ActivityFacility fac = facilities.getFacilities().get(myFacilityId);
 //			myAct.setFacility(fac);
 //			this.knowledge.addActivity(fac.getActivity(myActivityType));
 				//TODO JH apply some logic to label this a primary or secondary location

@@ -16,8 +16,8 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -49,7 +49,7 @@ public class ReadFromUrbansimParcelModel {
 		this.year = year ;
 	}
 
-	public void readFacilities(final Facilities parcels, final Facilities zones) {
+	public void readFacilities(final ActivityFacilities parcels, final ActivityFacilities zones) {
 		// (these are simply defined as those entities that have x/y coordinates in urbansim)
 		String filename = this.PATH_TO_OPUS_MATSIM+"tmp/parcel__dataset_table__exported_indicators__" + this.year + ".tab" ;
 		log.info( "Starting to read urbansim parcels from " + filename ) ;
@@ -72,7 +72,7 @@ public class ReadFromUrbansimParcelModel {
 
 				Coord coord = new CoordImpl( parts[idxFromKey.get("x_coord_sp")],parts[idxFromKey.get("y_coord_sp")] ) ;
 
-				Facility facility = parcels.createFacility(parcelId,coord) ;
+				ActivityFacility facility = parcels.createFacility(parcelId,coord) ;
 				facility.setDesc("urbansim location") ;
 
 				// Can't add info (in this case zone ID) to facilities, so put into separate data structure:
@@ -99,7 +99,7 @@ public class ReadFromUrbansimParcelModel {
 		long cnt = 0 ;
 	}
 
-	public void constructZones ( final Facilities parcels, final Facilities zones, final Map<Id,Id> zoneFromParcel ) {
+	public void constructZones ( final ActivityFacilities parcels, final ActivityFacilities zones, final Map<Id,Id> zoneFromParcel ) {
 
 		// summing the coordinates of all participating parcels into the zones
 		Map<Id,PseudoZone> pseudoZones = new HashMap<Id,PseudoZone>() ;
@@ -131,7 +131,7 @@ public class ReadFromUrbansimParcelModel {
 
 	}
 
-	public void readPersons(final Population oldPop, final Population newPop, final Facilities facilities, final NetworkLayer network, final double samplingRate ) {
+	public void readPersons(final Population oldPop, final Population newPop, final ActivityFacilities facilities, final NetworkLayer network, final double samplingRate ) {
 		String filename = this.PATH_TO_OPUS_MATSIM+"tmp/person__dataset_table__exported_indicators__" + this.year + ".tab" ;
 		log.info( "Starting to read persons from " + filename ) ;
 

@@ -30,7 +30,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -49,7 +49,7 @@ import org.matsim.world.World;
 public class AnalyzePlans {
 
 	private Population plans = new PopulationImpl();
-	private Facilities facilities;
+	private ActivityFacilities facilities;
 	private NetworkLayer network;
 	
 	private String plansfilePath;
@@ -106,7 +106,7 @@ public class AnalyzePlans {
 		World world = Gbl.getWorld();
 				
 		log.info("reading the facilities ...");
-		this.facilities =(Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		this.facilities =(ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 			
 		log.info("reading the network ...");

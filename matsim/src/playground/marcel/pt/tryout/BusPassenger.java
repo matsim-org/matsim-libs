@@ -21,7 +21,7 @@
 package playground.marcel.pt.tryout;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.population.PersonImpl;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
@@ -29,14 +29,14 @@ import playground.marcel.pt.transitSchedule.TransitLine;
 
 public class BusPassenger extends PersonImpl implements PassengerAgent {
 
-	private final Facility exitStop;
+	private final ActivityFacility exitStop;
 
-	public BusPassenger(final Id id, final Facility exitStop) {
+	public BusPassenger(final Id id, final ActivityFacility exitStop) {
 		super(id);
 		this.exitStop = exitStop;
 	}
 
-	public boolean arriveAtStop(final Facility stop) {
+	public boolean arriveAtStop(final ActivityFacility stop) {
 		return this.exitStop == stop;
 	}
 

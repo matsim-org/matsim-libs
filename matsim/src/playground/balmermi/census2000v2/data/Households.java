@@ -29,8 +29,8 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -91,7 +91,7 @@ public class Households {
 	// public methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public final void parse(String infile, Population plans, Facilities facilities) {
+	public final void parse(String infile, Population plans, ActivityFacilities facilities) {
 		int line_cnt = 0;
 		try {
 			FileReader fr = new FileReader(infile);
@@ -113,7 +113,7 @@ public class Households {
 				int hhtpz = Integer.parseInt(entries[4]);
 				
 				Municipality m = this.municipalities.getMunicipality(mid);
-				Facility f = facilities.getFacilities().get(fid);
+				ActivityFacility f = facilities.getFacilities().get(fid);
 				
 				Household hh = new Household(hhid,m,f);
 				if (hhtpw != Integer.MIN_VALUE) { hh.setHHTPW(hhtpw); }

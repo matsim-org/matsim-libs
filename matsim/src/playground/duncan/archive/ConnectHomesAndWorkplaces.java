@@ -24,7 +24,7 @@ package playground.duncan.archive;
 
 import java.io.PrintWriter;
 
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
@@ -76,7 +76,7 @@ public class ConnectHomesAndWorkplaces {
 		world.setNetworkLayer(network);
 		world.complete();
 
-		Facilities facilities = new FacilitiesImpl() ;
+		ActivityFacilities facilities = new FacilitiesImpl() ;
 		MatsimFacilitiesReader fr = new MatsimFacilitiesReader( facilities ) ;
 		fr.readFile( this.config.facilities().getInputFile() ) ;
 

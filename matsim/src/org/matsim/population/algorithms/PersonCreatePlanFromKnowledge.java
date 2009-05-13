@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -40,7 +40,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 	@Override
 	public void run(final Person person) {
 		Plan p = person.createPlan(true);
-		Facility home_facility = person.getKnowledge().getActivities("home").get(0).getFacility();
+		ActivityFacility home_facility = person.getKnowledge().getActivities("home").get(0).getFacility();
 		ArrayList<ActivityOption> acts = person.getKnowledge().getActivities();
 
 		// first act end time = [7am.9am]
@@ -65,7 +65,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		for (int i=0; i<nof_acts; i++) {
 			int act_index = MatsimRandom.getRandom().nextInt(acts.size());
 			ActivityOption act = acts.get(act_index);
-			Facility f = act.getFacility();
+			ActivityFacility f = act.getFacility();
 			a = p.createActivity(act.getType(),f.getCoord());
 			a.setLink(f.getLink());
 			a.setStartTime(time);

@@ -10,8 +10,8 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -29,7 +29,7 @@ public class Shp2Facilities {
 	private static Collection<Feature> getPolygons(final FeatureSource n) {
 		final Collection<Feature> polygons = new ArrayList<Feature>(); // not needed
 
-		Facilities facilities = new FacilitiesImpl("workplaces",false) ;
+		ActivityFacilities facilities = new FacilitiesImpl("workplaces",false) ;
 		long cnt = 0 ;
 		
 		FeatureIterator it = null;
@@ -63,7 +63,7 @@ public class Shp2Facilities {
 			
 			Id id = new IdImpl( cnt ) ; cnt++ ;
 			
-			Facility facility = facilities.createFacility(id, coord ) ;
+			ActivityFacility facility = facilities.createFacility(id, coord ) ;
 			
 			facility.createActivityOption( (String) feature.getAttribute("LU_CODE") ) ;
 			facility.createActivityOption( (String) feature.getAttribute("LU_DESCRIP") ) ;

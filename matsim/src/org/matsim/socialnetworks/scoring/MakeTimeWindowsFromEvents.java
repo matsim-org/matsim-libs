@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -40,7 +40,7 @@ import org.matsim.socialnetworks.mentalmap.TimeWindow;
 
 public class MakeTimeWindowsFromEvents {
 
-	LinkedHashMap<Facility,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<Facility,ArrayList<TimeWindow>>();
+	LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>>();
 	static final private Logger log = Logger.getLogger(MakeTimeWindowsFromEvents.class);
 	
 	public MakeTimeWindowsFromEvents(){
@@ -94,7 +94,7 @@ public class MakeTimeWindowsFromEvents {
 		this.timeWindowMap.clear();
 	}
 
-	public LinkedHashMap<Facility,ArrayList<TimeWindow>> getTimeWindowMap(){
+	public LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> getTimeWindowMap(){
 		return this.timeWindowMap;
 	}
 }

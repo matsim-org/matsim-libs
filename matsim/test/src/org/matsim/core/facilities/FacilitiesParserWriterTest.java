@@ -20,7 +20,7 @@
 
 package org.matsim.core.facilities;
 
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -52,7 +52,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		super.tearDown();
 	}
 
-	private final void runModules(final Facilities facilities, final World world) {
+	private final void runModules(final ActivityFacilities facilities, final World world) {
 		System.out.println("  running facilities modules... ");
 		new FacilitiesSummary().run(facilities);
 		new FacilitiesCalcMinDist().run(facilities);
@@ -98,7 +98,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		final World world = new World();
 
 		System.out.println("  reading facilites xml file independent of the world...");
-		Facilities facilities = new FacilitiesImpl();
+		ActivityFacilities facilities = new FacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		world.complete();
 		System.out.println("  done.");
@@ -123,7 +123,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		final World world = new World();
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
-		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
+		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		world.complete();
 		System.out.println("  done.");
@@ -157,7 +157,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		System.out.println("  done.");
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
-		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
+		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		world.complete();
 		System.out.println("  done.");
@@ -182,7 +182,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		final World world = new World();
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
-		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
+		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		world.complete();
 		System.out.println("  done.");

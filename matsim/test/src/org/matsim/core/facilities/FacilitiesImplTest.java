@@ -20,7 +20,7 @@
 
 package org.matsim.core.facilities;
 
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.FacilitiesImpl;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
@@ -69,15 +69,15 @@ public class FacilitiesImplTest extends MatsimTestCase {
 		facilities.addAlgorithm(algo1);
 		facilities.addAlgorithm(algo2);
 		// create a first facility
-		Facility f1 = facilities.createFacility(new IdImpl(1), new CoordImpl(1.0, 1.0));
+		ActivityFacility f1 = facilities.createFacility(new IdImpl(1), new CoordImpl(1.0, 1.0));
 		facilities.finishFacility(f1);
 		assertEquals(1, algo1.getCounter());
 		assertEquals(1, algo2.getCounter());
 		assertEquals("in streaming, facilities should contain no facility", 0, facilities.getFacilities().size());
 		// create two other facilities
-		Facility f2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2.0, 2.0));
+		ActivityFacility f2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2.0, 2.0));
 		facilities.finishFacility(f2);
-		Facility f3 = facilities.createFacility(new IdImpl(3), new CoordImpl(3.0, 3.0));
+		ActivityFacility f3 = facilities.createFacility(new IdImpl(3), new CoordImpl(3.0, 3.0));
 		facilities.finishFacility(f3);
 		assertEquals(3, algo1.getCounter());
 		assertEquals(3, algo2.getCounter());
@@ -87,7 +87,7 @@ public class FacilitiesImplTest extends MatsimTestCase {
 	/*package*/ static class MockAlgo1 extends AbstractFacilityAlgorithm {
 		private int counter = 0;
 
-		public void run(final Facility facility) {
+		public void run(final ActivityFacility facility) {
 			this.counter++;
 		}
 
@@ -99,7 +99,7 @@ public class FacilitiesImplTest extends MatsimTestCase {
 	/*package*/ static class MockAlgo2 implements FacilityAlgorithm {
 		private int counter = 0;
 
-		public void run(final Facility facility) {
+		public void run(final ActivityFacility facility) {
 			this.counter++;
 		}
 

@@ -29,13 +29,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.world.Layer;
 
-public class FacilitiesImpl extends Layer implements Facilities {
+public class FacilitiesImpl extends Layer implements ActivityFacilities {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -73,11 +73,11 @@ public class FacilitiesImpl extends Layer implements Facilities {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Facility createFacility(final Id id, final Coord center) {
+	public final ActivityFacility createFacility(final Id id, final Coord center) {
 		if (this.locations.containsKey(id)) {
 			Gbl.errorMsg("Facility id=" + id + " already exists.");
 		}
-		Facility f = new FacilityImpl(this,id,center);
+		ActivityFacility f = new FacilityImpl(this,id,center);
 		this.locations.put(f.getId(),f);
 
 		// show counter
@@ -106,7 +106,7 @@ public class FacilitiesImpl extends Layer implements Facilities {
 		if (!this.isStreaming) {
 			for (int i = 0; i < this.algorithms.size(); i++) {
 				FacilityAlgorithm algo = this.algorithms.get(i);
-				for (Facility f : getFacilities().values()) {
+				for (ActivityFacility f : getFacilities().values()) {
 					algo.run(f);
 				}
 			}
@@ -119,7 +119,7 @@ public class FacilitiesImpl extends Layer implements Facilities {
 	// finish methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void finishFacility(final Facility f) {
+	public final void finishFacility(final ActivityFacility f) {
 		if (this.isStreaming) {
 			// run algorithms
 			for (FacilityAlgorithm facilitiesAlgo : this.algorithms) {
@@ -147,16 +147,16 @@ public class FacilitiesImpl extends Layer implements Facilities {
 	//////////////////////////////////////////////////////////////////////
 
 	@SuppressWarnings("unchecked")
-	public final Map<Id, ? extends Facility> getFacilities() {
-		return (Map<Id, ? extends Facility>) getLocations();
+	public final Map<Id, ? extends ActivityFacility> getFacilities() {
+		return (Map<Id, ? extends ActivityFacility>) getLocations();
 	}
 
 	//Added 27.03.08 JH for random secondary location changes
-	public final TreeMap<Id,Facility> getFacilities(final String act_type) {
-		TreeMap<Id,Facility> facs = new TreeMap<Id, Facility>();
-		Iterator<? extends Facility> iter = this.getFacilities().values().iterator();
+	public final TreeMap<Id,ActivityFacility> getFacilitiesForActivityType(final String act_type) {
+		TreeMap<Id,ActivityFacility> facs = new TreeMap<Id, ActivityFacility>();
+		Iterator<? extends ActivityFacility> iter = this.getFacilities().values().iterator();
 		while (iter.hasNext()){
-			Facility f = iter.next();
+			ActivityFacility f = iter.next();
 			Map<String, ActivityOption> a = f.getActivityOptions();
 			if(a.containsKey(act_type)){
 				facs.put(f.getId(),f);

@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 
 /**
@@ -47,7 +47,7 @@ public class FacilitiesActTypeFilter extends AbstractFacilityFilter {
 		this.actTypePatterns.add(actTypePattern);
 	}
 
-	public boolean judge(final Facility facility) {
+	public boolean judge(final ActivityFacility facility) {
 
 		Iterator<String> activityIterator = facility.getActivityOptions().keySet().iterator();
 		while (activityIterator.hasNext()) {

@@ -26,7 +26,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.Facilities;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -49,7 +49,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
 
 	private final static Logger log = Logger.getLogger(MatsimFacilitiesReader.class);
 	
-	private final Facilities facilities;
+	private final ActivityFacilities facilities;
 	private MatsimXmlParser delegate = null;
 
 	/**
@@ -57,7 +57,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
 	 *
 	 * @param facilities The Facilities-object to store the facilities in.
 	 */
-	public MatsimFacilitiesReader(final Facilities facilities) {
+	public MatsimFacilitiesReader(final ActivityFacilities facilities) {
 		this.facilities = facilities;
 	}
 
