@@ -41,8 +41,8 @@
 		<param name="endTime" value="24:00:00" />
 		<param name="flowCapacityFactor" value="0.1" />
 		<param name="storageCapacityFactor" value="0.3" />
-		<param name = "snapshotperiod"	value = "00:15:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims -->
+		<param name = "snapshotperiod"	value = "00:10:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims, otfvis -->
 	</module>
 
 	<module name="planCalcScore">
