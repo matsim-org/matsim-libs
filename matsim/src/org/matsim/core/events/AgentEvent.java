@@ -71,5 +71,15 @@ public abstract class AgentEvent extends PersonEvent implements BasicAgentEvent 
 	public Id getLinkId() {
 		return this.linkId;
 	}
-
+	/**
+	 * @deprecated this method is only needed because there is no clear separation of
+	 * Basic*Event implementations and Event implementations as soon as appropriate
+	 * readers exist it can be removed so don't use if not really necessary
+	 * @param link
+	 */
+	@Deprecated
+	public void setLink(Link link) {
+		this.link = link;
+	}
+	
 }

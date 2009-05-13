@@ -41,7 +41,7 @@ public class LinkToLinkTravelTimeCalculatorTest extends MatsimTestCase {
 	 */
 	public void testLongTravelTimeInEmptySlot() {
 		Scenario scenario = new ScenarioImpl(loadConfig(null));
-
+    scenario.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
@@ -54,7 +54,7 @@ public class LinkToLinkTravelTimeCalculatorTest extends MatsimTestCase {
 
 		int timeBinSize = 15*60;
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-		LinkToLinkTravelTimeCalculator ttcalc = new LinkToLinkTravelTimeCalculator(network, timeBinSize, 12*3600, factory, true);
+		LinkToLinkTravelTimeCalculator ttcalc = new LinkToLinkTravelTimeCalculator(network, timeBinSize, 12*3600, factory, scenario.getConfig().travelTimeCalculator());
 
 		Person person1 = new PersonImpl(new IdImpl(1)); // person 1 travels link1 + link2
 		Person person2 = new PersonImpl(new IdImpl(2)); // person 2 travels link1 + link2

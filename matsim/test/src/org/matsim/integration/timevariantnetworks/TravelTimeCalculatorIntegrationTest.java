@@ -23,6 +23,7 @@ package org.matsim.integration.timevariantnetworks;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
@@ -31,6 +32,7 @@ import org.matsim.core.network.TimeVariantLinkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.LinkToLinkTravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeAggregatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
@@ -74,7 +76,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 	}
 
 	public void testTravelTimeCalculatorHashMap() {
-		loadConfig(null);
+		Config config = loadConfig(null);
 
 		// create a network
 		NetworkFactory nf = new NetworkFactory();
@@ -101,7 +103,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 		
-		TravelTime ttcalc = new TravelTimeCalculator(network, 15*60, 30*3600, factory);
+		TravelTime ttcalc = new LinkToLinkTravelTimeCalculator(network, 15*60, 30*3600, factory, config.travelTimeCalculator());
 
 		// do the tests
 		assertEquals(10.0, ttcalc.getLinkTravelTime(link2, 7*3600.0), EPSILON);

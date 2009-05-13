@@ -25,6 +25,8 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -33,10 +35,14 @@ import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.AgentStuckEvent;
+import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
@@ -80,16 +86,26 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		String networkFile = getClassInputDirectory() + "link10_network.xml";
 		String eventsFile = getClassInputDirectory() + "link10_events.txt";
 
-		Scenario scenario = new ScenarioImpl(loadConfig(null));
+		Scenario scenario = new ScenarioImpl();
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFile);
 
 		Events events = new Events();
-		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 30*3600, factory);
-		events.addHandler(ttcalc);
+		List<BasicEventImpl> eventsList = new LinkedList<BasicEventImpl>();
+		events.addHandler(new EventsConverter(eventsList, network));
 		new MatsimEventsReader(events).readFile(eventsFile);
 		events.printEventsCount();
 
+		
+		Events events2 = new Events();
+		
+		LinkToLinkTravelTimeCalculator ttcalc = new LinkToLinkTravelTimeCalculator(network, timeBinSize, 30*3600, factory, scenario.getConfig().travelTimeCalculator());
+		events2.addHandler(ttcalc);
+		for (BasicEventImpl e : eventsList){
+			events2.processEvent(e);
+		}
+		
+		
 		// read comparison data
 		BufferedReader infile = new BufferedReader(new FileReader(compareFile));
 		String line;
@@ -149,7 +165,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		int timeBinSize = 15*60;
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, factory);
+		LinkToLinkTravelTimeCalculator ttcalc = new LinkToLinkTravelTimeCalculator(network, timeBinSize, 12*3600, factory, scenario.getConfig().travelTimeCalculator());
 
 		Person person = new PersonImpl(new IdImpl(1));
 		
@@ -171,5 +187,36 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		assertEquals(10     , ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 4*timeBinSize), EPSILON);  // freespeedTravelTime > linkTravelTime2 - 1*timeBinSize
 		assertEquals(10     , ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 5*timeBinSize), EPSILON);  // freespeedTravelTime > linkTravelTime2 - 2*timeBinSize
 	}
+	
+	private static class EventsConverter implements BasicEventHandler {
+		 
+		private Network network;
+		private List<BasicEventImpl> eventsList;
+		
+		public EventsConverter(List<BasicEventImpl> eventsList, Network network) {
+			this.network = network;
+			this.eventsList = eventsList;
+		}
+
+		public void reset(int iteration) {
+		}
+
+		public void handleEvent(BasicEventImpl event) {
+			if (event instanceof LinkEvent){
+				LinkEvent e = (LinkEvent) event;
+				Link l = this.network.getLink(e.getLinkId());
+				e.setLink(l);
+			}
+			else if (event instanceof AgentStuckEvent){
+				AgentStuckEvent e = (AgentStuckEvent)event;
+				Link l = this.network.getLink(e.getLinkId());
+				e.setLink(l);
+				
+			}
+			this.eventsList.add(event);
+		}
+		
+	};
+ 
 
 }

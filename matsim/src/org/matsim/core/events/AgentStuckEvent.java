@@ -43,6 +43,7 @@ public class AgentStuckEvent extends AgentEvent implements BasicAgentStuckEvent 
 		return EVENT_TYPE;
 	}
 
+	@Override
 	public String getTextRepresentation() {
 		return asString() + "3\t" + EVENT_TYPE;
 	}
