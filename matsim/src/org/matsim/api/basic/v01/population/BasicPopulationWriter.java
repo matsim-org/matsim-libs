@@ -48,7 +48,7 @@ public class BasicPopulationWriter {
 	 * @param filename
 	 */
 	public void writeV4(final String filename) {
-		new PopulationWriter(population, filename, "v4").write();
+		new PopulationWriter(population, filename, "v4", 1.0).write();
 	}
 	
 }
