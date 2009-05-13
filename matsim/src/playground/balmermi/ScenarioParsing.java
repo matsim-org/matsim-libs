@@ -20,7 +20,7 @@
 
 package playground.balmermi;
 
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 
@@ -100,7 +100,7 @@ public class ScenarioParsing {
 
 		//////////////////////////////////////////////////////////////////////
 		
-		FacilitiesImpl facs = new FacilitiesImpl(null,true);
+		ActivityFacilitiesImpl facs = new ActivityFacilitiesImpl(null,true);
 		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_EHIGH));
 		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_EKIGA));
 		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_EOTHR));

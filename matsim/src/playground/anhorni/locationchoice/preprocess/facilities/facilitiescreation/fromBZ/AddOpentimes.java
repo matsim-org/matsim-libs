@@ -32,7 +32,7 @@ import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
@@ -48,7 +48,7 @@ import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreatio
  */
 public class AddOpentimes extends AbstractFacilityAlgorithm {
 
-	private final FacilitiesImpl shopsOf2005 = new FacilitiesImpl("shopsOf2005", FacilitiesImpl.FACILITIES_NO_STREAMING);
+	private final ActivityFacilitiesImpl shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
 	private final String shopsOf2005Filename = "input/facilities/facilities_shopsOf2005.xml";
 	private static final Logger log = Logger.getLogger(AddOpentimes.class);
 

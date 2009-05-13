@@ -23,7 +23,7 @@ package org.matsim.core.facilities.algorithms;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -31,7 +31,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class AbstractFacilityAlgorithmTest extends MatsimTestCase {
 
 	public void testRunAlgorithms() {
-		final ActivityFacilities facilities = new FacilitiesImpl();
+		final ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		// create 2 facilities
 		facilities.createFacility(new IdImpl(1), new CoordImpl(1.0, 1.0));
 		facilities.createFacility(new IdImpl(2), new CoordImpl(2.0, 2.0));

@@ -40,7 +40,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -320,7 +320,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
 		// TODO [MR] remove after testing
 		TransitSchedule schedule = new TransitSchedule();
-		ActivityFacilities facilities = new FacilitiesImpl();
+		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
 		TransitScheduleReaderBerta reader = new TransitScheduleReaderBerta(schedule, facilities, transformation);
 		reader.setLocalDtdDirectory("../thesis-data/examples/berta/");

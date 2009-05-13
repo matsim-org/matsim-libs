@@ -40,13 +40,13 @@ import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
-public class FacilityImpl extends AbstractLocation implements ActivityFacility {
+public class ActivityFacilityImpl extends AbstractLocation implements ActivityFacility {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final static Logger log = Logger.getLogger(FacilityImpl.class);
+	private final static Logger log = Logger.getLogger(ActivityFacilityImpl.class);
 	
 	private final TreeMap<String, ActivityOption> activities = new TreeMap<String, ActivityOption>();
 	private String desc = null;
@@ -55,7 +55,7 @@ public class FacilityImpl extends AbstractLocation implements ActivityFacility {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	protected FacilityImpl(final FacilitiesImpl layer, final Id id, final Coord center) {
+	protected ActivityFacilityImpl(final ActivityFacilitiesImpl layer, final Id id, final Coord center) {
 		super(layer,id,center);
 	}
 

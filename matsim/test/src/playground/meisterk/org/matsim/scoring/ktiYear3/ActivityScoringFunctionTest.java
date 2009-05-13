@@ -39,7 +39,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
@@ -79,7 +79,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		this.person = new PersonImpl(new IdImpl("123"));
 
 		// generate facilities
-		this.facilities = new FacilitiesImpl();
+		this.facilities = new ActivityFacilitiesImpl();
 		ActivityFacility facility1 = this.facilities.createFacility(new IdImpl("1"), new CoordImpl(0.0, 0.0));
 		ActivityFacility facility3 = this.facilities.createFacility(new IdImpl("3"), new CoordImpl(1000.0, 1000.0));
 		ActivityFacility facility5 = this.facilities.createFacility(new IdImpl("5"), new CoordImpl(1000.0, 1010.0));

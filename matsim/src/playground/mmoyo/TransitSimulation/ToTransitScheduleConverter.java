@@ -11,7 +11,7 @@ import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkLayer;
@@ -27,7 +27,7 @@ import playground.mmoyo.PTCase2.PTTimeTable2;
 import playground.mmoyo.PTRouter.PTLine;
 
 public class ToTransitScheduleConverter {
-	ActivityFacilities facilities = new FacilitiesImpl();
+	ActivityFacilities facilities = new ActivityFacilitiesImpl();
 	private static Time time;
 	
 	public ToTransitScheduleConverter (){
@@ -92,7 +92,7 @@ public class ToTransitScheduleConverter {
 	
 	
 	public void createFacilities(NetworkLayer net, String outFile){
-		ActivityFacilities facilities = new FacilitiesImpl();
+		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		
 		for (Node node:  net.getNodes().values()){
 			facilities.createFacility(node.getId(), node.getCoord());

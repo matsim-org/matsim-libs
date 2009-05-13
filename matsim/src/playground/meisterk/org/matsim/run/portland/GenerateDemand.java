@@ -21,7 +21,7 @@
 package playground.meisterk.org.matsim.run.portland;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -57,7 +57,7 @@ public class GenerateDemand {
 		System.out.println("Reading network...done.");
 
 		System.out.println("Reading facilities...");
-		FacilitiesImpl facilityLayer = new FacilitiesImpl();
+		ActivityFacilitiesImpl facilityLayer = new ActivityFacilitiesImpl();
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilityLayer);
 		//facilities_reader.setValidating(false);
 		facilities_reader.readFile(config.facilities().getInputFile());

@@ -34,7 +34,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -64,7 +64,7 @@ public class CreatePseudoNetwork {
 	private long nodeIdCounter = 0;
 	
 	public void run() {
-		FacilitiesImpl facilities = new FacilitiesImpl();
+		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 		network = new NetworkLayer();
 		this.linkIdCounter = 0;
 		this.nodeIdCounter = 0;

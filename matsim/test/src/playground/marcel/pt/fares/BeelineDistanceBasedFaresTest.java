@@ -23,14 +23,14 @@ package playground.marcel.pt.fares;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public final class BeelineDistanceBasedFaresTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost_DifferentCostsPerKilometer() {
-		final ActivityFacilities facilities = new FacilitiesImpl();
+		final ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		final ActivityFacility fromStop = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
 		final ActivityFacility toStop = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
 
@@ -40,7 +40,7 @@ public final class BeelineDistanceBasedFaresTest extends MatsimTestCase {
 	}
 
 	public void testGetSingleTripCost_SameFromAsTo() {
-		final ActivityFacilities facilities = new FacilitiesImpl();
+		final ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		final ActivityFacility fromStop = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
 
 		assertEquals(0.0, new BeelineDistanceBasedFares(1.0).getSingleTripCost(fromStop, fromStop), EPSILON);

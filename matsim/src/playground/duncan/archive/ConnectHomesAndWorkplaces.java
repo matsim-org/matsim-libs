@@ -28,7 +28,7 @@ import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -76,7 +76,7 @@ public class ConnectHomesAndWorkplaces {
 		world.setNetworkLayer(network);
 		world.complete();
 
-		ActivityFacilities facilities = new FacilitiesImpl() ;
+		ActivityFacilities facilities = new ActivityFacilitiesImpl() ;
 		MatsimFacilitiesReader fr = new MatsimFacilitiesReader( facilities ) ;
 		fr.readFile( this.config.facilities().getInputFile() ) ;
 

@@ -35,7 +35,7 @@ import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.world.Layer;
 
-public class FacilitiesImpl extends Layer implements ActivityFacilities {
+public class ActivityFacilitiesImpl extends Layer implements ActivityFacilities {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -49,15 +49,15 @@ public class FacilitiesImpl extends Layer implements ActivityFacilities {
 	public static final boolean FACILITIES_USE_STREAMING = true;
 	public static final boolean FACILITIES_NO_STREAMING = false;
 	
-	private boolean isStreaming = FacilitiesImpl.FACILITIES_NO_STREAMING;
+	private boolean isStreaming = ActivityFacilitiesImpl.FACILITIES_NO_STREAMING;
 	
-	private static final Logger log = Logger.getLogger(FacilitiesImpl.class);
+	private static final Logger log = Logger.getLogger(ActivityFacilitiesImpl.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public FacilitiesImpl(final String name, final boolean isStreaming) {
+	public ActivityFacilitiesImpl(final String name, final boolean isStreaming) {
 		super(LAYER_TYPE, name);
 		this.isStreaming = isStreaming;
 	}
@@ -65,7 +65,7 @@ public class FacilitiesImpl extends Layer implements ActivityFacilities {
 	/**
 	 * Creates a new Facilities object with streaming switched off.
 	 */
-	public FacilitiesImpl() {
+	public ActivityFacilitiesImpl() {
 		this(null, false);
 	}
 
@@ -77,7 +77,7 @@ public class FacilitiesImpl extends Layer implements ActivityFacilities {
 		if (this.locations.containsKey(id)) {
 			Gbl.errorMsg("Facility id=" + id + " already exists.");
 		}
-		ActivityFacility f = new FacilityImpl(this,id,center);
+		ActivityFacility f = new ActivityFacilityImpl(this,id,center);
 		this.locations.put(f.getId(),f);
 
 		// show counter

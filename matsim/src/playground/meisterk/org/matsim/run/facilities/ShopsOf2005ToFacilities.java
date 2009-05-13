@@ -64,7 +64,7 @@ import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTimeImpl;
@@ -228,7 +228,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void transformGeocodedKMLToFacilities() {
 
-		ActivityFacilities shopsOf2005 = new FacilitiesImpl("shopsOf2005", FacilitiesImpl.FACILITIES_NO_STREAMING);
+		ActivityFacilities shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
 
 		JAXBElement<KmlType> kmlElement = null;
 
@@ -1453,7 +1453,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void shopsToTXT() {
 
-		ActivityFacilities shopsOf2005 = new FacilitiesImpl("shopsOf2005", FacilitiesImpl.FACILITIES_NO_STREAMING);
+		ActivityFacilities shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
 		ArrayList<String> txtLines = new ArrayList<String>();
 		ShopId shopId = null;
 		String aShopLine = null;
@@ -1611,7 +1611,7 @@ public class ShopsOf2005ToFacilities {
 
 		ActivityFacilities facilities = null;
 		for (int dataSetIndex : new int[]{SHOPS_OF_2005/*, SHOPS_FROM_ENTERPRISE_CENSUS*/}) {
-			facilities = new FacilitiesImpl(shopsNames.get(new Integer(dataSetIndex)), FacilitiesImpl.FACILITIES_NO_STREAMING);
+			facilities = new ActivityFacilitiesImpl(shopsNames.get(new Integer(dataSetIndex)), ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
 
 			System.out.println("Reading facilities xml file... ");
 			FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilities);
@@ -1715,9 +1715,9 @@ public class ShopsOf2005ToFacilities {
 
 	private static void applyOpentimesToEnterpriseCensus() {
 
-		FacilitiesImpl facilities_input = new FacilitiesImpl("Switzerland based on Enterprise census 2000.", FacilitiesImpl.FACILITIES_USE_STREAMING);
+		ActivityFacilitiesImpl facilities_input = new ActivityFacilitiesImpl("Switzerland based on Enterprise census 2000.", ActivityFacilitiesImpl.FACILITIES_USE_STREAMING);
 
-		FacilitiesImpl facilities_output = new FacilitiesImpl("Facilities KTI Year 2", FacilitiesImpl.FACILITIES_NO_STREAMING);
+		ActivityFacilitiesImpl facilities_output = new ActivityFacilitiesImpl("Facilities KTI Year 2", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
 
 		// init algorithms
 		FacilitiesOpentimesKTIYear2 facilitiesOpentimesKTIYear2 = new FacilitiesOpentimesKTIYear2();

@@ -7,7 +7,7 @@ import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -87,8 +87,8 @@ public class Matsim4Urbansim {
 		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year ) ;
 
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
-		ActivityFacilities facilities = new FacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)", FacilitiesImpl.FACILITIES_NO_STREAMING) ;
-		ActivityFacilities zones      = new FacilitiesImpl("urbansim zones", FacilitiesImpl.FACILITIES_NO_STREAMING) ;
+		ActivityFacilities facilities = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING) ;
+		ActivityFacilities zones      = new ActivityFacilitiesImpl("urbansim zones", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING) ;
 		readFromUrbansim.readFacilities( facilities, zones ) ;
 
 		FacilitiesWriter facWriter = new FacilitiesWriter(facilities,PATH_TO_OPUS_MATSIM+"tmp/locations.xml.gz") ;

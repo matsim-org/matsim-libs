@@ -22,7 +22,7 @@ package playground.marcel;
 
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -41,7 +41,7 @@ public class PrintFacilityNetworkMatching {
 	public static void printMatching(final String networkFilename, final String facilitiesFilename, final String mappingFilename) {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
-		FacilitiesImpl facilities = new FacilitiesImpl();
+		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(facilitiesFilename);
 		
 		World world = new World();

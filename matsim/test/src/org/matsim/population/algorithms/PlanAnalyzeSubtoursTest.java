@@ -32,7 +32,7 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -65,7 +65,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	
 	public void testFacilitiesBased() {
 		Config config = loadConfig(PlanAnalyzeSubtoursTest.CONFIGFILE);
-		FacilitiesImpl facilities = new FacilitiesImpl();
+		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 
 		config.planomat().setTripStructureAnalysisLayer("facility");

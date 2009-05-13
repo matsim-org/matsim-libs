@@ -47,7 +47,7 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -90,7 +90,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		this.lrr = new LinksRetailerReader (controler);
 		this.links = lrr.ReadLinks(); 
 		this.txf = new MakeATableFromXMLFacilities("output/facilities_table2.txt");
-		FacilitiesImpl facs = (FacilitiesImpl) controler.getFacilities();
+		ActivityFacilitiesImpl facs = (ActivityFacilitiesImpl) controler.getFacilities();
 		txf.write(facs);
 		String retailersOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
 		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }

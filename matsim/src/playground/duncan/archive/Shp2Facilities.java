@@ -13,7 +13,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -29,7 +29,7 @@ public class Shp2Facilities {
 	private static Collection<Feature> getPolygons(final FeatureSource n) {
 		final Collection<Feature> polygons = new ArrayList<Feature>(); // not needed
 
-		ActivityFacilities facilities = new FacilitiesImpl("workplaces",false) ;
+		ActivityFacilities facilities = new ActivityFacilitiesImpl("workplaces",false) ;
 		long cnt = 0 ;
 		
 		FeatureIterator it = null;

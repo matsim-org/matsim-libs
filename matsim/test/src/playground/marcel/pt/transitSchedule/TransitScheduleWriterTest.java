@@ -33,7 +33,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -55,7 +55,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		Link l2 = network.createLink(new IdImpl("2"), n2, n3, 1000, 10, 3600, 1.0);
 		Link l3 = network.createLink(new IdImpl("3"), n3, n4, 1000, 10, 3600, 1.0);
 		Link l4 = network.createLink(new IdImpl("4"), n4, n5, 1000, 10, 3600, 1.0);
-		ActivityFacilities facilities = new FacilitiesImpl();
+		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 
 		ActivityFacility stop1 = facilities.createFacility(new IdImpl("stop1"), new CoordImpl(0, 0));
 		ActivityFacility stop2 = facilities.createFacility(new IdImpl("stop2"), new CoordImpl(1000, 0));

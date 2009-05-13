@@ -22,7 +22,7 @@ package org.matsim.core.facilities;
 
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.examples.TriangleScenario;
@@ -98,7 +98,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		final World world = new World();
 
 		System.out.println("  reading facilites xml file independent of the world...");
-		ActivityFacilities facilities = new FacilitiesImpl();
+		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		world.complete();
 		System.out.println("  done.");

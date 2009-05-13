@@ -30,7 +30,7 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunction;
@@ -53,7 +53,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		super.setUp();
 
 		// create facilities, activities in it and open times
-		ActivityFacilities facilities = new FacilitiesImpl();
+		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 
 		Coord defaultCoord = new CoordImpl(0.0, 0.0);
 		ActivityFacility testFacility = facilities.createFacility(new IdImpl(0), defaultCoord);

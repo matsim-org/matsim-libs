@@ -26,7 +26,7 @@ import java.util.Map;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -34,7 +34,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class MultipleFareSystemsTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost() {
-		final ActivityFacilities facilities = new FacilitiesImpl();
+		final ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		final ActivityFacility stop1 = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
 		final ActivityFacility stop2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
 		final ActivityFacility stop3 = facilities.createFacility(new IdImpl(3), new CoordImpl(1100, 1200));

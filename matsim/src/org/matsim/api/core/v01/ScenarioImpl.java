@@ -34,7 +34,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.vehicles.BasicVehicles;
 import org.matsim.core.basic.v01.vehicles.BasicVehiclesImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.FacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
@@ -84,8 +84,8 @@ public class ScenarioImpl implements Scenario {
 		this.getWorld().setNetworkLayer((NetworkLayer) this.network);
 		this.getWorld().complete();
 		this.population = new PopulationImpl();
-		this.facilities = new FacilitiesImpl();
-		this.getWorld().setFacilityLayer((FacilitiesImpl) this.facilities);
+		this.facilities = new ActivityFacilitiesImpl();
+		this.getWorld().setFacilityLayer((ActivityFacilitiesImpl) this.facilities);
 	
 		this.households = new HouseholdsImpl();
 		this.vehicles = new BasicVehiclesImpl();
