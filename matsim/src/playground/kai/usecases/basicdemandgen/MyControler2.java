@@ -22,31 +22,18 @@ package playground.kai.usecases.basicdemandgen;
  * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
  */
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureIterator;
-import org.matsim.api.basic.v01.BasicScenario;
-import org.matsim.api.basic.v01.BasicScenarioImpl;
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.geotools.feature.*;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.*;
+
+import org.matsim.api.basic.v01.*;
+import org.matsim.api.basic.v01.population.*;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
 
 
@@ -159,10 +146,10 @@ public class MyControler2 {
 		//dg yes but the used constructor from PopulationWriter doesn't need the config parameter
 		// so we don't need any Gbl or config 
 		// write the population for debugging purposes
-		PopulationWriter popWriter = new PopulationWriter(plans, "pop.xml.gz") ;
-		popWriter.write() ;
+		BasicPopulationWriter popWriter = new BasicPopulationWriter(plans) ;
+		popWriter.write("pop.xml.gz") ;
 
-		log.info("### DONE with demand generation  ###") ;
+		log.info("### DONE with demand generation  ### at " + new File("pop.xml.gz").getAbsolutePath()) ;
 	}
 
 }
