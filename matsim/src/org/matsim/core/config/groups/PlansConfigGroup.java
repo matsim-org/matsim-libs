@@ -20,9 +20,10 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.TreeMap;
+import java.util.*;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.core.config.Module;
 
 public class PlansConfigGroup extends Module {
@@ -52,6 +53,13 @@ public class PlansConfigGroup extends Module {
 
 	public PlansConfigGroup() {
 		super(GROUP_NAME);
+	}
+
+	@Override
+	protected Map<String, String> getComments() {
+		Map<String,String> map = super.getComments();
+		map.put(OUTPUT_FILE, "Path where plans file should be written to.  As far as I know, this variable is ignored when the controler is used.");
+		return map;
 	}
 
 	@Override
