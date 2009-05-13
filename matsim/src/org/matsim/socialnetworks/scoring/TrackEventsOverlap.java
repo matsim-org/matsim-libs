@@ -27,10 +27,10 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
-import org.matsim.core.events.handler.ActEndEventHandler;
-import org.matsim.core.events.handler.ActStartEventHandler;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 
 
@@ -40,7 +40,7 @@ import org.matsim.socialnetworks.mentalmap.TimeWindow;
  *
  * @author jhackney
  */
-public class TrackEventsOverlap implements ActStartEventHandler, ActEndEventHandler {
+public class TrackEventsOverlap implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>>();
 	LinkedHashMap<Activity,Double> startMap = new LinkedHashMap<Activity,Double>();
@@ -55,7 +55,7 @@ public class TrackEventsOverlap implements ActStartEventHandler, ActEndEventHand
 	}
 
 
-	public void handleEvent(final ActEndEvent event) {
+	public void handleEvent(final ActivityEndEvent event) {
 
 		double eventStartTime=-999;// event start time is unknown
 		double eventEndTime=event.getTime();
@@ -85,7 +85,7 @@ public class TrackEventsOverlap implements ActStartEventHandler, ActEndEventHand
 		}
 	}
 
-	public void handleEvent(final ActStartEvent event) {
+	public void handleEvent(final ActivityStartEvent event) {
 
 		double eventStartTime=event.getTime();
 		double eventEndTime=-999;// the event end time is not known

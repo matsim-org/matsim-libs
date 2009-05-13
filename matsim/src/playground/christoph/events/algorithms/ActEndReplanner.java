@@ -25,8 +25,8 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.handler.ActEndEventHandler;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -43,7 +43,7 @@ import playground.christoph.router.KnowledgePlansCalcRoute;
  * contains this and the next Activity and the Leg between them.
  */
 
-public class ActEndReplanner implements ActEndEventHandler {
+public class ActEndReplanner implements ActivityEndEventHandler {
 	
 	protected PlanAlgorithm replanner;
 	protected Person person;
@@ -88,7 +88,7 @@ public class ActEndReplanner implements ActEndEventHandler {
 	}
 	
 	// used when acting as EventHandler
-	public void handleEvent(ActEndEvent event) {
+	public void handleEvent(ActivityEndEvent event) {
 		// TODO Auto-generated method stub
 
 		// If replanning flag is set in the Person

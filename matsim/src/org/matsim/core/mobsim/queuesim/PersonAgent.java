@@ -30,8 +30,8 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PlanElement;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -163,7 +163,7 @@ public class PersonAgent implements DriverAgent {
 	 */
 	public void activityEnds(final double now) {
 		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
-		QueueSimulation.getEvents().processEvent(new ActEndEvent(now, this.getPerson(), this.currentLink, act));
+		QueueSimulation.getEvents().processEvent(new ActivityEndEvent(now, this.getPerson(), this.currentLink, act));
 		advancePlanElement(now);
 	}
 
@@ -211,7 +211,7 @@ public class PersonAgent implements DriverAgent {
 	 * @param act the activity the agent reaches
 	 */
 	private void reachActivity(final double now, final Activity act) {
-		QueueSimulation.getEvents().processEvent(new ActStartEvent(now, this.getPerson(), this.currentLink, act));
+		QueueSimulation.getEvents().processEvent(new ActivityStartEvent(now, this.getPerson(), this.currentLink, act));
 		/* schedule a departure if either duration or endtime is set of the activity.
 		 * Otherwise, the agent will just stay at this activity for ever...
 		 */

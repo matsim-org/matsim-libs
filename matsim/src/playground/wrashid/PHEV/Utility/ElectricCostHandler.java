@@ -7,15 +7,15 @@ import java.util.HashMap;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.PersonEvent;
-import org.matsim.core.events.handler.ActEndEventHandler;
-import org.matsim.core.events.handler.ActStartEventHandler;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
@@ -23,7 +23,7 @@ import org.matsim.core.events.handler.LinkLeaveEventHandler;
 //TODO: write tests for this class
 
 public class ElectricCostHandler implements LinkLeaveEventHandler,
-		LinkEnterEventHandler, ActStartEventHandler, ActEndEventHandler,
+		LinkEnterEventHandler, ActivityStartEventHandler, ActivityEndEventHandler,
 		AgentMoneyEventHandler {
 	// key: agentId
 	// value: energyState
@@ -185,7 +185,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// 0sec)
 	}
 
-	public void handleEvent(ActStartEvent event) {
+	public void handleEvent(ActivityStartEvent event) {
 		// for some strange reason, the links, person are not set using the DES
 		// controller
 		if (controler == null) {
@@ -204,7 +204,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		recordSOCOfVehicle(event);
 	}
 
-	public void handleEvent(ActEndEvent event) {
+	public void handleEvent(ActivityEndEvent event) {
 		// for some strange reason, the links, person are not set using the DES
 		// controller
 		if (controler == null) {

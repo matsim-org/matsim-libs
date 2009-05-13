@@ -23,12 +23,11 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicActEvent;
+import org.matsim.api.basic.v01.events.BasicActivityEvent;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.*;
 
-abstract class ActEvent extends PersonEvent implements BasicActEvent {
+abstract class ActivityEvent extends PersonEvent implements BasicActivityEvent {
 
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_ACTTYPE = "actType";
@@ -39,7 +38,7 @@ abstract class ActEvent extends PersonEvent implements BasicActEvent {
 	private transient Link link;
 	private transient Activity act;
 
-	ActEvent(final double time, final Person agent, final Link link, final Activity act) {
+	ActivityEvent(final double time, final Person agent, final Link link, final Activity act) {
 		super(time, agent);
 		this.act = act;
 		this.link = link;
@@ -47,7 +46,7 @@ abstract class ActEvent extends PersonEvent implements BasicActEvent {
 		this.acttype = act.getType();
 	}
 
-	ActEvent(final double time, final Id agentId, final Id linkId, final String acttype) {
+	ActivityEvent(final double time, final Id agentId, final Id linkId, final String acttype) {
 		super(time, agentId);
 		this.linkId = linkId;
 		this.acttype = acttype == null ? "" : acttype;

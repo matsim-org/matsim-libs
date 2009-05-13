@@ -3,8 +3,8 @@ package org.matsim.core.mobsim.jdeqsim.util;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.PersonEvent;
 import org.matsim.core.mobsim.jdeqsim.EventLog;
 
@@ -29,7 +29,7 @@ public class DEQSimEventFileComparator extends TestHandlerDetailedEventChecker {
  		// remove ActStartEvent and ActEndEvent, because this does not exist in
 		// c++ DEQSim
  		for (int i=0;i<allEvents.size();i++){
-	 		if (!(allEvents.get(i) instanceof ActStartEvent || allEvents.get(i) instanceof ActEndEvent)){
+	 		if (!(allEvents.get(i) instanceof ActivityStartEvent || allEvents.get(i) instanceof ActivityEndEvent)){
 				copyEventList.add(allEvents.get(i));
 			}
  		}

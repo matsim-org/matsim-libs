@@ -25,7 +25,7 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.utils.misc.Time;
@@ -113,7 +113,7 @@ public class EndLegMessage extends EventMessage {
 			actStartEventTime = this.getMessageArrivalTime();
 		}
 
-		event = new ActStartEvent(actStartEventTime, this.vehicle.getOwnerPerson(), this.vehicle.getCurrentLink(), nextAct);
+		event = new ActivityStartEvent(actStartEventTime, this.vehicle.getOwnerPerson(), this.vehicle.getCurrentLink(), nextAct);
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
 	}

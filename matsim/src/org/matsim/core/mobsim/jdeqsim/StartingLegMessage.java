@@ -20,7 +20,7 @@
 package org.matsim.core.mobsim.jdeqsim;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.events.ActEndEvent;
+import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.BasicEventImpl;
 
@@ -56,7 +56,7 @@ public class StartingLegMessage extends EventMessage {
 		BasicEventImpl event = null;
 
 		// schedule ActEndEvent
-		event = new ActEndEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson(),
+		event = new ActivityEndEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson(),
 				vehicle.getCurrentLink(), vehicle.getPreviousActivity());
 		SimulationParameters.getProcessEventThread().processEvent(event);
 

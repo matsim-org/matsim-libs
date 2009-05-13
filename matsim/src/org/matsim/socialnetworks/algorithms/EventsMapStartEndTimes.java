@@ -6,15 +6,15 @@ import java.util.LinkedHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
-import org.matsim.core.events.handler.ActEndEventHandler;
-import org.matsim.core.events.handler.ActStartEventHandler;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.handler.ActivityStartEventHandler;
 
-public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEventHandler {
+public class EventsMapStartEndTimes implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	public LinkedHashMap<Person, ArrayList<ActStartEvent>> startMap = new LinkedHashMap<Person,ArrayList<ActStartEvent>>();
-	public LinkedHashMap<Person, ArrayList<ActEndEvent>> endMap = new LinkedHashMap<Person,ArrayList<ActEndEvent>>();
+	public LinkedHashMap<Person, ArrayList<ActivityStartEvent>> startMap = new LinkedHashMap<Person,ArrayList<ActivityStartEvent>>();
+	public LinkedHashMap<Person, ArrayList<ActivityEndEvent>> endMap = new LinkedHashMap<Person,ArrayList<ActivityEndEvent>>();
 	public double maxtime=0;
 	private Population plans;
 	static final private Logger log = Logger.getLogger(EventsMapStartEndTimes.class);
@@ -26,11 +26,11 @@ public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEvent
 		log.info(" Looking through plans and mapping social interactions for scoring");
 	}
 
-	public void handleEvent(ActStartEvent event) {
+	public void handleEvent(ActivityStartEvent event) {
 		Person person = plans.getPersons().get(event.getPersonId());
-		ArrayList<ActStartEvent> startList;
+		ArrayList<ActivityStartEvent> startList;
 		if((startMap.get(person)==null)){
-			startList=new ArrayList<ActStartEvent>();
+			startList=new ArrayList<ActivityStartEvent>();
 		}else{
 			startList=startMap.get(person);
 		}
@@ -46,11 +46,11 @@ public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEvent
 
 	}
 
-	public void handleEvent(ActEndEvent event) {
+	public void handleEvent(ActivityEndEvent event) {
 		Person person = plans.getPersons().get(event.getPersonId());
-		ArrayList<ActEndEvent> endList;
+		ArrayList<ActivityEndEvent> endList;
 		if((endMap.get(person)== null)){
-			endList=new ArrayList<ActEndEvent>();
+			endList=new ArrayList<ActivityEndEvent>();
 		}else{
 			endList=endMap.get(person);
 		}

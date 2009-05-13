@@ -36,18 +36,18 @@ import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
-import org.matsim.core.events.handler.ActEndEventHandler;
-import org.matsim.core.events.handler.ActStartEventHandler;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author illenberger
  *
  */
-public class InteractionHandler implements ActStartEventHandler,
-		ActEndEventHandler {
+public class InteractionHandler implements ActivityStartEventHandler,
+		ActivityEndEventHandler {
 
 	private InteractionSelector selector;
 	
@@ -65,7 +65,7 @@ public class InteractionHandler implements ActStartEventHandler,
 		}
 	}
 	
-	public void handleEvent(ActStartEvent event) {
+	public void handleEvent(ActivityStartEvent event) {
 		ActivityFacility f = event.getAct().getFacility();
 		PhysicalFacility pf = pfacilities.get(f);
 //		if(pf == null) {
@@ -82,7 +82,7 @@ public class InteractionHandler implements ActStartEventHandler,
 
 	}
 
-	public void handleEvent(ActEndEvent event) {
+	public void handleEvent(ActivityEndEvent event) {
 		if(!event.getAct().getType().equalsIgnoreCase("home")) {
 		ActivityFacility f = event.getAct().getFacility();
 		PhysicalFacility pf = pfacilities.get(f);

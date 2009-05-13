@@ -23,8 +23,8 @@ package org.matsim.core.events.algorithms;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentMoneyEvent;
@@ -33,8 +33,8 @@ import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.handler.ActEndEventHandler;
-import org.matsim.core.events.handler.ActStartEventHandler;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentMoneyEventHandler;
@@ -45,7 +45,7 @@ import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-public class EventWriterTXT implements EventWriter, ActEndEventHandler, ActStartEventHandler, AgentArrivalEventHandler, 
+public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, ActivityStartEventHandler, AgentArrivalEventHandler, 
 		AgentDepartureEventHandler, AgentReplanEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler, 
 		AgentWait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 	
@@ -110,11 +110,11 @@ public class EventWriterTXT implements EventWriter, ActEndEventHandler, ActStart
 		}
 	}
 
-	public void handleEvent(ActEndEvent event) {
+	public void handleEvent(ActivityEndEvent event) {
 		writeLine(event.getTextRepresentation());
 	}
 
-	public void handleEvent(ActStartEvent event) {
+	public void handleEvent(ActivityStartEvent event) {
 		writeLine(event.getTextRepresentation());
 	}
 

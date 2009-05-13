@@ -20,15 +20,15 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.handler.ActEndEventHandler;
-import org.matsim.core.events.handler.ActStartEventHandler;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
@@ -39,13 +39,13 @@ import org.matsim.core.network.NetworkLayer;
 @SuppressWarnings("unused")
 public class MyModule implements
 BasicPlanStrategyModule,
-ActEndEventHandler,
+ActivityEndEventHandler,
 AgentDepartureEventHandler,
 AgentWait2LinkEventHandler,
 LinkLeaveEventHandler,
 LinkEnterEventHandler,
 AgentArrivalEventHandler,
-ActStartEventHandler
+ActivityStartEventHandler
 // TODO: names of these events handlers ok?
 {
 	private static final Logger log = Logger.getLogger(MyModule.class);
@@ -184,7 +184,7 @@ ActStartEventHandler
 
 	}
 
-	public void handleEvent(ActEndEvent event) {
+	public void handleEvent(ActivityEndEvent event) {
 		String str = event.getEventType(); // TODO: String?  Not an enum??
 		Map<String,String> attribs = event.getAttributes() ; // TODO: String?  may be ok ... 
 	}
@@ -204,7 +204,7 @@ ActStartEventHandler
 	public void handleEvent(AgentArrivalEvent event) {
 	}
 
-	public void handleEvent(ActStartEvent event) {
+	public void handleEvent(ActivityStartEvent event) {
 	}
 
 	public void reset(int iteration) {

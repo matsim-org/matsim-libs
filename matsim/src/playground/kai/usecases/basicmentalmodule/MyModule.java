@@ -5,8 +5,8 @@ import java.util.*;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.*;
-import org.matsim.api.basic.v01.events.BasicActEndEvent;
-import org.matsim.api.basic.v01.events.handler.BasicActEndEventHandler;
+import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
+import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
 import org.matsim.api.basic.v01.network.*;
 import org.matsim.api.basic.v01.population.*;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
@@ -15,7 +15,7 @@ import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
 @SuppressWarnings("unused")
 public class MyModule implements
 BasicPlanStrategyModule,
-BasicActEndEventHandler
+BasicActivityEndEventHandler
 {
 	private static final Logger log = Logger.getLogger(MyModule.class);
 	
@@ -146,8 +146,8 @@ BasicActEndEventHandler
 
 	}
 
-	public void handleEvent(BasicActEndEvent event) {
-		BasicActEndEvent ev = event ;
+	public void handleEvent(BasicActivityEndEvent event) {
+		BasicActivityEndEvent ev = event ;
 		ev.getActType();
 		ev.getLinkId();
 		ev.getPersonId();

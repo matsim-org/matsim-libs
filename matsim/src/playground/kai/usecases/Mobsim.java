@@ -8,8 +8,8 @@ import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentWait2LinkEvent;
@@ -31,7 +31,7 @@ public class Mobsim {
 		Id agentId = new IdImpl("agentId");
 		Id linkId = new IdImpl("linkId");
 		double time = 1. ;
-		ActEndEvent aee = new ActEndEvent(time, agentId, linkId, "actType" ) ;
+		ActivityEndEvent aee = new ActivityEndEvent(time, agentId, linkId, "actType" ) ;
 		eve.processEvent( aee ) ;
 
 		
@@ -46,7 +46,7 @@ public class Mobsim {
 
 		AgentArrivalEvent aae = new AgentArrivalEvent( time, agentId, linkId ) ;
 
-		ActStartEvent ase = new ActStartEvent( time, agentId, linkId, "acttype" ) ;
+		ActivityStartEvent ase = new ActivityStartEvent( time, agentId, linkId, "acttype" ) ;
 
 		// TODO: None of this is behind interfaces.  Needed if we want to accept "external" mobsims.  Do we want that?
 		// If so, we would need to be sure that we want to maintain the create methods.

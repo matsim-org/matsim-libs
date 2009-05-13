@@ -61,16 +61,16 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			this.events.processEvent(new LinkEnterEvent(time,
 					new IdImpl(atts.getValue(LinkEnterEvent.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK))));
-		} else if (ActEndEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new ActEndEvent(time,
-					new IdImpl(atts.getValue(ActEndEvent.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(ActEndEvent.ATTRIBUTE_LINK)),
-					atts.getValue(ActEndEvent.ATTRIBUTE_ACTTYPE)));
-		} else if (ActStartEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new ActStartEvent(time,
-					new IdImpl(atts.getValue(ActStartEvent.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(ActStartEvent.ATTRIBUTE_LINK)),
-					atts.getValue(ActStartEvent.ATTRIBUTE_ACTTYPE)));
+		} else if (ActivityEndEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(new ActivityEndEvent(time,
+					new IdImpl(atts.getValue(ActivityEndEvent.ATTRIBUTE_PERSON)),
+					new IdImpl(atts.getValue(ActivityEndEvent.ATTRIBUTE_LINK)),
+					atts.getValue(ActivityEndEvent.ATTRIBUTE_ACTTYPE)));
+		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(new ActivityStartEvent(time,
+					new IdImpl(atts.getValue(ActivityStartEvent.ATTRIBUTE_PERSON)),
+					new IdImpl(atts.getValue(ActivityStartEvent.ATTRIBUTE_LINK)),
+					atts.getValue(ActivityStartEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (AgentArrivalEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new AgentArrivalEvent(time,
 					new IdImpl(atts.getValue(AgentArrivalEvent.ATTRIBUTE_PERSON)),

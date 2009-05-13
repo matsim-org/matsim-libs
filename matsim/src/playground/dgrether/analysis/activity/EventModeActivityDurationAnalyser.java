@@ -29,12 +29,12 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.ActEndEventHandler;
-import org.matsim.core.events.handler.ActStartEventHandler;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -102,9 +102,9 @@ public class EventModeActivityDurationAnalyser {
 
 	}
 
-	private static class ActivityDurationHandler implements ActEndEventHandler, ActStartEventHandler{
+	private static class ActivityDurationHandler implements ActivityEndEventHandler, ActivityStartEventHandler{
 
-		Map<Id, ActStartEvent> eventMap = new HashMap<Id, ActStartEvent>();
+		Map<Id, ActivityStartEvent> eventMap = new HashMap<Id, ActivityStartEvent>();
 
 		IntegerCountMap<Double> ptStartTimeMap = new IntegerCountMap<Double>();
 		IntegerCountMap<Double> carStartTimeMap = new IntegerCountMap<Double>();
@@ -125,8 +125,8 @@ public class EventModeActivityDurationAnalyser {
 			this.plans = plans;
 		}
 
-		public void handleEvent(final ActEndEvent event) {
-			ActStartEvent startEvent = this.eventMap.get(new IdImpl(event.getPersonId().toString()));
+		public void handleEvent(final ActivityEndEvent event) {
+			ActivityStartEvent startEvent = this.eventMap.get(new IdImpl(event.getPersonId().toString()));
 			Plan p = this.plans.getPersons().get(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
 			if (startEvent == null) { // must be the end of home_0
 				this.durTemp = event.getTime();
@@ -156,7 +156,7 @@ public class EventModeActivityDurationAnalyser {
 			}
 		}
 
-		public void handleEvent(final ActStartEvent event) {
+		public void handleEvent(final ActivityStartEvent event) {
 			this.eventMap.put(new IdImpl(event.getPersonId().toString()), event);
 			Plan p = this.plans.getPersons().get(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
 			if (event.getActType().equalsIgnoreCase("w")) {

@@ -12,8 +12,8 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentStuckEvent;
@@ -21,8 +21,8 @@ import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.handler.ActEndEventHandler;
-import org.matsim.core.events.handler.ActStartEventHandler;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
@@ -41,7 +41,7 @@ import playground.wrashid.PDES2.TestHandler;
 import playground.wrashid.deqsim.PDESStarter2;
 
 public class TestHandlerEventCountChecker extends MatsimTestCase implements
-TestHandler, ActEndEventHandler, ActStartEventHandler,
+TestHandler, ActivityEndEventHandler, ActivityStartEventHandler,
 AgentDepartureEventHandler, AgentStuckEventHandler,
 AgentWait2LinkEventHandler, AgentArrivalEventHandler, EventHandler,
 LinkEnterEventHandler, LinkLeaveEventHandler  {
@@ -113,7 +113,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler  {
 		this.eventCounter = 0;
 	}
 
-	public void handleEvent(final ActEndEvent event) {
+	public void handleEvent(final ActivityEndEvent event) {
 		this.eventCounter++;
 	}
 
@@ -149,7 +149,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler  {
 		}
 	}
 
-	public void handleEvent(final ActStartEvent event) {
+	public void handleEvent(final ActivityStartEvent event) {
 		this.eventCounter++;
 	}
 

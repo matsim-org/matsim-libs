@@ -30,8 +30,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.events.BasicEvent;
-import org.matsim.core.events.handler.ActEndEventHandler;
-import org.matsim.core.events.handler.ActStartEventHandler;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentMoneyEventHandler;
@@ -272,11 +272,11 @@ public class Events {
 		} else if (klass == AgentDepartureEvent.class) {
 			((AgentDepartureEventHandler)handler).handleEvent((AgentDepartureEvent)ev);
 			return true;
-		} else if (klass == ActEndEvent.class) {
-			((ActEndEventHandler)handler).handleEvent((ActEndEvent)ev);
+		} else if (klass == ActivityEndEvent.class) {
+			((ActivityEndEventHandler)handler).handleEvent((ActivityEndEvent)ev);
 			return true;
-		} else if (klass == ActStartEvent.class) {
-			((ActStartEventHandler)handler).handleEvent((ActStartEvent)ev);
+		} else if (klass == ActivityStartEvent.class) {
+			((ActivityStartEventHandler)handler).handleEvent((ActivityStartEvent)ev);
 			return true;
 		} else if (klass == AgentStuckEvent.class) {
 			((AgentStuckEventHandler)handler).handleEvent((AgentStuckEvent)ev);

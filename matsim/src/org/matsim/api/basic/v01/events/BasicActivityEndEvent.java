@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicActEvent.java
+ * BasicActEndEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,12 +20,6 @@
 
 package org.matsim.api.basic.v01.events;
 
-import org.matsim.api.basic.v01.Id;
-
-public interface BasicActEvent extends BasicPersonEvent {
-
-	public String getActType();
-
-	public Id getLinkId();
+public interface BasicActivityEndEvent extends BasicActivityEvent {
 
 }

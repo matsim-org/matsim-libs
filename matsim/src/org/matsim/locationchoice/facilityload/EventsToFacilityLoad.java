@@ -28,17 +28,17 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
-import org.matsim.core.events.handler.ActEndEventHandler;
-import org.matsim.core.events.handler.ActStartEventHandler;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.handler.ActivityStartEventHandler;
 
 /*
  * @author anhorni
  * Uses FacilityPenalty to manage the facililities' loads by taking care of activity start and end events.
  */
 
-public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHandler {
+public class EventsToFacilityLoad implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);
@@ -70,7 +70,7 @@ public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHa
 	 * Add an arrival event in "FacilityLoad" for every start of an activity
 	 * Home activities are excluded.
 	 */
-	public void handleEvent(final ActStartEvent event) {
+	public void handleEvent(final ActivityStartEvent event) {
 		ActivityFacility facility = event.getAct().getFacility();
 		if (!(event.getAct().getType().startsWith("h") || event.getAct().getType().startsWith("tta"))) {
 			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addArrival(event.getTime());
@@ -81,7 +81,7 @@ public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHa
 	 * Add a departure event in "FacilityLoad" for every ending of an activity
 	 * Home activities are excluded
 	 */
-	public void handleEvent(final ActEndEvent event) {
+	public void handleEvent(final ActivityEndEvent event) {
 		ActivityFacility facility = event.getAct().getFacility();
 		if (!(event.getAct().getType().startsWith("h") || event.getAct().getType().startsWith("tta"))) {
 			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addDeparture(event.getTime());

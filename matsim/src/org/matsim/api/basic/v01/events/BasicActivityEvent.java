@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActEndEventHandler.java
+ * BasicActEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,11 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.api.basic.v01.events.handler;
+package org.matsim.api.basic.v01.events;
 
-import org.matsim.api.basic.v01.events.BasicActEndEvent;
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.api.basic.v01.Id;
 
-public interface BasicActEndEventHandler extends EventHandler {
-	public void handleEvent (BasicActEndEvent event);
+public interface BasicActivityEvent extends BasicPersonEvent {
+
+	public String getActType();
+
+	public Id getLinkId();
+
 }

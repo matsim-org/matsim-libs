@@ -26,11 +26,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.handler.ActEndEventHandler;
-import org.matsim.core.events.handler.ActStartEventHandler;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.utils.misc.Time;
@@ -84,7 +84,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 	}
 	
 	
-	private class TestSingleIterationEventHandler implements LinkEnterEventHandler, ActStartEventHandler, ActEndEventHandler {
+	private class TestSingleIterationEventHandler implements LinkEnterEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
 
 		private final double agent1LeaveHomeTime, agent2LeaveHomeTime;
 
@@ -129,7 +129,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 			}
 		}
 
-		public void handleEvent(final ActStartEvent e) {
+		public void handleEvent(final ActivityStartEvent e) {
 			log.debug("Start Activity " + e.getActType() + " : Time: " + Time.writeTime(e.getTime()) + " Agent: " + e.getPersonId().toString());
 			log.debug("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPerson().getId()));
 			if (e.getPerson().getId().equals(id1)) {
@@ -198,7 +198,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 			}
 		}
 
-		public void handleEvent(final ActEndEvent e) {
+		public void handleEvent(final ActivityEndEvent e) {
 			log.debug("End Activity " + e.getActType() + " : Time: " + Time.writeTime(e.getTime()) + " Agent: " + e.getPersonId().toString());
 			log.debug("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPerson().getId()));
 

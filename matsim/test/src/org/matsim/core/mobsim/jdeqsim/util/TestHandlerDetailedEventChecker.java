@@ -16,8 +16,8 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentWait2LinkEvent;
@@ -85,16 +85,16 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 						index++;
 
 						// each leg ends with arrival on act link
-						assertTrue(list.get(index) instanceof ActStartEvent);
-						assertEquals(act.getLinkId(), ((ActStartEvent) list.get(index)).getLinkId());
+						assertTrue(list.get(index) instanceof ActivityStartEvent);
+						assertEquals(act.getLinkId(), ((ActivityStartEvent) list.get(index)).getLinkId());
 						index++;
 					}
 				} else if (pe instanceof Leg) {
 					leg = (Leg) pe;
 
 					// act end event
-					assertTrue(list.get(index) instanceof ActEndEvent);
-					assertEquals(act.getLinkId(), ((ActEndEvent) list.get(index)).getLinkId());
+					assertTrue(list.get(index) instanceof ActivityEndEvent);
+					assertEquals(act.getLinkId(), ((ActivityEndEvent) list.get(index)).getLinkId());
 					index++;
 					
 					// each leg starts with departure on act link

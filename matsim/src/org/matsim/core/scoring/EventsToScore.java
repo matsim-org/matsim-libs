@@ -26,14 +26,14 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.events.ActEndEvent;
-import org.matsim.core.events.ActStartEvent;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.AgentStuckEvent;
-import org.matsim.core.events.handler.ActEndEventHandler;
-import org.matsim.core.events.handler.ActStartEventHandler;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentMoneyEventHandler;
@@ -51,7 +51,7 @@ import org.matsim.core.gbl.Gbl;
  * @author mrieser
  */
 public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
-		AgentMoneyEventHandler, ActStartEventHandler, ActEndEventHandler {
+		AgentMoneyEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private Population population = null;
 	private ScoringFunctionFactory sfFactory = null;
@@ -87,11 +87,11 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		getScoringFunctionForAgent(event.getPersonId()).addMoney(event.getAmount());
 	}
 
-	public void handleEvent(ActStartEvent event) {
+	public void handleEvent(ActivityStartEvent event) {
 		getScoringFunctionForAgent(event.getPersonId()).startActivity(event.getTime(), event.getAct());
 	}
 
-	public void handleEvent(ActEndEvent event) {
+	public void handleEvent(ActivityEndEvent event) {
 		getScoringFunctionForAgent(event.getPersonId()).endActivity(event.getTime());
 	}
 

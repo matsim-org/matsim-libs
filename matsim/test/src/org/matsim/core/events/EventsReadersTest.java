@@ -25,8 +25,8 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.handler.ActEndEventHandler;
-import org.matsim.core.events.handler.ActStartEventHandler;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
@@ -39,8 +39,8 @@ import org.xml.sax.SAXException;
 public class EventsReadersTest extends MatsimTestCase {
 
 
-	static class TestHandler implements ActEndEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler,
-			LinkLeaveEventHandler, LinkEnterEventHandler, AgentArrivalEventHandler, ActStartEventHandler,
+	static class TestHandler implements ActivityEndEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler,
+			LinkLeaveEventHandler, LinkEnterEventHandler, AgentArrivalEventHandler, ActivityStartEventHandler,
 			AgentStuckEventHandler {
 
 		public int eventCounter = 0;
@@ -49,7 +49,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			this.eventCounter = 0;
 		}
 
-		public void handleEvent(final ActEndEvent event) {
+		public void handleEvent(final ActivityEndEvent event) {
 			this.eventCounter++;
 			assertEquals("expected activity-End-Event to be event #1", 1, this.eventCounter);
 			assertEquals(21610.0, event.getTime(), 0.0);
@@ -97,7 +97,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("7", event.getLinkId().toString());
 		}
 
-		public void handleEvent(final ActStartEvent event) {
+		public void handleEvent(final ActivityStartEvent event) {
 			this.eventCounter++;
 			assertEquals("expected activityStart-Event to be event #7", 7, this.eventCounter);
 			assertEquals(21670.0, event.getTime(), 0.0);
