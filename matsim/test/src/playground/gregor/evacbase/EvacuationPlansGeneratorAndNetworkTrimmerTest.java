@@ -22,7 +22,8 @@ import org.xml.sax.SAXException;
 
 import playground.gregor.sims.evacbase.EvacuationAreaFileReader;
 import playground.gregor.sims.evacbase.EvacuationAreaLink;
-import playground.gregor.sims.evacbase.EvacuationPlansGeneratorAndNetworkTrimmer;
+import playground.gregor.sims.evacbase.EvacuationNetGenerator;
+import playground.gregor.sims.evacbase.EvacuationPlansGenerator;
 
 public class EvacuationPlansGeneratorAndNetworkTrimmerTest extends MatsimTestCase{
 
@@ -39,18 +40,9 @@ public class EvacuationPlansGeneratorAndNetworkTrimmerTest extends MatsimTestCas
 		Population pop = new PopulationImpl();
 		new MatsimPopulationReader(pop,net).readFile(c.plans().getInputFile());
 		
-		Map<Id,EvacuationAreaLink> el1 = new HashMap<Id, EvacuationAreaLink>();
-		try {
-			new EvacuationAreaFileReader(el1).readFile(c.evacuation().getEvacuationAreaFile());
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new EvacuationNetGenerator(net,c).run();
 		
-		new EvacuationPlansGeneratorAndNetworkTrimmer().generatePlans(pop, net, el1);
+		new EvacuationPlansGenerator(pop,net,net.getLink("el1")).run();
 		
 		new PopulationWriter(pop,c.plans().getOutputFile()).write();
 		assertEquals("different plans-files.", CRCChecksum.getCRCFromFile(refPlans),	CRCChecksum.getCRCFromFile(c.plans().getOutputFile()));

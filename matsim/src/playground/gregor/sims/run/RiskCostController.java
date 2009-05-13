@@ -36,7 +36,8 @@ import playground.gregor.flooding.FloodingReader;
 import playground.gregor.flooding.RiskCostFromFloodingData;
 import playground.gregor.sims.evacbase.EvacuationAreaFileReader;
 import playground.gregor.sims.evacbase.EvacuationAreaLink;
-import playground.gregor.sims.evacbase.EvacuationPlansGeneratorAndNetworkTrimmer;
+import playground.gregor.sims.evacbase.EvacuationNetGenerator;
+import playground.gregor.sims.evacbase.EvacuationPlansGenerator;
 import playground.gregor.sims.riskaversion.RiskAverseTravelCostCalculator;
 import playground.gregor.sims.riskaversion.RiskCostCalculator;
 
@@ -81,27 +82,20 @@ public class RiskCostController extends Controler{
 		this.travelCostCalculator = new RiskAverseTravelCostCalculator(this.travelTimeCalculator,rc);
 		
 		
-		// first modify network and plans
 
-		try {
-			String evacuationAreaLinksFile = this.config.evacuation().getEvacuationAreaFile();
-			new EvacuationAreaFileReader(this.evacuationAreaLinks).readFile(evacuationAreaLinksFile);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		log.info("generating initial evacuation plans... ");
-		EvacuationPlansGeneratorAndNetworkTrimmer e = new EvacuationPlansGeneratorAndNetworkTrimmer();
+		new EvacuationNetGenerator(this.network,this.config).run();
+		log.info("done");
+		
+		log.info("generating initial evacuation plans... ");
+		EvacuationPlansGenerator e = new EvacuationPlansGenerator(this.population,this.network,this.network.getLink("el1"));
 		e.setTravelCostCalculator(this.getTravelCostCalculator());
-		e.generatePlans(this.population, this.network, this.evacuationAreaLinks);
+		e.run();
 		log.info("done");
 
-		log.info("writing network xml file... ");
-		new NetworkWriter(this.network, getOutputFilename("evacuation_net.xml")).write();
-		log.info("done");
+//		log.info("writing network xml file... ");
+//		new NetworkWriter(this.network, getOutputFilename("evacuation_net.xml")).write();
+//		log.info("done");
 
 
 		super.setUp();

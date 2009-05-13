@@ -28,7 +28,6 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for playground.gregor.evacbase");
 
-		suite.addTestSuite(EvacuationAreaFileReaderWriterTest.class);
 		suite.addTestSuite(EvacuationPlansGeneratorAndNetworkTrimmerTest.class);
 
 		return suite;

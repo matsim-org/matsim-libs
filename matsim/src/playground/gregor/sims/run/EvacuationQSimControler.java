@@ -33,7 +33,8 @@ import org.xml.sax.SAXException;
 
 import playground.gregor.sims.evacbase.EvacuationAreaFileReader;
 import playground.gregor.sims.evacbase.EvacuationAreaLink;
-import playground.gregor.sims.evacbase.EvacuationPlansGeneratorAndNetworkTrimmer;
+import playground.gregor.sims.evacbase.EvacuationNetGenerator;
+import playground.gregor.sims.evacbase.EvacuationPlansGenerator;
 
 /**
  * @author glaemmel
@@ -63,7 +64,8 @@ public class EvacuationQSimControler extends Controler {
 			e.printStackTrace();
 		}
 		log.info("generating initial evacuation plans... ");
-		new EvacuationPlansGeneratorAndNetworkTrimmer().generatePlans(this.population, this.network, this.evacuationAreaLinks);
+		new EvacuationNetGenerator(this.network,this.config).run();
+		new EvacuationPlansGenerator(this.population,this.network,this.network.getLink("el1")).run();
 		log.info("done");
 
 		log.info("writing network xml file... ");

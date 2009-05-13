@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EvacPlansAndNetworkGen.java
+ * EvacuationPlansGeneratorAndNetworkTrimmer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,45 +18,67 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.shelters;
+package playground.gregor.sims.evacbase;
 
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.facilities.BasicOpeningTime.DayType;
-import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.Facilities;
-import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldConnectLocations;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.gregor.sims.evacbase.EvacuationPlansGeneratorAndNetworkTrimmer;
+/**
+ *@author glaemmel
+ */
+public class EvacuationPlansGenerator {
 
-public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTrimmer {
-	private final String shelters = "../inputs/padang/network_v20080618/shelters.shp";
-	Logger log = Logger.getLogger(EvacPlansAndNetworkGen.class);
-	public void createEvacuationPlans(final Population plans, final NetworkLayer network, final Facilities facilities, final World world) {
-		
-		
-		setUpFacilities(world, facilities);
-		
-		PlansCalcRoute router = new PlansCalcRoute(network, new FreespeedTravelTimeCost(), new FreespeedTravelTimeCost());
+	private final static Logger log = Logger.getLogger(EvacuationPlansGenerator.class);
+
+	
+	private TravelCost tc = null;
+
+	private Network network;
+
+	private Population pop;
+
+	private Link saveLink;
+
+	public EvacuationPlansGenerator(Population pop, Network network, Link saveLink) {
+		this.network = network;
+		this.pop = pop;
+		this.saveLink = saveLink;
+	}
+	
+	/**
+	 * Generates an evacuation plan for all agents inside the evacuation area.
+	 * Agents outside the evacuation are will be removed from the plans.
+	 *
+	 * @param plans
+	 * @param network
+	 */
+	public void run() {
+		PlansCalcRoute router;
+		if (this.tc != null) {
+			router = new PlansCalcRoute(network, this.tc, new FreespeedTravelTimeCost());
+		} else {
+			router = new PlansCalcRoute(network, new FreespeedTravelTimeCost(), new FreespeedTravelTimeCost());	
+		}
+
 		/* all persons that want to start on an already deleted link will be excluded from the
 		 *simulation.     */
-		Iterator<Person> it = plans.getPersons().values().iterator();
+		log.info("  - removing all persons outside the evacuation area");
+		Iterator<Person> it = pop.getPersons().values().iterator();
 		while (it.hasNext()) {
 			Person pers = it.next();
 
@@ -67,9 +89,10 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 			}
 		}
 
-		Facility fac = facilities.getFacilities().get(new IdImpl("shelter0"));
 		// the remaining persons plans will be routed
-		for (Person person : plans.getPersons().values()) {
+		log.info("  - generating evacuation plans for the remaining persons");
+		final Coord saveCoord = new CoordImpl(12000.0, -12000.0);
+		for (Person person : this.pop.getPersons().values()) {
 			if (person.getPlans().size() != 1 ) {
 				throw new RuntimeException("For each agent only one initial evacuation plan is allowed!");
 			}
@@ -80,39 +103,28 @@ public class EvacPlansAndNetworkGen extends EvacuationPlansGeneratorAndNetworkTr
 				throw new RuntimeException("For each initial evacuation plan only one Act is allowed - and no Leg at all");
 			}
 			
-			person.createKnowledge("evac location");
-			Activity fact = plan.getFirstActivity();
-			Facility f = facilities.getFacilities().get(fact.getLinkId());
-			fact.setFacility(f);
-			ActivityOption a = f.getActivityOption("h");
-			person.getKnowledge().addActivity(a, true);
 			Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);
 			plan.addLeg(leg);
-			Activity act = new org.matsim.core.population.ActivityImpl("evacuated",fac);
-			person.getKnowledge().addActivity(fac.getActivityOption("evacuated"),false);
-						
-			
-			act.setLink(fac.getLink());
-			plan.addActivity(act);
+
+			plan.addActivity(new org.matsim.core.population.ActivityImpl("h", saveCoord, saveLink));
+
 			router.run(plan);
 		}
-	}
-	private void setUpFacilities(World world, Facilities facilities) {
-		NetworkLayer n = (NetworkLayer)world.getLayer(NetworkLayer.LAYER_TYPE);
-		new SheltersReader(n,facilities,world).read(this.shelters);
-		for (Link link : n.getLinks().values()) {
-			if (link.getId().toString().contains("shelter")) {
-				continue;
-			}
-			Facility fac = facilities.createFacility(new IdImpl(link.getId().toString()), link.getCoord());
-			ActivityOption act = fac.createActivityOption("h");
-			act.addOpeningTime(new OpeningTimeImpl(DayType.wk,0,3600*30));
-		}
-		new WorldConnectLocations().run(world);
+
 	}
 
+
+
+	/**
+	 * This method allows to set a travel cost calculator. If not set a free speed travel cost calculator
+	 * will be instantiated automatically  
+	 * @param tc
+	 */
+	public void setTravelCostCalculator(final TravelCost tc) {
+		this.tc  = tc;
+	}
 
 }
