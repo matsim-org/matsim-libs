@@ -85,7 +85,9 @@ public class HouseholdsWriterV1 extends MatsimXmlWriter {
 
 	private void writeIncome(BasicIncome income) throws IOException {
 		atts.clear();
-		atts.add(this.createTuple(HouseholdsSchemaV1Names.CURRENCY,income.getCurrency()));
+		if (income.getCurrency() != null) {
+			atts.add(this.createTuple(HouseholdsSchemaV1Names.CURRENCY,income.getCurrency()));
+		}
 		atts.add(this.createTuple(HouseholdsSchemaV1Names.PERIOD, income.getIncomePeriod().toString()));
 		this.writeStartTag(HouseholdsSchemaV1Names.INCOME, atts);
 		this.writeContent(Double.toString(income.getIncome()), true);
