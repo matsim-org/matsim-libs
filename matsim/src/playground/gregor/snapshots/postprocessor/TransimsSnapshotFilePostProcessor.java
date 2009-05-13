@@ -53,35 +53,39 @@ public class TransimsSnapshotFilePostProcessor {
 	private final TransimsSnapshotFileWriter writer;
 
 
-//	private final Plans plans;
+	//	private final Plans plans;
 
 	private final List<PostProcessorI> processors;
 	private final FloodlineGenerator floodlineGenerator = null;
 
+	private String[] dummyline;
+
+	private double startTime;
+
 
 	public TransimsSnapshotFilePostProcessor(final String eventsfile, final String tVehFile){
-//		this.plans = plans;
+		//		this.plans = plans;
 		this.reader = new TransimsSnapshotFileReader(tVehFile);
 
 		TimeDependentColorizer tdc = new TimeDependentColorizer();
 		DestinationDependentColorizer ddc = new DestinationDependentColorizer();
-		
+
 		Events events = new Events();
 		events.addHandler(tdc);
 		events.addHandler(ddc);
 		new EventsReaderTXTv1(events).readFile(eventsfile);
-		
-		
+
+
 		String outfile = "../../outputs/output/colorizedT.veh.txt"; 
 		this.writer = new TransimsSnapshotFileWriter(outfile);
-//		this.floodlineGenerator = new FloodlineGenerator("../../inputs/networks/padang_flooding.txt.gz");
+		//		this.floodlineGenerator = new FloodlineGenerator("../../inputs/networks/padang_flooding.txt.gz");
 		this.processors = new ArrayList<PostProcessorI>();
 		addProcessor(tdc);
 		addProcessor(ddc);
 		addProcessor(new EvacuationLinksTeleporter());
 
 	}
-	
+
 
 	public void run(){
 
@@ -95,26 +99,33 @@ public class TransimsSnapshotFilePostProcessor {
 			if (time > 14*3600) {
 				break;
 			}
-			
+
 			for (PostProcessorI processor : this.processors){
 				line = processor.processEvent(line);
 			}
 
 			this.writer.writeLine(line);
 			int min_id = 800000;	
-			
+			if (this.dummyline == null) {
+				this.startTime = time;
+				this.dummyline = line;
+				this.dummyline[11] = 0 +"";
+				this.dummyline[12] = 0 +"";
+			}
+
+
 			if (this.floodlineGenerator != null && time > old_time) {
 				old_time = time;
-				
+
 				double floodTime = time - (time % 60);
 				Collection<FloodEvent> events = this.floodlineGenerator.getFlooded(floodTime);	
-				
-				
-				
-				
+
+
+
+
 				int id = min_id;
 				for (FloodEvent e : events) {
-					
+
 					line[0] = Integer.toString(id);
 					int color = 0;
 					if (e.getFlooding() < MIN_WALKABLE) {
@@ -128,17 +139,26 @@ public class TransimsSnapshotFilePostProcessor {
 					line[12] = Double.toString(e.getY());
 					line[15] = "-1";
 					this.writer.writeLine(line);
-					
+
 				}
-				
+
 
 			}
-			
-			
-			
+
+
+
 			line = this.reader.readLine();
 		}
-
+		int incr = 60;
+		double time = old_time;
+		while ( (time += incr) < (this.startTime + 1*3600 + 30 * 60)) {
+			this.dummyline[1] = time + "";
+			this.dummyline[15] = "-1";
+			this.dummyline[11] = Double.toString(662433.0);
+			this.dummyline[12] = Double.toString(9898853.0);
+			this.writer.writeLine(this.dummyline);
+		}
+		
 		this.writer.finish();
 
 	}
@@ -170,15 +190,15 @@ public class TransimsSnapshotFilePostProcessor {
 		log.info("done.");
 
 
-//		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
-//		Plans population = new Plans();
-//		PlansReaderI plansReader = new MatsimPlansReader(population);
-//		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-//		log.info("done.");
+		//		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
+		//		Plans population = new Plans();
+		//		PlansReaderI plansReader = new MatsimPlansReader(population);
+		//		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		//		log.info("done.");
 
 
 		String eventsfile = Gbl.getConfig().events().getInputFile();
-		
+
 		TransimsSnapshotFilePostProcessor tpp = new TransimsSnapshotFilePostProcessor(eventsfile,tVehFile);
 		tpp.run();
 	} 
