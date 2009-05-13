@@ -77,7 +77,7 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 
 		@Override
 		protected double getLinkWidth(BasicLink link) {
-			return super.getLinkWidth(link) * 5.0;
+			return super.getLinkWidth(link) * 2.0;
 		}
 
 	}

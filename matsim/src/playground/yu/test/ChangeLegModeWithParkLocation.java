@@ -666,8 +666,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 						.getPlanElements())
 					if (pe instanceof Leg)
 						legChainModes.append(((Leg) pe).getMode() + "|");
-				// writer.writeln(itr + "\t" + legChainModes.toString());
-				// writer.flush();
+//				 writer.writeln(itr + "\t" + legChainModes.toString());
+//				 writer.flush();
 				patterns.add(legChainModes.toString());
 			}
 		}

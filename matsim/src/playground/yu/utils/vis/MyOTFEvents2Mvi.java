@@ -3,11 +3,15 @@
  */
 package playground.yu.utils.vis;
 
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
+
+import playground.yu.utils.io.SimpleReader;
+import playground.yu.utils.io.SimpleWriter;
 
 /**
  *quote from org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI of David
@@ -51,12 +55,40 @@ public class MyOTFEvents2Mvi {
 		}
 
 		Gbl.startMeasurement();
+		// Gbl.createConfig(null);
+		new ScenarioLoader((String) null).loadScenario().getConfig();
 
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(args[0]);
 
-		new OTFEvent2MVI(new QueueNetwork(net), args[1], args[2], Integer
-				.parseInt(args[3])).convert();
+		SimpleReader sr = new SimpleReader(args[1]);
+
+		String eventsOutputFilename = args[1].replaceAll("events",
+				"events_short");
+		SimpleWriter sw2 = new SimpleWriter(eventsOutputFilename);
+
+		String line = sr.readLine();
+		sw2.writeln(line);
+		// after filehead
+		double time = 0;
+		while (line != null && time < 108000.0) {
+			line = sr.readLine();
+			if (line != null) {
+				sw2.writeln(line);
+				time = Double.parseDouble(line.split("\t")[0]);
+				sw2.flush();
+				if (time % 3600 == 0)
+					System.out.println("write new short Events, time :\t"
+							+ time);
+			}
+		}
+		sr.close();
+		sw2.close();
+
+		new OTFEvent2MVI(new QueueNetwork(net), eventsOutputFilename, args[2],
+				Integer.parseInt(args[3])).convert();
+
+		System.out.println("done.");
 	}
 
 }
