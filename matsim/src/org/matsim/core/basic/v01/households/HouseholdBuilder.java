@@ -20,15 +20,14 @@
 package org.matsim.core.basic.v01.households;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.households.BasicIncome.IncomePeriod;
+import org.matsim.households.Household;
 
 /**
  * Builder for household objects.
  * @author dgrether
  */
-public interface HouseholdBuilder {
-
-	public BasicHousehold createHousehold(Id householdId);
+public interface HouseholdBuilder extends BasicHouseholdBuilder{
 	
-	public BasicIncome createIncome(double income, IncomePeriod period);
+	public Household createHousehold(Id householdId);
+
 }

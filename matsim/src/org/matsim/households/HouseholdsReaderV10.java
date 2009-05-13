@@ -51,7 +51,7 @@ public class HouseholdsReaderV10 extends BasicHouseholdsReaderV1 {
 	
 	@Override
 	protected BasicHousehold createHousehold(Id currentHhId, List<Id> memberIds, List<Id> vehicleIds) {
-		Household hh = (Household) this.households.getHouseholdBuilder().createHousehold(currentHhId);
+		Household hh =  this.households.getHouseholdBuilder().createHousehold(currentHhId);
 		for (Id i : memberIds){
 			Person p = scenario.getPopulation().getPersons().get(i);
 			if (p == null){
@@ -60,6 +60,7 @@ public class HouseholdsReaderV10 extends BasicHouseholdsReaderV1 {
 						+ " Use the basic classes and parsers to avoid this restriction.");
 			}
 			hh.getMembers().put(i, p);
+			p.setHousehold(hh);
 		}
 		for (Id id : vehicleIds){
 			BasicVehicle v = scenario.getVehicles().getVehicles().get(id);

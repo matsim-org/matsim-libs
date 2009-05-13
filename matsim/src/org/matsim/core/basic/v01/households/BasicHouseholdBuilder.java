@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicHouseholdBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,25 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.core.basic.v01.households;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.households.BasicIncome.IncomePeriod;
 
+
 /**
  * @author dgrether
+ *
  */
-public class BasicHouseholdBuilder implements HouseholdBuilder {
+public interface BasicHouseholdBuilder {
 
-	public BasicHouseholdImpl createHousehold(Id householdId) {
-		BasicHouseholdImpl hh = new BasicHouseholdImpl(householdId);
-		return hh;
-	}
-
+	public BasicHousehold createHousehold(Id householdId);
 	
-	public BasicIncome createIncome(double income, IncomePeriod period) {
-		return new BasicIncomeImpl(income, period);
-	}
+	public BasicIncome createIncome(double income, IncomePeriod period);
 
 }

@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.households.BasicHouseholds;
+import org.matsim.core.basic.v01.households.HouseholdBuilder;
 
 
 /**
@@ -32,6 +33,8 @@ import org.matsim.core.basic.v01.households.BasicHouseholds;
 public interface Households extends BasicHouseholds<Household>{
 
 	public Map<Id, Household> getHouseholds();
+	
+	public HouseholdBuilder getHouseholdBuilder();
 	
 	
 }

@@ -47,18 +47,9 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 	protected BasicKnowledge knowledge = null;
 	private Desires desires = null;
 
-	private Id householdId;
 
 	public BasicPersonImpl(final Id id) {
 		this.id = id;
-	}
-
-	public void setHouseholdId(final Id householdId) {
-		this.householdId = householdId;
-	}
-
-	public Id getFiscalHouseholdId(){
-		return this.householdId;
 	}
 
 	public void addPlan(final T plan) {

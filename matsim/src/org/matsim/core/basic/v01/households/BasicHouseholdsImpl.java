@@ -38,10 +38,10 @@ public class BasicHouseholdsImpl implements BasicHouseholds<BasicHousehold> {
 	
 	public BasicHouseholdsImpl(){
 		this.households = new HashMap<Id, BasicHousehold>();
-		this.builder = new BasicHouseholdBuilder();
+		this.builder = new BasicHouseholdBuilderImpl();
 	}
 	
-	public HouseholdBuilder getHouseholdBuilder() {
+	public BasicHouseholdBuilder getHouseholdBuilder() {
 		return this.builder;
 	}
 

@@ -28,11 +28,13 @@ import java.util.List;
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.households.BasicIncome.IncomePeriod;
 import org.matsim.core.basic.v01.vehicles.BasicVehicleType;
 import org.matsim.core.basic.v01.vehicles.BasicVehicles;
+import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.testcases.MatsimTestCase;
@@ -51,6 +53,7 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
   private final Id id43 = new IdImpl("43");
   private final Id id44 = new IdImpl("44");
   private final Id id45 = new IdImpl("45");
+  private Person p23, p42, p43, p44, p45;
   
 	public void testBasicReaderWriter() throws FileNotFoundException, IOException {
 		BasicScenarioImpl scenario = new BasicScenarioImpl();
@@ -94,15 +97,32 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 
 	private void createTestPopulation(ScenarioImpl scenario) {
 		Population pop = scenario.getPopulation();
-		pop.getPersons().put(id23, (pop.getPopulationBuilder().createPerson(id23)));
-		pop.getPersons().put(id42, (pop.getPopulationBuilder().createPerson(id42)));
-		pop.getPersons().put(id43, (pop.getPopulationBuilder().createPerson(id43)));
-		pop.getPersons().put(id44, (pop.getPopulationBuilder().createPerson(id44)));
-		pop.getPersons().put(id45, (pop.getPopulationBuilder().createPerson(id45)));
+		p23 = pop.getPopulationBuilder().createPerson(id23);
+		p42 = pop.getPopulationBuilder().createPerson(id42);
+		p43 = pop.getPopulationBuilder().createPerson(id43);
+		p44 = pop.getPopulationBuilder().createPerson(id44);
+		p45 = pop.getPopulationBuilder().createPerson(id45);
+		pop.getPersons().put(id23, p23);
+		pop.getPersons().put(id42, p42);
+		pop.getPersons().put(id43, p43);
+		pop.getPersons().put(id44, p44);
+		pop.getPersons().put(id45, p45);
 	}
 
 	private void checkReferencedContent(Households households) {
+		Household hh23 = households.getHouseholds().get(id23);
+		assertNotNull(hh23);
+		assertEquals(p23, hh23.getMembers().get(id23));
+		assertEquals(p23.getHousehold(), hh23);
+		assertEquals(p43, hh23.getMembers().get(id43));
+		assertEquals(p43.getHousehold(), hh23);
 		
+		Household hh24 = households.getHouseholds().get(id24);
+		assertNotNull(hh24);
+		assertEquals(p44, hh24.getMembers().get(id44));
+		assertEquals(p44.getHousehold(), hh24);
+		assertEquals(p45, hh24.getMembers().get(id45));
+		assertEquals(p45.getHousehold(), hh24);
 	}
 
 	private void checkContent(BasicHouseholds<? extends BasicHousehold> households) {
@@ -130,7 +150,6 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 		assertEquals(IncomePeriod.month, hh.getIncome().getIncomePeriod());
 		assertEquals("eur", hh.getIncome().getCurrency());
 		assertEquals(50000.0d, hh.getIncome().getIncome(), EPSILON);
-		
 	
 		hh = households.getHouseholds().get(id24);
 		assertNotNull(hh);

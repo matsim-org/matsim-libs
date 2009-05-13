@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicHouseholds
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +16,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.basic.v01.households;
 
-import java.util.Map;
-
 import org.matsim.api.basic.v01.Id;
-
+import org.matsim.core.basic.v01.households.BasicIncome.IncomePeriod;
 
 /**
  * @author dgrether
- *
  */
-public interface BasicHouseholds<T extends BasicHousehold> {
+public class BasicHouseholdBuilderImpl implements BasicHouseholdBuilder {
 
-	public Map<Id, T> getHouseholds();
+	public BasicHouseholdImpl createHousehold(Id householdId) {
+		BasicHouseholdImpl hh = new BasicHouseholdImpl(householdId);
+		return hh;
+	}
 	
-	public BasicHouseholdBuilder getHouseholdBuilder();
-	
+	public BasicIncome createIncome(double income, IncomePeriod period) {
+		return new BasicIncomeImpl(income, period);
+	}
+
 }

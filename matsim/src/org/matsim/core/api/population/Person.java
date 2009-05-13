@@ -157,6 +157,6 @@ public interface Person extends BasicPerson<Plan>, Customizable{
 	@Deprecated // not yet well enough understood
 	public Desires getDesires();
 
-	public Id getFiscalHouseholdId();
+	public Id getHouseholdId();
 	
 }

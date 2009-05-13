@@ -45,7 +45,7 @@ public class BasicHouseholdsReaderV1 extends MatsimXmlParser {
 
 	private BasicIncome currentincome = null;
 
-	private HouseholdBuilder builder = null;
+	private BasicHouseholdBuilder builder = null;
 
 	private Id currentHhId = null;
 

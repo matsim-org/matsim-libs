@@ -225,7 +225,7 @@ public class PersonImpl implements Person {
 		}
 	}
 
-	public Id getFiscalHouseholdId() {
+	public Id getHouseholdId() {
 		if (this.household != null) {
 			return this.household.getId();
 		}
