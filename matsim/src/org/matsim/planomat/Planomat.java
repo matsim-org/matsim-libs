@@ -20,7 +20,7 @@
 
 package org.matsim.planomat;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -30,8 +30,8 @@ import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
-import org.jgap.impl.StockRandomGenerator;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
@@ -41,7 +41,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
@@ -63,19 +62,24 @@ public class Planomat implements PlanAlgorithm {
 	/**
 	 * Maximum possible activity duration. Serves as upper limit for double encoding of activity durations in GA plan chromosome.
 	 */
-	private static final double MAX_ACTIVITY_DURATION = 24.0 * 3600;
+	public static final double SCENARIO_DURATION = 24.0 * 3600;
+
+	protected static enum StepThroughPlanAction {EVALUATE, WRITE_BACK};
 
 	private final PlanomatConfigGroup config = Gbl.getConfig().planomat();
 	private final int numTimeIntervals = (int) Math.pow(2, config.getLevelOfTimeResolution());
-	protected final double timeIntervalSize = Planomat.MAX_ACTIVITY_DURATION / numTimeIntervals;
+	protected final double timeIntervalSize = Planomat.SCENARIO_DURATION / numTimeIntervals;
 
 	private final TransportMode[] possibleModes = this.config.getPossibleModes().toArray(new TransportMode[this.config.getPossibleModes().size()]);
-	
-	private LegTravelTimeEstimator legTravelTimeEstimator = null;
-	private ScoringFunctionFactory scoringFunctionFactory = null;
-	private Random seedGenerator = null;
+
+	private final LegTravelTimeEstimator legTravelTimeEstimator;
+	private final ScoringFunctionFactory scoringFunctionFactory;
+	private final Random seedGenerator;
 
 	private final static Logger logger = Logger.getLogger(Planomat.class);
+	private final boolean doLogging = this.config.isDoLogging();
+
+	private PlanAnalyzeSubtours planAnalyzeSubtours = null;
 
 	public Planomat(final LegTravelTimeEstimator legTravelTimeEstimator, final ScoringFunctionFactory scoringFunctionFactory) {
 
@@ -85,65 +89,65 @@ public class Planomat implements PlanAlgorithm {
 	}
 
 	public void run(final Plan plan) {
-		boolean doLogging = this.config.isDoLogging();
-		if (doLogging) {
+		if (this.doLogging) {
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...");
 		}
 		// perform subtour analysis only if mode choice on subtour basis is optimized
 		// (if only times are optimized, subtour analysis is not necessary)
-		PlanAnalyzeSubtours planAnalyzeSubtours = null;
 		if (this.possibleModes.length > 0) {
-			if (doLogging) {
+			if (this.doLogging) {
 				logger.info("Running subtour analysis...");
 			}
-			planAnalyzeSubtours = new PlanAnalyzeSubtours();
-			planAnalyzeSubtours.run(plan);
+			this.planAnalyzeSubtours = new PlanAnalyzeSubtours();
+			this.planAnalyzeSubtours.run(plan);
 		}
-		if (doLogging) {
+		if (this.doLogging) {
 			logger.info("Running subtour analysis...done.");
 			logger.info("Initialization of JGAP configuration...");
 		}
 		Genotype population = this.initJGAP(plan, planAnalyzeSubtours);
-		if (doLogging) {
+		if (this.doLogging) {
 			logger.info("Initialization of JGAP configuration...done.");
 			logger.info("Running evolution...");
 		}
 		IChromosome fittest = this.evolveAndReturnFittest(population);
-		if (doLogging) {
+		if (this.doLogging) {
 			logger.info("Running evolution...done.");
 			logger.info("Writing solution back to Plan object...");
 		}
-		this.writeChromosome2Plan(fittest, plan, planAnalyzeSubtours );
-		if (doLogging) {
+		double score = this.stepThroughPlan(StepThroughPlanAction.WRITE_BACK, fittest, plan);
+		if (this.doLogging) {
 			logger.info("Writing solution back to Plan object...done.");
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...done.");
 		}
 		// reset leg travel time estimator
 		this.legTravelTimeEstimator.reset();
-
+		// invalidate score information
+		plan.setScore(null);
 	}
 
 //	protected EnumSet<TransportMode> getModifiedModeChoiceSet(final Plan plan) {
-//		
-//		EnumSet<TransportMode> modeChoiceSet = Gbl.getConfig().planomat().getPossibleModes().clone();
-//		
-//		if (!plan.getPerson().getCarAvail().equals("always")) {
-//			modeChoiceSet.remove(TransportMode.car);
-//		}
-//		
-//		return modeChoiceSet;
+
+//	EnumSet<TransportMode> modeChoiceSet = Gbl.getConfig().planomat().getPossibleModes().clone();
+
+//	if (!plan.getPerson().getCarAvail().equals("always")) {
+//	modeChoiceSet.remove(TransportMode.car);
 //	}
-	
+
+//	return modeChoiceSet;
+//	}
+
 	private synchronized Genotype initJGAP(final Plan plan, final PlanAnalyzeSubtours planAnalyzeSubtours) {
 
 		Genotype population = null;
 
-		PlanomatJGAPConfiguration jgapConfiguration = new PlanomatJGAPConfiguration(plan, planAnalyzeSubtours);
-
 		// JGAP random number generator is initialized for each run
 		// but use a random number as seed so every run will draw a different, but deterministic sequence of random numbers
 		long seed = this.seedGenerator.nextLong();
-		((StockRandomGenerator) jgapConfiguration.getRandomGenerator()).setSeed( seed );
+		if (this.doLogging) {
+			logger.info("agent id: " + plan.getPerson().getId() + "; JGAP seed: " + Long.toString(seed));
+		}
+		PlanomatJGAPConfiguration jgapConfiguration = new PlanomatJGAPConfiguration(plan, planAnalyzeSubtours, seed);
 
 		IChromosome sampleChromosome = this.initSampleChromosome(plan, planAnalyzeSubtours, jgapConfiguration);
 		try {
@@ -152,14 +156,7 @@ public class Planomat implements PlanAlgorithm {
 			e1.printStackTrace();
 		}
 
-		ScoringFunction sf = this.scoringFunctionFactory.getNewScoringFunction(plan);
-		PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper(
-				sf,
-				plan,
-				this.legTravelTimeEstimator,
-				planAnalyzeSubtours,
-				this.timeIntervalSize,
-				this.possibleModes);
+		PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper(this, plan);		
 
 		try {
 			jgapConfiguration.setFitnessFunction( fitnessFunction );
@@ -178,9 +175,9 @@ public class Planomat implements PlanAlgorithm {
 		for (int i = 0, n = this.config.getJgapMaxGenerations(); i < n; i++) {
 			population.evolve();
 //			if (Gbl.getConfig().planomat().isDoLogging()) {
-//				fittest = population.getFittestChromosome();
-//				logMessage = "Generation #" + Integer.toString(i) + " : Max: " + fittest.getFitnessValue();
-//				logger.info(logMessage);
+//			fittest = population.getFittestChromosome();
+//			logMessage = "Generation #" + Integer.toString(i) + " : Max: " + fittest.getFitnessValue();
+//			logger.info(logMessage);
 //			}
 		}
 		return population.getFittestChromosome();
@@ -189,27 +186,32 @@ public class Planomat implements PlanAlgorithm {
 
 	protected IChromosome initSampleChromosome(final Plan plan, final PlanAnalyzeSubtours planAnalyzeSubtours, final org.jgap.Configuration jgapConfiguration) {
 
-		ArrayList<Gene> sampleGenes = new ArrayList<Gene>();
-		try {
-
-			int numActs = plan.getPlanElements().size() / 2;
-			for (int ii=0; ii < numActs; ii++) {
-				sampleGenes.add(new IntegerGene(jgapConfiguration, 0, this.numTimeIntervals - 1));
-			}
-
-			if (this.possibleModes.length > 0) {
-				for (int ii=0; ii < planAnalyzeSubtours.getNumSubtours(); ii++) {
-					sampleGenes.add(new IntegerGene(jgapConfiguration, 0, this.possibleModes.length - 1));
-				}
-			}
-
-		} catch (InvalidConfigurationException e) {
-			e.printStackTrace();
+		int numActs = plan.getPlanElements().size() / 2;
+		int numSubtours = 0;
+		if (this.possibleModes.length > 0) {
+			numSubtours = planAnalyzeSubtours.getNumSubtours();
 		}
+		Gene[] sampleGenes = new Gene[1 + numActs + numSubtours];
+
+		try {
+			// first integer gene for the start time of the plan
+			sampleGenes[0] = new IntegerGene(jgapConfiguration, 0, this.numTimeIntervals - 1);
+			// one integer gene for each activity duration
+			for (int ii=0; ii < numActs; ii++) {
+				sampleGenes[1 + ii] = new IntegerGene(jgapConfiguration, 0, this.numTimeIntervals - 1);
+			}
+			// one integer gene for the mode of each subtour
+			for (int ii=0; ii < numSubtours; ii++) {
+				sampleGenes[1 + numActs + ii] = new IntegerGene(jgapConfiguration, 0, this.possibleModes.length - 1);
+			}
+		} catch (InvalidConfigurationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}		
 
 		IChromosome sampleChromosome = null;
 		try {
-			sampleChromosome = new Chromosome( jgapConfiguration, sampleGenes.toArray(new Gene[sampleGenes.size()]) );
+			sampleChromosome = new Chromosome( jgapConfiguration, sampleGenes );
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
 		}
@@ -218,111 +220,160 @@ public class Planomat implements PlanAlgorithm {
 
 	}
 
-	/**
-	 * Writes a JGAP chromosome back to matsim plan object.
-	 *
-	 * @param individual the GA individual (usually the fittest after evolution) whose values will be written back to a plan object
-	 * @param plan the plan that will be altered
-	 */
-	protected void writeChromosome2Plan(
-			final IChromosome individual,
-			final Plan plan,
-			final PlanAnalyzeSubtours planAnalyzeSubtours ) {
-		
-		Activity activity = null;
-		Leg leg = null;
+	protected double stepThroughPlan(final StepThroughPlanAction action, final IChromosome individual, final Plan plan) {
+
+		// TODO comment this
+		double positionInTimeInterval = 0.5;
+
+		ScoringFunction scoringFunction = null;
+		scoringFunction = this.scoringFunctionFactory.getNewScoringFunction(plan);
 
 		Route tempRoute = null;
+		Leg leg = null;
+		Activity origin = null;
+		Activity destination = null;
 
-		int max = plan.getPlanElements().size();
-		double now = 0.0;
+		List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
+		int numLegs = actslegs.size() / 2;
 
-		for (int ii = 0; ii < max; ii++) {
-
-			Object o = plan.getPlanElements().get(ii);
-
-			if (o instanceof Activity) {
-
-				activity = ((Activity) o);
-
-				// handle first activity and middle activities
-				if (ii < (max - 1)) {
-
-					activity.setStartTime(now);
-					// the new activity duration is
-					// - a random value in the time interval which was the result of the optimization
-					// - rounded to a full second with Math.rint() to stay consistent with the time step-based queue simulations
-					activity.setDuration(Math.rint((((IntegerGene) individual.getGenes()[ii / 2]).intValue() + this.seedGenerator.nextDouble()) * this.timeIntervalSize));
-					now += activity.getDuration();
-					activity.setEndTime(now);
-
-					// handle last activity
-				} else if (ii == (max - 1)) {
-
-					// assume that there will be no delay between arrival time and activity start time
-					activity.setStartTime(now);
-					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-					activity.setDuration(Time.UNDEFINED_TIME);
-					activity.setEndTime(Time.UNDEFINED_TIME);
-
-				}
-
-			} else if (o instanceof Leg) {
-
-				leg = ((Leg) o);
-
-				// assume that there will be no delay between end time of previous activity and departure time
-				leg.setDepartureTime(now);
-
-				if (this.possibleModes.length > 0) {
-					// set mode to result from optimization
-					int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[ii / 2];
-					int modeIndex = ((IntegerGene) individual.getGene(planAnalyzeSubtours.getSubtourIndexation().length + subtourIndex)).intValue();
-					TransportMode mode = this.possibleModes[modeIndex];
-//					System.out.println(ii + "\t" + subtourIndex + "\t" + modeIndex + "\t" + modeName);
-					leg.setMode(mode);
-				} // otherwise leave modes untouched
-
-				if (!leg.getMode().equals(TransportMode.car)) {
-					tempRoute = leg.getRoute();
-				}
-
-				// set arrival time to estimation
-				Activity origin = ((Activity) plan.getPlanElements().get(ii - 1));
-				Activity destination = ((Activity) plan.getPlanElements().get(ii + 1));
-
-				double travelTimeEstimation = this.legTravelTimeEstimator.getLegTravelTimeEstimation(
-						plan.getPerson().getId(),
-						now,
-						origin,
-						destination,
-						leg);
-
-				// travel time estimation is rounded to a full second with Math.rint() to stay consistent with the time step-based queue simulations
-				travelTimeEstimation = Math.rint(travelTimeEstimation);
-
-				leg.setTravelTime(travelTimeEstimation);
-
-				if (!leg.getMode().equals(TransportMode.car)) {
-					// restore original routes, because planomat must not alter routes at all
-					leg.setRoute(tempRoute);
-				}
-				leg.getRoute().setTravelTime(travelTimeEstimation);
-
-				now += leg.getTravelTime();
-				// set planned arrival time accordingly
-				leg.setArrivalTime(now);
-
-			}
+		// TODO this as a quick and dirty implementation that takes a lot of resources
+		// replace activity duration encoding with double [0.0,1.0] or time slots, respectively
+		int sumOfAllActDurs = 0;
+		for (int geneIndex = 1; geneIndex <= numLegs; geneIndex++) {
+			sumOfAllActDurs += ((IntegerGene) individual.getGenes()[geneIndex]).intValue();
 		}
 
-		// invalidate score information
-		plan.setScore(null);
+		// solution of first gene, normalized to scenario duration, is end time of first activity 
+		double now = Math.rint(0.0);
+
+		origin = plan.getFirstActivity();
+		if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
+			origin.setStartTime(now);
+		}
+
+		if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
+			positionInTimeInterval = this.seedGenerator.nextDouble();
+		}
+		double activityDuration = Math.rint(this.getEffectiveActLegTimeFrame(
+				((IntegerGene) individual.getGene(0)).intValue(), 
+				this.numTimeIntervals, 
+				positionInTimeInterval));
+		now += activityDuration;
+
+		for (int geneIndex = 1; geneIndex <= numLegs; geneIndex++) {
+
+			scoringFunction.endActivity(now);
+			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
+				origin.setDuration(activityDuration);
+				origin.setEndTime(now);
+			}
+			///////////////////////////////////////////////////////////////////////////////////////////
+			// move agent forward in time according to anticipated travel time...
+			///////////////////////////////////////////////////////////////////////////////////////////
+			leg = ((Leg) actslegs.get(geneIndex * 2 - 1));
+			destination = plan.getNextActivity(leg);
+
+			scoringFunction.startLeg(now, null);
+			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
+				leg.setDepartureTime(now);
+			}
+
+			if (possibleModes.length > 0) {
+				// set mode
+				int subtourIndex = this.planAnalyzeSubtours.getSubtourIndexation()[geneIndex - 1];
+				int modeIndex = ((IntegerGene) individual.getGene(1 + numLegs + subtourIndex)).intValue();
+				leg.setMode(possibleModes[modeIndex]);
+			} // otherwise leave modes untouched
+
+			// save original route
+			if (!leg.getMode().equals(TransportMode.car)) {
+				tempRoute = leg.getRoute();
+			}
+
+			double anticipatedTravelTime = Math.rint(this.legTravelTimeEstimator.getLegTravelTimeEstimation(
+					plan.getPerson().getId(),
+					now,
+					origin,
+					destination,
+					leg));
+
+			now += anticipatedTravelTime;
+
+			if (!leg.getMode().equals(TransportMode.car)) {
+				// recover original route
+				leg.setRoute(tempRoute);
+			}
+			leg.getRoute().setTravelTime(anticipatedTravelTime);
+
+			scoringFunction.endLeg(now);
+			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
+				leg.setTravelTime(anticipatedTravelTime);
+				leg.setArrivalTime(now);
+			}
+			///////////////////////////////////////////////////////////////////////////////////////////
+			// move agent forward in time according to anticipated travel time...done.
+			///////////////////////////////////////////////////////////////////////////////////////////
+
+			///////////////////////////////////////////////////////////////////////////////////////////
+			// activity duration is solution of first gene, normalized to scenario duration, 
+			// - minus anticipated travel time,
+			// - rounded to full seconds
+			// - minimum 1 second (no negative activity durations will be produced)
+			///////////////////////////////////////////////////////////////////////////////////////////
+			scoringFunction.startActivity(now, null);
+			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
+				destination.setStartTime(now);
+			}
+
+			if (destination != plan.getLastActivity()) {
+				if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
+					positionInTimeInterval = this.seedGenerator.nextDouble();
+				}
+				double actLegTimeFrame = this.getEffectiveActLegTimeFrame(
+						((IntegerGene) individual.getGene(geneIndex)).intValue(), 
+						sumOfAllActDurs, 
+						positionInTimeInterval);
+
+				activityDuration = Math.rint(actLegTimeFrame - anticipatedTravelTime);
+				activityDuration = Math.max(1.0, activityDuration);
+				now += activityDuration;
+
+				origin = destination;
+			}
+
+		}
+
+		scoringFunction.finish();
+//		logger.info("score: " + scoringFunction.getScore());
+		return scoringFunction.getScore();
 
 	}
 
-	public void setSeedGenerator(final Random seedGenerator) {
-		this.seedGenerator = seedGenerator;
+	private double normalizeBy;
+	private double effectiveActDur;
+
+	public double getEffectiveActLegTimeFrame(
+			final int actDurInTimeSlots, 
+			final int overallTimeSlots, 
+			final double offsetWithinTimeSlot) {
+
+//		logger.info("overallTimeSlots = " + Integer.toString(overallTimeSlots));
+
+		this.normalizeBy = (((double) this.numTimeIntervals) / ((double) overallTimeSlots));
+
+//		logger.info("normalizeBy = " + Double.toString(normalizeBy));
+
+		this.effectiveActDur = actDurInTimeSlots * this.normalizeBy;
+
+//		logger.info("actDurInTimeSlots = " + Integer.toString(actDurInTimeSlots));
+//		logger.info("effectiveActDur = " + Double.toString(effectiveActDur));
+//		logger.info("offsetWithinTimeSlot = " + Double.toString(offsetWithinTimeSlot));
+
+//		logger.info("effectiveActLegTimeFrame = " + Double.toString(effectiveActLegTimeFrame));
+//		logger.info("");
+
+		return (((int) this.effectiveActDur) + offsetWithinTimeSlot) * this.timeIntervalSize;
+
 	}
 
 	public Random getSeedGenerator() {

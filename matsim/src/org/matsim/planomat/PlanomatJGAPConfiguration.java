@@ -42,25 +42,27 @@ public class PlanomatJGAPConfiguration extends Configuration {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public PlanomatJGAPConfiguration(Plan plan, PlanAnalyzeSubtours planAnalyzeSubtours) {
-		this("", "", plan, planAnalyzeSubtours);
+	public PlanomatJGAPConfiguration(Plan plan, PlanAnalyzeSubtours planAnalyzeSubtours, long seed) {
+		this("", "", plan, planAnalyzeSubtours, seed);
 	}
 
-	private PlanomatJGAPConfiguration(String a_id, String a_name, Plan plan, PlanAnalyzeSubtours planAnalyzeSubtours) {
+	private PlanomatJGAPConfiguration(String a_id, String a_name, Plan plan, PlanAnalyzeSubtours planAnalyzeSubtours, long seed) {
 		super(a_id, a_name);
 
 		Configuration.reset();
 		
-		setBreeder(new GABreeder());
+		this.setBreeder(new GABreeder());
 		try {
 			// initialize random number generator
-			setRandomGenerator(new StockRandomGenerator());
+			this.setRandomGenerator(new StockRandomGenerator());
+			((StockRandomGenerator) this.getRandomGenerator()).setSeed( seed );
+
 			setEventManager(new EventManager());
 
 			// initialize selection:
 			// - weighted roulette wheel selection (standard)
 			WeightedRouletteSelector weightedRouletteSelector = new WeightedRouletteSelector(this);
-			addNaturalSelector(weightedRouletteSelector, true);
+			this.addNaturalSelector(weightedRouletteSelector, true);
 			// - elitism (de Jong, 1975)
 			this.setPreservFittestIndividual(true);
 
@@ -86,12 +88,12 @@ public class PlanomatJGAPConfiguration extends Configuration {
 
 			// initialize fitness function
 			// - maximum selection
-			setFitnessEvaluator(new DefaultFitnessEvaluator());
+			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
 
 			// initialize genetic operators
-			setChromosomePool(new ChromosomePool());
-			addGeneticOperator(new CrossoverOperator(this, 0.6d));
-			addGeneticOperator(new MutationOperator(this, this.getPopulationSize()));
+			this.setChromosomePool(new ChromosomePool());
+			this.addGeneticOperator(new CrossoverOperator(this, 0.6d));
+			this.addGeneticOperator(new MutationOperator(this, this.getPopulationSize()));
 
 		} catch (InvalidConfigurationException e) {
 			throw new RuntimeException(

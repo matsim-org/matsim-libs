@@ -20,6 +20,7 @@
 
 package org.matsim.planomat;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.jgap.BaseGeneticOperator;
@@ -63,8 +64,15 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		planAnalyzeSubtours.run(testPlan);
 
 		// run testee
-		PlanomatJGAPConfiguration jgapConfig = new PlanomatJGAPConfiguration(testPlan, planAnalyzeSubtours);
+		long seed = 3810;
+		PlanomatJGAPConfiguration jgapConfig = new PlanomatJGAPConfiguration(testPlan, planAnalyzeSubtours, seed);
 
+		// see below for correct functioning of the random number generator
+		Double[] randomNumberSequenceA = new Double[1000];
+		for (int ii=0; ii < randomNumberSequenceA.length; ii++) {
+			randomNumberSequenceA[ii] = jgapConfig.getRandomGenerator().nextDouble();
+		}
+		
 		// test correct setting of natural selector
 		assertEquals(0, jgapConfig.getNaturalSelectorsSize(false));
 		assertEquals(1, jgapConfig.getNaturalSelectorsSize(true));
@@ -85,6 +93,14 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 				assertEquals(expectedPopSize, ((MutationOperator) bgo).getMutationRate());
 			}
 		}
+		
+		// test correct setting of random number generator
+		jgapConfig = new PlanomatJGAPConfiguration(testPlan, planAnalyzeSubtours, seed);
+		Double[] randomNumberSequenceB = new Double[1000];
+		for (int ii=0; ii < randomNumberSequenceA.length; ii++) {
+			randomNumberSequenceB[ii] = jgapConfig.getRandomGenerator().nextDouble();
+		}
+		assertTrue(Arrays.deepEquals(randomNumberSequenceA, randomNumberSequenceB));
 	}
 
 	public void testPlanomatJGAPConfigurationCarPt() {
@@ -101,7 +117,14 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		planAnalyzeSubtours.run(testPlan);
 
 		// run testee
-		PlanomatJGAPConfiguration jgapConfig = new PlanomatJGAPConfiguration(testPlan, planAnalyzeSubtours);
+		long seed = 3812;
+		PlanomatJGAPConfiguration jgapConfig = new PlanomatJGAPConfiguration(testPlan, planAnalyzeSubtours, seed);
+
+		// see below for correct functioning of the random number generator
+		Double[] randomNumberSequenceA = new Double[1000];
+		for (int ii=0; ii < randomNumberSequenceA.length; ii++) {
+			randomNumberSequenceA[ii] = jgapConfig.getRandomGenerator().nextDouble();
+		}
 
 		// test correct setting of natural selector
 		assertEquals(0, jgapConfig.getNaturalSelectorsSize(false));
@@ -124,6 +147,13 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 			}
 		}
 
+		// test correct setting of random number generator
+		jgapConfig = new PlanomatJGAPConfiguration(testPlan, planAnalyzeSubtours, seed);
+		Double[] randomNumberSequenceB = new Double[1000];
+		for (int ii=0; ii < randomNumberSequenceA.length; ii++) {
+			randomNumberSequenceB[ii] = jgapConfig.getRandomGenerator().nextDouble();
+		}
+		assertTrue(Arrays.deepEquals(randomNumberSequenceA, randomNumberSequenceB));
 	}
 
 	@Override

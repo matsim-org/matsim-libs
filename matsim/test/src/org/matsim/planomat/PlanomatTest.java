@@ -189,13 +189,14 @@ public class PlanomatTest extends MatsimTestCase {
 		planAnalyzeSubtours.run(testPlan);
 
 		testChromosome = testee.initSampleChromosome(testPlan, planAnalyzeSubtours, jgapConfiguration);
-		assertEquals(2, testChromosome.getGenes().length);
+		assertEquals(3, testChromosome.getGenes().length);
 		assertEquals(IntegerGene.class, testChromosome.getGenes()[0].getClass());
 		assertEquals(IntegerGene.class, testChromosome.getGenes()[1].getClass());
+		assertEquals(IntegerGene.class, testChromosome.getGenes()[2].getClass());
 
 	}
 
-	public void testWriteChromosome2Plan() {
+	public void testStepThroughPlan_WriteBack() {
 
 		// writeChromosome2Plan() has 3 arguments:
 		Plan testPlan = null;
@@ -218,25 +219,30 @@ public class PlanomatTest extends MatsimTestCase {
 		Configuration jgapConfiguration = new Configuration();
 
 		try {
-			Gene[] testGenes = new Gene[numActs + planAnalyzeSubtours.getNumSubtours()];
+			Gene[] testGenes = new Gene[1 + numActs + planAnalyzeSubtours.getNumSubtours()];
 
-			Integer i31 = Integer.valueOf(31);
-			Integer i32 = Integer.valueOf(32);
-			Integer i0 = Integer.valueOf(0);
+			Integer startPlan = Integer.valueOf(31);
+			Integer workDur = Integer.valueOf(40);
+			Integer homeDur = Integer.valueOf(88);
+			Integer modeIndex = Integer.valueOf(0);
 			
 			for (int ii=0; ii < testGenes.length; ii++) {
 				switch(ii) {
 				case 0:
 					testGenes[ii] = new IntegerGene(jgapConfiguration);
-					testGenes[ii].setAllele(i31);
+					testGenes[ii].setAllele(startPlan);
 					break;
 				case 1:
 					testGenes[ii] = new IntegerGene(jgapConfiguration);
-					testGenes[ii].setAllele(i32);
+					testGenes[ii].setAllele(workDur);
 					break;
 				case 2:
 					testGenes[ii] = new IntegerGene(jgapConfiguration);
-					testGenes[ii].setAllele(i0);
+					testGenes[ii].setAllele(homeDur);
+					break;
+				case 3:
+					testGenes[ii] = new IntegerGene(jgapConfiguration);
+					testGenes[ii].setAllele(modeIndex);
 					break;
 				}
 
@@ -255,9 +261,10 @@ public class PlanomatTest extends MatsimTestCase {
 		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, this.scenario.getNetwork());
 
 		// run the method
-		Planomat testee = new Planomat(ltte, null);
+		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().charyparNagelScoring());
+		Planomat testee = new Planomat(ltte, sfFactory);
 
-		testee.writeChromosome2Plan(testChromosome, testPlan, planAnalyzeSubtours);
+		testee.stepThroughPlan(Planomat.StepThroughPlanAction.WRITE_BACK, testChromosome, testPlan);
 
 		// write out the test person and the modified plan into a file
 		Population outputPopulation = new PopulationImpl();
