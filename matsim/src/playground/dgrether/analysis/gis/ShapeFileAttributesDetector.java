@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * ShapeFileAttributesDetector
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,32 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether;
+package playground.dgrether.analysis.gis;
 
+import java.io.IOException;
+import java.util.Iterator;
+
+import org.geotools.data.FeatureSource;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.Feature;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
 /**
+ * 
+ * Simple class to detect the available attributes of a shape file.
  * @author dgrether
- *
+ * 
  */
-public interface DgPaths {
-	
-	final String WORKBASE = "/Volumes/data/work/";
+public class ShapeFileAttributesDetector {
 
-	final String SCMWORKSPACE = "/Volumes/data/work/scmWorkspace/";
-	
-	final String WSBASE = "/Volumes/data/work/svnWorkspace/";
-	
-	final String VSPCVSBASE = "/Volumes/data/work/cvsRep/vsp-cvs/";
-	
-	final String SHAREDSVN = SCMWORKSPACE + "shared-svn/";
+	/**
+	 * @param args
+	 * @throws IOException
+	 */
+	public static void main(String[] args) throws IOException {
+		String shapeFile = args[0];
+		FeatureSource fts = ShapeFileReader.readDataFile(shapeFile);
 
+		// Iterator to iterate over the features from the shape file
+		Iterator<Feature> it = fts.getFeatures().iterator();
+		Feature ft = it.next(); // A feature contains a geometry (in this case a
+														// polygon) and an arbitrary number
+		// of other attributes
+		AttributeType[] attributeTypes = ft.getFeatureType().getAttributeTypes();
+		for (int i = 0; i < attributeTypes.length; i++) {
+			System.out.println(attributeTypes[i].getName());
+		}
+	}
 
-  
-  final String RUNBASE = SCMWORKSPACE + "runs-svn/";
-
-  final String IVTCHNET = SHAREDSVN + "studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
-  
-  final String IVTCHROADPRICING = SHAREDSVN + "studies/schweiz-ivtch/baseCase/roadpricing/zurichCityArea/zurichCityAreaWithoutHighwaysPricingScheme.xml";
-  
-  final String IVTCHCOUNTS = SHAREDSVN + "studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml";
 }

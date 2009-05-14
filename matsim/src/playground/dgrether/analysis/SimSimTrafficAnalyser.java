@@ -143,10 +143,15 @@ public class SimSimTrafficAnalyser {
 //		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run620/it.500/500.linkstats.txt.gz";		
 //		String outfile = DgPaths.VSPCVSBASE + "runs/run620/traffic612vs620.500";
 
-		String linkstats1 = DgPaths.VSPCVSBASE + "runs/run465/it.500/500.linkstats.txt.gz";
-		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run568/it.500/500.linkstats.txt.gz";		
-		String outfile = DgPaths.VSPCVSBASE + "runs/run568/traffic465vs568.500";
+//		String linkstats1 = DgPaths.VSPCVSBASE + "runs/run465/it.500/500.linkstats.txt.gz";
+//		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run568/it.500/500.linkstats.txt.gz";		
+//		String outfile = DgPaths.VSPCVSBASE + "runs/run568/traffic465vs568.500";
+		String linkstats1 = DgPaths.RUNBASE + "run709/it.1000/1000.linkstats.txt.gz";
+		String linkstats2 = DgPaths.RUNBASE + "run710/it.1000/1000.linkstats.txt.gz";		
+		String outfile = DgPaths.RUNBASE + "run710/traffic709vs710.500";
 
+		
+		
 		
 		
 		String srs = TransformationFactory.CH1903_LV03;
