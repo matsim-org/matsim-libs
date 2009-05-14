@@ -50,7 +50,7 @@ public class PlansMutateTimeAllocation {
 		new MatsimPopulationReader(population, network)
 				.readFile("../matsimTests/PlansMutateTimeAllocation/Berlin/bb_cl/plans3.xml.gz");
 
-		PlanMutateTimeAllocation pmta = new PlanMutateTimeAllocation(1800,
+		PlanMutateTimeAllocation pmta = new PlanMutateTimeAllocation(300,
 				MatsimRandom.getLocalInstance());
 
 		for (Person person : population.getPersons().values())
@@ -58,7 +58,7 @@ public class PlansMutateTimeAllocation {
 				pmta.run(plan);
 
 		new PopulationWriter(population,
-				"../matsimTests/PlansMutateTimeAllocation/Berlin/bb_cl/output/plans4.xml.gz")
+				"../matsimTests/PlansMutateTimeAllocation/Berlin/bb_cl/output/plans4_300s.xml.gz")
 				.write();
 
 		System.out.println("done.");

@@ -37,6 +37,8 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 
 /**
+ * test the effect with "removeOldestPlan"
+ * 
  * @author yu
  * 
  */
