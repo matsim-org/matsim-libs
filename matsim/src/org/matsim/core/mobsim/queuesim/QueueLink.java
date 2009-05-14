@@ -144,6 +144,8 @@ public class QueueLink {
 
 	/*package*/ VisData visdata = this.new VisDataImpl();
 	
+	private QueueSimEngine simEngine = null;
+	
 	/**
 	 * Initializes a QueueLink with one QueueLane.
 	 * @param l
@@ -300,9 +302,13 @@ public class QueueLink {
 		this.active = false;
 	}
 
+	public void setSimEngine(final QueueSimEngine simEngine) {
+		this.simEngine = simEngine;
+	}
+	
 	public void activateLink() {
 		if (!this.active) {
-			this.getQueueNetwork().addActiveLink(this);
+			this.simEngine.activateLink(this);
 			this.active = true;
 		}
 	}

@@ -102,29 +102,31 @@ public class MyQueueNetwork extends QueueNetwork{
 		log.info("... done");
 	}
 	
-	@Override
-	protected void simStep(final double time) {
-		
-		// Do Replanning if active...
-		if (leaveLinkReplanning) leaveLinkReplanning(time);
-		if (actEndReplanning) actEndReplanning(time);
-/*
-		if (actEndReplanning) 
-		{
-			long now = System.currentTimeMillis();
-			actEndReplanning(time);
-			long duration = System.currentTimeMillis() - now;
-			log.info("actEndReplanning V1: " + duration);
-			
-			now = System.currentTimeMillis();
-			actEndReplanningV2(time);
-			duration = System.currentTimeMillis() - now;
-			log.info("actEndReplanning V2: " + duration);
-		}
-*/		
-		// ... and finally execute the Simulation Step.
-		super.simStep(time);	
-	}
+//	  code should be migrated to QueueSimEngine
+//    please talk to me (mrieser) about that. // DISCUSS [MR]
+//	@Override
+//	protected void simStep(final double time) {
+//		
+//		// Do Replanning if active...
+//		if (leaveLinkReplanning) leaveLinkReplanning(time);
+//		if (actEndReplanning) actEndReplanning(time);
+///*
+//		if (actEndReplanning) 
+//		{
+//			long now = System.currentTimeMillis();
+//			actEndReplanning(time);
+//			long duration = System.currentTimeMillis() - now;
+//			log.info("actEndReplanning V1: " + duration);
+//			
+//			now = System.currentTimeMillis();
+//			actEndReplanningV2(time);
+//			duration = System.currentTimeMillis() - now;
+//			log.info("actEndReplanning V2: " + duration);
+//		}
+//*/		
+//		// ... and finally execute the Simulation Step.
+//		super.simStep(time);	
+//	}
 	
 	protected void leaveLinkReplanning(double time)
 	{

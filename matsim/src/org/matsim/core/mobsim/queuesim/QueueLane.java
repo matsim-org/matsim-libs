@@ -164,8 +164,8 @@ public class QueueLane {
 		 * moved capacity calculation to two methods, to be able to call it from
 		 * outside e.g. for reducing cap in case of an incident
 		 */
-		initFlowCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
-		recalcCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
+		initFlowCapacity(Time.UNDEFINED_TIME);
+		recalcCapacity(Time.UNDEFINED_TIME);
 	}
 
 
@@ -296,9 +296,6 @@ public class QueueLane {
 		return this.meterFromLinkEnd;
 	}
 
-	// ////////////////////////////////////////////////////////////////////
-	// Is called after link has been read completely
-	// ////////////////////////////////////////////////////////////////////
 	/*package*/ void finishInit() {
 		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
 	}

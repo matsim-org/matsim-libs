@@ -107,6 +107,8 @@ public class QueueSimulation {
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
+	
+	private QueueSimEngine simEngine = null;
 
 	/**
 	 * Includes all agents that have transportation modes unknown to
@@ -168,6 +170,8 @@ public class QueueSimulation {
 		this.network = new QueueNetwork(network);
 		this.networkLayer = network;
 		this.agentFactory = new AgentFactory(this);
+		
+		this.simEngine = new QueueSimEngine(this.network);
 	}
 
 	/**
@@ -336,7 +340,7 @@ public class QueueSimulation {
 
 	private void initPlanbasedControler(final PlanBasedSignalSystemControler controler, final BasicSignalSystemConfiguration config){
 		BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getSignalSystemId());
-		//TODO set other defaults of xml
+		//TODO [DG] set other defaults of xml
 		controler.setDefaultCirculationTime(systemDef.getDefaultCycleTime());
 
 	}
@@ -381,9 +385,9 @@ public class QueueSimulation {
 		}
 	}
 
-	protected void prepareNetwork() {
-		this.network.beforeSim();
-	}
+//	protected void prepareNetwork() {
+//		this.network.beforeSim();
+//	}
 
 	public void openNetStateWriter(final String snapshotFilename, final String networkFilename, final int snapshotPeriod) {
 		/* TODO [MR] I don't really like it that we change the configuration on the fly here.
@@ -468,8 +472,6 @@ public class QueueSimulation {
 			throw new RuntimeException("No valid Events Object (events == null)");
 		}
 
-		prepareNetwork();
-
 		prepareLanes();
 
 		prepareSignalSystems();
@@ -522,7 +524,7 @@ public class QueueSimulation {
 	 * Close any files, etc.
 	 */
 	protected void cleanupSim() {
-		this.network.afterSim();
+		this.simEngine.afterSim();
 		double now = SimulationTimer.getTime();
 		for (Tuple<Double, DriverAgent> entry : teleportationList) {
 			DriverAgent agent = entry.getSecond();
@@ -547,6 +549,7 @@ public class QueueSimulation {
 			}
 			this.netStateWriter = null;
 		}
+		this.simEngine = null;
 		QueueSimulation.events = null; // delete events object to free events handlers, if they are nowhere else referenced
 	}
 
@@ -565,14 +568,14 @@ public class QueueSimulation {
 	protected boolean doSimStep(final double time) {
 		this.moveVehiclesWithUnknownLegMode(time);
 		this.handleActivityEnds(time);
-		this.network.simStep(time);
+		this.simEngine.simStep(time);
 
 		if (time >= infoTime) {
 			infoTime += INFO_PERIOD;
 			Date endtime = new Date();
 			long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
 			double diffsim  = time - SimulationTimer.getSimStartTime();
-			int nofActiveLinks = this.network.getSimulatedLinks().size();
+			int nofActiveLinks = this.simEngine.getSimulatedLinks().size();
 			log.info("SIMULATION AT " + Time.writeTime(time) + ": #Veh=" + Simulation.getLiving() + " lost=" + Simulation.getLost() + " #links=" + nofActiveLinks
 					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
 			Gbl.printMemoryUsage();
