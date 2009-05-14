@@ -1,4 +1,4 @@
-package playground.anhorni.locationchoice.preprocess.planmodifications;
+package playground.anhorni.locationchoice.preprocess.plans.planmodificationsTRB09;
 
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Population;

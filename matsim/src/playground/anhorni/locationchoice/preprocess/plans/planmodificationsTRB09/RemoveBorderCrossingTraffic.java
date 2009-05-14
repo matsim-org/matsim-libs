@@ -1,4 +1,4 @@
-package playground.anhorni.locationchoice.preprocess.planmodifications;
+package playground.anhorni.locationchoice.preprocess.plans.planmodificationsTRB09;
 
 import java.util.Iterator;
 import java.util.List;

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.locationchoice.preprocess.planmodifications;
+package playground.anhorni.locationchoice.preprocess.plans.planmodificationsTRB09;
 
 import java.util.HashMap;
 import java.util.Map;

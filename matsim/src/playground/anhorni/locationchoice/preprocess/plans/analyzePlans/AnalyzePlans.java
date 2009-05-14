@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.locationchoice.preprocess.analyzePlans;
+package playground.anhorni.locationchoice.preprocess.plans.analyzePlans;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
