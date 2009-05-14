@@ -4,53 +4,35 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.world.World;
-
-import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeBuilder;
-import playground.anhorni.locationchoice.preprocess.helper.QuadTreeRing;
 
 
-public class ActivityDifferentiationShop {
+public class AssignLeisureTripDistances {
 	
 	private Population plans = new PopulationImpl();
-	private final static Logger log = Logger.getLogger(ActivityDifferentiationShop.class);
+	private final static Logger log = Logger.getLogger(AssignLeisureTripDistances.class);
 	
 	// from Microcensus for all modes
 	private double groceryShare = 0.66;
 	private int numberOfShopActs;
 	
-	private ActivityFacilities facilitiesActDiff;
-	private String facilitiesActDifffilePath = "input/facilities/facilitiesActDiff.xml.gz";
-	
-	public ActivityDifferentiationShop(Population plans) {
+	public AssignLeisureTripDistances(Population plans) {
 		this.plans = plans;
 	}
 	
 	public void run() {
 		this.init();
-		this.assignGroceryAndNonGrocery();
-		this.assignFacility();
+		this.assignGrocery();
 	}	
 	
 	private void init() {	
 		this.numberOfShopActs = this.getNumberOfShopActs();
-		
-		log.info("reading facilitiesActDiff ...");
-		World world = Gbl.getWorld();
-		this.facilitiesActDiff =(ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
-		new FacilitiesReaderMatsimV1(this.facilitiesActDiff).readFile(facilitiesActDifffilePath);		
 	}
 	
 	private int getNumberOfShopActs() {
@@ -77,7 +59,7 @@ public class ActivityDifferentiationShop {
 		return numberOfShopActs;
 	}
 	
-	private void assignGroceryAndNonGrocery() {
+	private void assignGrocery() {
 		
 		int assignedNumberOf_GroceryActs = 0;
 		int assignedNumberOf_NonGroceryActs = 0;
@@ -108,14 +90,12 @@ public class ActivityDifferentiationShop {
 						}
 					}
 					else {
-						if (assignedNumberOf_NonGroceryActs < (1.0 - groceryShare) * numberOfShopActs) {
+						if (assignedNumberOf_NonGroceryActs < (1.0-groceryShare) * numberOfShopActs) {
 							act.setType("shop_nongrocery");
-							act.setFacility(null);
 							assignedNumberOf_NonGroceryActs++;
 						}
 						else {
 							act.setType("shop_grocery");
-							act.setFacility(null);
 							assignedNumberOf_GroceryActs++;
 						}
 					}	
@@ -127,20 +107,7 @@ public class ActivityDifferentiationShop {
 		log.info("Number of non-grocery acts:\t" + assignedNumberOf_NonGroceryActs);
 		log.info("Share:\t"+ (100.0* assignedNumberOf_GroceryActs / this.numberOfShopActs));
 	}
-	
-	
-	private void assignFacility() {
-		FacilityQuadTreeBuilder builder = new FacilityQuadTreeBuilder();
-		QuadTree<ActivityFacility> groceryTree = builder.buildFacilityQuadTree("shop_grocery", this.facilitiesActDiff);
-		QuadTree<ActivityFacility> nongroceryTree = builder.buildFacilityQuadTree("shop_nongrocery", this.facilitiesActDiff);
-		
-		AssignLocations assignShops = new AssignLocations((QuadTreeRing<ActivityFacility>)nongroceryTree);
-		assignShops.run(this.plans, "shop_nongrocery");
-		
-		assignShops = new AssignLocations((QuadTreeRing<ActivityFacility>) groceryTree);
-		assignShops.run(this.plans, "shop_grocery");	
-	}
-	
+
 	public Population getPlans() {
 		return plans;
 	}
