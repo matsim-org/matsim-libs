@@ -50,7 +50,7 @@
 		<param name="BrainExpBeta" value="2.0" />
 
 		<param name="lateArrival" value="-18" />
-		<param name="earlyDeparture" value="-0" />
+		<param name="earlyDeparture" value="-18" />
 		<param name="performing" value="+6" />
 		<param name="traveling" value="-6" />
 		<param name="waiting" value="-0" />
@@ -99,7 +99,7 @@
 		
 	</module>
 	
-		<module name="planomat">
+	<module name="planomat">
 
 		<param name="populationSize" value="10" />
 		<param name="legTravelTimeEstimator" value="org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator" />
