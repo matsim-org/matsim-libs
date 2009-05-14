@@ -298,24 +298,7 @@ public class MyCommercialDemandGenerator2 {
 					index += 2;
 				}
 			}
-			
-			
-			// Get all plan entries
-			
 
-			// Find first activity past 24:00:00
-
-			// Copy all remaining entries to dummy agent
-
-			// Change activity type to major
-
-			// Create new agent
-
-			// Add major activity to new agent
-
-			// Add dummy agent's plans to new agent
-
-			// Adjust all activity end times
 		} else{
 			// The plan only spans one day.
 			result.add(plan);
