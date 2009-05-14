@@ -86,8 +86,12 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 						// set end time accordingly
 						act.setEndTime(now);
 					} else {
-						act.setEndTime(mutateTime(act.getEndTime()));
-						now = act.getEndTime();
+						double newEndTime = mutateTime(act.getEndTime());
+						if (newEndTime < now) {
+							newEndTime = now;
+						}
+						act.setEndTime(newEndTime);
+						now = newEndTime;
 					}
 
 				// handle last activity
