@@ -102,7 +102,7 @@ public class Events {
 		return null;
 	}
 
-	public void processEvent(final BasicEvent event) {
+	public synchronized void processEvent(final BasicEvent event) {
 		this.counter++;
 		if (this.counter == this.nextCounterMsg) {
 			this.nextCounterMsg *= 2;

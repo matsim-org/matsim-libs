@@ -29,7 +29,7 @@ import org.matsim.core.events.handler.EventHandler;
 
 /**
  * 
- * ParallelEvents allows parallelisation for events handling.
+ * ParallelEvents allows parallelization for events handling.
  * Usage: First create an object of this class. Before each iteration, call initProcessing.
  * After each iteration, call finishProcessing. This has already been incorporated into
  * the Controller.
@@ -178,6 +178,7 @@ public class ParallelEvents extends Events {
 		for (int i = 0; i < numberOfThreads; i++) {
 			eventsProcessThread[i] = new ProcessEventThread(events[i],
 					preInputBufferMaxLength, barrier);
+			new Thread(eventsProcessThread[i], "Events-" + i).start();
 		}
 	}
 	

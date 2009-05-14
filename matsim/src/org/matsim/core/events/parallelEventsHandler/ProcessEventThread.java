@@ -26,6 +26,7 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.events.Events;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * The wrapper around the Events class for allowing parallelization.
@@ -46,12 +47,9 @@ public class ProcessEventThread implements Runnable {
 		eventQueue = new ConcurrentListSPSC<BasicEvent>();
 		preInputBuffer = new ArrayList<BasicEvent>();
 		this.cb = cb;
-
-		Thread t = new Thread(this);
-		t.start();
 	}
 
-	public void processEvent(BasicEvent event) {
+	public synchronized void processEvent(BasicEvent event) {
 		// first approach (quick on office computer, but not on satawal)
 		// eventQueue.add(event);
 
@@ -78,11 +76,10 @@ public class ProcessEventThread implements Runnable {
 		// inform main thread, that processing finished
 		try {
 			cb.await();
+			Gbl.printCurrentThreadCpuTime();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (BrokenBarrierException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
