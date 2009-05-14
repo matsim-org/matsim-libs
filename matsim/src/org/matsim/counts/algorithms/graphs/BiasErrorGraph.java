@@ -40,6 +40,8 @@ import org.matsim.counts.CountSimComparison;
 
 public class BiasErrorGraph extends CountsGraph {
 
+	private ComparisonErrorStatsCalculator errorStats;
+	
 	public BiasErrorGraph(final List<CountSimComparison> ccl, final int iteration, final String filename,
 			final String chartTitle) {
 		super(ccl, iteration, filename, chartTitle);
@@ -50,7 +52,7 @@ public class BiasErrorGraph extends CountsGraph {
 		DefaultCategoryDataset dataset0 = new DefaultCategoryDataset();
 		DefaultCategoryDataset dataset1 = new DefaultCategoryDataset();
 
-		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator(this.ccl_);
+		this.errorStats = new ComparisonErrorStatsCalculator(this.ccl_);
 
 		double[] meanRelError = errorStats.getMeanRelError();
 //		double[] meanAbsError = errorStats.getMeanAbsError();
@@ -97,4 +99,22 @@ public class BiasErrorGraph extends CountsGraph {
 
 		return this.chart_;
 	}
+	
+	public double[] getMeanRelError() {
+		if (this.errorStats == null) {
+			throw new RuntimeException("Object not initialized correctly. Call createChart(..) first!");
+		}
+		return this.errorStats.getMeanRelError();
+	}
+
+
+
+	public double[] getMeanAbsBias() {
+		if (this.errorStats == null) {
+			throw new RuntimeException("Object not initialized correctly. Call createChart(..) first!");
+		}
+		return this.errorStats.getMeanAbsBias();
+	}
+	
+	
 }

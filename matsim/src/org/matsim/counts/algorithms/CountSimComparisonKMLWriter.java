@@ -20,6 +20,8 @@
 
 package org.matsim.counts.algorithms;
 
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +51,7 @@ import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.graphs.BiasErrorGraph;
@@ -285,6 +288,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 *
 	 * @param filename
 	 */
+	@Override
 	public void writeFile(final String filename) {
 
 		// init kml
@@ -328,7 +332,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(simRealFolder));
 
 		// error graphs and awtv graph
-		ScreenOverlayType errorGraph = createBiasErrorGraph();
+		ScreenOverlayType errorGraph = createBiasErrorGraph(filename);
 		errorGraph.setVisibility(Boolean.TRUE);
 		this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(errorGraph));
 
@@ -676,13 +680,43 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 
 	/**
 	 * Creates the CountsErrorGraph for all the data
+	 * @param kmlFilename the filename of the kml file
 	 * @param visible true if initially visible
 	 * @return the ScreenOverlay Feature
 	 */
-	private ScreenOverlayType createBiasErrorGraph() {
-		CountsGraph ep = new BiasErrorGraph(this.countComparisonFilter.getCountsForHour(null), this.iterationNumber, null, "error graph");
+	private ScreenOverlayType createBiasErrorGraph(String kmlFilename) {
+		BiasErrorGraph ep = new BiasErrorGraph(this.countComparisonFilter.getCountsForHour(null), this.iterationNumber, null, "error graph");
 		ep.createChart(0);
 
+		double[] meanError = ep.getMeanRelError();
+		double[] meanBias = ep.getMeanAbsBias();
+		String outdir = kmlFilename.substring(0, kmlFilename.lastIndexOf(System.getProperty("file.separator")));
+		String file = outdir + "/biasErrorGraphData.txt";
+		log.info("writing chart data to " + file);
+		try {
+			BufferedWriter bwriter = IOUtils.getBufferedWriter(file);
+			StringBuffer buffer = new StringBuffer();
+			buffer.append("hour \t mean relative error \t mean absolute bias");
+			bwriter.write(buffer.toString());
+			bwriter.newLine();
+			for (int i = 0; i < meanError.length; i++) {
+				buffer.delete(0, buffer.length());
+				buffer.append(i + 1);
+				buffer.append("\t");
+				buffer.append(meanError[i]);
+				buffer.append("\t");
+				buffer.append(meanBias[i]);
+				bwriter.write(buffer.toString());
+				bwriter.newLine();
+			}
+			bwriter.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
 		String filename = "errorGraphErrorBias.png";
 		try {
 			writeChartToKmz(filename, ep.getChart());
