@@ -25,31 +25,42 @@ package playground.yu.newPlans;
 
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 
 /**
  * @author yu
  * 
  */
-public class PlansMutateTimeAllocation implements StartupListener {
-	private PlanMutateTimeAllocation pmta = new PlanMutateTimeAllocation(1800,
-			MatsimRandom.getLocalInstance());
-
-	public void notifyStartup(StartupEvent event) {
-		for (Person person : event.getControler().getPopulation().getPersons()
-				.values())
-			for (Plan plan : person.getPlans())
-				pmta.run(plan);
-	}
+public class PlansMutateTimeAllocation {
 
 	public static void main(String[] args) {
-		Controler ctl = new Controler(args);
-		ctl.addControlerListener(new PlansMutateTimeAllocation());
-		ctl.setWriteEventsInterval(0);
-		ctl.run();
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network)
+				.readFile("../matsimTests/PlansMutateTimeAllocation/Berlin/bb_cl/bb_cl.xml.gz");
+
+		Population population = new PopulationImpl();
+		new MatsimPopulationReader(population, network)
+				.readFile("../matsimTests/PlansMutateTimeAllocation/Berlin/bb_cl/plans3.xml.gz");
+
+		PlanMutateTimeAllocation pmta = new PlanMutateTimeAllocation(1800,
+				MatsimRandom.getLocalInstance());
+
+		for (Person person : population.getPersons().values())
+			for (Plan plan : person.getPlans())
+				pmta.run(plan);
+
+		new PopulationWriter(population,
+				"../matsimTests/PlansMutateTimeAllocation/Berlin/bb_cl/output/plans4.xml.gz")
+				.write();
+
+		System.out.println("done.");
 	}
 }
