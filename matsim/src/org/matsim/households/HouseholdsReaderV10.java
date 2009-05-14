@@ -26,52 +26,57 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.households.BasicHousehold;
 import org.matsim.core.basic.v01.households.BasicHouseholds;
-import org.matsim.core.basic.v01.households.BasicHouseholdsReaderV1;
+import org.matsim.core.basic.v01.households.BasicHouseholdsReaderV10;
 import org.matsim.core.basic.v01.vehicles.BasicVehicle;
-
 
 /**
  * @author dgrether
- *
+ * 
  */
-public class HouseholdsReaderV10 extends BasicHouseholdsReaderV1 {
+public class HouseholdsReaderV10 extends BasicHouseholdsReaderV10 {
 
 	private Households households;
+
 	private ScenarioImpl scenario;
 
-	public HouseholdsReaderV10(ScenarioImpl scenario){
-		this((BasicHouseholds<?>)scenario.getHouseholds());
+	public HouseholdsReaderV10(ScenarioImpl scenario) {
+		this((BasicHouseholds<?>) scenario.getHouseholds());
 		this.households = scenario.getHouseholds();
 		this.scenario = scenario;
 	}
-	
+
 	protected HouseholdsReaderV10(BasicHouseholds<? extends BasicHousehold> households) {
 		super((BasicHouseholds<BasicHousehold>) households);
 	}
-	
+
 	@Override
 	protected BasicHousehold createHousehold(Id currentHhId, List<Id> memberIds, List<Id> vehicleIds) {
-		Household hh =  this.households.getHouseholdBuilder().createHousehold(currentHhId);
-		for (Id i : memberIds){
-			Person p = scenario.getPopulation().getPersons().get(i);
-			if (p == null){
-				throw new IllegalStateException("Person referenced in households file with id " + i.toString()
-						+ " is not existing in population. A consistent MATSim scenario could not be loaded. "
-						+ " Use the basic classes and parsers to avoid this restriction.");
+		Household hh = this.households.getHouseholdBuilder().createHousehold(currentHhId);
+		if (memberIds != null) {
+			for (Id i : memberIds) {
+				Person p = scenario.getPopulation().getPersons().get(i);
+				if (p == null) {
+					throw new IllegalStateException("Person referenced in households file with id " + i.toString()
+							+ " is not existing in population. A consistent MATSim scenario could not be loaded. "
+							+ " Use the basic classes and parsers to avoid this restriction.");
+				}
+				hh.getMembers().put(i, p);
+				p.setHousehold(hh);
 			}
-			hh.getMembers().put(i, p);
-			p.setHousehold(hh);
 		}
-		for (Id id : vehicleIds){
-			BasicVehicle v = scenario.getVehicles().getVehicles().get(id);
-			if (v == null){
-				throw new IllegalStateException("Vehicle referenced in households file with id " + id.toString()
-						+ " is not existing in scenario's vehicle definitions. A consistent MATSim scenario could not be loaded. "
-						+ " Use the basic classes and parsers to avoid this restriction.");				
+		if (vehicleIds != null) {
+			for (Id id : vehicleIds) {
+				BasicVehicle v = scenario.getVehicles().getVehicles().get(id);
+				if (v == null) {
+					throw new IllegalStateException(
+							"Vehicle referenced in households file with id "
+									+ id.toString()
+									+ " is not existing in scenario's vehicle definitions. A consistent MATSim scenario could not be loaded. "
+									+ " Use the basic classes and parsers to avoid this restriction.");
+				}
+				hh.getVehicles().put(id, v);
 			}
-			hh.getVehicles().put(id, v);
 		}
-		
 		return hh;
 	}
 

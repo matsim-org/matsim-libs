@@ -34,6 +34,7 @@ import org.matsim.core.config.groups.EvacuationConfigGroup;
 import org.matsim.core.config.groups.EventsConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.HouseholdsConfigGroup;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.config.groups.MatricesConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -92,6 +93,8 @@ public class Config {
 
 	private List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
 
+	private HouseholdsConfigGroup households;
+
 	/** static Logger-instance. */
 	private static final Logger log = Logger.getLogger(Config.class);
 
@@ -138,6 +141,9 @@ public class Config {
 
 		this.plans = new PlansConfigGroup();
 		this.modules.put(PlansConfigGroup.GROUP_NAME, this.plans);
+		
+		this.households = new HouseholdsConfigGroup();
+		this.modules.put(HouseholdsConfigGroup.GROUP_NAME, this.households);
 
 		this.planomat = new PlanomatConfigGroup();
 		this.modules.put(PlanomatConfigGroup.GROUP_NAME, this.planomat);
@@ -381,6 +387,10 @@ public class Config {
 
 	public final PlansConfigGroup plans() {
 		return this.plans;
+	}
+	
+	public final HouseholdsConfigGroup households(){
+		return this.households;
 	}
 
 	public final FacilitiesConfigGroup facilities() {

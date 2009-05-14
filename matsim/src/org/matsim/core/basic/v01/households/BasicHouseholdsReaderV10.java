@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
 /**
  * @author dgrether
  */
-public class BasicHouseholdsReaderV1 extends MatsimXmlParser {
+public class BasicHouseholdsReaderV10 extends MatsimXmlParser {
 	
 	private final BasicHouseholds<BasicHousehold> households;
 
@@ -56,7 +56,7 @@ public class BasicHouseholdsReaderV1 extends MatsimXmlParser {
 	private String currentincomeCurrency;
 
 
-	public BasicHouseholdsReaderV1(BasicHouseholds<BasicHousehold> households) {
+	public BasicHouseholdsReaderV10(BasicHouseholds<BasicHousehold> households) {
 		if (households == null) {
 			throw new IllegalArgumentException("Container for households must not be null!");
 		}

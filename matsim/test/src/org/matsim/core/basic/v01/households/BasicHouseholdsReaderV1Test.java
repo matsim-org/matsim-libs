@@ -58,7 +58,7 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 	public void testBasicReaderWriter() throws FileNotFoundException, IOException {
 		BasicScenarioImpl scenario = new BasicScenarioImpl();
 		BasicHouseholds<BasicHousehold> households = scenario.getHouseholds();
-		BasicHouseholdsReaderV1 reader = new BasicHouseholdsReaderV1(households);
+		BasicHouseholdsReaderV10 reader = new BasicHouseholdsReaderV10(households);
 		reader.readFile(this.getPackageInputDirectory() + TESTHOUSEHOLDSINPUT);
 		checkContent(households);
 		
@@ -72,7 +72,7 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 		//read it again to check if the same is read as at the very first beginning of test
 		scenario = new BasicScenarioImpl();
 		households = scenario.getHouseholds();
-		reader = new BasicHouseholdsReaderV1(households);
+		reader = new BasicHouseholdsReaderV10(households);
 		reader.readFile(outfilename);
 		checkContent(households);
 	}

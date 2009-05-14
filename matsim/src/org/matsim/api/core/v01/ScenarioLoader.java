@@ -39,6 +39,7 @@ import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.world.MatsimWorldReader;
@@ -101,6 +102,8 @@ public class ScenarioLoader {
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
+		this.loadHouseholds();
+		
 		if (this.config.scenario().isUseLanes()) {
 			this.loadLanes();
 		}
@@ -109,6 +112,25 @@ public class ScenarioLoader {
 			this.loadSignalSystemConfigurations();
 		}
 		return this.scenario;
+	}
+
+	private void loadHouseholds() {
+		if ((this.config.households() != null) && (this.config.households().getInputFile() != null)) {
+			String hhFileName = this.config.households().getInputFile();
+			log.info("loading households from " + hhFileName);
+			try {
+				new HouseholdsReaderV10((ScenarioImpl) this.scenario).parse(hhFileName);
+			} catch (SAXException e) {
+				throw new RuntimeException(e);
+			} catch (ParserConfigurationException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		else {
+			log.info("no households file set in config, not able to load households");
+		}		
 	}
 
 	private void loadSignalSystemConfigurations() {
