@@ -23,6 +23,8 @@ package org.matsim.core.gbl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.net.URL;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -252,5 +254,51 @@ public abstract class Gbl {
 	public static final void printRoundTime() {
 		log.info("### round time: " + Gbl.printTime());
 		Gbl.startMeasurement();
+	}
+	
+	/* Thread performance measurement */
+	private final static ThreadMXBean tbe  =  ManagementFactory.getThreadMXBean();
+
+	/**
+	 * Tries to enable CPU time measurement for threads. Not all JVMs support this feature.
+	 * 
+	 * @return <code>true</code> if the JVM supports time measurement for threads and the feature
+	 * could be enabled, <code>false</code> otherwise.
+	 */
+	public static final boolean enableThreadCpuTimeMeasurement() {
+		if (tbe.isThreadCpuTimeSupported()) {
+      tbe.setThreadCpuTimeEnabled(true);
+      return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * @param thread
+	 * @return cpu time for the given thread in seconds, <code>-1</code> if cpu time is not measured.
+	 */
+	public static final double getThreadCpuTime(final Thread thread) {
+		if (tbe.isThreadCpuTimeEnabled()) {
+			return tbe.getThreadCpuTime(thread.getId()) / 1.0e9;
+		}
+		return -1;
+	}
+	
+	/**
+	 * Prints the cpu time for the given time, i.e. the time the thread was effectively active on the CPU.
+	 * 
+	 * @param thread
+	 */
+	public static final void printThreadCpuTime(final Thread thread) {
+		if (tbe.isThreadCpuTimeEnabled()) {
+			log.info("Thread performance: Thread=" + thread.getName() + "  cpu-time=" + getThreadCpuTime(thread) + "sec");
+		}
+	}
+
+	/**
+	 * Prints the cpu time for the current time, i.e. the time the current thread was effectively active on the CPU.
+	 */
+	public static final void printCurrentThreadCpuTime() {
+		printThreadCpuTime(Thread.currentThread());
 	}
 }
