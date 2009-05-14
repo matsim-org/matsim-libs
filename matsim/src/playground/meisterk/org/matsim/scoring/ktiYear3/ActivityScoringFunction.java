@@ -164,13 +164,14 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 		}
 
-		// accumulate waiting time, which is the time that could not be performed in activities due to closed facilities
-		this.accumulatedWaitingTime += (departureTime - arrivalTime) - additionalDuration;
+		// accumulated waiting time, which is the time that could not be performed in activities due to closed facilities
+		double fromArrivalToDeparture = departureTime - arrivalTime;
+		this.accumulatedWaitingTime += fromArrivalToDeparture - additionalDuration;
 
 		// disutility if duration was too short
-		double minimalDuration = ActivityScoringFunction.MINIMUM_DURATION;
-		if ((minimalDuration >= 0) && (additionalDuration < minimalDuration)) {
-			this.accumulatedTooShortDuration += (minimalDuration - additionalDuration);
+		// penalty for too short duration is applied to the entire planned activity duration (perform + wait)  
+		if (fromArrivalToDeparture < ActivityScoringFunction.MINIMUM_DURATION) {
+			this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - fromArrivalToDeparture);
 		}
 
 		// no actual score is computed here

@@ -25,9 +25,9 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -201,7 +201,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
 
 		// []{end home, work_sector3, leisure, work_Sector3, start home, finish, reset}
-		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:30:00",  "00:30:00", "00:30:00", "00:30:00", "00:00:00"};
+		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:10:00",  "00:10:00", "00:10:00", "00:10:00", "00:00:00"};
 		String[] expectedWaitingTimeSequence = new String[]{"00:00:00", "00:30:00", "00:50:00", "01:05:00", "01:05:00", "01:05:00", "00:00:00"};
 		TreeMap<String, String[]> expectedAccumulatedActivityDurations = new TreeMap<String, String[]>();
 		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "14:30:00", "14:30:00", null});
@@ -228,7 +228,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
 
 		// []{end home, work_sector3, leisure, work_Sector3, start home, finish, reset}
-		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:30:00",  "00:30:00", "00:30:00", "00:30:00", "00:00:00"};
+		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:10:00",  "00:10:00", "00:10:00", "00:10:00", "00:00:00"};
 		String[] expectedWaitingTimeSequence = new String[]{"00:00:00", "01:00:00", "01:20:00", "01:35:00", "01:35:00", "01:35:00", "00:00:00"};
 		TreeMap<String, String[]> expectedAccumulatedActivityDurations = new TreeMap<String, String[]>();
 		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "14:30:00", "14:30:00", null});
