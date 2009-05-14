@@ -227,6 +227,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 			this.log.info(" ... removing social links done");
 			controler.stopwatch.endOperation("dissolvelinks");
 
+		}//new bracket position: run social scoring each iteration
 //			update activity statistics
 			this.log.info(" Remaking actStats from events");
 			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(controler.getTwm()));
@@ -236,7 +237,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 			this.log.info("SSTEST Finish Scoring with actStats "+snIter);
 			scoring.finish();
 			this.log.info(" ... scoring with actStats finished");
-		}
+//		}//old bracket position: run social scoring only on social iterations (are plans re-scored?)
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
