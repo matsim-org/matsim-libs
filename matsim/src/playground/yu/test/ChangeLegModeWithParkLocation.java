@@ -32,6 +32,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
@@ -614,6 +615,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 
 		protected StrategyManager loadStrategyManager() {
 			StrategyManager manager = new StrategyManager();
+			StrategyManagerConfigLoader.load(this, this.config, manager);
 
 			manager.setMaxPlansPerAgent(4);
 
@@ -642,7 +644,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		}
 	}
 
-	private static class LegChainModesListener implements StartupListener,
+	public static class LegChainModesListener implements StartupListener,
 			IterationEndsListener, ShutdownListener {
 		private SimpleWriter writer = null;
 		private Set<String> patterns;
@@ -656,7 +658,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			Controler ctl = event.getControler();
-//			int itr = event.getIteration();
+			// int itr = event.getIteration();
 
 			// get the leg modes of the selected plan of the first Person
 			for (Iterator<Person> pIt = ctl.getPopulation().getPersons()
@@ -666,8 +668,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 						.getPlanElements())
 					if (pe instanceof Leg)
 						legChainModes.append(((Leg) pe).getMode() + "|");
-//				 writer.writeln(itr + "\t" + legChainModes.toString());
-//				 writer.flush();
+				// writer.writeln(itr + "\t" + legChainModes.toString());
+				// writer.flush();
 				patterns.add(legChainModes.toString());
 			}
 		}

@@ -12,6 +12,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
@@ -244,6 +245,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 
 		protected StrategyManager loadStrategyManager() {
 			StrategyManager manager = new StrategyManager();
+			StrategyManagerConfigLoader.load(this, this.config, manager);
 			manager.setMaxPlansPerAgent(5);
 			//
 			// PlanStrategy strategy1 = new PlanStrategy(new

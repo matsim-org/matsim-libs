@@ -33,12 +33,20 @@ import java.util.Set;
  * 
  */
 public class CollectionSum {
-	public static double getSum(Collection<Double> clt) {
+	public static double getSum(Collection<? extends Number> clt) {
 		double sum = 0.0;
-		for (Iterator<Double> ir = clt.iterator(); ir.hasNext();)
-			sum += ir.next();
+		for (Iterator<Number> ir = (Iterator<Number>) clt.iterator(); ir
+				.hasNext();)
+			sum += ir.next().doubleValue();
 		return sum;
 	}
+
+	// public static double getSum(Collection<Integer> clt) {
+	// double sum = 0.0;
+	// for (Iterator<Integer> ir = clt.iterator(); ir.hasNext();)
+	// sum += ir.next();
+	// return sum;
+	// }
 
 	public static double getSum(final double[] array) {
 		if (array == null || array.length == 0)
