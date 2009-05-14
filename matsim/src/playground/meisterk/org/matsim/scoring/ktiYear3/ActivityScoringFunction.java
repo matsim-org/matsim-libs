@@ -73,6 +73,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	private TreeMap<String, Double> zeroUtilityDurations = new TreeMap<String, Double>();
 	private double accumulatedTooShortDuration;
 	private double accumulatedWaitingTime;
+	private double accumulatedNegativeDuration;
 
 	private static final DayType DEFAULT_DAY = DayType.wed;
 	private static final SortedSet<BasicOpeningTime> DEFAULT_OPENING_TIME = new TreeSet<BasicOpeningTime>();
@@ -104,7 +105,6 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		}
 
 		// calculate effective activity duration bounded by opening times
-		double accumulatedDuration; // retrieves activity duration for this activity type up to now
 		double additionalDuration = 0.0; // accumulates performance intervals for this activity
 		double activityStart, activityEnd; // hold effective activity start and end due to facility opening times
 		double scoreImprovement; // calculate score improvement only as basis for facility load penalties
@@ -133,18 +133,17 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			double duration = activityEnd - activityStart;
 			additionalDuration += duration;
 
-			// - accumulate duration by activity type, save it, but do not score it here
-			accumulatedDuration = 0.0;
-			if (this.accumulatedDurations.containsKey(act.getType())) {
-				accumulatedDuration = this.accumulatedDurations.get(act.getType());
-			}
-			this.accumulatedDurations.put(act.getType(), accumulatedDuration + duration);
-
 			// calculate penalty due to facility load only when:
 			// - activity type is penalized (currently only shop and leisure-type activities)
 			// - duration is bigger than 0
 			if (act.getType().startsWith("shop") || act.getType().startsWith("leisure")) {
 				if (duration > 0) {
+
+					double accumulatedDuration = 0.0;
+					if (this.accumulatedDurations.containsKey(act.getType())) {
+						accumulatedDuration = this.accumulatedDurations.get(act.getType());
+					}
+
 					scoreImprovement = 
 						this.getPerformanceScore(act.getType(), accumulatedDuration + duration) - 
 						this.getPerformanceScore(act.getType(), accumulatedDuration);
@@ -163,17 +162,32 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			}
 
 		}
-
+		
 		// accumulated waiting time, which is the time that could not be performed in activities due to closed facilities
 		double fromArrivalToDeparture = departureTime - arrivalTime;
 		this.accumulatedWaitingTime += fromArrivalToDeparture - additionalDuration;
 
-		// disutility if duration was too short
-		// penalty for too short duration is applied to the entire planned activity duration (perform + wait)  
-		if (fromArrivalToDeparture < ActivityScoringFunction.MINIMUM_DURATION) {
-			this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - fromArrivalToDeparture);
+		// disutility if duration of that activity was too short
+		// penalty for too short duration is applied only to performing and not to wait,
+		// since "waiting too a short time" is a bit odd
+		if (additionalDuration < ActivityScoringFunction.MINIMUM_DURATION) {
+			this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - additionalDuration);
 		}
 
+		// disutility if duration was negative
+		if (fromArrivalToDeparture <= 0.0) {
+			this.accumulatedNegativeDuration += fromArrivalToDeparture;
+		}
+		
+		// utility for additional (positive) activity duration
+		if (additionalDuration >= 0) {
+			double accumulatedDuration = 0.0;
+			if (this.accumulatedDurations.containsKey(act.getType())) {
+				accumulatedDuration = this.accumulatedDurations.get(act.getType());
+			}
+			this.accumulatedDurations.put(act.getType(), accumulatedDuration + additionalDuration);
+		}
+		
 		// no actual score is computed here
 		return 0.0;
 
@@ -186,6 +200,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		this.score += this.getWaitingTimeScore();
 		this.score += this.getPerformanceScore();
 		this.score += this.getFacilityPenaltiesScore();
+		this.score += this.getNegativeDurationScore();
 
 	}
 
@@ -216,14 +231,14 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			this.zeroUtilityDurations.put(actType, zeroUtilityDuration);
 		}
 
-		double tmpScore;
-		if (duration > 0) {
+		double tmpScore = 0.0;
+		if (duration > 0.0) {
 			double utilPerf = this.params.marginalUtilityOfPerforming * typicalDuration
 			* Math.log((duration / 3600.0) / this.zeroUtilityDurations.get(actType));
 			double utilWait = this.params.marginalUtilityOfWaiting * duration;
 			tmpScore = Math.max(0, Math.max(utilPerf, utilWait));
-		} else {
-			tmpScore = 2 * this.params.marginalUtilityOfLateArrival * Math.abs(duration);
+		} else if (duration < 0.0) {
+			logger.error("Accumulated activity durations < 0.0 must not happen.");
 		}
 
 		return tmpScore;
@@ -243,6 +258,10 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			performanceScore += this.getPerformanceScore(actType, this.accumulatedDurations.get(actType));
 		}
 		return performanceScore;
+	}
+	
+	public double getNegativeDurationScore() {
+		return (2 * this.params.marginalUtilityOfLateArrival * Math.abs(this.accumulatedNegativeDuration));
 	}
 	
 	@Override
@@ -284,6 +303,10 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	public void setFacilityPenalties(TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		this.facilityPenalties = facilityPenalties;
+	}
+
+	public double getAccumulatedNegativeDuration() {
+		return accumulatedNegativeDuration;
 	}
 
 }

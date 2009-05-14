@@ -157,7 +157,12 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "14:30:00", "14:30:00", null});
 		expectedAccumulatedActivityDurations.put("work_sector3", new String[]{null, "06:00:00", "06:00:00", "08:00:00", "08:00:00", "08:00:00", null});
 		expectedAccumulatedActivityDurations.put("leisure", new String[]{null, null, "00:20:00", "00:20:00", "00:20:00", "00:20:00", null});
-		this.runTest(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
+		String[] expectedNegativeDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00"};
+		this.runTest(
+				expectedTooShortDurationsSequence, 
+				expectedWaitingTimeSequence, 
+				expectedAccumulatedActivityDurations,
+				expectedNegativeDurationsSequence);
 	}
 
 	public void testOpenLongEnough() {
@@ -181,7 +186,12 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "14:30:00", "14:30:00", null});
 		expectedAccumulatedActivityDurations.put("work_sector3", new String[]{null, "06:00:00", "06:00:00", "08:00:00", "08:00:00", "08:00:00", null});
 		expectedAccumulatedActivityDurations.put("leisure", new String[]{null, null, "00:20:00", "00:20:00", "00:20:00", "00:20:00", null});
-		this.runTest(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
+		String[] expectedNegativeDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00"};
+		this.runTest(
+				expectedTooShortDurationsSequence, 
+				expectedWaitingTimeSequence, 
+				expectedAccumulatedActivityDurations,
+				expectedNegativeDurationsSequence);
 
 	}
 	
@@ -201,13 +211,18 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
 
 		// []{end home, work_sector3, leisure, work_Sector3, start home, finish, reset}
-		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:10:00",  "00:10:00", "00:10:00", "00:10:00", "00:00:00"};
+		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:30:00",  "00:30:00", "00:30:00", "00:30:00", "00:00:00"};
 		String[] expectedWaitingTimeSequence = new String[]{"00:00:00", "00:30:00", "00:50:00", "01:05:00", "01:05:00", "01:05:00", "00:00:00"};
 		TreeMap<String, String[]> expectedAccumulatedActivityDurations = new TreeMap<String, String[]>();
 		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "14:30:00", "14:30:00", null});
 		expectedAccumulatedActivityDurations.put("work_sector3", new String[]{null, "05:30:00", "05:30:00", "07:15:00", "07:15:00", "07:15:00", null});
 		expectedAccumulatedActivityDurations.put("leisure", new String[]{null, null, "00:00:00", "00:00:00", "00:00:00", "00:00:00", null});
-		this.runTest(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
+		String[] expectedNegativeDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00"};
+		this.runTest(
+				expectedTooShortDurationsSequence, 
+				expectedWaitingTimeSequence, 
+				expectedAccumulatedActivityDurations,
+				expectedNegativeDurationsSequence);
 
 	}
 	
@@ -228,20 +243,26 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
 
 		// []{end home, work_sector3, leisure, work_Sector3, start home, finish, reset}
-		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:10:00",  "00:10:00", "00:10:00", "00:10:00", "00:00:00"};
+		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:30:00",  "00:30:00", "00:30:00", "00:30:00", "00:00:00"};
 		String[] expectedWaitingTimeSequence = new String[]{"00:00:00", "01:00:00", "01:20:00", "01:35:00", "01:35:00", "01:35:00", "00:00:00"};
 		TreeMap<String, String[]> expectedAccumulatedActivityDurations = new TreeMap<String, String[]>();
 		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "14:30:00", "14:30:00", null});
 		expectedAccumulatedActivityDurations.put("work_sector3", new String[]{null, "05:00:00", "05:00:00", "06:45:00", "06:45:00", "06:45:00", null});
 		expectedAccumulatedActivityDurations.put("leisure", new String[]{null, null, "00:00:00", "00:00:00", "00:00:00", "00:00:00", null});
-		this.runTest(expectedTooShortDurationsSequence, expectedWaitingTimeSequence, expectedAccumulatedActivityDurations);
+		String[] expectedNegativeDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00"};
+		this.runTest(
+				expectedTooShortDurationsSequence, 
+				expectedWaitingTimeSequence, 
+				expectedAccumulatedActivityDurations,
+				expectedNegativeDurationsSequence);
 		
 	}
 	
 	protected void runTest(
 			String[] expectedTooShortDurationsSequence, 
 			String[] expectedWaitingTimeSequence, 
-			TreeMap<String, String[]> expectedAccumulatedActivityDurations) {
+			TreeMap<String, String[]> expectedAccumulatedActivityDurations,
+			String[] expectedNegativeDurationsSequence) {
 		
 		TreeMap<Id, FacilityPenalty> emptyFacilityPenalties = new TreeMap<Id, FacilityPenalty>();
 		KTIYear3ScoringFunctionFactory factory = new KTIYear3ScoringFunctionFactory(config.charyparNagelScoring(), emptyFacilityPenalties);
@@ -252,6 +273,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		assertEquals(0, factory.getActivities().getAccumulatedDurations().size());
 		assertEquals(expectedTooShortDurationsSequence[0], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
 		assertEquals(expectedWaitingTimeSequence[0], Time.writeTime(factory.getActivities().getAccumulatedWaitingTime()));
+		assertEquals(expectedNegativeDurationsSequence[0], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
 		
 		testee.startLeg(Time.parseTime("08:00:00"), (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(Time.parseTime("08:30:00"));
@@ -265,6 +287,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		}
 		assertEquals(expectedTooShortDurationsSequence[1], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
 		assertEquals(expectedWaitingTimeSequence[1], Time.writeTime(factory.getActivities().getAccumulatedWaitingTime()));
+		assertEquals(expectedNegativeDurationsSequence[1], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
 
 		testee.startLeg(Time.parseTime("14:30:00"), (Leg) this.plan.getPlanElements().get(3));
 		testee.endLeg(Time.parseTime("14:35:00"));
@@ -278,6 +301,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		}
 		assertEquals(expectedTooShortDurationsSequence[2], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
 		assertEquals(expectedWaitingTimeSequence[2], Time.writeTime(factory.getActivities().getAccumulatedWaitingTime()));
+		assertEquals(expectedNegativeDurationsSequence[2], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
 		
 		testee.startLeg(Time.parseTime("14:55:00"), (Leg) this.plan.getPlanElements().get(5));
 		testee.endLeg(Time.parseTime("15:00:00"));
@@ -291,6 +315,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		}
 		assertEquals(expectedTooShortDurationsSequence[3], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
 		assertEquals(expectedWaitingTimeSequence[3], Time.writeTime(factory.getActivities().getAccumulatedWaitingTime()));
+		assertEquals(expectedNegativeDurationsSequence[3], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
 
 		testee.startLeg(Time.parseTime("17:00:00"), (Leg) this.plan.getPlanElements().get(7));
 		testee.endLeg(Time.parseTime("17:30:00"));
@@ -303,6 +328,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		}
 		assertEquals(expectedTooShortDurationsSequence[4], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
 		assertEquals(expectedWaitingTimeSequence[4], Time.writeTime(factory.getActivities().getAccumulatedWaitingTime()));
+		assertEquals(expectedNegativeDurationsSequence[4], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
 
 		testee.finish();
 
@@ -313,10 +339,12 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		}
 		assertEquals(expectedTooShortDurationsSequence[5], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
 		assertEquals(expectedWaitingTimeSequence[5], Time.writeTime(factory.getActivities().getAccumulatedWaitingTime()));
+		assertEquals(expectedNegativeDurationsSequence[5], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
 
 		double expectedScore = 0.0;
 		expectedScore += factory.getParams().marginalUtilityOfEarlyDeparture * Time.parseTime(expectedTooShortDurationsSequence[5]);
 		expectedScore += factory.getParams().marginalUtilityOfWaiting * Time.parseTime(expectedWaitingTimeSequence[5]);
+		expectedScore += factory.getParams().marginalUtilityOfLateArrival * 2 * Time.parseTime(expectedNegativeDurationsSequence[5]);
 		double duration, zeroUtilityDuration, typicalDuration;
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
 			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
@@ -340,6 +368,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		}
 		assertEquals(expectedTooShortDurationsSequence[6], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
 		assertEquals(expectedWaitingTimeSequence[6], Time.writeTime(factory.getActivities().getAccumulatedWaitingTime()));
+		assertEquals(expectedNegativeDurationsSequence[6], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// check zero utility durations
