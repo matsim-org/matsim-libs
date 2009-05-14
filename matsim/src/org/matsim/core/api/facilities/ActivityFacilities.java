@@ -25,10 +25,11 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.facilities.BasicActivityFacilities;
 
-public interface ActivityFacilities extends Facilities {
+public interface ActivityFacilities extends BasicActivityFacilities<ActivityFacility> {
 
-	public Map<Id, ? extends ActivityFacility> getFacilities();
+	public Map<Id, ActivityFacility> getFacilities();
 	
 	public ActivityFacility createFacility(final Id id, final Coord center);
 	// TODO move create to Builder

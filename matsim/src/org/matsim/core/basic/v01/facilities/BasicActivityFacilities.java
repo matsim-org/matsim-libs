@@ -26,8 +26,8 @@ import org.matsim.api.basic.v01.Id;
 
 
 
-public interface BasicActivityFacilities extends BasicFacilities {
+public interface BasicActivityFacilities<T extends BasicActivityFacility> extends BasicFacilities {
 
-	public Map<Id, ? extends BasicActivityFacility> getFacilities();
+	public Map<Id, T> getFacilities();
 
 }

@@ -22,8 +22,6 @@ package org.matsim.core.basic.v01.facilities;
 import java.util.Map;
 
 public interface BasicActivityFacility extends BasicFacility {
-	// FIXME [kn] In my unterstanding, it is really not so great that this extends from Location and not from
-	// BasicLocation.  kai, apr'09
 
 	public Map<String, ? extends BasicActivityOption> getActivityOptions();
 

@@ -28,9 +28,9 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.world.Layer;
@@ -147,8 +147,8 @@ public class ActivityFacilitiesImpl extends Layer implements ActivityFacilities 
 	//////////////////////////////////////////////////////////////////////
 
 	@SuppressWarnings("unchecked")
-	public final Map<Id, ? extends ActivityFacility> getFacilities() {
-		return (Map<Id, ? extends ActivityFacility>) getLocations();
+	public final Map<Id, ActivityFacility> getFacilities() {
+		return (Map<Id, ActivityFacility>) getLocations();
 	}
 
 	//Added 27.03.08 JH for random secondary location changes
